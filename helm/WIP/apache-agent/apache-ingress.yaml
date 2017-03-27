@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: apache
+spec:
+  rules:
+# Unless you want to use hostname-based ingress, it is better to leave the
+# hostname out so it works for all paths.
+# If you are forwarding from another load balancer, make
+# sure the LB sets the appropiate X-forwarded headers.
+# See for example:
+# http://serverfault.com/questions/598202/make-nginx-to-pass-hostname-of-the-upstream-when-reverseproxying
+#  - host: test.my2do.com
+   - http:
+      paths:
+      - path: /apache/*
+        backend:
+          serviceName: apache-svc
+          servicePort: 80
+      - path: /apache
+        backend:
+          serviceName: apache-svc
+          servicePort: 80

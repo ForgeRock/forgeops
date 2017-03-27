@@ -1,0 +1,41 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: v1
+kind: Pod
+metadata:
+  name: amster
+  labels:
+    name: amster
+spec:
+  restartPolicy: Never
+  containers:
+  - name: amster
+    image: {{.Values.registry}}{{.Values.repo}}/{{ .Values.amster.image}}:{{ .Values.amster.tag }}
+    imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+    volumeMounts:
+    - name: amster-secrets
+      mountPath: /var/secrets/amster
+      readOnly: true
+  # config  holds the Amster scripts. stack-config contains the *.json Amster files to import
+    - name: config
+      mountPath: /amster
+{{- if not .Values.amster.skipImport }}
+    - name: stack-config
+      mountPath: /amster-config
+{{ end }}
+    readinessProbe:
+      exec:
+        command: ["/bin/sh", "-c", "[ -f /var/tmp/CONFIGURED ]" ]
+      periodSeconds: 10
+      initialDelaySeconds: 30
+  volumes:
+  - name: amster-secrets
+    secret:
+      secretName: amster-secrets
+  - name: config
+    configMap:
+      name: amster-config
+{{- if not .Values.amster.skipImport }}
+  - name: stack-config
+{{ toYaml .Values.stackConfigSource | indent  4 -}}
+{{ end }}

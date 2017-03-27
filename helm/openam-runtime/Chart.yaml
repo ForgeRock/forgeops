@@ -1,0 +1,3 @@
+description: OpenAM runtime image - this does not do installation
+name: openam-runtime
+version: 0.1.0

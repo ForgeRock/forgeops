@@ -1,0 +1,26 @@
+# Default values for es-kibana.
+#registry: ""
+elasticsearch:
+  image: docker.elastic.co/elasticsearch/elasticsearch
+  tag: 5.2.2
+  pullPolicy: IfNotPresent
+
+kibana:
+  image: docker.elastic.co/kibana/kibana
+  tag: 5.2.2
+  pullPolicy: IfNotPresent
+
+service:
+  name: elasticsearch
+  type: ClusterIP
+  externalPort: 9200
+  internalPort: 9200
+
+#resources:
+#  limits:
+#    cpu: 200m
+#    memory: 2.5Gi
+#  requests:
+#    cpu: 200m
+#    memory: 2.5Gi
+

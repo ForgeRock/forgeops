@@ -1,0 +1,9 @@
+name: postgres-openidm
+version: 0.1.0
+description: Chart for PostgreSQL for OpenIDM
+keywords:
+- postgresql
+- postgres
+- database
+- sql
+home: https://www.postgresql.org/

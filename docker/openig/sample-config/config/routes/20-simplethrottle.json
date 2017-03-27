@@ -1,0 +1,30 @@
+{
+  "condition": "${matches(request.uri.path, '^/simplethrottle')}",
+  "handler": {
+    "type": "Chain",
+    "config": {
+      "filters": [
+        {
+          "type": "ThrottlingFilter",
+          "config": {
+            "requestGroupingPolicy": "",
+            "strategy": "bursty",
+            "rate": {
+              "numberOfRequests": 2000,
+              "duration": "1 second"
+            }
+          }
+        }
+      ],
+      "handler": {
+        "type": "StaticResponseHandler",
+        "config": {
+          "entity": "OpenIG (Route: ${request.uri.path}). Using throttling.",
+          "reason": "Found",
+          "status": 200
+        }
+      }
+    }
+  },
+  "monitor": true
+}

@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Server port="8005" shutdown="SHUTDOWN">
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
+  <!-- Security listener. Documentation at /docs/config/listeners.html
+  <Listener className="org.apache.catalina.security.SecurityListener" />
+  -->
+  <!--APR library loader. Documentation at /docs/apr.html -->
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  <!-- Prevent memory leaks due to use of particular java/javax APIs-->
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
+
+  <!-- Global JNDI resources
+       Documentation at /docs/jndi-resources-howto.html
+  -->
+  <GlobalNamingResources>
+
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
+  </GlobalNamingResources>
+
+  <Service name="Catalina">
+
+      <!--    scheme="https" secure="true" - means that we use external ssl termination
+      secure="true" proxyPort="443"                 scheme="https"
+  -->
+    <Connector port="8080" protocol="HTTP/1.1"
+               maxThreads="400"
+               SSLEnabled="false"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+
+      <!--  We terminate ssl externally
+
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
+               keystoreFile="/usr/local/tomcat/ssl/keystore" keystorePass="password"
+               clientAuth="false" sslProtocol="TLS" />
+      -->
+
+    <!-- Define an AJP 1.3 Connector on port 8009
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+    -->
+
+    <Engine name="Catalina" defaultHost="localhost">
+
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
+      </Realm>
+
+      <Host name="localhost"  appBase="webapps" unpackWARs="true" autoDeploy="true">
+          <!--
+
+          Default Access Log
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log" suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+               -->
+        <!-- We add %D - response time (msec) -->
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" prefix="access_log" suffix=".txt"
+          pattern="%H %h %l %u %t &quot;%r&quot; %s %b %D ms" />
+      </Host>
+    </Engine>
+  </Service>
+</Server>

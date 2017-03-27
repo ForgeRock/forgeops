@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: openidm
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: openidm
+        image: "{{.Values.registry}}{{.Values.repo}}/{{.Values.openidm.image }}:{{ .Values.openidm.tag }}"
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        env:
+        - name: PROJECT_HOME
+          value: "/opt/openidm/custom/stack-config/{{ .Values.openidmProjectHome }}"
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /openidm/info/ping
+            port: {{ .Values.service.internalPort }}
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value:  "true"
+          initialDelaySeconds: 90
+          timeoutSeconds: 5
+          periodSeconds: 20
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        volumeMounts:
+        - name: openidm-secrets
+          mountPath: /opt/openidm/secrets
+        - name: logs
+          mountPath: /opt/openidm/logs
+        - name:  stack-config
+          mountPath: /opt/openidm/custom
+{{- if  eq .Values.logDriver "filebeat" }}
+      - name: log
+        image: "giantswarm/filebeat:5.2.2"
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        volumeMounts:
+        - name: logs
+          mountPath: /log
+        - name: log-config
+          mountPath: /etc/filebeat
+{{end}}
+      volumes:
+      - name: openidm-secrets
+        secret:
+          secretName: openidm-secrets
+      - name: log-config
+        configMap:
+          name: idm-log-config
+      - name: logs
+        emptyDir: {}
+      - name: stack-config
+{{ toYaml .Values.stackConfigSource | indent 8 -}}

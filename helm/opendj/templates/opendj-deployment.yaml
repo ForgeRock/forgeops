@@ -1,0 +1,71 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.djInstance }}
+spec:
+  serviceName: {{ .Values.djInstance }}
+  replicas: {{default 1 .Values.replicaCount }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        {{- if .Values.storageClass }}
+        volume.beta.kubernetes.io/storage-class: {{ .Values.storageClass }}
+        {{- else }}
+        volume.alpha.kubernetes.io/storage-class: default
+        {{- end }}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ default "5Gi"  .Values.storageSize }}
+  template:
+    metadata:
+      labels:
+        djInstance: {{ .Values.djInstance }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: opendj
+        image: "{{.Values.registry}}{{.Values.repo}}/{{.Values.opendj.image}}:{{.Values.opendj.tag}}"
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        env:
+        - name: BASE_DN
+          value: {{ .Values.rootSuffix }}
+        - name: DJ_MASTER_SERVER
+          value: {{ .Values.djInstance -}}{{- "-0." -}}{{ .Values.djInstance }}
+        - name: OPENDJ_JAVA_ARGS
+          value: {{ .Values.opendjJavaArgs }}{{- " -Xmx" -}}{{.Values.heapSize }}{{- " -Xms" -}}{{.Values.heapSize }}
+        - name: BOOTSTRAP
+          value:  {{ .Values.bootstrapScript }}
+{{- if not (empty .Values.numberSampleUsers) }}
+        - name: NUMBER_SAMPLE_USERS
+          value: "{{ .Values.numberSampleUsers }}"
+{{- end }}
+        ports:
+        - containerPort: 389
+          name: ldap
+        - containerPort: 4444
+          name: djadmin
+        volumeMounts:
+        - name: dj-secrets
+          mountPath: /var/secrets/opendj
+        - name: data
+          mountPath: /opt/opendj/data
+        readinessProbe:
+          exec:
+            command: ["/opt/opendj/probe.sh"]
+          periodSeconds: 20
+        livenessProbe:
+          exec:
+            command: ["/opt/opendj/probe.sh"]
+          initialDelaySeconds: 30
+          periodSeconds: 40
+      volumes:
+      - name: dj-secrets
+        secret:
+          secretName: {{ .Values.djInstance }}

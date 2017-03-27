@@ -1,0 +1,12 @@
+# Define default storage class. For OpenDJ we want fast disk.
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: fast
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd

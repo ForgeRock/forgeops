@@ -1,0 +1,58 @@
+# Copyright (c) 2016-2017 ForgeRock AS.
+# Various logging configuration files
+# Not all of these are used - if size is a concern use a helm expression to template them out
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-log-config
+data:
+  filebeat.yml: |
+    filebeat.prospectors:
+    - input_type: log
+      paths:
+        - /log/openam/debug/*
+    output.elasticsearch:
+      hosts: ["elasticsearch:9200"]
+    output.console:
+      pretty: true
+
+  fluentd.conf: |
+      <source>
+        type tail
+        format none
+        path /log/openam/debug/*
+        tag debug
+      </source>
+
+      <match **>
+        type stdout
+      </match>
+
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush     5
+        Daemon    Off
+        Log_Level debug
+
+    [INPUT]
+        Name tail
+        Path /log/openam/debug/*
+        Path_Key file
+
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+
+    [FILTER]
+        Name stdout
+        Match *
+
+    [OUTPUT]
+        Name stdout
+        Match *
+
+#    [OUTPUT]
+#        Name es
+#        Match *
+#        Host elasticsearch
+#        Logstash_Format On

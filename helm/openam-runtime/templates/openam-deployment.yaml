@@ -1,0 +1,102 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: openam
+spec:
+  replicas: {{default 1 .Values.openamReplicaCount }}
+  template:
+    metadata:
+      labels:
+        app: openam
+      annotations:
+        # This init container is responsible for assembling the openam root directory with the files needed to boot
+        # to a pre-configured configuration store.
+        pod.beta.kubernetes.io/init-containers: '[{
+            "name": "copy",
+            "image": "alpine",
+            "imagePullPolicy": "IfNotPresent",
+            "command":  [ "/bin/sh", "-c",
+            "mkdir -p /root/openam/openam/debug; umask u=rwx,g=,o= ; cd /root/openam; cp -L /var/boot/boot.json .; cp  -rL /var/secrets/openam/.?* openam; cp -L /var/secrets/openam/authorized_keys ."],
+            "volumeMounts": [
+                        { "name": "openam-root",    "mountPath": "/root/openam" },
+                        { "name": "openam-boot",    "mountPath": "/var/boot" },
+                        { "name": "openam-secrets", "mountPath": "/var/secrets/openam" }
+                        ]}]'
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: openam
+        image: {{ .Values.registry}}{{.Values.repo}}/{{.Values.openam.image}}:{{.Values.openam.tag}}
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: openam-root
+          mountPath: /root/openam
+        env:
+        - name: JAVA_OPTS
+          value:  "-Xmx{{ .Values.heapSize }}"
+        # For slow environments like Minikube you need to give OpenAM time to come up.
+        readinessProbe:
+          httpGet:
+            path: /openam/isAlive.jsp
+            port: 8080
+          initialDelaySeconds: 40
+          timeoutSeconds: 5
+          periodSeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /openam/isAlive.jsp
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+{{- if  eq .Values.logDriver "fluent-bit" }}
+      - name: log
+        image:  fluent-bit:latest
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        volumeMounts:
+        - name: openam-root
+          readOnly: true
+          mountPath: /log
+        - name: log-config
+          mountPath: /fluent-bit/etc
+{{ end }}
+{{- if  eq .Values.logDriver "fluentd" }}
+      - name: log
+        image: fluent/fluentd
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        env:
+        - name: FLUENTD_CONF
+          value: fluentd.conf
+        volumeMounts:
+        - name: openam-root
+          mountPath: /log
+        - name: log-config
+          mountPath: /fluentd/etc
+{{end}}
+{{- if  eq .Values.logDriver "filebeat" }}
+      - name: log
+        image: "giantswarm/filebeat:5.2.2"
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        volumeMounts:
+        - name: openam-root
+          mountPath: /log
+        - name: log-config
+          mountPath: /etc/filebeat
+{{end}}
+      volumes:
+      - name: openam-root
+        emptyDir: {}
+      - name: openam-secrets
+        secret:
+          secretName: openam-secrets
+      - name: openam-boot
+        configMap:
+          name: boot-json
+      - name: log-config
+        configMap:
+          name: am-log-config

@@ -1,0 +1,11 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+#
+# ingress does not yet support TCP L4 - so for now this is a custom
+# nginx extension.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-configmap
+data:
+  30389: "default/configstore:389"

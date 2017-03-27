@@ -1,0 +1,13 @@
+{
+  "prefix" : "openig",
+  "mode":  "PRODUCTION",
+  "heap": [
+    {
+      "name": "ApiProtectionFilter",
+      "type": "ChainOfFilters",
+      "config": {
+        "filters": []
+      }
+    }
+  ]
+}

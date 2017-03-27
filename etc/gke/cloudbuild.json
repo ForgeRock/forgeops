@@ -1,0 +1,23 @@
+{
+  "source": {
+    "repoSource": {
+      "projectId": "engineering-devops",
+      "repoName": "docker",
+      "branchName": "master"
+    }
+  },
+  "steps": [
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "args": [
+        "build",
+        "-t",
+        "gcr.io/engineering-devops/openam2",
+        "openam"
+      ]
+    }
+  ],
+  "images": [
+    "gcr.io/engineering-devops/openam2"
+  ]
+}

@@ -1,0 +1,22 @@
+# We use a single OpenDJ instance as the config and CTS store for the cluster.
+# This instance is ephemeral - just for demo purposes.
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: apache
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: apache
+        agent: apache
+    spec:
+      containers:
+      - name: apache
+        image: forgerock/apache-agent:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP

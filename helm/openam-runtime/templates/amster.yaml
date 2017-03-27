@@ -1,0 +1,35 @@
+# This is an Amster pod.
+# Right now it sits and waits forever. The idea is that you can exec into this
+# pod and execute Amster export commands.
+# Todo: Do we want a cron job or shell script that auto exports every hour?
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: amster
+  labels:
+    name: amster
+    app: amster
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: amster
+    spec:
+      containers:
+      - name: amster
+        image: {{.Values.registry}}{{.Values.repo}}/{{.Values.amster.image}}:{{.Values.amster.tag}}
+        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        command: [ "/bin/sh", "-c", "sleep 5000000"]
+        volumeMounts:
+        - name: openam-secrets
+          mountPath: /var/secrets/amster
+          readOnly: true
+        - name: stack-config
+          mountPath: /amster-config
+      volumes:
+      - name: openam-secrets
+        secret:
+          secretName: openam-secrets
+      - name: stack-config
+{{ toYaml .Values.stackConfigSource | indent  8 -}}

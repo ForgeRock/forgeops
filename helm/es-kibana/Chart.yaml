@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A lightweight chart with Elasticsearch and Kibana. Suitable for development and testing
+name: es-kibana
+version: 0.1.0

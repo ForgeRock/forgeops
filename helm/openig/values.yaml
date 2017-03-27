@@ -1,0 +1,40 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+#
+# Default values for OpenIG.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+
+registry: docker-public.forgerock.io/
+repo: forgerock
+
+pullPolicy: IfNotPresent
+
+service:
+  name: openig
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 1024Mi
+  requests:
+    cpu: 200m
+    memory: 1024Mi
+
+# OpenIG configuration - only applies if gitConfig is true.
+openig:
+  image: openig
+  tag: 5.0.0-SNAPSHOT
+
+
+# *RELATIVE* path within the stack-configuration source where the OpenIG config directory is located
+# (where OpenIG expects another /config directory to be located).
+# Must not start with a /.
+openigProjectHome: openig
+
+cookieDomain: .example.com
+

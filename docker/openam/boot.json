@@ -1,0 +1,19 @@
+{
+  "instance" : "${env.OPENAM_INSTANCE}",
+  "dsameUser" : "cn=dsameuser,ou=DSAME Users,dc=openam,dc=forgerock,dc=org",
+  "keystores" : {
+    "default" : {
+      "keyStorePasswordFile" : "${env.OPENAM_SECRETS}/.storepass",
+      "keyPasswordFile" : "${env.OPENAM_SECRETS}/.keypass",
+      "keyStoreType" : "JCEKS",
+      "keyStoreFile" : "${env.OPENAM_SECRETS}/keystore.jceks"
+    }
+  },
+  "configStoreList" : [ {
+    "baseDN" : "dc=openam,dc=forgerock,dc=org",
+    "dirManagerDN" : "cn=Directory Manager",
+    "ldapHost" : "${env.OPENAM_CONFIG_STORE_LDAP_HOST}",
+    "ldapPort" :   389,
+    "ldapProtocol" : "ldap"
+  } ]
+}

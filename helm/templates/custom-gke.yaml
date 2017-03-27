@@ -1,0 +1,40 @@
+# custom.yaml file with value overrides for charts,
+# Edit this for your environment.
+
+# Registry must have trailing /
+registry: gcr.io/
+repo: engineering-devops
+tag: latest
+
+cookieDomain: .homeunix.org
+
+# You must configure at least one stack source.
+# This is where the configuration comes from.
+stackConfigSource:
+  gitRepo:
+    repository: https://github.com/ForgeRock/stack-config.git
+    revision: 63eaeba529f6de07b66bd99144b725417e1822b2
+
+# OpenDJ
+storageClass: fast
+
+opendj:
+  image: opendj
+  tag: latest
+
+openam:
+  image: openam
+  tag: latest
+
+amster:
+  image: amster
+  tag:  latest
+
+openidm:
+  image: openidm
+  tag: latest
+
+openig:
+  image: openig
+  tag: latest
+  projectHome: openig

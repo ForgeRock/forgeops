@@ -1,0 +1,18 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Ingress definition to configure external routes.
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: openig-ingress
+  annotations:
+    ingress.kubernetes.io/enable-cors: "true"
+spec:
+  rules:
+  - host: "openig{{ .Values.cookieDomain }}"
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ template "fullname" . }}
+          servicePort: {{ .Values.service.externalPort }}

@@ -1,0 +1,43 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{.Values.registry}}{{.Values.repo}}/{{ .Values.openig.image }}:{{ .Values.openig.tag }}"
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        env:
+        - name: OPENIG_BASE
+          value: "/config/stack-config/{{ .Values.openigProjectHome }}"
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+# todo: When we figure out the right values here uncomment this...
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: {{ .Values.service.internalPort }}
+#          timeoutSeconds: 10
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: {{ .Values.service.internalPort }}
+#          initialDelaySeconds: 30
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: config
+{{ toYaml .Values.stackConfigSource | indent 8 -}}

@@ -1,0 +1,48 @@
+# custom.yaml file with value overrides for charts.
+# Copy this template to custom-hostpath.yaml and edit for your environment.
+
+# Example of setting the registry to blank - so the local docker cache is consulted instead of a registry.
+# You must have the double quotes if you want a blank registry.
+registry: ""
+
+# You must configure at least one stack source.
+# This is where the ForgeRock stack configuration comes from:
+# gitRepo - clones the example source from gitHub or other git repo. https://github.com/ForgeRock/stack-config.git
+# is a starter repo.
+# hostPath - maps to a local directory on your laptop. This only works for Minikube / VirtualBox.
+# For rapid development, use hostPath, and map to a local folder. This folder can be cloned from a starter git repo, and later
+# pushed to another repo, branched, tagged, etc.
+# Note that stackSource can be *any* volume that supplies configuration. You could use a PVC here, as an example.
+stackConfigSource:
+#  gitRepo:
+#    repository: https://github.com/ForgeRock/stack-config.git
+#    revision: HEAD
+  hostPath:
+    path: /Users/YOUR-USER-ID/tmp/config
+# If you don't want any config files you can use an emptyDir:
+#  emptyDir: {}
+
+# Tune DJ for a larger cluster:
+#opendjJavaArgs: "-server -Xmx2g -XX:+UseG1GC"
+#djCPULimit:  "1"
+#djMemoryLimit: "2Gi"
+
+# The cookie domain for the deployment.
+# This will be used to form the FQDN for all of the products.
+# example:  {openidm,openam,openig}.example.com
+cookieDomain: .example.com
+
+# Sample values you might use on GKE.
+# repo should be your Google Project ID.
+# Remember to set the trailing / on registry.
+#registry: gcr.io/
+#repo: engineering-devops
+
+# Use a storageClass on GKE to get fast SSD disk.
+#persistence:
+#  storageClass: fast
+
+# Enable Fluented logging to GKE. This will send log output to stackdriver / cloud logging console.
+# Experimental
+# gkeLogging: true
+

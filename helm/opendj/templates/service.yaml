@@ -1,0 +1,22 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.djInstance }}
+spec:
+  #type: NodePort
+  clusterIP: None
+  ports:
+    - port: 389
+      name: ldap
+      targetPort: 389
+#      nodePort: {{ default 30389 .Values.ldapNodePort }}
+    - port: 4444
+      name: djadmin
+      targetPort: 4444
+#      nodePort: {{ default 30444 .Values.ldapAdminPort }}
+  #
+  # Note the OpenDJ container is in the same pod as OpenAM - so we use the openam selector.
+  selector:
+    djInstance: {{ .Values.djInstance }}

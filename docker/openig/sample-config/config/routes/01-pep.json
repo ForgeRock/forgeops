@@ -1,0 +1,30 @@
+{
+  "properties": {
+    "openamUrl": "http://openam.example.com:8080/openam/"
+  },
+  "handler": {
+    "type": "Chain",
+    "config": {
+      "filters": [
+        {
+          "type": "SingleSignOnFilter",
+          "config": {
+            "openamUrl": "${openamUrl}"
+          }
+        },
+        {
+          "type": "PolicyEnforcementFilter",
+          "config": {
+            "openamUrl": "http://openam:80/openam/",
+            "application": "PEP policy set",
+            "pepUsername": "policyAdmin",
+            "pepPassword": "password",
+            "ssoTokenSubject": "${contexts.ssoToken.value}"
+          }
+        }
+      ],
+      "handler": "ClientHandler"
+    }
+  },
+  "condition": "${matches(request.uri.path, '/pep')}"
+}

@@ -1,0 +1,12 @@
+
+*.zip
+*.war
+staging/
+tmp/
+*.iml
+logs/
+/.gradle
+gradle.properties
+target/
+*.DS_Store
+.idea/

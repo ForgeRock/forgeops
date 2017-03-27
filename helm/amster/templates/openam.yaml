@@ -1,0 +1,49 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: v1
+kind: Pod
+metadata:
+  name: openam
+  labels:
+    name: openam
+  annotations:
+    # Move to an init container when the feature exits beta in Kubernetes
+    # For some reason, the cp command below fails if you use  cp -L /secrets/.?* - so we do it in two steps.
+    pod.beta.kubernetes.io/init-containers: '[
+    {
+      "name":  "copy-secrets",
+      "image": "alpine",
+      "imagePullPolicy": "IfNotPresent",
+      "command":
+      [ "/bin/sh", "-c", "mkdir -p /root/openam/openam; cd /root/openam; cp -L /secrets/.* openam; cp -L /secrets/* openam"],
+      "volumeMounts": [
+          { "name": "openam-root",    "mountPath": "/root/openam" },
+          { "name": "amster-secrets", "mountPath": "/secrets" }]
+    }]'
+spec:
+  restartPolicy: Never
+  containers:
+  - name: openam
+    image: {{.Values.registry}}{{.Values.repo}}/{{.Values.openam.image}}:{{ default "latest" .Values.openam.tag}}
+    imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+    ports:
+      - containerPort: 8080
+        name: http
+    volumeMounts:
+    - name: amster-secrets
+      mountPath: /var/secrets/amster
+    - name: openam-root
+      mountPath: /root/openam
+    readinessProbe:
+      httpGet:
+        path: /openam/isAlive.jsp
+        port: 8080
+      initialDelaySeconds: 15
+      timeoutSeconds: 5
+      periodSeconds: 10
+  volumes:
+  - name: openam-root
+    emptyDir: {}
+  - name: amster-secrets
+    secret:
+      secretName: amster-secrets

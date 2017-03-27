@@ -1,0 +1,14 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: v1
+kind: Service
+metadata:
+  name: openam
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      name: am80
+      targetPort: 8080
+  selector:
+    name: openam

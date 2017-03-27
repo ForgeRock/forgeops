@@ -1,0 +1,55 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Default values for openam-install.
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into your templates.
+# name: value
+
+# Registry is optional - and should include the trailing /
+registry: docker-public.forgerock.io/
+repo: forgerock
+
+openam:
+  image: openam
+  tag: 14.5.0-SNAPSHOT
+
+pullPolicy: IfNotPresent
+
+# Server base URL *within* the Kubernetes cluster - not the external LB URL.
+# No /openam appended here.
+serverBase: http://openam:80
+
+# What OpenAM is known by *outside* the cluster - includes context root /openam.
+#loadBalancerUrl: "https://openam.example.com:443/openam"
+loadBalancerUrl: "http://openam.example.com:80/openam"
+
+fqdnHostname: openam.example.com
+cookieDomain: .example.com
+amadmin_pw: password
+
+configStore:
+  suffix:  "dc=openam,dc=forgerock,dc=org"
+  # This is the first StatefulSet name:
+  host: configstore-0.configstore
+  port: 389
+  dirManager: "cn=Directory Manager"
+  adminPort: 4444
+  password: password
+
+userStore:
+  host:  userstore-0.userstore
+  port: 389
+  password: password
+  dirManager: "cn=Directory Manager"
+  suffix: "dc=openam,dc=forgerock,dc=org"
+
+# If skipImport is true, the basic 00_amster.sh config script will be run, but
+# the 01* import of config files will not.
+amster:
+  image: amster
+  tag:  14.5.0-SNAPSHOT
+  skipImport: false
+
+# default path to Amster *json files to import.
+# The default is the amster directory under the stack-config project, but if you have a special config you can modify this
+amsterImportPath: /amster-config/stack-config/amster

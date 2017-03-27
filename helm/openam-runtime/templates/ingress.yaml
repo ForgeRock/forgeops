@@ -1,0 +1,18 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Ingress definition to configure external routes.
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: openam
+  annotations:
+    ingress.kubernetes.io/enable-cors: "true"
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+   - http:
+        paths:
+        - path: /openam
+          backend:
+            serviceName: openam
+            servicePort: 80

@@ -1,0 +1,45 @@
+# Default values for openidm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# optional registry, including trailing /
+registry:  docker-public.forgerock.io/
+repo: forgerock
+
+
+pullPolicy: IfNotPresent
+
+
+replicaCount: 1
+
+image:
+
+service:
+  name: openidm
+  type: NodePort
+  externalPort: 80
+  internalPort: 8080
+
+resources:
+  limits:
+    cpu: 300m
+    memory: 768Mi
+  requests:
+    cpu: 300m
+    memory: 768Mi
+
+openidm:
+  image: openidm
+  tag: 5.5.0-SNAPSHOT
+
+# The *relative* path where the conf/ directory is found. This is relative to the root of the stack-config volume.
+# The default is usually fine.
+openidmProjectHome: openidm
+
+
+# This is used by the ingress controller to route to OpenIDM.
+#fqdn: openidm.{{ .Values.cookieDomain }}
+cookieDomain: .example.com
+
+# Values: filebeat, none
+logDriver: none

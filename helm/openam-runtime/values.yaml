@@ -1,0 +1,36 @@
+# Default values for openam runtime chart
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into the templates.
+
+# Optional registry - should include the trailing /
+registry: docker-public.forgerock.io/
+repo: forgerock
+
+openam:
+  image: openam
+  tag: 14.5.0-SNAPSHOT
+
+openamReplicaCount: 1
+
+# What OpenAM is known by *outside* the cluster - includes context root /openam.
+loadBalancerUrl: "https://openam.example.com:443/openam"
+
+openamInstance: http://openam:80/openam
+
+configLdapPort:  389
+configLdapHost: configstore-0.configstore
+
+# Suffix for OpenDJ config store.
+rootSuffix:  "dc=openam,dc=forgerock,dc=org"
+
+# Default JVM heap size.
+heapSize: 1g
+
+amster:
+  image: amster
+  tag: 14.5.0-SNAPSHOT
+
+
+# Valid types: fluentd, fluent-bit, filebeat, none
+logDriver: none
+

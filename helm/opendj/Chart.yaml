@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Deploy a pair of OpenDJ servers replicated
+name: opendj
+version: 0.1.0

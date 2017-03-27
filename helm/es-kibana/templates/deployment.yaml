@@ -1,0 +1,80 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+     # This init container is responsible for assembling the openam root directory with the files needed to boot
+     # to a pre-configured configuration store.
+#    pod.beta.kubernetes.io/init-containers: '[{
+#        "name": "copy",
+#        "image": "alpine",
+#        "imagePullPolicy": "IfNotPresent",
+#        "command":  [ "/bin/sh", "-c",
+#        "cp -fL /config/* /usr/share/elasticsearch/config"],
+#        "volumeMounts": [ { "name": "config-map", "mountPath": "/config" } ] }]'
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      containers:
+      - name: elasticsearch
+        image: "{{ .Values.elasticsearch.image }}:{{ .Values.elasticsearch.tag }}"
+        imagePullPolicy: {{ .Values.elasticsearch.pullPolicy }}
+        volumeMounts:
+        - name: es-data
+          mountPath: /usr/share/elasticsearch/data
+        - name: es-config
+          mountPath: /usr/share/elasticsearch/config
+        env:
+        - name:  ES_JAVA_OPTS
+          value: "-Djava.net.preferIPv4Stack=true"
+        command:
+          - /usr/share/elasticsearch/bin/es-docker
+        ports:
+        - containerPort: 9200
+          hostPort: 9200
+        # ES seems to take a long time to start - so we set the initial delay fairly high.
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 40
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 40
+          timeoutSeconds: 5
+          periodSeconds: 20
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      - name: "kibana"
+        image: "{{ .Values.kibana.image }}:{{ .Values.kibana.tag }}"
+        imagePullPolicy: {{ .Values.kibana.pullPolicy }}
+        ports:
+        - containerPort: 5601
+        env:
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        - name: ELASTICSEARCH_URL
+          value: "http://localhost:9200"
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: 5601
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: 5601
+      volumes:
+      - name: es-data
+        emptyDir: {}
+      - name: es-config
+        configMap:
+          name: es-config
