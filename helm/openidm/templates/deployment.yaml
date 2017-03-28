@@ -17,7 +17,7 @@ spec:
         imagePullPolicy: {{ .Values.pullPolicy }}
         env:
         - name: PROJECT_HOME
-          value: "/opt/openidm/custom/stack-config/{{ .Values.openidmProjectHome }}"
+          value: "/opt/openidm/custom/forgeops-init/{{ .Values.openidmProjectHome }}"
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -41,7 +41,7 @@ spec:
           mountPath: /opt/openidm/secrets
         - name: logs
           mountPath: /opt/openidm/logs
-        - name:  stack-config
+        - name:  forgeops-init
           mountPath: /opt/openidm/custom
 {{- if  eq .Values.logDriver "filebeat" }}
       - name: log
@@ -62,5 +62,5 @@ spec:
           name: idm-log-config
       - name: logs
         emptyDir: {}
-      - name: stack-config
+      - name: forgeops-init
 {{ toYaml .Values.stackConfigSource | indent 8 -}}

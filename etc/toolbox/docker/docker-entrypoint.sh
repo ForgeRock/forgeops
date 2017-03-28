@@ -4,11 +4,11 @@ echo "Cmd is $1"
 
 cd /data
 
-echo "Cloning the intial stack-config repo"
+echo "Cloning the intial forgeops-init repo"
 
-git clone https://github.com/ForgeRock/stack-config.git
+git clone https://stash.forgerock.org/scm/cloud/forgeops.git
 
-cd /data/stack-config
+cd /data/forgeops-init
 
 git pull
 

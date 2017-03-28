@@ -22,4 +22,4 @@ service:
 
 # Repo to where simulations source code is kept.
 # Run setup.sh to create the git ssh secret for cloning.
-gitRepo: "ssh://git@stash.forgerock.org:7999/~warren.strange_forgerock.com/private-stack-config.git"
+gitRepo: "ssh://git@stash.forgerock.org:7999/~warren.strange_forgerock.com/private-forgeops-init.git"

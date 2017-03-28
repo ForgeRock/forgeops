@@ -29,8 +29,8 @@ This is OK - it just means the container is not present and Kubernetes must pull
 
 # Configuration
  
-The configuration for the products is in /data/stack-config (git repo cloned from
-https://github.com/ForgeRock/stack-config)
+The configuration for the products is in /data/forgeops-init (git repo cloned from
+https://github.com/ForgeRock/forgeops-init)
 
 On Minikube the /data/ directory persists across restarts of Minikube. You can save 
 work in /data. Note that if you destroy the Minikube VM, /data/ is also destroyed. 

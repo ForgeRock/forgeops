@@ -25,7 +25,7 @@ spec:
     - name: GIT_SYNC_REPO
       value: {{ .Values.gitRepo }}
     - name: GIT_SYNC_DEST
-      value: stack-config
+      value: forgeops-init
     - name: GIT_SYNC_SSH
       value: "true"
     - name: GIT_SYNC_ONE_TIME
@@ -41,7 +41,7 @@ spec:
     # If you want to exec into the gatling pod, use this - the pod will just sleep.
     # command: ["/bin/sh",  "-c", "sleep 10000"]
     # Use this form to run a simulation. The sleep is needed so the container does not exit while we examine the results.
-    command: ["/bin/sh", "-c", "bin/gatling.sh -sf /config/stack-config/gatling/simulations/forgerock-qa -s openam.authn.RestLogin && sleep 100000"]
+    command: ["/bin/sh", "-c", "bin/gatling.sh -sf /config/forgeops-init/gatling/simulations/forgerock-qa -s openam.authn.RestLogin && sleep 100000"]
     volumeMounts:
     - name: perftest-results
       mountPath: /opt/gatling/results

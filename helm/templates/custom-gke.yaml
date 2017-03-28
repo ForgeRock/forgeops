@@ -12,7 +12,7 @@ cookieDomain: .homeunix.org
 # This is where the configuration comes from.
 stackConfigSource:
   gitRepo:
-    repository: https://github.com/ForgeRock/stack-config.git
+    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
     revision: 63eaeba529f6de07b66bd99144b725417e1822b2
 
 # OpenDJ

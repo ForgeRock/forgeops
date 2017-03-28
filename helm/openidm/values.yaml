@@ -32,7 +32,7 @@ openidm:
   image: openidm
   tag: 5.5.0-SNAPSHOT
 
-# The *relative* path where the conf/ directory is found. This is relative to the root of the stack-config volume.
+# The *relative* path where the conf/ directory is found. This is relative to the root of the forgeops-init volume.
 # The default is usually fine.
 openidmProjectHome: openidm
 

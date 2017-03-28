@@ -29,9 +29,9 @@ once pulled from git.
 # Development Example
 
 Fork and clone the following example configuration: 
-https://github.com/ForgeRock/stack-config. 
+https://github.com/ForgeRock/forgeops-init. 
 
-Assume this is saved to your home directory at ~/stack-config.
+Assume this is saved to your home directory at ~/forgeops-init.
 
 Create a custom.yaml file that overrides any required values found in the chart openidm/values.yaml. Please 
 see the comments in values.yaml to understand what you can override.
@@ -46,7 +46,7 @@ helm install --name openidm -f custom-openidm.yaml openidm
 
 You should be able to access OpenIDM at the ingress defined path:  https://openidm.example.com
 
-Any changes you make in the OpenIDM admin GUI will be captured in your cloned directory ~/stack-config.
+Any changes you make in the OpenIDM admin GUI will be captured in your cloned directory ~/forgeops-init.
 Try making changes, and running `git status`.
 
 When you are happy with the configuration, commit and push your changes.
@@ -59,7 +59,7 @@ the local file system. For example:
 ```yaml
 stackConfigSource:
   gitRepo:
-    repository: https://github.com/ForgeRock/stack-config.git
+    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
     revision: HEAD
 ```
 

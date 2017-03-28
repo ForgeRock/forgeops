@@ -16,11 +16,11 @@ spec:
     - name: amster-secrets
       mountPath: /var/secrets/amster
       readOnly: true
-  # config  holds the Amster scripts. stack-config contains the *.json Amster files to import
+  # config  holds the Amster scripts. forgeops-init contains the *.json Amster files to import
     - name: config
       mountPath: /amster
 {{- if not .Values.amster.skipImport }}
-    - name: stack-config
+    - name: forgeops-init
       mountPath: /amster-config
 {{ end }}
     readinessProbe:
@@ -36,6 +36,6 @@ spec:
     configMap:
       name: amster-config
 {{- if not .Values.amster.skipImport }}
-  - name: stack-config
+  - name: forgeops-init
 {{ toYaml .Values.stackConfigSource | indent  4 -}}
 {{ end }}

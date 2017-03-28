@@ -25,11 +25,11 @@ spec:
         - name: openam-secrets
           mountPath: /var/secrets/amster
           readOnly: true
-        - name: stack-config
+        - name: forgeops-init
           mountPath: /amster-config
       volumes:
       - name: openam-secrets
         secret:
           secretName: openam-secrets
-      - name: stack-config
+      - name: forgeops-init
 {{ toYaml .Values.stackConfigSource | indent  8 -}}

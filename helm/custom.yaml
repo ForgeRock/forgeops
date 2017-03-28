@@ -17,10 +17,14 @@ cookieDomain: .example.com
 # You must configure at least one stack source.
 # This is where the configuration comes from.
 stackConfigSource:
+    gitRepo:
+      repository: https://stash.forgerock.org/scm/cloud/forgeops.git
+      revision:  HEAD
+
 #  gitRepo clones the example source from GitHub or other Git repo.
-  gitRepo:
-    repository: https://github.com/ForgeRock/stack-config.git
-    revision:  release/5.0.0
+#  gitRepo:
+#    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
+#    revision:  release/5.0.0
 #    revision: 60f79b5b953588d220ea6dffee863e5a7d4d1f41
 #    revision: refs/heads/release/5.0.0
 #  hostPath maps to a local directory on your laptop. This only works for minikube / VirtualBox.

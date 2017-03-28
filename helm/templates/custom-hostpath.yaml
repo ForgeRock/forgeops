@@ -19,7 +19,7 @@ cookieDomain: .example.com
 stackConfigSource:
 #  gitRepo clones the example source from GitHub or other Git repo.
 #  gitRepo:
-#    repository: https://github.com/ForgeRock/stack-config.git
+#    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
 #    revision: HEAD
 #  hostPath maps to a local directory on your laptop. This only works for Minikube / VirtualBox.
    hostPath:

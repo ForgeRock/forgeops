@@ -31,7 +31,7 @@ openig:
   tag: 5.0.0-SNAPSHOT
 
 
-# *RELATIVE* path within the stack-configuration source where the OpenIG config directory is located
+# *RELATIVE* path within the forgeops-inituration source where the OpenIG config directory is located
 # (where OpenIG expects another /config directory to be located).
 # Must not start with a /.
 openigProjectHome: openig

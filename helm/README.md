@@ -29,9 +29,9 @@ You can also run `minikube dashboard`.
 * If you are using a private registry, see registry.sh. Edit the `~/etc/registry_env` and set
 REGISTRY_PASSWORD, REGISTRY_ID and REGISTRY_EMAIL  environment variables with your BackStage credentials.
 This is needed so that Kubernetes can authenticate to pull images from a private registry.
-* Clone https://github.com/ForgeRock/stack-config 
+* Clone https://github.com/ForgeRock/forgeops-init 
 * Copy custom-template.yaml to custom.yaml, and edit the variables for your environment, pointing the
-stack-config directory you just cloned
+forgeops-init directory you just cloned
 * Run `helm init` to intialize Helm.  Wait for helm to come up:
 `helm list` should not show any errors.
 * Run `bin/openam.sh`. This will deploy a config store, a user store, a CTS store,
@@ -87,7 +87,7 @@ The OpenIDM, OpenIG, and OpenAM charts include a mechanism to import configurati
 or to import and export configuration to a hostPath volume. 
 
 The hostPath volume can be used in conjunction with Minikube to map a folder in your home directory 
-(example: /Users/yourUsername/src/stack-config) to pod volumes in your Kubernetes cluster.  This enables you 
+(example: /Users/yourUsername/src/forgeops-init) to pod volumes in your Kubernetes cluster.  This enables you 
 to do local development and save your configuration files to your local folder. If you place this 
 folder under git, you can also track configuration changes, and push them to a remote repository.
 

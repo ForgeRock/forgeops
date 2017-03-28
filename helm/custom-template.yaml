@@ -7,7 +7,7 @@ registry: ""
 
 # You must configure at least one stack source.
 # This is where the ForgeRock stack configuration comes from:
-# gitRepo - clones the example source from gitHub or other git repo. https://github.com/ForgeRock/stack-config.git
+# gitRepo - clones the example source from gitHub or other git repo. https://stash.forgerock.org/scm/cloud/forgeops.git
 # is a starter repo.
 # hostPath - maps to a local directory on your laptop. This only works for Minikube / VirtualBox.
 # For rapid development, use hostPath, and map to a local folder. This folder can be cloned from a starter git repo, and later
@@ -15,7 +15,7 @@ registry: ""
 # Note that stackSource can be *any* volume that supplies configuration. You could use a PVC here, as an example.
 stackConfigSource:
 #  gitRepo:
-#    repository: https://github.com/ForgeRock/stack-config.git
+#    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
 #    revision: HEAD
   hostPath:
     path: /Users/YOUR-USER-ID/tmp/config

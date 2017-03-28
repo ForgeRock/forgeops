@@ -2,7 +2,7 @@
 # A sample script to export a configuration. This assumes that a volume is mounted
 # on the CONFIG_DIR below.
 
-CONFIG_DIR=/amster-config/stack-config/amster
+CONFIG_DIR=/amster-config/forgeops-init/amster
 
 # Add the following so git doesn't complain about any commits missing user name / email.
 git config --global user.email "amster@example.com"
