@@ -2,13 +2,12 @@
 # This is a YAML-formatted file.
 # Declare name/value pairs to be passed into the templates.
 
-# Optional registry - should include the trailing /
-registry: docker-public.forgerock.io/
-repo: forgerock
-
-openam:
-  image: openam
+image:
+  repository: forgerock
+  openam: openam
+  amster: amster
   tag: 14.5.0-SNAPSHOT
+  pullPolicy: IfNotPresent
 
 openamReplicaCount: 1
 
@@ -26,9 +25,6 @@ rootSuffix:  "dc=openam,dc=forgerock,dc=org"
 # Default JVM heap size.
 heapSize: 1g
 
-amster:
-  image: amster
-  tag: 14.5.0-SNAPSHOT
 
 
 # Valid types: fluentd, fluent-bit, filebeat, none

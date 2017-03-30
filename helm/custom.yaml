@@ -1,9 +1,6 @@
 # custom.yaml file with value overrides for charts.
 # Edit this for your environment.
 
-# Example of setting the registry to blank, so the local Docker cache is consulted instead of a registry.
-registry: ""
-
 # Sample values you might use on GKE.
 # repo should be your Google Project ID.
 # Remember to set the trailing / on registry.
@@ -18,12 +15,12 @@ cookieDomain: .example.com
 # This is where the configuration comes from.
 stackConfigSource:
     gitRepo:
-      repository: https://stash.forgerock.org/scm/cloud/forgeops.git
+      repository: https://stash.forgerock.org/scm/cloud/forgeops-init.git
       revision:  HEAD
 
 #  gitRepo clones the example source from GitHub or other Git repo.
 #  gitRepo:
-#    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
+#    repository: https://stash.forgerock.org/scm/cloud/forgeops-init.git
 #    revision:  release/5.0.0
 #    revision: 60f79b5b953588d220ea6dffee863e5a7d4d1f41
 #    revision: refs/heads/release/5.0.0

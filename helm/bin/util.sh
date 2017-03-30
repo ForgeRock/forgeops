@@ -9,7 +9,7 @@ cd ${HELMDIR}
 if [ ! -r ${HELMDIR}/custom.yaml ];
 then
     echo "You must provide a ${HELMDIR}/custom.yaml file"
-    echo "Copy custom-template.yaml to custom.yaml, and edit for your environment"
+    echo "Copy a custom template from templates/ to custom.yaml, and edit for your environment"
     exit 1
 fi
 

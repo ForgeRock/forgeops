@@ -10,3 +10,4 @@ gradle.properties
 target/
 *.DS_Store
 .idea/
+*.tgz

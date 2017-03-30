@@ -59,7 +59,7 @@ the local file system. For example:
 ```yaml
 stackConfigSource:
   gitRepo:
-    repository: https://stash.forgerock.org/scm/cloud/forgeops.git
+    repository: https://stash.forgerock.org/scm/cloud/forgeops-init.git
     revision: HEAD
 ```
 

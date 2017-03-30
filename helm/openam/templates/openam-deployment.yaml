@@ -9,7 +9,9 @@ spec:
   template:
     metadata:
       labels:
-        app: openam
+        app: {{ template "fullname" . }}
+        component: openam
+        vendor: forgerock
       annotations:
         # This init container is responsible for assembling the openam root directory with the files needed to boot
         # to a pre-configured configuration store.
@@ -28,8 +30,8 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: openam
-        image: {{ .Values.registry}}{{.Values.repo}}/{{.Values.openam.image}}:{{.Values.openam.tag}}
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        image:  {{.Values.image.repository}}/{{ .Values.image.openam}}:{{ .Values.image.tag }}
+        imagePullPolicy: {{default "IfNotPresent" .Values.image.pullPolicy}}
         ports:
         - containerPort: 8080
           name: http

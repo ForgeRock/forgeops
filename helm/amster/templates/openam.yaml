@@ -6,6 +6,9 @@ metadata:
   name: openam
   labels:
     name: openam
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    component: amster
   annotations:
     # Move to an init container when the feature exits beta in Kubernetes
     # For some reason, the cp command below fails if you use  cp -L /secrets/.?* - so we do it in two steps.
@@ -24,7 +27,7 @@ spec:
   restartPolicy: Never
   containers:
   - name: openam
-    image: {{.Values.registry}}{{.Values.repo}}/{{.Values.openam.image}}:{{ default "latest" .Values.openam.tag}}
+    image:  {{.Values.image.repository}}/{{ .Values.image.openam}}:{{ .Values.image.tag }}
     imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
     ports:
       - containerPort: 8080

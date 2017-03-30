@@ -23,9 +23,8 @@ if [ $? == 0 ]; then
     exit 0
 fi
 
-# We name the Helm deployment the same as the OpenDJ instance name.
-# This makes it easier to remove the deployment at a known name.
-helm install --name ${instance}  -f custom.yaml --set djInstance=${instance}  "$@" opendj
+# The OpenDJ instance name is also used as the Helm deployment name
+helm install  -f custom.yaml --set djInstance=${instance} "$@" opendj
 
 
 # DJ is a StatefulSet - so the pod name is well known.

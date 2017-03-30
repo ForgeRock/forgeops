@@ -6,10 +6,12 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 
-registry: docker-public.forgerock.io/
-repo: forgerock
 
-pullPolicy: IfNotPresent
+image:
+  repository: forgerock
+  name: openig
+  tag: 5.5.0-SNAPSHOT
+  pullPolicy: IfNotPresent
 
 service:
   name: openig
@@ -24,11 +26,6 @@ resources:
   requests:
     cpu: 200m
     memory: 1024Mi
-
-# OpenIG configuration - only applies if gitConfig is true.
-openig:
-  image: openig
-  tag: 5.0.0-SNAPSHOT
 
 
 # *RELATIVE* path within the forgeops-inituration source where the OpenIG config directory is located

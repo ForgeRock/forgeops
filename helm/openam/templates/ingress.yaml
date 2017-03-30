@@ -5,6 +5,9 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: openam
+  labels:
+    app: {{ template "fullname" . }}
+    vendor: forgerock
   annotations:
     ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/ssl-redirect: "false"

@@ -18,8 +18,9 @@ cd ${HELMDIR}
 
 echo "Installing amster chart"
 
-helm install --name amster -f custom.yaml amster
+helm install -f custom.yaml amster
 
+exit 0
 # Give amster pod time to start.
 sleep 30
 
@@ -33,7 +34,7 @@ echo "Removing the amster installation chart"
 
 # For testing the installation, uncomment this so the script exits before the amster / openam pods are deleted.
 # This will allow you to examine the OpenAM install.log, etc.
-#exit 0
+exit 0
 
 helm delete --purge amster
 
@@ -41,7 +42,7 @@ kill $PID
 
 echo "Starting openam runtime"
 
-helm install --name openam -f custom.yaml openam-runtime
+helm install -f custom.yaml openam
 
 echo "You will see a Terminated: message from the kubectl logs command. It is OK to ignore this."
 echo "Done"

@@ -5,15 +5,15 @@
 # Declare name/value pairs to be passed into your templates.
 # name: value
 
-# Registry is optional - and should include the trailing /
-registry: docker-public.forgerock.io/
-repo: forgerock
 
-openam:
-  image: openam
+# Generic Image properties. We use the same tag for amster and AM
+image:
+  repository: forgerock
+  pullPolicy: IfNotPresent
   tag: 14.5.0-SNAPSHOT
+  openam:  openam
+  amster: amster
 
-pullPolicy: IfNotPresent
 
 # Server base URL *within* the Kubernetes cluster - not the external LB URL.
 # No /openam appended here.
@@ -46,8 +46,6 @@ userStore:
 # If skipImport is true, the basic 00_amster.sh config script will be run, but
 # the 01* import of config files will not.
 amster:
-  image: amster
-  tag:  14.5.0-SNAPSHOT
   skipImport: false
 
 # default path to Amster *json files to import.

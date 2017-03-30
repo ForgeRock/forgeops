@@ -29,7 +29,7 @@ You can also run `minikube dashboard`.
 * If you are using a private registry, see registry.sh. Edit the `~/etc/registry_env` and set
 REGISTRY_PASSWORD, REGISTRY_ID and REGISTRY_EMAIL  environment variables with your BackStage credentials.
 This is needed so that Kubernetes can authenticate to pull images from a private registry.
-* Clone https://github.com/ForgeRock/forgeops-init 
+* Clone https://stash.forgerock.org/projects/CLOUD/repos/forgeops-init
 * Copy custom-template.yaml to custom.yaml, and edit the variables for your environment, pointing the
 forgeops-init directory you just cloned
 * Run `helm init` to intialize Helm.  Wait for helm to come up:

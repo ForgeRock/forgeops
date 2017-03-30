@@ -13,8 +13,8 @@ spec:
     spec:
       containers:
       - name: openidm
-        image: "{{.Values.registry}}{{.Values.repo}}/{{.Values.openidm.image }}:{{ .Values.openidm.tag }}"
-        imagePullPolicy: {{ .Values.pullPolicy }}
+        image: "{{.Values.image.repository}}/{{.Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: PROJECT_HOME
           value: "/opt/openidm/custom/forgeops-init/{{ .Values.openidmProjectHome }}"

@@ -1,29 +1,22 @@
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-# Default values for OpenDJ.
-# This is a YAML-formatted file.
-# Declare name/value pairs to be passed into your templates.
-# name: value
-
-# Optional registry - including trailing /
-registry: docker-public.forgerock.io/
-repo: forgerock
-
-pullPolicy: IfNotPresent
+# Copyright (c) 2016-2017 ForgeRock AS.
 
 dirManagerPassword: password
 
 # The default bootstrap script.
 bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
 
-# The OpenDJ root suffix.
-rootSuffix: "dc=openam,dc=forgerock,dc=org"
+# The OpenDJ baseDN
+baseDN: "dc=openam,dc=forgerock,dc=org"
 
-opendj:
-  image: opendj
-  tag: 4.0.0-SNAPSHOT
-# djInstance name - this will be the stateful service name of OpenDJ as well.
-djInstance: configstore
+# The default instance name. This will create a stateful set that can be resolved at
+#  $djInstance-0.$djInstance
+djInstance: userstore
+
+image:
+  repository: forgerock
+  name: opendj
+  pullPolicy: IfNotPresent
+  tag:  4.0.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicaCount: 1
@@ -31,21 +24,19 @@ replicaCount: 1
 # Set for creating sample users. If unset, only the base DN will be created.
 #numberSampleUsers: 5
 
-# Size for DJ storage. Note GKE IOPS scale based on the size of the volume.
+# Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
 # Set storageclass only on clusters that support it (GCP / AWS).
 #storageClass: fast
 
-# DJ tuning params - except memory, see below.
-# The G1 collector performs really poorly on searchrate - we should find out why.
+# OpenDJ tuning params - except memory, see below.
 opendjJavaArgs: "-server -XX:+UseG1GC "
-#opendjJavaArgs: "-server "
-
+# This gets used for the -Xmx argument
 heapSize: "512m"
 
 # Optional resources. For a small Minikube environment, just comment these out.
-# These help for pod placement on a larger cluster to ensure the DJ instance gets sufficient resources
+# These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources
 #resources:
 #  limits:
 #    cpu: 500m
@@ -53,3 +44,4 @@ heapSize: "512m"
 #  requests:
 #    cpu: 400m
 #    memory: 1024Mi
+

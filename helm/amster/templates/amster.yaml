@@ -6,12 +6,15 @@ metadata:
   name: amster
   labels:
     name: amster
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    component: amster
 spec:
   restartPolicy: Never
   containers:
   - name: amster
-    image: {{.Values.registry}}{{.Values.repo}}/{{ .Values.amster.image}}:{{ .Values.amster.tag }}
-    imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+    image: {{.Values.image.repository}}/{{ .Values.image.amster}}:{{ .Values.image.tag }}
+    imagePullPolicy: {{default "IfNotPresent" .Values.image.pullPolicy}}
     volumeMounts:
     - name: amster-secrets
       mountPath: /var/secrets/amster

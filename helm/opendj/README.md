@@ -8,10 +8,15 @@ to replicate to the first node.  This is a very simple topology
 that will only support a small number (say 3) OpenDJ nodes. It
 should be acceptable for testing and small installations. 
 
+The instance name defaults to the Helm chart deployment name. So for example 
+`helm install --name configstore`  will create a stateful set configstore-0
+
+
+
 # Notes
 
 By default, Minikube
-uses a "host path" provisioner. This does not survive Minikube 
+uses a "host path" provisioner. This may not survive Minikube 
 restarts! If you are on GKE, the default provisioner will create
 persistent disk volumes (PDs). 
 

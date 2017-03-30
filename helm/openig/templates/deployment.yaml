@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{.Values.registry}}{{.Values.repo}}/{{ .Values.openig.image }}:{{ .Values.openig.tag }}"
-        imagePullPolicy: {{ .Values.pullPolicy }}
+        image: "{{ .Values.image.repository}}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: OPENIG_BASE
           value: "/config/forgeops-init/{{ .Values.openigProjectHome }}"

@@ -8,18 +8,20 @@ metadata:
   name: amster
   labels:
     name: amster
-    app: amster
+    app:  {{ template "fullname" . }}
+    vendor: forgerock
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: amster
+        app: {{ template "fullname" . }}
+        vendor: forgerock
     spec:
       containers:
       - name: amster
-        image: {{.Values.registry}}{{.Values.repo}}/{{.Values.amster.image}}:{{.Values.amster.tag}}
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        image:  {{.Values.image.repository}}/{{ .Values.image.amster}}:{{ .Values.image.tag }}
+        imagePullPolicy: {{default "IfNotPresent" .Values.image.pullPolicy}}
         command: [ "/bin/sh", "-c", "sleep 5000000"]
         volumeMounts:
         - name: openam-secrets

@@ -1,11 +1,14 @@
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copyright (c) 2016-2017 ForgeRock AS.
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.djInstance }}
+  name: {{ template "instanceName" . }}
+  labels:
+    djInstance: {{ template "instanceName" . }}
+    app: {{ template "fullname" . }}
+    vendor: forgerock
 spec:
-  serviceName: {{ .Values.djInstance }}
+  serviceName: {{ template "instanceName" . }}
   replicas: {{default 1 .Values.replicaCount }}
   volumeClaimTemplates:
   - metadata:
@@ -24,20 +27,24 @@ spec:
   template:
     metadata:
       labels:
-        djInstance: {{ .Values.djInstance }}
+        djInstance: {{ template "instanceName" . }}
+        app: {{ template "fullname" . }}
+        vendor: forgerock
+        component: opendj
     spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: opendj
-        image: "{{.Values.registry}}{{.Values.repo}}/{{.Values.opendj.image}}:{{.Values.opendj.tag}}"
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        image:  "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         env:
         - name: BASE_DN
-          value: {{ .Values.rootSuffix }}
+          value: {{ .Values.baseDN }}
+        # The master server is the first instance in the stateful set (-0 )
         - name: DJ_MASTER_SERVER
-          value: {{ .Values.djInstance -}}{{- "-0." -}}{{ .Values.djInstance }}
+          value: {{  template "instanceName" . -}}-0.{{ template "instanceName" . }}
         - name: OPENDJ_JAVA_ARGS
           value: {{ .Values.opendjJavaArgs }}{{- " -Xmx" -}}{{.Values.heapSize }}{{- " -Xms" -}}{{.Values.heapSize }}
         - name: BOOTSTRAP
@@ -68,4 +75,4 @@ spec:
       volumes:
       - name: dj-secrets
         secret:
-          secretName: {{ .Values.djInstance }}
+          secretName: {{ template "instanceName" . }}
