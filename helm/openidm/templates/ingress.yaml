@@ -10,7 +10,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
-  - host: "openidm{{ .Values.cookieDomain }}"
+  - host: {{ template "externalFQDN" . }}
     http:
       paths:
       - path: /

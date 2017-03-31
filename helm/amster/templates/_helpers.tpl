@@ -14,3 +14,7 @@ We truncate at 24 characters because some Kubernetes name fields are limited to 
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 24 | trimSuffix "-" -}}
 {{- end -}}
+{{/*  expands to the fqdn. Note cookieDomain has a leading . */}}
+{{- define "externalFQDN" -}}
+{{- printf "openam.%s%s" .Release.Namespace .Values.cookieDomain -}}
+{{- end -}}

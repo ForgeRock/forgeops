@@ -30,5 +30,9 @@ findPod() {
     kubectl get pod -l $1 --no-headers | awk '{print $1;}'
 }
 
+DEFAULT_NAMESPACE=`kubectl config view | grep namespace | awk  '{print $2}'`
+export DEFAULT_NAMESPACE
 
-
+# todo - this is a trick to set the namespace default. We should set this up for the user
+#kubectl config set-context $(kubectl config current-context) --namespace=<insert-namespace-name-here>
+# kubectl config view | grep namespace:

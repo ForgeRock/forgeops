@@ -28,10 +28,12 @@ resources:
     memory: 1024Mi
 
 
-# *RELATIVE* path within the forgeops-inituration source where the OpenIG config directory is located
+# *RELATIVE* path within the forgeops-init source where the OpenIG config directory is located
 # (where OpenIG expects another /config directory to be located).
 # Must not start with a /.
 openigProjectHome: openig
 
+# These are both used to form the FQDN for the load balancer.  See _helpers.tpl
+component: openig
 cookieDomain: .example.com
 

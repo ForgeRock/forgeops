@@ -11,8 +11,6 @@ image:
 
 openamReplicaCount: 1
 
-# What OpenAM is known by *outside* the cluster - includes context root /openam.
-loadBalancerUrl: "https://openam.example.com:443/openam"
 
 openamInstance: http://openam:80/openam
 
@@ -24,7 +22,6 @@ rootSuffix:  "dc=openam,dc=forgerock,dc=org"
 
 # Default JVM heap size.
 heapSize: 1g
-
 
 
 # Valid types: fluentd, fluent-bit, filebeat, none

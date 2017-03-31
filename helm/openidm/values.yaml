@@ -37,8 +37,11 @@ resources:
 openidmProjectHome: openidm
 
 
+# Used to form the FQDN  - see _helpers.tpl
+component: openidm
+
 # This is used by the ingress controller to route to OpenIDM.
-#fqdn: openidm.{{ .Values.cookieDomain }}
+#   see _helpers.tpl
 cookieDomain: .example.com
 
 # Values: filebeat, none

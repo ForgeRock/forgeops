@@ -12,9 +12,9 @@ Kubernetes manifests by performing variable expansion using golang
 templates. This enables us to have generic "charts" that can
 be reused in different deployment contexts.
 
-*** NOTE: ****  You must copy custom-template.yaml to custom.yaml, and edit the
+*** NOTE: ****  You must create a custom.yaml template, and edit the
 values for your environment. The Helm charts will not install without these 
-value settings. 
+value settings. See the templates/ directory for examples
 
 You must also specify the source of product configuration, which can be a Git repo or a mounted volume. 
 See the section on configuration.
@@ -57,7 +57,7 @@ This directory contains Helm charts for:
 
 * opendj  - A chart to deploy one or more OpenDJ instances
 * amster  - A chart to install and configure OpenAM 
-* openam-runtime - A chart for the OpenAM runtime. Assumes OpenAM is
+* openam - A chart for the OpenAM runtime. Assumes OpenAM is
 installed already. This can scale up horizontally by increasing the replica count.
 * openidm - OpenIDM
 * postgres-opendim - Configures a Postgresql repository database for OpenIDM

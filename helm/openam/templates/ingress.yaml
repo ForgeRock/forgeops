@@ -10,12 +10,13 @@ metadata:
     vendor: forgerock
   annotations:
     ingress.kubernetes.io/enable-cors: "true"
-    ingress.kubernetes.io/ssl-redirect: "false"
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
-   - http:
-        paths:
-        - path: /openam
-          backend:
-            serviceName: openam
-            servicePort: 80
+  - host: {{ template "externalFQDN" . }}
+    http:
+      paths:
+      - path: /openam
+        backend:
+          serviceName: openam
+          servicePort: 80

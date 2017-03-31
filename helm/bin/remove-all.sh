@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
+# This removes *all* helm charts and delete the PVCs
 
-helm delete --purge openam
-helm delete --purge opendj
-helm delete --purge openam-install
-helm delete --purge userstore
-helm delete --purge configstore
-helm delete --purge amster
-helm delete --purge openidm
-helm delete --purge postgres
-helm delete --purge openig
-helm delete --purge ctsstore
+releases=`helm list -q`
+
+for r in ${releases}
+do
+    echo "Deleting release $r"
+    helm delete --purge $r
+done
+
 
 # Delete the OpenDJ data.
 kubectl delete pvc data-configstore-0

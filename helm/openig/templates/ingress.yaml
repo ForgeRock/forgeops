@@ -7,9 +7,10 @@ metadata:
   name: openig-ingress
   annotations:
     ingress.kubernetes.io/enable-cors: "true"
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
-  - host: "openig{{ .Values.cookieDomain }}"
+  - host: {{ template "externalFQDN" . }}
     http:
       paths:
       - path: /

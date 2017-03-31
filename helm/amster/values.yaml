@@ -19,11 +19,9 @@ image:
 # No /openam appended here.
 serverBase: http://openam:80
 
-# What OpenAM is known by *outside* the cluster - includes context root /openam.
-#loadBalancerUrl: "https://openam.example.com:443/openam"
-loadBalancerUrl: "http://openam.example.com:80/openam"
+# See the _helpers template to change the *external* load balancer fqdn
+# By default it expands to  openam.$namespace.$cookieDomain
 
-fqdnHostname: openam.example.com
 cookieDomain: .example.com
 amadmin_pw: password
 

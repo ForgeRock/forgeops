@@ -8,15 +8,12 @@ metadata:
     app: {{ template "fullname" . }}
     vendor: forgerock
 spec:
-  type: NodePort
   ports:
     - port: 80
       name: am80
       targetPort: 8080
-      nodePort: 30080
     - port: 443
       targetPort: 8443
-      nodePort: 30443
       name: am443
   selector:
     component: openam

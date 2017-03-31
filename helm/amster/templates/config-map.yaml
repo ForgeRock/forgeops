@@ -17,7 +17,7 @@ data:
     --pwdEncKey 123456789012 \
     --acceptLicense \
     --lbSiteName site1 \
-    --lbPrimaryUrl https://openam{{ .Values.cookieDomain }}/openam \
+    --lbPrimaryUrl https://{{ template "externalFQDN" . }}/openam \
     --cfgDir /root/openam
     :exit
 {{- if not .Values.amster.skipImport }}

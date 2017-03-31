@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Put commands here that setup the environment.
-# todo: Validate this, add additiional env checks
+# todo: Validate this
 
 brew install docker-machine docker-compose
 

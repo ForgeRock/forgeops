@@ -20,7 +20,6 @@ echo "Installing amster chart"
 
 helm install -f custom.yaml amster
 
-exit 0
 # Give amster pod time to start.
 sleep 30
 
@@ -30,14 +29,20 @@ PID=$!
 
 waitPodReady amster
 
-echo "Removing the amster installation chart"
 
 # For testing the installation, uncomment this so the script exits before the amster / openam pods are deleted.
 # This will allow you to examine the OpenAM install.log, etc.
-exit 0
+#exit 0
 
-helm delete --purge amster
 
+# Find the amster chart
+AMSTER_RELEASE=`helm list --namespace ${DEFAULT_NAMESPACE} | grep amster | awk '{print $1}'`
+
+echo "Removing the amster release $AMSTER_RELEASE"
+
+helm delete ${AMSTER_RELEASE}
+
+# Kill the tail process
 kill $PID
 
 echo "Starting openam runtime"
