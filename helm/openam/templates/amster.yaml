@@ -8,14 +8,16 @@ metadata:
   name: amster
   labels:
     name: amster
-    app:  {{ template "fullname" . }}
+    app: amster
+    helm-name:  {{ template "fullname" . }}
     vendor: forgerock
 spec:
   replicas: 1
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        helm-name: {{ template "fullname" . }}
+        app: amster
         vendor: forgerock
     spec:
       containers:

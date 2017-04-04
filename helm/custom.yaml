@@ -14,9 +14,11 @@ cookieDomain: .example.com
 # You must configure at least one stack source.
 # This is where the configuration comes from.
 stackConfigSource:
-    gitRepo:
-      repository: https://stash.forgerock.org/scm/cloud/forgeops-init.git
-      revision:  HEAD
+   hostPath:
+    path: /Users/warren.strange/tmp/fr/config
+#    gitRepo:
+#      repository: https://stash.forgerock.org/scm/cloud/forgeops-init.git
+#      revision:  HEAD
 
 #  gitRepo clones the example source from GitHub or other Git repo.
 #  gitRepo:

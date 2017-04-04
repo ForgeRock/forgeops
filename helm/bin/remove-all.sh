@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
-# This removes *all* helm charts and delete the PVCs
+# This removes *all* helm charts in the current namespace and delete the PVCs / PV in the current namespace
+# Use with caution - this deletes all of your data as well...
+#
 
-releases=`helm list -q`
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${DIR}/util.sh"
+
+releases=`helm list --namespace ${DEFAULT_NAMESPACE} -q`
 
 for r in ${releases}
 do
@@ -10,8 +16,12 @@ do
 done
 
 
-# Delete the OpenDJ data.
-kubectl delete pvc data-configstore-0
-kubectl delete pvc data-userstore-0
-kubectl delete pvc data-ctsstore-0
+pvclist=`kubectl get pvc -o jsonpath='{.items[*].metadata.name}'`
+
+for pvc in ${pvclist}
+do
+    echo "Deleting $pvc"
+    kubectl delete pvc ${pvc}
+done
+
 

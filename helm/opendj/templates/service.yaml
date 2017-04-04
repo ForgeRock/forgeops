@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: {{ template "instanceName" . }}
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "instanceName" . }}
     component: opendj
     vendor: forgerock
 spec:
