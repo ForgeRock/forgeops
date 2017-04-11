@@ -10,6 +10,7 @@ metadata:
 spec:
   serviceName: {{ template "instanceName" . }}
   replicas: {{default 1 .Values.replicaCount }}
+  {{- if .Values.djPersistence }}
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -24,6 +25,7 @@ spec:
       resources:
         requests:
           storage: {{ default "5Gi"  .Values.storageSize }}
+  {{- end }}
   template:
     metadata:
       labels:
@@ -58,11 +60,13 @@ spec:
           name: ldap
         - containerPort: 4444
           name: djadmin
+        {{- if .Values.djPersistence }}
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/secrets/opendj
         - name: data
           mountPath: /opt/opendj/data
+        {{- end }}
         readinessProbe:
           exec:
             command: ["/opt/opendj/probe.sh"]

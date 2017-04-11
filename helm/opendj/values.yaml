@@ -45,3 +45,6 @@ heapSize: "512m"
 #    cpu: 400m
 #    memory: 1024Mi
 
+# DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
+# Used in testing environments without pv providers
+djPersistence: true
