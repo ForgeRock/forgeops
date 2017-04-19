@@ -28,12 +28,19 @@ resources:
     memory: 1024Mi
 
 
-# *RELATIVE* path within the forgeops-init source where the OpenIG config directory is located
+# Path relative to the git clone root- where the OpenIG config directory is located
 # (where OpenIG expects another /config directory to be located).
 # Must not start with a /.
-openigProjectHome: openig
+openig:
+  projectHome: forgeops-init/openig/basic-sample
 
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl
 component: openig
 cookieDomain: .example.com
+
+
+
+git:
+  repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+  branch: master
 

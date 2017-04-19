@@ -19,10 +19,21 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
         - name: OPENIG_BASE
-          value: "/config/forgeops-init/{{ .Values.openigProjectHome }}"
+          value: "/git/{{ .Values.openig.projectHome }}"
+        - name: GIT_REPO
+          value: {{ .Values.git.repo }}
+        - name: GIT_BRANCH
+          value: {{ default "master" .Values.git.branch }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
-# todo: When we figure out the right values here uncomment this...
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        {{- if hasPrefix "ssh:" .Values.git.repo }}
+        - name: git-secret
+          mountPath: /etc/git-secret
+        {{- end }}
+# todo: Create a health check URL
 #        livenessProbe:
 #          httpGet:
 #            path: /
@@ -35,9 +46,12 @@ spec:
 #          initialDelaySeconds: 30
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-        volumeMounts:
-        - name: config
-          mountPath: /config
       volumes:
-      - name: config
-{{ toYaml .Values.stackConfigSource | indent 8 -}}
+      - name: git
+        emptyDir: {}
+      {{- if hasPrefix "ssh:" .Values.git.repo }}
+      - name: git-secret
+        secret:
+          secretName: git-creds
+          defaultMode: 256
+      {{- end }}

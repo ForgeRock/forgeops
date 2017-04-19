@@ -1,5 +1,5 @@
-# Container that configures OpenAM.
-# Includes configurator, and will eventually contain Amster / REST based config.
+# Amster Container that configures OpenAM.
+#
 #
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
@@ -9,16 +9,20 @@ FROM openjdk:8-jre-alpine
 ADD *.zip /tmp/
 
 
-RUN apk add --no-cache su-exec unzip curl git \
-    && unzip -q /tmp/amster.zip -d /var/tmp/amster \
-    && rm /tmp/*.zip
+# git is added to the container so we can optionally execute git commit, git push, etc.
+RUN apk add --no-cache su-exec unzip curl git bash openssh-client \
+    && mkdir -p /opt \
+    && unzip -q /tmp/amster.zip -d /opt/amster \
+    && rm /tmp/*.zip \
+    && git config --global user.email "amster@autoexport.com" \
+    && git config --global user.name "Amster auto-export user"
 
 
-WORKDIR /var/tmp
+WORKDIR /opt/amster
 
 
-ADD *.sh /var/tmp/
+ADD *.sh /opt/amster/
 
-ENTRYPOINT ["/var/tmp/docker-entrypoint.sh"]
+ENTRYPOINT ["/opt/amster/docker-entrypoint.sh"]
 
 CMD ["configure"]

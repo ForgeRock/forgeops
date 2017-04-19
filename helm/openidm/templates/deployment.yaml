@@ -16,8 +16,14 @@ spec:
         image: "{{.Values.image.repository}}/{{.Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         env:
+        - name: GIT_REPO
+          value: {{ .Values.git.repo }}
+        - name: GIT_BRANCH
+          value: {{ default "master" .Values.git.branch }}
         - name: PROJECT_HOME
-          value: "/opt/openidm/custom/forgeops-init/{{ .Values.openidmProjectHome }}"
+          value: "/opt/openidm/git/{{ .Values.openidm.projectPath }}"
+        - name: GIT_ROOT
+          value: "/opt/openidm/git"
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -41,9 +47,13 @@ spec:
           mountPath: /opt/openidm/secrets
         - name: logs
           mountPath: /opt/openidm/logs
-        - name:  forgeops-init
-          mountPath: /opt/openidm/custom
-{{- if  eq .Values.logDriver "filebeat" }}
+        - name: git
+          mountPath: /opt/openidm/git
+        {{- if hasPrefix "ssh:" .Values.git.repo }}
+        - name: git-secret
+          mountPath: /etc/git-secret
+        {{- end }}
+      {{- if  eq .Values.logDriver "filebeat" }}
       - name: log
         image: "giantswarm/filebeat:5.2.2"
         imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
@@ -52,7 +62,7 @@ spec:
           mountPath: /log
         - name: log-config
           mountPath: /etc/filebeat
-{{end}}
+        {{end}}
       volumes:
       - name: openidm-secrets
         secret:
@@ -62,5 +72,11 @@ spec:
           name: idm-log-config
       - name: logs
         emptyDir: {}
-      - name: forgeops-init
-{{ toYaml .Values.stackConfigSource | indent 8 -}}
+      - name: git
+        emptyDir: {}
+      {{- if hasPrefix "ssh:" .Values.git.repo }}
+      - name: git-secret
+        secret:
+          secretName: git-creds
+          defaultMode: 256
+      {{- end }}

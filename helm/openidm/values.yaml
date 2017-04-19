@@ -32,10 +32,6 @@ resources:
     memory: 768Mi
 
 
-# The *relative* path where the conf/ directory is found. This is relative to the root of the forgeops-init volume.
-# The default is usually fine.
-openidmProjectHome: openidm
-
 
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm
@@ -46,3 +42,13 @@ cookieDomain: .example.com
 
 # Values: filebeat, none
 logDriver: none
+
+
+# The *relative* path where the conf/ directory is found. This is relative to the root of the config directory
+openidm:
+  projectPath: forgeops-init/openidm/sample2b
+
+git:
+  repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+  branch: master
+

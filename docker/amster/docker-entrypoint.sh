@@ -1,11 +1,27 @@
 #!/usr/bin/env sh
 #
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copyright (c) 2016-2017 ForgeRock AS
 #
-# Run the configurator and any other config
-# Assumes that /var/tmp/openam.properties has been placed in the container filesystem
-# Container puts everything in
+
+DIR=`pwd`
+
+CONFIG_ROOT=${CONFIG_ROOT:-"${DIR}/git"}
+#CONFIG_LOCATION=${CONFIG_LOCATION:-"forgeops-init/amster"}
+# Path to script location - this is *not* the path to the amster/*.json config files - it is the path
+# to  *.amster scripts.
+AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}
+
+
+./git-init.sh
+
+
+if [ "$1" = 'pause' ]; then
+    echo "Container will now pause. kubectl exec into this to execute commands."
+    while true
+    do
+        sleep 100000
+    done
+fi
 
 
 # If this is not the configure command, then execute the command
@@ -14,6 +30,7 @@
 if [ ! "$1" = 'configure' ]; then
     exec "$@"
 fi
+
 
 # Else - configure
 
@@ -39,8 +56,6 @@ wait_for_openam()
 
 	while true
 	do
-		echo "Waiting for OpenAM server at ${CONFIG_URL} "
-
 		response=$(curl --write-out %{http_code} --silent --connect-timeout 30 --output /dev/null ${CONFIG_URL} )
 
       echo "Got Response code $response"
@@ -69,15 +84,13 @@ wait_for_openam()
 	echo "About to begin configuration"
 }
 
+echo "Waiting for OpenAM server at ${CONFIG_URL} "
 
 wait_for_openam
 
 
-AMSTER_CONFIG=${AMSTER_CONFIG:-/amster}
-
-
 # Execute Amster if the configuration is found.
-if [ -d  ${AMSTER_CONFIG} ]; then
+if [ -d  ${AMSTER_SCRIPTS} ]; then
     if [ ! -r /var/secrets/amster/id_rsa ]; then
         echo "ERROR: Can not find the Amster private key"
         exit 1
@@ -85,8 +98,8 @@ if [ -d  ${AMSTER_CONFIG} ]; then
 
     echo "Executing Amster to configure OpenAM"
     # Need to be in the amster directory, otherwise Amster can't find its libraries.
-    cd /var/tmp/amster
-    for file in ${AMSTER_CONFIG}/*.amster
+    cd ${DIR}
+    for file in ${AMSTER_SCRIPTS}/*.amster
     do
         echo "Executing Amster script $file"
         sh ./amster ${file}

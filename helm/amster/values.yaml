@@ -34,6 +34,7 @@ configStore:
   adminPort: 4444
   password: password
 
+# This is not currently supported on install by amster. You must import a user store config.
 userStore:
   host:  userstore-0.userstore
   port: 389
@@ -46,6 +47,12 @@ userStore:
 amster:
   skipImport: false
 
-# default path to Amster *json files to import.
-# The default is the amster directory under the forgeops-init project, but if you have a special config you can modify this
-amsterImportPath: /amster-config/forgeops-init/amster
+
+amster:
+  # Path relative to the root of the cloned git repo where we can find our config files
+  configPath: forgeops-init/openam/empty-import
+
+
+git:
+  repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+  revision: HEAD

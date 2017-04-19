@@ -3,7 +3,7 @@
 
 image:
   repository: gcr.io/engineering-devops
-
+  tag: latest
 
 cookieDomain: .homeunix.org
 

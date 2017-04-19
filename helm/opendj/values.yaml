@@ -48,3 +48,9 @@ heapSize: "512m"
 # DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
 # Used in testing environments without pv providers
 djPersistence: true
+
+
+git:
+  repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
+  branch: master
+

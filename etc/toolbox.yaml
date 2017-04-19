@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: toolbox
+  labels:
+    name: toolbox
+    vendor: forgerock
+spec:
+  restartPolicy: Never
+  containers:
+  - name: toolbox
+    image: toolbox:latest
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - name: podinfo
+      mountPath: /etc
+      readOnly: false
+  # Use of downward api. We may use this in future to understand what environment we are running in
+  # From docs:
+  # only annotations, labels, name and namespace are supported.
+  # See https://kubernetes.io/docs/resources-reference/v1.6/#downwardapivolumefile-v1-core
+  volumes:
+  - name: podinfo
+    downwardAPI:
+      items:
+      - path: "labels"
+        fieldRef:
+          fieldPath: metadata.labels

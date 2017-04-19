@@ -40,7 +40,7 @@ AMSTER_RELEASE=`helm list --namespace ${DEFAULT_NAMESPACE} | grep amster | awk '
 
 echo "Removing the amster release $AMSTER_RELEASE"
 
-helm delete ${AMSTER_RELEASE}
+helm delete --purge ${AMSTER_RELEASE}
 
 # Kill the tail process
 kill $PID

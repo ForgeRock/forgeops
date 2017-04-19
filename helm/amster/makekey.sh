@@ -8,7 +8,7 @@ ssh-keygen -t rsa -b 4096 -C "openam-install@example.com" -f secrets/id_rsa
 mv secrets/id_rsa.pub secrets/authorized_keys
 
 # The runtime needs the same secret if you want to use Amster.
-cp secrets/*  ../openam-runtime/secrets
+cp secrets/*  ../openam/secrets
 
 # If you want to tighten up the authorized_keys to an IP range-, use a from option instead:
 #key=`cat secrets/id_rsa.pub`

@@ -1,33 +1,30 @@
 #!/usr/bin/env sh
-# A sample script to export a configuration. This assumes that a volume is mounted
-# on the CONFIG_DIR below.
+# A sample script to export a configuration.
 
-CONFIG_DIR=/amster-config/forgeops-init/amster
+GIT_ROOT=${GIT_ROOT:-/git}
 
-# Add the following so git doesn't complain about any commits missing user name / email.
-git config --global user.email "amster@example.com"
-git config --global user.name "Amster Admin"
+CONFIG_PATH=${CONFIG_PATH:-forgeops-init/openam/default}
 
-cd $CONFIG_DIR
-# Disable mode checking. Hostpath mounts mess this up on VirtualBox.
+P="${GIT_ROOT}/${CONFIG_PATH}"
+
+mkdir -p ${P}
+
+# Disable mode checking.
+# When using hostPath mounts on VirtualBox the mode checks trigger differences.
+cd $GIT_ROOT
 git config core.fileMode false
 
 
 # Create Amster export script.
 cat > /tmp/export.amster <<EOF
 connect -k  /var/secrets/amster/id_rsa http://openam/openam
-export-config --path $CONFIG_DIR
+export-config --path $P
 :quit
 EOF
 
 # Do the export.
-cd /var/tmp/amster
-sh amster /tmp/export.amster
-
-cd $CONFIG_DIR
-
-git status
-
+cd /opt/amster
+sh ./amster /tmp/export.amster
 
 
 

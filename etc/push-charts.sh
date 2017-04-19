@@ -10,7 +10,7 @@ hdir=${cdir}/../helm
 
 dir=/tmp/charts
 
-charts="opendj amster openam openidm"
+charts="opendj amster openam openidm postgres-openidm"
 
 rm -fr $dir
 mkdir -p $dir

@@ -47,7 +47,7 @@ spec:
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ template "fullname" . }}
+              name: {{ template "name" . }}
               key: postgres-password
         ports:
         - name: postgresql

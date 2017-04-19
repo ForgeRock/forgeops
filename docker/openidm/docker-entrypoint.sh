@@ -1,7 +1,11 @@
 #!/bin/sh
 # Docker entry point for OpenIDM.
 
+
 if [ "$1" = 'openidm' ]; then
+    # Clone the project configuration source.
+    # source this to export the GIT_SSH command.
+     ./git-init.sh
 
     PROJECT_HOME="${PROJECT_HOME:-/opt/openidm}"
 

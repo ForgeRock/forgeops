@@ -175,3 +175,4 @@ the openam chart can discover the OpenDJ configuration store because the pod nam
 
 If you want to deploy different configurations (example: OpenAM for development, and OpenAM for QA), use Kubernetes 
 namespaces.  You can modify the bin/* scripts to pass a --namespace argument to the helm command.
+
