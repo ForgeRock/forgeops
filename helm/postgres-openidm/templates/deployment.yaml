@@ -7,33 +7,25 @@ metadata:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
-  annotations:
-        # This is taken from the official postgres Helm chart. Postgres complains if the data directory is not
-        # empty. This cleans up any lost+found that might be at the root. This should get recreated by fsck if required.
-        pod.beta.kubernetes.io/init-containers: '[
-          {
-              "name": "remove-lost-found",
-              "image": "busybox:1.25.0",
-              "imagePullPolicy": {{ default "IfNotPresent" .Values.imagePullPolicy | quote }},
-              "command": ["rm", "-fr", "/var/lib/postgresql/data/pgdata/lost+found"],
-              "volumeMounts": [
-                  {
-                      "name": "data",
-                      "mountPath": "/var/lib/postgresql/data/pgdata"
-                  }
-              ]
-          }
-      ]'
 spec:
   template:
     metadata:
       labels:
         app: openidm-postgres
     spec:
+      initContainers:
+      # This cleans up the lost+found at the root of pgdata. Postgres will not start if this directory is present.
+      - name: init
+        image: "busybox:1.25.0"
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data/pgdata
+        command:  ["rm", "-fr", "/var/lib/postgresql/data/pgdata/lost+found"]
       containers:
       - name: openidm-postgres
-        image: "{{.Values.image}}:{{ .Values.tag }}"
-        imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
+        image: "{{.Values.postgres.image}}:{{ .Values.postgres.tag }}"
+        imagePullPolicy: {{ default "IfNotPresent" .Values.imagePullPolicy | quote }}
         env:
         - name: POSTGRES_USER
           value: {{ default "postgres" .Values.postgresUser | quote }}

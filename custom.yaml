@@ -1,0 +1,26 @@
+# custom.yaml file with value overrides for charts.
+# Edit this for your environment.
+
+
+cookieDomain: .forgerocktest.com
+
+#cookieDomain: .example.com
+
+
+image:
+  repository: gcr.io/engineering-devops
+  tag: latest
+
+
+# Default git repo does not require authentication - but config is read only.
+git:
+ repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+ branch: master
+
+
+# An example using ssh. This can be used to import and export configuration to git. 
+# You must run bin/setup-git-creds.sh to use ssh. This will
+# add your git ssh key as a secret. 
+# git:
+#   repo: "ssh://git@stash.forgerock.org:7999/forgeops-init.git"
+#   branch: master

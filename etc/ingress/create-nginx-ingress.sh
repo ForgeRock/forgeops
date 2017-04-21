@@ -1,11 +1,6 @@
 #!/bin/bash
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-#
-
+# Create an nginx ingres. Minikube now bundles the ingress - so you dont need ths
 # See https://github.com/kubernetes/ingress
-
-#P="https://raw.githubusercontent.com/kubernetes/contrib/master/ingress/controllers/nginx"
 
 # Create the default HTTP backend.
 kubectl create -f default-backend.yaml
@@ -13,8 +8,8 @@ kubectl create -f default-backend.yaml
 
 # Create the custom nginx.
 kubectl create -f nginx-conf.yaml
-#kubectl create -f tcp-configmap.yaml
-kubectl create -f ingress.yaml
+
+kubectl create -f ingress-gke.yaml
 
 
 

@@ -4,7 +4,7 @@
 #
 # Tear down the ingress.
 
-kubectl delete -f ingress.yaml
+kubectl delete -f ingress-gke.yaml
 kubectl delete rc default-http-backend
 kubectl delete svc default-http-backend
 kubectl delete configmap tcp-configmap

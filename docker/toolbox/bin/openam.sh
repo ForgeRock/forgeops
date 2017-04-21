@@ -3,22 +3,19 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 source "${DIR}/util.sh"
 
-cd $DIR
 
 echo "Creating OpenDJ configuration store"
-./opendj.sh configstore
+bin/opendj.sh configstore
 
 echo "Creating OpenDJ user store"
-./opendj.sh userstore --set numberSampleUsers=1000
+bin/opendj.sh userstore --set numberSampleUsers=1000
 
 echo "Creating OpenDJ CTS store"
-./opendj.sh ctsstore --set bootstrapScript=/opt/opendj/bootstrap/cts/setup.sh
-
-cd ${HELMDIR}
+bin/opendj.sh ctsstore --set bootstrapScript=/opt/opendj/bootstrap/cts/setup.sh
 
 echo "Installing amster chart"
 
-helm install -f custom.yaml amster
+helm install -f custom.yaml ${HELM_REPO}/amster
 
 # Give amster pod time to start.
 sleep 30
@@ -47,7 +44,7 @@ kill $PID
 
 echo "Starting openam runtime"
 
-helm install -f custom.yaml openam
+helm install -f custom.yaml ${HELM_REPO}/openam
 
 echo "You will see a Terminated: message from the kubectl logs command. It is OK to ignore this."
 echo "Done"

@@ -38,20 +38,9 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-        env:
-        - name: BASE_DN
-          value: {{ .Values.baseDN }}
-        # The master server is the first instance in the stateful set (-0 )
-        - name: DJ_MASTER_SERVER
-          value: {{  template "instanceName" . -}}-0.{{ template "instanceName" . }}
-        - name: OPENDJ_JAVA_ARGS
-          value: {{ .Values.opendjJavaArgs }}{{- " -Xmx" -}}{{.Values.heapSize }}{{- " -Xms" -}}{{.Values.heapSize }}
-        - name: BOOTSTRAP
-          value:  {{ .Values.bootstrapScript }}
-{{- if not (empty .Values.numberSampleUsers) }}
-        - name: NUMBER_SAMPLE_USERS
-          value: "{{ .Values.numberSampleUsers }}"
-{{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
         ports:
         - containerPort: 389
           name: ldap

@@ -4,7 +4,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${DIR}/util.sh"
 
-helm install -f custom.yaml postgres-openidm
+helm install -f custom.yaml ${HELM_REPO}/postgres-openidm
 
 echo "Starting an OpenDJ user store instance"
 
@@ -21,7 +21,5 @@ waitPodReady $pod
 
 echo "Starting OpenIDM"
 
-helm install -f custom.yaml openidm
-
-
+helm install -f custom.yaml ${HELM_REPO}/openidm
 

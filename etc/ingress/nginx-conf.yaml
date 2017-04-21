@@ -7,9 +7,9 @@ metadata:
   name: nginx-load-balancer-conf
 data:
   enable-sticky-sessions: "true"
+  enable-vts-status: "true"
 #  ssl-redirect: "false"
 #  enable-vts-status: "true"
-#
 #  proxy-connect-timeout: "10"
 #  proxy-read-timeout: "120"
 #  proxy-send-imeout: "120"

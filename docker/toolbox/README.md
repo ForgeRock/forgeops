@@ -11,7 +11,7 @@ It may take up to 30 minutes to pull all the images.
 
 You may see an error message "Error from server (BadRequest): container "amster" in pod "amster" is waiting to start: ContainerCreating"
 
-This is OK - it just means the container is not present and Kubernetes must pull it. 
+This is OK - it just means the container is not present and Kubernetes is still pulling it.
 
 # Configuration
  

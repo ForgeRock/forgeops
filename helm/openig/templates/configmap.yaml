@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "fullname" . }}
+data:
+  OPENIG_BASE: "/git/{{ .Values.openig.projectHome }}"
+  GIT_REPO: "{{ .Values.git.repo }}"
+  GIT_BRANCH: {{ default "master" .Values.git.branch }}

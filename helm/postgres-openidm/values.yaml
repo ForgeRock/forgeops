@@ -1,5 +1,4 @@
-## postgres image repository
-image: "postgres"
+
 ## postgres image version
 ## ref: https://hub.docker.com/r/library/postgres/tags/
 ##
@@ -22,8 +21,9 @@ imageTag: "9.5.4"
 # postgresDatabase:
 
 # For postgres we  use the standard vanilla image on the Docker hub.
-image: postgres
-tag: 9-alpine
+postgres:
+  image: postgres
+  tag: 9-alpine
 
 postgresUser: openidm
 postgresPassword: openidm

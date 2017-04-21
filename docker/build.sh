@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copyright (c) 2016-2017 ForgeRock AS. 
 #
 # Build Docker images.
 # Usage:  Run ./build.sh -?
@@ -18,7 +17,7 @@ TAG=${TAG:-latest}
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam opendj openidm openig amster"
+IMAGES="openam opendj openidm openig amster toolbox"
 
 function buildDocker {
    SLASH="/"

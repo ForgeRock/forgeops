@@ -7,7 +7,6 @@ ENV HELM_FILENAME helm-${HELM_VERSION}-linux-amd64.tar.gz
 # If cloning from git..
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
 
-
 WORKDIR /
 
 RUN apt-get update \
@@ -20,7 +19,7 @@ RUN tar -zxvf /tmp/${HELM_FILENAME} -C /tmp \
   && mv /tmp/linux-amd64/helm /bin/helm \
   && chmod +x  /bin/kubectl \
   && rm -rf /tmp \
-  && mkdir -p /opt/toolbox \
+  && mkdir -p /opt/toolbox/bin \
   && git config --global user.email "forgeops-auto-export@forgerock.net" \
   && git config --global user.name "ForgeRock Auto export user"
 
@@ -28,10 +27,11 @@ RUN tar -zxvf /tmp/${HELM_FILENAME} -C /tmp \
 WORKDIR /opt/toolbox
 
 
-ADD *.sh /opt/toolbox/
+ADD bin /opt/toolbox/bin/
+ADD *.sh /opt/toolbox/bin/
+ADD templates /opt/toolbox/templates/
 
-
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/opt/toolbox/bin/docker-entrypoint.sh"]
 
 CMD ["pause"]
 

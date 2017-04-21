@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 # Utility functions - source these in other scripts.
 
+PROJECT_HOME="${DIR}/.."
+
 # Location where Helm charts are.
-HELMDIR="${DIR}/.."
+HELMDIR="${DIR}/../helm"
 
-cd ${HELMDIR}
+# Set to helm to use helm charts in this project, or to a remote repo name if your charts are on a remote server
+HELM_REPO=${HELM_REPO:-"helm"}
 
-if [ ! -r ${HELMDIR}/custom.yaml ];
+cd ${PROJECT_HOME}
+
+if [ ! -r ${PROJECT_HOME}/custom.yaml ];
 then
     echo "You must provide a ${HELMDIR}/custom.yaml file"
     echo "Copy a custom template from templates/ to custom.yaml, and edit for your environment"

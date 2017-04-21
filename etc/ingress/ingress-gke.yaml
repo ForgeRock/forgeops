@@ -1,0 +1,54 @@
+# According the docs https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/nginx-ingress.md
+# This is the recommended way to run an nginx ingress on GKE.
+# This uses the GKE outer load balancer to route to the nginx load balancer inside the cluster. 
+# It will give you an Anycast external IP without needing to expose your minion nodes 
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress-controller
+spec:
+  type: LoadBalancer
+  # Note: This is a reserved static IP on GKE. You need to change this for your environment,
+  # Or comment it out and let GKE pick an IP address for you.
+  # A static IP is useful if you have your DNS server configured to point to it.
+  loadBalancerIP: 35.184.100.105
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: https
+    port: 443
+    targetPort: 443
+  selector:
+    app: nginx-ingress-controller
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: nginx-ingress-controller
+spec:
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress-controller
+    spec:
+      containers:
+      - name: nginx-ingress-controller
+        image: gcr.io/google_containers/nginx-ingress-controller:0.9.0-beta.3
+        args:
+        - /nginx-ingress-controller
+        - --default-backend-service=default/default-http-backend
+        - --publish-service=default/nginx-ingress-controller
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        ports:
+        - containerPort: 80
+        - containerPort: 443

@@ -3,21 +3,55 @@
 
 See https://github.com/kubernetes/helm
 
-If you have not already done so, install (helm)[https://github.com/kubernetes/helm].
-
-The script bin/setup.sh will install Helm and other dependencies using homebrew.
-
 Helm is a package manager for Kubernetes. It templates out
 Kubernetes manifests by performing variable expansion using golang
 templates. This enables us to have generic "charts" that can
 be reused in different deployment contexts.
 
-*** NOTE: ****  You must create a custom.yaml template, and edit the
-values for your environment. The Helm charts will not install without these 
-value settings. See the templates/ directory for examples
 
-You must also specify the source of product configuration, which can be a Git repo or a mounted volume. 
-See the section on configuration.
+# Setup 
+
+1) If you have not already done so, install (helm)[https://github.com/kubernetes/helm] and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
+
+2) Create a custom.yaml file in the helm directory. You can copy a sample from the templates/ directory. This file sets the value overrides for things like the cooke domain, git repository, etc.
+
+3) Decide on a git configuration source for the initial product configuration. Edit the git: value in custom.yaml to 
+point to this source. 
+
+4) Build your Docker images, or set up access to a registry where those images can be pulled. The default docker repository and tag names are set in each helm chart in values.yaml. You may have to override these in your custom.yaml file.  The default assumes the docker images are in the docker cache (i.e. you have done a docker build direct to the minikube docker machine). See the README in the docker/ folder for more information.
+
+
+
+# Configuration
+
+The default configuration used to bootstrap the system comes from a git repository. The default repository used in the charts is:
+
+```
+git:
+ repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+ branch: master
+```
+
+forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it. 
+
+If you wish to use your own git repository, you can fork and clone the forgeops-init repository as a starter, and then make changes as required. To modify and save a configuration:
+
+* For AM, export the configuration using Amster.
+* For IDM, simply modify the configuration; it is saved automatically if IDM has been configured to sync back changes, which is the default configuration.
+
+
+The Docker images have the git command installed. To save configuration changes to your own repository, use the SSH protocol to access git. The Docker containers are configured such that your git SSH key should be held in the Kubernetes secret  `git-creds`. The shell script `bin/setup-git-creds.sh` will create this secret for you. You may have to edit this to work in your environment.
+
+After you have set up your SSH key, you can `kubectl exec` into a running amster or openidm pod, export the configuration (if appropriate), commit the changes using `git commit`, and then push your changes using `git push`.
+
+
+# Scripts
+
+There are various sample scripts in bin/ that you can modify as needed for your environment. These scripts run helm and kubectl commands to deploy the products.  Some examples:
+
+* open{am,idm,ig,dj}.sh - Deploys the various products
+* start-all.sh - deploys all products
+* remove-all.sh  - removes all deployments
 
 # Quick Start - Deploying OpenAM
 
@@ -28,10 +62,9 @@ You can also run `minikube dashboard`.
 * Enable the Minikube ingress controller.  `minikube addons enable ingress`
 * If you are using a private registry, see registry.sh. Edit the `~/etc/registry_env` and set
 REGISTRY_PASSWORD, REGISTRY_ID and REGISTRY_EMAIL  environment variables with your BackStage credentials.
-This is needed so that Kubernetes can authenticate to pull images from a private registry.
+This is needed so that Kubernetes can authenticate to pull images from a private registry. NOTE AT THIS TIME THAT THE FORGEROCK DOCKER REGISTRY IS ONLY AVAILABLE TO EMPLOYEES.
 * Clone https://stash.forgerock.org/projects/CLOUD/repos/forgeops-init
-* Copy custom-template.yaml to custom.yaml, and edit the variables for your environment, pointing the
-forgeops-init directory you just cloned
+* Copy template/custom.yaml to custom.yaml, and edit the variables for your environment.
 * Run `helm init` to intialize Helm.  Wait for helm to come up:
 `helm list` should not show any errors.
 * Run `bin/openam.sh`. This will deploy a config store, a user store, a CTS store,
@@ -43,8 +76,8 @@ to see what is happening, in another shell window, execute:
 
 You can also look at the pods, logs, etc. using kubectl, or the GUI dashboard.
 
-* Put your `minikube ip` in /etc/hosts, creating an entry for openam.example.com.
-* Bring up  https://openam.example.com/openam
+* Run the `minikube ip` command to obtain the IP address of your deployment, and then add an entry in your /etc/hosts file with the IP address and the FQDN an entry for openam.default.example.com.
+* Bring up  https://openam.default.example.com/openam
 
 To remove the deployment run bin/remove-all.sh. This delete the Helm
 charts and the persistent volume claims backing OpenDJ.
@@ -74,67 +107,39 @@ your own value overrides in the custom.yaml file that override just the values y
 change. You can then invoke Helm with your custom values. 
 
 For example,
-assume your ```custom.yaml`` file sets the DJ imageTag to "test-4.1".
+assume your ```custom.yaml`` file sets the DJ image tag to "test-4.1".
 You can deploy the OpenDJ chart using:
 
-```helm install --name opendj -f custom.yaml opendj```
+```helm install -f custom.yaml opendj```
 
 Further documentation can be found in each chart's README.md
 
-# Stack Configuration Files
+# Namespaces 
 
-The OpenIDM, OpenIG, and OpenAM charts include a mechanism to import configuration from a git repository,
-or to import and export configuration to a hostPath volume. 
+By default, the charts will deploy to the `default` namespace in Kubernetes. You can switch namespaces using the command `bin/set-namespace.sh  NAMESPACE`.  This will change your namespace context in kubectl to the new namespace, and will result in the products being deployed to that namespace. You can deploy multiple product instances in different namespaces and they will not interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
 
-The hostPath volume can be used in conjunction with Minikube to map a folder in your home directory 
-(example: /Users/yourUsername/src/forgeops-init) to pod volumes in your Kubernetes cluster.  This enables you 
-to do local development and save your configuration files to your local folder. If you place this 
-folder under git, you can also track configuration changes, and push them to a remote repository.
+To provide external ingress routes that are unique, the namespace is used when forming the ingress host name. The format is:
+ {openam,openidm,openig}.{namespace}.{cookieDomain} 
 
-You can supply configuration in an alternate volume by configuring the "stackConfiguration" section
-in the custom.yaml file. For example:
+ For example:
 
-```yaml
-stackConfigSource:
-  hostPath:
-    path: /Users/yourUsername/tmp/fr/config
-```
-    
-This can be any valid Kubernetes volume type. For example, if you have a PV that holds your configuration
-you can mount that instead of a hostPath. (Note: hostPath *only* works on a one node cluster!)
+ `openam.default.example.com`
 
-OpenIDM in "development" mode automatically writes out changes to configuration files as they are made in the GUI 
-console. OpenAM does not do this, but the OpenAM runtime chart (openam-runtime) includes an amster pod that
-can map to your hostPath volume. Currently this pod just sleeps forever, but you can use `kubectl exec` to 
-shell into the container, and then run the export.sh script. This script will run Amster to export the 
-current configuration to the hostPath volume that is mapped to your local folder.  In the future, the export.sh
-script may be configured to run periodically in the container. This would give you a pseudo export-on-change mechanism.
-
-Please see the custom.yaml for the format of the volume mapping. 
-
-You can edit these files, or better yet create your own custom.yaml to override those values.
 
 # Design Notes
+
+OpenIDM in "development" mode automatically writes out changes to configuration files as they are made in the GUI 
+console. OpenAM does not do this, but the OpenAM runtime chart (openam) includes an amster pod that
+can export configuration. Currently this pod just sleeps forever, but you can use `kubectl exec` to 
+shell into the container, and then run the export.sh script. This script will run Amster to export the 
+current configuration to /git.  In the future, the export.sh
+script may be configured to run periodically in the container. This would give you a pseudo export-on-change mechanism.
 
 The default OpenDJ deployment uses persistent volume claims (PVC) and
 StatefulSets to provide stateful deployment of the data tier. If you
 wish to start from scratch you should delete the PVC volumes.
 The remove-openam.sh script will do this for you. Note that
 PVCs and StatefulSets are features introduced in Kubernetes 1.5. 
-
-If OpenDJ is deployed with more than one server, subsequent replicas
-are configured to replicate to the first instance. You need to ensure
-all replicas are up and stable before proceeding to deploy OpenAM.
-If you don't, you may get into a situation where OpenAM deploys,
-but a new replica comes online and "replicates" on top of the install -
-wiping it out.  We need to fix this in the OpenDJ chart so that
-replication is initiated from the master - but this is still a work
-in progress.
-
-The shell scripts assign an explicit name to the Helm release
-using the --name argument on the helm install command. If you don't do this,
-Helm generates a unique release name. For scripting purposes a
-fixed release name allows us to clean up the release by name.
 
 If you are using Minikube take note that host path PVCs get deleted
 everytime Minikube is restarted.  The opendj/ chart is a StatefulSet,
@@ -151,10 +156,8 @@ These charts uses the following ForgeRock Docker images:
 * forgerock/openig  - OpenIG runtime image
 * forgerock/openidm  - OpenIDM runtime image
 
-You can `docker build` the images directly into the Docker instance running
+The Dockerfiles for these images are in the docker/ folder. You can `docker build` the images directly into the Docker instance running
 inside Minikube.  Run `eval $(minikube docker-env)` to set your Docker context.
-
-For the images' source code, see https://stash.forgerock.org/projects/DOCKER/repos/docker/browse
 
 # Tips
 
@@ -163,16 +166,4 @@ port forwarding:
 
 kubectl port-forward opendj-configstore-0 1389:389
 
-# Conventions
-
-A common Helm convention is to let Helm generate a random name for a release, and to
-assign pod names based on that random name. This is useful when you want to deploy
-many copies of the same chart in slightly different configurations.
-
-This project takes a different approach of using static release names. This 
-enables the charts to be more loosely coupled, but still function together. For example,
-the openam chart can discover the OpenDJ configuration store because the pod name is well known. 
-
-If you want to deploy different configurations (example: OpenAM for development, and OpenAM for QA), use Kubernetes 
-namespaces.  You can modify the bin/* scripts to pass a --namespace argument to the helm command.
 

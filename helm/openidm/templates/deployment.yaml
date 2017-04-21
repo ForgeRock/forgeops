@@ -15,15 +15,9 @@ spec:
       - name: openidm
         image: "{{.Values.image.repository}}/{{.Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        - name: GIT_REPO
-          value: {{ .Values.git.repo }}
-        - name: GIT_BRANCH
-          value: {{ default "master" .Values.git.branch }}
-        - name: PROJECT_HOME
-          value: "/opt/openidm/git/{{ .Values.openidm.projectPath }}"
-        - name: GIT_ROOT
-          value: "/opt/openidm/git"
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
         ports:
         - containerPort: 8080
         livenessProbe:

@@ -17,13 +17,9 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository}}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        env:
-        - name: OPENIG_BASE
-          value: "/git/{{ .Values.openig.projectHome }}"
-        - name: GIT_REPO
-          value: {{ .Values.git.repo }}
-        - name: GIT_BRANCH
-          value: {{ default "master" .Values.git.branch }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:

@@ -10,8 +10,8 @@ spec:
   restartPolicy: Never
   containers:
   - name: toolbox
-    image: forgerock/toolbox:latest
-    imagePullPolicy: IfNotPresent
+    image: gcr.io/engineering-devops/toolbox:latest
+    imagePullPolicy: Always
     env:
     - name: GIT_REPO
       value: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"

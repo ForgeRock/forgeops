@@ -22,6 +22,8 @@ rootSuffix:  "dc=openam,dc=forgerock,dc=org"
 # Default JVM heap size.
 heapSize: 1g
 
+# Default cookie domain. Include the leading dot.
+cookieDomain: .example.com
 
 # Valid logger types: fluentd, fluent-bit, filebeat, none
 logDriver: none

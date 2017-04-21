@@ -3,8 +3,6 @@
 # Declare variables to be passed into your templates.
 
 # optional registry, including trailing /
-registry:  docker-public.forgerock.io/
-repo: forgerock
 
 
 pullPolicy: IfNotPresent
@@ -23,13 +21,13 @@ service:
   externalPort: 80
   internalPort: 8080
 
-resources:
-  limits:
-    cpu: 300m
-    memory: 768Mi
-  requests:
-    cpu: 300m
-    memory: 768Mi
+resources: {}
+  # limits:
+  #   cpu: 300m
+  #   memory: 1024Mi
+  # requests:
+  #   cpu: 300m
+  #   memory: 1024Mi
 
 
 

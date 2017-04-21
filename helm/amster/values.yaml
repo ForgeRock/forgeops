@@ -42,17 +42,12 @@ userStore:
   dirManager: "cn=Directory Manager"
   suffix: "dc=openam,dc=forgerock,dc=org"
 
-# If skipImport is true, the basic 00_amster.sh config script will be run, but
-# the 01* import of config files will not.
 amster:
-  skipImport: false
-
-
-amster:
-  # Path relative to the root of the cloned git repo where we can find our config files
+  # Path relative to the root of the cloned git repo where we can find our configuration files
   configPath: forgeops-init/openam/empty-import
 
 
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-  revision: HEAD
+  branch: master
+
