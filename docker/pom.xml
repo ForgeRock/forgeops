@@ -64,7 +64,7 @@
     </repositories>
 
     <build>
-        <defaultGoal>docker:build</defaultGoal>
+        <defaultGoal>clean package docker:build</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>io.fabric8</groupId>
