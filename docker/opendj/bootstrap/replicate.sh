@@ -33,9 +33,9 @@ echo "Enabling replication."
 # todo: Replace with command to test for master being reachable and up:
 echo "Will sleep for a bit to ensure master is up."
 
-sleep 30
+sleep 10
 
-bin/dsreplication enable --host1 $MYHOSTNAME --port1 4444 \
+bin/dsreplication configure --host1 $MYHOSTNAME --port1 4444 \
   --bindDN1 "cn=directory manager" \
   --bindPassword1 $PASSWORD --replicationPort1 8989 \
   --host2 $MASTER --port2 4444 --bindDN2 "cn=directory manager" \

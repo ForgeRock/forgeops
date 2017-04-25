@@ -30,3 +30,5 @@ if [ -d /opt/opendj/bootstrap/ldif ]; then
       /opt/opendj/bin/ldapmodify -D "cn=Directory Manager" -h localhost -p 389 -w ${PASSWORD} -f /tmp/file.ldif
   done
 fi
+
+/opt/opendj/schedule_backup.sh

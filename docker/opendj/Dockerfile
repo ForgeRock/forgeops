@@ -17,11 +17,24 @@ ENV OPENDJ_JAVA_ARGS -server -Xmx512m -XX:+UseG1GC
 # Path to secret file that contains the cn=Directory Manager password
 # Used to configure the image
 # Mount a Docker volume or Kubernetes secret volume on /var/secrets/opendj
-# This is the path to the password file
-# If no volume is mounted, a default password is set
+# If no volume is mounted, a default password is used.
 ENV DIR_MANAGER_PW_FILE /var/secrets/opendj/dirmanager.pw
 
-ENV BASE_DN dc=example,dc=com
+# The default BASE_DN of the directory tree.
+ENV BASE_DN dc=openam,dc=forgerock,dc=org
+
+# The default backup directory. Only relevant if backups have been scheduled.
+ENV BACKUP_DIRECTORY /opt/opendj/backup
+
+# Optional full backup schedule in cron (5) format.
+ENV BACKUP_SCHEDULE_FULL  "0 2 * * *"
+
+# Optional incremental backup schedule in cron(5) format.
+ENV BACKUP_SCHEDULE_INCREMENTAL "15 * * * *"
+
+# The hostname to run the backups on. If this hostname does not match the container hostname, the backups will *not* be scheduled.
+# The default value below means backups will not be scheduled automatically. Set this environment variable if you want backups.
+ENV BACKUP_HOST dont-run-backups
 
 # Example of how you can download the DJ zip file from a maven repo
 # ENV MVN_REPO=https://maven.forgerock.org/repo/repo/org/forgerock/opendj
@@ -48,10 +61,9 @@ RUN apt-get update && apt-get install -y ldap-utils && \
     mkdir -p /var/secrets/opendj && \
     echo -n "password"  > ${DIR_MANAGER_PW_FILE}
 
-# Note the folllowing command has been removed for 4.1.0.
-# 4.1.0 uses --instancePath instead
+# Note the following RUN command has been removed for DJ 4.1.0.
+# 4.1.0 uses --instancePath instead of instance.loc.
 #     echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
-
 
 WORKDIR /opt/opendj
 

@@ -12,6 +12,17 @@ baseDN: "dc=openam,dc=forgerock,dc=org"
 #  $djInstance-0.$djInstance
 djInstance: userstore
 
+# The host where backups will be scheduled. Set this to the instance name where you want to run backups.
+# Example: userstore-0.
+# To disable scheduled backups, use a host name that does not match.
+# 
+backupHost: dontbackup
+
+# Backup schedules for full and incrementals.
+backupScheduleFull:  "2 2 * * *"
+backupScheduleIncremental: "15 * * * *"
+
+
 image:
   repository: forgerock
   name: opendj
@@ -46,7 +57,7 @@ heapSize: "512m"
 #    memory: 1024Mi
 
 # DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
-# Used in testing environments without pv providers
+# Used in testing environments without pv providers.
 djPersistence: true
 
 
@@ -54,3 +65,8 @@ git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
   branch: master
 
+# Set this to true to enable backups to gcloud
+enableGcloudBackups: false
+
+# backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
+gsBucket: gs://forgeops/dj-backup 

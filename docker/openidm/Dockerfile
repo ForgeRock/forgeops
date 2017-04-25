@@ -20,7 +20,7 @@ ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyCheck
 ADD openidm.zip /var/tmp/openidm.zip
 
 
-# For debain base image use this
+# For a Debian base image use the RUN stanza below.
 # Note git is version 2.1.4 -this may be too old to clone ssh:// repos
 #
 # RUN apt-get update && apt-get install -y ldap-utils openssh-client bash git && \
@@ -30,7 +30,7 @@ ADD openidm.zip /var/tmp/openidm.zip
 #     git config --global user.name "Git Auto-sync user"
 
 
-# For alpine
+# For alpine:
 # git version is 2.11.1 - which works with ssh:// repos
 # libc6-compat is needed by OrientDB as it uses the snappy Java shared library.
 # postgresql-client is for debugging purposes - it can be removed if you wish.

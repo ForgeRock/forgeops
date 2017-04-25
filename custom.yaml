@@ -1,13 +1,15 @@
 # custom.yaml file with value overrides for charts.
 # Edit this for your environment.
-# The scripts in bin/ also allow setting the environment variable CUSTOM_YAML to path to a custom yaml override. If that variable
-# Is not set we use this file
+# The scripts in bin/ allow setting the environment variable CUSTOM_YAML to path to a custom yaml
+# override. If that variable
+# Is not set we use this file instead.
 
+# The suffix for the installation. The FQDNs will be (for example) openam.{namespace}.{cookieDomain}
 cookieDomain: .example.com
 
 
 # Sample image override that works when you are building images 
-# direct to minikube using a "latest" tag.  Leaving this commented out uses the 
+# direct to minikube using a "latest" tag.  Leave this commented out to use the 
 # defaults.
 # image:
 #   repository: forgerock

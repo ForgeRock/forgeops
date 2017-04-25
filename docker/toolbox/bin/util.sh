@@ -15,8 +15,8 @@ CUSTOM_YAML=${CUSTOM_YAML:-${PROJECT_HOME}/custom.yaml}
 
 if [ ! -r ${CUSTOM_YAML} ];
 then
-    echo "You must provide a ${CUSTOM_YAML} file"
-    echo "Copy a custom template from templates/ to custom.yaml, and edit for your environment"
+    echo "You must provide a ${CUSTOM_YAML} file."
+    echo "Copy a custom template from templates/ or set the environment variable CUSTOM_YAML the path to your custom.yaml."
     exit 1
 fi
 

@@ -23,7 +23,9 @@ if [ $? == 0 ]; then
     exit 0
 fi
 
-# The OpenDJ instance name is also used as the Helm deployment name
+# The OpenDJ instance name is also used as the Helm deployment name.
+
+echo helm install  -f ${CUSTOM_YAML} --set djInstance=${instance} "$@" ${HELM_REPO}/opendj
 helm install  -f ${CUSTOM_YAML} --set djInstance=${instance} "$@" ${HELM_REPO}/opendj
 
 # DJ is a StatefulSet - so the pod name is well known.
