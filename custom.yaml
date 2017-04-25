@@ -1,8 +1,7 @@
 # custom.yaml file with value overrides for charts.
 # Edit this for your environment.
-
-
-#cookieDomain: .forgerocktest.com
+# The scripts in bin/ also allow setting the environment variable CUSTOM_YAML to path to a custom yaml override. If that variable
+# Is not set we use this file
 
 cookieDomain: .example.com
 

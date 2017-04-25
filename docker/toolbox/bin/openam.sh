@@ -15,7 +15,7 @@ bin/opendj.sh ctsstore --set bootstrapScript=/opt/opendj/bootstrap/cts/setup.sh
 
 echo "Installing amster chart"
 
-helm install -f custom.yaml ${HELM_REPO}/amster
+helm install -f ${CUSTOM_YAML} ${HELM_REPO}/amster
 
 # Give amster pod time to start.
 sleep 30
@@ -44,7 +44,7 @@ kill $PID
 
 echo "Starting openam runtime"
 
-helm install -f custom.yaml ${HELM_REPO}/openam
+helm install -f ${CUSTOM_YAML} ${HELM_REPO}/openam
 
 echo "You will see a Terminated: message from the kubectl logs command. It is OK to ignore this."
 echo "Done"

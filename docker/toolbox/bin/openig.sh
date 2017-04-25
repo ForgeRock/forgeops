@@ -4,4 +4,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "${DIR}/util.sh"
 
-helm install -f custom.yaml ${HELM_REPO}/openig
+helm install -f ${CUSTOM_YAML} ${HELM_REPO}/openig

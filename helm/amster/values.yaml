@@ -45,9 +45,15 @@ userStore:
 amster:
   # Path relative to the root of the cloned git repo where we can find our configuration files
   configPath: forgeops-init/openam/empty-import
+  
 
 
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
   branch: master
 
+
+# determines if '--clean true' is used for the import-config.
+# suggest this is 'true' if importing a complete configuration
+# and set to 'false' if importing partial/incremental configurations
+amsterClean: false

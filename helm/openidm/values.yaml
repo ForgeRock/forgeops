@@ -44,9 +44,8 @@ logDriver: none
 
 # The *relative* path where the conf/ directory is found. This is relative to the root of the config directory
 openidm:
-  projectPath: forgeops-init/openidm/sample2b
+  projectPath: forgeops-init/openidm/sync-with-ldap-bidirectional
 
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
   branch: master
-

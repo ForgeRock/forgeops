@@ -11,9 +11,11 @@ HELM_REPO=${HELM_REPO:-"helm"}
 
 cd ${PROJECT_HOME}
 
-if [ ! -r ${PROJECT_HOME}/custom.yaml ];
+CUSTOM_YAML=${CUSTOM_YAML:-${PROJECT_HOME}/custom.yaml}
+
+if [ ! -r ${CUSTOM_YAML} ];
 then
-    echo "You must provide a ${HELMDIR}/custom.yaml file"
+    echo "You must provide a ${CUSTOM_YAML} file"
     echo "Copy a custom template from templates/ to custom.yaml, and edit for your environment"
     exit 1
 fi

@@ -12,6 +12,7 @@ USER="cn=Directory Manager"
 
 /opt/opendj/setup -p $SERVER_PORT  \
   --adminConnectorPort 4444 \
+  --instancePath /opt/opendj/data \
   --baseDN $BASE_DN -h localhost --rootUserPassword "$PASSWORD" \
   --acceptLicense --addBaseEntry
 

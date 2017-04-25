@@ -39,8 +39,9 @@ if [ "$1" = 'openidm' ]; then
 
    # If secrets keystore is present copy files from the secrets directory to the standard location.
    if [ -r secrets/keystore.jceks ]; then
-	cp secrets/*  security
-	chown -R openidm:openidm security 
+	    cp secrets/*  security
+      # Currently we are not running as the openidm user. Revist later
+	    #chown -R openidm:openidm security 
    fi
 
    O2="-Dopenidm.repo.host=$REPO_HOST -Dopenidm.repo.port=$REPO_PORT -Dopenidm.repo.user=${REPO_USER} -Dopenidm.repo.password=${REPO_PASSWORD}"
@@ -75,4 +76,7 @@ if [ "$1" = 'openidm' ]; then
        ${LAUNCHER}  -c /opt/openidm/bin/launcher.json ${CLOPTS}
 fi
 
-exec su-exec openidm "$@"
+exec  "$@"
+
+#exec su-exec openidm "$@"
+

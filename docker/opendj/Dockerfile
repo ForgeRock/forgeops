@@ -41,12 +41,16 @@ ADD opendj.zip /tmp/
 # If you want to use Alpine install this
 #RUN apk add --no-cache su-exec openldap-clients && \
 
+
 RUN apt-get update && apt-get install -y ldap-utils && \
     unzip -q /tmp/opendj.zip -d /opt  && rm /tmp/opendj.zip && \
-    echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
     mkdir -p /opt/opendj/data/lib/extensions && \
     mkdir -p /var/secrets/opendj && \
     echo -n "password"  > ${DIR_MANAGER_PW_FILE}
+
+# Note the folllowing command has been removed for 4.1.0.
+# 4.1.0 uses --instancePath instead
+#     echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
 
 
 WORKDIR /opt/opendj

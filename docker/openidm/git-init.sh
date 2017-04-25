@@ -21,10 +21,9 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 if [ ! -z "${GIT_REPO}" ]; then
     mkdir -p ${GIT_ROOT}
     cd ${GIT_ROOT}
-    pwd
-    ls -lR
     echo git clone -b "${GIT_BRANCH}"  "${GIT_REPO}"
     git clone -b "${GIT_BRANCH}"  "${GIT_REPO}"
+
     if [ "$?" -ne 0 ]; then
        echo "git clone failed"
        exit 1

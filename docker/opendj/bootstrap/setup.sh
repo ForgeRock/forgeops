@@ -15,6 +15,7 @@ fi
 # todo: We may want to specify a keystore using --usePkcs12keyStore, --useJavaKeystore
 /opt/opendj/setup -p 389 --ldapsPort 636 --enableStartTLS  \
   --adminConnectorPort 4444 \
+  --instancePath /opt/opendj/data \
   --baseDN $BASE_DN -h localhost --rootUserPassword "$PASSWORD" \
   --acceptLicense \
   ${INIT_OPTION}

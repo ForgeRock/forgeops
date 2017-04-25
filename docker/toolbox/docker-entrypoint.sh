@@ -35,14 +35,25 @@ case $node in
 esac 
 
 
+do_pause() {
+    echo "Sleeping" 
+    while true
+    do
+        sleep 10000
+    done 
+}
 # assume command is startall. TODO: add different entry points
 
-bin/start-all.sh
+case $1 in
+startall)   
+    bin/start-all.sh;;
     
-# for now just pause...
-while true
-do
-    sleep 10000
-done
+pause) 
+    do_pause ;;
+
+*) 
+    exec $@ ;;
+esac
+
 
 # todo: optionally run bin/startall.sh
