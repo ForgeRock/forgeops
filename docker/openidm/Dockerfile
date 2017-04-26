@@ -31,7 +31,7 @@ ADD openidm.zip /var/tmp/openidm.zip
 
 
 # For alpine:
-# git version is 2.11.1 - which works with ssh:// repos
+# git version is 2.11.1 - which works with ssh:// repos.
 # libc6-compat is needed by OrientDB as it uses the snappy Java shared library.
 # postgresql-client is for debugging purposes - it can be removed if you wish.
 RUN apk add --no-cache su-exec git openssh-client bash libc6-compat && \

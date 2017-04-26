@@ -18,7 +18,7 @@ djInstance: userstore
 # 
 backupHost: dontbackup
 
-# Backup schedules for full and incrementals.
+# Backup schedules for full and incrementals. 
 backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "15 * * * *"
 

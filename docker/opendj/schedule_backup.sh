@@ -1,5 +1,5 @@
 #!/usr/bin/env sh 
-# Schedule automated backups
+# Schedule automated backups.
 
 cd /opt/opendj
 
