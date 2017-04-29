@@ -20,7 +20,7 @@ spec:
             "image": "alpine",
             "imagePullPolicy": "IfNotPresent",
             "command":  [ "/bin/sh", "-c",
-            "mkdir -p /root/openam/openam/debug; umask u=rwx,g=,o= ; cd /root/openam; cp -L /var/boot/boot.json .; cp  -rL /var/secrets/openam/.?* openam; cp -L /var/secrets/openam/authorized_keys ."],
+            "mkdir -p /root/openam/openam/debug; umask u=rwx,g=,o= ; cd /root/openam; cp -L /var/boot/*.json .; cp  -rL /var/secrets/openam/.?* openam; cp -L /var/secrets/openam/authorized_keys ."],
             "volumeMounts": [
                         { "name": "openam-root",    "mountPath": "/root/openam" },
                         { "name": "openam-boot",    "mountPath": "/var/boot" },

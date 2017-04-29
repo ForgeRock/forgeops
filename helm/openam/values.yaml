@@ -28,6 +28,11 @@ cookieDomain: .example.com
 # Valid logger types: fluentd, fluent-bit, filebeat, none
 logDriver: none
 
+openam:
+  # If true (the default), we create a boot.json that points to the config store. This is only set to false
+  # on an intial install, and you want AM to come up with the configurator screen. If you set this true
+  # and AM is not yet configured, you will get an error as it tries to open a config store that is not yet configured.
+  configureBoot: true
 
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"

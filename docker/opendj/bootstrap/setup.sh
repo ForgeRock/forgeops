@@ -24,10 +24,11 @@ fi
 
 if [ -d /opt/opendj/bootstrap/ldif ]; then
    echo "Found optional schema files in bootstrap/ldif. Will load them"
-  for file in /opt/opendj/bootstrap/ldif/*;  do
+  for file in /opt/opendj/bootstrap/ldif/dj-userstore/*;  do
       echo "Loading $file"
-       sed -e "s/@BASE_DN@/$BASE_DN/" <${file}  >/tmp/file.ldif
-      /opt/opendj/bin/ldapmodify -D "cn=Directory Manager" -h localhost -p 389 -w ${PASSWORD} -f /tmp/file.ldif
+       sed -e "s/@BASE_DN@/$BASE_DN/" -e "s/@userStoreRootSuffix@/$BASE_DN/"  -e "s/@DB_NAME@/userRoot/" <${file}  >/tmp/file.ldif
+      /opt/opendj/bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 389 -w ${PASSWORD} -f /tmp/file.ldif
+      echo "  "
   done
 fi
 

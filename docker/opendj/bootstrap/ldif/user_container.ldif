@@ -1,9 +1,0 @@
-dn: ou=People,@BASE_DN@
-objectClass: organizationalUnit
-objectClass: top
-ou: People
-
-dn: ou=Groups,@BASE_DN@
-objectClass: organizationalUnit
-objectClass: top
-ou: Groups

@@ -6,6 +6,7 @@ kind: ConfigMap
 metadata:
   name: boot-json
 data:
+  {{- if .Values.openam.configureBoot }}
   boot.json: |
    {
      "instance" : "{{ default "http://openam:80/openam" .Values.openamInstance }}",
@@ -26,3 +27,4 @@ data:
        "ldapProtocol" : "ldap"
      } ]
    }
+   {{- end }}

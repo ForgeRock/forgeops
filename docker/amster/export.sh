@@ -9,10 +9,11 @@ P="${GIT_ROOT}/${CONFIG_PATH}"
 
 mkdir -p ${P}
 
-# Disable mode checking.
-# When using hostPath mounts on VirtualBox the mode checks trigger differences.
 cd $GIT_ROOT
-git config core.fileMode false
+
+# Disable mode checking.
+# When using hostPath mounts on VirtualBox the mode checks trigger differences. You dont need this unless you are using VBox hostPath mounts.
+# git config core.fileMode false
 
 
 # Create Amster export script.
