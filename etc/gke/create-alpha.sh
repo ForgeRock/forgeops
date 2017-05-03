@@ -12,7 +12,7 @@ machine="n1-standard-8"
 # Benchmark notes: SSD disk - .17 / GB / month, about .50 / hour for 2 TB
 # scopes storage-full is needed for container engine to run the gsutil command. We use this for dj backup.
 # Create an alpha cluster
-gcloud alpha container clusters create $CLUSTER_NAME --cluster-version 1.6.1 \
+gcloud alpha container clusters create $CLUSTER_NAME --cluster-version 1.6.2 \
   --network "default" --num-nodes 1 \
   --enable-kubernetes-alpha \
   --enable-autoscaling --min-nodes=1 --max-nodes=4 \

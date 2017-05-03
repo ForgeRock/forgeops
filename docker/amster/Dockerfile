@@ -20,6 +20,9 @@ RUN apk add --no-cache su-exec unzip curl git bash openssh-client \
 
 WORKDIR /opt/amster
 
+# This sets a default ssh command if you are wanting to clone an ssh:// git repo. 
+# You must mount your ssh key on /etc/git-secret/ssh. You can use a Kubernetes secret volume for this purpose.
+ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
 
 ADD *.sh /opt/amster/
 

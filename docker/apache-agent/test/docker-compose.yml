@@ -1,8 +1,0 @@
-# test
-http:
-  container_name: atest
-  extra_hosts:
-      - "openam.example.com:192.168.99.1"
-  build: .
-  ports:
-      - "9000:80"

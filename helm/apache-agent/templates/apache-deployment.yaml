@@ -1,0 +1,54 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    component: apache
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        name: apache
+        agent: apache
+        app: {{ template "fullname" . }}
+    spec:
+      # Note: the privileged container and mounting the /dev/shm are needed to give the agent enough shared
+      # memory.  See https://bugster.forgerock.org/jira/browse/AMAGENTS-273
+      # And https://github.com/kubernetes/kubernetes/issues/28272 
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args: ["httpd-foreground"]
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        # todo: The agent will force a 302 redirect - but any codes between 200 and 399 are considered healthy
+        # However - it appears as if Kube tries to follow the 302 redirect, and this results in an error. For
+        # now we disable the probes.
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     host: localhost
+        #     port: {{ .Values.service.internalPort }}
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: {{ .Values.service.internalPort }}
+        #   initialDelaySeconds: 5
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        volumeMounts:
+        - name: dshm
+          mountPath: /dev/shm
+      volumes:
+      - name: dshm
+        hostPath: 
+          path: /dev/shm
+       
