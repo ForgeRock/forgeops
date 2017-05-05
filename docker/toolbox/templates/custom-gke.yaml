@@ -5,7 +5,7 @@ image:
   repository: gcr.io/engineering-devops
   tag: latest
 
-cookieDomain: .forgerocktest.com
+cookieDomain: .forgeops.com
 
 
 # OpenDJ storage class 

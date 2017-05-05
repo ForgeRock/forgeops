@@ -4,19 +4,19 @@ metadata:
   name: {{ template "fullname" . }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
-    component: apache
+    component: {{ .Values.component }}
 spec:
   replicas: {{ .Values.replicaCount }}
   template:
     metadata:
       labels:
-        name: apache
-        agent: apache
+        name: {{ .Values.component }}
+        agent: {{ .Values.component }}
         app: {{ template "fullname" . }}
     spec:
       # Note: the privileged container and mounting the /dev/shm are needed to give the agent enough shared
-      # memory.  See https://bugster.forgerock.org/jira/browse/AMAGENTS-273
-      # And https://github.com/kubernetes/kubernetes/issues/28272 
+      # memory.  See https://bugster.forgerock.org/jira/browse/AMAGENTS-273 and
+      # https://github.com/kubernetes/kubernetes/issues/28272.
       terminationGracePeriodSeconds: 5
       containers:
       - name: {{ .Chart.Name }}
@@ -47,8 +47,12 @@ spec:
         volumeMounts:
         - name: dshm
           mountPath: /dev/shm
+        - name: agent-conf
+          mountPath: /opt/web_agents/apache24_agent/instances/agent_1/config
       volumes:
       - name: dshm
         hostPath: 
           path: /dev/shm
-       
+      - name: agent-conf
+        configMap:
+          name: {{ template "fullname" . }}

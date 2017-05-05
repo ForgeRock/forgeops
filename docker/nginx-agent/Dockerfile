@@ -1,12 +1,8 @@
-#
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-#
-# Docker image for Apache + OpenAM HTTP agent.
-FROM httpd:2.4
+# Note: This is currently pending the fix for https://bugster.forgerock.org/jira/browse/AMAGENTS-501.
+# Copyright (c) 2016-2017 ForgeRock AS.
+FROM nginx:1.12
 
 WORKDIR /opt
-
 
 # Use this if you want to directly add the agent zip file.
 #ADD agent.zip /var/tmp/agent.zip
@@ -14,10 +10,10 @@ WORKDIR /opt
 # The agent bits are not on maven - so we need to download these from the internal build server.
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
 ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/nightly/Linux
-ENV APACHE_AGENT Apache_v24_Linux_64bit_5.0.0-SNAPSHOT.zip
+ENV AGENT NGINX_r12_Linux_64bit_5.0.0-SNAPSHOT.zip
 
-RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim && \
-      curl $WEB_AGENT_BUILDS/$APACHE_AGENT -o /var/tmp/agent.zip && \
+RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
+      curl $WEB_AGENT_BUILDS/$AGENT -o /var/tmp/agent.zip && \
       unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*
@@ -29,14 +25,13 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 #
 
 # Because we are running this before OpenAM is up and running we need to use the forceinstall option.
-# We are using  defaults here (OpenAM service name) that are not going to exist in most environments.
+# We are using defaults here (OpenAM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
-# Note: Another alternative to bootstrapping the agent in the docker build is to move this into the container startup. 
-RUN /opt/web_agents/apache24_agent/bin/agentadmin --s /usr/local/apache2/conf/httpd.conf \
+RUN /opt/web_agents/nginx12_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
         "http://openam:80/openam" \
-        "http://apache-svc:80/" \
+        "http://nginx:80/" \
         "/" \
-        "apache" \
+        "nginx" \
         /var/tmp/pw.txt \
         --changeOwner --acceptLicence --forceInstall
 
@@ -44,14 +39,15 @@ RUN /opt/web_agents/apache24_agent/bin/agentadmin --s /usr/local/apache2/conf/ht
 # Set this down lower for testing purposes.
 ENV AM_MAX_SHARED_POOL_SIZE 1048576000
 
-WORKDIR /opt/web_agents/apache24_agent
+WORKDIR /opt/web_agents
 
 ADD *.sh /opt/web_agents/
+ADD nginx.conf /etc/nginx/
+ADD default.conf /etc/nginx/conf.d/
 
-# This sends the debug logs to stderr so we can use docker tools to view the logs.
-RUN ln -sf /dev/stderr /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log
+RUN chown -R nginx:nginx  /opt/  && \
+    ln -sf /dev/stderr /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.log
 
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]
 
-# Inherit CMD from Parent httpd:2.4. This starts Apache in the foreground, so we can see the stdout.
-CMD ["httpd-foreground"]
+CMD ["start"]
