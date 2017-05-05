@@ -29,6 +29,7 @@ echo "RE-creating OpenDJ configuration store"
 bin/opendj.sh configstore
 
 # Configure boot set to false - because we want this to come up waiting to be configured.
+echo helm install -f ${CUSTOM_YAML} --set openam.configureBoot=false ${HELM_REPO}/openam
 helm install -f ${CUSTOM_YAML} --set openam.configureBoot=false ${HELM_REPO}/openam
 
 

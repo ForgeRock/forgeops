@@ -21,5 +21,6 @@ waitPodReady $pod
 
 echo "Starting OpenIDM"
 
+echo helm install -f ${CUSTOM_YAML} ${HELM_REPO}/openidm
 helm install -f ${CUSTOM_YAML} ${HELM_REPO}/openidm
 
