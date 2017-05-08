@@ -14,4 +14,3 @@ cp $SRC/cts-indices.ldif $DEST
 cp $SRC/cts-container.ldif $DEST
 cp $SRC/cts-add-multivalue.ldif $DEST
 cp $SRC/cts-add-multivalue-indices.ldif $DEST
-git

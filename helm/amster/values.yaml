@@ -42,14 +42,16 @@ userStore:
   dirManager: "cn=Directory Manager"
   suffix: "dc=openam,dc=forgerock,dc=org"
 
-amster:
-  # Path relative to the root of the cloned git repo where we can find our configuration files
-  configPath: forgeops-init/openam/empty-import
+# amster:
+#   # Path relative to the root of the cloned git repo where we can find our configuration files
+#   configPath: forgeops-init/openam/empty-import
   
 
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
   branch: master
+  configPath:
+    amster: forgeops-init/openam/empty-import
 
 
 # determines if '--clean true' is used for the import-config.

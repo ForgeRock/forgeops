@@ -36,11 +36,6 @@ spec:
       mountPath: /etc/git-secret
 {{- end }}
     args: ["configure"]
-    # readinessProbe:
-    #   exec:
-    #     command: ["/bin/sh", "-c", "[ -f /var/tmp/CONFIGURED ]" ]
-    #   periodSeconds: 10
-    #   initialDelaySeconds: 30
   volumes:
   - name: amster-secrets
     secret:
