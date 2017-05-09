@@ -9,9 +9,13 @@ HELMDIR="${DIR}/../helm"
 # Set to helm to use helm charts in this project, or to a remote repo name if your charts are on a remote server
 HELM_REPO=${HELM_REPO:-"helm"}
 
+
 cd ${PROJECT_HOME}
 
 CUSTOM_YAML=${CUSTOM_YAML:-${PROJECT_HOME}/custom.yaml}
+
+echo "PROJECT_HOME is ${PROJECT_HOME}"
+echo "CUSTOM_YAML is ${CUSTOM_YAML}"
 
 if [ ! -r ${CUSTOM_YAML} ];
 then

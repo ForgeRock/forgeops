@@ -7,4 +7,3 @@
 PROJECT=engineering-devops
 
 gsutil -m rm -r gs://artifacts.${PROJECT}.appspot.com 
-

@@ -3,10 +3,9 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
 
-# Example of setting a namespace context:
+# Examples of setting a namespace context:
 kubectl config set-context dev --namespace=default --cluster=gke_frstack-1077_us-central1-f_openam \
 --user=gke_frstack-1077_us-central1-f_openam
-
 
 kubectl config set-context tenant1 --namespace=tenant1 --cluster=gke_frstack-1077_us-central1-f_openam \
       --user=gke_frstack-1077_us-central1-f_openam

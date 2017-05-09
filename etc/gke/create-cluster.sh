@@ -7,7 +7,8 @@
 # See https://cloud.google.com/container-engine/docs/quickstart
 
 validateInputArgs() {
-  CLUSTER_VERSION=""
+  # Set a default cluster version
+  CLUSTER_VERSION="--cluster-version 1.6.2"
   CLUSTER_NAME=openam
 
   while [[ $# > 0 ]]
@@ -59,16 +60,24 @@ validateInputArgs "$@"
 export ZONE=us-central1-f
 
 
-# Options - we disable GKE HTTP LB addon since we want to deploy the nginx load balancer.
-# GCE LB is overkill for a test system.
-# Currently we need an alpha cluster to get the StatefulSet feature.
-gcloud alpha container clusters create $CLUSTER_NAME $CLUSTER_VERSION \
-  --network "default" --num-nodes 2 \
-  --enable-kubernetes-alpha \
-  --machine-type  n1-standard-2 --zone $ZONE \
-  --disable-addons HttpLoadBalancing \
-  --enable-autoscaling --min-nodes=2 --max-nodes=4 \
+# 8 cpus, 30 GB of memory
+machine="n1-standard-8"
+# 16 cpus, 60 GB,  .80 cents / hour
+# machine="n1-standard-16"
+
+echo gcloud container clusters create $CLUSTER_NAME $CLUSTER_VERSION \
+  --network "default" --num-nodes 1 \
+  --machine-type  ${machine} --zone $ZONE \
+  --enable-autoscaling --min-nodes=1 --max-nodes=4 \
   --disk-size 50
+
+
+gcloud container clusters create $CLUSTER_NAME $CLUSTER_VERSION \
+  --network "default" --num-nodes 1 \
+  --machine-type  ${machine} --zone $ZONE \
+  --enable-autoscaling --min-nodes=1 --max-nodes=4 \
+  --disk-size 50
+
 
 # You can add this if you want to use preemptible nodes. These are very inexpensive, but can be taken down at any time.
 # --preemptible \
