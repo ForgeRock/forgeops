@@ -12,9 +12,9 @@ HELM_REPO=${HELM_REPO:-"helm"}
 
 cd ${PROJECT_HOME}
 
-CUSTOM_YAML=${CUSTOM_YAML:-${PROJECT_HOME}/custom.yaml}
+CUSTOM_YAML=${CUSTOM_YAML:-./custom.yaml}
 
-echo "PROJECT_HOME is ${PROJECT_HOME}"
+#echo "PROJECT_HOME is ${PROJECT_HOME}"
 echo "CUSTOM_YAML is ${CUSTOM_YAML}"
 
 if [ ! -r ${CUSTOM_YAML} ];

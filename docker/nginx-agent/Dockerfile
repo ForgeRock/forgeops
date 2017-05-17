@@ -12,6 +12,7 @@ WORKDIR /opt
 ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/nightly/Linux
 ENV AGENT NGINX_r12_Linux_64bit_5.0.0-SNAPSHOT.zip
 
+
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
       curl $WEB_AGENT_BUILDS/$AGENT -o /var/tmp/agent.zip && \
       unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \

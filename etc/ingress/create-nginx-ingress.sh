@@ -1,5 +1,5 @@
 #!/bin/bash
-# Create an nginx ingres. Minikube now bundles the ingress - so you dont need this on that platform.
+# Create an nginx ingress. Minikube now bundles the ingress - so you don't need this on that platform.
 # See https://github.com/kubernetes/ingress
 
 # Create the default HTTP backend.

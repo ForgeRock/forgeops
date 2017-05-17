@@ -11,6 +11,6 @@ kubectl config set-context tenant1 --namespace=tenant1 --cluster=gke_frstack-107
       --user=gke_frstack-1077_us-central1-f_openam
 
 
-# To switch names spaces:
+# To switch namesspaces:
 
 kubectl config use-context dev

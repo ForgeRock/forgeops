@@ -193,7 +193,7 @@
 
                                 <artifactItem>
                                     <groupId>org.forgerock.opendj</groupId>
-                                    <artifactId>opendj-server-legacy</artifactId>
+                                    <artifactId>opendj-server</artifactId>
                                     <version>${opendjVersion}</version>
                                     <type>zip</type>
                                     <outputDirectory>opendj</outputDirectory>

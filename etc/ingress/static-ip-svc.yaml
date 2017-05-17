@@ -1,7 +1,7 @@
 # According the docs https://github.com/kubernetes-incubator/external-dns/blob/master/docs/tutorials/nginx-ingress.md
 # This is the recommended way to run an nginx ingress on GKE.
 # This uses the GKE outer load balancer to route to the nginx load balancer inside the cluster. 
-# It will give you an Anycast external IP without needing to expose your minion nodes 
+# It will give you an Anycast external IP without needing to expose your minion nodes.
 apiVersion: v1
 kind: Service
 metadata:

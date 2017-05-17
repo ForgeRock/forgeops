@@ -7,7 +7,7 @@
 # See https://cloud.google.com/container-engine/docs/quickstart
 
 validateInputArgs() {
-  # Set a default cluster version
+  # Set a default cluster version.
   CLUSTER_VERSION="--cluster-version 1.6.2"
   CLUSTER_NAME=openam
 
