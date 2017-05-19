@@ -37,3 +37,12 @@ openam:
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
   branch: master
+
+# The defaults below are small and OK for testing.
+resources:
+ limits:
+   cpu: 1000m
+   memory: 512Mi
+ requests:
+   cpu: 100m
+   memory: 512Mi

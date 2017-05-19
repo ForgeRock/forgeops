@@ -4,15 +4,16 @@
 
 #FROM openjdk:8-jre-alpine
 
-FROM openjdk:8-jre
+FROM openjdk:8u131-jre
 
 WORKDIR /opt
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 
 # Default options for a small instance. Overrride the environment var OPENDJ_JAVA_ARGS as needed
-ENV OPENDJ_JAVA_ARGS -server -Xmx512m -XX:+UseG1GC
-
+#ENV OPENDJ_JAVA_ARGS -server -Xmx512m -XX:+UseG1GC
+# You can use these options on jdk 8u131 or later. This will set the heap size according to the container size
+ENV OPENDJ_JAVA_ARGS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 # Path to secret file that contains the cn=Directory Manager password
 # Used to configure the image

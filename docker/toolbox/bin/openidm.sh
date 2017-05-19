@@ -8,7 +8,7 @@ helm install -f ${CUSTOM_YAML} ${HELM_REPO}/postgres-openidm
 
 echo "Starting an OpenDJ user store instance"
 
-${DIR}/opendj.sh userstore
+bin/opendj.sh userstore --set numberSampleUsers=1000
 
 # todo: probe for pod ready instead of sleeping
 echo "Waiting for Postgres to start"

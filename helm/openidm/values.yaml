@@ -21,13 +21,13 @@ service:
   externalPort: 80
   internalPort: 8080
 
-resources: {}
-  # limits:
-  #   cpu: 300m
-  #   memory: 1024Mi
-  # requests:
-  #   cpu: 300m
-  #   memory: 1024Mi
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 300m
+    memory: 512Mi
 
 
 

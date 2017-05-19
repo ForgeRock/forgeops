@@ -41,20 +41,19 @@ storageSize: "10Gi"
 # Set storageclass only on clusters that support it (GCP / AWS).
 #storageClass: fast
 
-# OpenDJ tuning params - except memory, see below.
-opendjJavaArgs: "-server -XX:+UseG1GC "
-# This gets used for the -Xmx argument
-heapSize: "512m"
+# You need to be on JDK 8u131 or higher to enable these options.
+opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
-# Optional resources. For a small Minikube environment, just comment these out.
-# These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources
-#resources:
-#  limits:
-#    cpu: 500m
-#    memory: 1024Mi
-#  requests:
-#    cpu: 400m
-#    memory: 1024Mi
+# Resource limits.
+# These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
+# The defaults below are small and OK for testing.
+resources:
+ limits:
+   cpu: 1000m
+   memory: 512Mi
+ requests:
+   cpu: 200m
+   memory: 512Mi
 
 # DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
 # Used in testing environments without pv providers.

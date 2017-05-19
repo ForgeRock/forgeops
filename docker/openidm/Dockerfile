@@ -12,6 +12,9 @@ ADD Dockerfile /
 
 # Override these to change the JVM:
 ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
+# Use this when alpine 8 131 lands.
+#ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+
 
 # This is only used if a git clone of an ssh: repo is performed.
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh

@@ -6,7 +6,7 @@ data:
   BASE_DN: {{ .Values.baseDN }}
   # The master server is the first instance in the stateful set (-0 )
   DJ_MASTER_SERVER: {{  template "instanceName" . -}}-0.{{ template "instanceName" . }}
-  OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}{{- " -Xmx" -}}{{.Values.heapSize }}{{- " -Xms" -}}{{.Values.heapSize }}
+  OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
   BACKUP_HOST: {{ .Values.backupHost }}
   BACKUP_SCHEDULE_FULL: {{ .Values.backupScheduleFull }}
   BACKUP_SCHEDULE_INCREMENTAL: {{ .Values.backupScheduleIncremental }}

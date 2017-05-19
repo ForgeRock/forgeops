@@ -39,8 +39,10 @@ spec:
         - name: openam-root
           mountPath: /root/openam
         env:
-        - name: JAVA_OPTS
-          value:  "-Xmx{{ .Values.heapSize }}"
+        - name: CATALINA_OPTS
+          value:  "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.
         readinessProbe:
           httpGet:
