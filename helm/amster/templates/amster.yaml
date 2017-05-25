@@ -9,6 +9,7 @@ metadata:
     app: {{ template "fullname" . }}
     vendor: forgerock
     component: amster
+    release: {{ .Release.Name }}
 spec:
   restartPolicy: Never
   containers:

@@ -146,6 +146,16 @@
                                 </tags>
                             </build>
                         </image>
+                         <image>
+                            <name>${repo}/git</name>
+                            <build>
+                                <dockerFileDir>git</dockerFileDir>
+                                <tags>
+                                    <tag>latest</tag>
+                                    <tag>${project.version}</tag>
+                                </tags>
+                            </build>
+                        </image>
                     </images>
                 </configuration>
                 <!-- End of images list -->
@@ -184,7 +194,7 @@
 
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>amster</artifactId>
+                                    <artifactId>openam-amster</artifactId>
                                     <version>${openamVersion}</version>
                                     <type>zip</type>
                                     <outputDirectory>amster</outputDirectory>

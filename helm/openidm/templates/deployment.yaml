@@ -10,8 +10,35 @@ spec:
     metadata:
       labels:
         app: {{ template "fullname" . }}
+        release: {{ .Release.Name }}
     spec:
+      initContainers:
+      - name: git-init
+        image: forgerock/git:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        {{- if hasPrefix "ssh:" .Values.git.repo }}
+        - name: git-secret
+          mountPath: /etc/git-secret
+        {{- end }}
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
       containers:
+      - name: git
+        image: forgerock/git:latest
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        {{- if hasPrefix "ssh:" .Values.git.repo }}
+        - name: git-secret
+          mountPath: /etc/git-secret
+        {{- end }}
+        args: ["sync"]
       - name: openidm
         image: "{{.Values.image.repository}}/{{.Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -42,7 +69,7 @@ spec:
         - name: logs
           mountPath: /opt/openidm/logs
         - name: git
-          mountPath: /opt/openidm/git
+          mountPath: /git
         {{- if hasPrefix "ssh:" .Values.git.repo }}
         - name: git-secret
           mountPath: /etc/git-secret

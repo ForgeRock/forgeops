@@ -3,10 +3,7 @@
 
 
 if [ "$1" = 'openidm' ]; then
-    # Clone the project configuration source.
-    # source this to export the GIT_SSH command.
-     ./git-init.sh
-
+  
     PROJECT_HOME="${PROJECT_HOME:-/opt/openidm}"
 
 
@@ -59,7 +56,7 @@ if [ "$1" = 'openidm' ]; then
    LAUNCHER="org.forgerock.openidm.launcher.Main"
 
 
-    echo "Starting OpenIDM"
+    echo "Starting OpenIDM with options: $CLOPTS"
 
    # The openidm user can not mount the hostPath volume in Minikube due to VirtualBox permissions,
    # so we run as root for now.

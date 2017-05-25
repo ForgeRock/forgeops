@@ -3,8 +3,9 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  PROJECT_HOME: "/opt/openidm/git/{{ .Values.git.configPath.idm }}"
+  PROJECT_HOME: "/git/{{ .Values.git.configPath.idm }}"
   GIT_REPO: "{{ .Values.git.repo }}"
   GIT_BRANCH: {{ default "master" .Values.git.branch }}
-  GIT_ROOT:  "/opt/openidm/git"
+  GIT_ROOT:  "/git"
+  
 
