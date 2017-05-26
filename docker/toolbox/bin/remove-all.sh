@@ -3,9 +3,10 @@
 # Use with caution - this deletes all of your data as well...
 #
 
-
+# Call the util.sh script. It errors out if there's no custom.yaml file, and
+# that file is not needed for this script, so ignore errors with || true
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/util.sh"
+source "${DIR}/util.sh" || true
 
 releases=`helm list --namespace ${DEFAULT_NAMESPACE} -q`
 
