@@ -6,9 +6,13 @@ PROJECT_HOME="${DIR}/.."
 # Location where Helm charts are.
 HELMDIR="${DIR}/../helm"
 
-# Set to helm to use helm charts in this project, or to a remote repo name if your charts are on a remote server
+# Set to helm to use helm charts in this project, or to a remote repo name if your charts are on a remote server.
 HELM_REPO=${HELM_REPO:-"helm"}
 
+# Set the DEFAULT_NAMESPACE environment variable.
+NS=`kubectl config view | grep namespace | awk  '{print $2}'`
+DEFAULT_NAMESPACE=${NS:-default}
+export DEFAULT_NAMESPACE
 
 cd ${PROJECT_HOME}
 
@@ -41,6 +45,4 @@ findPod() {
     kubectl get pod -l $1 --no-headers | awk '{print $1;}'
 }
 
-NS=`kubectl config view | grep namespace | awk  '{print $2}'`
-DEFAULT_NAMESPACE=${NS:-default}
-export DEFAULT_NAMESPACE
+
