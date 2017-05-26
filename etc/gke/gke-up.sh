@@ -7,7 +7,8 @@ kubectl create -f storage.yaml
 
 helm init
 
-../ingress/create-nginx-ingress.sh 
+cd ../ingress
+./create-nginx-ingress.sh 
 
 ../../bin/setup-git-creds.sh
 

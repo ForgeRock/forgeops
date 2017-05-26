@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: openidm
@@ -14,7 +14,7 @@ spec:
     spec:
       initContainers:
       - name: git-init
-        image: forgerock/git:latest
+        image: "{{.Values.image.repository}}/git:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: git
@@ -29,7 +29,7 @@ spec:
             name: {{ template "fullname" . }}
       containers:
       - name: git
-        image: forgerock/git:latest
+        image: "{{.Values.image.repository}}/git:{{ .Values.image.tag }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: git
@@ -39,6 +39,9 @@ spec:
           mountPath: /etc/git-secret
         {{- end }}
         args: ["sync"]
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
       - name: openidm
         image: "{{.Values.image.repository}}/{{.Values.image.name }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}

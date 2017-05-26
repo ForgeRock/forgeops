@@ -41,8 +41,8 @@ git:
 # The defaults below are small and OK for testing.
 resources:
  limits:
-   cpu: 1000m
-   memory: 1200Mi
+   cpu: 2000m
+   memory: 1600Mi
  requests:
-   cpu: 100m
-   memory: 1000Mi
+   cpu: 300m
+   memory: 1500Mi

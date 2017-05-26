@@ -1,9 +1,11 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 kind: Deployment
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 metadata:
-  name: {{ template "fullname" . }}
+  # If you want to run more than one IG deployment in the same namespace, change the deployment name 
+  # below to the {{ template "fullname" . }} to make the name unique.
+  name: openig
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
 spec:
@@ -12,7 +14,24 @@ spec:
     metadata:
       labels:
         app: {{ template "fullname" . }}
+        release: {{ .Release.Name }}
+        component: {{ .Values.component }}
     spec:
+      initContainers:
+      - name: git-init
+        image: "{{.Values.image.repository}}/git:{{ .Values.image.tag }}"
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        {{- if hasPrefix "ssh:" .Values.git.repo }}
+        - name: git-secret
+          mountPath: /etc/git-secret
+        {{- end }}
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository}}/{{ .Values.image.name }}:{{ .Values.image.tag }}"

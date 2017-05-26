@@ -29,5 +29,6 @@ ADD sample-config/* /var/openig/config/
 
 ADD *.sh /usr/local/bin/
 
-ENTRYPOINT ["/usr/local/bin/init.sh"]
+
+#ENTRYPOINT ["/usr/local/bin/init.sh"]
 

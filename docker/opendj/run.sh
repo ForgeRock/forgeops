@@ -13,6 +13,15 @@
 
 cd /opt/opendj
 
+if [ -f /opt/opendj/locks/server.lock ]; 
+then
+  echo "Lock file found. Will attempt to remove it"
+  rm -f /opt/opendj/locks/server.lock
+fi
+
+# Show experimental VM settings
+java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
+
 
 # Instance dir does not exist? Then we need to run setup
 if [ ! -d ./data/config ] ; then

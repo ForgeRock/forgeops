@@ -23,6 +23,8 @@ backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "15 * * * *"
 
 
+component: opendj
+
 image:
   repository: forgerock
   name: opendj
@@ -38,7 +40,7 @@ replicaCount: 1
 # Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
-# Set storageclass only on clusters that support it (GCP / AWS).
+# Set storageClass only on clusters that support it (GCP / AWS).
 #storageClass: fast
 
 # You need to be on JDK 8u131 or higher to enable these options.
@@ -46,14 +48,13 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
-# The defaults below are small and OK for testing.
 resources:
  limits:
    cpu: 1000m
-   memory: 512Mi
+   memory: 4000Mi
  requests:
-   cpu: 200m
-   memory: 512Mi
+   cpu: 300m
+   memory: 1500Mi
 
 # DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
 # Used in testing environments without pv providers.
@@ -69,3 +70,4 @@ enableGcloudBackups: false
 
 # backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
 gsBucket: gs://forgeops/dj-backup 
+

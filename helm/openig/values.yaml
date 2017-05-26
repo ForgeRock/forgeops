@@ -21,11 +21,11 @@ service:
 
 resources:
   limits:
-    cpu: 512m
+    cpu: 1000m
     memory: 1024Mi
   requests:
     cpu: 200m
-    memory: 256Mi
+    memory: 512Mi
 
 
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl

@@ -7,7 +7,7 @@ metadata:
     djInstance: {{ template "instanceName" . }}
     app: {{ template "fullname" . }}
     vendor: forgerock
-    component: opendj
+    component: {{ .Values.component }}
 spec:
   serviceName: {{ template "instanceName" . }}
   replicas: {{default 1 .Values.replicaCount }}
@@ -60,11 +60,12 @@ spec:
           exec:
             command: ["/opt/opendj/probe.sh"]
           periodSeconds: 20
+          initialDelaySeconds: 30
         livenessProbe:
           exec:
             command: ["/opt/opendj/probe.sh"]
-          initialDelaySeconds: 30
-          periodSeconds: 40
+          initialDelaySeconds: 300
+          periodSeconds: 60
       {{- if .Values.enableGcloudBackups }}
       # An example of enabling backup to google cloud storage.
       # The bucket must exist, and the cluster needs --scopes storage-full when it is created.
