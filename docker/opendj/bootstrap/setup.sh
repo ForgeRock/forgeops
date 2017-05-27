@@ -5,6 +5,7 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 echo "Setting up default OpenDJ instance."
+touch /opt/opendj/BOOTSTRAPPING
 
 INIT_OPTION="--addBaseEntry"
 

@@ -10,7 +10,7 @@ ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyCheck
 WORKDIR /
 
 RUN apt-get update \
-  && apt-get install -y ca-certificates git vim bash curl openssh-client
+  && apt-get install -y ca-certificates git vim bash curl openssh-client dnstools
 
 ADD http://storage.googleapis.com/kubernetes-helm/${HELM_FILENAME} /tmp
 ADD https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl /bin/

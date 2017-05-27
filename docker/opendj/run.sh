@@ -19,7 +19,7 @@ then
   rm -f /opt/opendj/locks/server.lock
 fi
 
-# Show experimental VM settings
+# Print experimental VM settings to the stdout.
 java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 
 
@@ -64,9 +64,10 @@ if (bin/status -n | grep Started) ; then
    bin/stop-ds
 fi
 
-
 echo "Starting OpenDJ"
 
-#
+# Remove any boostrapping sententil set by setup.sh. 
+rm -f /opt/opendj/BOOTSTRAPPING
+
 
 exec ./bin/start-ds --nodetach

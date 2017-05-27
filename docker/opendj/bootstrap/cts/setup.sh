@@ -3,6 +3,7 @@
 # See https://wikis.forgerock.org/confluence/display/openam/Configure+External+CTS
 
 cd /opt/opendj
+touch /opt/opendj/BOOTSTRAPPING
 
 # For the CTS store, we fix to a known base DN, port, directory manager.
 # The script that calls us should set the $PASSWORD environment variable.
