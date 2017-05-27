@@ -29,7 +29,7 @@ image:
   repository: forgerock
   name: opendj
   pullPolicy: IfNotPresent
-  tag:  4.1.0-SNAPSHOT
+  tag:  4.1.0-M3
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicaCount: 1
