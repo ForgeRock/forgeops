@@ -1,0 +1,11 @@
+dependencies:
+- name: openam 
+  version: 0.1.0
+  repository: https://storage.googleapis.com/forgerock-charts/
+- name: amster 
+  version: 0.1.1
+  repository: https://storage.googleapis.com/forgerock-charts/
+- name: opendj
+  version:  0.2.2
+  repository: https://storage.googleapis.com/forgerock-charts
+  alias: [ opendj-config, opendj-cts ]

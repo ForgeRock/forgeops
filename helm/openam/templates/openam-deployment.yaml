@@ -12,26 +12,26 @@ spec:
         app: {{ template "fullname" . }}
         component: openam
         vendor: forgerock
-      annotations:
-        # This init container is responsible for assembling the openam root directory with the files needed to boot
-        # to a pre-configured configuration store.
-        pod.beta.kubernetes.io/init-containers: '[{
-            "name": "copy",
-            "image": "alpine",
-            "imagePullPolicy": "IfNotPresent",
-            "command":  [ "/bin/sh", "-c",
-            "mkdir -p /root/openam/openam/debug; umask u=rwx,g=,o= ; cd /root/openam; cp -L /var/boot/*.json .; cp  -rL /var/secrets/openam/.?* openam; cp -L /var/secrets/openam/authorized_keys ."],
-            "volumeMounts": [
-                        { "name": "openam-root",    "mountPath": "/root/openam" },
-                        { "name": "openam-boot",    "mountPath": "/var/boot" },
-                        { "name": "openam-secrets", "mountPath": "/var/secrets/openam" }
-                        ]}]'
     spec:
       terminationGracePeriodSeconds: 10
+      initContainers:
+      - name: bootstrap
+        image: {{.Values.global.image.repository}}/amster:{{.Values.global.image.tag}}
+        imagePullPolicy:  {{ template "pullPolicy" . }}
+        args: ["bootstrap"]
+        volumeMounts:
+        - name: openam-root
+          mountPath: /root/openam
+        - name: openam-boot
+          mountPath: /var/boot
+        - name: openam-secrets
+          mountPath: /var/secrets/openam
+        - name: configstore-secret
+          mountPath: /var/secrets/configstore
       containers:
       - name: openam
-        image:  {{.Values.image.repository}}/{{ .Values.image.openam}}:{{ .Values.image.tag }}
-        imagePullPolicy: {{default "IfNotPresent" .Values.image.pullPolicy}}
+        image: {{ template "image" . }}
+        imagePullPolicy:  {{ template "pullPolicy" . }}
         ports:
         - containerPort: 8080
           name: http
@@ -104,3 +104,7 @@ spec:
       - name: log-config
         configMap:
           name: am-log-config
+      - name: configstore-secret
+        secret:
+          secretName: configstore
+          defaultMode: 256

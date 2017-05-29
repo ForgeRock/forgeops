@@ -20,5 +20,5 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ template "fullname" . }}
+          serviceName: {{  .Values.service.name }}
           servicePort: {{ .Values.service.externalPort }}

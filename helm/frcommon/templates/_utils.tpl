@@ -4,7 +4,7 @@
 #        runAsUser: 0
 #      initContainers:
 #   include "git-sync" . | indent 6
-*/
+*/}}
 {{- define "git-sync" -}}
 - name: git-sync
   image: "gcr.io/google_containers/git-sync:v2.0.4"
@@ -29,4 +29,24 @@
   - name: GIT_SYNC_SSH
     value: "true"
   {{- end }}
+{{- end -}}
+{{- define "image" -}}
+{{- printf "%s/%s:%s" .Values.global.image.repository .Values.component  .Values.global.image.tag -}}
+{{ end }}
+{{- define "pullPolicy" -}}
+{{- printf "%s" .Values.global.image.pullPolicy -}}
+{{- end -}}
+{{- define "gitImage" -}}
+{{/*- printf "%s/%s:%s" .Values.global.image.repository "git"  .Values.global.image.tag -*/}}
+{{- printf "%s/%s:%s" "quay.io/warren_strange" "git" "5.5.0" -}}
+{{- end -}}
+
+{{/* expands to the fqdn using the component name. Note cookieDomain has a leading . */}}
+{{- define "externalFQDN" -}}
+{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.cookieDomain -}}
+{{- end -}}
+
+{{/* OpenAM FQDN */}}
+{{- define "openamFQDN" -}}
+{{- printf "openam.%s%s" .Release.Namespace .Values.cookieDomain -}}
 {{- end -}}

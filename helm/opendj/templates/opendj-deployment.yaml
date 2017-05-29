@@ -32,16 +32,16 @@ spec:
         vendor: forgerock
         component: opendj
     spec:
-      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: 30
       containers:
       - name: opendj
-        image:  "{{ .Values.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image:  {{ template "image" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:
         - configMapRef:
-            name: {{ template "fullname" . }}
+            name: {{ template "instanceName" . }}
         ports:
         - containerPort: 389
           name: ldap

@@ -1,0 +1,9 @@
+# Sample global settings for all charts
+
+
+global:
+  repo: quay.sh/warren_strange
+  tag: 5.5.0
+  baseDomain: example.com
+
+

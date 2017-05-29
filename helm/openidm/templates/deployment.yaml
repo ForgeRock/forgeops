@@ -14,37 +14,33 @@ spec:
     spec:
       initContainers:
       - name: git-init
-        image: "{{.Values.image.repository}}/git:{{ .Values.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git
           mountPath: /git
-        {{- if hasPrefix "ssh:" .Values.git.repo }}
         - name: git-secret
           mountPath: /etc/git-secret
-        {{- end }}
         args: ["init"]
         envFrom:
         - configMapRef:
-            name: {{ template "fullname" . }}
+            name: git-repo
       containers:
       - name: git
-        image: "{{.Values.image.repository}}/git:{{ .Values.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git
           mountPath: /git
-        {{- if hasPrefix "ssh:" .Values.git.repo }}
         - name: git-secret
           mountPath: /etc/git-secret
-        {{- end }}
         args: ["sync"]
         envFrom:
         - configMapRef:
-            name: {{ template "fullname" . }}
+            name: git-repo
       - name: openidm
-        image: "{{.Values.image.repository}}/{{.Values.image.name }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ template "image"  . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
         envFrom:
         - configMapRef:
             name: {{ template "fullname" . }}
@@ -61,9 +57,9 @@ spec:
               value: anonymous
             - name: X-OpenIDM-NoSession
               value:  "true"
-          initialDelaySeconds: 90
+          initialDelaySeconds: 120
           timeoutSeconds: 5
-          periodSeconds: 20
+          periodSeconds: 30
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         volumeMounts:
@@ -73,20 +69,18 @@ spec:
           mountPath: /opt/openidm/logs
         - name: git
           mountPath: /git
-        {{- if hasPrefix "ssh:" .Values.git.repo }}
         - name: git-secret
           mountPath: /etc/git-secret
-        {{- end }}
       {{- if  eq .Values.logDriver "filebeat" }}
       - name: log
         image: "giantswarm/filebeat:5.2.2"
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
+        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: logs
           mountPath: /log
         - name: log-config
           mountPath: /etc/filebeat
-        {{end}}
+      {{end}}
       volumes:
       - name: openidm-secrets
         secret:
@@ -98,9 +92,7 @@ spec:
         emptyDir: {}
       - name: git
         emptyDir: {}
-      {{- if hasPrefix "ssh:" .Values.git.repo }}
       - name: git-secret
         secret:
-          secretName: git-creds
+          secretName: git-credentials
           defaultMode: 256
-      {{- end }}

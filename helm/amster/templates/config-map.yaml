@@ -17,7 +17,7 @@ data:
     --pwdEncKey 123456789012 \
     --acceptLicense \
     --lbSiteName site1 \
-    --lbPrimaryUrl https://{{ template "externalFQDN" . }}/openam \
+    --lbPrimaryUrl https://{{ template "openamFQDN" . }}/openam \
     --cfgDir /root/openam
     :exit
   01_import.amster: |

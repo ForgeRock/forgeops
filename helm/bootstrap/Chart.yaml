@@ -1,0 +1,4 @@
+apiVersion: v1
+description: This is a bootstrap chart that contains commomn infrastructure for the ForgerRock stack.
+name: bootstrap
+version: 0.1.0

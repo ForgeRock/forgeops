@@ -4,7 +4,7 @@
 # Top level directory where git projects will be cloned to.
 GIT_ROOT=${GIT_ROOT:=/git}
 
-GIT_BRANCH=${GIT_BRANCH:-master}5
+GIT_BRANCH=${GIT_BRANCH:-master}
 
 # For testing - just echo commands.
 #git="echo git"

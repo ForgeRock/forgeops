@@ -6,16 +6,8 @@ Expand the name of the chart.
 {{- default .Chart.Name .Values.nameOverride | trunc 24 | trimSuffix "-" -}}
 {{- end -}}
 
-{{/*
-Create a default fully qualified app name.
-We truncate at 24 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-*/}}
 {{- define "fullname" -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{/*  expands to the fqdn. Note cookieDomain has a leading . */}}
-{{- define "externalFQDN" -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.cookieDomain -}}
-{{- end -}}

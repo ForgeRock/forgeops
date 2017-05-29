@@ -10,10 +10,11 @@ pullPolicy: IfNotPresent
 
 replicaCount: 1
 
-image:
-  repository: forgerock
-  name: openidm
-  tag: 5.5.0-SNAPSHOT
+global:
+  image:
+    repository: forgerock
+    pullPolicy: IfNotPresent
+    tag: 5.5.0
 
 service:
   name: openidm
@@ -30,7 +31,6 @@ resources:
     memory: 512Mi
 
 
-
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm
 
@@ -42,7 +42,5 @@ cookieDomain: .example.com
 logDriver: none
 
 git:
-  repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-  branch: master
   configPath:
     idm: forgeops-init/openidm/sync-with-ldap-bidirectional

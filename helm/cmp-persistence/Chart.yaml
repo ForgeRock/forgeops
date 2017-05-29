@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Composite Helm Chart that deploys DJ instances for CTS, config store and user store
+name: cmp-persistence
+version: 0.1.0

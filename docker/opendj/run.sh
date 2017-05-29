@@ -1,7 +1,6 @@
 #!/usr/bin/env sh
 # Run the OpenDJ server
-# The idea is to consolidate all of the writable DJ directories to
-# a single instance directory root, and update DJ's instance.loc file to point to that root
+# We consolidate all of the writable DJ directories to /opt/opendj/data
 # This allows us to to mount a data volume on that root which  gives us
 # persistence across restarts of OpenDJ.
 # For Docker - mount a data volume on /opt/opendj/data
@@ -10,17 +9,13 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
-
 cd /opt/opendj
 
-if [ -f /opt/opendj/locks/server.lock ]; 
-then
-  echo "Lock file found. Will attempt to remove it"
-  rm -f /opt/opendj/locks/server.lock
-fi
+# If the pod was terminated abnormally the lock file may not have gotten cleaned up.
+rm -f /opt/opendj/locks/server.lock
 
-# Print experimental VM settings to the stdout.
-java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
+# Uncomment this to print experimental VM settings to the stdout.
+#java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 
 
 # Instance dir does not exist? Then we need to run setup
@@ -69,5 +64,10 @@ echo "Starting OpenDJ"
 # Remove any boostrapping sententil set by setup.sh. 
 rm -f /opt/opendj/BOOTSTRAPPING
 
+
+INSTANCE_ROOT=/opt/opendj/data
+
+# instance.loc points DJ at the data/ volume
+echo $INSTANCE_ROOT >/opt/opendj/instance.loc
 
 exec ./bin/start-ds --nodetach

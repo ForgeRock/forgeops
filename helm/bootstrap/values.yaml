@@ -1,0 +1,6 @@
+
+global:
+  git:
+    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    branch: master
+

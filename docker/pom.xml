@@ -24,7 +24,7 @@
 
     <groupId>org.forgerock.docker</groupId>
     <artifactId>docker</artifactId>
-    <version>5.5.0-SNAPSHOT</version>
+    <version>5.5.0</version>
     <packaging>pom</packaging>
 
     <description>
@@ -39,7 +39,7 @@
         <openamVersion>14.5.0-SNAPSHOT</openamVersion>
         <opendjVersion>4.1.0-M3</opendjVersion>
         <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
-        <openigVersion>5.5.0-SNAPSHOT</openigVersion>
+        <openigVersion>5.5.0-M1</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
         <repo>forgerock</repo>
     </properties>
@@ -83,6 +83,8 @@
                                 <dockerFileDir>openidm</dockerFileDir>
                                 <tags>
                                     <tag>${openidmVersion}</tag>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
                                 </tags>
                             </build>
                         </image>
@@ -93,6 +95,7 @@
                                 <tags>
                                     <tag>latest</tag>
                                     <tag>${openidmVersion}</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -103,6 +106,7 @@
                                 <tags>
                                     <tag>latest</tag>
                                     <tag>${openamVersion}</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -113,6 +117,7 @@
                                 <tags>
                                     <tag>latest</tag>
                                     <tag>${openamVersion}</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -123,6 +128,7 @@
                                 <tags>
                                     <tag>latest</tag>
                                     <tag>${openigVersion}</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -133,6 +139,7 @@
                                 <tags>
                                     <tag>latest</tag>
                                     <tag>${opendjVersion}</tag>
+                                    <tag>${project.version}</tag>
                                 </tags>
                             </build>
                         </image>

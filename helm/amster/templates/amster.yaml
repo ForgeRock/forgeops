@@ -11,16 +11,15 @@ metadata:
     component: amster
     release: {{ .Release.Name }}
 spec:
+  terminationGracePeriodSeconds: 10
   restartPolicy: Never
   containers:
   - name: amster
-    image: {{.Values.image.repository}}/{{ .Values.image.amster}}:{{ .Values.image.tag }}
-    imagePullPolicy: {{default "IfNotPresent" .Values.image.pullPolicy}}
-    env:
-    - name: GIT_REPO
-      value: {{ .Values.git.repo }}
-    - name: GIT_BRANCH
-      value: {{ .Values.git.branch }}
+    image: {{ template "image" . }}
+    imagePullPolicy: {{  template "pullPolicy" . }}
+    envFrom:
+    - configMapRef:
+        name: git-repo
     volumeMounts:
     # The ssh key for Amster authN
     - name: amster-secrets
@@ -32,11 +31,9 @@ spec:
     # configuration files (*.json)
     - name: git
       mountPath: /git
-{{- if hasPrefix "ssh:" .Values.git.repo }}
     - name: git-secret
       mountPath: /etc/git-secret
-{{- end }}
-    args: ["configure"]
+    args: ["configure", "sync"]
   volumes:
   - name: amster-secrets
     secret:
@@ -46,9 +43,7 @@ spec:
       name: amster-config
   - name: git
     emptyDir: {}
-{{- if hasPrefix "ssh:" .Values.git.repo }}
   - name: git-secret
     secret:
-      secretName: git-creds
+      secretName: git-credentials
       defaultMode: 256
-{{- end }}

@@ -9,16 +9,16 @@
 
 
 -- These btree indexes are great for sorting and exact matches.
-CREATE UNIQUE INDEX idx_json_managedobjects_userName ON openidm.managedobjects 
-    ( json_extract_path_text(fullobject, 'userName'), objecttypes_id );
-CREATE INDEX idx_json_managedobjects_givenName ON openidm.managedobjects 
-    ( json_extract_path_text(fullobject, 'givenName') );
-CREATE INDEX idx_json_managedobjects_sn ON openidm.managedobjects 
-    ( json_extract_path_text(fullobject, 'sn') );
-CREATE INDEX idx_json_managedobjects_mail ON openidm.managedobjects 
-    ( json_extract_path_text(fullobject, 'mail') );
-CREATE INDEX idx_json_managedobjects_accountStatus ON openidm.managedobjects 
-    ( json_extract_path_text(fullobject, 'accountStatus') );
+CREATE UNIQUE INDEX idx_json_managedobjects_userName ON openidm.managedobjects
+( json_extract_path_text(fullobject, 'userName'), objecttypes_id );
+CREATE INDEX idx_json_managedobjects_givenName ON openidm.managedobjects
+( json_extract_path_text(fullobject, 'givenName') );
+CREATE INDEX idx_json_managedobjects_sn ON openidm.managedobjects
+( json_extract_path_text(fullobject, 'sn') );
+CREATE INDEX idx_json_managedobjects_mail ON openidm.managedobjects
+( json_extract_path_text(fullobject, 'mail') );
+CREATE INDEX idx_json_managedobjects_accountStatus ON openidm.managedobjects
+( json_extract_path_text(fullobject, 'accountStatus') );
 
 -- The PosgreSQL contrib extension 'pg_trgm' is needed to perform fast LIKE queries. Be sure you have installed
 -- the 'postgresql-contrib' packages necessary to support it.
@@ -34,13 +34,13 @@ create extension pg_trgm;
 -- associated benefit.
 
 CREATE INDEX idx_json_managedobjects_userName_gin ON openidm.managedobjects
-  USING gin (json_extract_path_text(fullobject, 'userName') gin_trgm_ops);
-CREATE INDEX idx_json_managedobjects_givenName_gin ON openidm.managedobjects 
-  USING gin (json_extract_path_text(fullobject, 'givenName') gin_trgm_ops);
-CREATE INDEX idx_json_managedobjects_sn_gin ON openidm.managedobjects 
-  USING gin (json_extract_path_text(fullobject, 'sn') gin_trgm_ops);
-CREATE INDEX idx_json_managedobjects_mail_gin ON openidm.managedobjects 
-  USING gin (json_extract_path_text(fullobject, 'mail') gin_trgm_ops);
-CREATE INDEX idx_json_managedobjects_accountStatus_gin ON openidm.managedobjects 
-  USING gin (json_extract_path_text(fullobject, 'accountStatus') gin_trgm_ops);
+USING gin (json_extract_path_text(fullobject, 'userName') gin_trgm_ops);
+CREATE INDEX idx_json_managedobjects_givenName_gin ON openidm.managedobjects
+USING gin (json_extract_path_text(fullobject, 'givenName') gin_trgm_ops);
+CREATE INDEX idx_json_managedobjects_sn_gin ON openidm.managedobjects
+USING gin (json_extract_path_text(fullobject, 'sn') gin_trgm_ops);
+CREATE INDEX idx_json_managedobjects_mail_gin ON openidm.managedobjects
+USING gin (json_extract_path_text(fullobject, 'mail') gin_trgm_ops);
+CREATE INDEX idx_json_managedobjects_accountStatus_gin ON openidm.managedobjects
+USING gin (json_extract_path_text(fullobject, 'accountStatus') gin_trgm_ops);
 

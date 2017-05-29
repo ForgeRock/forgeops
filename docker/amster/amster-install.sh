@@ -5,15 +5,13 @@
 DIR=`pwd`
 
 CONFIG_ROOT=${CONFIG_ROOT:-"${DIR}/git"}
-#CONFIG_LOCATION=${CONFIG_LOCATION:-"forgeops-init/amster"}
+
 # Path to script location - this is *not* the path to the amster/*.json config files - it is the path
 # to  *.amster scripts.
 AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}
 
 
-# Else - configure
-
-# When OpenAM is in the Kubernetes cluster, use 'openam' for defaults.
+# Use 'openam' as the internal cluster dns name.
 export SERVER_URL=${OPENAM_INSTANCE:-http://openam:80}
 export URI=${SERVER_URI:-/openam}
 
@@ -30,7 +28,7 @@ CONFIG_URL="${INSTANCE}/config/options.htm"
 wait_for_openam()
 {
     # If we get lucky, OpenAM will be up before the first curl command is issued.
-    sleep 40
+    sleep 20
    response="000"
 
 	while true
@@ -45,8 +43,7 @@ wait_for_openam()
          if [ $? -eq 0  ]; then
             break
          fi
-         echo "It looks like OpenAM is configured already. Exiting"
-
+         echo "It looks like OpenAM is already configured . Exiting"
          exit 0
       fi
       if [ ${response} = "200" ];

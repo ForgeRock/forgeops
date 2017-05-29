@@ -10,7 +10,7 @@ hdir=${cdir}/../helm
 
 dir=/tmp/charts
 
-charts="opendj amster openam openidm postgres-openidm"
+charts="opendj amster openam openidm postgres-openidm frcommon cmp*"
 
 rm -fr $dir
 mkdir -p $dir
@@ -34,3 +34,13 @@ echo "Adding helm repo"
 echo "helm repo add forgerock $URL"
 
 helm repo add forgerock $URL
+
+
+cd $hdir
+
+for d in cmp*
+do
+    ~/bin/helm dep up $d
+done
+
+

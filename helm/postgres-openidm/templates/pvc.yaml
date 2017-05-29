@@ -2,7 +2,9 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: {{ template "fullname" . }}
+  # If you want multiple openidm repos per namespace, you must use a unique generated name below:
+  # name: {{ template "fullname" . }}
+  name: postgres-openidm
   labels:
     app: {{ template "fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"

@@ -12,8 +12,6 @@ WORKDIR $CATALINA_HOME
 # Note: By default, Tomcat does NOT listen on 8443. You must add a custom server.xml file to change this.
 EXPOSE 8080 8443
 
-ENV OPENAM_VERSION=14.0.0-SNAPSHOT
-
 ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 ADD openam.war  /tmp/openam.war

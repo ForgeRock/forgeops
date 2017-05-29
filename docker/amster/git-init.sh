@@ -6,10 +6,7 @@ GIT_ROOT=${GIT_ROOT:=/git}
 
 GIT_BRANCH=${GIT_BRANCH:-master}
 
-# Don't default - in case we dont want to sync.
-#GIT_REPO=${GIT_REPO:-"https://stash.forgerock.org/scm/cloud/forgeops-init.git"}
-
-# Note - this is only used if the git repo is ssh.
+# Note - this is only used if the git repo type is ssh.
 # It expects the git ssh key to be mounted at /etc/git-secret/ssh.
 
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"

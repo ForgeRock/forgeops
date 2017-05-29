@@ -11,7 +11,7 @@
 REGISTRY=""
 REPO=${REPO:-forgerock}
 # Default tag if none is specified.
-TAG=${TAG:-latest}
+TAG=${TAG:-5.5.0}
 
 # If you want to push to Google gcr.io, replace the repository name with your project name.
 PROJECT="engineering-devops"
@@ -49,7 +49,7 @@ while getopts "dgpt:r:R:P:" opt; do
          echo "-P project  - Set the Google project id if using gcr.io. Default $PROJECT"
          echo "-R Set the repository name. Default $REPO"
          echo "-r Set the Registry. Default $REGISTRY"
-         echo "-t tag - Tag the docker image image (default $TAG)"
+         echo "-t tag - Tag the docker image (default $TAG)"
          echo "-d dry run. Don't do the docker build/push, just show what would be done."
          exit 1
       ;;

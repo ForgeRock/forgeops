@@ -1,0 +1,10 @@
+# Default values for cmp-openidm-dj-postgres.
+
+
+# Override any child variables
+
+
+
+# Default is to not install the userstore.  Run with helm install --set tags.userstore=true to override
+tags:
+  userstore: false

@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
+# TODO: Remove this script as soon as the helm subchart feature lands
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/util.sh"
+bin/openam.sh
 
-cd ${DIR}
+helm install -f helm/global.yaml  helm/cmp-idm-id-postgres
 
-./openam.sh
+helm install -f helm/global.yaml helm/openig
 
-./openidm.sh
-
-./openig.sh
 

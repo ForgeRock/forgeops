@@ -1,9 +1,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: openidm-postgres
+  name: postgres-openidm
   labels:
-    app: openidm-postgres
+    app: postgres-openidm
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: openidm-postgres
+        app: postgres-openidm
     spec:
       initContainers:
       # This cleans up the lost+found at the root of pgdata. Postgres will not start if this directory is present.
@@ -23,7 +23,7 @@ spec:
           mountPath: /var/lib/postgresql/data/pgdata
         command:  ["rm", "-fr", "/var/lib/postgresql/data/pgdata/lost+found"]
       containers:
-      - name: openidm-postgres
+      - name: postgres
         image: "{{.Values.postgres.image}}:{{ .Values.postgres.tag }}"
         imagePullPolicy: {{ default "IfNotPresent" .Values.imagePullPolicy | quote }}
         env:
@@ -83,7 +83,9 @@ spec:
       - name: data
       {{- if .Values.persistence.enabled }}
         persistentVolumeClaim:
-          claimName: {{ template "fullname" . }}
+          # If you want to run multiple instances in the same namespace, uncomment below:
+          #claimName: {{ template "fullname" . }}
+          claimName: postgres-openidm
       {{- else }}
         emptyDir: {}
       {{- end -}}

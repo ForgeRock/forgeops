@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "instanceName" . }}
 data:
   BASE_DN: {{ .Values.baseDN }}
   # The master server is the first instance in the stateful set (-0 )

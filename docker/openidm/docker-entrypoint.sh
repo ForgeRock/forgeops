@@ -56,6 +56,9 @@ if [ "$1" = 'openidm' ]; then
    LAUNCHER="org.forgerock.openidm.launcher.Main"
 
 
+    # Copy any patch files to the project home
+    cp /opt/openidm/conf/*.patch ${PROJECT_HOME}/conf
+
     echo "Starting OpenIDM with options: $CLOPTS"
 
    # The openidm user can not mount the hostPath volume in Minikube due to VirtualBox permissions,

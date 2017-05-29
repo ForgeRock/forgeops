@@ -7,11 +7,11 @@
 replicaCount: 1
 
 
-image:
-  repository: forgerock
-  name: openig
-  tag: 5.5.0-SNAPSHOT
-  pullPolicy: IfNotPresent
+global:
+  image:
+    repository: forgerock
+    tag: 5.5.0
+    pullPolicy: IfNotPresent
 
 service:
   name: openig
@@ -34,8 +34,6 @@ cookieDomain: .example.com
 
 
 git:
-  repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-  branch: master
   configPath:
     ig: forgeops-init/openig/basic-sample
 

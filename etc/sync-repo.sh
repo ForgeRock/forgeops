@@ -65,7 +65,7 @@ main() {
   verify_prereqs
 
   # run of the command
-  gsutil rsync -d $1 gs://$2
+  gsutil -m rsync -d $1 gs://$2
 
 
   echo "Your remote chart repository now matches the contents of the $1 directory!"

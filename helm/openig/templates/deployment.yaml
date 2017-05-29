@@ -19,23 +19,21 @@ spec:
     spec:
       initContainers:
       - name: git-init
-        image: "{{.Values.image.repository}}/git:{{ .Values.image.tag }}"
-        imagePullPolicy: IfNotPresent
+        image: {{ template "gitImage" . }}
+        imagePullPolicy:  {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git
           mountPath: /git
-        {{- if hasPrefix "ssh:" .Values.git.repo }}
         - name: git-secret
           mountPath: /etc/git-secret
-        {{- end }}
         args: ["init"]
         envFrom:
         - configMapRef:
-            name: {{ template "fullname" . }}
+            name: git-repo
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository}}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ template "image" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
         envFrom:
         - configMapRef:
             name: {{ template "fullname" . }}
@@ -44,10 +42,8 @@ spec:
         volumeMounts:
         - name: git
           mountPath: /git
-        {{- if hasPrefix "ssh:" .Values.git.repo }}
         - name: git-secret
           mountPath: /etc/git-secret
-        {{- end }}
 # todo: Create a health check URL
 #        livenessProbe:
 #          httpGet:
@@ -64,9 +60,7 @@ spec:
       volumes:
       - name: git
         emptyDir: {}
-      {{- if hasPrefix "ssh:" .Values.git.repo }}
       - name: git-secret
         secret:
           secretName: git-creds
           defaultMode: 256
-      {{- end }}

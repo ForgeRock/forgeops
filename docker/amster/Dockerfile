@@ -10,7 +10,7 @@ ADD *.zip /tmp/
 
 
 # git is added to the container so we can optionally execute git commit, git push, etc.
-RUN apk add --no-cache su-exec unzip curl git bash openssh-client \
+RUN apk add --no-cache su-exec unzip curl git bash openssh-client openldap-clients \
     && mkdir -p /opt \
     && unzip -q /tmp/amster.zip -d /opt/amster \
     && rm /tmp/*.zip \

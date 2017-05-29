@@ -45,9 +45,6 @@ ENV BACKUP_HOST dont-run-backups
 # Use this to directly add the opendj zip file
 ADD opendj.zip /tmp/
 
-
-# Creating instance.loc consolidates the writable directories under one root
-# We also create the extensions directory
 # We set a dir manager default password value here, but this is almost
 # certainly not what you want. This hard coded path to the password
 # should get over mounted by a secret volume with the "real" password. See README.md
@@ -63,8 +60,9 @@ RUN apt-get update && apt-get install -y ldap-utils && \
     echo -n "password"  > ${DIR_MANAGER_PW_FILE}
 
 # Note the following RUN command has been removed for DJ 4.1.0.
-# 4.1.0 uses --instancePath instead of instance.loc.
+# 4.1.0 uses --instancePath instead of instance.loc on setup.sh and set INSTANCE_ROOT on boot.
 #     echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
+ENV INSTANCE_ROOT /opt/opendj/data
 
 WORKDIR /opt/opendj
 

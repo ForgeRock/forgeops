@@ -6,13 +6,7 @@
 # name: value
 
 
-# Generic Image properties. We use the same tag for amster and AM
-image:
-  repository: forgerock
-  pullPolicy: IfNotPresent
-  tag: 14.5.0-SNAPSHOT
-  openam:  openam
-  amster: amster
+component: amster
 
 
 # Server base URL *within* the Kubernetes cluster - not the external LB URL.
@@ -48,8 +42,6 @@ userStore:
   
 
 git:
-  repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-  branch: master
   configPath:
     amster: forgeops-init/openam/empty-import
 
@@ -58,3 +50,10 @@ git:
 # suggest this is 'true' if importing a complete configuration
 # and set to 'false' if importing partial/incremental configurations
 amsterClean: false
+
+# Defines default global values. These can get overridden with -f global.yaml
+global:
+  image:
+    repository: forgerock
+    pullPolicy: IfNotPresent
+    tag: 5.5.0
