@@ -32,7 +32,6 @@ validateInputArgs() {
 
       # Cluster name (default is openam)
       --cluster-name)
-      echo "Cluster name"
         CLUSTER_NAME=$1
         shift
         ;;
