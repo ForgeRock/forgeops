@@ -3,10 +3,10 @@
 # Use with caution - this deletes all of your data as well...
 #
 
-# Call the util.sh script. It errors out if there's no custom.yaml file, and
-# that file is not needed for this script, so ignore errors with || true
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/util.sh" || true
+# Get the namespace context
+NS=`kubectl config view | grep namespace | awk  '{print $2}'`
+DEFAULT_NAMESPACE=${NS:-default}
+export DEFAULT_NAMESPACE
 
 releases=`helm list --namespace ${DEFAULT_NAMESPACE} -q`
 
