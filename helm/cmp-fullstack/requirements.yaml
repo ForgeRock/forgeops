@@ -12,3 +12,12 @@ dependencies:
 - name: bootstrap
   version:  0.1.0
   repository: https://storage.googleapis.com/forgerock-charts
+- name: openidm
+  version:  0.1.0
+  repository: https://storage.googleapis.com/forgerock-charts
+- name: postgres-openidm
+  version:  0.1.1
+  repository: https://storage.googleapis.com/forgerock-charts
+- name: openig
+  version:  0.1.1
+  repository: https://storage.googleapis.com/forgerock-charts
