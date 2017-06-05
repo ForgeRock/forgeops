@@ -28,7 +28,7 @@ resources:
     memory: 1024Mi
   requests:
     cpu: 300m
-    memory: 512Mi
+    memory: 1024Mi
 
 
 # Used to form the FQDN  - see _helpers.tpl

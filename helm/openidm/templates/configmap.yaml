@@ -4,8 +4,11 @@ metadata:
   name: {{ template "fullname" . }}
 data:
   PROJECT_HOME: "/git/{{ .Values.git.configPath.idm }}"
-  GIT_REPO: "{{ .Values.git.repo }}"
-  GIT_BRANCH: {{ default "master" .Values.git.branch }}
-  GIT_ROOT:  "/git"
+  GIT_AUTOSAVE_BRANCH:  autosave-idm
+  # These are now set in the bootstrap chart - as they are shared
+#  GIT_REPO: "{{ .Values.git.repo }}"
+#  GIT_BRANCH: {{ default "master" .Values.git.branch }}
+#  GIT_ROOT:  "/git"
+
   
 

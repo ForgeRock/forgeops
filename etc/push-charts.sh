@@ -10,14 +10,13 @@ hdir=${cdir}/../helm
 
 dir=/tmp/charts
 
-charts="opendj amster openam openidm postgres-openidm frcommon bootstrap cmp*"
-
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-
+charts="opendj amster openam openidm postgres-openidm frcommon bootstrap cmp-idm-dj-postgres cmp-am-dj"
 for chart in $charts
 do
+    echo "Packaging $chart"
     helm package $hdir/$chart
 done
 
@@ -29,6 +28,11 @@ cd $cdir
 
 
 gsutil -m acl set -R -a public-read gs://${BUCKET}
+
+# See https://github.com/kubernetes/helm/issues/2453.
+gsutil setmeta -h "Content-Type:text/html" \
+  -h "Cache-Control:private, max-age=0, no-transform" gs://${BUCKET}
+
 
 echo "Adding helm repo"
 echo "helm repo add forgerock $URL"

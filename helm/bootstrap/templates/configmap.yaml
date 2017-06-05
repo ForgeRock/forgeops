@@ -6,3 +6,4 @@ data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_BRANCH: {{ .Values.global.git.branch }}
   GIT_ROOT:  "/git"
+

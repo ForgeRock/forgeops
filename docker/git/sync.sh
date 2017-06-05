@@ -6,6 +6,8 @@ GIT_ROOT=${GIT_ROOT:=/git}
 
 GIT_BRANCH=${GIT_BRANCH:-master}
 
+GIT_AUTOSAVE_BRANCH=${GIT_AUTOSAVE_BRANCH:-autosave}
+
 # For testing - just echo commands.
 #git="echo git"
 
@@ -18,9 +20,9 @@ cd ${GIT_ROOT}/*
 
 pwd
 
-$git branch autosave
+$git branch ${GIT_AUTOSAVE_BRANCH}
 $git branch
-$git checkout autosave
+$git checkout ${GIT_AUTOSAVE_BRANCH}
 
 while true 
 do
@@ -33,6 +35,6 @@ do
     if [[ ${GIT_REPO} == ssh* ]]; 
     then
         # We use -f to force the upstream push. Revisit this.
-        $git push --set-upstream origin autosave -f
+        $git push --set-upstream origin ${GIT_AUTOSAVE_BRANCH} -f
     fi
 done

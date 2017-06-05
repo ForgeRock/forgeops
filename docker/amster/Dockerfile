@@ -4,7 +4,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
-FROM openjdk:8-jre-alpine
+FROM openjdk:8u131-jre-alpine
 
 ADD *.zip /tmp/
 

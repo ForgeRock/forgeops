@@ -59,6 +59,11 @@ if [ "$1" = 'openidm' ]; then
     # Copy any patch files to the project home
     cp /opt/openidm/conf/*.patch ${PROJECT_HOME}/conf
 
+
+    # Uncomment this to print experimental VM settings to the stdout.
+    java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
+
+
     echo "Starting OpenIDM with options: $CLOPTS"
 
    # The openidm user can not mount the hostPath volume in Minikube due to VirtualBox permissions,
@@ -75,7 +80,6 @@ if [ "$1" = 'openidm' ]; then
        ${LAUNCHER}  -c /opt/openidm/bin/launcher.json ${CLOPTS}
 fi
 
+# Else - exec the arguments pass to the entry point.
 exec  "$@"
-
-#exec su-exec openidm "$@"
 

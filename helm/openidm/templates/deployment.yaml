@@ -38,6 +38,8 @@ spec:
         envFrom:
         - configMapRef:
             name: git-repo
+        - configMapRef:
+            name:  {{ template "fullname" . }}
       - name: openidm
         image: {{ template "image"  . }}
         imagePullPolicy: {{ template "pullPolicy" . }}

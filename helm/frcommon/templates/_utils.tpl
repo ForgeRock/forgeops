@@ -38,7 +38,7 @@
 {{- end -}}
 {{- define "gitImage" -}}
 {{/*- printf "%s/%s:%s" .Values.global.image.repository "git"  .Values.global.image.tag -*/}}
-{{- printf "%s/%s:%s" "quay.io/warren_strange" "git" "5.5.0" -}}
+{{- printf "%s/%s:%s" "quay.io/forgerock" "git" "5.5.0" -}}
 {{- end -}}
 
 {{/* expands to the fqdn using the component name. Note cookieDomain has a leading . */}}

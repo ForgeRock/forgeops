@@ -11,6 +11,9 @@ ENV PATH $CATALINA_HOME/bin:$PATH
 ENV OPENIG_BASE /var/openig
 WORKDIR $CATALINA_HOME
 
+# Set this for java 8 u131 or higher. This sets the heap according to the container memory.
+ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+
 # Let's remove some of the stuff we don't need.
 RUN rm -fr webapps/*
 

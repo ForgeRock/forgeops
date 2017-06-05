@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 #FROM openjdk:8-jre
 # Alpine
-FROM openjdk:8-jre-alpine
+FROM openjdk:8u131-jre-alpine
 
 WORKDIR /opt
 
@@ -11,9 +11,9 @@ EXPOSE 8080
 ADD Dockerfile /
 
 # Override these to change the JVM:
-ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
-# Use this when alpine 8 131 lands.
-#ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+#ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
+# Use this for Java 8 u131 or later. This sets the size of the VM heap according to the container size.
+ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 # Download or add OpenIDM nightly build and unzip.
 ADD openidm.zip /var/tmp/openidm.zip
