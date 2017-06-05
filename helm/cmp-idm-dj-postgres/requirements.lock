@@ -32,4 +32,8 @@ dependencies:
   tags: null
   version: 0.1.0
 digest: sha256:44f64f476ca0628dbba3a2b3e89bbfa15aa3cdb0448647f637fcf1c895d7061d
+<<<<<<< HEAD
 generated: 2017-06-05T14:23:42.166585822-06:00
+=======
+generated: 2017-06-02T18:08:32.61475374-06:00
+>>>>>>> e0ed8e1... updates for composite charts
