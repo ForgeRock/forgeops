@@ -8,6 +8,7 @@ replicaCount: 1
 
 
 global:
+  domain: .example.com
   image:
     repository: forgerock
     tag: 5.5.0
@@ -33,7 +34,7 @@ resources:
 
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl
 component: openig
-cookieDomain: .example.com
+
 
 
 

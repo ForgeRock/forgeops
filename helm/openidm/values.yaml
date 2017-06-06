@@ -11,6 +11,7 @@ pullPolicy: IfNotPresent
 replicaCount: 1
 
 global:
+  domain: .example.com
   image:
     repository: forgerock
     pullPolicy: IfNotPresent
@@ -40,7 +41,7 @@ component: openidm
 
 # This is used by the ingress controller to route to OpenIDM.
 #   see _helpers.tpl
-cookieDomain: .example.com
+domain: .example.com
 
 # Values: filebeat, none
 logDriver: none

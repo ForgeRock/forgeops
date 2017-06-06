@@ -58,6 +58,7 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 10
           periodSeconds: 30
+        # TODO: Pick a single good log driver for the stack.
 {{- if  eq .Values.logDriver "fluent-bit" }}
       - name: log
         image:  fluent-bit:latest

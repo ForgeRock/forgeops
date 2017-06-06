@@ -10,11 +10,10 @@ hdir=${cdir}/../helm
 
 dir=/tmp/charts
 
-
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-charts="opendj amster openam openidm openig postgres-openidm frcommon bootstrap cmp-idm-dj-postgres cmp-am-dj"
+charts="opendj amster openam openidm openig postgres-openidm frcommon git cmp-idm-dj-postgres cmp-am-dj cmp-am-dev"
 for chart in $charts
 do
     echo "Packaging $chart"

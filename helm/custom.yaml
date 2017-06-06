@@ -1,0 +1,39 @@
+# Sample value overrides for Helm. The values below will work out of the box, and
+# are the same as the default values.yaml in the charts.
+# To override these values, make a copy of this file, and pass it to helm with the -f option
+# Example:  helm install -f my-custom.yaml openam
+# *DO NOT* check your custom.values file into git, as it may contain ssh credentials. See below
+
+
+# Global variables are used in all charts, including child charts nested under a parent chart.
+# Refer to https://github.com/kubernetes/helm/blob/master/docs/charts.md#scope-dependencies-and-values for more information
+# Be careful of proper yaml nesting here.
+global:
+  image:
+    # Image repo and tag. The image that is pulled will be  {repository}/{component}:{tag}
+    # Example:  set repository: quay.io/acme, tag: 1.0.1, the openam image formed is: quay.io/acme/openam:1.0.1
+    repository: forgerock
+    tag: 5.5.0
+    # If you want to force a re-pull of all images set this to "Always"
+    pullPolicy: IfNotPresent
+  # The domain - including a leading dot '.'.  Product FQDNs are formed using this domain.
+  # The format is  {component}.{kube-namespace}.{domain}.  For example: openam.default.example.com
+  domain: .example.com
+  # Where to pull product configuration, or push it (pushing requires ssh:// git repos and ssh credentials)
+  git:
+    # git repo to clone. The value below is a public git repo that does not require authentication.
+    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    branch: master
+    # This is the base64 encoded ssh private key for git push. The value below is not a real ssh key and will not work.
+    # You need to replace this with your own ssh key. If you are just cloning http:// public repos that do not require
+    # authentication, this variable can be ignored.  If you set your own ssh key, do not check this file into git
+    # Generate a key using: ssh-keygen -t rsa -C "forgeops-robot@forgeops.com" -f ssh.   Base64 encode the value
+    # and put it in here. (base64 <ssh). The generated ssh.pub key is the public key to add to your stash or git repo to allow
+    # access.
+    sshKey:  dGhpcyBpcyBhIGR1bW15IGtleQo=
+    # Within the above git repo, this is the path to the product configuration.
+    configPath:
+      idm: forgeops-init/openidm/sync-with-ldap-bidirectional
+      amster: forgeops-init/openam/empty-import
+      ig: forgeops-init/openig/basic-sample
+

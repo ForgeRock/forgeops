@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
+# Deploy AM - this script will go away when helm 2.5 lands. We will use the cmp-* charts instead
+# Pass any additional helm args on the command line. e.g. -f custom.yaml
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source "${DIR}/util.sh"
 
+# Set this to forgerock to run against the online chart repo
+REPO=.
+
+set -x
+
+helm install $@ ${REPO}/git
 
 echo "Creating OpenDJ configuration store"
-bin/opendj.sh configstore
+helm install $@ --set djInstance=configstore ${REPO}/opendj
 
 echo "Creating OpenDJ user store"
-bin/opendj.sh userstore --set numberSampleUsers=1000
+helm install $@ --set djInstance=userstore --set numberSampleUsers=1000 ${REPO}/opendj
 
 echo "Creating OpenDJ CTS store"
-bin/opendj.sh ctsstore --set bootstrapScript=/opt/opendj/bootstrap/cts/setup.sh
+helm install $@ --set djInstance=ctsstore ${REPO}/opendj
 
 echo "Installing amster chart"
 
-echo helm install -f ${CUSTOM_YAML} ${HELM_REPO}/amster
-helm install -f ${CUSTOM_YAML} ${HELM_REPO}/amster
+helm install $@ ${REPO}/amster
 
 echo "Starting openam"
-
-# Configure boot set to false - because we want this to come up waiting to be configured.
-# See https://bugster.forgerock.org/jira/browse/AME-13657.
-
-echo helm install -f ${CUSTOM_YAML} --set openam.configureBoot=false ${HELM_REPO}/openam
-helm install -f ${CUSTOM_YAML} --set openam.configureBoot=false ${HELM_REPO}/openam
+helm install $@ ${REPO}/openam
 
 echo "Done"

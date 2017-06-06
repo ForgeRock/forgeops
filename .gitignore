@@ -8,4 +8,5 @@ target/
 *.DS_Store
 .idea/
 *.tgz
-/helm/custom.yaml
+/helm/git/secrets/ssh
+/helm/git/secrets/ssh.pub

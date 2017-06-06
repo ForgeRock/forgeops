@@ -14,9 +14,8 @@ component: amster
 serverBase: http://openam:80
 
 # See the _helpers template to change the *external* load balancer fqdn
-# By default it expands to  openam.$namespace.$cookieDomain
+# By default it expands to  openam.$namespace.$baseDomain
 
-cookieDomain: .example.com
 amadmin_pw: password
 
 configStore:
@@ -36,19 +35,15 @@ userStore:
   dirManager: "cn=Directory Manager"
   suffix: "dc=openam,dc=forgerock,dc=org"
 
-# amster:
-#   # Path relative to the root of the cloned git repo where we can find our configuration files
-#   configPath: forgeops-init/openam/empty-import
-  
-
 
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration
 # and set to 'false' if importing partial/incremental configurations
 amsterClean: false
 
-# Defines default global values. These can get overridden with -f global.yaml
+# Defines default global values. These can get overridden with -f custom.yaml
 global:
+  domain: .example.com
   image:
     repository: forgerock
     pullPolicy: IfNotPresent
@@ -56,3 +51,12 @@ global:
   git:
     configPath:
       amster: forgeops-init/openam/empty-import
+
+
+resources:
+ limits:
+   cpu: 500m
+   memory: 1024Mi
+ requests:
+   cpu: 300m
+   memory: 756Mi

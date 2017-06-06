@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # A sample script to export a configuration.
 
 GIT_ROOT=${GIT_ROOT:-/git}
@@ -28,7 +28,8 @@ doExport() {
 
 
 # If a command line arg is passed it is a flag to perform a git commit sync loop.
-# TODO: Should the arg be params such as the branch, sleep interval, etc.?
+# TODO: Pass in additional args such as the branch, sleep interval, etc.
+# TODO: For consistency we may want to replace this with the git sidecar to do the syncing.
 if [ "$#" -gt 0 ]; then
     echo "Will perform export / git sync loop"
     cd ${P}
@@ -41,8 +42,12 @@ if [ "$#" -gt 0 ]; then
        git add .
        t=`date`
        git commit -a -m "Auto-saved configuration at $t"
-       git push -f --set-upstream origin ${GIT_SAVE_BRANCH}
-       sleep 60
+       # Push only if it is a ssh repo
+       if [[ ${GIT_REPO} == ssh* ]];
+       then
+            git push -f --set-upstream origin ${GIT_SAVE_BRANCH}
+       fi
+       sleep 90
    done
 fi
 

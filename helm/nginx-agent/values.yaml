@@ -20,6 +20,6 @@ resources:
     memory: 256Mi
 
 # Default cookie domain. Include the leading dot.
-cookieDomain: .example.com
+domain: .example.com
 
 component: ngnix

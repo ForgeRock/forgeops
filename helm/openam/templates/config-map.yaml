@@ -1,12 +1,13 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Config map holds the boot.json for this instance.
+# This is now *DEPRECATED*. The boot.json file is now created by the init container. This is here for
+# sample purposes, and will be removed in the future.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: boot-json
 data:
-  {{- if .Values.openam.configureBoot }}
   boot.json: |
    {
      "instance" : "{{ default "http://openam:80/openam" .Values.openamInstance }}",
@@ -27,4 +28,3 @@ data:
        "ldapProtocol" : "ldap"
      } ]
    }
-   {{- end }}

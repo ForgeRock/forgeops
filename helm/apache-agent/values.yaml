@@ -22,4 +22,4 @@ resources:
 component: apache
 
 # Default cookie domain. Include the leading dot.
-cookieDomain: .example.com
+domain: .example.com

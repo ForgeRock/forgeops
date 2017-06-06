@@ -27,9 +27,9 @@ dependencies:
   condition: ""
   enabled: false
   import-values: null
-  name: bootstrap
+  name: git
   repository: https://storage.googleapis.com/forgerock-charts
   tags: null
   version: 0.1.0
-digest: sha256:bef317c9477adaf86bf71fb6c44446f52218d52690c872508c986d82cfac8de5
-generated: 2017-06-05T11:16:16.440257687-06:00
+digest: sha256:3fb7ff1456b2ba578d361b332c64b060d490a8b43978ab0380b52c13a2751cbc
+generated: 2017-06-06T15:54:08.730426251-06:00

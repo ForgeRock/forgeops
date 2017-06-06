@@ -37,16 +37,15 @@
 {{- printf "%s" .Values.global.image.pullPolicy -}}
 {{- end -}}
 {{- define "gitImage" -}}
-{{/*- printf "%s/%s:%s" .Values.global.image.repository "git"  .Values.global.image.tag -*/}}
-{{- printf "%s/%s:%s" "quay.io/forgerock" "git" "5.5.0" -}}
+{{ printf "%s/%s:%s" .Values.global.image.repository "git"  .Values.global.image.tag }}
 {{- end -}}
 
-{{/* expands to the fqdn using the component name. Note cookieDomain has a leading . */}}
+{{/* expands to the fqdn using the component name. Note domain has a leading . */}}
 {{- define "externalFQDN" -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.cookieDomain -}}
+{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.global.domain -}}
 {{- end -}}
 
 {{/* OpenAM FQDN */}}
 {{- define "openamFQDN" -}}
-{{- printf "openam.%s%s" .Release.Namespace .Values.cookieDomain -}}
+{{- printf "openam.%s%s" .Release.Namespace .Values.global.domain -}}
 {{- end -}}
