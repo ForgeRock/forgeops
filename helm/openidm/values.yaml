@@ -15,6 +15,10 @@ global:
     repository: forgerock
     pullPolicy: IfNotPresent
     tag: 5.5.0
+  git:
+    configPath:
+        idm: forgeops-init/openidm/sync-with-ldap-bidirectional
+
 
 service:
   name: openidm
@@ -41,6 +45,4 @@ cookieDomain: .example.com
 # Values: filebeat, none
 logDriver: none
 
-git:
-  configPath:
-    idm: forgeops-init/openidm/sync-with-ldap-bidirectional
+

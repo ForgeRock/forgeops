@@ -18,6 +18,8 @@ global:
   git:
     repo: "ssh://git@stash.forgerock.org:7999/~warren.strange_forgerock.com/forgeops-init.git"
     branch: dev
+    configPath:
+      idm: forgeops-init/openidm/sync-with-ldap-bidirectional
 
 
 

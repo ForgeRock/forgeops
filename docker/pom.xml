@@ -191,6 +191,16 @@
                                 </artifactItem>
 
                                 <artifactItem>
+                                    <groupId>org.forgerock.openidm</groupId>
+                                    <artifactId>repo-config</artifactId>
+                                    <version>${openidmVersion}</version>
+                                    <classifier>postgresql</classifier>
+                                    <type>zip</type>
+                                    <outputDirectory>openidm-postgres</outputDirectory>
+                                    <destFileName>db.zip</destFileName>
+                                </artifactItem>
+
+                                <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-server</artifactId>
                                     <version>${openamVersion}</version>

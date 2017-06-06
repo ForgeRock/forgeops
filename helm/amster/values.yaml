@@ -41,10 +41,6 @@ userStore:
 #   configPath: forgeops-init/openam/empty-import
   
 
-git:
-  configPath:
-    amster: forgeops-init/openam/empty-import
-
 
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration
@@ -57,3 +53,6 @@ global:
     repository: forgerock
     pullPolicy: IfNotPresent
     tag: 5.5.0
+  git:
+    configPath:
+      amster: forgeops-init/openam/empty-import
