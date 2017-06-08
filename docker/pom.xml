@@ -38,7 +38,7 @@
         <!-- Default versions to build  -->
         <openamVersion>14.5.0-SNAPSHOT</openamVersion>
         <opendjVersion>4.1.0-M3</opendjVersion>
-        <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
+        <openidmVersion>5.5.0-M1</openidmVersion>
         <openigVersion>5.5.0-M1</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
         <repo>forgerock</repo>

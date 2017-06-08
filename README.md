@@ -24,14 +24,17 @@ cd docker
 eval $(minikube docker-env)
 mvn
 cd ..
+# Make sure you have the ingress controller add on
+minikube addon enable ingress
 
 helm init
 
 cd helm/
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts/
-
+helm repo update
 # deploy the AM development example. Deploys AM, amster, and DJ config store.
-helm install cmp-am-dev 
+# Using forgerock/ as a prefix deploys from the chart repository. For local development use  ./cmp-am-dev
+helm install forgerock/cmp-am-dev 
 
 
 # Or, deploy idm 
