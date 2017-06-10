@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Deploy AM with embedded DJ. Suitable for development and testing.
+name: am-embedded-dj
+version: 0.1.0

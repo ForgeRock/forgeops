@@ -1,0 +1,19 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: v1
+kind: Service
+metadata:
+  name: openam
+  labels:
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+spec:
+  ports:
+    - port: 80
+      name: am80
+      targetPort: 8080
+    - port: 443
+      targetPort: 8443
+      name: am443
+  selector:
+    component: openam

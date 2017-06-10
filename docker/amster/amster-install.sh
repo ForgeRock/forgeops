@@ -10,6 +10,10 @@ CONFIG_ROOT=${CONFIG_ROOT:-"${DIR}/git"}
 # to  *.amster scripts.
 AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}
 
+# Default directory for optional post install scripts. Anything in this directory will be executed after
+# all amster scripts have run.
+POST_INSTALL_SCRIPTS=${POST_INSTALL_SCRIPTS:-"${AMSTER_SCRIPTS}"}
+
 
 # Use 'openam' as the internal cluster dns name.
 export SERVER_URL=${OPENAM_INSTANCE:-http://openam:80}
@@ -80,10 +84,18 @@ if [ -d  ${AMSTER_SCRIPTS} ]; then
         echo "Executing Amster script $file"
         sh ./amster ${file}
     done
-
 fi
 
-# Todo: we might want this script to dynamically create the boot.json configmap, so new AM instances boot.
-# See https://bugster.forgerock.org/jira/browse/AME-13657 
+# Execute any shell scripts ending with *sh
+if [ -d ${POST_INSTALL_SCRIPTS} ]; then
+    for script in ${POST_INSTALL_SCRIPTS}/*.sh
+    do
+        if [ -x ${script} ]; then
+            echo "Executing $script"
+            ${script}
+        fi
+    done
+fi
+
 
 echo "Configuration script finished"

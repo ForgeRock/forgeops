@@ -17,13 +17,13 @@ resources:
 
 # Child Chart overrides
 
-opendj:
+userstore:
   djInstance: userstore
 
-opendj-config:
+configstore:
   djInstance: configstore
 
-opendj-cts:
+ctsstore:
   djInstance: ctsstore
 
 

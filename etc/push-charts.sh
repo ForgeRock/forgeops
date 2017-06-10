@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Push our charts up to a gs storage bucket for Helm
-# You then add this as a Helm repo
+# You can add this as a Helm repo
 cdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 BUCKET=forgerock-charts
@@ -17,34 +17,18 @@ charts="opendj amster openam openidm openig postgres-openidm frcommon git cmp-id
 for chart in $charts
 do
     echo "Packaging $chart"
+    helm dep update $hdir/$chart
     helm package $hdir/$chart
 done
 
-helm repo index --url $URL .
+gsutil cp gs://${BUCKET}/index.yaml .
+helm repo index --url $URL --merge index.yaml .
 
-cd $cdir
-
-./sync-repo.sh /tmp/charts ${BUCKET}
-
+gsutil -m rsync ./ gs://${BUCKET}
 
 gsutil -m acl set -R -a public-read gs://${BUCKET}
 
 # See https://github.com/kubernetes/helm/issues/2453.
-gsutil setmeta -h "Content-Type:text/html" \
-  -h "Cache-Control:private, max-age=0, no-transform" gs://${BUCKET}
-
-
-echo "Adding helm repo"
-echo "helm repo add forgerock $URL"
-
-helm repo add forgerock $URL
-
-
-cd $hdir
-
-for d in cmp*
-do
-    ~/bin/helm dep up $d
-done
+gsutil -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" gs://${BUCKET}/*.tgz
 
 
