@@ -1,0 +1,15 @@
+service:
+  gogs:
+    databaseName: gogs
+    databaseType: sqlite3
+    serverDomain: gogs-gogs
+    serviceEnableCaptcha: false
+    serverRootUrl:  http://gogs/
+  
+
+postgresql:
+  install: false 
+
+
+#image: gitea/gitea
+#imageTag: latest

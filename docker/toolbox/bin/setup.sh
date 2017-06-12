@@ -4,7 +4,8 @@
 brew cask update
 brew update
 
-brew install docker-machine docker-compose kubernetes-helm kubernetes-cli
+brew install docker-machine docker-compose kubernetes-helm kubernetes-cli git
+
 
 brew cask install minikube
 # Install useful helm plugins
