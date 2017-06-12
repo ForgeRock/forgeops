@@ -1,4 +1,4 @@
 apiVersion: v1
-description: A Helm chart for ForgeRock OpenIG
+description: A Helm chart for ForgeRock Identity Gateway
 name: openig
 version: 0.1.1

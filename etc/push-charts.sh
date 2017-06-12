@@ -29,6 +29,6 @@ gsutil -m rsync ./ gs://${BUCKET}
 gsutil -m acl set -R -a public-read gs://${BUCKET}
 
 # See https://github.com/kubernetes/helm/issues/2453.
-gsutil -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" gs://${BUCKET}/*.tgz
-
+# This makes sure the bucket is not cached (default is to cache https:// objects for 1 hour).
+gsutil -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" "gs://${BUCKET}/*"
 

@@ -6,7 +6,9 @@
 
 3) Build your Docker images, or set up access to a registry where those images can be pulled. 
 The default docker repository and tag names are set in each helm chart in values.yaml. You can 
-override these in your custom.yaml file.  The default assumes the docker images are in the docker cache (i.e. you have done a docker build direct to the minikube docker machine). See the README in the docker/ folder for more information.
+override these in your custom.yaml file.  The default assumes the docker images are in the docker cache 
+(i.e. you have done a docker build direct to the Minikube docker machine). See the
+ README in the docker/ folder for more information.
 
 
 # Configuration
@@ -23,14 +25,27 @@ global:
 
 forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it. 
 
-If you wish to use your own git repository, you can fork and clone the forgeops-init repository as a starter.
+If you wish to use your own Git repository based on the forgeops-init repository, 
+you can fork and clone the forgeops-init repository.
+
+# Prerequisite Charts
+
+The git/ chart is a prerequisite that creates resources needed by other charts including openam, openidm,
+and openig. You need to install the git/ chart before deploying the other foundational charts.
+
+The composite charts (those that begin with cmp-*) include the git/ chart as a dependency. If you
+deploy a composite chart you *do not* need to install the git/ chart. However - this means 
+you can not deploy two composite charts to the same namespace, as the shared dependency (the git chart) can
+not be deployed twice. The solution is to create a single composite chart that includes all components
+that you want installed.
+
 
 # Auto-export
 
 The amster and AM charts now include a feature to auto-export configurations. The amster and idm git sidecar 
 container will periodically export the configuration into a git autosave branch. 
 
-If the git repo URL begins with ssh://, it assumed that you have write (push) access. The sync process
+If the git repo URL begins with ssh://, it is assumed that you have write (push) access. The sync process
 will attempt to push any configuration changes upstream to your git repo.
 
 To watch the configuration loop:
@@ -44,10 +59,8 @@ kubectl logs openidm-xxxxxx -c git -f
 
 # Scripts
 
-There are various sample scripts in bin/ that you can modify as needed for your environment. These scripts run helm
- and kubectl commands to deploy the products.  Some examples:
+There are various sample scripts in bin/ that you can modify as needed for your environment.  Some examples:
 
-* start-all.sh - deploys all products
 * remove-all.sh  - removes all deployments
 
 # Using a private registry
@@ -56,8 +69,8 @@ There are various sample scripts in bin/ that you can modify as needed for your 
 REGISTRY_PASSWORD, REGISTRY_ID and REGISTRY_EMAIL  environment variables with your BackStage credentials.
 This is needed so that Kubernetes can authenticate to pull images from a private registry. 
 NOTE AT THIS TIME THAT THE FORGEROCK DOCKER REGISTRY IS ONLY AVAILABLE TO EMPLOYEES.
-* Clone https://stash.forgerock.org/projects/CLOUD/repos/forgeops-init
 
+If you are using your own private registry you must modify registry.sh with the relevant credentials.
 
 # Charts
 
@@ -71,6 +84,7 @@ installed already. This can scale up horizontally by increasing the replica coun
 * postgres-opendim - Configures a Postgresql repository database for OpenIDM
 * openig -  OpenIG
 * cmp-*  - charts that begin with cmp are "composite" charts that include other charts
+
 
 
 # Modifying the Deployment
@@ -91,9 +105,15 @@ Further documentation can be found in each chart's README.md
 
 # Namespaces 
 
-By default, the charts will deploy to the `default` namespace in Kubernetes. You can switch namespaces using the command `bin/set-namespace.sh  NAMESPACE`.  This will change your namespace context in kubectl to the new namespace, and will result in the products being deployed to that namespace. You can deploy multiple product instances in different namespaces and they will not interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
+By default, the charts will deploy to the `default` namespace in Kubernetes. 
 
-To provide external ingress routes that are unique, the namespace is used when forming the ingress host name. The format is:
+You can switch namespaces using the command `bin/set-namespace.sh  NAMESPACE`.  This will 
+change your namespace context in kubectl to the new namespace, and will result in the products being 
+deployed to that namespace. You can deploy multiple product instances in different namespaces and they will not 
+interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
+
+To provide external ingress routes that are unique, the namespace is used when forming the 
+ingress host name. The format is:
  {openam,openidm,openig}.{namespace}.{domain} 
 
  For example:

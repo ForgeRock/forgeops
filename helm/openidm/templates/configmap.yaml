@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  PROJECT_HOME: "/git/{{ .Values.global.git.configPath.idm }}"
+  PROJECT_HOME: "{{ .Values.global.configPath.idm }}"
   GIT_AUTOSAVE_BRANCH:  autosave-idm
   
 

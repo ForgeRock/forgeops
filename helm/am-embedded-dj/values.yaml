@@ -11,8 +11,11 @@ global:
     tag: 5.5.0
     pullPolicy: IfNotPresent
   git:
-    configPath:
-      amster: forgeops-init/openam/empty-import
+    # git repo to clone. The value below is a public git repo that does not require authentication.
+    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    branch: master
+  configPath:
+    am: /git/forgeops-init/default/am/empty-import
 
 openamReplicaCount: 1
 

@@ -31,9 +31,14 @@ global:
     # and put it in here. (base64 <ssh). The generated ssh.pub key is the public key to add to your stash or git repo to allow
     # access.
     sshKey:  dGhpcyBpcyBhIGR1bW15IGtleQo=
-    # Within the above git repo, this is the path to the product configuration.
-    configPath:
-      idm: forgeops-init/openidm/sync-with-ldap-bidirectional
-      amster: forgeops-init/openam/empty-import
-      ig: forgeops-init/openig/basic-sample
+  # The path to the product configuration to import.
+  # If you base your configuration repository on the forgeops-init repository,
+  # specify paths starting with /git/forgeops-init as shown in the sample below. If
+  # you use a different strategy to get the configuration, such as a hostPath volume mount
+  # or baking the configuration into a custom Docker container,
+  # specify the full path to the configuration
+  configPath:
+    idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
+    am: /git/forgeops-init/default/am/empty-import
+    ig: /git/forgeops-init/default/ig/basic-sample
 

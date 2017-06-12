@@ -17,8 +17,11 @@ global:
     pullPolicy: IfNotPresent
     tag: 5.5.0
   git:
-    configPath:
-        idm: forgeops-init/openidm/sync-with-ldap-bidirectional
+    # git repo to clone. The value below is a public git repo that does not require authentication.
+    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    branch: master
+  configPath:
+    idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
 
 
 service:
