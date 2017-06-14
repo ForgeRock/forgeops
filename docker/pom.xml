@@ -258,4 +258,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>snapshot-releases</id>
+            <properties>
+                <openamVersion>14.5.0-SNAPSHOT</openamVersion>
+                <opendjVersion>4.1.0-SNAPSHOT</opendjVersion>
+                <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
+                <openigVersion>5.5.0-SNAPSHOT</openigVersion>
+            </properties>
+        </profile>
+    </profiles>
+
 </project>
