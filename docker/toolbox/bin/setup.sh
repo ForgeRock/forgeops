@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 # Edit this based on your environment!
-
-brew cask update
+# Prerequisites: you must have VirtualBox and homebrew installed.
 brew update
 
 brew install docker-machine docker-compose kubernetes-helm kubernetes-cli git
-
 
 brew cask install minikube
 
