@@ -1,7 +1,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1beta1
+kind: Deployment
 metadata:
   name: amster
   labels:
@@ -11,41 +11,46 @@ metadata:
     component: amster
     release: {{ .Release.Name }}
 spec:
-  terminationGracePeriodSeconds: 10
-  restartPolicy: Never
-  containers:
-  - name: amster
-    image: {{ template "image" . }}
-    imagePullPolicy: {{  template "pullPolicy" . }}
-    envFrom:
-    - configMapRef:
-        name: git-repo
-    volumeMounts:
-    # The ssh key for Amster authN
-    - name: amster-secrets
-      mountPath: /var/secrets/amster
-      readOnly: true
-    # The Amster scripts - not configuration.
-    - name: scripts
-      mountPath: /opt/amster/scripts
-    # configuration files (*.json)
-    - name: git
-      mountPath: /git
-    - name: git-secret
-      mountPath: /etc/git-secret
-    args: ["configure", "sync"]
-    resources:
-{{ toYaml .Values.resources | indent 10 }}
-  volumes:
-  - name: amster-secrets
-    secret:
-      secretName: amster-secrets
-  - name: scripts
-    configMap:
-      name: amster-config
-  - name: git
-    emptyDir: {}
-  - name: git-secret
-    secret:
-      secretName: git-credentials
-      defaultMode: 256
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: amster
+        image: {{ template "image" . }}
+        imagePullPolicy: {{  template "pullPolicy" . }}
+        envFrom:
+        - configMapRef:
+            name: git-repo
+        volumeMounts:
+        # The ssh key for Amster authN
+        - name: amster-secrets
+          mountPath: /var/secrets/amster
+          readOnly: true
+        # The Amster scripts - not configuration.
+        - name: scripts
+          mountPath: /opt/amster/scripts
+        # configuration files (*.json)
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["configure", "sync"]
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+      - name: amster-secrets
+        secret:
+          secretName: amster-secrets
+      - name: scripts
+        configMap:
+          name: amster-config
+      - name: git
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName: git-credentials
+          defaultMode: 256
