@@ -4,7 +4,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: openidm-ingress
+  name: openidm
   annotations:
     ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/ssl-redirect: "true"

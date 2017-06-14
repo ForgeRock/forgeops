@@ -54,7 +54,7 @@ resources:
    cpu: 1000m
    memory: 4000Mi
  requests:
-   cpu: 300m
+   cpu: 200m
    memory: 1500Mi
 
 # DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image

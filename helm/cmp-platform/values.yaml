@@ -1,0 +1,15 @@
+
+
+global:
+  domain: .example.com
+  image:
+    repository: gcr.io/engineering-devops
+
+
+userstore:
+  djInstance: userstore
+  numberSampleUsers: 500
+
+configstore:
+  djInstance: configstore
+

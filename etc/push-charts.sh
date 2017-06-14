@@ -13,7 +13,7 @@ dir=/tmp/charts
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-charts="opendj amster openam openidm openig postgres-openidm frcommon git cmp-idm-dj-postgres cmp-am-dj cmp-am-dev"
+charts="opendj amster openam openidm openig postgres-openidm frcommon git cmp-idm-dj-postgres cmp-am-dj cmp-am-dev cmp-platform"
 for chart in $charts
 do
     echo "Packaging $chart"
