@@ -3,8 +3,14 @@
 
 # Override any child variables
 
+global:
+  image:
+    repository: gcr.io/engineering-devops
+    tag: 5.5.0
 
 
-# Default is to not install the userstore.  Run with helm install --set tags.userstore=true to override
+
+# Default is to install userstore.  Run with helm install --set tags.userstore=false to override
+# Note that the userstore might have been deployed with one of the AM samples as well.
 tags:
-  userstore: false
+  userstore: true

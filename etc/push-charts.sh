@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Push our charts up to a gs storage bucket for Helm
 # You can add this as a Helm repo
+# TODO: This needs to be run twice - since the cmp- charts depend on the base charts, and those dont get
+# updated until the second pass.   This should be split into two phases - the first for base charts,
+# the second for cmp-* charts.
 cdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 BUCKET=forgerock-charts

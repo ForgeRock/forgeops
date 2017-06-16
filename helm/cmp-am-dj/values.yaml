@@ -1,10 +1,12 @@
 # Default values for openam-dj.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-image:
-  repository: forgerock/
-  tag: stable
-  pullPolicy: IfNotPresent
+
+
+global:
+  image:
+    repository: gcr.io/engineering-devops
+    tag: 5.5.0
 
   
 resources:
