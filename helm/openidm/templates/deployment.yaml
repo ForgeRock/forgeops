@@ -73,6 +73,8 @@ spec:
           mountPath: /git
         - name: git-secret
           mountPath: /etc/git-secret
+        - name: boot-properties
+          mountPath: /var/run/openidm
       {{- if  eq .Values.logDriver "filebeat" }}
       - name: log
         image: "giantswarm/filebeat:5.2.2"
@@ -98,3 +100,6 @@ spec:
         secret:
           secretName: git-credentials
           defaultMode: 256
+      - name: boot-properties
+        configMap:
+          name: idm-boot-properties

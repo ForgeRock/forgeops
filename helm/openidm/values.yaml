@@ -23,6 +23,18 @@ global:
   configPath:
     idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
 
+# Specific values
+openidm:
+  repo:
+    host: postgresql
+    port: 5432
+    user: openidm
+    password: openidm
+
+# Optional - if there is a DJ userstore configured
+userstore:
+  host: userstore-0.userstore
+  password: password
 
 service:
   name: openidm
@@ -42,9 +54,6 @@ resources:
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm
 
-# This is used by the ingress controller to route to OpenIDM.
-#   see _helpers.tpl
-domain: .example.com
 
 # Values: filebeat, none
 logDriver: none

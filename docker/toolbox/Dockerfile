@@ -10,7 +10,7 @@ RUN apt-get update \
   && apt-get install -y ca-certificates git vim bash curl openssh-client 
 
 
-ENV KUBE_LATEST_VERSION v1.6.3
+ENV KUBE_LATEST_VERSION v1.6.4
 ENV HELM_VERSION v2.4.2
 ENV HELM_FILENAME helm-${HELM_VERSION}-linux-amd64.tar.gz
 
