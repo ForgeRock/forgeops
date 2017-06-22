@@ -15,7 +15,7 @@ cd /opt/opendj
 rm -f /opt/opendj/locks/server.lock
 
 # Uncomment this to print experimental VM settings to the stdout.
-#java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
+java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 
 
 # Instance dir does not exist? Then we need to run setup

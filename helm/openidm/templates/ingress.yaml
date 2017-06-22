@@ -4,7 +4,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: openidm
+  name: {{ .Values.component }}
   annotations:
     ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -14,6 +14,7 @@ metadata:
     ingress.kubernetes.io/session-cookie-name: "route"
     ingress.kubernetes.io/session-cookie-hash: "sha1"
 spec:
+{{ include "tls-spec" . | indent 2 }}
   rules:
   - host: {{ template "externalFQDN" . }}
     http:

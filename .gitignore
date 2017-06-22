@@ -10,3 +10,4 @@ target/
 *.tgz
 /helm/git/secrets/ssh
 /helm/git/secrets/ssh.pub
+bazel-*

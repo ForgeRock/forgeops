@@ -51,8 +51,8 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 resources:
  limits:
-   cpu: 1000m
-   memory: 4000Mi
+   cpu: 500m
+   memory: 1600Mi
  requests:
    cpu: 200m
    memory: 1500Mi
@@ -72,3 +72,5 @@ enableGcloudBackups: false
 # backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
 gsBucket: gs://forgeops/dj-backup 
 
+# Uncomment this to create sample users.
+#numberSampleUsers: 100

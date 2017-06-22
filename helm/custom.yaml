@@ -41,4 +41,10 @@ global:
     idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
     am: /git/forgeops-init/default/am/empty-import
     ig: /git/forgeops-init/default/ig/basic-sample
-
+  # Set this to true to use TLS for the ingresses for AM, IG, and IDM
+  # If you set this to true, you must create the TLS secrets manually.
+  # See bin/gen-ssl-secret.sh for an example of how to create a self-signed certificate.
+  # Example command:   bin/gen-ssl-secret.sh openam.default.example.com
+  # Will generate a self-signed certificate for the openam.default.example.com ingress.
+  # The CN of the certificate *MUST* match the FQDN.
+  useTLS: false

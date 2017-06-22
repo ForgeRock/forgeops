@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 # A sample script to export a configuration.
 
+set -x
+
 GIT_ROOT=${GIT_ROOT:-/git}
-CONFIG_PATH=${CONFIG_PATH:-forgeops-init/openam/default}
+
+# This should be set by the downward API, but in case it isn't, default it.
+NAMESPACE=${NAMESPACE:-default}
+
+# This is where amster will export files. You may want to set this
+# environment variable rather than taking the default.
+CONFIG_PATH=${CONFIG_PATH:-forgeops-init/${NAMESPACE}/openam/autosave}
+
+
 GIT_SAVE_BRANCH=${GIT_SAVE_BRANCH:-am-autosave}
 
 
@@ -36,6 +46,7 @@ if [ "$#" -gt 0 ]; then
     git branch ${GIT_SAVE_BRANCH}
     git branch
     git checkout ${GIT_SAVE_BRANCH}
+    git config core.filemode false
     while true
     do
        doExport

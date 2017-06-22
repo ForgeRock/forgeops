@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 # Checkout from git.
+set -x
 
 GIT_ROOT=${GIT_ROOT:=/git}
 

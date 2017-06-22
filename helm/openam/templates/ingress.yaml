@@ -4,19 +4,20 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: openam
+  name: {{ .Values.component }}
   labels:
     app: {{ template "fullname" . }}
     vendor: forgerock
   annotations:
     ingress.kubernetes.io/enable-cors: "true"
-    ingress.kubernetes.io/ssl-redirect: "true"
     kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
     ingress.kubernetes.io/affinity: "cookie"
     ingress.kubernetes.io/session-cookie-name: "route"
     ingress.kubernetes.io/session-cookie-hash: "sha1"
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+{{ include "tls-spec" . | indent 2 }}
   rules:
   - host: {{ template "externalFQDN" . }}
     http:

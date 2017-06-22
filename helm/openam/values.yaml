@@ -10,6 +10,8 @@ global:
     repository: forgerock
     tag: 5.5.0
     pullPolicy: IfNotPresent
+  # If you set this to true, you must have a TLS secret with the same name as the FQDN
+  useTLS: false
 
 openamReplicaCount: 1
 
@@ -27,8 +29,10 @@ logDriver: none
 # The defaults below are small and OK for testing.
 resources:
  limits:
-   cpu: 2000m
-   memory: 1600Mi
+   cpu: 1000m
+   memory: 1300Mi
  requests:
    cpu: 300m
-   memory: 1500Mi
+   memory: 1200Mi
+
+

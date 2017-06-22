@@ -49,3 +49,13 @@
 {{- define "openamFQDN" -}}
 {{- printf "openam.%s%s" .Release.Namespace .Values.global.domain -}}
 {{- end -}}
+
+{{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
+{{- define "tls-spec" -}}
+{{ if .Values.global.useTLS -}}
+tls:
+- hosts:
+  - {{ template "externalFQDN" .  }}
+  secretName: {{ template "externalFQDN" . }}
+{{ end -}}
+{{- end -}}

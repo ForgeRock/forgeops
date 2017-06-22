@@ -59,7 +59,7 @@ global:
 resources:
  limits:
    cpu: 200m
-   memory: 1024Mi
+   memory: 756Mi
  requests:
    cpu: 100m
    memory: 756Mi
