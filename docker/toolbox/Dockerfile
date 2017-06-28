@@ -11,7 +11,7 @@ RUN apt-get update \
 
 
 ENV KUBE_LATEST_VERSION v1.6.6
-ENV HELM_VERSION v2.5
+ENV HELM_VERSION v2.5.0
 ENV HELM_FILENAME helm-${HELM_VERSION}-linux-amd64.tar.gz
 
 ADD http://storage.googleapis.com/kubernetes-helm/${HELM_FILENAME} /tmp
