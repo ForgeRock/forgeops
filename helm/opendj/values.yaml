@@ -51,11 +51,11 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 resources:
  limits:
-   cpu: 500m
-   memory: 1600Mi
+   cpu: 1000m
+   memory: 3000Mi
  requests:
-   cpu: 200m
-   memory: 1500Mi
+   cpu: 500m
+   memory: 2000Mi
 
 # DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
 # Used in testing environments without pv providers.
