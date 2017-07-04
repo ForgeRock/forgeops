@@ -9,12 +9,8 @@ GIT_ROOT=${GIT_ROOT:-/git}
 NAMESPACE=${NAMESPACE:-default}
 
 # This is where amster will export files. You may want to set this
-# environment variable rather than taking the default.
+# environment variable rather than accepting the default.
 CONFIG_PATH=${CONFIG_PATH:-forgeops-init/${NAMESPACE}/openam/autosave}
-
-
-GIT_SAVE_BRANCH=${GIT_SAVE_BRANCH:-am-autosave}
-
 
 P="${GIT_ROOT}/${CONFIG_PATH}"
 
@@ -36,29 +32,15 @@ doExport() {
     /opt/amster/amster /tmp/export.amster
 }
 
-
 # If a command line arg is passed it is a flag to perform a git commit sync loop.
-# TODO: Pass in additional args such as the branch, sleep interval, etc.
-# TODO: For consistency we may want to replace this with the git sidecar to do the syncing.
 if [ "$#" -gt 0 ]; then
-    echo "Will perform export / git sync loop"
+    echo "Will perform export sync loop"
     cd ${P}
-    git branch ${GIT_SAVE_BRANCH}
-    git branch
-    git checkout ${GIT_SAVE_BRANCH}
-    git config core.filemode false
+
     while true
     do
        doExport
-       git add .
-       t=`date`
-       git commit -a -m "Auto-saved configuration at $t"
-       # Push only if it is a ssh repo
-       if [[ ${GIT_REPO} == ssh* ]];
-       then
-            git push -f --set-upstream origin ${GIT_SAVE_BRANCH}
-       fi
-       sleep 90
+       sleep 300
    done
 fi
 

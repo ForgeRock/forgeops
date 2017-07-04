@@ -9,4 +9,4 @@ then
     exit 1
 fi
 # Else - query the ldap server
-exec ldapsearch $DEBUG -y ${DIR_MANAGER_PW_FILE} -H ldap://localhost:389 -D "cn=Directory Manager" -s base -l 5
+exec ldapsearch $DEBUG -y ${DIR_MANAGER_PW_FILE} -H ldap://localhost:1389 -D "cn=Directory Manager" -s base -l 5

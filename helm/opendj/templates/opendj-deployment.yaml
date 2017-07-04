@@ -33,6 +33,10 @@ spec:
         component: opendj
     spec:
       terminationGracePeriodSeconds: 30
+      # Run as user forgerock (11111). We don't need this as the container defaults to this user.
+#      securityContext:
+#        runAsUser: 0
+#        fsGroup: 11111
       containers:
       - name: opendj
         image:  {{ template "image" . }}
@@ -43,18 +47,19 @@ spec:
         - configMapRef:
             name: {{ template "instanceName" . }}
         ports:
-        - containerPort: 389
+        - containerPort: 1389
           name: ldap
         - containerPort: 4444
           name: djadmin
-        {{- if .Values.djPersistence }}
+
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/secrets/opendj
-        - name: data
-          mountPath: /opt/opendj/data
         - name: dj-backup
           mountPath: /opt/opendj/backup
+        {{- if .Values.djPersistence }}
+        - name: data
+          mountPath: /opt/opendj/data
         {{- end }}
         readinessProbe:
           exec:
@@ -82,6 +87,7 @@ spec:
       - name: dj-secrets
         secret:
           secretName: {{ template "instanceName" . }}
-          defaultMode: 256
+          # If we are running as non root, we can't set this mode to root read only
+          #defaultMode: 256
       - name: dj-backup
         emptyDir: {}

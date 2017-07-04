@@ -21,7 +21,7 @@ spec:
         args: ["bootstrap"]
         volumeMounts:
         - name: openam-root
-          mountPath: /root/openam
+          mountPath: /home/forgerock/openam
         - name: openam-boot
           mountPath: /var/boot
         - name: openam-secrets
@@ -37,10 +37,10 @@ spec:
           name: http
         volumeMounts:
         - name: openam-root
-          mountPath: /root/openam
+          mountPath: /home/forgerock/openam
         env:
         - name: CATALINA_OPTS
-          value:  "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+          value:  {{ .Values.catalinaOpts }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.
@@ -48,7 +48,7 @@ spec:
           httpGet:
             path: /openam/isAlive.jsp
             port: 8080
-          initialDelaySeconds: 40
+          initialDelaySeconds: 30
           timeoutSeconds: 5
           periodSeconds: 20
         livenessProbe:
@@ -108,4 +108,3 @@ spec:
       - name: configstore-secret
         secret:
           secretName: configstore
-          defaultMode: 256

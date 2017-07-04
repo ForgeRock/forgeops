@@ -18,7 +18,7 @@ data:
     --acceptLicense \
     --lbSiteName site1 \
     --lbPrimaryUrl https://{{ template "openamFQDN" . }}/openam \
-    --cfgDir /root/openam
+    --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |
     connect http://openam/openam -k /var/secrets/amster/id_rsa

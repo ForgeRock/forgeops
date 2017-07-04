@@ -1,19 +1,27 @@
 dependencies:
-- alias: null
+- alias: ""
   condition: ""
   enabled: false
   import-values: null
   name: opendj
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: null
   version: 0.2.2
-- alias: null
+- alias: ""
   condition: ""
   enabled: false
   import-values: null
   name: postgres-openidm
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../postgres-openidm
   tags: null
   version: 0.1.1
-digest: sha256:d7e2eb471aef865e332d1f39d97d027cb172d35c1919d262a73eac97c3414a96
-generated: 2017-06-01T10:42:33.002875634-06:00
+- alias: ""
+  condition: ""
+  enabled: false
+  import-values: null
+  name: git
+  repository: file://../git
+  tags: null
+  version: 0.1.0
+digest: sha256:6e36018f08e8378c700deef0525a7f2b10c50d8aaf31c5e5da926c01681ef04f
+generated: 2017-07-07T09:24:54.850629165-06:00

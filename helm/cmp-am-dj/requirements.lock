@@ -4,7 +4,7 @@ dependencies:
   enabled: false
   import-values: null
   name: openam
-  repository: https://storage.googleapis.com/forgerock-charts/
+  repository: file://../openam
   tags: null
   version: 0.1.0
 - alias: ""
@@ -12,7 +12,7 @@ dependencies:
   enabled: false
   import-values: null
   name: amster
-  repository: https://storage.googleapis.com/forgerock-charts/
+  repository: file://../amster
   tags: null
   version: 0.1.1
 - alias: ""
@@ -20,7 +20,7 @@ dependencies:
   enabled: false
   import-values: null
   name: opendj
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: null
   version: 0.2.2
 - alias: ""
@@ -28,7 +28,7 @@ dependencies:
   enabled: false
   import-values: null
   name: opendj
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: null
   version: 0.2.2
 - alias: ""
@@ -36,7 +36,7 @@ dependencies:
   enabled: false
   import-values: null
   name: opendj
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: null
   version: 0.2.2
 - alias: ""
@@ -44,8 +44,8 @@ dependencies:
   enabled: false
   import-values: null
   name: git
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../git
   tags: null
   version: 0.1.0
-digest: sha256:609a978bf731520057a74683b6134df9f9ac542369418c23eb9569e5809a5e73
-generated: 2017-06-09T18:13:20.111355951-06:00
+digest: sha256:6ed1e2f76a33cfbd020ac78619a5ac0c8b9b7f034cc8610c9bb78334bede308d
+generated: 2017-07-06T13:57:46.661381845-06:00

@@ -63,4 +63,5 @@ spec:
       - name: git-secret
         secret:
           secretName: git-credentials
-          defaultMode: 256
+          # The forgerock user needs to be able to read this file.
+          #defaultMode: 256

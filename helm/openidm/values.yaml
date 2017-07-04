@@ -35,6 +35,7 @@ openidm:
 userstore:
   host: userstore-0.userstore
   password: password
+  port: 1389
 
 service:
   name: openidm

@@ -17,8 +17,11 @@ openamReplicaCount: 1
 
 openamInstance: http://openam:80/openam
 
-configLdapPort:  389
+configLdapPort:  1389
 configLdapHost: configstore-0.configstore
+
+#catalinaOts: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dcom.sun.identity.configuration.directory=/openam"
+catalinaOpts: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
 # Suffix for OpenDJ config store.
 rootSuffix:  "dc=openam,dc=forgerock,dc=org"
@@ -36,3 +39,4 @@ resources:
    memory: 1200Mi
 
 
+openamHome: /home/forgerock/openam

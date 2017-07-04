@@ -99,7 +99,8 @@ spec:
       - name: git-secret
         secret:
           secretName: git-credentials
-          defaultMode: 256
+          # This gets mounted as root, so we need to open up the permissions for the forgerock user to read it
+          # defaultMode: 256
       - name: boot-properties
         configMap:
           name: idm-boot-properties

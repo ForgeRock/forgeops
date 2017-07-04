@@ -21,6 +21,8 @@ data:
       # Use a variable for our ldap host & password
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
+      userstore.port={{default "1389" .Values.userstore.port}}
+
 
       openidm.repo.password={{.Values.openidm.repo.password}}
       openidm.port.http=8080

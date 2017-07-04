@@ -49,17 +49,25 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
-resources:
- limits:
-   cpu: 1000m
-   memory: 3000Mi
- requests:
-   cpu: 500m
-   memory: 2000Mi
 
-# DJ persistence switch. Setting to false disables volume claims - all data are stored inside docker image
-# Used in testing environments without pv providers.
-djPersistence: true
+
+resources:
+ requests:
+   cpu: 200m
+   memory: 1024Mi
+   # For testing, we omit a hard resource limit
+#  limits:
+#     cpu: 1000m
+#   memory: 3000Mi
+
+
+# DJ persistence switch. Setting to false disables volume claims - all data is stored inside the docker image.
+# Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
+# See issue https://github.com/kubernetes/kubernetes/issues/2630,
+# which impacts minikube (or any hostPath based provisioner). The underlying PV has root permissions,
+# and the DJ container will not start. If you need to run this on Minikube with PVC, set runAsUser: 0 in the
+# deployment securityContext:
+djPersistence: false
 
 
 git:

@@ -2,9 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-#FROM openjdk:8-jre-alpine
-
-FROM openjdk:8u131-jre
+FROM forgerock/java:5.5.0
 
 WORKDIR /opt
 
@@ -43,7 +41,8 @@ ENV BACKUP_HOST dont-run-backups
 #RUN curl $MVN_REPO/opendj-server-legacy/$OPENDJ_VERSION/opendj-server-legacy-$OPENDJ_VERSION.zip -o /tmp/opendj.zip
 
 # Use this to directly add the opendj zip file
-ADD opendj.zip /tmp/
+ADD opendj.zip /home/forgerock/
+
 
 # We set a dir manager default password value here, but this is almost
 # certainly not what you want. This hard coded path to the password
@@ -52,28 +51,30 @@ ADD opendj.zip /tmp/
 # If you want to use Alpine install this
 #RUN apk add --no-cache su-exec openldap-clients && \
 
-
-RUN apt-get update && apt-get install -y ldap-utils && \
-    unzip -q /tmp/opendj.zip -d /opt  && rm /tmp/opendj.zip && \
-    mkdir -p /opt/opendj/data/lib/extensions && \
-    mkdir -p /var/secrets/opendj && \
-    echo -n "password"  > ${DIR_MANAGER_PW_FILE}
-
-# Note the following RUN command has been removed for DJ 4.1.0.
-# 4.1.0 uses --instancePath instead of instance.loc on setup.sh and set INSTANCE_ROOT on boot.
-#     echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
 ENV INSTANCE_ROOT /opt/opendj/data
 
-WORKDIR /opt/opendj
+RUN unzip -q /home/forgerock/opendj.zip -d /opt && rm -f /home/forgerock/opendj.zip \
+    && mkdir -p "$INSTANCE_ROOT" \
+    && chown -R forgerock /opt
 
-ADD Dockerfile /
+
 ADD bootstrap/ /opt/opendj/bootstrap/
 ADD *.sh /opt/opendj/
 
 
-EXPOSE 389 636 4444 8989
+#
+#    mkdir -p /opt/opendj/data/lib/extensions && \
+#     echo -n "password"  > ${DIR_MANAGER_PW_FILE}
 
-ADD run.sh /opt/opendj/run.sh
+# Note the following RUN command has been removed for DJ 4.1.0.
+# 4.1.0 uses --instancePath instead of instance.loc on setup.sh and set INSTANCE_ROOT on boot.
+#     echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
+
+WORKDIR /opt/opendj
+
+USER forgerock
+
+EXPOSE 1389 636 4444 8989
 
 
 CMD ["/opt/opendj/run.sh"]

@@ -22,7 +22,7 @@ configStore:
   suffix:  "dc=openam,dc=forgerock,dc=org"
   # This is the first StatefulSet name:
   host: configstore-0.configstore
-  port: 389
+  port: 1389
   dirManager: "cn=Directory Manager"
   adminPort: 4444
   password: password
@@ -30,7 +30,7 @@ configStore:
 # This is not currently supported on install by amster. You must import a user store config.
 userStore:
   host:  userstore-0.userstore
-  port: 389
+  port: 1389
   password: password
   dirManager: "cn=Directory Manager"
   suffix: "dc=openam,dc=forgerock,dc=org"

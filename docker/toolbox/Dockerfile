@@ -1,16 +1,15 @@
-FROM ubuntu:16.04
+FROM ubuntu:17.10
 
 # If cloning from git..
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
 
 WORKDIR /
 
-
 RUN apt-get update \
   && apt-get install -y ca-certificates git vim bash curl openssh-client 
 
 
-ENV KUBE_LATEST_VERSION v1.6.6
+ENV KUBE_LATEST_VERSION v1.7.0
 ENV HELM_VERSION v2.5.0
 ENV HELM_FILENAME helm-${HELM_VERSION}-linux-amd64.tar.gz
 

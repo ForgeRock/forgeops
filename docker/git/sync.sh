@@ -18,6 +18,8 @@ cd ${GIT_ROOT}/*
 
 # This configures git to ignore file mode changes.
 git config core.filemode false
+git config user.email "auto-sync@forgerock.net"
+git config user.name "Git Auto-sync user"
 
 git branch ${GIT_AUTOSAVE_BRANCH}
 git branch
@@ -25,7 +27,7 @@ git checkout ${GIT_AUTOSAVE_BRANCH}
 
 while true 
 do
-    sleep 30
+    sleep 180
     t=`date`
     git add .
     git commit -a -m "autosave at $t"

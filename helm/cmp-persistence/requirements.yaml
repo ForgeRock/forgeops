@@ -1,8 +1,11 @@
 dependencies:
 - name: opendj
   version:  0.2.2
-  repository: https://storage.googleapis.com/forgerock-charts
-  alias: [ opendj-config, opendj-cts ]
+  repository: file://../opendj
+  alias: ctsstore
 - name: postgres-openidm
   version: 0.1.1
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../postgres-openidm
+- name: git
+  version: 0.1.0
+  repository: file://../git

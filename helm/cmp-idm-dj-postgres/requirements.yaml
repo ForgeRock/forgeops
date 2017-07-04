@@ -1,14 +1,14 @@
 dependencies:
 - name: opendj
   version:  0.2.2
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: [userstore]
 - name: openidm
   version:  0.1.0
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../openidm
 - name: postgres-openidm
   version:  0.1.1
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../postgres-openidm
 - name: git
   version:  0.1.0
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../git

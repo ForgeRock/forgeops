@@ -1,5 +1,4 @@
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copyright (c) 2016-2017 ForgeRock AS.
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -17,20 +16,32 @@ spec:
       labels:
         app: {{ template "fullname" . }}
     spec:
-      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: git-init
+        image: {{ template "gitImage" . }}
+        imagePullPolicy:  {{ template "pullPolicy" . }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name: git-repo
       containers:
       - name: amster
         image: {{ template "image" . }}
         imagePullPolicy: {{  template "pullPolicy" . }}
-        envFrom:
-        - configMapRef:
-            name: git-repo
         env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
         volumeMounts:
+        - name: git
+          mountPath: /git
         # The ssh key for Amster authN
         - name: amster-secrets
           mountPath: /var/secrets/amster
@@ -38,14 +49,22 @@ spec:
         # The Amster scripts - not configuration.
         - name: scripts
           mountPath: /opt/amster/scripts
-        # configuration files (*.json)
+        args: ["configure", "sync"]
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      # Git sidecar that periodically commits / pushes configuration changes
+      - name: git
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
+        volumeMounts:
         - name: git
           mountPath: /git
         - name: git-secret
           mountPath: /etc/git-secret
-        args: ["configure", "sync"]
-        resources:
-{{ toYaml .Values.resources | indent 12 }}
+        args: ["sync"]
+        envFrom:
+        - configMapRef:
+            name: git-repo
       volumes:
       - name: amster-secrets
         secret:
@@ -53,9 +72,11 @@ spec:
       - name: scripts
         configMap:
           name: amster-config
+      # the amster and git pods share access to this volume
       - name: git
         emptyDir: {}
       - name: git-secret
         secret:
           secretName: git-credentials
-          defaultMode: 256
+          # The forgerock user needs read access to this secret
+          #defaultMode: 256

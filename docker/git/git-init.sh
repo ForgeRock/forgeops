@@ -13,8 +13,14 @@ export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyC
 if [ ! -z "${GIT_REPO}" ]; then
     mkdir -p ${GIT_ROOT}
     cd ${GIT_ROOT}
-    echo git clone -b "${GIT_BRANCH}"  "${GIT_REPO}"
+    # sometimes the git repo emptyDir does not get cleaned up from a previous run
+    rm -fr *
     git clone -b "${GIT_BRANCH}"  "${GIT_REPO}"
+    if [ "$?" -ne 0 ]; then
+       echo "git clone failed"
+       exit 1
+    fi
+    cd *
 
     if [ "$?" -ne 0 ]; then
        echo "git clone failed"

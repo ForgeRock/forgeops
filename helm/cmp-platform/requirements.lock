@@ -4,7 +4,7 @@ dependencies:
   enabled: false
   import-values: null
   name: openam
-  repository: https://storage.googleapis.com/forgerock-charts/
+  repository: file://../openam
   tags: null
   version: 0.1.0
 - alias: ""
@@ -12,7 +12,7 @@ dependencies:
   enabled: false
   import-values: null
   name: amster
-  repository: https://storage.googleapis.com/forgerock-charts/
+  repository: file://../amster
   tags: null
   version: 0.1.1
 - alias: ""
@@ -20,7 +20,7 @@ dependencies:
   enabled: false
   import-values: null
   name: opendj
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: null
   version: 0.2.2
 - alias: ""
@@ -28,7 +28,7 @@ dependencies:
   enabled: false
   import-values: null
   name: opendj
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../opendj
   tags: null
   version: 0.2.2
 - alias: ""
@@ -36,7 +36,7 @@ dependencies:
   enabled: false
   import-values: null
   name: git
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../git
   tags: null
   version: 0.1.0
 - alias: ""
@@ -44,7 +44,7 @@ dependencies:
   enabled: false
   import-values: null
   name: openidm
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../openidm
   tags: null
   version: 0.1.0
 - alias: ""
@@ -52,7 +52,7 @@ dependencies:
   enabled: false
   import-values: null
   name: postgres-openidm
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../postgres-openidm
   tags: null
   version: 0.1.1
 - alias: ""
@@ -60,8 +60,8 @@ dependencies:
   enabled: false
   import-values: null
   name: openig
-  repository: https://storage.googleapis.com/forgerock-charts
+  repository: file://../openig
   tags: null
   version: 0.1.1
-digest: sha256:fbe3f5217db8429df549acd1be55db372146e4ad2ba760a4df3682eef37b723d
-generated: 2017-06-14T11:15:33.337912878-06:00
+digest: sha256:6e92da11af9e8351b9d5b0e8c1c6a188e428aaf0eb0b782e82cd3548d0dbade8
+generated: 2017-07-06T14:18:45.962523897-06:00

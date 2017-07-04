@@ -8,7 +8,7 @@ touch /opt/opendj/BOOTSTRAPPING
 # For the CTS store, we fix to a known base DN, port, directory manager.
 # The script that calls us should set the $PASSWORD environment variable.
 BASE_DN="dc=openam,dc=forgerock,dc=org"
-SERVER_PORT=389
+SERVER_PORT=1389
 USER="cn=Directory Manager"
 
 /opt/opendj/setup -p $SERVER_PORT  \

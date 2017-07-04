@@ -14,7 +14,7 @@ if [ -n "${NUMBER_SAMPLE_USERS+set}" ]; then
 fi
 
 # todo: We may want to specify a keystore using --usePkcs12keyStore, --useJavaKeystore
-/opt/opendj/setup -p 389 --ldapsPort 636 --enableStartTLS  \
+/opt/opendj/setup -p 1389 --ldapsPort 1636 --enableStartTLS  \
   --adminConnectorPort 4444 \
   --instancePath /opt/opendj/data \
   --baseDN $BASE_DN -h localhost --rootUserPassword "$PASSWORD" \
@@ -28,7 +28,7 @@ if [ -d /opt/opendj/bootstrap/ldif ]; then
   for file in /opt/opendj/bootstrap/ldif/dj-userstore/*;  do
       echo "Loading $file"
        sed -e "s/@BASE_DN@/$BASE_DN/" -e "s/@userStoreRootSuffix@/$BASE_DN/"  -e "s/@DB_NAME@/userRoot/" <${file}  >/tmp/file.ldif
-      /opt/opendj/bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 389 -w ${PASSWORD} -f /tmp/file.ldif
+      /opt/opendj/bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
       echo "  "
   done
 fi

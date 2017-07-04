@@ -161,7 +161,7 @@ inside Minikube.  Run `eval $(minikube docker-env)` to set your Docker context.
 To connect an LDAP browser to OpenDJ running in the cluster, use
 port forwarding:
 
-kubectl port-forward opendj-configstore-0 1389:389
+kubectl port-forward opendj-configstore-0 1389:1389
 
 
 To see what is going on in Kubernetes try:

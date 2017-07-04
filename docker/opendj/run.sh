@@ -21,9 +21,7 @@ java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRA
 # Instance dir does not exist? Then we need to run setup
 if [ ! -d ./data/config ] ; then
   echo "Instance data Directory is empty. Creating new DJ instance"
-
   BOOTSTRAP=${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}
-
   # Set a default base DN. Setup scripts can choose to override this.
   export BASE_DN=${BASE_DN:-"dc=example,dc=com"}
   # If a password file is mounted, grab the password from that, otherwise default
@@ -33,7 +31,7 @@ if [ ! -d ./data/config ] ; then
    echo "Running $BOOTSTRAP"
    sh "${BOOTSTRAP}"
 
-   # Check if DJ_MASTER_SERVER var is set. If it is - replicate to that server
+   # Check if DJ_MASTER_SERVER var is set. If it is - replicate to that server.
    if [ ! -z ${DJ_MASTER_SERVER+x} ];  then
       /opt/opendj/bootstrap/replicate.sh $DJ_MASTER_SERVER
    fi

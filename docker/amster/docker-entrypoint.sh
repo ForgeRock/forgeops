@@ -34,7 +34,7 @@ wait_configstore_up() {
     echo "Waiting for the configuration store to come up"
     while true 
     do
-        ldapsearch -y ${DIR_MANAGER_PW_FILE} -H ldap://configstore-0.configstore:389 -D "cn=Directory Manager" -s base -l 5
+        ldapsearch -y ${DIR_MANAGER_PW_FILE} -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5
         if [ $? = 0 ]; 
         then
             echo "Config store is up"
@@ -49,11 +49,13 @@ wait_configstore_up() {
 is_configured() {
     echo "Testing if the configuration store is configured with an AM installation"
     test="ou=services,dc=openam,dc=forgerock,dc=org"
-    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H ldap://configstore-0.configstore:389 -D "cn=Directory Manager" -s base -l 5 -b "$test"`
+    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5 -b "$test"`
     status=$?
     echo "Result is $r status is $status"
     return $status
 }
+
+OPENAM_HOME=/home/forgerock/openam
 
 # This function is called as the init container that runs before OpenAM. It Checks the configstore. If it is configured,
 # This function will create the AM bootstrap file. Otherwise AM will come up in install mode.
@@ -64,12 +66,11 @@ bootstrap_openam() {
     if [ $? = 0 ];
     then
         echo "Configstore is present. Creating bootstrap"
-        mkdir -p /root/openam/openam/debug; 
-        umask u=rwx,g=,o=
-        cd /root/openam
-        cp -L /var/boot/*.json /root/openam
+        mkdir -p "$OPENAM_HOME"/openam/debug; 
+        cd "$OPENAM_HOME"
+        cp -L /var/boot/*.json "$OPENAM_HOME"
         cp  -rL /var/secrets/openam/.?* openam
-        cp -L /var/secrets/openam/authorized_keys /root/openam
+        cp -L /var/secrets/openam/authorized_keys "$OPENAM_HOME"
     fi
     exit 0
 }
@@ -82,12 +83,6 @@ pause)
     pause
     ;;
 configure)
-    ./git-init.sh
-    if [ "$?" -ne 0 ]; then
-        echo "git init failed, Can not continue. This container will sleep for ten minutes so you can exec into it for debugging"
-        sleep 600
-        exit 1
-    fi
     # invoke amster install.
     ./amster-install.sh
     shift
