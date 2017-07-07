@@ -25,6 +25,8 @@ spec:
         envFrom:
         - configMapRef:
             name: git-repo
+        - configMapRef:
+            name:  {{ template "fullname" . }}
       containers:
       - name: git
         image: {{ template "gitImage" . }}

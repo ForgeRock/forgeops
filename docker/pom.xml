@@ -78,6 +78,26 @@
                     <pushRegistry>${registry}</pushRegistry>
                     <images>
                         <image>
+                            <name>${repo}/java</name>
+                            <build>
+                                <dockerFileDir>java</dockerFileDir>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
+                            </build>
+                        </image>
+                        <image>
+                            <name>${repo}/tomcat</name>
+                            <build>
+                                <dockerFileDir>tomcat</dockerFileDir>
+                                <tags>
+                                    <tag>${project.version}</tag>
+                                    <tag>latest</tag>
+                                </tags>
+                            </build>
+                        </image>
+                        <image>
                             <name>${repo}/openidm</name>
                             <build>
                                 <dockerFileDir>openidm</dockerFileDir>

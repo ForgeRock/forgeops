@@ -108,3 +108,4 @@ spec:
       - name: configstore-secret
         secret:
           secretName: configstore
+          #defaultMode: 256

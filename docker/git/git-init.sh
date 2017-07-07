@@ -4,7 +4,7 @@ set -x
 
 GIT_ROOT=${GIT_ROOT:=/git}
 
-GIT_BRANCH=${GIT_BRANCH:-master}
+GIT_BRANCH=${GIT_CHECKOUT_BRANCH:-master}
 
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 

@@ -76,3 +76,11 @@ If you do not want to use the 'default' namespace, set your namespace using:
 
 kubectl config set-context $(kubectl config current-context) --namespace=<insert-namespace-name-here>
 
+
+# Known Issues
+
+* minkube PVCs can not be accessed by non root containers. This is related to the minikube hostpath PVC provisioner.
+This means that you can not use PVCs in minikube as DJ now runs as the forgerock user. The default DJ persistence
+strategy is now set to false by default, meaning the DJ data will vanish once the pod is gone. 
+Set this to true on GKE or other Cloud environments by setting `djPersistence: true` in the value overrides.
+See https://github.com/kubernetes/kubernetes/issues/2630.

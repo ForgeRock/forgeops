@@ -5,7 +5,8 @@ metadata:
 data:
   PROJECT_HOME: "{{ .Values.global.configPath.idm }}"
   GIT_AUTOSAVE_BRANCH:  autosave-idm
-  
+  GIT_CHECKOUT_BRANCH: {{ default "master" .Values.global.git.branch }}
+
 ---
 apiVersion: v1
 kind: ConfigMap
