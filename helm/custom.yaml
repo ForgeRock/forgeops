@@ -28,8 +28,10 @@ global:
     # private git repos, or pushing to a git repo. The value below is not a real ssh key and will not work.
     # You need to replace this with your own ssh key. If you are just cloning http:// public repos that do not require
     # authentication, this variable can be ignored.  If you set your own ssh key, do not check this file into git
-    # Generate a key using: ssh-keygen -t rsa -C "forgeops-robot@forgeops.com" -f ssh.   Base64 encode the value
-    # and put it in here. (base64 <ssh). The generated ssh.pub key is the public key to add to your stash or github repo
+    # Generate a key using:
+    # ssh-keygen -t rsa -C "forgeops-robot@forgeops.com" -f ssh.   Do not enter a passphrase!
+    # Base64 encode the value using base64 <ssh
+    # and enter below. The generated ssh.pub key is the public key to add to your stash or github repo
     # to allow access.
     sshKey:  dGhpcyBpcyBhIGR1bW15IGtleQo=
     # The number of seconds to wait between git commit and push. If set to zero (0), git push functionality is disabled.

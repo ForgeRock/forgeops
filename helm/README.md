@@ -43,7 +43,7 @@ that you want installed.
 # Auto-export
 
 The amster and AM charts now include a feature to auto-export configurations. The amster and idm git sidecar 
-container will periodically export the configuration, and tht git sidecar will optionally commit and push 
+container will periodically export the configuration, and the git sidecar will optionally commit and push 
 the changes. You must set global.git.pushInterval to the time in seconds to perform git sync. The default
 value is 0, which disables git sync.
 

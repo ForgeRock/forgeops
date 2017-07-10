@@ -41,6 +41,7 @@
         <openidmVersion>5.5.0-M1</openidmVersion>
         <openigVersion>5.5.0-M1</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
+        <releaseTag>5.5.0</releaseTag>
         <repo>forgerock</repo>
     </properties>
 
@@ -82,8 +83,7 @@
                             <build>
                                 <dockerFileDir>java</dockerFileDir>
                                 <tags>
-                                    <tag>${project.version}</tag>
-                                    <tag>latest</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -92,8 +92,7 @@
                             <build>
                                 <dockerFileDir>tomcat</dockerFileDir>
                                 <tags>
-                                    <tag>${project.version}</tag>
-                                    <tag>latest</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -103,8 +102,7 @@
                                 <dockerFileDir>openidm</dockerFileDir>
                                 <tags>
                                     <tag>${openidmVersion}</tag>
-                                    <tag>${project.version}</tag>
-                                    <tag>latest</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -113,9 +111,8 @@
                             <build>
                                 <dockerFileDir>openidm-postgres</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
                                     <tag>${openidmVersion}</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -124,9 +121,8 @@
                             <build>
                                 <dockerFileDir>openam</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
                                     <tag>${openamVersion}</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -135,9 +131,8 @@
                             <build>
                                 <dockerFileDir>amster</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
                                     <tag>${openamVersion}</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -146,9 +141,8 @@
                             <build>
                                 <dockerFileDir>openig</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
                                     <tag>${openigVersion}</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -157,9 +151,8 @@
                             <build>
                                 <dockerFileDir>opendj</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
                                     <tag>${opendjVersion}</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -168,8 +161,7 @@
                             <build>
                                 <dockerFileDir>toolbox</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -178,8 +170,7 @@
                             <build>
                                 <dockerFileDir>git</dockerFileDir>
                                 <tags>
-                                    <tag>latest</tag>
-                                    <tag>${project.version}</tag>
+                                    <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
                         </image>
@@ -287,6 +278,7 @@
                 <opendjVersion>4.1.0-SNAPSHOT</opendjVersion>
                 <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
                 <openigVersion>5.5.0-SNAPSHOT</openigVersion>
+                <releaseTag>5.5.0-SNAPSHOT</releaseTag>
             </properties>
         </profile>
     </profiles>
