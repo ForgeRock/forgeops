@@ -1,0 +1,27 @@
+dependencies:
+- alias: ""
+  condition: ""
+  enabled: false
+  import-values: null
+  name: git
+  repository: file://../git
+  tags: null
+  version: 0.1.0
+- alias: ""
+  condition: ""
+  enabled: false
+  import-values: null
+  name: amster
+  repository: file://../amster
+  tags: null
+  version: 0.1.1
+- alias: ""
+  condition: ""
+  enabled: false
+  import-values: null
+  name: openam
+  repository: file://../openam
+  tags: null
+  version: 0.1.0
+digest: sha256:4e0a3227da214b88ef804dfcc48bd27674b878d466c92ba97491de5c50a721bb
+generated: 2017-07-10T10:58:12.838818498-06:00

@@ -14,6 +14,7 @@ spec:
         vendor: forgerock
     spec:
       terminationGracePeriodSeconds: 10
+      {{ if .Values.createBootstrap -}}
       initContainers:
       - name: bootstrap
         image: {{.Values.global.image.repository}}/amster:{{.Values.global.image.tag}}
@@ -28,6 +29,7 @@ spec:
           mountPath: /var/secrets/openam
         - name: configstore-secret
           mountPath: /var/secrets/configstore
+      {{ end -}}
       containers:
       - name: openam
         image: {{ template "image" . }}
@@ -105,7 +107,9 @@ spec:
       - name: log-config
         configMap:
           name: am-log-config
+      {{ if .Values.createBootstrap -}}
       - name: configstore-secret
         secret:
           secretName: configstore
           #defaultMode: 256
+      {{- end }}

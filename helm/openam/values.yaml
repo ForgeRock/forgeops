@@ -40,3 +40,6 @@ resources:
 
 
 openamHome: /home/forgerock/openam
+
+# Set to true to create a boot.json file to bootstrap AM. If set to false, AM will come up to the configurator page.
+createBootstrap: true

@@ -26,23 +26,18 @@ serverBase: http://openam:80
 # See the _helpers template to change the *external* load balancer fqdn
 # By default it expands to  openam.$namespace.$baseDomain
 
-amadmin_pw: password
+
 
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration
 # and set to 'false' if importing partial/incremental configurations
 amsterClean: false
 
+amster:
+  configStore:
+    type: embedded
 
-# Suffix for OpenDJ config store.
-rootSuffix:  "dc=openam,dc=forgerock,dc=org"
+openam:
+  amadmin_pw: password
+  createBootstrap: false
 
-
-# The defaults below are small and OK for testing.
-resources:
- limits:
-   cpu: 2000m
-   memory: 1600Mi
- requests:
-   cpu: 300m
-   memory: 1500Mi

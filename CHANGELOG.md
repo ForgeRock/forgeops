@@ -7,3 +7,10 @@ the forgerock/ chart repo. This makes it easier to package the charts with the `
 * DJ now defaults to port 1389, not 389. This is so the container can be run by the non-root forgerock user.
 * Git sync functionality has been moved out of amster and into the git container. We now use sidecar git
 containers for all git functionality.
+
+# 2017-07-10
+
+* Added openam chart variable to conditionally create a bootstrap file or not. Used for embedded DJ.
+* Renamed am-embedded-dj to cmp-am-embedded to reflect that it is a composite chart.
+* Added git.pushInterval variable to set the interval in seconds to perform git push. 
+If set to 0, push is disabled. See custom.yaml.

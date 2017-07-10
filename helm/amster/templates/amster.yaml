@@ -30,9 +30,6 @@ spec:
         envFrom:
         - configMapRef:
             name: git-repo
-        env:
-        - name: GIT_CHECKOUT_BRANCH
-          value: {{ default "master"  .Values.global.git.branch }}
       containers:
       - name: amster
         image: {{ template "image" . }}

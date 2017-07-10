@@ -9,10 +9,12 @@ data:
     --authorizedKey  /var/secrets/amster/authorized_keys \
     --cookieDomain {{.Values.global.domain }} \
     --adminPwd {{ .Values.amadmin_pw }} \
-    --cfgStore dirServer \
+    --cfgStore {{ .Values.configStore.type }} \
+    {{ if eq .Values.configStore.type "dirServer" -}}
     --cfgStoreHost {{.Values.configStore.host }} \
-    --cfgStoreDirMgrPwd  {{.Values.configStore.password }}  \
+    --cfgStoreDirMgrPwd {{.Values.configStore.password }}  \
     --cfgStorePort {{.Values.configStore.port }}  \
+    {{ end -}}
     --policyAgentPwd Passw0rd \
     --pwdEncKey 123456789012 \
     --acceptLicense \

@@ -19,6 +19,9 @@ serverBase: http://openam:80
 amadmin_pw: password
 
 configStore:
+  # type can be dirServer or embedded.
+  type: dirServer
+   # If type is set to embedded, the attributes below are ignored.
   suffix:  "dc=openam,dc=forgerock,dc=org"
   # This is the first StatefulSet name:
   host: configstore-0.configstore

@@ -43,17 +43,19 @@ that you want installed.
 # Auto-export
 
 The amster and AM charts now include a feature to auto-export configurations. The amster and idm git sidecar 
-container will periodically export the configuration into a git autosave branch. 
+container will periodically export the configuration, and tht git sidecar will optionally commit and push 
+the changes. You must set global.git.pushInterval to the time in seconds to perform git sync. The default
+value is 0, which disables git sync.
 
-If the git repo URL begins with ssh://, it is assumed that you have write (push) access. The sync process
-will attempt to push any configuration changes upstream to your git repo.
 
 To watch the configuration loop:
 
 ```bash
 # amster - am logs
-kubectl logs amster -f 
-# openidm - find the idm pod name first
+kubectl logs amster-xxxx -c amster -f 
+# git sidecar
+kubectl logs amster-xxxx -c git -f 
+# openidm - git sidecar
 kubectl logs openidm-xxxxxx -c git -f 
 ```
 
