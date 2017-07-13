@@ -18,3 +18,8 @@ If set to 0, push is disabled. See custom.yaml.
 # 2017-07-12
 
 * pom.xml updated to create release (5.5.0) and snapshot (5.5.0-SNAPSHOT) tags using a maven profile.
+
+# 2017-07-13
+
+* Added opendj-git chart to pull DJ configuration from Git
+
