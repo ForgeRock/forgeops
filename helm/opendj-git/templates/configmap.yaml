@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "instanceName" . }}
+data:
+  # Values for git clone
+  GIT_REPO: "{{ .Values.global.git.repo }}"
+  GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
+  GIT_ROOT:  "/git"
+  # DJ Configuration
+  BASE_DN: {{ .Values.baseDN }}
+  # The master server is the first instance in the stateful set (-0 )
+  DJ_MASTER_SERVER: {{  template "instanceName" . -}}-0.{{ template "instanceName" . }}
+  OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
+  BACKUP_HOST: {{ .Values.backupHost }}
+  BACKUP_SCHEDULE_FULL: {{ .Values.backupScheduleFull }}
+  BACKUP_SCHEDULE_INCREMENTAL: {{ .Values.backupScheduleIncremental }}
+  BOOTSTRAP:  {{ .Values.bootstrapScript }}
+{{- if not (empty .Values.numberSampleUsers) }}
+  NUMBER_SAMPLE_USERS: "{{ .Values.numberSampleUsers }}"
+{{- end }}

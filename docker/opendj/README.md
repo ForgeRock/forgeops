@@ -1,17 +1,8 @@
 # ForgeRock OpenDJ Docker image
 
-Listens on 389/636/4444/8989
+Listens on 1389/1636/4444/8989
 
-Default bind credentials are CN=Directory Manager, the password defaults to "password"
-if you run this as-is, or 'changeme' if you use the docker-compose example. 
-
-
-Docker compose is the easiest way to experiment with this image. To run with docker-compose
-
-```
-docker-compose build
-docker-compose up 
-```
+Default bind credentials are CN=Directory Manager, the password defaults to "password".
 
 To run with Docker (example)
 ```
@@ -36,7 +27,7 @@ will typically be set by docker-compose or Kubernetes
 * DIR_MANAGER_PW_FILE: Path to a file that contains the Dir Manager password. This is needed when the image is
 first created
 * BOOTSTRAP:  Path to a shell script that will initialize OpenDJ. This is only executed if the data/config
-directory is empty. Defaults to /opt/opendj/boostrap/setup.sh
+directory is empty. Defaults to /opt/opendj/bootstrap/setup.sh
 * SECRET_VOLUME:  Path to a directory containing keystores. Defaults to /var/secrets/opendj. This is used
 to setup OpenDJ with known keystore values.
 * BASE_DN: The base DN to create. Used in setup and replication
@@ -68,8 +59,7 @@ under /opt/opendj/data
 If no database exists, the script defined by BOOTSTRAP will be
 run.  The default script path can be overridden by setting the environment
 variable BOOTSTRAP to the full path to the script.  To customize OpenDJ, 
-mount a volume on /opt/opendj/bootstrap/ that contains your setup.sh
-script. 
+mount a volume that contains your setup.sh script and set BOOTSTRAP to point to the startup.sh shell script. 
  
 If you do not provide a bootstrap script, the default setup.sh creates a sample back end.
 
