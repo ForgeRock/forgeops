@@ -59,10 +59,9 @@ global:
     amster: /git/forgeops-init/default/am/empty-import
 
 
+# For production you wil want to set CPU limits to help Kube Schedule the pods.
 resources:
  limits:
-   cpu: 200m
    memory: 756Mi
  requests:
-   cpu: 100m
    memory: 756Mi

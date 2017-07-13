@@ -76,14 +76,11 @@ resources:
 djPersistence: false
 
 
-git:
-  repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
-  branch: master
-
-# Set this to true to enable backups to gcloud
+# Set this to true to enable backups to gcloud.
 enableGcloudBackups: false
 
-# backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
+# Backup bucket destination. You need the right scopes in container engine to write to this bucket.
+# Add --scopes storage-full when you create the cluster.
 gsBucket: gs://forgeops/dj-backup 
 
 # Uncomment this to create sample users.

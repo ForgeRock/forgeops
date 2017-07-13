@@ -29,7 +29,7 @@ spec:
         args: ["init"]
         envFrom:
         - configMapRef:
-            name: git-repo
+            name: git-{{ .Release.Name }}
       containers:
       - name: amster
         image: {{ template "image" . }}
@@ -64,7 +64,7 @@ spec:
         args: ["sync"]
         envFrom:
         - configMapRef:
-            name: git-repo
+            name: git-{{ .Release.Name }}
         env:
         - name: GIT_AUTOSAVE_BRANCH
           value: autosave-am
@@ -80,6 +80,6 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName: git-credentials
+          secretName: git-{{ .Release.Name }}
           # The forgerock user needs read access to this secret
           #defaultMode: 256

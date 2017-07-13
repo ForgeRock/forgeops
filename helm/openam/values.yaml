@@ -30,12 +30,11 @@ rootSuffix:  "dc=openam,dc=forgerock,dc=org"
 logDriver: none
 
 # The defaults below are small and OK for testing.
+# For production you wil want to set CPU limits to help Kube Schedule the pods.
 resources:
  limits:
-   cpu: 1000m
    memory: 1300Mi
  requests:
-   cpu: 300m
    memory: 1200Mi
 
 

@@ -51,14 +51,10 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 
 
+# For production you will want to specify CPU limits to help Kube schedule the pods.
 resources:
- requests:
-   cpu: 200m
+  requests:
    memory: 1024Mi
-   # For testing, we omit a hard resource limit
-#  limits:
-#     cpu: 1000m
-#   memory: 3000Mi
 
 
 # DJ persistence switch. Setting to false disables volume claims - all data is stored inside the docker image.

@@ -21,5 +21,13 @@ If set to 0, push is disabled. See custom.yaml.
 
 # 2017-07-13
 
-* Added opendj-git chart to pull DJ configuration from Git
+* Added opendj-git chart to pull DJ configuration from Git.
+* Changed git chart to use a release name in the configmap and secret. This avoids name 
+conflicts if multiple composite charts include git.
+* Removed bin/openam.sh, as this strategy will no longer work with the above change. The git 
+release name will not be known to the other charts.
+* Added a Jenkinsfile for pipeline builds.
+* Removed CPU resource limits for am,dj and idm charts. For minikube and small scale testing this makes
+it easier to fit the pods into a resource constrained cluster. For production, the resource 
+limits should be set.
 

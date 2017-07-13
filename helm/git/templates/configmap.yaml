@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: git-repo
+  name: git-{{ .Release.Name }}
 data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
