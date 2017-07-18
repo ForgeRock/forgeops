@@ -36,6 +36,7 @@ timestamps {
           stageErrorMessage = 'The Maven build failed, please check the console output'
           sh "cd docker && mvn -U clean package docker:build docker:push"
         }
+        // Build after the release as we need the base java / tomcat containers.
         stage ('Docker snapshot build') {
           stageErrorMessage = 'The Maven snapshot build failed, please check the console output'
           sh "cd docker && mvn -U -Psnapshot-releases package docker:build docker:push"

@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 
 
-# Default - overrides
 global:
   image:
     repository: gcr.io/engineering-devops
@@ -18,6 +17,6 @@ resources:
 
 # Child Chart overrides
 
-opendj:
+configstore:
   djInstance: configstore
 

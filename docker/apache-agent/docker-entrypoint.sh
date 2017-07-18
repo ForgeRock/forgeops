@@ -52,13 +52,17 @@ pause() {
 
 echo "Command: $1"
 
+# Remove when https://bugster.forgerock.org/jira/browse/AMAGENTS-679 is fixed.
+echo "" > /tmp/monitor.semaphore
+chmod a+rw /tmp/monitor.semaphore
+
+
 case $1 in
 pause)
   pause ;;
 install)
   install
   pause  ;;
-  
 httpd-foreground)
   # todo: We should also concatenate the output of the agent debug log to stdout.
   # In a shell you can run { cmd1; cmd2; } also -see tail -f --follow=name --retry filename

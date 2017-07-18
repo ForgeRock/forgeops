@@ -26,3 +26,12 @@ gcloud alpha container node-pools create $NODEPOOL --cluster $CLUSTER --zone $ZO
 
 # Create a storage class for SSD
 kubectl create -f storage.yaml
+
+helm init
+
+echo "Giving Tiller time to start"
+sleep 20
+
+
+helm install --namespace nginx  --set "controller.service.loadBalancerIP=35.184.100.105" stable/nginx-ingress
+

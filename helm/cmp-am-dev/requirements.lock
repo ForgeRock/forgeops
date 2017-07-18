@@ -31,5 +31,5 @@ dependencies:
   repository: file://../git
   tags: null
   version: 0.1.0
-digest: sha256:d822a5d506f746ed093c03430f2f2709cd0a4055d3b9290a10bc8dc28608d3ca
-generated: 2017-07-06T13:55:53.559057077-06:00
+digest: sha256:e64d4547a8e930c9c5ac2c26a8fa43a1a883d96e0c66a7fa2067852b7af00a7d
+generated: 2017-07-19T14:58:01.60313216-06:00

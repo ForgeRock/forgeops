@@ -19,10 +19,13 @@ data:
     com.sun.identity.agents.config.connect.timeout = 4
 
     com.sun.identity.agents.config.debug.file.size = 0
-    com.sun.identity.agents.config.local.logfile = /opt/web_agents/apache24_agent/bin/../instances/agent_1/logs/debug/debug.log
+    #com.sun.identity.agents.config.local.logfile = /opt/web_agents/apache24_agent/bin/../instances/agent_1/logs/debug/debug.log
+    com.sun.identity.agents.config.local.logfile = /dev/stderr
     com.sun.identity.agents.config.local.audit.logfile = /opt/web_agents/apache24_agent/bin/../instances/agent_1/logs/audit/audit.log
 
-    com.sun.identity.agents.config.debug.level = error
+    #com.sun.identity.agents.config.debug.level = error
+    com.sun.identity.agents.config.debug.level = message
+
 
     org.forgerock.agents.config.postdata.preserve.dir = /opt/web_agents/apache24_agent/bin/../log
 

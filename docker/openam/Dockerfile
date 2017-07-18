@@ -5,8 +5,19 @@
 FROM tomcat:8.5.16-jre8-alpine
 
 
-#ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap  -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
-ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+#ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+# Option for setting the AM home directory:
+#    -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
+# Options for using cgroups for memory size:
+#   -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+# Option for sending debug output to stderr
+#-Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider -Dcom.sun.identity.shared.debug.file.format="%PREFIX% %MSG%\n%STACKTRACE%"
+
+ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
+  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider \
+  -Dcom.sun.identity.shared.debug.file.format=\"%PREFIX% %MSG%\\n%STACKTRACE%\"
+
+#  -Dcom.iplanet.services.debug.level=error
 
 ENV FORGEROCK_HOME /home/forgerock
 ENV OPENAM_HOME /home/forgerock/openam

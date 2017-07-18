@@ -9,4 +9,5 @@ then
     exit 1
 fi
 # Else - query the ldap server
-exec ldapsearch $DEBUG -y ${DIR_MANAGER_PW_FILE} -H ldap://localhost:1389 -D "cn=Directory Manager" -s base -l 5
+# Asking for the 1.1. attribute returns only the dn - cuts down on traffic
+exec ldapsearch $DEBUG -y ${DIR_MANAGER_PW_FILE} -H ldap://localhost:1389 -D "cn=Directory Manager" -s base -l 5 "(objectClass=*)" 1.1

@@ -31,3 +31,9 @@ release name will not be known to the other charts.
 it easier to fit the pods into a resource constrained cluster. For production, the resource 
 limits should be set.
 
+# 2017-07-21
+
+* Fixed openig chart to include git dependency.
+* Added rebuild.sh to opendj docker container to rebuild indexes.
+* Simplified AM audit logging
+

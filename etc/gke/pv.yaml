@@ -1,0 +1,37 @@
+# Pre-create PVs for testing. This allows us to keep the disk across cluster rebuilds.
+apiVersion: "v1"
+kind: "PersistentVolume"
+metadata:
+  name: data-configstore-0
+  annotations:
+    pv.beta.kubernetes.io/gid: "11111"
+#    volume.beta.kubernetes.io/mount-options: "discard"
+  labels:
+    pdName: dj-configstore-0
+spec:
+  capacity:
+    storage: "10Gi"
+  accessModes:
+    - "ReadWriteOnce"
+  storageClassName: fast
+  gcePersistentDisk:
+    fsType: "ext4"
+    pdName: "dj-configstore-0"
+---
+apiVersion: "v1"
+kind: "PersistentVolume"
+metadata:
+  name: data-userstore-0
+  annotations:
+    pv.beta.kubernetes.io/gid: "11111"
+  labels:
+    pdName: dj-userstore-0
+spec:
+  capacity:
+    storage: "10Gi"
+  accessModes:
+    - "ReadWriteOnce"
+  storageClassName: fast
+  gcePersistentDisk:
+    fsType: "ext4"
+    pdName: "dj-userstore-0"

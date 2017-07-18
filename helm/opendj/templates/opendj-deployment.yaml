@@ -15,6 +15,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "11111"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
@@ -33,10 +35,9 @@ spec:
         component: opendj
     spec:
       terminationGracePeriodSeconds: 30
-      # Run as user forgerock (11111). We don't need this as the container defaults to this user.
-#      securityContext:
-#        runAsUser: 0
-#        fsGroup: 11111
+      # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111
+      securityContext:
+        fsGroup: 11111
       containers:
       - name: opendj
         image:  {{ template "image" . }}

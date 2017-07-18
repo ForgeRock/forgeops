@@ -1,17 +1,19 @@
 # Note: This is currently pending the fix for https://bugster.forgerock.org/jira/browse/AMAGENTS-501.
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM nginx:1.12
+FROM nginx:1.13
 
 WORKDIR /opt
 
 # Use this if you want to directly add the agent zip file.
 #ADD agent.zip /var/tmp/agent.zip
 
+# Waiting on https://bugster.forgerock.org/jira/browse/AMAGENTS-501 to fix:
+# nginx: [emerg] module "/opt/web_agents/nginx12_agent/bin/../lib/openam_ngx_auth_module.so" version 1011010 instead of 1011013 in /etc/nginx/nginx.conf:8
+
 # The agent bits are not on maven - so we need to download these from the internal build server.
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
-ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/nightly/Linux
+ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/
 ENV AGENT NGINX_r12_Linux_64bit_5.0.0-SNAPSHOT.zip
-
 
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
       curl $WEB_AGENT_BUILDS/$AGENT -o /var/tmp/agent.zip && \

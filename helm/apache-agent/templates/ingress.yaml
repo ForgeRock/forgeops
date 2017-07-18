@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: apache
+  name:  {{ .Values.component }}
   annotations:
     ingress.kubernetes.io/enable-cors: "false"
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -11,9 +11,10 @@ metadata:
     ingress.kubernetes.io/session-cookie-name: "route"
     ingress.kubernetes.io/session-cookie-hash: "sha1"
 spec:
+{{ include "tls-spec" . | indent 2 }}
   rules:
   # If you are forwarding from another load balancer, make
-  # sure the LB sets the appropiate X-forwarded headers.
+  # sure the LB sets the appropriate X-forwarded headers.
   # See for example:
   # http://serverfault.com/questions/598202/make-nginx-to-pass-hostname-of-the-upstream-when-reverseproxying
   - host: {{ template "externalFQDN" . }}
@@ -21,5 +22,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName:  {{ template "fullname" . }}
+          #serviceName:  {{ template "fullname" . }}
+          serviceName: apache-agent
           servicePort: 80

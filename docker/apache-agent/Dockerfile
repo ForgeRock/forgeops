@@ -13,7 +13,7 @@ WORKDIR /opt
 
 # The agent bits are not on maven - so we need to download these from the internal build server.
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
-ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/nightly/Linux
+ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/
 ENV APACHE_AGENT Apache_v24_Linux_64bit_5.0.0-SNAPSHOT.zip
 
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim && \
@@ -28,21 +28,27 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 #                "path to the agent password file" [--changeOwner] [--acceptLicence] [--forceInstall]
 #
 
+
+# Shared memory cache size in bytes. The default is 1.5 GB. On Docker you need to run with --shm-size.
+# Set this down lower for testing purposes only. The settings below allow you to run with --shm-size=200m
+# See https://bugster.forgerock.org/jira/browse/AMAGENTS-383.
+# Remove this when https://bugster.forgerock.org/jira/browse/AMAGENTS-273 is resolved.
+ENV AM_MAX_SHARED_POOL_SIZE 0x200000
+ENV AM_MAX_SESSION_CACHE_SIZE 0x4000000
+
+
 # Because we are running this before OpenAM is up and running we need to use the forceinstall option.
 # We are using  defaults here (OpenAM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
 # Note: Another alternative to bootstrapping the agent in the docker build is to move this into the container startup. 
 RUN /opt/web_agents/apache24_agent/bin/agentadmin --s /usr/local/apache2/conf/httpd.conf \
         "http://openam:80/openam" \
-        "http://apache-svc:80/" \
+        "http://apache:80/" \
         "/" \
         "apache" \
         /var/tmp/pw.txt \
         --changeOwner --acceptLicence --forceInstall
 
-# Shared memory cache size in bytes. The default is 1.5 GB. On Docker you need to run with --shm-size.
-# Set this down lower for testing purposes.
-ENV AM_MAX_SHARED_POOL_SIZE 1048576000
 
 WORKDIR /opt/web_agents/apache24_agent
 

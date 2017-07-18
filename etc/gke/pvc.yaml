@@ -1,0 +1,30 @@
+# Optional PVCs to pre-create. This lets us keep the persistent data across cluster rebuilds.
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-configstore-0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast
+  selector:
+    matchLabels:
+      pdName:  dj-configstore-0
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: data-userstore-0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast
+  selector:
+    matchLabels:
+      pdName:  dj-userstore-0

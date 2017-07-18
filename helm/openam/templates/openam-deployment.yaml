@@ -40,9 +40,9 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
-        env:
-        - name: CATALINA_OPTS
-          value:  {{ .Values.catalinaOpts }}
+#        env:
+#        - name: CATALINA_OPTS
+#          value:  {{ .Values.catalinaOpts }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.
@@ -60,10 +60,9 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 10
           periodSeconds: 30
-        # TODO: Pick a single good log driver for the stack.
 {{- if  eq .Values.logDriver "fluent-bit" }}
       - name: log
-        image:  fluent-bit:latest
+        image:  fluent/fluent-bit:0.12-dev
         imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
         volumeMounts:
         - name: openam-root
@@ -72,29 +71,6 @@ spec:
         - name: log-config
           mountPath: /fluent-bit/etc
 {{ end }}
-{{- if  eq .Values.logDriver "fluentd" }}
-      - name: log
-        image: fluent/fluentd
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
-        env:
-        - name: FLUENTD_CONF
-          value: fluentd.conf
-        volumeMounts:
-        - name: openam-root
-          mountPath: /log
-        - name: log-config
-          mountPath: /fluentd/etc
-{{end}}
-{{- if  eq .Values.logDriver "filebeat" }}
-      - name: log
-        image: "giantswarm/filebeat:5.2.2"
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
-        volumeMounts:
-        - name: openam-root
-          mountPath: /log
-        - name: log-config
-          mountPath: /etc/filebeat
-{{end}}
       volumes:
       - name: openam-root
         emptyDir: {}

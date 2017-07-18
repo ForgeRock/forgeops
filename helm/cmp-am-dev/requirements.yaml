@@ -1,17 +1,14 @@
 dependencies:
 - name: openam 
   version: 0.1.0
-  #repository: https://storage.googleapis.com/forgerock-charts/
   repository: file://../openam
 - name: amster 
   version: 0.1.1
-  #repository: https://storage.googleapis.com/forgerock-charts/
   repository: file://../amster
 - name: opendj
   version:  0.2.2
-  #repository: https://storage.googleapis.com/forgerock-charts
   repository: file://../opendj
+  alias: configstore
 - name: git
   version:  0.1.0
-  #repository: https://storage.googleapis.com/forgerock-charts
   repository: file://../git
