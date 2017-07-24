@@ -1,0 +1,17 @@
+# Copyright (c) 2016-2017 ForgeRock AS.
+# Various logging configuration files
+# Not all of these are used - if size is a concern use a helm expression to template them out
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-log-config
+data:
+  filebeat.yml: |
+    filebeat.prospectors:
+    - input_type: log
+      paths:
+        - /log/*log.[0-9]
+    output.elasticsearch:
+      hosts: ["elasticsearch:9200"]
+    output.console:
+      pretty: true

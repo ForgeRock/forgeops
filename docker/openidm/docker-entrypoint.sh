@@ -28,7 +28,8 @@ if [ "$1" = 'openidm' ]; then
    # If secrets keystore is present copy files from the secrets directory to the standard location.
    if [ -r secrets/keystore.jceks ]; then
 	    cp secrets/*  security
-	    chown -R openidm:openidm security 
+
+	    #chown -R openidm:openidm security
    fi
 
     if [ -r ${BOOT_PROPERTIES} ]; then

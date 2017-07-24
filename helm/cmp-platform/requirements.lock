@@ -1,67 +1,27 @@
 dependencies:
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: openam
+- name: openam
   repository: file://../openam
-  tags: null
   version: 0.1.0
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: amster
+- name: amster
   repository: file://../amster
-  tags: null
   version: 0.1.1
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: opendj
+- name: opendj
   repository: file://../opendj
-  tags: null
   version: 0.2.2
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: opendj
+- name: opendj
   repository: file://../opendj
-  tags: null
   version: 0.2.2
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: git
+- name: git
   repository: file://../git
-  tags: null
   version: 0.1.0
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: openidm
+- name: openidm
   repository: file://../openidm
-  tags: null
   version: 0.1.0
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: postgres-openidm
+- name: postgres-openidm
   repository: file://../postgres-openidm
-  tags: null
   version: 0.1.1
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: openig
+- name: openig
   repository: file://../openig
-  tags: null
   version: 0.1.1
-digest: sha256:6e92da11af9e8351b9d5b0e8c1c6a188e428aaf0eb0b782e82cd3548d0dbade8
-generated: 2017-07-06T14:18:45.962523897-06:00
+digest: sha256:eafa7017d436ec4b3755f01e96afbb8f5d2e3cf4846298d5ac152f6106d2bed0
+generated: 2017-07-26T14:20:44.885010606-06:00

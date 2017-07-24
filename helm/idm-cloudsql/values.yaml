@@ -1,0 +1,62 @@
+# Default values for openidm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# optional registry, including trailing /
+
+
+# Used to form the FQDN  - see _helpers.tpl
+component: openidm
+
+replicaCount: 1
+
+global:
+  domain: .example.com
+  image:
+    repository: forgerock
+    pullPolicy: IfNotPresent
+    tag: 5.5.0-SNAPSHOT
+  git:
+    # git repo to clone. The value below is a public git repo that does not require authentication.
+    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    branch: master
+  configPath:
+    idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
+
+# Specific values
+openidm:
+  repo:
+    host: localhost
+    port: 5432
+    user: openidm
+    password: idmpassword
+
+# Optional - if there is a DJ userstore configured
+userstore:
+  host: userstore-0.userstore
+  password: password
+  port: 1389
+
+service:
+  name: openidm
+  type: NodePort
+  externalPort: 80
+  internalPort: 8080
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1024Mi
+  requests:
+    cpu: 300m
+    memory: 1024Mi
+
+
+
+# Values: filebeat, none
+logDriver: none
+
+
+# Cloud SQL connection name
+connectionName: "engineering-devops:us-central1:openidm1"
+

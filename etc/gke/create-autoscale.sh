@@ -22,7 +22,7 @@ gcloud alpha container clusters create $CLUSTER \
 
 gcloud alpha container node-pools create $NODEPOOL --cluster $CLUSTER --zone $ZONE \
     --machine-type ${medium} --preemptible --disk-size 50 \
-    --enable-autoscaling --min-nodes=1 --max-nodes=4
+    --enable-autoscaling --min-nodes=0 --max-nodes=4
 
 # Create a storage class for SSD
 kubectl create -f storage.yaml

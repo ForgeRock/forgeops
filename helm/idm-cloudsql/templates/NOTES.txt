@@ -1,0 +1,3 @@
+OpenIDM should be available soon at the ingress address of http://{{ template "externalFQDN" . }}
+
+It can take a few minutes for the ingress to become ready.

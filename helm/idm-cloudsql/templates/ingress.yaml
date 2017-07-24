@@ -1,0 +1,25 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Ingress definition to configure external routes.
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.component }}
+  annotations:
+    ingress.kubernetes.io/enable-cors: "true"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: "nginx"
+    kubernetes.io/tls-acme: "true"
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "sha1"
+spec:
+{{ include "tls-spec" . | indent 2 }}
+  rules:
+  - host: {{ template "externalFQDN" . }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{  .Values.service.name }}
+          servicePort: {{ .Values.service.externalPort }}

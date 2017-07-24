@@ -1,35 +1,15 @@
 dependencies:
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: opendj
+- name: opendj
   repository: file://../opendj
-  tags: null
   version: 0.2.2
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: openidm
+- name: openidm
   repository: file://../openidm
-  tags: null
   version: 0.1.0
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: postgres-openidm
+- name: postgres-openidm
   repository: file://../postgres-openidm
-  tags: null
   version: 0.1.1
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: git
+- name: git
   repository: file://../git
-  tags: null
   version: 0.1.0
-digest: sha256:70bf838a71858fba348cca9cce8ff18706c61f7e95ddf4de7115854f7ae16e92
-generated: 2017-07-07T09:23:41.687905628-06:00
+digest: sha256:93ca402265f7a0efc06769c67baaf58147614ac595d8006b6cc0ce84d90322a9
+generated: 2017-07-26T14:20:42.170087983-06:00

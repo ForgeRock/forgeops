@@ -30,7 +30,7 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 
 
 # Shared memory cache size in bytes. The default is 1.5 GB. On Docker you need to run with --shm-size.
-# Set this down lower for testing purposes only. The settings below allow you to run with --shm-size=200m
+# Set this lower for testing purposes only. The settings below allow you to run with --shm-size=200m
 # See https://bugster.forgerock.org/jira/browse/AMAGENTS-383.
 # Remove this when https://bugster.forgerock.org/jira/browse/AMAGENTS-273 is resolved.
 ENV AM_MAX_SHARED_POOL_SIZE 0x200000

@@ -1,51 +1,21 @@
 dependencies:
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: openam
+- name: openam
   repository: file://../openam
-  tags: null
   version: 0.1.0
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: amster
+- name: amster
   repository: file://../amster
-  tags: null
   version: 0.1.1
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: opendj
+- name: opendj
   repository: file://../opendj
-  tags: null
   version: 0.2.2
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: opendj
+- name: opendj
   repository: file://../opendj
-  tags: null
   version: 0.2.2
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: opendj
+- name: opendj
   repository: file://../opendj
-  tags: null
   version: 0.2.2
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: git
+- name: git
   repository: file://../git
-  tags: null
   version: 0.1.0
-digest: sha256:6ed1e2f76a33cfbd020ac78619a5ac0c8b9b7f034cc8610c9bb78334bede308d
-generated: 2017-07-06T13:57:46.661381845-06:00
+digest: sha256:88100fc388ac9ebd28f06f0788ff6ddca82de4bf7e07abfa7dbcf0c3bd992122
+generated: 2017-07-26T14:20:43.171753525-06:00

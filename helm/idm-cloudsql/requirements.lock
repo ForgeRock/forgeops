@@ -1,0 +1,11 @@
+dependencies:
+- alias: ""
+  condition: ""
+  enabled: false
+  import-values: null
+  name: git
+  repository: file://../git
+  tags: null
+  version: 0.1.0
+digest: sha256:0f75859e806bd07163b3bbb809d740609dd8bed946d7198c277a092781ca273b
+generated: 2017-07-24T15:20:17.903471153-06:00

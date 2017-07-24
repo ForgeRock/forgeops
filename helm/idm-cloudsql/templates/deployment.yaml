@@ -1,0 +1,119 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: openidm
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+        release: {{ .Release.Name }}
+    spec:
+      initContainers:
+      - name: git-init
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name:  git-{{ .Release.Name }}
+        - configMapRef:
+            name:  {{ template "fullname" . }}
+      containers:
+      - image: gcr.io/cloudsql-docker/gce-proxy:1.10
+        name: proxy
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                  "-instances={{ .Values.connectionName }}=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+          - name: ssl-certs
+            mountPath: /etc/ssl/certs
+          - name: cloudsql
+            mountPath: /cloudsql
+      - name: git
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["sync"]
+        envFrom:
+        - configMapRef:
+            name:  git-{{ .Release.Name }}
+        - configMapRef:
+            name:  {{ template "fullname" . }}
+      - name: idm
+        image: {{ template "image"  . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /openidm/info/ping
+            port: {{ .Values.service.internalPort }}
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value:  "true"
+          initialDelaySeconds: 120
+          timeoutSeconds: 5
+          periodSeconds: 30
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        volumeMounts:
+        - name: openidm-secrets
+          mountPath: /opt/openidm/secrets
+        - name: logs
+          mountPath: /opt/openidm/logs
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        - name: boot-properties
+          mountPath: /var/run/openidm
+      volumes:
+      - name: openidm-secrets
+        secret:
+          secretName: openidm-secrets
+      - name: log-config
+        configMap:
+          name: idm-log-config
+      - name: logs
+        emptyDir: {}
+      - name: git
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName:  git-{{ .Release.Name }}
+          # This gets mounted as root, so we need to open up the permissions for the forgerock user to read it
+          # defaultMode: 256
+      - name: boot-properties
+        configMap:
+          name: idm-boot-properties
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+      - name: ssl-certs
+        hostPath:
+          path: /etc/ssl/certs
+      - name: cloudsql
+        emptyDir:

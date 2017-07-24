@@ -1,6 +1,6 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 # Sample logging configuration files
-# Note that AM can send audit logs direct to ElasticSearch. This is for illustrative purposes.
+# Note that AM can send audit logs directly to ElasticSearch. This is for illustrative purposes.
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -10,22 +10,6 @@ The chart assumes that the OpenIDM configuration files (/conf/*.json, scripts/* 
 mounted on the OpenIDM container as a volume at runtime.  This is an alternative
 to making an immutable Docker container with the configuration baked into the container. 
 
-There are two modes of operation for this chart. A local mode designed to support development on a local Minikube 
-instance, and a production mode for deployment to a multi-node Kubernetes cluster.
-
-In local mode, a path to your home directory is mounted on the container
-using Minikube and a "hostPath" volume type.  Note that VirtualBox is recommended as the 
-Minikube hypervisor, as it has more reliable mounting of user home directories. 
-
-When the OpenIDM container runs, any changes made in the admin GUI are written back out to the 
-configuration files in your local home directory. If this directory is kept under git control, you
-can track any configuration changes using git commands (git status, git diff).
-
-In production mode of operation, the configuration is pulled from a git repository. This 
-works in a multi-node cluster, as each node in the cluster can pull the same configuration
-from git. In this mode of operation, the configuration is considered to be immutable
-once pulled from git.
-
 # Development Example
 
 Fork and clone the following example configuration: 
