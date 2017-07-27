@@ -30,6 +30,8 @@ openidm:
     port: 5432
     user: openidm
     password: openidm
+    schema: openidm
+    databaseName: openidm
 
 # Optional - if there is a DJ userstore configured
 userstore:
