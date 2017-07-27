@@ -1,13 +1,10 @@
 
--- This user will already exist.
--- create user openidm with password 'openidm';
 
--- The openidm role needs to be granted to postgres to create the database.
-grant openidm to postgres;
 
-drop database openidm;
+-- Creates the role (user) for this database.
+create role :idmuser login password :password;
+-- Grant permission to postgres so we can create the database owned by this user.
+grant :idmuser to postgres;
 
-create database openidm encoding 'utf8' owner openidm;
-
--- openidm user will already have these privileges.
--- grant all privileges on database openidm to openidm;
+-- Create the database. A PG instance might have many databases (dev,qa, tenant1, etc.).
+create database :idmuser  encoding 'utf8' owner :idmuser;

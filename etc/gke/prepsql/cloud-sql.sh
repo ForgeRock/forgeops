@@ -1,12 +1,21 @@
 #!/usr/bin/env bash
 
+# Cloud SQL instance name
 INSTANCE=openidm1
-PASSWORD="idmpassword"
-PROXY_USER="openidm"
 
+# User and password used bu IDM to connect to the database.
+PROXY_USER="idmuser"
+PASSWORD="idmpassword"
+#PROXY_USER="openidm"
+
+# Kube namespace to create the secrets in.
 NAMESPACE="default"
+
+# Password to use for the super user (postgres) account.
 PGPASSWORD="postgres"
 
+# Path to downloaded service account json file.  This is a private key
+# and should not be checked in to source control.
 PROXY_KEY_FILE_PATH="../../../helm/tmp/EngineeringDevOps-pgkey.json"
 
 # This creates the pg instance.
@@ -42,16 +51,19 @@ kubectl --namespace "${NAMESPACE}" create secret generic cloudsql-db-credentials
 
 kubectl --namespace "${NAMESPACE}" delete secret cloudsql-postgres-credentials
 
+# postgres creds are needed to create the proxy user and database.
 kubectl --namespace "${NAMESPACE}" create secret generic cloudsql-postgres-credentials \
      --from-literal=password="${PGPASSWORD}"
 
-# Starting a stopped instance
+
+# Sample commands:
+# Starting a stopped instance.
 # gcloud sql instances patch [INSTANCE_NAME] --activation-policy ALWAYS
 
 
-# Stop an instance
+# Stop an instance.
 # gcloud sql instances patch $INSTANCE --activation-policy NEVER
 
 
-# Restart instance
-gcloud sql instances restart $INSTANCE
+# Restart instance.
+# gcloud sql instances restart $INSTANCE

@@ -23,13 +23,15 @@ global:
   configPath:
     idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
 
-# Specific values
+# TODO: We should get the idmuser / password values from the secret created in the etc/gke/prepsql chart.
 openidm:
   repo:
     host: localhost
     port: 5432
-    user: openidm
+    user: idmuser
     password: idmpassword
+    databaseName: idmuser
+    schema: openidm
 
 # Optional - if there is a DJ userstore configured
 userstore:

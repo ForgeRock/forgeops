@@ -18,6 +18,9 @@ data:
       openidm.repo.port={{.Values.openidm.repo.port}}
       openidm.repo.user={{.Values.openidm.repo.user}}
       openidm.repo.password={{.Values.openidm.repo.password}}
+      openidm.repo.databaseName={{.Values.openidm.repo.databaseName}}
+      openidm.repo.schema={{.Values.openidm.repo.schema}}
+
 
       # Use a variable for our ldap host & password
       userstore.host={{.Values.userstore.host}}

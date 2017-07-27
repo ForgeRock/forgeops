@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
+# This script creates the database for the user passed in via the Env vars.
 
-echo "Create the PG database"
+echo "Create the postgres database for idm user $IDM_USER"
 cd /scripts
 
 # Give the proxy time to start...
 sleep 5
 
-echo "PG password is $PGPASSWORD"
+# Env var PGPASSWORD is set for us to authenticate to Postgres as the super user.
+# This creates the IDM user and database
+psql --host=localhost --username=postgres --file=createuser.pgsql -v idmuser="${IDM_USER}" -v password=\'"$IDM_PASSWORD"\'
 
-env
+# save the postgres root password for later.
+pgpass=$PGPASSWORD
 
-
-# env var PGPASSWORD is set for us..
-psql --host=localhost --username=postgres --file=createuser.pgsql
-
-# Subsequent commands can run as idm user
+# Subsequent psql commands run as idm user created in the previous step.
 export PGPASSWORD="$IDM_PASSWORD"
 
 psql --host=localhost --username="${IDM_USER}" --file=openidm.pgsql
@@ -26,6 +26,9 @@ do
     psql --host=localhost --username="${IDM_USER}" --file=$file
 done
 
-psql --host=localhost --username="${IDM_USER}" --file=default_schema_optimization.pgsql
+# This has to be run as super user against the database.
+export PGPASSWORD=$pgpass
+
+psql --host=localhost --username=postgres "${IDM_USER}" --file=default_schema_optimization.pgsql
 
 echo "Database creation finished. You can now remove this job"

@@ -90,6 +90,10 @@ spec:
           mountPath: /etc/git-secret
         - name: boot-properties
           mountPath: /var/run/openidm
+      # For debug
+      - name: psql
+        image: postgres:9.6.3
+        args: ["sh", "-c", "sleep 1000000"]
       volumes:
       - name: openidm-secrets
         secret:

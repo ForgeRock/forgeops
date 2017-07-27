@@ -1,5 +1,7 @@
 DROP SCHEMA IF EXISTS openidm CASCADE;
-CREATE SCHEMA openidm AUTHORIZATION openidm;
+-- Assume we are connecting as the IDM user that is invoking this script.
+-- This is the only change from the default script provided with IDM that assumes the user is "openidm".
+CREATE SCHEMA openidm AUTHORIZATION current_user;
 
 -- -----------------------------------------------------
 -- Table openidm.objecttpyes
