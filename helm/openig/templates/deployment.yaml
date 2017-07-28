@@ -29,10 +29,7 @@ spec:
         args: ["init"]
         envFrom:
         - configMapRef:
-            name:  git-{{ .Release.Name }}
-        env:
-        - name: GIT_CHECKOUT_BRANCH
-          value: {{ default "master"  .Values.global.git.branch }}
+            name:  {{ template "fullname" . }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ template "image" . }}
@@ -65,6 +62,6 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName:  git-{{ .Release.Name }}
+          secretName:  {{ template "fullname" . }}
           # The forgerock user needs to be able to read this file.
           #defaultMode: 256

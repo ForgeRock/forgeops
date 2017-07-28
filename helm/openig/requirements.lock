@@ -1,6 +1,6 @@
 dependencies:
-- name: git
-  repository: file://../git
+- name: frcommon
+  repository: file://../frcommon
   version: 0.1.0
-digest: sha256:ac616e49ae65aaf11217d6c8684d5f48d2bfe164a1289c04c8d3e9ca736b26b1
-generated: 2017-07-26T14:20:40.741432987-06:00
+digest: sha256:9276d9a5c2cb5eef1446c777d85978a0b91f1625143fab04087d23a5be7aef9c
+generated: 2017-07-28T11:19:20.492214866-06:00

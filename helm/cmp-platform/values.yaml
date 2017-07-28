@@ -3,7 +3,9 @@
 global:
   domain: .example.com
   image:
-    repository: gcr.io/engineering-devops
+    #repository: gcr.io/engineering-devops
+    repository: forgerock
+    tag: 5.5.0-SNAPSHOT
 
 
 userstore:

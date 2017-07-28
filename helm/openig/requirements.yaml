@@ -1,4 +1,4 @@
 dependencies:
-- name: git
+- name: frcommon
   version:  0.1.0
-  repository: file://../git
+  repository: file://../frcommon
