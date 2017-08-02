@@ -4,19 +4,13 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
 # Replicate to the master server hostname defined in $1.
-# If that server is ourself, this is a no-op.
 
 MASTER=$1
 
-# This is a bit kludgy:
 # The hostname has to be a fully resolvable DNS name in the cluster
 # if the service is called.
-
 MYHOSTNAME=`hostname -f`
 
-echo "Setting up replication from $MYHOSTNAME to $MASTER"
-
-# For debug:
 
 # Kubernetes puts the service name in /etc/hosts
 if grep ${MASTER} /etc/hosts; then
@@ -24,15 +18,11 @@ if grep ${MASTER} /etc/hosts; then
  exit 0
 fi
 
-# Comment out:
-echo "Replicate ENV vars:"
-env
+echo "Setting up replication from $MYHOSTNAME to $MASTER"
 
-echo "Enabling replication."
 
 # todo: Replace with command to test for master being reachable and up:
 echo "Will sleep for a bit to ensure master is up."
-
 sleep 10
 
 bin/dsreplication configure --host1 $MYHOSTNAME --port1 4444 \

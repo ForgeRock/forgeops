@@ -3,10 +3,7 @@
 
 cd /opt/opendj
 
-
 BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/backup}
-DIR_MANAGER_PW_FILE=${DIR_MANAGER_PW_FILE:-/var/secrets/opendj/dirmanager.pw}
-
 
 # If BACKUP_HOST is set, verify that we are the right host to run the backup.
 if [ -n "$BACKUP_HOST" ];

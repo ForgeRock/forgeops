@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Sample shell script to check for readiness
+# Sample shell script to check for readiness and liveness.
 # Returns 0 on ready, non zero if DJ is not ready
 #DEBUG="-v"
 

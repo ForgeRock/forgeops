@@ -16,7 +16,11 @@ serverBase: http://openam:80
 # See the _helpers template to change the *external* load balancer fqdn
 # By default it expands to  openam.$namespace.$baseDomain
 
-amadmin_pw: password
+# Install passwords.
+amadminPassword: password
+encryptionKey: "123456789012"
+policyAgentPassword: Passw0rd
+
 
 configStore:
   # type can be dirServer or embedded.

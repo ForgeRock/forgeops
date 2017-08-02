@@ -8,15 +8,16 @@ data:
     --serverUrl http://openam:80/openam \
     --authorizedKey  /var/secrets/amster/authorized_keys \
     --cookieDomain {{.Values.global.domain }} \
-    --adminPwd {{ .Values.amadmin_pw }} \
+    --adminPwd {{ .Values.amadminPassword }} \
     --cfgStore {{ .Values.configStore.type }} \
     {{ if eq .Values.configStore.type "dirServer" -}}
     --cfgStoreHost {{.Values.configStore.host }} \
     --cfgStoreDirMgrPwd {{.Values.configStore.password }}  \
     --cfgStorePort {{.Values.configStore.port }}  \
+    --cfgStoreRootSuffix {{ .Values.configStore.suffix }} \
     {{ end -}}
-    --policyAgentPwd Passw0rd \
-    --pwdEncKey 123456789012 \
+    --policyAgentPwd {{ .Values.policyAgentPassword }}  \
+    --pwdEncKey {{ .Values.encryptionKey }} \
     --acceptLicense \
     --lbSiteName site1 \
     --lbPrimaryUrl https://{{ template "openamFQDN" . }}/openam \

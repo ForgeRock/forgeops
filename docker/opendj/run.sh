@@ -23,8 +23,12 @@ if [ ! -d ./data/config ] ; then
   echo "Instance data Directory is empty. Creating new DJ instance"
   BOOTSTRAP=${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}
   # Set a default base DN. Setup scripts can choose to override this.
-  export BASE_DN=${BASE_DN:-"dc=example,dc=com"}
   # If a password file is mounted, grab the password from that, otherwise default
+  if [ ! -r "$DIR_MANAGER_PW_FILE" ]; then
+    echo "Warning; Can't find path to $DIR_MANAGER_PW_FILE. I will create a default DJ admin password"
+    mkdir -p "$SECRET_PATH"
+    echo -n "password" > "$DIR_MANAGER_PW_FILE"
+  fi
   PW=`cat $DIR_MANAGER_PW_FILE`
   export PASSWORD=${PW:-password}
 
@@ -33,18 +37,14 @@ if [ ! -d ./data/config ] ; then
 
    # Check if DJ_MASTER_SERVER var is set. If it is - replicate to that server.
    if [ ! -z ${DJ_MASTER_SERVER+x} ];  then
-      /opt/opendj/bootstrap/replicate.sh $DJ_MASTER_SERVER
+      /opt/opendj/replicate.sh $DJ_MASTER_SERVER
    fi
 fi
 
-# Check if keystores are mounted as a volume, and if so
-# Copy any keystores over
-SECRET_VOLUME=${SECRET_VOLUME:-/var/secrets/opendj}
-
-if [ -d "${SECRET_VOLUME}" ]; then
-  echo "Secret volume is present. Will copy any keystores and truststore"
+if [ -d "${SECRET_PATH}" ]; then
+  echo "Secret path is present. Will copy any keystores and truststore"
   # We send errors to /dev/null in case no data exists.
-  cp -f ${SECRET_VOLUME}/key*   ${SECRET_VOLUME}/trust* ./data/config 2>/dev/null
+  cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./data/config 2>/dev/null
 fi
 
 # todo: Check /opt/opendj/data/config/buildinfo

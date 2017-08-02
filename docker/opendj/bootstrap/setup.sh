@@ -5,10 +5,19 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 echo "Setting up default OpenDJ instance."
+
+cd /opt/opendj
+
 touch /opt/opendj/BOOTSTRAPPING
+
+DB_NAME=${DB_NAME:-userRoot}
+
+# The type of DJ we want to bootstrap. This determines the ldif files and scripts to load. Defaults to a userstore.
+BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
 
 INIT_OPTION="--addBaseEntry"
 
+# If NUMBER_SAMPLE_USERS is set we generate sample users.
 if [ -n "${NUMBER_SAMPLE_USERS+set}" ]; then
     INIT_OPTION="--sampleData ${NUMBER_SAMPLE_USERS}"
 fi
@@ -22,15 +31,29 @@ fi
   ${INIT_OPTION}
 
 # If any optional LDIF files are present, load them.
+ldif="bootstrap/${BOOTSTRAP_TYPE}/ldif"
 
-if [ -d /opt/opendj/bootstrap/ldif ]; then
-   echo "Found optional schema files in bootstrap/ldif. Will load them"
-  for file in /opt/opendj/bootstrap/ldif/dj-userstore/*;  do
-      echo "Loading $file"
-       sed -e "s/@BASE_DN@/$BASE_DN/" -e "s/@userStoreRootSuffix@/$BASE_DN/"  -e "s/@DB_NAME@/userRoot/" <${file}  >/tmp/file.ldif
-      /opt/opendj/bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+if [ -d "$ldif" ]; then
+    echo "Loading LDIF files in $ldif"
+    for file in "${ldif}"/*.ldif;  do
+        echo "Loading $file"
+        # search + replace all placeholder variables. Naming conventions are from AM.
+        sed -e "s/@BASE_DN@/$BASE_DN/"  \
+            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
+            -e "s/@DB_NAME@/$DB_NAME/"  \
+            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
+
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
       echo "  "
-  done
+    done
 fi
+
+script="bootstrap/${BOOTSTRAP_TYPE}/post-install.sh"
+
+if [ -r "$script" ]; then
+    echo "executing post install script $script"
+    sh "$script"
+fi
+
 
 /opt/opendj/schedule_backup.sh

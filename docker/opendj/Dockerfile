@@ -13,11 +13,13 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 # You can use these options on jdk 8u131 or later. This will set the heap size according to the container size
 ENV OPENDJ_JAVA_ARGS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
+ENV SECRET_PATH /var/run/secrets/opendj
+
 # Path to secret file that contains the cn=Directory Manager password
 # Used to configure the image
 # Mount a Docker volume or Kubernetes secret volume on /var/secrets/opendj
 # If no volume is mounted, a default password is used.
-ENV DIR_MANAGER_PW_FILE /var/secrets/opendj/dirmanager.pw
+ENV DIR_MANAGER_PW_FILE /var/run/secrets/opendj/dirmanager.pw
 
 # The default BASE_DN of the directory tree.
 ENV BASE_DN dc=openam,dc=forgerock,dc=org
@@ -44,18 +46,13 @@ ENV BACKUP_HOST dont-run-backups
 ADD opendj.zip /home/forgerock/
 
 
-# We set a dir manager default password value here, but this is almost
-# certainly not what you want. This hard coded path to the password
-# should get over mounted by a secret volume with the "real" password. See README.md
-
-# If you want to use Alpine install this
-#RUN apk add --no-cache su-exec openldap-clients && \
-
 ENV INSTANCE_ROOT /opt/opendj/data
 
-RUN unzip -q /home/forgerock/opendj.zip -d /opt && rm -f /home/forgerock/opendj.zip \
+RUN unzip -q /home/forgerock/opendj.zip -d /opt \
+    && rm -f /home/forgerock/opendj.zip \
     && mkdir -p "$INSTANCE_ROOT" \
-    && chown -R forgerock /opt
+    && mkdir -p "$SECRET_PATH" \
+    && chown -R forgerock /opt "$SECRET_PATH"
 
 
 ADD bootstrap/ /opt/opendj/bootstrap/
