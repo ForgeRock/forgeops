@@ -5,5 +5,6 @@ global:
     sshKey: dGhpcyBpcyBhIGR1bW15IGtleQo=
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     pushInterval: 0
+    projectDirectory: "forgeops-init"
     branch: master
 

@@ -7,3 +7,4 @@ data:
   GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
   GIT_ROOT:  "/git"
   GIT_PUSH_INTERVAL:  "{{ .Values.global.git.pushInterval }}"
+  GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}

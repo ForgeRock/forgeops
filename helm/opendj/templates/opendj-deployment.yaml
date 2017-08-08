@@ -34,6 +34,18 @@ spec:
         vendor: forgerock
         component: opendj
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: djInstance
+                  operator: In
+                  values:
+                  - {{ template "instanceName" . }}
+              topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
