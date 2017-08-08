@@ -60,7 +60,7 @@ global:
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
   configPath:
-    amster: /git/forgeops-init/default/am/empty-import
+    am: /git/forgeops-init/default/am/empty-import
 
 
 # For production you wil want to set CPU limits to help Kube Schedule the pods.

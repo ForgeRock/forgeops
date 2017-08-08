@@ -10,7 +10,7 @@ git:
  # Example below shows selective override of configuration path. See values.yaml in openig, openidm and amster charts for default values.
  # You can omit any of these paths below and the defaults will be used.
  configPath:
-  amster: forgeops-init/openam/empty-import
+  am: forgeops-init/openam/empty-import
   idm: forgeops-init/openidm/sync-with-ldap-bidirectional
   ig: forgeops-init/openig/basic-sample
 
