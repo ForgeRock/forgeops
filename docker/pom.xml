@@ -36,46 +36,43 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>14.5.0-SNAPSHOT</openamVersion>
-        <!-- We need a new Milestone for AM that supports the -D debug flags. Until then - use a snapshot
         <openamVersion>14.5.0-M6</openamVersion>
-        -->
         <opendjVersion>4.1.0-M7</opendjVersion>
-        <openidmVersion>5.5.0-M3</openidmVersion>
+        <openidmVersion>5.5.0-RC1</openidmVersion>
         <openigVersion>5.5.0-M1</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
         <releaseTag>5.5.0</releaseTag>
         <repo>forgerock</repo>
-    </properties>
+ </properties>
 
-    <repositories>
-        <repository>
-            <id>forgerock-internal-releases</id>
-            <name>ForgeRock Internal Releases Repository</name>
-            <url>https://maven.forgerock.org/repo/internal-releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>forgerock-internal-snapshots</id>
-            <name>ForgeRock Internal Snapshots Repository</name>
-            <url>https://maven.forgerock.org/repo/internal-snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-    </repositories>
+ <repositories>
+     <repository>
+         <id>forgerock-internal-releases</id>
+         <name>ForgeRock Internal Releases Repository</name>
+         <url>https://maven.forgerock.org/repo/internal-releases</url>
+         <snapshots>
+             <enabled>false</enabled>
+         </snapshots>
+     </repository>
+     <repository>
+         <id>forgerock-internal-snapshots</id>
+         <name>ForgeRock Internal Snapshots Repository</name>
+         <url>https://maven.forgerock.org/repo/internal-snapshots</url>
+         <releases>
+             <enabled>false</enabled>
+         </releases>
+     </repository>
+ </repositories>
 
-    <build>
-        <defaultGoal>clean package docker:build</defaultGoal>
-        <plugins>
-            <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>0.20.1</version>
+ <build>
+     <defaultGoal>clean package docker:build</defaultGoal>
+     <plugins>
+         <plugin>
+             <groupId>io.fabric8</groupId>
+             <artifactId>docker-maven-plugin</artifactId>
+             <version>0.20.1</version>
 
-                <!-- List of images to build -->
+             <!-- List of images to build -->
                 <configuration>
                     <sourceDirectory>.</sourceDirectory>
 

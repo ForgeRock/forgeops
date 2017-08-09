@@ -12,9 +12,9 @@ NAMESPACE=${NAMESPACE:-default}
 # environment variable rather than accepting the default.
 CONFIG_PATH=${CONFIG_PATH:-forgeops-init/${NAMESPACE}/openam/autosave}
 
-P="${GIT_ROOT}/${CONFIG_PATH}"
+P="${CONFIG_PATH}"
 
-mkdir -p ${P}
+mkdir -p "${P}"
 
 # Disable mode checking.
 # When using hostPath mounts on VirtualBox the mode checks trigger differences. You dont need this unless you are using VBox hostPath mounts.
