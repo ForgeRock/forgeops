@@ -69,7 +69,7 @@ spec:
             name: git-{{ .Release.Name }}
         env:
         - name: GIT_AUTOSAVE_BRANCH
-          value: autosave-am
+          value: autosave-am-{{ .Release.Namespace }}
       volumes:
       - name: amster-secrets
         secret:

@@ -4,7 +4,7 @@ metadata:
   name: {{ template "fullname" . }}
 data:
   PROJECT_HOME: "{{ .Values.global.configPath.idm }}"
-  GIT_AUTOSAVE_BRANCH:  autosave-idm
+  GIT_AUTOSAVE_BRANCH:  autosave-idm-{{ .Release.Namespace }}
   GIT_CHECKOUT_BRANCH: {{ default "master" .Values.global.git.branch }}
 
 ---
