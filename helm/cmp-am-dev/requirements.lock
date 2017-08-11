@@ -8,8 +8,5 @@ dependencies:
 - name: opendj
   repository: file://../opendj
   version: 0.2.2
-- name: git
-  repository: file://../git
-  version: 0.1.0
-digest: sha256:e1e8ff0dc93befd9156c352f5e66eb642797fce73a9e1d9693b97d639ecfa4ca
-generated: 2017-07-26T14:20:44.062976903-06:00
+digest: sha256:fd8c2d59f12569fe79239cbe741617f9eca156421f7499bb2dc261d59d8d154a
+generated: 2017-08-11T09:22:31.759525315-06:00

@@ -24,8 +24,6 @@ spec:
         args: ["init"]
         envFrom:
         - configMapRef:
-            name:  git-{{ .Release.Name }}
-        - configMapRef:
             name:  {{ template "fullname" . }}
       containers:
       - name: git
@@ -38,8 +36,6 @@ spec:
           mountPath: /etc/git-secret
         args: ["sync"]
         envFrom:
-        - configMapRef:
-            name:  git-{{ .Release.Name }}
         - configMapRef:
             name:  {{ template "fullname" . }}
       - name: openidm
@@ -100,7 +96,7 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName:  git-{{ .Release.Name }}
+          secretName:  git-idm-{{ .Release.Name }}
           # This gets mounted as root, so we need to open up the permissions for the forgerock user to read it
           # defaultMode: 256
       - name: boot-properties

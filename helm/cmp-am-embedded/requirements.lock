@@ -1,12 +1,9 @@
 dependencies:
-- name: git
-  repository: file://../git
-  version: 0.1.0
 - name: amster
   repository: file://../amster
   version: 0.1.1
 - name: openam
   repository: file://../openam
   version: 0.1.0
-digest: sha256:ed710fdf5cb9358bdd19e9b9700759925a612fed13762c66fa6d22f734617595
-generated: 2017-07-26T14:20:45.737066382-06:00
+digest: sha256:b94decea4fe4e6d4fa0dbdf692ac8c1d41540e91184425a5f4c365aef9cb98d0
+generated: 2017-08-11T10:05:22.668654437-06:00

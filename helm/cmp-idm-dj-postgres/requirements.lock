@@ -8,8 +8,5 @@ dependencies:
 - name: postgres-openidm
   repository: file://../postgres-openidm
   version: 0.1.1
-- name: git
-  repository: file://../git
-  version: 0.1.0
-digest: sha256:93ca402265f7a0efc06769c67baaf58147614ac595d8006b6cc0ce84d90322a9
-generated: 2017-07-26T14:20:42.170087983-06:00
+digest: sha256:bdf9343a8d8a60e5b1e252f5b83604466b76d1b7814c0db496cb66415138c56a
+generated: 2017-08-11T09:31:10.409809057-06:00

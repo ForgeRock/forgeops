@@ -37,3 +37,9 @@ limits should be set.
 * Added rebuild.sh to opendj docker container to rebuild indexes.
 * Simplified AM audit logging
 
+# 2017-08-11
+
+* Removed git helm chart. 
+* Refactored other composite charts to directly set git configmaps and secrets. The git 
+sub-chart was causing more problems than it solved.
+

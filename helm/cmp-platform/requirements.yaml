@@ -13,9 +13,6 @@ dependencies:
   version:  0.2.2
   repository: file://../opendj
   alias: configstore
-- name: git
-  version:  0.1.0
-  repository: file://../git
 - name: openidm
   version:  0.1.0
   repository: file://../openidm

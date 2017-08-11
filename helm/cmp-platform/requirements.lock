@@ -11,9 +11,6 @@ dependencies:
 - name: opendj
   repository: file://../opendj
   version: 0.2.2
-- name: git
-  repository: file://../git
-  version: 0.1.0
 - name: openidm
   repository: file://../openidm
   version: 0.1.0
@@ -23,5 +20,5 @@ dependencies:
 - name: openig
   repository: file://../openig
   version: 0.1.1
-digest: sha256:eafa7017d436ec4b3755f01e96afbb8f5d2e3cf4846298d5ac152f6106d2bed0
-generated: 2017-07-26T14:20:44.885010606-06:00
+digest: sha256:256594c097cc1d91e194d1f005bb0faa3e9f432a786ef178df856c6cc48aaf5e
+generated: 2017-08-11T09:50:46.392945743-06:00
