@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A sample script to export a configuration.
+# Runs the configuration web service. This assumes the project has already been checked out.
 
 set -x
 
@@ -8,42 +8,34 @@ GIT_ROOT=${GIT_ROOT:-/git}
 # This should be set by the downward API, but in case it isn't, default it.
 NAMESPACE=${NAMESPACE:-default}
 
-# This is where amster will export files. You may want to set this
-# environment variable rather than accepting the default.
-CONFIG_PATH=${CONFIG_PATH:-forgeops-init/${NAMESPACE}/openam/autosave}
+GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
 
-P="${CONFIG_PATH}"
+# Needed for any git ssh commands.
+export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
-mkdir -p "${P}"
+# Default export path - relative to the root.
+export EXPORT_PATH="${EXPORT_PATH:-${NAMESPACE}/am/export}"
 
-# Disable mode checking.
-# When using hostPath mounts on VirtualBox the mode checks trigger differences. You dont need this unless you are using VBox hostPath mounts.
-# git config core.fileMode false
+cd "${GIT_ROOT}/${GIT_PROJECT_DIRECTORY}"
+
+git config core.filemode false
+git config user.email "auto-sync@forgerock.net"
+git config user.name "Git Auto-sync user"
+
+git branch ${GIT_AUTOSAVE_BRANCH}
+git checkout ${GIT_AUTOSAVE_BRANCH}
+
+export AMSTER_EXPORT_PATH="${GIT_ROOT}/${GIT_PROJECT_DIRECTORY}/${EXPORT_PATH}"
+
+
+mkdir -p "${AMSTER_EXPORT_PATH}"
 
 # Create Amster export script.
-cat > /tmp/export.amster <<EOF
-connect -k  /var/secrets/amster/id_rsa http://openam/openam
-export-config --path $P
+cat > /tmp/do_export.amster <<EOF
+connect -k  /var/run/secrets/amster/id_rsa http://openam/openam
+export-config --path $AMSTER_EXPORT_PATH
 :quit
 EOF
 
-# Do the intial export.
-doExport() {
-    /opt/amster/amster /tmp/export.amster
-}
 
-# If a command line arg is passed it is a flag to perform a git commit sync loop.
-if [ "$#" -gt 0 ]; then
-    echo "Will perform export sync loop"
-    cd ${P}
-
-    while true
-    do
-       doExport
-       sleep 300
-   done
-fi
-
-
-# else we just perform a one time export and exit
-doExport
+/opt/amster/amster /tmp/do_export.amster

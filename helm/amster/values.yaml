@@ -59,10 +59,12 @@ global:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
+    projectDirectory: "/git/forgeops-init"
   configPath:
     am: /git/forgeops-init/default/am/empty-import
 
-
+amster:
+  exportPath: default/openam/autosave
 # For production you wil want to set CPU limits to help Kube Schedule the pods.
 resources:
  limits:

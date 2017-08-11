@@ -6,7 +6,7 @@ data:
   00_install.amster: |
     install-openam \
     --serverUrl http://openam:80/openam \
-    --authorizedKey  /var/secrets/amster/authorized_keys \
+    --authorizedKey  /var/run/secrets/amster/authorized_keys \
     --cookieDomain {{.Values.global.domain }} \
     --adminPwd {{ .Values.amadminPassword }} \
     --cfgStore {{ .Values.configStore.type }} \
@@ -24,7 +24,7 @@ data:
     --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |
-    connect http://openam/openam -k /var/secrets/amster/id_rsa
+    connect http://openam/openam -k /var/run/secrets/amster/id_rsa
     import-config --path {{ .Values.global.configPath.am }}  --clean {{.Values.amsterClean }}
     :exit
 ---
@@ -37,4 +37,5 @@ data:
   GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
   GIT_ROOT:  "/git"
   GIT_PUSH_INTERVAL:  "{{ .Values.global.git.pushInterval }}"
-  GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
+  GIT_PROJECT_DIRECTORY: {{ default "/git/forgeops-init" .Values.global.git.projectDirectory }}
+  EXPORT_PATH: {{   default "default/openam/autosave"  .Values.amster.exportPath }}

@@ -12,7 +12,7 @@ RUN apk add --no-cache git bash vim openssh-client \
 
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
 
-ADD *.sh  / 
+ADD *.sh  /
 
 USER forgerock
 

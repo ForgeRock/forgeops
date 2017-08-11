@@ -41,7 +41,7 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 # We are using defaults here (OpenAM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
 RUN /opt/web_agents/nginx11303_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
-        "http://openam:80/openam" \
+        "http://openam.default.svc.cluster.local:80/openam" \
         "http://nginx:80/" \
         "/" \
         "nginx" \
@@ -50,12 +50,6 @@ RUN /opt/web_agents/nginx11303_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
 
 # Shared memory cache size in bytes. The default is 1.5 GB. On Docker you need to run with --shm-size.
 # Set this down lower for testing purposes.
-# 20971520 is 20 MB - very small - only OK for testing. This seems to be per thread? So --shm-size 200m works
-# --shm-size 1.5g
-
-# 1 GB
-#ENV AM_MAX_SHARED_POOL_SIZE 1073745920
-
 # 52428800 - 50 MB
 ENV AM_MAX_SHARED_POOL_SIZE 52428800
 
@@ -63,7 +57,9 @@ ENV AM_MAX_SHARED_POOL_SIZE 52428800
 WORKDIR /opt/web_agents
 ADD *.sh /opt/web_agents/
 
-COPY agent.conf /opt/web_agents/nginx11303_agent/instances/agent_1/conf/agent.conf
+
+# TODO: We may want to directly copy in the agent.conf vs. run the installer?
+#COPY agent.conf /opt/web_agents/nginx11303_agent/instances/agent_1/conf/agent.conf
 
 RUN chown -R nginx:nginx  /opt/ && \
     ln -sf /dev/stderr /opt/web_agents/nginx11303_agent/instances/agent_1/logs/debug/debug.log

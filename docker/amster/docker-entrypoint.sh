@@ -14,16 +14,11 @@ AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}
 
 pause() {
     echo "Args are $# "
-    echo "Container will now pause. You can use kubectl exec to inspect this container"
-    if [ "$#" -gt 0 ];
-    then
-        echo "Will perform periodic export of AM config"
-        ./export.sh $1
-    fi
-    # Else - we just sleep forever, waiting for someone to exec into the container
+    echo "Container will now pause. You can use kubectl exec to run export.sh"
+    # Sleep forever, waiting for someone to exec into the container.
     while true
     do
-        sleep 100000 
+        sleep 1000000
     done
 }
 
@@ -80,7 +75,6 @@ bootstrap_openam() {
         mkdir -p "${OPENAM_HOME}/openam"
         cp -L /var/boot/*.json "$OPENAM_HOME"
         copy_secrets
-        cd "$OPENAM_HOME"
     fi
     exit 0
 }
@@ -95,11 +89,10 @@ pause)
 configure)
     # invoke amster install.
     ./amster-install.sh
-    shift
-    pause $*
+    pause
     ;;
 export)
-    ./export.sh $2
+    ./export.sh
     ;;
 *) 
    exec "$@"

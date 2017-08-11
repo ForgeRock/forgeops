@@ -2,9 +2,10 @@
 
 Note: This is the master (bleeding edge) for the Docker and Kubernetes assets.
 
-ForgeRock customers and partners can find documentation 
-for this in-progress version of the ForgeRock DevOps Examples at 
-https://ea.forgerock.com/docs/platform/doc/backstage/devops-guide/index.html.
+
+See the [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/doc/backstage/devops-guide/index.html)
+for more more information. 
+
 
 Public access to the documentation for version 5.0.0 of the ForgeRock DevOps 
 Examples is available at https://backstage.forgerock.com/docs/platform/5/devops-guide.

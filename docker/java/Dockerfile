@@ -15,7 +15,7 @@ ENV FORGEROCK_HOME /opt/forgerock
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
 # libc6-compat - needed by OrientDB for IDM. Remove this once orient is deprecated in 5.5.
-RUN apk add --no-cache su-exec unzip curl bash openldap-clients bind-tools iputils libc6-compat \
+RUN apk add --no-cache su-exec unzip curl bash openldap-clients bind-tools iputils libc6-compat git openssh-client  \
     && mkdir -p /opt/forgerock \
     && addgroup -g 11111 forgerock \
     && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D -G forgerock forgerock \

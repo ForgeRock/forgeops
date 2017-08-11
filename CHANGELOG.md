@@ -43,3 +43,7 @@ limits should be set.
 * Refactored other composite charts to directly set git configmaps and secrets. The git 
 sub-chart was causing more problems than it solved.
 
+# 2017-08-22 
+
+* Deprecated the git auto-sync behaviour. To sync git, exec into the amster or idm containers and directly
+execute git commands. 

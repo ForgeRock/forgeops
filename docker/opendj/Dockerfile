@@ -17,7 +17,7 @@ ENV SECRET_PATH /var/run/secrets/opendj
 
 # Path to secret file that contains the cn=Directory Manager password
 # Used to configure the image
-# Mount a Docker volume or Kubernetes secret volume on /var/secrets/opendj
+# Mount a Docker volume or Kubernetes secret volume on /var/run/secrets/opendj
 # If no volume is mounted, a default password is used.
 ENV DIR_MANAGER_PW_FILE /var/run/secrets/opendj/dirmanager.pw
 

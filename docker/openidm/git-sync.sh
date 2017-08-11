@@ -7,7 +7,7 @@ GIT_ROOT=${GIT_ROOT:=/git}
 GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
 
 
-GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave}"
+GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave-idm}"
 
 # Default time in seconds between commit / push.
 INTERVAL=${GIT_PUSH_INTERVAL:-300}
@@ -26,11 +26,8 @@ git branch ${GIT_AUTOSAVE_BRANCH}
 git branch
 git checkout ${GIT_AUTOSAVE_BRANCH}
 
-while true 
-do
-    sleep "${INTERVAL}"
-    t=`date`
-    git add .
-    git commit -a -m "autosave at $t"
-    git push --set-upstream origin ${GIT_AUTOSAVE_BRANCH} -f
-done
+t=`date`
+git add .
+git commit -a -m "autosave at $t"
+git push --set-upstream origin ${GIT_AUTOSAVE_BRANCH} -f
+

@@ -10,7 +10,7 @@ You can mount optional volumes to control the behavior of the image:
 
 * /root/openam: Mount a volume to persist the bootstrap configuration.
 If the container is restarted it will retain it bootstrap config.
-* /var/secrets/openam/{key*, .keypass, .storepass}  - optional key
+* /var/run/secrets/openam/{key*, .keypass, .storepass}  - optional key
 material copied into the /root/openam/openam directory. These files 
 can be copied using something like an Kubernetes init container. If you
 wanted all OpenAM instances to have the same keystores, you would mount

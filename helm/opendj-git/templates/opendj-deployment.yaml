@@ -62,7 +62,7 @@ spec:
           name: djadmin
         volumeMounts:
         - name: dj-secrets
-          mountPath: /var/secrets/opendj
+          mountPath: /var/run/secrets/opendj
         - name: dj-backup
           mountPath: /opt/opendj/backup
         - name: git

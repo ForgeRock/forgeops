@@ -71,7 +71,7 @@ wait_for_openam
 
 # Execute Amster if the configuration is found.
 if [ -d  ${AMSTER_SCRIPTS} ]; then
-    if [ ! -r /var/secrets/amster/id_rsa ]; then
+    if [ ! -r /var/run/secrets/amster/id_rsa ]; then
         echo "ERROR: Can not find the Amster private key"
         exit 1
     fi

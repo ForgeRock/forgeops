@@ -26,18 +26,6 @@ spec:
         - configMapRef:
             name:  {{ template "fullname" . }}
       containers:
-      - name: git
-        image: {{ template "gitImage" . }}
-        imagePullPolicy: {{ template "pullPolicy" . }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["sync"]
-        envFrom:
-        - configMapRef:
-            name:  {{ template "fullname" . }}
       - name: openidm
         image: {{ template "image"  . }}
         imagePullPolicy: {{ template "pullPolicy" . }}
@@ -73,16 +61,6 @@ spec:
           mountPath: /etc/git-secret
         - name: boot-properties
           mountPath: /var/run/openidm
-      {{- if  eq .Values.logDriver "filebeat" }}
-      - name: log
-        image: "giantswarm/filebeat:5.2.2"
-        imagePullPolicy: IfNotPresent
-        volumeMounts:
-        - name: logs
-          mountPath: /log
-        - name: log-config
-          mountPath: /etc/filebeat
-      {{end}}
       volumes:
       - name: openidm-secrets
         secret:

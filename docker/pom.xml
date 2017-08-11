@@ -156,6 +156,7 @@
                                 </tags>
                             </build>
                         </image>
+                        <!--
                         <image>
                             <name>${repo}/toolbox</name>
                             <build>
@@ -165,6 +166,7 @@
                                 </tags>
                             </build>
                         </image>
+                        -->
                          <image>
                             <name>${repo}/git</name>
                             <build>

@@ -34,6 +34,9 @@ spec:
       - name: amster
         image: {{ template "image" . }}
         imagePullPolicy: {{  template "pullPolicy" . }}
+        envFrom:
+        - configMapRef:
+            name: git-amster-{{ .Release.Name }}
         env:
         - name: NAMESPACE
           valueFrom:
@@ -41,12 +44,16 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG_PATH
           value: "{{ .Values.global.configPath.am }}"
+        - name: GIT_AUTOSAVE_BRANCH
+          value: autosave-am-{{ .Release.Namespace }}
         volumeMounts:
         - name: git
           mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
         # The ssh key for Amster authN
         - name: amster-secrets
-          mountPath: /var/secrets/amster
+          mountPath: /var/run/secrets/amster
           readOnly: true
         # The Amster scripts - not configuration.
         - name: scripts
@@ -54,22 +61,6 @@ spec:
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-      # Git sidecar that periodically commits / pushes configuration changes
-      - name: git
-        image: {{ template "gitImage" . }}
-        imagePullPolicy: {{ template "pullPolicy" . }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["sync"]
-        envFrom:
-        - configMapRef:
-            name: git-amster-{{ .Release.Name }}
-        env:
-        - name: GIT_AUTOSAVE_BRANCH
-          value: autosave-am-{{ .Release.Namespace }}
       volumes:
       - name: amster-secrets
         secret:
