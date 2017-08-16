@@ -3,6 +3,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS
 #
 
+set -x
 DIR=`pwd`
 
 CONFIG_ROOT=${CONFIG_ROOT:-"${DIR}/git"}
@@ -27,14 +28,14 @@ pause() {
 }
 
 # Default path to config store directory manager password file. This is mounted by Kube.
-DIR_MANAGER_PW_FILE=${DIR_MANAGER_PW_FILE:-/var/secrets/configstore/dirmanager.pw}
+DIR_MANAGER_PW_FILE=${DIR_MANAGER_PW_FILE:-/var/run/secrets/configstore/dirmanager.pw}
 
 # Wait until the configuration store comes up. This function will not return until it is up.
 wait_configstore_up() {
     echo "Waiting for the configuration store to come up"
     while true 
     do
-        ldapsearch -y ${DIR_MANAGER_PW_FILE} -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5
+        ldapsearch -y ${DIR_MANAGER_PW_FILE} -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5 > /dev/null 2>&1
         if [ $? = 0 ]; 
         then
             echo "Config store is up"
@@ -49,13 +50,23 @@ wait_configstore_up() {
 is_configured() {
     echo "Testing if the configuration store is configured with an AM installation"
     test="ou=services,dc=openam,dc=forgerock,dc=org"
-    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5 -b "$test"`
+    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5 -b "$test"  > /dev/null 2>&1`
     status=$?
-    echo "Result is $r status is $status"
+    echo "Is configured exit status is $status"
     return $status
 }
 
-OPENAM_HOME=/home/forgerock/openam
+export OPENAM_HOME=/home/forgerock/openam
+
+
+copy_secrets() {
+    echo "Copying secrets"
+    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
+    cp -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
+}
 
 # This function is called as the init container that runs before OpenAM. It Checks the configstore. If it is configured,
 # This function will create the AM bootstrap file. Otherwise AM will come up in install mode.
@@ -66,11 +77,10 @@ bootstrap_openam() {
     if [ $? = 0 ];
     then
         echo "Configstore is present. Creating bootstrap"
-        mkdir -p "$OPENAM_HOME"/openam/debug; 
-        cd "$OPENAM_HOME"
+        mkdir -p "${OPENAM_HOME}/openam"
         cp -L /var/boot/*.json "$OPENAM_HOME"
-        cp  -rL /var/secrets/openam/.?* openam
-        cp -L /var/secrets/openam/authorized_keys "$OPENAM_HOME"
+        copy_secrets
+        cd "$OPENAM_HOME"
     fi
     exit 0
 }

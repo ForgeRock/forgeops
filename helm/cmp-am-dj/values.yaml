@@ -5,7 +5,7 @@
 
 global:
   image:
-    repository: gcr.io/engineering-devops
+    repository: forgerock
     tag: 5.5.0
 
   
@@ -27,5 +27,6 @@ configstore:
 
 ctsstore:
   djInstance: ctsstore
+  bootstrapType: cts
 
 

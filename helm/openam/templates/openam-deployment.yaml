@@ -26,9 +26,9 @@ spec:
         - name: openam-boot
           mountPath: /var/boot
         - name: openam-secrets
-          mountPath: /var/secrets/openam
+          mountPath: /var/run/secrets/openam
         - name: configstore-secret
-          mountPath: /var/secrets/configstore
+          mountPath: /var/run/secrets/configstore
       {{ end -}}
       containers:
       - name: openam
@@ -60,17 +60,6 @@ spec:
           initialDelaySeconds: 60
           timeoutSeconds: 10
           periodSeconds: 30
-{{- if  eq .Values.logDriver "fluent-bit" }}
-      - name: log
-        image:  fluent/fluent-bit:0.12-dev
-        imagePullPolicy: {{default "IfNotPresent" .Values.pullPolicy}}
-        volumeMounts:
-        - name: openam-root
-          readOnly: true
-          mountPath: /log
-        - name: log-config
-          mountPath: /fluent-bit/etc
-{{ end }}
       volumes:
       - name: openam-root
         emptyDir: {}

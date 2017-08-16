@@ -11,6 +11,7 @@ data:
   BACKUP_SCHEDULE_FULL: {{ .Values.backupScheduleFull }}
   BACKUP_SCHEDULE_INCREMENTAL: {{ .Values.backupScheduleIncremental }}
   BOOTSTRAP:  {{ .Values.bootstrapScript }}
+  BOOTSTRAP_TYPE: {{ .Values.bootstrapType }}
 {{- if not (empty .Values.numberSampleUsers) }}
   NUMBER_SAMPLE_USERS: "{{ .Values.numberSampleUsers }}"
 {{- end }}

@@ -5,6 +5,10 @@ dirManagerPassword: password
 # The default bootstrap script.
 bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
 
+# The other option here is "cts". This sets the BOOTSTRAP_TYPE env var for the bootstrap script.
+bootstrapType: "userstore"
+
+
 # The OpenDJ baseDN
 baseDN: "dc=openam,dc=forgerock,dc=org"
 
