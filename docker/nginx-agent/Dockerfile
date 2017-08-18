@@ -12,11 +12,21 @@ WORKDIR /opt
 
 # The agent bits are not on maven - so we need to download these from the internal build server.
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
-ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/
-ENV AGENT NGINX_r12_Linux_64bit_5.0.0-SNAPSHOT.zip
+#ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/
+
+ENV NGINX_AGENT_ZIP http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/NGINX/Centos_7/NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip
+
+# For Local build - copy the .zip file in.
+COPY NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip /var/tmp/agent.zip
+
+
+
+ADD nginx.conf /etc/nginx/
+ADD default.conf /etc/nginx/conf.d/
+
 
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
-      curl $WEB_AGENT_BUILDS/$AGENT -o /var/tmp/agent.zip && \
+      #curl $NGINX_AGENT_ZIP -o /var/tmp/agent.zip && \
       unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*
@@ -30,7 +40,7 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 # Because we are running this before OpenAM is up and running we need to use the forceinstall option.
 # We are using defaults here (OpenAM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
-RUN /opt/web_agents/nginx12_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
+RUN /opt/web_agents/nginx11303_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
         "http://openam:80/openam" \
         "http://nginx:80/" \
         "/" \
@@ -40,16 +50,23 @@ RUN /opt/web_agents/nginx12_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
 
 # Shared memory cache size in bytes. The default is 1.5 GB. On Docker you need to run with --shm-size.
 # Set this down lower for testing purposes.
-ENV AM_MAX_SHARED_POOL_SIZE 1048576000
+# 20971520 is 20 MB - very small - only OK for testing. This seems to be per thread? So --shm-size 200m works
+# --shm-size 1.5g
+
+# 1 GB
+#ENV AM_MAX_SHARED_POOL_SIZE 1073745920
+
+# 52428800 - 50 MB
+ENV AM_MAX_SHARED_POOL_SIZE 52428800
+
 
 WORKDIR /opt/web_agents
-
 ADD *.sh /opt/web_agents/
-ADD nginx.conf /etc/nginx/
-ADD default.conf /etc/nginx/conf.d/
 
-RUN chown -R nginx:nginx  /opt/  && \
-    ln -sf /dev/stderr /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.log
+COPY agent.conf /opt/web_agents/nginx11303_agent/instances/agent_1/conf/agent.conf
+
+RUN chown -R nginx:nginx  /opt/ && \
+    ln -sf /dev/stderr /opt/web_agents/nginx11303_agent/instances/agent_1/logs/debug/debug.log
 
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]
 
