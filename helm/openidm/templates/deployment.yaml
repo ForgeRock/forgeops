@@ -11,6 +11,7 @@ spec:
       labels:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
+        component: {{ .Values.component }}
     spec:
       initContainers:
       - name: git-init

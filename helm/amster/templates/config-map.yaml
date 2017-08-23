@@ -31,7 +31,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: git-amster-{{ .Release.Name }}
+  name: amster-{{ .Release.Name }}
 data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
@@ -39,3 +39,7 @@ data:
   GIT_PUSH_INTERVAL:  "{{ .Values.global.git.pushInterval }}"
   GIT_PROJECT_DIRECTORY: {{ default "/git/forgeops-init" .Values.global.git.projectDirectory }}
   EXPORT_PATH: {{   default "default/openam/autosave"  .Values.amster.exportPath }}
+  GIT_SSH_COMMAND: "ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
+  GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
+  CONFIG_PATH: "{{ .Values.global.configPath.am }}"
+
