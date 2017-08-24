@@ -9,8 +9,6 @@ GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
 
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave}"
 
-# Default time in seconds between commit / push.
-INTERVAL=${GIT_PUSH_INTERVAL:-300}
 
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
@@ -26,11 +24,8 @@ git branch ${GIT_AUTOSAVE_BRANCH}
 git branch
 git checkout ${GIT_AUTOSAVE_BRANCH}
 
-while true 
-do
-    sleep "${INTERVAL}"
-    t=`date`
-    git add .
-    git commit -a -m "autosave at $t"
-    git push --set-upstream origin ${GIT_AUTOSAVE_BRANCH} -f
-done
+t=`date`
+git add .
+git commit -a -m "autosave at $t"
+git push --set-upstream origin ${GIT_AUTOSAVE_BRANCH} -f
+

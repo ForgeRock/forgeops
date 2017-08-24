@@ -9,9 +9,6 @@ GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
 
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave-am}"
 
-# Default time in seconds between commit / push.
-INTERVAL=${GIT_PUSH_INTERVAL:-300}
-
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
 
