@@ -10,7 +10,7 @@ data:
   GIT_ROOT:  "/git"
   GIT_PUSH_INTERVAL:  "{{ .Values.global.git.pushInterval }}"
   GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
-
+  SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
 
 ---
 apiVersion: v1

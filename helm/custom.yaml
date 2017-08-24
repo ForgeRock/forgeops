@@ -35,9 +35,13 @@ global:
     # and enter below. The generated ssh.pub key is the public key to add to your stash or github repo
     # to allow access.
     sshKey:  dGhpcyBpcyBhIGR1bW15IGtleQo=
-    # The number of seconds to wait between git commit and push. If set to zero (0), git push functionality is disabled.
-    # To push changes, you must set up ssh keys in github or stash.
-    pushInterval: 0
+    # Optional sed filter to run after git checkout. The sed edit script here will be recursively run on *every*
+    # file checked out to the /git directory. You must include the -e option to sed, and you can specify
+    # multiple substitutions by repeating the -e s/// pattern. For example:
+    # sedFilter: "-e s/openam.default.com/openam.test.com/ -e s/acme/foobar/"
+    # Note that this will *not* change values in config maps. If you are changing the FQDN on install
+    # make sure you also change global.domain above.
+    sedFilter: ""
   # The path to the product configuration to import.
   # If you base your configuration repository on the forgeops-init repository,
   # specify paths starting with /git/forgeops-init as shown in the sample below. If

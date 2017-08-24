@@ -22,10 +22,15 @@ if [ ! -z "${GIT_REPO}" ]; then
        sleep 300
        exit 1
     fi
-    cd *
-
-    if [ "$?" -ne 0 ]; then
-       echo "git clone failed"
-       exit 1
-    fi
 fi
+
+# Run optional sed substitutions. This is most commonly use to change the FQDN.
+# For example:
+# SED_FILTER="-e s/openam.foo.com/openam.bar.com/ -e s/baz.com/boo.com/"
+
+if [ ! -z "$SED_FILTER" ]; then
+    echo "Running sed replacement on checked out source using pattern $SED_FILTER"
+    find .  \( ! -type d \) -exec sed -i $SED_FILTER {} \;
+fi
+
+

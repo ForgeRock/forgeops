@@ -47,3 +47,9 @@ sub-chart was causing more problems than it solved.
 
 * Deprecated the git auto-sync behaviour. To sync git, exec into the amster or idm containers and directly
 execute git commands. 
+
+# 2017-08-24
+
+* Add sed filter to custom.yaml to run search/replace after git clone.
+
+
