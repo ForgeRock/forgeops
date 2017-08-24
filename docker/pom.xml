@@ -36,7 +36,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>14.5.0-M7</openamVersion>
+        <openamVersion>14.5.0-M8</openamVersion>
         <opendjVersion>4.1.0-M7</opendjVersion>
         <openidmVersion>5.5.0-RC1</openidmVersion>
         <openigVersion>5.5.0-M1</openigVersion>
