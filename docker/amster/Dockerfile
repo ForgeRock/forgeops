@@ -11,7 +11,7 @@ ADD *.zip /opt/forgerock
 # git is added to the container so we can optionally execute git commit, git push, etc.
 RUN unzip -q /opt/forgerock/amster.zip -d /opt/amster \
     && rm -f /opt/forgerock/amster.zip \
-    && chmod 755 /opt/amster/amster
+    && chmod 775 /opt/amster/amster
 
 WORKDIR /opt/amster
 
