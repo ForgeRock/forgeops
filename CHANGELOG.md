@@ -53,3 +53,8 @@ execute git commands.
 * Add sed filter to custom.yaml to run search/replace after git clone.
 
 
+# 2017-08-25
+
+* Add support for GCP cloud builder. Builds and pushed images to gcr.io. Also build helm charts and pushes to 
+a cloud bucket.
+

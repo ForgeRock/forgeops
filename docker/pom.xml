@@ -32,11 +32,30 @@
         mvn
         The default goal is set to docker:build
     </description>
+    <profiles>
+        <profile>
+            <id>snapshot-releases</id>
+            <properties>
+                <openamVersion>14.5.0-SNAPSHOT</openamVersion>
+                <opendjVersion>4.1.0-SNAPSHOT</opendjVersion>
+                <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
+                <openigVersion>5.5.0-SNAPSHOT</openigVersion>
+                <releaseTag>5.5.0-SNAPSHOT</releaseTag>
+            </properties>
+        </profile>
+        <profile>
+            <id>gcr</id>
+            <properties>
+                <repo>gcr.io/engineering-devops</repo>
+            </properties>
+        </profile>
+    </profiles>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>14.5.0-M8</openamVersion>
+        <openamVersion>14.5.0-M9</openamVersion>
         <opendjVersion>4.1.0-M7</opendjVersion>
         <openidmVersion>5.5.0-RC1</openidmVersion>
         <openigVersion>5.5.0-M1</openigVersion>
@@ -79,7 +98,7 @@
                     <pushRegistry>${registry}</pushRegistry>
                     <images>
                         <image>
-                            <name>${repo}/java</name>
+                            <name>forgerock/java</name>
                             <build>
                                 <dockerFileDir>java</dockerFileDir>
                                 <tags>
@@ -88,7 +107,7 @@
                             </build>
                         </image>
                         <image>
-                            <name>${repo}/tomcat</name>
+                            <name>forgerock/tomcat</name>
                             <build>
                                 <dockerFileDir>tomcat</dockerFileDir>
                                 <tags>
@@ -157,6 +176,7 @@
                             </build>
                         </image>
                         <!--
+                        This is not used right now, we skip the build
                         <image>
                             <name>${repo}/toolbox</name>
                             <build>
@@ -272,17 +292,6 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>snapshot-releases</id>
-            <properties>
-                <openamVersion>14.5.0-SNAPSHOT</openamVersion>
-                <opendjVersion>4.1.0-SNAPSHOT</opendjVersion>
-                <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
-                <openigVersion>5.5.0-SNAPSHOT</openigVersion>
-                <releaseTag>5.5.0-SNAPSHOT</releaseTag>
-            </properties>
-        </profile>
-    </profiles>
+
 
 </project>

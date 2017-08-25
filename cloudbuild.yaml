@@ -1,0 +1,31 @@
+# Google Cloud builder steps to build our helm charts and docker images.
+steps:
+# Get the helm command.
+- name: gcr.io/cloud-builders/wget
+  args: ['-O', 'helm.tar.gz', 'https://storage.googleapis.com/kubernetes-helm/helm-v2.6.0-linux-amd64.tar.gz']
+# Build helm charts and push to gs bucket.
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: ./etc/cloud-build-push-charts.sh
+# Decrypts settings.xml so we can pull artifacts from the ForgeRock maven repo.
+# See https://cloud.google.com/container-builder/docs/how-to/using-encrypted-resources
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - kms
+  - decrypt
+  - --ciphertext-file=docker/settings.xml.enc
+  - --plaintext-file=docker/settings.xml
+  - --location=global
+  - --keyring=forgeops-build
+  - --key=maven-settings
+# Run maven build using the gcr profile. This results in images being tagged for gcr.io/${PROJECT_ID}.
+- name: 'gcr.io/cloud-builders/java/mvn'
+  args: ['--settings','settings.xml', '-Pgcr', 'package', 'docker:build']
+  dir:  docker
+images:
+- 'gcr.io/$PROJECT_ID/git'
+- 'gcr.io/$PROJECT_ID/opendj'
+- 'gcr.io/$PROJECT_ID/openidm'
+- 'gcr.io/$PROJECT_ID/openig'
+- 'gcr.io/$PROJECT_ID/openam'
+- 'gcr.io/$PROJECT_ID/amster'
+- 'gcr.io/$PROJECT_ID/openidm-postgres'
