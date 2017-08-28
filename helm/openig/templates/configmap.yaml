@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  OPENIG_BASE: "{{ .Values.global.configPath.ig }}"
+  OPENIG_BASE: "/git/{{ .Values.global.git.projectDirectory}}/{{ .Values.global.configPath.ig }}"
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_BRANCH: {{ default "master" .Values.global.git.branch }}
   GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"

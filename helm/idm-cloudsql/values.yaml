@@ -21,7 +21,7 @@ global:
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
   configPath:
-    idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
+    idm: default/idm/sync-with-ldap-bidirectional
 
 # TODO: We should get the idmuser / password values from the secret created in the etc/gke/prepsql chart.
 openidm:

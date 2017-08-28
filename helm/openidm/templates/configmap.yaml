@@ -3,12 +3,11 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  PROJECT_HOME: "{{ .Values.global.configPath.idm }}"
+  PROJECT_HOME: "/git/{{ .Values.global.git.projectDirectory}}/{{ .Values.global.configPath.idm }}"
   GIT_AUTOSAVE_BRANCH:  autosave-idm-{{ .Release.Namespace }}
   GIT_CHECKOUT_BRANCH: {{ default "master" .Values.global.git.branch }}
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_ROOT:  "/git"
-  GIT_PUSH_INTERVAL:  "{{ .Values.global.git.pushInterval }}"
   GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
   SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
 

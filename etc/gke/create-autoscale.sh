@@ -33,5 +33,6 @@ echo "Giving Tiller time to start"
 sleep 20
 
 
+
 helm install --namespace nginx  --set "controller.service.loadBalancerIP=35.184.100.105" stable/nginx-ingress
 

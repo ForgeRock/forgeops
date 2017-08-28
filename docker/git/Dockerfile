@@ -16,6 +16,13 @@ ADD *.sh  /
 
 USER forgerock
 
+# Add ssh keys
+RUN mkdir -p /opt/forgerock/.ssh  && \
+    ssh-keyscan -p 7999 stash.forgerock.org >> ~/.ssh/known_hosts && \
+    ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+
+
 CMD ["init"]
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

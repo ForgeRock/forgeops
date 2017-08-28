@@ -42,16 +42,15 @@ global:
     # Note that this will *not* change values in config maps. If you are changing the FQDN on install
     # make sure you also change global.domain above.
     sedFilter: ""
-  # The path to the product configuration to import.
-  # If you base your configuration repository on the forgeops-init repository,
-  # specify paths starting with /git/forgeops-init as shown in the sample below. If
-  # you use a different strategy to get the configuration, such as a hostPath volume mount
-  # or baking the configuration into a custom Docker container,
+  # The relative path to the product configuration to import. Relative to /git/$projectDirectory/
   # specify the full path to the configuration
   configPath:
-    idm: /git/forgeops-init/default/idm/sync-with-ldap-bidirectional
-    am: /git/forgeops-init/default/am/empty-import
-    ig: /git/forgeops-init/default/ig/basic-sample
+    idm:  default/idm/sync-with-ldap-bidirectional
+    am:   default/am/empty-import
+    ig:   default/ig/basic-sample
+  # For AM only, you can specify a different export path. If this is not set, the export path defaults to  $configPath.am
+  exportPath:
+    am: default/am/autosave
   # Set this to true to use TLS for the ingresses for AM, IG, and IDM
   # If you set this to true, you must create the TLS secrets manually.
   # See bin/gen-ssl-secret.sh for an example of how to create a self-signed certificate.

@@ -25,7 +25,7 @@ data:
     :exit
   01_import.amster: |
     connect http://openam/openam -k /var/run/secrets/amster/id_rsa
-    import-config --path {{ .Values.global.configPath.am }}  --clean {{.Values.amsterClean }}
+    import-config --path /git/{{ .Values.global.git.projectDirectory }}/{{ .Values.global.configPath.am }}  --clean {{.Values.amsterClean }}
     :exit
 ---
 apiVersion: v1
@@ -36,9 +36,8 @@ data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
   GIT_ROOT:  "/git"
-  GIT_PUSH_INTERVAL:  "{{ .Values.global.git.pushInterval }}"
-  GIT_PROJECT_DIRECTORY: {{ default "/git/forgeops-init" .Values.global.git.projectDirectory }}
-  EXPORT_PATH: {{   default "default/openam/autosave"  .Values.amster.exportPath }}
+  GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
+  EXPORT_PATH: {{  default .Values.global.configPath.am .Values.global.exportPath.am }}
   GIT_SSH_COMMAND: "ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
   GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
   CONFIG_PATH: "{{ .Values.global.configPath.am }}"

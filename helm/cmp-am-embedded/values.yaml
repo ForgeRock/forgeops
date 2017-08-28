@@ -15,7 +15,7 @@ global:
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
   configPath:
-    am: /git/forgeops-init/default/am/empty-import
+    am: default/am/empty-import
 
 openamReplicaCount: 1
 
