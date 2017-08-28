@@ -8,7 +8,7 @@
 
 validateInputArgs() {
   # Set a default cluster version.
-  CLUSTER_VERSION="--cluster-version 1.7.2"
+  CLUSTER_VERSION="--cluster-version 1.7.3"
   CLUSTER_NAME=openam
 
   while [[ $# > 0 ]]
