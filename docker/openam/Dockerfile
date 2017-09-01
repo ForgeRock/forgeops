@@ -22,10 +22,11 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 ENV FORGEROCK_HOME /home/forgerock
 ENV OPENAM_HOME /home/forgerock/openam
 
+
 ADD openam.war  /tmp/openam.war
 
-#
-RUN apk add --no-cache su-exec unzip curl bash \
+# openldap-clients is needed to test for the configuration store.
+RUN apk add --no-cache su-exec unzip curl bash openldap-clients \
   && rm -fr /usr/local/tomcat/webapps/* \
   && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
   && rm /tmp/openam.war \
@@ -66,3 +67,13 @@ ADD server.xml "$CATALINA_HOME"/conf/server.xml
 
 # Settings for Tomcat cache.
 ADD context.xml "$CATALINA_HOME"/conf/context.xml
+
+# Path to optional pre-start script. Use this script hook to copy in images, web.xml, etc.
+ENV AM_PRE_START_SCRIPT /home/forgerock/am-pre-start-script.sh
+
+
+ADD *.sh $FORGEROCK_HOME/
+
+ENTRYPOINT ["/home/forgerock/docker-entrypoint.sh"]
+
+CMD ["run"]

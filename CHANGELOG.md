@@ -58,3 +58,9 @@ execute git commands.
 * Add support for GCP cloud builder. Builds and pushed images to gcr.io. Also build helm charts and pushes to 
 a cloud bucket.
 
+# 2017-09-05
+
+* Add pre-start hook to openam dockerfile for customizing the war before AM starts.
+* Migrate bootstrap setup from the amster container to openam. Now that AM has a custom entrypoint,
+it makes more sense to move this logic to AM.
+

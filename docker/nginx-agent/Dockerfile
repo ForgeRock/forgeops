@@ -14,10 +14,10 @@ WORKDIR /opt
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
 #ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/
 
-ENV NGINX_AGENT_ZIP http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/NGINX/Centos_7/NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip
+ARG NGINX_AGENT_ZIP=http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/NGINX/Centos_7/NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip
 
 # For Local build - copy the .zip file in.
-COPY NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip /var/tmp/agent.zip
+#COPY NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip /var/tmp/agent.zip
 
 
 
@@ -26,7 +26,7 @@ ADD default.conf /etc/nginx/conf.d/
 
 
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
-      #curl $NGINX_AGENT_ZIP -o /var/tmp/agent.zip && \
+      curl $NGINX_AGENT_ZIP -o /var/tmp/agent.zip && \
       unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*

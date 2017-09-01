@@ -20,8 +20,8 @@ openamInstance: http://openam:80/openam
 configLdapPort:  1389
 configLdapHost: configstore-0.configstore
 
-#catalinaOts: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dcom.sun.identity.configuration.directory=/openam"
-#catalinaOpts: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
+# If you want to override CATALINA_OPTS, uncomment this line and edit openam-deployment.yaml:
+#catalinaOpts: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dcom.sun.identity.configuration.directory=/openam"
 
 # Suffix for OpenDJ config store.
 rootSuffix:  "dc=openam,dc=forgerock,dc=org"

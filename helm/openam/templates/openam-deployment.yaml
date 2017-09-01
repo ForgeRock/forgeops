@@ -1,5 +1,4 @@
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copyright (c) 2016-2017 ForgeRock AS.
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -14,22 +13,6 @@ spec:
         vendor: forgerock
     spec:
       terminationGracePeriodSeconds: 10
-      {{ if .Values.createBootstrap -}}
-      initContainers:
-      - name: bootstrap
-        image: {{.Values.global.image.repository}}/amster:{{.Values.global.image.tag}}
-        imagePullPolicy:  {{ template "pullPolicy" . }}
-        args: ["bootstrap"]
-        volumeMounts:
-        - name: openam-root
-          mountPath: /home/forgerock/openam
-        - name: openam-boot
-          mountPath: /var/boot
-        - name: openam-secrets
-          mountPath: /var/run/secrets/openam
-        - name: configstore-secret
-          mountPath: /var/run/secrets/configstore
-      {{ end -}}
       containers:
       - name: openam
         image: {{ template "image" . }}
@@ -40,6 +23,13 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
+        {{ if .Values.createBootstrap -}}
+        - name: configstore-secret
+          mountPath: /var/run/secrets/configstore
+        {{ else }}
+        args: [ "run-nowait" ]
+        {{- end }}
+# If you want to override CATALINA_OPTS, uncomment this:
 #        env:
 #        - name: CATALINA_OPTS
 #          value:  {{ .Values.catalinaOpts }}

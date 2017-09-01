@@ -8,13 +8,16 @@ metadata:
 data:
   agent.conf: |
     com.sun.identity.agents.config.repository.location = centralized
-    com.sun.identity.agents.config.naming.url = http://openam:80/openam
+    #com.sun.identity.agents.config.naming.url = http://openam:80/openam
+    com.sun.identity.agents.config.naming.url = http://openam.default.192.168.99.100.xip.io:80/openam/
 
     com.sun.identity.client.notification.url = http://apache-svc:80//UpdateAgentCacheServlet?shortcircuit=false
 
+
+
     com.sun.identity.agents.config.organization.name = /
     com.sun.identity.agents.config.username = apache
-    com.sun.identity.agents.config.password = ASkZ17Wtegw=
+    com.sun.identity.agents.config.password = Jh1dRJ71jNI=
     com.sun.identity.agents.config.key = OTg5MGRjMTQtMTVjYi04Nw==
     com.sun.identity.agents.config.connect.timeout = 4
 
