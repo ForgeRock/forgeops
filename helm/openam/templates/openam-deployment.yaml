@@ -29,10 +29,9 @@ spec:
         {{ else }}
         args: [ "run-nowait" ]
         {{- end }}
-# If you want to override CATALINA_OPTS, uncomment this:
-#        env:
-#        - name: CATALINA_OPTS
-#          value:  {{ .Values.catalinaOpts }}
+        env:
+        - name: CATALINA_OPTS
+          value:  "{{ .Values.catalinaOpts }}"
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.
