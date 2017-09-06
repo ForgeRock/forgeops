@@ -88,7 +88,7 @@ run() {
 }
 
 
-# pre-create our keystores for AM.
+# Pre-create our keystores for AM.
 copy_secrets
 
 
