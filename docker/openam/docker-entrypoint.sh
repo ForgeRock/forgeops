@@ -72,7 +72,7 @@ bootstrap_openam() {
     then
         echo "Configstore is present. Creating bootstrap"
         mkdir -p "${OPENAM_HOME}/openam"
-        cp -L /var/boot/*.json "$OPENAM_HOME"
+        cp -L /var/run/openam/*.json "$OPENAM_HOME"
         copy_secrets
     fi
 }

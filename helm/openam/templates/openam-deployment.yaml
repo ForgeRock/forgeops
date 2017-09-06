@@ -26,6 +26,10 @@ spec:
         {{ if .Values.createBootstrap -}}
         - name: configstore-secret
           mountPath: /var/run/secrets/configstore
+        - name: openam-secrets
+          mountPath: /var/run/secrets/openam
+        - name: openam-boot
+          mountPath: /var/run/openam
         {{ else }}
         args: [ "run-nowait" ]
         {{- end }}
