@@ -55,11 +55,12 @@ export OPENAM_HOME=${OPENAM_HOME:-/home/forgerock/openam}
 
 copy_secrets() {
     echo "Copying secrets"
+    mkdir -p "${OPENAM_HOME}/openam"
     cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/openam"
     cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/openam"
     cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
     cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
-    cp -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
+    cp  -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
 }
 
 # This function runs before AM starts. It waits for the config store to be available. If it is configured,
@@ -73,7 +74,6 @@ bootstrap_openam() {
         echo "Configstore is present. Creating bootstrap"
         mkdir -p "${OPENAM_HOME}/openam"
         cp -L /var/run/openam/*.json "$OPENAM_HOME"
-        copy_secrets
     fi
 }
 
@@ -86,6 +86,11 @@ run() {
     cd "${CATALINA_HOME}"
     exec "${CATALINA_HOME}/bin/catalina.sh" run
 }
+
+
+# pre-create our keystores for AM.
+copy_secrets
+
 
 # The default command is "run" - which assumes an external configuration store. If
 # you want AM to come up without waiting for a configuration store, use run-nowait.
