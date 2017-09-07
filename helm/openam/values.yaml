@@ -10,7 +10,16 @@ global:
     repository: forgerock
     tag: 5.5.0
     pullPolicy: IfNotPresent
-  # If you set this to true, you must have a TLS secret with the same name as the FQDN
+  git:
+    sshKey: dummysshkey
+    # git repo to clone. The value below is a public git repo that does not require authentication.
+    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    branch: master
+    projectDirectory: "forgeops-init"
+  configPath:
+    am: default/am/empty-import
+  exportPath:
+  # If you set this to true, you must have a TLS secret with the same name as the FQDN.
   useTLS: false
 
 openamReplicaCount: 1
@@ -46,3 +55,8 @@ openamHome: /home/forgerock/openam
 
 # Set to true to create a boot.json file to bootstrap AM. If set to false, AM will come up to the configurator page.
 createBootstrap: true
+
+# This is an optional path to a script to execute before AM starts up. It can copy in images, update the web.xml, etc.
+# The path is *relative* to /git/{{ projectDirectory }}/{{ configPath.am }}.
+# For example:   /git/forgeops-init/default/am/my-config/customize-am.sh
+#amCustomizationScriptPath: "customize-am.sh"

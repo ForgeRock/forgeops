@@ -68,8 +68,8 @@ ADD server.xml "$CATALINA_HOME"/conf/server.xml
 # Settings for Tomcat cache.
 ADD context.xml "$CATALINA_HOME"/conf/context.xml
 
-# Path to optional pre-start script. Use this script hook to copy in images, web.xml, etc.
-ENV AM_PRE_START_SCRIPT /home/forgerock/am-pre-start-script.sh
+# Path to optional script to customize the AM web app. Use this script hook to copy in images, web.xml, etc.
+ENV CUSTOMIZE_AM /home/forgerock/customize-am.sh
 
 
 ADD *.sh $FORGEROCK_HOME/

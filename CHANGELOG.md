@@ -64,3 +64,6 @@ a cloud bucket.
 * Migrate bootstrap setup from the amster container to openam. Now that AM has a custom entrypoint,
 it makes more sense to move this logic to AM.
 
+# 2017-09-08
+
+* Add support for customizing the AM war file before AM starts

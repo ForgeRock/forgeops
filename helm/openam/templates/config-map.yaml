@@ -28,3 +28,21 @@ data:
        "ldapProtocol" : "ldap"
      } ]
    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-configmap
+data:
+  DOMAIN: "{{ .Values.global.domain }}"
+  CATALINA_OPTS: "{{ .Values.catalinaOpts }}"
+  GIT_REPO: "{{ .Values.global.git.repo }}"
+  GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
+  GIT_ROOT:  "/git"
+  GIT_PROJECT_DIRECTORY: "{{ .Values.global.git.projectDirectory }}"
+  GIT_SSH_COMMAND: "ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
+  GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
+  CONFIG_PATH: "{{ .Values.global.configPath.am }}"
+  {{ if .Values.amCustomizationScriptPath -}}
+  CUSTOMIZE_AM: "/git/{{.Values.global.git.projectDirectory }}/{{ .Values.global.configPath.am }}/{{ .Values.amCustomizationScriptPath }}"
+  {{- end }}

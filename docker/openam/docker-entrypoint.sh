@@ -10,7 +10,7 @@ command=$1
 
 echo "Command: $command"
 
-AM_PRE_START_SCRIPT="${AM_PRE_START_SCRIPT:-/home/forgerock/am-pre-start-script.sh}"
+CUSTOMIZE_AM="${CUSTOMIZE_AM:-/home/forgerock/customize-am.sh}"
 
 pause() {
     echo "Container will now pause"
@@ -78,9 +78,9 @@ bootstrap_openam() {
 }
 
 run() {
-   if [ -x "${AM_PRE_START_SCRIPT}" ]; then
-        echo "Executing am pre-start script"
-        sh "${AM_PRE_START_SCRIPT}"
+   if [ -x "${CUSTOMIZE_AM}" ]; then
+        echo "Executing AM customization script"
+        sh "${CUSTOMIZE_AM}"
     fi
 
     cd "${CATALINA_HOME}"
