@@ -36,6 +36,8 @@ spec:
         env:
         - name: CATALINA_OPTS
           value:  "{{ .Values.catalinaOpts }}"
+        - name: DOMAIN
+          value: "{{ .Values.global.domain }}"
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.
