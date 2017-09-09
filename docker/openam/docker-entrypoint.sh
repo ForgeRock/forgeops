@@ -81,7 +81,9 @@ run() {
    if [ -x "${CUSTOMIZE_AM}" ]; then
         echo "Executing AM customization script"
         sh "${CUSTOMIZE_AM}"
-    fi
+   else
+        echo "No AM customization script found, so no customizations will be performed"
+   fi
 
     cd "${CATALINA_HOME}"
     exec "${CATALINA_HOME}/bin/catalina.sh" run
