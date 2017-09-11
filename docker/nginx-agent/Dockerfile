@@ -33,12 +33,12 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 
 # Format of agentadmin command:
 # agentadmin --s "web-server configuration file, directory or site parameter" \
-#                "OpenAM URL" "Agent URL" "realm" "agent user id" \
+#                "AM URL" "Agent URL" "realm" "agent user id" \
 #                "path to the agent password file" [--changeOwner] [--acceptLicence] [--forceInstall]
 #
 
-# Because we are running this before OpenAM is up and running we need to use the forceinstall option.
-# We are using defaults here (OpenAM service name) that are not going to exist in most environments.
+# Because we are running this before AM is up and running we need to use the forceinstall option.
+# We are using defaults here (AM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
 RUN /opt/web_agents/nginx11303_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
         "http://openam.default.svc.cluster.local:80/openam" \

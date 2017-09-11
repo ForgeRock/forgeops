@@ -1,4 +1,4 @@
-# OpenAM Dockerfile
+# AM Dockerfile
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 #
@@ -57,11 +57,11 @@ USER forgerock
 #     -storepass password \
 #     -keypass password
 
-# Custom server.xml: use this if OpenAM is behind SSL termination.
+# Custom server.xml: use this if AM is behind SSL termination.
 # See the server.xml file for details.
 ADD server.xml "$CATALINA_HOME"/conf/server.xml
 
-# For debugging OpenAM in a container, uncomment this.
+# For debugging AM in a container, uncomment this.
 # Use something like  kubectl port-forward POD 5005:5005
 # ENV CATALINA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
 

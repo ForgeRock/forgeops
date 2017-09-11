@@ -11,7 +11,7 @@
 env_settings=~/etc/registry_env
 
 if [ -r $env_settings ]; then
-    source ~/etc/registry_env
+    source $env_settings
 fi
 
 if [ -z ${REGISTRY_PASSWORD+x}  -o -z ${REGISTRY_ID+x}  ]; then

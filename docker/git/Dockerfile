@@ -1,3 +1,4 @@
+# Git image for performing configuration checkout / push.
 FROM alpine:3.6
 
 ENV FORGEROCK_HOME /opt/forgerock

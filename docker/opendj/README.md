@@ -60,7 +60,7 @@ If you set the environment variable BOOTSTRAP_TYPE=cts,  the bootstrap/cts setup
 
 Examples provided under the bootstrap directory:
 
-* bootstrap/cts/  - configures DJ for an OpenAM CTS server 
+* bootstrap/cts/  - configures DJ for an AM CTS server 
 * bootstrap/userstore/ - Configures DJ as a sample user data store.  If you want some sample 
 users populated, set the environment variable `NUMBER_SAMPLE_USERS=100`.
 

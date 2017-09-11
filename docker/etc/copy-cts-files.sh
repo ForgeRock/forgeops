@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copies the CTS files from an OpenAM distribution to the opendj directory.
+# Copies the CTS files from an AM distribution to the opendj directory.
 
 rm -fr /tmp/openam
 unzip openam/openam.war -d /tmp/openam

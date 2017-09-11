@@ -11,6 +11,8 @@ objectclass: inetOrgPerson
 cn: openam
 sn: openam
 uid: openam
+givenName: openam
+mail: am@forgerock.org
 userPassword: cangetindj
 ds-privilege-name: subentry-write
 ds-privilege-name: update-schema
@@ -24,6 +26,8 @@ objectclass: inetOrgPerson
 cn: openidm
 sn: openidm
 uid: openidm
+mail: openidm@forgerock.org
+givenName: openidm
 userPassword: cangetindj
 ds-privilege-name: subentry-write
 ds-privilege-name: update-schema

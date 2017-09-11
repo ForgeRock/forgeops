@@ -1,4 +1,4 @@
-# Base Tomcat Image for ForgeRock platform. Used for antying that requires a web container (AM, IG)
+# Base Tomcat Image for ForgeRock Identity Platform. Used for components that requires a web container (AM, IG)
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 

@@ -1,7 +1,5 @@
 #
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-#
+# Copyright (c) 2016-2017 ForgeRock AS.
 FROM forgerock/tomcat:5.5.0
 
 # Default home for OpenIG config. Override this to set a different location.

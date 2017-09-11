@@ -1,30 +1,25 @@
-# OpenAM Dockerfile 
+# AM Dockerfile 
 
 
-This is designed to be a flexible OpenAM image that can be used in 
-different deployment styles.
+This is designed to be a flexible AM image that can be used in 
+different deployment styles. 
 
-# Volumes 
+If you have an existing configuration store, you can configure AM to use it by creating 
+an appropriate boot.json file with boot passwords stored in keystore.jceks.
 
-You can mount optional volumes to control the behavior of the image:
+Refer to the comments in the docker-entrypoint.sh file for more 
+information on the expected volumes and environment variables. 
 
-* /root/openam: Mount a volume to persist the bootstrap configuration.
-If the container is restarted it will retain it bootstrap config.
-* /var/run/secrets/openam/{key*, .keypass, .storepass}  - optional key
-material copied into the /root/openam/openam directory. These files 
-can be copied using something like an Kubernetes init container. If you
-wanted all OpenAM instances to have the same keystores, you would mount
-mount a Kubernetes secret volume with these files.
 
-# Building and Boostrapping Process
+# Building
 
 * The Dockerfile assumes that the openam.war file is pre-downloaded in this directory.
-* If no bootstrap file (/root/openam/boot.json) exists, OpenAM will come up in installation mode. 
-If you want to persist the installation, ensure that /root/openam is mounted as a persistent volume. 
-* If you have an existing configuration store, you can configre OpenAM to use it by creating 
-an appropriate boot.json file with boot passwords in keystore.jceks.
 
 
+# Customizing the war file
 
+If you wish to customize the war file, there are two strategies that you can use:
 
+* Inherit FROM this image, and overlay your changes on /usr/local/tomcat/webapps/openam/
+* Before you start AM, dynamically copy in the changes. This is the strategy used in the Helm charts.
 

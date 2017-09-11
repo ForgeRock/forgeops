@@ -57,3 +57,6 @@ fi
 
 
 /opt/opendj/schedule_backup.sh
+
+/opt/opendj/rebuild.sh
+

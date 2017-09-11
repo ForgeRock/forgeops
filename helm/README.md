@@ -28,43 +28,13 @@ forgeops-init.git has public read-only access.  You can clone this repository bu
 If you wish to use your own Git repository based on the forgeops-init repository, 
 you can fork and clone the forgeops-init repository.
 
-# Prerequisite Charts
-
-The git/ chart is a prerequisite that creates resources needed by other charts including openam, openidm,
-and openig. You need to install the git/ chart before deploying the other foundational charts.
-
-The composite charts (those that begin with cmp-*) include the git/ chart as a dependency. If you
-deploy a composite chart you *do not* need to install the git/ chart. However - this means 
-you can not deploy two composite charts to the same namespace, as the shared dependency (the git chart) can
-not be deployed twice. The solution is to create a single composite chart that includes all components
-that you want installed.
+# Composite Charts
 
 
-# Auto-export
-
-The amster and AM charts now include a feature to auto-export configurations. The amster and idm git sidecar 
-container will periodically export the configuration, and the git sidecar will optionally commit and push 
-the changes. You must set global.git.pushInterval to the time in seconds to perform git sync. The default
-value is 0, which disables git sync.
-
-
-To watch the configuration loop:
-
-```bash
-# amster - am logs
-kubectl logs amster-xxxx -c amster -f 
-# git sidecar
-kubectl logs amster-xxxx -c git -f 
-# openidm - git sidecar
-kubectl logs openidm-xxxxxx -c git -f 
-```
-
-# Scripts
-
-There are various sample scripts in bin/ that you can modify as needed for your environment.  Some examples:
-
-* remove-all.sh  - removes all deployments
-
+Composite charts have names that begin with cmp-. These charts assemble foundational charts such opendj, git, 
+ openam, etc. Refer to the values.yaml in each composite chart.  If you are building the
+ charts yourself, remember to perform a `helm dep up cmp-chart` to update any dependencies that might have changed.
+ 
 # Using a private registry
 
 * If you are using a private registry, see registry.sh. Edit the `~/etc/registry_env` and set
@@ -123,7 +93,7 @@ ingress host name. The format is:
  `openam.default.example.com`
 
 
-# Design Notes
+# Notes
 
 OpenIDM in "development" mode automatically writes out changes to configuration files as they are made in the GUI 
 console. OpenAM does not do this, but the amster chart includes a script that loops and exports
@@ -137,7 +107,6 @@ current configuration to /git.
 The default OpenDJ deployment uses persistent volume claims (PVC) and
 StatefulSets to provide stateful deployment of the data tier. If you
 wish to start from scratch you should delete the PVC volumes.
-The remove-openam.sh script will do this for you. Note that
 PVCs and StatefulSets are features introduced in Kubernetes 1.5. 
 
 If you are using Minikube take note that host path PVCs get deleted
@@ -145,18 +114,6 @@ every time Minikube is restarted.  The opendj/ chart is a StatefulSet,
 and relies on auto provisioning.  If you restart Minikube, you may find you
 need to re-install OpenAM.
 
-# Docker Images
-
-These charts uses the following ForgeRock Docker images:
-
-* forgerock/openam  - OpenAM runtime image
-* forgerock/opendj  - OpenDJ for the config / user store
-* forgerock/amster -    Amster configuration client for OpenAM
-* forgerock/openig  - OpenIG runtime image
-* forgerock/openidm  - OpenIDM runtime image
-
-The Dockerfiles for these images are in the docker/ folder. You can `docker build` the images directly into the Docker instance running
-inside Minikube.  Run `eval $(minikube docker-env)` to set your Docker context.
 
 # Tips
 

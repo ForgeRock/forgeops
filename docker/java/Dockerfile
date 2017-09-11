@@ -1,4 +1,4 @@
-# Base Java Image for ForgeRock platform. Used for DJ, amster, IG and IDM (Anything that does not need a web
+# Base Java Image for ForgeRock Identity Platform. Used for DJ, amster, IG and IDM (Anything that does not need a web
 # container)
 #
 #
@@ -14,8 +14,7 @@ ENV FORGEROCK_HOME /opt/forgerock
 # openldap-clients -used as a light weight ldap probe (C based- very small runtime and fast startup)
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
-# libc6-compat - needed by OrientDB for IDM. Remove this once orient is deprecated in 5.5.
-RUN apk add --no-cache su-exec unzip curl bash openldap-clients bind-tools iputils libc6-compat git openssh-client  \
+RUN apk add --no-cache su-exec unzip curl bash openldap-clients bind-tools iputils git openssh-client  \
     && mkdir -p /opt/forgerock \
     && addgroup -g 11111 forgerock \
     && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D -G forgerock forgerock \

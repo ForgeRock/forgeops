@@ -13,9 +13,9 @@ brew cask install minikube
 
 echo "Creating a Minikube VM"
 
-# The command below defaults to using VirtualBox - which we assume you have installed
+# The command below defaults to using VirtualBox - which we assume you have installed.
 # Add the --vm-driver=vmwarefusion  or --vm-driver=xhyve  if you want to change the hypervisor.
-minikube start --memory 8096 --kubernetes-version v1.6.4
+minikube start --memory 8096
 
 minikube status
 
@@ -31,8 +31,6 @@ helm plugin install https://github.com/adamreese/helm-nuke
 
 # Add ForgeRock chart repo.
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts/
-
-git clone https://stash.forgerock.org/scm/cloud/forgeops.git
 
 
 minikube dashboard

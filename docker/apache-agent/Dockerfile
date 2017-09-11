@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-# Docker image for Apache + OpenAM HTTP agent.
+# Docker image for Apache + AM HTTP agent.
 FROM httpd:2.4
 
 WORKDIR /opt
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 
 # Format of agentadmin command:
 # agentadmin --s "web-server configuration file, directory or site parameter" \
-#                "OpenAM URL" "Agent URL" "realm" "agent user id" \
+#                "AM URL" "Agent URL" "realm" "agent user id" \
 #                "path to the agent password file" [--changeOwner] [--acceptLicence] [--forceInstall]
 #
 
@@ -47,8 +47,8 @@ ARG AMSERVER=http://openam.default.192.168.99.100.xip.io:80/openam
 
 #ARG AMSERVER="http://openam:80/openam"
 
-# Because we are running this before OpenAM is up and running we need to use the forceinstall option.
-# We are using  defaults here (OpenAM service name) that are not going to exist in most environments.
+# Because we are running this before AM is up and running we need to use the forceinstall option.
+# We are using  defaults here (AM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
 # Note: Another alternative to bootstrapping the agent in the docker build is to move this into the container startup. 
 RUN /opt/web_agents/apache24_agent/bin/agentadmin --s /usr/local/apache2/conf/httpd.conf \

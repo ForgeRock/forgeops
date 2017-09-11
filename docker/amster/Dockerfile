@@ -1,4 +1,4 @@
-# Amster Container that configures OpenAM.
+# Amster Container that configures AM.
 #
 #
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the

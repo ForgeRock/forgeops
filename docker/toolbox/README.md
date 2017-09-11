@@ -1,7 +1,8 @@
 # Toolbox
 
 This container has tools installed such as Helm, the kubectl command, etc. The idea
-is to make it easier to get started on Kubernetes with Minikube.
+is to make it easier to get started on Kubernetes with Minikube. This is a work in progress
+and is not currently used. 
 
 # Please READ!!
 

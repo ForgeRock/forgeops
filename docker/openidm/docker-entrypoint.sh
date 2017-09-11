@@ -55,9 +55,6 @@ if [ "$1" = 'openidm' ]; then
 
    echo "Starting OpenIDM with options: $CLOPTS"
 
-   # The openidm user can not mount the hostPath volume in Minikube due to VirtualBox permissions,
-   # so we run as root for now.
-   #exec su-exec openidm java
    exec java \
         "${LOGGING_CONFIG}" \
         ${JAVA_OPTS} ${OPENIDM_OPTS} \

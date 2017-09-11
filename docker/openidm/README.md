@@ -1,4 +1,4 @@
-# Dockerfile ForgeRock OpenIDM
+# Dockerfile for ForgeRock IDM
 
 Within the container, OpenIDM runs on port 8080.
 
@@ -14,8 +14,4 @@ keystore.pin - file that contains the keystore / truststore password in clear te
 You do not need to provide all of these files - the start script will use the defaults 
 in conf/boot/boot.properties.
 
-# Known Issues
-
-If OpenIDM runs well before PostgreSQL is up, it may fail to start when trying 
-to connect to the repository database. 
 

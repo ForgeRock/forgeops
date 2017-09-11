@@ -1,9 +1,12 @@
 # Sample global settings for all charts
 
-
 global:
-  repo: quay.sh/warren_strange
-  tag: 5.5.0
-  baseDomain: example.com
-
-
+  domain: .192.168.99.100.xip.io
+  image:
+    repository: forgerock
+    tag: 5.5.0
+  git:
+    sshKey: yoursshkey
+    repo: "ssh://git@stash.forgerock.org:7999/cloud/forgeops-init.git"
+    branch: master
+    projectDirectory: forgeops-init

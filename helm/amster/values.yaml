@@ -63,9 +63,7 @@ global:
   configPath:
     am: default/am/empty-import
   exportPath:
-    {}
-    # If exportPath is empty - it defaults to configPath.am
-    #am: default/am/autosave
+    am: default/am/autosave
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:

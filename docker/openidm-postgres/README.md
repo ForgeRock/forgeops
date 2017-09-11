@@ -4,13 +4,13 @@ Extends the base PostgreSQL image with the schema required for OpenIDM.
 
 # Notes
 
-If you are using the Kubernetes Helm project files (fretes) you do *not* need this Docker image,
+If you are using the Kubernetes Helm chart for IDM, you do *not* need this Docker image,
 because the generic PostgreSQL image is used.
 
 The SQL files are copied from OpenIDM 5.5 snapshot. You need to update them for
 different OpenIDM releases.
 
-The createuser.psql script is not really needed as the Docker image creates the openidm user by setting
+The createuser.psql script is not required as the Docker image creates the openidm user by setting
 POSTGRES_USER=openidm
 
 # Sample commands to start

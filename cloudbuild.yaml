@@ -1,4 +1,4 @@
-# Google Cloud builder steps to build our helm charts and docker images.
+# Google Cloud builder steps to build our helm charts and docker images on gcr.io.
 steps:
 # Get the helm command.
 - name: gcr.io/cloud-builders/wget

@@ -71,7 +71,7 @@ release names needs to be unique across the cluster.
 * Composite charts have been introduced. Charts starting with helm/cmp* are composite charts constructed from
 other child charts.
 
-# Tip: Setting a namespace
+# Setting a namespace
 
 If you do not want to use the 'default' namespace, set your namespace using:
 

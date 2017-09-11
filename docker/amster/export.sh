@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the configuration web service. This assumes the project has already been checked out.
+# Does a one shot export of the AM configuration. This assumes the project has already been checked out.
 
 set -x
 

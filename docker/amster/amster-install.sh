@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Full amster install
+# Full amster install.
 
 
 DIR=`pwd`
@@ -23,15 +23,15 @@ export INSTANCE="${SERVER_URL}${URI}"
 
 # Alive check
 ALIVE="${INSTANCE}/isAlive.jsp"
-# Config page. This comes up if OpenAM is not configured.
+# Config page. This comes up if AM is not configured.
 CONFIG_URL="${INSTANCE}/config/options.htm"
 
-# Wait for OpenAM to come up before configuring it.
+# Wait for AM to come up before configuring it.
 # Curl times out after 2 minutes regardless of the --connect-timeout setting.
-# todo: Find a faster way to test for OpenAM readiness
+# todo: Find a faster way to test for AM readiness
 wait_for_openam()
 {
-    # If we get lucky, OpenAM will be up before the first curl command is issued.
+    # If we get lucky, AM will be up before the first curl command is issued.
     sleep 20
    response="000"
 
@@ -41,18 +41,18 @@ wait_for_openam()
 
       echo "Got Response code $response"
       if [ ${response} = "302" ]; then
-         echo "Checking to see if OpenAM is already configured. Will not reconfigure"
+         echo "Checking to see if AM is already configured. Will not reconfigure"
 
          curl ${CONFIG_URL} | grep -q "Configuration"
          if [ $? -eq 0  ]; then
             break
          fi
-         echo "It looks like OpenAM is already configured . Exiting"
+         echo "It looks like AM is already configured . Exiting"
          exit 0
       fi
       if [ ${response} = "200" ];
       then
-         echo "OpenAM web app is up and ready to be configured"
+         echo "AM web app is up and ready to be configured"
          break
       fi
 
@@ -64,7 +64,7 @@ wait_for_openam()
 	echo "About to begin configuration"
 }
 
-echo "Waiting for OpenAM server at ${CONFIG_URL} "
+echo "Waiting for AM server at ${CONFIG_URL} "
 
 wait_for_openam
 
@@ -76,7 +76,7 @@ if [ -d  ${AMSTER_SCRIPTS} ]; then
         exit 1
     fi
 
-    echo "Executing Amster to configure OpenAM"
+    echo "Executing Amster to configure AM"
     # Need to be in the amster directory, otherwise Amster can't find its libraries.
     cd ${DIR}
     for file in ${AMSTER_SCRIPTS}/*.amster

@@ -35,19 +35,19 @@ then
     echo
 fi
 
-# Generates a suitable transport key in the OpenAM keystore. By default the key will use the .storepass as its .keypass.
+# Generates a suitable transport key in the AM keystore. By default the key will use the .storepass as its .keypass.
 
 if [ $1 == "generate" ]
 then
     if [ -z "$2" ]
       then
-        echo "No argument for OpenAM config directory supplied"
+        echo "No argument for AM config directory supplied"
         exit 0
     fi
 
     OPENAM_DIR=$2
 
-    echo "OpenAM dir : ${OPENAM_DIR}"
+    echo "AM dir : ${OPENAM_DIR}"
 
     cd "${OPENAM_DIR}"
 
@@ -58,7 +58,7 @@ then
     keytool -genseckey -alias sms.transport.key -keyalg AES -keysize 128 -storetype jceks -keystore keystore.jceks -storepass ${SRC_STORE_PASS} -keypass ${SRC_STORE_PASS}
 
     echo "Successfully generated"
-    echo "Changes require a restart of OpenAM"
+    echo "Changes require a restart of AM"
 
 fi
 
@@ -115,13 +115,13 @@ if [ $1 == "delete" ]
 then
     if [ -z "$2" ]
       then
-        echo "No argument for OpenAM config directory supplied"
+        echo "No argument for AM config directory supplied"
         exit 0
     fi
 
     OPENAM_DIR=$2
 
-    echo "OpenAM directory : ${OPENAM_DIR}"
+    echo "AM directory : ${OPENAM_DIR}"
 
     cd "${OPENAM_DIR}"
 
@@ -132,7 +132,7 @@ then
     keytool -delete -alias "sms.transport.key" -storetype jceks -keystore "${OPENAM_DIR}/keystore.jceks" -storepass "${SRC_STORE_PASS}"
 
     echo "Successfully deleted"
-    echo "Changes require a restart of OpenAM"
+    echo "Changes require a restart of AM"
 
 fi
 

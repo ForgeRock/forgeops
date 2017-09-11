@@ -42,7 +42,7 @@ Note that access to the Artifactory server is restricted to ForgeRock staff, par
 
 # Building Minor or Patch Releases
 
-If you want to use a major or minor release (OpenAM 14.0.1, for example), log on to
+If you want to use a major or minor release (AM 14.0.1, for example), log on to
 backstage.forgerock.com and download the appropriate binary. The binary should be
 placed in the Docker build directory (e.g. openam/) and should not have any
 version info (openam.war, not OpenAM-14.0.1.war).
