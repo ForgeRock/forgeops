@@ -62,8 +62,8 @@ global:
     projectDirectory: "forgeops-init"
   configPath:
     am: default/am/empty-import
-  # If exportPath is not set it defaults to configPath.am
-  #exportPath:
+  # If exportPath.am is not set it defaults to configPath.am
+  exportPath: {}
     #am: default/am/autosave
 
 # For production set CPU limits to help Kube Schedule the pods.
