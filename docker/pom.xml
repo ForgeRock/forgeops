@@ -55,9 +55,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>14.5.0-M15</openamVersion>
+        <openamVersion>5.5.0-RC16</openamVersion>
         <opendjVersion>4.1.0-M7</opendjVersion>
-        <openidmVersion>5.5.0-RC7</openidmVersion>
+        <openidmVersion>5.5.0-RC8</openidmVersion>
         <openigVersion>5.5.0-M4</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
         <releaseTag>5.5.0</releaseTag>
@@ -234,7 +234,7 @@
                                 </artifactItem>
 
                                 <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
+                                    <groupId>org.forgerock.am</groupId>
                                     <artifactId>openam-server</artifactId>
                                     <version>${openamVersion}</version>
                                     <type>war</type>
@@ -243,7 +243,7 @@
                                 </artifactItem>
 
                                 <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
+                                    <groupId>org.forgerock.am</groupId>
                                     <artifactId>openam-amster</artifactId>
                                     <version>${openamVersion}</version>
                                     <type>zip</type>
