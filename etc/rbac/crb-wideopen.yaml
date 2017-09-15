@@ -1,5 +1,5 @@
-# This grants cluster admin (root, god like privileges) to the default service account.
-# This is a quick and dirty way of enabling RBAC for kube-dns and the nginx ingress addons.
+# This grants cluster admin (root like privileges) to the default service account.
+# This is a quick and dirty way of enabling RBAC for the kube-dns and nginx ingress add-ons.
 # To do this properly, the addons should have service accounts and the proper roles assigned.
 # Track: https://github.com/kubernetes/minikube/issues/1722  (minikube - Enable RBAC by default)
 # Another way of doing this:

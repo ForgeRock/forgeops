@@ -28,10 +28,20 @@
       <!--    scheme="https" secure="true" - means that we use external ssl termination
       secure="true" proxyPort="443"                 scheme="https"
   -->
+
+    <!-- See https://backstage.forgerock.com/docs/am/5.5/install-guide/#prepare-apache-tomcat
+
+     The URIEncoding should be set to UTF-8.
+
+     See also https://tomcat.apache.org/tomcat-8.0-doc/config/http.html.
+
+     Tomcat 8 should default this to UTF-8, but we set it just to be sure.
+     -->
     <Connector port="8080" protocol="HTTP/1.1"
                maxThreads="400"
                SSLEnabled="false"
                connectionTimeout="20000"
+               URIEncoding="UTF-8"
                redirectPort="8443" />
 
       <!--  We terminate ssl externally
