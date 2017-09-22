@@ -49,7 +49,7 @@ wait_configstore_up() {
 is_configured() {
     echo "Testing if the configuration store is configured with an AM installation"
     test="ou=services,dc=openam,dc=forgerock,dc=org"
-    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5 -b "$test"  > /dev/null 2>&1`
+    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H "ldap://${CONFIGURATION_LDAP}" -D "cn=Directory Manager" -s base -l 5 -b "$test"  > /dev/null 2>&1`
     status=$?
     echo "Is configured exit status is $status"
     return $status
