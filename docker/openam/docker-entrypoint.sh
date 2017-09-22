@@ -6,10 +6,15 @@
 set -x
 DIR=`pwd`
 
+
 command=$1
 
 echo "Command: $command"
 
+# Configuration store LDAP. Defaults to the configuration store stateful set running in the same namespace.
+export CONFIGURATION_LDAP="${CONFIGURATION_LDAP:-configstore-0.configstore:1389}"
+
+# Optional AM web app customization script that can be run before Tomcat starts.
 CUSTOMIZE_AM="${CUSTOMIZE_AM:-/home/forgerock/customize-am.sh}"
 
 pause() {
@@ -21,7 +26,7 @@ pause() {
     done
 }
 
-# Default path to config store directory manager password file. This is mounted by Kube.
+# Default path to config store directory manager password file. This is mounted by Kubernetes.
 DIR_MANAGER_PW_FILE=${DIR_MANAGER_PW_FILE:-/var/run/secrets/configstore/dirmanager.pw}
 
 # Wait until the configuration store comes up. This function will not return until it is up.
@@ -29,10 +34,10 @@ wait_configstore_up() {
     echo "Waiting for the configuration store to come up"
     while true 
     do
-        ldapsearch -y ${DIR_MANAGER_PW_FILE} -H ldap://configstore-0.configstore:1389 -D "cn=Directory Manager" -s base -l 5 > /dev/null 2>&1
+        ldapsearch -y ${DIR_MANAGER_PW_FILE} -H "ldap://${CONFIGURATION_LDAP}" -D "cn=Directory Manager" -s base -l 5 > /dev/null 2>&1
         if [ $? = 0 ]; 
         then
-            echo "Config store is up"
+            echo "Configuration store is up"
             break;
         fi
         sleep 5

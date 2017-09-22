@@ -16,10 +16,13 @@ information on the expected volumes and environment variables.
 * The Dockerfile assumes that the openam.war file is pre-downloaded in this directory.
 
 
-# Customizing the war file
+# Customizing the Web App 
 
-If you wish to customize the war file, there are two strategies that you can use:
+If you wish to customize the AM web app, there are two strategies that you can use:
 
 * Inherit FROM this image, and overlay your changes on /usr/local/tomcat/webapps/openam/
-* Before you start AM, dynamically copy in the changes. This is the strategy used in the Helm charts.
+* Before you start AM, dynamically copy in the changes. This is the strategy used in the Helm charts. Set
+ the CUSTOMIZE_AM variable to the path to a customization script. 
+
+
 
