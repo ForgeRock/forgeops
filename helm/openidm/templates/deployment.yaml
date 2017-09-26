@@ -12,6 +12,9 @@ spec:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
         component: {{ .Values.component }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
     spec:
       initContainers:
       - name: git-init

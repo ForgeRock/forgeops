@@ -63,6 +63,7 @@ if [ "$1" = 'openidm' ]; then
        -Dopenidm.system.server.root=/opt/openidm \
        -Djava.endorsed.dirs= \
        -Djava.awt.headless=true \
+       -Dopenidm.node.id="${NODE_ID}" \
        ${LAUNCHER}  -c /opt/openidm/bin/launcher.json ${CLOPTS}
 fi
 
