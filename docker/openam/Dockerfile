@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 #
-FROM tomcat:8.5.16-jre8-alpine
+FROM tomcat:8.5.21-jre8-alpine
 
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
