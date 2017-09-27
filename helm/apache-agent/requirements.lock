@@ -1,11 +1,6 @@
 dependencies:
-- alias: ""
-  condition: ""
-  enabled: false
-  import-values: null
-  name: frcommon
+- name: frcommon
   repository: file://../frcommon
-  tags: null
   version: 0.1.0
-digest: sha256:98f212888af030d3dafc6f76372f94db1e1226fe1d923a6849035d6d342efd22
-generated: 2017-07-18T12:18:42.932630005-06:00
+digest: sha256:9276d9a5c2cb5eef1446c777d85978a0b91f1625143fab04087d23a5be7aef9c
+generated: 2017-09-27T09:46:43.064499992-06:00
