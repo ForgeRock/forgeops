@@ -19,6 +19,9 @@ global:
   # The domain - including a leading dot '.'.  Product FQDNs are formed using this domain.
   # The format is  {component}.{kube-namespace}.{domain}.  For example: openam.default.example.com
   domain: .example.com
+  # As an alternative to using fake domain names in /etc/hosts, you can use xip.io and your minikube IP address:
+  # domain: .192.168.99.100.xip.io
+  # Git Configuration:
   # Where to pull product configuration, or push it (pushing requires git ssh credentials)
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.

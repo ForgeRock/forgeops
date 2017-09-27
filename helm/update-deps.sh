@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Utility script to update Helm chart dependencies. If you are installing Helm charts from
-# the source in this directory, update the deps before doing a helm install.
+# the source in this directory, update the dependencies before doing a helm install.
 
 for file in *
 do

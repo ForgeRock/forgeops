@@ -1,14 +1,25 @@
 # ForgeRock DevOps and Cloud Deployment 
 
-Note: This is the master (bleeding edge) for the Docker and Kubernetes assets.
+This repository is the master (bleeding edge) for the Docker and Kubernetes DevOps artifacts. The master targets
+features that are still in development and may not be stable.
+
+The DevOps artifacts for the 5.5.0 ForgeRock Identity Platform are on the `release/5.5.0` branch of this repository.
+
+If you have the source checked out from git:
+
+```bash
+git checkout release/5.5.0 
+```
 
 
-See the [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/doc/backstage/devops-guide/index.html)
-for more more information. 
+# Documentation 
 
+The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/doc/backstage/devops-guide/index.html)
+tracks the master branch.
 
-Public access to the documentation for version 5.0.0 of the ForgeRock DevOps 
-Examples is available at https://backstage.forgerock.com/docs/platform/5/devops-guide.
+The documentation for the the 5.5.0 release can be found on 
+[backstage](https://backstage.forgerock.com/docs/platform/5.5/devops-guide)
+as well as the previous [5.0.0 release documentation](https://backstage.forgerock.com/docs/platform/5/devops-guide).
 
 
 # Quick Start
@@ -30,24 +41,37 @@ minikube addon enable ingress
 
 helm init
 
+# Now copy helm/custom.yaml, and edit for your environment. 
+
 cd helm/
+
+# If you want to use the demonstration Helm chart repo, you can use this:
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts/
 helm repo update
 # deploy the AM development example. Deploys AM, amster, and DJ config store.
 # Using forgerock/ as a prefix deploys from the chart repository. For local development use the folder ./cmp-am-dev
-helm install forgerock/cmp-am-dev 
+helm install -f my-custom.yaml forgerock/cmp-am-dev 
+
+# If you running helm charts from this source code:
+./update-deps.sh   
+helm install -f my-custom.yaml cmp-am-dev
+
 
 
 # Or, deploy idm 
-helm install -f cmp-idm-dj-postgres
+helm install -f my-custom.yaml ./cmp-idm-dj-postgres
 
 #Get your minikube ip
 minikube ip
 
-# Put an entry in /etc/hosts like this:
+# You can put DNS entries in an entry in /etc/hosts. For example:
 # 192.168.99.100 openam.default.example.com openidm.default.example.com openig.default.example.com
 
 open http://openam.default.example.com
+
+# Alternartively, if you use something like xip.io, you access AM using the minikube IP:
+
+open http://openam.default.192.168.99.100.xip.io/openam
 
 
 ```

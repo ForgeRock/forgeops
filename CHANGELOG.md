@@ -67,3 +67,8 @@ it makes more sense to move this logic to AM.
 # 2017-09-08
 
 * Add support for customizing the AM war file before AM starts
+
+# 2017-09-27
+
+* Version updates for platform binaries. Documentation updates to prep for release.
+* Add helm/update-deps.sh script to update Helm dependencies for local install.
