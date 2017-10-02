@@ -55,9 +55,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>5.5.0-M17</openamVersion>
-        <opendjVersion>5.5.0-M12</opendjVersion>
-        <openidmVersion>5.5.0-RC11</openidmVersion>
+        <openamVersion>5.5.0-M22</openamVersion>
+        <opendjVersion>5.5.0-RC2</opendjVersion>
+        <openidmVersion>5.5.0-RC12</openidmVersion>
         <openigVersion>5.5.0-M7</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
         <releaseTag>5.5.0</releaseTag>
