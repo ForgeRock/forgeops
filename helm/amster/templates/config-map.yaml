@@ -20,7 +20,7 @@ data:
     --pwdEncKey {{ .Values.encryptionKey }} \
     --acceptLicense \
     --lbSiteName site1 \
-    --lbPrimaryUrl https://{{ template "openamFQDN" . }}/openam \
+    --lbPrimaryUrl {{ if .Values.global.useTLS }}https{{else}}http{{end}}://{{ template "openamFQDN" . }}/openam \
     --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |
