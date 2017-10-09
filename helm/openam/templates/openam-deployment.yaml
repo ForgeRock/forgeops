@@ -71,8 +71,8 @@ spec:
             path: /openam/isAlive.jsp
             port: 8080
           initialDelaySeconds: 60
-          timeoutSeconds: 10
-          periodSeconds: 30
+          timeoutSeconds: {{ .Values.livenessTimeout }}
+          periodSeconds: {{ .Values.livenessPeriod }}
       volumes:
       - name: openam-root
         emptyDir: {}
