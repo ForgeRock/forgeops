@@ -38,7 +38,7 @@
      Tomcat 8 should default this to UTF-8, but we set it just to be sure.
      -->
     <Connector port="8080" protocol="HTTP/1.1"
-               maxThreads="400"
+               maxThreads="1000"
                SSLEnabled="false"
                connectionTimeout="20000"
                URIEncoding="UTF-8"

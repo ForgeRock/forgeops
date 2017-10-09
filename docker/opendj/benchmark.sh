@@ -4,7 +4,7 @@
 
 
 ITERATIONS=1000000
-BASEDN="${BASE_DN:-dc=openam,dc=forgerock,dc=org}"
+BASE_DN="${BASE_DN:-dc=openam,dc=forgerock,dc=org}"
 USERS="${NUMBER_SAMPLE_USERS:-1000000}"
 #HOST=userstore-0.userstore
 HOST=localhost
@@ -21,19 +21,19 @@ time bin/searchrate  -h $HOST -p 1389 -D "cn=directory manager"  -j "${DIR_MANAG
 
 echo  "Authrate  test"
 time bin/authrate -h $HOST -p 1389 -D '%2$s' -w password -f -c "${CONNECTIONS}"  -m $ITERATIONS  \
-    -b "ou=people,$BASEDN" -s one -g "rand(0,$USERS)" "(uid=user.%d)"
+    -b "ou=people,$BASE_DN" -s one -g "rand(0,$USERS)" "(uid=user.%d)"
 
 # modrate - this is destructive!
 echo "Modrate test"
 time bin/modrate -h $HOST -p 1389 -D "cn=directory manager" -j "${DIR_MANAGER_PW_FILE}" \
-    -F -c "${CONNECTIONS}" -t 4 -m $ITERATIONS -b "uid=user.%d,ou=people,$BASEDN" \
+    -F -c "${CONNECTIONS}" -t 4 -m $ITERATIONS -b "uid=user.%d,ou=people,$BASE_DN" \
     -g "rand(0,$USERS)" -g "randstr(16)" 'description:%2$s'
 
 
 
 cat >/tmp/addrate.template  <<EOF
 
-define suffix=$BASEDN
+define suffix=$BASE_DN
 define maildomain=example.com
 
 branch: [suffix]

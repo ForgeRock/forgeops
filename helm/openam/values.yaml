@@ -36,6 +36,13 @@ catalinaOpts: >
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
 
+# For visualVM debug, you can add this to the above:
+#-Dcom.sun.management.jmxremote.port=<port>
+#-Dcom.sun.management.jmxremote.authenticate=false
+#-Dcom.sun.management.jmxremote.ssl=false
+#-Dcom.sun.management.jmxremote.rmi.port=<port>
+#-Djava.rmi.server.hostname=$HOST_HOSTNAME
+
 # Suffix for OpenDJ config store.
 rootSuffix:  "dc=openam,dc=forgerock,dc=org"
 
@@ -61,3 +68,7 @@ createBootstrap: true
 # The path is *relative* to /git/{{ projectDirectory }}/{{ configPath.am }}.
 # For example:   /git/forgeops-init/default/am/my-config/customize-am.sh
 amCustomizationScriptPath: "customize-am.sh"
+
+# Liveness probe tuning - time in seconds
+livenessPeriod: 60
+livenessTimeout: 15
