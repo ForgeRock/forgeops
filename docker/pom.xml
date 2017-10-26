@@ -36,11 +36,11 @@
         <profile>
             <id>snapshot-releases</id>
             <properties>
-                <openamVersion>5.5.0-SNAPSHOT</openamVersion>
-                <opendjVersion>5.5.0-SNAPSHOT</opendjVersion>
-                <openidmVersion>5.5.0-SNAPSHOT</openidmVersion>
-                <openigVersion>5.5.0-SNAPSHOT</openigVersion>
-                <releaseTag>5.5.0-SNAPSHOT</releaseTag>
+                <openamVersion>6.0.0-SNAPSHOT</openamVersion>
+                <opendjVersion>6.0.0-SNAPSHOT</opendjVersion>
+                <openidmVersion>6.0.0-SNAPSHOT</openidmVersion>
+                <openigVersion>6.0.0-SNAPSHOT</openigVersion>
+                <releaseTag>6.0.0-SNAPSHOT</releaseTag>
             </properties>
         </profile>
         <profile>
@@ -55,12 +55,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>5.5.0-M22</openamVersion>
-        <opendjVersion>5.5.0-RC2</opendjVersion>
-        <openidmVersion>5.5.0-RC12</openidmVersion>
-        <openigVersion>5.5.0-M7</openigVersion>
+        <openamVersion>5.5.1</openamVersion>
+        <opendjVersion>5.5.0</opendjVersion>
+        <openidmVersion>5.5.0</openidmVersion>
+        <openigVersion>5.5.0</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
-        <releaseTag>5.5.0</releaseTag>
+        <releaseTag>5.5.1</releaseTag>
         <repo>forgerock</repo>
  </properties>
 
