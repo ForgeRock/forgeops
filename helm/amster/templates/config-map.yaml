@@ -34,7 +34,6 @@ metadata:
   name: amster-{{ .Release.Name }}
 data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
-  GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
   GIT_ROOT:  "/git"
   GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
   EXPORT_PATH: {{  default .Values.global.configPath.am .Values.global.exportPath.am }}

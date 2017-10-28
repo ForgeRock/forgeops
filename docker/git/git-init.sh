@@ -5,6 +5,8 @@ set -x
 GIT_ROOT=${GIT_ROOT:=/git}
 
 GIT_BRANCH=${GIT_CHECKOUT_BRANCH:-master}
+GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
+
 
 
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
@@ -16,9 +18,15 @@ if [ ! -z "${GIT_REPO}" ]; then
     cd ${GIT_ROOT}
     # sometimes the git repo emptyDir does not get cleaned up from a previous run
     rm -fr *
-    git clone -b "${GIT_BRANCH}"  "${GIT_REPO}"
+    git clone "${GIT_REPO}"
     if [ "$?" -ne 0 ]; then
-       echo "git clone failed. Will sleep for 5 min for debugging"
+       echo "git clone failed"
+       exit 1
+    fi
+    cd "${GIT_PROJECT_DIRECTORY}"
+    git checkout "${GIT_BRANCH}"
+    if [ "$?" -ne 0 ]; then
+       echo "git checkout of ${GIT_BRANCH} failed. Will sleep for 5 min for debugging"
        sleep 300
        exit 1
     fi

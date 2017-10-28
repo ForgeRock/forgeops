@@ -72,3 +72,10 @@ it makes more sense to move this logic to AM.
 
 * Version updates for platform binaries. Documentation updates to prep for release.
 * Add helm/update-deps.sh script to update Helm dependencies for local install.
+
+# 2017-10-27 
+
+* Update for 5.5.1 
+* Update git container to enable checking out a specific commit (not just a branch)
+* Update deployment.spec for amster, ig, and openidm so that changes to the git configuration
+will trigger a rolling update. 

@@ -5,6 +5,6 @@ metadata:
 data:
   OPENIG_BASE: "/git/{{ .Values.global.git.projectDirectory}}/{{ .Values.global.configPath.ig }}"
   GIT_REPO: "{{ .Values.global.git.repo }}"
-  GIT_BRANCH: {{ default "master" .Values.global.git.branch }}
-  GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
+  # This moves to the deployment template so that changes to the branch/commit trigger a rolling update.
+  #GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
   GIT_ROOT:  "/git"

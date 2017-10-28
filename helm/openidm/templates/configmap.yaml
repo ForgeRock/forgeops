@@ -5,7 +5,6 @@ metadata:
 data:
   PROJECT_HOME: "/git/{{ .Values.global.git.projectDirectory}}/{{ .Values.global.configPath.idm }}"
   GIT_AUTOSAVE_BRANCH:  autosave-idm-{{ .Release.Namespace }}
-  GIT_CHECKOUT_BRANCH: {{ default "master" .Values.global.git.branch }}
   GIT_REPO: "{{ .Values.global.git.repo }}"
   GIT_ROOT:  "/git"
   GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}

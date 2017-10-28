@@ -29,6 +29,11 @@ spec:
         envFrom:
         - configMapRef:
             name:  {{ template "fullname" . }}
+        env:
+        # This is here so that a change in the git branch or commit triggers a rollout.
+        # See https://github.com/kubernetes/helm/issues/2639
+        - name: GIT_CHECKOUT_BRANCH
+          value: "{{ default "master" .Values.global.git.branch }}"
       containers:
       - name: openidm
         image: {{ template "image"  . }}
