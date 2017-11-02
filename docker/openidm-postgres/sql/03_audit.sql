@@ -7,6 +7,8 @@ CREATE TABLE openidm.auditauthentication (
   activitydate VARCHAR(29) NOT NULL,
   userid VARCHAR(255) DEFAULT NULL,
   eventname VARCHAR(50) DEFAULT NULL,
+  provider VARCHAR(255) DEFAULT NULL,
+  method VARCHAR(15) DEFAULT NULL,
   result VARCHAR(255) DEFAULT NULL,
   principals TEXT,
   context TEXT,
@@ -90,6 +92,8 @@ CREATE TABLE openidm.auditactivity (
   subjectrev VARCHAR(255) DEFAULT NULL,
   passwordchanged VARCHAR(5) DEFAULT NULL,
   message TEXT,
+  provider VARCHAR(255) DEFAULT NULL,
+  context VARCHAR(25) DEFAULT NULL,
   status VARCHAR(20),
   PRIMARY KEY (objectid)
 );

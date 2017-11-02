@@ -131,6 +131,11 @@ CREATE TABLE openidm.relationships (
   objectid VARCHAR(255) NOT NULL,
   rev VARCHAR(38) NOT NULL,
   fullobject JSON,
+  firstid VARCHAR(255),
+  secondid VARCHAR(255),
+  firstpropertyname VARCHAR(100),
+  secondpropertyname VARCHAR(100),
+  properties JSON,
   PRIMARY KEY (id),
   CONSTRAINT fk_relationships_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT idx_relationships_object UNIQUE (objecttypes_id, objectid)
@@ -138,6 +143,8 @@ CREATE TABLE openidm.relationships (
 
 CREATE INDEX idx_json_relationships_first ON openidm.relationships ( json_extract_path_text(fullobject, 'firstId'), json_extract_path_text(fullobject, 'firstPropertyName') );
 CREATE INDEX idx_json_relationships_second ON openidm.relationships ( json_extract_path_text(fullobject, 'secondId'), json_extract_path_text(fullobject, 'secondPropertyName') );
+CREATE INDEX idx_json_relationships_first_object ON openidm.relationships ( firstid, firstpropertyname );
+CREATE INDEX idx_json_relationships_second_object ON openidm.relationships ( secondid, secondpropertyname );
 CREATE INDEX idx_json_relationships ON openidm.relationships ( json_extract_path_text(fullobject, 'firstId'), json_extract_path_text(fullobject, 'firstPropertyName'), json_extract_path_text(fullobject, 'secondId'), json_extract_path_text(fullobject, 'secondPropertyName') );
 
 -- -----------------------------------------------------
@@ -173,16 +180,6 @@ CREATE TABLE openidm.links (
 CREATE UNIQUE INDEX idx_links_first ON openidm.links (linktype, linkqualifier, firstid);
 CREATE UNIQUE INDEX idx_links_second ON openidm.links (linktype, linkqualifier, secondid);
 
--- -----------------------------------------------------
--- Table openidm.securitykeys
--- -----------------------------------------------------
-
-CREATE TABLE openidm.securitykeys (
-  objectid VARCHAR(38) NOT NULL,
-  rev VARCHAR(38) NOT NULL,
-  keypair TEXT,
-  PRIMARY KEY (objectid)
-);
 
 -- -----------------------------------------------------
 -- Table openidm.internaluser
@@ -252,8 +249,8 @@ CREATE TABLE openidm.uinotification (
   createDate VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
   requester VARCHAR(255) NULL,
-  receiverId VARCHAR(38) NOT NULL,
-  requesterId VARCHAR(38) NULL,
+  receiverId VARCHAR(255) NOT NULL,
+  requesterId VARCHAR(255) NULL,
   notificationSubtype VARCHAR(255) NULL,
   PRIMARY KEY (objectid)
 );
@@ -300,12 +297,11 @@ CREATE TABLE openidm.clusteredrecontargetids (
   objectid VARCHAR(38) NOT NULL,
   rev VARCHAR(38) NOT NULL,
   reconid VARCHAR(255) NOT NULL,
-  targetid VARCHAR(255) NOT NULL,
+  targetids JSON NOT NULL,
   PRIMARY KEY (objectid)
 );
 
 CREATE INDEX idx_clusteredrecontargetids_reconid ON openidm.clusteredrecontargetids (reconid);
-CREATE INDEX idx_clusteredrecontargetids_reconid_targetid ON openidm.clusteredrecontargetids (reconid, targetid);
 
 -- -----------------------------------------------------
 -- Table openidm.updateobjects

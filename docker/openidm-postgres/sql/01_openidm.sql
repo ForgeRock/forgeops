@@ -40,6 +40,7 @@ CREATE TABLE openidm.genericobjectproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(32) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (genericobjects_id, propkey),
   CONSTRAINT fk_genericobjectproperties_genericobjects FOREIGN KEY (genericobjects_id) REFERENCES openidm.genericobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 CREATE INDEX fk_genericobjectproperties_genericobjects ON openidm.genericobjectproperties (genericobjects_id);
@@ -77,6 +78,7 @@ CREATE TABLE openidm.managedobjectproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(32) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (managedobjects_id, propkey),
   CONSTRAINT fk_managedobjectproperties_managedobjects FOREIGN KEY (managedobjects_id) REFERENCES openidm.managedobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -112,6 +114,7 @@ CREATE TABLE openidm.configobjectproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(255) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (configobjects_id, propkey),
   CONSTRAINT fk_configobjectproperties_configobjects FOREIGN KEY (configobjects_id) REFERENCES openidm.configobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -128,6 +131,11 @@ CREATE TABLE openidm.relationships (
   objectid VARCHAR(255) NOT NULL,
   rev VARCHAR(38) NOT NULL,
   fullobject JSON,
+  firstid VARCHAR(255),
+  secondid VARCHAR(255),
+  firstpropertyname VARCHAR(100),
+  secondpropertyname VARCHAR(100),
+  properties JSON,
   PRIMARY KEY (id),
   CONSTRAINT fk_relationships_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT idx_relationships_object UNIQUE (objecttypes_id, objectid)
@@ -135,6 +143,9 @@ CREATE TABLE openidm.relationships (
 
 CREATE INDEX idx_json_relationships_first ON openidm.relationships ( json_extract_path_text(fullobject, 'firstId'), json_extract_path_text(fullobject, 'firstPropertyName') );
 CREATE INDEX idx_json_relationships_second ON openidm.relationships ( json_extract_path_text(fullobject, 'secondId'), json_extract_path_text(fullobject, 'secondPropertyName') );
+CREATE INDEX idx_json_relationships_first_object ON openidm.relationships ( firstid, firstpropertyname );
+CREATE INDEX idx_json_relationships_second_object ON openidm.relationships ( secondid, secondpropertyname );
+CREATE INDEX idx_json_relationships ON openidm.relationships ( json_extract_path_text(fullobject, 'firstId'), json_extract_path_text(fullobject, 'firstPropertyName'), json_extract_path_text(fullobject, 'secondId'), json_extract_path_text(fullobject, 'secondPropertyName') );
 
 -- -----------------------------------------------------
 -- Table openidm.relationshipproperties (not used in postgres)
@@ -145,6 +156,7 @@ CREATE TABLE openidm.relationshipproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(32) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (relationships_id, propkey),
   CONSTRAINT fk_relationshipproperties_relationships FOREIGN KEY (relationships_id) REFERENCES openidm.relationships (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 CREATE INDEX fk_relationshipproperties_relationships ON openidm.relationshipproperties (relationships_id);
@@ -167,169 +179,6 @@ CREATE TABLE openidm.links (
 
 CREATE UNIQUE INDEX idx_links_first ON openidm.links (linktype, linkqualifier, firstid);
 CREATE UNIQUE INDEX idx_links_second ON openidm.links (linktype, linkqualifier, secondid);
-
--- -----------------------------------------------------
--- Table openidm.securitykeys
--- -----------------------------------------------------
-
-CREATE TABLE openidm.securitykeys (
-  objectid VARCHAR(38) NOT NULL,
-  rev VARCHAR(38) NOT NULL,
-  keypair TEXT,
-  PRIMARY KEY (objectid)
-);
-
--- -----------------------------------------------------
--- Table openidm.auditauthentication
--- -----------------------------------------------------
-CREATE TABLE openidm.auditauthentication (
-  objectid VARCHAR(56) NOT NULL,
-  transactionid VARCHAR(255) NOT NULL,
-  activitydate VARCHAR(29) NOT NULL,
-  userid VARCHAR(255) DEFAULT NULL,
-  eventname VARCHAR(50) DEFAULT NULL,
-  result VARCHAR(255) DEFAULT NULL,
-  principals TEXT,
-  context TEXT,
-  entries TEXT,
-  trackingids TEXT,
-  PRIMARY KEY (objectid)
-);
-
--- -----------------------------------------------------
--- Table openidm.auditaccess
--- -----------------------------------------------------
-
-CREATE TABLE openidm.auditaccess (
-  objectid VARCHAR(56) NOT NULL,
-  activitydate VARCHAR(29) NOT NULL,
-  eventname VARCHAR(255),
-  transactionid VARCHAR(255) NOT NULL,
-  userid VARCHAR(255) DEFAULT NULL,
-  trackingids TEXT,
-  server_ip VARCHAR(40),
-  server_port VARCHAR(5),
-  client_ip VARCHAR(40),
-  client_port VARCHAR(5),
-  request_protocol VARCHAR(255) NULL ,
-  request_operation VARCHAR(255) NULL ,
-  request_detail TEXT NULL ,
-  http_request_secure VARCHAR(255) NULL ,
-  http_request_method VARCHAR(255) NULL ,
-  http_request_path VARCHAR(255) NULL ,
-  http_request_queryparameters TEXT NULL ,
-  http_request_headers TEXT NULL ,
-  http_request_cookies TEXT NULL ,
-  http_response_headers TEXT NULL ,
-  response_status VARCHAR(255) NULL ,
-  response_statuscode VARCHAR(255) NULL ,
-  response_elapsedtime VARCHAR(255) NULL ,
-  response_elapsedtimeunits VARCHAR(255) NULL ,
-  response_detail TEXT NULL ,
-  roles TEXT NULL ,
-  PRIMARY KEY (objectid)
-);
-
--- -----------------------------------------------------
--- Table openidm.auditconfig
--- -----------------------------------------------------
-
-CREATE TABLE openidm.auditconfig (
-  objectid VARCHAR(56) NOT NULL,
-  activitydate VARCHAR(29) NOT NULL,
-  eventname VARCHAR(255) DEFAULT NULL,
-  transactionid VARCHAR(255) NOT NULL,
-  userid VARCHAR(255) DEFAULT NULL,
-  trackingids TEXT,
-  runas VARCHAR(255) DEFAULT NULL,
-  configobjectid VARCHAR(255) NULL ,
-  operation VARCHAR(255) NULL ,
-  beforeObject TEXT,
-  afterObject TEXT,
-  changedfields TEXT DEFAULT NULL,
-  rev VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (objectid)
-);
-
--- -----------------------------------------------------
--- Table openidm.auditactivity
--- -----------------------------------------------------
-
-CREATE TABLE openidm.auditactivity (
-  objectid VARCHAR(56) NOT NULL,
-  activitydate VARCHAR(29) NOT NULL,
-  eventname VARCHAR(255) DEFAULT NULL,
-  transactionid VARCHAR(255) NOT NULL,
-  userid VARCHAR(255) DEFAULT NULL,
-  trackingids TEXT,
-  runas VARCHAR(255) DEFAULT NULL,
-  activityobjectid VARCHAR(255) NULL ,
-  operation VARCHAR(255) NULL ,
-  subjectbefore TEXT,
-  subjectafter TEXT,
-  changedfields TEXT DEFAULT NULL,
-  subjectrev VARCHAR(255) DEFAULT NULL,
-  passwordchanged VARCHAR(5) DEFAULT NULL,
-  message TEXT,
-  status VARCHAR(20),
-  PRIMARY KEY (objectid)
-);
-
--- -----------------------------------------------------
--- Table openidm.auditrecon
--- -----------------------------------------------------
-
-CREATE TABLE openidm.auditrecon (
-  objectid VARCHAR(56) NOT NULL,
-  transactionid VARCHAR(255) NOT NULL,
-  activitydate VARCHAR(29) NOT NULL,
-  eventname VARCHAR(50) DEFAULT NULL,
-  userid VARCHAR(255) DEFAULT NULL,
-  trackingids TEXT,
-  activity VARCHAR(24) DEFAULT NULL,
-  exceptiondetail TEXT,
-  linkqualifier VARCHAR(255) DEFAULT NULL,
-  mapping VARCHAR(511) DEFAULT NULL,
-  message TEXT,
-  messagedetail TEXT,
-  situation VARCHAR(24) DEFAULT NULL,
-  sourceobjectid VARCHAR(511) DEFAULT NULL,
-  status VARCHAR(20) DEFAULT NULL,
-  targetobjectid VARCHAR(511) DEFAULT NULL,
-  reconciling VARCHAR(12) DEFAULT NULL,
-  ambiguoustargetobjectids TEXT,
-  reconaction VARCHAR(36) DEFAULT NULL,
-  entrytype VARCHAR(7) DEFAULT NULL,
-  reconid VARCHAR(56) DEFAULT NULL,
-  PRIMARY KEY (objectid)
-);
-
-CREATE INDEX idx_auditrecon_reconid ON openidm.auditrecon (reconid);
-CREATE INDEX idx_auditrecon_entrytype ON openidm.auditrecon (entrytype);
-
--- -----------------------------------------------------
--- Table openidm.auditsync
--- -----------------------------------------------------
-
-CREATE TABLE openidm.auditsync (
-  objectid VARCHAR(56) NOT NULL,
-  transactionid VARCHAR(255) NOT NULL,
-  activitydate VARCHAR(29) NOT NULL,
-  eventname VARCHAR(50) DEFAULT NULL,
-  userid VARCHAR(255) DEFAULT NULL,
-  trackingids TEXT,
-  activity VARCHAR(24) DEFAULT NULL,
-  exceptiondetail TEXT,
-  linkqualifier VARCHAR(255) DEFAULT NULL,
-  mapping VARCHAR(511) DEFAULT NULL,
-  message TEXT,
-  messagedetail TEXT,
-  situation VARCHAR(24) DEFAULT NULL,
-  sourceobjectid VARCHAR(511) DEFAULT NULL,
-  status VARCHAR(20) DEFAULT NULL,
-  targetobjectid VARCHAR(511) DEFAULT NULL,
-  PRIMARY KEY (objectid)
-);
 
 
 -- -----------------------------------------------------
@@ -382,6 +231,7 @@ CREATE TABLE openidm.schedulerobjectproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(32) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (schedulerobjects_id, propkey),
   CONSTRAINT fk_schedulerobjectproperties_schedulerobjects FOREIGN KEY (schedulerobjects_id) REFERENCES openidm.schedulerobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -399,11 +249,12 @@ CREATE TABLE openidm.uinotification (
   createDate VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
   requester VARCHAR(255) NULL,
-  receiverId VARCHAR(38) NOT NULL,
-  requesterId VARCHAR(38) NULL,
+  receiverId VARCHAR(255) NOT NULL,
+  requesterId VARCHAR(255) NULL,
   notificationSubtype VARCHAR(255) NULL,
   PRIMARY KEY (objectid)
 );
+CREATE INDEX idx_uinotification_receiverId ON openidm.uinotification (receiverId);
 
 
 -- -----------------------------------------------------
@@ -431,12 +282,26 @@ CREATE TABLE openidm.clusterobjectproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(32) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (clusterobjects_id, propkey),
   CONSTRAINT fk_clusterobjectproperties_clusterobjects FOREIGN KEY (clusterobjects_id) REFERENCES openidm.clusterobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 CREATE INDEX fk_clusterobjectproperties_clusterobjects ON openidm.clusterobjectproperties (clusterobjects_id);
 CREATE INDEX idx_clusterobjectproperties_prop ON openidm.clusterobjectproperties (propkey,propvalue);
 
+-- -----------------------------------------------------
+-- Table openidm.clusteredrecontargetids
+-- -----------------------------------------------------
+
+CREATE TABLE openidm.clusteredrecontargetids (
+  objectid VARCHAR(38) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  reconid VARCHAR(255) NOT NULL,
+  targetids JSON NOT NULL,
+  PRIMARY KEY (objectid)
+);
+
+CREATE INDEX idx_clusteredrecontargetids_reconid ON openidm.clusteredrecontargetids (reconid);
 
 -- -----------------------------------------------------
 -- Table openidm.updateobjects
@@ -464,6 +329,7 @@ CREATE TABLE openidm.updateobjectproperties (
   propkey VARCHAR(255) NOT NULL,
   proptype VARCHAR(32) DEFAULT NULL,
   propvalue TEXT,
+  PRIMARY KEY (updateobjects_id, propkey),
   CONSTRAINT fk_updateobjectproperties_updateobjects FOREIGN KEY (updateobjects_id) REFERENCES openidm.updateobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 CREATE INDEX fk_updateobjectproperties_updateobjects ON openidm.updateobjectproperties (updateobjects_id);

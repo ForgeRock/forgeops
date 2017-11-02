@@ -7,6 +7,8 @@
 
 set -x
 rm -fr /tmp/openidm
+rm -fr /tmp/helm
+
 unzip openidm/openidm.zip -d /tmp/
 
 TMP_PG=/tmp/openidm/db/postgresql/scripts
@@ -17,8 +19,8 @@ target=/tmp/helm
 mkdir -p $target
 
 
-cp $TMP_PG/openidm.pgsql $target/01_init.sql
-cp $TMP_PG/default_schema_optimization.pgsql $target/02_optimize.sql
+cp $TMP_PG/openidm.pgsql $target/01_openidm.sql
+cp $TMP_PG/default_schema_optimization.pgsql $target/02_default_schema_optimization.sql
 cp $TMP_PG/audit.pgsql $target/03_audit.sql
 
 cp $TMP_PG/activiti.postgres.create.*.sql  $target
@@ -27,5 +29,5 @@ cp $target/*  ../helm/postgres-openidm/sql
 cp $target/*  openidm-postgres/sql
 
 rm -fr $target
-rm -fr /tmp/openidm
+# rm -fr /tmp/openidm
 
