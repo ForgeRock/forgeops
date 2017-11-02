@@ -1,5 +1,7 @@
 #!/bin/sh
 # Docker entry point for OpenIDM.
+set -x
+
 
 if [ "$1" = 'openidm' ]; then
   
@@ -27,9 +29,8 @@ if [ "$1" = 'openidm' ]; then
 
    # If secrets keystore is present copy files from the secrets directory to the standard location.
    if [ -r secrets/keystore.jceks ]; then
-	    cp secrets/*  security
-
-	    #chown -R openidm:openidm security
+        echo "Copying Keystores"
+	    cp -L secrets/*  security
    fi
 
     if [ -r ${BOOT_PROPERTIES} ]; then
