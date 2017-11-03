@@ -1,24 +1,23 @@
 dependencies:
 - name: openam 
-  version: 0.1.0
-  #repository: https://storage.googleapis.com/forgerock-charts/
+  version: ">0.0.0"
   repository: file://../openam
 - name: amster 
-  version: 0.1.1
+  version: ">0.0.0"
   #repository: https://storage.googleapis.com/forgerock-charts/
   repository: file://../amster
 - name: opendj
-  version:  0.2.2
+  version: ">0.0.0"
   #repository: https://storage.googleapis.com/forgerock-charts
   repository: file://../opendj
   alias: userstore
 - name: opendj
-  version:  0.2.2
+  version: ">0.0.0"
   #repository: https://storage.googleapis.com/forgerock-charts
   repository: file://../opendj
   alias: ctsstore
 - name: opendj
-  version:  0.2.2
+  version: ">0.0.0"
   #repository: https://storage.googleapis.com/forgerock-charts
   repository: file://../opendj
   alias: configstore

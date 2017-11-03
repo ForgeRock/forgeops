@@ -1,18 +1,18 @@
 dependencies:
 - name: openam
   repository: file://../openam
-  version: 0.1.0
+  version: 6.0.0
 - name: amster
   repository: file://../amster
-  version: 0.1.1
+  version: 6.0.0
 - name: opendj
   repository: file://../opendj
-  version: 0.2.2
+  version: 6.0.0
 - name: opendj
   repository: file://../opendj
-  version: 0.2.2
+  version: 6.0.0
 - name: opendj
   repository: file://../opendj
-  version: 0.2.2
-digest: sha256:a00d4d4f7909159b13b7094c99bf9c8a6c6c3dce78fe21699cb4c9b8c1e7b612
-generated: 2017-08-11T10:05:19.947822601-06:00
+  version: 6.0.0
+digest: sha256:f5cf397c9ecb8a47b4cd0341594f435bc4bd6957614904f1cb7ecb5a79fcf93e
+generated: 2017-11-02T18:00:00.393681-06:00
