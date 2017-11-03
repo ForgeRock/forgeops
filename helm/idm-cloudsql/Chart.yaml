@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Deploy IDM using a Cloud SQL postgres database.
 name: idm-cloudsql
-version: 0.1.0
+version: 5.5.0

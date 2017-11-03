@@ -1,4 +1,4 @@
 apiVersion: v1
 description: A common ForgeRock chart. This contains utility template functions used by other charts.
 name: frcommon
-version: 0.1.0
+version: 5.5.0

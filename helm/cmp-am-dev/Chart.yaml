@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Composite Helm Chart that deploys OpenAM, amster and a separate DJ config store
 name: cmp-am-dev
-version: 0.1.0
+version: 5.5.0

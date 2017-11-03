@@ -1,4 +1,4 @@
 apiVersion: v1
 description: Composite chart to deploy IDM, Postgres repo db and a DJ userstore
 name: cmp-idm-dj-postgres
-version: 0.1.1
+version: 5.5.0
