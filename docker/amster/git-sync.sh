@@ -3,8 +3,7 @@
 
 set -x
 # Top level directory where git projects will be cloned to.
-GIT_ROOT=${GIT_ROOT:=/git}
-GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
+GIT_ROOT=${GIT_ROOT:=/git/config}
 
 
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave-am}"
@@ -12,7 +11,7 @@ GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave-am}"
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
 
-cd "${GIT_ROOT}/${GIT_PROJECT_DIRECTORY}"
+cd "${GIT_ROOT}"
 
 # This configures git to ignore file mode changes.
 git config core.filemode false

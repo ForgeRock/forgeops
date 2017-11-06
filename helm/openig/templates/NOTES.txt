@@ -13,3 +13,7 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl port-forward $POD_NAME 8080:{{ .Values.service.internalPort }}
 {{- end }}
+
+
+If you have an ingress controller, you can also access IG at
+http://{{ template "externalFQDN" . }}

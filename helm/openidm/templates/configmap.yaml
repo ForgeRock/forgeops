@@ -3,11 +3,9 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  PROJECT_HOME: "/git/{{ .Values.global.git.projectDirectory}}/{{ .Values.global.configPath.idm }}"
   GIT_AUTOSAVE_BRANCH:  autosave-idm-{{ .Release.Namespace }}
   GIT_REPO: "{{ .Values.global.git.repo }}"
-  GIT_ROOT:  "/git"
-  GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
+  CONFIG_PATH: "{{ .Values.global.configPath.idm }}"
   SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
 
 ---
@@ -23,6 +21,10 @@ data:
       openidm.repo.password={{.Values.openidm.repo.password}}
       openidm.repo.databaseName={{.Values.openidm.repo.databaseName}}
       openidm.repo.schema={{.Values.openidm.repo.schema}}
+
+      # Client password for IDM/AM integration
+      openidm.idpconfig.clientsecret={{ .Values.openidm.idpconfig.clientsecret }}
+
 
       # Use a variable for our ldap host & password
       userstore.host={{.Values.userstore.host}}

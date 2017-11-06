@@ -79,3 +79,8 @@ it makes more sense to move this logic to AM.
 * Update git container to enable checking out a specific commit (not just a branch)
 * Update deployment.spec for amster, ig, and openidm so that changes to the git configuration
 will trigger a rolling update. 
+
+# 2017-11-06 
+* Remove use of the projectDirectory. Git configuration is now checked out to a fixed directory /git/config
+* update default build tag to 6.0.0-SNAPSHOT
+* Add idm/am integration variable openidm.idpconfig.clientsecret.

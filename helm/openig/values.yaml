@@ -17,7 +17,6 @@ global:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
-    projectDirectory: forgeops-init
   configPath:
     ig: default/ig/basic-sample
   # If you set this to true, you must have a TLS secret with the same name as the FQDN

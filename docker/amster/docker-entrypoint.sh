@@ -4,21 +4,9 @@
 #
 
 set -x
-DIR=`pwd`
-
-CONFIG_ROOT=${CONFIG_ROOT:-"${DIR}/git"}
-# Path to script location - this is *not* the path to the amster/*.json config files - it is the path
-# to  *.amster scripts.
-AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}
-
 
 pause() {
     echo "Args are $# "
-
-    if [ -x /opt/forgerock/frconfigsrv ]; then
-        echo "Running frconfig"
-        /opt/forgerock/frconfigsrv
-    fi
 
     echo "Container will now pause. You can use kubectl exec to run export.sh"
     # Sleep forever, waiting for someone to exec into the container.

@@ -20,7 +20,6 @@ global:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
-    projectDirectory: "forgeops-init"
   configPath:
     idm: default/idm/sync-with-ldap-bidirectional
 
@@ -33,6 +32,9 @@ openidm:
     password: openidm
     schema: openidm
     databaseName: openidm
+  # Optional client secret for AM/IDM integration:
+  idpconfig:
+    clientsecret: password
 
 # Optional - if there is a DJ userstore configured
 userstore:
@@ -61,5 +63,4 @@ component: openidm
 
 # Values: filebeat, none
 logDriver: none
-
 

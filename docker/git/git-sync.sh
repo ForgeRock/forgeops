@@ -2,9 +2,6 @@
 # Sync git configuration upstream. This assumes that the git project has already been cloned.
 
 set -x
-# Top level directory where git projects will be cloned to.
-GIT_ROOT=${GIT_ROOT:=/git}
-GIT_PROJECT_DIRECTORY="${GIT_PROJECT_DIRECTORY:-forgeops-init}"
 
 
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave}"
@@ -13,7 +10,7 @@ GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave}"
 export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
 
-cd "${GIT_ROOT}/${GIT_PROJECT_DIRECTORY}"
+cd "${GIT_ROOT}"
 
 # This configures git to ignore file mode changes.
 git config core.filemode false
@@ -21,8 +18,9 @@ git config user.email "auto-sync@forgerock.net"
 git config user.name "Git Auto-sync user"
 
 
-git checkout -B ${GIT_AUTOSAVE_BRANCH}
+git checkout -B "${GIT_AUTOSAVE_BRANCH}"
 
+# todo: Consider adding back in an optional sleep/loop feature.
 t=`date`
 git add .
 git commit -a -m "autosave at $t"

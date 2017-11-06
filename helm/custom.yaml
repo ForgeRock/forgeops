@@ -26,7 +26,7 @@ global:
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-    projectDirectory: "forgeops-init"
+    # branch can be a git branch or a sha commit:
     branch: master
     # This is a base64 encoded ssh private key for git authentication, required for pulling from
     # private git repos, or pushing to a git repo. The value below is not a real ssh key and will not work.

@@ -15,14 +15,7 @@ pause() {
     done
 }
 
-# This is as of yet an experimental (unpublished) service that syncs configuration.
-# You can replace this with your own binary
-frsync () {
-    if [ -x /opt/forgerock/frconfigsrv ]; then
-        echo "Running frconfig service"
-        /opt/forgerock/frconfigsrv
-    fi
-}
+
 
 case "$1" in
 "init")
@@ -36,10 +29,6 @@ case "$1" in
      exec /git-sync.sh
     ;;
 "pause")
-    pause
-    ;;
-"frsync")
-    frsync
     pause
     ;;
 *)

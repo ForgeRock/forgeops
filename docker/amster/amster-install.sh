@@ -4,8 +4,6 @@
 
 DIR=`pwd`
 
-CONFIG_ROOT=${CONFIG_ROOT:-"${DIR}/git"}
-
 # Path to script location - this is *not* the path to the amster/*.json config files - it is the path
 # to  *.amster scripts.
 AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}

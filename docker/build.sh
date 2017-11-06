@@ -11,7 +11,7 @@
 REGISTRY=""
 REPO=${REPO:-forgerock}
 # Default tag if none is specified.
-TAG=${TAG:-5.5.1}
+TAG=${TAG:-6.0.0-SNAPSHOT}
 
 # If you want to push to Google gcr.io, replace the repository name with your project name.
 PROJECT="engineering-devops"

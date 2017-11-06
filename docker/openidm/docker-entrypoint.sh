@@ -2,11 +2,16 @@
 # Docker entry point for OpenIDM.
 set -x
 
+export GIT_ROOT="${GIT_ROOT:-/git/config}"
+
+# Path *relative* to GIT_ROOT to the IDM configuration.
+CONFIG_PATH="${CONFIG_PATH:-default/idm/sync-with-ldap-bidirectional}"
+
+echo $CONFIG_PATH
 
 if [ "$1" = 'openidm' ]; then
   
-    PROJECT_HOME="${PROJECT_HOME:-/opt/openidm}"
-
+    PROJECT_HOME="${GIT_ROOT}/${CONFIG_PATH}"
 
     if [ -z "$LOGGING_CONFIG" ]; then
       if [ -n "$PROJECT_HOME" -a -r "$PROJECT_HOME"/conf/logging.properties ]; then
@@ -20,7 +25,6 @@ if [ "$1" = 'openidm' ]; then
 
    HOSTNAME=`hostname`
    NODE_ID=${HOSTNAME}
-
 
     # Optional boot.properties file.
     # If this file is present it will override $PROJECT_HOME/conf/boot.properties
