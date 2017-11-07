@@ -25,6 +25,9 @@ data:
       openidm.repo.databaseName={{.Values.openidm.repo.databaseName}}
       openidm.repo.schema={{.Values.openidm.repo.schema}}
 
+      # Client password for IDM/AM integration
+      openidm.idpconfig.clientsecret={{ .Values.openidm.idpconfig.clientsecret }}
+
       # Use a variable for our ldap host & password
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}

@@ -33,6 +33,9 @@ openidm:
     password: openidm
     schema: openidm
     databaseName: openidm
+  # Optional client secret for AM/IDM integration:
+  idpconfig:
+    clientsecret: password
 
 # Optional - if there is a DJ userstore configured
 userstore:
