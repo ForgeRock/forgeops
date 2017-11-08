@@ -54,6 +54,8 @@ resources:
     memory: 1024Mi
 
 
+# Set this to true if you want to include a psql sidecar container in the pod for debugging purposes.
+debug: false
 
 # Values: filebeat, none
 logDriver: none

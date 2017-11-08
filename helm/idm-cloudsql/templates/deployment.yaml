@@ -86,10 +86,12 @@ spec:
           mountPath: /etc/git-secret
         - name: boot-properties
           mountPath: /var/run/openidm
-      # For debug
+      {{ if .Values.debug }}
+      # sidecar with psqsl client for debugging the database.
       - name: psql
         image: postgres:9.6.3
         args: ["sh", "-c", "sleep 1000000"]
+      {{ end }}
       volumes:
       - name: openidm-secrets
         secret:

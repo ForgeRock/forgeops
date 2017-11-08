@@ -24,7 +24,7 @@
 
     <groupId>org.forgerock.docker</groupId>
     <artifactId>docker</artifactId>
-    <version>5.5.0</version>
+    <version>6.0.0</version>
     <packaging>pom</packaging>
 
     <description>
@@ -51,16 +51,18 @@
         </profile>
     </profiles>
 
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
         <openamVersion>5.5.1</openamVersion>
         <opendjVersion>5.5.0</opendjVersion>
-        <openidmVersion>5.5.0</openidmVersion>
-        <openigVersion>5.5.0</openigVersion>
+        <!-- The IDM configuration for 6.0.0 must
+        align with the 6.0.0 forgeops-init. Replace this with a milestone when available.
+        -->
+        <openidmVersion>6.0.0-SNAPSHOT</openidmVersion>
+        <openigVersion>6.0.0-M1</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
-        <releaseTag>5.5.1</releaseTag>
+        <releaseTag>6.0.0</releaseTag>
         <repo>forgerock</repo>
  </properties>
 
