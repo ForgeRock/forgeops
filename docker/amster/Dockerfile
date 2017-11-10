@@ -24,6 +24,8 @@ RUN mkdir -p /opt/forgerock/.ssh  && \
     ssh-keyscan -p 7999 stash.forgerock.org >> ~/.ssh/known_hosts && \
     ssh-keyscan github.com >> ~/.ssh/known_hosts
 
+ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/id_rsa
+
 
 ENTRYPOINT ["/opt/amster/docker-entrypoint.sh"]
 

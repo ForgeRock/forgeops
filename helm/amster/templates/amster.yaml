@@ -75,6 +75,6 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName: git-amster-{{ .Release.Name }}
+          secretName: git-ssh-key
           # The forgerock user needs read access to this secret
           #defaultMode: 256

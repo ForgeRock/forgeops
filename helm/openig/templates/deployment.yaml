@@ -67,6 +67,6 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName:  {{ template "fullname" . }}
+          secretName:  git-ssh-key
           # The forgerock user needs to be able to read this file.
           #defaultMode: 256

@@ -32,6 +32,9 @@ WORKDIR /opt/openidm
 
 USER forgerock
 
+ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/id_rsa
+
+
 ENTRYPOINT ["/opt/openidm/docker-entrypoint.sh"]
 
 CMD ["openidm"]

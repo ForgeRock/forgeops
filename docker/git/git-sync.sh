@@ -3,11 +3,7 @@
 
 set -x
 
-
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave}"
-
-
-export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
 
 cd "${GIT_ROOT}"

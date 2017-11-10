@@ -3,5 +3,6 @@
 # TODO: Not clear if the initializer stuff is still needed for 1.8
 
 minikube start \
---extra-config=apiserver.Authorization.Mode=RBAC \
---extra-config=apiserver.Admission.PluginNames="Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,GenericAdmissionWebhook,ResourceQuota"
+--extra-config=apiserver.Admission.PluginNames="Initializers,NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,GenericAdmissionWebhook,ResourceQuota,PodPreset"
+
+# --extra-config=apiserver.Authorization.Mode=RBAC \

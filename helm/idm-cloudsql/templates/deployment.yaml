@@ -105,7 +105,7 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName:  git-idm-{{ .Release.Name }}
+          secretName:  git-ssh-key
           # This gets mounted as root, so we need to open up the permissions for the forgerock user to read it
           # defaultMode: 256
       - name: boot-properties

@@ -5,8 +5,8 @@ set -x
 
 GIT_BRANCH=${GIT_CHECKOUT_BRANCH:-master}
 
+ls -lR /etc/git-secret
 
-export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
 # If GIT_REPO is defined, clone the configuration repo
 

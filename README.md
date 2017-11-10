@@ -23,7 +23,12 @@ as well as the previous [5.0.0 release documentation](https://backstage.forgeroc
 
 
 # Quick Start
- 
+
+There is now a sample "bootstrap" script. See bin/bootstrap.sh. The bootstrap
+script uses a toolbox docker image that contains the helm and kubectl commands and can bring up the
+platform. See the etc/toolbox.yaml for an example of how this works.
+
+
 * Knowledge of Kubernetes and Helm is assumed. Please read 
 the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/index.md) before proceeding.
 * This assumes minikube is running (8G of RAM), and helm and kubectl are installed. 

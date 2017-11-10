@@ -14,7 +14,7 @@ RUN apk add --no-cache git bash vim openssh-client \
 # GIT_ROOT is where git config is cloned to. Don't change this unless you know what you are doing.
 ENV GIT_ROOT /git/config
 # The ssh command to use for authenticated git operations.
-ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
+ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/id_rsa
 
 ADD *.sh  /
 

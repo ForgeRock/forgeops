@@ -54,7 +54,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>5.5.1</openamVersion>
+        <openamVersion>6.0.0-M2</openamVersion>
         <opendjVersion>5.5.0</opendjVersion>
         <!-- The IDM configuration for 6.0.0 must
         align with the 6.0.0 forgeops-init. Replace this with a milestone when available.
@@ -177,8 +177,6 @@
                                 </tags>
                             </build>
                         </image>
-                        <!--
-                        This is not used right now, we skip the build
                         <image>
                             <name>${repo}/toolbox</name>
                             <build>
@@ -188,8 +186,7 @@
                                 </tags>
                             </build>
                         </image>
-                        -->
-                         <image>
+                        <image>
                             <name>${repo}/git</name>
                             <build>
                                 <dockerFileDir>git</dockerFileDir>

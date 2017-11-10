@@ -28,16 +28,6 @@ global:
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     # branch can be a git branch or a sha commit:
     branch: master
-    # This is a base64 encoded ssh private key for git authentication, required for pulling from
-    # private git repos, or pushing to a git repo. The value below is not a real ssh key and will not work.
-    # You need to replace this with your own ssh key. If you are just cloning http:// public repos that do not require
-    # authentication, this variable can be ignored.  If you set your own ssh key, do not check this file into git
-    # Generate a key using:
-    # ssh-keygen -t rsa -C "forgeops-robot@forgeops.com" -f ssh.   Do not enter a passphrase!
-    # Base64 encode the value using base64 <ssh
-    # and enter below. The generated ssh.pub key is the public key to add to your stash or github repo
-    # to allow access.
-    sshKey:  dGhpcyBpcyBhIGR1bW15IGtleQo=
     # Optional sed filter to run after git checkout. The sed edit script here will be recursively run on *every*
     # file checked out to the /git directory. You must include the -e option to sed, and you can specify
     # multiple substitutions by repeating the -e s/// pattern. For example:

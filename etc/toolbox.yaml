@@ -6,11 +6,12 @@ metadata:
     name: toolbox
     vendor: forgerock
 spec:
-  terminationGracePeriodSeconds: 3
+  terminationGracePeriodSeconds: 1
   restartPolicy: Never
   containers:
   - name: toolbox
-    image: forgerock/toolbox:latest
+    image:  gcr.io/engineering-devops/toolbox:6.0.0
+    #image: forgerock/toolbox:6.0.0
     imagePullPolicy: IfNotPresent
     env:
     - name: GIT_REPO
@@ -20,11 +21,10 @@ spec:
     volumeMounts:
     - name: podinfo
       mountPath: /etc/podinfo
-      readOnly: false
+    - name: platform-config
+      mountPath: /opt/forgerock/config
   # Use of downward api. We may use this in future to understand what environment we are running in
-  # From docs:
-  # only annotations, labels, name and namespace are supported.
-  # See https://kubernetes.io/docs/resources-reference/v1.6/#downwardapivolumefile-v1-core
+  # https://kubernetes.io/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/
   volumes:
   - name: podinfo
     downwardAPI:
@@ -32,4 +32,12 @@ spec:
       - path: "labels"
         fieldRef:
           fieldPath: metadata.labels
+  - name: platform-config
+  # If you want to supply a custom.yaml, comment this next line out:
+    emptyDir: {}
+    # And replace it with the configMap below
+    # You must create the configuration with kubectl create configmap platform-config --from-file=custom.yaml
+#    configMap:
+#      name: platform-config
+
 

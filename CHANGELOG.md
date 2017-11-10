@@ -84,3 +84,9 @@ will trigger a rolling update.
 * Remove use of the projectDirectory. Git configuration is now checked out to a fixed directory /git/config
 * update default build tag to 6.0.0-SNAPSHOT
 * Add idm/am integration variable openidm.idpconfig.clientsecret.
+
+# 2017-11-10
+* All charts now use a standard git-ssh-key secret for git repo access to forgeops-init. This 
+secret must be pre-created before deploying any helm charts. See the README.md
+* Created a bootstrap.sh script to create the secret and perform a helm install.
+

@@ -9,7 +9,6 @@ GIT_ROOT=${GIT_ROOT:-/git/config}
 NAMESPACE=${NAMESPACE:-default}
 
 # Needed for any git ssh commands.
-export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
 
 # Default export path - relative to the root.
 export EXPORT_PATH="${EXPORT_PATH:-${NAMESPACE}/am/export}"

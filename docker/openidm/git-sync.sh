@@ -11,9 +11,6 @@ GIT_ROOT=${GIT_ROOT:=/git/config}
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave-idm}"
 
 
-export GIT_SSH_COMMAND="ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
-
-
 cd "${GIT_ROOT}"
 
 # This configures git to ignore file mode changes.

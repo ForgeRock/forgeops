@@ -29,3 +29,4 @@ images:
 - 'gcr.io/$PROJECT_ID/openam'
 - 'gcr.io/$PROJECT_ID/amster'
 - 'gcr.io/$PROJECT_ID/openidm-postgres'
+- 'gcr.io/$PROJECT_ID/toolbox'
