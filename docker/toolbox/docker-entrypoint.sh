@@ -4,7 +4,7 @@ echo "Cmd is $1"
 
 echo "Initializing helm"
 
-# This will initialize tiller if it is not already running. TODO: Test for tiller first
+# This will start a tiller pod if it is not already running. TODO: Test for tiller first
 helm init
 
 # Try to guess what kind of cluster we are running on - and copy the right starter custom.yaml

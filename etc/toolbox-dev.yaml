@@ -1,4 +1,4 @@
-# This is a development version of the toolbox. It mounts a local volume which contains the
+# This is a development version of the toolbox. It mounts a local volume that contains the
 # forgeops/ project source code.  You need to mount your local forgeops folder on your laptop:
 # cd src/forgeops
 # minikube mount .:/forgeops

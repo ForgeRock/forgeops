@@ -86,7 +86,7 @@ will trigger a rolling update.
 * Add idm/am integration variable openidm.idpconfig.clientsecret.
 
 # 2017-11-10
-* All charts now use a standard git-ssh-key secret for git repo access to forgeops-init. This 
-secret must be pre-created before deploying any helm charts. See the README.md
+* All charts now use a standard git-ssh-key secret for accessing the configuration repository. This 
+secret must be created before installing any helm charts. See the README.md
 * Created a bootstrap.sh script to create the secret and perform a helm install.
 

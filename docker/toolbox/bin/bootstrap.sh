@@ -16,22 +16,21 @@ if ! kubectl get secret "${secretName}"; then
     echo "No ${secretName} secret found. I will generate a temporary one for you, but you should generate a permanent secret"
     echo "to access your git configuration. Run the following command to generate a secret:"
     echo "ssh-keygen -t rsa -C \"forgeopsrobot@forgrock.com\" -f id_rsa -N ''"
-    echo "The id_rsa.pub file should be uploaded to github or stash and set as an API key to your git repository"
-    echo "This is the repository that holds your private forgeops-init configuration."
+    echo "The id_rsa.pub file should be uploaded to github or stash and set as an API key to your Git configuration"
     echo "Create the Kubernetes secret using:"
     echi "kubectl create secret generic "${secretName}" --from-file=id_rsa"
 
-    # Generate a temporary ssh secret. This will be sufficient to pull the public forgeops-init
+    # Generate a temporary ssh secret. This will be sufficient to pull the starter forgeops-init configuration repository
     # The secret is created just to keep the helm charts happy. They reference this secret to mount the ssh key
-    # as a volume on the git container.
-    ssh-keygen -t rsa -C "forgeopsrobot@forgrock.com" -f id_rsa -N ''
+    # as a volume on the Git container.
+    ssh-keygen -t rsa -C "forgeopsrobot@forgerock.com" -f id_rsa -N ''
     kubectl create secret generic "${secretName}" --from-file=id_rsa
 
 fi
 
 node=minikube
 
-# If the minikube command is not found, assume we are on a gke (or other) cluster
+# If the minikube command is not found, assume we are on a GKE (or other) cluster
 if ! command -v minikube ; then
     node=gke
 fi
@@ -54,7 +53,7 @@ if [ ! -r "${CUSTOM_YAML}" ]; then
     REPO="gcr.io/engineering-devops"
 
     if [ "${node}" = "minikube" ]; then
-           echo "It looks like you are on minikube. I will assume the docker images have already been built"
+           echo "It looks like you are on Minikube. I will assume the Docker images have already been built"
            ip=`minikube ip`
            REPO=forgerock
            DOMAIN=".${ip}.xip.io"
@@ -71,7 +70,7 @@ global:
     branch: master
   configPath:
     idm:  default/idm/sync-with-ldap-bidirectional
-    am:   default/am/dev
+    am:   default/am/empty-import
     ig:   default/ig/basic-sample
   exportPath:
     am: default/am/dev
@@ -87,7 +86,7 @@ if [ -r "helm/${CHART}" ]; then
 fi
 
 if [ ! -r ${CHART} ]; then
-  echo "Cant find local chart, using the forgeops chart repo"
+  echo "Can not find local chart, using the forgeops chart repo"
   CHART="forgerock/${CHART}"
 fi
 
