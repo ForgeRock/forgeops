@@ -41,5 +41,5 @@ data:
   GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
   CONFIG_PATH: "{{ .Values.global.configPath.am }}"
   {{ if .Values.amCustomizationScriptPath -}}
-  CUSTOMIZE_AM: "/git/{{.Values.global.git.projectDirectory }}/{{ .Values.global.configPath.am }}/{{ .Values.amCustomizationScriptPath }}"
+  CUSTOMIZE_AM: "/git/config/{{ .Values.global.configPath.am }}/{{ .Values.amCustomizationScriptPath }}"
   {{- end }}

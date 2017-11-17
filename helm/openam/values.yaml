@@ -66,7 +66,7 @@ createBootstrap: true
 
 # This is an optional path to a script to execute before AM starts up. It can copy in images, update the web.xml, etc.
 # The path is *relative* to /git/{{ projectDirectory }}/{{ configPath.am }}.
-# For example:   /git/forgeops-init/default/am/my-config/customize-am.sh
+# For example:   /git/config/default/am/my-config/customize-am.sh
 amCustomizationScriptPath: "customize-am.sh"
 
 # Liveness probe tuning - time in seconds
