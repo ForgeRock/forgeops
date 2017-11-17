@@ -8,7 +8,7 @@ RUN apt-get update \
   && apt-get install -y ca-certificates git vim bash curl openssh-client bash-completion
 
 
-ENV KUBE_LATEST_VERSION v1.8.2
+ENV KUBE_LATEST_VERSION v1.8.3
 ARG HELM_VERSION=v2.7.0
 ARG HELM_FILENAME=helm-${HELM_VERSION}-linux-amd64.tar.gz
 ENV TOOLBOX_DIR /opt/forgerock
@@ -38,7 +38,6 @@ WORKDIR ${TOOLBOX_DIR}
 ADD bin ${TOOLBOX_DIR}/bin/
 ADD *.sh ${TOOLBOX_DIR}/bin/
 
-ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/id_rsa
 
 
 ENTRYPOINT ["/opt/forgerock/bin/docker-entrypoint.sh"]

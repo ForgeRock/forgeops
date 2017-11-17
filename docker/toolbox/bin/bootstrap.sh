@@ -18,7 +18,7 @@ if ! kubectl get secret "${secretName}"; then
     echo "ssh-keygen -t rsa -C \"forgeopsrobot@forgrock.com\" -f id_rsa -N ''"
     echo "The id_rsa.pub file should be uploaded to github or stash and set as an API key to your Git configuration"
     echo "Create the Kubernetes secret using:"
-    echi "kubectl create secret generic "${secretName}" --from-file=id_rsa"
+    echo "kubectl create secret generic "${secretName}" --from-file=id_rsa"
 
     # Generate a temporary ssh secret. This will be sufficient to pull the starter forgeops-init configuration repository
     # The secret is created just to keep the helm charts happy. They reference this secret to mount the ssh key

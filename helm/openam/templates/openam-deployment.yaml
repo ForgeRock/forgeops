@@ -45,6 +45,8 @@ spec:
           mountPath: /var/run/secrets/openam
         - name: openam-boot
           mountPath: /var/run/openam
+        - name: git-secret
+          mountPath: /etc/git-secret
         {{ else }}
         args: [ "run-nowait" ]
         {{- end }}
@@ -86,7 +88,7 @@ spec:
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName: git-am-{{ .Release.Name }}
+          secretName: git-ssh-key
           # The forgerock user needs read access to this secret
           #defaultMode: 256
       {{ if .Values.createBootstrap -}}

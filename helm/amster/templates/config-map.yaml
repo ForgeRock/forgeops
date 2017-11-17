@@ -35,7 +35,6 @@ metadata:
 data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
   EXPORT_PATH: {{  default .Values.global.configPath.am .Values.global.exportPath.am }}
-  GIT_SSH_COMMAND: "ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh"
   GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
   CONFIG_PATH: "{{ .Values.global.configPath.am }}"
   SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
