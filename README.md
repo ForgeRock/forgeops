@@ -14,7 +14,7 @@ git checkout release/5.5.0
 
 # Documentation 
 
-The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/doc/backstage/devops-guide/index.html)
+The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/doc/devops-guide/index.html)
 tracks the master branch.
 
 The documentation for the the 5.5.0 release can be found on 
