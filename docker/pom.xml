@@ -178,7 +178,7 @@
                             </build>
                         </image>
                         <image>
-                            <name>forgerock/util</name>
+                            <name>${repo}/util</name>
                             <build>
                                 <dockerFileDir>util</dockerFileDir>
                                 <tags>

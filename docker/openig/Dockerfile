@@ -9,7 +9,7 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
-RUN apk add --no-cache su-exec unzip curl bash vi bind-tools iputils \
+RUN apk add --no-cache su-exec unzip curl bash vim bind-tools iputils \
     && rm -fr "$CATALINA_HOME"/webapps/* \
     && mkdir -p /opt/forgerock \
     && addgroup -g 11111 forgerock \
