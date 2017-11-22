@@ -109,15 +109,6 @@
                             </build>
                         </image>
                         <image>
-                            <name>forgerock/tomcat</name>
-                            <build>
-                                <dockerFileDir>tomcat</dockerFileDir>
-                                <tags>
-                                    <tag>${releaseTag}</tag>
-                                </tags>
-                            </build>
-                        </image>
-                        <image>
                             <name>${repo}/openidm</name>
                             <build>
                                 <dockerFileDir>openidm</dockerFileDir>
@@ -181,6 +172,15 @@
                             <name>${repo}/toolbox</name>
                             <build>
                                 <dockerFileDir>toolbox</dockerFileDir>
+                                <tags>
+                                    <tag>${releaseTag}</tag>
+                                </tags>
+                            </build>
+                        </image>
+                        <image>
+                            <name>forgerock/util</name>
+                            <build>
+                                <dockerFileDir>util</dockerFileDir>
                                 <tags>
                                     <tag>${releaseTag}</tag>
                                 </tags>

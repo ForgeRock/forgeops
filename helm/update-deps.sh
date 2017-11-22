@@ -7,6 +7,6 @@ do
     # Is it a Helm chart?
     if [ -r $file/Chart.yaml ]; then
         echo "Updating Helm dependencies for $file"
-        helm dep up $file
+        helm dep up --skip-refresh $file
     fi
 done

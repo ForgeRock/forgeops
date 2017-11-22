@@ -1,6 +1,21 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM forgerock/tomcat:5.5.0
+FROM tomcat:8.5.23-jre8-alpine
+
+ENV FORGEROCK_HOME /opt/forgerock
+
+ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+
+
+# bind-tools for dig (dns diagnostics)
+# iputils - ping command
+RUN apk add --no-cache su-exec unzip curl bash vi bind-tools iputils \
+    && rm -fr "$CATALINA_HOME"/webapps/* \
+    && mkdir -p /opt/forgerock \
+    && addgroup -g 11111 forgerock \
+    && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D -G forgerock forgerock \
+    && chown -R forgerock /opt
+
 
 # Default home for OpenIG config. Override this to set a different location.
 ENV OPENIG_BASE /var/openig

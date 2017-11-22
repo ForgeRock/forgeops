@@ -90,3 +90,8 @@ will trigger a rolling update.
 secret must be created before installing any helm charts. See the README.md
 * Created a bootstrap.sh script to create the secret and perform a helm install.
 
+# 2017-11-22 
+* Simplifed AM image. It no longer contains bootstrap logic. This will make it easier to reuse the AM image
+in different contexts.
+* Created forgerock/util Docker image. Used in init containers to create bootstrap files, copy secrets, etc.
+* Removed tomcat image as IG was the only product using it.

@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 #
-FROM tomcat:8.5.21-jre8-alpine
+FROM tomcat:8.5.23-jre8-alpine
 
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
@@ -26,8 +26,7 @@ ENV OPENAM_HOME /home/forgerock/openam
 
 ADD openam.war  /tmp/openam.war
 
-# openldap-clients is needed to test for the configuration store.
-RUN apk add --no-cache su-exec unzip curl bash openldap-clients \
+RUN apk add --no-cache su-exec unzip curl bash  \
   && rm -fr /usr/local/tomcat/webapps/* \
   && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
   && rm /tmp/openam.war \
@@ -43,7 +42,7 @@ USER forgerock
 
 # If you want to create an image that is ready to be bootstrapped to a
 # configuration store, you can add a custom boot.json file.
-# This can also be added at runtime by a ConfigMap.
+# This can also be added at runtime by a ConfigMap or an init container.
 #ADD boot.json /root/openam
 
 # Generate a default keystore for SSL - only needed if you want SSL inside the cluster.
