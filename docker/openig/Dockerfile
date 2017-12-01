@@ -28,7 +28,8 @@ ADD openig.war /tmp/openig.war
 
 RUN unzip -q /tmp/openig.war -d /usr/local/tomcat/webapps/ROOT \
     && rm -f /tmp/openig.war \
-    && chown -R forgerock /usr/local/tomcat
+    && mkdir /var/openig \
+    && chown -R forgerock /usr/local/tomcat $OPENIG_BASE
 
 # Example of adding config to the container to create an immutable image:
 # ADD sample-config/* /var/openig/config/

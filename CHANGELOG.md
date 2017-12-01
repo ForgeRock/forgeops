@@ -95,3 +95,6 @@ secret must be created before installing any helm charts. See the README.md
 in different contexts.
 * Created forgerock/util Docker image. Used in init containers to create bootstrap files, copy secrets, etc.
 * Removed tomcat image as IG was the only product using it.
+
+# 2017-12-01 
+* Add RBAC support for AM chart

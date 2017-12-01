@@ -1,9 +1,0 @@
-dependencies:
-- name: amster
-  repository: file://../amster
-  version: 6.0.0
-- name: openam
-  repository: file://../openam
-  version: 6.0.0
-digest: sha256:3e85165ee9b8eda856a52fcc0b9de805df790b8df810df1edb011fc2eddd3f7c
-generated: 2017-11-02T18:00:01.026549-06:00

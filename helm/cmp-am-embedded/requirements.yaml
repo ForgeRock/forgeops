@@ -1,7 +1,0 @@
-dependencies:
-- name: amster
-  version: ">0.0.0"
-  repository: file://../amster
-- name: openam
-  version: ">0.0.0"
-  repository: file://../openam

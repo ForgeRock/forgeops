@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Deploy AM with embedded DJ. Suitable for development and testing.
-name: cmp-am-embedded
-version: 6.0.0

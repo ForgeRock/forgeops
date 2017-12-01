@@ -72,3 +72,6 @@ amCustomizationScriptPath: "customize-am.sh"
 # Liveness probe tuning - time in seconds
 livenessPeriod: 60
 livenessTimeout: 15
+
+rbac:
+  create: true
