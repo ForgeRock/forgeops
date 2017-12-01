@@ -98,3 +98,4 @@ in different contexts.
 
 # 2017-12-01 
 * Add RBAC support for AM chart
+* Remove AM embedded DJ chart. This is not the recommended way to deploy AM. 
