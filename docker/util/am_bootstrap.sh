@@ -31,6 +31,7 @@ copy_secrets() {
     cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
     cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
     cp  -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
+    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}/openam"
 }
 
 

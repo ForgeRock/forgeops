@@ -49,6 +49,18 @@
                 <repo>gcr.io/engineering-devops</repo>
             </properties>
         </profile>
+        <profile>
+            <id>backport</id>
+            <properties>
+                <openamVersion>5.5.1</openamVersion>
+                <opendjVersion>5.5.0</opendjVersion>
+                <openidmVersion>5.5.0</openidmVersion>
+                <openigVersion>5.5.0</openigVersion>
+                <releaseTag>5.5.1</releaseTag>
+            </properties>
+        </profile>
+
+
     </profiles>
 
     <properties>

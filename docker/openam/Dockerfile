@@ -31,7 +31,7 @@ RUN apk add --no-cache su-exec unzip curl bash  \
   && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
   && rm /tmp/openam.war \
   && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock \
-  && mkdir -p $"OPENAM_HOME" \
+  && mkdir -p "$OPENAM_HOME" \
   && mkdir -p "$FORGEROCK_HOME"/.openamcfg \
   && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_openam_  \
   && chown -R forgerock "$CATALINA_HOME" \
