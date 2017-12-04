@@ -59,8 +59,6 @@
                 <releaseTag>5.5.1</releaseTag>
             </properties>
         </profile>
-
-
     </profiles>
 
     <properties>
@@ -79,6 +77,14 @@
  </properties>
 
  <repositories>
+     <repository>
+         <id>forgerock-private-releases</id>
+         <name>ForgeRock Private Releases Repository</name>
+         <url>https://maven.forgerock.org/repo/private-releases</url>
+         <snapshots>
+             <enabled>false</enabled>
+         </snapshots>
+     </repository>
      <repository>
          <id>forgerock-internal-releases</id>
          <name>ForgeRock Internal Releases Repository</name>
