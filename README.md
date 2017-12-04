@@ -11,6 +11,11 @@ If you have the source checked out from git:
 git checkout release/5.5.0 
 ```
 
+NOTE: ForgeRock customers and partners who have access to the ForgeRock private-releases maven repository
+can use the maven pom.xml to build docker images for *released* versions of the products. You
+must have a settings.xml file with credentials for repository access. See the [backstage
+article](https://backstage.forgerock.com/knowledge/kb/article/a74096897)
+
 
 # Documentation 
 

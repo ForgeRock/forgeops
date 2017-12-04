@@ -55,7 +55,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>5.5.0</openamVersion>
+        <openamVersion>5.5.1</openamVersion>
         <opendjVersion>5.5.0</opendjVersion>
         <openidmVersion>5.5.0</openidmVersion>
         <openigVersion>5.5.0</openigVersion>
@@ -65,6 +65,14 @@
  </properties>
 
  <repositories>
+     <repository>
+         <id>forgerock-private-releases</id>
+         <name>ForgeRock Private Releases Repository</name>
+         <url>https://maven.forgerock.org/repo/private-releases</url>
+         <snapshots>
+             <enabled>false</enabled>
+         </snapshots>
+     </repository>
      <repository>
          <id>forgerock-internal-releases</id>
          <name>ForgeRock Internal Releases Repository</name>
