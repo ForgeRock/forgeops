@@ -7,6 +7,7 @@ data:
   GIT_REPO: "{{ .Values.global.git.repo }}"
   CONFIG_PATH: "{{ .Values.global.configPath.idm }}"
   SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
+  PROJECT_HOME:  "/git/config/{{ .Values.global.configPath.idm }}"
 
 ---
 apiVersion: v1

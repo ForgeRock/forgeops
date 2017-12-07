@@ -79,7 +79,7 @@ minikube ip
 
 open http://openam.default.example.com
 
-# Alternartively, if you use something like xip.io, you access AM using the minikube IP:
+# Alternatively, if you use something like xip.io, you access AM using the minikube IP:
 
 open http://openam.default.192.168.99.100.xip.io/openam
 
