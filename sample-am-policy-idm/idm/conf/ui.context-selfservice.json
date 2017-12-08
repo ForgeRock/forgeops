@@ -1,0 +1,9 @@
+{
+    "enabled" : true,
+    "urlContextRoot" : "/user",
+    "defaultDir" : "&{launcher.install.location}/ui/selfservice/default",
+    "extensionDir" : "&{launcher.install.location}/ui/selfservice/extension",
+    "responseHeaders" : {
+        "X-Frame-Options" : "DENY"
+    }
+}

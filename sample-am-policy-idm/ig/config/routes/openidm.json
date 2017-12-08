@@ -1,0 +1,226 @@
+{
+    "name": "openidm",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "heap": [
+        {
+            "name": "IDMHandler",
+            "type": "ClientHandler",
+            "baseURI": "http://idm-service.sample.svc.cluster.local:8080"
+        },
+        {
+            "name": "ssoFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 401,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 401, \"message\":\"Authentication Failed\"}"
+            }
+        },
+        {
+            "name": "authzFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 403,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 403, \"message\":\"Access Denied\"}"
+            }
+        },
+        {
+            "name": "badRequestFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 400,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 400, \"message\":\"Bad Request\"}"
+            }
+        }
+    ],
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "ConditionalFilter",
+                    "config": {
+                        "condition": "${matches(request.uri.path, '^/admin/') or matches(request.uri.path, '^/user/') or matches(request.uri.path, '^/logout')}",
+                        "delegate" : {
+                            "name": "SSOFilter",
+                            "type": "SingleSignOnFilter",
+                            "config": {
+                                "openamUrl": "http://am-service.sample.svc.cluster.local/openam",
+                                "logoutEndpoint": "/logout",
+                                "defaultLogoutLandingPage": "/user/"
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "ConditionalFilter",
+                    "config": {
+                        "condition": "${matches(request.uri.path, '^/openidm/')}",
+                        "delegate" : {
+                            "type": "ChainOfFilters",
+                            "config": {
+                                "filters": [
+                                    {
+                                        "type": "ConditionalFilter",
+                                        "config": {
+                                            "condition": "${not matches(request.method, 'GET')}",
+                                            "delegate" : {
+                                                "name": "CSRFHeaderCheck",
+                                                "type": "ScriptableFilter",
+                                                "config": {
+                                                    "type": "application/x-groovy",
+                                                    "file": "CSRFHeaderCheck.groovy",
+                                                    "args": {
+                                                        "failureResponse": "${heap['badRequestFailureResponse']}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "switch",
+                                        "type": "SwitchFilter",
+                                        "config": {
+                                            "onResponse": [
+                                                {
+                                                    "condition": "${response.status.code == 302}",
+                                                    "handler": {
+                                                        "name": "AllowedAnonymousEndpoints",
+                                                        "type": "ScriptableHandler",
+                                                        "config": {
+                                                            "type": "application/x-groovy",
+                                                            "file": "batchConditionalRequest.groovy",
+                                                            "args": {
+                                                                "delegate" : "${heap['IDMHandler']}",
+                                                                "failureResponse" : "${heap['ssoFailureResponse']}" ,
+                                                                "checkRequests": [
+                                                                    {
+                                                                        "path": "^/openidm/info/.*",
+                                                                        "methods": ["GET"]
+                                                                    },
+                                                                    {
+                                                                        "path": "^/openidm/config/ui/themeconfig",
+                                                                        "methods": ["GET"]
+                                                                    },
+                                                                    {
+                                                                        "path": "^/openidm/selfservice/.*",
+                                                                        "methods": ["GET","POST"]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "SSOFilter",
+                                        "type": "SingleSignOnFilter",
+                                        "config": {
+                                            "openamUrl": "http://am-service.sample.svc.cluster.local/openam"
+                                        }
+                                    },
+                                    {
+                                        "name": "SetTrustedAttributeHeaders",
+                                        "type": "ScriptableFilter",
+                                        "config": {
+                                            "type": "application/x-groovy",
+                                            "file": "constructSecurityContextHeaders.groovy"
+                                        }
+                                    },
+                                    {
+                                        "name": "StoreUserDetailsInSession",
+                                        "type": "ScriptableFilter",
+                                        "config": {
+                                            "type": "application/x-groovy",
+                                            "file": "storeUserDetailsInSession.groovy",
+                                            "args": {
+                                                "idmUserDetailEndpoint": "http://idm-service.sample.svc.cluster.local:8080/openidm/info/login",
+                                                "idmUserDetailMethod": "GET"
+                                            }
+                                        }
+                                    },
+                                    {
+                                      "type": "PolicyEnforcementFilter",
+                                      "name": "PolicyEnforcementFilter-1",
+                                      "config": {
+                                            "openamUrl": "http://am-service.sample.svc.cluster.local/openam",
+                                            "pepUsername": "openidm",
+                                            "pepPassword": "openidm",
+                                            "pepRealm": "/",
+                                            "application": "openidm",
+                                            "ssoTokenSubject": "${contexts.ssoToken.value}",
+                                            "environment": {
+                                                "securityContextPath": [
+                                                    "${session.idmUserDetails.authorization.component}/${session.idmUserDetails.authorization.id}"
+                                                ],
+                                                "securityContextRoles": "${session.idmUserDetails.authorization.roles}"
+                                            },
+                                            "failureHandler": {
+                                                "type": "Chain",
+                                                "config": {
+                                                    "filters": [
+                                                        {
+                                                            "type": "ScriptableFilter",
+                                                            "config": {
+                                                                "type": "application/x-groovy",
+                                                                "source": "return next.handle(context, request)"
+                                                            }
+                                                        }
+                                                    ],
+                                                    "handler" : "authzFailureResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "ConditionalFilter",
+                                        "config": {
+                                            "condition": "${matches(request.method, 'PATCH') and not empty contexts.policyDecision.attributes.allowedFields}",
+                                            "delegate" : {
+                                                "name": "CheckAllowedFieldsForPatch",
+                                                "type": "ScriptableFilter",
+                                                "config": {
+                                                    "type": "application/x-groovy",
+                                                    "file": "checkAllowedFieldsForPatch.groovy",
+                                                    "args": {
+                                                        "failureResponse": "${heap['authzFailureResponse']}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            ],
+            "handler": "IDMHandler"
+        }
+    }
+}

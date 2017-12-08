@@ -1,0 +1,11 @@
+{
+  "classPathURLs" : [ ],
+  "systemProperties" : { },
+  "requestAttributes" : { },
+  "scriptExtensions" : { },
+  "initParams" : { },
+  "urlPatterns" : [
+    "/*"
+  ],
+  "filterClass" : "org.forgerock.openidm.sample.trustedservletfilter.SampleTrustedServletFilter"
+}
