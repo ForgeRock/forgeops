@@ -11,7 +11,7 @@ spec:
         role: persistence
     spec:
       containers:
-        - image: forgerock/opendj:5.5.0
+        - image: dj:fullstack
           imagePullPolicy: IfNotPresent
           name: opendj
           env:
