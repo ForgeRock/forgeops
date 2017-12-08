@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: am
+  labels:
+    role: auth
+spec:
+  hostAliases:
+  - ip: "127.0.0.1"
+    hostnames:
+    - "am-service.sample.svc.cluster.local"
+  containers:
+    - image: forgerock/openam:5.5.1
+      imagePullPolicy: IfNotPresent
+      name: openam
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+      env:
+      - name: CONFIGURATION_LDAP
+        value: "dj-1.dj-service:1389"
+      resources:
+          requests:
+            memory: "512Mi"
+      volumeMounts:
+      - name: configstore-secret
+        mountPath: /var/run/secrets/configstore
+      readinessProbe:
+        httpGet:
+          path: /openam/isAlive.jsp
+          port: 8080
+        initialDelaySeconds: 30
+        timeoutSeconds: 5
+        periodSeconds: 20
+      livenessProbe:
+        httpGet:
+          path: /openam/isAlive.jsp
+          port: 8080
+        initialDelaySeconds: 60
+        timeoutSeconds: 15
+        periodSeconds: 60
+  volumes:
+  - name: configstore-secret
+    configMap:
+      name: am-config

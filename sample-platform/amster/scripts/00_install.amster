@@ -1,0 +1,12 @@
+install-openam --serverUrl http://am-service.sample.svc.cluster.local/openam \
+--authorizedKey  /var/run/secrets/amster/id_rsa.pub \
+--cookieDomain cluster.local \
+--adminPwd password \
+--cfgStore dirServer \
+--cfgStoreHost dj-0.dj-service \
+--cfgStoreDirMgrPwd password  \
+--cfgStorePort 1389  \
+--cfgStoreRootSuffix dc=example,dc=com \
+--acceptLicense \
+--cfgDir /home/forgerock/openam
+:exit

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: amster
+spec:
+  containers:
+    - image: amster:fullstack
+      imagePullPolicy: IfNotPresent
+      name: amster
+      env:
+      - name: OPENAM_INSTANCE
+        value: "http://am-service.sample.svc.cluster.local"
+      resources:
+          requests:
+            memory: "256Mi"

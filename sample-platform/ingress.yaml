@@ -1,0 +1,18 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+spec:
+  rules:
+  - host: am-service.sample.svc.cluster.local
+    http:
+      paths:
+      - backend:
+          serviceName: am-service
+          servicePort: 80
+  - host: idm-service.sample.svc.cluster.local
+    http:
+      paths:
+      - backend:
+          serviceName: ig-service
+          servicePort: 8080
