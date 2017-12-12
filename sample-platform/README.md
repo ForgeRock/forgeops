@@ -19,6 +19,7 @@ Use the forgeops project to build local docker images within your minikube envir
 
 Build the Docker images for this sample:
 
+    docker build -t am:fullstack am
     docker build -t amster:fullstack amster
     docker build -t ig:fullstack ig
     docker build -t idm:fullstack idm
