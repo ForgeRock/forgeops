@@ -10,7 +10,7 @@ spec:
     hostnames:
     - "am-service.sample.svc.cluster.local"
   containers:
-    - image: forgerock/openam:5.5.1
+    - image: am:fullstack
       imagePullPolicy: IfNotPresent
       name: openam
       ports:
