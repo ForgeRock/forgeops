@@ -18,6 +18,22 @@
     },
     "heap": [
         {
+            "name": "capture",
+            "type": "CaptureDecorator",
+            "config": {
+                "captureEntity": true,
+                "captureContext": true
+            }
+        },
+        {
+            "name": "debugHandler",
+            "type": "ClientHandler",
+            "capture": [
+                "request",
+                "response"
+            ]
+        },
+        {
             "name": "IDMHandler",
             "type": "ClientHandler",
             "baseURI": "http://idm-service.sample.svc.cluster.local:8080"
