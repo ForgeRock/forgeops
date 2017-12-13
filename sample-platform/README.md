@@ -27,6 +27,10 @@ Build the Docker images for this sample:
 
     kubectl create namespace sample
 
+    kubectl create secret generic social-credentials \
+        --from-literal=IDP_FACEBOOK_CLIENTID=$IDP_FACEBOOK_CLIENTID \
+        --from-literal=IDP_FACEBOOK_CLIENTSECRET=$IDP_FACEBOOK_CLIENTSECRET
+
     kubectl apply -f .
 
 Monitor the pods as they come up:

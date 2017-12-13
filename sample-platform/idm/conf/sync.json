@@ -140,6 +140,15 @@
                     }
                 },
                 {
+                    "target" : "aliasList",
+                    "transform" : {
+                        "type" : "text/javascript",
+                        "globals" : { },
+                        "source" : "var managedUser = openidm.read(\"managed/user/\" + source._id, null, [\"idps\"]);\n    \nif (managedUser.idps) {\n    managedUser.idps.map(function(relationship) {\n        var provider = relationship[\"_ref\"].split(\"/\");\n        return provider[1] + '-' + provider[2];\n    });\n} else {\n    [];\n}"
+                    },
+                    "source" : ""
+                },
+                {
                     "target" : "objectClass",
                     "default" : [
                         "top",
@@ -148,7 +157,8 @@
                         "inetOrgPerson",
                         "organizationalPerson",
                         "iplanet-am-user-service",
-                        "kbaInfoContainer"
+                        "kbaInfoContainer",
+                        "devicePrintProfilesContainer"
                     ]
                 },
                 {

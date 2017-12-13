@@ -144,6 +144,10 @@
                                                                     {
                                                                         "path": "^/openidm/selfservice/.*",
                                                                         "methods": ["GET","POST"]
+                                                                    },
+                                                                    {
+                                                                        "path": "^/openidm/policy/selfservice/.*",
+                                                                        "methods": ["GET","POST"]
                                                                     }
                                                                 ]
                                                             }
