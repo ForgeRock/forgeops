@@ -10,6 +10,16 @@ spec:
       imagePullPolicy: IfNotPresent
       name: openidm
       env:
+      - name: IDP_FACEBOOK_CLIENTID
+        valueFrom:
+          secretKeyRef:
+            name: social-credentials
+            key: IDP_FACEBOOK_CLIENTID
+      - name: IDP_FACEBOOK_CLIENTSECRET
+        valueFrom:
+          secretKeyRef:
+            name: social-credentials
+            key: IDP_FACEBOOK_CLIENTSECRET
       - name: OPENIDM_ANONYMOUS_PASSWORD
         value: "anonymous"
       - name: OPENIDM_ADMIN_PASSWORD

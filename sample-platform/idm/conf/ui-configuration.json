@@ -1,6 +1,6 @@
 {
     "configuration" : {
-        "selfRegistration" : false,
+        "selfRegistration" : true,
         "passwordReset" : false,
         "forgotUsername" : false,
         "lang" : "en",
@@ -30,6 +30,8 @@
             "oauthApplications" : "/oauth2/applications/",
             "resourceSet" : "/oauth2/resources/sets/",
             "auditHistory" : "/uma/auditHistory/"
-        }
+        },
+        "kbaDefinitionEnabled" : false,
+        "kbaEnabled" : false
     }
 }

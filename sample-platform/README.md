@@ -25,7 +25,12 @@ Build the Docker images for this sample:
     docker build -t idm:fullstack idm
 
     kubectl create namespace sample
-    kubectl --namespace sample apply -f .
+
+    kubectl create secret generic social-credentials \
+        --from-literal=IDP_FACEBOOK_CLIENTID=$IDP_FACEBOOK_CLIENTID \
+        --from-literal=IDP_FACEBOOK_CLIENTSECRET=$IDP_FACEBOOK_CLIENTSECRET
+
+    kubectl apply -f .
 
 Monitor the pods as they come up:
 

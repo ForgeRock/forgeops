@@ -1,0 +1,27 @@
+{
+    "stageConfigs" : [
+        {
+            "name" : "userQuery",
+            "validQueryFields" : [
+                "mail",
+                "givenName",
+                "sn"
+            ],
+            "identityIdField" : "_id",
+            "identityEmailField" : "mail",
+            "identityUsernameField" : "userName",
+            "identityServiceUrl" : "managed/user"
+        },
+        {
+            "name" : "retrieveUsername"
+        }
+    ],
+    "snapshotToken" : {
+        "type" : "jwt",
+        "jweAlgorithm" : "RSAES_PKCS1_V1_5",
+        "encryptionMethod" : "A128CBC_HS256",
+        "jwsAlgorithm" : "HS256",
+        "tokenExpiry" : "300"
+    },
+    "storage" : "stateless"
+}
