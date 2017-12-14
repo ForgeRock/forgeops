@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "5.5.1",
+    "entityType" : "SocialAuthentication",
+    "entityId" : "SocialAuthentication",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "enabledKeys" : [ "Facebook" ],
+    "displayNames" : {
+      "Facebook" : "Facebook"
+    },
+    "icons" : {
+      "Facebook" : "images/logos/facebook.png"
+    },
+    "authenticationChains" : {
+      "Facebook" : "FacebookSocialAuthenticationService"
+    },
+    "_type" : {
+      "_id" : "socialauthentication",
+      "name" : "Social Authentication Implementations",
+      "collection" : false
+    }
+  }
+}

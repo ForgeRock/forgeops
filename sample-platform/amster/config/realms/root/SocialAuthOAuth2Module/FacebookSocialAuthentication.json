@@ -1,0 +1,58 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "5.5.1",
+    "entityType" : "SocialAuthOAuth2Module",
+    "entityId" : "FacebookSocialAuthentication",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "FacebookSocialAuthentication",
+    "core" : {
+      "usesBasicAuth" : false,
+      "scopeDelimiter" : null,
+      "tokenEndpoint" : "https://graph.facebook.com/oauth/access_token",
+      "subjectProperty" : "id",
+      "logoutBehaviour" : "prompt",
+      "provider" : "facebook",
+      "scope" : [ "public_profile", "email" ],
+      "ssoProxyUrl" : "http://am-service.sample.svc.cluster.local:80/openam/oauth2c/OAuthProxy.jsp",
+      "clientSecret" : "AMSTER{IDP_FACEBOOK_CLIENTSECRET}",
+      "userInfoEndpoint" : "https://graph.facebook.com/v2.4/me?fields=email,first_name,last_name,name",
+      "clientId" : "AMSTER{IDP_FACEBOOK_CLIENTID}",
+      "issuerName" : null,
+      "logoutServiceUrl" : null,
+      "authenticationLevel" : 0,
+      "authorizeEndpoint" : "https://www.facebook.com/dialog/oauth",
+      "mixUpMitigation" : false
+    },
+    "emailSettings" : {
+      "smtpFromAddress" : null,
+      "emailGateway" : "org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl",
+      "smtpSslEnabled" : null,
+      "smtpPort" : "25",
+      "smtpPassword" : null,
+      "smtpUsername" : null,
+      "smtpHost" : "localhost",
+      "emailAttribute" : null
+    },
+    "accountProvisioning" : {
+      "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+      "attributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|iplanet-am-user-alias-list|facebook-" ],
+      "accountMapperConfiguration" : [ "id=iplanet-am-user-alias-list" ],
+      "mapToAnonymousUser" : false,
+      "attributeMapperConfiguration" : [ "first_name=givenName", "id=uid", "last_name=sn", "email=mail", "name=cn" ],
+      "createAccount" : true,
+      "enableRegistrationService" : true,
+      "accountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|*|facebook-",
+      "promptPasswordFlag" : false,
+      "anonymousUserName" : "anonymous",
+      "saveAttributesInSession" : true
+    },
+    "_type" : {
+      "_id" : "authSocialOAuth2",
+      "name" : "Social Auth OAuth2",
+      "collection" : true
+    }
+  }
+}
