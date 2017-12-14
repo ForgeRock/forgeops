@@ -49,6 +49,7 @@
                 <repo>gcr.io/engineering-devops</repo>
             </properties>
         </profile>
+        <!-- mvn -Pbackport will use the 5.5.x product versions against the master helm artifacts -->
         <profile>
             <id>backport</id>
             <properties>

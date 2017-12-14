@@ -6,17 +6,18 @@ kind: Ingress
 metadata:
   name: {{ .Values.component }}
   annotations:
-#    ingress.kubernetes.io/enable-cors: "true"
-     ingress.kubernetes.io/ssl-redirect: "true"
-     kubernetes.io/ingress.class: nginx
-     kubernetes.io/tls-acme: "true"
-     ingress.kubernetes.io/affinity: "cookie"
-     ingress.kubernetes.io/session-cookie-name: "route"
-     ingress.kubernetes.io/session-cookie-hash: "sha1"
+    kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
+    # Note that not all ingress controllers implement all these features..
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/enable-cors: "true"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "sha1"
 spec:
 {{ include "tls-spec" . | indent 2 }}
   rules:
-  - host: {{ template "externalFQDN" . }}
+  - host:  {{ template "externalFQDN" . }}
     http:
       paths:
       - path: /

@@ -8,12 +8,11 @@ metadata:
     app: {{ template "fullname" . }}
     vendor: forgerock
 spec:
+  type: {{ .Values.service.type }}
   ports:
-    - port: 80
-      name: am80
-      targetPort: 8080
-    - port: 443
-      targetPort: 8443
-      name: am443
+  - port: {{ .Values.service.externalPort }}
+    targetPort: {{ .Values.service.internalPort }}
+    protocol: TCP
+    name: {{ .Values.service.name }}
   selector:
     component: openam

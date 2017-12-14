@@ -75,3 +75,16 @@ livenessTimeout: 15
 
 rbac:
   create: true
+
+
+ingress:
+  class: nginx
+  #class: cloudflare-warp
+
+
+service:
+  name: openam
+  #type: NodePort
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080

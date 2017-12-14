@@ -79,9 +79,7 @@ Further documentation can be found in each chart's README.md
 
 By default, the charts will deploy to the `default` namespace in Kubernetes. 
 
-You can switch namespaces using the command `bin/set-namespace.sh  NAMESPACE`.  This will 
-change your namespace context in kubectl to the new namespace, and will result in the products being 
-deployed to that namespace. You can deploy multiple product instances in different namespaces and they will not 
+You can deploy multiple product instances in different namespaces and they will not 
 interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
 
 To provide external ingress routes that are unique, the namespace is used when forming the 
@@ -114,6 +112,13 @@ every time Minikube is restarted.  The opendj/ chart is a StatefulSet,
 and relies on auto provisioning.  If you restart Minikube, you may find you
 need to re-install OpenAM.
 
+# Templates and Dependencies
+
+There is a common chart - frcommon, that includes a number of utility template expansions. This
+chart is included in the other charts as a dependency.
+
+The script `helm/update-deps.sh` will update all of the dependencies. You must run this anytime you change 
+frcommon or any of the foundational charts (openam, openidm, etc.)
 
 # Tips
 

@@ -61,6 +61,6 @@ resources:
 component: openidm
 
 
-# Values: filebeat, none
-logDriver: none
-
+ingress:
+  class: nginx
+  #class: cloudflare-warp

@@ -42,7 +42,6 @@ spec:
         - name: configstore-secret
           mountPath: /var/run/secrets/configstore
         args:  ["bootstrap"]
-
       containers:
       - name: openam
         image: {{ template "image" . }}

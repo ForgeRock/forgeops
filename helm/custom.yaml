@@ -51,3 +51,6 @@ global:
   # Will generate a self-signed certificate for the openam.default.example.com ingress.
   # The CN of the certificate *MUST* match the FQDN.
   useTLS: false
+  # If set to true, the ingress fqdn names will be {component}{domain}
+  # If false, the fqdn will include the namespace: {component}{namespace}{domain}
+  shortFQDN: false

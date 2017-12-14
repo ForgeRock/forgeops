@@ -40,3 +40,7 @@ resources:
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl
 component: openig
 
+ingress:
+  class: nginx
+  #class: cloudflare-warp
+

@@ -26,7 +26,7 @@ charts="opendj amster openam openidm openig postgres-openidm frcommon git opendj
 for chart in $charts
 do
     echo "Packaging $chart"
-    $helm dep update $hdir/$chart
+    $helm dep update --skip-refresh $hdir/$chart
     $helm package $hdir/$chart
 done
 
