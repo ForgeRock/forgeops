@@ -4,15 +4,15 @@
             "name" : "user",
             "onCreate" : {
                 "type" : "text/javascript",
-                "source" : "require('onCreateUser').setDefaultFields(object);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onCreateUser').emailUser(object);require('lastChanged').updateLastChanged(object);"
+                "source" : "require('ui/onCreateUser').setDefaultFields(object);require('ui/onCreateUser').createIdpRelationships(object);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('ui/onCreateUser').emailUser(object);require('ui/lastChanged').updateLastChanged(object);"
             },
             "onUpdate" : {
                 "type" : "text/javascript",
-                "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onUpdateUser').createNotification(object, oldObject);require('lastChanged').updateLastChanged(object);"
+                "source" : "require('ui/onUpdateUser').preserveLastSync(object, oldObject, request);require('ui/onUpdateUser').updateIdpRelationships(object);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('ui/onUpdateUser').createNotification(object, oldObject);require('ui/lastChanged').updateLastChanged(object);"
             },
             "onDelete" : {
                 "type" : "text/javascript",
-                "file" : "onDelete-user-cleanup.js"
+                "file" : "ui/onDelete-user-cleanup.js"
             },
             "postCreate" : {
                 "type" : "text/javascript",
@@ -92,7 +92,6 @@
                     "termsAccepted",
                     "lastChanged",
                     "consentedMappings",
-                    "_meta",
                     "idps"
                 ],
                 "properties" : {
@@ -737,53 +736,6 @@
                         "returnByDefault" : false,
                         "isVirtual" : false
                     },
-                    "_meta" : {
-                        "description" : "Metadata",
-                        "type" : "object",
-                        "viewable" : false,
-                        "searchable" : false,
-                        "isPersonal" : false,
-                        "scope" : "private",
-                        "properties" : {
-                            "creationDate" : {
-                                "description" : "Creation Date",
-                                "title" : "Creation Date",
-                                "type" : "string"
-                            },
-                            "numberOfLogins" : {
-                                "description" : "Number of Logins",
-                                "title" : "Number of Logins",
-                                "type" : "number"
-                            },
-                            "stagesCompleted" : {
-                                "description" : "Stages completed successfully",
-                                "title" : "Stages Completed",
-                                "type" : "array",
-                                "items" : {
-                                    "type" : "object",
-                                    "title" : "Completed Stage",
-                                    "properties" : {
-                                        "identifier" : {
-                                            "title" : "Stage Identifier",
-                                            "description" : "Stage identifier",
-                                            "type" : "string"
-                                        },
-                                        "dateCompleted" : {
-                                            "title" : "Date Completed",
-                                            "description" : "Date stage was completed",
-                                            "type" : "string"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "order" : [
-                            "creationDate",
-                            "numberOfLogins",
-                            "stagesCompleted"
-                        ],
-                        "required" : [ ]
-                    },
                     "idps" : {
                         "title" : "Identity Providers",
                         "viewable" : true,
@@ -847,7 +799,7 @@
             },
             "onSync" : {
                 "type" : "text/javascript",
-                "source" : "require('vertexStatePropagator').propagateVertexStateChange(resourceName, oldObject, newObject, {'assignments': ['members'], 'temporalConstraints': ['members']})"
+                "source" : "require('roles/onSync-roles').syncUsersOfRoles(resourceName, oldObject, newObject, ['members']);"
             },
             "onCreate" : {
                 "type" : "text/javascript",
@@ -1089,7 +1041,7 @@
             "name" : "assignment",
             "onSync" : {
                 "type" : "text/javascript",
-                "source" : "require('vertexStatePropagator').propagateVertexStateChange(resourceName, oldObject, newObject, {'attributes': ['roles']})"
+                "source" : "require('roles/onSync-assignments').syncUsersOfRolesWithAssignment(resourceName, oldObject, newObject, ['roles']);"
             },
             "schema" : {
                 "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Assignment",
