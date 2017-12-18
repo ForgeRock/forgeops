@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "5.5.1",
+    "amsterVersion" : "6.0.0-M3",
     "entityType" : "Authentication",
     "entityId" : "Authentication",
     "pathParams" : { }
@@ -53,6 +53,9 @@
     "core" : {
       "orgConfig" : "ldapService",
       "adminAuthModule" : "ldapService"
+    },
+    "trees" : {
+      "authenticationSessionsStateManagement" : "InMemory"
     },
     "_type" : {
       "_id" : "EMPTY",

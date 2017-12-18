@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "5.5.1",
+    "amsterVersion" : "6.0.0-M3",
     "entityType" : "Policies",
     "entityId" : "patchOwnData",
     "pathParams" : { }
@@ -30,8 +30,8 @@
       "propertyValues" : [ "country", "telephoneNumber", "mail", "address2", "city", "givenName", "postalCode", "description", "stateProvince", "/preferences/marketing", "userName", "password", "postalAddress", "termsAccepted", "kbaInfo", "/preferences/updates", "consentedMappings", "sn" ]
     } ],
     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "lastModifiedDate" : "2017-12-08T22:21:54.840Z",
+    "lastModifiedDate" : "2017-12-18T20:08:13.635Z",
     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "creationDate" : "2017-12-08T20:56:55.999Z"
+    "creationDate" : "2017-12-18T20:08:13.635Z"
   }
 }

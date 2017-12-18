@@ -5,6 +5,11 @@ metadata:
   labels:
     role: auth
 spec:
+  initContainers:
+  - name: wait-for-configstore
+    image: "groundnuty/k8s-wait-for:0.3"
+    imagePullPolicy: IfNotPresent
+    args: [ "pod", "-l", "role=persistence" ]
   hostAliases:
   - ip: "127.0.0.1"
     hostnames:
@@ -17,15 +22,9 @@ spec:
         - containerPort: 8080
           name: http
           protocol: TCP
-      env:
-      - name: CONFIGURATION_LDAP
-        value: "dj-1.dj-service:1389"
       resources:
           requests:
-            memory: "512Mi"
-      volumeMounts:
-      - name: configstore-secret
-        mountPath: /var/run/secrets/configstore
+            memory: "1024Mi"
       readinessProbe:
         httpGet:
           path: /openam/isAlive.jsp
@@ -40,7 +39,3 @@ spec:
         initialDelaySeconds: 60
         timeoutSeconds: 15
         periodSeconds: 60
-  volumes:
-  - name: configstore-secret
-    configMap:
-      name: am-config

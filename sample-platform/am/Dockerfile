@@ -1,4 +1,4 @@
-FROM forgerock/openam:5.5.1
+FROM forgerock/openam:latest
 
 COPY WEB-INF /usr/local/tomcat/webapps/openam/WEB-INF
 COPY XUI /usr/local/tomcat/webapps/openam/XUI

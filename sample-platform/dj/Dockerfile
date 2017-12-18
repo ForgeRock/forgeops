@@ -1,4 +1,4 @@
-FROM forgerock/opendj:5.5.0
+FROM forgerock/opendj:latest
 
 COPY schema /tmp/schema
 COPY ldif /opt/opendj/bootstrap/userstore/ldif

@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "5.5.1",
+    "amsterVersion" : "6.0.0-M3",
     "entityType" : "Scripts",
     "entityId" : "59b70ae3-cb77-4db3-ac86-3068234801b5",
     "pathParams" : { }
@@ -9,7 +9,7 @@
   "data" : {
     "_id" : "59b70ae3-cb77-4db3-ac86-3068234801b5",
     "name" : "hasIDMAdminRole",
-    "description" : null,
+    "description" : "null",
     "script" : "YXV0aG9yaXplZCA9IGVudmlyb25tZW50CiAgICAuZ2V0KCJzZWN1cml0eUNvbnRleHRSb2xlcyIpCiAgICAuaW5qZWN0KGZhbHNlKSB7IHJlc3VsdCwgcm9sZSAtPgoJCXJldHVybiByZXN1bHQgfHwgcm9sZSA9PSAib3BlbmlkbS1hZG1pbiIKCX0=",
     "default" : false,
     "language" : "GROOVY",

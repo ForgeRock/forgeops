@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "5.5.1",
+    "amsterVersion" : "6.0.0-M3",
     "entityType" : "Applications",
     "entityId" : "openidm",
     "pathParams" : { }
@@ -10,20 +10,20 @@
     "_id" : "openidm",
     "displayName" : "OpenIDM",
     "description" : null,
-    "conditions" : [ "LEAuthLevel", "Policy", "Script", "AuthenticateToService", "SimpleTime", "AMIdentityMembership", "OR", "IPv6", "IPv4", "SessionProperty", "AuthScheme", "AuthLevel", "NOT", "Transaction", "AuthenticateToRealm", "AND", "ResourceEnvIP", "LDAPFilter", "OAuth2Scope", "Session" ],
-    "attributeNames" : [ ],
-    "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "resourceTypeUuids" : [ "76656a38-5f8e-401b-83aa-4ccb74ce88d2" ],
+    "resourceComparator" : null,
     "creationDate" : 1504214076793,
+    "lastModifiedDate" : 1513627693415,
+    "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "applicationType" : "iPlanetAMWebAgentService",
-    "subjects" : [ "Policy", "NOT", "OR", "JwtClaim", "AuthenticatedUsers", "AND", "Identity", "NONE" ],
+    "attributeNames" : [ ],
+    "editable" : true,
     "saveIndex" : null,
     "searchIndex" : null,
-    "resourceComparator" : null,
-    "editable" : true,
-    "resourceTypeUuids" : [ "76656a38-5f8e-401b-83aa-4ccb74ce88d2" ],
+    "applicationType" : "iPlanetAMWebAgentService",
     "entitlementCombiner" : "DenyOverride",
-    "lastModifiedDate" : 1512175141671,
+    "subjects" : [ "Policy", "NOT", "OR", "JwtClaim", "AuthenticatedUsers", "AND", "Identity", "NONE" ],
+    "conditions" : [ "LEAuthLevel", "Policy", "Script", "AuthenticateToService", "SimpleTime", "AMIdentityMembership", "OR", "IPv6", "IPv4", "SessionProperty", "AuthScheme", "AuthLevel", "NOT", "Transaction", "AuthenticateToRealm", "AND", "ResourceEnvIP", "LDAPFilter", "OAuth2Scope", "Session" ],
     "name" : "openidm"
   }
 }

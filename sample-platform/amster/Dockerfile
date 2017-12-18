@@ -1,12 +1,11 @@
-FROM forgerock/amster:5.5.1
+FROM forgerock/amster:latest
 
 COPY scripts /opt/amster/scripts/
 COPY config /opt/amster/config/
+COPY secrets /var/run/secrets/amster/
 
 USER root
 
-RUN mkdir -p /var/run/secrets/amster/ && \
-    ssh-keygen -f /var/run/secrets/amster/id_rsa -P "" -q && \
-    chown forgerock /var/run/secrets/amster/id_rsa*
+RUN chown forgerock /var/run/secrets/amster/id_rsa*
 
 USER forgerock
