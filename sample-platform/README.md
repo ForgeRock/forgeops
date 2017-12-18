@@ -1,6 +1,11 @@
-# Full Stack Sample
+# Platform Sample
 
-This is a sample project demonstrates one way to use four components of the ForgeRock Identity Platform (AM, DJ, IDM and IG). In particular, it shows how the AM policy engine can be used to control authorization for IDM, by using filters in IG.
+This is a sample project demonstrates one way to use four components of the ForgeRock Identity Platform (AM, DJ, IDM and IG). This sample demonstrates these capabilities:
+
+AM policy engine can be use to control authorization for IDM, by using filters in IG.
+Facebook authentication with AM
+Delegation of all self-service features to IDM (including automatic redirection to IDM during social authentication)
+Unification of end-user interfaces - using CORS to facilitate the seamless interaction of the various back-end services
 
 Docker and Kubernetes are used to automate the deployment of this sample. It is designed to run primarily in Minikube, and it is intentionally oversimplified in terms of its Kubernetes configuration. This sample may be useful to show the minimum necessary Kubernetes configuration, but it should not be considered a template for a production deployment. Refer to the other areas of forgeops for production-ready templates.
 
