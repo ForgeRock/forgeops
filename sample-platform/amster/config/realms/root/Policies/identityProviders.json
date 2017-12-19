@@ -11,7 +11,7 @@
     "name" : "identityProviders",
     "active" : true,
     "description" : "",
-    "resources" : [ "*://*:*/openidm/identityProviders", "*://*:*/openidm/identityProviders?_action=getAuthRedirect" ],
+    "resources" : [ "*://*:*/openidm/identityProviders?_action=handlePostAuth", "*://*:*/openidm/identityProviders", "*://*:*/openidm/identityProviders?_action=getAuthRedirect" ],
     "applicationName" : "openidm",
     "actionValues" : {
       "POST" : true,
