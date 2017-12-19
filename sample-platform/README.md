@@ -9,6 +9,8 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
     minikube start --insecure-registry 10.0.0.0/24 --memory 4096
     echo "`minikube ip` idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" >> /etc/hosts
     eval $(minikube docker-env)
+    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
+    kubectl config use-context sample-context
 
 Use the forgeops project to build local docker images within your minikube environment:
 
@@ -26,27 +28,28 @@ Build the Docker images for this sample:
 
 Monitor the pods as they come up:
 
-    kubectl --namespace sample logs -f dj
-    kubectl --namespace sample logs -f am
-    kubectl --namespace sample logs -f amster
-    kubectl --namespace sample logs -f ig
-    kubectl --namespace sample logs -f idm
+    kubectl logs -f dj-0
+    kubectl logs -f dj-1
+    kubectl logs -f am
+    kubectl logs -f amster
+    kubectl logs -f ig
+    kubectl logs -f idm
 
 Now the environment should be available at http://idm-service.sample.svc.cluster.local
 
 To export changes made to AM:
 
-    kubectl --namespace sample exec -it amster /opt/amster/amster
+    kubectl exec -it amster /opt/amster/amster
       connect http://am-service.sample.svc.cluster.local/openam -k /var/run/secrets/amster/id_rsa
       export-config --path /tmp/export
       :quit
 
-    kubectl --namespace sample cp amster:/tmp/export amster/config
+    kubectl cp amster:/tmp/export amster/config
 
 
 To export changes made to IDM:
 
-    kubectl --namespace sample cp idm:/var/openidm/conf conf
+    kubectl cp idm:/var/openidm/conf conf
 
 Review changes to config using git diff. Remove all untracked files with this command:
 
