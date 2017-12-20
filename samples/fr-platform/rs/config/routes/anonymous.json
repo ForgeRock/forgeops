@@ -1,0 +1,6 @@
+{
+    "name": "anonymous",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444/",
+    "condition": "${matches(request.uri.path, '^/admin') or matches(request.uri.path, '^/user') or matches(request.uri.path, '^/selfservice/') or matches(request.uri.path, '^/oauthReturn/') or matches(request.uri.path, '^/openidm/info/uiconfig') or matches(request.uri.path, '^/openidm/config/ui/themeconfig') or matches(request.uri.path, '^/openidm/identityProviders')}",
+    "handler": "IDMClient"
+}

@@ -12,7 +12,7 @@ spec:
     imagePullPolicy: IfNotPresent
     args: [ "wait", "dj-0.dj-service", "1389" ]
   containers:
-    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:6.0.0
+    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest
       imagePullPolicy: IfNotPresent
       name: openidm
       env:

@@ -1,0 +1,32 @@
+{
+    "name": "notifications",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${matches(request.uri.path, '^/openidm/endpoint/usernotifications')}",
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "notifications"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": "AccessTokenResolver",
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

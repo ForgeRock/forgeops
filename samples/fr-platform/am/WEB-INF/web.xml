@@ -177,7 +177,7 @@
     <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
     <init-param>
     <param-name>cors.allowed.origins</param-name>
-    <param-value>http://idm-service.sample.svc.cluster.local</param-value>
+    <param-value>http://client-service.sample.svc.cluster.local</param-value>
     </init-param>
     <init-param>
     <param-name>cors.allowed.methods</param-name>

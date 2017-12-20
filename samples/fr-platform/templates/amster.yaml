@@ -10,7 +10,7 @@ spec:
     imagePullPolicy: IfNotPresent
     args: [ "wait", "am-service", "80" ]
   containers:
-    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:6.0.0
+    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
       imagePullPolicy: IfNotPresent
       name: amster
       env:
@@ -28,4 +28,4 @@ spec:
         value: "http://am-service.sample.svc.cluster.local/openam"
       resources:
           requests:
-            memory: "256Mi"
+            memory: "64Mi"

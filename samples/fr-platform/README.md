@@ -13,7 +13,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
 
 If you want to enable Facebook for social registration and login, you will need to register an application within Facebook. You will need to make sure your Facebook App has these redirect urls registered:
 
-    http://idm-service.sample.svc.cluster.local/oauthReturn/
+    http://client-service.sample.svc.cluster.local/oauthReturn/
     http://am-service.sample.svc.cluster.local/openam
 
 Save the App Id and Secret as environment variables, like so:
@@ -36,7 +36,7 @@ helm install forgerock/fr-platform -n sample-fr-platform \
 
 2. You need to add the ingress IP to your local hosts. First, remove any old entry with this command:
 ```
-grep -v idm-service.sample.svc.cluster.local /etc/hosts \
+grep -v client-service.sample.svc.cluster.local /etc/hosts \
 | sudo tee /etc/hosts
 ```
 Next add the correct entry:
@@ -44,15 +44,16 @@ Next add the correct entry:
     If you are using minikube, use this command:
 ```
 echo "$(minikube ip) \
-    idm-service.sample.svc.cluster.local \
+    client-service.sample.svc.cluster.local \
     am-service.sample.svc.cluster.local" \
 | sudo tee -a /etc/hosts
+minikube ssh "sudo ip link set docker0 promisc on"
 ```
 If your cluster is available directly, you can use this command instead:
 ```
 echo "$( kubectl get ing -o \
     jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' ) \
-    idm-service.sample.svc.cluster.local \
+    client-service.sample.svc.cluster.local \
     am-service.sample.svc.cluster.local" \
 | sudo tee -a /etc/hosts
 ```
@@ -64,7 +65,7 @@ kubectl get po -n sample --watch
 
 4. Afterwards, you can access the application by opening this URL:
 ```
-http://idm-service.sample.svc.cluster.local
+http://client-service.sample.svc.cluster.local
 ```
 
     You can use amadmin / password to login.
@@ -91,18 +92,18 @@ In order to copy and paste the below commands, you will need make sure your work
 
 Build the Docker images for this sample:
 
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/ig:6.0.0 igOIDC
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:6.0.0 dj
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:6.0.0 am
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:6.0.0 amster
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:6.0.0 idm
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:6.0.0 pg
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest rs
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client:latest client
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:latest dj
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:latest am
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest amster
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest idm
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest pg
 
 Install the helm package:
 
     helm init --wait
-    helm package .
-    helm install fr-platform-6.0.0.tgz -n sample-fr-platform \
+    helm install . -n sample-fr-platform \
       --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
       --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
 

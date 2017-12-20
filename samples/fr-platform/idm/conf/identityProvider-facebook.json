@@ -110,7 +110,7 @@
             "target" : "locale"
         }
     ],
-    "redirectUri" : "http://idm-service.sample.svc.cluster.local/oauthReturn/",
+    "redirectUri" : "http://client-service.sample.svc.cluster.local/oauthReturn/",
     "configClass" : "org.forgerock.oauth.clients.oauth2.OAuth2ClientConfiguration",
     "enabled" : true
 }

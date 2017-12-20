@@ -11,9 +11,15 @@ spec:
       - backend:
           serviceName: am-service
           servicePort: 80
-  - host: idm-service.sample.svc.cluster.local
+  - host: client-service.sample.svc.cluster.local
     http:
       paths:
       - backend:
-          serviceName: ig-service
+          serviceName: client-service
+          servicePort: 8080
+  - host: rs-service.sample.svc.cluster.local
+    http:
+      paths:
+      - backend:
+          serviceName: rs-service
           servicePort: 8080
