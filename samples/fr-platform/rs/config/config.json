@@ -1,0 +1,107 @@
+{
+    "heap": [
+        {
+            "name": "AccessTokenResolver",
+            "type": "TokenIntrospectionAccessTokenResolver",
+            "config": {
+                "endpoint": "${env['OPENAM_INSTANCE']}/oauth2/introspect",
+                "providerHandler": {
+                    "type": "Chain",
+                    "config": {
+                        "filters": [
+                            {
+                                "type": "HeaderFilter",
+                                "config": {
+                                    "messageType": "request",
+                                    "add": {
+                                        "Authorization": [
+                                            "Basic ${encodeBase64('openidmClient:openidmClient')}"
+                                        ]
+                                    }
+                                }
+                            }
+                        ],
+                        "handler": "ClientHandler"
+                    }
+                }
+            }
+        },
+        {
+            "name": "IDMClient",
+            "type": "ClientHandler",
+            "config": {
+                "hostnameVerifier": "ALLOW_ALL",
+                "sslContextAlgorithm": "TLSv1.2",
+                "keyManager": {
+                    "type": "KeyManager",
+                    "config": {
+                        "keystore": {
+                            "type": "KeyStore",
+                            "config": {
+                                "url": "file:///var/openig/keystore.jks",
+                                "password": "changeit"
+                            }
+                        },
+                        "password": "changeit"
+                    }
+                },
+                "trustManager": {
+                    "type": "TrustManager",
+                    "config": {
+                        "keystore": {
+                            "type": "KeyStore",
+                            "config": {
+                                "url": "file:///var/openig/keystore.jks",
+                                "password": "changeit"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "_router",
+            "type": "Router",
+            "config": {
+                "defaultHandler": {
+                    "type": "DispatchHandler",
+                    "config": {
+                        "bindings": [
+                            {
+                                "condition": "${request.method == 'GET' and request.uri.path == '/'}",
+                                "handler": {
+                                    "type": "WelcomeHandler"
+                                }
+                            },
+                            {
+                                "condition": "${request.uri.path == '/'}",
+                                "handler": {
+                                    "type": "StaticResponseHandler",
+                                    "config": {
+                                        "status": 405,
+                                        "reason": "Method Not Allowed"
+                                    }
+                                }
+                            },
+                            {
+                                "handler": {
+                                    "type": "StaticResponseHandler",
+                                    "config": {
+                                        "status": 404,
+                                        "reason": "Not Found",
+                                        "headers": {
+                                            "Content-Type": [ "application/json" ]
+                                        },
+                                        "entity": "{ \"error\": \"Something gone wrong, please contact your system administrator.\"}"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "handler": "_router",
+    "audit": "global"
+}

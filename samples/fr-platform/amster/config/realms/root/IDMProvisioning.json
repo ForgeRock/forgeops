@@ -12,7 +12,7 @@
     "provisioningEncryptionMethod" : "A128CBC_HS256",
     "provisioningEncryptionAlgorithm" : "RSAES_PKCS1_V1_5",
     "provisioningSigningKeyAlias" : "openidm-selfservice-key",
-    "idmDeploymentUrl" : "http://idm-service.sample.svc.cluster.local/selfservice/",
+    "idmDeploymentUrl" : "http://client-service.sample.svc.cluster.local/selfservice/",
     "enabled" : true,
     "provisioningSigningAlgorithm" : "HS256",
     "_type" : {

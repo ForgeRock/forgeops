@@ -1,0 +1,32 @@
+{
+    "name": "workflow_tasks",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${((matches(request.uri.path, '^/openidm/endpoint/gettasksview$') and matches(request.uri.query, '_queryId=gettasksview') or matches(request.uri.path, '^/openidm/endpoint/getprocessesforuser$') or matches(request.uri.path, '^/openidm/workflow/processdefinition/.+')) and matches(request.method, 'GET')) or (((matches(request.uri.path, '^/openidm/workflow/processinstance/?$') and matches(request.uri.query, '_action=create')) or (matches(request.uri.path, '^/openidm/workflow/taskinstance/.+') and matches(request.uri.query, '_action=complete'))) and matches(request.method, 'POST')) or (matches(request.uri.path, '^/openidm/workflow/taskinstance/.+') and matches(request.method, 'PUT'))}",
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "workflow_tasks"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": "AccessTokenResolver",
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

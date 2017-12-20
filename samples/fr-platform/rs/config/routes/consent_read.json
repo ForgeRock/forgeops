@@ -1,0 +1,32 @@
+{
+    "name": "consent_read",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${matches(request.uri.path, '^/openidm/consent$') and matches(request.uri.query, '_action=getConsentMappings') and matches(request.method, 'POST')}",
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "consent_read"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": "AccessTokenResolver",
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

@@ -45,7 +45,7 @@
     "coreOpenIDClientConfig" : {
       "jwtTokenLifetime" : 0,
       "clientSessionUri" : null,
-      "postLogoutRedirectUri" : [ "http://idm-service.sample.svc.cluster.local/", "http://idm-service.sample.svc.cluster.local/admin/" ],
+      "postLogoutRedirectUri" : [ ],
       "defaultMaxAge" : 600,
       "claims" : [ ],
       "defaultMaxAgeEnabled" : false
@@ -57,10 +57,10 @@
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "openid", "policy", "email" ],
+      "scopes" : [ "openid", "policy", "email", "am-introspect-all-tokens", "profile", "consent_read", "workflow_tasks", "notifications" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ "http://idm-service.sample.svc.cluster.local:80/openid/callback" ],
+      "redirectionUris" : [ "http://client-service.sample.svc.cluster.local:80/openid/callback" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {

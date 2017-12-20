@@ -1,0 +1,32 @@
+{
+    "name": "openid",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${matches(request.uri.path, '^/openidm/info/login') or matches(request.uri.path, '^/openidm/info/version') or matches(request.uri.path, '^/openidm/authentication') or matches(request.uri.path, '^/openidm/config/ui/profile$') or matches(request.uri.path, '^/openidm/config/ui/dashboard$') or matches(request.uri.path, '^/openidm/policy/.+') or matches(request.uri.path, '^/openidm/schema/.+')}",
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "openid"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": "AccessTokenResolver",
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}
