@@ -15,15 +15,7 @@ export EXPORT_PATH="${EXPORT_PATH:-${NAMESPACE}/am/export}"
 
 cd "${GIT_ROOT}"
 
-git config core.filemode false
-git config user.email "auto-sync@forgerock.net"
-git config user.name "Git Auto-sync user"
-
-git branch ${GIT_AUTOSAVE_BRANCH}
-git checkout ${GIT_AUTOSAVE_BRANCH}
-
 export AMSTER_EXPORT_PATH="${GIT_ROOT}/${EXPORT_PATH}"
-
 
 mkdir -p "${AMSTER_EXPORT_PATH}"
 

@@ -10,7 +10,7 @@ WORKDIR /opt
 
 
 # Use this if you want to directly add the agent zip file.
-#ADD agent.zip /var/tmp/agent.zip
+#COPY agent.zip /var/tmp/agent.zip
 
 # The agent bits are not on maven - so we need to download these from the internal build server.
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
@@ -64,9 +64,9 @@ RUN /opt/web_agents/apache24_agent/bin/agentadmin --s /usr/local/apache2/conf/ht
 WORKDIR /opt/web_agents/apache24_agent
 
 # overwrites agent.conf
-ADD agent.conf /opt/web_agents/apache24_agent/instances/agent_1/config
+COPY agent.conf /opt/web_agents/apache24_agent/instances/agent_1/config
 
-ADD *.sh /opt/web_agents/
+COPY *.sh /opt/web_agents/
 
 # This sends the debug logs to stderr so we can use docker tools to view the logs.
 RUN ln -sf /dev/stderr /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log

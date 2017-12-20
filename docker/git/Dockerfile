@@ -1,5 +1,5 @@
 # Git image for performing configuration checkout / push.
-FROM alpine:3.6
+FROM alpine:3.7
 
 ENV FORGEROCK_HOME /opt/forgerock
 
@@ -16,7 +16,7 @@ ENV GIT_ROOT /git/config
 # The ssh command to use for authenticated git operations.
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/id_rsa
 
-ADD *.sh  /
+COPY *.sh  /
 
 USER forgerock
 

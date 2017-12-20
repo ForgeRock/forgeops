@@ -48,11 +48,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+
         volumeMounts:
         - name: git
           mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
         # The ssh key for Amster authN
         - name: amster-secrets
           mountPath: /var/run/secrets/amster
@@ -63,6 +62,15 @@ spec:
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+      - name: git
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["pause"]
       volumes:
       - name: amster-secrets
         secret:

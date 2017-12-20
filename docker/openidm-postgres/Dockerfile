@@ -7,6 +7,6 @@
 
 FROM postgres:9.6.1
 
-ADD sql/* /docker-entrypoint-initdb.d/
+COPY sql/* /docker-entrypoint-initdb.d/
 
 

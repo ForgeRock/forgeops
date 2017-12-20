@@ -5,7 +5,7 @@ FROM nginx:1.13
 WORKDIR /opt
 
 # Use this if you want to directly add the agent zip file.
-#ADD agent.zip /var/tmp/agent.zip
+#COPY agent.zip /var/tmp/agent.zip
 
 # Waiting on https://bugster.forgerock.org/jira/browse/AMAGENTS-501 to fix:
 # nginx: [emerg] module "/opt/web_agents/nginx12_agent/bin/../lib/openam_ngx_auth_module.so" version 1011010 instead of 1011013 in /etc/nginx/nginx.conf:8
@@ -21,8 +21,8 @@ ARG NGINX_AGENT_ZIP=http://abondance-uk.internal.forgerock.com/public/webagents/
 
 
 
-ADD nginx.conf /etc/nginx/
-ADD default.conf /etc/nginx/conf.d/
+COPY nginx.conf /etc/nginx/
+COPY default.conf /etc/nginx/conf.d/
 
 
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
@@ -55,7 +55,7 @@ ENV AM_MAX_SHARED_POOL_SIZE 52428800
 
 
 WORKDIR /opt/web_agents
-ADD *.sh /opt/web_agents/
+COPY *.sh /opt/web_agents/
 
 
 # TODO: We may want to directly copy in the agent.conf vs. run the installer?

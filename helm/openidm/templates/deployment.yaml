@@ -66,10 +66,17 @@ spec:
           mountPath: /opt/openidm/logs
         - name: git
           mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
         - name: boot-properties
           mountPath: /var/run/openidm
+      - name: git
+        image: {{ template "gitImage" . }}
+        imagePullPolicy: {{ template "pullPolicy" . }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["pause"]
       volumes:
       - name: openidm-secrets
         secret:

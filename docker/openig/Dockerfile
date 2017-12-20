@@ -24,7 +24,7 @@ ENV OPENIG_BASE /var/openig
 EXPOSE 8080
 
 # Download your OpenIG war file to this directory.
-ADD openig.war /tmp/openig.war
+COPY openig.war /tmp/openig.war
 
 RUN unzip -q /tmp/openig.war -d /usr/local/tomcat/webapps/ROOT \
     && rm -f /tmp/openig.war \
@@ -32,6 +32,6 @@ RUN unzip -q /tmp/openig.war -d /usr/local/tomcat/webapps/ROOT \
     && chown -R forgerock /usr/local/tomcat $OPENIG_BASE
 
 # Example of adding config to the container to create an immutable image:
-# ADD sample-config/* /var/openig/config/
+# COPY sample-config/* /var/openig/config/
 
 USER forgerock

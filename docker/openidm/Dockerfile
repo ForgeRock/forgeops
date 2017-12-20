@@ -1,7 +1,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-FROM forgerock/java:5.5.0
+FROM forgerock/java:6.0.0
 
 WORKDIR /opt
 
@@ -11,7 +11,7 @@ WORKDIR /opt
 ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 # Download or add OpenIDM nightly build and unzip.
-ADD openidm.zip /tmp/openidm.zip
+COPY openidm.zip /tmp/openidm.zip
 
 # For a Debian base image use the RUN stanza below.
 #
@@ -25,8 +25,8 @@ RUN unzip -q /tmp/openidm.zip && \
     chown -R forgerock:forgerock /opt/openidm && \
     rm -f /tmp/openidm.zip  && rm -fr /opt/openidm/samples
 
-ADD *.sh /opt/openidm/
-ADD logging.properties /opt/openidm/logging.properties
+COPY *.sh /opt/openidm/
+COPY logging.properties /opt/openidm/logging.properties
 
 WORKDIR /opt/openidm
 

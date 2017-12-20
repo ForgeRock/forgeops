@@ -24,7 +24,7 @@ ENV FORGEROCK_HOME /home/forgerock
 ENV OPENAM_HOME /home/forgerock/openam
 
 
-ADD openam.war  /tmp/openam.war
+COPY openam.war  /tmp/openam.war
 
 RUN apk add --no-cache su-exec unzip curl bash  \
   && rm -fr /usr/local/tomcat/webapps/* \
@@ -43,7 +43,7 @@ USER forgerock
 # If you want to create an image that is ready to be bootstrapped to a
 # configuration store, you can add a custom boot.json file.
 # This can also be added at runtime by a ConfigMap or an init container.
-#ADD boot.json /root/openam
+#COPY boot.json /root/openam
 
 # Generate a default keystore for SSL - only needed if you want SSL inside the cluster.
 # You can mount your own keystore on the ssl/ directory to override this.
@@ -59,20 +59,20 @@ USER forgerock
 
 # Custom server.xml: use this if AM is behind SSL termination.
 # See the server.xml file for details.
-ADD server.xml "$CATALINA_HOME"/conf/server.xml
+COPY server.xml "$CATALINA_HOME"/conf/server.xml
 
 # For debugging AM in a container, uncomment this.
 # Use something like  kubectl port-forward POD 5005:5005
 # ENV CATALINA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005"
 
 # Settings for Tomcat cache.
-ADD context.xml "$CATALINA_HOME"/conf/context.xml
+COPY context.xml "$CATALINA_HOME"/conf/context.xml
 
 # Path to optional script to customize the AM web app. Use this script hook to copy in images, web.xml, etc.
 ENV CUSTOMIZE_AM /home/forgerock/customize-am.sh
 
 
-ADD *.sh $FORGEROCK_HOME/
+COPY *.sh $FORGEROCK_HOME/
 
 ENTRYPOINT ["/home/forgerock/docker-entrypoint.sh"]
 

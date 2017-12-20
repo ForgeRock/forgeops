@@ -18,7 +18,7 @@ RUN apk add --no-cache su-exec unzip curl bash openldap-clients \
 USER forgerock
 
 
-ADD *.sh $FORGEROCK_HOME/
+COPY *.sh $FORGEROCK_HOME/
 
 ENTRYPOINT ["/home/forgerock/docker-entrypoint.sh"]
 

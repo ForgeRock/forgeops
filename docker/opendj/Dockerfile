@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-FROM forgerock/java:5.5.0
+FROM forgerock/java:6.0.0
 
 WORKDIR /opt
 
@@ -43,20 +43,23 @@ ENV BACKUP_HOST dont-run-backups
 #RUN curl $MVN_REPO/opendj-server-legacy/$OPENDJ_VERSION/opendj-server-legacy-$OPENDJ_VERSION.zip -o /tmp/opendj.zip
 
 # Use this to directly add the opendj zip file
-ADD opendj.zip /home/forgerock/
+COPY opendj.zip /home/forgerock/
 
 
 ENV INSTANCE_ROOT /opt/opendj/data
 
-RUN unzip -q /home/forgerock/opendj.zip -d /opt \
+# openldap-clients -used as a light weight ldap probe (C based- very small runtime and fast startup)
+
+RUN apk add --no-cache openldap-clients \
+    && unzip -q /home/forgerock/opendj.zip -d /opt \
     && rm -f /home/forgerock/opendj.zip \
     && mkdir -p "$INSTANCE_ROOT" \
     && mkdir -p "$SECRET_PATH" \
     && chown -R forgerock /opt "$SECRET_PATH"
 
 
-ADD bootstrap/ /opt/opendj/bootstrap/
-ADD *.sh /opt/opendj/
+COPY bootstrap/ /opt/opendj/bootstrap/
+COPY *.sh /opt/opendj/
 
 
 #
