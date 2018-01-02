@@ -95,6 +95,10 @@ Monitor the pods as they come up:
     kubectl logs -f ig
     kubectl logs -f idm
 
+To make the internal DJ cluster accessible locally:
+
+    kubectl port-forward dj-0 1389:1389 4444:4444 &
+
 Now the environment should be available at http://idm-service.sample.svc.cluster.local
 
 You can use amadmin / password to login.

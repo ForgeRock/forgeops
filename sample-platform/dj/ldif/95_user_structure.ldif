@@ -38,8 +38,6 @@ objectClass: organizationalUnit
 objectClass: top
 ou: assignment
 
-
-
 dn: ou=People,dc=example,dc=com
 ou: people
 description: people

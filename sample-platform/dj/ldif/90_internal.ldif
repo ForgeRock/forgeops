@@ -35,27 +35,6 @@ objectClass: organizationalUnit
 objectClass: top
 ou: roles
 
-# Config OU
-
-dn: ou=config,dc=openidm,dc=forgerock,dc=com
-objectClass: organizationalUnit
-objectClass: top
-ou: config
-
-# Security OU
-
-dn: ou=Security,dc=openidm,dc=forgerock,dc=com
-objectClass: organizationalUnit
-objectClass: top
-ou: Security
-
-# Security Keys OU
-
-dn: ou=Keys,ou=Security,dc=openidm,dc=forgerock,dc=com
-objectClass: organizationalUnit
-objectClass: top
-ou: Keys
-
 ##
 # Clustered Recon OUs
 ##
@@ -139,10 +118,10 @@ objectClass: organizationalUnit
 objectClass: top
 ou: ui
 
-dn: ou=notifications,ou=ui,dc=openidm,dc=forgerock,dc=com
+dn: ou=notification,ou=ui,dc=openidm,dc=forgerock,dc=com
 objectClass: organizationalUnit
 objectClass: top
-ou: notifications
+ou: notification
 
 # Populate objects
 

@@ -5,11 +5,20 @@ metadata:
   labels:
     role: management
 spec:
+  initContainers:
+  - name: wait-for-repo
+    image: "groundnuty/k8s-wait-for:0.3"
+    imagePullPolicy: IfNotPresent
+    args: [ "pod", "-l", "role=persistence" ]
   containers:
     - image: idm:fullstack
       imagePullPolicy: IfNotPresent
       name: openidm
       env:
+      - name: OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE
+        value: "true"
+      - name: OPENIDM_CONFIG_REPO_ENABLED
+        value: "false"
       - name: IDP_FACEBOOK_CLIENTID
         valueFrom:
           secretKeyRef:

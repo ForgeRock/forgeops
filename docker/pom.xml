@@ -67,7 +67,7 @@
         <!-- Default versions to build  -->
         <openamVersion>6.0.0-M5</openamVersion>
         <opendjVersion>6.0.0-M2</opendjVersion>
-        <openidmVersion>6.0.0-M4</openidmVersion>
+        <openidmVersion>6.0.0-M5</openidmVersion>
         <openigVersion>6.0.0-M119</openigVersion>
         <registry>docker-public.forgerock.io:443</registry>
         <releaseTag>6.0.0</releaseTag>

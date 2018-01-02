@@ -19,7 +19,7 @@
             {
                 "name" : "STATIC_USER",
                 "properties" : {
-                    "queryOnResource" : "repo/internal/user",
+                    "queryOnResource" : "endpoint/static/user",
                     "username" : "anonymous",
                     "password" : "&{openidm.anonymous.password}",
                     "defaultUserRoles" : [
@@ -31,7 +31,7 @@
             {
                 "name" : "STATIC_USER",
                 "properties" : {
-                    "queryOnResource" : "repo/internal/user",
+                    "queryOnResource" : "endpoint/static/user",
                     "username" : "openidm-admin",
                     "password" : "&{openidm.admin.password}",
                     "defaultUserRoles" : [

@@ -8,7 +8,7 @@
             },
             "onUpdate" : {
                 "type" : "text/javascript",
-                "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onUpdateUser').createNotification(object, oldObject);require('lastChanged').updateLastChanged(object);"
+                "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onUpdateUser').createNotification(object, oldObject);require('lastChanged').updateLastChanged(object);require('aliasList').update(object);"
             },
             "onDelete" : {
                 "type" : "text/javascript",
@@ -92,6 +92,8 @@
                     "lastChanged",
                     "consentedMappings",
                     "_meta",
+                    "aliasList",
+                    "cn",
                     "idps"
                 ],
                 "properties" : {
@@ -122,9 +124,6 @@
                         "searchable" : false,
                         "minLength" : 8,
                         "userEditable" : true,
-                        "encryption" : {
-                            "key" : "openidm-sym-default"
-                        },
                         "scope" : "private",
                         "isProtected" : true,
                         "usageDescription" : "",
@@ -771,6 +770,32 @@
                             "termsAccepted"
                         ],
                         "required" : [ ]
+                    },
+                    "aliasList" : {
+                        "description" : "Alias List",
+                        "type" : "array",
+                        "items" : {
+                            "type" : "string"
+                        },
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "scope" : "private",
+                        "isPersonal" : false
+                    },
+                    "cn" : {
+                        "description" : "Common Name",
+                        "type" : "string",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "scope" : "private",
+                        "isPersonal" : true,
+                        "isVirtual" : true,
+                        "onStore" : {
+                            "type" : "text/javascript",
+                            "source" : "object.cn || (object.givenName + ' ' + object.sn)"
+                        }
                     },
                     "idps" : {
                         "title" : "Identity Providers",

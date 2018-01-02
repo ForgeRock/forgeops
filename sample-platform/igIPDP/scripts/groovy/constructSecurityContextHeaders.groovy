@@ -2,8 +2,8 @@
 String sub = contexts.ssoToken.info.uid
 
 String adminContext = (new groovy.json.JsonBuilder([
-      "id" : "openidm-admin",
-      "component" : "repo/internal/user",
+      "id" : "amAdmin",
+      "component" : "endpoint/static/user",
       "roles" : ["openidm-admin", "openidm-authorized"],
       "moduleId" : "TRUSTED_ATTRIBUTE"
   ])).toString()

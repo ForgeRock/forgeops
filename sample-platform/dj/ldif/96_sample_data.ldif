@@ -1,5 +1,6 @@
 
 dn: uid=jdoe,ou=People,dc=example,dc=com
+fr-idm-uuid: jdoe
 objectClass: fr-idm-managed-user-explicit
 objectClass: person
 objectClass: organizationalPerson
@@ -15,6 +16,7 @@ description: Created for OpenIDM
 userPassword: Passw0rd
 
 dn: uid=bjensen,ou=People,dc=example,dc=com
+fr-idm-uuid: bjensen
 objectClass: fr-idm-managed-user-explicit
 objectClass: person
 objectClass: organizationalPerson
