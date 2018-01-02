@@ -17,6 +17,20 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
     kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
     kubectl config use-context sample-context
 
+
+If you want to enable Facebook usage, you will need to register an application within Facebook. Save the App Id and Secret as environment variables, like so:
+
+    export IDP_FACEBOOK_CLIENTID=<Your Facebook App Id>
+    export IDP_FACEBOOK_CLIENTSECRET=<Your Facebook App Secret>
+
+Otherwise, export dummy values:
+
+    export IDP_FACEBOOK_CLIENTID=FakeID
+    export IDP_FACEBOOK_CLIENTSECRET=FakeSecret
+
+If you use dummy values, Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
+
+
 Use the forgeops project to build local docker images within your minikube environment:
 
     cd forgeops/docker
