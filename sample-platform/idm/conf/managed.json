@@ -92,6 +92,7 @@
                     "termsAccepted",
                     "lastChanged",
                     "consentedMappings",
+                    "aliasList",
                     "idps"
                 ],
                 "properties" : {
@@ -122,9 +123,6 @@
                         "searchable" : false,
                         "minLength" : 8,
                         "userEditable" : true,
-                        "encryption" : {
-                            "key" : "openidm-sym-default"
-                        },
                         "scope" : "private",
                         "isProtected" : true,
                         "usageDescription" : "",
@@ -735,6 +733,23 @@
                         },
                         "returnByDefault" : false,
                         "isVirtual" : false
+                    },
+                    "aliasList" : {
+                        "description" : "Alias List",
+                        "type" : "array",
+                        "items" : {
+                            "type" : "string"
+                        },
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "scope" : "private",
+                        "isVirtual" : true,
+                        "isPersonal" : false,
+                        "onStore" : {
+                            "type" : "text/javascript",
+                            "source" : "object.idpData ? Object\n .keys(object.idpData)\n .filter(function (provider) { return object.idpData[provider].enabled !== false; })\n .map(function (provider) { return provider + '-' + object.idpData[provider].subject; }) : []"
+                        }
                     },
                     "idps" : {
                         "title" : "Identity Providers",

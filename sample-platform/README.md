@@ -38,6 +38,7 @@ Use the forgeops project to build local docker images within your minikube envir
 
 Build the Docker images for this sample:
 
+    docker build -t dj:fullstack dj
     docker build -t am:fullstack am
     docker build -t amster:fullstack amster
     docker build -t ig:fullstack ig
@@ -54,11 +55,14 @@ Build the Docker images for this sample:
 Monitor the pods as they come up:
 
     kubectl logs -f dj-0
-    kubectl logs -f dj-1
     kubectl logs -f am
     kubectl logs -f amster
     kubectl logs -f ig
     kubectl logs -f idm
+
+To make the internal DJ cluster accessible locally:
+
+    kubectl port-forward dj-0 1389:1389 4444:4444 &
 
 Now the environment should be available at http://idm-service.sample.svc.cluster.local
 

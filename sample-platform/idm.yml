@@ -5,6 +5,11 @@ metadata:
   labels:
     role: management
 spec:
+  initContainers:
+  - name: wait-for-repo
+    image: "groundnuty/k8s-wait-for:0.3"
+    imagePullPolicy: IfNotPresent
+    args: [ "pod", "-l", "role=persistence" ]
   containers:
     - image: idm:fullstack
       imagePullPolicy: IfNotPresent

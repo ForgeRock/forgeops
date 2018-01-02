@@ -1,0 +1,5 @@
+{
+    "type" : "text/javascript",
+    "context" : "endpoint/static/user/*",
+    "source" : "({_id: context.security.authenticationId})"
+}
