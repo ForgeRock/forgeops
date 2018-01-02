@@ -99,3 +99,11 @@ in different contexts.
 # 2017-12-01 
 * Add RBAC support for AM chart
 * Remove AM embedded DJ chart. This is not the recommended way to deploy AM. 
+
+# 2017-12-20
+* Removed git and ssh from all base images except for the git image
+* Add git sidecar image to amster and openidm for sync
+* Some minor updates to harden the docker images
+* Further work on the toolbox container
+
+

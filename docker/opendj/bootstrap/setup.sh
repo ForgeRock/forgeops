@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+set -x
 
 echo "Setting up default OpenDJ instance."
 
@@ -25,10 +26,11 @@ fi
 # todo: We may want to specify a keystore using --usePkcs12keyStore, --useJavaKeystore
 /opt/opendj/setup -p 1389 --ldapsPort 1636 --enableStartTLS  \
   --adminConnectorPort 4444 \
-  --instancePath /opt/opendj/data \
+  --instancePath ./data \
   --baseDN $BASE_DN -h localhost --rootUserPassword "$PASSWORD" \
   --acceptLicense \
-  ${INIT_OPTION}
+  ${INIT_OPTION} || (echo "Setup failed, will sleep for debugging"; sleep 10000)
+
 
 # If any optional LDIF files are present, load them.
 ldif="bootstrap/${BOOTSTRAP_TYPE}/ldif"

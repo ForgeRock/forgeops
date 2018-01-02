@@ -10,7 +10,8 @@ metadata:
     vendor: forgerock
   annotations:
     kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
-    ingress.kubernetes.io/rewrite-target: /
+    # Do not use for nginx. TODO: Does warp need this?
+    #ingress.kubernetes.io/rewrite-target: /
     ingress.kubernetes.io/enable-cors: "false"
     ingress.kubernetes.io/affinity: "cookie"
     ingress.kubernetes.io/session-cookie-name: "route"
