@@ -55,6 +55,7 @@ Build the Docker images for this sample:
 Monitor the pods as they come up:
 
     kubectl logs -f dj-0
+    kubectl logs -f dj-1
     kubectl logs -f am
     kubectl logs -f amster
     kubectl logs -f ig

@@ -19,7 +19,7 @@ spec:
           protocol: TCP
       env:
       - name: CONFIGURATION_LDAP
-        value: "dj-0.dj-service:1389"
+        value: "dj-1.dj-service:1389"
       resources:
           requests:
             memory: "512Mi"

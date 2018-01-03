@@ -15,6 +15,10 @@ spec:
       imagePullPolicy: IfNotPresent
       name: openidm
       env:
+      - name: OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE
+        value: "true"
+      - name: OPENIDM_CONFIG_REPO_ENABLED
+        value: "false"
       - name: IDP_FACEBOOK_CLIENTID
         valueFrom:
           secretKeyRef:

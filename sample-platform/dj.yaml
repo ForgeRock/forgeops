@@ -4,7 +4,7 @@ metadata:
   name: dj
 spec:
   serviceName: dj-service
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:

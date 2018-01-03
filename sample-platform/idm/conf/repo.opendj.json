@@ -16,7 +16,12 @@
                     "port": 1389
                 }
             ],
-            "secondaryLdapServers": []
+            "secondaryLdapServers": [
+                {
+                    "hostname": "dj-1.dj-service",
+                    "port": 1389
+                }
+            ]
         },
         "root": {
             "inheritFrom": "bind",

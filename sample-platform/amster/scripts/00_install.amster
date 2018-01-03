@@ -3,7 +3,7 @@ install-openam --serverUrl http://am-service.sample.svc.cluster.local/openam \
 --cookieDomain cluster.local \
 --adminPwd password \
 --cfgStore dirServer \
---cfgStoreHost dj-0.dj-service \
+--cfgStoreHost dj-1.dj-service \
 --cfgStoreDirMgrPwd password  \
 --cfgStorePort 1389  \
 --cfgStoreRootSuffix dc=example,dc=com \
