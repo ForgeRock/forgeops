@@ -53,7 +53,7 @@
     "com.iplanet.am.ldap.connection.delay.between.retries" : 1000,
     "_type" : {
       "_id" : "LDAPv3ForOpenDS",
-      "name" : "OpenDJ",
+      "name" : "embedded",
       "collection" : true
     }
   }
