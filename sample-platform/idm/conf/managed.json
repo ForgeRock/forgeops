@@ -16,15 +16,15 @@
             },
             "postCreate" : {
                 "type" : "text/javascript",
-                "file" : "roles/postOperation-roles.js"
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
             },
             "postUpdate" : {
                 "type" : "text/javascript",
-                "file" : "roles/postOperation-roles.js"
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
             },
             "postDelete" : {
                 "type" : "text/javascript",
-                "file" : "roles/postOperation-roles.js"
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);require('postDelete-idp-cleanup').removeConnectedIdpData(oldObject, resourceName, request);"
             },
             "actions" : {
                 "resetPassword" : {
@@ -89,7 +89,6 @@
                     "lastSync",
                     "kbaInfo",
                     "preferences",
-                    "termsAccepted",
                     "lastChanged",
                     "consentedMappings",
                     "_meta",
@@ -630,39 +629,6 @@
                         ],
                         "required" : [ ]
                     },
-                    "termsAccepted" : {
-                        "title" : "Terms Accepted",
-                        "type" : "object",
-                        "viewable" : false,
-                        "searchable" : false,
-                        "userEditable" : true,
-                        "usageDescription" : "",
-                        "isPersonal" : false,
-                        "properties" : {
-                            "termsVersion" : {
-                                "title" : "",
-                                "description" : "Terms & Conditions Version",
-                                "type" : "string",
-                                "viewable" : true,
-                                "userEditable" : false
-                            },
-                            "iso8601date" : {
-                                "title" : "",
-                                "description" : "ISO 8601 Date and time format",
-                                "type" : "string",
-                                "viewable" : true,
-                                "userEditable" : false
-                            }
-                        },
-                        "order" : [
-                            "termsVersion",
-                            "iso8601date"
-                        ],
-                        "description" : "Terms Accepted",
-                        "returnByDefault" : true,
-                        "isVirtual" : false,
-                        "required" : [ ]
-                    },
                     "lastChanged" : {
                         "title" : "Last Changed",
                         "type" : "object",
@@ -775,12 +741,34 @@
                                         }
                                     }
                                 }
+                            },
+                            "termsAccepted" : {
+                                "title" : "Terms Accepted",
+                                "description" : "Terms Accepted",
+                                "type" : "object",
+                                "properties" : {
+                                    "termsVersion" : {
+                                        "title" : "",
+                                        "description" : "Terms & Conditions Version",
+                                        "type" : "string"
+                                    },
+                                    "iso8601date" : {
+                                        "title" : "",
+                                        "description" : "ISO 8601 Date and time format",
+                                        "type" : "string"
+                                    }
+                                },
+                                "order" : [
+                                    "termsVersion",
+                                    "iso8601date"
+                                ]
                             }
                         },
                         "order" : [
                             "creationDate",
                             "numberOfLogins",
-                            "stagesCompleted"
+                            "stagesCompleted",
+                            "termsAccepted"
                         ],
                         "required" : [ ]
                     },
@@ -845,10 +833,6 @@
                 "type" : "text/javascript",
                 "file" : "roles/onDelete-roles.js"
             },
-            "onSync" : {
-                "type" : "text/javascript",
-                "source" : "require('vertexStatePropagator').propagateVertexStateChange(resourceName, oldObject, newObject, {'assignments': ['members'], 'temporalConstraints': ['members']})"
-            },
             "onCreate" : {
                 "type" : "text/javascript",
                 "source" : "require('roles/conditionalRoles').roleCreate(object);"
@@ -859,15 +843,15 @@
             },
             "postCreate" : {
                 "type" : "text/javascript",
-                "file" : "roles/postOperation-roles.js"
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
             },
             "postUpdate" : {
                 "type" : "text/javascript",
-                "file" : "roles/postOperation-roles.js"
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
             },
             "postDelete" : {
                 "type" : "text/javascript",
-                "file" : "roles/postOperation-roles.js"
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
             },
             "schema" : {
                 "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role",
@@ -1037,7 +1021,8 @@
                                     }
                                 }
                             ]
-                        }
+                        },
+                        "notifyRelationships" : ["members"]
                     },
                     "condition" : {
                         "description" : "A conditional filter for this role",
@@ -1067,7 +1052,8 @@
                             "order" : [
                                 "duration"
                             ]
-                        }
+                        },
+                        "notifyRelationships" : ["members"]
                     }
                 },
                 "required" : [
@@ -1087,10 +1073,6 @@
         },
         {
             "name" : "assignment",
-            "onSync" : {
-                "type" : "text/javascript",
-                "source" : "require('vertexStatePropagator').propagateVertexStateChange(resourceName, oldObject, newObject, {'attributes': ['roles']})"
-            },
             "schema" : {
                 "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Assignment",
                 "$schema" : "http://forgerock.org/json-schema#",
@@ -1165,7 +1147,8 @@
                                 "value"
                             ],
                             "required" : [ ]
-                        }
+                        },
+                        "notifyRelationships" : ["roles"]
                     },
                     "linkQualifiers" : {
                         "description" : "Conditional link qualifiers to restrict this assignment to.",

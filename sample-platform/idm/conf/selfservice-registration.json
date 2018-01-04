@@ -35,11 +35,7 @@
             "kbaConfig" : null
         },
         {
-            "name" : "termsAndConditions",
-            "termsTranslations" : {
-                "en" : "Some fake terms",
-                "fr" : "More fake terms"
-            }
+            "name" : "termsAndConditions"
         },
         {
             "name" : "selfRegistration",
