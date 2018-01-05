@@ -37,7 +37,7 @@
 
      Tomcat 8 should default this to UTF-8, but we set it just to be sure.
 
-     maxHttpHeaderSize="8192" - defaults to 8K which is sufficient for AM.
+     maxHttpHeaderSize="8192" - defaults to 8K which is sufficient for IG.
      -->
     <Connector port="8080" protocol="HTTP/1.1"
                maxThreads="1000"

@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM tomcat:8.5.23-jre8-alpine
+FROM tomcat:8.5.24-jre8-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 
@@ -22,6 +22,8 @@ ENV OPENIG_BASE /var/openig
 
 # Note: By default Tomcat does NOT listen on 8443. You must add a custom server.xml file to change this.
 EXPOSE 8080
+
+COPY server.xml "$CATALINA_HOME"/conf/server.xml
 
 # Download your OpenIG war file to this directory.
 COPY openig.war /tmp/openig.war
