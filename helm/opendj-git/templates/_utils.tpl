@@ -40,22 +40,4 @@
 {{ printf "%s/%s:%s" .Values.global.image.repository "git"  .Values.global.image.tag }}
 {{- end -}}
 
-{{/* expands to the fqdn using the component name. Note domain has a leading . */}}
-{{- define "externalFQDN" -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.global.domain -}}
-{{- end -}}
 
-{{/* OpenAM FQDN */}}
-{{- define "openamFQDN" -}}
-{{- printf "openam.%s%s" .Release.Namespace .Values.global.domain -}}
-{{- end -}}
-
-{{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
-{{- define "tls-spec" -}}
-{{ if .Values.global.useTLS -}}
-tls:
-- hosts:
-  - {{ template "externalFQDN" .  }}
-  secretName: {{ template "externalFQDN" . }}
-{{ end -}}
-{{- end -}}

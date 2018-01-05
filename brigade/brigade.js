@@ -63,11 +63,30 @@ function helmDeploy() {
 
 }
 
+function helmInstall() {
+      var helm = new Job("helm", "lachlanevenson/k8s-helm:" + helmTag)
+      helm.storage.enabled = false
+
+     helm.tasks = [
+       "ls /src",
+       "helm init --client-only",
+       "helm repo add forgerock " + forgerockRepo,
+       "helm search forgerock/",
+       "helm list",
+       "helm install forgerock/opendj --set global.image.repository=forgerock --namespace test"
+        ];
+
+      helm.run().then(result => {
+          console.log("Helm output =" + result)
+       });
+}
+
 events.on("exec", (brigadeEvent, project) => {
     console.log(util.inspect(brigadeEvent, false, null))
     console.log(util.inspect(project,false,null))
     //helmDeploy()
-    doTest()
+    //doTest()
+    helmInstall()
     console.log("done")
 })
 

@@ -80,6 +80,8 @@ rbac:
 ingress:
   class: nginx
   #class: cloudflare-warp
+  # Set hostname to override the default value of {{component}}.{{namespace}}.{{domain}}.
+  #hostname: foo.example.com
 
 
 service:

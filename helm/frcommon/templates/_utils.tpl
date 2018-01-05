@@ -43,17 +43,16 @@
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
 {{- define "externalFQDN" -}}
-{{- if .Values.global.shortFQDN  }}{{- printf "%s%s" .Values.component .Values.global.domain -}}
+{{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
 {{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.global.domain -}}
 {{- end -}}
 {{- end -}}
 
 
-{{/* printf "openam.%s%s" .Release.Namespace .Values.global.domain */}}
-{{/* OpenAM FQDN */}}
+{{/* OpenAM FQDN  - if it is not explicity set, generate it */}}
 {{- define "openamFQDN" -}}
-{{- if .Values.global.shortFQDN  }}{{- printf "openam%s" .Values.global.domain -}}
+{{- if .Values.openamFQDN  }}{{- printf "%s" .Values.openamFQDN -}}
 {{- else -}}
 {{- printf "openam.%s%s" .Release.Namespace .Values.global.domain -}}
 {{- end -}}

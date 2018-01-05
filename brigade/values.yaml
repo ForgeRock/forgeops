@@ -1,0 +1,12 @@
+# values for the brigade service itself
+
+rbac:
+  enabled: true
+
+service:
+    type: NodePort
+
+ingress:
+    enabled: true
+    hosts: [brigade.192.168.99.100.xip.io]
+
