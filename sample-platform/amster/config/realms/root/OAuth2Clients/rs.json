@@ -3,11 +3,11 @@
     "realm" : "/",
     "amsterVersion" : "6.0.0-M4",
     "entityType" : "OAuth2Clients",
-    "entityId" : "openidm",
+    "entityId" : "rs",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "openidm",
+    "_id" : "rs",
     "signEncOAuth2ClientConfig" : {
       "idTokenEncryptionMethod" : "A128CBC-HS256",
       "jwkSet" : null,
@@ -24,7 +24,7 @@
       "jwkStoreCacheMissCacheTime" : 60000,
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
-      "jwksUri" : "http://am-service.sample.svc.cluster.local:8080/openam/oauth2/connect/jwk_uri",
+      "jwksUri" : "http://am-service.sample.svc.cluster.local:80/openam/oauth2/connect/jwk_uri",
       "userinfoEncryptedResponseAlg" : null,
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
@@ -45,22 +45,22 @@
     "coreOpenIDClientConfig" : {
       "jwtTokenLifetime" : 0,
       "clientSessionUri" : null,
-      "postLogoutRedirectUri" : [ "http://idm-service.sample.svc.cluster.local/", "http://idm-service.sample.svc.cluster.local/admin/" ],
+      "postLogoutRedirectUri" : [ ],
       "defaultMaxAge" : 600,
       "claims" : [ ],
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : "openidm",
+      "userpassword" : "Test1234",
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "openid", "policy" ],
+      "scopes" : [ "uma_protection" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ "http://idm-service.sample.svc.cluster.local:80/home/id_token/callback" ],
+      "redirectionUris" : [ "http://rs.example.com/callback" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {

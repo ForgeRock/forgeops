@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.0.0-M4",
+    "entityType" : "ResourceTypes",
+    "entityId" : "f2780781-e2d0-43d8-9608-0f56748706801",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "f2780781-e2d0-43d8-9608-0f56748706801",
+    "uuid" : "f2780781-e2d0-43d8-9608-0f56748706801",
+    "name" : "Thermometer - f2780781-e2d0-43d8-9608-0f56748706801",
+    "description" : "Dynamically created resource type for the UMA resource set. Used to find all Policy Engine Policies that make up an UMA Policy",
+    "patterns" : [ "uma://-*-" ],
+    "actions" : {
+      "share" : true,
+      "read" : true,
+      "edit" : true,
+      "delete" : true,
+      "write" : true
+    },
+    "createdBy" : "id=dsameuser,ou=user,dc=example,dc=com",
+    "creationDate" : 1515452641742,
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=example,dc=com",
+    "lastModifiedDate" : 1515452641742
+  }
+}

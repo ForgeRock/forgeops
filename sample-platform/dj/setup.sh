@@ -12,9 +12,6 @@ touch /opt/opendj/BOOTSTRAPPING
 
 DB_NAME=${DB_NAME:-userRoot}
 
-# The type of DJ we want to bootstrap. This determines the ldif files and scripts to load. Defaults to a userstore.
-BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
-
 INIT_OPTION="--addBaseEntry"
 
 # If NUMBER_SAMPLE_USERS is set we generate sample users.
@@ -93,7 +90,7 @@ cp -r /tmp/schema/* /opt/opendj/data/config/schema
 /opt/opendj/bin/start-ds
 
 # If any optional LDIF files are present, load them.
-ldif="bootstrap/${BOOTSTRAP_TYPE}/ldif"
+ldif="bootstrap/userstore/ldif"
 
 if [ -d "$ldif" ]; then
     echo "Loading LDIF files in $ldif"
@@ -110,7 +107,55 @@ if [ -d "$ldif" ]; then
     done
 fi
 
-script="bootstrap/${BOOTSTRAP_TYPE}/post-install.sh"
+script="bootstrap/userstore/post-install.sh"
+
+if [ -r "$script" ]; then
+    echo "executing post install script $script"
+    sh "$script"
+fi
+
+ldif="bootstrap/cts/ldif"
+
+if [ -d "$ldif" ]; then
+    echo "Loading LDIF files in $ldif"
+    for file in "${ldif}"/*.ldif;  do
+        echo "Loading $file"
+        # search + replace all placeholder variables. Naming conventions are from AM.
+        sed -e "s/@BASE_DN@/$BASE_DN/"  \
+            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
+            -e "s/@DB_NAME@/$DB_NAME/"  \
+            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
+
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+      echo "  "
+    done
+fi
+
+script="bootstrap/cts/post-install.sh"
+
+if [ -r "$script" ]; then
+    echo "executing post install script $script"
+    sh "$script"
+fi
+
+ldif="bootstrap/extra/ldif"
+
+if [ -d "$ldif" ]; then
+    echo "Loading LDIF files in $ldif"
+    for file in "${ldif}"/*.ldif;  do
+        echo "Loading $file"
+        # search + replace all placeholder variables. Naming conventions are from AM.
+        sed -e "s/@BASE_DN@/$BASE_DN/"  \
+            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
+            -e "s/@DB_NAME@/$DB_NAME/"  \
+            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
+
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+      echo "  "
+    done
+fi
+
+script="bootstrap/extra/post-install.sh"
 
 if [ -r "$script" ]; then
     echo "executing post install script $script"

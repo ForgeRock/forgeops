@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "6.0.0-M3",
+    "amsterVersion" : "6.0.0-M4",
     "entityType" : "Policies",
     "entityId" : "gettasksview",
     "pathParams" : { }
@@ -21,8 +21,8 @@
     },
     "resourceTypeUuid" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "lastModifiedDate" : "2017-12-18T20:08:15.112Z",
+    "lastModifiedDate" : "2018-01-08T17:26:19.485Z",
     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "creationDate" : "2017-12-18T20:08:15.112Z"
+    "creationDate" : "2018-01-08T17:26:19.485Z"
   }
 }
