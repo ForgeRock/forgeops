@@ -16,3 +16,6 @@ spec:
       resources:
           requests:
             memory: "512Mi"
+      env:
+      - name: OPENAM_INSTANCE
+        value: "http://am-service.sample.svc.cluster.local/openam"

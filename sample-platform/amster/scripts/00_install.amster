@@ -1,4 +1,5 @@
-install-openam --serverUrl http://am-service.sample.svc.cluster.local/openam \
+this.binding.variables << System.getenv()
+install-openam --serverUrl OPENAM_INSTANCE \
 --authorizedKey  /var/run/secrets/amster/id_rsa.pub \
 --cookieDomain cluster.local \
 --adminPwd password \

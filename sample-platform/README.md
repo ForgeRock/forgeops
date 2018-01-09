@@ -12,6 +12,7 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
 ## Only needed once per machine:
 
     minikube start --insecure-registry 10.0.0.0/24 --memory 4096
+    minikube ssh "sudo ip link set docker0 promisc on" # fixes minikube bug
     echo "`minikube ip` idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" >> /etc/hosts
     eval $(minikube docker-env)
     kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube

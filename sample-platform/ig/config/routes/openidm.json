@@ -84,7 +84,7 @@
                             "name": "SSOFilter",
                             "type": "SingleSignOnFilter",
                             "config": {
-                                "openamUrl": "http://am-service.sample.svc.cluster.local/openam",
+                                "openamUrl": "${env['OPENAM_INSTANCE']}",
                                 "logoutEndpoint": "/logout",
                                 "defaultLogoutLandingPage": "/user/"
                             }
@@ -161,7 +161,7 @@
                                         "name": "SSOFilter",
                                         "type": "SingleSignOnFilter",
                                         "config": {
-                                            "openamUrl": "http://am-service.sample.svc.cluster.local/openam"
+                                            "openamUrl": "${env['OPENAM_INSTANCE']}"
                                         }
                                     },
                                     {
@@ -188,7 +188,7 @@
                                       "type": "PolicyEnforcementFilter",
                                       "name": "PolicyEnforcementFilter-1",
                                       "config": {
-                                            "openamUrl": "http://am-service.sample.svc.cluster.local/openam",
+                                            "openamUrl": "${env['OPENAM_INSTANCE']}",
                                             "pepUsername": "openidm",
                                             "pepPassword": "openidm",
                                             "pepRealm": "/",

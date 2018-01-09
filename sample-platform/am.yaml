@@ -10,10 +10,6 @@ spec:
     image: "groundnuty/k8s-wait-for:0.3"
     imagePullPolicy: IfNotPresent
     args: [ "pod", "-l", "role=persistence" ]
-  hostAliases:
-  - ip: "127.0.0.1"
-    hostnames:
-    - "am-service.sample.svc.cluster.local"
   containers:
     - image: am:fullstack
       imagePullPolicy: IfNotPresent
