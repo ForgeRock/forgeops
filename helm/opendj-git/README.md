@@ -37,7 +37,7 @@ global:
   git:
     sshKey: xUGs5SHRjWUR...base64-encoded-private-git-key...
     repo: "ssh://git@stash.forgerock.org:7999/cloud/forgeops-init.git"
-    branch: master
+    branch: release/5.5.0
 djInstance: msauthn
 baseDN: "dc=openam,dc=forgerock,dc=org"
 bootstrapScript: "/git/forgeops-init/default/dj-userstore/setup.sh"

@@ -20,7 +20,7 @@ The default repository used in the charts is:
 global:
     git:
      repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-     branch: master
+     branch: release/5.5.0
 ```
 
 forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it. 

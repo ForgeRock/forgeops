@@ -72,7 +72,7 @@ djPersistence: false
 
 git:
   repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
-  branch: master
+  branch: release/5.5.0
 
 # Set this to true to enable backups to gcloud
 enableGcloudBackups: false
