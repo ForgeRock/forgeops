@@ -19,6 +19,8 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
     kubectl config use-context sample-context
 
 
+## Facebook usage
+
 If you want to enable Facebook usage, you will need to register an application within Facebook. Save the App Id and Secret as environment variables, like so:
 
     export IDP_FACEBOOK_CLIENTID=<Your Facebook App Id>
@@ -31,13 +33,16 @@ Otherwise, export dummy values:
 
 If you use dummy values, Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
 
+## Building the base images
 
 Use the forgeops project to build local docker images within your minikube environment:
 
     cd forgeops/docker
     mvn
 
-Build the Docker images for this sample:
+## Starting the sample
+
+Build the Docker images and add the kubernetes resources for this sample:
 
     docker build -t dj:fullstack dj
     docker build -t am:fullstack am
@@ -63,6 +68,20 @@ Monitor the pods as they come up:
     kubectl logs -f idm
 
 Now the environment should be available at http://idm-service.sample.svc.cluster.local
+
+
+## For developers making changes
+
+You can deploy changes to the underlying product running in the container like so:
+
+    cp $OPENIDM_ZIP_TARGET/openidm*.zip ../docker/openidm/openidm.zip
+    docker build -t forgerock/openidm:latest ../docker/openidm
+    docker build -t idm:fullstack idm
+    kubectl delete po idm --grace-period=0
+    kubectl apply -f idm.yml
+
+
+## Saving config changes
 
 To export changes made to AM:
 
