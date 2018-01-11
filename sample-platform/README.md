@@ -11,9 +11,11 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
 
 ## Only needed once per machine:
 
+**You need minikube 0.23+ and kubectl 1.8+ for this to work**
+
     minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-    minikube ssh "sudo ip link set docker0 promisc on" # fixes minikube bug
-    echo "`minikube ip` idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" >> /etc/hosts
+    minikube addons enable ingress
+    echo "$(minikube ip) idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" | sudo tee -a /etc/hosts
     eval $(minikube docker-env)
     kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
     kubectl config use-context sample-context
@@ -21,7 +23,12 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
 
 ## Facebook usage
 
-If you want to enable Facebook usage, you will need to register an application within Facebook. Save the App Id and Secret as environment variables, like so:
+If you want to enable Facebook usage, you will need to register an application within Facebook. You will need to make sure your Facebook App has these redirect urls registered:
+
+    http://idm-service.sample.svc.cluster.local/oauthReturn/
+    http://am-service.sample.svc.cluster.local:80/openam/oauth2c/OAuthProxy.jsp
+
+Save the App Id and Secret as environment variables, like so:
 
     export IDP_FACEBOOK_CLIENTID=<Your Facebook App Id>
     export IDP_FACEBOOK_CLIENTSECRET=<Your Facebook App Secret>
@@ -41,6 +48,14 @@ Use the forgeops project to build local docker images within your minikube envir
     mvn
 
 ## Starting the sample
+
+Change your working directory back to this folder :
+
+    cd ../sample-platform
+
+This command needs to be executed each time you start the minikube VM, to fix a bug with its internal networking:
+
+    minikube ssh "sudo ip link set docker0 promisc on"
 
 Build the Docker images and add the kubernetes resources for this sample:
 
@@ -69,6 +84,7 @@ Monitor the pods as they come up:
 
 Now the environment should be available at http://idm-service.sample.svc.cluster.local
 
+You can use amadmin / password to login.
 
 ## For developers making changes
 
