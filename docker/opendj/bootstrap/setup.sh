@@ -62,10 +62,3 @@ fi
 
 /opt/opendj/rebuild.sh
 
-# This enables the Prometheus metrics
-bin/dsconfig  -h localhost -p 4444 -D "cn=directory manager" \
-    -w ${PASSWORD} --trustAll --no-prompt --batch <<EOF
-create-connection-handler --type http --handler-name "HTTP Connection Handler" --set enabled:true --set listen-port:8081
-set-http-endpoint-prop --endpoint-name /metrics/prometheus --set authorization-mechanism:HTTP\ Anonymous
-EOF
-
