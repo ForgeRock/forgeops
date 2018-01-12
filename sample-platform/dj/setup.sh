@@ -34,7 +34,7 @@ fi
    --bindDN "cn=Directory Manager" \
    --bindPassword password \
    --provider-name "IDM managed/role Json Schema" \
-   --type json-schema \
+   --type json-query-equality-matching-rule \
    --set enabled:true \
    --set case-sensitive-strings:false \
    --set ignore-white-space:true \
@@ -52,7 +52,7 @@ fi
    --bindDN "cn=Directory Manager" \
    --bindPassword password \
    --provider-name "IDM Relationship Json Schema" \
-   --type json-schema \
+   --type json-query-equality-matching-rule \
    --set enabled:true \
    --set case-sensitive-strings:false \
    --set ignore-white-space:true \
@@ -72,7 +72,7 @@ fi
    --bindDN "cn=Directory Manager" \
    --bindPassword password \
    --provider-name "IDM Cluster Object Json Schema" \
-   --type json-schema \
+   --type json-query-equality-matching-rule \
    --set enabled:true \
    --set case-sensitive-strings:false \
    --set ignore-white-space:true \

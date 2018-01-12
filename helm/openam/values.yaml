@@ -74,7 +74,7 @@ livenessPeriod: 60
 livenessTimeout: 15
 
 rbac:
-  create: true
+  enabled: true
 
 
 ingress:
