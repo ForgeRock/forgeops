@@ -13,7 +13,7 @@ global:
     # Image repo and tag. The image that is pulled will be  {repository}/{component}:{tag}
     # Example:  set repository: quay.io/acme, tag: 1.0.1, the openam image formed is: quay.io/acme/openam:1.0.1
     repository: forgerock
-    tag: 5.5.0
+    tag: 6.0.0
     # If you want to force a re-pull of all images set this to "Always"
     pullPolicy: IfNotPresent
   # The domain - including a leading dot '.'.  Product FQDNs are formed using this domain.

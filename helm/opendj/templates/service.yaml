@@ -17,5 +17,8 @@ spec:
     - port: 4444
       name: djadmin
       targetPort: 4444
+    - port: 8081
+      protocol: TCP
+      name: prometheus
   selector:
     djInstance: {{ .Values.djInstance }}

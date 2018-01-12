@@ -9,7 +9,7 @@ global:
   domain: .example.com
   image:
     repository: forgerock
-    tag: 5.5.0
+    tag: 6.0.0
     pullPolicy: IfNotPresent
   # If you set this to true, you must have a TLS secret with the same name as the FQDN.
   useTLS: false

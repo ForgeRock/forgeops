@@ -6,7 +6,7 @@
 global:
   image:
     repository: forgerock
-    tag: 5.5.0
+    tag: 6.0.0
 
   
 resources:

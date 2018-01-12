@@ -15,7 +15,16 @@ pause() {
     done
 }
 
+TIME=300
 
+syncloop() {
+    echo "Will commit and push changes every $TIME seconds"
+    while true
+    do
+        sleep $TIME
+        /git-sync.sh
+    done
+}
 
 case "$1" in
 "init")
@@ -30,6 +39,9 @@ case "$1" in
     ;;
 "pause")
     pause
+    ;;
+"syncloop")
+    syncloop
     ;;
 *)
     exec $*

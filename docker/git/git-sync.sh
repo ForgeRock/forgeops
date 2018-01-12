@@ -3,7 +3,9 @@
 
 set -x
 
-GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-autosave}"
+DEF_BRANCH="autosave-${COMPONENT}-${NAMESPACE}"
+
+GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-$DEF_BRANCH}"
 
 
 cd "${GIT_ROOT}"
@@ -20,5 +22,5 @@ git checkout -B "${GIT_AUTOSAVE_BRANCH}"
 t=`date`
 git add .
 git commit -a -m "autosave at $t"
-git push --set-upstream origin ${GIT_AUTOSAVE_BRANCH} -f
+git push --set-upstream origin "${GIT_AUTOSAVE_BRANCH}" -f
 

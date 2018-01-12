@@ -5,7 +5,7 @@ global:
   image:
     #repository: gcr.io/engineering-devops
     repository: forgerock
-    tag: 5.5.0-SNAPSHOT
+    tag: 6.0.0-SNAPSHOT
 
 
 userstore:

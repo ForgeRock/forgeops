@@ -15,7 +15,7 @@ global:
   image:
     repository: forgerock
     pullPolicy: IfNotPresent
-    tag: 5.5.0
+    tag: 6.0.0
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
@@ -66,3 +66,10 @@ ingress:
   #class: cloudflare-warp
   # Set hostname to override the default value of {{component}}.{{namespace}}.{{domain}}.
   #hostname: foo.example.com
+
+# Command to run in the git sidecar container.
+git:
+  # pause will sleep so you can exec into the container and manually sync changes.
+  #command: pause
+  # syncloop will auto save and push changes every 5 minutes. Use this in development.
+  command: syncloop

@@ -6,7 +6,7 @@
 global:
   image:
     repository: gcr.io/engineering-devops
-    tag: 5.5.0
+    tag: 6.0.0
 
 
 # Default is to install userstore.  Run with helm install --set tags.userstore=false to override
