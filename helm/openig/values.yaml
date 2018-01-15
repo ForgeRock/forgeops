@@ -11,7 +11,7 @@ global:
   domain: .example.com
   image:
     repository: forgerock
-    tag: 5.5.1
+    tag: 6.0.0
     pullPolicy: IfNotPresent
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
