@@ -14,8 +14,11 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
 **You need minikube 0.23+ and kubectl 1.8+ for this to work**
 
     minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-    minikube addons enable ingress
     echo "$(minikube ip) idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" | sudo tee -a /etc/hosts
+
+You may be prompted to enter your password after running the above commands. Afterward, run these:
+
+    minikube addons enable ingress
     eval $(minikube docker-env)
     kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
     kubectl config use-context sample-context
@@ -42,16 +45,18 @@ If you use dummy values, Facebook will still appear in your AM and IDM environme
 
 ## Building the base images
 
-Use the forgeops project to build local docker images within your minikube environment:
+The baseline docker images needed for this sample are defined in ../docker in this forgeops repository. A README in that directory covers the various methods available in order to build the Docker images. Whichever method you choose to use, be sure that you have built these images:
 
-    cd forgeops/docker
-    mvn
+- openam
+- amster
+- opendj
+- openidm
+- openig
+
 
 ## Starting the sample
 
-Change your working directory back to this folder :
-
-    cd ../sample-platform
+In order to copy and paste the below commands, you will need make sure your working folder is correct. You should be in the same folder as this README file (forgeops/sample-platform).
 
 This command needs to be executed each time you start the minikube VM, to fix a bug with its internal networking:
 
@@ -94,6 +99,16 @@ Now the environment should be available at http://idm-service.sample.svc.cluster
 
 You can use amadmin / password to login.
 
+REST API calls to IDM vary depending on which IG option you chose above. If you are using igIPDP, then you need to include an AM session cookie in your request, like so:
+
+    curl -H 'x-requested-with:curl' -H 'Cookie: iPlanetDirectoryPro=Qxl9.......' \
+     http://idm-service.sample.svc.cluster.local/openidm/....
+
+If you chose igOIDC, then you need to include an access_token in your request, like so:
+
+    curl -H 'x-requested-with:curl' -H 'Authorization: Bearer e3b1.......' \
+     http://idm-service.sample.svc.cluster.local/openidm/...
+
 ## For developers making changes
 
 You can deploy changes to the underlying product running in the container like so:
@@ -101,7 +116,7 @@ You can deploy changes to the underlying product running in the container like s
     cp $OPENIDM_ZIP_TARGET/openidm*.zip ../docker/openidm/openidm.zip
     docker build -t forgerock/openidm:latest ../docker/openidm
     docker build -t idm:fullstack idm
-    kubectl delete po idm --grace-period=0
+    kubectl delete po idm --grace-period=0 --force
     kubectl apply -f idm.yml
 
 
