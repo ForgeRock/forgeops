@@ -8,7 +8,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
     # Note that not all ingress controllers implement all these features..
-    ingress.kubernetes.io/rewrite-target: /
+    # Needed by warp only
+    #ingress.kubernetes.io/rewrite-target: /
     ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/ssl-redirect: "true"
     ingress.kubernetes.io/affinity: "cookie"

@@ -6,6 +6,8 @@ metadata:
   name: {{ template "fullname" . }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: {{ .Values.component }}
+    vendor: forgerock
 spec:
   type: {{ .Values.service.type }}
   ports:

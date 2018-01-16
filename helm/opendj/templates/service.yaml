@@ -6,7 +6,7 @@ metadata:
   name: {{ .Values.djInstance }}
   labels:
     app: {{ .Values.djInstance }}
-    component: opendj
+    component: {{ .Values.component }}
     vendor: forgerock
 spec:
   clusterIP: None

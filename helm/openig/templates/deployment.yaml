@@ -8,6 +8,8 @@ metadata:
   name: openig
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    vendor: forgerock
+    component: {{ .Values.component }}
 spec:
   replicas: {{ .Values.replicaCount }}
   template:
@@ -16,6 +18,7 @@ spec:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
         component: {{ .Values.component }}
+        vendor: forgerock
     spec:
       initContainers:
       - name: git-init

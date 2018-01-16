@@ -9,7 +9,7 @@ spec:
     metadata:
       labels:
         app: {{ template "fullname" . }}
-        component: openam
+        component: {{ .Values.component }}
         vendor: forgerock
     spec:
       terminationGracePeriodSeconds: 10
