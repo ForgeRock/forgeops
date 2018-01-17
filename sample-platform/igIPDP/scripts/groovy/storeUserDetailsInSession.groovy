@@ -8,6 +8,7 @@ if (!session.idmUserDetails || session.idmUserDetails.authenticationId != contex
     if (request.getHeaders().get('X-Authorization-Map')) {
         idmRequest.getHeaders().add(request.getHeaders().get('X-Authorization-Map'))
     }
+    idmRequest.getHeaders().add('X-Requested-With', 'IG')
     return http.send(idmRequest).thenAsync( new AsyncFunction() {
         Promise apply (response) {
             if (response.getStatus() == Status.OK) {

@@ -1,0 +1,22 @@
+{
+    "name": "selfservice",
+    "baseURI": "http://idm-service.sample.svc.cluster.local:8080/",
+    "condition": "${matches(request.uri.path, '^/selfservice/')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "handler":"ForgeRockClientHandler"
+}

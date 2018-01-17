@@ -1,0 +1,69 @@
+{
+    "name": "ui",
+    "baseURI": "http://idm-service.sample.svc.cluster.local:8080/",
+    "condition": "${matches(request.uri.path, '^/openid/') or matches(request.uri.path, '^/admin') or matches(request.uri.path, '^/user')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "heap" : [
+        {
+            "name": "openidmClient",
+            "type": "ClientRegistration",
+            "config": {
+                "clientId": "openidm",
+                "clientSecret": "openidm",
+                "issuer": {
+                    "type": "Issuer",
+                    "config": {
+                        "wellKnownEndpoint": "${env['OPENAM_INSTANCE']}/oauth2/.well-known/openid-configuration"
+                    }
+                },
+                "scopes": [
+                    "openid"
+                ]
+            }
+        }
+    ],
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ClientFilter",
+                    "config": {
+                        "clientEndpoint": "/openid",
+                        "target": "${session.openid}",
+                        "failureHandler": {
+                            "type": "StaticResponseHandler",
+                            "config": {
+                                "status": 401,
+                                "headers": {
+                                    "Content-Type": [ "application/json" ]
+                                },
+                                "entity": "{\"code\": 401, \"message\":\"Unable to perform oauth 2 flow\"}"
+                            }
+                        },
+                        "registrations": [
+                            "openidmClient"
+                        ],
+                        "requireHttps": false
+                    }
+                }
+            ],
+            "handler": "ForgeRockClientHandler"
+        }
+    }
+}

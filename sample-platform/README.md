@@ -57,12 +57,19 @@ This command needs to be executed each time you start the minikube VM, to fix a 
 
     minikube ssh "sudo ip link set docker0 promisc on"
 
-Build the Docker images and add the kubernetes resources for this sample:
+You now need to choose which type of interaction you want to use between AM and IG. If you want to use AM's SSO tokens (iPlanetDirectoryPro cookies), then build this version of IG:
+
+    docker build -t ig:fullstack igIPDP
+
+If you want to be an OpenID Connect / OAuth2 client, then build this version of IG:
+
+    docker build -t ig:fullstack igOIDC
+
+Build the remaining Docker images and add the kubernetes resources for this sample.
 
     docker build -t dj:fullstack dj
     docker build -t am:fullstack am
     docker build -t amster:fullstack amster
-    docker build -t ig:fullstack ig
     docker build -t idm:fullstack idm
 
     kubectl create namespace sample
@@ -72,6 +79,7 @@ Build the Docker images and add the kubernetes resources for this sample:
         --from-literal=IDP_FACEBOOK_CLIENTSECRET=$IDP_FACEBOOK_CLIENTSECRET
 
     kubectl apply -f .
+
 
 Monitor the pods as they come up:
 

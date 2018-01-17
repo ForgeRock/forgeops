@@ -1,0 +1,177 @@
+{
+    "name": "openidm",
+    "baseURI": "http://idm-service.sample.svc.cluster.local:8080",
+    "condition": "${matches(request.uri.path, '^/openidm/')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "heap": [
+        {
+            "name": "capture",
+            "type": "CaptureDecorator",
+            "config": {
+                "captureEntity": true,
+                "captureContext": true
+            }
+        },
+        {
+            "name": "debugHandler",
+            "type": "ClientHandler",
+            "capture": [
+                "request",
+                "response"
+            ]
+        },
+        {
+            "name": "authnFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 401,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 401, \"message\":\"Authentication Failed\"}"
+            }
+        },
+        {
+            "name": "badRequestFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 400,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 400, \"message\":\"Bad Request\"}"
+            }
+        }
+    ],
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "ConditionalFilter",
+                    "config": {
+                        "condition": "${not matches(request.method, 'GET')}",
+                        "delegate" : {
+                            "name": "CSRFHeaderCheck",
+                            "type": "ScriptableFilter",
+                            "config": {
+                                "type": "application/x-groovy",
+                                "file": "CSRFHeaderCheck.groovy",
+                                "args": {
+                                    "failureResponse": "${heap['badRequestFailureResponse']}"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "switch",
+                    "type": "SwitchFilter",
+                    "config": {
+                        "onResponse": [
+                            {
+                                "condition": "${response.status.code == 401}",
+                                "handler": {
+                                    "name": "AllowedAnonymousEndpoints",
+                                    "type": "ScriptableHandler",
+                                    "config": {
+                                        "type": "application/x-groovy",
+                                        "file": "batchConditionalRequest.groovy",
+                                        "args": {
+                                            "delegate" : "${heap['ForgeRockClientHandler']}",
+                                            "failureResponse" : "${heap['authnFailureResponse']}" ,
+                                            "checkRequests": [
+                                                {
+                                                    "path": "^/openidm/info/.*",
+                                                    "methods": ["GET"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/config/ui/themeconfig",
+                                                    "methods": ["GET"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/selfservice/.*",
+                                                    "methods": ["GET","POST"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/policy/selfservice/.*",
+                                                    "methods": ["GET","POST"]
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "getAccessTokenFromSession.groovy"
+                    }
+                },
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "openid"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": {
+                            "type": "TokenIntrospectionAccessTokenResolver",
+                            "config": {
+                                "endpoint": "${env['OPENAM_INSTANCE']}/oauth2/introspect",
+                                "providerHandler": {
+                                    "type": "Chain",
+                                    "config": {
+                                        "filters": [
+                                            {
+                                                "type": "HeaderFilter",
+                                                "config": {
+                                                    "messageType": "request",
+                                                    "add": {
+                                                        "Authorization": [
+                                                            "Basic ${encodeBase64('openidm:openidm')}"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "handler": "ForgeRockClientHandler"
+                                    }
+                                }
+                            }
+                        },
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                }
+            ],
+            "handler": "ForgeRockClientHandler"
+        }
+    }
+}

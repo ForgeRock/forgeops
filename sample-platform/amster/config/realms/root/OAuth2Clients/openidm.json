@@ -24,7 +24,7 @@
       "jwkStoreCacheMissCacheTime" : 60000,
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
-      "jwksUri" : "http://am-service.sample.svc.cluster.local:8080/openam/oauth2/connect/jwk_uri",
+      "jwksUri" : "http://am-service.sample.svc.cluster.local:80/openam/oauth2/connect/jwk_uri",
       "userinfoEncryptedResponseAlg" : null,
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
@@ -60,7 +60,7 @@
       "scopes" : [ "openid", "policy" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ "http://idm-service.sample.svc.cluster.local:80/home/id_token/callback" ],
+      "redirectionUris" : [ "http://idm-service.sample.svc.cluster.local:80/openid/callback" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {
