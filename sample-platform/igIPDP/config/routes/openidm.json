@@ -81,12 +81,35 @@
                     "config": {
                         "condition": "${matches(request.uri.path, '^/admin/') or matches(request.uri.path, '^/user/') or matches(request.uri.path, '^/logout')}",
                         "delegate" : {
-                            "name": "SSOFilter",
-                            "type": "SingleSignOnFilter",
+                            "type": "ChainOfFilters",
                             "config": {
-                                "openamUrl": "${env['OPENAM_INSTANCE']}",
-                                "logoutEndpoint": "/logout",
-                                "defaultLogoutLandingPage": "/user/"
+                                "filters": [
+                                    {
+                                        "type": "ConditionalFilter",
+                                        "config": {
+                                            "condition": "${matches(request.uri.path, '^/logout')}",
+                                            "delegate" : {
+                                                "type": "ScriptableFilter",
+                                                "config": {
+                                                    "type": "application/x-groovy",
+                                                    "source": [
+                                                        "session.remove('idmUserDetails')",
+                                                        "return next.handle(context, request)"
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "SSOFilter",
+                                        "type": "SingleSignOnFilter",
+                                        "config": {
+                                            "openamUrl": "${env['OPENAM_INSTANCE']}",
+                                            "logoutEndpoint": "/logout",
+                                            "defaultLogoutLandingPage": "/user/"
+                                        }
+                                    }
+                                ]
                             }
                         }
                     }
