@@ -61,6 +61,68 @@
                         ],
                         "requireHttps": false
                     }
+                },
+                {
+                    "name": "switch",
+                    "type": "SwitchFilter",
+                    "config": {
+                        "onResponse": [
+                            {
+                                "condition": "${response.status.code == 401}",
+                                "handler": {
+                                    "type": "StaticResponseHandler",
+                                    "config": {
+                                        "status": 302,
+                                        "headers": {
+                                            "Location": [ "/logout"]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "getAccessTokenFromSession.groovy"
+                    }
+                },
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "openid"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": {
+                            "type": "TokenIntrospectionAccessTokenResolver",
+                            "config": {
+                                "endpoint": "${env['OPENAM_INSTANCE']}/oauth2/introspect",
+                                "providerHandler": {
+                                    "type": "Chain",
+                                    "config": {
+                                        "filters": [
+                                            {
+                                                "type": "HeaderFilter",
+                                                "config": {
+                                                    "messageType": "request",
+                                                    "add": {
+                                                        "Authorization": [
+                                                            "Basic ${encodeBase64('openidm:openidm')}"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "handler": "ForgeRockClientHandler"
+                                    }
+                                }
+                            }
+                        },
+                        "cacheExpiration": "2 minutes"
+                    }
                 }
             ],
             "handler": "ForgeRockClientHandler"
