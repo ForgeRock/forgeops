@@ -2,7 +2,7 @@
 
 This is a sample project demonstrates one way to use four components of the ForgeRock Identity Platform (AM, DJ, IDM and IG). This sample demonstrates these capabilities:
 
-AM policy engine can be use to control authorization for IDM, by using filters in IG.
+External DJ cluster as a shared user store for AM and IDM
 Facebook authentication with AM
 Delegation of all self-service features to IDM (including automatic redirection to IDM during social authentication)
 Unification of end-user interfaces - using CORS to facilitate the seamless interaction of the various back-end services
@@ -62,16 +62,9 @@ This command needs to be executed each time you start the minikube VM, to fix a 
 
     minikube ssh "sudo ip link set docker0 promisc on"
 
-You now need to choose which type of interaction you want to use between AM and IG. If you want to use AM's SSO tokens (iPlanetDirectoryPro cookies), then build this version of IG:
-
-    docker build -t ig:fullstack igIPDP
-
-If you want to be an OpenID Connect / OAuth2 client, then build this version of IG:
+Build the Docker images and add the kubernetes resources for this sample:
 
     docker build -t ig:fullstack igOIDC
-
-Build the remaining Docker images and add the kubernetes resources for this sample.
-
     docker build -t dj:fullstack dj
     docker build -t am:fullstack am
     docker build -t amster:fullstack amster
@@ -103,12 +96,7 @@ Now the environment should be available at http://idm-service.sample.svc.cluster
 
 You can use amadmin / password to login.
 
-REST API calls to IDM vary depending on which IG option you chose above. If you are using igIPDP, then you need to include an AM session cookie in your request, like so:
-
-    curl -H 'x-requested-with:curl' -H 'Cookie: iPlanetDirectoryPro=Qxl9.......' \
-     http://idm-service.sample.svc.cluster.local/openidm/....
-
-If you chose igOIDC, then you need to include an access_token in your request, like so:
+To make REST API calls to IDM you need to include an access_token in your request, like so:
 
     curl -H 'x-requested-with:curl' -H 'Authorization: Bearer e3b1.......' \
      http://idm-service.sample.svc.cluster.local/openidm/...

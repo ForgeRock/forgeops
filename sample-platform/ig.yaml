@@ -5,6 +5,14 @@ metadata:
   labels:
     role: proxy
 spec:
+  initContainers:
+  - name: install
+    image: busybox
+    command:
+    - wget
+    - "-O"
+    - "/dev/null"
+    - "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
   containers:
     - image: ig:fullstack
       imagePullPolicy: IfNotPresent
