@@ -60,6 +60,9 @@ resources:
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm
 
+# Default log level. See templates/configmap/logging.properties. For example, you can use FINE here to
+# see fine grained logging output using kubectl logs.
+logLevel: INFO
 
 ingress:
   class: nginx
