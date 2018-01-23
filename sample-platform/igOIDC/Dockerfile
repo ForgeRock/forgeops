@@ -4,6 +4,7 @@ FROM forgerock/openig:latest
 
 ADD config /var/openig/config
 ADD scripts /var/openig/scripts
+ADD wellKnownCheck.sh /
 
 USER root
 

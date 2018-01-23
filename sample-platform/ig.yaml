@@ -6,13 +6,13 @@ metadata:
     role: proxy
 spec:
   initContainers:
-  - name: install
-    image: busybox
+  - name: wait-for-well-known
+    image: ig:fullstack
+    env:
+    - name: WELL_KNOWN_ENDPOINT
+      value: "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
     command:
-    - wget
-    - "-O"
-    - "/dev/null"
-    - "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
+    - /wellKnownCheck.sh
   containers:
     - image: ig:fullstack
       imagePullPolicy: IfNotPresent

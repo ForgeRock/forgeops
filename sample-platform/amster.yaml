@@ -3,6 +3,11 @@ kind: Pod
 metadata:
   name: amster
 spec:
+  initContainers:
+  - name: wait-for-configstore
+    image: "groundnuty/k8s-wait-for:0.3"
+    imagePullPolicy: IfNotPresent
+    args: [ "pod", "-l", "role=auth" ]
   containers:
     - image: amster:fullstack
       imagePullPolicy: IfNotPresent
