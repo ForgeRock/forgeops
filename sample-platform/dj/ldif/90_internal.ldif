@@ -44,10 +44,10 @@ objectClass: organizationalUnit
 objectClass: top
 ou: clusteredrecontargetids
 
-dn: ou=clusteredreconstate,dc=openidm,dc=forgerock,dc=com
+dn: ou=reconprogressstate,dc=openidm,dc=forgerock,dc=com
 objectClass: organizationalUnit
 objectClass: top
-ou: clusteredreconstate
+ou: reconprogressstate
 
 ##
 # scheduler
