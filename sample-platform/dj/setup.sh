@@ -89,6 +89,55 @@ cp -r /tmp/schema/* /opt/opendj/data/config/schema
 
 /opt/opendj/bin/start-ds
 
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-uuid \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-managed-role-json \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-cluster-json \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-relationship-json \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+
 # If any optional LDIF files are present, load them.
 ldif="bootstrap/userstore/ldif"
 
