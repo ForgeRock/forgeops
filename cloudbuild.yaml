@@ -22,13 +22,9 @@ steps:
   args: ['--settings','settings.xml', '-Pgcr', 'package', 'docker:build']
   dir:  docker
 images:
-- 'gcr.io/$PROJECT_ID/git'
 - 'gcr.io/$PROJECT_ID/opendj'
 - 'gcr.io/$PROJECT_ID/openidm'
 - 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'
 - 'gcr.io/$PROJECT_ID/amster'
 - 'gcr.io/$PROJECT_ID/openidm-postgres'
-- 'gcr.io/$PROJECT_ID/toolbox'
-- 'gcr.io/$PROJECT_ID/util'
-

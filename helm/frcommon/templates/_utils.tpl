@@ -37,7 +37,7 @@
 {{- printf "%s" .Values.global.image.pullPolicy -}}
 {{- end -}}
 {{- define "gitImage" -}}
-{{ printf "%s/%s:%s" .Values.global.image.repository "git"  .Values.global.image.tag }}
+{{ printf "forgerock/git:6.0.0"  }}
 {{- end -}}
 
 

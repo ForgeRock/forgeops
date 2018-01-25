@@ -30,8 +30,9 @@ spec:
         image: "groundnuty/k8s-wait-for:0.3"
         imagePullPolicy: IfNotPresent
         args: [ "pod", "-l", "djInstance=configstore" ]
+      # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
       - name: bootstrap
-        image: {{ .Values.global.image.repository }}/util:{{ .Values.global.image.tag }}
+        image: forgerock/util:6.0.0
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam

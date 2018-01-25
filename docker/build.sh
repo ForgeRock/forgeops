@@ -17,7 +17,7 @@ TAG=${TAG:-6.0.0}
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="java tomcat openam opendj openidm openig amster toolbox git"
+IMAGES="openam opendj openidm openig amster"
 
 function buildDocker {
    SLASH="/"

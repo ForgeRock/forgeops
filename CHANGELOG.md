@@ -107,3 +107,5 @@ in different contexts.
 * Further work on the toolbox container
 
 
+# 2018-01-24
+* Moved all utility and base images to https://github.com/ForgeRock/docker-public 

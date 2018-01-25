@@ -10,6 +10,8 @@ metadata:
     # Note that not all ingress controllers implement all these features..
     # Needed by warp only
     #ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/cluster-issuer: letsencrypt-staging
     ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/ssl-redirect: "true"
     ingress.kubernetes.io/affinity: "cookie"
