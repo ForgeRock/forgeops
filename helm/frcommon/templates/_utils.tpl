@@ -36,9 +36,6 @@
 {{- define "pullPolicy" -}}
 {{- printf "%s" .Values.global.image.pullPolicy -}}
 {{- end -}}
-{{- define "gitImage" -}}
-{{ printf "forgerock/git:6.0.0"  }}
-{{- end -}}
 
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}

@@ -64,7 +64,6 @@ spec:
           name: ldap
         - containerPort: 4444
           name: djadmin
-
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/run/secrets/opendj

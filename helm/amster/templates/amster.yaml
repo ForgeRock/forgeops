@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 5
       initContainers:
       - name: git-init
-        image: {{ template "gitImage" . }}
+        image: forgerock/git:6.0.0
         imagePullPolicy:  {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git
@@ -63,7 +63,7 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 12 }}
       - name: git
-        image: {{ template "gitImage" . }}
+        image: forgerock/git:6.0.0
         imagePullPolicy: {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git

@@ -14,7 +14,7 @@ spec:
     spec:
       initContainers:
       - name: git-init
-        image: {{ template "gitImage" . }}
+        image: forgerock/git:6.0.0
         imagePullPolicy: {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git
@@ -40,7 +40,7 @@ spec:
           - name: cloudsql
             mountPath: /cloudsql
       - name: git
-        image: {{ template "gitImage" . }}
+        image: forgerock/git:6.0.0
         imagePullPolicy: {{ template "pullPolicy" . }}
         volumeMounts:
         - name: git
