@@ -69,6 +69,7 @@ Build the Docker images and add the kubernetes resources for this sample:
     docker build -t am:fullstack am
     docker build -t amster:fullstack amster
     docker build -t idm:fullstack idm
+    docker build -t pg:fullstack pg
 
     kubectl create namespace sample
 

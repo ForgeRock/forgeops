@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2015-2017 ForgeRock AS. All Rights Reserved
+
+  Use of this code requires a commercial software license with ForgeRock AS.
+  or with one of its affiliates. All use shall be exclusively subject
+  to such license between the licensee and ForgeRock AS.
+-->
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples" id="definitions" xsi:schemaLocation="              http://www.omg.org/spec/BPMN/20100524/MODEL http://local.openicf.forgerock.org/BPMN20.xsd">
+  <process id="chess" name="Start a Game of Chess!" isExecutable="true">
+    <startEvent id="start" activiti:initiator="player1Id" activiti:formKey="chessboard.xhtml">
+      <extensionElements>
+        <activiti:formProperty id="grid" type="string"></activiti:formProperty>
+        <activiti:formProperty id="status" type="string" default="active"></activiti:formProperty>
+        <activiti:formProperty id="currentPlayer" type="string" default="white"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="prepForPlayer2" activiti:expression="black" activiti:resultVariableName="currentPlayer"></serviceTask>
+    <userTask id="joinGameTask" name="Play Chess" activiti:candidateGroups="openidm-authorized,openidm-admin" activiti:formKey="chessboard.xhtml">
+      <extensionElements>
+        <activiti:formProperty id="player2Id" type="string"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener" >
+          <activiti:field name="script">
+            <activiti:string>
+              task.getExecution().setVariable("grid", grid)
+              task.getExecution().setVariable("player2Id", player2Id)
+              task.getExecution().setVariable("player1Id", player1Id)
+            </activiti:string>
+          </activiti:field>
+          <activiti:field name="language" stringValue="groovy" />
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <scriptTask id="backToPlayer1" scriptFormat="groovy" activiti:autoStoreVariables="false">
+        <script>
+            currentPlayer = "white"
+            nextAssigned = player1Id
+            execution.setVariable("nextAssigned", player1Id)
+            execution.setVariable("currentPlayer", "white")
+        </script>
+    </scriptTask>
+    <userTask id="playGameTask" name="Play Chess" activiti:assignee="${nextAssigned}" activiti:formKey="chessboard.xhtml">
+        <extensionElements>
+          <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener" >
+            <activiti:field name="script">
+              <activiti:string>
+                task.getExecution().setVariable("grid", grid)
+                task.getExecution().setVariable("status", status)
+              </activiti:string>
+            </activiti:field>
+            <activiti:field name="language" stringValue="groovy" />
+          </activiti:taskListener>
+        </extensionElements>
+    </userTask>
+    <scriptTask id="updateGameState" scriptFormat="groovy" activiti:autoStoreVariables="false">
+        <script>
+            def nextPlayer
+
+            if (currentPlayer == "white") {
+                nextPlayer = "black"
+            } else {
+                nextPlayer = "white"
+            }
+            execution.setVariable("currentPlayer", nextPlayer)
+
+            if (status == "active") {
+                if (nextPlayer == "white") {
+                    execution.setVariable("nextAssigned", player1Id)
+                } else {
+                    execution.setVariable("nextAssigned", player2Id)
+                }
+            }
+        </script>
+    </scriptTask>
+    <scriptTask id="sendCompleteNotices" scriptFormat="groovy" activiti:autoStoreVariables="false">
+        <script>
+            java.text.SimpleDateFormat formatUTC = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'")
+            formatUTC.setTimeZone(TimeZone.getTimeZone("UTC"))
+            def message
+            def loser
+            def requestDate = formatUTC.format(new Date())
+
+            def player1 = openidm.query('managed/user', ["_queryId" : "credential-query", "username" : player1Id])
+            if (!player1 || !player1.result || !player1.result.size()) {
+                player1 = openidm.query('repo/internal/user', ["_queryId" : "credential-internaluser-query", "username" : player1Id])
+            }
+
+            def player2 = openidm.query('managed/user', ["_queryId" : "credential-query", "username" : player2Id])
+            if (!player2 || !player2.result || !player2.result.size()) {
+                player2 = openidm.query('repo/internal/user', ["_queryId" : "credential-internaluser-query", "username" : player2Id])
+            }
+
+            if (status == "stalemate") {
+                message = "Chess game between " + player1Id + " and " + player2Id + " ended in a stalemate."
+            } else {
+
+                if (nextAssigned == player1Id) {
+                    loser = player2Id
+                } else {
+                    loser = player1Id
+                }
+
+                message = nextAssigned + " won the game of chess against " + loser + "."
+            }
+
+            def completeNotification = [
+                "receiverId": player1.result[0]._id,
+                "requesterId" : "",
+                "requester" : "",
+                "createDate" : requestDate,
+                "notificationType" : "info",
+                "notificationSubtype" : "",
+                "message" : message
+            ];
+
+            openidm.create("repo/ui/notification", null, completeNotification)
+            completeNotification["receiverId"] = player2.result[0]._id
+            openidm.create("repo/ui/notification", null, completeNotification)
+        </script>
+    </scriptTask>
+    <sequenceFlow id="sequenceFlow-ad60a1ee-b70c-4622-aa50-bed830cbc10d" sourceRef="start" targetRef="prepForPlayer2"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow-873d6588-5e95-4371-8e27-d1bfb7c6149d" sourceRef="prepForPlayer2" targetRef="gameStartGateway"></sequenceFlow>
+    <exclusiveGateway id="gameStartGateway" name="Game Started"></exclusiveGateway>
+    <sequenceFlow id="sequenceFlow-a0f402b3-f2df-49c5-aa64-2889d294d070" sourceRef="gameStartGateway" targetRef="joinGameTask"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow-93750768-e21f-471c-973f-b422e7215fcf" sourceRef="joinGameTask" targetRef="backToPlayer1"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow-1109559c-6232-40d6-8c20-892d53c37a3f" sourceRef="backToPlayer1" targetRef="gameJoinedGateway"></sequenceFlow>
+    <exclusiveGateway id="gameJoinedGateway" name="Game Joined"></exclusiveGateway>
+    <sequenceFlow id="sequenceFlow-a20b5d1d-2ea7-419a-b8d4-7f3b527a3990" sourceRef="gameJoinedGateway" targetRef="playGameTask"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow-f10e668a-c9d8-46e1-8318-f3b5fe303d85" sourceRef="playGameTask" targetRef="updateGameState"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow-6acc0ee9-eca9-422d-81af-ac791873e394" sourceRef="updateGameState" targetRef="gamePlayedGateway"></sequenceFlow>
+    <exclusiveGateway id="gamePlayedGateway" name="Game Played"></exclusiveGateway>
+    <sequenceFlow id="sequenceFlow-5c99be51-d908-456d-9145-b0dd35650ac7" sourceRef="gamePlayedGateway" targetRef="playGameTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status=='active'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow-d0af2575-6e04-42b0-8fc9-acd9621dfe69" sourceRef="gamePlayedGateway" targetRef="sendCompleteNotices">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status!='active'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow-205600f4-243a-4661-b719-24fd10b40a83" sourceRef="sendCompleteNotices" targetRef="end"></sequenceFlow>
+    <endEvent id="end"></endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_chess">
+    <bpmndi:BPMNPlane bpmnElement="chess" id="BPMNPlane_chess">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="0.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="prepForPlayer2" id="BPMNShape_prepForPlayer2">
+        <omgdc:Bounds height="60.0" width="100.0" x="80.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="joinGameTask" id="BPMNShape_joinGameTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="320.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="backToPlayer1" id="BPMNShape_backToPlayer1">
+        <omgdc:Bounds height="60.0" width="100.0" x="470.0" y="52.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="playGameTask" id="BPMNShape_playGameTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="710.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="updateGameState" id="BPMNShape_updateGameState">
+        <omgdc:Bounds height="60.0" width="100.0" x="860.0" y="0.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendCompleteNotices" id="BPMNShape_sendCompleteNotices">
+        <omgdc:Bounds height="60.0" width="100.0" x="1100.0" y="59.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gameStartGateway" id="BPMNShape_gameStartGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gameJoinedGateway" id="BPMNShape_gameJoinedGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="620.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gamePlayedGateway" id="BPMNShape_gamePlayedGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1010.0" y="72.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="35.0" width="35.0" x="1250.0" y="74.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-ad60a1ee-b70c-4622-aa50-bed830cbc10d" id="BPMNEdge_sequenceFlow-ad60a1ee-b70c-4622-aa50-bed830cbc10d">
+        <omgdi:waypoint x="35.0" y="82.0"></omgdi:waypoint>
+        <omgdi:waypoint x="80.0" y="80.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-873d6588-5e95-4371-8e27-d1bfb7c6149d" id="BPMNEdge_sequenceFlow-873d6588-5e95-4371-8e27-d1bfb7c6149d">
+        <omgdi:waypoint x="180.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="80.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-a0f402b3-f2df-49c5-aa64-2889d294d070" id="BPMNEdge_sequenceFlow-a0f402b3-f2df-49c5-aa64-2889d294d070">
+        <omgdi:waypoint x="270.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="80.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-93750768-e21f-471c-973f-b422e7215fcf" id="BPMNEdge_sequenceFlow-93750768-e21f-471c-973f-b422e7215fcf">
+        <omgdi:waypoint x="420.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="80.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="82.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="82.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-1109559c-6232-40d6-8c20-892d53c37a3f" id="BPMNEdge_sequenceFlow-1109559c-6232-40d6-8c20-892d53c37a3f">
+        <omgdi:waypoint x="570.0" y="82.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="82.0"></omgdi:waypoint>
+        <omgdi:waypoint x="582.0" y="85.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="85.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-a20b5d1d-2ea7-419a-b8d4-7f3b527a3990" id="BPMNEdge_sequenceFlow-a20b5d1d-2ea7-419a-b8d4-7f3b527a3990">
+        <omgdi:waypoint x="660.0" y="85.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="85.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="710.0" y="90.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-f10e668a-c9d8-46e1-8318-f3b5fe303d85" id="BPMNEdge_sequenceFlow-f10e668a-c9d8-46e1-8318-f3b5fe303d85">
+        <omgdi:waypoint x="810.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="822.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="822.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="860.0" y="30.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-6acc0ee9-eca9-422d-81af-ac791873e394" id="BPMNEdge_sequenceFlow-6acc0ee9-eca9-422d-81af-ac791873e394">
+        <omgdi:waypoint x="960.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="972.0" y="30.0"></omgdi:waypoint>
+        <omgdi:waypoint x="972.0" y="92.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1010.0" y="92.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-5c99be51-d908-456d-9145-b0dd35650ac7" id="BPMNEdge_sequenceFlow-5c99be51-d908-456d-9145-b0dd35650ac7">
+        <omgdi:waypoint x="1010.0" y="92.0"></omgdi:waypoint>
+        <omgdi:waypoint x="998.0" y="92.0"></omgdi:waypoint>
+        <omgdi:waypoint x="998.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="810.0" y="90.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-d0af2575-6e04-42b0-8fc9-acd9621dfe69" id="BPMNEdge_sequenceFlow-d0af2575-6e04-42b0-8fc9-acd9621dfe69">
+        <omgdi:waypoint x="1050.0" y="92.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1062.0" y="92.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1062.0" y="89.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="89.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow-205600f4-243a-4661-b719-24fd10b40a83" id="BPMNEdge_sequenceFlow-205600f4-243a-4661-b719-24fd10b40a83">
+        <omgdi:waypoint x="1200.0" y="89.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1250.0" y="91.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,113 @@
+{
+    "dashboard" : {
+        "widgets" : [
+            {
+                "type" : "workflow"
+            },
+            {
+                "type" : "quickStart",
+                "size" : "medium",
+                "cards" : [
+                    {
+                        "name" : "dashboard.quickStart.viewProfile",
+                        "icon" : "fa-user",
+                        "href" : "#profile/details"
+                    },
+                    {
+                        "name" : "dashboard.quickStart.changePassword",
+                        "icon" : "fa-lock",
+                        "href" : "#signinandsecurity/password/"
+                    }
+                ]
+            },
+            {
+                "type" : "notifications",
+                "size" : "x-small"
+            }
+        ]
+    },
+    "adminDashboards" : [
+        {
+            "name" : "Administration",
+            "isDefault" : true,
+            "widgets" : [
+                {
+                    "type" : "quickStart",
+                    "size" : "large",
+                    "cards" : [
+                        {
+                            "name" : "Add Connector",
+                            "icon" : "fa-database",
+                            "href" : "#connectors/add/"
+                        },
+                        {
+                            "name" : "Create Mapping",
+                            "icon" : "fa-map-marker",
+                            "href" : "#mapping/add/"
+                        },
+                        {
+                            "name" : "Manage Roles",
+                            "icon" : "fa-check-square-o",
+                            "href" : "#resource/managed/role/list/"
+                        },
+                        {
+                            "name" : "Add Device",
+                            "icon" : "fa-tablet",
+                            "href" : "#managed/add/"
+                        },
+                        {
+                            "name" : "Configure Registration",
+                            "icon" : "fa-gear",
+                            "href" : "#selfservice/userregistration/"
+                        },
+                        {
+                            "name" : "Configure Password Reset",
+                            "icon" : "fa-gear",
+                            "href" : "#selfservice/passwordreset/"
+                        },
+                        {
+                            "name" : "Manage Users",
+                            "icon" : "fa-user",
+                            "href" : "#resource/managed/user/list/"
+                        },
+                        {
+                            "name" : "Configure System Preferences",
+                            "icon" : "fa-user",
+                            "href" : "#settings/"
+                        }
+                    ]
+                },
+                {
+                    "type" : "resourceList",
+                    "size" : "large"
+                }
+            ]
+        },
+        {
+            "name" : "System Monitoring",
+            "isDefault" : false,
+            "widgets" : [
+                {
+                    "type" : "audit",
+                    "size" : "large",
+                    "minRange": "#b0d4cd",
+                    "maxRange": "#24423c",
+                    "legendRange": {
+                        "week": [10, 30, 90, 270, 810],
+                        "month": [500, 2500, 5000],
+                        "year": [10000, 40000, 100000, 250000]
+                    }
+                },
+                {
+                    "type" : "systemHealthFull",
+                    "size" : "large"
+                },
+                {
+                    "type" : "lastRecon",
+                    "size" : "large",
+                    "barchart" : "false"
+                }
+            ]
+        }
+    ]
+}

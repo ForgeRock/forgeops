@@ -21,6 +21,10 @@ COPY openidm.zip /tmp/openidm.zip
 #     git config --global user.email "auto-sync@forgerock.net" && \
 #     git config --global user.name "Git Auto-sync user"
 
+RUN apk update && \
+    apk upgrade && \
+    apk add ttf-dejavu zip
+
 RUN unzip -q /tmp/openidm.zip && \
     chown -R forgerock:forgerock /opt/openidm && \
     rm -f /tmp/openidm.zip  && rm -fr /opt/openidm/samples
