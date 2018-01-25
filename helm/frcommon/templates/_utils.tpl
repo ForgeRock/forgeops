@@ -30,12 +30,6 @@
     value: "true"
   {{- end }}
 {{- end -}}
-{{- define "image" -}}
-{{- printf "%s/%s:%s" .Values.global.image.repository .Values.component  .Values.global.image.tag -}}
-{{ end }}
-{{- define "pullPolicy" -}}
-{{- printf "%s" .Values.global.image.pullPolicy -}}
-{{- end -}}
 
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
@@ -46,14 +40,6 @@
 {{- end -}}
 {{- end -}}
 
-
-{{/* OpenAM FQDN  - if it is not explicity set, generate it */}}
-{{- define "openamFQDN" -}}
-{{- if .Values.openamFQDN  }}{{- printf "%s" .Values.openamFQDN -}}
-{{- else -}}
-{{- printf "openam.%s%s" .Release.Namespace .Values.global.domain -}}
-{{- end -}}
-{{- end -}}
 
 {{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
 {{- define "tls-spec" -}}

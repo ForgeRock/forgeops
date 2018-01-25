@@ -22,7 +22,7 @@ spec:
       initContainers:
       - name: git-init
         image: forgerock/git:6.0.0
-        imagePullPolicy: {{ template "pullPolicy" . }}
+        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -40,7 +40,7 @@ spec:
       containers:
       - name: openidm
         image: {{ template "image"  . }}
-        imagePullPolicy: {{ template "pullPolicy" . }}
+        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
         envFrom:
         - configMapRef:
             name: {{ template "fullname" . }}
@@ -73,7 +73,7 @@ spec:
           mountPath: /var/run/openidm
       - name: git
         image: forgerock/git:6.0.0
-        imagePullPolicy: {{ template "pullPolicy" . }}
+        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git

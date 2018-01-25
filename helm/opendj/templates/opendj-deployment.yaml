@@ -52,8 +52,8 @@ spec:
         fsGroup: 11111
       containers:
       - name: opendj
-        image:  {{ template "image" . }}
-        imagePullPolicy: {{ template "pullPolicy" . }}
+        image:  {{ .Values.global.image.repository }}{{ .Values.component }}{{ .Values.global.image.tag }}
+        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:

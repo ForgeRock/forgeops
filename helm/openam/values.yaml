@@ -90,3 +90,15 @@ service:
   type: ClusterIP
   externalPort: 80
   internalPort: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # Do not use for nginx. TODO: Does warp need this?
+    #ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/enable-cors: "false"
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "sha1"
+    ingress.kubernetes.io/ssl-redirect: "true"

@@ -1,6 +1,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Ingress definition to configure external routes.
+{{- if .Values.ingress.enabled }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -8,15 +9,13 @@ metadata:
   labels:
     app: {{ template "fullname" . }}
     vendor: forgerock
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
   annotations:
-    kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
-    # Do not use for nginx. TODO: Does warp need this?
-    #ingress.kubernetes.io/rewrite-target: /
-    ingress.kubernetes.io/enable-cors: "false"
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "sha1"
-    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
 {{ include "tls-spec" . | indent 2 }}
   rules:
@@ -27,3 +26,4 @@ spec:
         backend:
           serviceName: openam
           servicePort: 80
+{{- end -}}
