@@ -39,7 +39,7 @@ spec:
           value: "{{ default "master" .Values.global.git.branch }}"
       containers:
       - name: openidm
-        image: {{ template "image"  . }}
+        image: {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
         imagePullPolicy: {{ .Values.global.image.pullPolicy }}
         envFrom:
         - configMapRef:
