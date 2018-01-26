@@ -1,5 +1,5 @@
 {
-    "name": "default",
+    "name": "base",
     "baseURI": "http://idm-service.sample.svc.cluster.local:8080/",
     "condition": "${matches(request.uri.path, '^/$')}",
     "auditService": {
