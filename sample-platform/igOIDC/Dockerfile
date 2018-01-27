@@ -1,5 +1,3 @@
-# docker build -t ig:fullstack ig
-
 FROM forgerock/openig:latest
 
 ADD config /var/openig/config

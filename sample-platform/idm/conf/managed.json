@@ -542,9 +542,6 @@
                                 "policyId" : "unique"
                             },
                             {
-                                "policyId" : "no-internal-user-conflict"
-                            },
-                            {
                                 "policyId" : "cannot-contain-characters",
                                 "params" : {
                                     "forbiddenChars" : [

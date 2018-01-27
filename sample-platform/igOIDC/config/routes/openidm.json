@@ -41,9 +41,21 @@
             "config": {
                 "status": 401,
                 "headers": {
-                    "Content-Type": [ "application/json" ]
+                    "Content-Type": [ "application/json" ],
+                    "WWW-Authenticate": [ "idtoken realm=${env['OPENAM_INSTANCE']}/oauth2/.well-known/openid-configuration" ]
                 },
                 "entity": "{\"code\": 401, \"message\":\"Authentication Failed\"}"
+            }
+        },
+        {
+            "name": "authzFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 403,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 403, \"message\":\"Access Denied\"}"
             }
         },
         {
@@ -94,7 +106,7 @@
                                         "file": "batchConditionalRequest.groovy",
                                         "args": {
                                             "delegate" : "${heap['ForgeRockClientHandler']}",
-                                            "failureResponse" : "${heap['authnFailureResponse']}" ,
+                                            "failureResponse" : "${heap['authnFailureResponse']}",
                                             "checkRequests": [
                                                 {
                                                     "path": "^/openidm/info/.*",
@@ -121,53 +133,61 @@
                     }
                 },
                 {
-                    "type": "ScriptableFilter",
-                    "config": {
-                        "type": "application/x-groovy",
-                        "file": "getAccessTokenFromSession.groovy"
-                    }
-                },
-                {
-                    "type": "OAuth2ResourceServerFilter",
-                    "config": {
-                        "scopes": [
-                            "openid"
-                        ],
-                        "requireHttps": false,
-                        "accessTokenResolver": {
-                            "type": "TokenIntrospectionAccessTokenResolver",
-                            "config": {
-                                "endpoint": "${env['OPENAM_INSTANCE']}/oauth2/introspect",
-                                "providerHandler": {
-                                    "type": "Chain",
-                                    "config": {
-                                        "filters": [
-                                            {
-                                                "type": "HeaderFilter",
-                                                "config": {
-                                                    "messageType": "request",
-                                                    "add": {
-                                                        "Authorization": [
-                                                            "Basic ${encodeBase64('openidm:openidm')}"
-                                                        ]
-                                                    }
-                                                }
-                                            }
-                                        ],
-                                        "handler": "ForgeRockClientHandler"
-                                    }
-                                }
-                            }
-                        },
-                        "cacheExpiration": "2 minutes"
-                    }
-                },
-                {
                     "name": "SetTrustedAttributeHeaders",
                     "type": "ScriptableFilter",
                     "config": {
                         "type": "application/x-groovy",
-                        "file": "constructSecurityContextHeaders.groovy"
+                        "file": "constructSecurityContextHeaders.groovy",
+                        "args": {
+                            "failureResponse" : "${heap['authnFailureResponse']}"
+                        }
+                    }
+                },
+                {
+                    "name": "StoreUserDetailsInSession",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "storeUserDetailsInSession.groovy",
+                        "args": {
+                            "idmUserDetailEndpoint": "http://idm-service.sample.svc.cluster.local:8080/openidm/authentication?_action=login",
+                            "idmUserDetailMethod": "POST"
+                        }
+                    }
+                },
+                {
+                  "type": "PolicyEnforcementFilter",
+                  "config": {
+                        "openamUrl": "${env['OPENAM_INSTANCE']}",
+                        "pepUsername": "openidm",
+                        "pepPassword": "openidm",
+                        "pepRealm": "/",
+                        "application": "openidm",
+                        "ssoTokenSubject": "${session.openid.id_token}",
+                        "environment": {
+                            "securityContextPath": [
+                                "${session.idmUserDetails.authorization.component}/${session.idmUserDetails.authorization.id}"
+                            ],
+                            "securityContextRoles": "${session.idmUserDetails.authorization.roles}"
+                        },
+                        "failureHandler": "authzFailureResponse"
+                    }
+                },
+                {
+                    "type": "ConditionalFilter",
+                    "config": {
+                        "condition": "${matches(request.method, 'PATCH') and not empty contexts.policyDecision.attributes.allowedFields}",
+                        "delegate" : {
+                            "name": "CheckAllowedFieldsForPatch",
+                            "type": "ScriptableFilter",
+                            "config": {
+                                "type": "application/x-groovy",
+                                "file": "checkAllowedFieldsForPatch.groovy",
+                                "args": {
+                                    "failureResponse": "${heap['authzFailureResponse']}"
+                                }
+                            }
+                        }
                     }
                 }
             ],

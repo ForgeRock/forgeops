@@ -10,11 +10,6 @@ if (authzHeaderValue) {
     security.authorization = modifiedMap;
 }
 
-var scopeHeaderValue = httpRequest.getHeaders().getFirst(scopeHeaderName);
-if (scopeHeaderValue) {
-    security.authorization.scopes = scopeHeaderValue.split(' ')
-}
-
 security.authorization.logoutUrl = '/logout';
 
 security;

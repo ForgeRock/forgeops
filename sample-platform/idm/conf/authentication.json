@@ -55,8 +55,7 @@
                         "type" : "text/javascript",
                         "file" : "augmentSecurityContext.js",
                         "globals" : {
-                            "authzHeaderName" : "X-Authorization-Map",
-                            "scopeHeaderName" : "X-Special-Trusted-User-Scope"
+                            "authzHeaderName" : "X-Authorization-Map"
                         }
                     }
                 },
