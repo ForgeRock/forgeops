@@ -1,0 +1,47 @@
+{
+    "name": "logout",
+    "baseURI": "http://idm-service.sample.svc.cluster.local:8080/",
+    "condition": "${matches(request.uri.path, '^/logout')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "logout.groovy",
+                        "args": {
+                            "endSessionEndpoint": "${env['OPENAM_INSTANCE']}/oauth2/connect/endSession"
+                        }
+                    }
+                }
+            ],
+            "handler": {
+                "type": "StaticResponseHandler",
+                "config": {
+                    "status": 302,
+                    "headers": {
+                        "Location": [ "/user/" ]
+                    }
+                }
+            }
+        }
+    }
+}

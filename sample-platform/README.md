@@ -41,7 +41,7 @@ Build the Docker images for this sample:
     docker build -t dj:fullstack dj
     docker build -t am:fullstack am
     docker build -t amster:fullstack amster
-    docker build -t ig:fullstack ig
+    docker build -t ig:fullstack igOIDC
     docker build -t idm:fullstack idm
 
     kubectl create namespace sample

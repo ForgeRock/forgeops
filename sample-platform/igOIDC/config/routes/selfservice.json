@@ -1,7 +1,7 @@
 {
-    "name": "default",
+    "name": "selfservice",
     "baseURI": "http://idm-service.sample.svc.cluster.local:8080/",
-    "condition": "${matches(request.uri.path, '^/$')}",
+    "condition": "${matches(request.uri.path, '^/selfservice/')}",
     "auditService": {
         "type": "AuditService",
         "config": {
@@ -18,13 +18,5 @@
             }]
         }
     },
-    "handler": {
-        "type": "StaticResponseHandler",
-        "config": {
-            "status": 302,
-            "headers": {
-                "Location": [ "/user/" ]
-            }
-        }
-    }
+    "handler":"ForgeRockClientHandler"
 }

@@ -5,6 +5,14 @@ metadata:
   labels:
     role: proxy
 spec:
+  initContainers:
+  - name: wait-for-well-known
+    image: ig:fullstack
+    env:
+    - name: WELL_KNOWN_ENDPOINT
+      value: "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
+    command:
+    - /wellKnownCheck.sh
   containers:
     - image: ig:fullstack
       imagePullPolicy: IfNotPresent
@@ -16,3 +24,6 @@ spec:
       resources:
           requests:
             memory: "512Mi"
+      env:
+      - name: OPENAM_INSTANCE
+        value: "http://am-service.sample.svc.cluster.local/openam"
