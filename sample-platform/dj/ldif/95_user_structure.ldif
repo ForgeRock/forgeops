@@ -38,6 +38,11 @@ objectClass: organizationalUnit
 objectClass: top
 ou: assignment
 
+dn: ou=facebook,ou=managed,dc=example,dc=com
+objectClass: organizationalUnit
+objectClass: top
+ou: facebook
+
 dn: ou=People,dc=example,dc=com
 ou: people
 description: people
