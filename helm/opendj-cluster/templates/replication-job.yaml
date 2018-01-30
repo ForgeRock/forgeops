@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.djInstance }}-setup-rs
+  labels:
+    djInstance: {{ .Values.djInstance }}
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    component: opendj
+spec:
+  template:
+    spec:
+      containers:
+      - name: opendj
+        image:  {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
+        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.djInstance }}
+        args: ["configure-replication"]
+        volumeMounts:
+        - name: dj-secrets
+          mountPath: /var/run/secrets/opendj
+      restartPolicy: Never
+    #backoffLimit: 4
+      volumes:
+      - name: dj-secrets
+        secret:
+          secretName: {{ .Values.djInstance }}
+          # If we are running as non root, we can't set this mode to root read only
+          #defaultMode: 256

@@ -1,13 +1,23 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 
+# The default instance name. This will create a stateful set that can be resolved at
+#  $djInstance-0.$djInstance
+djInstance: userstore
+
+
+# Default password
 dirManagerPassword: password
+
+# The default bootstrap script.
+bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
+
+# The other option here is "cts". This sets the BOOTSTRAP_TYPE env var for the bootstrap script.
+bootstrapType: "userstore"
+
 
 # The OpenDJ baseDN
 baseDN: "dc=openam,dc=forgerock,dc=org"
 
-# The default instance name. This will create a stateful set that can be resolved at
-#  $djInstance-0.$djInstance
-djInstance: userstore
 
 # The host where backups will be scheduled. Set this to the instance name where you want to run backups.
 # Example: userstore-0.
@@ -25,21 +35,15 @@ component: opendj
 global:
   image:
     repository: forgerock
+    name: opendj
     pullPolicy: IfNotPresent
-    tag: 6.0.0
-  git:
-    # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
-    branch: master
+    tag:  6.0.0
 
+directoryServer:
+  replicas: 3
 
-
-# The default bootstrap script.
-bootstrapScript: "/git/forgeops-init/default/dj-userstore/setup.sh"
-
-
-# The number of instances in the StatefulSet. Each instance will be replicated to the master.
-replicaCount: 1
+replicationServer:
+  replicas: 2
 
 # Set for creating sample users. If unset, only the base DN will be created.
 #numberSampleUsers: 5
@@ -56,15 +60,11 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 
-
+# For production you will want to specify CPU limits to help Kube schedule the pods.
+# Todo: We will want to size these independently for DS/RS
 resources:
- requests:
-   cpu: 200m
+  requests:
    memory: 1024Mi
-   # For testing, we omit a hard resource limit
-#  limits:
-#     cpu: 1000m
-#   memory: 3000Mi
 
 
 # DJ persistence switch. Setting to false disables volume claims - all data is stored inside the docker image.
@@ -76,12 +76,12 @@ resources:
 djPersistence: false
 
 
-# Set this to true to enable backups to gcloud.
+# Set this to true to enable backups to gcloud
 enableGcloudBackups: false
 
-# Backup bucket destination. You need the right scopes in container engine to write to this bucket.
-# Add --scopes storage-full when you create the cluster.
+# backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
 gsBucket: gs://forgeops/dj-backup 
 
-# Uncomment this to create sample users.
-#numberSampleUsers: 100
+# Uncomment this to create sample users in the DS.
+numberSampleUsers: 100
+

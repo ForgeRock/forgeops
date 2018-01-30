@@ -1,0 +1,48 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.djInstance }}
+  labels:
+    app: {{ .Values.djInstance }}
+    component: {{ .Values.component }}
+    vendor: forgerock
+spec:
+  clusterIP: None
+  ports:
+    - port: 1389
+      name: ldap
+      targetPort: 1389
+    - port: 4444
+      name: djadmin
+      targetPort: 4444
+    - port: 8081
+      protocol: TCP
+      name: prometheus
+  selector:
+    djInstance: {{ .Values.djInstance }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.djInstance }}-rs"
+  labels:
+    app: "{{ .Values.djInstance }}-rs"
+    component: {{ .Values.component }}
+    vendor: forgerock
+spec:
+  clusterIP: None
+  ports:
+    - port: 8989
+      name: replication
+      targetPort: 8989
+    - port: 4444
+      name: djadmin
+      targetPort: 4444
+    - port: 8081
+      protocol: TCP
+      name: prometheus
+  selector:
+    djInstance: "{{ .Values.djInstance }}-rs"

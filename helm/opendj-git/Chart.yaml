@@ -1,5 +1,0 @@
-apiVersion: v1
-description: OpenDJ + git configuration
-name: opendj-git
-version: 6.0.0
-

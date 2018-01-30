@@ -22,7 +22,7 @@ dir=/tmp/charts
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-charts="opendj amster openam openidm openig postgres-openidm frcommon git opendj-git cmp-idm-dj-postgres cmp-am-dj cmp-am-dev cmp-platform cmp-am-embedded"
+charts="opendj amster openam openidm openig postgres-openidm frcommon git opendj-cluster cmp-idm-dj-postgres cmp-am-dj cmp-am-dev cmp-platform cmp-am-embedded"
 for chart in $charts
 do
     echo "Packaging $chart"

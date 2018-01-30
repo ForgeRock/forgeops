@@ -2,19 +2,21 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: {{ template "instanceName" . }}
+  name: {{ .Values.djInstance }}
   labels:
-    djInstance: {{ template "instanceName" . }}
+    djInstance: {{ .Values.djInstance }}
     app: {{ template "fullname" . }}
     vendor: forgerock
     component: {{ .Values.component }}
 spec:
-  serviceName: {{ template "instanceName" . }}
-  replicas: {{default 1 .Values.replicaCount }}
+  serviceName: {{ .Values.djInstance }}
+  replicas: {{ .Values.directoryServer.replicas }}
   {{- if .Values.djPersistence }}
   volumeClaimTemplates:
   - metadata:
       name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "11111"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
@@ -27,25 +29,27 @@ spec:
   template:
     metadata:
       labels:
-        djInstance: {{ template "instanceName" . }}
+        djInstance: {{ .Values.djInstance }}
         app: {{ template "fullname" . }}
         vendor: forgerock
         component: opendj
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: djInstance
+                  operator: In
+                  values:
+                  - {{ .Values.djInstance }}
+              topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
-      initContainers:
-      - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy:  {{ .Values.global.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name: {{ template "instanceName" . }}
+      # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
+      securityContext:
+        fsGroup: 11111
       containers:
       - name: opendj
         image:  {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
@@ -54,32 +58,39 @@ spec:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:
         - configMapRef:
-            name: {{ template "instanceName" . }}
+            name: {{ .Values.djInstance }}
+        env:
+        - name: DS_ROLE
+          value: directory-server
         ports:
         - containerPort: 1389
           name: ldap
         - containerPort: 4444
-          name: djadmin
+          name: admin
+        - containerPort: 8989
+          name: replication
+        - containerPort: 8081
+          name: metrics
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/run/secrets/opendj
         - name: dj-backup
           mountPath: /opt/opendj/backup
-        - name: git
-          mountPath: /git
         {{- if .Values.djPersistence }}
         - name: data
           mountPath: /opt/opendj/data
         {{- end }}
+        # Due to cost, we don't want to do a full scrape of the metrics http endpoint - so we create a tcp connection
+        # todo: revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4728 is resolved.
         readinessProbe:
-          exec:
-            command: ["/opt/opendj/probe.sh"]
+          tcpSocket:
+            port: metrics
           periodSeconds: 20
           initialDelaySeconds: 30
         livenessProbe:
-          exec:
-            command: ["/opt/opendj/probe.sh"]
-          initialDelaySeconds: 300
+          tcpSocket:
+            port: metrics
+          initialDelaySeconds: 60
           periodSeconds: 60
       {{- if .Values.enableGcloudBackups }}
       # An example of enabling backup to google cloud storage.
@@ -96,11 +107,8 @@ spec:
       volumes:
       - name: dj-secrets
         secret:
-          secretName: {{ template "instanceName" . }}
+          secretName: {{ .Values.djInstance }}
+          # If we are running as non root, we can't set this mode to root read only
+          #defaultMode: 256
       - name: dj-backup
         emptyDir: {}
-      - name: git
-        emptyDir: {}
-      - name: git-secret
-        secret:
-          secretName: {{ template "instanceName" . }}

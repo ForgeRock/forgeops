@@ -1,6 +1,5 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-
 # Default password
 dirManagerPassword: password
 
@@ -63,6 +62,9 @@ resources:
    memory: 1024Mi
 
 
+# The role is one of directory-server, replication-server. Defaults to directory-server if not set
+role: directory-server
+
 # DJ persistence switch. Setting to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
 # See issue https://github.com/kubernetes/kubernetes/issues/2630,
@@ -84,3 +86,8 @@ gsBucket: gs://forgeops/dj-backup
 
 # Uncomment this to create sample users.
 #numberSampleUsers: 100
+
+# Set to true to enable the readiness probe. Note that when setting up an RS we need this to be false.
+# When the second RS is being configured, the first will try to contact it. If k8s does not see the pod
+# as "READY" it does not create a dns name for it. By disabling the probe, the pod comes up as READY as soon as it starts
+readinessProbeEnabled: true

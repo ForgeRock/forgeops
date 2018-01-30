@@ -61,7 +61,6 @@ RUN apk add --no-cache openldap-clients \
 COPY bootstrap/ /opt/opendj/bootstrap/
 COPY *.sh /opt/opendj/
 
-
 #
 #    mkdir -p /opt/opendj/data/lib/extensions && \
 #     echo -n "password"  > ${DIR_MANAGER_PW_FILE}
@@ -76,5 +75,5 @@ USER forgerock
 
 EXPOSE 1389 636 4444 8989
 
-
-CMD ["/opt/opendj/run.sh"]
+ENTRYPOINT  ["/opt/opendj/docker-entrypoint.sh"]
+CMD ["run"]

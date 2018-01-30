@@ -2,15 +2,15 @@
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.djInstance }}
+  name: "{{ .Values.djInstance }}-rs"
   labels:
-    djInstance: {{ .Values.djInstance }}
+    djInstance: "{{ .Values.djInstance }}-rs"
     app: {{ template "fullname" . }}
     vendor: forgerock
     component: {{ .Values.component }}
 spec:
-  serviceName: {{ .Values.djInstance }}
-  replicas: {{default 1 .Values.replicaCount }}
+  serviceName: "{{ .Values.djInstance }}-rs"
+  replicas: {{ .Values.replicationServer.replicas }}
   {{- if .Values.djPersistence }}
   volumeClaimTemplates:
   - metadata:
@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       labels:
-        djInstance: {{ .Values.djInstance }}
+        djInstance: "{{ .Values.djInstance }}-rs"
         app: {{ template "fullname" . }}
         vendor: forgerock
         component: opendj
@@ -59,9 +59,10 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ .Values.djInstance }}
+        env:
+        - name: DS_ROLE
+          value: replication-server
         ports:
-        - containerPort: 1389
-          name: ldap
         - containerPort: 4444
           name: admin
         - containerPort: 8989
@@ -77,15 +78,13 @@ spec:
         - name: data
           mountPath: /opt/opendj/data
         {{- end }}
-        # Due to cost, we don't want to do a full scrape of the metrics http endpoint - so we create a tcp connection
-        # todo: revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4728 is resolved.
-        {{- if .Values.readinessProbeEnabled }}
-        readinessProbe:
-          tcpSocket:
-            port: metrics
-          periodSeconds: 20
-          initialDelaySeconds: 30
-        {{- end }}
+        # For the RS we need to disable this. RS1 needs to talk to itself, and it is not available until it is READY
+        # If we move the init logic to the replication script we can fix this...
+#        readinessProbe:
+#          tcpSocket:
+#            port: metrics
+#          periodSeconds: 20
+#          initialDelaySeconds: 30
         livenessProbe:
           tcpSocket:
             port: metrics

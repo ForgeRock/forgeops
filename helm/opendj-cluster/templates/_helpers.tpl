@@ -7,6 +7,3 @@ Expand the name of the chart.
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{end}}
-{{- define "instanceName" -}}
-{{- printf "%s" .Values.djInstance -}}
-{{end}}

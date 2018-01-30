@@ -109,3 +109,6 @@ in different contexts.
 
 # 2018-01-24
 * Moved all utility and base images to https://github.com/ForgeRock/docker-public 
+
+# 2018-01-31
+* Updates to DJ container. Added opendj-cluster chart to support HA.
