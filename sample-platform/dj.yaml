@@ -29,3 +29,8 @@ spec:
           resources:
               requests:
                 memory: "512Mi"
+          readinessProbe:
+            exec:
+              command: ["/opt/opendj/probe.sh"]
+            periodSeconds: 20
+            initialDelaySeconds: 30
