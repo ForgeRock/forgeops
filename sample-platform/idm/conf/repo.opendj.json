@@ -14,10 +14,6 @@
                 {
                     "hostname": "dj-0.dj-service",
                     "port": 1389
-                },
-                {
-                    "hostname": "dj-1.dj-service",
-                    "port": 1389
                 }
             ],
             "secondaryLdapServers": [ ]

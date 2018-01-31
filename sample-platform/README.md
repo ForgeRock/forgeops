@@ -83,7 +83,6 @@ Build the Docker images and add the kubernetes resources for this sample:
 Monitor the pods as they come up:
 
     kubectl logs -f dj-0
-    kubectl logs -f dj-1
     kubectl logs -f am
     kubectl logs -f amster
     kubectl logs -f ig
@@ -91,7 +90,7 @@ Monitor the pods as they come up:
 
 To make the internal DJ cluster accessible locally:
 
-    kubectl port-forward dj-0 1389:1389 4444:4444 &
+    kubectl port-forward dj-0 2389:1389 &
 
 Now the environment should be available at http://idm-service.sample.svc.cluster.local
 

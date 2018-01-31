@@ -4,7 +4,7 @@ metadata:
   name: dj
 spec:
   serviceName: dj-service
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -29,13 +29,3 @@ spec:
           resources:
               requests:
                 memory: "512Mi"
-          readinessProbe:
-            exec:
-              command: ["/opt/opendj/probe.sh"]
-            periodSeconds: 20
-            initialDelaySeconds: 30
-          livenessProbe:
-            exec:
-              command: ["/opt/opendj/probe.sh"]
-            initialDelaySeconds: 300
-            periodSeconds: 60

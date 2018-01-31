@@ -10,7 +10,7 @@
     "_id" : "",
     "policyHeartbeatInterval" : 10,
     "bindDn" : "cn=Directory Manager",
-    "ldapServer" : [ "dj-0.dj-service:1389", "dj-1.dj-service:1389" ],
+    "ldapServer" : [ "dj-0.dj-service:1389" ],
     "connectionPoolMinimumSize" : 1,
     "usersSearchAttribute" : "uid",
     "userAliasEnabled" : false,
