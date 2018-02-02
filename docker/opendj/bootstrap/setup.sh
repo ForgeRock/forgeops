@@ -35,6 +35,8 @@ esac
 
 # Common tasks for all roles...
 # This enables the Prometheus metrics server
+# todo: use Http Basic auth mechanism. Create a monitoring user. On an RS?
+# Need to create an identity mapper.
 bin/dsconfig  -h localhost -p 4444 -D "cn=directory manager" \
     -w ${PASSWORD} --trustAll --no-prompt --batch <<EOF
 create-connection-handler --type http --handler-name "HTTP Connection Handler" --set enabled:true --set listen-port:8081

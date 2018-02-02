@@ -21,10 +21,8 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ default "5Gi"  .Values.storageSize }}
-      {{- if .Values.storageClass }}
-      storageClassName:  {{ .Values.storageClass }}
-      {{- end }}
+          storage: {{ default "5Gi"  .Values.replicationServer.storageSize }}
+      storageClassName:  {{ .Values.replicationServer.storageClass }}
   {{- end }}
   template:
     metadata:
@@ -55,7 +53,7 @@ spec:
         image:  {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
         imagePullPolicy: {{ .Values.global.image.pullPolicy }}
         resources:
-{{ toYaml .Values.resources | indent 12 }}
+{{ toYaml .Values.replicationServer.resources | indent 12 }}
         envFrom:
         - configMapRef:
             name: {{ .Values.djInstance }}

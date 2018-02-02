@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# Initialize replication for the cluster.
+# Configure and Initialize replication for the cluster.
 #
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
 
-set -x
+#set -x
 
 
 source /opt/opendj/env.sh
@@ -23,8 +23,6 @@ source /opt/opendj/env.sh
 
 
 
-
-
 ADMIN_ID=admin
 
 # Put an echo in front of this command if you just want to see what the script does.
@@ -35,11 +33,6 @@ if [ -z "$DS_SET_SIZE" ]; then
     exit 1
 fi
 
-# R0 is the FQDN of the first RS
-R0="${DJ_INSTANCE}-rs-0.${DJ_INSTANCE}-rs"
-let end="$DS_SET_SIZE - 1"
-
-LAST_DS="${DJ_INSTANCE}-$end.${DJ_INSTANCE}"
 
 env
 # Search for an LDAP host. Return 0 if it is available.
@@ -50,12 +43,18 @@ search() {
      "(objectClass=*)" 1.1
 }
 
+
+let last_ds="$DS_SET_SIZE - 1"
+let last_rs="$RS_SET_SIZE - 1"
+
+LAST_DS_SERVER="${DJ_INSTANCE}-$last_ds.${DJ_INSTANCE}"
+
 # We need to wait for the last DS instance in the set to be up
 while true; do
-    if search "$LAST_DS"; then
+    if search "$LAST_DS_SERVER"; then
             break
     fi
-    sleep 10
+    sleep 30
 done
 
 # We need at least RS0 to be up...
@@ -71,11 +70,12 @@ done
 echo "About to begin replication setup"
 
 
-# Step one - enable replication on all DS servers, including -0
-for i in $(seq 0 $end); do
-    H="${DJ_INSTANCE}-$i.${DJ_INSTANCE}"
+dsconfigure() {
+  H="${DJ_INSTANCE}-$1.${DJ_INSTANCE}"
+  R="${DJ_INSTANCE}-rs-$2.${DJ_INSTANCE}-rs"
+  echo "Configuring DS $H to replicate to RS $R"
 
-     $dsreplica configure \
+    $dsreplica configure \
      --adminUID "$ADMIN_ID" \
      --adminPassword "${PASSWORD}" \
      --baseDN "$BASE_DN" \
@@ -84,7 +84,7 @@ for i in $(seq 0 $end); do
      --bindDN1 "cn=Directory Manager" \
      --bindPassword1 "${PASSWORD}" \
      --noReplicationServer1 \
-     --host2 "$R0" \
+     --host2 "$R" \
      --port2 4444 \
      --bindDN2 "cn=Directory Manager" \
      --bindPassword2 "${PASSWORD}" \
@@ -92,26 +92,14 @@ for i in $(seq 0 $end); do
      --onlyReplicationServer2 \
      --trustAll \
      --no-prompt
+}
+
+for replica in $(seq 0 $last_rs); do
+  for dsserver in $(seq 0 $last_ds); do
+    dsconfigure $dsserver $replica
+  done
 done
 
+# Initialize replication
+/opt/opendj/bootstrap/replicate-init.sh
 
-# We initialize from the first server in the set.
-H0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
-
-# On each DS *other* than node 0, initialize replication
-# Note this expression is bash - not sh
-for i in $(seq 1 $end); do
-
-    H="${DJ_INSTANCE}-$i.${DJ_INSTANCE}"
-
-    $dsreplica initialize \
-        --baseDN "$BASE_DN" \
-        --hostSource "$H0" \
-        --portSource 4444 \
-        --hostDestination "${H}" \
-        --portDestination 4444 \
-        --trustAll \
-        --no-prompt \
-        --adminUID "$ADMIN_ID" \
-        --adminPassword "${PASSWORD}"
-done

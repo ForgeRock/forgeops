@@ -4,6 +4,8 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
+set -x
+
 DB_NAME=${DB_NAME:-userRoot}
 
 # The type of DJ we want to bootstrap. This determines the ldif files and scripts to load. Defaults to a userstore.
@@ -11,8 +13,8 @@ BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
 
 INIT_OPTION="--addBaseEntry"
 
-# If NUMBER_SAMPLE_USERS is set we generate sample users.
-if [ -n "${NUMBER_SAMPLE_USERS+set}" ]; then
+# If NUMBER_SAMPLE_USERS is set AND we are the first node, then generate sample users.
+if [[  -n "${NUMBER_SAMPLE_USERS}" && $HOSTNAME = *"0"* ]]; then
     INIT_OPTION="--sampleData ${NUMBER_SAMPLE_USERS}"
 fi
 

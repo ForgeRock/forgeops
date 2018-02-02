@@ -34,22 +34,35 @@ component: opendj
 
 global:
   image:
-    repository: forgerock
+    #repository: forgerock
+    repository: gcr.io/engineering-devops
     name: opendj
-    pullPolicy: IfNotPresent
+    #pullPolicy: IfNotPresent
+    pullPolicy: Always
     tag:  6.0.0
 
 directoryServer:
   replicas: 3
+  # Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
+  storageSize: "20Gi"
+  # DS nodes need fast (SSD) storage. Your cluster admin must create a 'fast' storage class.
+  storageClass: "fast"
+  resources:
+    requests:
+     memory: 4024Mi
 
 replicationServer:
   replicas: 2
+   # Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
+  storageSize: "10Gi"
+  storageClass: "fast"
+  resources:
+    requests:
+     memory: 4024Mi
 
 # Set for creating sample users. If unset, only the base DN will be created.
 #numberSampleUsers: 5
 
-# Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
-storageSize: "10Gi"
 
 # Set storageClass only on clusters that support it (GCP / AWS).
 #storageClass: fast
@@ -60,12 +73,6 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 
-# For production you will want to specify CPU limits to help Kube schedule the pods.
-# Todo: We will want to size these independently for DS/RS
-resources:
-  requests:
-   memory: 1024Mi
-
 
 # DJ persistence switch. Setting to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
@@ -73,7 +80,7 @@ resources:
 # which impacts minikube (or any hostPath based provisioner). The underlying PV has root permissions,
 # and the DJ container will not start. If you need to run this on Minikube with PVC, set runAsUser: 0 in the
 # deployment securityContext:
-djPersistence: false
+djPersistence: true
 
 
 # Set this to true to enable backups to gcloud
@@ -82,6 +89,6 @@ enableGcloudBackups: false
 # backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
 gsBucket: gs://forgeops/dj-backup 
 
-# Uncomment this to create sample users in the DS.
-numberSampleUsers: 100
-
+# Uncomment this to create sample users in the DS. The value must be quoted as a string
+# Note large values here will cause init failure as the initial setup takes too long and the pod will be killed.
+numberSampleUsers: "5000"
