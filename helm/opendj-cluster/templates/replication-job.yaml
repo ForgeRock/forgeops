@@ -1,3 +1,4 @@
+{{ if .Values.intializeReplication }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -29,3 +30,4 @@ spec:
           secretName: {{ .Values.djInstance }}
           # If we are running as non root, we can't set this mode to root read only
           #defaultMode: 256
+{{end}}

@@ -92,3 +92,7 @@ gsBucket: gs://forgeops/dj-backup
 # Uncomment this to create sample users in the DS. The value must be quoted as a string
 # Note large values here will cause init failure as the initial setup takes too long and the pod will be killed.
 numberSampleUsers: "5000"
+
+
+# Run the the job to initialize replication.
+initializeReplication: true
