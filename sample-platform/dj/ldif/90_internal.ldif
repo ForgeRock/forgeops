@@ -137,6 +137,12 @@ objectClass: top
 cn: openidm-admin
 description: Administrative access
 
+dn: cn=openidm-del-admin,ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=com
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-del-admin
+description: Delegated administrative access
+
 dn: cn=openidm-cert,ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=com
 objectClass: fr-idm-internal-role
 objectClass: top

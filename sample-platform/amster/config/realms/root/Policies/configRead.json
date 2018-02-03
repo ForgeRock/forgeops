@@ -3,31 +3,30 @@
     "realm" : "/",
     "amsterVersion" : "6.0.0-M5",
     "entityType" : "Policies",
-    "entityId" : "amadmin",
+    "entityId" : "configRead",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "amadmin",
-    "name" : "amadmin",
+    "_id" : "configRead",
+    "name" : "configRead",
     "active" : true,
     "description" : "",
-    "resources" : [ "*://*:*/*", "*://*:*/*?*" ],
+    "resources" : [ "*://*:*/openidm/config/*" ],
     "actionValues" : {
-      "DELETE" : true,
-      "POST" : true,
-      "GET" : true,
-      "PUT" : true,
-      "PATCH" : true
+      "GET" : true
     },
     "applicationName" : "openidm",
     "subject" : {
-      "type" : "Identity",
-      "subjectValues" : [ "id=amAdmin,ou=user,dc=example,dc=com" ]
+      "type" : "AuthenticatedUsers"
+    },
+    "condition" : {
+      "type" : "Script",
+      "scriptId" : "7b6a6668-3bbb-4b9d-9090-8e1c4625c72f"
     },
     "resourceTypeUuid" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "lastModifiedDate" : "2018-02-03T16:21:43.753Z",
+    "lastModifiedDate" : "2018-02-03T17:07:27.730Z",
     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "creationDate" : "2018-02-03T16:21:43.753Z"
+    "creationDate" : "2018-02-03T17:06:59.211Z"
   }
 }

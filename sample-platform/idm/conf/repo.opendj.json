@@ -371,6 +371,10 @@
                         "type": "simple",
                         "ldapAttribute": "mail"
                     },
+                    "organizationName": {
+                        "type": "simple",
+                        "ldapAttribute": "organizationName"
+                    },
                     "lastSync": {
                         "type": "json",
                         "ldapAttribute": "fr-idm-lastSync"

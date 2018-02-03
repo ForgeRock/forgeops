@@ -71,6 +71,7 @@
                     "givenName",
                     "sn",
                     "mail",
+                    "organizationName",
                     "description",
                     "accountStatus",
                     "telephoneNumber",
@@ -224,6 +225,16 @@
                                 "policyId" : "valid-email-address-format"
                             }
                         ]
+                    },
+                    "organizationName" : {
+                        "title" : "Organization Name",
+                        "description" : "Organization Name",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : true
                     },
                     "sn" : {
                         "title" : "Last Name",

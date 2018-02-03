@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "6.0.0-M4",
+    "amsterVersion" : "6.0.0-M5",
     "entityType" : "Policies",
     "entityId" : "ownPolicy",
     "pathParams" : { }
@@ -12,10 +12,10 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/policy/managed/user/*" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "GET" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },
@@ -25,8 +25,8 @@
     },
     "resourceTypeUuid" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
     "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "lastModifiedDate" : "2018-01-08T17:26:19.359Z",
+    "lastModifiedDate" : "2018-02-03T16:21:43.916Z",
     "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
-    "creationDate" : "2018-01-08T17:26:19.359Z"
+    "creationDate" : "2018-02-03T16:21:43.916Z"
   }
 }
