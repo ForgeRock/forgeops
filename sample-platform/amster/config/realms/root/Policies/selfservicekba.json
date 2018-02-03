@@ -12,10 +12,10 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/selfservice/kba" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "GET" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

@@ -12,8 +12,8 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/policy/*", "*://*:*/openidm/policy/*?_action=*" ],
-    "applicationName" : "openidm",
     "actionValues" : { },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

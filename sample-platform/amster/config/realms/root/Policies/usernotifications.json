@@ -12,11 +12,11 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/endpoint/usernotifications/*?*", "*://*:*/openidm/endpoint/usernotifications/*", "*://*:*/openidm/endpoint/usernotifications" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "DELETE" : true,
       "GET" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

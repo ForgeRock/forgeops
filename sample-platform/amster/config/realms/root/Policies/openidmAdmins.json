@@ -12,7 +12,6 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/*", "*://*:*/*?*" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "DELETE" : true,
       "POST" : true,
@@ -20,6 +19,7 @@
       "PATCH" : true,
       "PUT" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

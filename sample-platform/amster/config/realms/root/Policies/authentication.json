@@ -11,12 +11,12 @@
     "name" : "authentication",
     "active" : true,
     "description" : "",
-    "resources" : [ "*://*:*/openidm/authentication?_action=login", "*://*:*/openidm/authentication?_action=reauthenticate", "*://*:*/openidm/authentication?_action=logout", "*://*:*/openidm/authentication" ],
-    "applicationName" : "openidm",
+    "resources" : [ "*://*:*/openidm/info/login", "*://*:*/openidm/authentication?_action=reauthenticate", "*://*:*/openidm/authentication?_action=logout", "*://*:*/openidm/authentication" ],
     "actionValues" : {
       "POST" : true,
       "GET" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

@@ -12,10 +12,10 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/config/ui/themeconfig" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "GET" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

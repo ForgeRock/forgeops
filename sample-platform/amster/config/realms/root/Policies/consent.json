@@ -12,10 +12,10 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/consent?_action=getConsentMappings" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "POST" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },

@@ -12,11 +12,11 @@
     "active" : true,
     "description" : "",
     "resources" : [ "*://*:*/openidm/workflow/taskinstance/*", "*://*:*/openidm/workflow/taskinstance/*?_action=complete" ],
-    "applicationName" : "openidm",
     "actionValues" : {
       "POST" : true,
       "PUT" : true
     },
+    "applicationName" : "openidm",
     "subject" : {
       "type" : "AuthenticatedUsers"
     },
