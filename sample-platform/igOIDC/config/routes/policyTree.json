@@ -1,0 +1,106 @@
+{
+    "name": "policyTree",
+    "condition": "${matches(request.uri.path, '^/policyTree/')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "heap": [
+        {
+            "name": "capture",
+            "type": "CaptureDecorator",
+            "config": {
+                "captureEntity": true,
+                "captureContext": true
+            }
+        },
+        {
+            "name": "debugHandler",
+            "type": "ClientHandler",
+            "capture": [
+                "request",
+                "response"
+            ]
+        },
+        {
+            "name": "authnFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 401,
+                "headers": {
+                    "Content-Type": [ "application/json" ],
+                    "WWW-Authenticate": [ "idtoken realm=${env['OPENAM_INSTANCE']}/oauth2/.well-known/openid-configuration" ]
+                },
+                "entity": "{\"code\": 401, \"message\":\"Authentication Failed\"}"
+            }
+        }
+    ],
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy",
+                        "args": {
+                            "failureResponse" : "${heap['authnFailureResponse']}"
+                        }
+                    }
+                },
+                {
+                    "name": "StoreUserDetailsInSession",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "clientHandler": "ForgeRockClientHandler",
+                        "type": "application/x-groovy",
+                        "file": "storeUserDetailsInSession.groovy",
+                        "args": {
+                            "idmUserDetailEndpoint": "http://idm-service.sample.svc.cluster.local:8080/openidm/authentication?_action=login",
+                            "idmUserDetailMethod": "POST"
+                        }
+                    }
+                }
+            ],
+            "handler": {
+                "name": "FetchPolicyTree",
+                "type": "ScriptableHandler",
+                "config": {
+                    "clientHandler": "ForgeRockClientHandler",
+                    "type": "application/x-groovy",
+                    "file": "fetchPolicyTree.groovy",
+                    "args": {
+                        "resource": "http://idm-service.sample.svc.cluster.local/",
+                        "openamUrl": "${env['OPENAM_INSTANCE']}",
+                        "pepUsername": "openidm",
+                        "pepPassword": "openidm",
+                        "pepRealm": "/",
+                        "application": "openidm",
+                        "ssoTokenSubject": "${session.openid.id_token}",
+                        "environment": {
+                            "securityContextPath": [
+                                "${session.idmUserDetails.authorization.component}/${session.idmUserDetails.authorization.id}"
+                            ],
+                            "securityContextRoles": "${session.idmUserDetails.authorization.roles}"
+                        },
+                        "failureHandler": "authzFailureResponse"
+                    }
+                }
+            }
+        }
+    }
+}
