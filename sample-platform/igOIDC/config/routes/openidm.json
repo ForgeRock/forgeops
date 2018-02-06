@@ -159,6 +159,11 @@
                   "type": "PolicyEnforcementFilter",
                   "config": {
                         "openamUrl": "${env['OPENAM_INSTANCE']}",
+                        "cache": {
+                            "enabled": true,
+                            "defaultTimeout": "1 hour",
+                            "maxTimeout": "1 day"
+                        },
                         "pepUsername": "openidm",
                         "pepPassword": "openidm",
                         "pepRealm": "/",
