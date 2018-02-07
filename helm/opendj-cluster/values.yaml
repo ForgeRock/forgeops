@@ -95,4 +95,4 @@ numberSampleUsers: "5000"
 
 
 # Run the the job to initialize replication.
-initializeReplication: true
+intializeReplication: true
