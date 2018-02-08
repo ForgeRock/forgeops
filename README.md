@@ -19,7 +19,7 @@ article](https://backstage.forgerock.com/knowledge/kb/article/a74096897)
 
 # Documentation 
 
-The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/doc/devops-guide/index.html)
+The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html)
 tracks the master branch.
 
 The documentation for the the 5.5.0 release can be found on 
