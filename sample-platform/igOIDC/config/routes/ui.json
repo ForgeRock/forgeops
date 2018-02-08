@@ -49,11 +49,10 @@
                         "failureHandler": {
                             "type": "StaticResponseHandler",
                             "config": {
-                                "status": 401,
+                                "status": 302,
                                 "headers": {
-                                    "Content-Type": [ "application/json" ]
-                                },
-                                "entity": "{\"code\": 401, \"message\":\"Unable to perform oauth 2 flow\"}"
+                                    "Location": [ "/logout" ]
+                                }
                             }
                         },
                         "registrations": [
