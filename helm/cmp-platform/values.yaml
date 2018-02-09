@@ -1,11 +1,8 @@
 
 
 global:
+  #domain: .forgeops.com
   domain: .example.com
-  image:
-    #repository: gcr.io/engineering-devops
-    repository: forgerock
-    tag: 6.0.0-SNAPSHOT
 
 
 userstore:

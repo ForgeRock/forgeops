@@ -112,3 +112,8 @@ in different contexts.
 
 # 2018-01-31
 * Updates to DJ container. Added opendj-cluster chart to support HA.
+
+# 2018-02-09
+* Refactor helm charts to adhere to best practices
+* Reduced use of global variables in charts.
+* Build to quay.io

@@ -12,7 +12,7 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2016-2017 ForgeRock AS.
+* Copyright 2016-2018 ForgeRock AS.
 *
 -->
 
@@ -69,9 +69,9 @@
         <opendjVersion>6.0.0-M117.1</opendjVersion>
         <openidmVersion>6.0.0-M5</openidmVersion>
         <openigVersion>6.0.0-M121</openigVersion>
-        <registry>docker-public.forgerock.io:443</registry>
+        <registry>quay.io:443</registry>
         <releaseTag>6.0.0</releaseTag>
-        <repo>forgerock</repo>
+        <repo>quay.io/forgerock</repo>
     </properties>
 
  <repositories>
@@ -107,7 +107,7 @@
          <plugin>
              <groupId>io.fabric8</groupId>
              <artifactId>docker-maven-plugin</artifactId>
-             <version>0.23.0</version>
+             <version>0.24.0</version>
 
              <!-- List of images to build -->
                 <configuration>
@@ -125,6 +125,7 @@
                                 </tags>
                             </build>
                         </image>
+                        <!-- We do not currently use this image.
                         <image>
                             <name>${repo}/openidm-postgres</name>
                             <build>
@@ -135,6 +136,7 @@
                                 </tags>
                             </build>
                         </image>
+                        -->
                         <image>
                             <name>${repo}/openam</name>
                             <build>

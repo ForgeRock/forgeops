@@ -40,7 +40,6 @@ Composite charts have names that begin with cmp-. These charts assemble foundati
 * If you are using a private registry, see registry.sh. Edit the `~/etc/registry_env` and set
 REGISTRY_PASSWORD, REGISTRY_ID and REGISTRY_EMAIL  environment variables with your BackStage credentials.
 This is needed so that Kubernetes can authenticate to pull images from a private registry. 
-NOTE AT THIS TIME THAT THE FORGEROCK DOCKER REGISTRY IS ONLY AVAILABLE TO EMPLOYEES.
 
 If you are using your own private registry you must modify registry.sh with the relevant credentials.
 
@@ -77,12 +76,12 @@ Further documentation can be found in each chart's README.md
 
 # Namespaces 
 
-By default, the charts will deploy to the `default` namespace in Kubernetes. 
+By default charts  deploy to the `default` namespace in Kubernetes. 
 
 You can deploy multiple product instances in different namespaces and they will not 
 interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
 
-To provide external ingress routes that are unique, the namespace is used when forming the 
+To provide external ingress routes that are unique, the namespace can be used when forming the 
 ingress host name. The format is:
  {openam,openidm,openig}.{namespace}.{domain} 
 
@@ -90,6 +89,8 @@ ingress host name. The format is:
 
  `openam.default.example.com`
 
+Note that the details of the ingress will depend on the implementation. You may need to modify the ingress definitions. 
+ 
 
 # Notes
 
@@ -112,13 +113,9 @@ every time Minikube is restarted.  The opendj/ chart is a StatefulSet,
 and relies on auto provisioning.  If you restart Minikube, you may find you
 need to re-install OpenAM.
 
-# Templates and Dependencies
+# Dependencies
 
-There is a common chart - frcommon, that includes a number of utility template expansions. This
-chart is included in the other charts as a dependency.
-
-The script `helm/update-deps.sh` will update all of the dependencies. You must run this anytime you change 
-frcommon or any of the foundational charts (openam, openidm, etc.)
+The script `helm/update-deps.sh` will update all of the dependencies. You must run this anytime you change  any of the foundational charts (openam, openidm, etc.)
 
 # Tips
 

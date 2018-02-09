@@ -9,6 +9,9 @@ metadata:
     vendor: forgerock
     component: amster
     release: {{ .Release.Name }}
+    app: {{ template "name" . }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   template:
@@ -21,7 +24,7 @@ spec:
       initContainers:
       - name: git-init
         image: forgerock/git:6.0.0
-        imagePullPolicy:  {{ .Values.global.image.pullPolicy }}
+        imagePullPolicy:  {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -38,8 +41,8 @@ spec:
           value: "{{ .Values.global.git.branch }}"
       containers:
       - name: amster
-        image: {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
-        imagePullPolicy: {{  .Values.global.image.pullPolicy }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{  .Values.image.pullPolicy }}
         envFrom:
         - configMapRef:
             name: amster-{{ .Release.Name }}
@@ -63,7 +66,7 @@ spec:
 {{ toYaml .Values.resources | indent 12 }}
       - name: git
         image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git

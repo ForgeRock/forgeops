@@ -4,9 +4,7 @@
 
 
 global:
-  image:
-    repository: forgerock
-    tag: 6.0.0
+  domain: .forgeops.com
 
   
 resources:

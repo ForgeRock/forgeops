@@ -4,8 +4,7 @@
 
 
 global:
-  image:
-    repository: gcr.io/engineering-devops
+  domain: .forgeops.com
 
 resources:
   limits:

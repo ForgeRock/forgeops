@@ -8,6 +8,7 @@ metadata:
     app: {{ .Values.djInstance }}
     component: {{ .Values.component }}
     vendor: forgerock
+    heritage: {{ .Release.Service }}
 spec:
   clusterIP: None
   ports:
@@ -21,4 +22,5 @@ spec:
       protocol: TCP
       name: prometheus
   selector:
-    djInstance: {{ .Values.djInstance }}
+    app: {{ template "name" . }}
+    release: {{ .Release.Name }}

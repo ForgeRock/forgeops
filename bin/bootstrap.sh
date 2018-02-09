@@ -25,19 +25,6 @@ if ! kubectl get secret --namespace "${NAMESPACE}" "${secretName}"; then
 
 fi
 
-node=minikube
-
-# If the minikube command is not found, assume we are on a GKE (or other) cluster
-if ! command -v minikube ; then
-    node=gke
-fi
-
-# But if kubectl points at something that is not minikube, assume we are on another cluster type
-kubectl get node | grep minikube
-if [ $? -ne 0 ]; then
-    node=gke
-fi
-
 
 CUSTOM_YAML=config/custom.yaml
 
@@ -47,21 +34,11 @@ if [ ! -r "${CUSTOM_YAML}" ]; then
 
     CUSTOM_YAML=/tmp/custom.yaml
     DOMAIN=.forgeops.com
-    REPO="gcr.io/engineering-devops"
-
-    if [ "${node}" = "minikube" ]; then
-           echo "It looks like you are on Minikube. I will assume the Docker images have already been built"
-           ip=`minikube ip`
-           REPO=forgerock
-           DOMAIN=".${ip}.xip.io"
-   fi
+    REPO="quay.io/forgerock"
 
     cat > ${CUSTOM_YAML} <<EOF
 global:
   domain: ${DOMAIN}
-  image:
-    repository: ${REPO}
-    tag: 6.0.0
   git:
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master

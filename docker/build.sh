@@ -9,7 +9,7 @@
 
 # Default environment variables. You can set these all via command switches as well.
 REGISTRY=""
-REPO=${REPO:-forgerock}
+REPO=${REPO:-quay.io/forgerock}
 # Default tag if none is specified.
 TAG=${TAG:-6.0.0}
 

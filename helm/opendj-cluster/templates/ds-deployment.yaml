@@ -31,6 +31,7 @@ spec:
         app: {{ template "fullname" . }}
         vendor: forgerock
         component: opendj
+        release: {{ .Release.Name }}
     spec:
       affinity:
         podAntiAffinity:
@@ -50,8 +51,8 @@ spec:
         fsGroup: 11111
       containers:
       - name: opendj
-        image:  {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
-        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
 {{ toYaml .Values.directoryServer.resources | indent 12 }}
         envFrom:

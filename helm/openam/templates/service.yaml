@@ -16,4 +16,5 @@ spec:
     protocol: TCP
     name: {{ .Values.service.name }}
   selector:
-    component: openam
+    app: {{ template "openam.name" . }}
+    release: {{ .Release.Name }}

@@ -5,7 +5,7 @@ apiVersion: apps/v1beta1
 metadata:
   # If you want to run more than one IG deployment in the same namespace, change the deployment name 
   # below to the {{ template "fullname" . }} to make the name unique.
-  name: openig
+  name:  {{ template "fullname" . }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     vendor: forgerock
@@ -15,7 +15,7 @@ spec:
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "name" . }}
         release: {{ .Release.Name }}
         component: {{ .Values.component }}
         vendor: forgerock

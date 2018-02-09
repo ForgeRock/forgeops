@@ -5,9 +5,11 @@ metadata:
   name: {{ .Values.djInstance }}
   labels:
     djInstance: {{ .Values.djInstance }}
-    app: {{ template "fullname" . }}
+    app: {{ template "name" . }}
     vendor: forgerock
     component: {{ .Values.component }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   serviceName: {{ .Values.djInstance }}
   replicas: {{default 1 .Values.replicaCount }}
@@ -30,8 +32,9 @@ spec:
     metadata:
       labels:
         djInstance: {{ .Values.djInstance }}
-        app: {{ template "fullname" . }}
+        app: {{ template "name" . }}
         vendor: forgerock
+        release: {{ .Release.Name }}
         component: opendj
     spec:
       affinity:
@@ -52,8 +55,8 @@ spec:
         fsGroup: 11111
       containers:
       - name: opendj
-        image:  {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
-        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:

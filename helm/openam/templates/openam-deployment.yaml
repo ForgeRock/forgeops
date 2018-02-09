@@ -2,21 +2,23 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: openam
+  name: {{ template "openam.fullname" . }}
 spec:
   replicas: {{default 1 .Values.openamReplicaCount }}
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "openam.name" . }}
         component: {{ .Values.component }}
         vendor: forgerock
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
     spec:
       terminationGracePeriodSeconds: 10
       initContainers:
       - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy:  {{ .Values.global.image.pullPolicy }}
+        image: quay.io/forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -32,7 +34,8 @@ spec:
         args: [ "pod", "-l", "djInstance=configstore" ]
       # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
       - name: bootstrap
-        image: forgerock/util:6.0.0
+        image: quay.io/forgerock/util:6.0.0
+        imagePullPolicy:  {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
@@ -45,8 +48,8 @@ spec:
         args:  ["bootstrap"]
       containers:
       - name: openam
-        image: {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
-        imagePullPolicy:  {{ .Values.global.image.pullPolicy }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy:  {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080
           name: http

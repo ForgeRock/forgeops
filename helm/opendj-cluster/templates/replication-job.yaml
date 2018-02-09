@@ -13,8 +13,8 @@ spec:
     spec:
       containers:
       - name: opendj
-        image:  {{ .Values.global.image.repository }}/{{ .Values.component }}:{{ .Values.global.image.tag }}
-        imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
         - configMapRef:
             name: {{ .Values.djInstance }}

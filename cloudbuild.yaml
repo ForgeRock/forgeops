@@ -19,7 +19,7 @@ steps:
   - --key=maven-settings
 # Run maven build using the gcr profile. This results in images being tagged for gcr.io/${PROJECT_ID}.
 - name: 'gcr.io/cloud-builders/java/mvn'
-  args: ['--settings','settings.xml', '-Pgcr', 'package', 'docker:build']
+  args: ['--settings','settings.xml', '-Pgcr', '--batch-mode', 'package', 'docker:build']
   dir:  docker
 images:
 - 'gcr.io/$PROJECT_ID/opendj'
@@ -27,4 +27,3 @@ images:
 - 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'
 - 'gcr.io/$PROJECT_ID/amster'
-- 'gcr.io/$PROJECT_ID/openidm-postgres'

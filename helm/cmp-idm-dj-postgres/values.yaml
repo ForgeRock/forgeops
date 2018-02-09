@@ -4,10 +4,7 @@
 # Override any child variables
 
 global:
-  image:
-    repository: gcr.io/engineering-devops
-    tag: 6.0.0
-
+  domain: .forgeops.com
 
 # Default is to install userstore.  Run with helm install --set tags.userstore=false to override
 # Note that the userstore might have been deployed with one of the AM samples as well.

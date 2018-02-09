@@ -32,14 +32,10 @@ backupScheduleIncremental: "15 * * * *"
 
 component: opendj
 
-global:
-  image:
-    #repository: forgerock
-    repository: gcr.io/engineering-devops
-    name: opendj
-    #pullPolicy: IfNotPresent
-    pullPolicy: Always
-    tag:  6.0.0
+image:
+  repository: quay.io/forgerock/opendj
+  pullPolicy: IfNotPresent
+  tag: 6.0.0
 
 directoryServer:
   replicas: 3

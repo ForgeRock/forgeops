@@ -4,12 +4,13 @@
 
 component: openam
 
+image:
+  repository: quay.io/forgerock/openam
+  tag: 6.0.0
+  pullPolicy: IfNotPresent
+
 global:
-  domain: .example.com
-  image:
-    repository: forgerock
-    tag: 6.0.0
-    pullPolicy: IfNotPresent
+  domain: .forgeops.com
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
@@ -77,13 +78,6 @@ rbac:
   enabled: true
 
 
-ingress:
-  class: nginx
-  #class: cloudflare-warp
-  # Set hostname to override the default value of {{component}}.{{namespace}}.{{domain}}.
-  #hostname: foo.example.com
-
-
 service:
   name: openam
   #type: NodePort
@@ -92,6 +86,7 @@ service:
   internalPort: 8080
 
 ingress:
+  class: nginx
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx

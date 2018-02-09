@@ -1,17 +1,18 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: openidm
+  name: {{ template "fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     component: {{ .Values.component }}
     vendor: forgerock
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "name" . }}
         release: {{ .Release.Name }}
         component: {{ .Values.component }}
         vendor: forgerock
