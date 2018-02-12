@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Sample Gatling chart for load testing OpenAM
-name: gatling
-version: 6.0.0
