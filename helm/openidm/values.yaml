@@ -12,16 +12,17 @@ replicaCount: 1
 
 global:
   domain: .example.com
-  image:
-    repository: forgerock
-    pullPolicy: IfNotPresent
-    tag: 6.0.0
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     branch: master
   configPath:
     idm: default/idm/sync-with-ldap-bidirectional
+
+image:
+  repository: quay.io/forgerock/openidm
+  pullPolicy: IfNotPresent
+  tag: 6.0.0
 
 # Specific values
 openidm:

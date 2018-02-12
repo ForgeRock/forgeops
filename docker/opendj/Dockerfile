@@ -48,10 +48,7 @@ COPY opendj.zip /home/forgerock/
 
 ENV INSTANCE_ROOT /opt/opendj/data
 
-# openldap-clients -used as a light weight ldap probe (C based- very small runtime and fast startup)
-
-RUN apk add --no-cache openldap-clients \
-    && unzip -q /home/forgerock/opendj.zip -d /opt \
+RUN unzip -q /home/forgerock/opendj.zip -d /opt \
     && rm -f /home/forgerock/opendj.zip \
     && mkdir -p "$INSTANCE_ROOT" \
     && mkdir -p "$SECRET_PATH" \

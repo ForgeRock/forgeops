@@ -9,10 +9,6 @@ replicaCount: 1
 
 global:
   domain: .example.com
-  image:
-    repository: forgerock
-    tag: 6.0.0
-    pullPolicy: IfNotPresent
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
@@ -21,6 +17,11 @@ global:
     ig: default/ig/basic-sample
   # If you set this to true, you must have a TLS secret with the same name as the FQDN
   useTLS: false
+
+image:
+  repository: quay.io/forgerock/openig
+  tag: 6.0.0
+  pullPolicy: IfNotPresent
 
 service:
   name: openig

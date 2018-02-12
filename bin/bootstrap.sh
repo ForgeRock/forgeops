@@ -33,7 +33,7 @@ if [ ! -r "${CUSTOM_YAML}" ]; then
     echo "I can't find custom.yaml values for the helm chart deployment. I will create a sample one for you"
 
     CUSTOM_YAML=/tmp/custom.yaml
-    DOMAIN=.forgeops.com
+    DOMAIN=.example.com
     REPO="quay.io/forgerock"
 
     cat > ${CUSTOM_YAML} <<EOF

@@ -21,9 +21,11 @@ resources:
 
 global:
   domain: .example.com
-  image:
-    repository: forgerock
-    tag: 6.0.0
-    pullPolicy: IfNotPresent
+
 
 component: nginx-agent
+
+image:
+  repository: forgerock
+  tag: 6.0.0
+  pullPolicy: IfNotPresent

@@ -1,26 +1,18 @@
 #!/usr/bin/env bash
-# This removes *all* helm charts in the current namespace and delete the PVCs / PV in the current namespace
+# This removes *all* helm charts in the current namespace and deletes all PVCs / PV in the current namespace
 # Use with caution - this deletes all of your data as well...
 
-# Only argument is --namespace
-NAMESPACE=default
-while [[ $# > 0 ]]
-do
-  KEY=$1
-  shift
-  case $KEY in
-    # Which namespace to delete charts from
-    --namespace)
-      NAMESPACE=$1
-      shift
-      ;;
-  esac
-done
+#set -x
+
+kcontext=`kubectl config current-context`
+NS=`kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}"`
+
+NAMESPACE=${NS:-default}
 
 # Delete helm charts in specified namespace (of default namespace, if none specified)
 releases=`helm list --namespace ${NAMESPACE} -q`
-for r in ${releases}
 
+for r in "${releases}"
 do
     echo "Deleting release $r"
     helm delete --purge $r
@@ -34,5 +26,4 @@ do
     echo "Deleting $pvc"
     kubectl delete pvc ${pvc}
 done
-
 

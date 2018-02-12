@@ -117,3 +117,7 @@ in different contexts.
 * Refactor helm charts to adhere to best practices
 * Reduced use of global variables in charts.
 * Build to quay.io
+
+# 2018-02-14
+* Remove obsolete ELK chart
+* Refactor global.images to images. to better reflect best practices for helm charts
