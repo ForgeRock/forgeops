@@ -5,6 +5,7 @@ COPY conf /opt/openidm/conf
 COPY script /opt/openidm/script
 COPY security /opt/openidm/security
 COPY workflow /tmp/workflow
+COPY ui /opt/openidm/ui
 
 USER root
 
