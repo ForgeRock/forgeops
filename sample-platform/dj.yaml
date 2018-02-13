@@ -10,10 +10,17 @@ spec:
       labels:
         role: persistence
     spec:
+      volumes:
+      - name: dj-secrets
+        configMap:
+          name: dj-config
       containers:
         - image: dj:fullstack
           imagePullPolicy: IfNotPresent
           name: opendj
+          volumeMounts:
+          - name: dj-secrets
+            mountPath: /var/run/secrets/opendj
           env:
           - name: BASE_DN
             value: "dc=example,dc=com"
@@ -26,11 +33,13 @@ spec:
             - containerPort: 4444
               name: djadmin
               protocol: TCP
+            - containerPort: 8081
+              name: metrics
           resources:
               requests:
                 memory: "512Mi"
           readinessProbe:
-            exec:
-              command: ["/opt/opendj/probe.sh"]
+            tcpSocket:
+              port: metrics
             periodSeconds: 20
             initialDelaySeconds: 30

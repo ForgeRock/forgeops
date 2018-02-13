@@ -1,4 +1,4 @@
-FROM forgerock/amster:latest
+FROM quay.io/forgerock/amster:latest
 
 COPY scripts /opt/amster/scripts/
 COPY config /opt/amster/config/

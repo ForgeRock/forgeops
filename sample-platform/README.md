@@ -106,7 +106,7 @@ To make REST API calls to IDM you need to include an access_token in your reques
 You can deploy changes to the underlying product running in the container like so:
 
     cp $OPENIDM_ZIP_TARGET/openidm*.zip ../docker/openidm/openidm.zip
-    docker build -t forgerock/openidm:latest ../docker/openidm
+    docker build -t quay.io/forgerock/openidm:latest ../docker/openidm
     docker build -t idm:fullstack idm
     kubectl delete po idm --grace-period=0 --force
     kubectl apply -f idm.yml

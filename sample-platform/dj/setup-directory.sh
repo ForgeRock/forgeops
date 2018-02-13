@@ -4,6 +4,10 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
+#set -x
+
+source /opt/opendj/env.sh
+
 DB_NAME=${DB_NAME:-userRoot}
 
 # The type of DJ we want to bootstrap. This determines the ldif files and scripts to load. Defaults to a userstore.
@@ -11,11 +15,10 @@ BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
 
 INIT_OPTION="--addBaseEntry"
 
-# If NUMBER_SAMPLE_USERS is set we generate sample users.
-if [ -n "${NUMBER_SAMPLE_USERS+set}" ]; then
+# If NUMBER_SAMPLE_USERS is set AND we are the first node, then generate sample users.
+if [[  -n "${NUMBER_SAMPLE_USERS}" && $HOSTNAME = *"0"* ]]; then
     INIT_OPTION="--sampleData ${NUMBER_SAMPLE_USERS}"
 fi
-
 
 # fork added this line:
 # -b "dc=openidm,dc=forgerock,dc=com" \
@@ -23,10 +26,10 @@ fi
 /opt/opendj/setup directory-server -p 1389 --ldapsPort 1636 --enableStartTLS  \
   --adminConnectorPort 4444 \
   --instancePath ./data \
-  --baseDN "$BASE_DN" -h "${DJ_FQDN}" \
-  --rootUserPassword "$PASSWORD" \
+  --baseDN "${BASE_DN}" -h "${DJ_FQDN}" \
+   -b "dc=openidm,dc=forgerock,dc=com" \
+  --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
   --acceptLicense \
-  -b "dc=openidm,dc=forgerock,dc=com" \
   ${INIT_OPTION} || (echo "Setup failed, will sleep for debugging"; sleep 10000)
 
 # fork added these create schema providers
@@ -115,6 +118,55 @@ cp -r /tmp/schema/* /opt/opendj/data/config/schema
     --bindDN "cn=Directory Manager" \
     --bindPassword password \
     --backend-name userRoot \
+    --index-name fr-idm-link-firstid \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-link-secondid \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-link-qualifier \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name fr-idm-link-type \
+    --set index-type:equality \
+    --trustAll \
+    --no-prompt
+
+
+/opt/opendj/bin/dsconfig \
+    create-backend-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDN "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
     --index-name fr-idm-managed-role-json \
     --set index-type:equality \
     --trustAll \
@@ -145,6 +197,39 @@ cp -r /tmp/schema/* /opt/opendj/data/config/schema
     --no-prompt
 
 
+# vlvs for admin UI usage
+
+/opt/opendj/bin/dsconfig \
+    create-backend-vlv-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDn "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name people-by-uid \
+    --set base-dn:ou=People,dc=example,dc=com \
+    --set filter:"(uid=*)" \
+    --set scope:single-level \
+    --set sort-order:"+uid" \
+    --trustAll \
+    --no-prompt
+
+/opt/opendj/bin/dsconfig \
+    create-backend-vlv-index \
+    --hostname localhost \
+    --port 4444 \
+    --bindDn "cn=Directory Manager" \
+    --bindPassword password \
+    --backend-name userRoot \
+    --index-name people-by-uid-matchall \
+    --set base-dn:ou=People,dc=example,dc=com \
+    --set filter:"(&)" \
+    --set scope:single-level \
+    --set sort-order:"+uid" \
+    --trustAll \
+    --no-prompt
+
+
 # If any optional LDIF files are present, load them.
 ldif="bootstrap/userstore/ldif"
 
@@ -158,7 +243,7 @@ if [ -d "$ldif" ]; then
             -e "s/@DB_NAME@/$DB_NAME/"  \
             -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
 
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
       echo "  "
     done
 fi
@@ -182,7 +267,7 @@ if [ -d "$ldif" ]; then
             -e "s/@DB_NAME@/$DB_NAME/"  \
             -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
 
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
       echo "  "
     done
 fi
@@ -206,7 +291,7 @@ if [ -d "$ldif" ]; then
             -e "s/@DB_NAME@/$DB_NAME/"  \
             -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
 
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
       echo "  "
     done
 fi

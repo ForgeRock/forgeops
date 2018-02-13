@@ -1,4 +1,4 @@
-FROM forgerock/openig:latest
+FROM quay.io/forgerock/openig:latest
 
 ADD config /var/openig/config
 ADD scripts /var/openig/scripts
