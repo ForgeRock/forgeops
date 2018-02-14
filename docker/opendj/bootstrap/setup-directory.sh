@@ -4,7 +4,7 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
-set -x
+#set -x
 
 DB_NAME=${DB_NAME:-userRoot}
 

@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-set -x
+#set -x
 
 echo "Setting up default OpenDJ instance."
 
@@ -32,15 +32,9 @@ esac
 
 ./bootstrap/log-redirect.sh
 
+./bootstrap/setup-metrics.sh
 
-# Common tasks for all roles...
-# This enables the Prometheus metrics server
-# todo: use Http Basic auth mechanism. Create a monitoring user. On an RS?
-# Need to create an identity mapper.
-bin/dsconfig  -h localhost -p 4444 -D "cn=directory manager" \
-    -w ${PASSWORD} --trustAll --no-prompt --batch <<EOF
-create-connection-handler --type http --handler-name "HTTP Connection Handler" --set enabled:true --set listen-port:8081
-set-http-endpoint-prop --endpoint-name /metrics/prometheus --set authorization-mechanism:HTTP\ Anonymous
-EOF
+# Before we enable rest2ldap we need a strategy for paramterizing the json template
+#./bootstrap/setup-rest2ldap.sh
 
 

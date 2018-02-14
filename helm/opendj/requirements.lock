@@ -1,6 +1,0 @@
-dependencies:
-- name: frcommon
-  repository: file://../frcommon
-  version: 6.0.0
-digest: sha256:6262f215acfcfaf0e9a9d599e2473fa6469c68e80379565fae47383cacb571b7
-generated: 2017-12-14T12:32:53.943388-04:00

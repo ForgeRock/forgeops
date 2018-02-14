@@ -47,7 +47,6 @@ description: This is the description for {cn}.
 EOF
 bin/makeldif  -o /var/tmp/l.ldif  /var/tmp/template
 
-bin/ldapmodify --continueOnError --numConnections 4 \
-   -w "$PASSWORD" -D "cn=Directory Manager" --port 1389 \
-   /var/tmp/l.ldif
-
+bin/import-ldif --templateFile /var/tmp/template --clearBackend \
+   --backendId userRoot --tmpDirectory /var/tmp --bindDn "cn=Directory Manager" \
+   --bindPasswordFile "$DIR_MANAGER_PW_FILE" --port 4444 --trustAll
