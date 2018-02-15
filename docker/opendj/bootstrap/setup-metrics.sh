@@ -41,8 +41,8 @@ create-backend --backend-name metrics  --type ldif  --set enabled:true \
    --set base-dn:cn=metrics  --set ldif-file:db/metricsUser.ldif  --set is-private-backend:true
 EOF
 
-# Import the ldif into the new backend.
-bin/ldapmodify -D "cn=Directory Manager"  -h $HOSTNAME -p 1389 -w "${PASSWORD}" -f /tmp/metrics.ldif
+bin/import-ldif -h $HOSTNAME   --port 4444  --bindDN "cn=Directory Manager"  --bindPassword "${PASSWORD}"  \
+    --backendID metrics  --ldifFile /tmp/metrics.ldif  --trustAll
 
 # To test this:
 # curl -v --user "metrics:password"  http://localhost:8081/metrics/prometheus
