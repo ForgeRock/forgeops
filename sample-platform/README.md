@@ -11,12 +11,17 @@ Docker and Kubernetes are used to automate the deployment of this sample. It is 
 
 ## Only needed once per machine:
 
+**You need minikube 0.23+ and kubectl 1.8+ for this to work**
+
     minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-    echo "`minikube ip` idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" >> /etc/hosts
+    echo "$(minikube ip) idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" | sudo tee -a /etc/hosts
+
+You may be prompted to enter your password after running the above commands. Afterward, run these:
+
+    minikube addons enable ingress
     eval $(minikube docker-env)
     kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
     kubectl config use-context sample-context
-
 
 If you want to enable Facebook usage, you will need to register an application within Facebook. Save the App Id and Secret as environment variables, like so:
 
@@ -30,13 +35,26 @@ Otherwise, export dummy values:
 
 If you use dummy values, Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
 
+## Building the base images
 
-Use the forgeops project to build local docker images within your minikube environment:
+The baseline docker images needed for this sample are defined in ../docker in this forgeops repository. A README in that directory covers the various methods available in order to build the Docker images. Whichever method you choose to use, be sure that you have built these images:
 
-    cd forgeops/docker
-    mvn
+- openam
+- amster
+- opendj
+- openidm
+- openig
 
-Build the Docker images for this sample:
+
+## Starting the sample
+
+In order to copy and paste the below commands, you will need make sure your working folder is correct. You should be in the same folder as this README file (forgeops/sample-platform).
+
+This command needs to be executed each time you start the minikube VM, to fix a bug with its internal networking:
+
+    minikube ssh "sudo ip link set docker0 promisc on"
+
+Build the Docker images and add the kubernetes resources for this sample:
 
     docker build -t dj:fullstack dj
     docker build -t am:fullstack am
