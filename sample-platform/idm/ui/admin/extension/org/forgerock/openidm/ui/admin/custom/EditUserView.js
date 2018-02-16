@@ -23,9 +23,14 @@ define([
         defaultEditUserView.render.call(this, args, _.bind(function () {
             var allowedFields = PolicyTree.getAllowedFieldsToPatch('managed/user/*');
             if (allowedFields) {
-                this.$el.find(":input.form-control").prop('readonly', true)
+                this.$el.find(":input.form-control").prop('readonly', true);
                 allowedFields.forEach(_.bind(function (field) {
                     this.$el.find(".container-" + field + " :input").prop('readonly', false);
+                }, this));
+                // select boxes need to be disabled rather than set to readonly
+                this.$el.find("select.form-control").prop('disabled', true);
+                allowedFields.forEach(_.bind(function (field) {
+                    this.$el.find(".container-" + field + " select").prop('disabled', false);
                 }, this));
 
                 if (_.indexOf(allowedFields, 'password') !== -1) {
@@ -39,7 +44,7 @@ define([
     };
 
     EditUserView.prototype.getResetPasswordScriptAvailable = function () {
-        return this.resetPasswordScriptAvailable && PolicyTree.evaluate('managed/user/*?_action=resetPassword');
+        return this.resetPasswordScriptAvailable && PolicyTree.evaluate('managed/user/*?_action=resetPassword', 'POST');
     };
 
     return new EditUserView();
