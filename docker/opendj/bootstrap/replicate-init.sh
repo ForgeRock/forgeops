@@ -39,7 +39,7 @@ for i in $(seq 1 $end); do
         --trustAll \
         --no-prompt \
         --adminUID "$ADMIN_ID" \
-        --adminPassword "${PASSWORD}"
+        --adminPasswordFile "${DIR_MANAGER_PW_FILE}"
 done
 
 echo "Dumping any Generated logs"

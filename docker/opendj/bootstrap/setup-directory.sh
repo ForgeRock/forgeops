@@ -6,6 +6,8 @@
 
 #set -x
 
+source /opt/opendj/env.sh
+
 DB_NAME=${DB_NAME:-userRoot}
 
 # The type of DJ we want to bootstrap. This determines the ldif files and scripts to load. Defaults to a userstore.
@@ -23,8 +25,8 @@ fi
 /opt/opendj/setup directory-server -p 1389 --ldapsPort 1636 --enableStartTLS  \
   --adminConnectorPort 4444 \
   --instancePath ./data \
-  --baseDN "$BASE_DN" -h "${DJ_FQDN}" \
-  --rootUserPassword "$PASSWORD" \
+  --baseDN "${BASE_DN}" -h "${DJ_FQDN}" \
+  --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
   --acceptLicense \
   ${INIT_OPTION} || (echo "Setup failed, will sleep for debugging"; sleep 10000)
 
@@ -42,7 +44,7 @@ if [ -d "$ldif" ]; then
             -e "s/@DB_NAME@/$DB_NAME/"  \
             -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
 
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w ${PASSWORD} -f /tmp/file.ldif
+        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
       echo "  "
     done
 fi

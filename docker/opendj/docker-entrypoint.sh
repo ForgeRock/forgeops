@@ -52,8 +52,6 @@ start() {
 
     # instance.loc points DJ at the data/ volume
     echo $INSTANCE_ROOT >/opt/opendj/instance.loc
-    # unset the PASSWORD env var for better security
-    unset PASSWORD
     exec ./bin/start-ds --nodetach
 }
 

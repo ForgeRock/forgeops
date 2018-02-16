@@ -9,5 +9,7 @@ source /opt/opendj/env.sh
           --hostname localhost \
           --port 4444 \
           --adminUid admin \
-          --adminPassword  "${PASSWORD}" \
-          --no-prompt
+          --adminPasswordFile $DIR_MANAGER_PW_FILE \
+          --no-prompt \
+          --trustAll
+    

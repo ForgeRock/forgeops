@@ -17,7 +17,7 @@ source /opt/opendj/env.sh
 /opt/opendj/setup directory-server -p 1389  \
   --adminConnectorPort 4444 \
   --instancePath ./data \
-  --baseDN "$BASE_DN" -h localhost --rootUserPassword "$PASSWORD" \
+  --baseDN "$BASE_DN" -h localhost --rootUserPasswordFile "$DIR_MANAGER_PW_FILE" \
   --acceptLicense \
    || (echo "Setup failed"; exit 1)
 
@@ -38,7 +38,7 @@ env
 # Search for an LDAP host. Return 0 if it is available.
 search() {
     echo "Waiting for server $1 to be available"
-    /opt/opendj/bin/ldapsearch -h "$1" -w "$PASSWORD" -p 1389 -D "cn=Directory Manager" \
+    /opt/opendj/bin/ldapsearch -h "$1" -j "$DIR_MANAGER_PW_FILE" -p 1389 -D "cn=Directory Manager" \
      --baseDN "$BASE_DN" -s base -l 5 \
      "(objectClass=*)" 1.1
 }
@@ -77,17 +77,17 @@ dsconfigure() {
 
     $dsreplica configure \
      --adminUID "$ADMIN_ID" \
-     --adminPassword "${PASSWORD}" \
+     --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
      --baseDN "$BASE_DN" \
      --host1 "$H" \
      --port1 4444 \
      --bindDN1 "cn=Directory Manager" \
-     --bindPassword1 "${PASSWORD}" \
+     --bindPasswordFile1 "${DIR_MANAGER_PW_FILE}" \
      --noReplicationServer1 \
      --host2 "$R" \
      --port2 4444 \
      --bindDN2 "cn=Directory Manager" \
-     --bindPassword2 "${PASSWORD}" \
+     --bindPasswordFile2 "${DIR_MANAGER_PW_FILE}" \
      --replicationPort2 8989 \
      --onlyReplicationServer2 \
      --trustAll \

@@ -19,6 +19,4 @@ if [ ! -r "$DIR_MANAGER_PW_FILE" ]; then
     echo -n "password" > "$DIR_MANAGER_PW_FILE"
 fi
 
-export PASSWORD=`cat $DIR_MANAGER_PW_FILE`
-
 export INSTANCE_ROOT=/opt/opendj/data

@@ -21,7 +21,7 @@ set -x
           --hostname  localhost  \
           --port 4444 \
           --bindDn "cn=Directory Manager" \
-          --bindPassword "${PASSWORD}" \
+          --bindPasswordFile "${DIR_MANAGER_PW_FILE}" \
           --trustAll \
           --no-prompt
 
@@ -32,6 +32,6 @@ set -x
           --hostname localhost \
           --port 4444 \
           --bindDn "cn=Directory Manager" \
-          --bindPassword "${PASSWORD}" \
+          --bindPasswordFile "${DIR_MANAGER_PW_FILE}" \
           --trustAll \
           --no-prompt

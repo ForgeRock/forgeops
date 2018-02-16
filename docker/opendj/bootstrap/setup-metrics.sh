@@ -29,7 +29,7 @@ EOF
 # - Sets the endpoint auth mechanism
 # - Creates a new backend for the metrics user to live in
 bin/dsconfig  -h localhost -p 4444 -D "cn=directory manager" \
-    -w ${PASSWORD} --trustAll \
+    -j ${DIR_MANAGER_PW_FILE} --trustAll \
     --no-prompt --batch <<EOF
 create-identity-mapper --mapper-name "CN Match" --type exact-match --set enabled:true --set match-attribute:cn \
    --set match-base-dn:"cn=metrics"
@@ -41,8 +41,5 @@ create-backend --backend-name metrics  --type ldif  --set enabled:true \
    --set base-dn:cn=metrics  --set ldif-file:db/metricsUser.ldif  --set is-private-backend:true
 EOF
 
-bin/import-ldif -h $HOSTNAME   --port 4444  --bindDN "cn=Directory Manager"  --bindPassword "${PASSWORD}"  \
+bin/import-ldif -h $HOSTNAME   --port 4444  --bindDN "cn=Directory Manager"  --bindPasswordFile "${DIR_MANAGER_PW_FILE}"  \
     --backendID metrics  --ldifFile /tmp/metrics.ldif  --trustAll
-
-# To test this:
-# curl -v --user "metrics:password"  http://localhost:8081/metrics/prometheus

@@ -5,7 +5,9 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
 
-set -x
+#set -x
+
+source /opt/opendj/env.sh
 
 # This should only be run on directory servers
 if [ "${DS_ROLE}" != "directory-server" ]; then
@@ -14,10 +16,10 @@ if [ "${DS_ROLE}" != "directory-server" ]; then
 fi
 
 # If we are running in an interactive shell via exec - password might not be set.
-if [ -z "${PASSWORD}"  ]; then
-    PW=`cat $DIR_MANAGER_PW_FILE`
-    PASSWORD=${PW:-password}
-fi
+#if [ -z "${PASSWORD}"  ]; then
+#    PW=`cat $DIR_MANAGER_PW_FILE`
+#    PASSWORD=${PW:-password}
+#fi
 
 # Needed??
 ADMIN_ID=admin
@@ -30,17 +32,17 @@ R1="${DJ_INSTANCE}-rs-0.${DJ_INSTANCE}-rs"
 
 /opt/opendj/bin/dsreplication configure \
  --adminUID "$ADMIN_ID" \
- --adminPassword "${PASSWORD}" \
+ --adminPassword "${DIR_MANAGER_PW_FILE}" \
  --baseDN "$BASE_DN" \
  --host1 "$H" \
  --port1 4444 \
  --bindDN1 "cn=Directory Manager" \
- --bindPassword1 "${PASSWORD}" \
+ --bindPasswordFile1 "${DIR_MANAGER_PW_FILE}" \
  --noReplicationServer1 \
  --host2 "$R1" \
  --port2 4444 \
  --bindDN2 "cn=Directory Manager" \
- --bindPassword2 "${PASSWORD}" \
+ --bindPasswordFile2 "${DIR_MANAGER_PW_FILE}" \
  --replicationPort2 8989 \
  --onlyReplicationServer2 \
  --trustAll \
@@ -62,5 +64,5 @@ if [[ "$HOSTNAME" != *"-0"* ]];  then
         --trustAll \
         --no-prompt \
         --adminUID admin \
-        --adminPassword "${PASSWORD}"
+        --adminPasswordFile "${DIR_MANAGER_PW_FILE}"
 fi

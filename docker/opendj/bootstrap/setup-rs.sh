@@ -26,7 +26,7 @@ fi
 /opt/opendj/setup replication-server  \
   --adminConnectorPort 4444 \
   --instancePath ./data \
-  --rootUserDN "cn=Directory Manager" --rootUserPassword "$PASSWORD" \
+  --rootUserDN "cn=Directory Manager" --rootUserPasswordFile "$DIR_MANAGER_PW_FILE" \
   --hostname "${RS_FQDN}" \
   --replicationPort 8989 \
   $RS \
