@@ -40,9 +40,11 @@
    --set ignore-white-space:true \
    --set matching-rule-name:caseIgnoreJsonQueryMatchRelationship \
    --set matching-rule-oid:1.3.6.1.4.1.36733.2.3.4.3  \
-   --set indexed-field:firstId \
+   --set indexed-field:firstResourceCollection \
+   --set indexed-field:firstResourceId \
    --set indexed-field:firstPropertyName \
-   --set indexed-field:secondId \
+   --set indexed-field:secondResourceCollection \
+   --set indexed-field:secondResourceId \
    --set indexed-field:secondPropertyName \
    --trustAll \
    --no-prompt
@@ -67,7 +69,7 @@
 
 /opt/opendj/bin/stop-ds
 
-cp -r /tmp/schema/* /opt/opendj/data/db/schema
+cp -r /tmp/schema/* /opt/opendj/db/schema
 
 /opt/opendj/bin/start-ds
 

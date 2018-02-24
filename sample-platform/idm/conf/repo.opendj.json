@@ -1,5 +1,6 @@
 {
     "embedded": false,
+    "maxConnectionAttempts" : 5,
     "security": {
         "keyManager": "jvm",
         "trustManager": "jvm"
@@ -7,7 +8,7 @@
     "ldapConnectionFactories": {
         "bind": {
             "connectionSecurity": "none",
-            "connectionPoolSize": 24,
+            "connectionPoolSize": 50,
             "heartBeatIntervalSeconds": 60,
             "heartBeatTimeoutMilliSeconds": 10000,
             "primaryLdapServers": [
@@ -74,10 +75,10 @@
                 "_queryFilter": "/instanceId eq \"${instanceId}\""
             },
             "find-relationships-for-resource": {
-                "_queryFilter": "(/firstId eq \"${fullResourceId}\" and /firstPropertyName eq \"${resourceFieldName}\") or (/secondId eq \"${fullResourceId}\" and /secondPropertyName eq \"${resourceFieldName}\")"
+                "_queryFilter": "(/firstResourceCollection eq \"${resourceContainer}\" and /firstResourceId eq \"${resourceId}\" and /firstPropertyName eq \"${resourceFieldName}\") or (/secondResourceCollection eq \"${resourceContainer}\" and /secondResourceId eq \"${resourceId}\" and /secondPropertyName eq \"${resourceFieldName}\")"
             },
             "find-relationship-edges": {
-                "_queryFilter": "((/firstId eq \"${vertex1Id}\" and /firstPropertyName eq \"${vertex1FieldName}\") and (/secondId eq \"${vertex2Id}\" and /secondPropertyName eq \"${vertex2FieldName}\")) or ((/firstId eq \"${vertex2Id}\" and /firstPropertyName eq \"${vertex2FieldName}\") and (/secondId eq \"${vertex1Id}\" and /secondPropertyName eq \"${vertex1FieldName}\"))"
+                "_queryFilter": "((/firstResourceCollection eq \"${vertex1ResourceContainer}\" and /firstResourceId eq \"${vertex1ResourceId}\" and /firstPropertyName eq \"${vertex1FieldName}\") and (/secondResourceCollection eq \"${vertex2ResourceContainer}\" and /secondResourceId eq \"${vertex2ResourceId}\" and /secondPropertyName eq \"${vertex2FieldName}\")) or ((/firstResourceCollection eq \"${vertex2ResourceContainer}\" and /firstResourceId eq \"${vertex2ResourceId}\" and /firstPropertyName eq \"${vertex2FieldName}\") and (/secondResourceCollection eq \"${vertex1ResourceContainer}\" and /secondResourceId eq \"${vertex1ResourceId}\" and /secondPropertyName eq \"${vertex1FieldName}\"))"
             }
         },
         "explicit": {
@@ -142,6 +143,26 @@
             "type": [
                 "EQUALITY"
             ]
+        },
+        "fr-idm-link-type" : {
+            "type" : [
+                "EQUALITY"
+            ]
+        },
+        "fr-idm-link-firstid" : {
+            "type" : [
+                "EQUALITY"
+            ]
+        },
+        "fr-idm-link-secondid" : {
+            "type" : [
+                "EQUALITY"
+            ]
+        },
+        "fr-idm-link-qualifier" : {
+            "type" : [
+                "EQUALITY"
+            ]
         }
     },
     "schemaProviders": {
@@ -200,18 +221,6 @@
             },
             "link": {
                 "dnTemplate": "ou=links,dc=openidm,dc=forgerock,dc=com",
-                "uniqueConstraints": [
-                    [
-                        "linkType",
-                        "linkQualifier",
-                        "firstId"
-                    ],
-                    [
-                        "linkType",
-                        "linkQualifier",
-                        "secondId"
-                    ]
-                ],
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-link"
@@ -266,11 +275,6 @@
             },
             "managed/user": {
                 "dnTemplate": "ou=People,dc=example,dc=com",
-                "uniqueConstraints": [
-                    [
-                        "fr-idm-uuid"
-                    ]
-                ],
                 "namingStrategy": {
                     "type": "clientNaming",
                     "dnAttribute": "uid",
@@ -421,7 +425,8 @@
                     "uidObject",
                     "fr-idm-managed-role"
                 ],
-                "jsonAttribute": "fr-idm-managed-role-json"
+                "jsonAttribute": "fr-idm-managed-role-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole"
             },
             "scheduler": {
                 "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=com"
@@ -435,7 +440,8 @@
                     "uidObject",
                     "fr-idm-cluster-obj"
                 ],
-                "jsonAttribute": "fr-idm-cluster-json"
+                "jsonAttribute": "fr-idm-cluster-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchClusterObject"
             },
             "relationships": {
                 "dnTemplate": "ou=relationships,dc=openidm,dc=forgerock,dc=com",
@@ -443,7 +449,8 @@
                     "uidObject",
                     "fr-idm-relationship"
                 ],
-                "jsonAttribute": "fr-idm-relationship-json"
+                "jsonAttribute": "fr-idm-relationship-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchRelationship"
             },
             "updates": {
                 "dnTemplate": "ou=updates,dc=openidm,dc=forgerock,dc=com"

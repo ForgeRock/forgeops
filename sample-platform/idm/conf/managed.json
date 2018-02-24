@@ -4,7 +4,7 @@
             "name" : "user",
             "onCreate" : {
                 "type" : "text/javascript",
-                "source" : "require('onCreateUser').setDefaultFields(object);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onCreateUser').emailUser(object);require('lastChanged').updateLastChanged(object);"
+                "source" : "require('onCreateUser').setDefaultFields(object);require('roles/conditionalRoles').createConditionalGrantsForUser(object, 'roles');require('onCreateUser').emailUser(object);require('lastChanged').updateLastChanged(object);"
             },
             "onUpdate" : {
                 "type" : "text/javascript",
@@ -14,17 +14,9 @@
                 "type" : "text/javascript",
                 "file" : "onDelete-user-cleanup.js"
             },
-            "postCreate" : {
-                "type" : "text/javascript",
-                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
-            },
-            "postUpdate" : {
-                "type" : "text/javascript",
-                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
-            },
             "postDelete" : {
                 "type" : "text/javascript",
-                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);require('postDelete-idp-cleanup').removeConnectedIdpData(oldObject, resourceName, request);"
+                "source" : "require('postDelete-idp-cleanup').removeConnectedIdpData(oldObject, resourceName, request);"
             },
             "actions" : {
                 "resetPassword" : {
@@ -322,6 +314,7 @@
                         "usageDescription" : "",
                         "isPersonal" : false,
                         "type" : "array",
+                        "relationshipGrantTemporalConstraintsEnforced" : true,
                         "items" : {
                             "type" : "relationship",
                             "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User:roles:items",
@@ -716,7 +709,7 @@
                         "viewable" : false,
                         "searchable" : false,
                         "isPersonal" : false,
-                        "scope" : "private",
+                        "userEditable" : false,
                         "properties" : {
                             "creationDate" : {
                                 "description" : "Creation Date",
@@ -921,6 +914,7 @@
                         "viewable" : true,
                         "type" : "array",
                         "returnByDefault" : false,
+                        "relationshipGrantTemporalConstraintsEnforced" : true,
                         "items" : {
                             "type" : "relationship",
                             "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role:members:items",
