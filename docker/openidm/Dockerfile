@@ -34,7 +34,8 @@ COPY logging.properties /opt/openidm/logging.properties
 
 WORKDIR /opt/openidm
 
-USER forgerock
+# Must be numeric. This is the forgerock user id.
+USER 11111
 
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/id_rsa
 

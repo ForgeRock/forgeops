@@ -36,4 +36,4 @@ RUN unzip -q /tmp/openig.war -d /usr/local/tomcat/webapps/ROOT \
 # Example of adding config to the container to create an immutable image:
 # COPY sample-config/* /var/openig/config/
 
-USER forgerock
+USER 11111

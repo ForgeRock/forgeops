@@ -39,6 +39,13 @@ curl -u your.backstage.login -O "http://maven.forgerock.org/repo/internal/settin
 ```
 Note that access to the Artifactory server is restricted to ForgeRock staff, partners and subscription customers.
 
+# Additional Dockerfiles
+
+There are a number of utility Docker images that do not contain ForgeRock software but are
+required when running ForgeRock software in Kubernetes. These can be 
+found [on github](https://github.com/ForgeRock/docker-public). These images are
+automatically built and pushed to [quay.io](https://quay.io/organization/forgerock).
+
 
 # Building Minor or Patch Releases
 

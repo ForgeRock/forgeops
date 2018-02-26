@@ -18,7 +18,7 @@ RUN unzip -q /opt/forgerock/amster.zip -d /opt/amster \
 
 WORKDIR /opt/amster
 
-USER forgerock
+USER 11111
 
 ENTRYPOINT ["/opt/amster/docker-entrypoint.sh"]
 

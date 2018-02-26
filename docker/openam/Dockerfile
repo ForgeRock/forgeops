@@ -38,7 +38,8 @@ RUN apk add --no-cache su-exec unzip curl bash  \
   && chown -R forgerock  "$FORGEROCK_HOME"
 
 
-USER forgerock
+# The userid must be numeric here.
+USER 11111
 
 # If you want to create an image that is ready to be bootstrapped to a
 # configuration store, you can add a custom boot.json file.

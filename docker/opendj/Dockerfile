@@ -67,7 +67,7 @@ COPY *.sh /opt/opendj/
 
 WORKDIR /opt/opendj
 
-USER forgerock
+USER 11111
 
 EXPOSE 1389 636 4444 8989
 
