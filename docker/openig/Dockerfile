@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM tomcat:8.5.24-jre8-alpine
+FROM tomcat:8.5.28-jre8-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 
@@ -9,11 +9,13 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
+# Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
+# This is a work around for: https://github.com/docker-library/tomcat/issues/35
 RUN apk add --no-cache su-exec unzip curl bash vim bind-tools iputils \
     && rm -fr "$CATALINA_HOME"/webapps/* \
     && mkdir -p /opt/forgerock \
     && addgroup -g 11111 forgerock \
-    && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D -G forgerock forgerock \
+    && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D -G root forgerock \
     && chown -R forgerock /opt
 
 
