@@ -29,12 +29,14 @@ ENV OPENAM_HOME /home/forgerock/openam
 
 COPY openam.war  /tmp/openam.war
 
+# Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
+# This is a work around for: https://github.com/docker-library/tomcat/issues/35
 RUN apk add --no-cache su-exec unzip curl bash  \
   && rm -fr /usr/local/tomcat/webapps/* \
   && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
   && rm /tmp/openam.war \
   && addgroup -g 11111 forgerock \
-  && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G forgerock \
+  && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G root \
   && mkdir -p "$OPENAM_HOME" \
   && mkdir -p "$FORGEROCK_HOME"/.openamcfg \
   && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_openam_  \
@@ -42,11 +44,8 @@ RUN apk add --no-cache su-exec unzip curl bash  \
   && chown -R forgerock:forgerock  "$FORGEROCK_HOME"
 
 
-# The userid must be numeric here.
-# Running as a non root user is currently causing issues on GKE 1.9.2. While this is being investigated
-# we are are reverting to running as root.
-# We are possibly hitting https://github.com/docker-library/tomcat/issues/35
-#USER 11111
+# The userid must be numeric.
+USER 11111
 
 # If you want to create an image that is ready to be bootstrapped to a
 # configuration store, you can add a custom boot.json file.
