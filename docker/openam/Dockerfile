@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 #
-FROM tomcat:8.5.24-jre8-alpine
+FROM tomcat:8.5.28-jre8-alpine
 
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
@@ -12,6 +12,9 @@ FROM tomcat:8.5.24-jre8-alpine
 #   -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for sending debug output to stderr
 #-Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider -Dcom.sun.identity.shared.debug.file.format="%PREFIX% %MSG%\n%STACKTRACE%"
+# -Duser.home=/home/forgeock
+# See also https://forum.forgerock.com/topic/openamcfg-location/
+
 
 ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
   -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
@@ -30,16 +33,20 @@ RUN apk add --no-cache su-exec unzip curl bash  \
   && rm -fr /usr/local/tomcat/webapps/* \
   && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
   && rm /tmp/openam.war \
-  && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock \
+  && addgroup -g 11111 forgerock \
+  && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G forgerock \
   && mkdir -p "$OPENAM_HOME" \
   && mkdir -p "$FORGEROCK_HOME"/.openamcfg \
   && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_openam_  \
-  && chown -R forgerock "$CATALINA_HOME" \
-  && chown -R forgerock  "$FORGEROCK_HOME"
+  && chown -R forgerock:forgerock "$CATALINA_HOME" \
+  && chown -R forgerock:forgerock  "$FORGEROCK_HOME"
 
 
 # The userid must be numeric here.
-USER 11111
+# Running as a non root user is currently causing issues on GKE 1.9.2. While this is being investigated
+# we are are reverting to running as root.
+# We are possibly hitting https://github.com/docker-library/tomcat/issues/35
+#USER 11111
 
 # If you want to create an image that is ready to be bootstrapped to a
 # configuration store, you can add a custom boot.json file.
