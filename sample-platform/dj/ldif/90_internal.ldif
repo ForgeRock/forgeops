@@ -123,6 +123,15 @@ objectClass: organizationalUnit
 objectClass: top
 ou: notification
 
+##
+# jsonstorage
+##
+
+dn: ou=jsonstorage,dc=openidm,dc=forgerock,dc=com
+objectclass: organizationalunit
+objectclass: top
+ou: jsonstorage
+
 # Populate objects
 
 dn: cn=openidm-authorized,ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=com
