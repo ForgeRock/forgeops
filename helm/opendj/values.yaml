@@ -17,17 +17,6 @@ baseDN: "dc=openam,dc=forgerock,dc=org"
 #  $djInstance-0.$djInstance
 djInstance: userstore
 
-# The host where backups will be scheduled. Set this to the instance name where you want to run backups.
-# Example: userstore-0.
-# To disable scheduled backups, use a host name that does not match.
-# 
-backupHost: dontbackup
-
-# Backup schedules for full and incrementals. 
-backupScheduleFull:  "2 2 * * *"
-backupScheduleIncremental: "15 * * * *"
-
-
 component: opendj
 
 image:
@@ -59,8 +48,10 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 resources:
   requests:
    memory: 512Mi
-  limits:
-    memory: 512Mi
+  # Setup will run more than 1 jvm, which will attempt to allocate more memory than the pod has.
+  # todo: We need to explicitly set the jvm size for everything *except* the server, which should use cgroups.
+#  limits:
+#    memory: 768Mi
 
 
 # The role is one of directory-server, replication-server. Defaults to directory-server if not set

@@ -19,12 +19,6 @@ bootstrapType: "userstore"
 baseDN: "dc=openam,dc=forgerock,dc=org"
 
 
-# The host where backups will be scheduled. Set this to the instance name where you want to run backups.
-# Example: userstore-0.
-# To disable scheduled backups, use a host name that does not match.
-# 
-backupHost: dontbackup
-
 # Backup schedules for full and incrementals. 
 backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "15 * * * *"
@@ -34,7 +28,8 @@ component: opendj
 
 image:
   repository: quay.io/forgerock/opendj
-  pullPolicy: IfNotPresent
+  # for development
+  pullPolicy: Always
   tag: 6.0.0
 
 directoryServer:
@@ -83,7 +78,7 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # which impacts minikube (or any hostPath based provisioner). The underlying PV has root permissions,
 # and the DJ container will not start. If you need to run this on Minikube with PVC, set runAsUser: 0 in the
 # deployment securityContext:
-djPersistence: false
+djPersistence: true
 
 
 # Set this to true to enable backups to gcloud
