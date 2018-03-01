@@ -46,3 +46,30 @@ spec:
       name: prometheus
   selector:
     djInstance: "{{ .Values.djInstance }}-rs"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Values.djInstance }}-admin"
+  labels:
+    app: "{{ .Values.djInstance }}-admin"
+    component: {{ .Values.component }}
+    vendor: forgerock
+spec:
+  clusterIP: None
+  ports:
+    - port: 8989
+      name: replication
+      targetPort: 8989
+    - port: 4444
+      name: djadmin
+      targetPort: 4444
+    - port: 8081
+      protocol: TCP
+      name: prometheus
+    - port: 1389
+      name: ldap
+      targetPort: 1389
+  selector:
+    djInstance: "{{ .Values.djInstance }}-admin"

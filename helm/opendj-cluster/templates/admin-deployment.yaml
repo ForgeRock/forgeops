@@ -1,16 +1,17 @@
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS.
+# Admin server statefulset.
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: "{{ .Values.djInstance }}-rs"
+  name: "{{ .Values.djInstance }}-admin"
   labels:
-    djInstance: "{{ .Values.djInstance }}-rs"
+    djInstance: "{{ .Values.djInstance }}-admin"
     app: {{ template "fullname" . }}
     vendor: forgerock
     component: {{ .Values.component }}
 spec:
-  serviceName: "{{ .Values.djInstance }}-rs"
-  replicas: {{ .Values.replicationServer.replicas }}
+  serviceName: "{{ .Values.djInstance }}-admin"
+  replicas: 1
   {{- if .Values.djPersistence }}
   volumeClaimTemplates:
   - metadata:
@@ -21,13 +22,14 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ default "5Gi"  .Values.replicationServer.storageSize }}
+          # admin servers are also DS servers - so they need the same amount of storage.
+          storage: {{ default "5Gi"  .Values.directoryServer.storageSize }}
       storageClassName:  {{ .Values.replicationServer.storageClass }}
   {{- end }}
   template:
     metadata:
       labels:
-        djInstance: "{{ .Values.djInstance }}-rs"
+        djInstance: "{{ .Values.djInstance }}-admin"
         app: {{ template "fullname" . }}
         vendor: forgerock
         component: opendj
@@ -53,13 +55,13 @@ spec:
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
-{{ toYaml .Values.replicationServer.resources | indent 12 }}
+{{ toYaml .Values.adminServer.resources | indent 12 }}
         envFrom:
         - configMapRef:
             name: {{ .Values.djInstance }}
         env:
         - name: DS_ROLE
-          value: replication-server
+          value: admin-server
         ports:
         - containerPort: 4444
           name: admin
@@ -76,19 +78,18 @@ spec:
         - name: data
           mountPath: /opt/opendj/data
         {{- end }}
-        # For the RS we need to disable the readiness probe. RS1 needs to talk to *itself* (for some reason), and the service
-        # is not created until it reports READY. Chicken and egg.
+        # For the RS we need to disable this. RS1 needs to talk to itself, and it is not available until it is READY
         # If we move the init logic to the replication script we can fix this...
 #        readinessProbe:
 #          tcpSocket:
 #            port: metrics
 #          periodSeconds: 20
-#          initialDelaySeconds: 90
+#          initialDelaySeconds: 30
         livenessProbe:
           tcpSocket:
             port: metrics
-          initialDelaySeconds: 120
-          periodSeconds: 90
+          initialDelaySeconds: 90
+          periodSeconds: 60
       {{- if .Values.enableGcloudBackups }}
       # An example of enabling backup to google cloud storage.
       # The bucket must exist, and the cluster needs --scopes storage-full when it is created.

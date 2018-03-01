@@ -2,10 +2,18 @@
 # Sample bootstrap script
 #set -x
 
+msg() { echo -e "\e[32mINFO ---> $1\e[0m"; }
+err() { echo -e "\e[31mERR ---> $1\e[0m" ; exit 1; }
+check() { command -v "$1" >/dev/null 2>&1 || err "$1 utility is required!"; }
+
+check kubectl
+check helm
+
 if ! kubectl cluster-info; then
     echo "It looks like your cluster is not running or kubectl is not configured"
     exit 1
 fi
+
 
 
 secretName="git-ssh-key"
@@ -69,8 +77,10 @@ echo "Using ${CUSTOM_YAML} values:"
 cat "${CUSTOM_YAML}"
 
 
-echo "Running helm..."
+#echo "Running helm..."
 
+# For now, we just echo the command
+echo "Run the following command"
 
-helm install -f "${CUSTOM_YAML}" "${CHART}"
+echo helm install -f "${CUSTOM_YAML}" "${CHART}"
 

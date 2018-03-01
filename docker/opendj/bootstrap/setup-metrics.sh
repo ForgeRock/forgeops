@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Create the metrics user for monitoring.
 #
+
+echo "Setting up metrics collection"
+
 cd /opt/opendj
 source /opt/opendj/env.sh
 

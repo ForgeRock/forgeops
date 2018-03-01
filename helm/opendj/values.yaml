@@ -58,7 +58,9 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # For production you will want to specify CPU limits to help Kube schedule the pods.
 resources:
   requests:
-   memory: 1024Mi
+   memory: 512Mi
+  limits:
+    memory: 512Mi
 
 
 # The role is one of directory-server, replication-server. Defaults to directory-server if not set

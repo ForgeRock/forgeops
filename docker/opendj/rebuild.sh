@@ -2,6 +2,8 @@
 # Script to rebuild indexes. If you find the DJ indexes are degraded, exec
 # into the container and run this command.
 
+echo "Rebuilding indexes"
+
 bin/rebuild-index \
  --port 4444 \
  --hostname localhost \

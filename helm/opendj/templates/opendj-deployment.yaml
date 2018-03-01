@@ -89,10 +89,12 @@ spec:
           periodSeconds: 20
           initialDelaySeconds: 30
         {{- end }}
+        # Note the initial delay needs to be quite high because setup can take a while the first time.
+        # We should revisit this.
         livenessProbe:
           tcpSocket:
             port: metrics
-          initialDelaySeconds: 60
+          initialDelaySeconds: 120
           periodSeconds: 60
       {{- if .Values.enableGcloudBackups }}
       # An example of enabling backup to google cloud storage.

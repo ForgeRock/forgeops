@@ -51,7 +51,7 @@ RUN unzip -q /home/forgerock/opendj.zip -d /opt \
     && rm -f /home/forgerock/opendj.zip \
     && mkdir -p "$INSTANCE_ROOT" \
     && mkdir -p "$SECRET_PATH" \
-    && chown -R forgerock /opt "$SECRET_PATH"
+    && chown -R forgerock:root /opt "$SECRET_PATH"
 
 
 COPY bootstrap/ /opt/opendj/bootstrap/

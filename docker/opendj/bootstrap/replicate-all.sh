@@ -2,25 +2,14 @@
 #
 # Configure and Initialize replication for the cluster.
 #
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-
+# This should be run from the admin server node.
 #set -x
 
 
 source /opt/opendj/env.sh
-
-
-# It looks like the replication commands want the *local* server to be setup as well. Since we are
-# running in a job, we create a very simple DS server.
-/opt/opendj/setup directory-server -p 1389  \
-  --adminConnectorPort 4444 \
-  --instancePath ./data \
-  --baseDN "$BASE_DN" -h localhost --rootUserPasswordFile "$DIR_MANAGER_PW_FILE" \
-  --acceptLicense \
-   || (echo "Setup failed"; exit 1)
-
 
 
 ADMIN_ID=admin
@@ -33,8 +22,6 @@ if [ -z "$DS_SET_SIZE" ]; then
     exit 1
 fi
 
-
-env
 # Search for an LDAP host. Return 0 if it is available.
 search() {
     echo "Waiting for server $1 to be available"
@@ -69,22 +56,47 @@ done
 
 echo "About to begin replication setup"
 
+# First tell the two RS servers about each other
 
+R0="${DJ_INSTANCE}-rs-0.${DJ_INSTANCE}-rs"
+R1="${DJ_INSTANCE}-rs-1.${DJ_INSTANCE}-rs"
+
+echo "Introducing $R0 to $R1"
+
+# This is now being done as part of setup - but lets keep this around until we
+# decide if this is a better place to configure it.
+#/opt/opendj/bin/dsreplication configure \
+# --baseDN "$BASE_DN" \
+# --adminUID "$ADMIN_ID" \
+# --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
+# --host1 "$R0" \
+# --port1 4444 \
+# --replicationPort1 8989 \
+# --bindDN1 "cn=Directory Manager" \
+# --bindPasswordFile1 "${DIR_MANAGER_PW_FILE}" \
+# --onlyReplicationServer1 \
+# --host2 "$R1" \
+# --port2 4444 \
+# --bindDN2 "cn=Directory Manager" \
+# --bindPasswordFile2 "${DIR_MANAGER_PW_FILE}" \
+# --replicationPort2 8989 \
+# --onlyReplicationServer2 \
+# --trustAll \
+# --no-prompt
+
+# arguments: $1 - the ds host to replicate, $2 - the RS server instance to replicate to.
 dsconfigure() {
-  H="${DJ_INSTANCE}-$1.${DJ_INSTANCE}"
-  R="${DJ_INSTANCE}-rs-$2.${DJ_INSTANCE}-rs"
-  echo "Configuring DS $H to replicate to RS $R"
-
-    $dsreplica configure \
+  echo "Configuring DS $1 to replicate to RS $2"
+  $dsreplica configure \
      --adminUID "$ADMIN_ID" \
      --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
      --baseDN "$BASE_DN" \
-     --host1 "$H" \
+     --host1 "$1" \
      --port1 4444 \
      --bindDN1 "cn=Directory Manager" \
      --bindPasswordFile1 "${DIR_MANAGER_PW_FILE}" \
      --noReplicationServer1 \
-     --host2 "$R" \
+     --host2 "$2" \
      --port2 4444 \
      --bindDN2 "cn=Directory Manager" \
      --bindPasswordFile2 "${DIR_MANAGER_PW_FILE}" \
@@ -94,11 +106,18 @@ dsconfigure() {
      --no-prompt
 }
 
+# For each replica server..
 for replica in $(seq 0 $last_rs); do
+  R="${DJ_INSTANCE}-rs-$replica.${DJ_INSTANCE}-rs"
   for dsserver in $(seq 0 $last_ds); do
-    dsconfigure $dsserver $replica
+    H="${DJ_INSTANCE}-$dsserver.${DJ_INSTANCE}"
+    dsconfigure "${H}" "${R}"
   done
+  # This admin server is also a DS, so we need to setup replication to it.
+   dsconfigure "${FQDN}"  "${R}"
 done
+
+
 
 # Initialize replication
 /opt/opendj/bootstrap/replicate-init.sh

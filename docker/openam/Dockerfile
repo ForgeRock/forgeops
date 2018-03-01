@@ -12,7 +12,7 @@ FROM tomcat:8.5.28-jre8-alpine
 #   -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for sending debug output to stderr
 #-Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider -Dcom.sun.identity.shared.debug.file.format="%PREFIX% %MSG%\n%STACKTRACE%"
-# -Duser.home=/home/forgeock
+# -Duser.home=/home/forgerock
 # See also https://forum.forgerock.com/topic/openamcfg-location/
 
 

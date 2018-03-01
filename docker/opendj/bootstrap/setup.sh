@@ -24,6 +24,9 @@ directory-server)
 replication-server)
     ./bootstrap/setup-rs.sh
     ;;
+admin-server)
+    ./bootstrap/setup-admin.sh
+    ;;
 *)
     echo "Unsupported DS Role $DS_ROLE"
     exit 1
@@ -34,7 +37,13 @@ esac
 
 ./bootstrap/setup-metrics.sh
 
-# Before we enable rest2ldap we need a strategy for paramterizing the json template
+# todo: relevant for an RS?
+# This causes the backend to be taken offline for the rebuild. We need to verify the liveness probe does not
+# kill the pod while the rebuild is occurring.
+#/opt/opendj/rebuild.sh
+
+
+# Before we enable rest2ldap we need a strategy for parameterizing the json template
 #./bootstrap/setup-rest2ldap.sh
 
 

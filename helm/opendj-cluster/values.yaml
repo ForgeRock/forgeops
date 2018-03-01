@@ -38,14 +38,14 @@ image:
   tag: 6.0.0
 
 directoryServer:
-  replicas: 3
+  replicas: 2
   # Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
   storageSize: "20Gi"
   # DS nodes need fast (SSD) storage. Your cluster admin must create a 'fast' storage class.
   storageClass: "fast"
   resources:
     requests:
-     memory: 4024Mi
+     memory: 512Mi
 
 replicationServer:
   replicas: 2
@@ -54,7 +54,14 @@ replicationServer:
   storageClass: "fast"
   resources:
     requests:
-     memory: 4024Mi
+     memory: 512Mi
+
+# Admin servers do not need as much memory
+adminServer:
+ resources:
+  requests:
+    memory: 256Mi
+
 
 # Set for creating sample users. If unset, only the base DN will be created.
 #numberSampleUsers: 5
@@ -76,7 +83,7 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # which impacts minikube (or any hostPath based provisioner). The underlying PV has root permissions,
 # and the DJ container will not start. If you need to run this on Minikube with PVC, set runAsUser: 0 in the
 # deployment securityContext:
-djPersistence: true
+djPersistence: false
 
 
 # Set this to true to enable backups to gcloud
@@ -87,8 +94,4 @@ gsBucket: gs://forgeops/dj-backup
 
 # Uncomment this to create sample users in the DS. The value must be quoted as a string
 # Note large values here will cause init failure as the initial setup takes too long and the pod will be killed.
-numberSampleUsers: "5000"
-
-
-# Run the the job to initialize replication.
-intializeReplication: true
+numberSampleUsers: "500"

@@ -75,10 +75,6 @@ start)
     # Start only. Will fail if there is no configuration
     start
     ;;
-configure-replication)
-    # Run the script to setup replication
-    /opt/opendj/bootstrap/replicate-all.sh
-    ;;
 *)
     exec "$@"
 esac
