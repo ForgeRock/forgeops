@@ -47,11 +47,11 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # For production you will want to specify CPU limits to help Kube schedule the pods.
 resources:
   requests:
-   memory: 512Mi
-  # Setup will run more than 1 jvm, which will attempt to allocate more memory than the pod has.
-  # todo: We need to explicitly set the jvm size for everything *except* the server, which should use cgroups.
-#  limits:
-#    memory: 768Mi
+   memory: 1048Mi
+  # Setup runs more than 1 jvm, which will attempt to allocate more memory than the pod has.
+  # For install, it looks like we need at least 2GB - 2.5 GB
+  limits:
+    memory: 2500Mi
 
 
 # The role is one of directory-server, replication-server. Defaults to directory-server if not set
@@ -63,12 +63,7 @@ role: directory-server
 # which impacts minikube (or any hostPath based provisioner). The underlying PV has root permissions,
 # and the DJ container will not start. If you need to run this on Minikube with PVC, set runAsUser: 0 in the
 # deployment securityContext:
-djPersistence: false
-
-
-git:
-  repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
-  branch: master
+djPersistence: true
 
 # Set this to true to enable backups to gcloud
 enableGcloudBackups: false

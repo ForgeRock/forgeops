@@ -2,14 +2,14 @@
 # A sample baseline benchmark that runs against the DJ user store. This modifies directory data. This should
 # only be used for testing.
 
+USERS="${NUMBER_SAMPLE_USERS:-1000000}"
+
+[[ $# -eq 1 ]] && USERS=$1
 
 ITERATIONS=1000000
 BASE_DN="${BASE_DN:-dc=openam,dc=forgerock,dc=org}"
-USERS="${NUMBER_SAMPLE_USERS:-1000000}"
-#HOST=userstore-0.userstore
 HOST=localhost
 CONNECTIONS=10
-
 
 echo "Searchrate test"
 # searchrate needs more time to warm up - so we double the iterations.

@@ -33,6 +33,7 @@ spec:
         component: opendj
         release: {{ .Release.Name }}
     spec:
+    {{- if .Values.useAntiAffinity }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -45,6 +46,7 @@ spec:
                   values:
                   - {{ .Values.djInstance }}
               topologyKey: kubernetes.io/hostname
+      {{- end }}
       terminationGracePeriodSeconds: 30
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
@@ -91,18 +93,6 @@ spec:
             port: metrics
           initialDelaySeconds: 90
           periodSeconds: 60
-      {{- if .Values.enableGcloudBackups }}
-      # An example of enabling backup to google cloud storage.
-      # The bucket must exist, and the cluster needs --scopes storage-full when it is created.
-      # This runs the gsutil command periodically to rsync the contents of the /backup folder (shared with the DJ container) to cloud storage. 
-      - name: backup
-        image: gcr.io/cloud-builders/gcloud
-        imagePullPolicy: IfNotPresent
-        command: [ "/bin/sh", "-c", "while true; do gsutil -m rsync -r /backup {{ .Values.gsBucket }} ; sleep 600;  done"]
-        volumeMounts:
-        - name: dj-backup
-          mountPath: /backup
-      {{- end }}
       volumes:
       - name: dj-secrets
         secret:

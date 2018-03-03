@@ -4,6 +4,11 @@ cd /opt/opendj
 
 USERS=1000000
 
+[[ $# -eq 1 ]] && USERS=$1
+
+echo "Making $USERS sample users"
+
+
 source ./env.sh
 
 cat <<EOF >/var/tmp/template

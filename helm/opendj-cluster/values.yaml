@@ -82,7 +82,7 @@ djPersistence: true
 
 
 # Set this to true to enable backups to gcloud
-enableGcloudBackups: false
+enableGcloudBackups: true
 
 # backup Bucket destination. You need the right scopes in container engine to write to this bucket. add --scopes storage-full when you create the cluster.
 gsBucket: gs://forgeops/dj-backup 
@@ -90,3 +90,6 @@ gsBucket: gs://forgeops/dj-backup
 # Uncomment this to create sample users in the DS. The value must be quoted as a string
 # Note large values here will cause init failure as the initial setup takes too long and the pod will be killed.
 numberSampleUsers: "500"
+
+# Set to true to use Anti Affinity scheduling. This will attempt to schedule DS nodes across availability zones.
+useAntiAffinity: false

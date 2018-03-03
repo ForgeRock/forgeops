@@ -34,18 +34,6 @@ spec:
         vendor: forgerock
         component: opendj
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: djInstance
-                  operator: In
-                  values:
-                  - {{ .Values.djInstance }}
-              topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 30
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
@@ -101,6 +89,11 @@ spec:
         volumeMounts:
         - name: dj-backup
           mountPath: /backup
+#        - name: google-cloud-key
+#          mountPath: /var/secrets/google
+#        env:
+#        - name: GOOGLE_APPLICATION_CREDENTIALS
+#          value: /var/secrets/google/key.json
       {{- end }}
       volumes:
       - name: dj-secrets
