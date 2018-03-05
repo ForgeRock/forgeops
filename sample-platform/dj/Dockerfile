@@ -2,6 +2,5 @@ FROM quay.io/forgerock/opendj:latest
 
 COPY schema /tmp/schema
 COPY ldif /opt/opendj/bootstrap/extra/ldif
-COPY setup-directory.sh /opt/opendj/bootstrap
-COPY replicate.sh /opt/opendj/bootstrap
+COPY post-install.sh /opt/opendj/bootstrap/userstore
 COPY rebuild.sh /opt/opendj/

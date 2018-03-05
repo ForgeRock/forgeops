@@ -6,6 +6,11 @@
 # to such license between the licensee and ForgeRock AS.
 #
 
+dn: dc=openidm,dc=forgerock,dc=com
+dc: openidm
+objectClass: top
+objectClass: domain
+
 # Links OU
 
 dn: ou=links,dc=openidm,dc=forgerock,dc=com

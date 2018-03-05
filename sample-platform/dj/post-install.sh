@@ -1,38 +1,14 @@
-#!/usr/bin/env bash
-# Set up a directory server.
-#
-# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+/opt/opendj/bin/dsconfig \
+ set-backend-prop \
+ --hostname localhost \
+ --port 4444 \
+ --bindDN "cn=Directory Manager" \
+ --bindPassword password \
+ --backend-name userRoot \
+ --add base-dn:dc=openidm,dc=forgerock,dc=com \
+ --trustAll \
+ --no-prompt
 
-#set -x
-
-source /opt/opendj/env.sh
-
-DB_NAME=${DB_NAME:-userRoot}
-
-# The type of DJ we want to bootstrap. This determines the ldif files and scripts to load. Defaults to a userstore.
-BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
-
-INIT_OPTION="--addBaseEntry"
-
-# If NUMBER_SAMPLE_USERS is set AND we are the first node, then generate sample users.
-if [[  -n "${NUMBER_SAMPLE_USERS}" && $HOSTNAME = *"0"* ]]; then
-    INIT_OPTION="--sampleData ${NUMBER_SAMPLE_USERS}"
-fi
-
-# fork added this line:
-# -b "dc=openidm,dc=forgerock,dc=com" \
-# todo: We may want to specify a keystore using --usePkcs12keyStore, --useJavaKeystore
-/opt/opendj/setup directory-server -p 1389 --ldapsPort 1636 --enableStartTLS  \
-  --adminConnectorPort 4444 \
-  --instancePath ./data \
-  --baseDN "${BASE_DN}" -h "${DJ_FQDN}" \
-   -b "dc=openidm,dc=forgerock,dc=com" \
-  --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
-  --acceptLicense \
-  ${INIT_OPTION} || (echo "Setup failed, will sleep for debugging"; sleep 10000)
-
-# fork added these create schema providers
 /opt/opendj/bin/dsconfig \
    create-schema-provider \
    --hostname localhost \
@@ -89,16 +65,12 @@ fi
    --trustAll \
    --no-prompt
 
-# fork added this
 /opt/opendj/bin/stop-ds
 
-# fork added this
-cp -r /tmp/schema/* /opt/opendj/data/config/schema
+cp -r /tmp/schema/* /opt/opendj/data/db/schema
 
-# fork added this
 /opt/opendj/bin/start-ds
 
-# fork added these indexes
 /opt/opendj/bin/dsconfig \
     create-backend-index \
     --hostname localhost \
@@ -230,30 +202,6 @@ cp -r /tmp/schema/* /opt/opendj/data/config/schema
     --no-prompt
 
 
-# If any optional LDIF files are present, load them.
-ldif="bootstrap/userstore/ldif"
-
-if [ -d "$ldif" ]; then
-    echo "Loading LDIF files in $ldif"
-    for file in "${ldif}"/*.ldif;  do
-        echo "Loading $file"
-        # search + replace all placeholder variables. Naming conventions are from AM.
-        sed -e "s/@BASE_DN@/$BASE_DN/"  \
-            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
-            -e "s/@DB_NAME@/$DB_NAME/"  \
-            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
-
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
-      echo "  "
-    done
-fi
-
-script="bootstrap/userstore/post-install.sh"
-
-if [ -r "$script" ]; then
-    echo "executing post install script $script"
-    sh "$script"
-fi
 
 ldif="bootstrap/extra/ldif"
 
@@ -266,43 +214,7 @@ if [ -d "$ldif" ]; then
             -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
             -e "s/@DB_NAME@/$DB_NAME/"  \
             -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
-
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
+        /opt/opendj/bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
       echo "  "
     done
 fi
-
-script="bootstrap/extra/post-install.sh"
-
-if [ -r "$script" ]; then
-    echo "executing post install script $script"
-    sh "$script"
-fi
-
-ldif="bootstrap/cts/ldif"
-
-if [ -d "$ldif" ]; then
-    echo "Loading LDIF files in $ldif"
-    for file in "${ldif}"/*.ldif;  do
-        echo "Loading $file"
-        # search + replace all placeholder variables. Naming conventions are from AM.
-        sed -e "s/@BASE_DN@/$BASE_DN/"  \
-            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
-            -e "s/@DB_NAME@/$DB_NAME/"  \
-            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
-
-        ./bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
-      echo "  "
-    done
-fi
-
-script="bootstrap/cts/post-install.sh"
-
-if [ -r "$script" ]; then
-    echo "executing post install script $script"
-    sh "$script"
-fi
-
-/opt/opendj/schedule_backup.sh
-
-/opt/opendj/rebuild.sh
