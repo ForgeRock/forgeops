@@ -47,7 +47,6 @@ start() {
     echo "Starting OpenDJ"
 
     # Remove any bootstrap sentinel created by setup.
-    # todo: Revisit if we really need this, since we no longer use the probe.sh script.
     rm -f /opt/opendj/BOOTSTRAPPING
 
     # instance.loc points DJ at the data/ volume

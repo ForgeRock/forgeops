@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Default setup script
 #
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
@@ -7,40 +7,30 @@
 
 echo "Setting up default OpenDJ instance."
 
+
+# Default bootstrap script
+export BOOTSTRAP=${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}
+export DB_NAME=${DB_NAME:-userRoot}
+
+# The type of DJ we want to bootstrap. This determines the LDIF files and scripts to load. Defaults to a userstore.
+export BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
+
+
+
 cd /opt/opendj
 
 touch /opt/opendj/BOOTSTRAPPING
 source /opt/opendj/env.sh
 
 
-# The role of this server. Role can be replication-server, directory-server or proxy-server
-# If not set, we default to directory-server
-DS_ROLE=${DS_ROLE:-"directory-server"}
-
-case "$DS_ROLE" in
-directory-server)
-    ./bootstrap/setup-directory.sh
-    ;;
-replication-server)
-    ./bootstrap/setup-rs.sh
-    ;;
-admin-server)
-    ./bootstrap/setup-admin.sh
-    ;;
-*)
-    echo "Unsupported DS Role $DS_ROLE"
-    exit 1
-esac
-
+./bootstrap/setup-directory.sh
 
 ./bootstrap/log-redirect.sh
 
 ./bootstrap/setup-metrics.sh
 
-# todo: relevant for an RS?
-# This causes the backend to be taken offline for the rebuild. We need to verify the liveness probe does not
-# kill the pod while the rebuild is occurring.
-#/opt/opendj/rebuild.sh
+# rebuild indexes
+/opt/opendj/rebuild.sh
 
 
 # Before we enable rest2ldap we need a strategy for parameterizing the json template

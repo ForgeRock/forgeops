@@ -2,7 +2,8 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-FROM forgerock/java:6.0.0
+# The java docker image source can be found at https://github.com/ForgeRock/docker-public
+FROM quay.io/forgerock/java:6.0.0
 
 WORKDIR /opt
 

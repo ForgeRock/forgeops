@@ -4,13 +4,10 @@ metadata:
   name: {{ .Values.djInstance }}
 data:
   BASE_DN: {{ .Values.baseDN }}
-  DS_ROLE: {{ default "directory-server" .Values.role }}
   # example: configstore, cts, userstore. The instance is used to construct the FQDN of DJ.
   DJ_INSTANCE: {{ .Values.djInstance }}
-  # The master server is the first instance in the stateful set (-0 )
-  DJ_MASTER_SERVER: {{   .Values.djInstance -}}-0.{{ .Values.djInstance }}
+  DS_SET_SIZE: "{{ .Values.replicas }}"
   OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
-  BACKUP_HOST: {{ .Values.backupHost }}
   BACKUP_SCHEDULE_FULL: {{ .Values.backupScheduleFull }}
   BACKUP_SCHEDULE_INCREMENTAL: {{ .Values.backupScheduleIncremental }}
   BOOTSTRAP:  {{ .Values.bootstrapScript }}

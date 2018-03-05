@@ -15,7 +15,7 @@ baseDN: "dc=openam,dc=forgerock,dc=org"
 
 # The default instance name. This will create a stateful set that can be resolved at
 #  $djInstance-0.$djInstance
-djInstance: userstore
+djInstance: ds
 
 component: opendj
 
@@ -26,7 +26,7 @@ image:
   tag:  6.0.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
-replicaCount: 1
+replicas: 1
 
 # Set for creating sample users. If unset, only the base DN will be created.
 #numberSampleUsers: 5
@@ -54,15 +54,8 @@ resources:
     memory: 2500Mi
 
 
-# The role is one of directory-server, replication-server. Defaults to directory-server if not set
-role: directory-server
-
-# DJ persistence switch. Setting to false disables volume claims - all data is stored inside the docker image.
+# DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
-# See issue https://github.com/kubernetes/kubernetes/issues/2630,
-# which impacts minikube (or any hostPath based provisioner). The underlying PV has root permissions,
-# and the DJ container will not start. If you need to run this on Minikube with PVC, set runAsUser: 0 in the
-# deployment securityContext:
 djPersistence: true
 
 # Set this to true to enable backups to gcloud
@@ -74,7 +67,9 @@ gsBucket: gs://forgeops/dj-backup
 # Uncomment this to create sample users.
 #numberSampleUsers: 100
 
-# Set to true to enable the readiness probe. Note that when setting up an RS we need this to be false.
-# When the second RS is being configured, the first will try to contact it. If k8s does not see the pod
-# as "READY" it does not create a dns name for it. By disabling the probe, the pod comes up as READY as soon as it starts
-readinessProbeEnabled: true
+
+# Backup schedules for full and incrementals. This is a crontab format:
+# minutes hour day-of-week month year
+backupScheduleFull:  "2 2 * * *"
+backupScheduleIncremental: "45 * * * *"
+

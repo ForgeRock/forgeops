@@ -12,7 +12,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   serviceName: {{ .Values.djInstance }}
-  replicas: {{default 1 .Values.replicaCount }}
+  replicas: {{default 1 .Values.replicas }}
   {{- if .Values.djPersistence }}
   volumeClaimTemplates:
   - metadata:
@@ -82,13 +82,12 @@ spec:
         {{- end }}
         # Due to cost, we don't want to do a full scrape of the metrics http endpoint - so we create a tcp connection
         # todo: revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4728 is resolved.
-        {{- if .Values.readinessProbeEnabled }}
         readinessProbe:
-          tcpSocket:
-            port: metrics
+          exec:
+            command:
+            - /opt/opendj/probe.sh
           periodSeconds: 20
           initialDelaySeconds: 30
-        {{- end }}
         # Note the initial delay needs to be quite high because setup can take a while the first time.
         # We should revisit this.
         livenessProbe:
