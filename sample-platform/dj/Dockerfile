@@ -1,4 +1,4 @@
-FROM quay.io/forgerock/opendj:latest
+FROM quay.io/forgerock/opendj:6.0.0
 
 COPY schema /tmp/schema
 COPY ldif /opt/opendj/bootstrap/extra/ldif

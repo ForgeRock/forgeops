@@ -5,7 +5,6 @@
 # Copyright (c) 2017-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-# This should be run on the first node (ds-0).
 
 
 source /opt/opendj/env.sh
@@ -45,8 +44,11 @@ while true; do
     sleep 30
 done
 
+# For good measure...
+echo "About to begin replication setup.."
 
-echo "About to begin replication setup"
+sleep 30
+
 
 # Configure replication between host $1 and $2.
 dsconfigure() {

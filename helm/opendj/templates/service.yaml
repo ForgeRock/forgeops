@@ -18,6 +18,9 @@ spec:
     - port: 4444
       name: djadmin
       targetPort: 4444
+    - port: 1636
+      name: ldaps
+      targetPort: 1636
     - port: 8081
       protocol: TCP
       name: prometheus

@@ -21,8 +21,9 @@ component: opendj
 
 image:
   repository: quay.io/forgerock/opendj
-  # For development we set this to Always to get the most current image:
+  # For development we set this to Always to get the most current image.
   pullPolicy: Always
+  #pullPolicy: IfNotPresent
   tag:  6.0.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
@@ -73,3 +74,6 @@ gsBucket: gs://forgeops/dj-backup
 backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "45 * * * *"
 
+# Run the post setup job to configure replication and backup
+setupJob: false
+#setupJob: true

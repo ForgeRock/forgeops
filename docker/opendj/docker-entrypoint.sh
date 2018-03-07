@@ -14,7 +14,7 @@ cd /opt/opendj
 # If the pod was terminated abnormally the lock file may not have gotten cleaned up.
 rm -f /opt/opendj/locks/server.lock
 
-# Uncomment this to print experimental VM settings to the stdout.
+# Uncomment this to print experimental VM settings to stdout.
 java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 
 source /opt/opendj/env.sh
@@ -23,6 +23,7 @@ configure() {
       # Instance dir does not exist? Then we need to run setup
     if [ ! -d ./data/config ] ; then
       echo "Instance data Directory is empty. Creating new DJ instance"
+      BOOTSTRAP="${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}"
        echo "Running $BOOTSTRAP"
        sh "${BOOTSTRAP}"
     fi
@@ -73,6 +74,9 @@ configure)
 start)
     # Start only. Will fail if there is no configuration
     start
+    ;;
+run-post-setup-job)
+    /opt/opendj/bootstrap/post-setup-job.sh
     ;;
 *)
     exec "$@"

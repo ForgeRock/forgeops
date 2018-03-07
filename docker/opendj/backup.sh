@@ -9,5 +9,6 @@ B="${BACKUP_DIRECTORY}/$HOSTNAME"
 mkdir -p "$B"
 
 /opt/opendj/bin/backup --backupDirectory "${B}" \
-  -p 4444 -D "cn=Directory Manager" -j "${DIR_MANAGER_PW_FILE}" --trustAll \
+  -p 4444 -D "cn=Directory Manager" -j "${DIR_MANAGER_PW_FILE}" \
+   --trustAll \
   --backUpAll
