@@ -30,7 +30,7 @@ source /opt/opendj/env.sh
 ./bootstrap/setup-metrics.sh
 
 # rebuild indexes
-/opt/opendj/rebuild.sh
+/opt/opendj/scripts/rebuild.sh
 
 
 # Before we enable rest2ldap we need a strategy for parameterizing the json template

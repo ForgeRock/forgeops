@@ -9,6 +9,7 @@ export FQDN="${HOSTNAME}.${DJ_INSTANCE}"
 
 export INSTANCE_ROOT=/opt/opendj/data
 
+export BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/backup}
 
 
 # If a password file is mounted, grab the password from that, otherwise default

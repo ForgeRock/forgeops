@@ -53,6 +53,7 @@ RUN unzip -q /home/forgerock/opendj.zip -d /opt \
 
 
 COPY bootstrap/ /opt/opendj/bootstrap/
+COPY scripts/ /opt/opendj/scripts/
 COPY *.sh /opt/opendj/
 
 #
