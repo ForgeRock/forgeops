@@ -16,7 +16,7 @@ spec:
   {{- if .Values.djPersistence }}
   volumeClaimTemplates:
   - metadata:
-      name: data
+      name: db
       annotations:
         pv.beta.kubernetes.io/gid: "11111"
     spec:
@@ -75,9 +75,11 @@ spec:
         - name: dj-secrets
           mountPath: /var/run/secrets/opendj
         - name: dj-backup
-          mountPath: /opt/opendj/backup
+          mountPath: /opt/opendj/bak
+        - name: logs
+          mountPath: /opt/opendj/logs
         {{- if .Values.djPersistence }}
-        - name: data
+        - name: db
           mountPath: /opt/opendj/data
         {{- end }}
         # Due to cost, we don't want to do a full scrape of the metrics http endpoint - so we create a tcp connection
@@ -87,7 +89,7 @@ spec:
             command:
             - /opt/opendj/probe.sh
           periodSeconds: 20
-          initialDelaySeconds: 30
+          initialDelaySeconds: 10
         # Note the initial delay needs to be quite high because setup can take a while the first time.
         # We should revisit this.
         livenessProbe:
@@ -114,4 +116,6 @@ spec:
           # If we are running as non root, we can't set this mode to root read only
           #defaultMode: 256
       - name: dj-backup
+        emptyDir: {}
+      - name: logs
         emptyDir: {}

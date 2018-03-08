@@ -16,9 +16,9 @@ echo "Doing a full backup"
   --backUpAll
 
 # Revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4852 is fixed.
-echo "Backing up additional configuration files under /opt/opendj/data"
+echo "Backing up additional configuration files"
 
-cd /opt/opendj/data
+cd /opt/opendj
 
 t=`date "+%m%d%H%M%Y.%S"`
 tar cvfz "${B}/admin-bak-${t}.tar.gz" config var db/admin db/ads-truststore db/*ldif db/rootUser

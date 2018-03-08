@@ -22,7 +22,6 @@ fi
 # Note: $RS must be unquoted so the shell expands it
 /opt/opendj/setup replication-server  \
   --adminConnectorPort 4444 \
-  --instancePath ./data \
   --rootUserDN "cn=Directory Manager" \
   --rootUserPasswordFile "$DIR_MANAGER_PW_FILE" \
   --hostname "${FQDN}" \

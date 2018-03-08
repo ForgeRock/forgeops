@@ -45,7 +45,7 @@ while true; do
 done
 
 # For good measure...
-echo "About to begin replication setup.."
+echo "About to begin replication setup in 30 seconds..."
 
 sleep 30
 
@@ -76,14 +76,6 @@ for j in $(seq 1 $last_ds); do
     dsconfigure "${DS0}" "${DJ_INSTANCE}-$j.${DJ_INSTANCE}"
 done
 
-# Initialize replication data:
-$dsreplica initialize-all  \
-    --adminUID "$ADMIN_ID" \
-    --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
-    --port 4444 \
-    --hostname "$DS0" \
-    --baseDN "$BASE_DN" \
-    --trustAll \
-    --no-prompt
+/opt/opendj/bootstrap/replicate-init.sh
 
 

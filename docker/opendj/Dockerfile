@@ -24,9 +24,6 @@ ENV DIR_MANAGER_PW_FILE /var/run/secrets/opendj/dirmanager.pw
 # The default BASE_DN of the directory tree.
 ENV BASE_DN dc=openam,dc=forgerock,dc=org
 
-# The default backup directory. Only relevant if backups have been scheduled.
-ENV BACKUP_DIRECTORY /opt/opendj/backup
-
 # Optional full backup schedule in cron (5) format.
 ENV BACKUP_SCHEDULE_FULL  "0 2 * * *"
 
@@ -42,30 +39,22 @@ ENV BACKUP_SCHEDULE_INCREMENTAL "15 * * * *"
 # Use this to directly add the opendj zip file
 COPY opendj.zip /home/forgerock/
 
-
-ENV INSTANCE_ROOT /opt/opendj/data
-
 RUN unzip -q /home/forgerock/opendj.zip -d /opt \
     && rm -f /home/forgerock/opendj.zip \
-    && mkdir -p "$INSTANCE_ROOT" \
     && mkdir -p "$SECRET_PATH" \
-    && chown -R forgerock:root /opt "$SECRET_PATH"
+    && chown -R forgerock:root /opt "$SECRET_PATH" \
+    && chmod g+rwx /opt/opendj
 
 
 COPY bootstrap/ /opt/opendj/bootstrap/
 COPY scripts/ /opt/opendj/scripts/
 COPY *.sh /opt/opendj/
 
-#
-#    mkdir -p /opt/opendj/data/lib/extensions && \
-#     echo -n "password"  > ${DIR_MANAGER_PW_FILE}
-
-# Note the following RUN command has been removed for DJ 4.1.0.
-# 4.1.0 uses --instancePath instead of instance.loc on setup.sh and set INSTANCE_ROOT on boot.
-#     echo "/opt/opendj/data" > /opt/opendj/instance.loc  && \
 
 WORKDIR /opt/opendj
 
+# We are hitting https://github.com/kubernetes/kubernetes/issues/2630
+# We need to run as root. We can investigate using gosu to drop to the forgerock user at runtime.
 USER 11111
 
 EXPOSE 1389 636 4444 8989

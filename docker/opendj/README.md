@@ -10,16 +10,6 @@ mkdir dj    # Make an instance dir to persist data
 docker run -it -v `pwd`/dj:/opt/opendj/data -p 1389:1389 forgerock/opendj:5.5.0
 ```
 
-# Container Strategy
-
-This image separates out the read only bits (DJ binaries) from the volatile data.
-
-All writable files and configuration (persisted data) is kept under /opt/opendj/data. The idea is that you will mount
-a volume (Docker Volume, or Kubernetes Volume) on /opt/opendj/data that will survive container restarts.
-
-If you choose not to mount a persistent volume, OpenDJ will start fine - but you will lose your data when the container is removed.
-
-# Environment Variable Summary
 
 There are number of environment variables that control the behaviour of the container. These
 will typically be set by docker-compose or Kubernetes

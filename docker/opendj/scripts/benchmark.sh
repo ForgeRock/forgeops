@@ -2,6 +2,8 @@
 # A sample baseline benchmark that runs against the DJ user store. This modifies directory data. This should
 # only be used for testing.
 
+cd /opt/opendj
+
 USERS="${NUMBER_SAMPLE_USERS:-1000000}"
 
 [[ $# -eq 1 ]] && USERS=$1

@@ -7,9 +7,10 @@ export DJ_INSTANCE="${DJ_INSTANCE:-userstore}"
 # Subsequent scripts may want to know our FQDN in the cluster. The convention below works in k8s using StatefulSets.
 export FQDN="${HOSTNAME}.${DJ_INSTANCE}"
 
-export INSTANCE_ROOT=/opt/opendj/data
+export BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/bak}
 
-export BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/backup}
+# Admin id for replication.
+export ADMIN_ID=admin
 
 
 # If a password file is mounted, grab the password from that, otherwise default

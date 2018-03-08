@@ -12,7 +12,10 @@
 cd /opt/opendj
 
 # If the pod was terminated abnormally the lock file may not have gotten cleaned up.
+
 rm -f /opt/opendj/locks/server.lock
+mkdir -p locks
+
 
 # Uncomment this to print experimental VM settings to stdout.
 java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
@@ -20,12 +23,13 @@ java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRA
 source /opt/opendj/env.sh
 
 configure() {
-      # Instance dir does not exist? Then we need to run setup
-    if [ ! -d ./data/config ] ; then
+      # If the instance data does not exist we need to run setup.
+    if [ ! -d ./data/db ] ; then
       echo "Instance data Directory is empty. Creating new DJ instance"
       BOOTSTRAP="${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}"
-       echo "Running $BOOTSTRAP"
-       sh "${BOOTSTRAP}"
+      # DS setup complains if the directory is not empty.
+      echo "Running $BOOTSTRAP"
+      sh "${BOOTSTRAP}"
     fi
 }
 
@@ -33,25 +37,26 @@ start() {
     if [ -d "${SECRET_PATH}" ]; then
       echo "Secret path is present. Will copy any keystores and truststore"
       # We send errors to /dev/null in case no data exists.
-      cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./data/config 2>/dev/null
+      cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./config 2>/dev/null
     fi
 
     # todo: Check /opt/opendj/data/config/buildinfo
     # Run upgrade if the server is older
-
-    if (bin/status -n | grep Started) ; then
-       # If we have just been configured, a restart is needed to ensure we pick up any JVM env var args
-       echo "Restarting OpenDJ after installation."
-       bin/stop-ds
-    fi
 
     echo "Starting OpenDJ"
 
     # Remove any bootstrap sentinel created by setup.
     rm -f /opt/opendj/BOOTSTRAPPING
 
-    # instance.loc points DJ at the data/ volume
-    echo $INSTANCE_ROOT >/opt/opendj/instance.loc
+    # If there is a ./data directory present, create sym links for any top level directories.
+    # todo: When commons configuration lands, we should modify config.ldif to point to the directory locations.
+    if [ -d data/db ]; then
+        for d in data/*
+        do
+            ln -s $d
+        done
+    fi
+
     exec ./bin/start-ds --nodetach
 }
 

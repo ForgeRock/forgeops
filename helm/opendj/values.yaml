@@ -57,6 +57,7 @@ resources:
 
 # DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
+# If you run into issues with minikube set this to false. See https://github.com/kubernetes/minikube/issues/1990
 djPersistence: true
 
 # Set this to true to enable backups to gcloud

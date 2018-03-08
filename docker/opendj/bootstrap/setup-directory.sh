@@ -8,6 +8,8 @@
 
 source /opt/opendj/env.sh
 
+cd /opt/opendj
+
 
 INIT_OPTION="--addBaseEntry"
 
@@ -16,18 +18,22 @@ if [[  -n "${NUMBER_SAMPLE_USERS}" && $HOSTNAME = *"0"* ]]; then
     INIT_OPTION="--sampleData ${NUMBER_SAMPLE_USERS}"
 fi
 
+# This is an alternative to using symbolic links at the top level /opt/opendj directory.
+# If you use this, your docker image must create an instanc.loc file that points to this directory.
+#INSTANCE_PATH="--instancePath /opt/opendj/data"
+
 # An admin server is also a directory server.
 /opt/opendj/setup directory-server\
   -p 1389 \
   --enableStartTLS  \
   --adminConnectorPort 4444 \
-  --instancePath ./data \
   --enableStartTls \
   --ldapsPort 1636 \
   --httpPort 8080 --httpsPort 8443 \
   --baseDN "${BASE_DN}" -h "${FQDN}" \
   --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
   --acceptLicense \
+  ${INSTANCE_PATH} \
   ${INIT_OPTION} || (echo "Setup failed, will sleep for debugging"; sleep 10000)
 
 
