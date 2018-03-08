@@ -40,8 +40,9 @@ RUN apk add --no-cache su-exec unzip curl bash  \
   && mkdir -p "$OPENAM_HOME" \
   && mkdir -p "$FORGEROCK_HOME"/.openamcfg \
   && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_openam_  \
-  && chown -R forgerock:forgerock "$CATALINA_HOME" \
-  && chown -R forgerock:forgerock  "$FORGEROCK_HOME"
+  && chown -R forgerock:root "$CATALINA_HOME" \
+  && chown -R forgerock:root  "$FORGEROCK_HOME" \
+  && chmod -R g+rwx "$CATALINA_HOME"
 
 
 # The userid must be numeric.

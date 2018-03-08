@@ -10,13 +10,16 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
 # Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
+# We make sure the tomcat directories can be written by the group.
 # This is a work around for: https://github.com/docker-library/tomcat/issues/35
 RUN apk add --no-cache su-exec unzip curl bash vim bind-tools iputils \
     && rm -fr "$CATALINA_HOME"/webapps/* \
     && mkdir -p /opt/forgerock \
     && addgroup -g 11111 forgerock \
     && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D -G root forgerock \
-    && chown -R forgerock /opt
+    && chown -R forgerock:root "$CATALINA_HOME" \
+    && chown -R forgerock:root  "$FORGEROCK_HOME" \
+    && chmod -R g+rwx "$CATALINA_HOME"
 
 
 # Default home for OpenIG config. Override this to set a different location.

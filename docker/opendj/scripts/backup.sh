@@ -15,6 +15,7 @@ echo "Doing a full backup"
   --trustAll \
   --backUpAll
 
+# Revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4852 is fixed.
 echo "Backing up additional configuration files under /opt/opendj/data"
 
 cd /opt/opendj/data
