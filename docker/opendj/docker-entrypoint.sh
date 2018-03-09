@@ -18,7 +18,7 @@ mkdir -p locks
 
 
 # Uncomment this to print experimental VM settings to stdout.
-java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
+#java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 
 source /opt/opendj/env.sh
 

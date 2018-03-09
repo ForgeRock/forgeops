@@ -53,6 +53,22 @@ spec:
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
         fsGroup: 11111
+      # The init container is responsible for any setup if the persistent data  does not exist.
+      initContainers:
+      - name: setup
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: dj-secrets
+          mountPath: /var/run/secrets/opendj
+        {{- if .Values.djPersistence }}
+        - name: db
+          mountPath: /opt/opendj/data
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.djInstance }}
+        args: [ "configure" ]
       containers:
       - name: opendj
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -84,18 +100,17 @@ spec:
         {{- end }}
         # Due to cost, we don't want to do a full scrape of the metrics http endpoint - so we create a tcp connection
         # todo: revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4728 is resolved.
+        args: [ "start" ]
         readinessProbe:
-          exec:
-            command:
-            - /opt/opendj/probe.sh
-          periodSeconds: 20
-          initialDelaySeconds: 10
+          tcpSocket:
+            port: metrics
+          periodSeconds: 5
         # Note the initial delay needs to be quite high because setup can take a while the first time.
         # We should revisit this.
         livenessProbe:
           tcpSocket:
             port: metrics
-          initialDelaySeconds: 120
+          initialDelaySeconds: 10
           periodSeconds: 60
       {{- if .Values.enableGcloudBackups }}
       # An example of enabling backup to google cloud storage.

@@ -76,5 +76,4 @@ backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "45 * * * *"
 
 # Run the post setup job to configure replication and backup
-setupJob: false
-#setupJob: true
+runSetup: true

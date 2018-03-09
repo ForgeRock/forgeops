@@ -1,8 +1,8 @@
-{{ if .Values.setupJob }}
+{{ if .Values.runSetup }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.djInstance }}-setup
+  name: {{ .Values.djInstance }}-replication-setup
   labels:
     djInstance: {{ .Values.djInstance }}
     app: {{ template "fullname" . }}
