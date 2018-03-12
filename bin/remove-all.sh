@@ -9,8 +9,9 @@ NS=`kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].contex
 
 NAMESPACE=${NS:-default}
 
-# Delete helm charts in specified namespace (of default namespace, if none specified)
-releases=`helm list --namespace ${NAMESPACE} -q`
+# Delete helm charts in specified namespace (of default namespace, if none specified).
+# Use --all to make sure charts with DELETED status are removed.
+releases=`helm list --namespace ${NAMESPACE} --all -q`
 
 for r in "${releases}"
 do
