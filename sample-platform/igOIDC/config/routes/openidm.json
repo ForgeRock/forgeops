@@ -207,6 +207,9 @@
                             }
                         }
                     }
+                },
+                {
+                    "type": "CookieFilter"
                 }
             ],
             "handler": "ForgeRockClientHandler"
