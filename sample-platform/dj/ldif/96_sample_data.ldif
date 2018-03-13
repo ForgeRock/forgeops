@@ -1,6 +1,5 @@
 
 dn: uid=jdoe,ou=People,dc=example,dc=com
-fr-idm-uuid: jdoe
 objectClass: fr-idm-managed-user-explicit
 objectClass: person
 objectClass: organizationalPerson
@@ -17,7 +16,6 @@ userPassword: Passw0rd
 organizationName: example
 
 dn: uid=bjensen,ou=People,dc=example,dc=com
-fr-idm-uuid: bjensen
 objectClass: fr-idm-managed-user-explicit
 objectClass: person
 objectClass: organizationalPerson

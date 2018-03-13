@@ -276,10 +276,11 @@
             "managed/user": {
                 "dnTemplate": "ou=People,dc=example,dc=com",
                 "namingStrategy": {
-                    "type": "clientNaming",
+                    "type": "serverNaming",
                     "dnAttribute": "uid",
-                    "idAttribute": "fr-idm-uuid"
+                    "idAttribute": "entryUUID"
                 },
+                "nativeId" : true,
                 "objectClasses": [
                     "person",
                     "organizationalPerson",
@@ -292,7 +293,7 @@
                 "properties": {
                     "_id": {
                         "type": "simple",
-                        "ldapAttribute": "fr-idm-uuid",
+                        "ldapAttribute": "entryUUID",
                         "writability": "createOnly"
                     },
                     "userName": {
