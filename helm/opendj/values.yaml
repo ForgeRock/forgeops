@@ -6,7 +6,8 @@ dirManagerPassword: password
 # The default bootstrap script.
 bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
 
-# The other option here is "cts". This sets the BOOTSTRAP_TYPE env var for the bootstrap script.
+# The options here are "userstore" or "cts" or "proxy". 
+# This sets the BOOTSTRAP_TYPE env var for the bootstrap script which is setup.sh.
 bootstrapType: "userstore"
 
 
