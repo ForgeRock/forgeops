@@ -22,15 +22,17 @@ touch /opt/opendj/BOOTSTRAPPING
 source /opt/opendj/env.sh
 
 
-./bootstrap/setup-directory.sh
+if [ ${BOOTSTRAP_TYPE} == "proxy" ]
+then
+	./bootstrap/setup-proxy.sh
+else
+	./bootstrap/setup-directory.sh
+	# rebuild indexes
+	/opt/opendj/scripts/rebuild.sh
+fi
 
 ./bootstrap/log-redirect.sh
-
 ./bootstrap/setup-metrics.sh
-
-# rebuild indexes
-/opt/opendj/scripts/rebuild.sh
-
 
 # Before we enable rest2ldap we need a strategy for parameterizing the json template
 #./bootstrap/setup-rest2ldap.sh
