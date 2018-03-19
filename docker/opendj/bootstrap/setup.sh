@@ -12,6 +12,10 @@ echo "Setting up default OpenDJ instance."
 export BOOTSTRAP=${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}
 export DB_NAME=${DB_NAME:-userRoot}
 
+# We explictly set the OPENDJ_JAVA_ARGS hence overriding what is set by the configMap because
+# for setup we don't need a large heap size
+export OPENDJ_JAVA_ARGS="-Xms256m -Xmx512m"
+
 # The type of DJ we want to bootstrap. This determines the LDIF files and scripts to load. Defaults to a userstore.
 export BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
 
