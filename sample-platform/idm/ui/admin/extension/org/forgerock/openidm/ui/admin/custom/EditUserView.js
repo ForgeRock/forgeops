@@ -27,6 +27,11 @@ define([
                 allowedFields.forEach(_.bind(function (field) {
                     this.$el.find(".container-" + field + " :input").prop('readonly', false);
                 }, this));
+                // select boxes need to be disabled rather than set to readonly
+                this.$el.find("select.form-control").prop('disabled', true);
+                allowedFields.forEach(_.bind(function (field) {
+                    this.$el.find(".container-" + field + " select").prop('disabled', false);
+                }, this));
 
                 if (_.indexOf(allowedFields, 'password') !== -1) {
                     this.$el.find("#input-password").prop('readonly', false);
