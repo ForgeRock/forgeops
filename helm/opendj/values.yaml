@@ -11,8 +11,8 @@ bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
 bootstrapType: "userstore"
 
 
-# The OpenDJ baseDN
-baseDN: "dc=openam,dc=forgerock,dc=org"
+# The default OpenDJ baseDN
+baseDN: "o=userstore"
 
 # The default instance name. This will create a stateful set that can be resolved at
 #  $djInstance-0.$djInstance

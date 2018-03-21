@@ -45,127 +45,127 @@
 # coreTokenInteger07 should not be indexed as it is used to store the session's maxIdleTimeInMinutes.
 # There are no searches that filter on max idle time in minutes so index maintenance overheads should be avoided.
 
-dn: ds-cfg-attribute=coreTokenExpirationDate,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenExpirationDate,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenExpirationDate
 ds-cfg-index-type: ordering
 
-dn: ds-cfg-attribute=coreTokenUserId,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenUserId,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenUserId
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=etag,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=etag,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: etag
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString01,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString01
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString02,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString02
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString03,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString03
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString08,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString08,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString08
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString09,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString09,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString09
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString10,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString10,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString10
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString14,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString14,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString14
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenString15,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenString15,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenString15
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenInteger01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenInteger01,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenInteger01
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenInteger02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenInteger02,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenInteger02
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenInteger03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenInteger03,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenInteger03
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenInteger04,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenInteger04,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenInteger04
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenInteger05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenInteger05,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenInteger05
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenDate01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenDate01,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate01
 ds-cfg-index-type: ordering
 
-dn: ds-cfg-attribute=coreTokenDate02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenDate02,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate02
 ds-cfg-index-type: ordering
 
-dn: ds-cfg-attribute=coreTokenDate03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenDate03,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate03
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenDate04,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenDate04,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate04
 ds-cfg-index-type: ordering
 
-dn: ds-cfg-attribute=coreTokenDate05,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenDate05,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate05

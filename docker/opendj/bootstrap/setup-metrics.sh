@@ -31,8 +31,7 @@ EOF
 # - Creates an http connection handler for the metrics endpoint
 # - Sets the endpoint auth mechanism
 # - Creates a new backend for the metrics user to live in
-bin/dsconfig  -h localhost -p 4444 -D "cn=directory manager" \
-    -j ${DIR_MANAGER_PW_FILE} --trustAll \
+bin/dsconfig --offline \
     --no-prompt --batch <<EOF
 create-identity-mapper --mapper-name "CN Match" --type exact-match --set enabled:true --set match-attribute:cn \
    --set match-base-dn:"cn=metrics"
@@ -44,5 +43,5 @@ create-backend --backend-name metrics  --type ldif  --set enabled:true \
    --set base-dn:cn=metrics  --set ldif-file:db/metricsUser.ldif  --set is-private-backend:true
 EOF
 
-bin/import-ldif -h $HOSTNAME   --port 4444  --bindDN "cn=Directory Manager"  --bindPasswordFile "${DIR_MANAGER_PW_FILE}"  \
+bin/import-ldif --offline  \
     --backendID metrics  --ldifFile /tmp/metrics.ldif  --trustAll

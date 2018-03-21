@@ -10,7 +10,7 @@
     }
   },
   "configStoreList" : [ {
-    "baseDN" : "dc=openam,dc=forgerock,dc=org",
+    "baseDN" : "o=userstore",
     "dirManagerDN" : "cn=Directory Manager",
     "ldapHost" : "${env.OPENAM_CONFIG_STORE_LDAP_HOST}",
     "ldapPort" :   389,

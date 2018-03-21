@@ -1,11 +1,5 @@
 #!/usr/bin/env sh
 
-cd /opt/opendj
-
-set +x
-
-source /opt/opendj/env.sh
-
 
 #echo "Testing"
 

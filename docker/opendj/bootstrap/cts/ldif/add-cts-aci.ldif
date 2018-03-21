@@ -1,9 +1,9 @@
-dn: ou=admins,@BASE_DN@
+dn: ou=admins,o=cts
 objectclass: top
 objectclass: organizationalUnit
 ou: admins
 
-dn: uid=openam,ou=admins,@BASE_DN@
+dn: uid=openam,ou=admins,o=cts
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
@@ -16,7 +16,7 @@ ds-privilege-name: subentry-write
 ds-privilege-name: update-schema
 ds-privilege-name: password-reset
 
-dn: @BASE_DN@
+dn: o=cts
 changetype: modify
 add: aci
 aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (search, read)(userdn = "lldap:///uid=openam,ou=admins,@BASE_DN@");)

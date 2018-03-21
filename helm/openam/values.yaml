@@ -46,7 +46,7 @@ catalinaOpts: >
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
 
 # Suffix for OpenDJ config store.
-rootSuffix:  "dc=openam,dc=forgerock,dc=org"
+rootSuffix:  "o=userstore"
 
 # Valid logger types: fluent-bit, none
 # For audit logs it is suggested you configure AM to send directly to ElasticSearch.

@@ -1,0 +1,5 @@
+dn: cn=config
+changetype: modify
+replace: ds-cfg-server-id
+ds-cfg-server-id: &{server.id}
+-

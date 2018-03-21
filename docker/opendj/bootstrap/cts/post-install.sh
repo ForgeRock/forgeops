@@ -1,12 +1,5 @@
 #!/usr/bin/env sh
 
-cd /opt/opendj
-
-set +x
-
-source /opt/opendj/env.sh
-
-
 # Optional - turn off sync writes.
 # This is experimental -
 # This setting made little difference in CTS performance (10-15 %).
@@ -20,7 +13,8 @@ source /opt/opendj/env.sh
 # Access logs do not add a lot of value for the CTS store.
 echo "Disabling CTS store access log"
 
-bin/dsconfig --trustAll -w "$PASSWORD" -h localhost --bindDN "cn=Directory Manager" set-log-publisher-prop --port 4444 \
+/opt/opendj/bin/dsconfig set-log-publisher-prop \
+          --offline \
           --publisher-name Json\ File-Based\ Access\ Logger \
           --set enabled:false \
           --no-prompt

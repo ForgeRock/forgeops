@@ -3,10 +3,6 @@
 # of the ds cluster itself. This job should exit after completion.
 # This is where you set up replication or schedule backup.
 
-cd /opt/opendj
-
-source /opt/opendj/env.sh
-
 # dsreplication wants a local directory server installed - even if it is talking to a remote node.
 /opt/opendj/setup directory-server\
   -p 1389 \

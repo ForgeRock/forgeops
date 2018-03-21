@@ -22,7 +22,7 @@ ENV SECRET_PATH /var/run/secrets/opendj
 ENV DIR_MANAGER_PW_FILE /var/run/secrets/opendj/dirmanager.pw
 
 # The default BASE_DN of the directory tree.
-ENV BASE_DN dc=openam,dc=forgerock,dc=org
+ENV BASE_DN o=userstore
 
 # Optional full backup schedule in cron (5) format.
 ENV BACKUP_SCHEDULE_FULL  "0 2 * * *"

@@ -9,7 +9,7 @@ USERS="${NUMBER_SAMPLE_USERS:-1000000}"
 [[ $# -eq 1 ]] && USERS=$1
 
 ITERATIONS=1000000
-BASE_DN="${BASE_DN:-dc=openam,dc=forgerock,dc=org}"
+BASE_DN="${BASE_DN:-o=userstore}"
 HOST=localhost
 CONNECTIONS=10
 

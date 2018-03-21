@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Script to rebuild indexes. If you find the DJ indexes are degraded, exec
 # into the container and run this command.
 

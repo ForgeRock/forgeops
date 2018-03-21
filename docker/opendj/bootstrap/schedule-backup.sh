@@ -5,7 +5,6 @@ set -x
 
 echo "Scheduling backup"
 
-BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/backup}
 
 # The first node in the cluster is where we run backups.
 host="${DJ_INSTANCE}-0.${DJ_INSTANCE}"

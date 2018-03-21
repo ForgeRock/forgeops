@@ -22,16 +22,16 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 
-dn: ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+dn: ou=tokens,o=cts
 objectClass: organizationalUnit
 objectClass: top
 ou: tokens
 
-dn: ou=openam-session,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+dn: ou=openam-session,ou=tokens,o=cts
 objectClass: organizationalUnit
 objectClass: top
 ou: openam-session
 
-dn: ou=famrecords,ou=openam-session,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+dn: ou=famrecords,ou=openam-session,ou=tokens,o=cts
 ou: famrecords
 objectClass: organizationalUnit

@@ -50,13 +50,13 @@ echo "About to begin replication setup in 30 seconds..."
 sleep 30
 
 
-# Configure replication between host $1 and $2.
+# Configure replication between host $1 and $2 using basedn $3
 dsconfigure() {
   echo "Configuring $1 to replicate to $2"
   $dsreplica configure \
      --adminUID "$ADMIN_ID" \
      --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
-     --baseDN "$BASE_DN" \
+     --baseDN "$3" \
      --host1 "$1" \
      --port1 4444 \
      --bindDN1 "cn=Directory Manager" \
@@ -73,7 +73,8 @@ dsconfigure() {
 
 # For each directory server starting at ds-1 to ds-last
 for j in $(seq 1 $last_ds); do
-    dsconfigure "${DS0}" "${DJ_INSTANCE}-$j.${DJ_INSTANCE}"
+    dsconfigure "${DS0}" "${DJ_INSTANCE}-$j.${DJ_INSTANCE}" "$BASE_DN"
+    dsconfigure "${DS0}" "${DJ_INSTANCE}-$j.${DJ_INSTANCE}" "o=cts"
 done
 
 /opt/opendj/bootstrap/replicate-init.sh

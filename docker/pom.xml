@@ -66,7 +66,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
         <openamVersion>6.0.0-M5</openamVersion>
-        <opendjVersion>6.0.0-M119.1</opendjVersion>
+        <opendjVersion>6.0.0-M120.1</opendjVersion>
         <openidmVersion>6.0.0-M7</openidmVersion>
         <openigVersion>6.0.0-M123</openigVersion>
         <registry>quay.io:443</registry>

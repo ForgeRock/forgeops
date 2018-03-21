@@ -36,6 +36,9 @@ spec:
       - name: bootstrap
         image: quay.io/forgerock/util:6.0.0
         imagePullPolicy:  {{ .Values.image.pullPolicy }}
+        env:
+        - name: BASE_DN
+          value: {{ .Values.rootSuffix }}
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam

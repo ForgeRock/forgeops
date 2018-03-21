@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS.
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:

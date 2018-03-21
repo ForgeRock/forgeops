@@ -23,7 +23,6 @@ export BOOTSTRAP_TYPE="${BOOTSTRAP_TYPE:-userstore}"
 cd /opt/opendj
 
 touch /opt/opendj/BOOTSTRAPPING
-source /opt/opendj/env.sh
 
 
 if [ ${BOOTSTRAP_TYPE} == "proxy" ]
@@ -31,9 +30,12 @@ then
 	./bootstrap/setup-proxy.sh
 else
 	./bootstrap/setup-directory.sh
-	# rebuild indexes
-	/opt/opendj/scripts/rebuild.sh
-fi
+
+    echo "Rebuilding indexes"
+    bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
+    bin/rebuild-index --offline --baseDN "o=cts" --rebuildDegraded
+
+ fi
 
 ./bootstrap/log-redirect.sh
 ./bootstrap/setup-metrics.sh
@@ -41,21 +43,22 @@ fi
 # Before we enable rest2ldap we need a strategy for parameterizing the json template
 #./bootstrap/setup-rest2ldap.sh
 
-bin/stop-ds
+# This is causing replication to fail. We will  have to revisit.
+#./bootstrap/convert-config-to-template.sh
 
-echo "Moving mutable directories to data/"
 
-mkdir -p data
-
-# For now we need to most of the directories created by setup, including the "immutable" ones.
-# When we get full support for commons configuration we should revisit.
-for dir in db changelogDb config var
-do
-    echo "moving $dir to data/"
-    # Use cp as it works across file systems.
-    cp -r $dir data/$dir
-    rm -fr $dir
-done
+if [ -d data ]; then
+    echo "Moving mutable directories to data/"
+    # For now we need to most of the directories created by setup, including the "immutable" ones.
+    # When we get full support for commons configuration we should revisit.
+    for dir in db changelogDb config var
+    do
+        echo "moving $dir to data/"
+        # Use cp as it works across file systems.
+        cp -r $dir data/$dir
+        rm -fr $dir
+    done
+fi
 
 
 

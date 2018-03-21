@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Run the OpenDJ server
 # We consolidate all of the writable DJ directories to /opt/opendj/data
 # This allows us to to mount a data volume on that root which  gives us
@@ -29,7 +29,7 @@ configure() {
       BOOTSTRAP="${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}"
       # DS setup complains if the directory is not empty.
       echo "Running $BOOTSTRAP"
-      sh "${BOOTSTRAP}"
+      "${BOOTSTRAP}"
     fi
 }
 
@@ -56,6 +56,8 @@ start() {
             ln -s $d
         done
     fi
+
+    echo "Server id $SERVER_ID"
 
     exec ./bin/start-ds --nodetach
 }

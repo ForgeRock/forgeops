@@ -12,19 +12,19 @@
 #
 # Copyright 2016-2017 ForgeRock AS.
 
-dn: ds-cfg-attribute=coreTokenMultiString01,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenMultiString01,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenMultiString01
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenMultiString02,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenMultiString02,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenMultiString02
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=coreTokenMultiString03,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+dn: ds-cfg-attribute=coreTokenMultiString03,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenMultiString03

@@ -1,17 +1,16 @@
 dn: ou=people,@BASE_DN@
-ou: people
 objectClass: top
 objectClass: organizationalUnit
 
 dn: ou=groups,@BASE_DN@
-ou: groups
 objectClass: top
 objectClass: organizationalUnit
 
+
 dn: ou=admins,@BASE_DN@
-ou: admins
 objectClass: top
 objectClass: organizationalUnit
+
 
 dn:@BASE_DN@
 changetype:modify

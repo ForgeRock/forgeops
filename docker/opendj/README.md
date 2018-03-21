@@ -19,7 +19,7 @@ will typically be set by docker-compose or Kubernetes
 directory is empty. Defaults to /opt/opendj/bootstrap/setup.sh
 * SECRET_PATH:  Path to a directory containing keystores. Defaults to /var/run/secrets/opendj. This is used
 to setup OpenDJ with known keystores. This would typically be a Kubernetes secret volume.
-* BASE_DN: The base DN to create. Used in setup and replication. Defaults to `dc=openam,dc=forgerock,dc=org`
+* BASE_DN: The base DN to create. Used in setup and replication.
 * DJ_MASTER_SERVER: If set, bootstrap/replicate.sh will enable replication to
 this master. This only happens at setup time.
 

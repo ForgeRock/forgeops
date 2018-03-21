@@ -1,0 +1,29 @@
+dn: cn=config
+changetype: modify
+replace: ds-cfg-server-id
+ds-cfg-server-id: &{server.id}
+-
+
+dn: ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.cts|true}
+-
+
+dn: cn=o=cts,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.cts|true}
+-
+
+dn: ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.userstore|true}
+-
+
+dn: cn=o=userstore,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.userstore|true}
+-
