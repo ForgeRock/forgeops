@@ -21,6 +21,9 @@ And open up a connection to ldap://localhost:1389
 
 The default password is "password".
 
+To deploy Directory Proxy Server
+`helm install --set "bootstrapType=proxy,djInstance=dps,runSetup=false" opendj`
+
 
 # Values.yaml
 
