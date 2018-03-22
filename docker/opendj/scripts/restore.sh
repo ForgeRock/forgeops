@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# This will do an online restore of a previous backup.
 
 BACKUP_ID=$1
 if [ -z "$BACKUP_ID" ]; then

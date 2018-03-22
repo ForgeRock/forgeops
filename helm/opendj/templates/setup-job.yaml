@@ -1,4 +1,5 @@
-{{ if .Values.runSetup }}
+{{ if .Values.runPostSetupJob }}
+# This is an optional job that configures replication and schedules backups.
 apiVersion: batch/v1
 kind: Job
 metadata:

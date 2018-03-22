@@ -31,10 +31,14 @@ image:
 replicas: 1
 
 # Set for creating sample users. If unset, only the base DN will be created.
-#numberSampleUsers: 5
+#numberSampleUsers: 500
 
-# Size for OpenDJ storage. Note GKE IOPS scale based on the size of the volume.
+# Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
+
+# Size of the backup disk attached to each pod.
+backupStorageSize: "10Gi"
+
 
 # Set storageClass only on clusters that support it (GCP / AWS).
 #storageClass: fast
@@ -77,4 +81,5 @@ backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "45 * * * *"
 
 # Run the post setup job to configure replication and backup
-runSetup: true
+# We default this to false for safety. You must explicitly set this to true.
+runPostSetupJob: false

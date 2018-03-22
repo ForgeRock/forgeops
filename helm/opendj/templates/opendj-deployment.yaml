@@ -27,6 +27,15 @@ spec:
       {{- if .Values.storageClass }}
       storageClassName:  {{ .Values.storageClass }}
       {{- end }}
+  - metadata:
+      name: backup
+      annotations:
+        pv.beta.kubernetes.io/gid: "11111"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ default "5Gi"  .Values.backupStorageSize }}
   {{- end }}
   template:
     metadata:
@@ -53,22 +62,35 @@ spec:
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
         fsGroup: 11111
-      # The init container is responsible for any setup if the persistent data  does not exist.
       initContainers:
+      # The restore init container restores data from a previous backup.
+      - name: restore
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: db
+          mountPath: /opt/opendj/data
+        - name: backup
+          mountPath: /opt/opendj/bak
+        - name: dj-secrets
+          mountPath: /var/run/secrets/opendj
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.djInstance }}
+        args: [ "restore-from-backup" ]
+      # The setup init container is responsible for setting up DS if it is not configured or restored.
       - name: setup
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/run/secrets/opendj
-        {{- if .Values.djPersistence }}
         - name: db
           mountPath: /opt/opendj/data
-        {{- end }}
         envFrom:
         - configMapRef:
             name: {{ .Values.djInstance }}
-        args: [ "configure" ]
+        args: [ "setup" ]
       containers:
       - name: opendj
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -90,14 +112,12 @@ spec:
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/run/secrets/opendj
-        - name: dj-backup
+        - name: backup
           mountPath: /opt/opendj/bak
         - name: logs
           mountPath: /opt/opendj/logs
-        {{- if .Values.djPersistence }}
         - name: db
           mountPath: /opt/opendj/data
-        {{- end }}
         # Due to cost, we don't want to do a full scrape of the metrics http endpoint - so we create a tcp connection
         # todo: revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4728 is resolved.
         args: [ "start" ]
@@ -121,16 +141,18 @@ spec:
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c", "while true; do gsutil -m rsync -r /backup {{ .Values.gsBucket }} ; sleep 600;  done"]
         volumeMounts:
-        - name: dj-backup
+        - name: backup
           mountPath: /backup
       {{- end }}
       volumes:
       - name: dj-secrets
         secret:
           secretName: {{ .Values.djInstance }}
-          # If we are running as non root, we can't set this mode to root read only
-          #defaultMode: 256
-      - name: dj-backup
-        emptyDir: {}
       - name: logs
         emptyDir: {}
+      {{- if not .Values.djPersistence }}
+      - name: backup
+        emptyDir: {}
+      - name: db
+        emptyDir: {}
+      {{ end }}

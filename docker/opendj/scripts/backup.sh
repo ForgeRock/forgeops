@@ -8,19 +8,15 @@ B="${BACKUP_DIRECTORY}/$HOSTNAME"
 
 mkdir -p "$B"
 
-echo "Doing a full backup"
+echo "Doing a full online backup"
 /opt/opendj/bin/backup --backupDirectory "${B}" \
   -p 4444 -D "cn=Directory Manager" -j "${DIR_MANAGER_PW_FILE}" \
   --compress \
   --trustAll \
   --backUpAll
 
-# Revisit when https://bugster.forgerock.org/jira/browse/OPENDJ-4852 is fixed.
-echo "Backing up additional configuration files"
+# Now run the script to backup admin data.
+/opt/opendj/scripts/backup-admin.sh
 
-cd /opt/opendj
-
-t=`date "+%m%d%H%M%Y.%S"`
-tar cvfz "${B}/admin-bak-${t}.tar.gz" config var db/admin db/ads-truststore db/*ldif db/rootUser
 
 

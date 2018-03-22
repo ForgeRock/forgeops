@@ -22,7 +22,7 @@ mkdir -p locks
 
 source /opt/opendj/env.sh
 
-configure() {
+setup() {
       # If the instance data does not exist we need to run setup.
     if [ ! -d ./data/db ] ; then
       echo "Instance data Directory is empty. Creating new DJ instance"
@@ -30,6 +30,8 @@ configure() {
       # DS setup complains if the directory is not empty.
       echo "Running $BOOTSTRAP"
       "${BOOTSTRAP}"
+    else
+        echo "Instance directory ./data/db is not empty. Setup will be skipped"
     fi
 }
 
@@ -70,21 +72,26 @@ echo "Command is $CMD"
 
 case "$CMD" in
 run)
-    # Configure (if configuration does not already exist), and then start
+    # Setup (if configuration does not already exist), and then start.
     # This is the default action.
-    configure
+    setup
     start
     ;;
-configure)
-    # Configure only
-    configure
+setup)
+    # Configure/setup only.
+    setup
     ;;
 start)
     # Start only. Will fail if there is no configuration
     start
     ;;
 run-post-setup-job)
+    # Runs post setup job that configures replication
     /opt/opendj/bootstrap/post-setup-job.sh
+    ;;
+restore-from-backup)
+    # Re-initializes DS from a previous backup. Use this instead of setup.
+    /opt/opendj/bootstrap/restore-from-backup.sh
     ;;
 *)
     exec "$@"
