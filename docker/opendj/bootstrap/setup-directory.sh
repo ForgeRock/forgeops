@@ -4,17 +4,11 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
-set -x
-
-source /opt/opendj/env.sh
+#set -x
 
 cd /opt/opendj
 
 echo "Setting up $BASE_DN"
-
-# This is an alternative to using symbolic links at the top level /opt/opendj directory.
-# If you use this, your docker image must create an instance.loc file that points to this directory.
-#INSTANCE_PATH="--instancePath /opt/opendj/data"
 
 # An admin server is also a directory server.
 ./setup directory-server \
@@ -31,6 +25,9 @@ echo "Setting up $BASE_DN"
   --doNotStart \
   --addBaseEntry || (echo "Setup failed, will sleep for debugging"; sleep 10000)
 
+echo "Set the global server id to $SERVER_ID"
+
+bin/dsconfig  set-global-configuration-prop --set server-id:$SERVER_ID  --offline  --no-prompt
 
 
 echo "Creating CTS backend..."
@@ -52,6 +49,25 @@ EOF
 # Need to manually import the base entry as we are offline.
 bin/import-ldif --offline -n ctsRoot -F -l /tmp/cts.ldif
 
+
+echo "Tuning the disk free space thresholds"
+
+# For development you may want to tune the disk thresholds. TODO: Make this configurable
+bin/dsconfig  set-backend-prop \
+    --backend-name userRoot  \
+    --set "disk-low-threshold:2GB"  --set "disk-full-threshold:1GB"  \
+    --offline \
+    --no-prompt
+
+bin/dsconfig  set-backend-prop \
+    --backend-name ctsRoot  \
+    --set "disk-low-threshold:2GB"  --set "disk-full-threshold:1GB"  \
+    --offline \
+    --no-prompt
+
+
+
+
 # Load any optional LDIF files. $1 is the directory to load from
 load_ldif() {
 
@@ -70,29 +86,13 @@ load_ldif() {
 
             #cat /tmp/file.ldif
             bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
-            # Note that currentlt these ldif files must be imported with ldap-modify.
+            # Note that currently these ldif files must be added with ldapmodify.
             #bin/import-ldif --offline -n userRoot -l /tmp/file.ldif --rejectFile /tmp/rejects.ldif
             #cat /tmp/rejects.ldif
           echo "  "
         done
     fi
 }
-
-
-
-
-# For development you may want to tune the disk thresholds. TODO: Make this configurable
-bin/dsconfig  set-backend-prop \
-    --backend-name userRoot  \
-    --set "disk-low-threshold:2 GB"  --set "disk-full-threshold:1 GB"  \
-    --offline \
-    --no-prompt
-
-bin/dsconfig  set-backend-prop \
-    --backend-name ctsRoot  \
-    --set "disk-low-threshold:2 GB"  --set "disk-full-threshold:1 GB"  \
-    --offline \
-    --no-prompt
 
 
 # Run any post installation scripts for the bootstrap type.

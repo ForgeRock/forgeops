@@ -6,7 +6,7 @@
 DS0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
 
 
-# Initialize replication data:
+# Initialize replication of user data:
 /opt/opendj/bin/dsreplication initialize-all  \
     --adminUID "$ADMIN_ID" \
     --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
@@ -17,8 +17,7 @@ DS0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
     --no-prompt
 
 
-
-# Initialize replication data:
+# Initialize replication of the CTS data:
 /opt/opendj/bin/dsreplication initialize-all  \
     --adminUID "$ADMIN_ID" \
     --adminPasswordFile "${DIR_MANAGER_PW_FILE}" \
@@ -27,5 +26,3 @@ DS0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
     --baseDN "o=cts" \
     --trustAll \
     --no-prompt
-
-

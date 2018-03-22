@@ -43,7 +43,8 @@ else
 # Before we enable rest2ldap we need a strategy for parameterizing the json template
 #./bootstrap/setup-rest2ldap.sh
 
-# This is causing replication to fail. We will  have to revisit.
+# Note that presently dsreplication does not handle templated config.ldif. You
+# must completely finish setting up replication first, and then template this file.
 #./bootstrap/convert-config-to-template.sh
 
 
