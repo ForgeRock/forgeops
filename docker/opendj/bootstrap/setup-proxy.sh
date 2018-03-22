@@ -19,7 +19,6 @@ echo "Setting up Directory Proxy"
 # to load balance but then this pod needs to be created after DS pods
 
 ./setup proxy-server \
-          --instancePath "${INSTANCE_PATH}" \
           --rootUserDn "cn=Directory Manager" \
           --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}"  \
           --monitorUserDn "uid=Monitor" \
