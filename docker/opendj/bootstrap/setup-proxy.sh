@@ -6,10 +6,10 @@
 
 #set -x
 
-source /opt/opendj/env.sh
 
 cd /opt/opendj
 
+echo "Setting up Directory Proxy"
 
 # This is an alternative to using symbolic links at the top level /opt/opendj directory.
 # If you use this, your docker image must create an instanc.loc file that points to this directory.
@@ -18,7 +18,7 @@ cd /opt/opendj
 # We could also specify --replicationServer "blah" for DPS to automatically discover DS instnaces
 # to load balance but then this pod needs to be created after DS pods
 
-/opt/opendj/setup proxy-server \
+./setup proxy-server \
           --instancePath "${INSTANCE_PATH}" \
           --rootUserDn "cn=Directory Manager" \
           --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}"  \
