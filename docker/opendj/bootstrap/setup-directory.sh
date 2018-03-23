@@ -10,6 +10,16 @@ cd /opt/opendj
 
 echo "Setting up $BASE_DN"
 
+
+INIT_OPTION="--addBaseEntry"
+
+# If NUMBER_SAMPLE_USERS is set AND we are the first node, then generate sample users.
+if [[  -n "${NUMBER_SAMPLE_USERS}" && $HOSTNAME = *"0"* ]]; then
+    INIT_OPTION="--sampleData ${NUMBER_SAMPLE_USERS}"
+fi
+
+
+
 # An admin server is also a directory server.
 ./setup directory-server \
   -p 1389 \
@@ -23,7 +33,7 @@ echo "Setting up $BASE_DN"
   --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
   --acceptLicense \
   --doNotStart \
-  --addBaseEntry || (echo "Setup failed, will sleep for debugging"; sleep 10000)
+   ${INIT_OPTION}  || (echo "Setup failed, will sleep for debugging"; sleep 10000)
 
 echo "Set the global server id to $SERVER_ID"
 
