@@ -86,8 +86,8 @@
                     "args": {
                         "resource": "http://idm-service.sample.svc.cluster.local/",
                         "openamUrl": "${env['OPENAM_INSTANCE']}",
-                        "pepUsername": "openidm",
-                        "pepPassword": "openidm",
+                        "pepUsername": "openidmClient",
+                        "pepPassword": "openidmClient",
                         "pepRealm": "/",
                         "application": "openidm",
                         "ssoTokenSubject": "${session.openid.id_token}",

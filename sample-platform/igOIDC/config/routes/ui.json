@@ -23,8 +23,8 @@
             "name": "openidmClient",
             "type": "ClientRegistration",
             "config": {
-                "clientId": "openidm",
-                "clientSecret": "openidm",
+                "clientId": "openidmClient",
+                "clientSecret": "openidmClient",
                 "issuer": {
                     "type": "Issuer",
                     "config": {

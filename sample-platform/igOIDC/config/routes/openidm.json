@@ -164,8 +164,8 @@
                             "defaultTimeout": "1 hour",
                             "maxTimeout": "1 day"
                         },
-                        "pepUsername": "openidm",
-                        "pepPassword": "openidm",
+                        "pepUsername": "openidmClient",
+                        "pepPassword": "openidmClient",
                         "pepRealm": "/",
                         "application": "openidm",
                         "ssoTokenSubject": "${session.openid.id_token}",

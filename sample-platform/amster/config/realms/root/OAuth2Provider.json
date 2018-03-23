@@ -54,7 +54,7 @@
       "requireRequestUriRegistration" : false,
       "alwaysAddClaimsToToken" : false,
       "supportedRequestParameterEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "RSA1_5", "A256KW", "dir", "A192KW" ],
-      "authorisedOpenIdConnectSSOClients" : [ "openidm" ],
+      "authorisedOpenIdConnectSSOClients" : [ "openidmClient" ],
       "idTokenInfoClientAuthenticationEnabled" : true,
       "supportedRequestParameterSigningAlgorithms" : [ "ES384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512" ],
       "loaMapping" : { },
