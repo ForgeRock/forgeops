@@ -34,11 +34,6 @@ configure() {
 }
 
 start() {
-    if [ -d "${SECRET_PATH}" ]; then
-      echo "Secret path is present. Will copy any keystores and truststore"
-      # We send errors to /dev/null in case no data exists.
-      cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./config 2>/dev/null
-    fi
 
     # todo: Check /opt/opendj/data/config/buildinfo
     # Run upgrade if the server is older
@@ -55,6 +50,12 @@ start() {
         do
             ln -s $d
         done
+    fi
+
+    if [ -d "${SECRET_PATH}" ]; then
+      echo "Secret path is present. Will copy any keystores and truststore"
+      # We send errors to /dev/null in case no data exists.
+      cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./config 2>/dev/null
     fi
 
     echo "Server id $SERVER_ID"

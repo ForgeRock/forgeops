@@ -22,7 +22,7 @@ time bin/searchrate  -h $HOST -p 1389 -D "cn=directory manager"  -j "${DIR_MANAG
 
 
 echo  "Authrate  test"
-time bin/authrate -h $HOST -p 1389 -D '%2$s' -w password -f -c "${CONNECTIONS}"  -m $ITERATIONS  \
+time bin/authrate -h $HOST -p 1389 -D '%2$s'  -j "${DIR_MANAGER_PW_FILE}"  -f -c "${CONNECTIONS}"  -m $ITERATIONS  \
     -b "ou=people,$BASE_DN" -s one -g "rand(0,$USERS)" "(uid=user.%d)"
 
 # modrate - this is destructive!
