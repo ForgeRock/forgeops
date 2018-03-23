@@ -1,3 +1,5 @@
+/opt/opendj/bin/start-ds
+
 /opt/opendj/bin/dsconfig \
  set-backend-prop \
  --hostname localhost \
@@ -208,3 +210,5 @@ if [ -d "$ldif" ]; then
       echo "  "
     done
 fi
+
+/opt/opendj/bin/stop-ds
