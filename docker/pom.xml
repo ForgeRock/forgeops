@@ -75,10 +75,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
-        <openamVersion>6.0.0-M7</openamVersion>
+        <openamVersion>6.0.0-M10</openamVersion>
         <opendjVersion>6.0.0-M120.2</opendjVersion>
         <openidmVersion>6.0.0-M7</openidmVersion>
-        <openigVersion>6.0.0-M123</openigVersion>
+        <openigVersion>6.0.0-M124</openigVersion>
         <registry>quay.io:443</registry>
         <releaseTag>6.0.0</releaseTag>
         <repo>quay.io/forgerock</repo>
