@@ -44,6 +44,16 @@
             </properties>
         </profile>
         <profile>
+            <id>pull-request</id>
+            <properties>
+                <openamVersion>6.0.0-SNAPSHOT</openamVersion>
+                <opendjVersion>6.0.0-SNAPSHOT</opendjVersion>
+                <openidmVersion>6.0.0-SNAPSHOT</openidmVersion>
+                <openigVersion>6.0.0-SNAPSHOT</openigVersion>
+                <releaseTag>${releaseTag}</releaseTag>
+            </properties>
+        </profile>
+        <profile>
             <id>gcr</id>
             <properties>
                 <repo>gcr.io/engineering-devops</repo>
@@ -120,7 +130,6 @@
                             <build>
                                 <dockerFileDir>openidm</dockerFileDir>
                                 <tags>
-                                    <tag>${openidmVersion}</tag>
                                     <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
@@ -142,7 +151,6 @@
                             <build>
                                 <dockerFileDir>openam</dockerFileDir>
                                 <tags>
-                                    <tag>${openamVersion}</tag>
                                     <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
@@ -152,7 +160,6 @@
                             <build>
                                 <dockerFileDir>amster</dockerFileDir>
                                 <tags>
-                                    <tag>${openamVersion}</tag>
                                     <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
