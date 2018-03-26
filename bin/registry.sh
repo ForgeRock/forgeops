@@ -14,18 +14,19 @@ if [ -r $env_settings ]; then
     source $env_settings
 fi
 
-if [ -z ${REGISTRY_PASSWORD+x}  -o -z ${REGISTRY_ID+x}  ]; then
-    echo "It looks like you have not set the REGISTRY_PASSWORD or REGISTRY_ID environment variables"
+if [ -z ${REGISTRY+x} ] || [ -z ${REGISTRY_ID+x} ] ||
+   [ -z ${REGISTRY_PASSWORD+x} ] || [ -z ${REGISTRY_EMAIL+x} ]; then
+    echo "It looks like you have not set one of the following environment variables:"
+    echo " REGISTRY, REGISTRY_ID, REGISTRY_PASSWORD or REGISTRY_EMAIL environment variables"
     exit 1
 fi
 
-REGISTRY="docker-public.forgerock.io"
-
 # Create the image pull secret.
-kubectl create secret docker-registry frregistrykey --docker-server="${REGISTRY}" \
+kubectl create secret docker-registry frregistrykey \
+        --docker-server="${REGISTRY}" \
         --docker-username="${REGISTRY_ID}" \
         --docker-password="${REGISTRY_PASSWORD}" \
-       --docker-email="${REGISTRY_ID}@example.com"
+        --docker-email="${REGISTRY_EMAIL}"
 
 # Get the service account.
 kubectl get serviceaccounts default -o yaml > /var/tmp/sa.yaml
@@ -42,5 +43,5 @@ EOF
 # Reload the service account into Kubernetes.
 kubectl replace serviceaccount default -f /var/tmp/sa.yaml
 
-echo "done"
+echo "Done"
 
