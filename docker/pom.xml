@@ -140,7 +140,6 @@
                             <build>
                                 <dockerFileDir>openidm-postgres</dockerFileDir>
                                 <tags>
-                                    <tag>${openidmVersion}</tag>
                                     <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
@@ -169,7 +168,6 @@
                             <build>
                                 <dockerFileDir>openig</dockerFileDir>
                                 <tags>
-                                    <tag>${openigVersion}</tag>
                                     <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
@@ -179,7 +177,6 @@
                             <build>
                                 <dockerFileDir>opendj</dockerFileDir>
                                 <tags>
-                                    <tag>${opendjVersion}</tag>
                                     <tag>${releaseTag}</tag>
                                 </tags>
                             </build>
