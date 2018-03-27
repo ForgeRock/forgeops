@@ -75,6 +75,7 @@ spec:
         fsGroup: 11111
       initContainers:
       # The restore init container restores data from a previous backup.
+      {{ if .Values.restore.enabled }}
       - name: restore
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -89,6 +90,7 @@ spec:
         - configMapRef:
             name: {{ .Values.djInstance }}
         args: [ "restore-from-backup" ]
+      {{ end }}
       # The setup init container is responsible for setting up DS if it is not configured or restored.
       - name: setup
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}

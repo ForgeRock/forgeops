@@ -50,7 +50,9 @@ postalCode: <random:numeric:5>
 postalAddress: {cn}${street}${l}, {st}  {postalCode}
 description: This is the description for {cn}.
 EOF
-bin/makeldif  -o /var/tmp/l.ldif  /var/tmp/template
+
+# Uncomment this is you want to capture the raw LDIF.
+#bin/makeldif  -o /var/tmp/l.ldif  /var/tmp/template
 
 bin/import-ldif --templateFile /var/tmp/template --clearBackend \
    --backendId userRoot --tmpDirectory /var/tmp --bindDn "cn=Directory Manager" \

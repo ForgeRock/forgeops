@@ -62,8 +62,7 @@ resources:
 # If you run into issues with minikube set this to false. See https://github.com/kubernetes/minikube/issues/1990
 djPersistence: true
 
-<<<<<<< HEAD
-# Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".  
+# Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".
 # The hard setting means that do not deploy more than one pod in a node which is critical for HA.
 podAntiAffinity: "soft"
 
@@ -74,6 +73,9 @@ gcs:
   #add --scopes storage-full when you create the cluster.
   bucket:  gs://forgeops/dj-backup
 
+restore:
+  # If true, run the init container that can restore from a previous DS backup.
+  enabled: false
 
 gsBucket:
 

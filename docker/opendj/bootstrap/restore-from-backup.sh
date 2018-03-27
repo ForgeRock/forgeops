@@ -8,7 +8,7 @@ cd /opt/opendj
 
 if [ -d data/db ]; then
     echo "It looks like there is existing data in the data/db directory. Restore will not overwrite exiting data."
-    exit 1
+    exit 0
 fi
 
 B="${BACKUP_DIRECTORY}/$HOSTNAME"
