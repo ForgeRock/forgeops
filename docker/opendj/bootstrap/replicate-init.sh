@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # This script is used to initialize or re-initialize replication.
 
+ADMIN_ID="admin"
 
 # First directory server in the set
 DS0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
