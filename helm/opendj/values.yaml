@@ -48,8 +48,6 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
-
-
 # For production you will want to specify CPU limits to help Kube schedule the pods.
 resources:
   requests:
@@ -59,11 +57,14 @@ resources:
   limits:
     memory: 2500Mi
 
-
 # DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
 # If you run into issues with minikube set this to false. See https://github.com/kubernetes/minikube/issues/1990
 djPersistence: true
+
+# Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".  
+# The hard setting means that do not deploy more than one pod in a node which is critical for HA.
+podAntiAffinity: "soft"
 
 # Set this to true to enable backups to gcloud
 enableGcloudBackups: false
@@ -73,7 +74,6 @@ gsBucket: gs://forgeops/dj-backup
 
 # Uncomment this to create sample users.
 #numberSampleUsers: 100
-
 
 # Backup schedules for full and incrementals. This is a crontab format:
 # minutes hour day-of-week month year
