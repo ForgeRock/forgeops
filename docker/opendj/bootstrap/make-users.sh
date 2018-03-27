@@ -18,7 +18,7 @@ define numusers=$USERS
 
 branch: [suffix]
 objectClass: top
-objectClass: domain
+objectClass: organization
 
 branch: ou=People,[suffix]
 objectClass: top
