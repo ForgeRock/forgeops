@@ -25,5 +25,5 @@ spec:
       protocol: TCP
       name: prometheus
   selector:
-    app: {{ template "name" . }}
+    app: {{ template "fullname" . }}
     release: {{ .Release.Name }}

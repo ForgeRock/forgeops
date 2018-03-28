@@ -15,6 +15,8 @@ if ! kubectl cluster-info; then
 fi
 
 
+helm repo add forgerock https://storage.googleapis.com/forgerock-charts
+
 
 secretName="git-ssh-key"
 
@@ -25,9 +27,11 @@ if ! kubectl get secret --namespace "${NAMESPACE}" "${secretName}"; then
     echo "public read only access to the forgeops-init repo. To create your own secret use "
     echo "the following command to generate a secret:"
     echo "ssh-keygen -t rsa -C \"forgeopsrobot@forgrock.com\" -f id_rsa -N ''"
-    echo "The id_rsa.pub file should be uploaded to github or stash and set as an API key to your Git configuration"
+    echo "The id_rsa.pub file should be uploaded to github or stash and configured as a deployment key for your Git repository"
     echo "Create the Kubernetes secret using the private key:"
     echo "kubectl create secret generic "${secretName}" --from-file=id_rsa"
+
+    ssh-keygen -t rsa -C "forgeopsrobot@forgrock.com" -f id_rsa -N ''
 
     kubectl create secret generic "${secretName}" --from-file=id_rsa
 
@@ -38,7 +42,7 @@ CUSTOM_YAML=config/custom.yaml
 
 # If there is a conf/custom.yaml present, then use it, otherwise create a default one:
 if [ ! -r "${CUSTOM_YAML}" ]; then
-    echo "I can't find custom.yaml values for the helm chart deployment. I will create a sample one for you"
+    echo "I can't find custom.yaml values for the helm chart deployment. I will create a sample for you"
 
     CUSTOM_YAML=/tmp/custom.yaml
     DOMAIN=.example.com
@@ -60,27 +64,12 @@ EOF
 
 fi
 
-CHART=cmp-platform
+echo "Using values.yaml settings in ${CUSTOM_YAML}"
 
-# If we are running from the forgeops project directory, use the charts in the project.
-if [ -r "helm/${CHART}" ]; then
- CHART="helm/${CHART}"
-fi
+echo "You are now ready to install the forgerock helm charts"
 
-if [ ! -r ${CHART} ]; then
-  echo "Can not find local chart, using the forgeops chart repo"
-  CHART="forgerock/${CHART}"
-fi
+echo "Example: You can use the following commands to deploy AM"
 
-echo "Using ${CUSTOM_YAML} values:"
-
-cat "${CUSTOM_YAML}"
-
-
-#echo "Running helm..."
-
-# For now, we just echo the command
-echo "Run the following command"
-
-echo helm install -f "${CUSTOM_YAML}" "${CHART}"
-
+echo "helm install -f ${CUSTOM_YAML} --set djInstance=configstore forgerock/opendj"
+echo "helm install -f ${CUSTOM_YAML} forgerock/amster"
+echo "helm install -f ${CUSTOM_YAML} forgerock/openam"

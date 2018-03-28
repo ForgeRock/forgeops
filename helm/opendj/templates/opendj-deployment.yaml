@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.djInstance }}
   labels:
     djInstance: {{ .Values.djInstance }}
-    app: {{ template "name" . }}
+    app: {{ template "fullname" . }}
     vendor: forgerock
     component: {{ .Values.component }}
     release: {{ .Release.Name }}
@@ -41,7 +41,7 @@ spec:
     metadata:
       labels:
         djInstance: {{ .Values.djInstance }}
-        app: {{ template "name" . }}
+        app: {{ template "fullname" . }}
         vendor: forgerock
         release: {{ .Release.Name }}
         component: opendj
