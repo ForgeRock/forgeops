@@ -34,7 +34,21 @@
     </description>
     <profiles>
         <profile>
-            <id>snapshot-releases</id>
+            <id>bintray-public</id>
+            <properties>
+                <registry>forgerock-docker-public.bintray.io:443</registry>
+                <repo>forgerock-docker-public.bintray.io/forgerock</repo>
+            </properties>
+        </profile>
+        <profile>
+            <id>quay</id>
+            <properties>
+                <registry>quay.io:443</registry>
+                <repo>quay.io/forgerock</repo>
+            </properties>
+        </profile>
+        <profile>
+            <id>snapshot</id>
             <properties>
                 <openamVersion>6.0.0-SNAPSHOT</openamVersion>
                 <opendjVersion>6.0.0-SNAPSHOT</opendjVersion>
@@ -46,10 +60,6 @@
         <profile>
             <id>pull-request</id>
             <properties>
-                <openamVersion>6.0.0-SNAPSHOT</openamVersion>
-                <opendjVersion>6.0.0-SNAPSHOT</opendjVersion>
-                <openidmVersion>6.0.0-SNAPSHOT</openidmVersion>
-                <openigVersion>6.0.0-SNAPSHOT</openigVersion>
                 <releaseTag>${releaseTag}</releaseTag>
             </properties>
         </profile>
@@ -79,9 +89,9 @@
         <opendjVersion>6.0.0-M120.2</opendjVersion>
         <openidmVersion>6.0.0-M7</openidmVersion>
         <openigVersion>6.0.0-M124</openigVersion>
-        <registry>quay.io:443</registry>
+        <registry>forgerock-docker-internal.bintray.io:443</registry>
         <releaseTag>6.0.0</releaseTag>
-        <repo>quay.io/forgerock</repo>
+        <repo>forgerock-docker-internal.bintray.io/forgerock</repo>
     </properties>
 
  <repositories>
