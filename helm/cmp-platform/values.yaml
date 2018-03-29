@@ -1,7 +1,6 @@
 
 
 global:
-  #domain: .forgeops.com
   domain: .example.com
 
 

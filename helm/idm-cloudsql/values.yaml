@@ -20,7 +20,7 @@ global:
     idm: default/idm/sync-with-ldap-bidirectional
 
 image:
-  repository: quay.io/forgerock/openidm
+  repository: forgerock-docker-public.bintray.io/forgerock/openidm
   pullPolicy: IfNotPresent
   tag: 6.0.0-SNAPSHOT
 

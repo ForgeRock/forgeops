@@ -23,7 +23,7 @@ policyAgentPassword: Passw0rd
 
 
 image:
-  repository: quay.io/forgerock/amster
+  repository: forgerock-docker-public.bintray.io/forgerock/amster
   tag: 6.0.0
   #pullPolicy: IfNotPresent
   pullPolicy: Always

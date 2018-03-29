@@ -19,7 +19,7 @@ global:
   useTLS: false
 
 image:
-  repository: quay.io/forgerock/openig
+  repository: forgerock-docker-public.bintray.io/forgerock/openig
   tag: 6.0.0
   pullPolicy: IfNotPresent
 

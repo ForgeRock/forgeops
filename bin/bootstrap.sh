@@ -46,7 +46,7 @@ if [ ! -r "${CUSTOM_YAML}" ]; then
 
     CUSTOM_YAML=/tmp/custom.yaml
     DOMAIN=.example.com
-    REPO="quay.io/forgerock"
+    REPO="forgerock-docker-public.bintray.io/forgerock/forgerock"
 
     cat > ${CUSTOM_YAML} <<EOF
 global:
