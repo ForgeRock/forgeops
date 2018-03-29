@@ -38,3 +38,4 @@ data:
   GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
   CONFIG_PATH: "{{ .Values.global.configPath.am }}"
   SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
+  FQDN: {{ default "openam.default.example.com" .Values.fqdn }}
