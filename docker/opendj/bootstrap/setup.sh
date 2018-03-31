@@ -52,7 +52,7 @@ if [ -d data ]; then
     echo "Moving mutable directories to data/"
     # For now we need to most of the directories created by setup, including the "immutable" ones.
     # When we get full support for commons configuration we should revisit.
-    for dir in db changelogDb config var
+    for dir in db changelogDb config var import-tmp
     do
         echo "moving $dir to data/"
         # Use cp as it works across file systems.
