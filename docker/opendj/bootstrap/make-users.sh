@@ -8,9 +8,6 @@ USERS=1000000
 
 echo "Making $USERS sample users"
 
-
-source ./env.sh
-
 cat <<EOF >/var/tmp/template
 define suffix=$BASE_DN
 define maildomain=example.com
@@ -55,5 +52,5 @@ EOF
 #bin/makeldif  -o /var/tmp/l.ldif  /var/tmp/template
 
 bin/import-ldif --templateFile /var/tmp/template --clearBackend \
-   --backendId userRoot --tmpDirectory /var/tmp --bindDn "cn=Directory Manager" \
+   --backendId userRoot --tmpDirectory /opt/opendj/import-tmp --bindDn "cn=Directory Manager" \
    --bindPasswordFile "$DIR_MANAGER_PW_FILE" --port 4444 --trustAll
