@@ -12,11 +12,10 @@ echo "Redirecting logs to stdout"
 
 set -x
 
-# We disable this logger.  By default errors already go to stderr.
 /opt/opendj/bin/dsconfig set-log-publisher-prop \
           --publisher-name "File-Based Error Logger" \
           --set log-file:/dev/stdout \
-          --set enabled:false \
+          --set enabled:true \
           --reset rotation-policy \
           --offline \
           --no-prompt
