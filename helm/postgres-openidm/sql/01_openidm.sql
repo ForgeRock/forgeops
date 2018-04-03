@@ -131,21 +131,20 @@ CREATE TABLE openidm.relationships (
   objectid VARCHAR(255) NOT NULL,
   rev VARCHAR(38) NOT NULL,
   fullobject JSON,
-  firstid VARCHAR(255),
-  secondid VARCHAR(255),
+  firstresourcecollection VARCHAR(255),
+  firstresourceid VARCHAR(56),
   firstpropertyname VARCHAR(100),
+  secondresourcecollection VARCHAR(255),
+  secondresourceid VARCHAR(56),
   secondpropertyname VARCHAR(100),
   properties JSON,
   PRIMARY KEY (id),
   CONSTRAINT fk_relationships_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT idx_relationships_object UNIQUE (objecttypes_id, objectid)
 );
-
-CREATE INDEX idx_json_relationships_first ON openidm.relationships ( json_extract_path_text(fullobject, 'firstId'), json_extract_path_text(fullobject, 'firstPropertyName') );
-CREATE INDEX idx_json_relationships_second ON openidm.relationships ( json_extract_path_text(fullobject, 'secondId'), json_extract_path_text(fullobject, 'secondPropertyName') );
-CREATE INDEX idx_json_relationships_first_object ON openidm.relationships ( firstid, firstpropertyname );
-CREATE INDEX idx_json_relationships_second_object ON openidm.relationships ( secondid, secondpropertyname );
-CREATE INDEX idx_json_relationships ON openidm.relationships ( json_extract_path_text(fullobject, 'firstId'), json_extract_path_text(fullobject, 'firstPropertyName'), json_extract_path_text(fullobject, 'secondId'), json_extract_path_text(fullobject, 'secondPropertyName') );
+CREATE INDEX idx_json_relationships ON openidm.relationships ( json_extract_path_text(fullobject, 'firstResourceCollection'), json_extract_path_text(fullobject, 'firstResourceId'), json_extract_path_text(fullobject, 'firstPropertyName'), json_extract_path_text(fullobject, 'secondResourceCollection'), json_extract_path_text(fullobject, 'secondResourceId'), json_extract_path_text(fullobject, 'secondPropertyName') );
+CREATE INDEX idx_json_relationships_first_object ON openidm.relationships ( firstresourcecollection, firstresourceid, firstpropertyname );
+CREATE INDEX idx_json_relationships_second_object ON openidm.relationships ( secondresourcecollection, secondresourceid, secondpropertyname );
 
 -- -----------------------------------------------------
 -- Table openidm.relationshipproperties (not used in postgres)
@@ -349,7 +348,8 @@ VALUES
 ('openidm-admin', '0', 'Administrative access'),
 ('openidm-cert', '0', 'Authenticated via certificate'),
 ('openidm-tasks-manager', '0', 'Allowed to reassign workflow tasks'),
-('openidm-reg', '0', 'Anonymous access');
+('openidm-reg', '0', 'Anonymous access'),
+('openidm-prometheus', '0', 'Prometheus access');
 
 COMMIT;
 
