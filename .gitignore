@@ -12,3 +12,4 @@ target/
 /helm/git/secrets/ssh.pub
 bazel-*
 brigade.yaml
+settings.xml
