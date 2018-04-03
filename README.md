@@ -22,10 +22,8 @@ article](https://backstage.forgerock.com/knowledge/kb/article/a74096897)
 The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html)
 tracks the master branch.
 
-The documentation for the the 5.5.0 release can be found on 
-[backstage](https://backstage.forgerock.com/docs/platform/5.5/devops-guide)
-as well as the previous [5.0.0 release documentation](https://backstage.forgerock.com/docs/platform/5/devops-guide).
-
+The documentation for the current release can be found on 
+[backstage](https://backstage.forgerock.com/docs/platform).
 
 # Quick Start
 
@@ -37,7 +35,7 @@ platform. See the etc/toolbox.yaml for an example of how this works.
 * Knowledge of Kubernetes and Helm is assumed. Please read 
 the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/index.md) before proceeding.
 * This assumes minikube is running (8G of RAM), and helm and kubectl are installed. 
-* See bin/setup.sh for a sample setup script
+* See bin/setup.sh for a sample setup script.
 
 ```sh
 

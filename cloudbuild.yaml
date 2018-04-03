@@ -17,7 +17,9 @@ steps:
   - --location=global
   - --keyring=forgeops-build
   - --key=maven-settings
-# Run maven build for bintray images
+# Run maven build for bintray images. The settings.xml file also sets the local maven cache to ./m2cache,
+# This allows subsequent maven runs to reuse the cache.
+# Settings.xml also has <server> credentials for pushing to bintray.
 - name: 'gcr.io/cloud-builders/java/mvn'
   args: ['--settings','settings.xml', '--batch-mode', 'package', 'docker:build', 'docker:push']
   dir:  docker
