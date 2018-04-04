@@ -26,10 +26,8 @@ if (session.openid != null && session.openid.id_token_claims.sub != null) {
         "id" : "amAdmin",
         "component" : "endpoint/static/user",
         "roles" : ["openidm-admin", "openidm-authorized"],
-        "moduleId" : "TRUSTED_ATTRIBUTE"
+        "moduleId" : "STATIC_USER"
     ])).toString()
-
-    request.getHeaders().add('X-Special-Trusted-User', sub);
 
     if (sub.toLowerCase() == 'amadmin') {
         request.getHeaders().add('X-Authorization-Map', adminContext);

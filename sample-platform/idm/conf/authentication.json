@@ -16,6 +16,40 @@
         },
         "authModules" : [
             {
+                "name": "CLIENT_CERT",
+                "properties": {
+                    "queryOnResource": "endpoint/static/user",
+                    "defaultUserRoles": [
+                        "openidm-cert"
+                    ],
+                    "allowedAuthenticationIdPatterns": [
+                        "CN=ig, O=forgerock"
+                    ],
+                    "runAsProperties": {
+                        "adminRoles": [
+                            "openidm-cert"
+                        ],
+                        "disallowedRunAsRoles": [ ],
+                        "queryOnResource": "managed/user",
+                        "propertyMapping": {
+                            "authenticationId" : "userName",
+                            "userRoles": "authzRoles"
+                        },
+                        "defaultUserRoles" : [
+                            "openidm-authorized"
+                        ]
+                    },
+                    "augmentSecurityContext" : {
+                        "type" : "text/javascript",
+                        "file" : "augmentSecurityContext.js",
+                        "globals" : {
+                            "authzHeaderName" : "X-Authorization-Map"
+                        }
+                    }
+                },
+                "enabled": true
+            },
+            {
                 "name" : "STATIC_USER",
                 "properties" : {
                     "queryOnResource" : "endpoint/static/user",
@@ -37,26 +71,6 @@
                         "openidm-admin",
                         "openidm-authorized"
                     ]
-                },
-                "enabled" : true
-            },
-            {
-                "name" : "TRUSTED_ATTRIBUTE",
-                "properties" : {
-                    "queryOnResource" : "managed/user",
-                    "propertyMapping" : {
-                        "authenticationId" : "userName",
-                        "userRoles" : "authzRoles"
-                    },
-                    "defaultUserRoles" : [ "openidm-authorized" ],
-                    "authenticationIdAttribute" : "X-ForgeRock-AuthenticationId",
-                    "augmentSecurityContext" : {
-                        "type" : "text/javascript",
-                        "file" : "augmentSecurityContext.js",
-                        "globals" : {
-                            "authzHeaderName" : "X-Authorization-Map"
-                        }
-                    }
                 },
                 "enabled" : true
             }

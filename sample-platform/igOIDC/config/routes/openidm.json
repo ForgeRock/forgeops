@@ -1,6 +1,6 @@
 {
     "name": "openidm",
-    "baseURI": "http://idm-service.sample.svc.cluster.local:8080",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
     "condition": "${matches(request.uri.path, '^/openidm/')}",
     "auditService": {
         "type": "AuditService",
@@ -19,6 +19,49 @@
         }
     },
     "heap": [
+        {
+            "name": "IDMClient",
+            "type": "Chain",
+            "config": {
+                "filters": [
+                    {
+                        "type": "CookieFilter"
+                    }
+                ],
+                "handler": {
+                    "type": "ClientHandler",
+                    "config": {
+                        "hostnameVerifier": "ALLOW_ALL",
+                        "sslContextAlgorithm": "TLSv1.2",
+                        "keyManager": {
+                            "type": "KeyManager",
+                            "config": {
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                },
+                                "password": "changeit"
+                            }
+                        },
+                        "trustManager": {
+                            "type": "TrustManager",
+                            "config": {
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         {
             "name": "capture",
             "type": "CaptureDecorator",
@@ -103,9 +146,10 @@
                                     "type": "ScriptableHandler",
                                     "config": {
                                         "type": "application/x-groovy",
+                                        "clientHandler": "IDMClient",
                                         "file": "batchConditionalRequest.groovy",
                                         "args": {
-                                            "delegate" : "${heap['ForgeRockClientHandler']}",
+                                            "delegate" : "${heap['IDMClient']}",
                                             "failureResponse" : "${heap['authnFailureResponse']}",
                                             "checkRequests": [
                                                 {
@@ -147,10 +191,11 @@
                     "name": "StoreUserDetailsInSession",
                     "type": "ScriptableFilter",
                     "config": {
+                        "clientHandler": "IDMClient",
                         "type": "application/x-groovy",
                         "file": "storeUserDetailsInSession.groovy",
                         "args": {
-                            "idmUserDetailEndpoint": "http://idm-service.sample.svc.cluster.local:8080/openidm/authentication?_action=login",
+                            "idmUserDetailEndpoint": "https://idm-service.sample.svc.cluster.local:8444/openidm/authentication?_action=login",
                             "idmUserDetailMethod": "POST"
                         }
                     }
@@ -182,6 +227,7 @@
                     "name": "ScopeValidation",
                     "type": "ScriptableFilter",
                     "config": {
+                        "clientHandler": "IDMClient",
                         "type": "application/x-groovy",
                         "file": "scopeValidation.groovy",
                         "args": {
@@ -199,6 +245,7 @@
                             "name": "CheckAllowedFieldsForPatch",
                             "type": "ScriptableFilter",
                             "config": {
+                                "clientHandler": "IDMClient",
                                 "type": "application/x-groovy",
                                 "file": "checkAllowedFieldsForPatch.groovy",
                                 "args": {
@@ -207,12 +254,9 @@
                             }
                         }
                     }
-                },
-                {
-                    "type": "CookieFilter"
                 }
             ],
-            "handler": "ForgeRockClientHandler"
+            "handler": "IDMClient"
         }
     }
 }

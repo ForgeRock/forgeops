@@ -36,8 +36,8 @@ spec:
       - name: OPENIDM_ADMIN_PASSWORD
         value: "openidm-admin"
       ports:
-        - containerPort: 8080
-          name: http
+        - containerPort: 8444
+          name: mutualssl
           protocol: TCP
       resources:
           requests:

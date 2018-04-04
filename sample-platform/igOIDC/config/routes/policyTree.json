@@ -19,6 +19,39 @@
     },
     "heap": [
         {
+            "name": "IDMClient",
+            "type": "ClientHandler",
+            "config": {
+                "hostnameVerifier": "ALLOW_ALL",
+                "sslContextAlgorithm": "TLSv1.2",
+                "keyManager": {
+                    "type": "KeyManager",
+                    "config": {
+                        "keystore": {
+                            "type": "KeyStore",
+                            "config": {
+                                "url": "file:///var/openig/keystore.jks",
+                                "password": "changeit"
+                            }
+                        },
+                        "password": "changeit"
+                    }
+                },
+                "trustManager": {
+                    "type": "TrustManager",
+                    "config": {
+                        "keystore": {
+                            "type": "KeyStore",
+                            "config": {
+                                "url": "file:///var/openig/keystore.jks",
+                                "password": "changeit"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
             "name": "capture",
             "type": "CaptureDecorator",
             "config": {
@@ -66,11 +99,11 @@
                     "name": "StoreUserDetailsInSession",
                     "type": "ScriptableFilter",
                     "config": {
-                        "clientHandler": "ForgeRockClientHandler",
+                        "clientHandler": "IDMClient",
                         "type": "application/x-groovy",
                         "file": "storeUserDetailsInSession.groovy",
                         "args": {
-                            "idmUserDetailEndpoint": "http://idm-service.sample.svc.cluster.local:8080/openidm/authentication?_action=login",
+                            "idmUserDetailEndpoint": "https://idm-service.sample.svc.cluster.local:8444/openidm/authentication?_action=login",
                             "idmUserDetailMethod": "POST"
                         }
                     }

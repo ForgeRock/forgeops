@@ -1,6 +1,6 @@
 {
     "name": "logout",
-    "baseURI": "http://idm-service.sample.svc.cluster.local:8080/",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444/",
     "condition": "${matches(request.uri.path, '^/logout')}",
     "auditService": {
         "type": "AuditService",

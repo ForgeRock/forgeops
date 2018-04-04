@@ -1,4 +1,3 @@
-
 Boolean matches = false
 
 checkRequests.forEach { checkRequest ->

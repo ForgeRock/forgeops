@@ -88,7 +88,6 @@ Request idmRequest = new Request()
     .setUri(collectionURI)
     .setMethod("GET")
 
-idmRequest.getHeaders().add('X-Special-Trusted-User', 'IG')
 idmRequest.getHeaders().add('X-Authorization-Map', (new groovy.json.JsonBuilder([
         "id" : "ig",
         "component" : "endpoint/static/user",
