@@ -33,7 +33,7 @@ ENV BACKUP_SCHEDULE_INCREMENTAL "15 * * * *"
 
 # Example of how you can download the DJ zip file from a maven repo
 # ENV MVN_REPO=https://maven.forgerock.org/repo/repo/org/forgerock/opendj
-# ENV OPENDJ_VERSION=4.0.0-SNAPSHOT
+# ENV OPENDJ_VERSION=4.0.0-SNAPSHOThm
 #RUN curl $MVN_REPO/opendj-server-legacy/$OPENDJ_VERSION/opendj-server-legacy-$OPENDJ_VERSION.zip -o /tmp/opendj.zip
 
 # Use this to directly add the opendj zip file

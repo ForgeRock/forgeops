@@ -74,6 +74,20 @@ spec:
       securityContext:
         fsGroup: 11111
       initContainers:
+      {{- if (and .Values.gcs.enabled .Values.restore.enabled) }}
+      # An example of restoring a previous backup to google cloud storage.
+      # The bucket and path must exist, and the cluster needs --scopes storage-full when it is created.
+      # This runs the gsutil command to rsync the contents of the bucket to the /backup folder
+      - name: gcs
+        #image: gcr.io/cloud-builders/gcloud:latest
+        # For release we use a pinned version
+        image: gcr.io/cloud-builders/gcloud@sha256:2030ade364a03a313926b169effc754e4b99867f05323a3d248354d3d1630dc0
+        imagePullPolicy: IfNotPresent
+        command: [ "/bin/sh", "-c", "gsutil -m rsync -r {{ .Values.gcs.restoreBucket }} /backup; chmod -R g+rwx /backup"]
+        volumeMounts:
+        - name: backup
+          mountPath: /backup
+      {{- end }}
       # The restore init container restores data from a previous backup.
       {{ if .Values.restore.enabled }}
       - name: restore
@@ -137,9 +151,6 @@ spec:
         readinessProbe:
           tcpSocket:
             port: metrics
-          periodSeconds: 5
-        # Note the initial delay needs to be quite high because setup can take a while the first time.
-        # We should revisit this.
         livenessProbe:
           tcpSocket:
             port: metrics
@@ -150,9 +161,12 @@ spec:
       # The bucket and path must exist, and the cluster needs --scopes storage-full when it is created.
       # This runs the gsutil command periodically to rsync the contents of the /backup folder (shared with the DJ container) to cloud storage. 
       - name: backup
-        image: gcr.io/cloud-builders/gcloud
+        #image: gcr.io/cloud-builders/gcloud
+        # For release we use a pinned version
+        image: gcr.io/cloud-builders/gcloud@sha256:2030ade364a03a313926b169effc754e4b99867f05323a3d248354d3d1630dc0
         imagePullPolicy: IfNotPresent
-        command: [ "/bin/sh", "-c", "while true; do gsutil -m rsync -r /backup {{ .Values.gcs.bucket }} ; sleep 600;  done"]
+        command: [ "/bin/sh", "-c",
+            "while true; do gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }} ; sleep {{ .Values.gcs.sleepSeconds }};  done"]
         volumeMounts:
         - name: backup
           mountPath: /backup

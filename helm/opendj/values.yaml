@@ -69,15 +69,18 @@ podAntiAffinity: "soft"
 gcs:
   # Set this to true to enable backups to Google Cloud Storage. You need to create the top level bucket first.
   enabled: false
+  # Time in seconds to sleep between runs of the backup rsync process.
+  sleepSeconds: 600
   # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
   #add --scopes storage-full when you create the cluster.
-  bucket:  gs://forgeops/dj-backup
+  backupBucket:  gs://forgeops/dj-backup
+  # Restore bucket. Usually the same as above, but for initialization we might want to restore from another source.
+  restoreBucket: gs://forgeops/dj-backup
+
 
 restore:
-  # If true, run the init container that can restore from a previous DS backup.
+  # If true, run the init containers that can restore from a previous DS backup.
   enabled: false
-
-gsBucket:
 
 # Uncomment this to create sample users.
 #numberSampleUsers: 100
