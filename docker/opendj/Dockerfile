@@ -21,6 +21,9 @@ ENV SECRET_PATH /var/run/secrets/opendj
 # If no volume is mounted, a default password is used.
 ENV DIR_MANAGER_PW_FILE /var/run/secrets/opendj/dirmanager.pw
 
+# Path to the file that contains the uid=monitor user password for Prometheus metrics.
+ENV MONITOR_PW_FILE /var/run/secrets/opendj/monitor.pw
+
 # The default BASE_DN of the directory tree.
 ENV BASE_DN o=userstore
 

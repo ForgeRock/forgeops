@@ -17,6 +17,25 @@ rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
 
+# If the Directory Manager password file is mounted, grab the password from that, otherwise default.
+# See https://github.com/kubernetes/kubernetes/issues/40651
+# https://github.com/kubernetes/kubernetes/issues/30427
+if [ ! -r "$DIR_MANAGER_PW_FILE" ]; then
+    echo "Warning; Cannot find path to $DIR_MANAGER_PW_FILE. I will create a default password"
+    mkdir -p "$SECRET_PATH"
+    echo -n "password" > "$DIR_MANAGER_PW_FILE"
+fi
+
+
+# Create a default monitor user password if one does not exist.
+# https://github.com/kubernetes/kubernetes/issues/30427
+if [ ! -r "$MONITOR_PW_FILE" ]; then
+    echo "Warning; Cannot find path to $MONITOR_PW_FILE. I will create a default password"
+    mkdir -p "$SECRET_PATH"
+    echo -n "password" > "$MONITOR_PW_FILE"
+fi
+
+
 # Uncomment this to print experimental VM settings to stdout.
 #java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 

@@ -46,16 +46,3 @@ if [[ $ID =~ ^-?[0-9]+$ ]]; then
   export SERVER_ID=$(expr "$ID" + 10 )
 fi
 
-
-echo "server id $SERVER_ID "
-
-
-# If a password file is mounted, grab the password from that, otherwise default
-# See https://github.com/kubernetes/kubernetes/issues/40651
-# https://github.com/kubernetes/kubernetes/issues/30427
-if [ ! -r "$DIR_MANAGER_PW_FILE" ]; then
-    echo "Warning; Cant find path to $DIR_MANAGER_PW_FILE. I will create a default DJ admin password"
-    mkdir -p "$SECRET_PATH"
-    echo -n "password" > "$DIR_MANAGER_PW_FILE"
-fi
-

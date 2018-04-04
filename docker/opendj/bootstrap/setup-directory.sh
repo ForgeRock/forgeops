@@ -21,6 +21,9 @@ fi
 
 
 # An admin server is also a directory server.
+# TODO: Integrate keystore settings:
+# --usePkcs12keyStore /path/to/keystore.p12 \
+# --keyStorePasswordFile /tmp/keystore.pin \
 ./setup directory-server \
   -p 1389 \
   --enableStartTLS  \
@@ -31,6 +34,7 @@ fi
   --baseDN "${BASE_DN}" \
   --hostname "${FQDN}" \
   --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
+  --monitorUserPasswordFile "${MONITOR_PW_FILE}" \
   --acceptLicense \
   --doNotStart \
    ${INIT_OPTION}  || (echo "Setup failed, will sleep for debugging"; sleep 10000)

@@ -1,7 +1,10 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-# Default password
+# Default admin password.
 dirManagerPassword: password
+
+# Default monitor password for uid=monitor.
+monitorPassword: password
 
 # The default bootstrap script.
 bootstrapScript: "/opt/opendj/bootstrap/setup.sh"

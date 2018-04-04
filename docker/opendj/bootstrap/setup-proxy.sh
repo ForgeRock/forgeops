@@ -32,6 +32,7 @@ echo "Setting up Directory Proxy"
           --staticPrimaryServer "ds-0.ds:1389" \
           --proxyUserBindDn "cn=proxy" \
           --proxyUserBindPasswordFile "${DIR_MANAGER_PW_FILE}" \
+          --monitorUserPasswordFile "${MONITOR_PW_FILE}" \
           --loadBalancingAlgorithm affinity \
           || (echo "Setup failed, will sleep for debugging"; sleep 10000)
 
