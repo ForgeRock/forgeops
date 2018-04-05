@@ -8,7 +8,9 @@ data:
   CONFIG_PATH: "{{ .Values.global.configPath.idm }}"
   SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
   PROJECT_HOME:  "/git/config/{{ .Values.global.configPath.idm }}"
-  LOGGING_CONFIG: "-Djava.util.logging.config.file=/var/run/openidm/logging.properties"
+  LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
+  IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
+
 
 ---
 apiVersion: v1
@@ -16,6 +18,7 @@ kind: ConfigMap
 metadata:
   name: idm-boot-properties
 data:
+  # todo: These need to be reviewed for 6.0.0
    boot.properties: |
       openidm.repo.host={{.Values.openidm.repo.host}}
       openidm.repo.port={{.Values.openidm.repo.port}}
@@ -35,12 +38,13 @@ data:
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
       userstore.port={{default "1389" .Values.userstore.port}}
-
-
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
+      openidm.host=localhost
+
       openidm.auth.clientauthonlyports=8444
+
       openidm.https.keystore.cert.alias=openidm-localhost
 
       openidm.keystore.type=JCEKS
@@ -54,6 +58,10 @@ data:
       openidm.keystore.password=changeit
       openidm.truststore.password=changeit
 
+      # Prometheus endpoint authentication
+      openidm.prometheus.username=prometheus
+      openidm.prometheus.password=prometheus
+
       # Optionally use the crypto bundle to obfuscate the password and set one of these:
       #openidm.keystore.password=OBF:
       #openidm.keystore.password=CRYPT:
@@ -65,7 +73,7 @@ data:
 
       # key in keystore to handle config encryption
       openidm.config.crypto.alias=openidm-sym-default
-      #openidm.script.javascript.debug=transport=socket,suspend=y,address=9888,trace=true
+      openidm.script.javascript.debug=transport=socket,suspend=y,address=9888,trace=true
       #openidm.script.javascript.sources=/Eclipse/workspace/External JavaScript Source/
 
       # key in keystore to handle selfservice sharedkey
@@ -74,6 +82,9 @@ data:
       # key in keystore to handle jwtsession hmac signing key
       openidm.config.crypto.jwtsession.hmackey.alias=openidm-jwtsessionhmac-key
 
+      # key/cert in keystore/truststore to handle embedded opendj ssl
+      openidm.config.crypto.opendj.localhost.cert=server-cert
+
       # optionally map a hostname to a specific client key alias
       openidm.ssl.host.aliases=localhost=
 
@@ -81,7 +92,7 @@ data:
       openidm.policy.enforcement.enabled=true
 
       # node id if clustered; each node in a cluster must have a unique node id
-      openidm.node.id=node1
+      #openidm.node.id=node1
 
       # enables the execution of persistent schedulers
       openidm.scheduler.execute.persistent.schedules=true
@@ -97,15 +108,29 @@ data:
       # defaults to TLSv1.2 if not specified
       #openidm.external.rest.tls.version=TLSv1.1
 
+      # set external REST service's HTTP client hostname verification policy for HTTPS endpoints
+      # valid values: ALLOW_ALL, STRICT
+      # defaults to STRICT if not specified
+      openidm.external.rest.hostnameVerifier=ALLOW_ALL
+
       # Indicates whether the IDM deployment is automated by a cluster management tool such as Kubernetes, which
       # deploys containers in Pods whose identities are transient. Pod shutdown will mean that the corresponding cluster
       # node identity will never re-appear in the cluster, and thus IDM's record of this cluster node should be deleted
       # upon cluster node shutdown or failure. Defaults to false if not specified.
-      openidm.cluster.remove.offline.node.state=true
+      # openidm.cluster.remove.offline.node.state=true
 
       # enables API Descriptor generation, which if set to 'false', renders the API Explorer non-functional
       openidm.apidescriptor.enabled=true
 
+      # enables workflow
+      openidm.workflow.enabled=true
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-logging-properties
+data:
    logging.properties: |
       # Properties file that configures the operation of the JDK
       # logging facility.

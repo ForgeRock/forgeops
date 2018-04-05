@@ -4,23 +4,18 @@ set -x
 
 PROJECT_HOME="${PROJECT_HOME:-/opt/openidm}"
 
+LOGGING_PROPERTIES="${LOGGING_PROPERTIES:-/opt/openidm/conf/logging.properties}"
+
+OPENIDM_HOME=/opt/openidm
+
+
+# In IDM 6.0, property files are picked up using commons config.
+export IDM_ENVCONFIG_DIRS="${IDM_ENVCONFIG_DIRS:-/var/run/openidm}"
+
 if [ "$1" = 'openidm' ]; then
-    if [ -z "$LOGGING_CONFIG" ]; then
-      if [ -n "$PROJECT_HOME" -a -r "$PROJECT_HOME"/conf/logging.properties ]; then
-        LOGGING_CONFIG="-Djava.util.logging.config.file=$PROJECT_HOME/conf/logging.properties"
-      elif [ -r "$OPENIDM_HOME"/conf/logging.properties ]; then
-        LOGGING_CONFIG="-Djava.util.logging.config.file=$OPENIDM_HOME/conf/logging.properties"
-      else
-        LOGGING_CONFIG="-Dnop"
-      fi
-    fi
 
    HOSTNAME=`hostname`
    NODE_ID=${HOSTNAME}
-
-    # Optional boot.properties file.
-    # If this file is present it will override $PROJECT_HOME/conf/boot.properties
-   BOOT_PROPERTIES="${BOOT_PROPERTIES:-/var/run/openidm/boot.properties}"
 
 
    # If secrets keystore is present copy files from the secrets directory to the standard location.
@@ -29,20 +24,6 @@ if [ "$1" = 'openidm' ]; then
 	    cp -L secrets/*  security
    fi
 
-    if [ -r ${BOOT_PROPERTIES} ]; then
-         OPENIDM_OPTS="-Dopenidm.boot.file=${BOOT_PROPERTIES}"
-    fi
-
-   echo "Using OPENIDM_OPTS: $OPENIDM_OPTS"
-
-
-   CLOPTS="-p ${PROJECT_HOME}"
-
-   # For IDM 5.0 use this:
-   #LAUNCHER="org.forgerock.commons.launcher.Main"
-   # For IDM >=5.5.0 use the following:
-   LAUNCHER="org.forgerock.openidm.launcher.Main"
-
     # Copy any patch files to the project home
     cp /opt/openidm/conf/*.patch ${PROJECT_HOME}/conf
 
@@ -50,18 +31,37 @@ if [ "$1" = 'openidm' ]; then
     #java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
 
 
-   echo "Starting OpenIDM with options: $CLOPTS"
+    # Bundle directory
+    BUNDLE_PATH="$OPENIDM_HOME/bundle"
+
+    # Find any file in the bundle directory based on a wildcard
+    find_bundle_file () {
+        echo "$(find ${BUNDLE_PATH} -name $1)"
+    }
+
+    SLF4J_API=$(find_bundle_file "slf4j-api-[0-9]*.jar")
+    SLF4J_JDK14=$(find_bundle_file "slf4j-jdk14-[0-9]*.jar")
+    JACKSON_CORE=$(find_bundle_file "jackson-core-[0-9]*.jar")
+    JACKSON_DATABIND=$(find_bundle_file "jackson-databind-[0-9]*.jar")
+    JACKSON_ANNOTATIONS=$(find_bundle_file "jackson-annotations-[0-9]*.jar")
+
+    SLF4J_PATHS="$SLF4J_API:$SLF4J_JDK14"
+    JACKSON_PATHS="$JACKSON_CORE:$JACKSON_DATABIND:$JACKSON_ANNOTATIONS"
+    OPENIDM_SYSTEM_PATH="$BUNDLE_PATH/openidm-system-6.0.0-SNAPSHOT.jar"
+
+    CLASSPATH="$OPENIDM_HOME/bin/*:$OPENIDM_HOME/framework/*:$SLF4J_PATHS:$JACKSON_PATHS:$OPENIDM_SYSTEM_PATH"
 
    exec java \
-        "${LOGGING_CONFIG}" \
-        ${JAVA_OPTS} ${OPENIDM_OPTS} \
+       "-Djava.util.logging.config.file=${LOGGING_PROPERTIES}" \
+        ${JAVA_OPTS}  \
        -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \
-       -classpath /opt/openidm/bin/*:/opt/openidm/framework/* \
+       -classpath "$CLASSPATH" \
        -Dopenidm.system.server.root=/opt/openidm \
        -Djava.endorsed.dirs= \
        -Djava.awt.headless=true \
        -Dopenidm.node.id="${NODE_ID}" \
-       ${LAUNCHER}  -c /opt/openidm/bin/launcher.json ${CLOPTS}
+       org.forgerock.openidm.launcher.Main -c /opt/openidm/bin/launcher.json \
+       -p "${PROJECT_HOME}"
 fi
 
 # Else - exec the arguments pass to the entry point.
