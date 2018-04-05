@@ -14,18 +14,35 @@ spec:
       - name: dj-secrets
         configMap:
           name: dj-config
+      - name: db
+        emptyDir:
+          medium: Memory
+      initContainers:
+        - name: setup
+          image:  dj:fullstack
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - name: dj-secrets
+            mountPath: /var/run/secrets/opendj
+          - name: db
+            mountPath: /opt/opendj/data
+          env:
+          - name: BASE_DN
+            value: "dc=example,dc=com"
+          args: [ "setup" ]
       containers:
         - image: dj:fullstack
           imagePullPolicy: IfNotPresent
+          args: [ "start" ]
           name: opendj
           volumeMounts:
           - name: dj-secrets
             mountPath: /var/run/secrets/opendj
+          - name: db
+            mountPath: /opt/opendj/data
           env:
           - name: BASE_DN
             value: "dc=example,dc=com"
-          - name: DJ_MASTER_SERVER
-            value: dj-0.dj-service
           ports:
             - containerPort: 1389
               name: ldap
@@ -33,14 +50,17 @@ spec:
             - containerPort: 4444
               name: djadmin
               protocol: TCP
-            - containerPort: 8081
+            - containerPort: 8080
               name: metrics
           resources:
               requests:
                 memory: "512Mi"
           readinessProbe:
-            exec:
-              command:
-              - /opt/opendj/probe.sh
-            periodSeconds: 20
-            initialDelaySeconds: 30
+            tcpSocket:
+              port: metrics
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 60

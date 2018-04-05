@@ -1,4 +1,4 @@
-FROM quay.io/forgerock/openig:latest
+FROM forgerock-docker-internal.bintray.io/forgerock/openig:latest
 
 ADD config /var/openig/config
 ADD scripts /var/openig/scripts

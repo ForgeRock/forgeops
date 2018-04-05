@@ -1,4 +1,4 @@
-FROM quay.io/forgerock/openam:latest
+FROM forgerock-docker-internal.bintray.io/forgerock/openam:latest
 
 COPY WEB-INF /usr/local/tomcat/webapps/openam/WEB-INF
 COPY XUI /usr/local/tomcat/webapps/openam/XUI

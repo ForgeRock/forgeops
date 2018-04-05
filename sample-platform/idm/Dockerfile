@@ -1,4 +1,4 @@
-FROM quay.io/forgerock/openidm:latest
+FROM forgerock-docker-internal.bintray.io/forgerock/openidm:latest
 
 COPY bundle /opt/openidm/bundle
 COPY conf /opt/openidm/conf
