@@ -45,4 +45,3 @@ if [[ $ID =~ ^-?[0-9]+$ ]]; then
   # server id can not start at 0
   export SERVER_ID=$(expr "$ID" + 10 )
 fi
-

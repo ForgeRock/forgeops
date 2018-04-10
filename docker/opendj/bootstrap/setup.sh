@@ -37,7 +37,7 @@ else
 
  fi
 
-./bootstrap/log-redirect.sh
+./scripts/log-redirect.sh
 
 
 # Before we enable rest2ldap we need a strategy for parameterizing the json template

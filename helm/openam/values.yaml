@@ -45,7 +45,7 @@ catalinaOpts: >
 #-Dcom.sun.management.jmxremote.rmi.port=<port>
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
 
-# Suffix for OpenDJ config store.
+# Suffix for OpenDJ config store. We reuse the default baseDN of o=userstore.
 rootSuffix:  "o=userstore"
 
 # Valid logger types: fluent-bit, none

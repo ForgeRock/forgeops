@@ -1,0 +1,84 @@
+{{ if .Values.runVerifyCronJob }}
+# This is an optional cron job that restores from a backup and verifies the integrity of the data.
+# To create an ad hoc job you can use:
+#  kubectl create job verify --from=cronjob/ds-verify
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Values.djInstance }}-verify
+  labels:
+    djInstance: {{ .Values.djInstance }}
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    component: opendj
+spec:
+  schedule: "15 1 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
+          securityContext:
+            fsGroup: 11111
+          restartPolicy: Never
+          initContainers:
+          {{- if .Values.gcs.enabled }}
+            # An example of restoring a previous backup from a google cloud storage bucket.
+            # The bucket and path must exist, and the cluster needs --scopes storage-full when it is created.
+            # This runs the gsutil command to rsync the contents of the bucket to the /backup folder
+          - name: gcs
+            #image: gcr.io/cloud-builders/gcloud:latest
+            # For release we use a pinned version
+            image: gcr.io/cloud-builders/gcloud@sha256:2030ade364a03a313926b169effc754e4b99867f05323a3d248354d3d1630dc0
+            imagePullPolicy: IfNotPresent
+            command: [ "/bin/sh", "-c", "gsutil -m rsync -r {{ .Values.gcs.restoreBucket }} /backup; chmod -R g+rwx /backup"]
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+            {{- end }}
+          containers:
+          - name: opendj
+            image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            envFrom:
+            - configMapRef:
+                name: {{ .Values.djInstance }}
+            args: ["restore-and-verify"]
+            volumeMounts:
+            - name: dj-secrets
+              mountPath: /var/run/secrets/opendj
+            - name: backup
+              mountPath: /opt/opendj/bak
+            - name: logs
+              mountPath: /opt/opendj/logs
+            - name: db
+              mountPath: /opt/opendj/data
+          volumes:
+          - name: dj-secrets
+            secret:
+              secretName: {{ .Values.djInstance }}
+          - name: logs
+            emptyDir: {}
+          - name: backup
+            emptyDir: {}
+          - name: db
+            persistentVolumeClaim:
+              claimName: {{ .Values.djInstance }}-verify
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.djInstance }}-verify
+  annotations:
+    pv.beta.kubernetes.io/gid: "11111"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ default "5Gi"  .Values.storageSize }}
+  {{- if .Values.storageClass }}
+  storageClassName:  {{ .Values.storageClass }}
+  {{- end }}
+{{end}}

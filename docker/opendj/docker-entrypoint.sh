@@ -35,6 +35,16 @@ if [ ! -r "$MONITOR_PW_FILE" ]; then
     echo -n "password" > "$MONITOR_PW_FILE"
 fi
 
+# Create top level symbolic links if there is a persistent data volume mounted.
+# todo: When commons configuration is finalized, we should modify config.ldif to point to the directory locations.
+if [ -d data/db ]; then
+    for d in data/*
+    do
+        echo "Creating symbolic link $d"
+        ln -s $d
+    done
+fi
+
 
 # Uncomment this to print experimental VM settings to stdout.
 #java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
@@ -61,27 +71,18 @@ start() {
 
     echo "Starting OpenDJ"
 
-    # Remove any bootstrap sentinel created by setup.
-    rm -f /opt/opendj/BOOTSTRAPPING
-
-    # If there is a ./data directory present, create sym links for any top level directories.
-    # todo: When commons configuration lands, we should modify config.ldif to point to the directory locations.
-    if [ -d data/db ]; then
-        for d in data/*
-        do
-            ln -s $d
-        done
-    fi
-
     if [ -d "${SECRET_PATH}" ]; then
       echo "Secret path is present. Will copy any keystores and truststore"
       # We send errors to /dev/null in case no data exists.
       cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./config 2>/dev/null
     fi
 
+    # redirect logs to stdout for better docker integration.
+    scripts/log-redirect.sh
+
     echo "Server id $SERVER_ID"
 
-    exec ./bin/start-ds --nodetach
+    exec ./bin/start-ds --nodetach || ( echo "startup failed. Will pause for diagnosis"; sleep 300)
 }
 
 CMD="${1:-run}"
@@ -111,6 +112,11 @@ run-post-setup-job)
 restore-from-backup)
     # Re-initializes DS from a previous backup. Use this instead of setup.
     /opt/opendj/bootstrap/restore-from-backup.sh
+    ;;
+restore-and-verify)
+    # Restore from backup, and then verify the integrity of the data.
+    OVERWRITE_DATA=true /opt/opendj/bootstrap/restore-from-backup.sh
+    exec /opt/opendj/scripts/verify.sh
     ;;
 *)
     exec "$@"

@@ -7,7 +7,8 @@ metadata:
   name: {{ .Values.component }}
   annotations:
     kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
-    ingress.kubernetes.io/rewrite-target: /
+    # This causes issues when idm redirects to /admin
+    #ingress.kubernetes.io/rewrite-target: /
     # Note that not all ingress controllers implement all these features..
     ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/ssl-redirect: "true"

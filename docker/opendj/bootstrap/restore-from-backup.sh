@@ -2,16 +2,23 @@
 # Initialize from a backup. We assume the files to restore are in the bak/ folder
 # This runs in an init container. DS is not running.
 # This is a prototype - do not use in production.
-source /opt/opendj/env.sh
 
 cd /opt/opendj
 
-if [ -d data/db ]; then
+set -x
+
+if [ "$OVERWRITE_DATA" = "true" ]
+then
+    rm -fr data/*
+fi
+
+if [ -d data/db/schema ]; then
     echo "It looks like there is existing data in the data/db directory. Restore will not overwrite exiting data."
     exit 0
 fi
 
-B="${BACKUP_DIRECTORY}/$HOSTNAME"
+# When we restore, we want to take the backup from the first node in set (instance-0).
+B="${BACKUP_DIRECTORY}/${DJ_INSTANCE}-0"
 
 # Admin files to restore first...
 admin="${B}/admin"

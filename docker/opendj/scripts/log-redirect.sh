@@ -5,8 +5,6 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
 
-source /opt/opendj/env.sh
-
 
 echo "Redirecting logs to stdout"
 

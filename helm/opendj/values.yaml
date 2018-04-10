@@ -85,9 +85,6 @@ restore:
   # If true, run the init containers that can restore from a previous DS backup.
   enabled: false
 
-# Uncomment this to create sample users.
-#numberSampleUsers: 100
-
 # Backup schedules for full and incrementals. This is a crontab format:
 # minutes hour day-of-week month year
 backupScheduleFull:  "2 2 * * *"
@@ -96,3 +93,9 @@ backupScheduleIncremental: "45 * * * *"
 # Run the post setup job to configure replication and backup
 # We default this to false for safety. You must explicitly set this to true.
 runPostSetupJob: false
+
+runVerifyCronJob: true
+
+# An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
+# If you don't have slack, set this to "undefined"
+slackUrl: undefined

@@ -15,4 +15,6 @@ mkdir -p "$B"
 
 t=`date "+%m%d%H%M%Y.%S"`
 
-tar cvfz "${B}/admin-${t}.tar.gz" --exclude './db/*Root' .
+# Backup all the files that the binary backup command does NOT include.
+tar cvfz "${B}/admin-${t}.tar.gz" \
+    --exclude './db/*Root' .
