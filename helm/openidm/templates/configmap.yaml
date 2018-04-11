@@ -38,6 +38,7 @@ data:
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
       userstore.port={{default "1389" .Values.userstore.port}}
+      userstore.basecontext={{default "o=userstore" .Values.userstore.basecontext}}
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
