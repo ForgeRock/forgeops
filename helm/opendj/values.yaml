@@ -26,8 +26,8 @@ component: opendj
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/opendj
   # For development we set this to Always to get the most current image.
-  pullPolicy: Always
-  #pullPolicy: IfNotPresent
+  #pullPolicy: Always
+  pullPolicy: IfNotPresent
   tag:  6.0.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
@@ -52,13 +52,14 @@ opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLi
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 # For production you will want to specify CPU limits to help Kube schedule the pods.
-resources:
-  requests:
-   memory: 1048Mi
-  # Setup runs more than 1 jvm, which will attempt to allocate more memory than the pod has.
-  # For install, it looks like we need at least 2GB - 2.5 GB
-  limits:
-    memory: 2500Mi
+resources: {}
+
+# Sample values:
+#resources:
+#  requests:
+#   memory: 2000Mi
+#  limits:
+#    memory: 2500Mi
 
 # DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
@@ -94,7 +95,8 @@ backupScheduleIncremental: "45 * * * *"
 # We default this to false for safety. You must explicitly set this to true.
 runPostSetupJob: false
 
-runVerifyCronJob: true
+# If true, a cronjob is created that periodically restores the backup from GCS and verifies the data.
+runVerifyCronJob: false
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"

@@ -1,11 +1,4 @@
-# Docker Build Files for the ForgeRock Identity Platform
-
-## Contributing 
-
-To create a pull request, fork the project to your private community Bitbucket Server/Bitbucket 
-Server account, clone it to your workstation, commit your changes, and push them
-up to your Bitbucket Server repository. You can then create a pull request on 
-Bitbucket.
+# Docker Build Files for ForgeRock Identity Platform
 
 ## About
 

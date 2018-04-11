@@ -1,17 +1,39 @@
 # ForgeRock DevOps and Cloud Deployment 
 
-This repository is the master (bleeding edge) for the Docker and Kubernetes DevOps artifacts. The master targets
-features that are still in development and may not be stable.
+Docker and Kubernetes DevOps artifacts for the ForgeRock platform. 
 
-The DevOps artifacts for the 5.5.0 ForgeRock Identity Platform are on the `release/5.5.0` branch of this repository.
+# Disclaimer 
 
-If you have the source checked out from git:
+These samples are provided on an “as is” basis, without warranty of any kind, to the fullest extent 
+permitted by law. ForgeRock does not warrant or guarantee the individual success developers 
+may have in implementing the code on their development platforms or in 
+production configurations. ForgeRock does not warrant, guarantee or make any representations 
+regarding the use, results of use, accuracy, timeliness or completeness of any data or 
+information relating to these samples. ForgeRock disclaims all warranties, expressed or implied, and 
+in particular, disclaims all warranties of merchantability, and warranties related to the code, or any 
+service or software related thereto. ForgeRock shall not be liable for any direct, indirect or 
+consequential damages or costs of any type arising out of any action taken by you or others related 
+to the samples.
+
+
+# Branches 
+
+The master branch targets
+features that are still in development and may not be stable. Please checkout the 
+ branch that matches the targeted release.
+
+
+For example, if you have the source checked out from git:
 
 ```bash
-git checkout release/5.5.0 
+git checkout release/x.y.0 
 ```
 
-NOTE: ForgeRock customers and partners who have access to the ForgeRock private-releases maven repository
+# Docker images 
+
+Docker images are maintained in the docker/ folder. 
+
+ForgeRock customers and partners who have access to the ForgeRock private-releases maven repository
 can use the maven pom.xml to build docker images for *released* versions of the product. You
 must have a settings.xml file with credentials for repository access. See the [backstage
 article](https://backstage.forgerock.com/knowledge/kb/article/a74096897)
