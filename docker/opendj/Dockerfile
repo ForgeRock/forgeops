@@ -13,16 +13,25 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 #ENV OPENDJ_JAVA_ARGS -server -Xmx512m -XX:+UseG1GC
 # You can use these options on jdk 8u131 or later. This will set the heap size according to the container size
 ENV OPENDJ_JAVA_ARGS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseCompressedOops
+
+######## Secret Paths ########
+
+# This is the default location where secrets should be mounted.
 ENV SECRET_PATH /var/run/secrets/opendj
 
 # Path to secret file that contains the cn=Directory Manager password
 # Used to configure the image
-# Mount a Docker volume or Kubernetes secret volume on /var/run/secrets/opendj
-# If no volume is mounted, a default password is used.
 ENV DIR_MANAGER_PW_FILE /var/run/secrets/opendj/dirmanager.pw
 
 # Path to the file that contains the uid=monitor user password for Prometheus metrics.
 ENV MONITOR_PW_FILE /var/run/secrets/opendj/monitor.pw
+
+# Paths to the keystore and the keystore pin.
+ENV KEYSTORE_FILE /var/run/secrets/opendj/keystore.pkcs12
+ENV KEYSTORE_PIN_FILE /var/run/secrets/opendj/keystore.pin
+
+ENV SSL_CERT_ALIAS opendj-ssl
+
 
 # The default BASE_DN of the directory tree.
 ENV BASE_DN o=userstore
@@ -43,16 +52,15 @@ ENV BACKUP_SCHEDULE_INCREMENTAL "15 * * * *"
 COPY opendj.zip /home/forgerock/
 
 RUN unzip -q /home/forgerock/opendj.zip -d /opt \
-    && rm -f /home/forgerock/opendj.zip \
-    && mkdir -p "$SECRET_PATH" \
-    && chown -R forgerock:root /opt "$SECRET_PATH" \
-    && chmod g+rwx /opt/opendj
+    && rm -f /home/forgerock/opendj.zip
 
 
 COPY bootstrap/ /opt/opendj/bootstrap/
 COPY scripts/ /opt/opendj/scripts/
+COPY secrets/ /opt/opendj/secrets/
 COPY *.sh /opt/opendj/
 
+RUN chmod -R g+rwx /opt/opendj
 
 WORKDIR /opt/opendj
 

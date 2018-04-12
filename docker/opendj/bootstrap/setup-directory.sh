@@ -20,6 +20,7 @@ fi
 
 
 
+
 # An admin server is also a directory server.
 # TODO: Integrate keystore settings:
 # --usePkcs12keyStore /path/to/keystore.p12 \
@@ -35,6 +36,9 @@ fi
   --hostname "${FQDN}" \
   --rootUserPasswordFile "${DIR_MANAGER_PW_FILE}" \
   --monitorUserPasswordFile "${MONITOR_PW_FILE}" \
+  --usePkcs12KeyStore "${KEYSTORE_FILE}" \
+  --keyStorePasswordFile "${KEYSTORE_PIN_FILE}" \
+  --certNickName "${SSL_CERT_ALIAS}" \
   --acceptLicense \
   --doNotStart \
    ${INIT_OPTION}  || (echo "Setup failed, will sleep for debugging"; sleep 10000)
@@ -62,6 +66,32 @@ EOF
 
 # Need to manually import the base entry as we are offline.
 bin/import-ldif --offline -n ctsRoot -F -l /tmp/cts.ldif
+
+
+echo "Creating Default Trust Manager..."
+./bin/dsconfig create-trust-manager-provider \
+      --type file-based \
+      --provider-name "Default Trust Manager" \
+      --set enabled:true \
+      --set trust-store-type:PKCS12 \
+      --set trust-store-pin:\&{file:"${KEYSTORE_PIN_FILE}"} \
+      --set trust-store-file:"${KEYSTORE_FILE}" \
+      --offline \
+      --no-prompt
+
+echo "Configuring LDAP connection handler..."
+./bin/dsconfig set-connection-handler-prop \
+      --handler-name "LDAP" \
+      --set "trust-manager-provider:Default Trust Manager" \
+      --offline \
+      --no-prompt
+
+echo "Configuring LDAPS connection handler..."
+./bin/dsconfig set-connection-handler-prop \
+      --handler-name "LDAPS" \
+      --set "trust-manager-provider:Default Trust Manager" \
+      --offline \
+      --no-prompt
 
 
 echo "Tuning the disk free space thresholds"

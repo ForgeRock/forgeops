@@ -17,23 +17,16 @@ rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
 
-# If the Directory Manager password file is mounted, grab the password from that, otherwise default.
-# See https://github.com/kubernetes/kubernetes/issues/40651
-# https://github.com/kubernetes/kubernetes/issues/30427
-if [ ! -r "$DIR_MANAGER_PW_FILE" ]; then
-    echo "Warning; Cannot find path to $DIR_MANAGER_PW_FILE. I will create a default password"
-    mkdir -p "$SECRET_PATH"
-    echo -n "password" > "$DIR_MANAGER_PW_FILE"
+# Check for a mounted secret volume. Fall back to secrets bundled in the image if we can't find them.
+if [ ! -d "$SECRET_PATH" ]; then
+    echo "Warning; Cannot find mounted secret volume on $SECRET_PATH. Falling back to using secrets bundled in the image"
+
+    export DIR_MANAGER_PW_FILE=/opt/opendj/secrets/dirmanager.pw
+    export MONITOR_PW_FILE=/opt/opendj/secrets/monitor.pw
+    export KEYSTORE_FILE=/opt/opendj/secrets/keystore.pkcs12
+    export KEYSTORE_PIN_FILE=/opt/opendj/secrets/keystore.pin
 fi
 
-
-# Create a default monitor user password if one does not exist.
-# https://github.com/kubernetes/kubernetes/issues/30427
-if [ ! -r "$MONITOR_PW_FILE" ]; then
-    echo "Warning; Cannot find path to $MONITOR_PW_FILE. I will create a default password"
-    mkdir -p "$SECRET_PATH"
-    echo -n "password" > "$MONITOR_PW_FILE"
-fi
 
 # Create top level symbolic links if there is a persistent data volume mounted.
 # todo: When commons configuration is finalized, we should modify config.ldif to point to the directory locations.

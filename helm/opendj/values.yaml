@@ -1,13 +1,16 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-# Default admin password.
-dirManagerPassword: password
-
-# Default monitor password for uid=monitor.
-monitorPassword: password
 
 # The default bootstrap script.
 bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
+
+# If useDefaultSecrets is set to true (the default), the secret values in ../secrets will
+# be used to create a secret map with the same name as the instance ($djInstance).
+# If you set useDefaultSecrets to false, you must create this secret map yourself before the DS
+# instances will be provisioned. This allows you to inject your own secrets rather
+# than use the default ones bundled in the chart. An alternate strategy is to fork this chart.
+# and replace the secrets in ./secrets with your own.
+useDefaultSecrets: true
 
 # The options here are "userstore" or "cts" or "proxy". 
 # This sets the BOOTSTRAP_TYPE env var for the bootstrap script which is setup.sh.
