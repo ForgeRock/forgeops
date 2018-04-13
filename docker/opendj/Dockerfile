@@ -52,6 +52,8 @@ ENV BACKUP_SCHEDULE_INCREMENTAL "15 * * * *"
 COPY opendj.zip /home/forgerock/
 
 RUN unzip -q /home/forgerock/opendj.zip -d /opt \
+    && chown -R forgerock:root /opt \
+    && chmod g+rwx /opt/opendj \
     && rm -f /home/forgerock/opendj.zip
 
 
@@ -60,12 +62,13 @@ COPY scripts/ /opt/opendj/scripts/
 COPY secrets/ /opt/opendj/secrets/
 COPY *.sh /opt/opendj/
 
-RUN chmod -R g+rwx /opt/opendj
+RUN chown -R forgerock:root /opt/opendj \
+    && chmod g+rwx /opt/opendj
 
 WORKDIR /opt/opendj
 
-# We are hitting https://github.com/kubernetes/kubernetes/issues/2630
-# We need to run as root. We can investigate using gosu to drop to the forgerock user at runtime.
+# In the past we ran into https://github.com/kubernetes/kubernetes/issues/2630
+# Adding the forgerock user (11111) to the root group has solved the issue. This is the approach openshift uses.
 USER 11111
 
 EXPOSE 1389 636 4444 8989
