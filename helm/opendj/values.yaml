@@ -12,12 +12,16 @@ bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
 # and replace the secrets in ./secrets with your own.
 useDefaultSecrets: true
 
-# The options here are "userstore" or "cts" or "proxy". 
+# The options here are "proxy" or "directory-server.
 # This sets the BOOTSTRAP_TYPE env var for the bootstrap script which is setup.sh.
-bootstrapType: "userstore"
+bootstrapType: "directory-server"
 
 
-# The default OpenDJ baseDN
+# The default OpenDJ baseDN.
+# Note that the default install creates two backends: o=cts and o=userstore
+# The setting below changes the base dn for the o=userstore backend only!
+# We strongly suggest that you *NOT* change the default. There is very little value in
+# having the basedn reflect a unique organizational structure.
 baseDN: "o=userstore"
 
 # The default instance name. This will create a stateful set that can be resolved at
@@ -29,8 +33,8 @@ component: opendj
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/opendj
   # For development we set this to Always to get the most current image.
-  #pullPolicy: Always
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
+  #pullPolicy: IfNotPresent
   tag:  6.0.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
