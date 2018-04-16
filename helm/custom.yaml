@@ -21,6 +21,13 @@ global:
     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
     # branch can be a git branch or a sha commit:
     branch: master
+    # Optional sed filter to run after git checkout. The sed edit script here will be recursively run on *every*
+    # file checked out to the /git directory. You must include the -e option to sed, and you can specify
+    # multiple substitutions by repeating the -e s/// pattern. For example:
+    # sedFilter: "-e s/openam.default.com/openam.test.com/ -e s/acme/foobar/"
+    # Note that this will *not* change values in config maps. If you are changing the FQDN on install
+    # make sure you also change global.domain above.
+    sedFilter: ""
   # The relative path to the product configuration to import. Relative to /git/$projectDirectory/
   # specify the full path to the configuration
   configPath:

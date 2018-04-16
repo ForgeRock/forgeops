@@ -40,4 +40,5 @@ data:
   FQDN: {{ default "openam.default.example.com" .Values.fqdn }}
   VERSION: {{ default .Values.image.tag .Values.version }}
   CTS_STORES: {{ default "ctsstore-0.ctsstore:1389" .Values.ctsStores}}
+  SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
 
