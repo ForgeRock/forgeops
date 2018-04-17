@@ -7,7 +7,7 @@
 # Note: This script assumes the relevant binary war files and zip files have been downloaded
 # and moved to the correct locations (example: openam/openam.war).
 
-# Default environment variables. You can set these all via command switches as well.
+# Default settings. You can set these all via command switches as well.
 REGISTRY="forgerock-docker-public.bintray.io"
 REPO="forgerock"
 # Default tag if none is specified.

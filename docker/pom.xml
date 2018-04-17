@@ -86,13 +86,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
         <openamVersion>6.0.0-M13</openamVersion>
-        <opendjVersion>6.0.0-RC1</opendjVersion>
+        <opendjVersion>6.0.0-RC2</opendjVersion>
         <!-- IDM is using a snapshot pending a new milestone that integrates commons config -->
         <openidmVersion>6.0.0-SNAPSHOT</openidmVersion>
         <!-- TODO: Update milestone
         <openidmVersion>6.0.0-M7</openidmVersion>
         -->
-        <openigVersion>6.0.0-M125</openigVersion>
+        <openigVersion>6.0.0-RC1</openigVersion>
         <registry>forgerock-docker-internal.bintray.io:443</registry>
         <releaseTag>6.0.0</releaseTag>
         <repo>forgerock-docker-internal.bintray.io/forgerock</repo>
