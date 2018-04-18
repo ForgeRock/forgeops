@@ -19,7 +19,7 @@ steps:
   dir: 'docker'
   # Run the script to build all the docker images. Tag with the gcr.io project (-g option)
   entrypoint: './build.sh'
-  args: ['-g']
+  args: ['-g', '-t', 'latest']
   env:
   - 'API_KEY=${_API_KEY}'
 images:
