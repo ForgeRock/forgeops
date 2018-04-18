@@ -98,9 +98,6 @@ restore:
 backupScheduleFull:  "2 2 * * *"
 backupScheduleIncremental: "45 * * * *"
 
-# Run the post setup job to configure replication and backup
-# We default this to false for safety. You must explicitly set this to true.
-runPostSetupJob: false
 
 # If true, a cronjob is created that periodically restores the backup from GCS and verifies the data.
 runVerifyCronJob: false
