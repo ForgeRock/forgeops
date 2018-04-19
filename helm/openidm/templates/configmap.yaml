@@ -42,7 +42,7 @@ data:
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
-      openidm.host=localhost
+      openidm.host={{ template "externalFQDN" . }}
 
       openidm.auth.clientauthonlyports=8444
 

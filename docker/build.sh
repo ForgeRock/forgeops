@@ -7,10 +7,9 @@
 # Note: This script assumes the relevant binary war files and zip files have been downloaded
 # and moved to the correct locations (example: openam/openam.war).
 
-# Default environment variables. You can set these all via command switches as well.
-REGISTRY=""
-#REPO=${REPO:-quay.io/forgerock}
-REPO="forgerock-docker-public.bintray.io/forgerock"
+# Default settings. You can set these all via command switches as well.
+REGISTRY="forgerock-docker-public.bintray.io"
+REPO="forgerock"
 # Default tag if none is specified.
 TAG=${TAG:-6.0.0}
 
@@ -21,37 +20,45 @@ PROJECT="engineering-devops"
 IMAGES="openam opendj openidm openig amster"
 
 function buildDocker {
-   SLASH="/"
-   if [[ ! -z $REGISTRY ]]
+
+   if [[ ! -z "${AUTHENTICATE}" ]] ;
    then
-     BUILD_REGISTRY=${REGISTRY}${SLASH}
-   else
-     BUILD_REGISTRY=${REGISTRY}
+       if  [[ -z "$DOCKER_USER" || -z "$DOCKER_PASSWORD" ]];
+       then
+            echo "Environment variable DOCKER_USER and DOCKER_PASSWORD not set"
+            exit 1
+       fi
+       docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" "$REGISTRY"
    fi
-   ${DRYRUN}  docker build -t ${BUILD_REGISTRY}${REPO}/$1:${TAG} $1
+
+   ${DRYRUN}  docker build -t ${REGISTRY}/${REPO}/$1:${TAG}${SNAPSHOT} $1
    if [ -n "$PUSH" ]; then
-      ${DRYRUN} ${GCLOUD} docker ${CMD_SEP} push ${BUILD_REGISTRY}${REPO}/$1:${TAG}
+      ${DRYRUN} docker push ${REGISTRY}/${REPO}/$1:${TAG}${SNAPSHOT}
    fi
 }
 
-while getopts "dgpt:r:R:P:" opt; do
+while getopts "adgpst:r:R:P:" opt; do
   case ${opt} in
+    a ) AUTHENTICATE="true" ;;
     t ) TAG="${OPTARG}" ;;
+    s ) SNAPSHOT="-SNAPSHOT" ;;
     d ) DRYRUN="echo" ;;
     r ) REGISTRY="${OPTARG}" ;;
     R ) REPO="${OPTARG}" ;;
-    g ) GCLOUD="gcloud" && PUSH="1" && REGISTRY="gcr.io" && CMD_SEP="--" && REPO="${PROJECT}" ;;
+    g ) REGISTRY="gcr.io" && REPO="${PROJECT}" ;;
     P ) PROJECT="${OPTARG}" && REPO="${PROJECT}" ;;
     p ) PUSH="1" ;;
     \? )
          echo "Usage: build [-p] [-g] [-t tag] [-r registry] [-R repo] [-G project] image1 ..."
          echo "-p Push images to registry after building."
-         echo "-g Push images to the Google gcr.io registry."
+         echo "-g Build images for the Google gcr.io registry."
          echo "-P project  - Set the Google project id if using gcr.io. Default $PROJECT"
+         echo "-s Build SNAPSHOT images. Default $TAG-SNAPSHOT"
          echo "-R Set the repository name. Default $REPO"
          echo "-r Set the Registry. Default $REGISTRY"
          echo "-t tag - Tag the docker image (default $TAG)"
          echo "-d dry run. Don't do the docker build/push, just show what would be done."
+         echo "-a authenticate to the registry using API_KEY environment variable."
          exit 1
       ;;
   esac

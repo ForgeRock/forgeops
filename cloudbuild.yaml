@@ -6,30 +6,37 @@ steps:
 # Build helm charts and push to gs bucket.
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: ./etc/cloud-build-push-charts.sh
-# Decrypts settings.xml so we can pull artifacts from the ForgeRock maven repo.
-# See https://cloud.google.com/container-builder/docs/how-to/using-encrypted-resources
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-  - kms
-  - decrypt
-  - --ciphertext-file=docker/settings.xml.enc
-  - --plaintext-file=docker/settings.xml
-  - --location=global
-  - --keyring=forgeops-build
-  - --key=maven-settings
-# Run maven build for bintray images. The settings.xml file also sets the local maven cache to ./m2cache,
-# This allows subsequent maven runs to reuse the cache.
-# Settings.xml also has <server> credentials for pushing to bintray.
-- name: 'gcr.io/cloud-builders/java/mvn'
-  args: ['--settings','settings.xml', '--batch-mode', 'package', 'docker:build', 'docker:push']
-  dir:  docker
-# Run maven build using the gcr profile. This results in images being tagged for gcr.io/${PROJECT_ID}.
-- name: 'gcr.io/cloud-builders/java/mvn'
-  args: ['--settings','settings.xml', '-Pgcr', '--batch-mode', 'package', 'docker:build']
-  dir:  docker
-images:
-- 'gcr.io/$PROJECT_ID/opendj'
-- 'gcr.io/$PROJECT_ID/openidm'
-- 'gcr.io/$PROJECT_ID/openig'
-- 'gcr.io/$PROJECT_ID/openam'
-- 'gcr.io/$PROJECT_ID/amster'
+- name: 'gcr.io/cloud-builders/wget'
+  # Run dl.sh download script with options to use wget (-w).
+  entrypoint: './dl.sh'
+  args: ['-w']
+  dir: 'docker'
+  env:
+#  - 'BUILD_ID=$BUILD_ID'
+#  - 'PROJECT=$PROJECT_ID'
+#  - 'REV=$REVISION_ID'
+#  - 'BRANCH_NAME=$BRANCH_NAME'
+#  - 'REPO_NAME=$REPO_NAME'
+#  - 'TAG_NAME=$TAG_NAME'
+  # Set _API_KEY in the cloudbuild
+  # console https://console.cloud.google.com/gcr/triggers?project=engineering-devops
+  # This is the credential to pull product binaries from the ForgeRock Artifactory repository.
+  - 'API_KEY=${_ARTIFACTORY_API_KEY}'
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker'
+  # Run the script to build the docker images with options -a (authenticate) and -p (push)
+  entrypoint: './build.sh'
+  args: ['-a', '-p']
+  env:
+  # Set _DOCKER_USERNAME and _DOCKER_PASSWORD in the cloudbuild
+  # console https://console.cloud.google.com/gcr/triggers?project=engineering-devops
+  # These are the credentials needed to push images to your private docker registry.
+  - 'DOCKER_USER=${_DOCKER_USER}'
+  - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
+# Since we are building bintray images by default, we don't need to tell the builder about GCR images.
+#images:
+#- 'gcr.io/$PROJECT_ID/opendj'
+#- 'gcr.io/$PROJECT_ID/openidm'
+#- 'gcr.io/$PROJECT_ID/openig'
+#- 'gcr.io/$PROJECT_ID/openam'
+#- 'gcr.io/$PROJECT_ID/amster'

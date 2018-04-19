@@ -1,5 +1,6 @@
-{{ if .Values.runPostSetupJob }}
+{{ if gt ( int .Values.replicas ) 1 }}
 # This is an optional job that configures replication and schedules backups.
+# We run this if the number of replicas is > 1
 apiVersion: batch/v1
 kind: Job
 metadata:
