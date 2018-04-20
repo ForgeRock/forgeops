@@ -27,7 +27,7 @@ if ! kubectl get secret --namespace "${NAMESPACE}" "${secretName}"; then
     echo "public read only access to the forgeops-init repo. To create your own secret use "
     echo "the following command to generate a secret:"
     echo "ssh-keygen -t rsa -C \"forgeopsrobot@forgrock.com\" -f id_rsa -N ''"
-    echo "The id_rsa.pub file should be uploaded to github or stash and configured as a deployment key for your Git repository"
+    echo "The id_rsa.pub file should be uploaded to github and configured as a deployment key for your Git repository"
     echo "Create the Kubernetes secret using the private key:"
     echo "kubectl create secret generic "${secretName}" --from-file=id_rsa"
 
@@ -52,7 +52,7 @@ if [ ! -r "${CUSTOM_YAML}" ]; then
 global:
   domain: ${DOMAIN}
   git:
-    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    repo: "https://github.com/ForgeRock/forgeops-init.git"
     branch: master
   configPath:
     idm:  default/idm/sync-with-ldap-bidirectional
