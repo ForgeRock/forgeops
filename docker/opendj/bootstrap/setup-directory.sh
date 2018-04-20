@@ -139,27 +139,8 @@ load_ldif() {
 }
 
 
-# Run any post installation scripts for the bootstrap type.
-post_install_scripts() {
-    script="bootstrap/${BOOTSTRAP_TYPE}/post-install.sh"
-
-    if [ -r "$script" ]; then
-        echo "executing post install script $script"
-        sh "$script"
-    fi
-}
-
-
-
 # Load any optional ldif files. These fiiles need to be loaded with the server running.
 bin/start-ds
 load_ldif "bootstrap/userstore/ldif"
 load_ldif "bootstrap/cts/ldif"
 bin/stop-ds
-
-
-post_install_scripts
-
-#     --hostname $FQDN  --port 4444  --bindDN "cn=Directory Manager"  \
-#     --bindPasswordFile "${DIR_MANAGER_PW_FILE}" \
-

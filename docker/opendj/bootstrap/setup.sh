@@ -40,6 +40,14 @@ else
 
  fi
 
+# Run post install customization script if the user supplied one.
+script="bootstrap/post-install.sh"
+
+if [ -r "$script" ]; then
+    echo "executing post install script $script"
+    sh "$script"
+fi
+
 ./scripts/log-redirect.sh
 
 
