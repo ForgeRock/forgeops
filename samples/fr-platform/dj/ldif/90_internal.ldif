@@ -40,6 +40,13 @@ objectClass: organizationalUnit
 objectClass: top
 ou: roles
 
+# Internal UserMeta OU
+
+dn: ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=com
+objectclass: organizationalunit
+objectclass: top
+ou: usermeta
+
 ##
 # Clustered Recon OUs
 ##

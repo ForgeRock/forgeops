@@ -43,17 +43,6 @@ Otherwise, export dummy values:
 
 If you use dummy values, Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
 
-## Building the base images
-
-The baseline docker images needed for this sample are defined in ../docker in this forgeops repository. A README in that directory covers the various methods available in order to build the Docker images. Whichever method you choose to use, be sure that you have built these images:
-
-- openam
-- amster
-- opendj
-- openidm
-- openig
-
-
 ## Starting the sample
 
 In order to copy and paste the below commands, you will need make sure your working folder is correct. You should be in the same folder as this README file (forgeops/sample-platform).

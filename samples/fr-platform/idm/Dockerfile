@@ -1,4 +1,4 @@
-FROM forgerock-docker-internal.bintray.io/forgerock/openidm:latest
+FROM forgerock-docker-public.bintray.io/forgerock/openidm:6.0.0
 
 COPY conf /opt/openidm/conf
 COPY script /opt/openidm/script
