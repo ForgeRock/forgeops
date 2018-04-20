@@ -29,9 +29,9 @@ spec:
         - configMapRef:
             name: am-configmap
       - name: wait-for-configstore
-        image: "groundnuty/k8s-wait-for:0.3"
-        imagePullPolicy: IfNotPresent
-        args: [ "pod", "-l", "djInstance=configstore" ]
+        image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        args: [ "wait", "{{ .Values.configLdapHost }}", "{{ .Values.configLdapPort }}" ]
       # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
       - name: bootstrap
         image: quay.io/forgerock/util:6.0.0

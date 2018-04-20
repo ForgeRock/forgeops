@@ -3,8 +3,6 @@
 # Copyright (c) 2016-2017 ForgeRock AS
 #
 
-set -x
-
 command=$1
 
 echo "Command: $command"
@@ -18,11 +16,14 @@ pause() {
     done
 }
 
-# The default command is "run" - which assumes an external configuration store. If
-# you want AM to come up without waiting for a configuration store, use run-nowait.
 case "$command"  in
 bootstrap) 
     exec $HOME/am_bootstrap.sh
+    ;;
+wait)
+    # execute wait_for script that waits for a service, pod, etc. to be ready.
+    shift
+    exec $HOME/wait_for_service.sh "$@"
     ;;
 pause) 
     pause
