@@ -1,4 +1,4 @@
-FROM forgerock-docker-internal.bintray.io/forgerock/amster:latest
+FROM forgerock-docker-public.bintray.io/forgerock/amster:6.0.0
 
 COPY scripts /opt/amster/scripts/
 COPY config /opt/amster/config/

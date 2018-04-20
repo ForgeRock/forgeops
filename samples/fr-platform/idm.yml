@@ -7,16 +7,16 @@ metadata:
 spec:
   initContainers:
   - name: wait-for-repo
-    image: "groundnuty/k8s-wait-for:0.3"
+    image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
     imagePullPolicy: IfNotPresent
-    args: [ "pod", "-l", "role=persistence" ]
+    args: [ "wait", "dj-0.dj-service", "1389" ]
   containers:
     - image: idm:fullstack
       imagePullPolicy: IfNotPresent
       name: openidm
       env:
       - name: IDM_ENVCONFIG_DIRS
-        value: /opt/openidm/conf/boot
+        value: /opt/openidm/resolver
       - name: OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE
         value: "true"
       - name: OPENIDM_CONFIG_REPO_ENABLED

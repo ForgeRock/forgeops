@@ -75,10 +75,10 @@
                 "_queryFilter": "/instanceId eq \"${instanceId}\""
             },
             "find-relationships-for-resource": {
-                "_queryFilter": "(/firstResourceCollection eq \"${resourceContainer}\" and /firstResourceId eq \"${resourceId}\" and /firstPropertyName eq \"${resourceFieldName}\") or (/secondResourceCollection eq \"${resourceContainer}\" and /secondResourceId eq \"${resourceId}\" and /secondPropertyName eq \"${resourceFieldName}\")"
+              "_queryFilter": "(/firstResourceCollection eq \"${resourceCollection}\" and /firstResourceId eq \"${resourceId}\" and /firstPropertyName eq \"${propertyName}\") or (/secondResourceCollection eq \"${resourceCollection}\" and /secondResourceId eq \"${resourceId}\" and /secondPropertyName eq \"${propertyName}\")"
             },
             "find-relationship-edges": {
-                "_queryFilter": "((/firstResourceCollection eq \"${vertex1ResourceContainer}\" and /firstResourceId eq \"${vertex1ResourceId}\" and /firstPropertyName eq \"${vertex1FieldName}\") and (/secondResourceCollection eq \"${vertex2ResourceContainer}\" and /secondResourceId eq \"${vertex2ResourceId}\" and /secondPropertyName eq \"${vertex2FieldName}\")) or ((/firstResourceCollection eq \"${vertex2ResourceContainer}\" and /firstResourceId eq \"${vertex2ResourceId}\" and /firstPropertyName eq \"${vertex2FieldName}\") and (/secondResourceCollection eq \"${vertex1ResourceContainer}\" and /secondResourceId eq \"${vertex1ResourceId}\" and /secondPropertyName eq \"${vertex1FieldName}\"))"
+              "_queryFilter": "((/firstResourceCollection eq \"${firstResourceCollection}\" and /firstResourceId eq \"${firstResourceId}\" and /firstPropertyName eq \"${firstPropertyName}\") and (/secondResourceCollection eq \"${secondResourceCollection}\" and /secondResourceId eq \"${secondResourceId}\" and /secondPropertyName eq \"${secondPropertyName}\")) or ((/firstResourceCollection eq \"${secondResourceCollection}\" and /firstResourceId eq \"${secondResourceId}\" and /firstPropertyName eq \"${secondPropertyName}\") and (/secondResourceCollection eq \"${firstResourceCollection}\" and /secondResourceId eq \"${firstResourceId}\" and /secondPropertyName eq \"${firstPropertyName}\"))"
             }
         },
         "explicit": {
@@ -388,6 +388,9 @@
             },
             "jsonstorage": {
                 "dnTemplate": "ou=jsonstorage,dc=openidm,dc=forgerock,dc=com"
+            },
+            "internal/usermeta" : {
+                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=com"
             }
         }
     }
