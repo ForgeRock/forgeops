@@ -19,7 +19,7 @@ The default repository used in the charts is:
 ```
 global:
     git:
-     repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+     repo: "https://github.com/ForgeRock/forgeops-init.git"
      branch: master
 ```
 

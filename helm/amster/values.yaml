@@ -61,7 +61,7 @@ global:
   domain: .forgeops.com
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    repo: "https://github.com/ForgeRock/forgeops-init.git"
     branch: master
   configPath:
     am: default/am/empty-import

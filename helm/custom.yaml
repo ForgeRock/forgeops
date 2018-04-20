@@ -18,7 +18,7 @@ global:
   # Where to pull product configuration, or push it (pushing requires git ssh credentials)
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+    repo: "https://github.com/ForgeRock/forgeops-init.git"
     # branch can be a git branch or a sha commit:
     branch: master
     # Optional sed filter to run after git checkout. The sed edit script here will be recursively run on *every*

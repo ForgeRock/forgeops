@@ -20,7 +20,7 @@ spec:
     imagePullPolicy: IfNotPresent
     env:
     - name: GIT_REPO
-      value: "https://stash.forgerock.org/scm/cloud/forgeops-init.git"
+      value: "https://github.com/ForgeRock/forgeops-init.git"
     - name: GIT_BRANCH
       value: master
     volumeMounts:
