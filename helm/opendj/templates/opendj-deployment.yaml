@@ -50,7 +50,7 @@ spec:
         podAntiAffinity:
         {{- if eq .Values.podAntiAffinity "hard" }}
           requiredDuringSchedulingIgnoredDuringExecution:
-          - topologyKey: "kubernetes.io/hostname"
+          - topologyKey: {{ .Values.topologyKey }}
             labelSelector:
                 matchExpressions:
                 - key: djInstance
@@ -67,7 +67,7 @@ spec:
                   operator: In
                   values:
                   - {{ .Values.djInstance }}
-              topologyKey: "kubernetes.io/hostname"
+              topologyKey: {{ .Values.topologyKey }}
          {{- end }}
       terminationGracePeriodSeconds: 30
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
