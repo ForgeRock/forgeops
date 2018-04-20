@@ -20,11 +20,11 @@ COPY openidm.zip /tmp/openidm.zip
 #     rm -f /var/tmp/openidm.zip  && rm -fr /opt/openidm/samples && \
 #     git config --global user.email "auto-sync@forgerock.net" && \
 #     git config --global user.name "Git Auto-sync user"
-# ttf-dejavu  - needed for orientdb. No longer needed?
+# ttf-dejavu  - needed for Activiti workflow.
 
 RUN apk update && \
     apk upgrade && \
-    apk add zip
+    apk add zip ttf-dejavu
 
 RUN unzip -q /tmp/openidm.zip && \
     chown -R forgerock:forgerock /opt/openidm && \
