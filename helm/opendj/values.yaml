@@ -77,6 +77,10 @@ djPersistence: true
 # The hard setting means that do not deploy more than one pod in a node which is critical for HA.
 podAntiAffinity: "soft"
 
+# This is the exact value for TopologyKey. The other possible value is "failure-domain.beta.kubernetes.io/zone"
+# which can be used NOT to schedule the pod on a node in the same zone thus allowing for HA across zones
+topologyKey: "kubernetes.io/hostname"
+
 gcs:
   # Set this to true to enable backups to Google Cloud Storage. You need to create the top level bucket first.
   enabled: false
