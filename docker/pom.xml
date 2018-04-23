@@ -86,7 +86,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Default versions to build  -->
         <openamVersion>6.0.0-M13</openamVersion>
-        <opendjVersion>6.0.0-RC2</opendjVersion>
+        <opendjVersion>6.0.0-RC3</opendjVersion>
         <openidmVersion>6.0.0-M8</openidmVersion>
         <openigVersion>6.0.0-RC1</openigVersion>
         <registry>forgerock-docker-internal.bintray.io:443</registry>

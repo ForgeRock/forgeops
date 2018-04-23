@@ -45,24 +45,36 @@ init container name:
 
 `kubectl logs userstore-0 -c setup -f`
 
-# Scaling and replication
+## Scaling and replication
 
 To scale a deployment set the number of replicas in values.yaml, and enable the postSetupJob. See values.yaml
 for the various options. Each node in the statefulset is a combined directory and replication server. 
 
 
-# Backup
+## Backup
 
 Backups can be scheduled using the directory servers cron facility. The backup job is configured as part
 of the post installation job (see values.yaml for cron settings).  Each pod in the statefulset mounts a backup
 persistent volume claim (PVC) on bak/. This PVC holds the contents of the backups. You must size this PVC according 
 to the amount of backup data you wish to retain. Old backups must be purged manually.
 
+A backup can be initiated manually by execing into the image and running the scripts/backup.sh command. For example:
+
+`kubectl exec userstore-0 -it bash`
+`./scripts/backup.sh`
+
+The `backup.sh` script also backs up directory meta data (config.ldif, etc.). You should perform at least one manual backup
+to capture this data. 
+
+The backups can be listed using `scripts/list-backup.sh`
+
+## Disaster Recovery
+
 There is also an option to
 copy backup data to a Google Cloud Storage bucket (gcs). This is useful as a disaster recovery
-strategy, or to move data from one environment to another (prod to QA, for example).
+strategy, or to move data from one environment to another (prod to QA, for example). 
 
-# Restore 
+## Restore 
 
 A backup can restored from the mounted backup PVC. This can be done manually by execing into the container and running
 the bin/restore utility. A convenience script (restore.sh) is also provided in the scripts/ directory. 
