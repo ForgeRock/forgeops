@@ -3,7 +3,7 @@
 Deploy one or more ForgeRock Directory Server instances using Persistent disk claims
 and StatefulSets. 
 
-# Sample Usage
+## Sample Usage
 
 To deploy to a Kubernetes cluster:
 
@@ -25,13 +25,13 @@ To deploy Directory Proxy Server
 `helm install --set "bootstrapType=proxy,djInstance=dps,runSetup=false" opendj`
 
 
-# Values.yaml
+## Values.yaml
 
 Please refer to values.yaml. There are a number of variables you can set on the helm command line, or 
 in your own custom.yaml to control the behavior of the deployment. The features described below
 are all controlled by variables in values.yaml.
 
-# Diagnostics and Troubleshooting
+## Diagnostics and Troubleshooting
 
 Use kubectl exec to get a shell into the running container. For example:
 
@@ -85,7 +85,7 @@ Optionally, a directory server instance can be initialized from a previous backu
 be used in a disaster recovery scenario, or in development to load a previously exported data set.
 
 
-# Backup verification
+## Backup verification
 
 An optional Kubernetes cron job can be scheduled that will periodically attempt to restore the last backup to
 a transient instance, and verify the data by doing an export-ldif.  The conclusion of this job will
@@ -95,7 +95,7 @@ Using Kubernetes tools, `kubectl get cronjob`  and `kubectl logs cron-job-xyz` c
 the results of the verification.
 
 
-# Slack Notifications
+## Slack Notifications
 
 A sample script (scripts/notify.sh) can be enabled to send event notifications to slack. You must create a 
 slack webhook URL and set in values.yaml. Currently notifications occur after a full backup and after verification 
@@ -105,7 +105,7 @@ If you want to use an alternate notification mechanism you can replace the notif
 with an alternate implementation.
 
 
-# Benchmarking 
+## Benchmarking 
 
 If you are benchmarking on a cloud provider make sure you use an SSD storage class as the directory is very sensitive 
 to disk performance.
