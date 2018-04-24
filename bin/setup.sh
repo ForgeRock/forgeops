@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Edit this based on your environment!
+# Sample setup script for Mac OS X. Edit this based on your environment!
 # Prerequisites: you must have homebrew installed.
 brew update
 
@@ -15,8 +15,7 @@ echo "Creating a Minikube VM"
 
 # The command below defaults to using VirtualBox - which we assume you have installed.
 # Add the --vm-driver=vmwarefusion  or --vm-driver=xhyve  if you want to change the hypervisor.
-minikube start --memory 8096
-
+minikube start --bootstrapper kubeadm --kubernetes-version v1.10.1 --memory 6192
 minikube status
 
 
