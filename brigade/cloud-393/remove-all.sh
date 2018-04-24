@@ -10,3 +10,4 @@ helm delete --purge cdtest
 kubectl delete job --all
 kubectl delete pods --all
 
+# afdf
