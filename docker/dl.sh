@@ -18,6 +18,7 @@ DJ_VERSION=$VERSION
 IG_VERSION=$VERSION-RC3
 
 
+
 # you should not need to edit the paths below
 REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
 SNAPSHOT_REPO=https://maven.forgerock.org/repo/internal-snapshots/org/forgerock

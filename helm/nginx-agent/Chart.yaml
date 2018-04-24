@@ -1,4 +1,0 @@
-apiVersion: v1
-description: A Helm chart to deploy an nginx web server with a ForgeRock policy agent.
-name: nginx-agent
-version: 6.0.0
