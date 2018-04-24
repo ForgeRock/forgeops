@@ -1,0 +1,11 @@
+project: "ForgeRock/forgeops"
+repository: "github.com/ForgeRock/forgeops/tree/cloud-393"
+cloneURL: "https://github.com/ForgeRock/forgeops.git"
+# Used by GitHub to compute hooks.
+# MAKE SURE YOU CHANGE THIS. It's basically a password.
+sharedSecret: "secret_project"
+# Use this to have Brigade update your project about the build.
+# You probably want this if you want pull requests or commits to show
+# the build status.
+github:
+  token: "0a50b3d2872e7344e4f90bbd6b8923bed9b0ec5d"
