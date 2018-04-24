@@ -6,10 +6,14 @@
 # The publishService.enabled attribute will tell nginx to publish the L4 IP as the ingress IP.
 
 # Set this IP to your reserved IP. Must be in the same zone as your cluster.
-MYIP=xx.xx.xx.xx
-helm install --namespace nginx  --set "controller.service.loadBalancerIP=$MYIP" \
-    --set rbac.create=true \
-    --set "controller.publishService.enabled=true"  stable/nginx-ingress
+MYIP=$1
+
+helm install --namespace nginx --name nginx  \
+  --set rbac.create=true \
+  --set "controller.service.loadBalancerIP=$MYIP" \
+  --set "controller.publishService.enabled=true" \
+  stable/nginx-ingress
+
 
 
 

@@ -22,6 +22,10 @@ objectClass: top
 objectClass: organizationalUnit
 subordinateTemplate: person:[numusers]
 
+branch: ou=Groups,[suffix]
+objectClass: top
+objectClass: organizationalUnit
+
 template: person
 rdnAttr: uid
 objectClass: top
