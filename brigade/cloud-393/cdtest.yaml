@@ -1,5 +1,5 @@
 project: "ForgeRock/forgeops"
-repository: "github.com/ForgeRock/forgeops"
+repository: "github.com/ForgeRock/forgeops/tree/cloud-393"
 cloneURL: "https://github.com/ForgeRock/forgeops.git"
 # Used by GitHub to compute hooks.
 # MAKE SURE YOU CHANGE THIS. It's basically a password.
