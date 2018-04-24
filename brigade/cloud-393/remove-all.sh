@@ -11,3 +11,4 @@ kubectl delete job --all
 kubectl delete pods --all
 
 # afdf
+echo "hello"
