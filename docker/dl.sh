@@ -14,7 +14,7 @@ SNAPSHOT=6.0.0-SNAPSHOT
 # Update release / milestone / RC builds here.
 AM_VERSION=$VERSION-M13
 IDM_VERSION=$VERSION-M8
-DJ_VERSION=$VERSION-RC2
+DJ_VERSION=$VERSION-RC3
 IG_VERSION=$VERSION-RC1
 
 
@@ -42,54 +42,72 @@ IG_SNAPSHOT=$SNAPSHOT_REPO/openig/openig-war/$SNAPSHOT/openig-war-$SNAPSHOT.war
 
 HEADER="X-JFrog-Art-Api: $API_KEY"
 
-dl() {
-    echo "Downloading $1 to $2"
 
+# Download a binary specified by $1
+dl_binary() {
+    case "$1" in
+    amster)
+        dl $AMSTER_SNAPSHOT $AMSTER amster/amster.zip
+        ;;
+    openam)
+        dl $AM_SNAPSHOT $AM openam/openam.war
+        ;;
+    openidm)
+        dl $IDM_SNAPSHOT $IDM openidm/openidm.zip
+        ;;
+   openig)      
+        dl $IG_SNAPSHOT $IG openig/openig.war
+        ;;
+    opendj)
+        dl $DJ_SNAPSHOT $DJ opendj/opendj.zip
+        ;;
+    *) 
+        echo "Invalid image to downoad $1"
+        exit 1
+    esac
+}
 
+# Do the actual download. $1 - snapshost source $2 - release source, $3 destination
+dl(){
+    if [ -z "$BUILD_SNAPSHOTS" ]; 
+    then
+        src="$2"
+    else
+        src="$1"
+    fi
+
+    echo "Downloading $src to $3"
     if [ -z "${WGET}" ]
     then
-        curl -s -H "$HEADER"  $1 -o $2
+        curl -s -H "$HEADER"  $src -o $3
     else
-        wget -q --header "$HEADER" $1  -O $2
+        wget -q --header "$HEADER" $src  -O $3
     fi
 }
 
-
-dl_snapshots() {
-    dl $AMSTER_SNAPSHOT amster/amster.zip
-    dl $AM_SNAPSHOT openam/openam.war
-    dl $IDM_SNAPSHOT openidm/openidm.zip
-    dl $IG_SNAPSHOT openig/openig.war
-    dl $DJ_SNAPSHOT opendj/opendj.zip
-}
-
-dl_milestones() {
-    dl $AMSTER amster/amster.zip
-    dl $AM openam/openam.war
-    dl $IDM openidm/openidm.zip
-    dl $IG openig/openig.war
-    dl $DJ opendj/opendj.zip
-}
+IMAGES="opendj openidm amster openam openig"
 
 while getopts "sw" opt; do
   case ${opt} in
     s ) BUILD_SNAPSHOTS="true" ;;
     w ) WGET="true" ;;
     \? )
-         echo "Usage: dl.sh [-s]"
+         echo "Usage: dl.sh [-s] images..."
          echo "-s download snapshots instead of releases"
          echo "-w Use wget instead of curl"
+         echo "Images can be one or more of: $IMAGES"
+         echo "If not specified, all images are downloaded"
          exit 1
       ;;
   esac
 done
 shift $((OPTIND -1))
 
-if [ ! -z "$BUILD_SNAPSHOTS" ]
-then
-    echo "Downloading snapshots"
-    dl_snapshots
-else
-    echo "Downloading releases/milestones"
-    dl_milestones
+
+if [ "$#" -ne 0 ]; then
+   IMAGES="$@"
 fi
+
+for image in $IMAGES; do
+      dl_binary $image
+done
