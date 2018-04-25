@@ -1,4 +1,6 @@
-First edit your providers env file such as gke-env.sh.
+First copy and edit your providers env file. For example
+$ cp gke-eng.template gke-eng.cfg
+$ vi gke-env.cfg
 
 If you have an existing kubernetes cluster that you want to use then edit the gke-up.sh cript and comment the create-cluster.sh line, otherwise continue to the next step
 
