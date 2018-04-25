@@ -3,50 +3,21 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 
-validateInputArgs() {
+. ./gke-env.cfg
 
-  CLUSTER_NAME=openam
+echo "=> Read the following env variables from config file"
+echo "Kubernetes Cluster Name = $GKE_CLUSTER_NAME"
+echo "GKE Compute Zone = $GKE_COMPUTE_ZONE"
+echo ""
+echo "=> Do you want to delete the above cluster?"
+read -p "Continue (y/n)?" choice
+case "$choice" in 
+   y|Y|yes|YES ) echo "yes";;
+   n|N|no|NO ) echo "no"; exit;;
+   * ) echo "Invalid input, Bye!"; exit;;
+esac
 
-  while [[ $# > 0 ]]
-  do
-    KEY=$1
-    shift
-
-    # Parse arguments
-    case $KEY in
-
-      # Usage message
-      -h)
-        USAGE=yes
-        ;;
-
-      # Cluster name (default is openam)
-      --cluster-name)
-      echo "Cluster name"
-        CLUSTER_NAME=$1
-        shift
-        ;;
-
-    esac
-  done
-
-  if [[ ${USAGE} == yes ]]
-  then
-    echo
-    echo "Options:"
-    echo "--cluster-name    - Name of the cluster to delete. Default is openam."
-    echo
-    exit 0
-  fi
-
-}
-
-validateInputArgs "$@"
-
-export ZONE=us-central1-f
-PROJECT=engineering-devops
-
-gcloud container clusters delete $CLUSTER_NAME --zone $ZONE
+gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_COMPUTE_ZONE
 
 
 

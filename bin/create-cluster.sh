@@ -6,15 +6,17 @@
 # You must have the gcloud command installed and access to a GCP project.
 # See https://cloud.google.com/container-engine/docs/quickstart
 
-. ./gke-env.sh
+. ./gke-env.cfg
 
-echo "=> Read the following env variables from gke-env file"
+echo "=> Read the following env variables from config file"
 echo "GKE Project Name = $GKE_PROJECT_NAME"
 echo "GKE Compute Zone = $GKE_COMPUTE_ZONE"
 echo "Kubernetes Cluster Name = $GKE_CLUSTER_NAME"
+echo "Cluster Namespace = $GKE_CLUSTER_NS"
 echo "Cluster Version = $GKE_CLUSTER_VERSION"
 echo "Cluster size =  $GKE_CLUSTER_SIZE"
 echo "VM Type = $GKE_MACHINE_TYPE"
+echo "Ingress Controller IP = $GKE_INGRESS_IP"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
@@ -41,7 +43,7 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --network "default" \
       --enable-cloud-logging \
       --enable-cloud-monitoring \
-      --num-nodes $GKE_CLUSTER_SIZE \
+      --num-nodes "$GKE_CLUSTER_SIZE" \
       --enable-autoscaling \
       --enable-autoupgrade \
       --enable-autorepair \
