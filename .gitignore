@@ -13,3 +13,4 @@ target/
 bazel-*
 brigade.yaml
 settings.xml
+*.cfg
