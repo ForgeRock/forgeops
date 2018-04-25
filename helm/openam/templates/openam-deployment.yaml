@@ -17,7 +17,7 @@ spec:
       terminationGracePeriodSeconds: 10
       initContainers:
       - name: git-init
-        image: quay.io/forgerock/git:6.0.0
+        image: forgerock/git:6.0.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
@@ -34,7 +34,7 @@ spec:
         args: [ "wait", "{{ .Values.configLdapHost }}", "{{ .Values.configLdapPort }}" ]
       # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
       - name: bootstrap
-        image: quay.io/forgerock/util:6.0.0
+        image: forgerock/util:6.0.0
         imagePullPolicy:  {{ .Values.image.pullPolicy }}
         env:
         - name: BASE_DN

@@ -32,48 +32,28 @@ curl -u your.backstage.login -O "http://maven.forgerock.org/repo/internal/settin
 ```
 Note that access to the Artifactory server is restricted to ForgeRock staff, partners and subscription customers.
 
-# Additional Dockerfiles
 
-There are a number of utility Docker images that do not contain ForgeRock software but are
-required when running ForgeRock software in Kubernetes. These can be 
-found [on github](https://github.com/ForgeRock/docker-public). These images are
-automatically built and pushed to [quay.io](https://quay.io/organization/forgerock).
-
-
-# Building Minor or Patch Releases
+## Building Minor or Patch Releases
 
 If you want to use a major or minor release (AM 14.0.1, for example), log on to
 backstage.forgerock.com and download the appropriate binary. The binary should be
 placed in the Docker build directory (e.g. openam/) and should not have any
 version info (openam.war, not OpenAM-14.0.1.war).
 
-# Using a Private Docker Registry 
-
-The maven pom.xml builds Docker images and optionally push them to a registry. Images are
-available in ForgeRock's private registry server at docker-public.forgerock.io. This registry
-is currently limited to ForgeRock staff. 
-
-To access the registry you will need 
-[ForgeRock backstage credentials](https://backstage.forgerock.com/login) and the appropriate permissions to pull images.  
-You can browse the available images using [artifactory](https://docker-public.forgerock.io/repo/webapp/#/artifacts/browse/tree/General/docker-public) 
-
-To use the registry you must authorize Docker to pull images:
-
-```docker login -e your_email -u your_backstage_id  -p your_password docker-public.forgerock.io```
-
-You can now pull and run images. For example:
-
-```docker pull docker-public.forgerock.io/forgerock/openam:14.5.0-SNAPSHOT```
-
-To use the private registry in Helm charts in a Kubernetes deployment, 
-see the documentation [here](https://Bitbucket Server.forgerock.org/projects/DOCKER/repos/fretes/browse). 
-
-# Kubernetes
+## Kubernetes
 
 If you are interested in running on a Kubernetes cluster, see the helm/ folder
 
-# How to Run These Images
+## How to Run These Images
 
-Please see the README.md in each directory. For the most part these images are intended to be
-orchestrated together using something like Kubernetes. They depend on external volumes being
-mounted for secrets, configuration and persistent data.
+Please see the README.md in each directory. These images are intended to be
+orchestrated together using Kubernetes. They depend on external volumes being
+mounted for secrets, configuration and persistent data. As such, they are not supported in non Kubernetes environments (docker compose, docker swarm, etc.)
+
+
+## Image Builds
+
+The product images are built automatically (using Conatainer Builder) when a commit is made to ForgeOps. These images are pushed to https://bintray.com/forgerock.
+
+
+The java and git images are available on the docker hub. They are built when a new commit is made to ForgeOps

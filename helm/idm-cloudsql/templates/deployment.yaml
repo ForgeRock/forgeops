@@ -14,7 +14,7 @@ spec:
     spec:
       initContainers:
       - name: git-init
-        image: quay.io/forgerock/git:6.0.0
+        image: forgerock/git:6.0.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
@@ -40,7 +40,7 @@ spec:
           - name: cloudsql
             mountPath: /cloudsql
       - name: git
-        image: quay.io/forgerock/git:6.0.0
+        image: forgerock/git:6.0.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
