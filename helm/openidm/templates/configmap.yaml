@@ -62,6 +62,7 @@ data:
       # Prometheus endpoint authentication
       openidm.prometheus.username=prometheus
       openidm.prometheus.password=prometheus
+      openidm.prometheus.role=openidm-prometheus
 
       # Optionally use the crypto bundle to obfuscate the password and set one of these:
       #openidm.keystore.password=OBF:
