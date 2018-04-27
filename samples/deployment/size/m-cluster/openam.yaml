@@ -6,7 +6,6 @@ resources:
     memory: 8Gi
   requests:
     memory: 6Gi
-    cpu: 12000m
 
 image:
   tag: 6.0.0
