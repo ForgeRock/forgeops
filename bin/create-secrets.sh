@@ -6,4 +6,6 @@
 # You must have the gcloud command installed and access to a GCP project.
 # See https://cloud.google.com/container-engine/docs/quickstart
 
-echo "I don't have any secrets yet!"
+
+kubectl delete secret git-ssh-key
+kubectl create secret generic git-ssh-key --from-file=/Users/wahmed/Engineering/id_rsa

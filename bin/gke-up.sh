@@ -10,7 +10,7 @@ case "$choice" in
    * ) echo "Invalid input, Bye!"; exit;;
 esac
 
-. ./gke-env.cfg
+. ../etc/gke-env.cfg
 
 ./create-cluster.sh
 ./create-sc.sh

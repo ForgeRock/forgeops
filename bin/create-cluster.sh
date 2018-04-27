@@ -6,7 +6,7 @@
 # You must have the gcloud command installed and access to a GCP project.
 # See https://cloud.google.com/container-engine/docs/quickstart
 
-. ./gke-env.cfg
+. ../etc/gke-env.cfg
 
 echo "=> Read the following env variables from config file"
 echo "GKE Project Name = $GKE_PROJECT_NAME"
