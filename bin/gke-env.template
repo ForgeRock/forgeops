@@ -2,7 +2,7 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 # Google Cloud Project ID
-GKE_PROJECT_NAME="engineering-devops"
+GKE_PROJECT_NAME="my-gcp-project"
 
 # Compute Zone
 GKE_COMPUTE_ZONE="us-east1-d"
@@ -20,8 +20,8 @@ GKE_CLUSTER_SIZE="2"
 GKE_MACHINE_TYPE="custom-16-40960"
 
 # Kubernetes Namespace
-GKE_CLUSTER_NS="bench"
+GKE_CLUSTER_NS="prod"
 
 # IP of the Ingress Controller
 # Leave  blank "" if you don't know the IP or want to dynamically set it
-GKE_INGRESS_IP="35.231.28.179"
+GKE_INGRESS_IP=""
