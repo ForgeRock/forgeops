@@ -13,9 +13,9 @@ SNAPSHOT=6.0.0-SNAPSHOT
 
 # Update release / milestone / RC builds here.
 AM_VERSION=$VERSION-M14
-IDM_VERSION=$VERSION-RC5
+IDM_VERSION=$VERSION-RC6
 DJ_VERSION=$VERSION
-IG_VERSION=$VERSION-RC2
+IG_VERSION=$VERSION-RC3
 
 
 # you should not need to edit the paths below
