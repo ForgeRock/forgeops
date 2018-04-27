@@ -1,0 +1,22 @@
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/amster
+  tag: 6.0.0
+  pullPolicy: Always
+
+# Defines default global values. These can get overridden with -f custom.yaml
+global:
+  domain: .frk8s.net
+  git:
+    # git repo to clone. The value below is a public git repo that does not require authentication.
+    branch: master
+    repo: git@github.com:ForgeRock/cloud-deployment-config.git
+    sedFilter: "-e s/benchmark.forgeops.com/bench.frk8s.net/"
+  configPath:
+    am: gatling/forgeops-benchmark-am
+
+# For production set CPU limits to help Kube Schedule the pods.
+resources:
+ limits:
+   memory: 756Mi
+ requests:
+   memory: 756Mi
