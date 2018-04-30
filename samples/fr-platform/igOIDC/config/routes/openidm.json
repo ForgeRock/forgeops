@@ -157,8 +157,16 @@
                                                     "methods": ["GET"]
                                                 },
                                                 {
+                                                    "path": "^/openidm/authentication.*",
+                                                    "methods": ["GET", "POST"]
+                                                },
+                                                {
                                                     "path": "^/openidm/config/ui/themeconfig",
                                                     "methods": ["GET"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/identityProviders.*",
+                                                    "methods": ["POST"]
                                                 },
                                                 {
                                                     "path": "^/openidm/selfservice/.*",
