@@ -4,9 +4,8 @@ if (!session.idmUserDetails || session.idmUserDetails.authenticationId != sessio
         .setUri(idmUserDetailEndpoint)
         .setMethod(idmUserDetailMethod)
 
-    if (session.openid.id_token_claims.sub.toLowerCase() != "amadmin") {
-        idmRequest.getHeaders().add('X-OpenIDM-RunAs', session.openid.id_token_claims.sub)
-    }
+    idmRequest.getHeaders().add('X-OpenIDM-RunAs', session.openid.id_token_claims.sub)
+
     if (request.getHeaders().get('X-Authorization-Map')) {
         idmRequest.getHeaders().add(request.headers['X-Authorization-Map'])
     }
