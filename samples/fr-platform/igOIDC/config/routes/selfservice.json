@@ -1,7 +1,7 @@
 {
     "name": "selfservice",
     "baseURI": "https://idm-service.sample.svc.cluster.local:8444/",
-    "condition": "${matches(request.uri.path, '^/selfservice/')}",
+    "condition": "${matches(request.uri.path, '^/selfservice/') or matches(request.uri.path, '^/oauthReturn/')}",
     "auditService": {
         "type": "AuditService",
         "config": {

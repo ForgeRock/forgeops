@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : null,
-    "amsterVersion" : "6.0.0-M4",
+    "amsterVersion" : "6.0.0-M13",
     "entityType" : "DefaultSecurityProperties",
     "entityId" : "DefaultSecurityProperties",
     "pathParams" : { }
@@ -23,10 +23,10 @@
       "com.iplanet.am.cookie.encode" : false
     },
     "amconfig.header.securitykey" : {
-      "com.sun.identity.saml.xmlsig.keystore" : "/var/run/secrets/openam/keystore.jceks",
+      "com.sun.identity.saml.xmlsig.keystore" : "%BASE_DIR%/%SERVER_URI%/keystore.jceks",
       "com.sun.identity.saml.xmlsig.storetype" : "JCEKS",
-      "com.sun.identity.saml.xmlsig.storepass" : "/var/run/secrets/openam/.storepass",
-      "com.sun.identity.saml.xmlsig.keypass" : "/var/run/secrets/openam/.keypass",
+      "com.sun.identity.saml.xmlsig.storepass" : "%BASE_DIR%/%SERVER_URI%/.storepass",
+      "com.sun.identity.saml.xmlsig.keypass" : "%BASE_DIR%/%SERVER_URI%/.keypass",
       "com.sun.identity.saml.xmlsig.certalias" : "test"
     },
     "amconfig.header.crlcache" : {

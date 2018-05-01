@@ -2,6 +2,10 @@ import org.forgerock.json.jose.jws.SignedJwt
 import org.forgerock.json.jose.common.JwtReconstruction
 import org.forgerock.json.jose.exceptions.JwtReconstructionException
 
+// remove any client-supplied protected values
+request.getHeaders().remove('X-OpenIDM-RunAs')
+request.getHeaders().remove('X-Authorization-Map')
+
 if (request.headers['idtoken']) {
     try {
         // we don't need to validate the id_token because it will be sent to AM and AM will validate it for us
@@ -30,7 +34,7 @@ if (session.openid != null && session.openid.id_token_claims.sub != null) {
     ])).toString()
 
     if (sub.toLowerCase() == 'amadmin') {
-        request.getHeaders().add('X-Authorization-Map', adminContext);
+        request.getHeaders().add('X-Authorization-Map', adminContext)
     }
 
     return next.handle(context, request)

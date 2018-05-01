@@ -7,9 +7,9 @@ metadata:
 spec:
   initContainers:
   - name: wait-for-configstore
-    image: "groundnuty/k8s-wait-for:0.3"
+    image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
     imagePullPolicy: IfNotPresent
-    args: [ "pod", "-l", "role=persistence" ]
+    args: [ "wait", "dj-0.dj-service", "1389" ]
   containers:
     - image: am:fullstack
       imagePullPolicy: IfNotPresent

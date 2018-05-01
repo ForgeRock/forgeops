@@ -5,9 +5,9 @@ metadata:
 spec:
   initContainers:
   - name: wait-for-configstore
-    image: "groundnuty/k8s-wait-for:0.3"
+    image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
     imagePullPolicy: IfNotPresent
-    args: [ "pod", "-l", "role=auth" ]
+    args: [ "wait", "am-service", "80" ]
   containers:
     - image: amster:fullstack
       imagePullPolicy: IfNotPresent

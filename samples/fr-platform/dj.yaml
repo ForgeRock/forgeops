@@ -11,9 +11,6 @@ spec:
         role: persistence
     spec:
       volumes:
-      - name: dj-secrets
-        configMap:
-          name: dj-config
       - name: db
         emptyDir:
           medium: Memory
@@ -22,8 +19,6 @@ spec:
           image:  dj:fullstack
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - name: dj-secrets
-            mountPath: /var/run/secrets/opendj
           - name: db
             mountPath: /opt/opendj/data
           env:
@@ -36,8 +31,6 @@ spec:
           args: [ "start" ]
           name: opendj
           volumeMounts:
-          - name: dj-secrets
-            mountPath: /var/run/secrets/opendj
           - name: db
             mountPath: /opt/opendj/data
           env:

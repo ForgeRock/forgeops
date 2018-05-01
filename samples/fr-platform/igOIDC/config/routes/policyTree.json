@@ -20,31 +20,41 @@
     "heap": [
         {
             "name": "IDMClient",
-            "type": "ClientHandler",
+            "type": "Chain",
             "config": {
-                "hostnameVerifier": "ALLOW_ALL",
-                "sslContextAlgorithm": "TLSv1.2",
-                "keyManager": {
-                    "type": "KeyManager",
+                "filters": [
+                    {
+                        "type": "CookieFilter"
+                    }
+                ],
+                "handler": {
+                    "type": "ClientHandler",
                     "config": {
-                        "keystore": {
-                            "type": "KeyStore",
+                        "hostnameVerifier": "ALLOW_ALL",
+                        "sslContextAlgorithm": "TLSv1.2",
+                        "keyManager": {
+                            "type": "KeyManager",
                             "config": {
-                                "url": "file:///var/openig/keystore.jks",
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                },
                                 "password": "changeit"
                             }
                         },
-                        "password": "changeit"
-                    }
-                },
-                "trustManager": {
-                    "type": "TrustManager",
-                    "config": {
-                        "keystore": {
-                            "type": "KeyStore",
+                        "trustManager": {
+                            "type": "TrustManager",
                             "config": {
-                                "url": "file:///var/openig/keystore.jks",
-                                "password": "changeit"
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                }
                             }
                         }
                     }

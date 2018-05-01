@@ -4,11 +4,11 @@
             "name" : "user",
             "onCreate" : {
                 "type" : "text/javascript",
-                "source" : "require('onCreateUser').setDefaultFields(object);require('roles/conditionalRoles').createConditionalGrantsForUser(object, 'roles');require('onCreateUser').emailUser(object);require('lastChanged').updateLastChanged(object);"
+                "source" : "require('onCreateUser').setDefaultFields(object);require('roles/conditionalRoles').createConditionalGrantsForUser(object, 'roles');require('onCreateUser').emailUser(object);"
             },
             "onUpdate" : {
                 "type" : "text/javascript",
-                "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onUpdateUser').createNotification(object, oldObject);require('lastChanged').updateLastChanged(object);require('aliasList').update(object);"
+                "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);require('roles/conditionalRoles').updateConditionalGrantsForUser(object, 'roles');require('onUpdateUser').createNotification(object, oldObject);require('aliasList').update(object);"
             },
             "onDelete" : {
                 "type" : "text/javascript",
@@ -82,9 +82,7 @@
                     "lastSync",
                     "kbaInfo",
                     "preferences",
-                    "lastChanged",
                     "consentedMappings",
-                    "_meta",
                     "aliasList",
                     "cn",
                     "idps"
@@ -322,6 +320,7 @@
                             "reverseRelationship" : true,
                             "reversePropertyName" : "members",
                             "validate" : true,
+                            "notifySelf" : true,
                             "properties" : {
                                 "_ref" : {
                                     "description" : "References a relationship from a managed object",
@@ -629,34 +628,6 @@
                         ],
                         "required" : [ ]
                     },
-                    "lastChanged" : {
-                        "title" : "Last Changed",
-                        "type" : "object",
-                        "viewable" : false,
-                        "searchable" : false,
-                        "userEditable" : false,
-                        "usageDescription" : "",
-                        "isPersonal" : false,
-                        "properties" : {
-                            "date" : {
-                                "title" : "",
-                                "description" : "Last changed date",
-                                "type" : "string",
-                                "viewable" : true,
-                                "searchable" : true,
-                                "userEditable" : true
-                            }
-                        },
-                        "order" : [
-                            "date"
-                        ],
-                        "description" : "Last Changed",
-                        "returnByDefault" : true,
-                        "isVirtual" : false,
-                        "required" : [
-                            "date"
-                        ]
-                    },
                     "consentedMappings" : {
                         "title" : "Consented Mappings",
                         "description" : "Consented Mappings",
@@ -703,75 +674,6 @@
                         "returnByDefault" : false,
                         "isVirtual" : false
                     },
-                    "_meta" : {
-                        "description" : "Metadata",
-                        "type" : "object",
-                        "viewable" : false,
-                        "searchable" : false,
-                        "isPersonal" : false,
-                        "userEditable" : false,
-                        "properties" : {
-                            "creationDate" : {
-                                "description" : "Creation Date",
-                                "title" : "Creation Date",
-                                "type" : "string"
-                            },
-                            "numberOfLogins" : {
-                                "description" : "Number of Logins",
-                                "title" : "Number of Logins",
-                                "type" : "number"
-                            },
-                            "stagesCompleted" : {
-                                "description" : "Stages completed successfully",
-                                "title" : "Stages Completed",
-                                "type" : "array",
-                                "items" : {
-                                    "type" : "object",
-                                    "title" : "Completed Stage",
-                                    "properties" : {
-                                        "identifier" : {
-                                            "title" : "Stage Identifier",
-                                            "description" : "Stage identifier",
-                                            "type" : "string"
-                                        },
-                                        "dateCompleted" : {
-                                            "title" : "Date Completed",
-                                            "description" : "Date stage was completed",
-                                            "type" : "string"
-                                        }
-                                    }
-                                }
-                            },
-                            "termsAccepted" : {
-                                "title" : "Terms Accepted",
-                                "description" : "Terms Accepted",
-                                "type" : "object",
-                                "properties" : {
-                                    "termsVersion" : {
-                                        "title" : "",
-                                        "description" : "Terms & Conditions Version",
-                                        "type" : "string"
-                                    },
-                                    "iso8601date" : {
-                                        "title" : "",
-                                        "description" : "ISO 8601 Date and time format",
-                                        "type" : "string"
-                                    }
-                                },
-                                "order" : [
-                                    "termsVersion",
-                                    "iso8601date"
-                                ]
-                            }
-                        },
-                        "order" : [
-                            "creationDate",
-                            "numberOfLogins",
-                            "stagesCompleted",
-                            "termsAccepted"
-                        ],
-                        "required" : [ ]
-                    },
                     "aliasList" : {
                         "description" : "Alias List",
                         "type" : "array",
@@ -809,6 +711,7 @@
                             "type" : "relationship",
                             "reverseRelationship" : true,
                             "reversePropertyName" : "user",
+                            "notifySelf" : true,
                             "validate" : true,
                             "properties" : {
                                 "_ref" : {
@@ -850,6 +753,14 @@
                     "givenName",
                     "sn",
                     "mail"
+                ]
+            },
+            "meta" : {
+                "property" : "_meta",
+                "resourceCollection" : "internal/usermeta",
+                "trackedProperties" : [
+                    "createDate",
+                    "lastChanged"
                 ]
             }
         },
@@ -947,6 +858,7 @@
                             "resourceCollection" : [
                                 {
                                     "path" : "managed/user",
+                                    "notify" : true,
                                     "label" : "User",
                                     "query" : {
                                         "queryFilter" : "true",
@@ -1018,6 +930,7 @@
                             "title" : "Managed Assignments Items",
                             "reverseRelationship" : true,
                             "reversePropertyName" : "roles",
+                            "notifySelf" : true,
                             "validate" : true,
                             "properties" : {
                                 "_ref" : {
@@ -1221,6 +1134,7 @@
                             "resourceCollection" : [
                                 {
                                     "path" : "managed/role",
+                                    "notify" : true,
                                     "label" : "Role",
                                     "query" : {
                                         "queryFilter" : "true",
@@ -1280,6 +1194,7 @@
                         "resourceCollection" : [
                             {
                                 "path" : "managed/user",
+                                "notify" : true,
                                 "label" : "User",
                                 "query" : {
                                     "queryFilter" : "true",

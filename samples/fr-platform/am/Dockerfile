@@ -1,4 +1,4 @@
-FROM forgerock-docker-internal.bintray.io/forgerock/openam:latest
+FROM forgerock-docker-public.bintray.io/forgerock/openam:6.0.0
 
 COPY WEB-INF /usr/local/tomcat/webapps/openam/WEB-INF
 COPY XUI /usr/local/tomcat/webapps/openam/XUI
