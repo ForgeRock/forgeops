@@ -1,0 +1,38 @@
+bootstrapType: cts
+
+djInstance: ctsstore
+
+global:
+  domain: .forgeops.com
+
+resources:
+  limits:
+    memory: 8Gi
+  requests:
+    memory: 6Gi
+
+image:
+  tag: latest
+  pullPolicy: Always
+
+storageSize: "100Gi"
+storageClass: "fast"
+backupStorageSize: "20Gi"
+
+opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -Xms5g -Xmx5g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
+
+podAntiAffinity: "hard"
+
+gcs:
+  enabled: false
+  sleepSeconds: 600
+  backupBucket:  gs://forgeops/dj-backup/1m
+  restoreBucket: gs://forgeops/dj-backup/1m
+restore:
+  enabled: false
+
+runPostSetupJob: false
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

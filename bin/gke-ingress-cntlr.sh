@@ -10,15 +10,19 @@
 IP=$1
 
 if [ -z $IP ]; then
+  echo "Creating Ingress Controller without IP"
   helm install --namespace nginx --name nginx  \
     --set rbac.create=true \
-    --set "controller.publishService.enabled=true" \
+    --set controller.publishService.enabled=true \
+    --set controller.stats.enabled=true \
     stable/nginx-ingress
 else
+  echo "Creating Ingress Controller with IP=$IP"
   helm install --namespace nginx --name nginx  \
     --set rbac.create=true \
-    --set "controller.service.loadBalancerIP=$IP" \
-    --set "controller.publishService.enabled=true" \
+    --set controller.service.loadBalancerIP=$IP \
+    --set controller.publishService.enabled=true \
+    --set controller.stats.enabled=true \
     stable/nginx-ingress
 fi
 

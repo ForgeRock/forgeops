@@ -4,20 +4,23 @@
 # Google Cloud Project ID
 GKE_PROJECT_NAME="my-gcp-project"
 
-# Compute Zone
-GKE_COMPUTE_ZONE="us-east1-d"
-
 # Kubernetes Cluster Name
 GKE_CLUSTER_NAME="forgeops-medium-cluster"
+
+# Primay Zone
+GKE_PRIMARY_ZONE="us-east1-d"
+
+# Additional Zone(s) in the same region "PRIMARY_ZONE,[ZONE,...]"
+GKE_ZONE=""
 
 # Kubernetes Cluster Version
 GKE_CLUSTER_VERSION="1.9.6-gke.1"
 
 # Nodes in Cluster
-GKE_CLUSTER_SIZE="2"
+GKE_CLUSTER_SIZE="3"
 
 # VM Type
-GKE_MACHINE_TYPE="custom-16-40960"
+GKE_MACHINE_TYPE="custom-8-20480"
 
 # Kubernetes Namespace
 GKE_CLUSTER_NS="prod"

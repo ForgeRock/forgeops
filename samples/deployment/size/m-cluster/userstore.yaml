@@ -1,0 +1,26 @@
+djInstance: userstore
+
+global:
+  domain: .fr8ks.net
+
+numberSampleUsers: "1000"
+
+resources:
+  limits:
+    memory: 10Gi
+  requests:
+    memory: 8Gi
+
+opendjJavaArgs: "-server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
+
+storageSize: "500Gi"
+storageClass: "fast"
+backupStorageSize: "20Gi"
+
+image:
+  tag: latest
+  pullPolicy: Always
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

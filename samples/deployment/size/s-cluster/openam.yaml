@@ -1,0 +1,23 @@
+global:
+  domain: .forgeops.com
+
+resources:
+  limits:
+    memory: 6Gi
+  requests:
+    memory: 4Gi
+
+image:
+  tag: 6.0.0
+  pullPolicy: Always
+
+catalinaOpts: >
+  -server -XX:+UnlockExperimentalVMOptions -Xms4g -Xmx4g
+  -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
+  -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
+  -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails
+  -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log
+
+#openamReplicaCount: 2
