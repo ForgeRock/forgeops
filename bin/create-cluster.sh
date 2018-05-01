@@ -9,9 +9,10 @@
 . ../etc/gke-env.cfg
 
 echo "=> Read the following env variables from config file"
-echo "GKE Project Name = $GKE_PROJECT_NAME"
-echo "GKE Compute Zone = $GKE_COMPUTE_ZONE"
-echo "Kubernetes Cluster Name = $GKE_CLUSTER_NAME"
+echo "Project Name = $GKE_PROJECT_NAME"
+echo "Primary Zone = $GKE_PRIMARY_ZONE"
+echo "Additional Zones = $GKE_ADDITIONAL_ZONES"
+echo "Cluster Name = $GKE_CLUSTER_NAME"
 echo "Cluster Namespace = $GKE_CLUSTER_NS"
 echo "Cluster Version = $GKE_CLUSTER_VERSION"
 echo "Cluster size =  $GKE_CLUSTER_SIZE"
@@ -28,30 +29,32 @@ esac
 
 
 echo ""
-echo "=> Creating cluster called $GKE_CLUSTER_NAME in zone $GKE_ZONE  with specs $GKE_MACHINE_TYPE"
+echo "=> Creating cluster called \"$GKE_CLUSTER_NAME\" with specs \"$GKE_MACHINE_TYPE\""
 echo ""
 
 gcloud beta container clusters create $GKE_CLUSTER_NAME \
-      --project $GKE_PROJECT_NAME \
-      --zone $GKE_COMPUTE_ZONE \
-      --username "admin" \
-      --cluster-version $GKE_CLUSTER_VERSION \
-      --machine-type $GKE_MACHINE_TYPE \
-      --min-cpu-platform "Intel Skylake" \
-      --image-type "COS" \
-      --disk-size "50" \
-      --network "default" \
-      --enable-cloud-logging \
-      --enable-cloud-monitoring \
-      --num-nodes "$GKE_CLUSTER_SIZE" \
-      --enable-autoscaling \
-      --enable-autoupgrade \
-      --enable-autorepair \
-      --addons=HorizontalPodAutoscaling \
-      --addons=KubernetesDashboard \
+      --project=$GKE_PROJECT_NAME \
+      --zone=$GKE_PRIMARY_ZONE \
+      --node-locations="$GKE_PRIMARY_ZONE,$GKE_ADDITIONAL_ZONES" \
+      --username="admin" \
+      --cluster-version=$GKE_CLUSTER_VERSION \
+      --machine-type=$GKE_MACHINE_TYPE \
+      --min-cpu-platform="Intel Skylake" \
+      --image-type=COS \
+      --disk-size=50 \
+      --network=default \
+      --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
       --max-nodes=$GKE_CLUSTER_SIZE \
-      --labels=owner=sre
+      --labels=owner=sre \
+      --addons=HorizontalPodAutoscaling \
+      --addons=KubernetesDashboard \
+      --enable-cloud-logging \
+      --enable-cloud-monitoring \
+      --enable-autoscaling \
+      --enable-autoupgrade \
+      --enable-autorepair
+
 
 #      --preemptible
 #	   --disk-type=pd-ssd

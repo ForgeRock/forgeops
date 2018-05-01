@@ -78,7 +78,9 @@ djPersistence: true
 podAntiAffinity: "soft"
 
 # This is the exact value for TopologyKey. The other possible value is "failure-domain.beta.kubernetes.io/zone"
-# which can be used NOT to schedule the pod on a node in the same zone thus allowing for HA across zones
+# which will ensure that pod is scheduled on nodes in different zones thus allowing for HA across zones.
+# Note you want to leave this value as is if you are deploying a single zone cluster and change the values only
+# if you have a multi-zone cluster.
 topologyKey: "kubernetes.io/hostname"
 
 gcs:

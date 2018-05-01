@@ -3,11 +3,11 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 
-. ./gke-env.cfg
+. ../etc/gke-env.cfg
 
 echo "=> Read the following env variables from config file"
-echo "Kubernetes Cluster Name = $GKE_CLUSTER_NAME"
-echo "GKE Compute Zone = $GKE_COMPUTE_ZONE"
+echo "Cluster Name = $GKE_CLUSTER_NAME"
+echo "Compute Zone = $GKE_PRIMARY_ZONE"
 echo ""
 echo "=> Do you want to delete the above cluster?"
 read -p "Continue (y/n)?" choice
@@ -17,7 +17,7 @@ case "$choice" in
    * ) echo "Invalid input, Bye!"; exit;;
 esac
 
-gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_COMPUTE_ZONE
+gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE
 
 
 

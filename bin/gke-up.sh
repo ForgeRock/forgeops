@@ -17,4 +17,6 @@ esac
 kubectl create namespace $GKE_CLUSTER_NS
 ./helm-rbac-init.sh
 ./create-secrets.sh
-./gke-ingress.sh $GKE_INGRESS_IP
+# Need this sleep as tiller is not ready immediately
+sleep 10s
+./gke-ingress-cntlr.sh $GKE_INGRESS_IP

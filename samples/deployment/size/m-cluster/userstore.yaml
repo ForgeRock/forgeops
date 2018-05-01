@@ -1,8 +1,10 @@
 djInstance: userstore
+
 global:
   domain: .fr8ks.net
-# Generate 1M users for testing in root realm
-numberSampleUsers: "1000000"
+
+numberSampleUsers: "1000"
+
 resources:
   limits:
     memory: 10Gi
@@ -18,3 +20,7 @@ backupStorageSize: "20Gi"
 image:
   tag: latest
   pullPolicy: Always
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

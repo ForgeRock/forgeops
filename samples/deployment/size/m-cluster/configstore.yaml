@@ -1,6 +1,8 @@
 djInstance: configstore
+
 global:
   domain: .frk8s.net
+
 resources:
   limits:
     memory: 2Gi
@@ -10,3 +12,8 @@ resources:
 image:
   tag: latest
   pullPolicy: Always
+
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

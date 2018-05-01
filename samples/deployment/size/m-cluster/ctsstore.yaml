@@ -1,5 +1,7 @@
 bootstrapType: cts
+
 djInstance: ctsstore
+
 global:
   domain: .frk8s.net
 resources:
@@ -29,3 +31,7 @@ restore:
   enabled: false
 
 runPostSetupJob: false
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

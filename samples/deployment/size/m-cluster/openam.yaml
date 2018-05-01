@@ -19,3 +19,5 @@ catalinaOpts: >
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
   -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails
   -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log
+
+#openamReplicaCount: 2
