@@ -1,0 +1,23 @@
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: openam-tls
+  namespace: lee
+spec:
+  secretName: {{ template "externalFQDN" . }}
+  issuerRef:
+    name: letsencrypt-staging
+    kind: ClusterIssuer
+  commonName: {{ template "externalFQDN" . }}
+  #dnsNames:
+  #- www.forgeops.com
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - {{ template "externalFQDN" . }}
+    #- http01:
+    #    ingress: openam
+    #  domains:
+    #  - www.forgeops.com
