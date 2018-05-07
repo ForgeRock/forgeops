@@ -12,10 +12,10 @@ VERSION=6.0.0
 SNAPSHOT=6.0.0-SNAPSHOT
 
 # Update release / milestone / RC builds here.
-AM_VERSION=$VERSION-M14
-IDM_VERSION=$VERSION-RC6
+AM_VERSION=$VERSION
+IDM_VERSION=$VERSION
 DJ_VERSION=$VERSION
-IG_VERSION=$VERSION-RC3
+IG_VERSION=$VERSION
 
 
 # you should not need to edit the paths below
@@ -79,9 +79,15 @@ dl(){
     echo "Downloading $src to $3"
     if [ -z "${WGET}" ]
     then
-        curl -s -H "$HEADER"  $src -o $3
+        curl --fail -s -H "$HEADER"  $src -o $3
     else
         wget -q --header "$HEADER" $src  -O $3
+    fi
+
+    if [ $? -ne 0 ] 
+    then 
+        echo "Download failed"
+        exit 1
     fi
 }
 
