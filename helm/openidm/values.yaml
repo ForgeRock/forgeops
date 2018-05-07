@@ -66,9 +66,11 @@ logLevel: INFO
 
 ingress:
   class: nginx
-  #class: cloudflare-warp
-  # Set hostname to override the default value of {{component}}.{{namespace}}.{{domain}}.
-  #hostname: foo.example.com
+  annotations:
+    # Nginx specific annotations
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
 
 # Command to run in the git sidecar container.
 git:
