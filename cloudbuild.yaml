@@ -9,7 +9,8 @@ steps:
 - name: 'gcr.io/cloud-builders/wget'
   # Run dl.sh download script with options to use wget (-w).
   entrypoint: './dl.sh'
-  args: ['-w']
+  # For now we need snapshots because we dont have milestone releases for 6.5.0
+  args: ['-w', '-s']
   dir: 'docker'
   env:
 #  - 'BUILD_ID=$BUILD_ID'

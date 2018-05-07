@@ -8,7 +8,7 @@ then
 fi
 
 # Update major versions / snapshots here.
-VERSION=6.0.0
+VERSION=6.5.0
 SNAPSHOT=6.5.0-SNAPSHOT
 
 # Update release / milestone / RC builds here.
