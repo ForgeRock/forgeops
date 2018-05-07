@@ -1,104 +1,156 @@
 #!/bin/bash
 ################################################################################
 # This script will do following:
-#   - Deploy OpenAM along with DS (CTS, CFGStore, UsrStore)
+#   - Deploy OpenAM along with DS (configstore, userstore and CTS)
 #   - Ensure configs are in place
 #   - Restart OpenAM to take all configuration online
 ################################################################################
 
 
 #### Variables
-DOMAIN=frk8s.net
-NAMESPACE=bench
-AM_URL="openam.$NAMESPACE.$DOMAIN"
-CLUSTER=m-cluster
+
+NAMESPACE="bench"
+DOMAIN="frk8s.net"
+URL_PREFIX="openam"
+SIZE="m-cluster"
+
+
+# Note the above variables are intended to be overwritten if cmd line args are provided 
+
+print_help()
+{
+    printf 'Usage: \t%s\t[-c|--context <context>] [-n|--namespace <namespace>] [-d|--domain <domain>]
+            \t\t[-p|--prefix <AM prefix>] [-s|--size <s-cluster|m-cluster>] [-h|--help]\n' "$0"
+    printf 'Example: ./deploy.sh -c dev-cluster -n dev -d forgerock.org -p openam -s m-cluster\n'
+}
+
+parse_commandline()
+{
+    while test $# -gt 0
+    do
+        case "$1" in
+            -c|--context)
+                CONTEXT="$2"
+                shift
+                ;;
+            -n|--namespace)
+                NAMESPACE="$2"
+                shift
+                ;;
+            -d|--domain)
+                DOMAIN="$2"
+                shift
+                ;;
+            -p|--prefix)
+                URL_PREFIX="$2"
+                shift
+                ;;
+            -s|--size)
+                SIZE="$2"
+                shift
+                ;;
+            -h|--help|*)
+                print_help
+                exit 0
+                ;;
+        esac
+        shift
+    done
+}
+
+AM_URL="${URL_PREFIX}.${NAMESPACE}.${DOMAIN}"
 
 #### Setup methods
-set_kubectl_context() {
-    CURRENT_NAMESPACE=$(kubectl config view | grep namespace:)
-    if [[ "$CURRENT_NAMESPACE" != *"$NAMESPACE"* ]]; then
-        echo "Setting namespace to $NAMESPACE"
-        kubectl config set-context $(kubectl config current-context) \
-          --namespace=$NAMESPACE
+set_kubectl_context() 
+{
+    if [ -z ${CONTEXT} ]; then
+        CONTEXT=$(kubectl config current-context)
     fi
-}
 
-isalive_check() {
-    echo "Running OpenAM alive.jsp check"
-    STATUS_CODE=$(curl -LI  http://$AM_URL/openam/isAlive.jsp \
-        -o /dev/null -w '%{http_code}\n' -s)
-    until [ "$STATUS_CODE" = "200" ]; do
-        echo "AM is not alive, waiting 5 seconds before retry..."
-        sleep 5
-        STATUS_CODE=$(curl -LI  http://$AM_URL/openam/isAlive.jsp \
-          -o /dev/null -w '%{http_code}\n' -s)
-    done
-    echo "OpenAM is alive"
-}
+    echo "=> Switching Context to \"${CONTEXT}\" and Namespace to \"${NAMESPACE}\""
 
-checkout_forgeops() {
-    rm -rf forgeops/
-    echo "Checking out forgeops";
-    git clone git@github.com:ForgeRock/forgeops.git
-    echo "Forgeops checked out"
+    kubectl config use-context ${CONTEXT} --namespace=${NAMESPACE}
+    
+    if test $? -gt 0
+        then
+            echo "=> Could not use context \"${CONTEXT}\". Make sure context exists. Exiting!!!"
+        exit 1
+    fi
 }
 
 
 #### Deploy methods
-deploy() {
+deploy() 
+{
+    echo "=> Deploying charts into namespace \"${NAMESPACE}\""
     # Update openam chart dependencies
-    helm dep up forgeops/helm/openam
+    helm dep up ../../helm/openam
 
     # Deploy user/config/cts stores
-    helm install --name configstore-$NAMESPACE -f size/$CLUSTER/configstore.yaml \
-        --namespace=$NAMESPACE forgeops/helm/opendj
-    helm install --name userstore-$NAMESPACE -f size/$CLUSTER/userstore.yaml \
-        --namespace=$NAMESPACE forgeops/helm/opendj
-    helm install --name ctsstore-$NAMESPACE -f size/$CLUSTER/ctsstore.yaml \
-        --namespace=$NAMESPACE forgeops/helm/opendj
+    helm install --name configstore-${NAMESPACE} -f size/${SIZE}/configstore.yaml \
+        --namespace=${NAMESPACE} ../../helm/opendj
+    helm install --name userstore-${NAMESPACE} -f size/${SIZE}/userstore.yaml \
+        --namespace=${NAMESPACE} ../../helm/opendj
+    helm install --name ctsstore-${NAMESPACE} -f size/${SIZE}/ctsstore.yaml \
+        --namespace=${NAMESPACE} ../../helm/opendj
 
     # Deploy amster & openam
-    helm install --name openam-$NAMESPACE -f size/$CLUSTER/openam.yaml \
-        --namespace=$NAMESPACE forgeops/helm/openam
-    helm install --name amster-$NAMESPACE -f size/$CLUSTER/amster.yaml \
-        --namespace=$NAMESPACE forgeops/helm/amster
-
+    helm install --name openam-${NAMESPACE} -f size/${SIZE}/openam.yaml \
+        --namespace=${NAMESPACE} ../../helm/openam
+    helm install --name amster-${NAMESPACE} -f size/${SIZE}/amster.yaml \
+        --namespace=${NAMESPACE} ../../helm/amster
 }
 
-livecheck_stage1() {
+isalive_check() 
+{
+    echo "=> Running OpenAM alive.jsp check"
+    #STATUS_CODE=$(curl -LI  http://$AM_URL/openam/isAlive.jsp \
+    #    -o /dev/null -w '%{http_code}\n' -s)
+    STATUS_CODE="503"
+    until [ "${STATUS_CODE}" = "200" ]; do
+        echo "=> AM is not alive, waiting 10 seconds before retry..."
+        sleep 10
+        STATUS_CODE=$(curl -LI  http://${AM_URL}/openam/isAlive.jsp \
+          -o /dev/null -w '%{http_code}\n' -s)
+    done
+    echo "=> OpenAM is alive"
+}
+
+livecheck_stage1() 
+{
     # This livecheck waits for OpenAM config to be imported.
     # We are looking to amster pod logs periodically.
-    echo "Livecheck stage1 - waiting for config to be imported to OpenAM";
+    echo "=> Livecheck stage1 - waiting for config to be imported to OpenAM";
     sleep 10
-    AMSTER_POD_NAME=$(kubectl get pods --selector=app=amster-$NAMESPACE-amster \
+    AMSTER_POD_NAME=$(kubectl get pods --selector=app=amster-${NAMESPACE}-amster \
         -o jsonpath='{.items[*].metadata.name}')
     FINISHED_STRING="Configuration script finished"
 
     while true; do
-    OUTPUT=$(kubectl logs $AMSTER_POD_NAME amster)
+    OUTPUT=$(kubectl logs ${AMSTER_POD_NAME} amster)
         if [[ $OUTPUT = *$FINISHED_STRING* ]]; then
-            echo "OpenAM configuration import is finished"
+            echo "=> OpenAM configuration import is finished"
             break
         fi
-        echo "Configuration not finished yet. Waiting for 10 seconds...."
+        echo "=> Configuration not finished yet. Waiting for 10 seconds...."
         sleep 10
     done
 }
 
-restart_openam() {
+restart_openam() 
+{
     # We need to restart OpenAM to take CTS settings online
     OPENAM_POD_NAME=$(kubectl get pods --selector=app=openam \
         -o jsonpath='{.items[*].metadata.name}')
-    kubectl delete pod $OPENAM_POD_NAME --namespace=$NAMESPACE
+    kubectl delete pod $OPENAM_POD_NAME --namespace=${NAMESPACE}
     sleep 10
     isalive_check
-    echo "Deployment is now prepared for benchmarking"
-    echo "Run: 'helm install benchmark-client' to run benchmark"
+    printf "\e[38;5;40m=> Deployment is now ready\n"
 }
 
 #### Main method
+parse_commandline "$@"
 set_kubectl_context
-checkout_forgeops
 deploy
 livecheck_stage1
 restart_openam
