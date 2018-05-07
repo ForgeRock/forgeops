@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Composite Helm Chart that deploys OpenAM, and DJ instances for CTS, Config store and userstore
-name: cmp-am-dj
-version: 6.0.0

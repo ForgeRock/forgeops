@@ -9,7 +9,7 @@ fi
 
 # Update major versions / snapshots here.
 VERSION=6.0.0
-SNAPSHOT=6.0.0-SNAPSHOT
+SNAPSHOT=6.5.0-SNAPSHOT
 
 # Update release / milestone / RC builds here.
 AM_VERSION=$VERSION
