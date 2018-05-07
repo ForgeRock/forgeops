@@ -6,16 +6,9 @@ kind: Ingress
 metadata:
   name: {{ .Values.component }}
   annotations:
-    kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
-    # This causes issues when idm redirects to /admin
-    #ingress.kubernetes.io/rewrite-target: /
-    # Note that not all ingress controllers implement all these features..
-    ingress.kubernetes.io/enable-cors: "true"
-    ingress.kubernetes.io/ssl-redirect: "true"
-    kubernetes.io/tls-acme: "true"
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "sha1"
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
 {{ include "tls-spec" . | indent 2 }}
   rules:
