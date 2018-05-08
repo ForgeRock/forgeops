@@ -29,7 +29,7 @@ You may be prompted to enter your password after running the above commands. Aft
 If you want to enable Facebook usage, you will need to register an application within Facebook. You will need to make sure your Facebook App has these redirect urls registered:
 
     http://idm-service.sample.svc.cluster.local/oauthReturn/
-    http://am-service.sample.svc.cluster.local:80/openam/oauth2c/OAuthProxy.jsp
+    http://am-service.sample.svc.cluster.local/openam
 
 Save the App Id and Secret as environment variables, like so:
 
