@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.0.0-M5",
+    "entityType" : "Scripts",
+    "entityId" : "7b6a6668-3bbb-4b9d-9090-8e1c4625c72f",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "7b6a6668-3bbb-4b9d-9090-8e1c4625c72f",
+    "name" : "hasDelegatedAdminRole",
+    "description" : null,
+    "script" : "YXV0aG9yaXplZCA9IGVudmlyb25tZW50CiAgICAuZ2V0KCJzZWN1cml0eUNvbnRleHRSb2xlcyIpCiAgICAuaW5qZWN0KGZhbHNlKSB7IHJlc3VsdCwgcm9sZSAtPgoJCXJldHVybiByZXN1bHQgfHwgcm9sZSA9PSAib3BlbmlkbS1kZWwtYWRtaW4iCgl9",
+    "default" : false,
+    "language" : "GROOVY",
+    "context" : "POLICY_CONDITION",
+    "createdBy" : "null",
+    "creationDate" : 0,
+    "lastModifiedBy" : "null",
+    "lastModifiedDate" : 0
+  }
+}

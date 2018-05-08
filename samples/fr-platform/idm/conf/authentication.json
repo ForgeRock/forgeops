@@ -1,0 +1,119 @@
+{
+    "serverAuthContext" : {
+        "sessionModule" : {
+            "name" : "JWT_SESSION",
+            "properties" : {
+                "keyAlias" : "&{openidm.https.keystore.cert.alias}",
+                "privateKeyPassword" : "&{openidm.keystore.password}",
+                "keystoreType" : "&{openidm.keystore.type}",
+                "keystoreFile" : "&{openidm.keystore.location}",
+                "keystorePassword" : "&{openidm.keystore.password}",
+                "maxTokenLifeMinutes" : "120",
+                "tokenIdleTimeMinutes" : "30",
+                "sessionOnly" : true,
+                "isHttpOnly" : true
+            }
+        },
+        "authModules" : [
+            {
+                "name": "CLIENT_CERT",
+                "properties": {
+                    "queryOnResource": "endpoint/static/user",
+                    "defaultUserRoles": [
+                        "openidm-cert"
+                    ],
+                    "allowedAuthenticationIdPatterns": [
+                        "CN=ig, O=forgerock"
+                    ],
+                    "runAsProperties": {
+                        "adminRoles": [
+                            "openidm-cert"
+                        ],
+                        "disallowedRunAsRoles": [ ],
+                        "queryOnResource": "managed/user",
+                        "propertyMapping": {
+                            "authenticationId" : "userName",
+                            "userRoles": "authzRoles"
+                        },
+                        "defaultUserRoles" : [
+                            "openidm-authorized"
+                        ],
+                        "augmentSecurityContext" : {
+                            "type" : "text/javascript",
+                            "file" : "augmentSecurityContext.js",
+                            "globals" : {
+                                "authzHeaderName" : "X-Authorization-Map"
+                            }
+                        }
+                    },
+                    "augmentSecurityContext" : {
+                        "type" : "text/javascript",
+                        "file" : "augmentVerifyRunAs.js"
+                    }
+                },
+                "enabled": true
+            },
+            {
+                "name": "CLIENT_CERT",
+                "properties": {
+                    "queryOnResource": "endpoint/static/user",
+                    "defaultUserRoles": [
+                        "openidm-cert"
+                    ],
+                    "allowedAuthenticationIdPatterns": [
+                        "CN=ig, O=forgerock"
+                    ],
+                    "runAsProperties": {
+                        "adminRoles": [
+                            "openidm-cert"
+                        ],
+                        "disallowedRunAsRoles": [ ],
+                        "queryId" : "credential-query",
+                        "queryOnResource": "endpoint/static/user",
+                        "propertyMapping": {
+                            "authenticationId" : "userName"
+                        },
+                        "defaultUserRoles" : [ ],
+                        "augmentSecurityContext" : {
+                            "type" : "text/javascript",
+                            "file" : "augmentSecurityContext.js",
+                            "globals" : {
+                                "authzHeaderName" : "X-Authorization-Map"
+                            }
+                        }
+                    },
+                    "augmentSecurityContext" : {
+                        "type" : "text/javascript",
+                        "file" : "augmentVerifyRunAs.js"
+                    }
+                },
+                "enabled": true
+            },
+            {
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "anonymous",
+                    "password" : "&{openidm.anonymous.password}",
+                    "defaultUserRoles" : [
+                        "openidm-reg"
+                    ]
+                },
+                "enabled" : true
+            },
+            {
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "openidm-admin",
+                    "password" : "&{openidm.admin.password}",
+                    "defaultUserRoles" : [
+                        "openidm-admin",
+                        "openidm-authorized"
+                    ]
+                },
+                "enabled" : true
+            }
+        ]
+    }
+}

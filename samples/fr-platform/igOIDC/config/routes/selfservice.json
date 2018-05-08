@@ -1,0 +1,54 @@
+{
+    "name": "selfservice",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444/",
+    "condition": "${matches(request.uri.path, '^/selfservice/') or matches(request.uri.path, '^/oauthReturn/')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "handler": {
+        "name": "IDMClient",
+        "type": "ClientHandler",
+        "config": {
+            "hostnameVerifier": "ALLOW_ALL",
+            "sslContextAlgorithm": "TLSv1.2",
+            "keyManager": {
+                "type": "KeyManager",
+                "config": {
+                    "keystore": {
+                        "type": "KeyStore",
+                        "config": {
+                            "url": "file:///var/openig/keystore.jks",
+                            "password": "changeit"
+                        }
+                    },
+                    "password": "changeit"
+                }
+            },
+            "trustManager": {
+                "type": "TrustManager",
+                "config": {
+                    "keystore": {
+                        "type": "KeyStore",
+                        "config": {
+                            "url": "file:///var/openig/keystore.jks",
+                            "password": "changeit"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

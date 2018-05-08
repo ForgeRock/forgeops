@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.0.0-M4",
+    "entityType" : "Scripts",
+    "entityId" : "79cc43a1-535c-42b1-9214-babd0c483058",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "79cc43a1-535c-42b1-9214-babd0c483058",
+    "name" : "IsInternalUser",
+    "description" : "Checks to see if the user is an internal one (agent or amadmin)",
+    "script" : "YXV0aFN0YXRlID0gKAogIHVzZXJuYW1lLnRvTG93ZXJDYXNlKCkgPT09ICJhbWFkbWluIiB8fAogIHVzZXJuYW1lLnRvTG93ZXJDYXNlKCkgPT09ICJvcGVuaWRtY2xpZW50IgopID8gU1VDQ0VTUyA6IEZBSUxFRDs=",
+    "default" : false,
+    "language" : "JAVASCRIPT",
+    "context" : "AUTHENTICATION_SERVER_SIDE",
+    "createdBy" : "null",
+    "creationDate" : 0,
+    "lastModifiedBy" : "null",
+    "lastModifiedDate" : 0
+  }
+}

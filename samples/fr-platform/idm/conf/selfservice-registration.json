@@ -1,0 +1,60 @@
+{
+    "allInOneRegistration" : true,
+    "stageConfigs" : [
+        {
+            "name" : "parameters",
+            "parameterNames" : [
+                "returnParams"
+            ]
+        },
+        {
+            "name" : "consent",
+            "consentTranslations" : {
+                "en" : "Please consent to sharing your data with whomever we like.",
+                "fr" : "Veuillez accepter le partage de vos données avec ceux que nous souhaitons."
+            }
+        },
+        {
+            "name" : "idmUserDetails",
+            "identityEmailField" : "mail",
+            "socialRegistrationEnabled" : true,
+            "registrationProperties" : [
+                "userName",
+                "givenName",
+                "sn",
+                "mail"
+            ],
+            "identityServiceUrl" : "managed/user",
+            "registrationPreferences" : [
+                "marketing",
+                "updates"
+            ]
+        },
+        {
+            "name" : "kbaSecurityAnswerDefinitionStage",
+            "kbaConfig" : null
+        },
+        {
+            "name" : "termsAndConditions"
+        },
+        {
+            "name" : "selfRegistration",
+            "identityServiceUrl" : "managed/user"
+        },
+        {
+            "name" : "openAMAutoLogin",
+            "identityUsernameField" : "userName",
+            "identityPasswordField" : "password",
+            "openAMBaseUrl" : "http://am-service.sample.svc.cluster.local/openam/",
+            "authenticationEndpoint" : "json/realms/root/authenticate"
+        }
+    ],
+    "snapshotToken" : {
+        "type" : "jwt",
+        "jweAlgorithm" : "RSAES_PKCS1_V1_5",
+        "encryptionMethod" : "A128CBC_HS256",
+        "jwsAlgorithm" : "HS256",
+        "tokenExpiry" : 300
+    },
+    "storage" : "stateless"
+}

@@ -1,0 +1,104 @@
+{
+    "name": "ui",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444/",
+    "condition": "${matches(request.uri.path, '^/openid/') or matches(request.uri.path, '^/admin') or matches(request.uri.path, '^/user')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "heap" : [
+        {
+            "name": "IDMClient",
+            "type": "ClientHandler",
+            "config": {
+                "hostnameVerifier": "ALLOW_ALL",
+                "sslContextAlgorithm": "TLSv1.2",
+                "keyManager": {
+                    "type": "KeyManager",
+                    "config": {
+                        "keystore": {
+                            "type": "KeyStore",
+                            "config": {
+                                "url": "file:///var/openig/keystore.jks",
+                                "password": "changeit"
+                            }
+                        },
+                        "password": "changeit"
+                    }
+                },
+                "trustManager": {
+                    "type": "TrustManager",
+                    "config": {
+                        "keystore": {
+                            "type": "KeyStore",
+                            "config": {
+                                "url": "file:///var/openig/keystore.jks",
+                                "password": "changeit"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "openidmClient",
+            "type": "ClientRegistration",
+            "config": {
+                "clientId": "openidmClient",
+                "clientSecret": "openidmClient",
+                "issuer": {
+                    "type": "Issuer",
+                    "config": {
+                        "wellKnownEndpoint": "${env['OPENAM_INSTANCE']}/oauth2/.well-known/openid-configuration"
+                    }
+                },
+                "scopes": [
+                    "openid"
+                ]
+            }
+        }
+    ],
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ClientFilter",
+                    "config": {
+                        "clientEndpoint": "/openid",
+                        "target": "${session.openid}",
+                        "failureHandler": {
+                            "type": "StaticResponseHandler",
+                            "config": {
+                                "status": 302,
+                                "headers": {
+                                    "Location": [ "/logout" ]
+                                }
+                            }
+                        },
+                        "registrations": [
+                            "openidmClient"
+                        ],
+                        "requireHttps": false
+                    }
+                },
+                {
+                    "type": "LocationHeaderFilter"
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

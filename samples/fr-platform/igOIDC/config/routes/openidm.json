@@ -1,0 +1,270 @@
+{
+    "name": "openidm",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${matches(request.uri.path, '^/openidm/')}",
+    "auditService": {
+        "type": "AuditService",
+        "config": {
+            "config": {},
+            "event-handlers": [{
+                "class": "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+                "config": {
+                    "name": "json",
+                    "logDirectory": "/tmp/logs",
+                    "topics": [
+                        "access"
+                    ]
+                }
+            }]
+        }
+    },
+    "heap": [
+        {
+            "name": "IDMClient",
+            "type": "Chain",
+            "config": {
+                "filters": [
+                    {
+                        "type": "CookieFilter"
+                    }
+                ],
+                "handler": {
+                    "type": "ClientHandler",
+                    "config": {
+                        "hostnameVerifier": "ALLOW_ALL",
+                        "sslContextAlgorithm": "TLSv1.2",
+                        "keyManager": {
+                            "type": "KeyManager",
+                            "config": {
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                },
+                                "password": "changeit"
+                            }
+                        },
+                        "trustManager": {
+                            "type": "TrustManager",
+                            "config": {
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "name": "capture",
+            "type": "CaptureDecorator",
+            "config": {
+                "captureEntity": true,
+                "captureContext": true
+            }
+        },
+        {
+            "name": "debugHandler",
+            "type": "ClientHandler",
+            "capture": [
+                "request",
+                "response"
+            ]
+        },
+        {
+            "name": "authnFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 401,
+                "headers": {
+                    "Content-Type": [ "application/json" ],
+                    "WWW-Authenticate": [ "idtoken realm=${env['OPENAM_INSTANCE']}/oauth2/.well-known/openid-configuration" ]
+                },
+                "entity": "{\"code\": 401, \"message\":\"Authentication Failed\"}"
+            }
+        },
+        {
+            "name": "authzFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 403,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 403, \"message\":\"Access Denied\"}"
+            }
+        },
+        {
+            "name": "badRequestFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 400,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 400, \"message\":\"Bad Request\"}"
+            }
+        }
+    ],
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "ConditionalFilter",
+                    "config": {
+                        "condition": "${not matches(request.method, 'GET')}",
+                        "delegate" : {
+                            "name": "CSRFHeaderCheck",
+                            "type": "ScriptableFilter",
+                            "config": {
+                                "type": "application/x-groovy",
+                                "file": "CSRFHeaderCheck.groovy",
+                                "args": {
+                                    "failureResponse": "${heap['badRequestFailureResponse']}"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "switch",
+                    "type": "SwitchFilter",
+                    "config": {
+                        "onResponse": [
+                            {
+                                "condition": "${response.status.code == 401}",
+                                "handler": {
+                                    "name": "AllowedAnonymousEndpoints",
+                                    "type": "ScriptableHandler",
+                                    "config": {
+                                        "type": "application/x-groovy",
+                                        "clientHandler": "IDMClient",
+                                        "file": "batchConditionalRequest.groovy",
+                                        "args": {
+                                            "delegate" : "${heap['IDMClient']}",
+                                            "failureResponse" : "${heap['authnFailureResponse']}",
+                                            "checkRequests": [
+                                                {
+                                                    "path": "^/openidm/info/.*",
+                                                    "methods": ["GET"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/authentication.*",
+                                                    "methods": ["GET", "POST"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/config/ui/themeconfig",
+                                                    "methods": ["GET"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/identityProviders.*",
+                                                    "methods": ["POST"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/selfservice/.*",
+                                                    "methods": ["GET","POST"]
+                                                },
+                                                {
+                                                    "path": "^/openidm/policy/selfservice/.*",
+                                                    "methods": ["GET","POST"]
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy",
+                        "args": {
+                            "failureResponse" : "${heap['authnFailureResponse']}"
+                        }
+                    }
+                },
+                {
+                    "name": "StoreUserDetailsInSession",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "clientHandler": "IDMClient",
+                        "type": "application/x-groovy",
+                        "file": "storeUserDetailsInSession.groovy",
+                        "args": {
+                            "idmUserDetailEndpoint": "https://idm-service.sample.svc.cluster.local:8444/openidm/authentication?_action=login",
+                            "idmUserDetailMethod": "POST"
+                        }
+                    }
+                },
+                {
+                  "type": "PolicyEnforcementFilter",
+                  "config": {
+                        "openamUrl": "${env['OPENAM_INSTANCE']}",
+                        "cache": {
+                            "enabled": true,
+                            "defaultTimeout": "1 hour",
+                            "maxTimeout": "1 day"
+                        },
+                        "pepUsername": "openidmClient",
+                        "pepPassword": "openidmClient",
+                        "pepRealm": "/",
+                        "application": "openidm",
+                        "ssoTokenSubject": "${session.openid.id_token}",
+                        "environment": {
+                            "securityContextPath": [
+                                "${session.idmUserDetails.authorization.component}/${session.idmUserDetails.authorization.id}"
+                            ],
+                            "securityContextRoles": "${session.idmUserDetails.authorization.roles}"
+                        },
+                        "failureHandler": "authzFailureResponse"
+                    }
+                },
+                {
+                    "name": "ScopeValidation",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "clientHandler": "IDMClient",
+                        "type": "application/x-groovy",
+                        "file": "scopeValidation.groovy",
+                        "args": {
+                            "scopeResourceQueryFilter": "/organizationName eq \"\\${organizationName}\"",
+                            "scopingAttribute": "organizationName",
+                            "failureResponse": "${heap['authzFailureResponse']}"
+                        }
+                    }
+                },
+                {
+                    "type": "ConditionalFilter",
+                    "config": {
+                        "condition": "${matches(request.method, 'PATCH') and not empty contexts.policyDecision.attributes.allowedFields}",
+                        "delegate" : {
+                            "name": "CheckAllowedFieldsForPatch",
+                            "type": "ScriptableFilter",
+                            "config": {
+                                "clientHandler": "IDMClient",
+                                "type": "application/x-groovy",
+                                "file": "checkAllowedFieldsForPatch.groovy",
+                                "args": {
+                                    "failureResponse": "${heap['authzFailureResponse']}"
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.0.0-M4",
+    "entityType" : "DeviceIdMatchModule",
+    "entityId" : "DeviceIdMatch",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "DeviceIdMatch",
+    "authenticationLevel" : 0,
+    "clientScript" : "157298c0-7d31-4059-a95b-eeb08473b7e5",
+    "clientScriptEnabled" : true,
+    "serverScript" : "703dab1a-1921-4981-98dd-b8e5349d8548",
+    "_type" : {
+      "_id" : "deviceidmatch",
+      "name" : "Device Id (Match)",
+      "collection" : true
+    }
+  }
+}

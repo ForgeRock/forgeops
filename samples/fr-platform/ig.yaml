@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ig
+  labels:
+    role: proxy
+spec:
+  initContainers:
+  - name: wait-for-well-known
+    image: ig:fullstack
+    env:
+    - name: WELL_KNOWN_ENDPOINT
+      value: "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
+    command:
+    - /wellKnownCheck.sh
+  containers:
+    - image: ig:fullstack
+      imagePullPolicy: IfNotPresent
+      name: ig
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+      resources:
+          requests:
+            memory: "512Mi"
+      env:
+      - name: OPENAM_INSTANCE
+        value: "http://am-service.sample.svc.cluster.local/openam"

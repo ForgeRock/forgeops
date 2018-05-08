@@ -1,0 +1,19 @@
+djInstance: userstore
+
+global:
+  domain: .forgeops.com
+
+numberSampleUsers: "1000000"
+resources:
+  limits:
+    memory: 6Gi
+  requests:
+    memory: 4Gi
+
+image:
+  tag: latest
+  pullPolicy: Always
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

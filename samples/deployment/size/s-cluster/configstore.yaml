@@ -1,0 +1,18 @@
+djInstance: configstore
+
+global:
+  domain: .forgeops.com
+
+resources:
+  limits:
+    memory: 2Gi
+  requests:
+    memory: 1Gi
+
+image:
+  tag: latest
+  pullPolicy: Always
+
+#replicas: 2
+
+#topologyKey: "failure-domain.beta.kubernetes.io/zone"

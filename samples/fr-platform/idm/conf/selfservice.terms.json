@@ -1,0 +1,26 @@
+{
+  "versions": [
+    {
+      "version": "2.0",
+      "termsTranslations": {
+        "en": "Some 2.0 fake terms",
+        "fr": "More 2.0 fake terms"
+      },
+      "createDate": "2017-12-19T03:54:16.865Z"
+    },
+    {
+      "version": "1.5",
+      "termsTranslations": {
+        "en": "Some 1.5 fake terms",
+        "fr": "More 1.5 fake terms"
+      },
+      "createDate": "2017-11-20T04:20:11.320Z"
+    }
+  ],
+  "active": "1.5",
+  "uiConfig" : {
+    "displayName" : "We've updated our terms",
+    "purpose" : "You must accept the updated terms in order to proceed.",
+    "buttonText" : "Accept"
+  }
+}

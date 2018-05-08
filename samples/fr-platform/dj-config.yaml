@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dj-config
+data:
+  dirmanager.pw: "password"
+  monitor.pw: "password"

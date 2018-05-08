@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.0.0-M4",
+    "entityType" : "ResourceTypes",
+    "entityId" : "1400a6f3-2114-43fd-a6f1-3c12b5bf70f00",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "1400a6f3-2114-43fd-a6f1-3c12b5bf70f00",
+    "uuid" : "1400a6f3-2114-43fd-a6f1-3c12b5bf70f00",
+    "name" : "Camera - 1400a6f3-2114-43fd-a6f1-3c12b5bf70f00",
+    "description" : "Dynamically created resource type for the UMA resource set. Used to find all Policy Engine Policies that make up an UMA Policy",
+    "patterns" : [ "uma://-*-" ],
+    "actions" : {
+      "share" : true,
+      "read" : true,
+      "edit" : true,
+      "delete" : true,
+      "write" : true
+    },
+    "createdBy" : "id=dsameuser,ou=user,dc=example,dc=com",
+    "creationDate" : 1515452626842,
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=example,dc=com",
+    "lastModifiedDate" : 1515452626842
+  }
+}
