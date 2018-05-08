@@ -34,12 +34,15 @@ steps:
   # These are the credentials needed to push images to your private docker registry.
   - 'DOCKER_USER=${_DOCKER_USER}'
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
-# Since we are building bintray images by default, we don't need to tell the builder about GCR images.
-# TODO: We may want to look at tagging the above images and sending them to gcr.io for local testing.
-#images:
-#- 'gcr.io/$PROJECT_ID/opendj'
-#- 'gcr.io/$PROJECT_ID/openidm'
-#- 'gcr.io/$PROJECT_ID/openig'
-#- 'gcr.io/$PROJECT_ID/openam'
-#- 'gcr.io/$PROJECT_ID/amster'
-#- 'gcr.io/$PROJECT_ID/util'
+# Run a second time to build images for gcr.io for local testing
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker'
+  entrypoint: './build.sh'
+  args: ['-g']
+images:
+- 'gcr.io/$PROJECT_ID/opendj'
+- 'gcr.io/$PROJECT_ID/openidm'
+- 'gcr.io/$PROJECT_ID/openig'
+- 'gcr.io/$PROJECT_ID/openam'
+- 'gcr.io/$PROJECT_ID/amster'
+- 'gcr.io/$PROJECT_ID/util'
