@@ -1,0 +1,43 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.0.0-M4",
+    "entityType" : "SocialFacebook",
+    "entityId" : "ff5744c3-c2b7-4d3e-95ab-aa4f0a2964c1",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "ff5744c3-c2b7-4d3e-95ab-aa4f0a2964c1",
+    "redirectURI" : "AMSTER{OPENAM_INSTANCE}",
+    "authenticationIdKey" : "id",
+    "clientId" : "AMSTER{IDP_FACEBOOK_CLIENTID}",
+    "basicAuth" : true,
+    "cfgAccountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+    "scopeString" : "public_profile,email",
+    "cfgAccountMapperConfiguration" : {
+      "id" : "iplanet-am-user-alias-list"
+    },
+    "cfgAttributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|iplanet-am-user-alias-list|facebook-" ],
+    "issuer" : null,
+    "tokenEndpoint" : "https://graph.facebook.com/v2.12/oauth/access_token",
+    "cfgAttributeMappingConfiguration" : {
+      "name" : "cn",
+      "last_name" : "sn",
+      "id" : "uid",
+      "first_name" : "givenName",
+      "email" : "mail"
+    },
+    "provider" : "facebook",
+    "cfgMixUpMitigation" : false,
+    "authorizeEndpoint" : "https://www.facebook.com/dialog/oauth",
+    "clientSecret" : "AMSTER{IDP_FACEBOOK_CLIENTSECRET}",
+    "userInfoEndpoint" : "https://graph.facebook.com/v2.6/me?fields=name%2Cemail%2Cfirst_name%2Clast_name",
+    "cfgAccountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|iplanet-am-user-alias-list|facebook-",
+    "saveUserAttributesToSession" : true,
+    "_type" : {
+      "_id" : "SocialFacebookNode",
+      "name" : "Social Facebook",
+      "collection" : true
+    }
+  }
+}

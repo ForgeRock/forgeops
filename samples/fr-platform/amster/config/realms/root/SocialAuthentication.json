@@ -16,7 +16,7 @@
       "Facebook" : "images/logos/facebook.png"
     },
     "authenticationChains" : {
-      "Facebook" : "FacebookSocialAuthenticationService"
+      "Facebook" : "Facebook-ProvisionIDMAccount"
     },
     "_type" : {
       "_id" : "socialauthentication",
