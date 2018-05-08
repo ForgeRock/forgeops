@@ -2,14 +2,15 @@
 steps:
 # Get the helm command.
 - name: gcr.io/cloud-builders/wget
-  args: ['-O', 'helm.tar.gz', 'https://storage.googleapis.com/kubernetes-helm/helm-v2.7.2-linux-amd64.tar.gz']
+  args: ['-O', 'helm.tar.gz', 'https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-linux-amd64.tar.gz']
 # Build helm charts and push to gs bucket.
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: ./etc/cloud-build-push-charts.sh
 - name: 'gcr.io/cloud-builders/wget'
   # Run dl.sh download script with options to use wget (-w).
   entrypoint: './dl.sh'
-  args: ['-w']
+  # For now we need snapshots because we dont have milestone releases for 6.5.0
+  args: ['-w', '-s']
   dir: 'docker'
   env:
 #  - 'BUILD_ID=$BUILD_ID'
