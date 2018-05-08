@@ -2,7 +2,7 @@
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: openam-tls
+  name: openig-tls
 spec:
   secretName: {{ template "externalFQDN" . }}
   issuerRef:
@@ -19,7 +19,7 @@ spec:
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: openam-tls-staging
+  name: openig-tls-staging
 spec:
   secretName: {{ template "externalFQDN" . }}
   issuerRef:
