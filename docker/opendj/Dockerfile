@@ -2,8 +2,8 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 
-# The java docker image source can be found at https://github.com/ForgeRock/docker-public
-FROM forgerock/java:6.5.0
+# The base java image is built on the docker hub.
+FROM forgerock/java:latest
 
 WORKDIR /opt
 

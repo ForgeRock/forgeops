@@ -3,6 +3,7 @@
 #
 # Utility shell scripts used as init containers to perform creation of bootstrap files
 # wait for for pods to be available, etc.
+# We expect this to be deprecated for 6.5 
 FROM alpine:3.7
 
 #  -Dcom.iplanet.services.debug.level=error
