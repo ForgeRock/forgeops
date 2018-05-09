@@ -37,8 +37,7 @@ Composite charts have names that begin with cmp-. These charts assemble foundati
  
 # Using a private registry
 
-* If you are using a private registry, see registry.sh. Edit the `~/etc/registry_env` and set
-REGISTRY_PASSWORD, REGISTRY_ID and REGISTRY_EMAIL  environment variables with your BackStage credentials.
+* If you are using a private registry, review the `~/etbinc/registry.sh`.
 This is needed so that Kubernetes can authenticate to pull images from a private registry. 
 
 If you are using your own private registry you must modify registry.sh with the relevant credentials.
