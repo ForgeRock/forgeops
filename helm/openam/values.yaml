@@ -33,9 +33,14 @@ configLdapPort:  1389
 configLdapHost: configstore-0.configstore
 
 
+# This option:
+#  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450 
+# This may impact amster imports for some configurations (SAML entities)
+# If you need to renable this for amster, it should be disabled after the import is complete
+
 catalinaOpts: >
   -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
 
