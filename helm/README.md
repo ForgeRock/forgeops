@@ -1,6 +1,6 @@
 # Setup 
 
-1) If you have not already done so, install (helm)[https://github.com/kubernetes/helm] and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
+1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
 
 2) See the comments in custom.yaml. You can copy this file and customize.
 
