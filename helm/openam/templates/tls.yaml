@@ -1,4 +1,4 @@
-{{- if .Values.global.prodTLS }}
+{{- if .Values.global.useTLS }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -8,27 +8,12 @@ spec:
   issuerRef:
     name: letsencrypt
     kind: ClusterIssuer
-  commonName: {{ template "externalFQDN" . }}
+  commonName: ""
+  dnsNames:
+  - '*.forgeops.com'
   acme:
     config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - {{ template "externalFQDN" . }}
-{{- else }}
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: openam-tls-staging
-spec:
-  secretName: {{ template "externalFQDN" . }}
-  issuerRef:
-    name: letsencrypt-staging
-    kind: ClusterIssuer
-  commonName: {{ template "externalFQDN" . }}
-  acme:
-    config:
-    - http01:
+    - dns01:
         ingressClass: nginx
       domains:
       - {{ template "externalFQDN" . }}
