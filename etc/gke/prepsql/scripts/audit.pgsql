@@ -8,7 +8,7 @@ CREATE TABLE openidm.auditauthentication (
   userid VARCHAR(255) DEFAULT NULL,
   eventname VARCHAR(50) DEFAULT NULL,
   provider VARCHAR(255) DEFAULT NULL,
-  method VARCHAR(15) DEFAULT NULL,
+  method VARCHAR(25) DEFAULT NULL,
   result VARCHAR(255) DEFAULT NULL,
   principals TEXT,
   context TEXT,
