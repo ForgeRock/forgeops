@@ -46,8 +46,16 @@ replicas: 1
 # Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
-# Size of the backup disk attached to each pod.
-backupStorageSize: "10Gi"
+
+backup:
+  # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
+  enabled: false
+  storageClass: "nfs"
+  storageSize: "20Gi"
+  # Backup schedules for full and incrementals. This is a crontab format:
+  # minutes hour day-of-week month year
+  scheduleFull:  "2 2 * * *"
+  scheduleIncremental: "45 * * * *"
 
 
 # Set storageClass only on clusters that support it (GCP / AWS).
@@ -92,17 +100,12 @@ gcs:
   #add --scopes storage-full when you create the cluster.
   backupBucket:  gs://forgeops/dj-backup
   # Restore bucket. Usually the same as above, but for initialization we might want to restore from another source.
-  restoreBucket: gs://forgeops/dj-backup
+  restoreBucket: gs://forgeops/dj-backup/1m
 
 
 restore:
   # If true, run the init containers that can restore from a previous DS backup.
   enabled: false
-
-# Backup schedules for full and incrementals. This is a crontab format:
-# minutes hour day-of-week month year
-backupScheduleFull:  "2 2 * * *"
-backupScheduleIncremental: "45 * * * *"
 
 
 # If true, a cronjob is created that periodically restores the backup from GCS and verifies the data.
@@ -111,3 +114,7 @@ runVerifyCronJob: false
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"
 slackUrl: undefined
+
+
+# Pinned gcloud Image. You should not need to change this very often
+gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b

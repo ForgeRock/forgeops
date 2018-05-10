@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2018 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS. All Rights Reserved.
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
@@ -27,15 +27,6 @@ spec:
       {{- if .Values.storageClass }}
       storageClassName:  {{ .Values.storageClass }}
       {{- end }}
-  - metadata:
-      name: backup
-      annotations:
-        pv.beta.kubernetes.io/gid: "11111"
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: {{ default "5Gi"  .Values.backupStorageSize }}
   {{- end }}
   template:
     metadata:
@@ -81,7 +72,7 @@ spec:
       - name: gcs
         #image: gcr.io/cloud-builders/gcloud:latest
         # For release we use a pinned version
-        image: gcr.io/cloud-builders/gcloud@sha256:2030ade364a03a313926b169effc754e4b99867f05323a3d248354d3d1630dc0
+        image: {{ .Values.gcloudImage }}
         imagePullPolicy: IfNotPresent
         command: [ "/bin/sh", "-c", "gsutil -m rsync -r {{ .Values.gcs.restoreBucket }} /backup; chmod -R g+rwx /backup"]
         volumeMounts:
@@ -157,30 +148,21 @@ spec:
             port: metrics
           initialDelaySeconds: 10
           periodSeconds: 60
-      {{- if .Values.gcs.enabled }}
-      # An example of enabling backup to google cloud storage.
-      # The bucket and path must exist, and the cluster needs --scopes storage-full when it is created.
-      # This runs the gsutil command periodically to rsync the contents of the /backup folder (shared with the DJ container) to cloud storage. 
-      - name: backup
-        #image: gcr.io/cloud-builders/gcloud
-        # For release we use a pinned version
-        image: gcr.io/cloud-builders/gcloud@sha256:2030ade364a03a313926b169effc754e4b99867f05323a3d248354d3d1630dc0
-        imagePullPolicy: IfNotPresent
-        command: [ "/bin/sh", "-c",
-            "while true; do gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }} ; sleep {{ .Values.gcs.sleepSeconds }};  done"]
-        volumeMounts:
-        - name: backup
-          mountPath: /backup
-      {{- end }}
       volumes:
       - name: dj-secrets
         secret:
           secretName: {{ .Values.djInstance }}
       - name: logs
         emptyDir: {}
-      {{- if not .Values.djPersistence }}
+      {{- if .Values.backup.enabled }}
+      - name: backup
+        persistentVolumeClaim: 
+          claimName: bak-{{ .Values.djInstance }}
+      {{ else }}
       - name: backup
         emptyDir: {}
+      {{ end }}
+      {{- if not .Values.djPersistence }}
       - name: db
         emptyDir: {}
       {{ end }}

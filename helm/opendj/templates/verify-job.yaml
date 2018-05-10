@@ -30,7 +30,7 @@ spec:
           - name: gcs
             #image: gcr.io/cloud-builders/gcloud:latest
             # For release we use a pinned version
-            image: gcr.io/cloud-builders/gcloud@sha256:2030ade364a03a313926b169effc754e4b99867f05323a3d248354d3d1630dc0
+            image:  {{ .Values.gcloudImage }}
             imagePullPolicy: IfNotPresent
             command: [ "/bin/sh", "-c", "gsutil -m rsync -r {{ .Values.gcs.restoreBucket }} /backup; chmod -R g+rwx /backup"]
             volumeMounts:
@@ -61,7 +61,8 @@ spec:
           - name: logs
             emptyDir: {}
           - name: backup
-            emptyDir: {}
+            persistentVolumeClaim: 
+              claimName: bak-{{ .Values.djInstance }}
           - name: db
             persistentVolumeClaim:
               claimName: {{ .Values.djInstance }}-verify

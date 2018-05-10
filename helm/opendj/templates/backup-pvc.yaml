@@ -1,0 +1,14 @@
+{{ if .Values.backup.enabled }}
+# pvc for the shared backup volume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: bak-{{ .Values.djInstance }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.backup.storageSize }}
+  storageClassName: nfs
+{{ end }}

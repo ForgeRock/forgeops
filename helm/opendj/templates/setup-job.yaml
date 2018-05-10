@@ -30,6 +30,4 @@ spec:
       - name: dj-secrets
         secret:
           secretName: {{ .Values.djInstance }}
-          # If we are running as non root, we can't set this mode to root read only
-          #defaultMode: 256
 {{end}}

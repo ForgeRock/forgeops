@@ -54,9 +54,11 @@ for the various options. Each node in the statefulset is a combined directory an
 ## Backup
 
 Backups can be scheduled using the directory servers cron facility. The backup job is configured as part
-of the post installation job (see values.yaml for cron settings).  Each pod in the statefulset mounts a backup
-persistent volume claim (PVC) on bak/. This PVC holds the contents of the backups. You must size this PVC according 
-to the amount of backup data you wish to retain. Old backups must be purged manually.
+of the post installation job (see values.yaml for cron settings).  Each pod in the statefulset mounts a shared backup
+ volume claim (PVC) on bak/. This PVC holds the contents of the backups. You must size this PVC according 
+to the amount of backup data you wish to retain. Old backups must be purged manually. The backup pvc must
+be an ReadWriteMany volume type (like NFS, for example). You may wish to deploy the NFS provisioner chart
+(see ../../bin/create-nfs-provisioner.sh for an example).
 
 A backup can be initiated manually by execing into the image and running the scripts/backup.sh command. For example:
 
@@ -78,7 +80,6 @@ strategy, or to move data from one environment to another (prod to QA, for examp
 
 A backup can restored from the mounted backup PVC. This can be done manually by execing into the container and running
 the bin/restore utility. A convenience script (restore.sh) is also provided in the scripts/ directory. 
-
 
 
 Optionally, a directory server instance can be initialized from a previous backup done to a GCS bucket. This can
