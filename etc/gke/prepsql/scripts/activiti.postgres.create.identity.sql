@@ -36,13 +36,13 @@ create table ACT_ID_INFO (
 );
 
 create index ACT_IDX_MEMB_GROUP on ACT_ID_MEMBERSHIP(GROUP_ID_);
-alter table ACT_ID_MEMBERSHIP 
+alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_GROUP
-    foreign key (GROUP_ID_) 
+    foreign key (GROUP_ID_)
     references ACT_ID_GROUP (ID_);
 
 create index ACT_IDX_MEMB_USER on ACT_ID_MEMBERSHIP(USER_ID_);
-alter table ACT_ID_MEMBERSHIP 
+alter table ACT_ID_MEMBERSHIP
     add constraint ACT_FK_MEMB_USER
-    foreign key (USER_ID_) 
+    foreign key (USER_ID_)
     references ACT_ID_USER (ID_);
