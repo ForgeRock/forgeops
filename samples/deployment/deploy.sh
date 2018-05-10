@@ -12,7 +12,7 @@
 NAMESPACE="bench"
 DOMAIN="frk8s.net"
 URL_PREFIX="openam"
-SIZE="m-cluster"
+TYPE="m-cluster"
 
 
 # Note the above variables are intended to be overwritten if cmd line args are provided 
@@ -20,8 +20,8 @@ SIZE="m-cluster"
 print_help()
 {
     printf 'Usage: \t%s\t[-c|--context <context>] [-n|--namespace <namespace>] [-d|--domain <domain>]
-            \t\t[-p|--prefix <AM prefix>] [-s|--size <s-cluster|m-cluster>] [-h|--help]\n' "$0"
-    printf 'Example: ./deploy.sh -c dev-cluster -n dev -d forgerock.org -p openam -s m-cluster\n'
+            \t\t[-p|--prefix <AM prefix>] [-t|--type <s-cluster|m-cluster>] [-h|--help]\n' "$0"
+    printf 'Example: ./deploy.sh -c dev-cluster -n dev -d forgerock.org -p openam -t m-cluster\n'
 }
 
 parse_commandline()
@@ -45,8 +45,8 @@ parse_commandline()
                 URL_PREFIX="$2"
                 shift
                 ;;
-            -s|--size)
-                SIZE="$2"
+            -t|--type)
+                TYPE="$2"
                 shift
                 ;;
             -h|--help|*)
@@ -87,17 +87,17 @@ deploy()
     helm dep up ../../helm/openam
 
     # Deploy user/config/cts stores
-    helm install --name configstore-${NAMESPACE} -f size/${SIZE}/configstore.yaml \
+    helm install --name configstore-${NAMESPACE} -f type/${TYPE}/configstore.yaml \
         --namespace=${NAMESPACE} ../../helm/opendj
-    helm install --name userstore-${NAMESPACE} -f size/${SIZE}/userstore.yaml \
+    helm install --name userstore-${NAMESPACE} -f type/${TYPE}/userstore.yaml \
         --namespace=${NAMESPACE} ../../helm/opendj
-    helm install --name ctsstore-${NAMESPACE} -f size/${SIZE}/ctsstore.yaml \
+    helm install --name ctsstore-${NAMESPACE} -f type/${TYPE}/ctsstore.yaml \
         --namespace=${NAMESPACE} ../../helm/opendj
 
     # Deploy amster & openam
-    helm install --name openam-${NAMESPACE} -f size/${SIZE}/openam.yaml \
+    helm install --name openam-${NAMESPACE} -f type/${TYPE}/openam.yaml \
         --namespace=${NAMESPACE} ../../helm/openam
-    helm install --name amster-${NAMESPACE} -f size/${SIZE}/amster.yaml \
+    helm install --name amster-${NAMESPACE} -f type/${TYPE}/amster.yaml \
         --namespace=${NAMESPACE} ../../helm/amster
 }
 
