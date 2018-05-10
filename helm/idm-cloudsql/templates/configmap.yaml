@@ -3,12 +3,13 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  PROJECT_HOME: "{{ .Values.global.configPath.idm }}"
-  GIT_AUTOSAVE_BRANCH:  autosave-idm
-  GIT_CHECKOUT_BRANCH: {{ default "master" .Values.global.git.branch }}
+  GIT_AUTOSAVE_BRANCH:  autosave-idm-{{ .Release.Namespace }}
   GIT_REPO: "{{ .Values.global.git.repo }}"
-  GIT_ROOT:  "/git"
-  GIT_PROJECT_DIRECTORY: {{ default "forgeops-init" .Values.global.git.projectDirectory }}
+  CONFIG_PATH: "{{ .Values.global.configPath.idm }}"
+  SED_FILTER: {{ default "" .Values.global.git.sedFilter }}
+  PROJECT_HOME:  "/git/config/{{ .Values.global.configPath.idm }}"
+  LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
+  IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
 
 
 ---
@@ -17,6 +18,7 @@ kind: ConfigMap
 metadata:
   name: idm-boot-properties
 data:
+  # todo: These need to be reviewed for 6.0.0
    boot.properties: |
       openidm.repo.host={{.Values.openidm.repo.host}}
       openidm.repo.port={{.Values.openidm.repo.port}}
@@ -25,17 +27,25 @@ data:
       openidm.repo.databaseName={{.Values.openidm.repo.databaseName}}
       openidm.repo.schema={{.Values.openidm.repo.schema}}
 
+      # This is here to suppress IDM crypting the password and writing out authentication.json
+      openidm.anonymous.password=anonymous
+
+      # Client password for IDM/AM integration
+      openidm.idpconfig.clientsecret={{ .Values.openidm.idpconfig.clientsecret }}
+
 
       # Use a variable for our ldap host & password
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
       userstore.port={{default "1389" .Values.userstore.port}}
-
-
+      userstore.basecontext={{default "o=userstore" .Values.userstore.basecontext}}
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
+      openidm.host={{ template "externalFQDN" . }}
+
       openidm.auth.clientauthonlyports=8444
+
       openidm.https.keystore.cert.alias=openidm-localhost
 
       openidm.keystore.type=JCEKS
@@ -49,6 +59,11 @@ data:
       openidm.keystore.password=changeit
       openidm.truststore.password=changeit
 
+      # Prometheus endpoint authentication
+      openidm.prometheus.username=prometheus
+      openidm.prometheus.password=prometheus
+      openidm.prometheus.role=openidm-prometheus
+
       # Optionally use the crypto bundle to obfuscate the password and set one of these:
       #openidm.keystore.password=OBF:
       #openidm.keystore.password=CRYPT:
@@ -60,7 +75,7 @@ data:
 
       # key in keystore to handle config encryption
       openidm.config.crypto.alias=openidm-sym-default
-      #openidm.script.javascript.debug=transport=socket,suspend=y,address=9888,trace=true
+      openidm.script.javascript.debug=transport=socket,suspend=y,address=9888,trace=true
       #openidm.script.javascript.sources=/Eclipse/workspace/External JavaScript Source/
 
       # key in keystore to handle selfservice sharedkey
@@ -69,6 +84,9 @@ data:
       # key in keystore to handle jwtsession hmac signing key
       openidm.config.crypto.jwtsession.hmackey.alias=openidm-jwtsessionhmac-key
 
+      # key/cert in keystore/truststore to handle embedded opendj ssl
+      openidm.config.crypto.opendj.localhost.cert=server-cert
+
       # optionally map a hostname to a specific client key alias
       openidm.ssl.host.aliases=localhost=
 
@@ -76,7 +94,7 @@ data:
       openidm.policy.enforcement.enabled=true
 
       # node id if clustered; each node in a cluster must have a unique node id
-      openidm.node.id=node1
+      #openidm.node.id=node1
 
       # enables the execution of persistent schedulers
       openidm.scheduler.execute.persistent.schedules=true
@@ -92,6 +110,11 @@ data:
       # defaults to TLSv1.2 if not specified
       #openidm.external.rest.tls.version=TLSv1.1
 
+      # set external REST service's HTTP client hostname verification policy for HTTPS endpoints
+      # valid values: ALLOW_ALL, STRICT
+      # defaults to STRICT if not specified
+      openidm.external.rest.hostnameVerifier=ALLOW_ALL
+
       # Indicates whether the IDM deployment is automated by a cluster management tool such as Kubernetes, which
       # deploys containers in Pods whose identities are transient. Pod shutdown will mean that the corresponding cluster
       # node identity will never re-appear in the cluster, and thus IDM's record of this cluster node should be deleted
@@ -100,3 +123,133 @@ data:
 
       # enables API Descriptor generation, which if set to 'false', renders the API Explorer non-functional
       openidm.apidescriptor.enabled=true
+
+      # enables workflow
+      openidm.workflow.enabled=true
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-logging-properties
+data:
+   logging.properties: |
+      # Properties file that configures the operation of the JDK
+      # logging facility.
+
+      # The system will look for this configuration file, first using
+      # a System property specified at startup:
+      #
+      # >java -Djava.util.logging.config.file=myLoggingConfigFilePath
+      #
+      # If this property is not specified, then the configuration file is
+      # retrieved from its default location at:
+      #
+      # JDK_HOME/jre/lib/logging.properties
+
+      ############################################################
+      #      Global properties
+      ############################################################
+      # ------------------------------------------
+      # The set of handlers to be loaded upon startup.
+      # Comma-separated list of class names.
+      # (? LogManager docs say no comma here, but JDK example has comma.)
+      # StreamHandler: A simple handler for writing formatted records to an OutputStream.
+      # ConsoleHandler: A simple handler for writing formatted records to System.err
+      # FileHandler: A handler that writes formatted log records either to a single file, or to a set of rotating log files.
+      # SocketHandler: A handler that writes formatted log records to remote TCP ports.
+      # MemoryHandler: A handler that buffers log records in memory.
+      # handlers=java.util.logging.ConsoleHandler
+      # handlers=java.util.logging.FileHandler, java.util.logging.ConsoleHandler
+
+      # For Docker, write everything to the console
+      handlers=java.util.logging.ConsoleHandler
+
+
+      # Default global logging level.
+      # This specifies which kinds of events are logged across
+      # all loggers.  For any given facility this global level
+      # can be overriden by a facility specific level
+      # Note that the ConsoleHandler also has a separate level
+      # setting to limit messages printed to the console.
+      # Loggers and Handlers may override this level
+      .level={{ default "INFO" .Values.logLevel }}
+
+      # Loggers
+      # ------------------------------------------
+      # Loggers are usually attached to packages.
+      # Here, the level for each package is specified.
+      # The global level is used by default, so levels
+      # specified here simply act as an override.
+      # The levels in descending order are:
+      #   SEVERE (highest value)
+      #   WARNING
+      #   INFO
+      #   CONFIG
+      #   FINE
+      #   FINER
+      #   FINEST (lowest value)
+
+      ############################################################
+      # Facility specific properties.
+      # Provides extra control for each logger.
+      ############################################################
+      #org.forgerock.openidm.provisioner.level = FINER
+      #org.forgerock.openidm.repo.level = FINER
+      #org.forgerock.openidm.recon.level = FINER
+
+      # OpenICF is noisy at INFO level
+      org.forgerock.openicf.level=WARNING
+
+      # Logs the output from OSGi logging
+      org.forgerock.openidm.Framework.level=WARNING
+
+      # On restart the BarURLHandler can create warning noise
+      org.activiti.osgi.BarURLHandler.level=SEVERE
+
+      # Suppress warnings of failed connector loading
+      org.identityconnectors.framework.impl.api.local.LocalConnectorInfoManagerImpl.level=SEVERE
+
+      ############################################################
+      # Handler specific properties.
+      # Describes specific configuration info for Handlers.
+      ############################################################
+
+      # --- ConsoleHandler ---
+      # Default: java.util.logging.ConsoleHandler.level = INFO
+      # Override of global logging level
+      #java.util.logging.ConsoleHandler.level = WARNING
+      # For Docker
+      java.util.logging.ConsoleHandler.level = INFO
+      java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
+      # specifies the name of the filter class to be associated with this handler,
+      # defaults to {@code null} if this property is not found or has an invalid value.
+      java.util.logging.ConsoleHandler.filter=org.forgerock.openidm.logging.util.LogFilter
+
+      # --- FileHandler ---
+      # Override of global logging level
+      java.util.logging.FileHandler.level = ALL
+
+      # Naming style for the output file:
+      # (The output file is placed in the directory
+      # defined by the "user.home" System property.)
+      # java.util.logging.FileHandler.pattern = %h/java%u.log
+      java.util.logging.FileHandler.pattern = logs/openidm%u.log
+
+      # Limiting size of output file in bytes:
+      java.util.logging.FileHandler.limit = 5242880
+
+      # Number of output files to cycle through, by appending an
+      # integer to the base file name:
+      java.util.logging.FileHandler.count = 5
+
+      # Style of output (Simple or XML):
+      # Writes brief "human-readable" summaries of log records.
+      java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
+
+      # Writes detailed XML-structured information.
+      # java.util.logging.FileHandler.formatter = java.util.logging.XMLFormatter
+
+      # specifies the character set encoding name.
+      # defaults to the default platform encoding
+      java.util.logging.FileHandler.encoding = UTF-8
