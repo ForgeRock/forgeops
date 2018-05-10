@@ -23,8 +23,12 @@ Other requirements are:
  - Helm is installed (Kubernetes package manager)
  - Ingress is deployed and you can access the cluster endpoint
  - You have edited the variables in `deploy.sh` to your environment
+<<<<<<< HEAD
  - You have edited  `type/[cluster-size]/amster.yaml` and modified the sedFilter to your environment. Example follows.
  - You have ```curl``` installed 
+=======
+ - You have edited  `type/[cluster-size]/amster.yaml` and modified the sedFilter to your environment. Example follows. 
+>>>>>>> dd148c115f3b8b45afb68ce9e0b58f5cfbf44fdb
  
 ```
 global:
