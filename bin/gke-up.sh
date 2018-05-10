@@ -2,7 +2,7 @@
 # Sample wrapper script to initialize GKE. This creates the cluster and configures Helm, the nginx ingress,
 # and creates git credential secrets. Edit this for your requirements.
 
-echo "=> Have you copied the template file gke-env.template to gke-env.cfg and edited to cater to your enviroment?"
+echo "=> Have you copied the template file etc/gke-env.template to etc/gke-env.cfg and edited to cater to your enviroment?"
 read -p "Continue (y/n)?" choice
 case "$choice" in 
    y|Y|yes|YES ) echo "yes";;

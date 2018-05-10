@@ -11,7 +11,7 @@ resources:
     memory: 8Gi
 
 image:
-  tag: latest
+  tag: 6.0.0
   pullPolicy: Always
 
 storageSize: "500Gi"
