@@ -4,6 +4,8 @@ metadata:
   name: {{ .Values.service.name }}
   labels:
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: {{ .Values.component }}
+    vendor: forgerock
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +14,6 @@ spec:
     protocol: TCP
     name: {{ .Values.service.name }}
   selector:
-    app: {{ template "fullname" . }}
+    app: {{ template "name" . }}
+    release: {{ .Release.Name }}
+
