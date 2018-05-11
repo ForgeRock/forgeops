@@ -21,3 +21,4 @@ kubectl config set-context $(kubectl config current-context) --namespace=$GKE_CL
 # Need this sleep as tiller is not ready immediately
 sleep 20s
 ./gke-ingress-cntlr.sh $GKE_INGRESS_IP
+./create-nfs-provisioner.sh
