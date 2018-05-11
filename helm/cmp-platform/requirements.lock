@@ -1,0 +1,24 @@
+dependencies:
+- name: openam
+  repository: file://../openam
+  version: 6.0.0
+- name: amster
+  repository: file://../amster
+  version: 6.0.0
+- name: opendj
+  repository: file://../opendj
+  version: 6.0.0
+- name: opendj
+  repository: file://../opendj
+  version: 6.0.0
+- name: openidm
+  repository: file://../openidm
+  version: 6.0.0
+- name: postgres-openidm
+  repository: file://../postgres-openidm
+  version: 6.0.0
+- name: openig
+  repository: file://../openig
+  version: 6.0.0
+digest: sha256:afe0877d84172abd1f3c8710973882fe0507864afe72ecf67bdfb8e598e51f14
+generated: 2017-11-02T18:00:02.304173-06:00
