@@ -3,6 +3,9 @@
 
 ADMIN_ID="admin"
 
+# Need to set this so that pod does not run out of resources and hence OOM
+OPENDJ_JAVA_ARGS="-server -Xms2g -Xmx2g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
+
 # First directory server in the set
 DS0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
 
