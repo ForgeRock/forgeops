@@ -6,15 +6,15 @@ metadata:
 spec:
   secretName: {{ template "externalFQDN" . }}
   issuerRef:
-    name: letsencrypt
+    name: letsencrypt-dns
     kind: ClusterIssuer
   commonName: ""
   dnsNames:
-  - '*.forgeops.com'
+  - "*.{{ .Release.Namespace }}.forgeops.com"
   acme:
     config:
     - dns01:
-        ingressClass: nginx
+        provider: prod-dns
       domains:
-      - {{ template "externalFQDN" . }}
+      - {{ .Release.Namespace }}.forgeops.com
 {{- end -}}
