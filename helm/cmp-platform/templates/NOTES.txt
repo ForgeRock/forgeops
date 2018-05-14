@@ -1,0 +1,26 @@
+
+ForgeRock Platform
+
+If you are on minikube, get your ip address using `minikube ip`
+
+In your /etc/hosts file you will have an entry like:
+
+192.168.100.1 openam.{{.Release.Namespace}}{{.Values.global.domain}} openidm.{{.Release.Namespace}}{{.Values.global.domain}} openig.{{.Release.Namespace}}{{.Values.global.domain}}
+
+
+Get the pod status using:
+
+kubectl get po
+
+Get the ingress status using:
+
+kubectl get ing
+
+
+
+When the pods are ready, you can open up the consoles:
+
+http://openam.{{.Release.Namespace}}{{.Values.global.domain}}/openam
+http://openidm.{{.Release.Namespace}}{{.Values.global.domain}}/admin
+http://openig.{{.Release.Namespace}}{{.Values.global.domain}}/
+

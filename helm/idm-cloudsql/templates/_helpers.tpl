@@ -11,3 +11,24 @@ Expand the name of the chart.
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+
+
+{{/* expands to the fqdn using the component name. Note domain has a leading . */}}
+{{- define "externalFQDN" -}}
+{{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
+{{- else -}}
+{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.global.domain -}}
+{{- end -}}
+{{- end -}}
+
+
+{{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
+{{- define "tls-spec" -}}
+{{ if .Values.global.useTLS -}}
+tls:
+- hosts:
+  - {{ template "externalFQDN" .  }}
+  secretName: {{ template "externalFQDN" . }}
+{{ end -}}
+{{- end -}}
+

@@ -1,0 +1,9 @@
+{
+  "name": "google-container-slack",
+  "version": "0.0.1",
+  "description": "Slack integration for Google Cloud Container Builder, using Google Cloud Functions",
+  "main": "index.js",
+  "dependencies": {
+    "@slack/client": "3.9.0"
+  }
+}

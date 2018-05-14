@@ -1,0 +1,4 @@
+apiVersion: v1
+description: Deploys all components of the ForgeRock Identity Platform.
+name: cmp-platform
+version: 6.5.0
