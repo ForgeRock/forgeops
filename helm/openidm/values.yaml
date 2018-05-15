@@ -2,17 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# optional registry, including trailing /
-
-
-pullPolicy: IfNotPresent
 
 replicaCount: 1
 
+# Top level domain. Used to create the ingress
 domain: .forgeops.com
 
 config:
-  # Name of the shared pvc for our configuration.
+  # Name of the shared pvc for our configuration. If using the frconfig helm chart, this is the default.
   claim: frconfig
   # Path to our project
   path: /git/config/default/idm/sync-with-ldap-bidirectional

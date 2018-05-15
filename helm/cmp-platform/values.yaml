@@ -1,4 +1,6 @@
 
+amster:
+  domain: .example.com
 
 openam:
   domain: .example.com
@@ -15,4 +17,3 @@ userstore:
 
 configstore:
   djInstance: configstore
-

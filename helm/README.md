@@ -1,12 +1,12 @@
-# Setup 
+# Helm Charts
+
+## Setup 
 
 1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
 
-2) See the comments in custom.yaml. You can copy this file and customize.
-
-3) Build your Docker images, or set up access to a registry where those images can be pulled. 
-The default docker repository and tag names are set in each helm chart in values.yaml. You can 
-override these in your custom.yaml file.  The default assumes the docker images are in the docker cache 
+2) Build your Docker images, or set up access to a registry where those images can be pulled.
+The default docker repository and tag names are set in each helm chart in values.yaml. You can
+override these in your custom.yaml file.  The default assumes the docker images are in the docker cache
 (i.e. you have done a docker build direct to the Minikube docker machine). See the
  README in the docker/ folder for more information.
 
@@ -23,17 +23,20 @@ global:
      branch: master
 ```
 
-forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it. 
+forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it.
 
-If you wish to use your own Git repository based on the forgeops-init repository, 
-you can fork and clone the forgeops-init repository.
+If you wish to use your own Git repository based on the forgeops-init repository,
+you can fork and clone the forgeops-init repository. See [frconfig/README.md](frconfig/README.md).
 
 # Composite Charts
 
+The provided cmp-platform cahrt bundles other foundational charts such opendj, frconfig, 
+ openam, etc. Performing a `helm install cmp-platform`  will deploy all the components.
+ Remember to perform a `helm dep up cmp-platform` to update any dependencies that might have changed.
 
-Composite charts have names that begin with cmp-. These charts assemble foundational charts such opendj, git, 
- openam, etc. Refer to the values.yaml in each composite chart.  If you are building the
- charts yourself, remember to perform a `helm dep up cmp-chart` to update any dependencies that might have changed.
+ In general we recommendt that charts be deployed individually,as it makes it easier to debug and makes it possible
+ to redploy a single component at a time.
+
  
 # Using a private registry
 
