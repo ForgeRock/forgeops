@@ -53,7 +53,7 @@ backup:
   storageClass: "nfs"
   storageSize: "20Gi"
   # Backup schedules for full and incrementals. This is a crontab format:
-  # minutes hour day-of-week month year
+  # minutes hour day-of-month month day-of-week
   scheduleFull:  "2 2 * * *"
   scheduleIncremental: "45 * * * *"
 

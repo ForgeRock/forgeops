@@ -15,10 +15,9 @@ We truncate at 24 characters because some Kubernetes name fields are limited to 
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
 {{/* OpenAM FQDN  - if it is not explicity set, generate it */}}
-{{- define "openamFQDN" -}}
-{{- if .Values.openamFQDN  }}{{- printf "%s" .Values.openamFQDN -}}
+{{- define "fqdn" -}}
+{{- if .Values.fqdn }}{{- printf "%s" .Values.fqdn -}}
 {{- else -}}
 {{- printf "openam.%s%s" .Release.Namespace .Values.domain -}}
 {{- end -}}
