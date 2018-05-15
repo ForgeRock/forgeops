@@ -30,12 +30,12 @@ you can fork and clone the forgeops-init repository. See [frconfig/README.md](fr
 
 # Composite Charts
 
-The provided cmp-platform cahrt bundles other foundational charts such opendj, frconfig, 
+The provided cmp-platform chart bundles other foundational charts such opendj, frconfig,
  openam, etc. Performing a `helm install cmp-platform`  will deploy all the components.
  Remember to perform a `helm dep up cmp-platform` to update any dependencies that might have changed.
 
- In general we recommendt that charts be deployed individually,as it makes it easier to debug and makes it possible
- to redploy a single component at a time.
+ In general we recommend that charts be deployed individually as it makes it easier to debug and
+ to redeploy a single component at a time.
 
  
 # Using a private registry

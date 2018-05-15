@@ -1,4 +1,4 @@
-# frconfig - Manage configuration for the ForgeRock platform componets
+# frconfig - Manage configuration for the ForgeRock platform components
 
 This chart is responsible for fetching configuration to a shared
 persistent volume that is mounted by other pods. It must be running
