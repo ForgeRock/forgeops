@@ -1,0 +1,66 @@
+# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved.
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "frconfig.fullname" . }}
+  labels:
+    name: frconfig
+    app: {{ template "frconfig.fullname" . }}
+    vendor: forgerock
+    component: frconfig
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name:  {{ template "frconfig.fullname" . }}
+      labels:
+        app: {{ template "frconfig.fullname" . }}
+        component: frconfig
+    spec:
+      terminationGracePeriodSeconds: 5
+      initContainers:
+      - name: git-init
+        image: forgerock/git:6.0.0
+        imagePullPolicy:  {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name: {{ template "frconfig.fullname" . }}
+      containers:
+      - name: git
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        args: ["pause"]
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+      - name: git
+        persistentVolumeClaim:
+          claimName: {{ .Values.storage.name }}
+      - name: git-secret
+        secret:
+          {{ if .Values.git.sshSecretName }}
+          secretName: {{ .Values.git.sshSecretName }} 
+          {{ else }}
+          secretName: {{ template "frconfig.fullname" . }}
+          {{ end }}
+          # The forgerock user needs read access to this secret
+          #defaultMode: 256

@@ -9,14 +9,13 @@ pullPolicy: IfNotPresent
 
 replicaCount: 1
 
-global:
-  domain: .example.com
-  git:
-    # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
-    branch: master
-  configPath:
-    idm: default/idm/sync-with-ldap-bidirectional
+domain: .forgeops.com
+
+config:
+  # Name of the shared pvc for our configuration.
+  claim: frconfig
+  # Path to our project
+  path: /git/config/default/idm/sync-with-ldap-bidirectional
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openidm
@@ -71,10 +70,3 @@ ingress:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
-
-# Command to run in the git sidecar container.
-git:
-  # pause will sleep so you can exec into the container and manually sync changes.
-  #command: pause
-  # syncloop will auto save and push changes every 5 minutes. Use this in development.
-  command: syncloop

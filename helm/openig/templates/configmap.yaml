@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "fullname" . }}
-data:
-  OPENIG_BASE: "/git/config/{{ .Values.global.configPath.ig }}"
-  GIT_REPO: "{{ .Values.global.git.repo }}"
-  # This moves to the deployment template so that changes to the branch/commit trigger a rolling update.
-  #GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"

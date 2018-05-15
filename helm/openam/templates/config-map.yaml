@@ -34,12 +34,8 @@ kind: ConfigMap
 metadata:
   name: am-configmap
 data:
-  DOMAIN: "{{ .Values.global.domain }}"
+  DOMAIN: "{{ .Values.domain }}"
   CATALINA_OPTS: "{{ .Values.catalinaOpts }}"
-  GIT_REPO: "{{ .Values.global.git.repo }}"
-  GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
-  GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
-  CONFIG_PATH: "{{ .Values.global.configPath.am }}"
-  {{ if .Values.amCustomizationScriptPath -}}
-  CUSTOMIZE_AM: "/git/config/{{ .Values.global.configPath.am }}/{{ .Values.amCustomizationScriptPath }}"
+  {{ if .Values.config.amCustomizationScriptPath -}}
+  CUSTOMIZE_AM: "{{ .Values.config.amCustomizationScriptPath }}"
   {{- end }}

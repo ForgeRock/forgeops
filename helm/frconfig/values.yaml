@@ -1,0 +1,43 @@
+# Default values for frconfig.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+# Shared Storage Configuration
+storage:
+  # This class should map to a shared read write many type. NFS, for example
+  class: "nfs"
+  # The name of the shared storage volume. This is the platform default, and should not be changed.
+  name: "frconfig"
+  # The size of the shared storage. Needs to be large enough to contain the git config repo.
+  size: "10Gi"
+
+git:
+  # git repo to clone. The value below is a public git repo that does not require authentication.
+  # repo: "git@github.com:ForgeRock/cloud-deployment-config.git"
+  # Public, read only repo:
+  repo: "https://github.com/ForgeRock/forgeops-init.git"
+  branch: master
+  # You can set this to the name of a secret that contains a key "id_rsa"
+  # The secret contains the git ssh key that has permissions to clone and/or update the git repo.
+  # If you don't set this value, the chart includes a default dummy ssh key value. The dummy
+  # value can clone a public https:// git repo.
+  #ssh-secret-name: "git-ssh-key"
+
+image:
+  repository: forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi

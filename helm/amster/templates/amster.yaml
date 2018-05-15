@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved.
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -20,25 +20,7 @@ spec:
         app: {{ template "fullname" . }}
         component:  {{ .Values.component }}
     spec:
-      terminationGracePeriodSeconds: 5
-      initContainers:
-      - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy:  {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name: amster-{{ .Release.Name }}
-        # This is here so that a change in the git branch or commit triggers a rollout.
-        # See https://github.com/kubernetes/helm/issues/2639
-        env:
-        - name: GIT_CHECKOUT_BRANCH
-          value: "{{ .Values.global.git.branch }}"
+      terminationGracePeriodSeconds: 5    
       containers:
       - name: amster
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -64,22 +46,6 @@ spec:
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-      - name: git
-        image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: COMPONENT
-          value:  {{ .Values.component }}
-        args: ["pause"]
       volumes:
       - name: amster-secrets
         secret:
@@ -89,9 +55,5 @@ spec:
           name: amster-config
       # the amster and git pods share access to this volume
       - name: git
-        emptyDir: {}
-      - name: git-secret
-        secret:
-          secretName: git-ssh-key
-          # The forgerock user needs read access to this secret
-          #defaultMode: 256
+        persistentVolumeClaim:
+          claimName: {{ default "frconfig" .Values.config.claim }}
