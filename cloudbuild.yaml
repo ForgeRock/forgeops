@@ -39,6 +39,8 @@ steps:
   dir: 'docker'
   entrypoint: './build.sh'
   args: ['-g']
+# Downloading artifacts can be slow.. so we need to bump the timeout
+timeout: 720s
 images:
 - 'gcr.io/$PROJECT_ID/opendj'
 - 'gcr.io/$PROJECT_ID/openidm'

@@ -5,7 +5,7 @@
 component: openam
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openam
+  repository: forgerock-docker-public.bintray.io/forgerock
   tag: 6.0.0
   # For development we set this to Always to get the most current image:
   #pullPolicy: Always

@@ -82,7 +82,7 @@ spec:
       # The restore init container restores data from a previous backup.
       {{ if .Values.restore.enabled }}
       - name: restore
-        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: db
@@ -98,7 +98,7 @@ spec:
       {{ end }}
       # The setup init container is responsible for setting up DS if it is not configured or restored.
       - name: setup
-        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: dj-secrets
@@ -111,7 +111,7 @@ spec:
         args: [ "setup" ]
       containers:
       - name: opendj
-        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
