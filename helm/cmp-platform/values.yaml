@@ -1,11 +1,13 @@
 
 
-global:
+openam:
   domain: .example.com
-  git:
-    # This is a public repo, so we need to use https:// to clone.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
 
+openig:
+  domain: .example.com
+
+openidm:
+  domain: .example.com
 
 userstore:
   djInstance: userstore

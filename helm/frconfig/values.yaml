@@ -23,7 +23,11 @@ git:
   # The secret contains the git ssh key that has permissions to clone and/or update the git repo.
   # If you don't set this value, the chart includes a default dummy ssh key value. The dummy
   # value can clone a public https:// git repo.
-  #ssh-secret-name: "git-ssh-key"
+  #sshSecretName: "git-ssh-key"
+  # The git-init process can run a search / replace using sed. This should be avoided
+  # if possible in preference to using commons config.
+  # sedFilter: "-e s/some.string/some.replacement/ -e s/foo/bar/"
+
 
 image:
   repository: forgerock/git

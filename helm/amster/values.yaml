@@ -29,7 +29,7 @@ config:
   exportPath: /tmp/amster
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/amster
+  repository: forgerock-docker-public.bintray.io/forgerock
   tag: 6.0.0
   #pullPolicy: IfNotPresent
   pullPolicy: Always
@@ -61,7 +61,7 @@ userStore:
 # and set to 'false' if importing partial/incremental configurations
 amsterClean: false
 
-# Defines default global values. These can get overridden with -f custom.yaml
+# The top level domain (including the leading .)
 domain: .forgeops.com
 
 

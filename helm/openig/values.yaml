@@ -17,7 +17,7 @@ config:
 useTLS: false
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openig
+  repository: forgerock-docker-public.bintray.io/forgerock
   tag: 6.0.0
   pullPolicy: IfNotPresent
 

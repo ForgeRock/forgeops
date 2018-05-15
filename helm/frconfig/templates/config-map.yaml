@@ -8,3 +8,4 @@ data:
   GIT_CHECKOUT_BRANCH:  {{ .Values.git.branch }}
   FQDN: {{ default "openam.default.example.com" .Values.fqdn }}
   VERSION: {{ default .Values.image.tag .Values.version }}
+  SED_FILTER: {{ default "" .Values.git.sedFilter }}
