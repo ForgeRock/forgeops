@@ -1,6 +1,6 @@
 djInstance: userstore
 
-numberSampleUsers: "1000"
+numberSampleUsers: "10000000"
 
 resources:
   limits:
@@ -12,7 +12,6 @@ opendjJavaArgs: "-server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:M
 
 storageSize: "500Gi"
 storageClass: "fast"
-backupStorageSize: "20Gi"
 
 #replicas: 2
 
