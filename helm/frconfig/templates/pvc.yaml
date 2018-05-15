@@ -1,0 +1,12 @@
+# pvc for the shared backup volume
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+    name: {{ .Values.storage.name }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.storage.size }}
+  storageClassName: {{ .Values.storage.class }}

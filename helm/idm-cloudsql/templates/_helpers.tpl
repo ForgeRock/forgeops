@@ -17,14 +17,14 @@ Expand the name of the chart.
 {{- define "externalFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.global.domain -}}
+{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
 {{- end -}}
 {{- end -}}
 
 
 {{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
 {{- define "tls-spec" -}}
-{{ if .Values.global.useTLS -}}
+{{ if .Values.useTLS -}}
 tls:
 - hosts:
   - {{ template "externalFQDN" .  }}

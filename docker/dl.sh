@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
 # Script to download binaries from ForgeRock Artifactory repository.
 
+
 if [ -z "$API_KEY" ]
 then
     echo "You must set the API_KEY environment variable"
@@ -8,7 +9,7 @@ then
 fi
 
 # Update major versions / snapshots here.
-VERSION=6.5.0
+VERSION=${VERSION:-6.5.0}
 SNAPSHOT=6.5.0-SNAPSHOT
 
 # Update release / milestone / RC builds here.

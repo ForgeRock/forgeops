@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -16,18 +16,6 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       initContainers:
-      - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name: am-configmap
       - name: wait-for-configstore
         image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
@@ -61,8 +49,6 @@ spec:
           mountPath: /home/forgerock/openam
         - name: git
           mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
         envFrom:
         - configMapRef:
             name: am-configmap
@@ -85,7 +71,7 @@ spec:
           httpGet:
             path: /openam/isAlive.jsp
             port: 8080
-          initialDelaySeconds: 60
+          initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
           periodSeconds: {{ .Values.livenessPeriod }}
       volumes:
@@ -98,12 +84,8 @@ spec:
         configMap:
           name: boot-json
       - name: git
-        emptyDir: {}
-      - name: git-secret
-        secret:
-          secretName: git-ssh-key
-          # The forgerock user needs read access to this secret
-          #defaultMode: 256
+        persistentVolumeClaim:
+          claimName: {{ default "frconfig"  .Values.config.claim }}
       - name: configstore-secret
         secret:
           secretName: configstore

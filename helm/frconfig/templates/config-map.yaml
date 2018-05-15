@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "frconfig.fullname" . }}
+data:
+  GIT_REPO: "{{ .Values.git.repo }}"
+  GIT_AUTOSAVE_BRANCH:  autosave-{{ .Release.Namespace }}
+  GIT_CHECKOUT_BRANCH:  {{ .Values.git.branch }}
+  FQDN: {{ default "openam.default.example.com" .Values.fqdn }}
+  VERSION: {{ default .Values.image.tag .Values.version }}

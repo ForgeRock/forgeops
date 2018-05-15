@@ -1,3 +1,4 @@
+# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved.
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -20,24 +21,6 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
     spec:
-      initContainers:
-      - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name:  {{ template "fullname" . }}
-        env:
-        # This is here so that a change in the git branch or commit triggers a rollout.
-        # See https://github.com/kubernetes/helm/issues/2639
-        - name: GIT_CHECKOUT_BRANCH
-          value: "{{ default "master" .Values.global.git.branch }}"
       containers:
       - name: openidm
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
@@ -74,22 +57,6 @@ spec:
           mountPath: /var/run/openidm/commons
         - name: logging-properties
           mountPath: /var/run/openidm/logging
-      - name: git
-        image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        - name: COMPONENT
-          value:  {{ .Values.component }}
-        args: [ "{{.Values.git.command}}" ]
       volumes:
       - name: openidm-secrets
         secret:
@@ -97,12 +64,8 @@ spec:
       - name: logs
         emptyDir: {}
       - name: git
-        emptyDir: {}
-      - name: git-secret
-        secret:
-          secretName:  git-ssh-key
-          # This gets mounted as root, so we need to open up the permissions for the forgerock user to read it
-          # defaultMode: 256
+        persistentVolumeClaim:
+          claimName: {{ default "frconfig" .Values.config.claim }}
       - name: boot-properties
         configMap:
           name: idm-boot-properties

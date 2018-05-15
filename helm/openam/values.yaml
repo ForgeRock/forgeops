@@ -11,19 +11,13 @@ image:
   #pullPolicy: Always
   pullPolicy: IfNotPresent
 
-global:
-  domain: .forgeops.com
-  git:
-    # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
-    branch: master
-    projectDirectory: "forgeops-init"
-  configPath:
-    am: default/am/empty-import
-  exportPath:
-      am: default/am/autosave
-  # If you set this to true, you must have a TLS secret with the same name as the FQDN.
-  useTLS: false
+domain: .forgeops.com
+
+config:
+  claim: frconfig
+
+# If you set this to true, you must have a TLS secret with the same name as the FQDN.
+useTLS: false
 
 openamReplicaCount: 1
 

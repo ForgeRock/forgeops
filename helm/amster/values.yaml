@@ -8,7 +8,6 @@
 
 component: amster
 
-
 # Server base URL *within* the Kubernetes cluster - not the external LB URL.
 # No /openam appended here.
 serverBase: http://openam:80
@@ -21,6 +20,13 @@ amadminPassword: password
 encryptionKey: "123456789012"
 policyAgentPassword: Passw0rd
 
+
+config:
+  # The name of the shared read write many PVC volume that holds the configuration
+  claim: frconfig
+  importPath: /git/config/default/am/empty-import
+  # If exportPath.am is not set it defaults to configPath.am
+  exportPath: /tmp/amster
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
@@ -50,24 +56,14 @@ userStore:
   dirManager: "cn=Directory Manager"
   suffix:  "o=userstore"
 
-
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration
 # and set to 'false' if importing partial/incremental configurations
 amsterClean: false
 
 # Defines default global values. These can get overridden with -f custom.yaml
-global:
-  domain: .forgeops.com
-  git:
-    # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
-    branch: master
-  configPath:
-    am: default/am/empty-import
-  # If exportPath.am is not set it defaults to configPath.am
-  exportPath: {}
-    #am: default/am/autosave
+domain: .forgeops.com
+
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:

@@ -20,31 +20,13 @@ spec:
         component: {{ .Values.component }}
         vendor: forgerock
     spec:
-      initContainers:
-      - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy:  {{ .Values.image.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name:  {{ template "fullname" . }}
-        # This is here so that a change in the git branch or commit triggers a rollout.
-        # See https://github.com/kubernetes/helm/issues/2639
-        env:
-        - name: GIT_CHECKOUT_BRANCH
-          value: "{{ .Values.global.git.branch }}"
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        envFrom:
-        - configMapRef:
-            name: {{ template "fullname" . }}
+        env:
+        - name: OPENIG_BASE
+          value: "{{ .Values.config.path }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
@@ -52,22 +34,23 @@ spec:
           mountPath: /git
         - name: git-secret
           mountPath: /etc/git-secret
-# todo: Create a health check URL
-#        livenessProbe:
-#          httpGet:
-#            path: /
-#            port: {{ .Values.service.internalPort }}
-#          timeoutSeconds: 10
-#        readinessProbe:
-#          httpGet:
-#            path: /
-#            port: {{ .Values.service.internalPort }}
-#          initialDelaySeconds: 30
+        livenessProbe:
+          httpGet:
+           path: /
+           port: {{ .Values.service.internalPort }}
+          timeoutSeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 5
         resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:
       - name: git
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: {{ default "frconfig" .Values.config.claim }}
       - name: git-secret
         secret:
           secretName:  git-ssh-key

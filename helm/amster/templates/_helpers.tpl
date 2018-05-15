@@ -20,6 +20,6 @@ We truncate at 24 characters because some Kubernetes name fields are limited to 
 {{- define "openamFQDN" -}}
 {{- if .Values.openamFQDN  }}{{- printf "%s" .Values.openamFQDN -}}
 {{- else -}}
-{{- printf "openam.%s%s" .Release.Namespace .Values.global.domain -}}
+{{- printf "openam.%s%s" .Release.Namespace .Values.domain -}}
 {{- end -}}
 {{- end -}}
