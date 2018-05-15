@@ -1,8 +1,5 @@
 djInstance: userstore
 
-global:
-  domain: .fr8ks.net
-
 numberSampleUsers: "1000"
 
 resources:
@@ -16,10 +13,6 @@ opendjJavaArgs: "-server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:M
 storageSize: "500Gi"
 storageClass: "fast"
 backupStorageSize: "20Gi"
-
-image:
-  tag: 6.0.0
-  pullPolicy: Always
 
 #replicas: 2
 

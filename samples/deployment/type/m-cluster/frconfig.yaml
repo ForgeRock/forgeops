@@ -1,0 +1,11 @@
+
+replicaCount: 1
+
+git:
+  #repo: "https://github.com/ForgeRock/forgeops-init.git"
+  repo: git@github.com:ForgeRock/cloud-deployment-config.git
+  branch: master
+  sedFilter: "-e s/benchmark.forgeops.com/bench.frk8s.net/"
+
+
+ git.sshSecretName: “git-ssh-key”
