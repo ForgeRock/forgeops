@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-NAMESPACE="bench"
 
 print_help()
 {
@@ -32,8 +31,14 @@ delete_all()
     helm delete --purge $(helm list -q --all --namespace=${NAMESPACE})
 
     # Delete all persistent volume claims
-    kubectl delete pvc --all
+    # Note this is dangerous so be careful before uncommenting
+    #kubectl delete pvc --all
 }
+
+if [ $# -lt 2 ]; then
+    print_help
+    exit 0
+fi
 
 parse_commandline "$@"
 delete_all
