@@ -10,8 +10,8 @@ GKE_CLUSTER_NAME="forgeops-medium-cluster"
 # Primay Zone
 GKE_PRIMARY_ZONE="us-east1-d"
 
-# Additional Zone(s) in the same region "PRIMARY_ZONE,[ZONE,...]"
-GKE_ZONE=""
+# Additional Zone(s) in the same region
+GKE_ADDITIONAL_ZONES=""
 
 # Kubernetes Cluster Version
 GKE_CLUSTER_VERSION="1.9.6-gke.1"
