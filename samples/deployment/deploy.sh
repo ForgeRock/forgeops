@@ -90,8 +90,18 @@ deploy_charts()
     components=(frconfig configstore userstore ctsstore openam amster)
 
     for c in ${components[@]}; do
+
+        chart="${c}"
+        
+        case "${c}" in
+          *store)
+            chart="opendj"
+            ;;
+        esac
+
         helm install --name ${c}-${NAMESPACE} -f type/common.yaml -f type/${TYPE}/${c}.yaml \
-            --namespace=${NAMESPACE} ../../helm/${c}
+            --namespace=${NAMESPACE} ../../helm/${chart}
+
     done
 
 }
