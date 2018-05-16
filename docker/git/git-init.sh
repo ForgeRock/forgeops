@@ -14,15 +14,18 @@ if [ ! -z "${GIT_REPO}" ]; then
 
     mkdir -p "${GIT_ROOT}"
     cd ${GIT_ROOT}
-    # sometimes the git repo emptyDir does not get cleaned up from a previous run
-    rm -fr *
-    git clone "${GIT_REPO}" "${GIT_ROOT}"
-    if [ "$?" -ne 0 ]; then
-       echo "git clone failed. Will sleep for 5 minutes for debugging."
-       sleep 300
-       exit 1
+    
+    # Only clone the git repo if it does not already exist.
+    if [ ! -d .git  ];
+    then 
+        git clone "${GIT_REPO}" "${GIT_ROOT}"
+        if [ "$?" -ne 0 ]; then
+        echo "git clone failed. Will sleep for 5 minutes for debugging."
+        sleep 300
+        exit 1
+        fi
     fi
-    cd "${GIT_ROOT}"
+  
     git checkout "${GIT_BRANCH}"
     if [ "$?" -ne 0 ]; then
        echo "git checkout of ${GIT_BRANCH} failed. Will sleep for 5 min for debugging"

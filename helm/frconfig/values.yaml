@@ -28,9 +28,15 @@ git:
   # if possible in preference to using commons config.
   # sedFilter: "-e s/some.string/some.replacement/ -e s/foo/bar/"
 
+# If you want to skip PVC creation, deploy with --set createPVC=false.
+# This is useful if you have an existing PVC that you want to remount.
+createPVC: true
+
+
+component: git
 
 image:
-  repository: forgerock/git
+  repository: forgerock
   tag: 6.5.0
   pullPolicy: IfNotPresent
 
