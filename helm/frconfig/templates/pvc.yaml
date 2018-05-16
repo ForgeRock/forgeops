@@ -1,8 +1,14 @@
 # pvc for the shared backup volume
+# Note that we instruct helm to keep this PVC around
+# We appear to be hitting https://github.com/kubernetes-incubator/external-storage/issues/251 
+# So we delete the helm chart first, then clean up the PVC later.
+{{ if .Values.createPVC }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
     name: {{ .Values.storage.name }}
+    annotations:
+      "helm.sh/resource-policy": keep
 spec:
   accessModes:
     - ReadWriteMany
@@ -10,3 +16,4 @@ spec:
     requests:
       storage: {{ .Values.storage.size }}
   storageClassName: {{ .Values.storage.class }}
+  {{ end }}
