@@ -1,15 +1,8 @@
-global:
-  domain: .forgeops.com
-
 resources:
   limits:
     memory: 6Gi
   requests:
     memory: 4Gi
-
-image:
-  tag: 6.0.0
-  pullPolicy: Always
 
 catalinaOpts: >
   -server -XX:+UnlockExperimentalVMOptions -Xms4g -Xmx4g

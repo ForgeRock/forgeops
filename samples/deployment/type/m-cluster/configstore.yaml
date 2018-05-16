@@ -1,18 +1,10 @@
 djInstance: configstore
 
-global:
-  domain: .frk8s.net
-
 resources:
   limits:
     memory: 2Gi
   requests:
     memory: 1Gi
-
-image:
-  tag: 6.0.0
-  pullPolicy: Always
-
 
 #replicas: 2
 

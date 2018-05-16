@@ -80,32 +80,35 @@ set_kubectl_context()
 
 
 #### Deploy methods
-deploy() 
+deploy_charts() 
 {
     echo "=> Deploying charts into namespace \"${NAMESPACE}\""
     # Update openam chart dependencies
     helm dep up ../../helm/openam
 
-    # Deploy user/config/cts stores
-    helm install --name configstore-${NAMESPACE} -f type/${TYPE}/configstore.yaml \
-        --namespace=${NAMESPACE} ../../helm/opendj
-    helm install --name userstore-${NAMESPACE} -f type/${TYPE}/userstore.yaml \
-        --namespace=${NAMESPACE} ../../helm/opendj
-    helm install --name ctsstore-${NAMESPACE} -f type/${TYPE}/ctsstore.yaml \
-        --namespace=${NAMESPACE} ../../helm/opendj
+    # These are the charts (components) that will be deployed via helm
+    components=(frconfig configstore userstore ctsstore openam amster)
 
-    # Deploy amster & openam
-    helm install --name openam-${NAMESPACE} -f type/${TYPE}/openam.yaml \
-        --namespace=${NAMESPACE} ../../helm/openam
-    helm install --name amster-${NAMESPACE} -f type/${TYPE}/amster.yaml \
-        --namespace=${NAMESPACE} ../../helm/amster
+    for c in ${components[@]}; do
+
+        chart="${c}"
+        
+        case "${c}" in
+          *store)
+            chart="opendj"
+            ;;
+        esac
+
+        helm install --name ${c}-${NAMESPACE} -f type/common.yaml -f type/${TYPE}/${c}.yaml \
+            --namespace=${NAMESPACE} ../../helm/${chart}
+
+    done
+
 }
 
 isalive_check() 
 {
     echo "=> Running OpenAM alive.jsp check"
-    #STATUS_CODE=$(curl -LI  http://$AM_URL/openam/isAlive.jsp \
-    #    -o /dev/null -w '%{http_code}\n' -s)
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
         echo "=> AM is not alive, waiting 10 seconds before retry..."
@@ -151,6 +154,6 @@ restart_openam()
 #### Main method
 parse_commandline "$@"
 set_kubectl_context
-deploy
+deploy_charts
 livecheck_stage1
 restart_openam

@@ -2,21 +2,15 @@ bootstrapType: cts
 
 djInstance: ctsstore
 
-global:
-  domain: .frk8s.net
 resources:
   limits:
     memory: 10Gi
   requests:
     memory: 8Gi
 
-image:
-  tag: 6.0.0
-  pullPolicy: Always
-
 storageSize: "500Gi"
 storageClass: "fast"
-backupStorageSize: "20Gi"
+
 
 opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -Xms8g -Xmx8g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
 
@@ -27,6 +21,7 @@ gcs:
   sleepSeconds: 600
   backupBucket:  gs://forgeops/dj-backup/10m
   restoreBucket: gs://forgeops/dj-backup/10m
+
 restore:
   enabled: false
 
@@ -35,3 +30,5 @@ runPostSetupJob: false
 #replicas: 2
 
 #topologyKey: "failure-domain.beta.kubernetes.io/zone"
+
+#slackUrl: undefined
