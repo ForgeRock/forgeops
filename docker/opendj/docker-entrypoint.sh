@@ -17,6 +17,18 @@ rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
 
+
+exit_script() {
+    echo "Got signal. Killing child processes. Ignore any errors below as the child processes may already be gone"
+    trap - SIGINT SIGTERM # clear the trap
+    kill -- -$$ # Sends SIGTERM to child/sub processes
+    echo "Exiting"
+    exit 0
+}
+
+trap exit_script SIGINT SIGTERM SIGUSR1 EXIT
+
+
 # Check for a mounted secret volume. Fall back to secrets bundled in the image if we can't find them.
 if [ ! -d "$SECRET_PATH" ]; then
     echo "Warning; Cannot find mounted secret volume on $SECRET_PATH. Falling back to using secrets bundled in the image"
