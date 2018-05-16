@@ -9,11 +9,11 @@ configDir=$1
 
 if [ -z "${configDir}" ] || [ ! -d ${configDir} ];
 then 
-    echo "Usage: dep.sh config-directory"
+    echo "Usage: deploy.sh config-directory"
     exit 1
 fi
 
-# Make sure we are in the directory where the script is located. All paths are relative to this directory.
+# Make sure we are in the root directory. All paths are relative to this directory.
 
 cd "$(dirname "$0")/.."
 helm_dir=helm 
@@ -31,7 +31,7 @@ fi
 echo "Cleaning up any previous deployments. Ignore errors below"
 bin/remove-all.sh ${NAMESPACE}
 
-echo "Creating namespace ${NAMESPACE}. Ignore errors below it if already exists"
+echo "Creating namespace ${NAMESPACE}. Ignore errors below if already exists"
 kubectl create namespace ${NAMESPACE}
 # Note the above variables are intended to be overwritten if cmd line args are provided 
 
