@@ -48,3 +48,6 @@ images:
 - 'gcr.io/$PROJECT_ID/openam'
 - 'gcr.io/$PROJECT_ID/amster'
 - 'gcr.io/$PROJECT_ID/util'
+- 'gcr.io/$PROJECT_ID/java'
+- 'gcr.io/$PROJECT_ID/git'
+
