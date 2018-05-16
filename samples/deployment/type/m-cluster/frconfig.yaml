@@ -1,7 +1,6 @@
-replicaCount: 1
-
 git:
-  repo: git@github.com:ForgeRock/forgeops-init.git
+  repo: https://github.com/ForgeRock/forgeops-init.git
   branch: master
+#  sshSecretName: “git-ssh-key”
 
-git.sshSecretName: “git-ssh-key”
+replicaCount: 1
