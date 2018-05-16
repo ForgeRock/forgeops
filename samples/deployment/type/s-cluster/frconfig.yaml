@@ -1,6 +1,7 @@
-replicaCount: 1
-
 git:
-  #repo: "https://github.com/ForgeRock/forgeops-init.git"
-  repo: git@github.com:ForgeRock/cloud-deployment-config.git
+  repo: git@github.com:ForgeRock/forgeops-init.git
   branch: master
+
+git.sshSecretName: “git-ssh-key”
+
+replicaCount: 1
