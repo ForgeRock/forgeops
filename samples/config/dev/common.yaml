@@ -1,0 +1,9 @@
+domain: .forgeops.com
+
+image:
+  # repository: gcr.io/engineering-devops
+  repository: gcr.io/engineering-devops
+  tag: 6.0.0
+  pullPolicy: Always
+
+git.sshSecretName: “git-ssh-key”
