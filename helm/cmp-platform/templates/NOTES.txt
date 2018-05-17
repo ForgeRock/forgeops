@@ -20,7 +20,7 @@ kubectl get ing
 
 When the pods are ready, you can open up the consoles:
 
-http://openam.{{.Release.Namespace}}{{.Values.domain}}/openam
-http://openidm.{{.Release.Namespace}}{{.Values.domain}}/admin
-http://openig.{{.Release.Namespace}}{{.Values.domain}}/
+http://openam.{{.Release.Namespace}}{{.Values.openam.domain}}/openam
+http://openidm.{{.Release.Namespace}}{{.Values.openidm.domain}}/admin
+http://openig.{{.Release.Namespace}}{{.Values.openig.domain}}/
 

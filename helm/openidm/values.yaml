@@ -16,7 +16,9 @@ config:
 
 image:
   repository: gcr.io/engineering-devops
-  pullPolicy: IfNotPresent
+  # For development use Always
+  pullPolicy: Always
+  #pullPolicy: IfNotPresent
   tag: 6.5.0
 
 # Specific values
