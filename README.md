@@ -4,19 +4,18 @@ Docker and Kubernetes DevOps artifacts for the ForgeRock platform.
 
 ## Disclaimer 
 
-These samples are provided on an “as is” basis, without warranty of any kind, to the fullest extent 
-permitted by law. ForgeRock does not warrant or guarantee the individual success developers 
-may have in implementing the code on their development platforms or in 
-production configurations. ForgeRock does not warrant, guarantee or make any representations 
-regarding the use, results of use, accuracy, timeliness or completeness of any data or 
-information relating to these samples. ForgeRock disclaims all warranties, expressed or implied, and 
-in particular, disclaims all warranties of merchantability, and warranties related to the code, or any 
-service or software related thereto. ForgeRock shall not be liable for any direct, indirect or 
-consequential damages or costs of any type arising out of any action taken by you or others related 
+These samples are provided on an “as is” basis, without warranty of any kind, to the fullest extent
+permitted by law. ForgeRock does not warrant or guarantee the individual success developers
+may have in implementing the code on their development platforms or in
+production configurations. ForgeRock does not warrant, guarantee or make any representations
+regarding the use, results of use, accuracy, timeliness or completeness of any data or
+information relating to these samples. ForgeRock disclaims all warranties, expressed or implied, and
+in particular, disclaims all warranties of merchantability, and warranties related to the code, or any
+service or software related thereto. ForgeRock shall not be liable for any direct, indirect or
+consequential damages or costs of any type arising out of any action taken by you or others related
 to the samples.
 
-
-## Branches 
+## Branches
 
 The master branch targets
 features that are still in development and may not be stable. Please checkout the 

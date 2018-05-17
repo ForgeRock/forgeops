@@ -1,6 +1,7 @@
 #!/usr/bin/env sh
-# Script to download binaries from ForgeRock Artifactory repository.
-
+# Script to download binaries from the ForgeRock Artifactory repository.
+# This is used as part of a CI/CD process to build Docker images. If you are ForegeRock customer
+# please download artifacts from BackStage and place them in the appropriate folders.
 
 if [ -z "$API_KEY" ]
 then
