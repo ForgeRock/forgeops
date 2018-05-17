@@ -16,9 +16,11 @@ There are a few ways to build the Docker images:
 * Use the build.sh shell script. This essentially the same as performing a manual build. The build.sh script
  is available for convenience.
 
+Please refer to the [DevOps Guide](https://backstage.forgerock.com/docs/platform/6/devops-guide/) for more information.
+
 ## ForgeRock platform components
 
-You must log on to backstage to download the relevant ForgeRock products. Place the binaries in the appropriate folder, renaming them as required (openam.war, openidm.zip, opendj.zip, openig.war )
+You must log on to BackStage to download the relevant ForgeRock binaries. Place the binaries in the appropriate folder, renaming them as required (openam.war, openidm.zip, opendj.zip, openig.war )
 
 ## Building Minor or Patch Releases
 
