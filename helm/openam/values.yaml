@@ -5,8 +5,8 @@
 component: openam
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock
-  tag: 6.0.0
+  repository: gcr.io/engineering-devops
+  tag: 6.5.0
   # For development we set this to Always to get the most current image:
   #pullPolicy: Always
   pullPolicy: IfNotPresent
