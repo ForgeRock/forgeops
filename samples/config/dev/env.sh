@@ -1,5 +1,8 @@
 # Environment settings for the deployment
 
+# The URL prefix for openam service
+URL_PREFIX=openam
+
 # k8s namespace to deploy in
 NAMESPACE=sandbox
 
