@@ -31,7 +31,7 @@ djInstance: ds
 component: opendj
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock
+  repository: gcr.io/engineering-devops
   # For development we set this to Always to get the most current image.
   pullPolicy: Always
   #pullPolicy: IfNotPresent

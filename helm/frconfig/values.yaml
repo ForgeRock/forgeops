@@ -32,11 +32,10 @@ git:
 # This is useful if you have an existing PVC that you want to remount.
 createPVC: true
 
-
 component: git
 
 image:
-  repository: forgerock
+  repository: gcr.io/engineering-devops
   tag: 6.5.0
   pullPolicy: IfNotPresent
 

@@ -17,8 +17,8 @@ config:
 useTLS: false
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock
-  tag: 6.0.0
+  repository: gcr.io/engineering-devops
+  tag: 6.5.0
   pullPolicy: IfNotPresent
 
 service:

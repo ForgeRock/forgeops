@@ -15,9 +15,9 @@ config:
   path: /git/config/default/idm/sync-with-ldap-bidirectional
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock
+  repository: gcr.io/engineering-devops
   pullPolicy: IfNotPresent
-  tag: 6.0.0
+  tag: 6.5.0
 
 # Specific values
 openidm:
