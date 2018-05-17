@@ -12,52 +12,37 @@
 #   - Restart OpenAM to take all configuration online
 ####################################################################################
 
-print_help()
+usage() 
 {
-    printf 'Usage: \t%s\t[-c|--cfgdir <cfg directory>] [-n|--namespace <namespace>] [-d|--domain <domain>]
-            \t\t [-p|--prefix <AM prefix>] [-f|--yaml <common yaml file>] [--remove-all] [-h|--help]\n' "$0"
-    printf 'Example 1: %s -p openam -n dev -d forgerock.org\n' "$0"
-    printf 'Example 2: %s -c samples/config/dev\n' "$0"
+    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-R] [-d] config_directory"
+    echo "-f extra config yaml that will be passed to helm. May be repeated"
+    echo "-e extra env.sh that will be sourced to set environment variables. May be repeated"
+    echo "-R Remove all.  Purge any existing deployment (Warning - destructive)"
+    echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts"
+    exit 1
 }
+# Additional YAML options for helm
+YAML=""
 
-parse_commandline()
+parse()
 {
-    while test $# -gt 0
-    do
-        case "$1" in
-            -c|--cfgdir)
-                CFGDIR="$2"
-                shift
-                ;;
-            -n|--namespace)
-                NAMESPACE="$2"
-                shift
-                ;;
-            -d|--domain)
-                DOMAIN="$2"
-                shift
-                ;;
-            -p|--prefix)
-                URL_PREFIX="$2"
-                shift
-                ;;
-            -f|--yaml)
-                YAML="$2"
-                shift
-                ;;
-            -s|--silent)
-                SILENT=true
-                ;;
-            --remove-all)
-                RMALL=true
-                ;;
-            -h|--help|*)
-                print_help
-                exit 0
-                ;;
+    while getopts "df:e:R" opt; do
+        case ${opt} in
+            f ) YAML="$YAML -f ${OPTARG} " ;;
+            e ) ENV_SH="${OPTARG}" ;;
+            R ) RMALL=true ;;
+            d ) DRYRUN="echo " ;;
+            \? ) usage ;;
         esac
-        shift
     done
+    shift $((OPTIND -1))
+ 
+    if [ "$#" -ne 1 ]; then
+         echo "Error: Missing deployment directory"
+         usage
+    fi
+
+    CFGDIR="$1"
 }
 
 chk_config()
@@ -75,10 +60,13 @@ chk_config()
     else
         echo "=> Using \"${CFGDIR}\" as the root of your configuration"
         echo "=> Reading env.sh"
-        source ${CFGDIR}/env.sh
-        if [ $? != 0 ]; then
-            echo "ERROR: Could not find or read your env.sh file.  Exiting!"
-            exit 1
+        if [ ! -z "${ENV_SH}" ]; then
+            echo "=> Reading ${ENV_SH}"
+            source "${ENV_SH}"
+        fi
+        if [ -r  ${CFGDIR}/env.sh ]; then 
+            echo "=> Reading ${CFGDIR}/env.sh"
+            source ${CFGDIR}/env.sh
         fi
     fi
 
@@ -100,25 +88,8 @@ chk_config()
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
     AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}"
-
 }
 
-
-
-#### Setup methods
-#set_kubectl_context() 
-#{
-#    if [ -z ${CONTEXT} ]; then
-#        CONTEXT=$(kubectl config current-context)
-#    fi
-#    echo "=> Switching Context to \"${CONTEXT}\" and Namespace to \"${NAMESPACE}\""
-#    kubectl config use-context ${CONTEXT} --namespace=${NAMESPACE}
-#    if test $? -gt 0
-#        then
-#            echo "=> Could not use context \"${CONTEXT}\". Make sure context exists. Exiting!!!"
-#        exit 1
-#    fi
-#}
 
 create_namespace() 
 {
@@ -141,6 +112,12 @@ create_secrets()
 deploy_charts() 
 {
     echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\"" 
+
+    # If the deploy directory contains a common.yaml, append it to the helm arguments.
+    if [ -r "${CFGDIR}"/common.yaml ]; then
+        YAML="$YAML -f ${CFGDIR}/common.yaml"
+    fi
+
     # These are the charts (components) that will be deployed via helm 
     for comp in ${COMPONENTS[@]}; do
         chart="${comp}"
@@ -150,19 +127,9 @@ deploy_charts()
             ;;
         esac
 
-        if [ ! -z ${YAML} ]; then
-            common="-f ${YAML}"
-        else
-            common="-f ${CFGDIR}/common.yaml"
-        fi
-
-        # if nothing then there is no commons.yaml
-        if [ ! -f "${common}" ]; then
-            common=""
-        fi
-
-        helm install --name ${comp}-${NAMESPACE} ${common} -f ${CFGDIR}/${comp}.yaml \
-            --namespace=${NAMESPACE} helm/${chart}
+        ${DRYRUN} helm install --name ${comp}-${NAMESPACE} ${YAML} \
+            -f ${CFGDIR}/${comp}.yaml \
+            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
     done
 }
 
@@ -171,7 +138,7 @@ isalive_check()
     echo "=> Running OpenAM alive.jsp check"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
-        echo "=> AM is not alive, waiting 10 seconds before retry..."
+        echo "=> ${AM_URL} is not alive, waiting 10 seconds before retry..."
         sleep 10
         STATUS_CODE=$(curl -LI  http://${AM_URL}/openam/isAlive.jsp \
           -o /dev/null -w '%{http_code}\n' -s)
@@ -212,17 +179,18 @@ restart_openam()
 }
 
 
+# All helm chart paths are relative to this directory.
+DIR=`echo $(dirname "$0")/..`
 
-
-############################## Main method ############################
-
-
-
-# Make sure we are in the root directory. All paths are relative to this directory.
-cd "$(dirname "$0")/.." 
-
-parse_commandline "$@"
+parse "$@"
 chk_config
+
+# Dryrun? Just show what helm commands would be executed.
+if [ ! -z "$DRYRUN" ]; then
+    deploy_charts 
+    exit 0
+fi
+
 create_namespace
 deploy_charts
 livecheck_stage1
