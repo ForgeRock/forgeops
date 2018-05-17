@@ -9,7 +9,9 @@ then
 fi
 
 # Update major versions / snapshots here.
-VERSION=${VERSION:-6.5.0}
+
+# Note: Until we get 6.5 milestones, we are using the 6.0.0 product images.
+VERSION=${VERSION:-6.0.0}
 SNAPSHOT=6.5.0-SNAPSHOT
 
 # Update release / milestone / RC builds here.
@@ -46,6 +48,8 @@ HEADER="X-JFrog-Art-Api: $API_KEY"
 
 # Download a binary specified by $1
 dl_binary() {
+
+    # We supply both the snapshot source and the non snapshot source to the dl function
     case "$1" in
     amster)
         dl $AMSTER_SNAPSHOT $AMSTER amster/amster.zip
@@ -68,7 +72,8 @@ dl_binary() {
     esac
 }
 
-# Do the actual download. $1 - snapshost source $2 - release source, $3 destination
+# Do the actual download. $1 - snapshot source $2 - release source, $3 destination
+# Based on the value of -s argument, we download either the snapshot or the normal release
 dl(){
     if [ -z "$BUILD_SNAPSHOTS" ]; 
     then
@@ -99,7 +104,7 @@ while getopts "sw" opt; do
     s ) BUILD_SNAPSHOTS="true" ;;
     w ) WGET="true" ;;
     \? )
-         echo "Usage: dl.sh [-s] images..."
+         echo "Usage: dl.sh [-s] [-w] images..."
          echo "-s download snapshots instead of releases"
          echo "-w Use wget instead of curl"
          echo "Images can be one or more of: $IMAGES"

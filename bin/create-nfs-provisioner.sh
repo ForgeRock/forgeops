@@ -8,7 +8,7 @@
 helm repo add nfs-provisioner https://raw.githubusercontent.com/IlyaSemenov/nfs-provisioner-chart/master/repo
 
 # Set the desired volume size. Requests will be allocated out of this total.
-STORAGE_SIZE="50Gi"
+STORAGE_SIZE="100Gi"
 
 helm install --name nfs-provisioner --namespace nfs-provisioner \
     --set provisionerVolume.mode=pvc,storageClass=nfs,provisionerVolume.settings.storageSize=${STORAGE_SIZE} \
