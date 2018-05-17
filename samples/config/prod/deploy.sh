@@ -9,10 +9,10 @@
 
 #### Variables
 
-NAMESPACE="bench"
+NAMESPACE="prod"
 DOMAIN="frk8s.net"
 URL_PREFIX="openam"
-TYPE="m-cluster"
+TYPE="s-cluster"
 
 
 # Note the above variables are intended to be overwritten if cmd line args are provided 
@@ -84,7 +84,7 @@ deploy_charts()
 {
     echo "=> Deploying charts into namespace \"${NAMESPACE}\""
     # Update openam chart dependencies
-    helm dep up ../../helm/openam
+    helm dep up ../../../helm/openam
 
     # These are the charts (components) that will be deployed via helm
     components=(frconfig configstore userstore ctsstore openam amster)
@@ -99,8 +99,8 @@ deploy_charts()
             ;;
         esac
 
-        helm install --name ${c}-${NAMESPACE} -f type/common.yaml -f type/${TYPE}/${c}.yaml \
-            --namespace=${NAMESPACE} ../../helm/${chart}
+        helm install --name ${c}-${NAMESPACE} -f common.yaml -f ${TYPE}/${c}.yaml \
+            --namespace=${NAMESPACE} ../../../helm/${chart}
 
     done
 
