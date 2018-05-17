@@ -11,16 +11,14 @@ are changing often as we find better ways to build these images for a wide range
 There are a few ways to build the Docker images:
 
 * Manually. Copy the relevant artifacts (example: openam.war) to the directory
-and run ```docker build -t forgerock/openam openam```.
+ and run ```docker build -t forgerock/openam openam```.
 
-* Use the build.sh shell script. This essentially the same as 
-performing a manual build. The build.sh script
-is available for convenience. 
+* Use the build.sh shell script. This essentially the same as performing a manual build. The build.sh script
+ is available for convenience.
 
 ## ForgeRock platform components
 
-Yoy must log on to backstage to download the relevant ForgeRock products. The dl.sh script 
-is provided as an example of how to automate this process. You must have an API_KEY to use this script.
+You must log on to backstage to download the relevant ForgeRock products. Place the binaries in the appropriate folder, renaming them as required (openam.war, openidm.zip, opendj.zip, openig.war )
 
 ## Building Minor or Patch Releases
 
