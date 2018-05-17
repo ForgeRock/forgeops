@@ -1,0 +1,38 @@
+# This yaml file provides override values for the exporter-forgerock chart
+
+# To switch FR product endpoint discovery off, change enabled: false. All products are enabled by default
+# Other values related to the product endpoint can be edited below.
+
+am:
+  enabled: true
+  #component: am
+  #path: /openam/json/metrics/prometheus
+  #labelSelectorComponent: openam
+  #secretUser: cHJvbWV0aGV1cw==
+  #secretPassword: cHJvbWV0aGV1cw==
+  
+ds:
+  enabled: true
+  #component: ds
+  #path: /metrics/prometheus
+  #labelSelectorComponent: opendj
+  #secretUser: bWV0cmljcw==
+  #secretPassword: cGFzc3dvcmQ=
+
+idm:
+  enabled: true
+  #component: idm
+  #path: /openidm/metrics/prometheus
+  #labelSelectorComponent: openidm
+  #secretUser: cHJvbWV0aGV1cw==
+  #secretPassword: cHJvbWV0aGV1cw==
+
+ig:
+  enabled: true
+  #component: ig
+  #path: /openig/api/metrics/prometheus
+  #labelSelectorComponent: openig
+  #secretUser: b3BlbmlkbS1hZG1pbg==
+  #secretPassword: b3BlbmlkbS1hZG1pbg==  
+
+
