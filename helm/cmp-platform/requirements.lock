@@ -1,24 +1,27 @@
 dependencies:
+- name: frconfig
+  repository: file://../frconfig
+  version: 6.5.0
 - name: openam
   repository: file://../openam
-  version: 6.0.0
+  version: 6.5.0
 - name: amster
   repository: file://../amster
-  version: 6.0.0
+  version: 6.5.0
 - name: opendj
   repository: file://../opendj
-  version: 6.0.0
+  version: 6.5.0
 - name: opendj
   repository: file://../opendj
-  version: 6.0.0
+  version: 6.5.0
 - name: openidm
   repository: file://../openidm
-  version: 6.0.0
+  version: 6.5.0
 - name: postgres-openidm
   repository: file://../postgres-openidm
-  version: 6.0.0
+  version: 6.5.0
 - name: openig
   repository: file://../openig
-  version: 6.0.0
-digest: sha256:afe0877d84172abd1f3c8710973882fe0507864afe72ecf67bdfb8e598e51f14
-generated: 2017-11-02T18:00:02.304173-06:00
+  version: 6.5.0
+digest: sha256:7761f2ba52d56da5967eb194667ee222596096a4c987e9e5d723d383bccf860e
+generated: 2018-05-17T12:53:28.706145785-06:00

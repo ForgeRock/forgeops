@@ -1,4 +1,7 @@
 dependencies:
+- name: frconfig
+  version: ">0.0.0"
+  repository: file://../frconfig
 - name: openam 
   version: ">0.0.0"
   repository: file://../openam
