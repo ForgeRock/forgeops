@@ -14,11 +14,11 @@
 
 usage() 
 {
-    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-P] config_directory"
-    echo "-f extra config yaml that will be passed to helm"
-    echo "-e extra env.sh that will be sourced to set environment variables"
+    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-R] [-d] config_directory"
+    echo "-f extra config yaml that will be passed to helm. May be repeated"
+    echo "-e extra env.sh that will be sourced to set environment variables. May be repeated"
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)"
-    echo "-d dryrun. Show the helm commands that would be executed but do not deploy"
+    echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts"
     exit 1
 }
 # Additional YAML options for helm
@@ -113,7 +113,7 @@ deploy_charts()
 {
     echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\"" 
 
-    # If they deploy directory contains a common.yaml, append it to the helm arguments.
+    # If the deploy directory contains a common.yaml, append it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
         YAML="$YAML -f ${CFGDIR}/common.yaml"
     fi
@@ -185,7 +185,7 @@ DIR=`echo $(dirname "$0")/..`
 parse "$@"
 chk_config
 
-# Dryrun? Just show what helm commands would be executed
+# Dryrun? Just show what helm commands would be executed.
 if [ ! -z "$DRYRUN" ]; then
     deploy_charts 
     exit 0
