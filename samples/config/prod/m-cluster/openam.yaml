@@ -5,8 +5,7 @@ resources:
     memory: 6Gi
 
 catalinaOpts: >
-  -server -XX:+UnlockExperimentalVMOptions -Xms6g -Xmx6g
-  -XX:+UseG1GC -XX:MaxGCPauseMillis=100
+  -server -Xms6g -Xmx6g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseCompressedOops
   -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'

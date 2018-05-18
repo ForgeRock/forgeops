@@ -32,6 +32,8 @@ echo ""
 echo "=> Creating cluster called \"$GKE_CLUSTER_NAME\" with specs \"$GKE_MACHINE_TYPE\""
 echo ""
 
+MAX_NODES=`expr $GKE_CLUSTER_SIZE + 1`
+
 gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --project=$GKE_PROJECT_NAME \
       --zone=$GKE_PRIMARY_ZONE \
@@ -45,7 +47,7 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --network=default \
       --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
-      --max-nodes=$GKE_CLUSTER_SIZE \
+      --max-nodes=$MAX_NODES \
       --labels=owner=sre \
       --addons=HorizontalPodAutoscaling \
       --addons=KubernetesDashboard \
