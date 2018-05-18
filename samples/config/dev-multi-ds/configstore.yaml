@@ -1,6 +1,6 @@
 djInstance: configstore
 
-replicas: 2
+replicas: 1
 
 # backup:
 #   enabled: true
