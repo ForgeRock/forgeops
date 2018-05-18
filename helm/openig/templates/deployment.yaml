@@ -51,8 +51,3 @@ spec:
       - name: git
         persistentVolumeClaim:
           claimName: {{ default "frconfig" .Values.config.claim }}
-      - name: git-secret
-        secret:
-          secretName:  git-ssh-key
-          # The forgerock user needs to be able to read this file.
-          #defaultMode: 256

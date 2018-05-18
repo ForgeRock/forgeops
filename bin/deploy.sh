@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ###################################################################################
 # Deployment script that can be used for CI automation, etc.
@@ -14,9 +14,10 @@
 
 usage() 
 {
-    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-R] [-d] config_directory"
+    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
     echo "-e extra env.sh that will be sourced to set environment variables. May be repeated."
+    echo "-n set the namespace. Values in env.sh will override this."
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
@@ -24,14 +25,15 @@ usage()
 # Additional YAML options for helm
 YAML=""
 
-parse()
+parse_args()
 {
-    while getopts "df:e:R" opt; do
+    while getopts "df:e:n:R" opt; do
         case ${opt} in
             f ) YAML="$YAML -f ${OPTARG} " ;;
             e ) ENV_SH="${OPTARG}" ;;
             R ) RMALL=true ;;
             d ) DRYRUN="echo " ;;
+            n ) NAMESPACE="${OPTARG}" ;;
             \? ) usage ;;
         esac
     done
@@ -127,8 +129,14 @@ deploy_charts()
             ;;
         esac
 
-        ${DRYRUN} helm install --name ${comp}-${NAMESPACE} ${YAML} \
-            -f ${CFGDIR}/${comp}.yaml \
+        CHART_YAML=""
+        if [ -r  "${CFGDIR}/${comp}.yaml" ];
+        then
+           CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
+        fi
+
+        ${DRYRUN} helm install --name ${comp}-${NAMESPACE} \
+            ${YAML} ${CHART_YAML} \
             --namespace=${NAMESPACE} ${DIR}/helm/${chart}
     done
 }
@@ -182,7 +190,7 @@ restart_openam()
 # All helm chart paths are relative to this directory.
 DIR=`echo $(dirname "$0")/..`
 
-parse "$@"
+parse_args "$@"
 chk_config
 
 # Dryrun? Just show what helm commands would be executed.
@@ -195,3 +203,7 @@ create_namespace
 deploy_charts
 livecheck_stage1
 restart_openam
+
+kubectl get ing --namespace ${NAMESPACE}
+
+echo "done"
