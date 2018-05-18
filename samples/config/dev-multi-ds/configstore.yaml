@@ -1,0 +1,17 @@
+djInstance: configstore
+
+replicas: 2
+
+# backup:
+#   enabled: true
+
+# runVerifyCronJob: true
+
+# restore.enabled: false
+
+
+resources:
+  limits:
+    memory: 1Gi
+  requests:
+    memory: 1Gi
