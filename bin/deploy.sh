@@ -15,10 +15,10 @@
 usage() 
 {
     echo "Usage: $0 [-f config.yaml] [-e env.sh] [-R] [-d] config_directory"
-    echo "-f extra config yaml that will be passed to helm. May be repeated"
-    echo "-e extra env.sh that will be sourced to set environment variables. May be repeated"
-    echo "-R Remove all.  Purge any existing deployment (Warning - destructive)"
-    echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts"
+    echo "-f extra config yaml that will be passed to helm. May be repeated."
+    echo "-e extra env.sh that will be sourced to set environment variables. May be repeated."
+    echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
+    echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
 }
 # Additional YAML options for helm
@@ -95,7 +95,7 @@ create_namespace()
 {
     if [ "${RMALL}" = true ]; then
         echo "=> Removing all components of the deployment from ${NAMESPACE}"
-        bin/remove-all.sh ${NAMESPACE}
+        ${DIR}/bin/remove-all.sh ${NAMESPACE}
     fi
 
     echo "=> Creating namespace \"${NAMESPACE}\". Ignore errors below if already exists"
