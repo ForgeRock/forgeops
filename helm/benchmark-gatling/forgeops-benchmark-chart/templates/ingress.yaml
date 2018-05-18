@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.component }}
+  annotations:
+    kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
+spec:
+  rules:
+  - host: {{ template "externalFQDN" . }}
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: {{ template "fullname" . }}
+            servicePort: {{ .Values.service.externalPort }}
