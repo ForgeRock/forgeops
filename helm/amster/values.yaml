@@ -84,3 +84,7 @@ resources:
 # ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on
 # import. 
 #ctsStores: ctsstore-0.ctsstore:1389
+
+# ctsPassword - defaults to "password"
+# This will be deprecated once commons secrets is integrated.
+#ctsPassword: password
