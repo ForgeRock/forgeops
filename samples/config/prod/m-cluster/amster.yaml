@@ -8,6 +8,7 @@ config:
 version: 6.0.0
 
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
+ctsPassword: password
 
 
 # For production set CPU limits to help Kube Schedule the pods.
