@@ -9,6 +9,7 @@ global:
   domain: .forgeops.com
 
 # Gatling image with tests.
+# Dockerfile for this image can be found in forgeops/docker/gatling
 image:
   repository: forgerock-docker-internal.bintray.io/benchmark:v1
   pullPolicy: Always
@@ -16,10 +17,9 @@ image:
 benchmark:
   # Name of scala test name to run
   # This benchmark supports following testnames
-  #   - openam.authn.RestLogin
-  #   - openam.oauth2.AccessToken
-  #   - openam.oauth2.IdTokenInfo
-  testname: openam.authn.RestLogin
+  #   - am.AMRestAuthNSim
+  #   - am.AMAccessTokenSim
+  testname: am.AMRestAuthNSim
 
   # How many users we want to use for benchmark
   users: "1000000"
