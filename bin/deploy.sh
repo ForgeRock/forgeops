@@ -40,7 +40,7 @@ parse_args()
     shift $((OPTIND -1))
  
     if [ "$#" -ne 1 ]; then
-         echo "Error: Missing deployment directory"
+         echo "Error: Missing deployment config directory"
          usage
     fi
 
@@ -205,5 +205,3 @@ livecheck_stage1
 restart_openam
 
 kubectl get ing --namespace ${NAMESPACE}
-
-echo "done"
