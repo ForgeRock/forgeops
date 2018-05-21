@@ -20,7 +20,7 @@ spec:
   endpoints:
   # If you use port -this targets the *service* port (not the pod port)
   # It looks like it wants a string name for the port - so match this to the service port name
-  - port: prometheus
+  - targetPort: 8080
     path: {{ .Values.ds.path }}
     basicAuth:
       username:

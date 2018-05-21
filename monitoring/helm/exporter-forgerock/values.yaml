@@ -15,7 +15,7 @@ ds:
   enabled: false
   path: /metrics/prometheus
   labelSelectorComponent: opendj
-  secretUser: bWV0cmljcw==
+  secretUser: bW9uaXRvcg==
   secretPassword: cGFzc3dvcmQ=
 
 idm:
