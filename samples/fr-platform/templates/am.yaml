@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: am
+  namespace: sample
   labels:
     role: auth
 spec:
@@ -11,7 +12,7 @@ spec:
     imagePullPolicy: IfNotPresent
     args: [ "wait", "dj-0.dj-service", "1389" ]
   containers:
-    - image: am:fullstack
+    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:6.0.0
       imagePullPolicy: IfNotPresent
       name: openam
       ports:
@@ -35,3 +36,16 @@ spec:
         initialDelaySeconds: 60
         timeoutSeconds: 15
         periodSeconds: 60
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: am-service
+  namespace: sample
+spec:
+  ports:
+    - port: 80
+      name: http
+      targetPort: 8080
+  selector:
+    role: auth

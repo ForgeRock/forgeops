@@ -7,26 +7,11 @@ Facebook authentication with AM
 Delegation of all self-service features to IDM (including automatic redirection to IDM during social authentication)
 Unification of end-user interfaces - using CORS to facilitate the seamless interaction of the various back-end services
 
-Docker and Kubernetes are used to automate the deployment of this sample. It is designed to run primarily in Minikube, and it is intentionally oversimplified in terms of its Kubernetes configuration. This sample may be useful to show the minimum necessary Kubernetes configuration, but it should not be considered a template for a production deployment. Refer to the other areas of forgeops for production-ready templates.
+Docker, Kubernetes and Helm are used to automate the deployment of this sample. It is intentionally oversimplified in terms of its Kubernetes configuration. This sample may be useful to show the minimum necessary Kubernetes configuration, but it should not be considered a template for a production deployment. Refer to the other areas of forgeops for production-ready templates.
 
-## Only needed once per machine:
+## Optional Facebook usage
 
-**You need minikube 0.23+ and kubectl 1.8+ for this to work**
-
-    minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-    echo "$(minikube ip) idm-service.sample.svc.cluster.local am-service.sample.svc.cluster.local" | sudo tee -a /etc/hosts
-
-You may be prompted to enter your password after running the above commands. Afterward, run these:
-
-    minikube addons enable ingress
-    eval $(minikube docker-env)
-    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
-    kubectl config use-context sample-context
-
-
-## Facebook usage
-
-If you want to enable Facebook usage, you will need to register an application within Facebook. You will need to make sure your Facebook App has these redirect urls registered:
+If you want to enable Facebook for social registration and login, you will need to register an application within Facebook. You will need to make sure your Facebook App has these redirect urls registered:
 
     http://idm-service.sample.svc.cluster.local/oauthReturn/
     http://am-service.sample.svc.cluster.local/openam
@@ -36,72 +21,100 @@ Save the App Id and Secret as environment variables, like so:
     export IDP_FACEBOOK_CLIENTID=<Your Facebook App Id>
     export IDP_FACEBOOK_CLIENTSECRET=<Your Facebook App Secret>
 
-Otherwise, export dummy values:
+If you don't want to use Facebook, the default values of "FakeID" and "FakeSecret" will be used. Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
 
-    export IDP_FACEBOOK_CLIENTID=FakeID
-    export IDP_FACEBOOK_CLIENTSECRET=FakeSecret
+## Quick Start
 
-If you use dummy values, Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
+1. If you have Helm installed and you have kubectl setup to work with your Kubernetes cluster, then you can get started very quickly with these commands:
+```
+helm init --wait
+helm repo add forgerock https://storage.googleapis.com/forgerock-charts
+helm install forgerock/fr-platform -n sample-fr-platform \
+  --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
+  --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
+```
 
-## Starting the sample
+2. You need to add the ingress IP to your local hosts. First, remove any old entry with this command:
+```
+grep -v idm-service.sample.svc.cluster.local /etc/hosts \
+| sudo tee /etc/hosts
+```
+Next add the correct entry:
+
+    If you are using minikube, use this command:
+```
+echo "$(minikube ip) \
+    idm-service.sample.svc.cluster.local \
+    am-service.sample.svc.cluster.local" \
+| sudo tee -a /etc/hosts
+```
+If your cluster is available directly, you can use this command instead:
+```
+echo "$( kubectl get ing -o \
+    jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' ) \
+    idm-service.sample.svc.cluster.local \
+    am-service.sample.svc.cluster.local" \
+| sudo tee -a /etc/hosts
+```
+
+3. Wait for all of the pods to become ready:
+```
+kubectl get po -n sample --watch
+```
+
+4. Afterwards, you can access the application by opening this URL:
+```
+http://idm-service.sample.svc.cluster.local
+```
+
+    You can use amadmin / password to login.
+
+5. You can remove the sample like so:
+```
+helm delete --purge sample-fr-platform
+```
+
+## Building and Running locally
+
+To start the project locally, you need at least a 4gb node. The best option is to use minikube, like so:
+
+    minikube start --insecure-registry 10.0.0.0/24 --memory 4096
+    minikube addons enable ingress
+    eval $(minikube docker-env)
+    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
+    kubectl config use-context sample-context
+    minikube ssh "sudo ip link set docker0 promisc on"
+
+### Building the Docker images and helm package
 
 In order to copy and paste the below commands, you will need make sure your working folder is correct. You should be in the same folder as this README file (forgeops/sample-platform).
 
-This command needs to be executed each time you start the minikube VM, to fix a bug with its internal networking:
+Build the Docker images for this sample:
 
-    minikube ssh "sudo ip link set docker0 promisc on"
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/ig:6.0.0 igOIDC
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:6.0.0 dj
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:6.0.0 am
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:6.0.0 amster
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:6.0.0 idm
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:6.0.0 pg
 
-Build the Docker images and add the kubernetes resources for this sample:
+Install the helm package:
 
-    docker build -t ig:fullstack igOIDC
-    docker build -t dj:fullstack dj
-    docker build -t am:fullstack am
-    docker build -t amster:fullstack amster
-    docker build -t idm:fullstack idm
-    docker build -t pg:fullstack pg
+    helm init --wait
+    helm package .
+    helm install fr-platform-6.0.0.tgz -n sample-fr-platform \
+      --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
+      --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
 
-    kubectl create namespace sample
+You can now follow the steps described in the "Quick Start" section, starting from (2).
 
-    kubectl create secret generic social-credentials \
-        --from-literal=IDP_FACEBOOK_CLIENTID=$IDP_FACEBOOK_CLIENTID \
-        --from-literal=IDP_FACEBOOK_CLIENTSECRET=$IDP_FACEBOOK_CLIENTSECRET
-
-    kubectl apply -f .
-
-
-Monitor the pods as they come up:
-
-    kubectl logs -f dj-0
-    kubectl logs -f am
-    kubectl logs -f amster
-    kubectl logs -f ig
-    kubectl logs -f idm
+## Connecting to your cluster
 
 To make the internal DJ cluster accessible locally:
 
     kubectl port-forward dj-0 2389:1389 &
 
-Now the environment should be available at http://idm-service.sample.svc.cluster.local
-
-You can use amadmin / password to login.
-
-To make REST API calls to IDM you need to include an access_token in your request, like so:
-
-    curl -H 'x-requested-with:curl' -H 'Authorization: Bearer e3b1.......' \
-     http://idm-service.sample.svc.cluster.local/openidm/...
-
-## For developers making changes
-
-You can deploy changes to the underlying product running in the container like so:
-
-    cp $OPENIDM_ZIP_TARGET/openidm*.zip ../docker/openidm/openidm.zip
-    docker build -t quay.io/forgerock/openidm:latest ../docker/openidm
-    docker build -t idm:fullstack idm
-    kubectl delete po idm --grace-period=0 --force
-    kubectl apply -f idm.yml
-
-
-## Saving config changes
+## Saving configuration changes
 
 To export changes made to AM:
 
@@ -121,10 +134,4 @@ Review changes to config using git diff. Remove all untracked files with this co
 
     git clean -fdx
 
-Be sure to rebuild your amster image afterwards:
-
-    docker build -t amster:fullstack amster
-
-To destroy the environment:
-
-    kubectl delete namespace sample
+Be sure to rebuild your docker images afterwards.
