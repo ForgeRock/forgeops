@@ -2,19 +2,20 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: ig
+  namespace: sample
   labels:
     role: proxy
 spec:
   initContainers:
   - name: wait-for-well-known
-    image: ig:fullstack
+    image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/ig:6.0.0
     env:
     - name: WELL_KNOWN_ENDPOINT
       value: "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
     command:
     - /wellKnownCheck.sh
   containers:
-    - image: ig:fullstack
+    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/ig:6.0.0
       imagePullPolicy: IfNotPresent
       name: ig
       ports:
@@ -27,3 +28,16 @@ spec:
       env:
       - name: OPENAM_INSTANCE
         value: "http://am-service.sample.svc.cluster.local/openam"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ig-service
+  namespace: sample
+spec:
+  ports:
+    - port: 8080
+      name: http
+      targetPort: 8080
+  selector:
+    role: proxy
