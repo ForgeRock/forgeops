@@ -30,6 +30,9 @@ do
     $helm package $hdir/$chart
 done
 
+# include the unsupported sample fr-platform chart along with the others
+$helm package $hdir/../samples/fr-platform
+
 # Fetch a copy of the existing index.
 gsutil cp gs://${BUCKET}/index.yaml .
 # Merge the new charts with the existing index.

@@ -1,0 +1,4 @@
+apiVersion: v1
+description: A Helm chart demonstrating one option for using all four ForgeRock products together
+name: fr-platform
+version: 6.0.0
