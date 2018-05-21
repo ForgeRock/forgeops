@@ -2,10 +2,14 @@
 
 # To switch FR product endpoint discovery off, change enabled: false. All products are enabled by default
 # Other values related to the product endpoint can be edited below.
+#
+# path = product metrics endpoint.
+# labelSelectorComponent = a label used on a products Kubernetes service which can be used for Prometheus discovery.
+# secretUser = user to access product metrics endpoint(base64 encoded).
+# secretPassword = password to access product metrics endpoint(base64 encoded).
 
 am:
   enabled: true
-  #component: am
   #path: /openam/json/metrics/prometheus
   #labelSelectorComponent: openam
   #secretUser: cHJvbWV0aGV1cw==
@@ -13,7 +17,6 @@ am:
   
 ds:
   enabled: true
-  #component: ds
   #path: /metrics/prometheus
   #labelSelectorComponent: opendj
   #secretUser: bWV0cmljcw==
@@ -21,7 +24,6 @@ ds:
 
 idm:
   enabled: true
-  #component: idm
   #path: /openidm/metrics/prometheus
   #labelSelectorComponent: openidm
   #secretUser: cHJvbWV0aGV1cw==
@@ -29,7 +31,6 @@ idm:
 
 ig:
   enabled: true
-  #component: ig
   #path: /openig/api/metrics/prometheus
   #labelSelectorComponent: openig
   #secretUser: b3BlbmlkbS1hZG1pbg==

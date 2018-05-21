@@ -2,22 +2,20 @@
 
 This deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
 
-**This Prometheus folder contains the following functions:**
-* Prometheus Operator Helm chart.
-* kube-prometheus Helm chart that contains child charts for:
-    * GKE cluster monitoring,
-    * Prometheus,
-    * Grafana,
-    * Alert Manager.
-* exporter-forgerock Helm chart that include ServiceMonitors containing the endpoint details for ForgeRock products so Prometheus can  
-scrape metrics.
+**This monitoring folder contains the following functions:**
+* deploy scripts to:
+    * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
+    * connect to the Prometheus and Grafana endpoints.
+* exporter-forgerock Helm chart that contains a Helm chart that provides:
+    * configurable ServiceMonitors that define ForgeRock product endpoints to be monitored by Prometheus.
+* values files that are used by the deploy script and can be edited to customize the configuration of Prometheus, Grafana and Alert Manager.
 
 <br />
 
 # How Prometheus works
 
 The Prometheus operator works by watching for ServiceMonitor CRDs (CRDs are Kubernetes Custom Resource Definitions). These are first  
-class Kubernetes types that you can manage with kubectl (kubectl create/delete/patch, etc.).  The ServiceMonitor CRDs define the target to be scrapped.
+class Kubernetes types that you can manage with kubectl (kubectl create/delete/patch, etc.).  The ServiceMonitor CRDs define the target to be scraped.
 
 The Prometheus operator watches for changes to current ServiceMonitors or for new ServiceMonitors and updates the  
 Prometheus configuration with the details defined in the ServiceMonitors automatically.  
@@ -28,20 +26,10 @@ No restarting of Prometheus is required.
 
 # How Grafana works
 
-The Grafana Helm chart is deployed as part of the kube-prometheus chart.
+The Grafana Helm chart is deployed as part of the kube-prometheus chart.  This comes prepackaged with ServiceMonitors and  
+dashboards that monitor various aspects of the GKE cluster including the cluster node resources and Kubernetes objects.
 
-* Grafana dashboard files are configured in the Grafana Helm chart as follows:
-    * **grafana-dashboards.yaml** - GKE cluster monitoring dashboards.
-    * **grafana-dashboards-am.yaml** - Forgerock AM dashboard.
-    * **grafana-dashboards-ds.yaml** - Forgerock DS dashboard.
-    * **grafana-dashboards-idm.yaml** - Forgerock IDM dashboard.
-    * **grafana-dashboards-ig.yaml** - Forgerock IG dashboard.
-
-These yaml files are defined as a Helm template object which is then included in a configmap (dashboards-configmap-yaml).  
-
-The Grafana watcher picks up any new configuration and updates the dashboards automatically.  
-
-No restarting of Grafana required.  
+Dashboards for ForgeRock products are imported into Grafana after Grafana has been deployed. 
 
 <br />
 
@@ -53,29 +41,23 @@ No restarting of Grafana required.
 (Use namespace that is different to where your application is running).
 
 ### Prepare for deployment
-* cd to root of forgeops-dashboard repo.
+* cd to monitoring folder within forgeops repo.
 
-* Running the deployment without any overrides will use the default prometheus/helm/custom.yaml file which monitors default namespace and all ForgeRock  
- product endpoints.  If you wish to override these values follow the next steps, make copy of prometheus/helm/custom.yaml file amend  
- the following values:
-    * add namespaces to be monitored in namespaceSelector array.  New line for each namespace.
-    * enable/disable products that you wish to be monitored.
+* Running the deployment without any overrides will use the default values file which monitors 'monitoring' namespace and all ForgeRock  
+ product endpoints.  If you wish to override these values, make a copy of helm/custom.yaml file and uncomment/amend the relevant values.
 
 ### Deploy
 
-Run the deploy script ./bin/deploy_prometheus.sh with the following flags:
-* -i (install) or -u (upgrade).
-* -n *namespace* : to deploy Prometheus into.
+Run the deploy script ./bin/deploy_prometheus.sh with the OPTIONAL flags:
+* -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
 * -f *values file* \[optional\] : absolute path to yaml file as defined in previous section.
 * -h / no flags : view help
-
-**NOTE**: if you change any of the Helm template files, upgrade the cluster by using the -u flag instead of -i (install).
 
 ### View Prometheus/Grafana
 
 The following script uses kubectl port forwarding to access Prometheus and Grafana UIs. Run ./bin/connect.sh with the following flags:
 * -G (Grafana) or -P (Prometheus).
-* -n *namespace* : where Grafana/Prometheus is deployed.
+* -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or need to access  
 multiple instance of Grafana/Prometheus, use the -p flag.
 * -h / no flags : view help
@@ -104,9 +86,10 @@ If you want Prometheus to scrape metrics from a different product, you need to c
     * change 'port: openam' to either port: \<port name\> or targetPort: \<port number\>
     * find and replace 'am' with 'product-name'.
     * If you don't require authentication to scrape the endpoint, then remove the basicAuth section.
-* In values.yaml, copy the am section and create a new section as follows:
+* In values.yaml, copy the below am section and create a new section as described by the comments:
     ```
     <product name>:
+        component: am   # product name to define the ServiceMonitor
         enabled: false      # overriden in custom.yaml
         path: /openam/json/metrics/prometheus       # metrics path
         labelSelectorComponent: openam      # kubernetes service label name
@@ -115,7 +98,7 @@ If you want Prometheus to scrape metrics from a different product, you need to c
     ```
 * Update Prometheus with new ServiceMonitor
     ```
-    ./bin/deploy_prometheus.sh -u -n <namespace> -f custom.yaml
+    ./bin/deploy_prometheus.sh [-n <namespace>]
     ```
 
 
