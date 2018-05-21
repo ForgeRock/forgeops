@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: ReplicaSet
 metadata:
   name: postgresql96
+  namespace: sample
 spec:
   replicas: 1
   template:
@@ -10,7 +11,7 @@ spec:
         type: postgresql96
     spec:
       containers:
-        - image: pg:fullstack
+        - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:6.0.0
           imagePullPolicy: IfNotPresent
           name: postgresql96
           ports:
@@ -24,6 +25,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: postgresql96-service
+  namespace: sample
   labels:
     role: host
 spec:

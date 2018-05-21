@@ -1,0 +1,4 @@
+social:
+    facebook:
+        id: "FakeID"
+        secret: "FakeSecret"

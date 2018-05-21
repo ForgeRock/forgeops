@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ingress
+  namespace: sample
 spec:
   rules:
   - host: am-service.sample.svc.cluster.local
