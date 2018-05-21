@@ -4,7 +4,8 @@
 * Copyright (c) 2018 ForgeRock AS. Use of this source code is subject to the
 * Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 */
-package simulations.am
+
+package am
 
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation

@@ -5,7 +5,7 @@
 * Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 */
 
-package simulations.am
+package am
 
 import io.gatling.core.Predef._
 import io.gatling.core.scenario.Simulation
@@ -14,6 +14,7 @@ import io.gatling.http.Predef._
 import io.gatling.http.protocol.HttpProtocolBuilder
 
 class AMRestAuthNSim extends Simulation {
+
     val userPoolSize: Integer = Integer.getInteger("users", 3)
     val concurrency: Integer = Integer.getInteger("concurrency", 10)
     val duration: Integer = Integer.getInteger("duration", 60)
@@ -46,4 +47,3 @@ class AMRestAuthNSim extends Simulation {
 
     setUp(loginScenario.inject(rampUsers(concurrency) over warmup)).protocols(httpProtocol)
 }
-

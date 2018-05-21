@@ -11,7 +11,7 @@ FROM denvazh/gatling:2.2.1
 
 COPY custom-gatling.sh /custom-gatling.sh
 RUN chmod +x /custom-gatling.sh
-COPY ../../samples/simulations /opt/gatling/user-files/
+COPY simulations /opt/gatling/user-files/
 
 ENTRYPOINT ["/custom-gatling.sh"]
 CMD [""]
