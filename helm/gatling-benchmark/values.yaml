@@ -1,7 +1,6 @@
-# ForgeOps Benchmark suite - Gatling helm chart
+# ForgeOps gatling helm chart
 # This is a YAML-formatted file.
-# Gatling image values - Currently we are using our own gatling image
-# with benchmark simulations included in it
+
 
 
 # Domain on which reports will be available
@@ -29,6 +28,8 @@ benchmark:
   duration: 3600
   # Logout percent in authn testnames(0 disables logout)
   logoutpercent: 0
+  # Warmup duration
+  warmup: 1
 
   # Product specific values that are passed into gatling.
   # Will likely to exapand in future to cover all 4 products.

@@ -27,6 +27,7 @@ spec:
             -Dusers={{ .Values.benchmark.users }}
             -Dconcurrency={{ .Values.benchmark.concurrency }}
             -Dduration={{ .Values.benchmark.duration }}
+            -Dwarmup={{ .Values.benchmark.warmup }}
             '
             -g '-m -s {{ .Values.benchmark.testname }} -rd {{ .Values.benchmark.testname }}' &&
             export FN=$(ls -t /opt/gatling/results | head -1) && tar -czvf /opt/gatling/results/$FN.tar.gz

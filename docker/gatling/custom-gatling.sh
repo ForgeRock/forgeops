@@ -1,6 +1,10 @@
 #!/bin/sh
 # Custom gatling runtime script
 # Useful for making it easier to pass arguments to gatling from helm charts
+#
+# Copyright (c) 2018 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+
 
 while getopts j:i:g: option
 do
