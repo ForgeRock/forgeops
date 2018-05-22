@@ -35,7 +35,7 @@ image:
   # For development we set this to Always to get the most current image.
   pullPolicy: Always
   #pullPolicy: IfNotPresent
-  tag:  6.0.0
+  tag:  6.5.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicas: 1
@@ -98,9 +98,13 @@ gcs:
   sleepSeconds: 600
   # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
   #add --scopes storage-full when you create the cluster.
-  backupBucket:  gs://forgeops/dj-backup
+  # Note the namespace will be appended to this bucket path. This is done to avoid collisions where 
+  # multiple backups may be ocurring in different namespaces
+  backupBucket:  gs://forgeops/dj-backup/test
   # Restore bucket. Usually the same as above, but for initialization we might want to restore from another source.
-  restoreBucket: gs://forgeops/dj-backup/1m
+  # Note the namespace is *not* appended here. This is so you can restore from a fixed location, or
+  # restore from say prod to qa.
+  restoreBucket: gs://forgeops/dj-backup/1m/sandbox
 
 
 restore:

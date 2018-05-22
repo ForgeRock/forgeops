@@ -6,7 +6,7 @@ cd /opt/opendj
 source /opt/opendj/env.sh
 
 # Create a unique folder for this host's backup.
-B="${BACKUP_DIRECTORY}/$FQDN"
+B="${BACKUP_DIRECTORY}/$HOSTNAME"
 
 mkdir -p "$B"
 

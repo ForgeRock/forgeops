@@ -19,9 +19,9 @@ mkdir -p locks
 
 
 exit_script() {
-    echo "Got signal. Killing child processes. Ignore any errors below as the child processes may already be gone"
+    echo "Got signal. Killing child processes. Ignore any errors below as the child processes may have already exited"
     trap - SIGINT SIGTERM # clear the trap
-    kill -- -$$ # Sends SIGTERM to child/sub processes
+    kill -- -$$ >/dev/null 2>&1 # Sends SIGTERM to child/sub processes
     echo "Exiting"
     exit 0
 }
@@ -121,7 +121,9 @@ restore-from-backup)
 restore-and-verify)
     # Restore from backup, and then verify the integrity of the data.
     OVERWRITE_DATA=true /opt/opendj/bootstrap/restore-from-backup.sh
-    exec /opt/opendj/scripts/verify.sh
+    /opt/opendj/scripts/verify.sh
+    echo "Sleeping for a bit so you can inspect the container"
+    sleep 300
     ;;
 *)
     exec "$@"

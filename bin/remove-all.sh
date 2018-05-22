@@ -32,6 +32,8 @@ pvclist=`kubectl get pvc --namespace ${NAMESPACE} -o jsonpath='{.items[*].metada
 for pvc in ${pvclist}
 do
     echo "Deleting $pvc"
-    kubectl delete pvc ${pvc}
+    kubectl delete pvc --namespace ${NAMESPACE}  ${pvc}
 done
 
+
+kubectl delete job --namespace  ${NAMESPACE} --all

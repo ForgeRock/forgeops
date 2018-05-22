@@ -32,8 +32,6 @@ spec:
         volumeMounts:
         - name: git
           mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
         livenessProbe:
           httpGet:
            path: /

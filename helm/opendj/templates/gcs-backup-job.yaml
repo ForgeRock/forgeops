@@ -27,7 +27,7 @@ spec:
             # For release we use a pinned version
             image: {{ .Values.gcloudImage }}
             imagePullPolicy: IfNotPresent
-            command: [ "/bin/sh", "-c", "gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }}"]
+            command: [ "/bin/sh", "-c", "gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }}/{{ .Release.Namespace }}"]
             volumeMounts:
             - name: backup
               mountPath: /backup     
