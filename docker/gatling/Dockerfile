@@ -1,5 +1,5 @@
 # Dockerfile for building gatling image with benchmark Tests
-FROM denvazh/gatling:2.2.1
+FROM denvazh/gatling:2.3.1
 
 # TODO - Discuss if this is needed now.
 # ADD http://abondance.internal.forgerock.com/pkg/clients/gatling/ext/ldap/gatling-ldap-full-0.0.4-SNAPSHOT.zip /
