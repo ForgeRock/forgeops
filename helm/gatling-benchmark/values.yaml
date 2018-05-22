@@ -1,0 +1,50 @@
+# ForgeOps gatling helm chart
+# This is a YAML-formatted file.
+
+
+
+# Domain on which reports will be available
+global:
+  domain: .forgeops.com
+
+# Gatling image with tests.
+# Dockerfile for this image can be found in forgeops/docker/gatling
+image:
+  repository: forgerock-docker-internal.bintray.io/benchmark:v1
+  pullPolicy: Always
+
+benchmark:
+  # Name of scala test name to run
+  # This benchmark supports following testnames
+  #   - am.AMRestAuthNSim
+  #   - am.AMAccessTokenSim
+  testname: am.AMRestAuthNSim
+
+  # How many users we want to use for benchmark
+  users: "1000000"
+  # How many user threads we want to use for benchmark
+  concurrency: 50
+  # Duration of test in seconds
+  duration: 3600
+  # Logout percent in authn testnames(0 disables logout)
+  logoutpercent: 0
+  # Warmup duration
+  warmup: 1
+
+  # Product specific values that are passed into gatling.
+  # Will likely to exapand in future to cover all 4 products.
+  # In case you are running gatling in different namespace
+  # you need to specify host as a full fqdn. e.g openam.pyforge.forgeops.com
+  openam:
+    host: openam
+    port: 80
+
+# Reporting related values.
+component: gatling
+service:
+  name: forgeops-benchmark
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 80
+ingress:
+  class: nginx

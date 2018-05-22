@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2016-2017 ForgeRock AS. 
+# Copyright (c) 2016-2017 ForgeRock AS.
 #
 # Build Docker images.
 # Usage:  Run ./build.sh -?
@@ -20,7 +20,7 @@ TAG=${TAG:-6.5.0}
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam opendj openidm openig amster util git java"
+IMAGES="openam opendj openidm openig amster util git java gatling"
 
 function buildDocker {
 
