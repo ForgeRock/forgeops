@@ -27,6 +27,6 @@ Expand the name of the chart.
 tls:
 - hosts:
   - {{ template "externalFQDN" .  }}
-  secretName: {{ template "externalFQDN" . }}
+  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
 {{ end -}}
 {{- end -}}
