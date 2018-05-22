@@ -3,7 +3,8 @@
 
 source /opt/opendj/env.sh
 
-B="${BACKUP_DIRECTORY}/$HOSTNAME"
+# The backups are under the first instances host name.
+B="${BACKUP_DIRECTORY}/${DJ_INSTANCE}-0"
 
 echo "userRoot backups"
 

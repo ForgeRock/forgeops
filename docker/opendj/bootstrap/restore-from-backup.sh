@@ -5,8 +5,8 @@
 
 cd /opt/opendj
 
-set -x
 
+# The only time we overwrite data is when testing a restore. 
 if [ "$OVERWRITE_DATA" = "true" ]
 then
     rm -fr data/*
