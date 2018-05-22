@@ -4,9 +4,9 @@ kind: Certificate
 metadata:
   name: openam-tls
 spec:
-  secretName: {{ template "externalFQDN" . }}
+  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.global.domain }}
   issuerRef:
-    name: letsencrypt-dns
+    name: letsencrypt-prod
     kind: ClusterIssuer
   commonName: ""
   dnsNames:

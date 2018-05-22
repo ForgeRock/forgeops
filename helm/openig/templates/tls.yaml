@@ -1,35 +1,20 @@
-{{- if .Values.global.prodTLS }}
+{{- if .Values.global.useTLS }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
   name: openig-tls
 spec:
-  secretName: {{ template "externalFQDN" . }}
+  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.global.domain }}
   issuerRef:
-    name: letsencrypt
+    name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: {{ template "externalFQDN" . }}
+  commonName: ""
+  dnsNames:
+  - "*.{{ .Release.Namespace }}.forgeops.com"
   acme:
     config:
-    - http01:
-        ingressClass: nginx
+    - dns01:
+        provider: prod-dns
       domains:
-      - {{ template "externalFQDN" . }}
-{{- else }}
-apiVersion: certmanager.k8s.io/v1alpha1
-kind: Certificate
-metadata:
-  name: openig-tls-staging
-spec:
-  secretName: {{ template "externalFQDN" . }}
-  issuerRef:
-    name: letsencrypt-staging
-    kind: ClusterIssuer
-  commonName: {{ template "externalFQDN" . }}
-  acme:
-    config:
-    - http01:
-        ingressClass: nginx
-      domains:
-      - {{ template "externalFQDN" . }}
+      - {{ .Release.Namespace }}.forgeops.com
 {{- end -}}
