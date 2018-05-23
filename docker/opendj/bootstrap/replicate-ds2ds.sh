@@ -6,8 +6,11 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
 
+cd /opt/opendj 
 
-source /opt/opendj/env.sh
+source env.sh
+
+quick_setup
 
 ADMIN_ID=admin
 

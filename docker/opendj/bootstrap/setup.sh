@@ -48,8 +48,15 @@ if [ -r "$script" ]; then
     sh "$script"
 fi
 
-./scripts/log-redirect.sh
+# Set the paths to our PVC directory
+./bootstrap/set-data-paths.sh 
 
+./bootstrap/log-redirect.sh
+
+if [[ $HOSTNAME =~ cts* ]]; then
+    echo "Disabling acccess logging for the CTS"
+    ./bootstrap/disable-access-log.sh 
+fi
 
 # Before we enable rest2ldap we need a strategy for parameterizing the json template
 #./bootstrap/setup-rest2ldap.sh
@@ -71,7 +78,3 @@ if [ -d data ]; then
         rm -fr $dir
     done
 fi
-
-
-
-

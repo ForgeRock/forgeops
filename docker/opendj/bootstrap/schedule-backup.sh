@@ -1,5 +1,5 @@
 #!/usr/bin/env sh 
-# Schedule automated backups.
+# Schedule automated backups. We are now using Kubernetes cronjobs for backup scheduling.
 
 set -x
 

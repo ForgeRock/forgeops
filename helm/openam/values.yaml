@@ -75,10 +75,6 @@ amCustomizationScriptPath: "customize-am.sh"
 livenessPeriod: 60
 livenessTimeout: 15
 
-rbac:
-  enabled: true
-
-
 service:
   name: openam
   #type: NodePort

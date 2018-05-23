@@ -8,8 +8,6 @@ data:
   DJ_INSTANCE: {{ .Values.djInstance }}
   DS_SET_SIZE: "{{ .Values.replicas }}"
   OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
-  BACKUP_SCHEDULE_FULL: {{ .Values.backup.scheduleFull }}
-  BACKUP_SCHEDULE_INCREMENTAL: {{ .Values.backup.scheduleIncremental }}
   BOOTSTRAP:  {{ .Values.bootstrapScript }}
   BOOTSTRAP_TYPE: {{ .Values.bootstrapType }}
   SLACK_URL: {{ .Values.slackUrl }}

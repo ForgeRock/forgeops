@@ -17,6 +17,9 @@ case "$choice" in
    * ) echo "Invalid input, Bye!"; exit;;
 esac
 
+# This helps to release any IP address
+helm delete nginx 
+
 gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE
 
 

@@ -1,0 +1,66 @@
+{{ if .Values.backup.enabled }}
+# Cron job that rsyncs the contents of the backup PVC up to a gcs storage bucket
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Values.djInstance }}-bak
+  labels:
+    djInstance: {{ .Values.djInstance }}
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    component: opendj
+spec:
+  # Edit the schedule below. This example runs every 30 minutes
+  schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          # Backup to gcs cloud storage
+          # The bucket and path must exist, and the cluster needs --scopes storage-full when it is created.
+          # This runs the gsutil command periodically to rsync the contents of the /backup folder (shared with the DJ container) to cloud storage. 
+          - name: backup
+            image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            args: [ "/opt/opendj/scripts/backup.sh", "--incremental"]
+            env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            envFrom:
+            - configMapRef:
+                name: {{ .Values.djInstance }}
+            volumeMounts:
+            - name: backup
+              mountPath: /opt/opendj/bak
+            - name: dj-secrets
+              mountPath: /var/run/secrets/opendj
+          {{ if .Values.gcs.backup }}
+          # Backup to gcs cloud storage using rsync.
+          # The bucket and path must exist, and the cluster needs --scopes storage-full when it is created.
+          # This runs the gsutil command periodically to rsync the contents of the /backup folder (shared with the DJ container) to cloud storage. 
+          - name: gcs
+            image: {{ .Values.gcloudImage }}
+            imagePullPolicy: IfNotPresent
+            command: [ "/bin/sh", "-c", "gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }}"]
+            volumeMounts:
+            - name: backup
+              mountPath: /backup
+          {{ end }}
+          containers:
+          - name: echo
+            image: busybox 
+            args: ["echo", "done"]
+          volumes:
+          - name: backup
+            persistentVolumeClaim: 
+              claimName: bak-{{ .Values.djInstance }}
+          - name: dj-secrets
+            secret:
+              secretName: {{ .Values.djInstance }}
+{{- end }}
+

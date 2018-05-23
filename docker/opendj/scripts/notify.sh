@@ -5,7 +5,7 @@
 
 if [ -z "$SLACK_URL" ] || [ "$SLACK_URL" = "undefined" ]
 then
-    echo "No slack url set"
+    echo "notify: $2 $1"
     exit 0
 fi
 
