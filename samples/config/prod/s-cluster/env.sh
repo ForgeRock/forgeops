@@ -11,4 +11,4 @@ DOMAIN="frk8s.net"
 
 # The components to deploy
 # Note the opendj stores are aliased as configstore, userstore, ctstore - but they all use the opendj chart.
-COMPONENTS=(frconfig configstore userstore openam amster)
+COMPONENTS=(frconfig configstore userstore ctsstore openam amster)

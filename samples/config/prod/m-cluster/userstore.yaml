@@ -1,6 +1,6 @@
 djInstance: userstore
 
-numberSampleUsers: "10000000"
+numberSampleUsers: "1000"
 
 resources:
   limits:

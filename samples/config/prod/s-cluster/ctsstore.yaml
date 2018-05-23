@@ -11,7 +11,7 @@ resources:
 storageSize: "100Gi"
 storageClass: "fast"
 
-opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -Xms5g -Xmx5g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
+opendjJavaArgs: "-server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
 
 podAntiAffinity: "hard"
 
