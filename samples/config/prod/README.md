@@ -26,7 +26,7 @@ Other requirements are:
 
 
 ### HA and Multi-Zone deployments
-- If you need HA for a single zone cluster then comment out the *openamReplicaCount* and *replicas* keys in each of the yaml file in the `templates` directory.  Set the value to the desired number but make sure that your node is sized appropiately to support the number.
+- If you need HA for a single zone cluster then comment out the *openamReplicaCount* and *replicas* keys in each of the yaml file in the `templates` directory.  Set the value to the desired number but make sure that your node is sized appropiately to support the number.  Also ensure the value of `ctsStores` and `ctsPassword` is accurate in amster.yaml.
 
 - If you need HA for multi-zone cluster then comment out the *topologyKey* in each of the yaml files.
 
