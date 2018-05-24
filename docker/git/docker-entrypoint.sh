@@ -2,9 +2,6 @@
 # This container can be used as an init container to check out configuration from git,
 # or as a sync container - to push changes to a git repo.
 
-
-#git config --global core.filemode false
-
 echo "Command is $1"
 
 pause() {
@@ -25,6 +22,13 @@ exit_script() {
 
 trap exit_script SIGINT SIGTERM SIGUSR1 EXIT
 
+git_config() 
+{
+    cd /git/config
+    git config core.filemode false
+    git config user.email "auto-sync@forgerock.net"
+    git config user.name "Git Auto-sync user"
+}
 
 TIME=300
 
@@ -37,28 +41,29 @@ syncloop() {
     done
 }
 
+
+
 case "$1" in
 "init")
     /git-init.sh
     ;;
 "sync")
+    git_config
     /git-sync.sh
     ;;
 "init-sync")
      /git-init.sh
+     git_config
      /git-sync.sh
     ;;
 "pause")
     pause
     ;;
 "syncloop")
+    git_config
     syncloop
     ;;
 *)
     exec $*
     ;;
 esac
-
-
-
-

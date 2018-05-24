@@ -5,9 +5,6 @@ set -x
 
 GIT_BRANCH=${GIT_CHECKOUT_BRANCH:-master}
 
-ls -lR /etc/git-secret
-
-
 # If GIT_REPO is defined, clone the configuration repo
 
 if [ ! -z "${GIT_REPO}" ]; then
