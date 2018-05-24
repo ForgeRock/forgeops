@@ -34,6 +34,9 @@ fi
 # Deploy to cluster
 if read -t 10 -p "Installing Prometheus Operator and Grafana to '${NAMESPACE}' namespace in 10 seconds or when enter is pressed...";then echo;fi
 
+# Add coreos repo to helm
+helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+
 # Install/Upgrade prometheus-operator
 helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values values/prometheus-operator.yaml --namespace=$NAMESPACE
 
