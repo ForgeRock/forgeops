@@ -104,7 +104,7 @@ If you want Prometheus to scrape metrics from a different product, you need to c
 
 ### Import Custom Grafana Dashboards
 
-Currently the easiest way to import dashboards, is to manually import the json files in the GUI.
+The easiest way to import dashboards, is to manually import the json files in the GUI.
 Currently exporting then importing dashboards via the HTTP api doesn't work correctly and requires manual amendments.
 
 An automated way of importing the dashboards at deploy time may be added later.
