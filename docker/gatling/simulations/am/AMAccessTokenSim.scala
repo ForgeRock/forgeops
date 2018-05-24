@@ -26,7 +26,7 @@ class AMAccessTokenSim extends Simulation {
     val oauth2ClientId: String = System.getProperty("oauth2_client_id", "oauth2")
     val oauth2ClientPassword: String = System.getProperty("oauth2_client_pw", "password")
     val oauth2RedirectUri: String = System.getProperty("oauth2_redirect_uri", "http://fake.com")
-    val issueTokenInfo: String = System.getProperty("issue_token_info", "False")
+    val getTokenInfo: String = System.getProperty("get_token_info", "False")
 
     val realm: String = System.getProperty("realm", "/")
     val state = 1234
@@ -84,7 +84,7 @@ class AMAccessTokenSim extends Simulation {
                   .formParam("redirect_uri", oauth2RedirectUri)
                   .basicAuth(oauth2ClientId, oauth2ClientPassword)
                   .check(jsonPath("$.access_token").find.saveAs(accessTokenVarName))
-            ).doIf(issueTokenInfo.toLowerCase.equals("true")) {
+            ).doIf(getTokenInfo.toLowerCase.equals("true")) {
                 exec(
                     http("IdTokenInfo stage")
                     .get("/openam/oauth2/tokeninfo")
