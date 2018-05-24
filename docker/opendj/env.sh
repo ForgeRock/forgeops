@@ -74,3 +74,6 @@ quick_setup()
 
     fi
 }
+
+# Set some common command lind arguments that we need for configuration
+COMMON_ARGS="--hostname ${FQDN} --bindPasswordFile ${DIR_MANAGER_PW_FILE} --port 4444 --trustAll --no-prompt"

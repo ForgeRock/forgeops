@@ -56,6 +56,8 @@ backup:
   # minutes hour day-of-month month day-of-week
   scheduleFull:  "2 2 * * *"
   scheduleIncremental: "45 * * * *"
+  # If true, run a verification job
+  verify: false
 
 
 # Set storageClass only on clusters that support it (GCP / AWS).
@@ -104,14 +106,13 @@ gcs:
   # Restore bucket. Usually the same as above, but for initialization we might want to restore from another source.
   # Note the namespace is *not* appended here. This is so you can restore from a fixed location, or
   # restore from say prod to qa.
-  restoreBucket: gs://forgeops/dj-backup/1m/sandbox
+  restoreBucket: gs://forgeops/dj-backup/test
 
 
 restore:
   # If true, run the init containers that can restore from a previous DS backup.
   enabled: false
-  # If true, run a verification job
-  verify: false
+ 
 
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.

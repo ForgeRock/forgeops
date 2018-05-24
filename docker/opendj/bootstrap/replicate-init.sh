@@ -32,3 +32,5 @@ DS0="${DJ_INSTANCE}-0.${DJ_INSTANCE}"
     --baseDN "o=cts" \
     --trustAll \
     --no-prompt
+
+
