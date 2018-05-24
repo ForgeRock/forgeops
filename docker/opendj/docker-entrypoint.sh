@@ -16,16 +16,6 @@ cd /opt/opendj
 rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
-
-exit_script() {
-    trap - SIGINT SIGTERM # clear the trap
-    kill -- -$$ >/dev/null 2>&1 # Sends SIGTERM to child/sub processes
-    echo "Exiting"
-    exit 0
-}
-
-trap exit_script SIGINT SIGTERM SIGUSR1 EXIT
-
 restore() 
 {
     echo "Attempting to restore from backup"
@@ -91,7 +81,7 @@ start() {
 
     echo "Server id $SERVER_ID"
 
-    exec ./bin/start-ds --nodetach || ( echo "startup failed. Will pause for diagnosis"; sleep 300)
+    exec tini -v -- ./bin/start-ds --nodetach
 }
 
 

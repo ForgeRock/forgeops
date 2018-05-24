@@ -13,7 +13,7 @@ ENV FORGEROCK_HOME /opt/forgerock
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
 # CDIC-72 - find / -perm +6000 -type f -exec chmod a-s {} \; || true
-RUN apk add --no-cache su-exec unzip curl bash bind-tools iputils sysstat \
+RUN apk add --no-cache su-exec unzip curl bash bind-tools iputils sysstat tini \
     && apk del --no-cache bind \
     && mkdir -p "${FORGEROCK_HOME}" \
     && addgroup -g 11111 forgerock \

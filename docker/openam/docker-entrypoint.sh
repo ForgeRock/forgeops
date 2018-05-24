@@ -3,7 +3,6 @@
 # Copyright (c) 2016-2017 ForgeRock AS
 #
 
-set -x
 DIR=`pwd`
 
 command=$1
@@ -22,7 +21,7 @@ run() {
    fi
 
     cd "${CATALINA_HOME}"
-    exec "${CATALINA_HOME}/bin/catalina.sh" run
+    exec tini -v -- "${CATALINA_HOME}/bin/catalina.sh" run
 }
 
 

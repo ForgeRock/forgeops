@@ -24,7 +24,7 @@ COPY openidm.zip /tmp/openidm.zip
 
 RUN apk update && \
     apk upgrade && \
-    apk add zip ttf-dejavu
+    apk add zip ttf-dejavu tini
 
 RUN unzip -q /tmp/openidm.zip && \
     chown -R forgerock:forgerock /opt/openidm && \
