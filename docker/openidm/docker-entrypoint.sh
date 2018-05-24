@@ -51,7 +51,7 @@ if [ "$1" = 'openidm' ]; then
 
     CLASSPATH="$OPENIDM_HOME/bin/*:$OPENIDM_HOME/framework/*:$SLF4J_PATHS:$JACKSON_PATHS:$OPENIDM_SYSTEM_PATH"
 
-   exec java \
+   exec tini -v -- java \
        "-Djava.util.logging.config.file=${LOGGING_PROPERTIES}" \
         ${JAVA_OPTS}  \
        -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \

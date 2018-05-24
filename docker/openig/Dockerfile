@@ -1,6 +1,6 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM tomcat:8.5.28-jre8-alpine
+FROM tomcat:8.5.31-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 
@@ -12,7 +12,7 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 # Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
 # We make sure the tomcat directories can be written by the group.
 # This is a work around for: https://github.com/docker-library/tomcat/issues/35
-RUN apk add --no-cache su-exec unzip curl bash vim bind-tools iputils \
+RUN apk add --no-cache su-exec unzip curl bash vim bind-tools iputils tini \
     && rm -fr "$CATALINA_HOME"/webapps/* \
     && mkdir -p /opt/forgerock \
     && addgroup -g 11111 forgerock \
@@ -42,3 +42,5 @@ RUN unzip -q /tmp/openig.war -d /usr/local/tomcat/webapps/ROOT \
 # COPY sample-config/* /var/openig/config/
 
 USER 11111
+
+CMD ["tini", "-v", "--", "catalina.sh", "run"]

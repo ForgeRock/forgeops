@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
 #
-FROM tomcat:8.5.28-jre8-alpine
+FROM tomcat:8.5.31-alpine
 
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
@@ -36,7 +36,7 @@ COPY openam.war  /tmp/openam.war
 
 # Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
 # This is a work around for: https://github.com/docker-library/tomcat/issues/35
-RUN apk add --no-cache su-exec unzip curl bash  \
+RUN apk add --no-cache su-exec unzip curl bash tini \
   && rm -fr /usr/local/tomcat/webapps/* \
   && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
   && rm /tmp/openam.war \
