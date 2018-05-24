@@ -56,6 +56,9 @@ fi
 if [[ $HOSTNAME =~ cts* ]]; then
     echo "Disabling acccess logging for the CTS"
     ./bootstrap/disable-access-log.sh 
+
+    echo "Tuning ds"
+    ./bootstrap/dstune.sh
 fi
 
 # Before we enable rest2ldap we need a strategy for parameterizing the json template

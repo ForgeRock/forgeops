@@ -2,8 +2,7 @@
 # Configure and Initialize replication for the cluster - assumes that the
 # directory servers are also replication servers.
 #
-# Copyright (c) 2017-2018 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copyright (c) 2017-2018 ForgeRock AS. All rights reserved.
 #
 
 cd /opt/opendj 
@@ -74,10 +73,24 @@ dsconfigure() {
      --no-prompt
 }
 
+# Set our purge delay to 8 hours. The default backup is every 30 minutes.
+set_purge_delay() 
+{
+    # Sets replication purge delay
+    /opt/opendj/bin/dsconfig set-replication-server-prop \
+        --provider-name Multimaster\ Synchronization \
+        --set replication-purge-delay:8\ h \
+        --hostname "${1}" --bindPasswordFile ${DIR_MANAGER_PW_FILE} --port 4444 --trustAll --no-prompt       
+}
+
+set_purge_delay ${DS0}
+
 # For each directory server starting at ds-1 to ds-last
 for j in $(seq 1 $last_ds); do
-    dsconfigure "${DS0}" "${DJ_INSTANCE}-$j.${DJ_INSTANCE}" "$BASE_DN"
-    dsconfigure "${DS0}" "${DJ_INSTANCE}-$j.${DJ_INSTANCE}" "o=cts"
+    ds2="${DJ_INSTANCE}-$j.${DJ_INSTANCE}"
+    dsconfigure "${DS0}"  "$ds2" "$BASE_DN"
+    dsconfigure "${DS0}" "$ds2"  "o=cts"
+    set_purge_delay "$ds2" 
 done
 
 /opt/opendj/bootstrap/replicate-init.sh

@@ -15,7 +15,6 @@ storage:
 
 git:
   # git repo to clone. The value below is a public git repo that does not require authentication.
-  # repo: "git@github.com:ForgeRock/cloud-deployment-config.git"
   # Public, read only repo:
   repo: "https://github.com/ForgeRock/forgeops-init.git"
   branch: master
@@ -39,6 +38,13 @@ image:
   tag: 6.5.0
   pullPolicy: IfNotPresent
 
+# The entrypoint that is run by the main git container. 
+# "pause" will wait for a user to exec into the container to run /git-sync.sh, or any other git commands they wish.
+# "syncloop" will run a loop every 5 min that commits all changes to a branch (autosave-NAMESPACE) and pushes it to the upstream git repo.
+# Note that if you want to push, you must use ssh and not https (repo must start with git:, not https;//), and you must have a 
+# a secret configured that holds your id_rsa private key for your repo.
+command: pause
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -50,3 +56,4 @@ resources: {}
   # requests:
   #  cpu: 100m
   #  memory: 128Mi
+

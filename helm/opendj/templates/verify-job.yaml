@@ -1,4 +1,4 @@
-{{ if .Values.restore.verify }}
+{{ if .Values.backup.verify }}
 # This is an optional cron job that restores from a backup and verifies the integrity of the data.
 # To create an ad hoc job you can use:
 #  kubectl create job verify --from=cronjob/ds-verify

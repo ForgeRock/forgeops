@@ -48,7 +48,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        args: ["pause"]
+        args: [ "{{.Values.command }}" ]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:
