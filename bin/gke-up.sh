@@ -21,3 +21,5 @@ kubectl config set-context $(kubectl config current-context) --namespace=$GKE_CL
 sleep 20s
 ./gke-ingress-cntlr.sh $GKE_INGRESS_IP
 ./create-nfs-provisioner.sh
+# Add cert-manager
+./deploy-cert-manager.sh
