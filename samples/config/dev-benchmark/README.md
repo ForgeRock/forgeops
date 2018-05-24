@@ -1,5 +1,5 @@
 # Dev-benchmark sample config
-This config is used to develop and test gatling benchmark simulation.
+This config is used to develop and test Gatling benchmark simulation.
 
 ## Configuration
 - 1x AM
