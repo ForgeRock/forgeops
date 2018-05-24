@@ -102,85 +102,13 @@ If you want Prometheus to scrape metrics from a different product, you need to c
     ```
 
 
-### Configure new Grafana Dashboards
+### Import Custom Grafana Dashboards
 
-You will need to convert a exported Grafana json file into the correct format to work as a Kubernetes template object.
-Some considerations:
+Currently the easiest way to import dashboards, is to manually import the json files in the GUI.
+Currently exporting then importing dashboards via the HTTP api doesn't work correctly and requires manual amendments.
 
-* Ensure datasource is called prometheus.
-* Ensure the root id is set to NULL.
-    ```
-        "id": null,
-    ```
-* Any grafana variables within the json file e.g. {{job}} must be formatted as {{\`{{job}}\`}}.
-* An __inputs section within the json file is a prompt for user input e.g. datasource name. If this exists, an equivalent inputs  
- section must be provided.  For example:
-    ```
-        "__inputs": [
-          {
-            "name": "PROMETHEUS_DS",
-            "label": "Prometheus DS",
-            "description": "",
-            "type": "datasource",
-            "pluginId": "prometheus",
-            "pluginName": "Prometheus"
-          }
-        ],
-    ```
-    must also be matched with a:
+An automated way of importing the dashboards at deploy time may be added later.
 
-    ```
-        "inputs": [
-          {
-            "name": "PROMETHEUS_DS",
-            "pluginId": "prometheus",
-            "type": "datasource",
-            "value": "prometheus"
-          }
-        ],
-    ```
-
-
-To include a new Grafana dashboard, follow these steps:
-* Create a new dashboard file grafana-dashboards-\<product-name\>.yaml in helm/grafana/.
-* Create template replacing 'am' with your product name:
-    ```
-    {{ define "grafana-dashboards-am.yaml.tpl" }}
-    am-dashboard.json: |
-      {
-        "dashboard":
-
-       ###json file goes here
-
-      }
-    {{ end }}
-    ```
-
-*  Add the json file content where the comment is above.  You'll need to tab the whole json file so the open and close braces are  
- inline with the other open and close braces. See below:
-
-    ```
-        {{ define "grafana-dashboards-am.yaml.tpl" }}
-        am-dashboard.json: |
-          {
-            "dashboard":
-          {
-            "id": null,
-            "title": "ForgeRock Access Management Dashboard",
-            "originalTitle": "ForgeRock Access Management Dashboard",
-
-            ...
-
-            "refresh": false,
-            "schemaVersion": 12,
-            "version": 2,
-            "links": []
-          }
-          }
-        {{ end }}
-    ```
-
-<br />
 
 ### Prometheus Operator configuration
 
