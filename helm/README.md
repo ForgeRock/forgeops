@@ -94,6 +94,13 @@ ingress host name. The format is:
 
 Note that the details of the ingress will depend on the implementation. You may need to modify the ingress definitions. 
  
+# TLS
+
+To enable any of the products to use HTTPS on their external endpoint, set the following flag to true in your custom.yaml file.
+```
+useTLS: True
+```
+
 
 # Notes
 

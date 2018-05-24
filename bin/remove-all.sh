@@ -37,3 +37,4 @@ done
 
 
 kubectl delete job --namespace  ${NAMESPACE} --all
+
