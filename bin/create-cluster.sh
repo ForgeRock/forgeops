@@ -34,34 +34,46 @@ echo ""
 
 MAX_NODES=`expr $GKE_CLUSTER_SIZE + 1`
 
+OPTS=""
+
+if [ ! -z "$GKE_OPTIONS" ]; then 
+      OPTS="${GKE_OPTIONS}"
+fi
+
+if [ ! -z "$GKE_ADDITIONAL_ZONES" ]; then 
+      OPTS="$OPTS --additional-zones=$GKE_ADDITIONAL_ZONES"
+fi
+
+# scopes are required for gcs storage backup and cloud sql
+
+
 gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --project=$GKE_PROJECT_NAME \
       --zone=$GKE_PRIMARY_ZONE \
-      --node-locations="$GKE_PRIMARY_ZONE,$GKE_ADDITIONAL_ZONES" \
-      --username="admin" \
       --cluster-version=$GKE_CLUSTER_VERSION \
-      --machine-type=$GKE_MACHINE_TYPE \
+      --machine-type="$GKE_MACHINE_TYPE" \
       --min-cpu-platform="Intel Skylake" \
       --image-type=COS \
-      --disk-size=50 \
+      --disk-size=60 \
       --network=default \
       --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
       --max-nodes=$MAX_NODES \
       --labels=owner=sre \
       --addons=HorizontalPodAutoscaling \
-      --addons=KubernetesDashboard \
-      --enable-cloud-logging \
-      --enable-cloud-monitoring \
       --enable-autoscaling \
+      --enable-stackdriver-kubernetes \
       --enable-autoupgrade \
-      --enable-autorepair
+      --enable-autorepair \
+      --scopes "https://www.googleapis.com/auth/cloud-platform" \
+      --disk-type=pd-ssd $OPTS
 
 
+# These options are no longer required or default:
+#       --enable-cloud-monitoring \
+#       --username="admin" \
+#       --node-locations="$GKE_PRIMARY_ZONE,$GKE_ADDITIONAL_ZONES" \
+#       --addons=KubernetesDashboard \
+#      --enable-cloud-logging \
 #      --preemptible
-#	   --disk-type=pd-ssd
-
-
-
-exit 0
-
+#	 --disk-type=pd-ssd

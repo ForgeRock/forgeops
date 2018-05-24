@@ -17,9 +17,7 @@ rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
 
-
 exit_script() {
-    echo "Got signal. Killing child processes. Ignore any errors below as the child processes may have already exited"
     trap - SIGINT SIGTERM # clear the trap
     kill -- -$$ >/dev/null 2>&1 # Sends SIGTERM to child/sub processes
     echo "Exiting"
@@ -28,6 +26,15 @@ exit_script() {
 
 trap exit_script SIGINT SIGTERM SIGUSR1 EXIT
 
+restore() 
+{
+    echo "Attempting to restore from backup"
+    if [ -z "$RESTORE_PATH" ]; then 
+        scripts/restore.sh -o
+    else
+        scripts/restore.sh -o -p "$RESTORE_PATH"
+    fi
+}
 
 # Check for a mounted secret volume. Fall back to secrets bundled in the image if we can't find them.
 if [ ! -d "$SECRET_PATH" ]; then
@@ -82,13 +89,11 @@ start() {
       cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./config 2>/dev/null
     fi
 
-    # redirect logs to stdout for better docker integration.
-    scripts/log-redirect.sh
-
     echo "Server id $SERVER_ID"
 
     exec ./bin/start-ds --nodetach || ( echo "startup failed. Will pause for diagnosis"; sleep 300)
 }
+
 
 CMD="${1:-run}"
 
@@ -112,19 +117,22 @@ start)
     ;;
 run-post-setup-job)
     # Runs post setup job that configures replication
-    /opt/opendj/bootstrap/post-setup-job.sh
+    bootstrap/replicate-ds2ds.sh 
     ;;
 restore-from-backup)
-    # Re-initializes DS from a previous backup. Use this instead of setup.
-    /opt/opendj/bootstrap/restore-from-backup.sh
+    # Re-initializes DS from a previous backup. Assumes the directory has gone through setup.
+    scripts/restore.sh -o
     ;;
 restore-and-verify)
     # Restore from backup, and then verify the integrity of the data.
-    OVERWRITE_DATA=true /opt/opendj/bootstrap/restore-from-backup.sh
-    /opt/opendj/scripts/verify.sh
-    echo "Sleeping for a bit so you can inspect the container"
-    sleep 300
+    scripts/restore.sh -o
+    scripts/verify.sh
     ;;
+backup)
+    shift
+    /opt/opendj/scripts/backup.sh "$@"
+    ;;
+
 *)
     exec "$@"
 esac

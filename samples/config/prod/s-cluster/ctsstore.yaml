@@ -16,7 +16,8 @@ opendjJavaArgs: "-server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:M
 podAntiAffinity: "hard"
 
 gcs:
-  enabled: false
+  backup: false
+  restore: false
   sleepSeconds: 600
   backupBucket:  gs://forgeops/dj-backup/1m
   restoreBucket: gs://forgeops/dj-backup/1m

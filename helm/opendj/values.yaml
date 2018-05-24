@@ -93,9 +93,9 @@ topologyKey: "kubernetes.io/hostname"
 
 gcs:
   # Set this to true to enable backups to Google Cloud Storage. You need to create the top level bucket first.
-  enabled: false
-  # Time in seconds to sleep between runs of the backup rsync process.
-  sleepSeconds: 600
+  backup: false
+  # Set to true to enable restoring data from a gcs bucket.
+  restore: false
   # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
   #add --scopes storage-full when you create the cluster.
   # Note the namespace will be appended to this bucket path. This is done to avoid collisions where 
@@ -110,10 +110,9 @@ gcs:
 restore:
   # If true, run the init containers that can restore from a previous DS backup.
   enabled: false
+  # If true, run a verification job
+  verify: false
 
-
-# If true, a cronjob is created that periodically restores the backup from GCS and verifies the data.
-runVerifyCronJob: false
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"

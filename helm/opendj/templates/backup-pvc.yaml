@@ -3,12 +3,14 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-    name: bak-{{ .Values.djInstance }}
+  name: bak-{{ .Values.djInstance }}
+  annotations:
+    "helm.sh/resource-policy": keep
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
       storage: {{ .Values.backup.storageSize }}
-  storageClassName: nfs
+  storageClassName: {{ .Values.backup.storageClass }}
 {{ end }}

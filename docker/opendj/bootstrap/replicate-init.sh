@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # This script is used to initialize or re-initialize replication.
 
+# TODO: use post-external-initialise when reinitializing from a restore
+
 ADMIN_ID="admin"
 
 # Need to set this so that pod does not run out of resources and hence OOM
