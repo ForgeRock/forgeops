@@ -52,10 +52,9 @@ backup:
   enabled: false
   storageClass: "nfs"
   storageSize: "20Gi"
-  # Backup schedules for full and incrementals. This is a crontab format:
+  # Backup schedule. The first backup is a full, subsequent backups are incremenatal
   # minutes hour day-of-month month day-of-week
-  scheduleFull:  "2 2 * * *"
-  scheduleIncremental: "45 * * * *"
+  schedule:  "*/30 * * * *"
   # If true, run a verification job
   verify: false
 

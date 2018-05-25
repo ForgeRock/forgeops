@@ -6,7 +6,8 @@ replicaCount: 1
 
 # Shared Storage Configuration
 storage:
-  # This class should map to a shared read write many PVC type. NFS, for example
+  # This class should map to a shared read write many (RWX) PVC type. NFS, for example.
+  # On minikube the "standard" storage class support RWX.
   class: "nfs"
   # The name of the shared storage volume. This is the platform default, and should not be changed.
   name: "frconfig"
