@@ -10,11 +10,29 @@ STORAGE_SIZE="100Gi"
 
 echo "Cleaning up any old nfs server deployments"
 helm delete --purge nfs-provisioner 
-kubectl delete namespace nfs-provisioner
-kubectl create namespace nfs-provisioner
+
+cat <<EOF >/tmp/nfs.yaml
+# tolerations:
+# - key: preemptible
+#   operator: Equal
+#   value: "yes"
+#   effect: NoSchedule
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: cloud.google.com/gke-preemptible
+          operator: DoesNotExist  
+provisionerVolume:
+    mode: pvc
+storageClass:
+    name: nfs
+persistence:
+    size: $STORAGE_SIZE
+EOF
 
 helm install --name nfs-provisioner --namespace nfs-provisioner \
-    --set provisionerVolume.mode=pvc,storageClass.name=nfs,persistence.size=${STORAGE_SIZE} \
+    -f /tmp/nfs.yaml \
     stable/nfs-server-provisioner
-
 
