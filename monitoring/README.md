@@ -1,23 +1,22 @@
 # Prometheus and Grafana deployment
 
-This deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
+The deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
 
-**This monitoring folder contains the following functions:**
+**The monitoring folder contains the following functions:**
 * deploy scripts to:
     * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
     * connect to the Prometheus and Grafana endpoints.
-* exporter-forgerock Helm chart that contains a Helm chart that provides:
-    * configurable ServiceMonitors that define ForgeRock product endpoints to be monitored by Prometheus.
+* forgerock-servicemonitors Helm chart that provides configurable ServiceMonitors.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
 * values files that are used by the deploy script and can be edited to customize the configuration of Prometheus, Grafana and Alert Manager.
 
 <br />
 
 # How Prometheus works
 
-The Prometheus operator works by watching for ServiceMonitor CRDs (CRDs are Kubernetes Custom Resource Definitions). These are first  
+The Prometheus Operator works by watching for ServiceMonitor CRDs (CRDs are Kubernetes Custom Resource Definitions). These are first  
 class Kubernetes types that you can manage with kubectl (kubectl create/delete/patch, etc.).  The ServiceMonitor CRDs define the target to be scraped.
 
-The Prometheus operator watches for changes to current ServiceMonitors or for new ServiceMonitors and updates the  
+The Prometheus Operator watches for changes to current ServiceMonitors or for new ServiceMonitors and updates the  
 Prometheus configuration with the details defined in the ServiceMonitors automatically.  
 
 No restarting of Prometheus is required.

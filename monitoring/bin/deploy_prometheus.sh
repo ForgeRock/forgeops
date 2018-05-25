@@ -43,8 +43,8 @@ helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --se
 # Install/Upgrade kube-prometheus
 helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true --values values/kube-prometheus.yaml --namespace=$NAMESPACE
 
-# Install/Upgrade exporter-forgerock
-helm upgrade -i ${NAMESPACE}-exporter-forgerock helm/exporter-forgerock/ --values helm/${FILE} --set=rbac.install=true --namespace=$NAMESPACE
+# Install/Upgrade forgerock-servicemonitors
+helm upgrade -i ${NAMESPACE}-forgerock-servicemonitors helm/forgerock-servicemonitors/ --values helm/${FILE} --set=rbac.install=true --namespace=$NAMESPACE
 
 
 
