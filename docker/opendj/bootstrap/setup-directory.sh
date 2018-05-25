@@ -68,6 +68,16 @@ EOF
 bin/import-ldif --offline -n ctsRoot -F -l /tmp/cts.ldif
 
 
+echo "Creating CTS UID index for uid=monitor search"
+./bin/dsconfig create-backend-index \
+          --backend-name ctsRoot \
+          --set index-type:equality \
+          --type generic \
+          --index-name uid \
+          --offline \
+          --no-prompt
+
+
 echo "Creating Default Trust Manager..."
 ./bin/dsconfig create-trust-manager-provider \
       --type file-based \

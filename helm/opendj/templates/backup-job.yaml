@@ -10,8 +10,7 @@ metadata:
     vendor: forgerock
     component: opendj
 spec:
-  # Edit the schedule below. This example runs every 30 minutes
-  schedule: "*/30 * * * *"
+  schedule: "{{ .Values.backup.schedule }}"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -52,6 +51,7 @@ spec:
               mountPath: /backup
           {{ end }}
           containers:
+          # A job needs at least one container. This is just a dummy echo command.
           - name: echo
             image: busybox 
             args: ["echo", "done"]

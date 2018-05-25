@@ -5,13 +5,16 @@
 # we want all DS servers to mount a common shared backup volume.
 # See https://github.com/IlyaSemenov/nfs-provisioner-chart 
 
-helm repo add nfs-provisioner https://raw.githubusercontent.com/IlyaSemenov/nfs-provisioner-chart/master/repo
-
 # Set the desired volume size. Requests will be allocated out of this total.
 STORAGE_SIZE="100Gi"
 
+echo "Cleaning up any old nfs server deployments"
+helm delete --purge nfs-provisioner 
+kubectl delete namespace nfs-provisioner
+kubectl create namespace nfs-provisioner
+
 helm install --name nfs-provisioner --namespace nfs-provisioner \
-    --set provisionerVolume.mode=pvc,storageClass=nfs,provisionerVolume.settings.storageSize=${STORAGE_SIZE} \
-    nfs-provisioner/nfs-provisioner
+    --set provisionerVolume.mode=pvc,storageClass.name=nfs,persistence.size=${STORAGE_SIZE} \
+    stable/nfs-server-provisioner
 
 
