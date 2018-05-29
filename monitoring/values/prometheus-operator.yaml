@@ -1,0 +1,7 @@
+# Override values for Prometheus.
+# Possible values to override can be found here:
+# https://github.com/coreos/prometheus-operator/tree/master/helm/prometheus-operator
+
+image.tag:  v0.19.0
+image.pullPolicy: Always
+rbacEnable: true
