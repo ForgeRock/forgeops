@@ -1,4 +1,4 @@
-# This yaml file provides override values for the exporter-forgerock chart
+# This yaml file provides override values for the exporter-forgerock chart.
 
 # To switch FR product endpoint discovery off, change enabled: false. All products are enabled by default
 # Other values related to the product endpoint can be edited below.

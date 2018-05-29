@@ -2,7 +2,7 @@
 
 The deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
 
-**The monitoring folder contains the following functions:**
+**The monitoring folder contains the following artifacts:**
 * deploy scripts to:
     * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
     * connect to the Prometheus and Grafana endpoints.
