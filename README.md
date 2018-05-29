@@ -116,7 +116,7 @@ Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forg
 Troubleshooting Suggestions:
 
 * Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script and the cmp-platform composite charts are provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
-* Describe a failing pod using `kuebctl get pods; kubectl describe pod pod-xxx`
+* Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.
     2. Examine all the init containers. Did each init container complete with a zero (success) exit code? If not, examine the logs from that failed init container using `kubectl logs pod-xxx -c init-container-name`
     3. Did the main container enter a crashloop? Retrieve the logs using `kubectl logs pod-xxx`.
@@ -124,10 +124,10 @@ Troubleshooting Suggestions:
     5. You can use `kubectl logs -p pod-xxx` to examine the logs of previous (exited) pods.
 * A common problem with 6.0 charts is the `git-ssh-secret` has not been properly created, or an existing secret is present and the helm chart is attempting to recreate it. Look at the init logs where git is used (amster, openidm, openig). You may find errors in attempting to clone the forgeops configuration repo. Even if you are cloning the public read only forgeops-init repo, you still need a "dummy" git-ssh-key (this process is being simplified for 6.5)
 * If the pods are coming up successfully, but you can't reach the service, you likely have ingress issues:
-    1. Use `kubectl descring ing` and `kubectl get ing ingress-name -o yaml` to view the ingress object.
+    1. Use `kubectl describe ing` and `kubectl get ing ingress-name -o yaml` to view the ingress object.
     2. Describe the service using `kubectl get svc; kubectl describe svc xxx`.  Does the service have an `Endpoint:` binding? If the service endpoint binding is not present, it means the service did not match any running pods.
 * Determine if your cluster is having issues (not enough memory, failing nodes). Watch for pods killed with OOM (Out of Memory). Commands to check:
     1. `kubectl describe node`
     2. `kubectl get events -w`
 * Most images provide the ability to exec into the pod using bash, and examine processes and logs.  Use `kubectl exec pod-name -it bash`.
-* For 6.5, the Kuberntes cluster must support a read-write-many (RWX) volume type, such as NFS, or Minikube's hostpath provisioner. You can describe the persistent volumes using `kubectl describe pvc`. If a PVC is in a pending state, your cluster may not support the storage class.
+* For 6.5, the Kubernetes cluster must support a read-write-many (RWX) volume type, such as NFS, or Minikube's hostpath provisioner. You can describe persistent volumes using `kubectl describe pvc`. If a PVC is in a pending state, your cluster may not support the required storage class.
