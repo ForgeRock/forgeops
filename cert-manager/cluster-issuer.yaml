@@ -26,5 +26,5 @@ spec:
           # The original unencrypted service account key must then be deleted afterwards.
           serviceAccountSecretRef:
             name: clouddns
-            key: key.json
+            key: cert-manager.json
     

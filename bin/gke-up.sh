@@ -18,7 +18,7 @@ kubectl config set-context $(kubectl config current-context) --namespace=$GKE_CL
 ./create-sc.sh
 ./helm-rbac-init.sh
 # Need this sleep as tiller is not ready immediately
-sleep 20s
+sleep 40s
 ./gke-ingress-cntlr.sh $GKE_INGRESS_IP
 ./create-nfs-provisioner.sh
 # Add cert-manager
