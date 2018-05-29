@@ -6,11 +6,6 @@ replicaCount: 1
 
 domain: .forgeops.com
 
-image:
-  repository: nginx
-  tag: stable
-  pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 80

@@ -51,17 +51,21 @@ spec:
           mountPath: /opt/openidm/secrets
         - name: logs
           mountPath: /opt/openidm/logs
+        - name: audit-logs
+          mountPath: /opt/openidm/audit
         - name: git
           mountPath: /git
         - name: boot-properties
           mountPath: /var/run/openidm/commons
         - name: logging-properties
-          mountPath: /var/run/openidm/logging
+          mountPath: /var/run/openidm/logging  
       volumes:
       - name: openidm-secrets
         secret:
           secretName: openidm-secrets
       - name: logs
+        emptyDir: {}
+      - name: audit-logs
         emptyDir: {}
       - name: git
         persistentVolumeClaim:

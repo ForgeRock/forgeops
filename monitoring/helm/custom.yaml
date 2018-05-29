@@ -31,7 +31,7 @@ idm:
 
 ig:
   enabled: true
-  #path: /openig/api/metrics/prometheus
+  #path: /openig/metrics/prometheus
   #labelSelectorComponent: openig
   #secretUser: b3BlbmlkbS1hZG1pbg==
   #secretPassword: b3BlbmlkbS1hZG1pbg==  
