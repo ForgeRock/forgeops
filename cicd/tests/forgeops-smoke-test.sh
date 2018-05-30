@@ -22,7 +22,7 @@ usage() {
 }
 
 list_suites() {
-  echo -e "\e[32m$(ls testcases/)"
+  echo "$(ls testcases/)"
 }
 
 # Parameters parsing
@@ -70,10 +70,10 @@ FAILED=0
 print_report() {
   echo ""
   echo ""
-  echo -e "\e[33mForgeops smoke test suite report\e[39m"
+  echo  "Forgeops smoke test suite report"
   echo "----Summary----"
-  echo -e "\e[32mPASSED: \e[39m$PASSED"
-  echo -e "\e[31mFAILED: \e[39m$FAILED"
+  echo "PASSED: ${PASSED}"
+  echo "FAILED: ${FAILED}"
   echo ""
   echo "----Details----"
   cat out.txt

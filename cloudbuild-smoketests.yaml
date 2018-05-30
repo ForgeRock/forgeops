@@ -1,0 +1,51 @@
+# Cloudbuild pipeline for smoke tests
+
+steps:
+# List helm to init everything
+- name: 'gcr.io/engineering-devops/helm'
+  args: ['list']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-east1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=eng-shared'
+
+# Ensure kctl is working
+- name: 'gcr.io/engineering-devops/helm'
+  entrypoint: 'kubectl'
+  args: ['get', 'pods']
+
+# Build smoke tests docker image
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'cicd/tests'
+  args: [
+          'build',
+          '-t', 'gcr.io/$PROJECT_ID/smoke-test:latest',
+          '.'
+        ]
+
+# Run deployment scripts
+- name: 'gcr.io/engineering-devops/helm'
+  entrypoint: 'bin/deploy.sh'
+  args: ['samples/config/smoke-deployment']
+
+# Modify hosts to be able to access cluster via ingress
+- name: 'gcr.io/engineering-devops/helm'
+  id: HOSTS
+  entrypoint: 'cicd/tests/modify-hosts.sh'
+  args: ['samples/config/smoke-deployment']
+
+# Run custom smoke test image built in previous step
+- name: 'gcr.io/$PROJECT_ID/smoke-test:latest'
+  dir: '/tmp'
+  env:
+  - 'IDM_URL=http://openidm.smoke.forgeops.com/openidm'
+  - 'IDM_ADMIN_PWD=openidm-admin'
+  - 'IG_URL=http://openig.smoke.forgeops.com/'
+  - 'AM_URL=http://openam.smoke.forgeops.com/openam'
+  - 'AM_ADMIN_PWD=password'
+  entrypoint: '/tmp/run-full-smoke.sh'
+
+# Clean it up
+- name: 'gcr.io/engineering-devops/helm'
+  entrypoint: 'bin/remove-all.sh'
+  args: 'smoke'
+  timeout: 600s

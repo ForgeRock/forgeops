@@ -12,7 +12,7 @@
 #   - Restart OpenAM to take all configuration online
 ####################################################################################
 
-usage() 
+usage()
 {
     echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
@@ -38,7 +38,7 @@ parse_args()
         esac
     done
     shift $((OPTIND -1))
- 
+
     if [ "$#" -ne 1 ]; then
          echo "Error: Missing deployment config directory"
          usage
@@ -56,7 +56,7 @@ chk_config()
     fi
     echo "=> k8s Context is: \"${context}\""
 
-    if [ -z "${CFGDIR}" ] || [ ! -d "${CFGDIR}" ]; then 
+    if [ -z "${CFGDIR}" ] || [ ! -d "${CFGDIR}" ]; then
         echo "ERROR: Configuration directory path not given or inaccessable.  Exiting!"
         exit 1
     else
@@ -66,7 +66,7 @@ chk_config()
             echo "=> Reading ${ENV_SH}"
             source "${ENV_SH}"
         fi
-        if [ -r  ${CFGDIR}/env.sh ]; then 
+        if [ -r  ${CFGDIR}/env.sh ]; then
             echo "=> Reading ${CFGDIR}/env.sh"
             source ${CFGDIR}/env.sh
         fi
@@ -93,7 +93,7 @@ chk_config()
 }
 
 
-create_namespace() 
+create_namespace()
 {
     if [ "${RMALL}" = true ]; then
         echo "=> Removing all components of the deployment from ${NAMESPACE}"
@@ -105,22 +105,22 @@ create_namespace()
 }
 
 # todo: this should decode and install any secrets we need. The git-ssh-key, for example
-create_secrets() 
+create_secrets()
 {
     echo "to do"
 }
 
 #### Deploy methods
-deploy_charts() 
+deploy_charts()
 {
-    echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\"" 
+    echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\""
 
     # If the deploy directory contains a common.yaml, append it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
         YAML="$YAML -f ${CFGDIR}/common.yaml"
     fi
 
-    # These are the charts (components) that will be deployed via helm 
+    # These are the charts (components) that will be deployed via helm
     for comp in ${COMPONENTS[@]}; do
         chart="${comp}"
         case "${comp}" in
@@ -141,7 +141,7 @@ deploy_charts()
     done
 }
 
-isalive_check() 
+isalive_check()
 {
     echo "=> Running OpenAM alive.jsp check"
     STATUS_CODE="503"
@@ -154,18 +154,19 @@ isalive_check()
     echo "=> OpenAM is alive"
 }
 
-livecheck_stage1() 
+livecheck_stage1()
 {
     # This livecheck waits for OpenAM config to be imported.
     # We are looking to amster pod logs periodically.
     echo "=> Livecheck stage1 - waiting for config to be imported to OpenAM";
     sleep 10
-    AMSTER_POD_NAME=$(kubectl get pods --selector=app=amster-${NAMESPACE}-amster \
-        -o jsonpath='{.items[*].metadata.name}')
     FINISHED_STRING="Configuration script finished"
 
     while true; do
-    OUTPUT=$(kubectl logs ${AMSTER_POD_NAME} amster)
+    AMSTER_POD_NAME=$(kubectl -n=${NAMESPACE} get pods --selector=component=amster \
+      -o jsonpath='{.items[*].metadata.name}')
+    echo "Inspecting amster pod: ${AMSTER_POD_NAME}"
+    OUTPUT=$(kubectl -n=${NAMESPACE} logs ${AMSTER_POD_NAME} amster)
         if [[ $OUTPUT = *$FINISHED_STRING* ]]; then
             echo "=> OpenAM configuration import is finished"
             break
@@ -175,10 +176,10 @@ livecheck_stage1()
     done
 }
 
-restart_openam() 
+restart_openam()
 {
     # We need to restart OpenAM to take CTS settings online
-    OPENAM_POD_NAME=$(kubectl get pods --selector=app=openam \
+    OPENAM_POD_NAME=$(kubectl -n=${NAMESPACE} get pods --selector=app=openam \
         -o jsonpath='{.items[*].metadata.name}')
     kubectl delete pod $OPENAM_POD_NAME --namespace=${NAMESPACE}
     sleep 10
@@ -195,7 +196,7 @@ chk_config
 
 # Dryrun? Just show what helm commands would be executed.
 if [ ! -z "$DRYRUN" ]; then
-    deploy_charts 
+    deploy_charts
     exit 0
 fi
 
