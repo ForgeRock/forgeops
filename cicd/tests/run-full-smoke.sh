@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Helper script to run smoke tests. Used in google cloudbuilder to wrap up
+# around failed RCs. 
 
 /tmp/forgeops-smoke-test.sh -s am-smoke.sh
 AM_RC=$?
