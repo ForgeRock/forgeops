@@ -1,6 +1,6 @@
 const IncomingWebhook = require('@slack/client').IncomingWebhook;
-# Add your slack webhook URL here
-const SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/xxxxxxxx"
+#// Add your slack webhook URL here
+const SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/XXXXXXXXXXXX"
 
 const webhook = new IncomingWebhook(SLACK_WEBHOOK_URL);
 
@@ -39,7 +39,10 @@ const createSlackMessage = (build) => {
         fields: [{
           title: 'Status',
           value: build.status
-        }]
+        }, {
+          title: 'Tags',
+          value: build.tags.join(' ')
+        }],
       }
     ]
   };

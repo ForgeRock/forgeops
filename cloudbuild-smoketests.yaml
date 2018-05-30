@@ -27,11 +27,11 @@ steps:
   entrypoint: 'bin/deploy.sh'
   args: ['samples/config/smoke-deployment']
 
-# Modify hosts to be able to access cluster via ingress
-- name: 'gcr.io/engineering-devops/helm'
-  id: HOSTS
-  entrypoint: 'cicd/tests/modify-hosts.sh'
-  args: ['samples/config/smoke-deployment']
+# In case there are problems with accessing ingress, allow this to run.
+#- name: 'gcr.io/engineering-devops/helm'
+#  id: HOSTS
+#  entrypoint: 'cicd/tests/modify-hosts.sh'
+#  args: ['samples/config/smoke-deployment']
 
 # Run custom smoke test image built in previous step
 - name: 'gcr.io/$PROJECT_ID/smoke-test:latest'
@@ -47,5 +47,7 @@ steps:
 # Clean it up
 - name: 'gcr.io/engineering-devops/helm'
   entrypoint: 'bin/remove-all.sh'
-  args: 'smoke'
-  timeout: 600s
+  args: ['smoke']
+
+timeout: 1200s
+tags: ['smoke', 'tests']
