@@ -56,6 +56,7 @@ component: openig
 
 ingress:
   class: nginx
+  prodTLS: false
   annotations:
     kubernetes.io/ingress.class: nginx
     # Do not use for nginx. TODO: Does warp need this?
