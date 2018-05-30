@@ -16,7 +16,7 @@ usage()
 {
     echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
-    echo "-e extra env.sh that will be sourced to set environment variables. May be repeated."
+    echo "-e extra env.sh that will be sourced to set environment variables."
     echo "-n set the namespace. Values in env.sh will override this."
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
@@ -62,13 +62,14 @@ chk_config()
     else
         echo "=> Using \"${CFGDIR}\" as the root of your configuration"
         echo "=> Reading env.sh"
-        if [ ! -z "${ENV_SH}" ]; then
-            echo "=> Reading ${ENV_SH}"
-            source "${ENV_SH}"
-        fi
         if [ -r  ${CFGDIR}/env.sh ]; then
             echo "=> Reading ${CFGDIR}/env.sh"
             source ${CFGDIR}/env.sh
+        fi
+        # We want env.sh provided on the command line to take precedence.
+         if [ ! -z "${ENV_SH}" ]; then
+            echo "=> Reading ${ENV_SH}"
+            source "${ENV_SH}"
         fi
     fi
 
@@ -115,9 +116,9 @@ deploy_charts()
 {
     echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\""
 
-    # If the deploy directory contains a common.yaml, append it to the helm arguments.
+    # If the deploy directory contains a common.yaml, prepend it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
-        YAML="$YAML -f ${CFGDIR}/common.yaml"
+        YAML="-f ${CFGDIR}/common.yaml $YAML"
     fi
 
     # These are the charts (components) that will be deployed via helm

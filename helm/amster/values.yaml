@@ -28,8 +28,8 @@ config:
   # To level path where we import the the configuration from. Your git repo will usually be mounted on /git/config
   # in this pod.
   importPath: /git/config/default/am/empty-import
-  # Where we perform export paths to.
-  exportPath: /tmp/amster
+  # Where we perform export paths to. If not set, this defaults to the importPath
+  #exportPath: /tmp/amster
 
 image:
   repository: gcr.io/engineering-devops

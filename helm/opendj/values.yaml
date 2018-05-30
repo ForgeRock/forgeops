@@ -95,7 +95,9 @@ topologyKey: "kubernetes.io/hostname"
 gcs:
   # Set this to true to enable backups to Google Cloud Storage. You need to create the top level bucket first.
   backup: false
-  # Set to true to enable restoring data from a gcs bucket.
+  # Set to true to enable restoring data from a gcs bucket to the bak/ folder.
+  # Note: This does not trigger a DS restore. It only gets the data from GCS to the bak/ folder
+  # See the restore.enabled setting.
   restore: false
   # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
   #add --scopes storage-full when you create the cluster.
@@ -107,9 +109,13 @@ gcs:
   # restore from say prod to qa.
   restoreBucket: gs://forgeops/dj-backup/test
 
-
+# Restore parameters. 
 restore:
-  # If true, run the init containers that can restore from a previous DS backup.
+  # If true, runs the init containers that restores the directory from a backup in the bak/ folder.
+  # The backup data must be present in the bak/ folder. The gcs: settings can be used
+  # to copy data from a gcs bucket to the bak/ folder.
+  # Restore will not overwrite existing DS data.  
+  # The most recent backup will be restored. 
   enabled: false
  
 
