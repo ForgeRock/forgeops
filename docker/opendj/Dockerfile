@@ -36,13 +36,6 @@ ENV SSL_CERT_ALIAS opendj-ssl
 # The default BASE_DN of the directory tree.
 ENV BASE_DN o=userstore
 
-# Optional full backup schedule in cron (5) format.
-ENV BACKUP_SCHEDULE_FULL  "0 2 * * *"
-
-# Optional incremental backup schedule in cron(5) format.
-ENV BACKUP_SCHEDULE_INCREMENTAL "15 * * * *"
-
-
 # Example of how you can download the DJ zip file from a maven repo
 # ENV MVN_REPO=https://maven.forgerock.org/repo/repo/org/forgerock/opendj
 # ENV OPENDJ_VERSION=4.0.0-SNAPSHOT

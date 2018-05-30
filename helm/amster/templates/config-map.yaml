@@ -33,7 +33,7 @@ kind: ConfigMap
 metadata:
   name: amster-{{ .Release.Name }}
 data:
-  EXPORT_PATH: {{  default .Values.config.exportPath }}
+  EXPORT_PATH: {{  default .Values.config.importPath .Values.config.exportPath }}
   CONFIG_PATH: "{{ .Values.config.importPath }}"
   VERSION: {{ default .Values.image.tag .Values.version }}
   CTS_STORES: {{ default "ctsstore-0.ctsstore:1389" .Values.ctsStores }}
