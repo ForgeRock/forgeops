@@ -2,7 +2,7 @@
 
 
 # The default bootstrap script.
-bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
+bootstrapScript: "/opt/opendj/bootstrap/setup-directory.sh"
 
 # If useDefaultSecrets is set to true (the default), the secret values in ../secrets will
 # be used to create a secret map with the same name as the instance ($djInstance).
@@ -11,11 +11,6 @@ bootstrapScript: "/opt/opendj/bootstrap/setup.sh"
 # than use the default ones bundled in the chart. An alternate strategy is to fork this chart.
 # and replace the secrets in ./secrets with your own.
 useDefaultSecrets: true
-
-# The options here are "proxy" or "directory-server.
-# This sets the BOOTSTRAP_TYPE env var for the bootstrap script which is setup.sh.
-bootstrapType: "directory-server"
-
 
 # The default OpenDJ baseDN.
 # Note that the default install creates two backends: o=cts and o=userstore
@@ -46,12 +41,18 @@ replicas: 1
 # Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
+# StorageClass is optional. It can be the name of a fast (SSD) class.
+#storageClass: fast
 
 backup:
   # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
   enabled: false
   storageClass: "nfs"
   storageSize: "20Gi"
+  # If you provide the name of a backup PVC, the default bak-$instance will NOT be created, and this
+  # the named pvc will be used as the shared backup volume. This can be used to re-attach 
+  # a previous backup pvc - assuming it was not deleted.
+  #pvcName: 
   # Backup schedule. The first backup is a full, subsequent backups are incremental
   # Format is crontab: minutes hour day-of-month month day-of-week
   schedule:  "*/30 * * * *"
@@ -118,6 +119,8 @@ restore:
   # The most recent backup will be restored. 
   enabled: false
  
+proxy:
+  enabled: false
 
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.

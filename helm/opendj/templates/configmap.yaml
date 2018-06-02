@@ -9,7 +9,6 @@ data:
   DS_SET_SIZE: "{{ .Values.replicas }}"
   OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
   BOOTSTRAP:  {{ .Values.bootstrapScript }}
-  BOOTSTRAP_TYPE: {{ .Values.bootstrapType }}
   SLACK_URL: {{ .Values.slackUrl }}
 {{- if not (empty .Values.numberSampleUsers) }}
   NUMBER_SAMPLE_USERS: "{{ .Values.numberSampleUsers }}"

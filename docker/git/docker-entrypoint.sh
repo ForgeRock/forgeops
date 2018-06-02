@@ -13,7 +13,7 @@ pause() {
 }
 
 exit_script() {
-    echo "Got signal. Killing child processes"
+    echo "Got signal"
     trap - SIGINT SIGTERM # clear the trap
     kill -- -$$ # Sends SIGTERM to child/sub processes
     echo "Exiting"

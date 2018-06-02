@@ -13,5 +13,5 @@ resources:
  requests:
    memory: 756Mi
 
-
-ctsStores: "ctsstore-0.ctsstore:1389"
+# Use the config store as the cts
+ctsStores: "configstore-0.configstore:1389"

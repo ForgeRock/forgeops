@@ -66,9 +66,14 @@ spec:
               secretName: {{ .Values.djInstance }}
           - name: logs
             emptyDir: {}
+          {{- if or .Values.backup.enabled .Values.restore.enabled }}
           - name: backup
             persistentVolumeClaim: 
-              claimName: bak-{{ .Values.djInstance }}
+              claimName: {{ default (printf "bak-%s" .Values.djInstance) .Values.backup.pvcName }}
+          {{ else }}
+          - name: backup
+            emptyDir: {}
+          {{ end }}
           - name: db
             persistentVolumeClaim:
               claimName: {{ .Values.djInstance }}-verify

@@ -154,3 +154,57 @@ bin/start-ds
 load_ldif "bootstrap/userstore/ldif"
 load_ldif "bootstrap/cts/ldif"
 bin/stop-ds
+
+echo "Rebuilding indexes"
+bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
+bin/rebuild-index --offline --baseDN "o=cts" --rebuildDegraded
+
+
+# Run post install customization script if the user supplied one.
+script="bootstrap/post-install.sh"
+
+if [ -r "$script" ]; then
+    echo "executing post install script $script"
+    sh "$script"
+fi
+
+# Set the paths to our PVC directory
+./bootstrap/set-data-paths.sh 
+
+./bootstrap/log-redirect.sh
+
+if [[ $HOSTNAME =~ cts* ]]; then
+    echo "Disabling acccess logging for the CTS"
+    ./bootstrap/disable-access-log.sh 
+
+    echo "Tuning ds"
+    ./bootstrap/dstune.sh
+fi
+
+# Before we enable rest2ldap we need a strategy for parameterizing the json template
+#./bootstrap/setup-rest2ldap.sh
+
+# Note that presently dsreplication does not handle templated config.ldif. You
+# must completely finish setting up replication first, and then template this file.
+#./bootstrap/convert-config-to-template.sh
+
+
+if [ -d data ]; then
+    echo "Moving mutable directories to data/"
+    # For now we need to most of the directories created by setup, including the "immutable" ones.
+    # When we get full support for commons configuration we should revisit.
+    for dir in db changelogDb config var import-tmp
+    do
+        echo "moving $dir to data/"
+        # Use cp as it works across file systems.
+        cp -r $dir data/$dir
+        rm -fr $dir
+    done
+fi
+
+
+for d in data/*
+do
+    echo "Creating symbolic link $d"
+    ln -s $d
+done

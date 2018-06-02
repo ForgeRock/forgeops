@@ -20,6 +20,8 @@ esac
 # This helps to release any IP address
 helm delete nginx 
 
+sleep 10 
+
 gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE
 
 
