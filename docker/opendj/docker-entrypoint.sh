@@ -57,7 +57,7 @@ setup() {
       # If the instance data does not exist we need to run setup.
     if [ ! -d ./data/db ] ; then
       echo "Instance data Directory is empty. Creating new DJ instance"
-      BOOTSTRAP="${BOOTSTRAP:-/opt/opendj/bootstrap/setup.sh}"
+      BOOTSTRAP="${BOOTSTRAP:-/opt/opendj/bootstrap/setup-directory.sh}"
       # DS setup complains if the directory is not empty.
       echo "Running $BOOTSTRAP"
       "${BOOTSTRAP}"
@@ -67,23 +67,30 @@ setup() {
 }
 
 start() {
-
-    # todo: Check /opt/opendj/data/config/buildinfo
-    # Run upgrade if the server is older
-
     echo "Starting OpenDJ"
-
-    if [ -d "${SECRET_PATH}" ]; then
-      echo "Secret path is present. Will copy any keystores and truststore"
-      # We send errors to /dev/null in case no data exists.
-      cp -f ${SECRET_PATH}/key*   ${SECRET_PATH}/trust* ./config 2>/dev/null
-    fi
-
     echo "Server id $SERVER_ID"
-
     exec tini -v -- ./bin/start-ds --nodetach
 }
 
+# Restore from a backup
+restore() {
+       if [ -d ./data/db ] ; then
+        echo "It looks like there is existing directory data. Restore will not run."
+        exit 0
+       fi
+
+        # run setup - because the directory needs to be configured
+       # todo - See if we can restore a saved template instead.
+       unset NUMBER_SAMPLE_USERS
+       setup
+
+       # We are currently using dsreplication initialize-all to load data from the first server 
+       # So we restore data only on the first server and let initialization copy the data.
+       if [[ $HOSTNAME = *"0"* ]]; then 
+            echo "Restoring data from backup on host $HOSTNAME"
+            scripts/restore.sh -o
+       fi
+}
 
 CMD="${1:-run}"
 
@@ -110,8 +117,7 @@ run-post-setup-job)
     bootstrap/replicate-ds2ds.sh 
     ;;
 restore-from-backup)
-    # Re-initializes DS from a previous backup. Assumes the directory has gone through setup.
-    scripts/restore.sh -o
+    restore
     ;;
 restore-and-verify)
     # Restore from backup, and then verify the integrity of the data.
@@ -122,7 +128,10 @@ backup)
     shift
     /opt/opendj/scripts/backup.sh "$@"
     ;;
-
+proxy)
+    bootstrap/setup-proxy.sh
+    start
+    ;;
 *)
     exec "$@"
 esac

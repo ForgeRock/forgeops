@@ -1,0 +1,44 @@
+# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved
+{{ if .Values.proxy.enabled }}
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{  .Values.djInstance }}-proxy
+spec:
+  replicas: {{default 1 .Values.openamReplicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}
+        component: {{ .Values.component }}
+        vendor: forgerock
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: proxy
+        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        imagePullPolicy:  {{ .Values.image.pullPolicy }}
+      # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
+        envFrom:
+        - configMapRef:
+            name: {{ .Values.djInstance }}
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: BOOTSTRAP_TYPE
+          value: "proxy"
+        volumeMounts:
+        - name: dj-secrets
+          mountPath: /var/run/secrets/opendj
+        args:  ["setup"]
+      volumes:
+      - name: dj-secrets
+        secret:
+          secretName: {{ .Values.djInstance }}
+      - name: logs
+        emptyDir: {}
+    {{ end }}

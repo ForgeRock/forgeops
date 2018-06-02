@@ -9,6 +9,9 @@ gcloud beta container node-pools create "${GKE_CLUSTER_NAME}-pool1" \
     --machine-type="n1-standard-1" \
     --num-nodes="1" \
     --enable-autorepair \
+    --enable-autoupgrade \
     --node-version="${GKE_CLUSTER_VERSION}" \
-    --scopes "https://www.googleapis.com/auth/cloud-platform" \
-    --node-taints="preemptible=true:NoSchedule"
+    --scopes "https://www.googleapis.com/auth/cloud-platform" 
+
+
+#    --node-taints="preemptible=true:NoSchedule"

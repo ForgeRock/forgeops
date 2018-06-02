@@ -1,10 +1,13 @@
-{{ if .Values.backup.enabled }}
+# If the deployer supplies a PVC, we will not create a new one.
+{{ if or .Values.backup.enabled .Values.restore.enabled }}
+{{ if not .Values.backup.pvcName }}
 # pvc for the shared backup volume
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: bak-{{ .Values.djInstance }}
   annotations:
+    # We tell helm to not delete the backup PVC for safety
     "helm.sh/resource-policy": keep
 spec:
   accessModes:
@@ -13,4 +16,5 @@ spec:
     requests:
       storage: {{ .Values.backup.storageSize }}
   storageClassName: {{ .Values.backup.storageClass }}
+{{ end }}
 {{ end }}

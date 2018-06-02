@@ -13,13 +13,18 @@ esac
 . ../etc/gke-env.cfg
 
 ./create-cluster.sh
+./gke-create-nodepool.sh 
+
 kubectl create namespace $GKE_CLUSTER_NS
 kubectl config set-context $(kubectl config current-context) --namespace=$GKE_CLUSTER_NS
 ./create-sc.sh
 ./helm-rbac-init.sh
+
 # Need this sleep as tiller is not ready immediately
 sleep 40s
-./gke-ingress-cntlr.sh $GKE_INGRESS_IP
+
 ./create-nfs-provisioner.sh
+
+./gke-ingress-cntlr.sh $GKE_INGRESS_IP
 # Add cert-manager
 ./deploy-cert-manager.sh
