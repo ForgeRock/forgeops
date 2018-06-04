@@ -108,7 +108,7 @@ to disk performance.
 
 ## Initializing a DS cluster from a previous backup (experimental)
 
-Backups to gcs are placed in the a directory structure that looks like this:
+Backups to GCS are placed in the a directory structure that looks like this:
 
 `gs://backup-bucket/backup-root/{namespace}/{instance}/yy/mm/dd/`
 
@@ -118,7 +118,7 @@ For example:
 
 Where 'sandbox' is the namespace name, and 'userstore' is the instance.
 
-The restore script will recurse through the `yy/mm/dd` to find the most recent backup. Within each day folder, there is a full backup and a a number of incrementals. The restore will restore the most recent incremental and full backup for that day.
+The restore script will recurse through the `yy/mm/dd` directory to find the most recent backup. Within each day's direrectory there is a full backup and a a number of incremental backups. The restore operation will restore the most recent incremental and full backup for that day.
 
 To recover this backup to a new instance, perform the following procedure:
 
@@ -130,7 +130,7 @@ For example, if your namespace is `test` you can do the following:
 
 ### Prepare your custom.yaml
 
-The custom.yaml for your new cluster will enable gcs restore parameters, and point at your restore bucket from above. For example:
+The custom.yaml file for your new cluster will enable GCS restore parameters, and point at your restore bucket from above. For example:
 
 ```yaml
 restore:
@@ -143,19 +143,18 @@ gcs:
   restoreBucket: gs://forgeops/dj-backup/10m
 ```
 
-Note that the `namespace` and `instance-name` are calculated, are *not* part of the restoreBucket path.
+Note that the `namespace` and `instance-name` are calculated, and are *not* part of the restoreBucket path.
 
 ### Install your helm chart
 
-Using the above custom.yaml (note that additional parameters may be required - the sample above shows only
-the restore features), install your helm opendj chart. You should see the init containers run for `gcs`, `restore` and `setup`, before the final DS container runs. Using kubectl logs, you can view the output. For example:
+Using the above custom.yaml file, install your helm opendj chart. Note that additional parameters may be required - the sample above shows only the restore features. You should see the init containers run for `gcs`, `restore` and `setup`, before the final DS container runs. Using kubectl logs, you can view the output. For example:
 
 `kubectl logs userstore-0 -c gcs -f`
 
-Repeat the above for the restore and setup init containers. 
+Repeat the above for the restore and setup init containers.
 
 ### Troubleshooting
 
-If the gcs init container can not restore the contents to the bak/ folder, the path is incorrect, or your cluster does not have sufficient priviliege to read/write to a gcs storage bucket. Refer to the GKE documentation for more information. A possible quick fix is to create your cluster using:
+If the gcs init container can not restore the contents to the bak/ folder, the path is incorrect, or your cluster does not have sufficient priviliege to read/write to a GCS storage bucket. Refer to the GKE documentation for more information. A possible quick fix is to create your cluster using:
 
  `--scopes "https://www.googleapis.com/auth/cloud-platform"`
