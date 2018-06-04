@@ -51,7 +51,7 @@ if [[ $PROMETHEUS -eq 1 ]]; then
         PORT=9090
     fi
 
-    kubectl port-forward  prometheus-${NAMESPACE}-kube-prometheus-prometheus-0 $PORT:9090 --namespace=$NAMESPACE
+    kubectl port-forward  prometheus-${NAMESPACE}-kube-prometheus-0 $PORT:9090 --namespace=$NAMESPACE
 fi
 
 echo "Incorrect usage: "
