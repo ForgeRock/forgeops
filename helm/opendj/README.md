@@ -122,7 +122,7 @@ The restore script will recurse through the `yy/mm/dd` to find the most recent b
 
 To recover this backup to a new instance, perform the following procedure:
 
-### Copy the data to a gcs location with the desired namespace.
+### Copy the data to a gcs location for the desired namespace
 
 For example, if your namespace is `test` you can do the following:
 
@@ -145,7 +145,7 @@ gcs:
 
 Note that the `namespace` and `instance-name` are calculated, are *not* part of the restoreBucket path.
 
-### Install your helm chart.
+### Install your helm chart
 
 Using the above custom.yaml (note that additional parameters may be required - the sample above shows only
 the restore features), install your helm opendj chart. You should see the init containers run for `gcs`, `restore` and `setup`, before the final DS container runs. Using kubectl logs, you can view the output. For example:
@@ -154,7 +154,7 @@ the restore features), install your helm opendj chart. You should see the init c
 
 Repeat the above for the restore and setup init containers. 
 
-### Troublehshooting
+### Troubleshooting
 
 If the gcs init container can not restore the contents to the bak/ folder, the path is incorrect, or your cluster does not have sufficient priviliege to read/write to a gcs storage bucket. Refer to the GKE documentation for more information. A possible quick fix is to create your cluster using:
 
