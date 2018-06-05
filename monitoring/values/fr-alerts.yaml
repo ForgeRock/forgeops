@@ -5,10 +5,10 @@ prometheusRules:
     - name: fr.rules
       rules:
       - alert: ds_disk_free_space_bytes
-        expr: ds_disk_free_space_bytes > 10000
-        for: 1m
+        expr: ds_disk_free_space_bytes < 5000000000
+        for: 5m
         labels:
           severity: warning
         annotations:
-          description: "Disk space running low. Please free up space"
-          summary: "Disk space running low"
+          description: "Free disk space below 5GB, please free up some space now"
+          summary: "Free disk space running low"
