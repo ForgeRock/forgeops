@@ -18,6 +18,19 @@ ds-privilege-name: subentry-write
 ds-privilege-name: update-schema
 ds-privilege-name: password-reset
 
+dn: uid=proxy,ou=admins,@BASE_DN@
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+cn: proxy
+sn: proxy
+uid: proxy
+givenName: proxy
+mail: proxy-user@forgerock.org
+userPassword: password
+ds-privilege-name: proxied-auth
+
 dn: uid=openidm,ou=admins,@BASE_DN@
 objectclass: top
 objectclass: person

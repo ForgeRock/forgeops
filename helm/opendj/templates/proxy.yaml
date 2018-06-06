@@ -1,16 +1,17 @@
 # Copyright (c) 2016-2018 ForgeRock AS. All rights reserved
 {{ if .Values.proxy.enabled }}
+# ds proxy - current experimental
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{  .Values.djInstance }}-proxy
 spec:
-  replicas: {{default 1 .Values.openamReplicaCount }}
+  replicas: {{ .Values.proxy.replicas }}
   template:
     metadata:
       labels:
-        app: {{ template "name" . }}
-        component: {{ .Values.component }}
+        app: {{ template "name" . }}-proxy
+        component: proxy
         vendor: forgerock
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
@@ -29,16 +30,41 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: BOOTSTRAP_TYPE
-          value: "proxy"
         volumeMounts:
         - name: dj-secrets
           mountPath: /var/run/secrets/opendj
-        args:  ["setup"]
+        args:  ["proxy"]
       volumes:
       - name: dj-secrets
         secret:
           secretName: {{ .Values.djInstance }}
       - name: logs
         emptyDir: {}
-    {{ end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.djInstance }}-proxy
+  labels:
+    app: {{ .Values.djInstance }}
+    component: {{ .Values.component }}
+    vendor: forgerock
+    heritage: {{ .Release.Service }}
+spec:
+  ports:
+    - port: 1389
+      name: ldap
+      targetPort: 1389
+    - port: 4444
+      name: djadmin
+      targetPort: 4444
+    - port: 1636
+      name: ldaps
+      targetPort: 1636
+    - port: 8081
+      protocol: TCP
+      name: prometheus
+  selector:
+    app: {{ template "name" . }}-proxy
+    release: {{ .Release.Name }}
+{{ end }}
