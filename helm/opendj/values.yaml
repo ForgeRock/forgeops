@@ -120,11 +120,12 @@ restore:
   # The most recent backup will be restored. 
   enabled: false
  
+# DS proxy - experimental.
 proxy:
   enabled: false
 
 haproxy:
-  enabled: true
+  enabled: false
   replicas: 1
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
