@@ -27,9 +27,15 @@ class AMRestAuthNSim extends Simulation {
     val random = new util.Random
 
     val userFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(
-    """X-OpenAM-Username""" -> ("""user.""" + random.nextInt(userPoolSize).toString),
-    """X-OpenAM-Password""" -> "password")
+    """username""" -> ("""user.""" + random.nextInt(userPoolSize).toString),
+    """password""" -> "password")
     )
+
+    def getXOpenAMHeaders(username: String, password: String): scala.collection.immutable.Map[String, String] = {
+        scala.collection.immutable.Map(
+            "X-OpenAM-Username" -> username,
+            "X-OpenAM-Password" -> password)
+    }
 
     val httpProtocol: HttpProtocolBuilder = http
         .baseURLs(amUrl)
@@ -39,10 +45,11 @@ class AMRestAuthNSim extends Simulation {
 
     val loginScenario: ScenarioBuilder = scenario("Rest login")
         .during(duration) {
-            exec(http("Rest login")
+            feed(userFeeder)
+            .exec(http("Rest login")
                 .post("/openam/json/authenticate")
                 .disableUrlEncoding
-                .headers(userFeeder.next()))
+                .headers(getXOpenAMHeaders("${username}", "${password}")))
         }
 
     setUp(loginScenario.inject(rampUsers(concurrency) over warmup)).protocols(httpProtocol)
