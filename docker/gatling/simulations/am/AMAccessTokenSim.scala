@@ -39,9 +39,15 @@ class AMAccessTokenSim extends Simulation {
     val random = new util.Random
 
     val userFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(
-        """X-OpenAM-Username""" -> ("""user.""" + random.nextInt(userPoolSize).toString),
-        """X-OpenAM-Password""" -> "password")
+        """username""" -> ("""user.""" + random.nextInt(userPoolSize).toString),
+        """password""" -> "password")
     )
+
+    def getXOpenAMHeaders(username: String, password: String): scala.collection.immutable.Map[String, String] = {
+        scala.collection.immutable.Map(
+            "X-OpenAM-Username" -> username,
+            "X-OpenAM-Password" -> password)
+    }
 
     val httpProtocol: HttpProtocolBuilder = http
         .baseURLs(amUrl)
@@ -50,12 +56,13 @@ class AMAccessTokenSim extends Simulation {
 
     val accessTokenScenario: ScenarioBuilder = scenario("OAuth2 Auth code flow")
         .during(duration) {
-            exec(
+            feed(userFeeder)
+            .exec(
                 http("Rest login stage")
                     .post("/openam/json/authenticate")
                     .disableUrlEncoding
                     .header("Content-Type", "application/json")
-                    .headers(userFeeder.next())
+                    .headers(getXOpenAMHeaders("${username}", "${password}"))
                     .check(jsonPath("$.tokenId").find.saveAs(tokenVarName))
             ).exec(
                 addCookie(Cookie("iPlanetDirectoryPro", _.get(tokenVarName).as[String]))
