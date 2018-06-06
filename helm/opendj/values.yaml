@@ -49,9 +49,10 @@ backup:
   enabled: false
   storageClass: "nfs"
   storageSize: "20Gi"
-  # If you provide the name of a backup PVC, the default bak-$instance will NOT be created, and this
+  # If you provide the name of a backup PVC, the default bak-$instance will NOT be created, and
   # the named pvc will be used as the shared backup volume. This can be used to re-attach 
   # a previous backup pvc - assuming it was not deleted.
+  # for example, to reuse the previous volume  pvcName: userstore-bak
   #pvcName: 
   # Backup schedule. The first backup is a full, subsequent backups are incremental
   # Format is crontab: minutes hour day-of-month month day-of-week
@@ -122,11 +123,17 @@ restore:
 proxy:
   enabled: false
 
+haproxy:
+  enabled: true
+  replicas: 1
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"
 slackUrl: undefined
 
+# Uncomment if you want to run an additional "admin" ds pod that you can exec into and run DS commands.
+# Useful for debugging.
+#adminContainer: true
 
 # Pinned gcloud Image. You should not need to change this very often
 gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b

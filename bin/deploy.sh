@@ -17,7 +17,7 @@ usage()
     echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
     echo "-e extra env.sh that will be sourced to set environment variables."
-    echo "-n set the namespace. Values in env.sh will override this."
+    echo "-n set the namespace. Override values in env.sh."
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
@@ -33,7 +33,7 @@ parse_args()
             e ) ENV_SH="${OPTARG}" ;;
             R ) RMALL=true ;;
             d ) DRYRUN="echo " ;;
-            n ) NAMESPACE="${OPTARG}" ;;
+            n ) OPT_NAMESPACE="${OPTARG}" ;;
             \? ) usage ;;
         esac
     done
@@ -71,6 +71,11 @@ chk_config()
             echo "=> Reading ${ENV_SH}"
             source "${ENV_SH}"
         fi
+    fi
+
+    # Allow overriding namespace 
+    if [ ! -z "$OPT_NAMESPACE" ]; then
+        NAMESPACE="$OPT_NAMESPACE" 
     fi
 
     if [ -z "${NAMESPACE}" ]; then

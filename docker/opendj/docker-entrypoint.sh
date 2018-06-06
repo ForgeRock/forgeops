@@ -72,6 +72,12 @@ start() {
     exec tini -v -- ./bin/start-ds --nodetach
 }
 
+pause() {
+    while true; do
+        sleep 1000
+    done
+}
+
 # Restore from a backup
 restore() {
        if [ -d ./data/db ] ; then
@@ -131,6 +137,9 @@ backup)
 proxy)
     bootstrap/setup-proxy.sh
     start
+    ;;
+pause) 
+    pause
     ;;
 *)
     exec "$@"

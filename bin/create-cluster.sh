@@ -32,7 +32,7 @@ echo ""
 echo "=> Creating cluster called \"$GKE_CLUSTER_NAME\" with specs \"$GKE_MACHINE_TYPE\""
 echo ""
 
-MAX_NODES=`expr $GKE_CLUSTER_SIZE + 1`
+MAX_NODES=`expr $GKE_CLUSTER_SIZE + 2`
 
 OPTS=""
 
@@ -46,6 +46,8 @@ fi
 
 # scopes are required for gcs storage backup and cloud sql
 
+# stackdriver beta is not really stable right now.
+#       --enable-stackdriver-kubernetes \
 
 gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --project=$GKE_PROJECT_NAME \
@@ -54,7 +56,7 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --machine-type="$GKE_MACHINE_TYPE" \
       --min-cpu-platform="Intel Skylake" \
       --image-type=COS \
-      --disk-size=60 \
+      --disk-size=80 \
       --network=default \
       --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
@@ -62,10 +64,10 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --labels=owner=sre \
       --addons=HorizontalPodAutoscaling \
       --enable-autoscaling \
-      --enable-stackdriver-kubernetes \
       --enable-autoupgrade \
       --enable-autorepair \
       --scopes "https://www.googleapis.com/auth/cloud-platform" \
+      --enable-cloud-logging --enable-cloud-monitoring \
       --disk-type=pd-ssd $OPTS
 
 

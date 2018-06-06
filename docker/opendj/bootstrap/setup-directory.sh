@@ -120,8 +120,6 @@ bin/dsconfig  set-backend-prop \
     --no-prompt
 
 
-
-
 # Load any optional LDIF files. $1 is the directory to load from
 load_ldif() {
 
@@ -139,6 +137,7 @@ load_ldif() {
                 -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
 
             #cat /tmp/file.ldif
+            echo bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
             bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -j ${DIR_MANAGER_PW_FILE} -f /tmp/file.ldif
             # Note that currently these ldif files must be added with ldapmodify.
             #bin/import-ldif --offline -n userRoot -l /tmp/file.ldif --rejectFile /tmp/rejects.ldif
