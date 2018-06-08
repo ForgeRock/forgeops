@@ -28,8 +28,8 @@ restore:
 
 runPostSetupJob: false
 
-#replicas: 2
+replicas: 2
 
-#topologyKey: "failure-domain.beta.kubernetes.io/zone"
+topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
 #slackUrl: undefined

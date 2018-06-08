@@ -6,6 +6,6 @@ resources:
   requests:
     memory: 1Gi
 
-#replicas: 2
+replicas: 2
 
-#topologyKey: "failure-domain.beta.kubernetes.io/zone"
+topologyKey: "failure-domain.beta.kubernetes.io/zone"
