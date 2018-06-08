@@ -17,7 +17,7 @@ class AMConfig(object):
         try:
             self.am_url = os.environ['AM_URL']
         except KeyError:
-            self.am_url = 'http://openam.pavel.forgeops.com/openam'
+            self.am_url = 'http://openam.example.forgeops.com/openam'
 
         try:
             self.amadmin_pwd = os.environ['AM_ADMIN_PWD']
@@ -33,7 +33,7 @@ class IDMConfig(object):
         try:
             self.idm_url = os.environ['IDM_URL']
         except KeyError:
-            self.idm_url = 'http://openidm.pavel.forgeops.com/openidm'
+            self.idm_url = 'http://openidm.example.forgeops.com/openidm'
 
         try:
             self.idm_admin_username = os.environ['IDM_ADMIN_USERNAME']
@@ -64,4 +64,4 @@ class IGConfig(object):
         try:
             self.ig_url = os.environ['IG_URL']
         except KeyError:
-            self.ig_url = 'http://openig.pavel.forgeops.com/'
+            self.ig_url = 'http://openig.example.forgeops.com/'
