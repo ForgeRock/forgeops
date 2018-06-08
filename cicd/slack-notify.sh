@@ -37,23 +37,23 @@ fi
 
 JSON_SLACK=$(cat <<EOF
 {
-	"mrkdwn": true,
-    "text": "*${TEST_NAME} results*",
-    "attachments": [
-      {
-        "text": "$(cat ${TEST_RESULTS_FILE})"
-      },
-  		{
-  			"color": "good",
-  			"text": "Last commit by: $(cat ${LAST_COMMIT_FILE})"
-  		},
-  		{
-  			"color": "good",
-  			"text": "Link to report: ${TEST_REPORT_LINK}"
-  		}
-    ]
+  "mrkdwn": true,
+  "text": "*${TEST_NAME} results*",
+  "attachments": [
+    {
+      "text": "$(cat ${TEST_RESULTS_FILE})"
+    },
+		{
+			"color": "good",
+			"text": "Last commit by: $(cat ${LAST_COMMIT_FILE})"
+		},
+		{
+			"color": "good",
+			"text": "Link to report: ${TEST_REPORT_LINK}"
+		}
+  ]
 }
 EOF
 )
 
-curl --data-urlencode "payload=${JSON_SLACK}" $SLACK_SERVICE
+curl --data-urlencode "payload=${JSON_SLACK}" ${SLACK_SERVICE}
