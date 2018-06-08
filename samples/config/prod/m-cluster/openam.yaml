@@ -12,4 +12,4 @@ catalinaOpts: >
   -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails
   -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log
 
-#openamReplicaCount: 2
+openamReplicaCount: 2
