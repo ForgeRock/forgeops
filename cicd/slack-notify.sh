@@ -3,10 +3,10 @@
 # Helper script to compose slack notification with test results
 #
 # Required vars
-# - SLACK_SERVICE:
-# - TEST_NAME
-# - TEST_RESULTS_FILE: (PASS/FAIL)
-# - LAST_COMMIT_FILE: Username of last user that merged code into master
+# - SLACK_SERVICE - Webhook URL for slack notification
+# - TEST_NAME - Name of test suite
+# - TEST_RESULTS_FILE: Standart output of test run
+# - LAST_COMMIT_FILE: File with last commit username
 # Optional vars
 # - TEST_REPORT_LINK: URL to tests
 

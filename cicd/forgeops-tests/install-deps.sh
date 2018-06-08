@@ -3,7 +3,6 @@
 # your local copy.
 #
 # Otherwise this will be taken care by docker image
-#
 
 pip3 install requests
 pip3 install html-testRunner
