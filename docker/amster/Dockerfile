@@ -10,7 +10,7 @@ COPY *.zip /opt/forgerock
 
 COPY *.sh /opt/amster/
 # put these in the path as well - for convenience.
-COPY *.sh /usr/local/bin
+COPY *.sh /usr/local/bin/
 
 # git is added to the container so we can optionally execute git commit, git push, etc.
 RUN unzip -q /opt/forgerock/amster.zip -d /opt/amster \
