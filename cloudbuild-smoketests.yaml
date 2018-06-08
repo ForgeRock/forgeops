@@ -15,10 +15,10 @@ steps:
 
 # Build smoke tests docker image
 - name: 'gcr.io/cloud-builders/docker'
-  dir: 'cicd/tests'
+  dir: 'cicd/forgeops-tests'
   args: [
           'build',
-          '-t', 'gcr.io/$PROJECT_ID/smoke-test:latest',
+          '-t', 'gcr.io/$PROJECT_ID/forgeops-tests:latest',
           '.'
         ]
 
@@ -27,22 +27,37 @@ steps:
   entrypoint: 'bin/deploy.sh'
   args: ['samples/config/smoke-deployment']
 
-# In case there are problems with accessing ingress, allow this to run.
-#- name: 'gcr.io/engineering-devops/helm'
-#  id: HOSTS
-#  entrypoint: 'cicd/tests/modify-hosts.sh'
-#  args: ['samples/config/smoke-deployment']
-
 # Run custom smoke test image built in previous step
-- name: 'gcr.io/$PROJECT_ID/smoke-test:latest'
-  dir: '/tmp'
+- name: 'gcr.io/$PROJECT_ID/forgeops-tests:latest'
+  dir: 'cicd/forgeops-tests/'
   env:
   - 'IDM_URL=http://openidm.smoke.forgeops.com/openidm'
   - 'IDM_ADMIN_PWD=openidm-admin'
   - 'IG_URL=http://openig.smoke.forgeops.com/'
   - 'AM_URL=http://openam.smoke.forgeops.com/openam'
   - 'AM_ADMIN_PWD=password'
-  entrypoint: '/tmp/run-full-smoke.sh'
+  entrypoint: 'bash'
+  args: ['run-smoke-tests.sh']
+
+# Get last username who merged changes into master
+- name: 'gcr.io/cloud-builders/git'
+  dir: cicd/
+  entrypoint: 'bash'
+  args: ['last-commit.sh']
+
+# Send slack notifications
+# Don't forget to define SLACK_SERVICE in google container builder to receive
+# notifications on slack channel
+- name: 'gcr.io/cloud-builders/curl'
+  env:
+  #- 'SLACK_SERVICE=
+  - 'TEST_NAME=Forgeops smoke tests'
+  - 'TEST_REPORT_LINK=http://one.day.there.will.be/results'
+  - 'TEST_RESULTS_FILE=forgeops-tests/results.txt'
+  - 'LAST_COMMIT_FILE=uname-lastcommit.txt'
+  dir: 'cicd/'
+  entrypoint: 'bash'
+  args: ['slack-notify.sh']
 
 # Clean it up
 - name: 'gcr.io/engineering-devops/helm'
