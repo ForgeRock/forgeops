@@ -50,7 +50,7 @@ steps:
 # notifications on slack channel
 - name: 'gcr.io/cloud-builders/curl'
   env:
-  #- 'SLACK_SERVICE=
+  - 'SLACK_SERVICE=${_SLACK_SERVICE}'
   - 'TEST_NAME=Forgeops smoke tests'
   - 'TEST_REPORT_LINK=http://one.day.there.will.be/results'
   - 'TEST_RESULTS_FILE=forgeops-tests/results.txt'
