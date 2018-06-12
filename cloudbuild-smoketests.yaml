@@ -44,6 +44,7 @@ steps:
   dir: cicd/
   entrypoint: 'bash'
   args: ['last-commit.sh']
+  
 # Upload results to GS bucket
 - name: 'gcr.io/cloud-builders/gsutil'
   dir: 'cicd/forgeops-tests/reports'
