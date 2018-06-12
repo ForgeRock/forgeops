@@ -33,5 +33,12 @@ ig:
   labelSelectorComponent: openig
   secretUser: b3BlbmlkbS1hZG1pbg==
   secretPassword: b3BlbmlkbS1hZG1pbg==
+  
+grafanaDashboards:
+  importJobName: import-dashboards
+  image: gcr.io/engineering-devops/grafana/auto-import:v1
+  pullPolicy: Always
+  
+
 
 
