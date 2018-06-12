@@ -1,13 +1,13 @@
 # Auto Importing of Grafana Dashboards
 
 This readme describes the contents of this folder along with instructions to rebuild the auto-upload  
-container image and change the dashboards.
+container image and changing the core dashboards.
 
 ## Directory Contents
-* **dashboards/** exported Grafana dashboard json files to be used as part of the auto import function.
+* **dashboards/** exported Grafana dashboard json files to be used as part of the auto import job.
 * **processed-dashboards/** Grafana dashboard files that have been taken from the dashboards/ directory and  
-and formatted for importing.
-* **Dockerfile** use to create the container image used in the kubernetes job for the auto import.
+and formatted ready for importing.
+* **Dockerfile** used to create the container image used in the Kubernetes job for the auto import.
 * **import-dashboards.sh** script executed in the above container image to carry out the formatting and import.
 * **README.md** 
 
@@ -26,5 +26,12 @@ These instructions are for Google Container Registry:
 * gcloud docker -- push gcr.io/engineering-devops/grafana/auto-import:\<version\> .
 
 ## Dashboard files
+The dashboard files that are included in the dashboards/ folder are taken from the released ForgeRock 6.0.0  
+sample dashboards provided in the ForgeRock Download Center.  
+
+Additional dashboards can be imported, after deployment, via the Grafana GUI.  
+
+Any updates or additions to these core dashboards will require new dashboards added to the dashboards/ folder  
+and a new auto-import image built using the instructions in the previous section.
 
 
