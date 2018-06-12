@@ -44,6 +44,10 @@ steps:
   dir: cicd/
   entrypoint: 'bash'
   args: ['last-commit.sh']
+# Upload results to GS bucket
+- name: 'gcr.io/cloud-builders/gsutil'
+  dir: 'cicd/forgeops-tests/reports'
+  args: ['cp', '*', 'gs://forgeops-test-reports/smoke-tests/']
 
 # Send slack notifications
 # Don't forget to define SLACK_SERVICE in google container builder to receive
