@@ -57,7 +57,7 @@ steps:
   env:
   - 'SLACK_SERVICE=${_SLACK_SERVICE}'
   - 'TEST_NAME=Forgeops smoke tests'
-  - 'TEST_REPORT_LINK=http://reports.forgeops.com/smoke-tests/'
+  - 'TEST_REPORT_LINK=http://results.forgeops.com/smoke-tests/'
   - 'TEST_RESULTS_FILE=forgeops-tests/results.txt'
   - 'LAST_COMMIT_FILE=uname-lastcommit.txt'
   dir: 'cicd/'
