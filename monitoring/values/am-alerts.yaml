@@ -1,14 +1,50 @@
-# default rules are in templates/general.rules.yaml
 prometheusRules: 
   am.rules: |-
     groups:
     - name: am.rules
       rules:
-      - alert: ds_disk_free_space_bytes
-        expr: ds_disk_free_space_bytes < 5000000000
-        for: 5m
+      - alert: am_authentication_count
+        expr: sum(increase(am_authentication_count{job=~"$instance",outcome="failure"} > 20%
+        for: 1m
         labels:
           severity: warning
         annotations:
-          description: "Free disk space below 5GB, please free up some space now"
-          summary: "Free disk space running low"
+          description: "Total Failed AuthN"
+      - alert: am_cts_task_seconds_total
+        expr: sum by (job) (rate(am_cts_task_seconds_total{job=~"$instance"}[90s])) / sum by (job) (rate(am_cts_task_count{job=~"$instance"}[90s])) > 10ms
+        labels:
+          severity: warning
+        annotations:
+          description: "Average Task Service Time"
+      - alert: am_cts_reaper_cache_size
+        expr: am_cts_reaper_cache_size > org.forgerock.services.cts.reaper.cache.size
+        labels:
+          severity: warning
+        annotations:
+          description: "CTS Reaper Cache Size"
+      - alert: am_cts_reaper_search_second
+        expr: am_cts_reaper_search_second > 25 ms
+        labels:
+          severity: warning
+        annotations:
+          description: "CTS Overall Average search service time"
+      - alert: am_cts_reaper_deletion_total
+        expr: irate(am_cts_reaper_deletion_total{reaper_type=~"search",outcome=~"$outcome"}[1m]) > 0
+        labels:
+          severity: warning
+        annotations:
+          description: "CTS Search based Deletion Throughput" 
+      - alert: am_cts_task_count
+        expr: “rate(am_cts_task_count{job=~"$instance",token_type=~"$token_type",operation=~"$operation",outcome=~"failure"}[5m])” > 0
+        labels:
+          severity: warning
+        annotations:
+          description: "CTS Delete task throughput failure"
+      - alert: am_cts_task_queue_seconds_total
+        expr: sum by (job) (irate(am_cts_task_queue_seconds_total{job=~"$instance"}[1m])) / sum by (job) (irate(am_cts_task_queue_count{job=~"$instance"}[1m])) > 10ms
+        labels:
+          severity: warning
+        annotations:
+          description: "CTS Average Task Queueing Time"    
+      
+          

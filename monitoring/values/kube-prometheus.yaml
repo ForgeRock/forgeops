@@ -26,12 +26,26 @@ alertmanager:
       resolve_timeout: 5m
       slack_api_url: 'https://hooks.slack.com/services/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'
     route:
-      group_by: ['alertname']
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 4h
-      receiver: 'slack-notifications'        
-        
+      group_by: [alertname]
+      #group_wait: 30s
+      #group_interval: 5m
+      #repeat_interval: 4h
+      receiver: 'slack-notifications'
+      routes:
+      - match:
+          alertname: DeadMansSwitch
+      #    alertname: K8SNodeNotReady
+      #    alertname: NodeDiskRunningFull
+      #    alertname: K8SApiserverDown
+      #    alertname: K8SKubeletDown
+      #    alertname: PrometheusConfigReloadFailed
+      #    alertname: PrometheusErrorSendingAlerts
+      #    alertname: PodFrequentlyRestarting
+      #    alertname: AlertmanagerFailedReload
+      #    alertname: AlertmanagerDownOrMissing
+      #    alertname: AlertmanagerConfigInconsistent
+        receiver: 'slack-notifications'
+      
     receivers:
     - name: 'slack-notifications'
       slack_configs:
