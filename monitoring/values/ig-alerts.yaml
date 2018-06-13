@@ -1,10 +1,10 @@
 # default rules are in templates/general.rules.yaml
 prometheusRules: 
-  fr.rules: |-
+  ig.rules: |-
     groups:
-    - name: fr.rules
+    - name: ig.rules
       rules:
-      - alert: ds_disk_free_space_bytes
+      - alert: ds_disk_free_space_byte_4
         expr: ds_disk_free_space_bytes < 5000000000
         for: 5m
         labels:
