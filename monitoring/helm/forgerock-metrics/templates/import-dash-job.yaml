@@ -12,4 +12,13 @@ spec:
       - name: {{ .Values.grafanaDashboards.importJobName }}
         image:  {{ .Values.grafanaDashboards.image }}
         imagePullPolicy: {{ .Values.grafanaDashboards.pullPolicy }}
+        volumeMounts:
+        - name: dashboard-files
+          mountPath: /dashboards
       restartPolicy: Never
+      volumes:
+      - name: dashboard-files
+        configMap:
+          name: dashboards
+      - name: dashboards
+        emptyDir: {}

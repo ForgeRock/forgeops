@@ -6,8 +6,9 @@ The deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operator
 * deploy scripts to:
     * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
     * connect to the Prometheus and Grafana endpoints.
-* forgerock-servicemonitors Helm chart that provides configurable ServiceMonitors.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
+* forgerock-metrics Helm chart that provides configurable ServiceMonitors and a job to automatically import Grafana dashboards for ForgeRock products.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
 * values files that are used by the deploy script and can be edited to customize the configuration of Prometheus, Grafana and Alert Manager.
+* auto-import folder which provides a Dockerfile for producing the docker image used by the import-dashboards job.
 
 <br />
 
