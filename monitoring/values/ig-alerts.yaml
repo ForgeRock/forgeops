@@ -1,4 +1,3 @@
-# default rules are in templates/general.rules.yaml
 prometheusRules: 
   ig.rules: |-
     groups:
