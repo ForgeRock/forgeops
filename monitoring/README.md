@@ -2,6 +2,8 @@
 
 The deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
 
+Alertmanager docs: [Alertmanager](https://prometheus.io/docs/alerting/configuration/).
+
 **The monitoring folder contains the following artifacts:**
 * deploy scripts to:
     * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
@@ -32,7 +34,19 @@ Dashboards for ForgeRock products are imported into Grafana after Grafana has be
 
 <br />
 
-# Deployment Instructions
+# How Alertmanager works
+Alertmanager is used to redirect specific alerts from Prometheus to configured receivers.  
+To configure Alertmanager, there is an Alertmanager configuration section in values/kube-prometheus.yaml.  
+Details about how Alertmanager works can be found in the link at the top of the page.  
+In summary:
+* global section defines attributes that apply to all alerts.
+* route section defines a tree topology of alerts filters to direct particular alerts to a specific receiver.  
+Currently we're sending all alerts to a Slack receiver.
+* receivers section defines named configurations of notification integrations.
+
+Prometheus alerts are configured within the prometheusRules section of the values/kube-prometheus.yaml.  This section has been overriden by the values/fr-alerts.yaml file so all alerts can be configured separately there.
+
+# Deployment instructions
 ### Pre-requisites
 * Deployed ForgeRock application in Google Cloud cluster.
 * Kubectl authenticated to cluster.
