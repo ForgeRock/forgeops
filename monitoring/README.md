@@ -45,7 +45,8 @@ In summary:
 Currently we're sending all alerts to a Slack receiver.
 * receivers section defines named configurations of notification integrations.
 
-Prometheus alerts are configured within the prometheusRules section of the values/kube-prometheus.yaml.  This section has been overriden by the values/fr-alerts.yaml file so all alerts can be configured separately there.
+Prometheus alerts are configured, by product, in the values/*\<product\>*-alerts.yaml files.  
+These files override the prometheusRules section in the kube-prometheus.yaml file.
 
 # Deployment instructions
 ### Pre-requisites

@@ -1,0 +1,14 @@
+# default rules are in templates/general.rules.yaml
+prometheusRules: 
+  ds.rules: |-
+    groups:
+    - name: ds.rules
+      rules:
+      - alert: ds_disk_free_space_bytes_2
+        expr: ds_disk_free_space_bytes < 8000000000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          description: "Free disk space below 5GB, please free up some space now"
+          summary: "Free disk space running low"

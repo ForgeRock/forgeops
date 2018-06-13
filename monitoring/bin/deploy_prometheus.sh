@@ -41,7 +41,8 @@ helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
 helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values values/prometheus-operator.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade kube-prometheus
-helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f values/kube-prometheus.yaml,values/fr-alerts.yaml --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true \
+    -f values/kube-prometheus.yaml,values/am-alerts.yaml,values/ds-alerts.yaml,values/idm-alerts.yaml,values/ig-alerts.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade forgerock-metrics
 helm upgrade -i ${NAMESPACE}-forgerock-metrics helm/forgerock-metrics/ --values helm/${FILE} --set=rbac.install=true --namespace=$NAMESPACE
