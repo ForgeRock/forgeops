@@ -17,7 +17,7 @@ spec:
           medium: Memory
       initContainers:
         - name: setup
-          image:  forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:latest
+          image:  {{ .Values.images.dj }}
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: db
@@ -27,7 +27,7 @@ spec:
             value: "dc=example,dc=com"
           args: [ "setup" ]
       containers:
-        - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:latest
+        - image: {{ .Values.images.dj }}
           imagePullPolicy: IfNotPresent
           args: [ "start" ]
           name: opendj

@@ -10,7 +10,7 @@ spec:
     imagePullPolicy: IfNotPresent
     args: [ "wait", "am-service", "80" ]
   containers:
-    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
+    - image: {{ .Values.images.amster }}
       imagePullPolicy: IfNotPresent
       name: amster
       env:

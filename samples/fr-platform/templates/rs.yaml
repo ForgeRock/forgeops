@@ -8,7 +8,7 @@ metadata:
 spec:
   initContainers:
   - name: wait-for-well-known
-    image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest
+    image: {{ .Values.images.rs }}
     imagePullPolicy: IfNotPresent
     resources:
         requests:
@@ -19,7 +19,7 @@ spec:
     command:
     - /wellKnownCheck.sh
   containers:
-    - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest
+    - image: {{ .Values.images.rs }}
       imagePullPolicy: IfNotPresent
       name: rs
       ports:

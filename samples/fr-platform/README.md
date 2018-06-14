@@ -25,14 +25,25 @@ If you don't want to use Facebook, the default values of "FakeID" and "FakeSecre
 
 ## Quick Start
 
-1. If you have Helm installed and you have kubectl setup to work with your Kubernetes cluster, then you can get started very quickly with these commands:
+0. *(Optional, for local use)* If you do not have kubectl and helm already configured, you can initialize them in your local environment like so:
 ```
+minikube start --insecure-registry 10.0.0.0/24 --memory 4096
+minikube addons enable ingress
+eval $(minikube docker-env)
+kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
+kubectl config use-context sample-context
+minikube ssh "sudo ip link set docker0 promisc on"
 helm init --wait
+```
+
+1. With Helm installed and kubectl setup to work with your Kubernetes cluster (either local or remote), then you can get started very quickly with these commands:
+```
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts
 helm install forgerock/fr-platform -n sample-fr-platform \
   --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
   --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
 ```
+
 
 2. You need to add the ingress IP to your local hosts. First, remove any old entry with this command:
 ```
@@ -75,20 +86,20 @@ http://client-service.sample.svc.cluster.local
 helm delete --purge sample-fr-platform
 ```
 
-## Building and Running locally
+## Local Kubernetes and Helm setup
 
-To start the project locally, you need at least a 4gb node. The best option is to use minikube, like so:
+To start the project locally, you need at least a 4gb minikube node. Setup your local node using the instructions provided in the *(Optional, for local use)* step above.
 
-    minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-    minikube addons enable ingress
-    eval $(minikube docker-env)
-    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
-    kubectl config use-context sample-context
-    minikube ssh "sudo ip link set docker0 promisc on"
+The best option for making changes to the sample is to use the "skaffold" tool, available here: https://github.com/GoogleContainerTools/skaffold
+Once it is installed and your minikube environment is ready, you can start the whole sample with one command:
 
-### Building the Docker images and helm package
+    skaffold dev
 
-In order to copy and paste the below commands, you will need make sure your working folder is correct. You should be in the same folder as this README file (forgeops/sample-platform).
+This will build the docker images and incorporate them into the helm templates, followed by managing the release of the chart. Any changes made to the configuration files for each docker image will be watched by skaffold, and will result in an automatic rebuild of the image followed by a redeployment into the cluster.
+
+### Manually building the Docker images and helm package
+
+When you are done making changes to the base configuration, you can create final docker images and helm packages with the below commands.
 
 Build the Docker images for this sample:
 
@@ -100,14 +111,13 @@ Build the Docker images for this sample:
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest idm
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest pg
 
-Install the helm package:
+You can now push these to a docker registry, if that is needed.
 
-    helm init --wait
-    helm install . -n sample-fr-platform \
-      --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
-      --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
+Create the helm package:
 
-You can now follow the steps described in the "Quick Start" section, starting from (2).
+    helm package .
+
+You now have a file names something like fr-platform-6.5.0-SNAPSHOT.tgz that you can publish to a helm repositories. Afterwards you can follow the steps described in the "Quick Start" section, similar to what is shown in step 1.
 
 ## Connecting to your cluster
 
