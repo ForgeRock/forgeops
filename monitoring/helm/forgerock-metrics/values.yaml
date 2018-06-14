@@ -36,7 +36,7 @@ ig:
   
 grafanaDashboards:
   importJobName: import-dashboards
-  image: gcr.io/engineering-devops/grafana/auto-import:v1.1
+  image: forgerock-docker-public.bintray.io/forgerock/auto-import:1.0
   pullPolicy: Always
   
 
