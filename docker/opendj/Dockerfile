@@ -62,7 +62,7 @@ WORKDIR /opt/opendj
 
 # In the past we ran into https://github.com/kubernetes/kubernetes/issues/2630
 # Adding the forgerock user (11111) to the root group has solved the issue. This is the approach openshift uses.
-USER 11111
+#USER 11111
 
 EXPOSE 1389 636 4444 8989
 

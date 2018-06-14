@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.djInstance }}
+data:
+  BASE_DN: {{ .Values.baseDN }}
+  # example: configstore, cts, userstore. The instance is used to construct the FQDN of DJ.
+  DJ_INSTANCE: {{ .Values.djInstance }}
+  DS_SET_SIZE: "{{ .Values.replicas }}"
+  OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
+  BOOTSTRAP:  {{ .Values.bootstrapScript }}
+  SLACK_URL: {{ .Values.slackUrl }}

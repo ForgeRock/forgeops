@@ -8,7 +8,6 @@ URL="https://storage.googleapis.com/forgerock-charts"
 # Where our helm charts are located.
 hdir=`pwd`/helm
 
-
 # The previous build step downloaded Helm to our working directory. We need to unpack it.
 tar xvf helm.tar.gz
 
@@ -22,7 +21,7 @@ dir=/tmp/charts
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-charts="frconfig opendj amster openam openidm openig postgres-openidm cmp-platform web"
+charts="frconfig ds amster openam openidm openig postgres-openidm cmp-platform web"
 for chart in $charts
 do
     echo "Packaging $chart"
