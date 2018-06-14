@@ -11,7 +11,7 @@ spec:
         type: postgresql96
     spec:
       containers:
-        - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest
+        - image: {{ .Values.images.pg }}
           imagePullPolicy: IfNotPresent
           name: postgresql96
           ports:
