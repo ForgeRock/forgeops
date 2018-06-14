@@ -1,0 +1,78 @@
+# TODO: Currently the admin-backend.ldif does not use commons templating.
+dn: cn=all-servers,cn=Server Groups,cn=admin data
+changetype: modify
+replace: uniqueMember
+uniqueMember: &{fqdn.ds0}:4444
+uniqueMember: &{fqdn.ds1}:4444
+uniqueMember: &{fqdn.ds2}:4444
+
+dn: cn=dsrs1.example.com:1444,cn=Servers,cn=admin data
+changetype: modify
+replace: id
+id: &{fqdn.ds0}:4444
+-
+replace: adminport
+adminport: 4444
+-
+replace: hostname
+hostname: &{fqdn.ds0}
+-
+replace: cn
+cn: &{fqdn.ds0}
+-
+replace: ldapport
+ldapport: 1389
+-
+replace: ldapsport
+ldapsport: 1636
+
+
+dn: cn=dsrs2.example.com:2444,cn=Servers,cn=admin data
+changetype: modify
+replace: id
+id:  &{fqdn.ds1}:4444
+-
+replace: adminport
+adminport: 4444
+-
+replace: hostname
+hostname: &{fqdn.ds1}
+-
+replace: cn
+cn: &{fqdn.ds1}
+-
+replace: ldapport
+ldapport: 1389
+-
+replace: ldapsport
+ldapsport: 1636
+
+# Add extra third server entry
+dn: cn=dsrs3.example.com:4444,cn=Servers,cn=admin data
+changetype: add
+objectclass: top
+objectclass: ds-cfg-branch
+objectclass: extensibleobject
+hostname: &{fqdn.ds2}
+jmxport: -1
+id: &{fqdn.ds2}:4444
+ldapport: 1389
+ldapsport: 1636
+ldapsEnabled: true
+jmxEnabled: false
+adminport: 2444
+jmxsport: -1
+ldapEnabled: true
+startTLSEnabled: true
+adminEnabled: true
+jmxsEnabled: false
+cn: &{fqdn.ds2}:4444
+memberofgroups: all-servers
+#ds-cfg-key-id: 602D81D319A03E7C32B93976C495766C
+
+# todo: find out how to rename the RDN with a special character
+# dn: cn=dsrs1.example.com:1444,cn=Servers,cn=admin data
+# changetype: modrdn
+# newrdn: cn=\&{fqdn.ds0}:4444,cn=Servers,cn=admin data
+# changetype: modrdn
+# deleteoldrdn: 1

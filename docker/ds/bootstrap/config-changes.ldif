@@ -1,0 +1,98 @@
+dn: cn=config
+changetype: modify
+replace: ds-cfg-server-id
+ds-cfg-server-id: &{server.id}
+-
+
+dn: cn=DIGEST-MD5,cn=SASL Mechanisms,cn=config
+changetype: modify
+replace: ds-cfg-server-fqdn
+ds-cfg-server-fqdn: &{fqdn}
+-
+
+dn: ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.cts|true}
+-
+replace: ds-cfg-db-directory
+ds-cfg-db-directory: &{data.dir|db}
+
+dn: cn=o=cts,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.cts|true}
+-
+replace: ds-cfg-replication-server
+ds-cfg-replication-server: &{fqdn.rs0}
+ds-cfg-replication-server: &{fqdn.rs1}
+-
+
+dn: ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.userstore|true}
+-
+replace: ds-cfg-db-directory
+ds-cfg-db-directory: &{data.dir|db}
+
+
+dn: cn=o=userstore,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.userstore|true}
+-
+replace: ds-cfg-replication-server
+ds-cfg-replication-server: &{fqdn.rs0}
+ds-cfg-replication-server: &{fqdn.rs1}
+-
+
+dn: cn=cn=admin data,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-replication-server
+ds-cfg-replication-server: &{fqdn.rs0}
+ds-cfg-replication-server: &{fqdn.rs1}
+-
+
+dn: cn=cn=schema,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-replication-server
+ds-cfg-replication-server: &{fqdn.rs0}
+ds-cfg-replication-server: &{fqdn.rs1}
+
+dn: cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-replication-port
+ds-cfg-replication-port: 8989
+-
+replace: ds-cfg-replication-server
+ds-cfg-replication-server: &{fqdn.rs0}
+ds-cfg-replication-server: &{fqdn.rs1}
+-
+
+dn: cn=Administration Connector,cn=config
+changetype: modify
+replace: ds-cfg-listen-port
+ds-cfg-listen-port: 4444
+-
+
+dn: cn=HTTPS,cn=connection handlers,cn=config
+changetype: modify
+replace: ds-cfg-listen-port
+ds-cfg-listen-port: 8443
+-
+
+dn: cn=HTTP,cn=connection handlers,cn=config
+changetype: modify
+replace: ds-cfg-listen-port
+ds-cfg-listen-port: 8080
+-
+
+# Not working... pin file is absolute due to the way commons replacement works.
+dn: ds-cfg-backend-id=ads-truststore,cn=Backends,cn=config
+changetype: modify
+replace: ds-cfg-trust-store-file
+ds-cfg-trust-store-file: &{ads.truststore|db/ads-truststore/ads-truststore}
+-
+replace: ds-cfg-trust-store-pin
+ds-cfg-trust-store-pin: &{file:data/db/ads-truststore/ads-truststore.pin}

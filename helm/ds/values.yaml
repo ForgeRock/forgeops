@@ -1,8 +1,5 @@
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS.
 
-
-# The default bootstrap script.
-bootstrapScript: "/opt/opendj/bootstrap/setup-directory.sh"
 
 # If useDefaultSecrets is set to true (the default), the secret values in ../secrets will
 # be used to create a secret map with the same name as the instance ($djInstance).
@@ -65,8 +62,10 @@ backup:
 #storageClass: fast
 
 # You need to be on JDK 8u131 or higher to enable these options.
-opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMFraction=2"
+# todo: find JDK 11 args
+#opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMFraction=2"
 
+opendjJavaArgs: "-Xmx1024m -XX:+UnlockDiagnosticVMOptions"
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 # For production you will want to specify CPU limits to help Kube schedule the pods.
