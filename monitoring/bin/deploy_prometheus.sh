@@ -38,10 +38,10 @@ if read -t 10 -p "Installing Prometheus Operator and Grafana to '${NAMESPACE}' n
 helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
 
 # Install/Upgrade prometheus-operator
-helm upgrade -i ${NAMESPACE}-prometheus-operator2 coreos/prometheus-operator --set=rbac.install=true --values values/prometheus-operator.yaml --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values values/prometheus-operator.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade kube-prometheus
-helm upgrade -i ${NAMESPACE}-kube-prometheus2 coreos/kube-prometheus --set=rbac.install=true \
+helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true \
     -f values/kube-prometheus.yaml,values/am-alerts.yaml,values/ds-alerts.yaml,values/idm-alerts.yaml,values/ig-alerts.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade forgerock-metrics

@@ -460,3 +460,4 @@ prometheusRules: {}
 # Select Deployed DNS Solution
 deployCoreDNS: false
 deployKubeDNS: true
+deployKubeEtcd: false
