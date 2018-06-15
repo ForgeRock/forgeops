@@ -3,11 +3,11 @@ prometheusRules:
     groups:
     - name: ig.rules
       rules:
-      - alert: ds_disk_free_space_byte_4
-        expr: ds_disk_free_space_bytes < 5000000000
+      - alert: ig_route_response_time_seconds
+        expr: ig_route_response_time_seconds{route="default",name="default",router="gateway._router"} > 0.4
         for: 5m
         labels:
           severity: warning
         annotations:
-          description: "Free disk space below 5GB, please free up some space now"
-          summary: "Free disk space running low"
+          description: "Rate (calls/seconds) of responses with their associated times in milliseconds"
+
