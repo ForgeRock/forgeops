@@ -11,7 +11,7 @@
 echo "=> Read the following env variables from config file"
 echo "Project Name = $GKE_PROJECT_NAME"
 echo "Primary Zone = $GKE_PRIMARY_ZONE"
-echo "Additional Zones = $GKE_ADDITIONAL_ZONES"
+echo "Additional Zones = $GKE_NODE_LOCATIONS"
 echo "Cluster Name = $GKE_CLUSTER_NAME"
 echo "Cluster Namespace = $GKE_CLUSTER_NS"
 echo "Cluster Version = $GKE_CLUSTER_VERSION"
@@ -23,8 +23,8 @@ echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
 case "$choice" in 
    y|Y|yes|YES ) echo "yes";;
-   n|N|no|NO ) echo "no"; exit;;
-   * ) echo "Invalid input, Bye!"; exit;;
+   n|N|no|NO ) echo "no"; exit 1;;
+   * ) echo "Invalid input, Bye!"; exit 1;;
 esac
 
 
@@ -40,8 +40,8 @@ if [ ! -z "$GKE_OPTIONS" ]; then
       OPTS="${GKE_OPTIONS}"
 fi
 
-if [ ! -z "$GKE_ADDITIONAL_ZONES" ]; then 
-      OPTS="$OPTS --additional-zones=$GKE_ADDITIONAL_ZONES"
+if [ ! -z "$GKE_NODE_LOCATIONS" ]; then 
+      OPTS="$OPTS --node-locations=$GKE_NODE_LOCATIONS"
 fi
 
 # scopes are required for gcs storage backup and cloud sql
@@ -74,7 +74,6 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
 # These options are no longer required or default:
 #       --enable-cloud-monitoring \
 #       --username="admin" \
-#       --node-locations="$GKE_PRIMARY_ZONE,$GKE_ADDITIONAL_ZONES" \
 #       --addons=KubernetesDashboard \
 #      --enable-cloud-logging \
 #      --preemptible
