@@ -3,11 +3,32 @@ prometheusRules:
     groups:
     - name: idm.rules
       rules:
-      - alert: ds_disk_free_space_bytes_3
-        expr: ds_disk_free_space_bytes < 5000000000
-        for: 5m
+      - alert: idm_repo_seconds
+        expr: idm_repo_seconds{operation="read",repo_type="jdbc",resource_mapping="cluster_states"} > 0.1
+        for: 3m
         labels:
           severity: warning
         annotations:
-          description: "Free disk space below 5GB, please free up some space now"
-          summary: "Free disk space running low"
+          description: "read operation to a JDBC datasource"
+      - alert: idm_repo_seconds_2
+        expr: idm_repo_seconds{operation="read",repo_type="jdbc",resource_mapping="reconprogressstate"} > 0.1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          description: "read operation to a JDBC datasource, recon progress"
+      - alert: idm_repo_seconds_3
+        expr: idm_repo_seconds{operation="update",repo_type="jdbc",resource_mapping="cluster_states"} > 0.1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          description: "update operation to a JDBC datasource"
+      - alert: idm_repo_seconds_4
+        expr: idm_repo_seconds{operation="update",repo_type="jdbc",resource_mapping="reconprogressstate"} > 0.1
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          description: "update operation to a JDBC datasource, recon progress"
+
