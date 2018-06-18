@@ -5,19 +5,20 @@
 GKE_PROJECT_NAME="my-gcp-project"
 
 # Kubernetes Cluster Name
-GKE_CLUSTER_NAME="forgeops-medium-cluster"
+GKE_CLUSTER_NAME="my-cluster"
 
 # Primay Zone
 GKE_PRIMARY_ZONE="us-east1-d"
 
 # Additional Zone(s) in the same region
-GKE_ADDITIONAL_ZONES=""
+# Must include primary zone in comma separated list
+GKE_NODE_LOCATIONS="us-east1-d,us-east1-c"
 
 # Kubernetes Cluster Version
-GKE_CLUSTER_VERSION="1.9.6-gke.1"
+GKE_CLUSTER_VERSION="1.10.2-gke.3"
 
-# Nodes in Cluster
-GKE_CLUSTER_SIZE="3"
+# Nodes per zone in Cluster
+GKE_CLUSTER_SIZE="2"
 
 # VM Type
 GKE_MACHINE_TYPE="custom-8-20480"

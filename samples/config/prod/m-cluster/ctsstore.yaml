@@ -4,7 +4,7 @@ djInstance: ctsstore
 
 resources:
   limits:
-    memory: 10Gi
+    memory: 12Gi
   requests:
     memory: 8Gi
 

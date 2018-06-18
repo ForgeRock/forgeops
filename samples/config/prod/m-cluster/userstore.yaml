@@ -4,7 +4,7 @@ numberSampleUsers: "1000"
 
 resources:
   limits:
-    memory: 10Gi
+    memory: 11Gi
   requests:
     memory: 8Gi
 
@@ -16,3 +16,7 @@ storageClass: "fast"
 replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
+
+haproxy:
+  enabled: true
+  replicas: 1
