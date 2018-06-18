@@ -1,0 +1,60 @@
+# Developing / Hacking on DS
+
+* Get a copy of opendj 6.0, and place it in this folder (ds/opendj.zip). 
+* Start minikube:`minikube start --bootstrapper kubeadm --kubernetes-version v1.10.4 --memory 6192`
+* Connect your docker command up:  `eval $(minikube docker-env)`
+
+Build:
+
+* Build the docker image. You can issue docker commands, but if you use the shell script may be easier.
+    * `cd forgeops/docker; ./build.sh -g ds`  - will  build an image called gcr.io/engineering-devops/ds:6.5.0
+* If you just want to docker run something (to see if the image comes up)
+    * `docker run -rm -it gcr.io/engineering-devops/ds:6.5.0` 
+    * Or to get a bash shell into the final image:  `docker run -rm -it gcr.io/engineering-devops/ds:6.5.0 debug` 
+
+
+Run Helm:
+
+To test in minikube I am using the follow custom.yaml:
+
+```yaml
+image:
+  repository: gcr.io/engineering-devops
+  #pullPolicy: Always
+  pullPolicy: IfNotPresent
+  tag: 6.5.0
+
+djInstance: userstore
+
+replicas: 2
+djPersistence: false
+```
+
+Deploy with:
+
+```sh
+cd helm/
+helm install --name ds -f custom.yaml ds/
+```
+
+You can exec into the image and play around, etc. 
+```
+k get pods 
+k exec userstore-0 -it bash
+```
+
+Things to note:
+- The docker-entrypoint.sh relocates (copies) most folders from db/* to data/db/*. The changes in config-changes.ldif update the configuration to change these locations using commons config.
+
+
+Hacking:
+
+Configuring ds at *runtime*:
+
+exec into the running ds image, and run `scripts/replicate-ds2ds.sh`  - which attempts to setup replication at runtime
+
+If you want to experiment with configuring ds at docker *build time*, in the docker folder:
+
+Edit ds/boostrap/setup-dsrs-to-template.sh  and uncomment the configuration of the second server and the dsreplication commands.
+
+
