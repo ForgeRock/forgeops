@@ -262,7 +262,7 @@ prometheus:
 
   ## How long to retain metrics
   ##
-  retention: 24h
+  retention: 1m
 
   ## Prefix used to register routes, overriding externalUrl route.
   ## Useful for proxies that rewrite URLs.
@@ -440,14 +440,18 @@ prometheus:
   ## Ref: https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/storage.md
   ##
   storageSpec: {}
-  #  volumeClaimTemplate:
-  #    spec:
-  #      storageClassName: gluster
-  #      accessModes: ["ReadWriteOnce"]
-  #      resources:
-  #        requests:
-  #          storage: 50Gi
-  #    selector: {}
+  #    volumeClaimTemplate:
+  #      metadata:
+  #        name: prometheus-metrics
+  #        annotations:
+  #          "helm.sh/resource-policy": keep
+  #      spec:
+  #        storageClassName: fast
+  #        accessModes: ["ReadWriteOnce"]
+  #        resources:
+  #          requests:
+  #            storage: 100Gi
+  #      selector: {}
 
 # default rules are in templates/general.rules.yaml
 prometheusRules: {}
@@ -456,3 +460,4 @@ prometheusRules: {}
 # Select Deployed DNS Solution
 deployCoreDNS: false
 deployKubeDNS: true
+deployKubeEtcd: false

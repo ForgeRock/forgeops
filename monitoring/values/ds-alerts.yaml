@@ -12,7 +12,7 @@ prometheusRules:
           description: "Free disk space below 5GB, please free up some space now"
           summary: "Free disk space running low"
       - alert: ds_replication_replica_remote_replicas_current_delay_seconds
-        expr: max(ds_replication_replica_remote_replicas_current_delay_seconds) > 50 ms
+        expr: max(ds_replication_replica_remote_replicas_current_delay_seconds) > 0.5
         for: 5m
         labels:
           severity: warning
