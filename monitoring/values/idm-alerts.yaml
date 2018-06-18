@@ -31,5 +31,11 @@ prometheusRules:
           severity: warning
         annotations:
           description: "update operation to a JDBC datasource, recon progress"
-
+      - alert: idm_repo_get_connection_seconds
+        expr: idm_repo_get_connection_seconds{repo_type="jdbc"} > 0.005
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          description: "Rate of successful/unsuccessful retrieval of a repo connection"
 

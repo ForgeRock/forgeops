@@ -10,4 +10,11 @@ prometheusRules:
           severity: warning
         annotations:
           description: "Rate (calls/seconds) of responses with their associated times in milliseconds"
+      - alert: ig_route_response_error_total
+        expr: ig_route_response_error_total{route="default",name="default",router="gateway._router"} > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "count of all responses which generated an exception"
 
