@@ -5,25 +5,14 @@ FROM openjdk:11-jdk
 COPY opendj.zip /var/tmp/
 
 
-# RUN unzip -q /var/tmp/opendj.zip -d /opt \
-#     && chown -R forgerock:root /opt \
-#     && chmod g+rwx /opt/opendj \
-#     && rm -f /var/tmp/opendj.zip 
-
 WORKDIR /var/tmp/bootstrap
 
 COPY bootstrap/ /var/tmp/bootstrap/
-#COPY secrets/  /var/run/secrets/opendj/
-#WORKDIR /opt/opendj
 
 # The default BASE_DN of the directory tree.
 ENV BASE_DN o=userstore
 
-
-RUN ./setup-dsrs-dsrs.sh \
-    && ./stop-all.sh  \
-    && ./convert-dsrs-to-template.sh dsrs1
-
+RUN ./setup.sh
 
 #####################  Runtime container ################
 FROM openjdk:11-jdk 

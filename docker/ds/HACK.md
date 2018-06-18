@@ -44,7 +44,10 @@ k exec userstore-0 -it bash
 ```
 
 Things to note:
-- The docker-entrypoint.sh relocates (copies) most folders from db/* to data/db/*. The changes in config-changes.ldif update the configuration to change these locations using commons config.
+* The docker-entrypoint.sh relocates (copies) most folders from db/* to data/db/*. The changes in config-changes.ldif update the configuration to point to these locations using commons config.
+* The secrets/ folder is added at build time. I couldn't get the CA keystore to properly sign the ssl cert using the create-keystores.sh script. I gave up on this for now and used keystore explorer.
+
+
 
 
 Hacking:

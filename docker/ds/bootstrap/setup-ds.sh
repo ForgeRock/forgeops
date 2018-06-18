@@ -44,10 +44,17 @@ echo "Creating CTS backend..."
           --offline \
           --no-prompt
 
-./bin/import-ldif --offline -n ctsRoot -F -l ../../shared/cts.ldif
+cat <<EOF >/tmp/cts.ldif 
+dn: o=cts
+objectClass: top
+objectClass: organization
+o: cts
+EOF
+
+./bin/import-ldif --offline -n ctsRoot -F -l /tmp/cts.ldif
 
 
-# Monitor searches will be very slow unless there is an inded on uid
+# Monitor searches will be very slow unless there is an index on uid
 echo "Creating CTS UID index for uid=monitor search"
 ./bin/dsconfig create-backend-index \
           --backend-name ctsRoot \
