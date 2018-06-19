@@ -2,7 +2,9 @@
 
 The deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
 
-Alertmanager docs: [Alertmanager](https://prometheus.io/docs/alerting/configuration/).
+Alertmanager overview: [Overview](https://prometheus.io/docs/alerting/overview/).
+
+Alertmanager configuration: [Config](https://prometheus.io/docs/alerting/configuration/).
 
 **The monitoring folder contains the following artifacts:**
 * deploy scripts to:
