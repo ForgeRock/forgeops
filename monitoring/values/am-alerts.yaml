@@ -5,6 +5,7 @@ prometheusRules:
       rules:
       - alert: am_cts_task_seconds_total
         expr: sum by (job) (rate(am_cts_task_seconds_total{job=~"$instance"}[90s])) / sum by (job) (rate(am_cts_task_count{job=~"$instance"}[90s])) > 0.1
+        for: 3m
         labels:
           severity: warning
         annotations:
