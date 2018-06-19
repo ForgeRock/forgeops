@@ -1,0 +1,35 @@
+prometheusRules: 
+  cluster.rules: |-
+    groups:
+    - name: cluster.rules
+      rules:
+      - alert: node_memory_MemFree
+        expr: node_memory_MemFree < 100000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "Node memory running low"
+      - alert: up
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          description: "Service is down for more than 1 minute"
+      - alert: instance:node_cpu:rate:sum
+        expr: instance:node_cpu:rate:sum > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "Instance cpu above 80% for over 5 mins" 
+      - alert: node_disk_io_time_ms
+        expr: rate(node_disk_io_time_ms[5m]) > 200
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "Disk IO time over 300ms for 5 mins"  
+      
+          

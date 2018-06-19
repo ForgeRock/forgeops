@@ -2,12 +2,15 @@
 
 The deployment uses the [CoreOS Prometheus Operator](https://coreos.com/operators/prometheus/docs/0.15.0/index.html). 
 
+Alertmanager docs: [Alertmanager](https://prometheus.io/docs/alerting/configuration/).
+
 **The monitoring folder contains the following artifacts:**
 * deploy scripts to:
     * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
     * connect to the Prometheus and Grafana endpoints.
-* forgerock-servicemonitors Helm chart that provides configurable ServiceMonitors.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
+* forgerock-metrics Helm chart that provides configurable ServiceMonitors and a job to automatically import Grafana dashboards for ForgeRock products.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
 * values files that are used by the deploy script and can be edited to customize the configuration of Prometheus, Grafana and Alert Manager.
+* auto-import folder which provides a Dockerfile for producing the docker image used by the import-dashboards job.
 
 <br />
 
@@ -32,7 +35,20 @@ Dashboards for ForgeRock products are imported into Grafana after Grafana has be
 
 <br />
 
-# Deployment Instructions
+# How Alertmanager works
+Alertmanager is used to redirect specific alerts from Prometheus to configured receivers.  
+To configure Alertmanager, there is an Alertmanager configuration section in values/kube-prometheus.yaml.  
+Details about how Alertmanager works can be found in the link at the top of the page.  
+In summary:
+* global section defines attributes that apply to all alerts.
+* route section defines a tree topology of alerts filters to direct particular alerts to a specific receiver.  
+Currently we're sending all alerts to a Slack receiver.
+* receivers section defines named configurations of notification integrations.
+
+Prometheus alerts are configured, by product, in the values/*\<product\>*-alerts.yaml files.  
+These files override the prometheusRules section in the kube-prometheus.yaml file.
+
+# Deployment instructions
 ### Pre-requisites
 * Deployed ForgeRock application in Google Cloud cluster.
 * Kubectl authenticated to cluster.

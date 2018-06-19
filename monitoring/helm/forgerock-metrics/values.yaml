@@ -33,5 +33,12 @@ ig:
   labelSelectorComponent: openig
   secretUser: b3BlbmlkbS1hZG1pbg==
   secretPassword: b3BlbmlkbS1hZG1pbg==
+  
+grafanaDashboards:
+  importJobName: import-dashboards
+  image: forgerock-docker-public.bintray.io/forgerock/auto-import:1.0
+  pullPolicy: Always
+  
+
 
 

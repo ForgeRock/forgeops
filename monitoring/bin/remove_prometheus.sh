@@ -19,7 +19,7 @@ fi
 if read -t 15 -p "Removing Prometheus Operator and Grafana from '${NAMESPACE}' namespace in 15 seconds or when enter is pressed...If this is not what you intended, press ctrl-c and run '$0 -h' for guidance";then echo;fi
 
 # Remove Prometheus Operator
-helm delete --purge ${NAMESPACE}-forgerock-servicemonitors
+helm delete --purge ${NAMESPACE}-forgerock-metrics
 helm delete --purge ${NAMESPACE}-prometheus-operator
 helm delete --purge ${NAMESPACE}-kube-prometheus
 

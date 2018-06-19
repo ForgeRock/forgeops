@@ -1,0 +1,27 @@
+prometheusRules: 
+  ds.rules: |-
+    groups:
+    - name: ds.rules
+      rules:
+      - alert: ds_disk_free_space_bytes
+        expr: ds_disk_free_space_bytes < 5000000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "Free disk space below 5GB, please free up some space now"
+          summary: "Free disk space running low"
+      - alert: ds_replication_replica_remote_replicas_current_delay_seconds
+        expr: max(ds_replication_replica_remote_replicas_current_delay_seconds) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "DS Max replication latency"
+      - alert: ds_connection_handlers_ldap_requests_seconds_total
+        expr: sum by (job, ldap_handler, type) (irate(ds_connection_handlers_ldap_requests_seconds_total{job=~"$ds_instance",ldap_handler=~"$ldap_handler"}[1m])) / sum by (job, ldap_handler, type) (irate(ds_connection_handlers_ldap_requests_count{job=~"$ds_instance",ldap_handler=~"$ldap_handler"}[1m]))
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          description: "DS Current response times"
