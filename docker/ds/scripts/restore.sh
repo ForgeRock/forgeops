@@ -2,7 +2,6 @@
 # This will do an online restore of a previous backup. 
 # The backup folder structure is organized by date: bak/year/month/day/.
 
-
 #set -x 
 usage()
 { 
@@ -16,8 +15,6 @@ usage()
 cd /opt/opendj
 
 source env.sh 
-
-quick_setup
 
 # The default root of the backup folder includes the namespace and instance name. 
 # This disambiguates backups running on the same cluster.
@@ -35,7 +32,7 @@ done
 if [ !  -z "${OFFLINE}" ]; then
     ARGS="--offline"
 else
-    ARGS="--hostname ${FQDN_DS_0} --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
+    ARGS="--hostname ${FQDN_DS0} --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
 fi
 
 fail() 
@@ -52,18 +49,15 @@ restore()
     cd $RESTORE_PATH || fail 
     for dir in `ls` 
     do
-        if [ "$dir" = "tasks" ]; 
-        then 
-            echo "Skipping restore of $dir"
-            continue
-        fi
-
         d="${RESTORE_PATH}/${dir}"
-        echo /opt/opendj/bin/restore $ARGS --backupDirectory "$d" 
-        eval /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
-        if [ "$?" -ne 0 ]; then
-            ERR="$?"
-            echo "warning: restore had a non zero exit $ERR"
+        if [ "$dir" = "userRoot" ] || [ "$dir" = "ctsRoot" ]; 
+        then 
+           echo /opt/opendj/bin/restore $ARGS --backupDirectory "$d" 
+            eval /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
+             if [ "$?" -ne 0 ]; then
+                ERR="$?"
+                echo "warning: restore had a non zero exit $ERR"
+            fi
         fi
     done
     cd /opt/opendj
