@@ -22,12 +22,12 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 
-dn: ou=tokens,o@BASE_DN@
+dn: ou=tokens,o=cts
 objectClass: organizationalUnit
 objectClass: top
 ou: tokens
 
-dn: ou=openam-session,ou=tokens,o@BASE_DN@
+dn: ou=openam-session,ou=tokens,o=cts
 objectClass: organizationalUnit
 objectClass: top
 ou: openam-session

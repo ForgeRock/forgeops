@@ -25,23 +25,26 @@ export ADS_TRUSTSTORE_PIN="data/db/ads-truststore/ads-truststore.pin"
 export ADS_TRUSTSTORE="data/db/ads-truststore/ads-truststore"
 
 
+
 # Admin id for replication.
 export ADMIN_ID=admin
 
-# The section below calculates the environment variables needed to parameterize the config.ldif file.
+# The section below calculates the environment variables needed to parameterize the config.ldif file for replication.
 let last_ds="$DS_SET_SIZE - 1"
 
 # For each directory server....
 for j in $(seq 0 $last_ds); do
     dsrs="${DJ_INSTANCE}-$j.${DJ_INSTANCE}:8989"
     if [ "$j" -eq "0" ]; then
-        DS_CHANGELOG_HOSTPORTS="$dsrs"
+        RS_SERVERS="$dsrs"
     else
-        DS_CHANGELOG_HOSTPORTS="$DS_CHANGELOG_HOSTPORTS,$dsrs"
+        RS_SERVERS="$RS_SERVERS,$dsrs"
     fi
 done
 
-export DS_CHANGELOG_HOSTPORTS
+export RS_SERVERS
+
+echo "RS_SERVERS:  $RS_SERVERS"
 
 #  Selectively enable or disable backends
 export DS_ENABLE_USERSTORE=true

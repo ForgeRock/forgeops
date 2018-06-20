@@ -13,7 +13,7 @@ echo "##### Cleaning servers..."
 ./clean-all.sh
 
 echo "##### Configuring directory server DSRS 1..."
-./setup-ds.sh dsrs 1 1000
+./setup-ds.sh dsrs 1 100
 
 if [ -n "$CONFIG_REPLICATION" ]; then 
 
@@ -43,10 +43,15 @@ fi
 
 ./stop-all.sh
 
+
 convert_to_template()
 {
     echo "Converting $1 config.ldif to use commons configuration"
     cd run/$1
+
+    echo "Rebuilding indexes"
+    ./bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
+    ./bin/rebuild-index --offline --baseDN "o=cts" --rebuildDegraded
 
     for i in changelogDb/*.dom/*.server; do
         rm -rf $i
@@ -58,6 +63,7 @@ convert_to_template()
     # Some of the configuration changes won't apply if replication is not being configured.
     ./bin/ldifmodify -c -o config/config.ldif.new config/config.ldif ../../config-changes.ldif
     mv config/config.ldif.new config/config.ldif
+
 
     cd ../../
 }

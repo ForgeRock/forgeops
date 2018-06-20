@@ -166,9 +166,4 @@ EOF
           --set enabled:false \
           --offline \
           --no-prompt
-
-    echo "Rebuilding indexes"
-    bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
-    bin/rebuild-index --offline --baseDN "o=cts" --rebuildDegraded
-
 }

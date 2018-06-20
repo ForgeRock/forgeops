@@ -80,28 +80,6 @@ bin/dsconfig  set-backend-prop \
     --no-prompt
 
 
-# Todo: why does import ldif not work. Leaves backends with 0 entries, and skips all imports.
-# We only need to do this on server 1
-if [ "$IMPORT_LDIF" ];
-then
-    export DB_NAME=userRoot
-    # Import LDIF
-    for file in ../../ldif/userstore/*.ldif;  do
-        echo "Loading $file"
-        # search + replace all placeholder variables. Naming conventions are from AM.
-        sed -e "s/@BASE_DN@/$BASE_DN/"  \
-            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
-            -e "s/@DB_NAME@/$DB_NAME/"  \
-            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
-        #cat /tmp/file.ldif
-        ./bin/import-ldif --offline -n userRoot -l /tmp/file.ldif
-    done
-
-    for file in ../../ldif/cts/*.ldif;  do
-        echo "Loading $file"
-        ./bin/import-ldif --offline -n ctsRoot -l "$file"
-    done
-fi
 
 echo "Creating Default Trust Manager..."
 ./bin/dsconfig create-trust-manager-provider \
@@ -128,10 +106,31 @@ echo "Configuring LDAPS connection handler..."
       --offline \
       --no-prompt
 
-# Relocate data paths
-#./set-data-paths.sh 
-
+# From util.sh. Consider moving the logic here...
 configure
 
 ./bin/start-ds
+
+IMPORT_LDIF=yes
+# Do we only need to do this on server 1?
+if [ "$IMPORT_LDIF" ];
+then
+    export DB_NAME=userRoot
+    # Import LDIF
+    for file in ../../ldif/userstore/*.ldif; do
+        echo "Loading $file"
+        # search + replace all placeholder variables. Naming conventions are from AM.
+        sed -e "s/@BASE_DN@/$BASE_DN/"  \
+            -e "s/@userStoreRootSuffix@/$BASE_DN/"  \
+            -e "s/@DB_NAME@/$DB_NAME/"  \
+            -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
+        #cat /tmp/file.ldif
+        bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w password /tmp/file.ldif       
+    done
+
+    # The cts files do need sed replacement - all values are hard coded to o=cts
+    echo "Loading cts schema and indexes"
+    bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w password ../../ldif/cts/*
+fi
+
 cd ..
