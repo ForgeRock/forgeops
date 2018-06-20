@@ -64,7 +64,7 @@ dl_binary() {
    openig)      
         dl $IG_SNAPSHOT $IG openig/openig.war
         ;;
-    ds)
+    opendj)
         dl $DJ_SNAPSHOT $DJ ds/opendj.zip
         ;;
     *) 
