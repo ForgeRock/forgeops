@@ -80,7 +80,6 @@ bin/dsconfig  set-backend-prop \
     --no-prompt
 
 
-
 echo "Creating Default Trust Manager..."
 ./bin/dsconfig create-trust-manager-provider \
       --type file-based \
@@ -105,6 +104,14 @@ echo "Configuring LDAPS connection handler..."
       --set "trust-manager-provider:Default Trust Manager" \
       --offline \
       --no-prompt
+
+echo "Enabling the /api endpoint"
+./bin/dsconfig \
+    set-http-endpoint-prop \
+    --endpoint-name "/api" \
+    --set enabled:true \
+    --offline \
+    --no-prompt
 
 # From util.sh. Consider moving the logic here...
 configure
