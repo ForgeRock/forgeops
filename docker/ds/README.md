@@ -25,10 +25,13 @@ supply the appropriate environment variables in order for the intance to run cor
 
 ## Docker-entrypoint
 
-The image assumes that a persistent volume will be mounted on the /opt/opendj/data directory. This is where the volatile 
-data lives - and persists across container restarts. 
+The image assumes that a persistent volume will be mounted on the /opt/opendj/data directory. This is where volatile
+data lives - and persists across container restarts.
 
-At runtime, the docker entry point looks to see if this directory is empty, and if it is, copies the initial backends (e.g. userstore, cts) to this volume to use as starter databases.  If data exists in the pvc, the copy will not occur. 
+At runtime, the docker entry point looks to see if this directory is empty, and if it is, copies the initial backends (e.g. userstore, cts) to this volume to use as starter databases.  If data exists in the pvc, the copy will not occur.
+
+The file `env.sh` set a number of environment variables that are used to template out the config.ldif file. For example,
+RS_SERVERS is a list of all the DS/RS hostnames and ports. 
 
 
 ## Limitations
@@ -39,6 +42,4 @@ The directories internal metrics (exposed via Prometheus) report accurate status
 the directory replication logs (logs/replication) show replication activity.
 
 These limitations will be removed in the 6.5/7.0 time frame.
-
-
 

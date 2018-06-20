@@ -24,9 +24,7 @@ replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.cts|true}
 -
 replace: ds-cfg-replication-server
-ds-cfg-replication-server: &{fqdn.rs0}
-ds-cfg-replication-server: &{fqdn.rs1}
-ds-cfg-replication-server: &{fqdn.rs2}
+ds-cfg-replication-server: &{rs.servers}
 -
 
 dn: ds-cfg-backend-id=userRoot,cn=Backends,cn=config
@@ -37,32 +35,25 @@ ds-cfg-enabled: &{ds.enable.userstore|true}
 replace: ds-cfg-db-directory
 ds-cfg-db-directory: &{data.dir|db}
 
-
 dn: cn=o=userstore,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.userstore|true}
 -
 replace: ds-cfg-replication-server
-ds-cfg-replication-server: &{fqdn.rs0}
-ds-cfg-replication-server: &{fqdn.rs1}
-ds-cfg-replication-server: &{fqdn.rs2}
+ds-cfg-replication-server: &{rs.servers}
 -
 
 dn: cn=cn=admin data,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-replication-server
-ds-cfg-replication-server: &{fqdn.rs0}
-ds-cfg-replication-server: &{fqdn.rs1}
-ds-cfg-replication-server: &{fqdn.rs2}
+ds-cfg-replication-server: &{rs.servers}
 -
 
 dn: cn=cn=schema,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-replication-server
-ds-cfg-replication-server: &{fqdn.rs0}
-ds-cfg-replication-server: &{fqdn.rs1}
-ds-cfg-replication-server: &{fqdn.rs2}
+ds-cfg-replication-server: &{rs.servers}
 
 dn: cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
@@ -70,9 +61,7 @@ replace: ds-cfg-replication-port
 ds-cfg-replication-port: 8989
 -
 replace: ds-cfg-replication-server
-ds-cfg-replication-server: &{fqdn.rs0}
-ds-cfg-replication-server: &{fqdn.rs1}
-ds-cfg-replication-server: &{fqdn.rs2}
+ds-cfg-replication-server: &{rs.servers}
 
 dn: cn=Administration Connector,cn=config
 changetype: modify
@@ -92,7 +81,7 @@ replace: ds-cfg-listen-port
 ds-cfg-listen-port: 8080
 -
 
-# Not working... pin file is absolute due to the way commons replacement works.
+# Note: pin file is absolute due to the way commons replacement works.
 dn: ds-cfg-backend-id=ads-truststore,cn=Backends,cn=config
 changetype: modify
 replace: ds-cfg-trust-store-file
