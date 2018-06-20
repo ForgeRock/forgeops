@@ -44,8 +44,6 @@ done
 
 export RS_SERVERS
 
-echo "RS_SERVERS:  $RS_SERVERS"
-
 #  Selectively enable or disable backends
 export DS_ENABLE_USERSTORE=true
 export DS_ENABLE_CTS=true

@@ -30,15 +30,20 @@ restore()
     fi
 }
 
-# Check for a mounted secret volume. Fall back to secrets bundled in the image if we can't find them.
-if [ ! -d "$SECRET_PATH" ]; then
-    echo "Warning; Cannot find mounted secret volume on $SECRET_PATH. Falling back to using secrets bundled in the image"
-
-    export DIR_MANAGER_PW_FILE=/opt/opendj/secrets/dirmanager.pw
-    export MONITOR_PW_FILE=/opt/opendj/secrets/monitor.pw
-    export KEYSTORE_FILE=/opt/opendj/secrets/keystore.pkcs12
-    export KEYSTORE_PIN_FILE=/opt/opendj/secrets/keystore.pin
-fi
+# At runtime we set the Directory Manager password using the mounted secrets
+update_ds_password()
+{
+    if [ ! -f "$DIR_MANAGER_PW_FILE" ]; then
+        echo "Can't find the directory manager password file. Won't change the password"
+        return
+    fi
+    echo "Updating the directory manager password"
+    pw=`bin/encode-password  -s PBKDF2 -f $DIR_MANAGER_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g'`
+    pw="userPassword: $pw"
+    head -n -2  db/rootUser/rootUser.ldif >/tmp/pw
+    echo "$pw" >>/tmp/pw 
+    mv /tmp/pw db/rootUser/rootUser.ldif
+}
 
 relocate_data() 
 {
@@ -46,7 +51,6 @@ relocate_data()
         echo "Data volume contains existing data"
         return
     fi
-    #     for dir in ads-truststore ctsRoot schema  tasks  userRoot 
     mkdir -p data/db
     for dir in ctsRoot userRoot ads-truststore admin
     do
@@ -90,8 +94,8 @@ echo "Server id is $SERVER_ID"
 
 case "$CMD" in
 start)
-    # Start only. Will fail if there is no configuration
     relocate_data
+    update_ds_password
     start
     ;;
 restore-from-backup)
@@ -111,6 +115,7 @@ pause)
     ;;
 debug)
     relocate_data
+    update_ds_password
     bash
     ;;
 *)
