@@ -42,7 +42,7 @@ steps:
 # Downloading artifacts can be slow.. so we need to bump the timeout
 timeout: 1000s
 images:
-- 'gcr.io/$PROJECT_ID/opendj'
+- 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'
 - 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'

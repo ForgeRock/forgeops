@@ -64,8 +64,8 @@ dl_binary() {
    openig)      
         dl $IG_SNAPSHOT $IG openig/openig.war
         ;;
-    opendj)
-        dl $DJ_SNAPSHOT $DJ opendj/opendj.zip
+    ds)
+        dl $DJ_SNAPSHOT $DJ ds/opendj.zip
         ;;
     *) 
         echo "Invalid image to downoad $1"
