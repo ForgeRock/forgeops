@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Back up the directory now. Additional command line arguments are passed to the backup command.
+# See https://backstage.forgerock.com/knowledge/kb/article/a98768700
 
 cd /opt/opendj
 
@@ -8,9 +9,6 @@ source /opt/opendj/env.sh
 NAMESPACE="${NAMESPACE:-default}"
 
 DATESTAMP=`date "+%Y/%m/%d"`
-
-quick_setup
-
 
 BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/bak}
 # Create a unique folder for this host's backup.
@@ -22,7 +20,7 @@ B="${BACKUP_DIRECTORY}/${NAMESPACE}/${DJ_INSTANCE}/${DATESTAMP}"
 
 echo "Starting backup to ${B}"
 /opt/opendj/bin/backup --backupDirectory "${B}" \
-  --hostname "${FQDN_DS_0}" \
+  --hostname "${FQDN_DS0}" \
   -p 4444 -D "cn=Directory Manager" -j "${DIR_MANAGER_PW_FILE}" \
   --compress \
   --trustAll \
@@ -35,6 +33,9 @@ else
    scripts/notify.sh "Online backup to $B failed" "ERROR"
 fi
 
-# Now run the script to backup admin data.
-#/opt/opendj/scripts/backup-admin.sh
+# TODO:  These commands need to execute on one of the ds/rs nodes in the cluster. Not on a temporary node.
+echo "Backing up additional files to $B"
+for file in data/db/admin data/db/ads-truststore; do
+  cp -r "$file" "$B"
+done
 
