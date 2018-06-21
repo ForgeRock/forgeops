@@ -89,3 +89,9 @@ ds-cfg-trust-store-file: &{ads.truststore|db/ads-truststore/ads-truststore}
 -
 replace: ds-cfg-trust-store-pin
 ds-cfg-trust-store-pin: &{file:data/db/ads-truststore/ads-truststore.pin}
+
+
+dn: cn=replication server,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-replication-db-directory
+ds-cfg-replication-db-directory: ${changelog.db.directory|changelogDb}

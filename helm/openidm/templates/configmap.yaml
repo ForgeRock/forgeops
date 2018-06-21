@@ -7,6 +7,7 @@ data:
   PROJECT_HOME:  "{{ .Values.config.path }}"
   LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
   IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
+  JAVA_OPTS: {{ default "-Xmx1024m -server -XX:+UseG1GC" .Values.javaOpts }}
 
 ---
 apiVersion: v1

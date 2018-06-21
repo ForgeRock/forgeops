@@ -6,9 +6,9 @@ FROM forgerock/java:6.0.0
 WORKDIR /opt
 
 # Override these to change the JVM:
-#ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
+ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
 # Use this for Java 8 u131 or later. This sets the size of the VM heap according to the container size.
-ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+#ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 # Download or add OpenIDM nightly build and unzip.
 COPY openidm.zip /tmp/openidm.zip

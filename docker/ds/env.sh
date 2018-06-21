@@ -23,8 +23,7 @@ export SERVER_FQDN="$FQDN"
 export DATA_DIR="data/db"
 export ADS_TRUSTSTORE_PIN="data/db/ads-truststore/ads-truststore.pin"
 export ADS_TRUSTSTORE="data/db/ads-truststore/ads-truststore"
-
-
+export CHANGELOG_DB_DIRECTORY="data/db/changelogDb"
 
 # Admin id for replication.
 export ADMIN_ID=admin
@@ -62,3 +61,5 @@ fi
 # Set some common command arguments that we need for configuration
 COMMON_ARGS="--hostname ${FQDN} --bindPasswordFile ${DIR_MANAGER_PW_FILE} --port 4444 --trustAll --no-prompt"
 
+# Namespace should be set - but default just in case.
+NAMESPACE="${NAMESPACE:-default}"

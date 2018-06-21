@@ -27,6 +27,8 @@ spec:
         env:
         - name: OPENIG_BASE
           value: "{{ .Values.config.path }}"
+        - name: CATALINA_OPTS
+          value: "{{ .Values.catalinaOpts }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:

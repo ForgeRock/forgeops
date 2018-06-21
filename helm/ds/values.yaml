@@ -69,14 +69,11 @@ opendjJavaArgs: "-Xmx1024m -XX:+UnlockDiagnosticVMOptions"
 # Resource limits.
 # These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 # For production you will want to specify CPU limits to help Kube schedule the pods.
-resources: {}
-
-# Sample values:
-#resources:
-#  requests:
-#   memory: 2000Mi
-#  limits:
-#    memory: 2500Mi
+resources:
+ requests:
+  memory: 2000Mi
+ limits:
+   memory: 2500Mi
 
 # DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
@@ -102,22 +99,33 @@ gcs:
   restore: false
   # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
   #add --scopes storage-full when you create the cluster.
-  # Note the namespace will be appended to this bucket path. This is done to avoid collisions where 
-  # multiple backups may be ocurring in different namespaces
+  # Note the namespace and DS instance name will be appended to this bucket path. This is done to avoid collisions where 
+  # multiple backups may be ocurring in different namespaces or dj instances.
   backupBucket:  gs://forgeops/dj-backup/test
-  # Restore bucket. Usually the same as above, but for initialization we might want to restore from another source.
-  # Note the namespace is *not* appended here. This is so you can restore from a fixed location, or
-  # restore from say prod to qa.
-  restoreBucket: gs://forgeops/dj-backup/test
+  # Restore bucket. Note that in this case the namespace and instance name are *not* appended. This
+  # enables restoration across namespaces or instance types. For example, to restore data from production
+  # to QA, you might use something like:
+  #restoreBucket: gs://mybucket/dsbackups/prod/usestore
+  restoreBucket: gs://forgeops/dj-backup/test/default/userstore
 
 # Restore parameters. 
 restore:
-  # If true, runs the init containers that restores the directory from a backup in the bak/ folder.
+  # If true, runs the init containers that restores the directory from a backup folder in the bak/ folder.
   # The backup data must be present in the bak/ folder. The gcs: settings can be used
-  # to copy data from a gcs bucket to the bak/ folder.
+  # to copy data from a gcs bucket to the bak/ folder. If a previous backup PVC was not deleted,
+  # data can be restored from that PVC.
   # Restore will not overwrite existing DS data.  
-  # The most recent backup will be restored. 
+  # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
+  # is used to recover.
   enabled: false
+  # The value of path is either "latest" - which will attempt to restore from the latest backup folder,
+  # or a path *relative* to /opt/opendj/bak/ which is a direct path to the folder to restore.
+  # The later setting is used to restore from an explicit known good backup state. 
+  path: latest
+  # Example of restoring from a backup from a specific date
+  #path: 2018/05/15
+  #If the root directory contains the data:
+  #path: /
  
 # DS proxy - experimental.
 proxy:
@@ -135,5 +143,6 @@ slackUrl: undefined
 # Useful for debugging.
 #adminContainer: true
 
-# Pinned gcloud Image. You should not need to change this very often
-gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b
+#  gcloud Image. You should not need to change this very often
+gcloudImage: gcr.io/cloud-builders/gcloud:latest
+#gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b
