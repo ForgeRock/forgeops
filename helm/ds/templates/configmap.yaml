@@ -7,6 +7,7 @@ data:
   # example: configstore, cts, userstore. The instance is used to construct the FQDN of DJ.
   DJ_INSTANCE: {{ .Values.djInstance }}
   DS_SET_SIZE: "{{ .Values.replicas }}"
-  OPENDJ_JAVA_ARGS: {{ .Values.opendjJavaArgs }}
-  BOOTSTRAP:  {{ .Values.bootstrapScript }}
+  OPENDJ_JAVA_ARGS: "{{ .Values.opendjJavaArgs }}"
   SLACK_URL: {{ .Values.slackUrl }}
+  DS_ENABLE_CTS: "{{ .Values.cts.enabled }}"
+  DS_ENABLE_USERSTORE: "{{ .Values.userstore.enabled }}"

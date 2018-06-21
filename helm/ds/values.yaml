@@ -22,6 +22,14 @@ djInstance: ds
 
 component: ds
 
+# If you want to disable the userstore backend, set this to false
+userstore:
+  enabled: true
+
+# If you wan to disable the cts backend, set to false.
+cts:
+  enabled: true
+
 image:
   repository: gcr.io/engineering-devops
   # For development we set this to Always to get the most current image.
