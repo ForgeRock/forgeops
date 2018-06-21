@@ -23,7 +23,7 @@ spec:
           - name: backup
             image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
             imagePullPolicy: {{ .Values.image.pullPolicy }}
-            args: [ "/opt/opendj/scripts/backup.sh", "--incremental"]
+            args: [ "backup"]
             env:
             - name: NAMESPACE
               valueFrom:
@@ -44,7 +44,8 @@ spec:
           - name: gcs
             image: {{ .Values.gcloudImage }}
             imagePullPolicy: IfNotPresent
-            command: [ "/bin/sh", "-c", "gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }}"]
+            command: [ "/bin/sh", 
+               "-c", "gsutil -m rsync -r /backup {{ .Values.gcs.backupBucket }}/{{ .Release.Namespace}}/{{ .Values.djInstance }}"]
             volumeMounts:
             - name: backup
               mountPath: /backup
@@ -53,7 +54,7 @@ spec:
           # A job needs at least one container. This is just a dummy echo command.
           - name: echo
             image: busybox 
-            args: ["echo", "done"]
+            args: ["echo", "done. See the gcs and backup init container logs for the backup output. example: kubectl logs pod-name -c backup "]
           volumes:
           {{- if or .Values.backup.enabled .Values.restore.enabled }}
           - name: backup

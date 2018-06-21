@@ -6,12 +6,13 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 
-
 domain: .example.com
 config:
   claim: frconfig
   path: /git/config/default/ig/basic-sample
 
+# Tomcat JVM options.
+catalinaOpts: "-Xmx512m"
   
 # If you set this to true, you must have a TLS secret with the same name as the FQDN
 useTLS: false

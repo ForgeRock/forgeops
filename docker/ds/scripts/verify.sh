@@ -4,6 +4,8 @@
 
 cd /opt/opendj
 
+source env.sh
+
 for backend in `bin/dsconfig --offline list-backends -s -n `
 do
 

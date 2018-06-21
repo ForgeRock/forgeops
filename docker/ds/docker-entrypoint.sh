@@ -20,15 +20,6 @@ source /opt/opendj/env.sh
 rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
-restore() 
-{
-    echo "Attempting to restore from backup"
-    if [ -z "$RESTORE_PATH" ]; then 
-        scripts/restore.sh -o
-    else
-        scripts/restore.sh -o -p "$RESTORE_PATH"
-    fi
-}
 
 # At runtime we set the Directory Manager password using the mounted secrets
 update_ds_password()
@@ -57,6 +48,8 @@ relocate_data()
         echo "Copying $dir"
         cp -r db/$dir data/db/$dir
     done
+    echo "Copying changelogDb"
+    cp -r changelogDb data/db/changelogDb
 }
 
 start() {
@@ -71,20 +64,45 @@ pause() {
     done
 }
 
+
+
+restore() 
+{
+    echo "Attempting to restore from backup"
+    if [ -z "$RESTORE_PATH" ]; then 
+        scripts/restore.sh -o
+    else
+        scripts/restore.sh -o -p "$RESTORE_PATH"
+    fi
+}
+
+
+init_container() {
+    relocate_data
+    update_ds_password
+}
+
+
 # Restore from a backup
 restore() {
-    if [ -d ./data/db ] ; then
-        echo "It looks like there is existing directory data. Restore will not run."
+    if [ -d data/db/userRoot ]; then 
+        echo "Restore will not overwrite existing data."
         exit 0
     fi
 
+    init_container
+
     # We are currently using dsreplication initialize-all to load data from the first server 
     # So we restore data only on the first server and let initialization copy the data.
-    if [[ $HOSTNAME = *"0"* ]]; then 
-        echo "Restoring data from backup on host $HOSTNAME"
-        scripts/restore.sh -o
-    fi
+    # if [[ $HOSTNAME = *"0"* ]]; then 
+    #     echo "Restoring data from backup on host $HOSTNAME"
+    #     scripts/restore.sh -o
+    # fi
+    echo "Restoring data from backup on host $HOSTNAME"
+    scripts/restore.sh -o
+
 }
+
 
 CMD="${1:-run}"
 
@@ -92,31 +110,22 @@ echo "Command is $CMD"
 
 echo "Server id is $SERVER_ID"
 
+
 case "$CMD" in
 start)
-    relocate_data
-    update_ds_password
+    init_container
     start
     ;;
 restore-from-backup)
     restore
     ;;
 restore-and-verify)
-    # Restore from backup, and then verify the integrity of the data.
-    scripts/restore.sh -o
+    restore
     scripts/verify.sh
     ;;
 backup)
-    shift
-    /opt/opendj/scripts/backup.sh "$@"
-    ;;
-pause) 
-    pause
-    ;;
-debug)
-    relocate_data
-    update_ds_password
-    bash
+    init_container
+    /opt/opendj/scripts/backup.sh
     ;;
 *)
     exec "$@"

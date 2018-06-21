@@ -4,8 +4,8 @@ FROM tomcat:8.5.31-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 
-ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-
+#ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+ENV CATALINA_OPTS -server -Xmx756m
 
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command

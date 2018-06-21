@@ -2,7 +2,6 @@
 # This will do an online restore of a previous backup. 
 # The backup folder structure is organized by date: bak/year/month/day/.
 
-#set -x 
 usage()
 { 
     echo "$0 [-o] [-p path] [-n]"
@@ -18,7 +17,7 @@ source env.sh
 
 # The default root of the backup folder includes the namespace and instance name. 
 # This disambiguates backups running on the same cluster.
-BACKUP_DIRECTORY="/opt/opendj/bak/${NAMESPACE}/${DJ_INSTANCE}"
+BACKUP_DIRECTORY="/opt/opendj/bak/"
 
 while getopts ":p:on" opt; do
     case $opt in 
@@ -37,7 +36,7 @@ fi
 
 fail() 
 {
-  echo "Error : restore path is not valud. Current path $RESTORE_PATH"
+  echo "Error : restore path is not valid. Current path $RESTORE_PATH"
   exit 1
 }
 
@@ -81,10 +80,11 @@ find_latest()
    cd /opt/opendj
 }
 
+# If no restore path is specified, find the lastest backup.
+# This sets RESTORE_PATH as a side effect.
 if [ -z "${RESTORE_PATH}" ]; then 
     find_latest
 fi
-
 
 restore "$RESTORE_PATH"
 
