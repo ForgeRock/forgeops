@@ -113,6 +113,10 @@ echo "Enabling the /api endpoint"
     --offline \
     --no-prompt
 
+# load API schema with correct DN's (ie o=userstore vs dc=example,dc=com)
+echo "Installing rest2ldap endpoint map"
+cp ../../example-v1.json ./config/rest2ldap/endpoints/api
+
 # From util.sh. Consider moving the logic here...
 configure
 
