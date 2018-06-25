@@ -16,6 +16,20 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       initContainers:
+       {{ if eq .Values.config.strategy  "git" }}
+      - name: git-init
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+      {{ end }}
       - name: wait-for-configstore
         image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
@@ -83,10 +97,14 @@ spec:
       - name: openam-boot
         configMap:
           name: boot-json
-      - name: git
-        persistentVolumeClaim:
-          claimName: {{ default "frconfig"  .Values.config.claim }}
       - name: configstore-secret
         secret:
           secretName: configstore
           #defaultMode: 256
+      {{ if eq .Values.config.strategy  "git" }}
+      - name: git
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName:  {{ default "frconfig" .Values.config.name }}
+      {{ end }}

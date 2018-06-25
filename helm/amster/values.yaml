@@ -23,8 +23,9 @@ policyAgentPassword: Passw0rd
 
 
 config:
+  strategy: git
   # The name of the shared read write many PVC volume that holds the configuration
-  claim: frconfig
+  name: frconfig
   # To level path where we import the the configuration from. Your git repo will usually be mounted on /git/config
   # in this pod.
   importPath: /git/config/default/am/empty-import

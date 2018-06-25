@@ -4,6 +4,13 @@
 
 replicaCount: 1
 
+
+config:
+  name: frconfig
+  strategy: git
+  #strategy: "shared-pvc"
+  
+
 # Shared Storage Configuration
 storage:
   # This class should map to a shared read write many (RWX) PVC type. NFS, for example.
@@ -13,6 +20,10 @@ storage:
   name: "frconfig"
   # The size of the shared storage. Needs to be large enough to contain the git config repo.
   size: "10Gi"
+  # If you want to skip PVC creation, deploy with --set storage.createPVC=false.
+  # This is useful if you have an existing PVC that you want to remount, or
+  # if your configuration does not use shared RWX storage.
+  createPVC: true
 
 git:
   # git repo to clone. The value below is a public git repo that does not require authentication.
@@ -28,9 +39,6 @@ git:
   # if possible in preference to using commons config.
   # sedFilter: "-e s/some.string/some.replacement/ -e s/foo/bar/"
 
-# If you want to skip PVC creation, deploy with --set createPVC=false.
-# This is useful if you have an existing PVC that you want to remount.
-createPVC: true
 
 component: git
 
@@ -51,3 +59,4 @@ resources:
     memory: 128Mi
   limits:
     memory: 128Mi
+

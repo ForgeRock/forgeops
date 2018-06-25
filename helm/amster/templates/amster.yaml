@@ -20,7 +20,20 @@ spec:
         app: {{ template "fullname" . }}
         component:  {{ .Values.component }}
     spec:
-      terminationGracePeriodSeconds: 5    
+      terminationGracePeriodSeconds: 5   
+      initContainers:
+      - name: git-init
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
       containers:
       - name: amster
         image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
@@ -46,6 +59,20 @@ spec:
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+      - name: git
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        args: [ "pause"]
       volumes:
       - name: amster-secrets
         secret:
@@ -55,5 +82,7 @@ spec:
           name: amster-config
       # the amster and git pods share access to this volume
       - name: git
-        persistentVolumeClaim:
-          claimName: {{ default "frconfig" .Values.config.claim }}
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName:  {{ default "frconfig" .Values.config.name }}

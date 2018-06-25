@@ -20,6 +20,21 @@ spec:
         component: {{ .Values.component }}
         vendor: forgerock
     spec:
+      {{ if eq .Values.config.strategy  "git" }}
+      initContainers:
+      - name: git-init
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+      {{ end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
@@ -48,6 +63,10 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 12 }}
       volumes:
+      {{ if eq .Values.config.strategy  "git" }}
       - name: git
-        persistentVolumeClaim:
-          claimName: {{ default "frconfig" .Values.config.claim }}
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName:  {{ default "frconfig" .Values.config.name }}
+      {{ end }}

@@ -1,7 +1,7 @@
 
 
 config:
-  claim: frconfig
+  name: frconfig
   importPath: /git/config/samples/am/R6.0
 
 version: 6.0.0
