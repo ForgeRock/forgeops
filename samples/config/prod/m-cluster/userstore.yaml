@@ -18,5 +18,5 @@ replicas: 2
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
 haproxy:
-  enabled: true
+  enabled: false
   replicas: 1
