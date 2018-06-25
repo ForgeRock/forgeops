@@ -23,7 +23,7 @@ baseDN: "o=userstore"
 #  $djInstance-0.$djInstance
 djInstance: ds
 
-component: ds
+component: opendj
 
 image:
   repository: gcr.io/engineering-devops
