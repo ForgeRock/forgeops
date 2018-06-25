@@ -13,6 +13,11 @@ steps:
   entrypoint: 'kubectl'
   args: ['get', 'pods']
 
+# Run remove all before tests to ensure namespace is clear before test run
+- name: 'gcr.io/engineering-devops/helm'
+  entrypoint: 'bin/remove-all.sh'
+  args: ['smoke']
+
 # Build smoke tests docker image
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'cicd/forgeops-tests'
