@@ -5,26 +5,24 @@ replicaCount: 1
 
 component: apache-agent
 
-global:
-  domain: .example.com
-  image:
-    repository: forgerock
-    tag: 6.5.0
-    pullPolicy: IfNotPresent
-  # If you set this to true, you must have a TLS secret with the same name as the FQDN.
-  useTLS: false
+domain: .forgeops.com
+image:
+  repository: gcr.io/engineering-devops
+  tag: latest
+  pullPolicy: Always
+# If you set this to true, you must have a TLS secret with the same name as the FQDN.
+useTLS: false
 
+# User, password and realm must match agent profile in OpenAM.
+agent:
+  user: apache
+  password: password
+  amServer: http://openam.example.forgeops.com/openam
+  url: http://apache-agent.example.forgeops.com
+  realm: "/"
 
 service:
   name: apache
   type: ClusterIP
   externalPort: 80
   internalPort: 80
-resources: {}
-#  limits:
-#    cpu: 100m
-#    memory: 256Mi
-#  requests:
-#    cpu: 100m
-#    memory: 256Mi
-

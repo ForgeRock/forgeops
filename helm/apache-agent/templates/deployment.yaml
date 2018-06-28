@@ -22,7 +22,7 @@ spec:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        args: ["httpd-foreground"]
+        args: ["install"]
         securityContext:
           privileged: true
         env:
@@ -31,33 +31,41 @@ spec:
           value: "0x40000000"
         - name: AM_MAX_SHARED_POOL_SIZE
           value: "0x20000000"
+        - name: AGENT_PW
+          value: "{{ .Values.agent.password }}"
+        - name: AGENT_USER
+          value: "{{ .Values.agent.user }}"
+        - name: AGENT_NAMING_URL
+          value: "{{ .Values.agent.amServer }}"
+        - name: AGENT_URL
+          value: "{{ .Values.agent.url }}"
+        - name: AGENT_REALM
+          value: "{{ .Values.agent.realm }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         # todo: The agent will force a 302 redirect - but any codes between 200 and 399 are considered healthy
         # However - it appears as if Kube tries to follow the 302 redirect, and this results in an error. For
         # now we disable the probes.
-        # livenessProbe:
-        #   httpGet:
-        #     path: /
-        #     host: localhost
-        #     port: {{ .Values.service.internalPort }}
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 10
-        # readinessProbe:
-        #   httpGet:
-        #     path: /
-        #     port: {{ .Values.service.internalPort }}
-        #   initialDelaySeconds: 5
-        resources:
-{{ toYaml .Values.resources | indent 12 }}
-        volumeMounts:
-        - name: dshm
-          mountPath: /dev/shm
-        - name: agent-conf
-          mountPath: /opt/web_agents/apache24_agent/instances/agent_1/config
+        #
+        # Related kubernetes issue: https://github.com/kubernetes/kubernetes/issues/47893
+        #
+        #livenessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: {{ .Values.service.internalPort }}
+        #  initialDelaySeconds: 10
+        #  periodSeconds: 10
+        #readinessProbe:
+        #  httpGet:
+        #    path: /
+        #    port: {{ .Values.service.internalPort }}
+        #  initialDelaySeconds: 10
+      volumeMounts:
+      - name: dshm
+        mountPath: /dev/shm
       volumes:
       - name: dshm
-        hostPath: 
+        hostPath:
           path: /dev/shm
       - name: agent-conf
         configMap:
