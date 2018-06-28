@@ -1,0 +1,6 @@
+agent:
+  user: apache
+  password: password
+  amServer: http://openam.smoke.forgeops.com/openam
+  url: http://apache-agent.smoke.forgeops.com
+  realm: "/"
