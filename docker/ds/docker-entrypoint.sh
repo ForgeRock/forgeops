@@ -127,6 +127,9 @@ backup)
     init_container
     /opt/opendj/scripts/backup.sh
     ;;
+pause)
+    pause
+    ;;
 *)
     exec "$@"
 esac

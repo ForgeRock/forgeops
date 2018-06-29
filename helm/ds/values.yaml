@@ -134,14 +134,6 @@ restore:
   #path: 2018/05/15
   #If the root directory contains the data:
   #path: /
- 
-# DS proxy - experimental.
-proxy:
-  enabled: false
-
-haproxy:
-  enabled: false
-  replicas: 1
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"
