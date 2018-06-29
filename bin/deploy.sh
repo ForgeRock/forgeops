@@ -131,7 +131,7 @@ deploy_charts()
         chart="${comp}"
         case "${comp}" in
           *store)
-            chart="opendj"
+            chart="ds"
             ;;
         esac
 

@@ -21,6 +21,21 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
     spec:
+      {{ if eq .Values.config.strategy  "git" }}
+      initContainers:
+      - name: git-init
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+      {{ end }}
       containers:
       - name: openidm
         image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
@@ -58,7 +73,23 @@ spec:
         - name: boot-properties
           mountPath: /var/run/openidm/commons
         - name: logging-properties
-          mountPath: /var/run/openidm/logging  
+          mountPath: /var/run/openidm/logging
+      {{ if eq .Values.config.strategy  "git" }}
+      - name: git
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        args: [ "pause"]
+      {{ end }}
       volumes:
       - name: openidm-secrets
         secret:
@@ -67,12 +98,17 @@ spec:
         emptyDir: {}
       - name: audit-logs
         emptyDir: {}
-      - name: git
-        persistentVolumeClaim:
-          claimName: {{ default "frconfig" .Values.config.claim }}
       - name: boot-properties
         configMap:
           name: idm-boot-properties
       - name: logging-properties
         configMap:
           name: idm-logging-properties
+      {{- if eq .Values.config.strategy "git" }}
+      - name: git
+        emptyDir:  {}
+      - name: git-secret
+        secret:
+          secretName:  {{ default "frconfig" .Values.config.name }}
+      {{ end }}
+   

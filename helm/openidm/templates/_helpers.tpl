@@ -30,3 +30,41 @@ tls:
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
 {{ end -}}
 {{- end -}}
+
+{{- define "git-init" -}}
+{{ if eq .Values.config.strategy "git" }}
+- name: git-init
+  image: forgerock/git:6.0.0
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  volumeMounts:
+  - name: git
+    mountPath: /git
+  - name: git-secret
+    mountPath: /etc/git-secret
+  args: ["init"]
+  envFrom:
+  - configMapRef:
+      name:  {{ default "frconfig" .Values.config.name  }}
+{{- else -}}
+        {}
+{{ end }}
+{{- end -}}
+
+
+{{- define "git-sync" -}}
+{{ if eq .Values.config.strategy "git" }}
+- name: git
+  image: forgerock/git:6.0.0
+  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  volumeMounts:
+  - name: git
+    mountPath: /git
+  - name: git-secret
+    mountPath: /etc/git-secret
+  env:
+  - name: NAMESPACE
+    valueFrom:
+      fieldRef:
+        fieldPath: metadata.namespace
+{{ end }}
+{{- end -}}

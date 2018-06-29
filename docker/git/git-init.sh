@@ -17,9 +17,9 @@ if [ ! -z "${GIT_REPO}" ]; then
     then 
         git clone "${GIT_REPO}" "${GIT_ROOT}"
         if [ "$?" -ne 0 ]; then
-        echo "git clone failed. Will sleep for 5 minutes for debugging."
-        sleep 300
-        exit 1
+            echo "git clone failed. Will sleep for 5 minutes for debugging."
+            sleep 300
+            exit 1
         fi
     fi
   

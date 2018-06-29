@@ -14,7 +14,8 @@ image:
 domain: .forgeops.com
 
 config:
-  claim: frconfig
+  name: frconfig
+  strategy: git
 
 # If you set this to true, you must have a TLS secret with the same name as the FQDN.
 useTLS: false

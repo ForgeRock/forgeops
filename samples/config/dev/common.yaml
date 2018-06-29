@@ -1,11 +1,14 @@
-domain: .forgeops.com
+#domain: .forgeops.com
+domain: .example.com
+
 
 image:
   # repository: gcr.io/engineering-devops
   repository: gcr.io/engineering-devops
   tag: 6.5.0
-  pullPolicy: Always
+  #pullPolicy: Always  
+  pullPolicy: IfNotPresent
 
 
-  useTLS: true
+#useTLS: true
   
