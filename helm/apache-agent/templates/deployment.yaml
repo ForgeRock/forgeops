@@ -38,7 +38,7 @@ spec:
         - name: AGENT_NAMING_URL
           value: "{{ .Values.agent.amServer }}"
         - name: AGENT_URL
-          value: "{{ .Values.agent.url }}"
+          value: "http://{{ template "externalFQDN" . }}:80"
         - name: AGENT_REALM
           value: "{{ .Values.agent.realm }}"
         ports:
