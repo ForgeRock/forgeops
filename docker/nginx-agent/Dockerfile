@@ -1,6 +1,6 @@
 # Note: This is currently pending the fix for https://bugster.forgerock.org/jira/browse/AMAGENTS-501.
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM nginx:1.13
+FROM nginx:1.11.10
 
 WORKDIR /opt
 
@@ -14,8 +14,8 @@ WORKDIR /opt
 # If you are outside of ForgeRock you will need to adjust for your environment, or just copy the agent.zip into this folder.
 #ENV WEB_AGENT_BUILDS http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/
 
-ARG NGINX_AGENT_ZIP=http://abondance-uk.internal.forgerock.com/public/webagents/engineering_master/Linux/NGINX/Centos_7/NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip
-
+ARG AM_SERVER=http://openam.example.forgeops.com:80/openam
+ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 # For Local build - copy the .zip file in.
 #COPY NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip /var/tmp/agent.zip
 
@@ -23,10 +23,9 @@ ARG NGINX_AGENT_ZIP=http://abondance-uk.internal.forgerock.com/public/webagents/
 
 COPY nginx.conf /etc/nginx/
 COPY default.conf /etc/nginx/conf.d/
-
+COPY agent.zip /var/tmp/
 
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
-      curl $NGINX_AGENT_ZIP -o /var/tmp/agent.zip && \
       unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*
@@ -40,11 +39,11 @@ RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim
 # Because we are running this before AM is up and running we need to use the forceinstall option.
 # We are using defaults here (AM service name) that are not going to exist in most environments.
 # They will need to be overridden at runtime by updating the bootstrap files.
-RUN /opt/web_agents/nginx11303_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
-        "http://openam.default.svc.cluster.local:80/openam" \
-        "http://nginx:80/" \
+RUN /opt/web_agents/nginx12_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
+        "$AM_SERVER"  \
+        "$AGENT_SERVER" \
         "/" \
-        "nginx" \
+        "apache" \
         /var/tmp/pw.txt \
         --changeOwner --acceptLicence --forceInstall
 
@@ -56,14 +55,20 @@ ENV AM_MAX_SHARED_POOL_SIZE 52428800
 
 WORKDIR /opt/web_agents
 COPY *.sh /opt/web_agents/
-
+COPY agent.conf /opt/web_agents/nginx12_agent/instances/agent_1/config/
 
 # TODO: We may want to directly copy in the agent.conf vs. run the installer?
 #COPY agent.conf /opt/web_agents/nginx11303_agent/instances/agent_1/conf/agent.conf
 
-RUN chown -R nginx:nginx  /opt/ && \
-    ln -sf /dev/stderr /opt/web_agents/nginx11303_agent/instances/agent_1/logs/debug/debug.log
+# Copy testing pages to htdocs
+COPY neu.html /usr/local/apache2/htdocs/
+COPY policy.html /usr/local/apache2/htdocs/
+
+
+RUN ln -sf /dev/stderr /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.log
+RUN chown -R nginx:nginx  /opt/
+
 
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]
 
-CMD ["start"]
+CMD ["/opt/web_agents/docker-entrypoint.sh"]

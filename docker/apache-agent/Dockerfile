@@ -48,6 +48,9 @@ COPY agent.conf /opt/web_agents/apache24_agent/instances/agent_1/config/
 COPY neu.html /usr/local/apache2/htdocs/
 COPY policy.html /usr/local/apache2/htdocs/
 
+RUN ln -sf /dev/stderr /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log
+RUN chown -R daemon:daemon /opt/
+
 RUN echo "CoreDumpDirectory /tmp/" >> /usr/local/apache2/conf/httpd.conf
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]
 

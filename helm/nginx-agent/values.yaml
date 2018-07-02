@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 replicaCount: 1
 
-
 service:
   name: nginx
   type: ClusterIP
@@ -18,14 +17,18 @@ resources:
     memory: 256Mi
 
 # Default cookie domain. Include the leading dot.
+domain: .forgeops.com
 
-global:
-  domain: .example.com
+agent:
+  user: nginx
+  password: password
+  amServer: http://openam.pavel.forgeops.com/openam
+  realm: "/"
 
 
 component: nginx-agent
 
 image:
-  repository: forgerock
-  tag: 6.5.0
-  pullPolicy: IfNotPresent
+  repository: gcr.io/engineering-devops
+  tag: latest
+  pullPolicy: Always

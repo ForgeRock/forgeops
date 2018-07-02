@@ -7,44 +7,44 @@
 # Set defaults. You can override these environment variables.
 
 : ${AGENT_PW:=password}
-: ${AGENT_PW_KEY:=OWNjOTM5NmItNzUxYS0zZQ==}
+: ${AGENT_PW_KEY:=ZGJlYzA4NTUtNjE4Mi04OQ==}
 : ${AGENT_USER:=nginx}
-: ${AGENT_NAMING_URL:="http://openam:80/openam"}
+: ${AGENT_REALM:="/"}
+: ${AGENT_NAMING_URL:="http://openam.example.forgeops.com:80/openam"}
+: ${AGENT_URL:="http://agent:80"}
 
 
-
-
-# todo: See if /secrets/apache-agent-pw exists. If it does, override the environment variable.
-# If it does, use that to bootstrap the agent secret.
-
+# Override agent variables
 install() {
-  cd /opt/web_agents/apache24_agent/bin
-    
-    # Run agentadmin to encode password with key. The awk trick is needed because output is a full text message - not the value.
-    export AGENT_PW=`./agentadmin --p $AGENT_PW_KEY $AGENT_PW |  awk 'NF>1{print $NF}'`
-    
-    # For debugging:
-    echo encrytped password is $AGENT_PW
+  cd /opt/web_agents/nginx12_agent/bin
+  echo "DEBUG: Agent realm is set to: $AGENT_REALM"
+  # Run agentadmin to encode password with key. The awk trick is needed because output is a full text message - not the value.
+  export AGENT_PW=`./agentadmin --p $AGENT_PW_KEY $AGENT_PW |  awk 'NF>1{print $NF}'`
 
-    # Run sed on agent.conf to replace any vars.
-    cd /opt/web_agents/nginx12_agent/instances/agent_1/config/
+  # For debugging:
+  echo encrytped password is $AGENT_PW
 
-    FILE=agent.conf
+  # Run sed on agent.conf to replace any vars.
+  cd /opt/web_agents/nginx12_agent/instances/agent_1/config/
 
-    # Override any variables in the agent.conf file.
-    cp $FILE "$FILE.bak"
-    cat $FILE | \
-      sed "s|AGENT_PW|$AGENT_PW|"  | \
-      sed "s|AGENT_PW_KEY|$AGENT_PW_KEY|"  | \
-      sed "s/AGENT_USER/$AGENT_USER/" | \
-      sed "s+AGENT_NAMING_URL+$AGENT_NAMING_URL+" \
-      > $FILE.new
-    
-    mv $FILE.new $FILE  
+  FILE=agent.conf
+
+  # Override any variables in the agent.conf file.
+  cp $FILE "$FILE.bak"
+  cat $FILE | \
+    sed "s|AGENT_PASSWORD|$AGENT_PW|"  | \
+    sed "s|AGENT_PW_KEY|$AGENT_PW_KEY|"  | \
+    sed "s/AGENT_USER/$AGENT_USER/" | \
+    sed "s/AGENT_REALM/\\$AGENT_REALM/" | \
+    sed "s+AM_SERVER+$AGENT_NAMING_URL+" | \
+    sed "s+AGENT_URL+$AGENT_URL+" \
+    > $FILE.new
+
+  mv $FILE.new $FILE
 }
 
 pause() {
-  while true 
+  while true
   do
     sleep 6000
   done
@@ -57,16 +57,7 @@ pause)
   pause ;;
 install)
   install
-  pause  ;;
-  
-start)
-  # todo: We should also concatenate the output of the agent debug log to stdout.
-  # In a shell you can run { cmd1; cmd2; } also -see tail -f --follow=name --retry filename
   exec nginx -g "daemon off;" ;;
-*) 
-  exec $@ 
+*)
+  exec $@
 esac
-
-
-
-
