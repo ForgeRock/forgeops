@@ -28,8 +28,20 @@ config:
 # Tomcat JVM options.
 catalinaOpts: "-Xmx512m"
   
-# If you set this to true, you must have a TLS secret with the same name as the FQDN
-useTLS: false
+# TLS is enabled by default. See TLS section for configuration options
+useTLS: true
+
+tls:
+  # strategy is the method of TLS provisioning. Can either be:
+  # - CertManager[default]: Use CertManager with forgeops.com domain and Letsencrypt production.
+  # - SelfSigned:           Runs job that creates self signed wildcard certificated based namespace.  
+  # - UserProvided:         Allows user to provide their own cert files.
+  strategy: CertManager
+  # path to certs if 'tlsStrategy: UserProvided'. 
+  crtPath: /Users/lee.baines/Documents/generic/deploy/ingress/tls.crt
+  keyPath: /Users/lee.baines/Documents/generic/deploy/ingress/tls.key
+  jobName: tls-generator
+  jobImage: gcr.io/engineering-devops/certs/tls:1.1
 
 image:
   repository: gcr.io/engineering-devops
@@ -50,13 +62,11 @@ resources:
     cpu: 200m
     memory: 512Mi
 
-
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl
 component: openig
 
 ingress:
   class: nginx
-  prodTLS: false
   annotations:
     kubernetes.io/ingress.class: nginx
     # Do not use for nginx. TODO: Does warp need this?
