@@ -1,6 +1,6 @@
 {{ if .Values.adminContainer }}
 # This is a small optional "admin" pod that just pauses and waits for 
-# someone to exec into the image. Used for debugging
+# someone to exec into the image. Used for debugging.
 apiVersion: v1
 kind: Pod
 metadata:
