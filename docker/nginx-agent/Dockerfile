@@ -52,21 +52,17 @@ RUN /opt/web_agents/nginx12_agent/bin/agentadmin --s /etc/nginx/nginx.conf \
 # 52428800 - 50 MB
 ENV AM_MAX_SHARED_POOL_SIZE 52428800
 
-
 WORKDIR /opt/web_agents
 COPY *.sh /opt/web_agents/
 COPY agent.conf /opt/web_agents/nginx12_agent/instances/agent_1/config/
-
-# TODO: We may want to directly copy in the agent.conf vs. run the installer?
-#COPY agent.conf /opt/web_agents/nginx11303_agent/instances/agent_1/conf/agent.conf
 
 # Copy testing pages to htdocs
 COPY neu.html /usr/local/apache2/htdocs/
 COPY policy.html /usr/local/apache2/htdocs/
 
-
+RUN usermod -aG root nginx
 RUN ln -sf /dev/stderr /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.log
-RUN chown -R nginx:nginx  /opt/
+
 
 
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]
