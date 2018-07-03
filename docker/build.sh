@@ -8,6 +8,7 @@
 # and moved to the correct locations (example: openam/openam.war).
 
 # Default settings. You can set these all via command switches as well.
+
 #REGISTRY="forgerock-docker-public.bintray.io"
 
 REGISTRY="forgerock-docker-internal.bintray.io"
@@ -40,7 +41,7 @@ function buildDocker {
    fi
 }
 
-while getopts "adgpst:r:R:P:" opt; do
+while getopts "adgpst:r:R:P:i:" opt; do
   case ${opt} in
     a ) AUTHENTICATE="true" ;;
     t ) TAG="${OPTARG}" ;;
@@ -50,6 +51,7 @@ while getopts "adgpst:r:R:P:" opt; do
     R ) REPO="${OPTARG}" ;;
     g ) REGISTRY="gcr.io" && REPO="${PROJECT}" ;;
     P ) PROJECT="${OPTARG}" && REPO="${PROJECT}" ;;
+    i ) INCREMENTAL="${OPTARG}" ;;
     p ) PUSH="1" ;;
     \? )
          echo "Usage: build [-p] [-g] [-t tag] [-r registry] [-R repo] [-G project] image1 ..."
@@ -62,11 +64,21 @@ while getopts "adgpst:r:R:P:" opt; do
          echo "-t tag - Tag the docker image (default $TAG)"
          echo "-d dry run. Don't do the docker build/push, just show what would be done."
          echo "-a authenticate to the registry using API_KEY environment variable."
+         echo "-i N - incrementally build only containers that changed in the last N commits"
          exit 1
       ;;
   esac
 done
 shift $((OPTIND -1))
+
+if [ ! -z "$INCREMENTAL" ]; then
+  IMAGES=`git diff --name-only "HEAD..HEAD~$INCREMENTAL" | sort -u  | grep "/docker" | awk 'BEGIN {FS="/"} {print $2}' | uniq`
+  echo "Incremental build: $IMAGES"
+  if [ -z "$IMAGES" ]; then
+    echo "No images changed in the last $INCREMENTAL commits"
+    exit 0
+  fi
+fi
 
 if [ "$#" -eq "0" ]; then
    for image in $IMAGES; do
