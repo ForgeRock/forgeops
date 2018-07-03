@@ -5,8 +5,10 @@ cd /opt/opendj
 source env.sh 
 
 USERS=1000000
+START=0
 
 [[ $# -eq 1 ]] && USERS=$1
+[[ $# -eq 2 ]] && USERS=$1 && START=$2
 
 echo "Making $USERS sample users"
 
@@ -38,7 +40,7 @@ givenName: <first>
 sn: <last>
 cn: {givenName} {sn}
 initials: {givenName:1}<random:chars:ABCDEFGHIJKLMNOPQRSTUVWXYZ:1>{sn:1}
-employeeNumber: <sequential:0>
+employeeNumber: <sequential:$START>
 uid: user.{employeeNumber}
 mail: {uid}@[maildomain]
 userPassword: password
