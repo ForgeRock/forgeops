@@ -19,12 +19,24 @@ spec:
       # https://github.com/kubernetes/kubernetes/issues/28272.
       terminationGracePeriodSeconds: 5
       containers:
+      # Sidecar container to tail out logs from shared volume
+      - name: logs-sidecar
+        image: alpine
+        command: ["/bin/sh"]
+        args: ["-c", "while ! [ -f /logmount/debug.log ]; do sleep 1; done && tail -f /logmount/debug.log"]
+        volumeMounts:
+        - name: logs
+          mountPath: /logmount
+      # Agent/Server container
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args: ["install"]
         securityContext:
           privileged: true
+        volumeMounts:
+        - name: logs
+          mountPath: /logmount
         env:
         # 1 GB session cache
         - name: AM_MAX_SESSION_CACHE_SIZE
@@ -42,30 +54,14 @@ spec:
         - name: AM_AGENT_REALM
           value: "{{ .Values.agent.realm }}"
         - name: AM_PDP_TEMP_PATH
-          value: "{{ default "/tmp/"  .Values.agent.pdpPath }}"
+          value: "{{ default "/logmount"  .Values.agent.pdpPath }}"
         - name: AM_DEBUG_FILE_PATH
-          value: "{{ default "/tmp/"  .Values.agent.debugFilePath }}"
+          value: "{{ default "/logmount/"  .Values.agent.debugFilePath }}"
         - name: AM_AUDIT_FILE_PATH
-          value: "{{ default "/tmp/"  .Values.agent.auditFilePath }}"
+          value: "{{ default "/logmount/"  .Values.agent.auditFilePath }}"
+
         ports:
         - containerPort: {{ .Values.service.internalPort }}
-        # todo: The agent will force a 302 redirect - but any codes between 200 and 399 are considered healthy
-        # However - it appears as if Kube tries to follow the 302 redirect, and this results in an error. For
-        # now we disable the probes.
-        #
-        # Related kubernetes issue: https://github.com/kubernetes/kubernetes/issues/47893
-        #
-        #livenessProbe:
-        #  httpGet:
-        #    path: /
-        #    port: {{ .Values.service.internalPort }}
-        #  initialDelaySeconds: 10
-        #  periodSeconds: 10
-        #readinessProbe:
-        #  httpGet:
-        #    path: /
-        #    port: {{ .Values.service.internalPort }}
-        #  initialDelaySeconds: 10
       volumeMounts:
       - name: dshm
         mountPath: /dev/shm
@@ -73,6 +69,5 @@ spec:
       - name: dshm
         hostPath:
           path: /dev/shm
-      - name: agent-conf
-        configMap:
-          name: {{ template "fullname" . }}
+      - name: logs
+        emptyDir: {}

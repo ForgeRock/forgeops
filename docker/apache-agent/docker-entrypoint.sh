@@ -31,10 +31,7 @@
 : ${AM_PROXY_PASSWORD:=" "}
 
 install() {
-
-  # TODO - Get password from mounted config
   cd /opt/web_agents/apache24_agent/bin
-
   echo "DEBUG: Agent realm is set to: $AGENT_REALM"
 
   # Run agentadmin to encode password with key. The awk trick is needed because output is a full text message - not the value.
@@ -47,9 +44,8 @@ install() {
 
   # Run sed on agent.conf.template to replace any vars.
   cd /opt/web_agents/apache24_agent/instances/agent_1/config/
-
-  # Copy template out of agent config folder to create actual agent.conf file
   cp /opt/web_agents/apache24_agent/config/agent.conf.template .
+
   FILE=agent.conf.template
 
   # Fill template with variables

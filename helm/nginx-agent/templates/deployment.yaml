@@ -19,12 +19,22 @@ spec:
       # And https://github.com/kubernetes/kubernetes/issues/28272
       terminationGracePeriodSeconds: 5
       containers:
+      - name: logs-sidecar
+        image: alpine
+        command: ["/bin/sh"]
+        args: ["-c", "while ! [ -f /logmount/debug.log ]; do sleep 1; done && tail -f /logmount/debug.log"]
+        volumeMounts:
+        - name: logs
+          mountPath: /logmount
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}/{{.Values.component}}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args: ["install"]
         securityContext:
           privileged: true
+        volumeMounts:
+        - name: logs
+          mountPath: /logmount
         env:
         - name: AM_AGENT_PASSWORD
           value: "{{ .Values.agent.password }}"
@@ -37,11 +47,11 @@ spec:
         - name: AM_AGENT_REALM
           value: "{{ .Values.agent.realm }}"
         - name: AM_PDP_TEMP_PATH
-          value: "{{ default "/tmp/"  .Values.agent.pdpPath }}"
+          value: "{{ default "/logmount"  .Values.agent.pdpPath }}"
         - name: AM_DEBUG_FILE_PATH
-          value: "{{ default "/tmp/"  .Values.agent.debugFilePath }}"
+          value: "{{ default "/logmount/"  .Values.agent.debugFilePath }}"
         - name: AM_AUDIT_FILE_PATH
-          value: "{{ default "/tmp/"  .Values.agent.auditFilePath }}"
+          value: "{{ default "/logmount/"  .Values.agent.auditFilePath }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         resources:
@@ -50,6 +60,8 @@ spec:
         - name: dshm
           mountPath: /dev/shm
       volumes:
+      - name: logs
+        emptyDir: {}
       - name: dshm
         hostPath:
           path: /dev/shm
