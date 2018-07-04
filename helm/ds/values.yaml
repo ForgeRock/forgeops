@@ -40,9 +40,6 @@ image:
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicas: 1
 
-# Set for creating sample users. If unset, only the base DN will be created.
-#numberSampleUsers: 500
-
 # Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
