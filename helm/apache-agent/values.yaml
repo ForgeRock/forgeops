@@ -18,7 +18,7 @@ useTLS: false
 agent:
   user: apache
   password: password
-  amServer: http://openam.example.forgeops.com/openam
+  amServer: http://openam.pavel.forgeops.com/openam
   realm: "/"
 
 service:

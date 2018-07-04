@@ -5,23 +5,14 @@
 # Docker image for Apache + AM HTTP agent.
 FROM httpd:2.4
 WORKDIR /opt
-# Shared memory cache size in bytes. The default is 1.5 GB. On Docker you need to run with --shm-size.
-# Set this lower for testing purposes only. The settings below allow you to run with --shm-size=200m
-# See https://bugster.forgerock.org/jira/browse/AMAGENTS-383.
-# Remove this when https://bugster.forgerock.org/jira/browse/AMAGENTS-273 is resolved.
-#ENV AM_MAX_SHARED_POOL_SIZE 0x200000
-#ENV AM_MAX_SESSION_CACHE_SIZE 0x4000000
 
 ENV AM_MAX_SHARED_POOL_SIZE 1048576000
 ENV AM_DEFAULT_LOG_LEVEL All
 
-# For testing purposes, you can build this image with ARGs to match your
-# deployment
+# For testing purposes, you can build this image with ARGs to match your deployment
 ARG AM_SERVER=http://openam.example.forgeops.com:80/openam
 ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 
-# Given agent builds are residing in internal network, we need to download
-# them before running docker build and save them to Dockerfile folder as agent.zip
 ARG APACHE_AGENT=/var/tmp/agent.zip
 COPY agent.zip /var/tmp/agent.zip
 
@@ -42,15 +33,10 @@ RUN /opt/web_agents/apache24_agent/bin/agentadmin --s /usr/local/apache2/conf/ht
 
 WORKDIR /opt/web_agents/apache24_agent
 COPY *.sh /opt/web_agents/
-COPY agent.conf /opt/web_agents/apache24_agent/instances/agent_1/config/
 
 # Copy testing pages to htdocs
 COPY neu.html /usr/local/apache2/htdocs/
 COPY policy.html /usr/local/apache2/htdocs/
-
-RUN usermod -aG root daemon
-RUN ln -sf /dev/stderr /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log
-
 
 RUN echo "CoreDumpDirectory /tmp/" >> /usr/local/apache2/conf/httpd.conf
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]

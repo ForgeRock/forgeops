@@ -26,16 +26,22 @@ spec:
         securityContext:
           privileged: true
         env:
-        - name: AGENT_PW
+        - name: AM_AGENT_PASSWORD
           value: "{{ .Values.agent.password }}"
-        - name: AGENT_USER
+        - name: AM_AGENT_USER
           value: "{{ .Values.agent.user }}"
-        - name: AGENT_NAMING_URL
+        - name: AM_OPENAM_URL
           value: "{{ .Values.agent.amServer }}"
-        - name: AGENT_URL
+        - name: AM_AGENT_URL
           value: "http://{{ template "externalFQDN" . }}:80"
-        - name: AGENT_REALM
+        - name: AM_AGENT_REALM
           value: "{{ .Values.agent.realm }}"
+        - name: AM_PDP_TEMP_PATH
+          value: "{{ default "/tmp/"  .Values.agent.pdpPath }}"
+        - name: AM_DEBUG_FILE_PATH
+          value: "{{ default "/tmp/"  .Values.agent.debugFilePath }}"
+        - name: AM_AUDIT_FILE_PATH
+          value: "{{ default "/tmp/"  .Values.agent.auditFilePath }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         resources:

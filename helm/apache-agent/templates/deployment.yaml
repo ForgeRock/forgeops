@@ -31,16 +31,22 @@ spec:
           value: "0x40000000"
         - name: AM_MAX_SHARED_POOL_SIZE
           value: "0x20000000"
-        - name: AGENT_PW
+        - name: AM_AGENT_PASSWORD
           value: "{{ .Values.agent.password }}"
-        - name: AGENT_USER
+        - name: AM_AGENT_USER
           value: "{{ .Values.agent.user }}"
-        - name: AGENT_NAMING_URL
+        - name: AM_OPENAM_URL
           value: "{{ .Values.agent.amServer }}"
-        - name: AGENT_URL
+        - name: AM_AGENT_URL
           value: "http://{{ template "externalFQDN" . }}:80"
-        - name: AGENT_REALM
+        - name: AM_AGENT_REALM
           value: "{{ .Values.agent.realm }}"
+        - name: AM_PDP_TEMP_PATH
+          value: "{{ default "/tmp/"  .Values.agent.pdpPath }}"
+        - name: AM_DEBUG_FILE_PATH
+          value: "{{ default "/tmp/"  .Values.agent.debugFilePath }}"
+        - name: AM_AUDIT_FILE_PATH
+          value: "{{ default "/tmp/"  .Values.agent.auditFilePath }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         # todo: The agent will force a 302 redirect - but any codes between 200 and 399 are considered healthy
