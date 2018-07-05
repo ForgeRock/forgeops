@@ -26,7 +26,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: tls-certs
+  name: tls-certs-{{ .Values.component }}
 type: opaque
 data:
   tls.crt: |-
@@ -41,9 +41,9 @@ data:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.tls.jobName }}
+  name: {{ .Values.tls.jobName }}-{{ .Values.component }}
   labels:
-    component: {{ .Values.tls.JobName }}
+    component: {{ .Values.tls.jobName }}
 spec:
   activeDeadlineSeconds: 30
   backoffLimit: 2

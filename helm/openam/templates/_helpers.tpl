@@ -44,8 +44,10 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 
 {{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
 {{- define "tls-spec" -}}
+{{ if .Values.useTLS -}}
 tls:
 - hosts:
   - {{ template "externalFQDN" .  }}
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
+{{- end -}}
 {{- end -}}

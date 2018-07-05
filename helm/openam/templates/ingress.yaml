@@ -19,6 +19,7 @@ metadata:
       {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
+{{ include "tls-spec" . | indent 2 }}
   rules:
   - host: {{ template "externalFQDN" . }}
     http:
@@ -26,6 +27,5 @@ spec:
       - path: /openam
         backend:
           serviceName: {{ $serviceName }}
-          servicePort: {{ $servicePort }}
-{{ include "tls-spec" . | indent 4 }}       
+          servicePort: {{ $servicePort }}      
 {{- end -}}

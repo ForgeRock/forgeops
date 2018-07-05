@@ -38,8 +38,8 @@ tls:
   # - UserProvided:         Allows user to provide their own cert files.
   strategy: CertManager
   # path to certs if 'tlsStrategy: UserProvided'. 
-  crtPath: /Users/lee.baines/Documents/generic/deploy/ingress/tls.crt
-  keyPath: /Users/lee.baines/Documents/generic/deploy/ingress/tls.key
+  # crtPath: /path/to/cert/tls.crt
+  # keyPath: /path/to/key/tls.key
   jobName: tls-generator
   jobImage: gcr.io/engineering-devops/certs/tls:1.1
 
@@ -47,12 +47,6 @@ image:
   repository: gcr.io/engineering-devops
   tag: 6.5.0
   pullPolicy: IfNotPresent
-
-service:
-  name: openig
-  type: ClusterIP
-  externalPort: 80
-  internalPort: 8080
 
 resources:
 #  limits:
@@ -64,6 +58,12 @@ resources:
 
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl
 component: openig
+
+service:
+  name: openig
+  type: ClusterIP
+  externalPort: 80
+  internalPort: 8080
 
 ingress:
   class: nginx
