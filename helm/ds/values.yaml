@@ -30,8 +30,9 @@ userstore:
 cts:
   enabled: true
 
+# TOOD: Decide if we want to sync this with the other chart format.
 image:
-  repository: gcr.io/engineering-devops
+  repository: gcr.io/engineering-devops/ds
   pullPolicy: IfNotPresent
   tag:  6.5.0
 
