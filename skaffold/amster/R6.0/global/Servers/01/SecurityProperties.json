@@ -1,0 +1,120 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "SecurityProperties",
+    "entityId" : "http://openam:80/openam",
+    "pathParams" : {
+      "serverName" : "http://openam:80/openam"
+    }
+  },
+  "data" : {
+    "_id" : "01/properties/security",
+    "amconfig.header.encryption" : {
+      "com.iplanet.security.encryptor" : {
+        "value" : "com.iplanet.services.util.JCEEncryption",
+        "inherited" : true
+      },
+      "com.iplanet.security.SecureRandomFactoryImpl" : {
+        "value" : "com.iplanet.am.util.SecureRandomFactoryImpl",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.validation" : {
+      "com.iplanet.services.comm.server.pllrequest.maxContentLength" : {
+        "value" : "16384",
+        "inherited" : true
+      },
+      "com.iplanet.am.clientIPCheckEnabled" : {
+        "value" : false,
+        "inherited" : true
+      }
+    },
+    "amconfig.header.cookie" : {
+      "com.iplanet.am.cookie.name" : {
+        "value" : "iPlanetDirectoryPro",
+        "inherited" : true
+      },
+      "com.iplanet.am.cookie.secure" : {
+        "value" : false,
+        "inherited" : true
+      },
+      "com.iplanet.am.cookie.encode" : {
+        "value" : false,
+        "inherited" : true
+      }
+    },
+    "amconfig.header.securitykey" : {
+      "com.sun.identity.saml.xmlsig.keystore" : {
+        "value" : "%BASE_DIR%/%SERVER_URI%/keystore.jceks",
+        "inherited" : true
+      },
+      "com.sun.identity.saml.xmlsig.storetype" : {
+        "value" : "JCEKS",
+        "inherited" : true
+      },
+      "com.sun.identity.saml.xmlsig.storepass" : {
+        "value" : "%BASE_DIR%/%SERVER_URI%/.storepass",
+        "inherited" : true
+      },
+      "com.sun.identity.saml.xmlsig.keypass" : {
+        "value" : "%BASE_DIR%/%SERVER_URI%/.keypass",
+        "inherited" : true
+      },
+      "com.sun.identity.saml.xmlsig.certalias" : {
+        "value" : "test",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.crlcache" : {
+      "com.sun.identity.crl.cache.directory.host" : {
+        "value" : "",
+        "inherited" : true
+      },
+      "com.sun.identity.crl.cache.directory.port" : {
+        "value" : "",
+        "inherited" : true
+      },
+      "com.sun.identity.crl.cache.directory.ssl" : {
+        "value" : false,
+        "inherited" : true
+      },
+      "com.sun.identity.crl.cache.directory.user" : {
+        "value" : "",
+        "inherited" : true
+      },
+      "com.sun.identity.crl.cache.directory.password" : {
+        "value" : null,
+        "inherited" : true
+      },
+      "com.sun.identity.crl.cache.directory.searchlocs" : {
+        "value" : "",
+        "inherited" : true
+      },
+      "com.sun.identity.crl.cache.directory.searchattr" : {
+        "value" : "",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.ocsp.check" : {
+      "com.sun.identity.authentication.ocspCheck" : {
+        "value" : false,
+        "inherited" : true
+      },
+      "com.sun.identity.authentication.ocsp.responder.url" : {
+        "value" : "",
+        "inherited" : true
+      },
+      "com.sun.identity.authentication.ocsp.responder.nickname" : {
+        "value" : "",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.deserialisationwhitelist" : {
+      "openam.deserialisation.classes.whitelist" : {
+        "value" : "com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction,com.sun.identity.common.CaseInsensitiveHashMap,com.sun.identity.common.CaseInsensitiveHashSet,com.sun.identity.common.CaseInsensitiveKey,com.sun.identity.common.configuration.ServerConfigXML,com.sun.identity.common.configuration.ServerConfigXML$DirUserObject,com.sun.identity.common.configuration.ServerConfigXML$ServerGroup,com.sun.identity.common.configuration.ServerConfigXML$ServerObject,com.sun.identity.console.base.model.SMSubConfig,com.sun.identity.console.service.model.SMDescriptionData,com.sun.identity.console.service.model.SMDiscoEntryData,com.sun.identity.console.session.model.SMSessionData,com.sun.identity.console.user.model.UMUserPasswordResetOptionsData,com.sun.identity.shared.datastruct.OrderedSet,com.sun.xml.bind.util.ListImpl,com.sun.xml.bind.util.ProxyListImpl,java.lang.Boolean,java.lang.Integer,java.lang.Number,java.lang.StringBuffer,java.net.InetAddress,java.security.cert.Certificate,java.security.cert.Certificate$CertificateRep,java.util.ArrayList,java.util.Collections$EmptyMap,java.util.Collections$EmptySet,java.util.Collections$SingletonList,java.util.HashMap,java.util.HashSet,java.util.LinkedHashSet,java.util.Locale,org.forgerock.openam.authentication.service.protocol.RemoteCookie,org.forgerock.openam.authentication.service.protocol.RemoteHttpServletRequest,org.forgerock.openam.authentication.service.protocol.RemoteHttpServletResponse,org.forgerock.openam.authentication.service.protocol.RemoteServletRequest,org.forgerock.openam.authentication.service.protocol.RemoteServletResponse,org.forgerock.openam.authentication.service.protocol.RemoteSession,org.forgerock.openam.dpro.session.NoOpTokenRestriction,org.forgerock.openam.dpro.session.ProofOfPossessionTokenRestriction",
+        "inherited" : true
+      }
+    }
+  }
+}

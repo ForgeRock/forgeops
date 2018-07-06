@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "WindowsNtModule",
+    "entityId" : "WindowsNtModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "authenticationHost" : null,
+      "sambaConfigurationFileName" : null,
+      "authenticationLevel" : 0,
+      "authenticationDomain" : null
+    },
+    "_type" : {
+      "_id" : "windowsnt",
+      "name" : "Windows NT",
+      "collection" : false
+    }
+  }
+}

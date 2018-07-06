@@ -24,7 +24,7 @@ spec:
       initContainers:
       - name: git-init
         image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        #imagePullPolicy: {{ .Values.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -37,8 +37,8 @@ spec:
       {{ end }}
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ template "image" . }}
+        #imagePullPolicy: {{ .Values.pullPolicy }}
         env:
         - name: OPENIG_BASE
           value: "{{ .Values.config.path }}"
@@ -47,8 +47,10 @@ spec:
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
+        {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
+        {{ end }}
         livenessProbe:
           httpGet:
            path: /

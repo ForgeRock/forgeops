@@ -1,0 +1,37 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "LdapModule",
+    "entityId" : "LDAP",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "LDAP",
+    "userSearchFilter" : null,
+    "authenticationLevel" : 0,
+    "userBindPassword" : null,
+    "userBindPassword-encrypted" : "AAAAA0FFUwIQY6ZhWnNTR4Z4exKAfRI3TXop7ZIv8zvy+YyEDxuLN1togqEnjDufMg==",
+    "searchScope" : "SUBTREE",
+    "returnUserDN" : true,
+    "profileAttributeMappings" : [ ],
+    "userBindDN" : "cn=Directory Manager",
+    "userSearchAttributes" : [ "uid" ],
+    "connectionHeartbeatTimeUnit" : "SECONDS",
+    "beheraPasswordPolicySupportEnabled" : true,
+    "userProfileRetrievalAttribute" : "uid",
+    "minimumPasswordLength" : "8",
+    "primaryLdapServer" : [ "configstore-0.configstore:1389" ],
+    "openam-auth-ldap-connection-mode" : "LDAP",
+    "connectionHeartbeatInterval" : 10,
+    "secondaryLdapServer" : [ ],
+    "userSearchStartDN" : [ "o=userstore" ],
+    "trustAllServerCertificates" : false,
+    "operationTimeout" : 0,
+    "_type" : {
+      "_id" : "ldap",
+      "name" : "LDAP",
+      "collection" : true
+    }
+  }
+}

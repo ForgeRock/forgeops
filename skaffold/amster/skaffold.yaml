@@ -1,0 +1,21 @@
+apiVersion: skaffold/v1alpha2
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - imageName: gcr.io/engineering-devops/sk-amster
+# See https://github.com/GoogleContainerTools/skaffold/issues/360
+deploy:
+  helm:
+    releases:
+    - name: sk-amster
+      chartPath: ../../helm/amster
+      values:
+        image: gcr.io/engineering-devops/sk-amster
+      setValues:
+        skaffold: "true"
+        config.strategy: "docker"
+        config.importPath: "/git"
+        domain: ".example.com"
+  

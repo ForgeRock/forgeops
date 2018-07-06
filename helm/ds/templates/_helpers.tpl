@@ -11,7 +11,7 @@ Expand the name of the chart.
 {{/* work in progress. TODO reduce dj image boilerplate */}}
 {{define "dscontainer"}}
 image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
-imagePullPolicy: {{ .Values.image.pullPolicy }}
+imagePullPolicy: {{ .Values.pullPolicy }}
 volumeMounts:
 - name: dj-secrets
     mountPath: /var/run/secrets/opendj

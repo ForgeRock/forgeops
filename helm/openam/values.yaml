@@ -4,12 +4,10 @@
 
 component: openam
 
-image:
-  repository: gcr.io/engineering-devops
-  tag: 6.5.0
-  # For development we set this to Always to get the most current image:
-  pullPolicy: Always
-  #pullPolicy: IfNotPresent
+image: gcr.io/engineering-devops:6.5.0
+
+
+pullPolicy: IfNotPresent
 
 domain: .forgeops.com
 

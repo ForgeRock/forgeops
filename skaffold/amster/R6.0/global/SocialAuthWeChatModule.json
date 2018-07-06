@@ -1,0 +1,56 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "SocialAuthWeChatModule",
+    "entityId" : "SocialAuthWeChatModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "core" : {
+        "usesBasicAuth" : false,
+        "scopeDelimiter" : null,
+        "tokenEndpoint" : "https://api.wechat.com/sns/oauth2/access_token",
+        "subjectProperty" : "openid",
+        "provider" : "WeChat",
+        "scope" : [ "snsapi_login" ],
+        "ssoProxyUrl" : "http://openam:80/openam/oauth2c/OAuthProxy.jsp",
+        "clientSecret" : null,
+        "userInfoEndpoint" : "https://api.wechat.com/sns/userinfo",
+        "clientId" : null,
+        "authorizeEndpoint" : "https://open.weixin.qq.com/connect/qrconnect"
+      },
+      "emailSettings" : {
+        "smtpFromAddress" : null,
+        "emailGateway" : "org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl",
+        "smtpSslEnabled" : null,
+        "smtpPort" : "25",
+        "smtpPassword" : null,
+        "smtpUsername" : "",
+        "smtpHost" : "localhost",
+        "emailAttribute" : ""
+      },
+      "accountProvisioning" : {
+        "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+        "attributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|uid|wechat-" ],
+        "accountMapperConfiguration" : [ "openid=uid" ],
+        "mapToAnonymousUser" : false,
+        "attributeMapperConfiguration" : [ "nickname=givenName", "openid=uid", "nickname=sn", "nickname=cn" ],
+        "createAccount" : true,
+        "enableRegistrationService" : false,
+        "accountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|*|wechat-",
+        "promptPasswordFlag" : false,
+        "anonymousUserName" : "anonymous",
+        "saveAttributesInSession" : true
+      },
+      "authenticationLevel" : 0
+    },
+    "_type" : {
+      "_id" : "authSocialWeChat",
+      "name" : "Social Auth WeChat",
+      "collection" : false
+    }
+  }
+}

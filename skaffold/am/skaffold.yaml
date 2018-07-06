@@ -1,0 +1,26 @@
+apiVersion: skaffold/v1alpha2
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - imageName: gcr.io/engineering-devops/sk-openam
+deploy:
+  # See https://github.com/GoogleContainerTools/skaffold/issues/360
+  helm:
+    releases:
+    - name: sk-openam
+      chartPath: ../../helm/openam
+      #wait: true
+      #valuesFilePath: helm-skaffold-values.yaml
+      values:
+        image: gcr.io/engineering-devops/sk-openam
+      setValues:
+        skaffold: "true"
+        config.strategy: "docker"
+        config.importPath: "/git"
+        domain: ".example.com"
+    - name: sk-ds
+      chartPath: ../../helm/ds
+      setValues:
+        djInstance: "configstore"

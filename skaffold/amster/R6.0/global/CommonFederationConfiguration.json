@@ -1,0 +1,47 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "CommonFederationConfiguration",
+    "entityId" : "CommonFederationConfiguration",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "generalConfig" : {
+      "certificateChecking" : "on",
+      "samlErrorPageHttpBinding" : "HTTP-POST",
+      "maxContentLength" : 20480,
+      "samlErrorPageUrl" : "/saml2/jsp/saml2error.jsp"
+    },
+    "implementationClasses" : {
+      "configurationClass" : "com.sun.identity.plugin.configuration.impl.ConfigurationInstanceImpl",
+      "signatureProviderClass" : "com.sun.identity.saml.xmlsig.AMSignatureProvider",
+      "keyProviderClass" : "com.sun.identity.saml.xmlsig.JKSKeyProvider",
+      "sessionProviderClass" : "com.sun.identity.plugin.session.impl.FMSessionProvider",
+      "loggerClass" : "com.sun.identity.plugin.log.impl.LogProvider",
+      "datastoreClass" : "com.sun.identity.plugin.datastore.impl.IdRepoDataStoreProvider",
+      "passwordDecoderClass" : "com.sun.identity.saml.xmlsig.FMPasswordDecoder"
+    },
+    "algorithms" : {
+      "transformationAlgorithm" : "http://www.w3.org/2001/10/xml-exc-c14n#",
+      "QuerySignatureAlgorithmRSA" : "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+      "signatureAlgorithm" : "http://www.w3.org/2000/09/xmldsig#rsa-sha1",
+      "QuerySignatureAlgorithmEC" : "http://www.w3.org/2001/04/xmldsig-more#ecdsa-sha512",
+      "canonicalizationAlgorithm" : "http://www.w3.org/2001/10/xml-exc-c14n#",
+      "QuerySignatureAlgorithmDSA" : "http://www.w3.org/2000/09/xmldsig#dsa-sha1",
+      "DigestAlgorithm" : "http://www.w3.org/2000/09/xmldsig#sha1"
+    },
+    "montoring" : {
+      "monitoringAgentClass" : "com.sun.identity.plugin.monitoring.impl.AgentProvider",
+      "monitoringSaml2Class" : "com.sun.identity.plugin.monitoring.impl.FedMonSAML2SvcProvider",
+      "monitoringIdffClass" : "com.sun.identity.plugin.monitoring.impl.FedMonIDFFSvcProvider",
+      "monitoringSaml1Class" : "com.sun.identity.plugin.monitoring.impl.FedMonSAML1SvcProvider"
+    },
+    "_type" : {
+      "_id" : "federation/common",
+      "name" : "Common Federation Configuration",
+      "collection" : false
+    }
+  }
+}

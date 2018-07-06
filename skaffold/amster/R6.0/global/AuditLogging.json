@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "AuditLogging",
+    "entityId" : "AuditLogging",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "auditEnabled" : true,
+    "fieldFilterPolicy" : [ "/access/http/request/queryParameters/tokenId", "/access/http/request/headers/cache-control", "/access/http/request/queryParameters/redirect_uri", "/access/http/request/queryParameters/Login.Token1", "/access/http/request/headers/accept-language", "/config/before", "/access/http/request/headers/%AM_AUTH_COOKIE_NAME%", "/config/after", "/access/http/request/queryParameters/access_token", "/access/http/request/headers/X-OpenAM-Password", "/access/http/request/queryParameters/id_token_hint", "/access/http/request/headers/proxy-authorization", "/access/http/request/queryParameters/IDToken1", "/access/http/request/queryParameters/requester", "/access/http/request/headers/connection", "/access/http/request/queryParameters/sessionUpgradeSSOTokenId", "/access/http/request/headers/content-type", "/access/http/request/cookies/%AM_COOKIE_NAME%", "/access/http/request/headers/accept-encoding", "/access/http/request/headers/authorization", "/access/http/request/headers/content-length", "/access/http/request/headers/%AM_COOKIE_NAME%" ],
+    "defaults" : {
+      "auditEnabled" : true,
+      "fieldFilterPolicy" : [ "/access/http/request/queryParameters/tokenId", "/access/http/request/headers/cache-control", "/access/http/request/queryParameters/redirect_uri", "/access/http/request/queryParameters/Login.Token1", "/access/http/request/headers/accept-language", "/config/before", "/access/http/request/headers/%AM_AUTH_COOKIE_NAME%", "/config/after", "/access/http/request/queryParameters/access_token", "/access/http/request/headers/X-OpenAM-Password", "/access/http/request/queryParameters/id_token_hint", "/access/http/request/headers/proxy-authorization", "/access/http/request/queryParameters/IDToken1", "/access/http/request/queryParameters/requester", "/access/http/request/headers/connection", "/access/http/request/queryParameters/sessionUpgradeSSOTokenId", "/access/http/request/headers/content-type", "/access/http/request/cookies/%AM_COOKIE_NAME%", "/access/http/request/headers/accept-encoding", "/access/http/request/headers/authorization", "/access/http/request/headers/content-length", "/access/http/request/headers/%AM_COOKIE_NAME%" ]
+    },
+    "_type" : {
+      "_id" : "audit",
+      "name" : "Audit Logging",
+      "collection" : false
+    }
+  }
+}

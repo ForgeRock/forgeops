@@ -32,11 +32,10 @@ config:
   # Where we perform export paths to. If not set, this defaults to the importPath
   #exportPath: /tmp/amster
 
-image:
-  repository: gcr.io/engineering-devops
-  tag: 6.5.0
-  #pullPolicy: IfNotPresent
-  pullPolicy: Always
+# Default image. Might get overridden by skaffold, etc.
+image: gcr.io/engineering-devops:6.5.0
+
+pullPolicy: IfNotPresent
 
 
 configStore:
@@ -74,9 +73,9 @@ resources:
 
 # Optional value overrides
 
-# version - defaults to the tag version. This sets the environment variable VERSION which is used by amster / commons config to
+# version. This sets the environment variable VERSION which is used by amster / commons config to
 # mass update the amster version tag on import. The amster configuration contains &{version} (see forgeops-init)
-#version: 6.5.0
+version: 6.0.0
 
 # fqdn - the openam server external fqdn.
 # If this is *not* set, it defaults to openam.{namespace}{{ .Values.domain }}

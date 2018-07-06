@@ -35,3 +35,11 @@ tls:
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
 {{ end -}}
 {{- end -}}
+
+{{- define "image" -}}
+{{- if .Values.skaffold -}}
+{{- .Values.image -}}
+{{- else -}}
+{{- printf "%s/%s:%s" .Values.image.repository .Values.component .Values.image.tag -}}
+{{- end -}}
+{{- end -}}

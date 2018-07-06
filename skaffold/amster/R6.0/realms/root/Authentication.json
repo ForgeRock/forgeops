@@ -1,0 +1,69 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "Authentication",
+    "entityId" : "Authentication",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "accountlockout" : {
+      "lockoutDuration" : 0,
+      "lockoutEmailAddress" : null,
+      "loginFailureLockoutMode" : false,
+      "lockoutDurationMultiplier" : 1,
+      "lockoutWarnUserCount" : 0,
+      "lockoutAttributeValue" : null,
+      "lockoutAttributeName" : null,
+      "loginFailureCount" : 5,
+      "invalidAttemptsDataAttributeName" : null,
+      "loginFailureDuration" : 300,
+      "storeInvalidAttemptsInDataStore" : true
+    },
+    "general" : {
+      "locale" : "en_US",
+      "statelessSessionsEnabled" : false,
+      "userStatusCallbackPlugins" : [ ],
+      "identityType" : [ "agent", "user" ],
+      "defaultAuthLevel" : 0,
+      "twoFactorRequired" : false
+    },
+    "userprofile" : {
+      "defaultRole" : [ ],
+      "aliasAttributeName" : [ "uid" ],
+      "dynamicProfileCreation" : "false"
+    },
+    "security" : {
+      "moduleBasedAuthEnabled" : true,
+      "zeroPageLoginAllowedWithoutReferrer" : true,
+      "sharedSecret" : null,
+      "sharedSecret-encrypted" : "AAAAA0FFUwIQRW6q+HYSntR7lzymq45AH5dsF5eYRlAqY+LaonUYy+XxfL5kbHtu6tSyOLMYHqG91/15HDaCn2OpfHhpMtHcDZBpFCWxfKrq",
+      "keyAlias" : "test",
+      "zeroPageLoginEnabled" : false,
+      "zeroPageLoginReferrerWhiteList" : [ ]
+    },
+    "postauthprocess" : {
+      "usernameGeneratorClass" : "com.sun.identity.authentication.spi.DefaultUserIDGenerator",
+      "loginFailureUrl" : [ "" ],
+      "userAttributeSessionMapping" : [ ],
+      "loginPostProcessClass" : [ ],
+      "usernameGeneratorEnabled" : true,
+      "loginSuccessUrl" : [ "/openam/console" ]
+    },
+    "core" : {
+      "orgConfig" : "ldapService",
+      "adminAuthModule" : "ldapService"
+    },
+    "trees" : {
+      "authenticationSessionsStateManagement" : "JWT",
+      "authenticationSessionsWhitelist" : false,
+      "authenticationSessionsMaxDuration" : 5
+    },
+    "_type" : {
+      "_id" : "EMPTY",
+      "name" : "Core",
+      "collection" : false
+    }
+  }
+}

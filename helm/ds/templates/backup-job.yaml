@@ -22,7 +22,7 @@ spec:
           # Backup to the bak/ folder
           - name: backup
             image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            imagePullPolicy: {{ .Values.pullPolicy }}
             args: [ "backup"]
             env:
             - name: NAMESPACE

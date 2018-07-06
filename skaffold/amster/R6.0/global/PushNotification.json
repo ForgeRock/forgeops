@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "PushNotification",
+    "entityId" : "PushNotification",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "delegateFactory" : "org.forgerock.openam.services.push.sns.SnsHttpDelegateFactory",
+      "mdDuration" : 120,
+      "accessKey" : null,
+      "appleEndpoint" : null,
+      "mdConcurrency" : 16,
+      "secret" : null,
+      "region" : "us-east-1",
+      "googleEndpoint" : null,
+      "mdCacheSize" : 10000
+    },
+    "_type" : {
+      "_id" : "pushNotification",
+      "name" : "Push Notification Service",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "JdbcModule",
+    "entityId" : "JdbcModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "jdbcUrl" : "jdbc:mysql://127.0.0.1:3306/test",
+      "connectionType" : "JNDI",
+      "username" : "root",
+      "passwordStatement" : "select PASSWORD_COLUMN from TABLE where USERNAME_COLUMN = ?",
+      "passwordTransformClass" : "com.sun.identity.authentication.modules.jdbc.ClearTextTransform",
+      "connectionPoolJndiName" : "java:comp/env/jdbc/samplePool",
+      "password" : null,
+      "password-encrypted" : "AAAAA0FFUwIQ3ISi8+r992Bqah/bAFvwf2knVQizcpL0RhBPgkAWJC+OqKb3lWuYMQ==",
+      "jdbcDriver" : "com.mysql.jdbc.Driver",
+      "passwordColumn" : "PASSWORD_COLUMN",
+      "authenticationLevel" : 0
+    },
+    "_type" : {
+      "_id" : "jdbc",
+      "name" : "JDBC",
+      "collection" : false
+    }
+  }
+}

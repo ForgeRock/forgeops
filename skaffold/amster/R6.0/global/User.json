@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "User",
+    "entityId" : "User",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "dynamic" : {
+      "defaultUserStatus" : "Active",
+      "preferredTimezone" : null,
+      "adminDNStartingView" : null
+    },
+    "_type" : {
+      "_id" : "user",
+      "name" : "User",
+      "collection" : false
+    }
+  }
+}

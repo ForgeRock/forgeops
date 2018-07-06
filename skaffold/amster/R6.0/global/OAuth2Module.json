@@ -1,0 +1,52 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "OAuth2Module",
+    "entityId" : "OAuth2Module",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "mixUpMitigation" : false,
+      "ssoProxyUrl" : "http://openam:80/openam/oauth2c/OAuthProxy.jsp",
+      "authenticationLevel" : 0,
+      "accountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper",
+      "accountMapperConfiguration" : [ "id=facebook-id", "email=mail" ],
+      "oauth2LogoutServiceUrl" : "",
+      "anonymousUserName" : "anonymous",
+      "mailGatewayClass" : "org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl",
+      "oauth2EmailAttribute" : "",
+      "smtpHostName" : "localhost",
+      "smtpSslEnabled" : null,
+      "userProfileServiceUrl" : "https://graph.facebook.com/me",
+      "openidConnectContextValue" : null,
+      "promptForPassword" : true,
+      "smtpFromAddress" : "info@forgerock.com",
+      "scope" : "email,read_stream",
+      "accessTokenParameterName" : "access_token",
+      "smtpHostPort" : "25",
+      "saveAttributesInSession" : true,
+      "openidConnectIssuer" : null,
+      "attributeMapperConfiguration" : [ "first_name=givenname", "id=facebook-id", "email=facebook-email", "last_name=facebook-lname", "first_name=facebook-fname", "last_name=sn", "name=cn", "email=mail" ],
+      "clientSecret" : null,
+      "smtpUsername" : "",
+      "authenticationEndpointUrl" : "https://www.facebook.com/dialog/oauth",
+      "openidConnectContextType" : null,
+      "accessTokenEndpointUrl" : "https://graph.facebook.com/oauth/access_token",
+      "clientId" : null,
+      "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+      "smtpPassword" : null,
+      "attributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper" ],
+      "createAccount" : true,
+      "mapToAnonymousUser" : false,
+      "logoutBehaviour" : "prompt"
+    },
+    "_type" : {
+      "_id" : "oauth2",
+      "name" : "Legacy OAuth 2.0 / OpenID Connect",
+      "collection" : false
+    }
+  }
+}

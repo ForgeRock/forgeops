@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "ScriptingEngineConfiguration",
+    "entityId" : "engineConfiguration",
+    "pathParams" : {
+      "contexts" : "OIDC_CLAIMS"
+    }
+  },
+  "data" : {
+    "_id" : "engineConfiguration",
+    "queueSize" : 10,
+    "useSecurityManager" : true,
+    "idleTimeout" : 60,
+    "coreThreads" : 10,
+    "blackList" : [ "java.lang.Class", "java.security.AccessController", "java.lang.reflect.*" ],
+    "whiteList" : [ "java.lang.Float", "java.util.HashMap$KeyIterator", "com.sun.identity.shared.debug.Debug", "java.lang.Double", "org.forgerock.openam.oauth2.OpenAMAccessToken", "java.util.HashMap$Entry", "java.util.HashMap", "java.lang.Character$Subset", "java.lang.Integer", "java.util.TreeSet", "java.util.ArrayList", "java.util.LinkedHashMap", "java.util.HashSet", "com.sun.identity.idm.AMIdentity", "java.lang.Character$UnicodeBlock", "java.lang.Character", "java.util.Collections$1", "org.forgerock.openidconnect.ssoprovider.OpenIdConnectSSOToken", "java.lang.Long", "java.lang.Short", "org.forgerock.http.client.*", "java.lang.Math", "java.lang.Boolean", "java.lang.String", "java.util.LinkedList", "org.codehaus.groovy.runtime.ScriptBytecodeAdapter", "java.lang.Byte", "java.lang.Number", "java.lang.StrictMath", "java.util.ArrayList$Itr", "java.util.LinkedHashSet", "java.lang.Void", "org.codehaus.groovy.runtime.GStringImpl", "java.util.LinkedHashMap$LinkedEntryIterator", "groovy.json.JsonSlurper", "org.forgerock.oauth2.core.UserInfoClaims", "com.iplanet.sso.providers.dpro.SessionSsoToken", "java.util.LinkedHashMap$LinkedEntrySet", "java.util.Collections$SingletonList", "org.forgerock.openidconnect.Claim", "org.forgerock.oauth2.core.exceptions.InvalidRequestException", "java.util.LinkedHashMap$Entry", "java.util.Collections$EmptyList", "java.util.TreeMap", "java.lang.Object", "java.util.HashMap$Node" ],
+    "maxThreads" : 50,
+    "serverTimeout" : 0,
+    "_type" : {
+      "_id" : "engineConfiguration",
+      "name" : "Scripting engine configuration",
+      "collection" : false
+    }
+  }
+}

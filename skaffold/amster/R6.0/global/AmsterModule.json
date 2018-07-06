@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "AmsterModule",
+    "entityId" : "AmsterModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "authenticationLevel" : 0,
+      "enabled" : true,
+      "authorizedKeys" : "/home/forgerock/openam/authorized_keys"
+    },
+    "_type" : {
+      "_id" : "amster",
+      "name" : "ForgeRock Amster",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "EmailService",
+    "entityId" : "EmailService",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "emailAddressAttribute" : "mail",
+      "message" : null,
+      "port" : 465,
+      "password" : null,
+      "from" : null,
+      "hostname" : null,
+      "username" : null,
+      "sslState" : "SSL",
+      "subject" : null,
+      "emailImplClassName" : "org.forgerock.openam.services.email.MailServerImpl"
+    },
+    "_type" : {
+      "_id" : "email",
+      "name" : "Email Service",
+      "collection" : false
+    }
+  }
+}

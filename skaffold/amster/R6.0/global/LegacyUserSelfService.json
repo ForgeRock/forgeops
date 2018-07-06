@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "LegacyUserSelfService",
+    "entityId" : "LegacyUserSelfService",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "forgotPasswordTokenLifetime" : 900,
+      "selfServiceEnabled" : false,
+      "selfRegistrationConfirmationUrl" : "http://openam:80/openam/XUI/confirm.html",
+      "forgotPasswordEnabled" : false,
+      "selfRegistrationEnabled" : false,
+      "selfRegistrationTokenLifetime" : 900,
+      "forgotPasswordConfirmationUrl" : "http://openam:80/openam/XUI/confirm.html",
+      "userRegisteredDestination" : "default",
+      "protectedUserAttributes" : [ ]
+    },
+    "_type" : {
+      "_id" : "security",
+      "name" : "Legacy User Self Service",
+      "collection" : false
+    }
+  }
+}

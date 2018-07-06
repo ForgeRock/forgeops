@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "GlobalScripts",
+    "entityId" : "c827d2b4-3608-4693-868e-bbcf86bd87c7",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "c827d2b4-3608-4693-868e-bbcf86bd87c7",
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "lastModifiedDate" : "1433147666269",
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "context" : "AUTHENTICATION_CLIENT_SIDE",
+    "name" : "Scripted Module - Client Side",
+    "description" : "Default global script for client side Scripted Authentication Module",
+    "language" : "JAVASCRIPT",
+    "creationDate" : "1433147666269",
+    "script" : "LyoKICogQ29weXJpZ2h0IDIwMTYtMjAxNyBGb3JnZVJvY2sgQVMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQKICoKICogVXNlIG9mIHRoaXMgY29kZSByZXF1aXJlcyBhIGNvbW1lcmNpYWwgc29mdHdhcmUgbGljZW5zZSB3aXRoIEZvcmdlUm9jayBBUy4KICogb3Igd2l0aCBvbmUgb2YgaXRzIGFmZmlsaWF0ZXMuIEFsbCB1c2Ugc2hhbGwgYmUgZXhjbHVzaXZlbHkgc3ViamVjdAogKiB0byBzdWNoIGxpY2Vuc2UgYmV0d2VlbiB0aGUgbGljZW5zZWUgYW5kIEZvcmdlUm9jayBBUy4KICovCi8qIERlZmF1bHQgQXV0aGVudGljYXRpb24gY2xpZW50IHNpZGUgc2NyaXB0IHRvIHVzZSBhcyBhIHRlbXBsYXRlIGZvciBuZXcgc2NyaXB0cyAqLw==",
+    "_type" : {
+      "_id" : "globalScript",
+      "name" : "Scripting",
+      "collection" : true
+    }
+  }
+}

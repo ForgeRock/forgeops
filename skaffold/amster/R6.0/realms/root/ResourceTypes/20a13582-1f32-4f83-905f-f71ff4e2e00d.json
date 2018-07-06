@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "ResourceTypes",
+    "entityId" : "20a13582-1f32-4f83-905f-f71ff4e2e00d",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "20a13582-1f32-4f83-905f-f71ff4e2e00d",
+    "uuid" : "20a13582-1f32-4f83-905f-f71ff4e2e00d",
+    "name" : "Delegation Service",
+    "description" : "The built-in delegation Resource Type available to OpenAM Policies.",
+    "patterns" : [ "sms://*:*/*", "sms://*:*/*?*" ],
+    "actions" : {
+      "READ" : true,
+      "MODIFY" : true,
+      "DELEGATE" : true
+    },
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "creationDate" : 1422892465848,
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "lastModifiedDate" : 1422892465848
+  }
+}

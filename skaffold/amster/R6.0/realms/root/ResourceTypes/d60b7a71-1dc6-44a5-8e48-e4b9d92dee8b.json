@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "ResourceTypes",
+    "entityId" : "d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b",
+    "uuid" : "d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b",
+    "name" : "OAuth2 Scope",
+    "description" : "The built-in OAuth2 Scope Resource Type for OAuth2 policy-provided scope.",
+    "patterns" : [ "*://*:*/*", "*://*:*/*?*", "*" ],
+    "actions" : {
+      "GRANT" : true
+    },
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "creationDate" : 1517161800564,
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "lastModifiedDate" : 1517161800564
+  }
+}

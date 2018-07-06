@@ -80,7 +80,7 @@ spec:
       {{ if .Values.restore.enabled }}
       - name: restore
         image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         volumeMounts:
         - name: db
           mountPath: /opt/opendj/data
@@ -101,7 +101,7 @@ spec:
       containers:
       - name: ds
         image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
         #terminationGracePeriodSeconds: 10
         resources:
 {{ toYaml .Values.resources | indent 12 }}

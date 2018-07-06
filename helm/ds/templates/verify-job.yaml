@@ -41,7 +41,7 @@ spec:
           containers:
           - name: opendj
             image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
-            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            imagePullPolicy: {{ .Values.pullPolicy }}
             envFrom:
             - configMapRef:
                 name: {{ .Values.djInstance }}

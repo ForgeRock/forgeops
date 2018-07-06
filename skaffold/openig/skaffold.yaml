@@ -1,0 +1,29 @@
+apiVersion: skaffold/v1alpha2
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+  - imageName: gcr.io/engineering-devops/igtest
+    # docker:
+    #   buildArgs:
+    #     FOO: "bar"
+deploy:
+  # See https://github.com/GoogleContainerTools/skaffold/issues/360
+  helm:
+    releases:
+    - name: ig-test
+      chartPath: ../../helm/openig
+      #wait: true
+      #valuesFilePath: helm-skaffold-values.yaml
+      values:
+        image: gcr.io/engineering-devops/igtest
+      #overrides builds an override values.yaml file to run with the helm deploy
+      #overrides:
+      # some:
+      #   key: someValue
+      #setValues get appended to the helm deploy with --set.  
+      setValues:
+        skaffold: "true"
+        config.strategy: "docker"
+        config.path: "/git"

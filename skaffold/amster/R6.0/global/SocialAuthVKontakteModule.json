@@ -1,0 +1,55 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "SocialAuthVKontakteModule",
+    "entityId" : "SocialAuthVKontakteModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "emailSettings" : {
+        "smtpFromAddress" : null,
+        "emailGateway" : "org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl",
+        "smtpSslEnabled" : null,
+        "smtpPort" : "25",
+        "smtpPassword" : null,
+        "smtpUsername" : "",
+        "smtpHost" : "localhost",
+        "emailAttribute" : ""
+      },
+      "accountProvisioning" : {
+        "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+        "attributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|uid|vkontakte-" ],
+        "accountMapperConfiguration" : [ "id=uid" ],
+        "mapToAnonymousUser" : false,
+        "attributeMapperConfiguration" : [ "first_name=givenName", "first_name=cn", "id=uid", "last_name=sn", "email=mail" ],
+        "createAccount" : true,
+        "enableRegistrationService" : false,
+        "accountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|uid|vkontakte-",
+        "promptPasswordFlag" : false,
+        "anonymousUserName" : "anonymous",
+        "saveAttributesInSession" : true
+      },
+      "core" : {
+        "tokenEndpoint" : "https://oauth.vk.com/access_token",
+        "subjectProperty" : "id",
+        "apiVersion" : "5.73",
+        "provider" : "VKontakte",
+        "scope" : [ "email" ],
+        "ssoProxyUrl" : "http://openam:80/openam/oauth2c/OAuthProxy.jsp",
+        "clientSecret" : null,
+        "forgerock-am-auth-socialauthvk-auth-level" : 0,
+        "userInfoEndpoint" : "https://api.vk.com/method/users.get",
+        "clientId" : null,
+        "authorizeEndpoint" : "https://oauth.vk.com/authorize"
+      }
+    },
+    "_type" : {
+      "_id" : "authSocialVk",
+      "name" : "Social Auth VKontakte",
+      "collection" : false
+    }
+  }
+}

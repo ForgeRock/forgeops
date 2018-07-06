@@ -1,0 +1,60 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "SocialAuthOAuth2Module",
+    "entityId" : "SocialAuthOAuth2Module",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "core" : {
+        "usesBasicAuth" : true,
+        "scopeDelimiter" : null,
+        "tokenEndpoint" : null,
+        "subjectProperty" : null,
+        "logoutBehaviour" : "prompt",
+        "provider" : null,
+        "scope" : [ ],
+        "ssoProxyUrl" : "http://openam:80/openam/oauth2c/OAuthProxy.jsp",
+        "clientSecret" : null,
+        "userInfoEndpoint" : null,
+        "clientId" : null,
+        "issuerName" : null,
+        "logoutServiceUrl" : "",
+        "authenticationLevel" : 0,
+        "authorizeEndpoint" : null,
+        "mixUpMitigation" : false
+      },
+      "emailSettings" : {
+        "smtpFromAddress" : null,
+        "emailGateway" : "org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl",
+        "smtpSslEnabled" : null,
+        "smtpPort" : "25",
+        "smtpPassword" : null,
+        "smtpUsername" : "",
+        "smtpHost" : "localhost",
+        "emailAttribute" : ""
+      },
+      "accountProvisioning" : {
+        "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+        "attributeMappingClasses" : [ ],
+        "accountMapperConfiguration" : [ ],
+        "mapToAnonymousUser" : false,
+        "attributeMapperConfiguration" : [ ],
+        "createAccount" : true,
+        "enableRegistrationService" : false,
+        "accountMapperClass" : null,
+        "promptPasswordFlag" : false,
+        "anonymousUserName" : "anonymous",
+        "saveAttributesInSession" : true
+      }
+    },
+    "_type" : {
+      "_id" : "authSocialOAuth2",
+      "name" : "Social Auth OAuth2",
+      "collection" : false
+    }
+  }
+}

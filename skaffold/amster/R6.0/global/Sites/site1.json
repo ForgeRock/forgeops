@@ -1,0 +1,14 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "Sites",
+    "entityId" : "site1",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "site1",
+    "url" : "http://&{fqdn}/openam",
+    "secondaryURLs" : [ ]
+  }
+}

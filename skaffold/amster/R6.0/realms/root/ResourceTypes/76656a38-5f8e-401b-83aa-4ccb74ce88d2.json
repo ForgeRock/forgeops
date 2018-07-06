@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "ResourceTypes",
+    "entityId" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
+    "uuid" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
+    "name" : "URL",
+    "description" : "The built-in URL Resource Type available to OpenAM Policies.",
+    "patterns" : [ "*://*:*/*", "*://*:*/*?*" ],
+    "actions" : {
+      "HEAD" : true,
+      "DELETE" : true,
+      "POST" : true,
+      "GET" : true,
+      "OPTIONS" : true,
+      "PUT" : true,
+      "PATCH" : true
+    },
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "creationDate" : 1422892465848,
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "lastModifiedDate" : 1422892465848
+  }
+}

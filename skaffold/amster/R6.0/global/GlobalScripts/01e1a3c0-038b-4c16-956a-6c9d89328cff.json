@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "&{version}",
+    "entityType" : "GlobalScripts",
+    "entityId" : "01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "lastModifiedDate" : "1433147666269",
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "context" : "AUTHENTICATION_TREE_DECISION_NODE",
+    "name" : "Authentication Tree Decision Node Script",
+    "description" : "Default global script for a scripted decision node",
+    "language" : "JAVASCRIPT",
+    "creationDate" : "1433147666269",
+    "script" : "LyoKICAtIERhdGEgbWFkZSBhdmFpbGFibGUgYnkgbm9kZXMgdGhhdCBoYXZlIGFscmVhZHkgZXhlY3V0ZWQgYXJlIGF2YWlsYWJsZSBpbiB0aGUgc2hhcmVkU3RhdGUgdmFyaWFibGUuCiAgLSBUaGUgc2NyaXB0IHNob3VsZCBzZXQgb3V0Y29tZSB0byBlaXRoZXIgInRydWUiIG9yICJmYWxzZSIuCiAqLwoKb3V0Y29tZSA9ICJ0cnVlIjs=",
+    "_type" : {
+      "_id" : "globalScript",
+      "name" : "Scripting",
+      "collection" : true
+    }
+  }
+}
