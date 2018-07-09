@@ -38,11 +38,6 @@ install() {
   AM_AGENT_PASSWORD=$(cat /var/run/secrets/agent/.password)
   AM_AGENT_PW=`./agentadmin --p $AM_AGENT_KEY $AM_AGENT_PASSWORD |  awk 'NF>1{print $NF}'`
 
-  # Create debug output for docker using mkfifo and setting owner to nginx workper process user
-  mkfifo -m 600 /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.out
-  cat <> /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.out 1>&2 &
-  chown nginx:nginx /opt/web_agents/nginx12_agent/instances/agent_1/logs/debug/debug.out
-
   # Run sed on agent.conf to replace any vars.
   cd /opt/web_agents/nginx12_agent/instances/agent_1/config/
   cp /opt/web_agents/nginx12_agent/config/agent.conf.template .

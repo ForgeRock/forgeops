@@ -32,15 +32,10 @@
 install() {
   cd /opt/web_agents/apache24_agent/bin
   echo "DEBUG: Agent realm is set to: $AGENT_REALM"
-  
+
   AM_AGENT_PASSWORD=$(cat /var/run/secrets/agent/.password)
   # Run agentadmin to encode password with key. The awk trick is needed because output is a full text message - not the value.
   AM_AGENT_PW=`./agentadmin --p $AM_AGENT_KEY $AM_AGENT_PASSWORD |  awk 'NF>1{print $NF}'`
-
-  # Create debug output for docker using mkfifo and setting owner to nginx workper process user
-  mkfifo -m 600 /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log
-  cat <> /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log 1>&2 &
-  chown daemon:daemon /opt/web_agents/apache24_agent/instances/agent_1/logs/debug/debug.log
 
   # Run sed on agent.conf.template to replace any vars.
   cd /opt/web_agents/apache24_agent/instances/agent_1/config/
