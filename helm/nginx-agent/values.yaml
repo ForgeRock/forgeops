@@ -21,7 +21,6 @@ domain: .forgeops.com
 
 agent:
   user: nginx
-  password: password
   amServer: http://openam.pavel.forgeops.com/openam
   realm: "/"
 

@@ -1,7 +1,5 @@
-#
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-#
 # Docker image for Apache + AM HTTP agent.
 FROM httpd:2.4
 WORKDIR /opt
@@ -13,6 +11,7 @@ ENV AM_DEFAULT_LOG_LEVEL All
 ARG AM_SERVER=http://openam.example.forgeops.com:80/openam
 ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 
+# Before building image, make sure you have apache 2.4 web agent in this dockerfile folder
 ARG APACHE_AGENT=/var/tmp/agent.zip
 COPY agent.zip /var/tmp/agent.zip
 
@@ -41,5 +40,5 @@ COPY policy.html /usr/local/apache2/htdocs/
 RUN echo "CoreDumpDirectory /tmp/" >> /usr/local/apache2/conf/httpd.conf
 ENTRYPOINT ["/opt/web_agents/docker-entrypoint.sh"]
 
-# Inherit CMD from Parent httpd:2.4. This starts Apache in the foreground, so we can see the stdout.
+# Set entrypoint to docker-entrypoint.sh do to runtime installation/configuration steps
 CMD ["/opt/web_agents/docker-entrypoint.sh"]

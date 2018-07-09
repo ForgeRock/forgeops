@@ -17,7 +17,6 @@ useTLS: false
 # in selected amServer. User and password must match profile in amServer
 agent:
   user: apache
-  password: password
   amServer: http://openam.pavel.forgeops.com/openam
   realm: "/"
 

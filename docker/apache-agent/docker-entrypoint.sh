@@ -5,7 +5,6 @@
 
 # Agent properties to generate bootstrap agent.conf file properties from template
 # General properties
-: ${AM_AGENT_PASSWORD:="password"}
 : ${AM_AGENT_KEY:="ZGJlYzA4NTUtNjE4Mi04OQ=="}
 : ${AM_AGENT_NAME:="apache"}
 : ${AM_AGENT_REALM:="/"}
@@ -33,7 +32,8 @@
 install() {
   cd /opt/web_agents/apache24_agent/bin
   echo "DEBUG: Agent realm is set to: $AGENT_REALM"
-
+  
+  AM_AGENT_PASSWORD=$(cat /var/run/secrets/agent/.password)
   # Run agentadmin to encode password with key. The awk trick is needed because output is a full text message - not the value.
   AM_AGENT_PW=`./agentadmin --p $AM_AGENT_KEY $AM_AGENT_PASSWORD |  awk 'NF>1{print $NF}'`
 

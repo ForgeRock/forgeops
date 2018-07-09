@@ -1,18 +1,19 @@
-# Note: This is currently pending the fix for https://bugster.forgerock.org/jira/browse/AMAGENTS-501.
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Nginx agent base image
 FROM nginx:1.11.10
 
 WORKDIR /opt
 
 ARG AM_SERVER=http://openam.example.forgeops.com:80/openam
 ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
-# For Local build - copy the .zip file in.
-#COPY NGINX_r11303_Centos7_64bit_5.0.0-SNAPSHOT.zip /var/tmp/agent.zip
 
+# Copy nginx.conf with included agent module
 COPY nginx.conf /etc/nginx/
 COPY default.conf /etc/nginx/conf.d/
 COPY agent.zip /var/tmp/
 
+# Install necessary dependencies
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
       unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \

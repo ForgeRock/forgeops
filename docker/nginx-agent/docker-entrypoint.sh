@@ -5,7 +5,6 @@
 
 # Agent properties to generate bootstrap agent.conf file properties from template
 # General properties
-: ${AM_AGENT_PASSWORD:="password"}
 : ${AM_AGENT_KEY:="ZGJlYzA4NTUtNjE4Mi04OQ=="}
 : ${AM_AGENT_NAME:="nginx"}
 : ${AM_AGENT_REALM:="/"}
@@ -36,6 +35,7 @@ install() {
   cd /opt/web_agents/nginx12_agent/bin
   echo "DEBUG: Agent realm is set to: $AGENT_REALM"
   # Run agentadmin to encode password with key. The awk trick is needed because output is a full text message - not the value.
+  AM_AGENT_PASSWORD=$(cat /var/run/secrets/agent/.password)
   AM_AGENT_PW=`./agentadmin --p $AM_AGENT_KEY $AM_AGENT_PASSWORD |  awk 'NF>1{print $NF}'`
 
   # Create debug output for docker using mkfifo and setting owner to nginx workper process user

@@ -14,11 +14,9 @@ spec:
         agent: apache
         app: {{ template "fullname" . }}
     spec:
-      # Note: the privileged container and mounting the /dev/shm are needed to give the agent enough shared
-      # memory.  See https://bugster.forgerock.org/jira/browse/AMAGENTS-273
-      # And https://github.com/kubernetes/kubernetes/issues/28272
       terminationGracePeriodSeconds: 5
       containers:
+      # Sidecar container to tail out logs from shared volume
       - name: logs-sidecar
         image: alpine
         command: ["/bin/sh"]
@@ -35,6 +33,12 @@ spec:
         volumeMounts:
         - name: logs
           mountPath: /logmount
+        - name: agent-secrets
+          mountPath: /var/run/secrets/agent
+        - name: dshm
+          mountPath: /dev/shm
+        # This can be extended for any configurable properties. Look to forgeops/docker/nginx-agent/docker-entrypoint.sh
+        # for list of supported env variables.
         env:
         - name: AM_AGENT_PASSWORD
           value: "{{ .Values.agent.password }}"
@@ -47,7 +51,7 @@ spec:
         - name: AM_AGENT_REALM
           value: "{{ .Values.agent.realm }}"
         - name: AM_PDP_TEMP_PATH
-          value: "{{ default "/logmount"  .Values.agent.pdpPath }}"
+          value: "{{ default "/logmount/"  .Values.agent.pdpPath }}"
         - name: AM_DEBUG_FILE_PATH
           value: "{{ default "/logmount/"  .Values.agent.debugFilePath }}"
         - name: AM_AUDIT_FILE_PATH
@@ -56,10 +60,10 @@ spec:
         - containerPort: {{ .Values.service.internalPort }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-        volumeMounts:
-        - name: dshm
-          mountPath: /dev/shm
       volumes:
+      - name: agent-secrets
+        secret:
+          secretName: nginx-agent-secrets
       - name: logs
         emptyDir: {}
       - name: dshm

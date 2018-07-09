@@ -21,6 +21,5 @@ spec:
       paths:
       - path: /
         backend:
-          #serviceName:  {{ template "fullname" . }}
           serviceName: apache-agent
           servicePort: 80
