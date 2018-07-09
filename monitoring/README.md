@@ -113,6 +113,18 @@ If you want Prometheus to scrape metrics from a different product, you need to c
         secretUser: cHJvbWV0aGV1cw==        # username in base64 encode if required
         secretPassword: cHJvbWV0aGV1cw==        # password in base64 encode if required
     ```
+* The default scope for Prometheus is to scrape all namespaces configured in values.yaml like this:
+    ```
+    namespaceSelectorStrategy: any
+    ```
+  If you want to limit this scope, you can define a list of namespace, for example:
+    ```
+    namespaceSelectorStrategy: selection
+    namespaceSelector:
+      - production
+      - staging
+      - test
+    ```
 * Update Prometheus with new ServiceMonitor
     ```
     ./bin/deploy_prometheus.sh [-n <namespace>]

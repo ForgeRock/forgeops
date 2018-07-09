@@ -34,11 +34,14 @@ spec:
     matchLabels:
       component: {{ .Values.am.labelSelectorComponent }}
   namespaceSelector:
+    {{ if eq .Values.namespaceSelectorStrategy "any" }}
     any: true
-    #matchNames:
-      #{{- range .Values.namespaceSelector }}
-      #- {{ . }}
-      #{{- end }}
+    {{ else }}
+    matchNames:
+      {{- range .Values.namespaceSelector }}
+      - {{ . }}
+      {{- end }}
+    {{ end }}
 ---
 apiVersion: v1
 kind: Secret
