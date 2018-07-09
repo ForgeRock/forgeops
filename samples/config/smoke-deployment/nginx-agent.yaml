@@ -1,4 +1,4 @@
 agent:
-  user: apache
+  user: nginx
   amServer: http://openam.smoke.forgeops.com/openam
   realm: "/"

@@ -8,4 +8,4 @@ DOMAIN="forgeops.com"
 
 # The components to deploy
 # Note the opendj stores are aliased as configstore, userstore, ctstore - but they all use the opendj chart.
-COMPONENTS=(frconfig configstore userstore openam amster postgres-openidm openig openidm apache-agent)
+COMPONENTS=(frconfig configstore userstore openam amster postgres-openidm openig openidm apache-agent nginx-agent)

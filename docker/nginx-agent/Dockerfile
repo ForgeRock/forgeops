@@ -36,8 +36,8 @@ WORKDIR /opt/web_agents
 COPY *.sh /opt/web_agents/
 
 # Copy testing pages to htdocs
-COPY neu.html /usr/local/apache2/htdocs/
-COPY policy.html /usr/local/apache2/htdocs/
+COPY neu.html /usr/share/nginx/html/
+COPY policy.html /usr/share/nginx/html/
 
 RUN chown -R nginx:nginx /opt/
 
