@@ -14,7 +14,7 @@ serverBase: http://openam:80
 
 
 # The top level domain (including the leading .). This excludes the openam component. 
-domain: .forgeops.com
+domain: .example.com
 
 # Install passwords.
 amadminPassword: password
@@ -35,9 +35,8 @@ config:
 image:
   repository: gcr.io/engineering-devops
   tag: 6.5.0
-  #pullPolicy: IfNotPresent
-  pullPolicy: Always
-
+  pullPolicy: IfNotPresent
+  #pullPolicy: Always
 
 configStore:
   # type can be dirServer or embedded.

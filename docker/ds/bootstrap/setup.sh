@@ -13,7 +13,7 @@ echo "##### Cleaning servers..."
 ./clean-all.sh
 
 echo "##### Configuring directory server DSRS 1..."
-./setup-ds.sh dsrs 1 100
+./setup-ds.sh dsrs 1 10
 
 if [ -n "$CONFIG_REPLICATION" ]; then 
 
