@@ -11,11 +11,11 @@
 
 #REGISTRY="forgerock-docker-public.bintray.io"
 
-REGISTRY="forgerock-docker-internal.bintray.io"
+REGISTRY="forgerock-docker-public.bintray.io"
 
 REPO="forgerock"
 # Default tag if none is specified.
-TAG=${TAG:-6.5.0}
+TAG=${TAG:-6.0.1}
 
 # If you want to push to Google gcr.io, replace the repository name with your project name.
 PROJECT="engineering-devops"

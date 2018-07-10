@@ -7,10 +7,10 @@
 Build:
 
 * Build the docker image. You can issue docker commands or use the build.sh shell script.
-    * `cd forgeops/docker; ./build.sh -g ds`  - will  build an image called gcr.io/engineering-devops/ds:6.5.0
+    * `cd forgeops/docker; ./build.sh -g ds`  - will  build an image called gcr.io/engineering-devops/ds:6.0.1
 * If you just want to docker run something (to see if the image comes up)
-    * `docker run -rm -it gcr.io/engineering-devops/ds:6.5.0` 
-    * Or to get a bash shell into the final image:  `docker run -rm -it gcr.io/engineering-devops/ds:6.5.0 debug` 
+    * `docker run -rm -it gcr.io/engineering-devops/ds:6.0.1` 
+    * Or to get a bash shell into the final image:  `docker run -rm -it gcr.io/engineering-devops/ds:6.0.1 debug` 
 
 
 Run Helm:
@@ -22,7 +22,7 @@ image:
   repository: gcr.io/engineering-devops
   #pullPolicy: Always
   pullPolicy: IfNotPresent
-  tag: 6.5.0
+  tag: 6.0.1
 
 djInstance: userstore
 

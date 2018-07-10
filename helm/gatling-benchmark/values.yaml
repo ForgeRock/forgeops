@@ -7,7 +7,7 @@ domain: .forgeops.com
 # Gatling image with tests.
 # Dockerfile for this image can be found in forgeops/docker/gatling
 image:
-  repository: gcr.io/engineering-devops/gatling:6.5.0
+  repository: forgerock-docker-public.bintray.io/forgerock/gatling:6.0.1
   pullPolicy: Always
 
 benchmark:

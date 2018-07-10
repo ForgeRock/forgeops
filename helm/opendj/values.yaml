@@ -26,11 +26,11 @@ djInstance: ds
 component: opendj
 
 image:
-  repository: gcr.io/engineering-devops
+  repository: forgerock-docker-public.bintray.io/forgerock
   # For development we set this to Always to get the most current image.
   pullPolicy: Always
   #pullPolicy: IfNotPresent
-  tag:  6.5.0
+  tag:  6.0.1
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicas: 1

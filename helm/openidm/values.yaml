@@ -24,11 +24,11 @@ config:
   strategy: git
   
 image:
-  repository: gcr.io/engineering-devops
+  repository: forgerock-docker-public.bintray.io/forgerock
   # For development use Always
   pullPolicy: IfNotPresent
   #pullPolicy: IfNotPresent
-  tag: 6.5.0
+  tag: 6.0.1
 
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"

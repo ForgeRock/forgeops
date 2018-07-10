@@ -20,9 +20,9 @@ global:
     idm: default/idm/sync-with-ldap-bidirectional
 
 image:
-  repository: gcr.io/engineering-devops/openidm
+  repository: forgerock-docker-public.bintray.io/forgerock/openidm
   pullPolicy: IfNotPresent
-  tag: 6.5.0-SNAPSHOT
+  tag: 6.0.1-SNAPSHOT
 
 # TODO: We should get the idmuser / password values from the secret created in the etc/gke/prepsql chart.
 openidm:

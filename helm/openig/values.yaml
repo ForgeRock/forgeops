@@ -32,8 +32,8 @@ catalinaOpts: "-Xmx512m"
 useTLS: false
 
 image:
-  repository: gcr.io/engineering-devops
-  tag: 6.5.0
+  repository: forgerock-docker-public.bintray.io/forgerock
+  tag: 6.0.1
   pullPolicy: IfNotPresent
 
 service:
