@@ -12,6 +12,9 @@ kubectl create secret generic clouddns --from-file=../etc/cert-manager.json -n k
 # Deploy Cert Manager Helm chart
 helm upgrade -i cert-manager --namespace kube-system stable/cert-manager --values ../cert-manager/values.yaml
 
+# Allow time for operator to be deployed so CRDs are recognized
+sleep 5
+
 # Deploy Cluster Issuer
 kubectl create -f ../cert-manager/cluster-issuer.yaml -n kube-system
 
