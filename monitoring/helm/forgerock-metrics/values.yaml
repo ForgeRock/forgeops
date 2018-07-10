@@ -2,6 +2,17 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Select namespace strategy. 
+#   any = scrape all namespaces[default].
+#   selection = user defined array of namespaces to scrape.
+namespaceSelectorStrategy: any
+# if namespaceSelectorStrategy: selected, then replace the namespace array below
+# with the namespaces to be scraped by Prometheus.
+#namespaceSelector:
+#  - production
+#  - staging
+#  - test
+
 am:
   component: am
   enabled: false
