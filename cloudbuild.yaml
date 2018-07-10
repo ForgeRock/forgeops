@@ -40,7 +40,7 @@ steps:
   entrypoint: './build.sh'
   args: ['-g']
 # Downloading artifacts can be slow.. so we need to bump the timeout
-timeout: 2000s
+timeout: 3000s
 images:
 - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'

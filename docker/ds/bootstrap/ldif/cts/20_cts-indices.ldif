@@ -57,12 +57,6 @@ objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenUserId
 ds-cfg-index-type: equality
 
-dn: ds-cfg-attribute=etag,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
-objectClass: top
-objectClass: ds-cfg-backend-index
-ds-cfg-attribute: etag
-ds-cfg-index-type: equality
-
 dn: ds-cfg-attribute=coreTokenString01,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-backend-index
@@ -169,4 +163,22 @@ dn: ds-cfg-attribute=coreTokenDate05,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backe
 objectClass: top
 objectClass: ds-cfg-backend-index
 ds-cfg-attribute: coreTokenDate05
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenMultiString01,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend-index
+ds-cfg-attribute: coreTokenMultiString01
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenMultiString02,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend-index
+ds-cfg-attribute: coreTokenMultiString02
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=coreTokenMultiString03,cn=Index,ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-backend-index
+ds-cfg-attribute: coreTokenMultiString03
 ds-cfg-index-type: equality

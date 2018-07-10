@@ -35,3 +35,8 @@ ou: openam-session
 dn: ou=famrecords,ou=openam-session,ou=tokens,o=cts
 ou: famrecords
 objectClass: organizationalUnit
+
+dn: ou=admins,o=cts
+objectclass: top
+objectclass: organizationalUnit
+ou: admins
