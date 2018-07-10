@@ -19,6 +19,8 @@ SERVER_ID=${2}
 WORKDIR=/var/tmp/ds
 
 DJ=run/${1}${2}
+DSHOST="${1}${2}.example.com"
+
 #SECRETS=$DJ/secrets
 SECRETS=/var/run/secrets/opendj
 

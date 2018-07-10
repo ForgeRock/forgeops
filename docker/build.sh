@@ -35,13 +35,19 @@ function buildDocker {
        docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" "$REGISTRY"
    fi
 
-   ${DRYRUN}  docker build -t ${REGISTRY}/${REPO}/$1:${TAG}${SNAPSHOT} $1
+   CF=""
+   if [ -n "$CACHE_FROM" ]; then
+    CF="--cache-from $CACHE_FROM/$1:${TAG}"
+   fi
+
+   eval ${DRYRUN}  docker build "$CF" -t ${REGISTRY}/${REPO}/$1:${TAG}${SNAPSHOT} $1
    if [ -n "$PUSH" ]; then
       ${DRYRUN} docker push ${REGISTRY}/${REPO}/$1:${TAG}${SNAPSHOT}
    fi
 }
 
-while getopts "adgpst:r:R:P:i:" opt; do
+# --cache-from multistage issue: https://github.com/moby/moby/issues/34715 
+while getopts "adgpst:r:R:P:i:c:" opt; do
   case ${opt} in
     a ) AUTHENTICATE="true" ;;
     t ) TAG="${OPTARG}" ;;
@@ -52,6 +58,7 @@ while getopts "adgpst:r:R:P:i:" opt; do
     g ) REGISTRY="gcr.io" && REPO="${PROJECT}" ;;
     P ) PROJECT="${OPTARG}" && REPO="${PROJECT}" ;;
     i ) INCREMENTAL="${OPTARG}" ;;
+    c ) CACHE_FROM="${OPTARG}" ;;
     p ) PUSH="1" ;;
     \? )
          echo "Usage: build [-p] [-g] [-t tag] [-r registry] [-R repo] [-G project] image1 ..."
@@ -65,6 +72,7 @@ while getopts "adgpst:r:R:P:i:" opt; do
          echo "-d dry run. Don't do the docker build/push, just show what would be done."
          echo "-a authenticate to the registry using API_KEY environment variable."
          echo "-i N - incrementally build only containers that changed in the last N commits"
+         echo "-c prefix - add --cache-from $prefix/$image:$tag to the docker build"
          exit 1
       ;;
   esac
