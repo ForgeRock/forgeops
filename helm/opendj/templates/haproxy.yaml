@@ -1,5 +1,7 @@
 {{ if .Values.haproxy.enabled }}
 # Haproxy - experimental
+# Todo: we may want to create a custom haproxy dockerfile to support logging
+# https://ops.tips/gists/haproxy-docker-container-logs/
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:

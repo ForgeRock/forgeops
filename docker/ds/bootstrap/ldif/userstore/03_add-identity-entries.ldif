@@ -56,8 +56,9 @@ uniqueMember: uid=openidm,ou=admins,@BASE_DN@
 dn: @BASE_DN@
 changetype: modify
 replace: aci
-aci: (targetattr="* || aci")(version 3.0;acl "Allow identity modification";allow (write)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)
+aci: (targetattr="* || aci")(version 3.0;acl "Allow identity modification";allow (search, read, write, add, delete)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)
 aci: (targetattr!="userPassword||authPassword")(version 3.0;acl "Allow identity search"; allow (search, read)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)
 aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow persistent search"; allow (search, read)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)
 aci: (version 3.0;acl "Add identity"; allow (add)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)
 aci: (version 3.0;acl "Add or delete identities"; allow (add, delete)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)
+aci: (targetcontrol="1.2.840.113556.1.4.473")(version 3.0;acl "Allow server-side sorting"; allow (read)(groupdn = "ldap:///cn=admins,ou=groups,@BASE_DN@");)

@@ -113,6 +113,15 @@ echo "Enabling the /api endpoint"
     --offline \
     --no-prompt
 
+# Prep ds for use by AM as external configuration store.
+# https://backstage.forgerock.com/docs/am/6/install-guide/#prepare-configuration-store
+echo "Adding ACI for configstore"
+./bin/dsconfig set-access-control-handler-prop \
+ --add global-aci:'(target = "ldap:///cn=schema")(targetattr = "attributeTypes ||objectClasses")(version 3.0; acl "Modify schema"; allow (write)(userdn = "ldap:///uid=openam,ou=admins,'"$BASE_DN"'");)' \
+--offline \
+--no-prompt
+
+
 # load API schema with correct DN's (ie o=userstore vs dc=example,dc=com)
 echo "Installing rest2ldap endpoint map"
 cp ../../example-v1.json ./config/rest2ldap/endpoints/api
