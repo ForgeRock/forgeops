@@ -23,6 +23,11 @@ steps:
   # console https://console.cloud.google.com/gcr/triggers?project=engineering-devops
   # This is the credential to pull product binaries from the ForgeRock Artifactory repository.
   - 'API_KEY=${_ARTIFACTORY_API_KEY}'
+# build gcr.io
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker'
+  entrypoint: './build.sh'
+  args: ['-g','-c', 'gcr.io/engineering/devops' ]
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'
   # Run the script to build the docker images with options -a (authenticate) and -p (push)
@@ -34,13 +39,8 @@ steps:
   # These are the credentials needed to push images to your private docker registry.
   - 'DOCKER_USER=${_DOCKER_USER}'
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
-# Run a second time to build images for gcr.io for local testing
-- name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker'
-  entrypoint: './build.sh'
-  args: ['-g']
 # Downloading artifacts can be slow.. so we need to bump the timeout
-timeout: 2000s
+timeout: 2500s
 images:
 - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'

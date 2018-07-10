@@ -20,7 +20,7 @@ SSL_KEYSTORE=$SECRETS/ssl-keystore.p12
     --rootUserDn "cn=Directory Manager" \
     --rootUserPassword password \
     --monitorUserPassword password \
-    --hostname $DJ.example.com \
+    --hostname "$DSHOST" \
     --adminConnectorPort ${PORT_DIGIT}444 \
     --ldapPort ${PORT_DIGIT}389 \
     --enableStartTls \
@@ -131,9 +131,8 @@ configure
 
 ./bin/start-ds
 
-IMPORT_LDIF=yes
-# Do we only need to do this on server 1?
-if [ "$IMPORT_LDIF" ];
+# We only import the ldif on server 1 since we are going to initialize replication from it anywayss.
+if [ "${PORT_DIGIT}" = "1" ];
 then
     export DB_NAME=userRoot
     # Import LDIF
@@ -145,12 +144,14 @@ then
             -e "s/@DB_NAME@/$DB_NAME/"  \
             -e "s/@SM_CONFIG_ROOT_SUFFIX@/$BASE_DN/"  <${file}  >/tmp/file.ldif
         #cat /tmp/file.ldif
-        bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w password /tmp/file.ldif       
+        bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h $DSHOST -p ${PORT_DIGIT}389 -w password /tmp/file.ldif       
     done
 
     # The cts files do need sed replacement - all values are hard coded to o=cts
     echo "Loading cts schema and indexes"
-    bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w password ../../ldif/cts/*
+    for file in ../../ldif/cts/*.ldif; do
+         bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h $DSHOST -p ${PORT_DIGIT}389 -w password $file
+    done
 fi
 
 cd ..
