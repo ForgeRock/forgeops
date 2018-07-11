@@ -1,4 +1,7 @@
 # Google Cloud builder steps to build our helm charts and docker images on gcr.io.
+options:
+  machineType: 'N1_HIGHCPU_8'
+timeout: 1000s
 steps:
 # Get the helm command.
 - name: gcr.io/cloud-builders/wget
@@ -40,7 +43,6 @@ steps:
   # These are the credentials needed to push images to your private docker registry.
   - 'DOCKER_USER=${_DOCKER_USER}'
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
-timeout: 3000s
 images:
 - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'
