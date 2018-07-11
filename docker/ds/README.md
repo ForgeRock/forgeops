@@ -28,7 +28,8 @@ supply the appropriate environment variables in order for the intance to run cor
 The image assumes that a persistent volume will be mounted on the /opt/opendj/data directory. This is where volatile
 data lives - and persists across container restarts.
 
-At runtime, the docker entry point looks to see if this directory is empty, and if it is, copies the initial backends (e.g. userstore, cts) to this volume to use as starter databases.  If data exists in the pvc, the copy will not occur.
+At runtime, the docker entry point looks to see if this directory is empty, and if it is, copies the initial backends (e.g. userstore, cts) to this volume
+to use as starter databases.  If data exists in the pvc, the copy will not occur.
 
 The file `env.sh` set a number of environment variables that are used to template out the config.ldif file. For example,
 RS_SERVERS is a list of all the DS/RS hostnames and ports. 
@@ -36,7 +37,8 @@ RS_SERVERS is a list of all the DS/RS hostnames and ports.
 
 ## Limitations
 
-The admin-backed and other LDIF backends currently do not use commons configuration. As a consequence some commands do not work correctly. `dsreplication status`, for example, will not report the correct status.
+The admin-backed and other LDIF backends currently do not use commons configuration. As a consequence some commands do not work correctly. `dsreplication status`,
+for example, will not report the correct status.
 
 The directories internal metrics (exposed via Prometheus) report accurate status and can be used for monitoring and alerting. In addition
 the directory replication logs (logs/replication) show replication activity.

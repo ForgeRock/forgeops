@@ -1,0 +1,45 @@
+{
+    "serverAuthContext" : {
+        "sessionModule" : {
+            "name" : "JWT_SESSION",
+            "properties" : {
+                "keyAlias" : "&{openidm.https.keystore.cert.alias}",
+                "privateKeyPassword" : "&{openidm.keystore.password}",
+                "keystoreType" : "&{openidm.keystore.type}",
+                "keystoreFile" : "&{openidm.keystore.location}",
+                "keystorePassword" : "&{openidm.keystore.password}",
+                "maxTokenLifeMinutes" : "120",
+                "tokenIdleTimeMinutes" : "30",
+                "sessionOnly" : true,
+                "isHttpOnly" : true
+            }
+        },
+        "authModules" : [
+            {
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "anonymous",
+                    "password" : "&{openidm.anonymous.password}",
+                    "defaultUserRoles" : [
+                        "openidm-reg"
+                    ]
+                },
+                "enabled" : true
+            },
+            {
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "openidm-admin",
+                    "password" : "&{openidm.admin.password}",
+                    "defaultUserRoles" : [
+                        "openidm-admin",
+                        "openidm-authorized"
+                    ]
+                },
+                "enabled" : true
+            }
+        ]
+    }
+}

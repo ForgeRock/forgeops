@@ -9,6 +9,7 @@ COPY opendj.zip /var/tmp/
 WORKDIR /var/tmp/bootstrap
 
 COPY bootstrap/ /var/tmp/bootstrap/
+COPY schema /var/tmp/schema
 
 # The default BASE_DN of the directory tree.
 ENV BASE_DN o=userstore

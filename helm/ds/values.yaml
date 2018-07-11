@@ -14,7 +14,8 @@ useDefaultSecrets: true
 # The setting below changes the base dn for the o=userstore backend only!
 # We strongly suggest that you *NOT* change the default. There is very little value in
 # having the basedn reflect a unique organizational structure.
-baseDN: "o=userstore"
+#baseDN: "o=userstore"
+baseDN: "dc=example,dc=com"
 
 # The default instance name. This will create a stateful set that can be resolved at
 #  $djInstance-0.$djInstance
@@ -28,14 +29,14 @@ userstore:
 
 # If you wan to disable the cts backend, set to false.
 cts:
-  enabled: true
+  enabled: false
 
 image:
   repository: gcr.io/engineering-devops
   # For development we set this to Always to get the most current image.
   pullPolicy: Always
   #pullPolicy: IfNotPresent
-  tag:  6.5.0
+  tag:  alextest
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicas: 1

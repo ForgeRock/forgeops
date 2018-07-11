@@ -1,0 +1,5 @@
+{
+    "type" : "text/javascript",
+    "context" : "endpoint/static/user/*",
+    "source" : "request.method === 'query' ? ([{_id: request.additionalParameters.userName}]) : ({_id: context.security.authenticationId})"
+}

@@ -1,0 +1,15 @@
+{
+    "filters" : [
+        {
+            "pattern" : "^(managed|system|repo/internal)($|(/.+))",
+            "onRequest" : {
+                "type" : "text/javascript",
+                "file" : "policyFilter.js"
+            },
+            "methods" : [
+                "create",
+                "update"
+            ]
+        }
+    ]
+}
