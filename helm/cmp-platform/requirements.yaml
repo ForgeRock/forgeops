@@ -8,13 +8,13 @@ dependencies:
 - name: amster 
   version: ">0.0.0"
   repository: file://../amster
-- name: opendj
+- name: ds
   version: ">0.0.0"
-  repository: file://../opendj
+  repository: file://../ds
   alias: userstore
-- name: opendj
+- name: ds
   version: ">0.0.0"
-  repository: file://../opendj
+  repository: file://../ds
   alias: configstore
 - name: openidm
   version: ">0.0.0"

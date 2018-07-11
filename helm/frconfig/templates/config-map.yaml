@@ -6,7 +6,3 @@ data:
   GIT_REPO: "{{ .Values.git.repo }}"
   GIT_AUTOSAVE_BRANCH:  autosave-{{ .Release.Namespace }}
   GIT_CHECKOUT_BRANCH:  {{ .Values.git.branch }}
-  # Todo: If this only needed for the sed filter, revisit
-  FQDN: {{ default "openam.default.example.com" .Values.fqdn }}
-  VERSION: {{ default .Values.image.tag .Values.version }}
-  SED_FILTER: {{ default "" .Values.git.sedFilter }}

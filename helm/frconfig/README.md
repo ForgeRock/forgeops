@@ -1,41 +1,55 @@
 # frconfig - Manage configuration for the ForgeRock platform components
 
-This chart is responsible for fetching configuration to a shared
-persistent volume that is mounted by other pods. It must be running
-*before* any other components can be deployed.
+This chart creates Kubernetes config maps and secrets needed to clone platform configurations
+from a git repository.
 
-The shared PVC *must* be a read-write-many volume type. NFS is a popular option here, but
-any read-write-many volume will work.
-
-The script ../../bin/create-nfs-provisioner provides a sample NFS server + dynamic volume provisioner that
-is suitable for this purpose.
+This is a prerequisite chart that must be deployed before other charts such as openig, amster, and openidm.
 
 ## values.yaml
 
-The defaults provided in values.yaml will clone the "public" forgeops-init git repository. This is a bare bones
-starter repository with a minimal platform configuration. 
+The defaults in values.yaml clone the public (read only) [forgeops-init](https://github.com/ForgeRock/forgeops-init) repository. This 
+is a bare bones starter repository with a minimal platform configuration.
 
-If you want to use a custom configuration, create a custom.yaml file that overrides the defaults. A sample
-is shown below:
+To use a different git repository, you must create a custom values.yaml with your git details. 
+Note that private git reposities must use a git url of the form `git@github.com....`. 
+Git https urls can only be cloned if they are public.
+
+A sample custom.yaml is shown below:
 
 ```yaml
 git:
   # git repo to clone.
   repo: "git@github.com:Acme/cloud-deployment-config.git"
-  branch: master
-  # Name of a secret that contains a key "id_rsa"
-  # The secret contains the git ssh key that has permissions to clone and/or update the git repo.
-  sshSecretName: "git-ssh-key"
+  branch: mybranch
+# Usually you do not need to change config.name. See the comments below for more information.
+# config:
+#   name: frconfig
 ```
 
-If you use a custom git repository make sure you create an ssh secret that contains a key `id_rsa`. This is the private key that has permissions to clone and/or update your repository (the public part of this key is uploaded to your github or stash repository).  Set the sshSecretName to the name of this secret. 
+## git secret
+
+A dummy ssh secret `id_rsa` is stored in the `frconfig` secret. If you need ssh access to your git repository
+you must replace this secret with a real ssh key. For example:
+
+```shell
+# Generate your own id_rsa and id_rsa.pub keypair, according to the instructions on github or stash,
+# then run the following commands:
+kubectl delete secret frconfig
+kubectl create secret generic frconfig --from-file=id_rsa
+```
+
+Note the secret file name (the key in the secret map) *must* be id_rsa.  This is the private key that has permissions to clone and/or update your repository (the public part of this key is uploaded to your github or stash repository).
 
 ## Configuration per product
 
-This project uses a single git repository that contains configuration for all products. If you want to use a strategy of a configuration repository per product, you can deploy multiple instances of this chart. For each instance you must customize:
+This project uses a single git repository that contains configuration for all products. If you want to use a strategy of a configuration repository per product, you can deploy multiple instances of this chart, each with a different name for `config.name`.
 
-* git.repo - The custom git repository to clone.
-* git.sshSecretName - must be set to the git ssh secret that can clone your repository.
-* storage.claim - the name of the PVC volume claim that holds the configuration and is mounted by each product pod. The default is `frconfig`.  You can set the
- claim name for each product in the values.yaml overrides. Just ensure the same claim name is used for
- the `storage.claim` in this chart, and the products `config.claim` value. For example, to deploy IDM use `helm install --set config.claim=idm openidm`.
+The value for `config.name` is significant, as other
+charts reference this value. Products default `config.name` to "frconfig", but this can be overridden by helm.
+
+As an example, to create a custom configuration for openig, use the following procedure:
+
+* Create an appropriate values.yaml with `git` settings for your repository. Set config.name to "my-ig-config"
+* Deploy this chart `helm install -f values.yaml frconfig`
+* Replace the dummy ssh secret with your id_rsa value. See the section above. Note the secret name is now `my-ig-config`
+* Deploy the openig chart, overriding the configuration name:  `helm install --set config.name=my-ig-config openig`

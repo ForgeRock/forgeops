@@ -13,7 +13,20 @@ openidm:
 
 userstore:
   djInstance: userstore
-  numberSampleUsers: 500
+  djPersistence: false
+  opendjJavaArgs: "-Xmx400m"
+  resources:
+    limits:
+      memory: 600Mi
+    requests:
+      memory: 400Mi
 
 configstore:
   djInstance: configstore
+  djPersistence: false
+  opendjJavaArgs: "-Xmx400m"
+  resources:
+    limits:
+      memory: 600Mi
+    requests:
+      memory: 400Mi
