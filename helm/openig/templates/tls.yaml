@@ -10,15 +10,15 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: ""
+  commonName: "*.{{ .Release.Namespace }}.forgeops.com"
   dnsNames:
-  - "*.{{ .Release.Namespace }}.forgeops.com"
+  - {{ .Release.Namespace }}.forgeops.com
   acme:
     config:
     - dns01:
         provider: prod-dns
       domains:
-      - {{ .Release.Namespace }}.forgeops.com
+      - "*.{{ .Release.Namespace }}.forgeops.com"
 {{- end -}}
 ---
 # Secret that contains the tls files provided by user if 'tls.strategy: UserProvided.
