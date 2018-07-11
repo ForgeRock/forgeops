@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Set this to configuration replication at docker build time. Comment out to configure just a single server.
-CONFIG_REPLICATION="yes"
+#CONFIG_REPLICATION="yes"
 
 # Add hostnames to the docker containers /etc/hosts - needed only for building.
 echo "127.0.0.1 dsrs1.example.com" >>/etc/hosts
@@ -52,6 +52,7 @@ convert_to_template()
     echo "Rebuilding indexes"
     ./bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
     ./bin/rebuild-index --offline --baseDN "o=cts" --rebuildDegraded
+    ./bin/rebuild-index --offline --baseDN "o=idm" --rebuildDegraded
 
     for i in changelogDb/*.dom/*.server; do
         rm -rf $i

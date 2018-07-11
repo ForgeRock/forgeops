@@ -53,7 +53,6 @@ EOF
 
 ./bin/import-ldif --offline -n ctsRoot -F -l /tmp/cts.ldif
 
-
 # Monitor searches will be very slow unless there is an index on uid
 echo "Creating CTS UID index for uid=monitor search"
 ./bin/dsconfig create-backend-index \
@@ -63,6 +62,18 @@ echo "Creating CTS UID index for uid=monitor search"
           --index-name uid \
           --offline \
           --no-prompt
+
+
+
+echo "Creating IDM backend..."
+./bin/dsconfig create-backend \
+          --set base-dn:o=idm\
+          --set enabled:true \
+          --type je \
+          --backend-name idmRoot \
+          --offline \
+          --no-prompt
+
 
 
 echo "Tuning the disk free space thresholds"
@@ -129,6 +140,12 @@ cp ../../example-v1.json ./config/rest2ldap/endpoints/api
 # From util.sh. Consider moving the logic here...
 configure
 
+
+echo "Putting IDM schema extensions in place"
+cp /var/tmp/schema/* ./db/schema
+
+/var/tmp/bootstrap/setup-idm.sh
+
 ./bin/start-ds
 
 # We only import the ldif on server 1 since we are going to initialize replication from it anywayss.
@@ -152,6 +169,9 @@ then
     for file in ../../ldif/cts/*.ldif; do
          bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h $DSHOST -p ${PORT_DIGIT}389 -w password $file
     done
+
+    echo "Loading idm schema"
+    bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h localhost -p 1389 -w password ../../ldif/idm/*
 fi
 
 cd ..

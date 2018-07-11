@@ -1,0 +1,183 @@
+#
+# Copyright 2017 ForgeRock AS. All Rights Reserved
+#
+# Use of this code requires a commercial software license with ForgeRock AS.
+# or with one of its affiliates. All use shall be exclusively subject
+# to such license between the licensee and ForgeRock AS.
+#
+
+dn: o=idm
+dc: openidm
+objectClass: top
+objectClass: domain
+
+# Links OU
+
+dn: ou=links,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: links
+
+##
+# relationships
+##
+dn: ou=relationships,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: relationships
+
+# Internal OU
+
+dn: ou=internal,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: internal
+
+# Internal Roles OU
+
+dn: ou=roles,ou=internal,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: roles
+
+# Internal UserMeta OU
+
+dn: ou=usermeta,ou=internal,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: usermeta
+
+##
+# Clustered Recon OUs
+##
+
+dn: ou=clusteredrecontargetids,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: clusteredrecontargetids
+
+dn: ou=reconprogressstate,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: reconprogressstate
+
+##
+# scheduler
+##
+dn: ou=scheduler,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: scheduler
+
+dn: ou=triggers,ou=scheduler,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: triggers
+
+dn: ou=jobs,ou=scheduler,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: jobs
+
+dn: ou=calendars,ou=scheduler,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: calendars
+
+dn: ou=jobGroups,ou=scheduler,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: jobGroups
+
+dn: ou=triggerGroups,ou=scheduler,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: triggerGroups
+
+##
+# cluster
+##
+dn: ou=cluster,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: cluster
+
+dn: ou=states,ou=cluster,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: states
+
+dn: ou=events,ou=cluster,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: events
+
+##
+# updates
+##
+dn: ou=updates,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: updates
+
+
+##
+# UI
+##
+
+dn: ou=ui,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: ui
+
+dn: ou=notification,ou=ui,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: notification
+
+##
+# jsonstorage
+##
+
+dn: ou=jsonstorage,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: jsonstorage
+
+# Populate objects
+
+dn: cn=openidm-authorized,ou=roles,ou=internal,o=idm
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-authorized
+description: Basic minimum user
+
+dn: cn=openidm-admin,ou=roles,ou=internal,o=idm
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-admin
+description: Administrative access
+
+dn: cn=openidm-del-admin,ou=roles,ou=internal,o=idm
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-del-admin
+description: Delegated administrative access
+
+dn: cn=openidm-cert,ou=roles,ou=internal,o=idm
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-cert
+description: Authenticated via certificate
+
+dn: cn=openidm-task-manager,ou=roles,ou=internal,o=idm
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-task-manager
+description: Allowed to reassign workflow tasks
+
+dn: cn=openidm-reg,ou=roles,ou=internal,o=idm
+objectClass: fr-idm-internal-role
+objectClass: top
+cn: openidm-reg
+description: Anonymous access
