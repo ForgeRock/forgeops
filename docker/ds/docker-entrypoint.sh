@@ -43,7 +43,7 @@ relocate_data()
         return
     fi
     mkdir -p data/db
-    for dir in ctsRoot userRoot ads-truststore admin
+    for dir in ctsRoot userRoot ads-truststore admin idmRoot
     do
         echo "Copying $dir"
         cp -r db/$dir data/db/$dir

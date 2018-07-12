@@ -18,15 +18,6 @@ steps:
   entrypoint: 'bin/remove-all.sh'
   args: ['smoke']
 
-# Build smoke tests docker image
-- name: 'gcr.io/cloud-builders/docker'
-  dir: 'cicd/forgeops-tests'
-  args: [
-          'build',
-          '-t', 'gcr.io/$PROJECT_ID/forgeops-tests:latest',
-          '.'
-        ]
-
 # Run deployment scripts
 - name: 'gcr.io/engineering-devops/helm'
   entrypoint: 'bin/deploy.sh'
@@ -45,10 +36,11 @@ steps:
   args: ['run-smoke-tests.sh']
 
 # Get last username who merged changes into master
-- name: 'gcr.io/cloud-builders/git'
-  dir: cicd/
-  entrypoint: 'bash'
-  args: ['last-commit.sh']
+# This doesn't work if cloudbuild is launched outside of a git trigger
+# - name: 'gcr.io/cloud-builders/git'
+#   dir: cicd/
+#   entrypoint: 'bash'
+#   args: ['last-commit.sh']
 
 # Upload results to GS bucket
 - name: 'gcr.io/cloud-builders/gsutil'

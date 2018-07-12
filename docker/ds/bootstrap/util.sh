@@ -38,12 +38,6 @@ clean()
     fi
 }
 
-create_hosts()
-{
-    echo "127.0.0.1 dsrs1.example.com" >>/etc/hosts
-    echo "127.0.0.1 dsrs2.example.com" >>/etc/hosts
-}
-
 copy_secrets()
 {
     mkdir -p /var/run/secrets/opendj
@@ -99,7 +93,6 @@ create_keystores()
 prepare()
 {
     clean
-    create_hosts
     copy_secrets
     #create_keystores 
     unzip -q $ARCHIVE
@@ -168,4 +161,13 @@ EOF
           --set enabled:false \
           --offline \
           --no-prompt
+
+    # Very verbose
+    # echo "Enable debug logging"
+    # ./bin/dsconfig set-log-publisher-prop \
+    #       --publisher-name File-Based\ Debug\ Logger \
+    #       --set enabled:true \
+    #       --offline \
+    #       --no-prompt
+
 }

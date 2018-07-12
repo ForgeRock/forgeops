@@ -53,18 +53,6 @@ EOF
 
 ./bin/import-ldif --offline -n ctsRoot -F -l /tmp/cts.ldif
 
-# Monitor searches will be very slow unless there is an index on uid
-echo "Creating CTS UID index for uid=monitor search"
-./bin/dsconfig create-backend-index \
-          --backend-name ctsRoot \
-          --set index-type:equality \
-          --type generic \
-          --index-name uid \
-          --offline \
-          --no-prompt
-
-
-
 echo "Creating IDM backend..."
 ./bin/dsconfig create-backend \
           --set base-dn:o=idm\
@@ -74,6 +62,22 @@ echo "Creating IDM backend..."
           --offline \
           --no-prompt
 
+# If the server is not the first, we can skip the rest of the setup, as only the first server is templated out.
+if [ "${PORT_DIGIT}" != "1" ]; then
+    echo "Exiting setup early for server ${PORT_DIGIT}"
+    ./bin/start-ds
+    exit 0
+fi
+
+# Monitor searches will be very slow unless there is an index on uid
+echo "Creating CTS UID index for uid=monitor search"
+./bin/dsconfig create-backend-index \
+          --backend-name ctsRoot \
+          --set index-type:equality \
+          --type generic \
+          --index-name uid \
+          --offline \
+          --no-prompt
 
 
 echo "Tuning the disk free space thresholds"
