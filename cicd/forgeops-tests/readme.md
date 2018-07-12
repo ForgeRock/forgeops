@@ -1,6 +1,13 @@
 # Forgeops testing framework
 Simple forgeops testing framework build on top of python3 unittest framework
 
+## Building a docker image
+
+```
+docker build -t gcr.io/engineering-devops/forgeops-tests forgeops-tests
+docker push  gcr.io/engineering-devops/forgeops-tests
+```
+
 ## Configuration
 To provide configuration you have to set following environmental variables for products
 

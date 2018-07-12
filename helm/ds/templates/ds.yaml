@@ -102,7 +102,11 @@ spec:
       - name: ds
         image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        #terminationGracePeriodSeconds: 10
+        terminationGracePeriodSeconds: 30
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/opt/opendj/bin/stop-ds"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:
