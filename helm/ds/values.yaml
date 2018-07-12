@@ -32,9 +32,7 @@ cts:
 
 image:
   repository: gcr.io/engineering-devops
-  # For development we set this to Always to get the most current image.
-  pullPolicy: Always
-  #pullPolicy: IfNotPresent
+  pullPolicy: IfNotPresent
   tag:  6.5.0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.

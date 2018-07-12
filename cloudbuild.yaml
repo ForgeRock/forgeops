@@ -1,7 +1,7 @@
 # Google Cloud builder steps to build our helm charts and docker images on gcr.io.
 options:
   machineType: 'N1_HIGHCPU_8'
-timeout: 1000s
+timeout: 1500s
 steps:
 # Get the helm command.
 - name: gcr.io/cloud-builders/wget
@@ -32,17 +32,22 @@ steps:
   entrypoint: './build.sh'
   #args: ['-g','-c', 'gcr.io/engineering/devops' ]
   args: ['-g']
-- name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker'
-  # Run the script to build the docker images with options -a (authenticate) and -p (push)
-  entrypoint: './build.sh'
-  args: ['-a', '-p']
-  env:
-  # Set _DOCKER_USERNAME and _DOCKER_PASSWORD in the cloudbuild
-  # console https://console.cloud.google.com/gcr/triggers?project=engineering-devops
-  # These are the credentials needed to push images to your private docker registry.
-  - 'DOCKER_USER=${_DOCKER_USER}'
-  - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
+# Until we start using the internal repo, we skip the step to push to bintray.
+# TODO: Make the bintray push a separate cloudbuild job.
+# - name: 'gcr.io/cloud-builders/docker'
+#   dir: 'docker'
+#   # Run the script to build the docker images with options -a (authenticate) and -p (push)
+#   entrypoint: './build.sh'
+#   args: ['-a', '-p']
+#   env:
+#   # Set _DOCKER_USERNAME and _DOCKER_PASSWORD in the cloudbuild
+#   # console https://console.cloud.google.com/gcr/triggers?project=engineering-devops
+#   # These are the credentials needed to push images to your private docker registry.
+#   - 'DOCKER_USER=${_DOCKER_USER}'
+#   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
+# Launch the smoke test
+- name: gcr.io/cloud-builders/gcloud
+  args: ['container','builds','submit', '--config', 'cloudbuild-snapshot.yaml', '.']
 images:
 - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'
