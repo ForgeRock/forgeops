@@ -1,0 +1,19 @@
+# Build ds image
+# gcloud container builds submit --config dsbuild.yaml
+# options:
+#   machineType: 'N1_HIGHCPU_8'
+timeout: 3000s
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  dir: '.'
+  args: [
+          'build',
+          '-t', 'gcr.io/$PROJECT_ID/ds:latest', '.',
+          # seems to have no impact..
+          # '--add-host', 'dsrs1.example.com:127.0.0.1', 
+          # '--add-host', 'dsrs2.example.com:127.0.0.1',
+          #'-m', '4g'
+          #'--ulimit', 'nofile=1024'
+        ]
+images:
+- gcr.io/$PROJECT_ID/ds:latest

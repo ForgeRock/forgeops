@@ -28,8 +28,9 @@
 ##
 
 dn: cn=schema
-changetype: modify
-add: attributeTypes
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
 attributeTypes: ( 1.2.840.113556.1.2.102 NAME 'memberof' DESC 'Group that the entry belongs to' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 X-ORIGIN 'iPlanet Delegated Administrator' )
 attributeTypes: ( 2.16.840.1.113730.3.1.692 NAME 'inetUserStatus' DESC '"active", "inactive", or "deleted" status of a user' EQUALITY caseIgnoreMatch SINGLE-VALUE SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Nortel subscriber interoperability' )
 attributeTypes: ( 2.16.840.1.113730.3.1.693 NAME 'inetUserHttpURL' DESC 'A users Web addresses' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Nortel subscriber interoperability' )
@@ -99,8 +100,7 @@ attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.862 NAME 'sunIdentityServerPPEmergency
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.989 NAME 'sun-fm-saml2-nameid-infokey' DESC 'SAML 2.0 Name Identifier Information Key' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.990 NAME 'sun-fm-saml2-nameid-info' DESC 'SAML 2.0 Name Identifier Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.131 NAME 'oath2faEnabled' DESC 'Indicator for enabling of OATH 2FA' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 X-ORIGIN 'OpenSSO' )
--
-add: objectClasses
+# objectclasses
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.76 NAME 'sunFederationManagerDataStore' DESC 'FSUser provider OC' SUP top AUXILIARY MAY ( iplanet-am-user-federation-info-key $ iplanet-am-user-federation-info $ sunIdentityServerDiscoEntries) X-ORIGIN 'OpenSSO' )
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.127 NAME 'sunIdentityServerLibertyPPService' DESC 'sunIdentityServerLibertyPPService OC' SUP top AUXILIARY MAY ( sunIdentityServerPPCommonNameCN $ sunIdentityServerPPCommonNameAltCN $ sunIdentityServerPPCommonNameFN $ sunIdentityServerPPCommonNameSN $ sunIdentityServerPPCommonNamePT $ sunIdentityServerPPCommonNameMN $ sunIdentityServerPPInformalName $ sunIdentityServerPPLegalIdentityLegalName $ sunIdentityServerPPLegalIdentityDOB $ sunIdentityServerPPLegalIdentityMaritalStatus $ sunIdentityServerPPLegalIdentityGender $ sunIdentityServerPPLegalIdentityAltIdType $ sunIdentityServerPPLegalIdentityAltIdValue $ sunIdentityServerPPLegalIdentityVATIdType $ sunIdentityServerPPLegalIdentityVATIdValue $sunIdentityServerPPEmploymentIdentityJobTitle $ sunIdentityServerPPEmploymentIdentityOrg $ sunIdentityServerPPEmploymentIdentityAltO $ sunIdentityServerPPAddressCard $ sunIdentityServerPPMsgContact $ sunIdentityServerPPFacadeMugShot $ sunIdentityServerPPFacadeWebSite $ sunIdentityServerPPFacadeNamePronounced $ sunIdentityServerPPFacadeGreetSound $ sunIdentityServerPPFacadegreetmesound $ sunIdentityServerPPDemographicsDisplayLanguage $ sunIdentityServerPPDemographicsLanguage $ sunIdentityServerPPDemographicsBirthDay $ sunIdentityServerPPDemographicsAge $ sunIdentityServerPPDemographicsTimeZone $ sunIdentityServerPPSignKey $ sunIdentityServerPPEncryptKey $ sunIdentityServerPPEmergencyContact ) X-ORIGIN 'OpenSSO' )
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.148 NAME 'sunFMSAML2NameIdentifier' DESC 'SAML 2.0 name identifier objectclass' SUP top AUXILIARY MAY ( sun-fm-saml2-nameid-infokey $ sun-fm-saml2-nameid-info ) X-ORIGIN 'OpenSSO' )

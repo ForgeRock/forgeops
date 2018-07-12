@@ -14,6 +14,9 @@ COPY schema /var/tmp/schema
 # The default BASE_DN of the directory tree.
 ENV BASE_DN o=userstore
 
+#ENV OPENDJ_JAVA_ARGS "-Xmx256m"
+#ENV OPENDJ_JAVA_ARGS "-Djava.net.preferIPv4Stack=true"
+
 RUN ./setup.sh
 
 #####################  Runtime container ################

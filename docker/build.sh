@@ -9,9 +9,9 @@
 
 # Default settings. You can set these all via command switches as well.
 
-#REGISTRY="forgerock-docker-public.bintray.io"
+REGISTRY="forgerock-docker-public.bintray.io"
 
-REGISTRY="forgerock-docker-internal.bintray.io"
+#REGISTRY="forgerock-docker-internal.bintray.io"
 
 REPO="forgerock"
 # Default tag if none is specified.
@@ -80,7 +80,7 @@ done
 shift $((OPTIND -1))
 
 if [ ! -z "$INCREMENTAL" ]; then
-  IMAGES=`git diff --name-only "HEAD..HEAD~$INCREMENTAL" | sort -u  | grep "/docker" | awk 'BEGIN {FS="/"} {print $2}' | uniq`
+  IMAGES=`git diff --name-only "HEAD..HEAD~$INCREMENTAL" | sort -u  | grep "docker/" | awk 'BEGIN {FS="/"} {print $2}' | uniq`
   echo "Incremental build: $IMAGES"
   if [ -z "$IMAGES" ]; then
     echo "No images changed in the last $INCREMENTAL commits"

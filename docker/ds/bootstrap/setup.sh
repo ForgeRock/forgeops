@@ -1,24 +1,33 @@
 #!/bin/sh
 
-# Set this to configuration replication at docker build time. Comment out to configure just a single server.
-#CONFIG_REPLICATION="yes"
 
 # Add hostnames to the docker containers /etc/hosts - needed only for building.
-echo "127.0.0.1 dsrs1.example.com" >>/etc/hosts
-echo "127.0.0.1 dsrs2.example.com" >>/etc/hosts
-echo "127.0.0.1 dsrs3.example.com" >>/etc/hosts
-
+echo "127.0.0.1 dsrs1.example.com dsrs2.example.com" >>/etc/hosts
 
 echo "##### Cleaning servers..."
 ./clean-all.sh
 
+
 echo "##### Configuring directory server DSRS 1..."
 ./setup-ds.sh dsrs 1 10
+
+# Set this to configuration replication at docker build time. Comment out to configure just a single server.
+CONFIG_REPLICATION="yes"
 
 if [ -n "$CONFIG_REPLICATION" ]; then 
 
     echo "##### Configuring directory server DSRS 2..."
     ./setup-ds.sh dsrs 2
+
+
+# Debug...
+jps -mlv
+pid=`jps  -m | grep Directory | awk '{print $1}'`
+echo "PId = $pid"
+# (while true; do jstack $pid; sleep 30; done)
+# This triggers a lot of debug...
+# tail -f ./run/dsrs1/logs/debug &
+
 
     echo "##### Configuring replication between DSRS 1 and DSRS 2..."
     ./run/dsrs1/bin/dsreplication configure \
@@ -27,6 +36,7 @@ if [ -n "$CONFIG_REPLICATION" ]; then
         --bindDn2 "cn=directory manager" --bindPassword2 password \
         --baseDn o=userstore \
         --baseDn o=cts \
+        --baseDn o=idm \
         --host1 dsrs1.example.com --port1 1444 --replicationPort1 1989 \
         --host2 dsrs2.example.com --port2 2444 --replicationPort2 2989 \
         --no-prompt
@@ -36,6 +46,7 @@ if [ -n "$CONFIG_REPLICATION" ]; then
         -I admin -w password -X \
         --baseDn o=userstore \
         --baseDn o=cts \
+        --baseDn o=idm \
         --hostname dsrs1.example.com --port 1444 \
         --no-prompt
 fi

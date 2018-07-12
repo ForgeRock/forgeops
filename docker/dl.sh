@@ -9,7 +9,7 @@ then
     exit 1
 fi
 
-# Update major versions / snapshots here.
+# Update major versions / snapshots here. 
 
 # Note: Until we get 6.5 milestones, we are using the 6.0.0 product images.
 VERSION=${VERSION:-6.0.0}

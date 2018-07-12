@@ -1,0 +1,11 @@
+# Build smoke tests docker image
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  dir: '.'
+  args: [
+          'build',
+          '-t', 'gcr.io/$PROJECT_ID/forgeops-tests:latest',
+          'forgeops-tests'
+        ]
+images:
+- gcr.io/$PROJECT_ID/forgeops-tests:latest
