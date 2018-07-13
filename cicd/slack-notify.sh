@@ -25,11 +25,6 @@ if [ -z ${TEST_RESULTS_FILE+x} ]; then
   exit 0
 fi
 
-if [ -z ${LAST_COMMIT_FILE+x} ]; then
-  echo "LAST_COMMIT must be set"
-  exit 0
-fi
-
 if [ -z ${TEST_REPORT_LINK+x} ]; then
   TEST_REPORT_LINK="No report link"
 fi
@@ -43,10 +38,6 @@ JSON_SLACK=$(cat <<EOF
     {
       "text": "$(cat ${TEST_RESULTS_FILE})"
     },
-		{
-			"color": "good",
-			"text": "Last commit by: $(cat ${LAST_COMMIT_FILE})"
-		},
 		{
 			"color": "good",
 			"text": "Link to report: ${TEST_REPORT_LINK}"
