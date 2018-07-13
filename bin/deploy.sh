@@ -103,7 +103,7 @@ create_namespace()
 {
     if [ "${RMALL}" = true ]; then
         echo "=> Removing all components of the deployment from ${NAMESPACE}"
-        ${DIR}/bin/remove-all.sh ${NAMESPACE}
+        ${DIR}/bin/remove-all.sh -N ${NAMESPACE}
     fi
 
     echo "=> Creating namespace \"${NAMESPACE}\". Ignore errors below if already exists"

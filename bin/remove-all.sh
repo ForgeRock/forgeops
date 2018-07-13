@@ -2,17 +2,24 @@
 # This removes *all* helm charts in the current namespace and deletes all PVCs / PV in the current namespace
 # Use with caution - this deletes all of your data as well...
 
-#set -x
-
 kcontext=`kubectl config current-context`
 NS=`kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}"`
 
-NAMESPACE=${NS:-default}
+while getopts "N" opt; do
+        case ${opt} in
+            N)  REMOVE_NS="yes" ;;
+            \? ) echo "$0 [-N]  Remove helm charts and delete the namespace" ;;
+        esac
+done
+shift $((OPTIND -1))
 
 if [ $# -eq 1 ];
 then 
-    NAMESPACE=$1
+    NS=$1
 fi
+
+NAMESPACE=${NS:-default}
+
 
 echo "Removing all releases for namespace $NAMESPACE"
 
@@ -35,6 +42,9 @@ do
     kubectl delete pvc --namespace ${NAMESPACE}  ${pvc}
 done
 
-
 kubectl delete job --namespace  ${NAMESPACE} --all
 
+if [ -n "$REMOVE_NS" ]; then
+    echo "Deleting namespace $NAMESPACE"
+    kubectl delete ns "$NAMESPACE"
+fi
