@@ -6,3 +6,4 @@ RUN apk add bash
 
 RUN pip install requests
 RUN pip install html-testRunner
+RUN pip install beautifulsoup4
