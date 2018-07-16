@@ -1,8 +1,10 @@
-{{- if .Values.useTLS }}
+# CertManager certificate object created if 'tls.strategy: CertManager'. 
+# This object triggers a certificate request to LetsEncrypt via the CertManager Operator.
+{{ if and (eq .Values.tls.strategy "CertManager") .Values.useTLS }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: openidm-tls
+  name: {{ .Values.component }}.{{ .Release.Namespace }}{{ .Values.domain }}
 spec:
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   issuerRef:
@@ -10,11 +12,64 @@ spec:
     kind: ClusterIssuer
   commonName: ""
   dnsNames:
-  - "*.{{ .Release.Namespace }}.forgeops.com"
+  - '*.{{ .Release.Namespace }}{{ .Values.domain }}'
   acme:
     config:
     - dns01:
         provider: prod-dns
       domains:
-      - {{ .Release.Namespace }}.forgeops.com
-{{- end -}}
+      - '*.{{ .Release.Namespace }}{{ .Values.domain }}'
+{{ end }}
+---
+# Secret that contains the tls files provided by user if 'tls.strategy: UserProvided.
+{{ if eq .Values.tls.strategy "UserProvided" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: tls-certs-{{ .Values.component }}
+type: opaque
+data:
+  tls.crt: |-
+  {{ .Files.Get .Values.tls.crtPath | b64enc | indent 4 }}
+  tls.key: |-
+  {{ .Files.Get .Values.tls.keyPath | b64enc | indent 4 }}
+{{ end }}
+---
+# This job creates either a self signed certificate if 'tls.strategy: SelfSigned',
+# or imports user provided certificates if 'tls.strategy: UserProvided'.
+{{ if or (eq .Values.tls.strategy "SelfSigned") (eq .Values.tls.strategy "UserProvided") }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.tls.jobName }}-{{ .Values.component }}
+  labels:
+    component: {{ .Values.tls.jobName }}
+spec:
+  activeDeadlineSeconds: 30
+  backoffLimit: 2
+  template:
+    spec:
+      containers:
+      - name: {{ .Values.tls.jobName }}
+        image:  {{ .Values.tls.jobImage }}
+        imagePullPolicy: Always
+        env: 
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: STRATEGY
+          value: {{ .Values.tls.strategy }}
+        {{- if eq .Values.tls.strategy "UserProvided" }}
+        volumeMounts:
+        - name: tls-certs
+          mountPath: /certs
+      volumes:
+      - name: tls-certs
+        secret:
+          secretName: tls-certs
+      - name: certs
+        emptyDir: {}
+        {{- end }}
+      restartPolicy: Never
+{{ end }}

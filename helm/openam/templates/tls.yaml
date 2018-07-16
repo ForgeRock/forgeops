@@ -1,26 +1,25 @@
 # CertManager certificate object created if 'tls.strategy: CertManager'. 
 # This object triggers a certificate request to LetsEncrypt via the CertManager Operator.
-{{- if eq .Values.tls.strategy "CertManager"  }}
+{{ if and (eq .Values.tls.strategy "CertManager") .Values.useTLS }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: openam-tls
+  name: {{ .Values.component }}.{{ .Release.Namespace }}{{ .Values.domain }}
 spec:
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
-  commonName: '*.{{ .Release.Namespace }}.forgeops.com'
+  commonName: ""
   dnsNames:
-  - {{ .Release.Namespace }}.forgeops.com
+  - '*.{{ .Release.Namespace }}{{ .Values.domain }}'
   acme:
     config:
     - dns01:
         provider: prod-dns
       domains:
-      - '*.{{ .Release.Namespace }}.forgeops.com'
-      - {{ .Release.Namespace }}.forgeops.com
-{{- end -}}
+      - '*.{{ .Release.Namespace }}{{ .Values.domain }}'
+{{ end }}
 ---
 # Secret that contains the tls files provided by user if 'tls.strategy: UserProvided.
 {{ if eq .Values.tls.strategy "UserProvided" }}
@@ -73,4 +72,4 @@ spec:
         emptyDir: {}
         {{- end }}
       restartPolicy: Never
-{{- end -}}
+{{ end }}
