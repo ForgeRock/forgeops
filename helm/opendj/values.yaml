@@ -68,7 +68,7 @@ backup:
 opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMFraction=2"
 
 # Resource limits.
-# These help for pod placement on a larger cluster to ensure the OpenDJ instance gets sufficient resources.
+# These help for pod placement in a larger cluster to ensure the OpenDJ instance gets sufficient resources.
 # For production you will want to specify CPU limits to help Kube schedule the pods.
 resources: {}
 
