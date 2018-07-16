@@ -12,8 +12,8 @@ storageSize: "100Gi"
 storageClass: "fast"
 
 # Uncomment the next line if you don't want to use cgroups which is the default JVM setting
-#opendjJavaArgs: "-server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
+#opendjJavaArgs: "-server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log"
 
-#replicas: 2
+replicas: 2
 
-#topologyKey: "failure-domain.beta.kubernetes.io/zone"
+topologyKey: "failure-domain.beta.kubernetes.io/zone"

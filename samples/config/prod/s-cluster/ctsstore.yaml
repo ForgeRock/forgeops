@@ -11,7 +11,11 @@ resources:
 storageSize: "100Gi"
 storageClass: "fast"
 
-opendjJavaArgs: "-server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
+opendjJavaArgs: >
+  -server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+
 
 podAntiAffinity: "hard"
 
@@ -26,6 +30,6 @@ restore:
 
 runPostSetupJob: false
 
-#replicas: 2
+replicas: 2
 
-#topologyKey: "failure-domain.beta.kubernetes.io/zone"
+topologyKey: "failure-domain.beta.kubernetes.io/zone"

@@ -1,14 +1,11 @@
-fqdn: openam.prod.frk8s.net
-
 config:
   claim: frconfig
   importPath: /git/config/samples/am/R6.0
   exportPath: /tmp/amster
 
-version: 6.0.0
+version: 6.5.0
 
-#ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
-ctsStores: ctsstore-0.ctsstore:1389
+ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
 ctsPassword: password
 
 

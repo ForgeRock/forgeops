@@ -1,4 +1,5 @@
 domain: .frk8s.net
+fqdn: openam.prod.frk8s.net
 
 image:
   # repository: gcr.io/engineering-devops

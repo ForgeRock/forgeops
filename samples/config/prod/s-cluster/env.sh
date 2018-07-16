@@ -1,13 +1,26 @@
 # Environment settings for the deployment
 
-# The URL prefix for openam service
-URL_PREFIX="openam"
+# Set the URL_PREFIX and DOMAIN from common.yaml
+while read line
+do
+    if [[ "$line" =~ ^fqdn:.*$ ]]; then 
+    	FQDN=${line#fqdn:}
+    fi
 
-# k8s namespace to deploy in
+    if [[ "$line" =~ ^domain:.*$ ]]; then 
+    	DOMAIN=${line#domain:}
+done < common.yaml
+
+# The URL prefix for openam service
+# You can override by just providing a string here
+URL_PREFIX=${FQDN%%.*}
+
+# k8s namespace to deploy in.
 NAMESPACE="prod"
 
-# Top level domain. Do not include the leading .
-DOMAIN="frk8s.net"
+# Top level domain. Do not include the leading ".""
+# You can override by just providing a string here 
+DOMAIN=${DOMAIN/\./}
 
 # The components to deploy
 # Note the opendj stores are aliased as configstore, userstore, ctstore - but they all use the opendj chart.

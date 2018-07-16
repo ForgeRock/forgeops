@@ -8,7 +8,10 @@ resources:
   requests:
     memory: 8Gi
 
-opendjJavaArgs: "-server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails -XX:+PrintPromotionFailure -Xloggc:/tmp/gc.log"
+opendjJavaArgs: >
+  -server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
 
 storageSize: "500Gi"
 storageClass: "fast"
@@ -18,5 +21,5 @@ replicas: 2
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
 haproxy:
-  enabled: true
+  enabled: false
   replicas: 1
