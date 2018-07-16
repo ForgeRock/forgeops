@@ -1,5 +1,3 @@
-fqdn: openam.prod.frk8s.net
-
 config:
   claim: frconfig
   #importPath: /git/config/samples/am/R6.0
