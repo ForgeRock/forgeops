@@ -16,14 +16,14 @@ steps:
 # Run remove all before tests to ensure namespace is clear before test run
 - name: 'gcr.io/engineering-devops/helm'
   entrypoint: 'bin/remove-all.sh'
-  args: ['smoke']
+  args: ['-N','smoke']
 
 # Run deployment scripts
 - name: 'gcr.io/engineering-devops/helm'
   entrypoint: 'bin/deploy.sh'
   args: ['samples/config/smoke-deployment']
 
-# Run custom smoke test image built in previous step
+# Run custom smoke test image
 - name: 'gcr.io/$PROJECT_ID/forgeops-tests:latest'
   dir: 'cicd/forgeops-tests/'
   env:
