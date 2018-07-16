@@ -48,3 +48,6 @@ if [ -n "$REMOVE_NS" ]; then
     echo "Deleting namespace $NAMESPACE"
     kubectl delete ns "$NAMESPACE"
 fi
+
+# Needed for cloudbuild
+exit 0
