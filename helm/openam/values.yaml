@@ -45,7 +45,7 @@ catalinaOpts: >
 tls:
   # strategy is the method of TLS provisioning. Can either be:
   # - CertManager[default]: Use CertManager with forgeops.com domain and Letsencrypt production.
-  # - SelfSigned:           Runs job that creates self signed wildcard certificate based on namespace.  
+  # - SelfSigned:           Runs job that creates self-signed wildcard certificate based on namespace.  
   # - UserProvided:         Allows user to provide their own cert files.
   strategy: CertManager
   # path to certs if 'tlsStrategy: UserProvided'. 

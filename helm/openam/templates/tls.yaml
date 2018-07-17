@@ -35,7 +35,7 @@ data:
   {{ .Files.Get .Values.tls.keyPath | b64enc | indent 4 }}
 {{ end }}
 ---
-# This job creates either a self signed certificate if 'tls.strategy: SelfSigned',
+# This job creates either a self-signed certificate if 'tls.strategy: SelfSigned',
 # or imports user provided certificates if 'tls.strategy: UserProvided'.
 {{ if or (eq .Values.tls.strategy "SelfSigned") (eq .Values.tls.strategy "UserProvided") }}
 apiVersion: batch/v1

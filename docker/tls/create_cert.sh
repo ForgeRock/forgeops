@@ -25,7 +25,7 @@ delete_old_jobs () {
     done
 }
 
-# Create a self signed certificate
+# Create a self-signed certificate
 create_selfsigned () {
     openssl req \
        -newkey rsa:2048 -nodes -keyout tls.key \
@@ -54,7 +54,7 @@ if [[ $(kubectl get secret --no-headers wildcard.${NAMESPACE}.forgeops.com | awk
     printf "* kubectl delete secret wildcard.${NAMESPACE}.forgeops.com\n"
     printf "* redeploy product\n"
 else
-    # Create secret based on self signed or user provided tls certs
+    # Create secret based on self-signed or user provided tls certs
     case "$STRATEGY" in
         SelfSigned ) 
             create_selfsigned 

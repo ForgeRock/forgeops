@@ -1,8 +1,8 @@
 # TLS job image 
 # Copyright (c) 2016-2018 ForgeRock AS.
 #
-# TLS job either creates an Self Signed certificate or adds imports user provided certificates
-# based in selection in values files.  This job runs as part of the product Helm Charts.
+# TLS job either creates an self-signed certificate or adds imports user provided certificates
+# based in selection in values files.  This job runs as part of the product Helm charts.
 FROM alpine:3.7
 
 ENV NAMESPACE $NAMESPACE
