@@ -14,7 +14,7 @@ done
 shift $((OPTIND -1))
 
 if [ $# -eq 1 ];
-then 
+then
     NS=$1
 fi
 
@@ -47,6 +47,18 @@ kubectl delete job --namespace  ${NAMESPACE} --all
 if [ -n "$REMOVE_NS" ]; then
     echo "Deleting namespace $NAMESPACE"
     kubectl delete ns "$NAMESPACE"
+
+    while true; do
+        OK_STRING="NotFound"
+        echo "Waiting for ns to be deleted completely"
+        OUTPUT=$(kubectl get ns $NAMESPACE)
+            if [[ $OK_STRING = *$OUTPUT* ]]; then
+                echo "Namespace is deleted"
+                break
+            fi
+          echo "=> Namespace $NAMESPACE is being deleted. Waiting for 5 more seconds..."
+          sleep 5
+    done
 fi
 
 # Needed for cloudbuild
