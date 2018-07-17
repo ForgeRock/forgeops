@@ -36,6 +36,18 @@ javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 # If you set this to true, you must have a TLS secret with the same name as the FQDN.
 useTLS: false
 
+tls:
+  # strategy is the method of TLS provisioning. Can either be:
+  # - CertManager[default]: Use CertManager with forgeops.com domain and Letsencrypt production.
+  # - SelfSigned:           Runs job that creates self signed wildcard certificated based namespace.  
+  # - UserProvided:         Allows user to provide their own cert files.
+  strategy: CertManager
+  # path to certs if 'tlsStrategy: UserProvided'. 
+  # crtPath: /path/to/cert/tls.crt
+  # keyPath: /path/to/key/tls.key
+  jobName: tls-generator
+  jobImage: forgerock-docker-public.bintray.io/forgerock/tls:1.0
+
 # Specific values
 openidm:
   repo:
@@ -79,8 +91,10 @@ logLevel: INFO
 
 ingress:
   class: nginx
+  enabled: true
   annotations:
     # Nginx specific annotations
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    ingress.kubernetes.io/ssl-redirect: "true"

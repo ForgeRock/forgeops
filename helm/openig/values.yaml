@@ -41,7 +41,7 @@ tls:
   # crtPath: /path/to/cert/tls.crt
   # keyPath: /path/to/key/tls.key
   jobName: tls-generator
-  jobImage: gcr.io/engineering-devops/certs/tls:1.1
+  jobImage: forgerock-docker-public.bintray.io/forgerock/tls:1.0
 
 image:
   repository: gcr.io/engineering-devops
@@ -67,6 +67,7 @@ service:
 
 ingress:
   class: nginx
+  enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
     # Do not use for nginx. TODO: Does warp need this?
@@ -80,10 +81,6 @@ ingress:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
-    # cert manager annotations
-    #certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
-    #certmanager.k8s.io/acme-challenge-type: "dns01"
-    #certmanager.k8s.io/acme-dns01-provider: "prod-dns"
     
     
 

@@ -52,7 +52,7 @@ tls:
   # crtPath: /path/to/cert/tls.crt
   # keyPath: /path/to/key/tls.key
   jobName: tls-generator
-  jobImage: gcr.io/engineering-devops/certs/tls:1.2
+  jobImage: forgerock-docker-public.bintray.io/forgerock/tls:1.0
 
 
 # Suffix for OpenDJ config store. We reuse the default baseDN of o=userstore.

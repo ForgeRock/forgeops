@@ -2,8 +2,6 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Ingress definition to configure external routes.
 {{- if .Values.ingress.enabled }}
-{{- $serviceName := .Values.service.name }}
-{{- $servicePort := .Values.service.externalPort }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -26,6 +24,6 @@ spec:
       paths:
       - path: /openam
         backend:
-          serviceName: {{ $serviceName }}
-          servicePort: {{ $servicePort }}      
+          serviceName: {{ .Values.service.name }}
+          servicePort: {{ .Values.service.externalPort }}   
 {{- end -}}
