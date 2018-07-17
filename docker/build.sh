@@ -21,7 +21,7 @@ TAG=${TAG:-6.5.0}
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam ds openidm openig amster util git java gatling"
+IMAGES="openam ds openidm openig amster util git java gatling apache-agent nginx-agent"
 
 function buildDocker {
 
@@ -46,7 +46,7 @@ function buildDocker {
    fi
 }
 
-# --cache-from multistage issue: https://github.com/moby/moby/issues/34715 
+# --cache-from multistage issue: https://github.com/moby/moby/issues/34715
 while getopts "adgpst:r:R:P:i:c:" opt; do
   case ${opt} in
     a ) AUTHENTICATE="true" ;;

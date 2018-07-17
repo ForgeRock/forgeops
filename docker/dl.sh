@@ -48,10 +48,10 @@ IG=$REPO/openig/openig-war/$IG_VERSION/openig-war-$IG_VERSION.war
 IG_SNAPSHOT=$SNAPSHOT_REPO/openig/openig-war/$SNAPSHOT/openig-war-$SNAPSHOT.war
 
 NGINX_AGENT_SNAPSHOT=$WEB_AGENTS_SNAPSHOT_REPO/web-agents-nightly-NGINX_r12_Debian9_64bit.zip
-NGINX_AGENT_STABLE=$WEB_AGENTS_STABLE_REPO/web-agents-nightly-NGINX_r12_Debian9_64bit.zip
+NGINX_AGENT_STABLE=$WEB_AGENTS_STABLE_REPO/web-agents-5.0.1-NGINX_r12_Ubuntu16_64bit.zip
 
 APACHE_AGENT_SNAPSHOT=$WEB_AGENTS_SNAPSHOT_REPO/web-agents-nightly-Apache_v24_Linux_64bit.zip
-APACHE_AGENT_STABLE=$WEB_AGENTS_STABLE_REPO/web-agents-nightly-Apache_v24_Linux_64bit.zip
+APACHE_AGENT_STABLE=$WEB_AGENTS_STABLE_REPO/web-agents-5.0.1-Apache_v24_Linux_64bit.zip
 
 HEADER="X-JFrog-Art-Api: $API_KEY"
 
@@ -76,11 +76,11 @@ dl_binary() {
     opendj)
         dl $DJ_SNAPSHOT $DJ ds/opendj.zip
         ;;
-    nginx_agent)
-        dl $NGINX_AGENT_SNAPSHOT $NGINX_AGENT_STABLE nginx_agent/agent.zip
+    nginx-agent)
+        dl $NGINX_AGENT_SNAPSHOT $NGINX_AGENT_STABLE nginx-agent/agent.zip
         ;;
-    apache_agent)
-        dl $APACHE_AGENT_SNAPSHOT $APACHE_AGENT_STABLE apache_agent/agent.zip
+    apache-agent)
+        dl $APACHE_AGENT_SNAPSHOT $APACHE_AGENT_STABLE apache-agent/agent.zip
         ;;
     *)
         echo "Invalid image to downoad $1"
@@ -113,7 +113,7 @@ dl(){
     fi
 }
 
-IMAGES="opendj openidm amster openam openig"
+IMAGES="opendj openidm amster openam openig nginx-agent apache-agent"
 
 while getopts "sw" opt; do
   case ${opt} in
