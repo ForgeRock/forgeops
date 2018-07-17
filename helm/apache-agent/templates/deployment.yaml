@@ -36,6 +36,8 @@ spec:
           mountPath: /logmount
         - name: agent-secrets
           mountPath: /var/run/secrets/agent
+        - name: dshm
+          mountPath: /dev/shm
         # This can be extended for any configurable properties. Look to forgeops/docker/apache-agent/docker-entrypoint.sh
         # for list of supported env variables.
         env:
