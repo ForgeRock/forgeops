@@ -88,6 +88,21 @@ if [ ! -z "$INCREMENTAL" ]; then
   fi
 fi
 
+# Test for the forgerock downloader image - needed to download bits
+
+DL=`docker images -q forgerock/downloader`
+
+if [ -z "$DL" ]; then 
+  echo "Can't find forgerock/downloader image needed to download ForgeRock binaries. I will attempt to build it"
+  if [ -z "$API_KEY" ]; then
+    echo "Artifactory API_KEY environment variable is not set. You must export API_KEY=your_artifactory_api_key"
+    exit 1
+  fi
+  docker build -t forgerock/downloader --build-arg API_KEY=$API_KEY downloader
+fi 
+
+
+
 if [ "$#" -eq "0" ]; then
    for image in $IMAGES; do
       buildDocker $image

@@ -9,29 +9,13 @@ steps:
 # Build helm charts and push to gs bucket.
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: ./etc/cloud-build-push-charts.sh
-- name: 'gcr.io/cloud-builders/wget'
-  # Run dl.sh download script with options to use wget (-w).
-  entrypoint: './dl.sh'
-  # -w - use wget instead of curl. We may want to use -s for snapshots..
-  args: ['-w']
-  dir: 'docker'
-  env:
-#  - 'BUILD_ID=$BUILD_ID'
-#  - 'PROJECT=$PROJECT_ID'
-#  - 'REV=$REVISION_ID'
-#  - 'BRANCH_NAME=$BRANCH_NAME'
-#  - 'REPO_NAME=$REPO_NAME'
-#  - 'TAG_NAME=$TAG_NAME'
-  # Set _API_KEY in the cloudbuild
-  # console https://console.cloud.google.com/gcr/triggers?project=engineering-devops
-  # This is the credential to pull product binaries from the ForgeRock Artifactory repository.
-  - 'API_KEY=${_ARTIFACTORY_API_KEY}'
 # build gcr.io
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'
   entrypoint: './build.sh'
-  #args: ['-g','-c', 'gcr.io/engineering/devops' ]
   args: ['-g']
+  env:
+  - 'API_KEY=${_ARTIFACTORY_API_KEY}'
 # TODO: Make the bintray push a separate cloudbuild job.
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'

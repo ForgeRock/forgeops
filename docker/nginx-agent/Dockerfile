@@ -1,7 +1,14 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Nginx agent base image
+FROM forgerock/downloader 
+
+RUN download nginx-agent
+RUN unzip nginx-agent.zip -d /var/tmp 
+
 FROM nginx:1.11.10
+
+COPY --from=0 /var/tmp/web_agents /opt/web_agents
 
 WORKDIR /opt
 
@@ -11,11 +18,9 @@ ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 # Copy nginx.conf with included agent module
 COPY nginx.conf /etc/nginx/
 COPY default.conf /etc/nginx/conf.d/
-COPY agent.zip /var/tmp/
 
 # Install necessary dependencies
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
-      unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*
 

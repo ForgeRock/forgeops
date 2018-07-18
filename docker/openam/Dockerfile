@@ -1,9 +1,16 @@
 # AM Dockerfile
 #
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS.
 #
-FROM tomcat:8.5.31-alpine
+FROM forgerock/downloader 
 
+ARG VERSION="6.0.0"
+RUN download -v $VERSION openam 
+RUN mkdir -p /var/tmp/openam && unzip /openam.war -d /var/tmp/openam
+
+FROM tomcat:8.5-alpine
+
+COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/openam
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for setting the AM home directory:
@@ -31,15 +38,10 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 ENV FORGEROCK_HOME /home/forgerock
 ENV OPENAM_HOME /home/forgerock/openam
 
-
-COPY openam.war  /tmp/openam.war
-
 # Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
 # This is a work around for: https://github.com/docker-library/tomcat/issues/35
 RUN apk add --no-cache su-exec unzip curl bash tini \
   && rm -fr /usr/local/tomcat/webapps/* \
-  && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
-  && rm /tmp/openam.war \
   && addgroup -g 11111 forgerock \
   && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G root \
   && mkdir -p "$OPENAM_HOME" \
@@ -60,7 +62,8 @@ USER 11111
 
 # Generate a default keystore for SSL - only needed if you want SSL inside the cluster.
 # You can mount your own keystore on the ssl/ directory to override this.
-# Because of the complexity of configuring ssl, we should look at using istio.io to handle intercomponent ssl
+# Because of the complexity of configuring ssl, we recommend using something like istio to provide
+# SSL within the cluster.
 #RUN mkdir -p /usr/local/tomcat/ssl && \
 #   keytool -genkey -noprompt \
 #     -keyalg RSA \
