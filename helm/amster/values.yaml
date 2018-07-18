@@ -62,7 +62,7 @@ global:
   git:
     # git repo to clone. The value below is a public git repo that does not require authentication.
     repo: "https://github.com/ForgeRock/forgeops-init.git"
-    branch: master
+    branch: release/6.0.0
   configPath:
     am: default/am/empty-import
   # If exportPath.am is not set it defaults to configPath.am
