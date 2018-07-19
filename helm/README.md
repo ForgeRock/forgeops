@@ -101,10 +101,13 @@ To enable any of the products to use HTTPS on their external endpoint, set the f
 useTLS: True
 ```
 
-There are 3 TLS strategies to choose from.  The default behaviour is to use CertManager which in turn requests certificates from LetsEncrypt.  
+The default behaviour if useTLS = true, is to use certmanager to manage the certificate request/renewal via letsencrypt.  This is enabled by the following flag:
+```
+useCertManager: True
+```
 
-The other options are to use the auto created self signed certificate or to provide your own certificates.  These can be configured by switching the tls.strategy value to either SelfSigned or UserProvided.  
-For UserProvided option, you need to provide the certificates as part of the deployment. See the values file for the specific product helm chart for further comments.
+If you don't have cert manager deployed and want to use TLS certs, set the useCertManager flag to false, and use the the script ../bin/create_cert.sh  
+to either automatically generate a self-signed cert, or provide your own certs.  See the comments in the script for more details.
 
 # Notes
 
