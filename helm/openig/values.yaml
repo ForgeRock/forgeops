@@ -29,19 +29,9 @@ config:
 catalinaOpts: "-Xmx512m"
   
 # TLS is enabled by default. See TLS section for configuration options
-useTLS: true
-
-tls:
-  # strategy is the method of TLS provisioning. Can either be:
-  # - CertManager[default]: Use CertManager with forgeops.com domain and Letsencrypt production.
-  # - SelfSigned:           Runs job that creates self-signed wildcard certificated based namespace.  
-  # - UserProvided:         Allows user to provide their own cert files.
-  strategy: CertManager
-  # path to certs if 'tlsStrategy: UserProvided'. 
-  # crtPath: /path/to/cert/tls.crt
-  # keyPath: /path/to/key/tls.key
-  jobName: tls-generator
-  jobImage: forgerock-docker-public.bintray.io/forgerock/tls:1.0
+useTLS: false
+# switch to false to provide self-signed certs or to provide your own
+useCertManager: true
 
 image:
   repository: gcr.io/engineering-devops

@@ -42,17 +42,10 @@ catalinaOpts: >
 #-Dcom.sun.management.jmxremote.rmi.port=<port>
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
 
-tls:
-  # strategy is the method of TLS provisioning. Can either be:
-  # - CertManager[default]: Use CertManager with forgeops.com domain and Letsencrypt production.
-  # - SelfSigned:           Runs job that creates self-signed wildcard certificate based on namespace.  
-  # - UserProvided:         Allows user to provide their own cert files.
-  strategy: CertManager
-  # path to certs if 'tlsStrategy: UserProvided'. 
-  # crtPath: /path/to/cert/tls.crt
-  # keyPath: /path/to/key/tls.key
-  jobName: tls-generator
-  jobImage: forgerock-docker-public.bintray.io/forgerock/tls:1.0
+# TLS is enabled by default. See TLS section for configuration options
+useTLS: false
+# switch to false to provide self-signed certs or to provide your own
+useCertManager: true
 
 
 # Suffix for OpenDJ config store. We reuse the default baseDN of o=userstore.

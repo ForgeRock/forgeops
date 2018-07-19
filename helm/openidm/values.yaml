@@ -33,20 +33,10 @@ image:
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
-# If you set this to true, you must have a TLS secret with the same name as the FQDN.
+# TLS is enabled by default. See TLS section for configuration options
 useTLS: false
-
-tls:
-  # strategy is the method of TLS provisioning. Can either be:
-  # - CertManager[default]: Use CertManager with forgeops.com domain and Letsencrypt production.
-  # - SelfSigned:           Runs job that creates self-signed wildcard certificated based namespace.  
-  # - UserProvided:         Allows user to provide their own cert files.
-  strategy: CertManager
-  # path to certs if 'tlsStrategy: UserProvided'. 
-  # crtPath: /path/to/cert/tls.crt
-  # keyPath: /path/to/key/tls.key
-  jobName: tls-generator
-  jobImage: forgerock-docker-public.bintray.io/forgerock/tls:1.0
+# switch to false to provide self-signed certs or to provide your own
+useCertManager: true
 
 # Specific values
 openidm:
