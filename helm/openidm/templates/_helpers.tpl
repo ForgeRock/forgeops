@@ -28,7 +28,7 @@ tls:
 - hosts:
   - {{ template "externalFQDN" .  }}
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
-{{ end -}}
+{{- end -}}
 {{- end -}}
 
 {{- define "git-init" -}}

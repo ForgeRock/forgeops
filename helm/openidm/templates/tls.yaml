@@ -1,8 +1,10 @@
-{{- if .Values.useTLS }}
+# CertManager certificate object created if 'tls.strategy: CertManager'. 
+# This object triggers a certificate request to LetsEncrypt via the CertManager Operator.
+{{ if and .Values.useCertManager .Values.useTLS }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: openidm-tls
+  name: {{ .Values.component }}.{{ .Release.Namespace }}{{ .Values.domain }}
 spec:
   secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   issuerRef:
@@ -10,11 +12,11 @@ spec:
     kind: ClusterIssuer
   commonName: ""
   dnsNames:
-  - "*.{{ .Release.Namespace }}.forgeops.com"
+  - '*.{{ .Release.Namespace }}{{ .Values.domain }}'
   acme:
     config:
     - dns01:
         provider: prod-dns
       domains:
-      - {{ .Release.Namespace }}.forgeops.com
-{{- end -}}
+      - '*.{{ .Release.Namespace }}{{ .Values.domain }}'
+{{ end }}

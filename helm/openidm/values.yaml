@@ -33,8 +33,10 @@ image:
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
-# If you set this to true, you must have a TLS secret with the same name as the FQDN.
+# TLS is enabled by default. See TLS section for configuration options
 useTLS: false
+# switch to false to provide self-signed certs or to provide your own
+useCertManager: true
 
 # Specific values
 openidm:
@@ -79,8 +81,10 @@ logLevel: INFO
 
 ingress:
   class: nginx
+  enabled: true
   annotations:
     # Nginx specific annotations
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    ingress.kubernetes.io/ssl-redirect: "true"

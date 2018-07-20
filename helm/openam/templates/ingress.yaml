@@ -24,6 +24,6 @@ spec:
       paths:
       - path: /openam
         backend:
-          serviceName: openam
-          servicePort: 80
+          serviceName: {{ .Values.service.name }}
+          servicePort: {{ .Values.service.externalPort }}   
 {{- end -}}

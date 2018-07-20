@@ -16,9 +16,6 @@ config:
   name: frconfig
   strategy: git
 
-# If you set this to true, you must have a TLS secret with the same name as the FQDN.
-useTLS: false
-
 openamReplicaCount: 1
 
 openamInstance: http://openam:80/openam
@@ -44,6 +41,12 @@ catalinaOpts: >
 #-Dcom.sun.management.jmxremote.ssl=false
 #-Dcom.sun.management.jmxremote.rmi.port=<port>
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
+
+# TLS is enabled by default. See TLS section for configuration options
+useTLS: false
+# switch to false to provide self-signed certs or to provide your own
+useCertManager: true
+
 
 # Suffix for OpenDJ config store. We reuse the default baseDN of o=userstore.
 rootSuffix:  "o=userstore"

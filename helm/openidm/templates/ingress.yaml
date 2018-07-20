@@ -1,10 +1,17 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Ingress definition to configure external routes.
+{{- if .Values.ingress.enabled }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Values.component }}
+  labels:
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
   annotations:
     {{- range $key, $value := .Values.ingress.annotations }}
       {{ $key }}: {{ $value | quote }}
@@ -17,5 +24,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{  .Values.service.name }}
-          servicePort: {{ .Values.service.externalPort }}
+          serviceName: {{ .Values.service.name }}
+          servicePort: {{ .Values.service.externalPort }}   
+{{- end -}}
