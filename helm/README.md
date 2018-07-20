@@ -106,7 +106,7 @@ The default behaviour if useTLS = true, is to use certmanager to manage the cert
 useCertManager: True
 ```
 
-If you don't have cert manager deployed and want to use TLS certs, set the useCertManager flag to false, and use the the script ../bin/create_cert.sh  
+If you don't have cert manager deployed and want to use TLS certs, set the useCertManager flag to false, and use the script ../bin/generate-tls.sh  
 to either automatically generate a self-signed cert, or provide your own certs.  See the comments in the script for more details.
 
 # Notes
