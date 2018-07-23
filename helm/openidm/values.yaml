@@ -33,8 +33,11 @@ image:
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
-# If you set this to true, you must have a TLS secret with the same name as the FQDN.
+# To enable any of the products to use HTTPS on their external endpoint, set the following flag to true.
 useTLS: false
+# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  
+# This is enabled by the following flag:
+useCertManager: true
 
 # Specific values
 openidm:
@@ -79,8 +82,10 @@ logLevel: INFO
 
 ingress:
   class: nginx
+  enabled: true
   annotations:
     # Nginx specific annotations
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    ingress.kubernetes.io/ssl-redirect: "true"
