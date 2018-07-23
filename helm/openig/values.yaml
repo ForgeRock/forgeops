@@ -28,9 +28,10 @@ config:
 # Tomcat JVM options.
 catalinaOpts: "-Xmx512m"
   
-# TLS is enabled by default. See TLS section for configuration options
+# To enable any of the products to use HTTPS on their external endpoint, set the following flag to true.
 useTLS: false
-# switch to false to provide self-signed certs or to provide your own
+# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  
+# This is enabled by the following flag:
 useCertManager: true
 
 image:

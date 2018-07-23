@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Script can be used to either automatically generate a self-signed TLS certificate, or to provide your own TLS cert and key.
+# The script has 2 options, it can either be used to generate a self-signed TLS certificate, or it will generate the secret from your own cert and key 
+# if you provide the paths in the template.  
 # Either method will be wrapped up in a secret called wildcard.<namespace>.<domain> which is inherited by the ingress and can be used by all FR products.
 
 # ***IMPORTANT***  the following value must be set in your custom.yaml:
 # useCertManager: false
-# otherwise the deployment will try to generate a certmanager certificate object and will override the secret if certmanager is installed.
+# otherwise the deployment will try to generate a cert-manager Certificate object and will override the secret if cert-manager is installed.
 # Copy the etc/generate-tls.template file to etc/generate-tls.cfg and specify your values as required.
 
 echo "=> Have you copied the template file etc/generate-tls.template to etc/generate-tls.cfg and edited to cater to your requirement?"
@@ -52,7 +53,7 @@ if [[ $(kubectl get secret --no-headers wildcard.${NAMESPACE}.${DOMAIN} | awk '{
     printf "\n*** TLS secret already exists ***\n"
     case "$(kubectl get secret wildcard.${NAMESPACE}.${DOMAIN} -o=jsonpath='{.metadata.labels.strategy}')" in
         "" ) 
-            printf "Current tls secret is provided by CertManager\n" ;;
+            printf "Current tls secret is provided by cert-manager\n" ;;
         SelfSigned ) 
             printf "Current tls secret is SelfSigned\n"  ;;
         UserProvided ) 
