@@ -88,6 +88,31 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
           periodSeconds: {{ .Values.livenessPeriod }}
+      # audit logging containers
+      - name: access-logs
+        image: busybox
+        args: [bin/sh, -c, 'tail -n+1 -f /home/forgerock/openam/openam/log/access.audit.json' ] 
+        volumeMounts:
+        - name: openam-root
+          mountPath: /home/forgerock/openam
+      - name: activity-logs
+        image: busybox
+        args: [bin/sh, -c, 'tail -n+1 -f /home/forgerock/openam/openam/log/activity.audit.json' ] 
+        volumeMounts:
+        - name: openam-root
+          mountPath: /home/forgerock/openam
+      - name: authentication-logs
+        image: busybox
+        args: [bin/sh, -c, 'tail -n+1 -f /home/forgerock/openam/openam/log/authentication.audit.json' ] 
+        volumeMounts:
+        - name: openam-root
+          mountPath: /home/forgerock/openam
+      - name: config-logs
+        image: busybox
+        args: [bin/sh, -c, 'tail -n+1 -f /home/forgerock/openam/openam/log/config.audit.json' ] 
+        volumeMounts:
+        - name: openam-root
+          mountPath: /home/forgerock/openam
       volumes:
       - name: openam-root
         emptyDir: {}
