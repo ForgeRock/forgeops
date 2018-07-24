@@ -23,14 +23,16 @@ policyAgentPassword: Passw0rd
 
 
 config:
-  strategy: git
-  # The name of the shared read write many PVC volume that holds the configuration
+  # Name of the configMap that holds the configuration repository URL and of
+  # the secret required to access it.
   name: frconfig
-  # To level path where we import the the configuration from. Your git repo will usually be mounted on /git/config
-  # in this pod.
-  importPath: /git/config/default/am/empty-import
+  # The path where we import the configuration from. Your git repo will usually be mounted on /git/config.
+  importPath: /git/config/6.5/default/am/empty-import
   # Where we perform export paths to. If not set, this defaults to the importPath
   #exportPath: /tmp/amster
+  # strategy defines how products get their configuration .
+  # Using the git strategy, each helm chart pulls the configurtion from git using an init container.
+  strategy: git
 
 image:
   repository: gcr.io/engineering-devops
