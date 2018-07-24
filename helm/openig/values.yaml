@@ -11,15 +11,11 @@ domain: .example.com
 # Configuration parameters. Common to all charts that require configuration from a
 # source. Currently the only source is a git repo.
 config:
-  # Path to our project
-  path: /git/config/default/ig/basic-sample
-  # The name of the configuration we want to use. This is used as a reference 
-  # to either a pvc claim to mount that holds the configuration, or the name
-  # is used to reference secrets and a configmap that is used to clone the git repo.
-  # The default "frconfig" can be used when you want all products to share the same git repo. 
-  # You can deploy multiple instances of the frconfig chart if you want per product repos.
-  # for example,  helm install --set config.name=openig frconfig
+  # Name of the configMap that holds the configuration repository URL and of
+  # the secret required to access it.
   name: frconfig
+  # Path to our project
+  path: /git/config/6.5/default/ig/basic-sample
   # strategy defines how products get their configuration .
   # Using the git strategy, each helm chart pulls the configuration from git using an init container. 
   strategy: git
