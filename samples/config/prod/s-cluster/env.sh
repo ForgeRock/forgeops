@@ -9,6 +9,7 @@ do
 
     if [[ "$line" =~ ^domain:.*$ ]]; then 
     	DOMAIN=${line#domain:}
+    fi
 done < common.yaml
 
 # The URL prefix for openam service
