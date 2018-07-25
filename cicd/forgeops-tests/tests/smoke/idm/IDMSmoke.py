@@ -142,41 +142,41 @@ class IDMSmoke(unittest.TestCase):
             '_action': 'submitRequirements'
         }
 
-        payload = {
+        payload1 = {
             "input": {
                 'queryFilter': 'userName eq \"rsutter\"'
             }
         }
 
-        stage1 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload)
+        stage1 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload1)
         self.assertEqual(200, stage1.status_code, "Try to find user with query for pw reset")
 
-        payload = {
+        payload2 = {
             "token": stage1.json()["token"],
             "input": {
                 'queryFilter': 'userName eq \"rsutter\"'
             }
         }
-        stage2 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload)
+        stage2 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload2)
         self.assertEqual(200, stage2.status_code, "Stage 2 - Query user")
 
-        payload2 = {
+        payload3 = {
             "token": stage2.json()["token"],
             "input": {
                 "answer1": "black"
             }
         }
 
-        stage3 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload2)
+        stage3 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload3)
         self.assertEqual(200, stage3.status_code, "Stage 3 - Answer question")
 
-        payload3 = {
+        payload4 = {
             "token": stage3.json()["token"],
             "input": {
                 "password": "Th3Password"
             }
         }
 
-        stage4 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload3)
+        stage4 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload4)
         self.assertEqual(200, stage4.status_code, "Stage 4 - Password reset")
         s.close()
