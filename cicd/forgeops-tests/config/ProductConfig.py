@@ -28,6 +28,7 @@ class AMConfig(object):
         self.rest_oauth2_authz_url = self.am_url + '/oauth2/authorize'
 
 
+
 class IDMConfig(object):
     def __init__(self):
         try:
@@ -47,6 +48,8 @@ class IDMConfig(object):
 
         self.rest_ping_url = self.idm_url + '/info/ping'
         self.rest_managed_user_url = self.idm_url + '/managed/user'
+        self.rest_selfreg_url = self.idm_url + '/selfservice/registration'
+        self.rest_selfpwreset_url = self.idm_url + '/selfservice/reset'
 
     def get_admin_headers(self, headers):
         """
