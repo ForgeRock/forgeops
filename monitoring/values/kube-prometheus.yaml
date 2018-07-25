@@ -8,6 +8,15 @@ exporter-kubelets:
 # Grafana
 deployGrafana: True
 
+# Kube-scheduler
+deployKubeScheduler: False
+
+# Controller Manager
+deployKubeControllerManager: False
+
+# Kube state
+deployKubeState: True
+
 ## If true, create & use RBAC resources resp. Pod Security Policies
 ##
 global:
@@ -458,6 +467,7 @@ prometheusRules: {}
 # Select Deployed DNS Solution
 deployCoreDNS: false
 deployKubeDNS: true
+<<<<<<< HEAD
 deployKubeEtcd: false
 
 ##Custom Labels to be added to Prometheus Rules CRD
@@ -465,3 +475,6 @@ deployKubeEtcd: false
 additionalRulesLabels: 
   role: alert-rules
   prometheus: monitoring-kube-prometheus
+=======
+deployKubeEtcd: true
+>>>>>>> updating location of metrics helm chart and added path variable
