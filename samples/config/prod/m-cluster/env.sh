@@ -10,7 +10,7 @@ do
     if [[ "$line" =~ ^domain:.*$ ]]; then 
     	DOMAIN=${line#domain:}
     fi
-done < common.yaml
+done < $CFGDIR/common.yaml
 
 # The URL prefix for openam service
 # You can override by just providing a string here
