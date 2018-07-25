@@ -23,79 +23,102 @@ Save the App Id and Secret as environment variables, like so:
 
 If you don't want to use Facebook, the default values of "FakeID" and "FakeSecret" will be used. Facebook will still appear in your AM and IDM environments as an option, but it won't be functional.
 
-## Quick Start
+## Running the Sample
 
-0. *(Optional, for local use)* If you do not have kubectl and helm already configured, you can initialize them in your local environment like so:
-```
-minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-minikube addons enable ingress
-eval $(minikube docker-env)
-kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
-kubectl config use-context sample-context
-minikube ssh "sudo ip link set docker0 promisc on"
-helm init --wait
-```
+*Note: skip the "optional" steps below if you are working with a hosted Kubernetes provider and have already setup your kubectl and helm environment.*
 
-1. With Helm installed and kubectl setup to work with your Kubernetes cluster (either local or remote), then you can get started very quickly with these commands:
-```
-helm repo add forgerock https://storage.googleapis.com/forgerock-charts
-helm install forgerock/fr-platform -n sample-fr-platform \
-  --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
-  --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
-```
+1. *(Optional - initial minikube vm setup)* If you want to run the sample locally in minikube, you first need to prepare your minikube VM. This is only needed the first time you setup your minikube VM; if you restart your host or your VM, you do not need to repeat this setup.
+
+    This creates the minikube VM, enables the ingress addon, adds a new namespace to your kubectl config, and initializes the helm tiller:
+
+    ```
+    minikube start --insecure-registry 10.0.0.0/24 --memory 4096
+    minikube addons enable ingress
+    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
+    sleep 2
+    helm init --wait
+    ```
+
+2. *(Optional - prep minikube for use)* If you are using minikube, you will need to run these commands every time the VM starts (after first setup as well as after every reboot).
+
+    These commands fix a bug in minikube related to loopback networking, prepare your Docker environment to point to the minikube Docker service, and instructs kubectl to use the proper namespace for this sample.
+
+    ```
+    minikube ssh "sudo ip link set docker0 promisc on"
+    eval $(minikube docker-env)
+    kubectl config use-context sample-context
+    ```
 
 
-2. You need to add the ingress IP to your local hosts. First, remove any old entry with this command:
-```
-grep -v client-service.sample.svc.cluster.local /etc/hosts \
-| sudo tee /etc/hosts
-```
-Next add the correct entry:
+3. With Helm installed and kubectl setup to work with your Kubernetes cluster (either local or remote), you can choose between two ways of running the sample.
 
-    If you are using minikube, use this command:
-```
-echo "$(minikube ip) \
-    client-service.sample.svc.cluster.local \
-    am-service.sample.svc.cluster.local" \
-| sudo tee -a /etc/hosts
-minikube ssh "sudo ip link set docker0 promisc on"
-```
-If your cluster is available directly, you can use this command instead:
-```
-echo "$( kubectl get ing -o \
-    jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' ) \
-    client-service.sample.svc.cluster.local \
-    am-service.sample.svc.cluster.local" \
-| sudo tee -a /etc/hosts
-```
+    **Option 1**: If you want to simply run the sample as quickly as possible and do not expect to make changes to it yourself, simply install the published helm chart:
 
-3. Wait for all of the pods to become ready:
-```
-kubectl get po -n sample --watch
-```
+    ```
+    helm repo add forgerock https://storage.googleapis.com/forgerock-charts
+    helm install forgerock/fr-platform -n sample-fr-platform \
+      --set-string social.facebook.id=${IDP_FACEBOOK_CLIENTID} \
+      --set-string social.facebook.secret=${IDP_FACEBOOK_CLIENTSECRET}
+    ```
 
-4. Afterwards, you can access the application by opening this URL:
-```
-http://client-service.sample.svc.cluster.local
-```
+    **Option 2:** If you want to work on the sample, you can use the "[skaffold](https://github.com/GoogleContainerTools/skaffold)" tool to quickly build and deploy the images:
+
+    ```
+    skaffold dev &
+    ```
+
+    This will build the docker images and incorporate them into the helm templates, followed by managing the release of the chart. Any changes made to the configuration files for each docker image will be watched by skaffold, and will result in an automatic rebuild of the image followed by a redeployment into the cluster.
+
+
+4. You need to add the ingress IP to your local hosts file.
+
+    If you are using minikube, use these commands:
+    ```
+    grep -v client-service.sample.svc.cluster.local /etc/hosts \
+    | sudo tee /etc/hosts && \
+    echo "$(minikube ip) \
+        client-service.sample.svc.cluster.local \
+        am-service.sample.svc.cluster.local" \
+    | sudo tee -a /etc/hosts
+    ```
+
+    If your cluster is available directly, you can use these commands instead:
+    ```
+    grep -v client-service.sample.svc.cluster.local /etc/hosts \
+    | sudo tee /etc/hosts && \
+    echo "$( kubectl get ing -o \
+        jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' ) \
+        client-service.sample.svc.cluster.local \
+        am-service.sample.svc.cluster.local" \
+    | sudo tee -a /etc/hosts
+    ```
+
+5. Wait for all of the pods to become ready:
+
+    ```
+    kubectl get po -n sample --watch
+    ```
+
+    When all pods report that they are in a ready state, hit Ctrl^C to exit.
+
+6. You can access the application by opening this URL:
+
+    ```
+    http://client-service.sample.svc.cluster.local
+    ```
 
     You can use amadmin / password to login.
 
-5. You can remove the sample like so:
-```
-helm delete --purge sample-fr-platform
-```
+7. You can remove the sample like so:
+    ```
+    helm delete --purge sample-fr-platform
+    ```
 
-## Local Kubernetes and Helm setup
+    And if you are using minikube, you can reset the whole environment with this command:
 
-To start the project locally, you need at least a 4gb minikube node. Setup your local node using the instructions provided in the *(Optional, for local use)* step above.
-
-The best option for making changes to the sample is to use the "skaffold" tool, available here: https://github.com/GoogleContainerTools/skaffold
-Once it is installed and your minikube environment is ready, you can start the whole sample with one command:
-
-    skaffold dev
-
-This will build the docker images and incorporate them into the helm templates, followed by managing the release of the chart. Any changes made to the configuration files for each docker image will be watched by skaffold, and will result in an automatic rebuild of the image followed by a redeployment into the cluster.
+    ```
+    minikube delete
+    ```
 
 ### Manually building the Docker images and helm package
 
