@@ -90,6 +90,18 @@ spec:
               fieldPath: metadata.namespace
         args: [ "pause"]
       {{ end }}
+      # audit logging containers
+      {{- range .Values.auditLogs }}
+      - name: {{ .name }}
+        image: busybox
+        env:
+        - name: LOGFILE
+          value: {{ .path }}
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ] 
+        volumeMounts:
+        - name: audit-logs
+          mountPath: /opt/openidm/audit
+      {{- end }}
       volumes:
       - name: openidm-secrets
         secret:
