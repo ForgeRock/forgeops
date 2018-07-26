@@ -142,7 +142,7 @@ configure
 
 /var/tmp/bootstrap/setup-idm.sh
 
-#echo "Putting IDM schema extensions in place"
+#`echo "Putting IDM schema extensions in place"
 cp /var/tmp/schema/* ./db/schema
 
 
