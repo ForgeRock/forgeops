@@ -47,6 +47,13 @@ objectclass: organizationalunit
 objectclass: top
 ou: usermeta
 
+# Config OU
+
+dn: ou=config,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: config
+
 ##
 # Clustered Recon OUs
 ##
