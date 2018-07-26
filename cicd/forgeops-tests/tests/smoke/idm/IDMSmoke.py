@@ -8,8 +8,9 @@ Contains CRUD on user operations + running replication.
 Test are sorted automatically so that's why it's needed to keep test_0[1,2,3]_ naming.
 """
 # Lib imports
+import json
 import unittest
-from requests import get, post, put, delete
+from requests import get, post, put, delete, session
 
 # Framework imports
 from config.ProductConfig import IDMConfig
@@ -86,3 +87,96 @@ class IDMSmoke(unittest.TestCase):
         })
         resp = delete(url=self.idmcfg.rest_managed_user_url + self.testuser, headers=headers)
         self.assertEqual(200, resp.status_code, "Delete test user")
+
+    def test_6_user_self_registration(self):
+        user_data = {
+            "input": {
+                "user": {
+                    "userName": "rsutter",
+                    "givenName": "rick",
+                    "sn": "sutter",
+                    "mail": "rick@mail.com",
+                    "password": "Welcome1",
+                    "preferences": {
+                        "updates": False,
+                        "marketing": False
+                    }
+                },
+                "kba": [
+                    {
+                        "answer": "black",
+                        "questionId": "1"
+                    }
+                ]
+            }
+        }
+
+        headers = {'Content-Type': 'application/json',
+                   'X-OpenIDM-Username': 'anonymous',
+                   'X-OpenIDM-Password': 'anonymous',
+                   'Cache-Control': 'no-cache'}
+        params = {'_action': 'submitRequirements'}
+        resp = post(url=self.idmcfg.rest_selfreg_url, params=params, headers=headers, json=user_data)
+        print(resp.text)
+        self.assertEqual(200, resp.status_code)
+
+    def test_7_user_reset_pw(self):
+        s = session()
+        headers_init = {
+            'Content-Type': 'application/json',
+            'X-OpenIDM-Username': 'anonymous',
+            'X-OpenIDM-Password': 'anonymous',
+            'Cache-Control': 'no-cache',
+            'X-OpenIDM-NoSession': "true",
+            "Accept-API-Version": "protocol=1.0,resource=1.0"
+        }
+
+        headers = {
+            'Content-Type': 'application/json',
+            'X-OpenIDM-Username': 'anonymous',
+            'X-OpenIDM-Password': 'anonymous',
+            'Cache-Control': 'no-cache'
+        }
+
+        params = {
+            '_action': 'submitRequirements'
+        }
+
+        payload1 = {
+            "input": {
+                'queryFilter': 'userName eq \"rsutter\"'
+            }
+        }
+
+        stage1 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload1)
+        self.assertEqual(200, stage1.status_code, "Try to find user with query for pw reset")
+
+        payload2 = {
+            "token": stage1.json()["token"],
+            "input": {
+                'queryFilter': 'userName eq \"rsutter\"'
+            }
+        }
+        stage2 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload2)
+        self.assertEqual(200, stage2.status_code, "Stage 2 - Query user")
+
+        payload3 = {
+            "token": stage2.json()["token"],
+            "input": {
+                "answer1": "black"
+            }
+        }
+
+        stage3 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload3)
+        self.assertEqual(200, stage3.status_code, "Stage 3 - Answer question")
+
+        payload4 = {
+            "token": stage3.json()["token"],
+            "input": {
+                "password": "Th3Password"
+            }
+        }
+
+        stage4 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload4)
+        self.assertEqual(200, stage4.status_code, "Stage 4 - Password reset")
+        s.close()

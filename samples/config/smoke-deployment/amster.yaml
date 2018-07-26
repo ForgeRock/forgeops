@@ -2,8 +2,7 @@
 
 config:
   claim: frconfig
-  importPath: /git/config/samples/am/R6.0
-  exportPath: /tmp/amster
+  importPath: /git/config/6.5/smoke-tests/am/
 
 version: 6.0.0
 
