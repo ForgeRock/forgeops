@@ -12,6 +12,17 @@ kubectl create secret generic clouddns --from-file=../etc/cert-manager.json -n k
 # Deploy Cert Manager Helm chart
 helm upgrade -i cert-manager --namespace kube-system stable/cert-manager --values ../cert-manager/values.yaml
 
+# Check that cert-manager is up before deploying the cluster-issuer
+while true; do
+    if [ $(kubectl get pod -n kube-system | grep cert-manager | awk '{ print $3 }') == "Running"  ]; then
+        echo "cert-manager is running..."
+        break
+    else
+        echo "cert-manager not up yet..."
+    fi
+    sleep 5
+done
+
 # Allow time for operator to be deployed so CRDs are recognized
 sleep 5
 
