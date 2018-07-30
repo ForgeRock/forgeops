@@ -48,7 +48,5 @@ helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --se
 
 helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f ${MONPATH}values/kube-prometheus.yaml --namespace=$NAMESPACE
 
-helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f ${MONPATH}values/kube-prometheus.yaml,${MONPATH}values/am-alerts.yaml --namespace=$NAMESPACE
-
 # Install/Upgrade forgerock-servicemonitors
 helm upgrade -i ${NAMESPACE}-forgerock-metrics ../helm/forgerock-metrics --values ${MONPATH}values/${FILE} --set=rbac.install=true --namespace=$NAMESPACE
