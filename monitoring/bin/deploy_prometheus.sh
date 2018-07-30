@@ -2,7 +2,7 @@
 
 # Please run from within the Monitoring folder.
 
-MONPATH="../monitoring/"
+MONPATH="../monitoring"
 
 USAGE="Usage: $0 [-n <namespace>] [-f <values file>]"
 
@@ -42,11 +42,11 @@ if read -t 10 -p "Installing Prometheus Operator and Grafana to '${NAMESPACE}' n
 helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
 
 # Install/Upgrade prometheus-operator
-helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values ${MONPATH}values/prometheus-operator.yaml --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values ${MONPATH}/values/prometheus-operator.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade kube-prometheus
 
-helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f ${MONPATH}values/kube-prometheus.yaml --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f ${MONPATH}/values/kube-prometheus.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade forgerock-servicemonitors
-helm upgrade -i ${NAMESPACE}-forgerock-metrics ../helm/forgerock-metrics --values ${MONPATH}values/${FILE} --set=rbac.install=true --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-forgerock-metrics ../helm/forgerock-metrics --values ${MONPATH}/values/${FILE} --set=rbac.install=true --namespace=$NAMESPACE

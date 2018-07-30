@@ -461,20 +461,17 @@ prometheus:
       #selector: {}
 
 # default rules are in templates/general.rules.yaml
-prometheusRules: {}
+# prometheusRules: {}
 
 
 # Select Deployed DNS Solution
 deployCoreDNS: false
 deployKubeDNS: true
-<<<<<<< HEAD
-deployKubeEtcd: false
+deployKubeEtcd: true
 
 ##Custom Labels to be added to Prometheus Rules CRD
 ##
 additionalRulesLabels: 
   role: alert-rules
   prometheus: monitoring-kube-prometheus
-=======
-deployKubeEtcd: true
->>>>>>> updating location of metrics helm chart and added path variable
+

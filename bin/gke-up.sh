@@ -67,3 +67,6 @@ done
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh
+
+# Add Prometheus
+../monitoring/bin/deploy_prometheus.sh
