@@ -138,3 +138,10 @@ slackUrl: undefined
 
 # Pinned gcloud Image. You should not need to change this very often
 gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b
+
+# Audit log details for log streaming sidecar containers
+auditLogs:
+  - name: http-access-logs
+    path: "/opt/opendj/logs/http-access.audit.json"
+  - name: ldap-access-logs
+    path: "/opt/opendj/logs/ldap-access.audit.json"

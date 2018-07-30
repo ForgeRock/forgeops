@@ -69,6 +69,13 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     
+# Audit log details for log streaming sidecar containers
+auditLogs:
+  - name: access-logs
+    path: "/tmp/logs/access.audit.json"
+  - name: debug-logs
+    path: "/tmp/logs/route-system.log"
+    
     
 
 

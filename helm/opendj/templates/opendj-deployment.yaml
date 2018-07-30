@@ -161,6 +161,18 @@ spec:
             port: metrics
           initialDelaySeconds: 10
           periodSeconds: 60
+      # audit logging containers
+      {{- range .Values.auditLogs }}
+      - name: {{ .name }}
+        image: busybox
+        env:
+        - name: LOGFILE
+          value: {{ .path }}
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ] 
+        volumeMounts:
+        - name: logs
+          mountPath: /opt/opendj/logs
+      {{- end }}
       volumes:
       - name: dj-secrets
         secret:

@@ -49,6 +49,8 @@ spec:
         volumeMounts:
         - name: git
           mountPath: /git
+        - name: logs
+          mountPath: /tmp/logs
         livenessProbe:
           httpGet:
            path: /
@@ -62,7 +64,21 @@ spec:
           initialDelaySeconds: 5
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+      # audit logging containers
+      {{- range .Values.auditLogs }}
+      - name: {{ .name }}
+        image: busybox
+        env:
+        - name: LOGFILE
+          value: {{ .path }}
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
+        volumeMounts:
+        - name: logs
+          mountPath: /tmp/logs
+      {{- end }}
       volumes:
+      - name: logs
+        emptyDir: {}
       {{ if eq .Values.config.strategy  "git" }}
       - name: git
         emptyDir: {}

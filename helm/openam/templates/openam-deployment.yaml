@@ -88,6 +88,18 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
           periodSeconds: {{ .Values.livenessPeriod }}
+      # audit logging containers
+      {{- range .Values.auditLogs }}
+      - name: {{ .name }}
+        image: busybox
+        env:
+        - name: LOGFILE
+          value: {{ .path }}
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ] 
+        volumeMounts:
+        - name: openam-root
+          mountPath: /home/forgerock/openam
+      {{- end }}
       volumes:
       - name: openam-root
         emptyDir: {}
