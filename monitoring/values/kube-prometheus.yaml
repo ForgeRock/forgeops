@@ -273,14 +273,16 @@ prometheus:
   ## 2. If `matchExpressions` is used `rules.additionalLabels` must contain at least one label
   ##    from `matchExpressions` in order to be matched by Prometheus
   ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels
-  rulesSelector: {}
+  #rulesSelector: {}
    #rulesSelector: {
    #   matchExpressions: [{key: prometheus, operator: In, values: [example-rules, example-rules-2]}]
    # }
    ### OR
-   #rulesSelector: {
-   #  matchLabels: [{role: example-rules}]
-   #}
+  #rulesSelector:
+  #  matchLabels: 
+  #    role: alert-rules
+  #    prometheus: monitoring-kube-prometheus
+
 
   ## Prometheus alerting & recording rules
   ## Ref: https://prometheus.io/docs/querying/rules/
@@ -290,9 +292,9 @@ prometheus:
     specifiedInValues: true
     ## What additional rules to be added to the ConfigMap
     ## You can use this together with `rulesSelector`
-    additionalLabels: {}
-    #  prometheus: example-rules
-    #  application: etcd
+    additionalLabels:
+      role: alert-rules
+      prometheus: monitoring-kube-prometheus
     value: {}
 
   service:
@@ -457,3 +459,9 @@ prometheusRules: {}
 deployCoreDNS: false
 deployKubeDNS: true
 deployKubeEtcd: false
+
+##Custom Labels to be added to Prometheus Rules CRD
+##
+additionalRulesLabels: 
+  role: alert-rules
+  prometheus: monitoring-kube-prometheus
