@@ -12,7 +12,7 @@ do
 
     if [[ "$line" =~ ^domain:.*$ ]]; then 
     	DOMAIN=${line#domain:}
-    	DOMAIN=${FQDN// /}
+    	DOMAIN=${DOMAIN// /}
     fi
 done < $CFGDIR/common.yaml
 
