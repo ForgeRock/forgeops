@@ -43,12 +43,12 @@ To configure Alertmanager, there is an Alertmanager configuration section in val
 Details about how Alertmanager works can be found in the link at the top of the page.  
 In summary:
 * global section defines attributes that apply to all alerts.
-* route section defines a tree topology of alerts filters to direct particular alerts to a specific receiver.  
+* route section defines a tree topology of alert filters to direct particular alerts to a specific receiver.  
 Currently we're sending all alerts to a Slack receiver.
 * receivers section defines named configurations of notification integrations.
 
-Prometheus alerts are configured, by product, in the values/*\<product\>*-alerts.yaml files.  
-These files override the prometheusRules section in the kube-prometheus.yaml file.
+Prometheus alerts are configured, by product, in the values/fr-alerts.yaml file.  
+A PrometheusRules CRD has been included in the Helm chart which includes the fr-alerts.yaml file and syncs the rules with Prometheus using labels.
 
 # Deployment instructions
 ### Pre-requisites
