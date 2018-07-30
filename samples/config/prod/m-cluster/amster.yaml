@@ -1,5 +1,4 @@
 config:
-  claim: frconfig
   #importPath: /git/config/samples/am/R6.0
   importPath: /git/config/samples/am/m-cluster
   exportPath: /tmp/amster

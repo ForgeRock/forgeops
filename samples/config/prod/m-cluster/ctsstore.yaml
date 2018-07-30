@@ -20,7 +20,7 @@ opendjJavaArgs: >
 podAntiAffinity: "hard"
 
 gcs:
-  backup: false
+  backup: true
   restore: false
   sleepSeconds: 600
   backupBucket:  gs://forgeops/dj-backup/10m
