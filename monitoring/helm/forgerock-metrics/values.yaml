@@ -50,6 +50,11 @@ grafanaDashboards:
   image: forgerock-docker-public.bintray.io/forgerock/auto-import:1.0
   pullPolicy: Always
   
+additionalRulesLabels:
+  prometheus: monitoring-kube-prometheus
+  role: alert-rules
+
+  
 
 
 
