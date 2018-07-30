@@ -19,7 +19,3 @@ storageClass: "fast"
 replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
-
-haproxy:
-  enabled: false
-  replicas: 1
