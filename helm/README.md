@@ -96,18 +96,15 @@ Note that the details of the ingress will depend on the implementation. You may 
  
 # TLS
 
-To enable any of the products to use HTTPS on their external endpoint, set the following flag to true in your custom.yaml file.
-```
-useTLS: True
-```
+The default behavior is to use TLS and have cert-manager to manage the certificate request/renewal via
+Let's Encrypt.
 
-The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  This is enabled by the following flag:
-```
-useCertManager: True
-```
-
-If you want to use TLS but don't want cert-manager to manage the certificate request/renewal, then set
+If you want to use TLS but don't want to cert-manager to manage the certificate request/renewal, then set
 useTLS to true, set useCertManager to false, and run the script ../bin/generate-tls.sh.
+```
+useTLS: true
+useCertManager: false
+```
 
 # Notes
 
