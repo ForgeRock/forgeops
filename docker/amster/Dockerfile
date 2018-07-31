@@ -3,19 +3,24 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+FROM forgerock/downloader:latest
+
+ARG VERSION="6.0.0"
+RUN download -v $VERSION amster
+RUN unzip -q /amster.zip -d /var/tmp
 
 FROM forgerock/java:6.0.0
 
-COPY *.zip /opt/forgerock
+COPY --from=0 /var/tmp/amster/  /opt/amster/
+
+#COPY *.zip /opt/forgerock
 
 COPY *.sh /opt/amster/
 # put these in the path as well - for convenience.
 COPY *.sh /usr/local/bin/
 
 # git is added to the container so we can optionally execute git commit, git push, etc.
-RUN unzip -q /opt/forgerock/amster.zip -d /opt/amster \
-    && rm -f /opt/forgerock/amster.zip \
-    && chmod 775 /opt/amster/amster \
+RUN chmod 775 /opt/amster/amster \
     && chown -R forgerock /opt
 
 WORKDIR /opt/amster

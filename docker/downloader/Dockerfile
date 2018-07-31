@@ -1,0 +1,14 @@
+# docker build --build-arg API_KEY=$API_KEY -t forgerock/downloader downloader
+FROM alpine:latest
+
+ARG API_KEY
+
+RUN apk add --update \
+        bash \
+        curl \
+    && rm -rf /var/cache/apk/* \
+    && echo $API_KEY >/api_key
+
+COPY download /usr/bin/
+
+ENTRYPOINT [ "/usr/bin/download", "-w" ]

@@ -1,7 +1,14 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Docker image for Apache + AM HTTP agent.
+FROM forgerock/downloader 
+
+RUN download apache-agent
+RUN unzip apache-agent.zip -d /var/tmp 
+
 FROM httpd:2.4
+
+COPY --from=0 /var/tmp/web_agents /opt/web_agents 
 WORKDIR /opt
 
 ENV AM_MAX_SHARED_POOL_SIZE 1048576000
@@ -11,13 +18,8 @@ ENV AM_DEFAULT_LOG_LEVEL All
 ARG AM_SERVER=http://openam.example.forgeops.com:80/openam
 ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 
-# Before building image, make sure you have apache 2.4 web agent in this dockerfile folder
-ARG APACHE_AGENT=/var/tmp/agent.zip
-COPY agent.zip /var/tmp/agent.zip
-
 # Install needed sw
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim && \
-      unzip -q /var/tmp/agent.zip && rm /var/tmp/agent.zip && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*
 

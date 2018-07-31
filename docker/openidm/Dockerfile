@@ -1,7 +1,14 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
+FROM forgerock/downloader 
+
+ARG VERSION="6.0.0"
+RUN download -v $VERSION openidm 
+RUN mkdir -p /var/tmp/openidm && unzip /openidm.zip -d /var/tmp/openidm/
 
 FROM forgerock/java:6.0.0
+
+COPY --from=0 /var/tmp/openidm /opt/openidm
 
 WORKDIR /opt
 
@@ -9,9 +16,6 @@ WORKDIR /opt
 ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
 # Use this for Java 8 u131 or later. This sets the size of the VM heap according to the container size.
 #ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-
-# Download or add OpenIDM nightly build and unzip.
-COPY openidm.zip /tmp/openidm.zip
 
 # For a Debian base image use the RUN stanza below.
 #
@@ -26,9 +30,7 @@ RUN apk update && \
     apk upgrade && \
     apk add zip ttf-dejavu tini
 
-RUN unzip -q /tmp/openidm.zip && \
-    chown -R forgerock:forgerock /opt/openidm && \
-    rm -f /tmp/openidm.zip  && rm -fr /opt/openidm/samples
+RUN chown -R forgerock:forgerock /opt/openidm  && rm -fr /opt/openidm/samples
 
 COPY *.sh /opt/openidm/
 COPY logging.properties /opt/openidm/logging.properties

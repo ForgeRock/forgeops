@@ -1,10 +1,14 @@
+
+FROM forgerock/downloader 
+
+ARG VERSION="6.5.0"
+# We are getting the snapshot version of DS
+RUN download -v $VERSION -s opendj
+
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
-#FROM openjdk:11-jdk 
-FROM openjdk:8-jdk 
-
-
-# Use this to directly add the opendj zip file
-COPY opendj.zip /var/tmp/
+FROM openjdk:11-jdk 
+#FROM openjdk:8-jdk 
+COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 
 WORKDIR /var/tmp/bootstrap
 
@@ -20,11 +24,11 @@ ENV BASE_DN o=userstore
 RUN ./setup.sh
 
 #####################  Runtime container ################
-#FROM openjdk:11-jdk
-FROM openjdk:8-jdk 
+FROM openjdk:11-jdk
+#FROM openjdk:8-jdk 
 
 
-COPY --from=0 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
+COPY --from=1 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
 
 RUN useradd -d /opt/opendj -G root -m -u 11111 forgerock \
     && apt-get update && apt-get install -y --no-install-recommends dumb-init vim
