@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Script uses port-forwarding to connect to either Prometheus or Grafana.
-# Use prom_connect.sh -P to connect to Prometheus. Type localhost:9090 to access Prometheus UI.
-# Use prom_connect.sh -G to connect to Grafana. Type localhost:3000 to access Grafana UI.
-# Script defaults to monitoring namespace and the ports mentioned above but can be overriden. Run prom_connect.sh -h for guidance.
+# Use connect_prometheus.sh -P to connect to Prometheus. Type localhost:9090 to access Prometheus UI.
+# Use connect_prometheus.sh -G to connect to Grafana. Type localhost:3000 to access Grafana UI.
+# Script defaults to monitoring namespace and the ports mentioned above but can be overriden. Run connect_prometheus.sh -h for guidance.
 
 USAGE="Usage: $0: [-G | -P] [-n <namespace>] [-p <port>]"
 

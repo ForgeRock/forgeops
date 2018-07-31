@@ -72,4 +72,4 @@ done
 ./deploy-cert-manager.sh
 
 # Add Prometheus
-./prom_deploy.sh
+deploy_prometheus.sh

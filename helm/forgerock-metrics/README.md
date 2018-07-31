@@ -65,18 +65,18 @@ A PrometheusRules CRD has been included in the Helm chart which includes the fr-
 * Running the deployment without any overrides will use the default values file which deploys to 'monitoring' namespace and scrapes metrics  
  from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
  If you wish to override these values, create a new custom.yaml file, add your override configuration using helm/forgerock-metrics/values.yaml  
- as a guide, and run prom_deploy.sh -f \<custom yaml file\>.
+ as a guide, and run deploy_prometheus.sh -f \<custom yaml file\>.
 
 ### Deploy
 
-Run the deploy script ./prom_deploy.sh with the OPTIONAL flags:
+Run the deploy script ./deploy_prometheus.sh with the OPTIONAL flags:
 * -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
 * -f *values file* \[optional\] : absolute path to yaml file as defined in previous section.
 * -h / no flags : view help
 
 ### View Prometheus/Grafana
 
-The following script uses kubectl port forwarding to access Prometheus and Grafana UIs. Run ./bin/prom_connect.sh with the following flags:
+The following script uses kubectl port forwarding to access Prometheus and Grafana UIs. Run ./bin/connect_prometheus.sh with the following flags:
 * -G (Grafana) or -P (Prometheus).
 * -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or need to access  
@@ -131,7 +131,7 @@ If you want Prometheus to scrape metrics from a different product, you need to c
     ```
 * Update Prometheus with new ServiceMonitor
     ```
-    ./prom_deploy.sh [-n <namespace>]
+    ./deploy_prometheus.sh [-n <namespace>]
     ```
 
 
