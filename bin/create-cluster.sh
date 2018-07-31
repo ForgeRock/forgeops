@@ -49,15 +49,18 @@ fi
 # stackdriver beta is not really stable right now.
 #       --enable-stackdriver-kubernetes \
 
-gcloud beta container clusters create $GKE_CLUSTER_NAME \
-      --project=$GKE_PROJECT_NAME \
-      --zone=$GKE_PRIMARY_ZONE \
-      --cluster-version=$GKE_CLUSTER_VERSION \
+
+# Create cluster with values parsed from cfg file
+gcloud container clusters create $GKE_CLUSTER_NAME \
+      --project="$GKE_PROJECT_NAME" \
+      --zone="$GKE_PRIMARY_ZONE" \
+      --cluster-version="$GKE_CLUSTER_VERSION" \
       --machine-type="$GKE_MACHINE_TYPE" \
       --min-cpu-platform="Intel Skylake" \
       --image-type=COS \
       --disk-size=80 \
       --network=default \
+      --no-enable-ip-alias \
       --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
       --max-nodes=$MAX_NODES \
@@ -66,7 +69,7 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --enable-autoscaling \
       --enable-autoupgrade \
       --enable-autorepair \
-      --scopes "https://www.googleapis.com/auth/cloud-platform" \
+      --scopes "gke-default" \
       --enable-cloud-logging --enable-cloud-monitoring \
       --disk-type=pd-ssd $OPTS
 
