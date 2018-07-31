@@ -40,6 +40,9 @@ fi
 # Add a nodepool for nfs server
 ./gke-create-nodepool.sh 
 
+# Create monitoring namespace
+kubectl create namespace ${GKE_MONITORING_NS}
+
 # Create the namespace parsed from cfg file and set the context
 kubectl create namespace ${GKE_CLUSTER_NS}
 kubectl config set-context $(kubectl config current-context) --namespace=${GKE_CLUSTER_NS}
@@ -67,3 +70,6 @@ done
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh
+
+# Add Prometheus
+deploy_prometheus.sh

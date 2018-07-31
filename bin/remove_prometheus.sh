@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Script removes all Prometheus related Helm charts.  It defaults to monitoring namespace but can be overriden by
+# adding the namespace as an argument.
 
 NAMESPACE=$1
 

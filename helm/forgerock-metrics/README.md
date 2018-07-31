@@ -6,6 +6,8 @@ Alertmanager overview: [Overview](https://prometheus.io/docs/alerting/overview/)
 
 Alertmanager configuration: [Config](https://prometheus.io/docs/alerting/configuration/).
 
+**Note**: All mentioned scripts are available in the bin/ directory.
+
 **The monitoring folder contains the following artifacts:**
 * deploy scripts to:
     * deploy the Prometheus Operator along with Grafana and Alert Manager and other Helm charts that help monitor GKE.
@@ -39,7 +41,7 @@ Dashboards for ForgeRock products are imported into Grafana after Grafana has be
 
 # How Alertmanager works
 Alertmanager is used to redirect specific alerts from Prometheus to configured receivers.  
-To configure Alertmanager, there is an Alertmanager configuration section in values/kube-prometheus.yaml.  
+To configure Alertmanager, there is an Alertmanager configuration section in etc/prometheus_values/kube-prometheus.yaml.  
 Details about how Alertmanager works can be found in the link at the top of the page.  
 In summary:
 * global section defines attributes that apply to all alerts.
@@ -47,7 +49,7 @@ In summary:
 Currently we're sending all alerts to a Slack receiver.
 * receivers section defines named configurations of notification integrations.
 
-Prometheus alerts are configured, by product, in the values/fr-alerts.yaml file.  
+Prometheus alerts are configured, by product, in the helm/forgerock-metrics/fr-alerts.yaml file.  
 A PrometheusRules CRD has been included in the Helm chart which includes the fr-alerts.yaml file and syncs the rules with Prometheus using labels.
 
 # Deployment instructions
@@ -60,19 +62,21 @@ A PrometheusRules CRD has been included in the Helm chart which includes the fr-
 ### Prepare for deployment
 * cd to monitoring folder within forgeops repo.
 
-* Running the deployment without any overrides will use the default values file which monitors 'monitoring' namespace and all ForgeRock  
- product endpoints.  If you wish to override these values, make a copy of helm/custom.yaml file and uncomment/amend the relevant values.
+* Running the deployment without any overrides will use the default values file which deploys to 'monitoring' namespace and scrapes metrics  
+ from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
+ If you wish to override these values, create a new custom.yaml file, add your override configuration using helm/forgerock-metrics/values.yaml  
+ as a guide, and run deploy_prometheus.sh -f \<custom yaml file\>.
 
 ### Deploy
 
-Run the deploy script ./bin/deploy_prometheus.sh with the OPTIONAL flags:
+Run the deploy script ./deploy_prometheus.sh with the OPTIONAL flags:
 * -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
 * -f *values file* \[optional\] : absolute path to yaml file as defined in previous section.
 * -h / no flags : view help
 
 ### View Prometheus/Grafana
 
-The following script uses kubectl port forwarding to access Prometheus and Grafana UIs. Run ./bin/connect.sh with the following flags:
+The following script uses kubectl port forwarding to access Prometheus and Grafana UIs. Run ./bin/connect_prometheus.sh with the following flags:
 * -G (Grafana) or -P (Prometheus).
 * -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or need to access  
@@ -127,7 +131,7 @@ If you want Prometheus to scrape metrics from a different product, you need to c
     ```
 * Update Prometheus with new ServiceMonitor
     ```
-    ./bin/deploy_prometheus.sh [-n <namespace>]
+    ./deploy_prometheus.sh [-n <namespace>]
     ```
 
 
@@ -135,19 +139,6 @@ If you want Prometheus to scrape metrics from a different product, you need to c
 
 The easiest way to import dashboards, is to manually import the json files in the GUI.
 Currently exporting then importing dashboards via the HTTP api doesn't work correctly and requires manual amendments.
-
-An automated way of importing the dashboards at deploy time may be added later.
-
-
-### Prometheus Operator configuration
-
-The default Prometheus Operator configuration doesn't work in GKE without the following change in helm/exporter-kubelets/values.yaml:
-
-```
-https=false
-```
-
-Set to true for use within Minikube.
 
 
 

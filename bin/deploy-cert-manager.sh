@@ -9,6 +9,15 @@
 # Create secret so the Cluster Issuer can gain access to CloudDNS
 kubectl create secret generic clouddns --from-file=../etc/cert-manager.json -n kube-system
 
+# Need as sometimes tiller is not ready immediately
+while :
+do
+    helm ls >/dev/null 2>&1
+    test $? -eq 0 && break
+    echo "Waiting on tiller to be ready..."
+    sleep 5s
+done
+
 # Deploy Cert Manager Helm chart
 helm upgrade -i cert-manager --namespace kube-system stable/cert-manager --values ../cert-manager/values.yaml
 
@@ -18,7 +27,7 @@ while true; do
         echo "cert-manager is running..."
         break
     else
-        echo "cert-manager not up yet..."
+        echo "cert-manager is still starting up..."
     fi
     sleep 5
 done

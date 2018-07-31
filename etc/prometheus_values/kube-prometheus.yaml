@@ -8,6 +8,15 @@ exporter-kubelets:
 # Grafana
 deployGrafana: True
 
+# Kube-scheduler
+deployKubeScheduler: False
+
+# Controller Manager
+deployKubeControllerManager: False
+
+# Kube state
+deployKubeState: True
+
 ## If true, create & use RBAC resources resp. Pod Security Policies
 ##
 global:
@@ -452,16 +461,17 @@ prometheus:
       #selector: {}
 
 # default rules are in templates/general.rules.yaml
-prometheusRules: {}
+# prometheusRules: {}
 
 
 # Select Deployed DNS Solution
 deployCoreDNS: false
 deployKubeDNS: true
-deployKubeEtcd: false
+deployKubeEtcd: true
 
 ##Custom Labels to be added to Prometheus Rules CRD
 ##
 additionalRulesLabels: 
   role: alert-rules
   prometheus: monitoring-kube-prometheus
+
