@@ -15,7 +15,7 @@ namespaceSelectorStrategy: any
 
 am:
   component: am
-  enabled: false
+  enabled: true
   path: /openam/json/metrics/prometheus
   labelSelectorComponent: openam
   secretUser: cHJvbWV0aGV1cw==
@@ -23,7 +23,7 @@ am:
 
 ds:
   component: ds
-  enabled: false
+  enabled: true
   path: /metrics/prometheus
   labelSelectorComponent: opendj
   secretUser: bW9uaXRvcg==
@@ -31,7 +31,7 @@ ds:
 
 idm:
   component: idm
-  enabled: false
+  enabled: true
   path: /openidm/metrics/prometheus
   labelSelectorComponent: openidm
   secretUser: cHJvbWV0aGV1cw==
@@ -39,7 +39,7 @@ idm:
 
 ig:
   component: ig
-  enabled: false
+  enabled: true
   path: /openig/metrics/prometheus
   labelSelectorComponent: openig
   secretUser: b3BlbmlkbS1hZG1pbg==
