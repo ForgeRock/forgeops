@@ -10,6 +10,8 @@ RUN mkdir -p /var/tmp/openam && unzip /openam.war -d /var/tmp/openam
 
 FROM tomcat:8.5-alpine
 
+RUN rm -fr "$CATALINA_HOME"/webapps/*
+
 COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/openam
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
@@ -41,7 +43,6 @@ ENV OPENAM_HOME /home/forgerock/openam
 # Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
 # This is a work around for: https://github.com/docker-library/tomcat/issues/35
 RUN apk add --no-cache su-exec unzip curl bash tini \
-  && rm -fr /usr/local/tomcat/webapps/* \
   && addgroup -g 11111 forgerock \
   && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G root \
   && mkdir -p "$OPENAM_HOME" \
