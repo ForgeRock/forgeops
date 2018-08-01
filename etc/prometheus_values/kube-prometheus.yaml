@@ -348,10 +348,8 @@ prometheus:
       values:
       - alertmanager
       - exporter-coredns
-      - exporter-kube-controller-manager
       - exporter-kube-dns
       - exporter-kube-etcd
-      - exporter-kube-scheduler
       - exporter-kube-state
       - exporter-kubelets
       - exporter-kubernetes
