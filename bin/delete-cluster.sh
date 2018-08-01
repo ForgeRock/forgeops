@@ -22,7 +22,7 @@ helm delete nginx
 
 sleep 10 
 
-gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE
+gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE --quiet
 
 
 
