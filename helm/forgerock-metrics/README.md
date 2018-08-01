@@ -11,7 +11,7 @@ Alertmanager configuration: [Config](https://prometheus.io/docs/alerting/configu
 
 Helm charts:
 * ***prometheus-operator*** which creates custom resources which makes the Prometheus deployment native to Kubernetes and configuration through Kubernetes manifests.
-* ***kube-prometheus*** which contains multiple sub charts including Prometheus, Grafana and Alertmanager and other Helm charts that help monitor GKE.
+* ***kube-prometheus*** which contains multiple subcharts including Prometheus, Grafana and Alertmanager and other Helm charts that monitor GKE.
 * ***forgerock-metrics***  provides configurable ServiceMonitors, alerting rules and a job to automatically import Grafana dashboards for ForgeRock products.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
 
 Scripts:
@@ -45,8 +45,8 @@ No restarting of Prometheus is required.
 The Grafana Helm chart is deployed as part of the kube-prometheus chart.  Grafana automatically connects to Prometheus and syncs all  
 the metrics which are visible through Graphs.  
 
-Dashboards for ForgeRock products are imported into Grafana post deployment. This is carried out by a Kubernetes job that mounts the dashboard files  
-from helm/forgerock-metrics/dashboards folder, formats them to bypass a couple of limitations in the Grafana import API, and then uses the API to import them.
+Dashboards for ForgeRock products are imported into Grafana post-deployment. A Kubernetes job mounts the dashboard files from the helm/forgerock-metrics/dashboards  
+folder, formats them to bypass a couple of limitations in the Grafana import API, and then uses the API to import them.
 
 <br />
 
@@ -68,10 +68,10 @@ A PrometheusRules CRD has been included in the Helm chart which includes the fr-
 * Deployed ForgeRock application in Google Cloud cluster.
 * Kubectl authenticated to cluster.
 * Separate namespace prepared for deploying Prometheus/Grafana
-(Use namespace that is different to where your application is running, default is 'monitoring').
+(Use a namespace that is different to where your application is running. The default is 'monitoring').
 
 ### Prepare for deployment
-* cd to bin folder within forgeops repo.
+* cd to the bin folder in your forgeops repo clone.
 
 * Running the deployment without any overrides will use the default values file which deploys to 'monitoring' namespace and scrapes metrics  
  from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
@@ -87,7 +87,7 @@ Run the deploy script ./deploy_prometheus.sh with the OPTIONAL flags:
 
 ### View Prometheus/Grafana
 
-The following script uses kubectl port forwarding to access Prometheus and Grafana UIs. Run ./connect_prometheus.sh with the following flags:
+The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs. Run ./connect_prometheus.sh with the following flags:
 * -G (Grafana) or -P (Prometheus).
 * -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or need to access  
@@ -149,20 +149,20 @@ If you want Prometheus to scrape metrics from a different product, you need to c
 To add new alerting rules, add additional rules to fr-alerts.yaml. fr-alerts.yaml is split into groups with a group for each product and a  
 separate group for cluster rules.  
 
-See https://prometheus.io/docs/practices/alerting/ for details on configuring alerts. 
+See [Prometheus alerting](https://prometheus.io/docs/practices/alerting/) for details on configuring alerts. 
 
 ### Configure the alert message output(Slack).
 The alert output can be configured in the Alertmanager section of the kube-prometheus.yaml. In the slack_configs section of the receiver block,  
 you can define the template for the alert output.  The output text also incorporates labels so the info can be dynamically imported from the original  
 alert definition(see the Configuring alerting rules how to).  
 
-See https://prometheus.io/docs/alerting/configuration/ and https://prometheus.io/docs/alerting/notifications/ for more details.
+See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
 
 
 ### Import Custom Grafana Dashboards
 
-The easiest way to import dashboards, is to manually import the json files in the GUI.  
-Currently exporting then importing dashboards via the HTTP api doesn't work correctly and requires manual amendments.
+The easiest way to import dashboards is to manually import the JSON files in the GUI.  
+Currently exporting then importing dashboards via the HTTP API doesn't work correctly and requires manual amendments.
 
 ### Add new dashboards to the auto import job
 To add further custom Grafana dashboards as part of the deployment, a new method of importing dashboards will be developed shortly  
