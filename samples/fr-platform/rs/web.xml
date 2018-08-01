@@ -40,7 +40,7 @@
     </init-param>
     <init-param>
     <param-name>cors.allowed.headers</param-name>
-    <param-value>authorization</param-value>
+    <param-value>Content-Type,X-OpenIDM-NoSession,X-OpenIDM-Username,X-OpenIDM-Password,X-Requested-With,Cache-Control,authorization,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers</param-value>
     </init-param>
     <init-param>
     <param-name>cors.support.credentials</param-name>
