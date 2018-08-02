@@ -66,18 +66,18 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --image-type=COS \
       --disk-size=80 \
       --network="$GKE_NETWORK_NAME" \
-      --no-enable-ip-alias \
+      --enable-ip-alias \
       --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
       --max-nodes=$MAX_NODES \
-      --labels=owner=sre \
+      --labels="owner=sre" \
       --addons=HorizontalPodAutoscaling \
       --enable-autoscaling \
       --enable-autoupgrade \
       --enable-autorepair \
-      --scopes  "https://www.googleapis.com/auth/cloud-platform" \
-     --enable-cloud-logging --enable-cloud-monitoring \
-      --enable-ip-alias  \
+      --scopes "gke-default" \
+      --enable-cloud-logging \
+      --enable-cloud-monitoring \
       --disk-type=pd-ssd $OPTS
 
 # --scopes "https://www.googleapis.com/auth/cloud-platform"
