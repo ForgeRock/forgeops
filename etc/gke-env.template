@@ -36,4 +36,4 @@ GKE_MONITORING_NS="monitoring"
 GKE_INGRESS_IP=""
 
 # The vpc network that the cluster is created with
-GKE_NETWORK_NAME=default
+GKE_NETWORK_NAME="default"
