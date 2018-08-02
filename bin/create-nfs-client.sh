@@ -2,8 +2,9 @@
 # Create an nfs client provisioner.
 # WIP: Update this when the nfs-client-provisioner is published to helm stable
 
-source etc/gke-env.cfg 
+source ../etc/gke-env.cfg 
 
+# This is the IP of our GCP filestore instance.
 NFS_SERVER=10.149.108.186
 
 
@@ -18,4 +19,4 @@ helm install --name nfs-client --namespace nfs-client \
      --set nfs.server="${NFS_SERVER}" \
      --set nfs.path="/export" \
      --set storageClass.provisionerName="$GKE_CLUSTER_NAME" \
-     ../../kube/charts/stable/nfs-client-provisioner
+     ../helm/nfs-client-provisioner
