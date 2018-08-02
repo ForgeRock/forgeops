@@ -8,6 +8,10 @@
 
 . ../etc/gke-env.cfg
 
+GKE_NETWORK_NAME="${GKE_NETWORK_NAME:-default}"
+GKE_MONITORING_NS="${GKE_MONITORING_NS:-monitoring}"
+
+
 echo "=> Read the following env variables from config file"
 echo "Project Name = $GKE_PROJECT_NAME"
 echo "Primary Zone = $GKE_PRIMARY_ZONE"
@@ -18,6 +22,7 @@ echo "Cluster Monitoring Namespace = $GKE_MONITORING_NS"
 echo "Cluster Version = $GKE_CLUSTER_VERSION"
 echo "Cluster Size =  $GKE_CLUSTER_SIZE"
 echo "VM Type = $GKE_MACHINE_TYPE"
+echo "Network = $GKE_NETWORK_NAME"
 echo "Ingress Controller IP = $GKE_INGRESS_IP"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
@@ -33,7 +38,7 @@ echo ""
 echo "=> Creating cluster called \"$GKE_CLUSTER_NAME\" with specs \"$GKE_MACHINE_TYPE\""
 echo ""
 
-MAX_NODES=`expr $GKE_CLUSTER_SIZE + 2`
+MAX_NODES=`expr $GKE_CLUSTER_SIZE + 3`
 
 OPTS=""
 
@@ -60,7 +65,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --min-cpu-platform="Intel Skylake" \
       --image-type=COS \
       --disk-size=80 \
-      --network=default \
+      --network="$GKE_NETWORK_NAME" \
       --no-enable-ip-alias \
       --num-nodes=$GKE_CLUSTER_SIZE \
       --min-nodes=0 \
@@ -70,11 +75,14 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --enable-autoscaling \
       --enable-autoupgrade \
       --enable-autorepair \
-      --scopes "gke-default" \
-      --enable-cloud-logging --enable-cloud-monitoring \
+      --scopes  "https://www.googleapis.com/auth/cloud-platform" \
+     --enable-cloud-logging --enable-cloud-monitoring \
+      --enable-ip-alias  \
       --disk-type=pd-ssd $OPTS
 
+# --scopes "https://www.googleapis.com/auth/cloud-platform"
 
+#    --enable-cloud-logging --enable-cloud-monitoring \
 # These options are no longer required or default:
 #       --enable-cloud-monitoring \
 #       --username="admin" \

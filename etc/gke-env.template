@@ -34,3 +34,6 @@ GKE_MONITORING_NS="monitoring"
 # Static (External) IP Address to assign to the Ingress Controller
 # Leave  blank "" if you don't know the IP or want to dynamically set it
 GKE_INGRESS_IP=""
+
+# The vpc network that the cluster is created with
+GKE_NETWORK_NAME=default

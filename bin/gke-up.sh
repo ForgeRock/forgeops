@@ -13,7 +13,7 @@ ask() {
 }
 
 echo -e "WARNING: This script requires a properly provisioned GCP Project with appropriate\n\t accounts, roles, privileges, keyrings, keys etc. These pre-requisites are\n\t outlined in the DevOps Documentation. Please ensure you have completed all\n\t before proceeding."
-ask
+
 
 echo ""
 echo "=> Have you copied the template file etc/gke-env.template to etc/gke-env.cfg and edited to cater to your enviroment?"
@@ -38,7 +38,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Add a nodepool for nfs server
-./gke-create-nodepool.sh 
+#./gke-create-nodepool.sh 
 
 # Create monitoring namespace
 kubectl create namespace ${GKE_MONITORING_NS}
@@ -63,7 +63,8 @@ do
 done
 
 # Creater the NFS provisioner for backups
-./create-nfs-provisioner.sh
+# Skip this until we get client provisioner going..
+#./create-nfs-provisioner.sh
 
 # Create the ingress controller
 ./gke-ingress-cntlr.sh ${GKE_INGRESS_IP}

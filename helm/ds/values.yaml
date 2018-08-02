@@ -47,7 +47,7 @@ storageSize: "10Gi"
 backup:
   # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
   enabled: false
-  storageClass: "nfs"
+  storageClass: "nfs-client"
   storageSize: "20Gi"
   # If you provide the name of a backup PVC, the default bak-$instance will NOT be created, and
   # the named pvc will be used as the shared backup volume. This can be used to re-attach 
