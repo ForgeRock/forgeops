@@ -1,9 +1,9 @@
 
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0"
+ARG VERSION="6.0.1-M1"
 # We are getting the snapshot version of DS
-RUN download -v $VERSION -s opendj
+RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
 #FROM openjdk:11-jdk 
