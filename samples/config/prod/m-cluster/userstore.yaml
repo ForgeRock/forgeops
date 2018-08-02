@@ -8,10 +8,16 @@ resources:
   requests:
     memory: 8Gi
 
+# For JDK 8
 opendjJavaArgs: >
   -server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+
+# For JDK 11
+#opendjJavaArgs: >
+#  -server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+#  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 storageSize: "500Gi"
 storageClass: "fast"
@@ -19,3 +25,25 @@ storageClass: "fast"
 replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
+
+backup:
+  enabled: true
+  storageClass: "nfs"
+  storageSize: "20Gi"
+  schedule:  "*/30 * * * *"
+  verify: false
+  # If you want to restore from a backup pvc then provide the name below and uncomment
+  #pvcName: "bak-userstore"
+
+gcs:
+  backup: true
+  restore: false
+  backupBucket: gs://forgeops/dj-backup/m-cluster/userstore
+  restoreBucket: gs://forgeops/dj-backup/m-cluster/userstore
+
+# Restore parameters.
+restore:
+ enabled: false
+
+# This is where backup and restore notificaiton will be sent
+slackUrl: undefined
