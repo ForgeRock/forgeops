@@ -106,8 +106,16 @@ create_namespace()
         ${DIR}/bin/remove-all.sh -N ${NAMESPACE}
     fi
 
-    echo "=> Creating namespace \"${NAMESPACE}\". Ignore errors below if already exists"
-    kubectl create namespace ${NAMESPACE}
+    if $(kubectl get namespace ${NAMESPACE} > /dev/null 2>&1); then
+        echo "=> Namespace ${NAMESPACE} already exists.  Skipping creation..."
+    else
+        echo "=> Creating namespace \"${NAMESPACE}\""
+        kubectl create namespace ${NAMESPACE}
+        if [ $? -ne 0 ]; then
+            echo "Non-zero return by kubectl.  Is your context correct? Exiting!"
+            exit 1
+        fi
+    fi
 }
 
 # todo: this should decode and install any secrets we need. The git-ssh-key, for example
@@ -149,13 +157,17 @@ deploy_charts()
 
 isalive_check()
 {
-    echo "=> Running OpenAM alive.jsp check"
+    PROTO="http"
+    if $(grep -q 'useTLS:\s*true' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
+        PROTO="https"
+    fi
+    ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
+    echo "=> Checking ${ALIVE_JSP} to see if alive"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
-        echo "=> ${AM_URL} is not alive, waiting 10 seconds before retry..."
+        echo "=> ${ALIVE_JSP} is not alive, waiting 10 seconds before retry..."
         sleep 10
-        STATUS_CODE=$(curl -LI  http://${AM_URL}/openam/isAlive.jsp \
-          -o /dev/null -w '%{http_code}\n' -s)
+        STATUS_CODE=$(curl -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -s)
     done
     echo "=> OpenAM is alive"
 }
@@ -190,9 +202,14 @@ restart_openam()
     kubectl delete pod $OPENAM_POD_NAME --namespace=${NAMESPACE}
     sleep 10
     isalive_check
-    printf "\e[38;5;40m=> Deployment is now ready\n"
 }
 
+scale_am()
+{
+    echo "Scaling OpenAM to two replicas..."
+    kubectl scale --replicas=2 deployment/openam-openam
+    printf "\e[38;5;40m=> Deployment is now ready\n"
+}
 
 # All helm chart paths are relative to this directory.
 DIR=`echo $(dirname "$0")/..`
@@ -210,5 +227,6 @@ create_namespace
 deploy_charts
 livecheck_stage1
 restart_openam
+scale_am
 
 kubectl get ing --namespace ${NAMESPACE}
