@@ -21,7 +21,11 @@ TAG=${TAG:-6.5.0}
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam ds openidm openig amster util git java gatling apache-agent nginx-agent"
+#IMAGES="openam ds openidm openig amster util git java gatling apache-agent nginx-agent"
+
+# Temporary bypass of ds to debug slow build
+IMAGES="openam openidm openig amster util git java gatling apache-agent nginx-agent"
+
 
 function buildDocker {
 

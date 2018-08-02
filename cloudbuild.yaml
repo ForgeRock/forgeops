@@ -16,7 +16,6 @@ steps:
   args: ['-g']
   env:
   - 'API_KEY=${_ARTIFACTORY_API_KEY}'
-# TODO: Make the bintray push a separate cloudbuild job.
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'
   # Run the script to build the docker images with options -a (authenticate) and -p (push)
@@ -32,7 +31,7 @@ steps:
 - name: gcr.io/cloud-builders/gcloud
   args: ['container','builds','submit', '--config', 'cloudbuild-smoketests.yaml', '--async', '--substitutions', '_SLACK_SERVICE=${_SLACK_SERVICE}', '.']
 images:
-- 'gcr.io/$PROJECT_ID/ds'
+# - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'
 - 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'
