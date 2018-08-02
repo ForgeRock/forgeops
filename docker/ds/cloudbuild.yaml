@@ -10,6 +10,7 @@ steps:
   dir: '.'
   args: [
           'build',
+          '--network=host',
           '-t', 'gcr.io/$PROJECT_ID/ds:test', '.',
           # seems to have no impact..
           # '--add-host', 'dsrs1.example.com:127.0.0.1', 

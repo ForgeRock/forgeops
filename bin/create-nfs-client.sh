@@ -5,7 +5,10 @@
 source ../etc/gke-env.cfg 
 
 # This is the IP of our GCP filestore instance.
-NFS_SERVER=10.149.108.186
+NFS_SERVER="${NFS_SERVER:-10.149.108.186}"
+NFS_PATH="${NFS_PATH:-/export}"
+NFS_STORAGE_CLASS="${NFS_STORAGE_CLASS:-nfs-client}"
+NFS_RELEASE="${NFS_RELEASE:-nfs-client}"
 
 
 #  --set serviceAccount.create=true \
@@ -13,10 +16,11 @@ NFS_SERVER=10.149.108.186
 #     --set rbac.create=true \
 
 
-kubectl create namespace nfs-client
-helm delete --purge nfs-client
-helm install --name nfs-client --namespace nfs-client \
+kubectl create namespace "$NFS_RELEASE"
+helm delete --purge  "$NFS_RELEASE"
+helm install --name  "$NFS_RELEASE" --namespace "$NFS_RELEASE" \
      --set nfs.server="${NFS_SERVER}" \
-     --set nfs.path="/export" \
-     --set storageClass.provisionerName="$GKE_CLUSTER_NAME" \
+     --set nfs.path="$NFS_PATH" \
+     --set storageClass.provisionerName="${GKE_CLUSTER_NAME}" \
+     --set storageClass.name="${NFS_STORAGE_CLASS}" \
      ../helm/nfs-client-provisioner
