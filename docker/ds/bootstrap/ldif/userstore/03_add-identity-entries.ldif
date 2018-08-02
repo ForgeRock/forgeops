@@ -17,12 +17,8 @@ userPassword: cangetindj
 ds-privilege-name: subentry-write
 ds-privilege-name: update-schema
 ds-privilege-name: password-reset
-ds-privilege-name: bypass-acl
-ds-privilege-name: modify-acl
-ds-privilege-name: config-write
-ds-privilege-name: config-read
 
-dn: uid=saasadmin,ou=admins,@BASE_DN@
+dn: uid=restadmin,ou=admins,@BASE_DN@
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
