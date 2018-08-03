@@ -162,12 +162,12 @@ isalive_check()
         PROTO="https"
     fi
     ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
-    echo "=> Checking ${ALIVE_JSP} to see if alive"
+    echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
         echo "=> ${ALIVE_JSP} is not alive, waiting 10 seconds before retry..."
         sleep 10
-        STATUS_CODE=$(curl -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -s)
+        STATUS_CODE=$(curl -k -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -s)
     done
     echo "=> OpenAM is alive"
 }
@@ -207,7 +207,10 @@ restart_openam()
 scale_am()
 {
     echo "Scaling OpenAM to two replicas..."
-    kubectl scale --replicas=2 deployment/openam-openam
+    DEPNAME=$(kubectl get deployment -l app=openam -o name)
+    kubectl scale --replicas=2 ${DEPNAME}
+    test $? -ne 0 && echo "Could not scale AM pod.  Please check errpr and fix manually"
+ 
     printf "\e[38;5;40m=> Deployment is now ready\n"
 }
 
