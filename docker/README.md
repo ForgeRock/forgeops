@@ -8,14 +8,20 @@ are changing often as we find better ways to build these images for a wide range
 
 ## Binary Downloads
 
-The forgerock/downloader docker image downloads artifacts from the ForgerRock maven repository. This docker image
+The forgerock/downloader docker image downloads artifacts from the ForgeRock maven repository. This docker image
 is the first stage in a multistage build. In order to build this image you need a API Key for the maven repository.
 
 ForgeRock customers should follow the backstage procedure for maven access.  
 
-Internal users can obtain your API key by logging on to http://docker-public.forgerock.io/repo/webapp/, browsing to your profile:  http://docker-public.forgerock.io/repo/webapp/#/profile where you can copy your api key.
+Internal users can obtain their API keys as follows:
 
-Export an environment variable API_KEY=your_api_key, and pass this on to your build of the downloader/ image. See the downloader/README.md
+* Navigate to http://docker-public.forgerock.io/repo/webapp/#/profile
+* Log in. The User Profile page should appear.
+* Re-enter your password in the Current Password field and click Unlock.
+* Click Show API Key (the "eye" icon to the right of the API Key field).
+* Copy your API Key.
+
+Export an environment variable API_KEY=your_api_key before attempting to build Docker images using the downloader. For more information, see the  downloader/download script.
 
 
 ## How to Run These Images
