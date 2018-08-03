@@ -31,7 +31,7 @@ steps:
 - name: gcr.io/cloud-builders/gcloud
   args: ['container','builds','submit', '--config', 'cloudbuild-smoketests.yaml', '--async', '--substitutions', '_SLACK_SERVICE=${_SLACK_SERVICE}', '.']
 images:
-# - 'gcr.io/$PROJECT_ID/ds'
+- 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'
 - 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'
