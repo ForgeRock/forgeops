@@ -206,12 +206,12 @@ restart_openam()
 
 scale_am()
 {
-    echo "Scaling OpenAM to two replicas..."
+    echo "=> Scaling OpenAM to two replicas..."
     DEPNAME=$(kubectl get deployment -l app=openam -o name)
     kubectl scale --replicas=2 ${DEPNAME}
-    test $? -ne 0 && echo "Could not scale AM pod.  Please check errpr and fix manually"
+    test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix manually"
  
-    printf "\e[38;5;40m=> Deployment is now ready\n"
+    printf "\e[38;5;40m=> Deployment is now ready <=\n"
 }
 
 # All helm chart paths are relative to this directory.
