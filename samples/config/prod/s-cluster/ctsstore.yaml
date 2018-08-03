@@ -33,7 +33,7 @@ topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
 backup:
   enabled: false
-  storageClass: "nfs"
+  storageClass: "nfs-client"
   storageSize: "20Gi"
   schedule:  "*/30 * * * *"
   verify: false
