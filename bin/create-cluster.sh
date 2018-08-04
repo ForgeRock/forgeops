@@ -49,6 +49,8 @@ fi
 
 # Create cluster with values parsed from cfg file
 # scopes are required for gcs storage backup and cloud sql
+# If no service account is specified then the default one is used
+# It is recommended to create a service account
 gcloud container clusters create $GKE_CLUSTER_NAME \
       --project="${GKE_PROJECT_NAME}" \
       --zone="${GKE_PRIMARY_ZONE}" \
@@ -67,7 +69,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --enable-autoscaling \
       --enable-autoupgrade \
       --enable-autorepair \
-      --scopes "gke-default" \
+      --scopes "https://www.googleapis.com/auth/cloud-platform" \
       --enable-cloud-logging \
       --enable-cloud-monitoring \
       --disk-type=pd-ssd ${OPTS}
@@ -75,5 +77,6 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
 
 # stackdriver beta is not really stable right now.
 #       --enable-stackdriver-kubernetes \
+#  --scopes "gke-default"
 
 
