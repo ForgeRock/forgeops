@@ -62,9 +62,9 @@ dl(){
     echo "Downloading $src to $3"
     if [ -z "${WGET}" ]
     then
-        $DRYRUN curl --fail -s -H "$HEADER"  $src -o $3
+        $DRYRUN time curl --fail -s -H "$HEADER"  $src -o $3
     else
-        $DRYRUN wget -q --header "$HEADER" $src  -O $3
+        $DRYRUN time wget -q --header "$HEADER" $src  -O $3
     fi
 
     if [ $? -ne 0 ] 
