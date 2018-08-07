@@ -6,7 +6,7 @@ FROM forgerock/downloader
 
 ARG VERSION="6.0.0"
 RUN download -v $VERSION openam 
-RUN mkdir -p /var/tmp/openam && unzip /openam.war -d /var/tmp/openam
+RUN mkdir -p /var/tmp/openam && unzip -q /openam.war -d /var/tmp/openam
 
 FROM tomcat:8.5-alpine
 
