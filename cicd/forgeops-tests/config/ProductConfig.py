@@ -28,7 +28,6 @@ class AMConfig(object):
         self.rest_oauth2_authz_url = self.am_url + '/oauth2/authorize'
 
 
-
 class IDMConfig(object):
     def __init__(self):
         try:

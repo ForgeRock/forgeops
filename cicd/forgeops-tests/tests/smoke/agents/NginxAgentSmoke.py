@@ -15,6 +15,25 @@ class NginxAgentSmoke(unittest.TestCase):
     deny_policy_url = '/deny.html'
     neu_url = '/neu.html'
 
+    def test_0_create_test_user(self):
+        """
+                Setup a user that will be tested in user login.
+
+                """
+        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+                   'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
+        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        self.assertEqual(200, resp.status_code, 'Admin login')
+        admin_token = resp.json()["tokenId"]
+
+        headers = {'iPlanetDirectoryPro': admin_token, 'Content-Type': 'application/json',
+                   'Accept-API-Version': 'resource=3.0, protocol=2.1'}
+        user_data = {'username': 'testuser-nginx',
+                     'userpassword': 'password',
+                     'mail': 'testuser-nginx@forgerock.com'}
+        resp = post(self.amcfg.am_url + '/json/realms/root/users/?_action=create', headers=headers, json=user_data)
+        self.assertEqual(201, resp.status_code, "Expecting test user to be created - HTTP-201")
+
     def test_redirect(self):
         resp = get(url=self.agent_cfg.agent_url, allow_redirects=False)
         self.assertEqual(302, resp.status_code, 'Expecting 302 redirect to AM login')
@@ -22,7 +41,7 @@ class NginxAgentSmoke(unittest.TestCase):
 
     def test_access_allowed_resource(self):
         s = session()
-        s.headers = {'X-OpenAM-Username': 'user.1', 'X-OpenAM-Password': 'password',
+        s.headers = {'X-OpenAM-Username': 'testuser-nginx', 'X-OpenAM-Password': 'password',
                      'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
         resp = s.post(url=self.amcfg.rest_authn_url, headers=s.headers)
         self.assertEqual(200, resp.status_code, 'User needs to login')
@@ -38,7 +57,7 @@ class NginxAgentSmoke(unittest.TestCase):
 
     def test_access_denied_resource(self):
         s = session()
-        s.headers = {'X-OpenAM-Username': 'user.1', 'X-OpenAM-Password': 'password',
+        s.headers = {'X-OpenAM-Username': 'testuser-nginx', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
         resp = s.post(url=self.amcfg.rest_authn_url, headers=s.headers)
         self.assertEqual(200, resp.status_code, 'User login, expecting HTTP-200')
