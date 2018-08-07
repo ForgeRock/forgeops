@@ -54,7 +54,7 @@ class IDMUpdateManagedUsers extends  Simulation {
         .inferHtmlResources()
         .contentTypeHeader("""application/json""")
 
-    val updateScenario: ScenarioBuilder = scenario("Create managed users").
+    val updateScenario: ScenarioBuilder = scenario("Update managed users").
         exec(session => session.set("resp_code", 200)).
         asLongAs( session => !(session("resp_code").as[Int] == 404) ) {
             feed(userFeeder)

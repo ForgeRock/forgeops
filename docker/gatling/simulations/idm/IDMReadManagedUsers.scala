@@ -40,7 +40,7 @@ class IDMReadManagedUsers extends Simulation{
         .inferHtmlResources()
         .contentTypeHeader("""application/json""")
 
-    val readScenario: ScenarioBuilder = scenario("Delete managed users").
+    val readScenario: ScenarioBuilder = scenario("Read managed users").
         exec(session => session.set("resp_code", 200)).
         asLongAs( session => !(session("resp_code").as[Int] == 404) ) {
             feed(userFeeder)

@@ -232,6 +232,7 @@ if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     echo "AM is present in deployment, running AM livechecks"
     livecheck_stage1
     restart_openam
+    scale_am
 fi
 
 kubectl get ing --namespace ${NAMESPACE}
