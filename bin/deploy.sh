@@ -210,7 +210,7 @@ scale_am()
     DEPNAME=$(kubectl get deployment -l app=openam -o name)
     kubectl scale --replicas=2 ${DEPNAME}
     test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix manually"
- 
+
     printf "\e[38;5;40m=> Deployment is now ready <=\n"
 }
 
@@ -228,16 +228,10 @@ fi
 
 create_namespace
 deploy_charts
-<<<<<<< 2532fcb4653c19dac7ec75648aa7ff61fbfe386b
-livecheck_stage1
-restart_openam
-scale_am
-=======
 if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     echo "AM is present in deployment, running AM livechecks"
     livecheck_stage1
     restart_openam
 fi
->>>>>>> Saving work on CLOUD-597
 
 kubectl get ing --namespace ${NAMESPACE}
