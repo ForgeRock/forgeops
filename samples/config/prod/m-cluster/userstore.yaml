@@ -30,20 +30,20 @@ backup:
   enabled: true
   storageClass: "nfs-client"
   storageSize: "20Gi"
-  schedule:  "*/30 * * * *"
+  schedule:  "*/60 * * * *"
   verify: false
   # If you want to restore from a backup pvc then provide the name below and uncomment
   #pvcName: "bak-userstore"
 
 gcs:
   backup: true
-  restore: false
-  backupBucket: gs://forgeops/dj-backup/m-cluster/userstore
-  restoreBucket: gs://forgeops/dj-backup/m-cluster/userstore
+  restore: true
+  backupBucket: gs://forgeops/dj-backup/m-cluster
+  restoreBucket: gs://forgeops/restore/m-cluster
 
 # Restore parameters.
 restore:
- enabled: false
+ enabled: true
 
 # This is where backup and restore notificaiton will be sent
 slackUrl: undefined

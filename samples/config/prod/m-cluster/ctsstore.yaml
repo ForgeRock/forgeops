@@ -40,8 +40,8 @@ backup:
 gcs:
   backup: false
   restore: false
-  backupBucket: gs://forgeops/dj-backup/m-cluster/ctsstore
-  restoreBucket: gs://forgeops/dj-backup/m-cluster/ctsstore
+  backupBucket: gs://forgeops/dj-backup/m-cluster
+  restoreBucket: gs://forgeops/dj-backup/m-cluster
 
 restore:
   enabled: false
