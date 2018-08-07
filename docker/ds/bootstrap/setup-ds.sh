@@ -9,10 +9,6 @@ set -x
 echo "Setting up server..."
 cd $DJ
 
-SAMPLE_DATA=
-if [ -n "${3}" ]; then
-    SAMPLE_DATA="--sampleData ${3}"
-fi
 
 SSL_KEYSTORE=$SECRETS/ssl-keystore.p12
 
@@ -27,8 +23,8 @@ SSL_KEYSTORE=$SECRETS/ssl-keystore.p12
     --ldapsPort ${PORT_DIGIT}636 \
     --httpPort ${PORT_DIGIT}8080 \
     --httpsPort ${PORT_DIGIT}8443 \
-    ${SAMPLE_DATA} \
     --baseDn "$BASE_DN" \
+    --addBaseEntry \
     --certNickname $SSL_CERT_ALIAS \
     --usePkcs12KeyStore $SSL_KEYSTORE \
     --keyStorePasswordFile $KEYSTORE_PIN \

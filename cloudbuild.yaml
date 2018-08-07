@@ -5,7 +5,7 @@ timeout: 3500s
 steps:
 # Get the helm command.
 - name: gcr.io/cloud-builders/wget
-  args: ['-O', 'helm.tar.gz', 'https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-linux-amd64.tar.gz']
+  args: ['-q','-O', 'helm.tar.gz', 'https://storage.googleapis.com/kubernetes-helm/helm-v2.9.0-linux-amd64.tar.gz']
 # Build helm charts and push to gs bucket.
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: ./etc/cloud-build-push-charts.sh
@@ -29,7 +29,7 @@ steps:
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
 # Launch the smoke test
 - name: gcr.io/cloud-builders/gcloud
-  args: ['container','builds','submit', '--config', 'cloudbuild-smoketests.yaml', '--async', '--substitutions', '_SLACK_SERVICE=${_SLACK_SERVICE}', '.']
+  args: ['builds','submit', '--config', 'cloudbuild-smoketests.yaml', '--async', '--substitutions', '_SLACK_SERVICE=${_SLACK_SERVICE}', '.']
 images:
 - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'

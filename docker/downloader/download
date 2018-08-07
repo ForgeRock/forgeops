@@ -60,11 +60,12 @@ dl(){
     fi
 
     echo "Downloading $src to $3"
-    if [ -z "${WGET}" ]
+    if [ -n "${CURL}" ]
     then
         $DRYRUN time curl --fail -s -H "$HEADER"  $src -o $3
     else
-        $DRYRUN time wget -q --header "$HEADER" $src  -O $3
+        #$DRYRUN time wget -q --header "$HEADER" $src  -O $3
+     $DRYRUN time wget -q --inet4-only --timeout=20 --header "$HEADER" $src  -O $3
     fi
 
     if [ $? -ne 0 ] 
@@ -79,16 +80,16 @@ dl(){
 VERSION=${VERSION:-6.0.0}
 
 
-while getopts "swv:d" opt; do
+while getopts "scv:d" opt; do
   case ${opt} in
     s ) BUILD_SNAPSHOTS="true" ;;
-    w ) WGET="true" ;;
+    w ) CURL="true" ;;
     v ) VERSION="${OPTARG}" ;;
     d ) DRYRUN="echo" ;;
     \? )
          echo "Usage: dl.sh [-s] [-w] images..."
          echo "-s download snapshots instead of releases"
-         echo "-w Use wget instead of curl"
+         echo "-c Use curl instead of wget"
          echo "-v VERSION - download a specific version (example -v 6.5.0). Default $VERSION"
          echo "Images can be one or more of: $IMAGES"
          echo "If not specified, all images are downloaded"
@@ -97,9 +98,6 @@ while getopts "swv:d" opt; do
   esac
 done
 shift $((OPTIND -1))
-
-# experiment using wget as the default to see if it improves download reliability
-WGET="true"
 
 # Update release / milestone / RC builds here.
 AM_VERSION=$VERSION
