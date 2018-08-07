@@ -1,36 +1,20 @@
 #!/usr/bin/env bash
 # List backups.
 
+cd /opt/opendj
+
 source /opt/opendj/env.sh
 
-if [ $# -eq 1 ]; 
-then 
-  B=$1
-else
-  echo "Usage: $0 path-to-backup-files"
-  echo "Example: $0 bak/user/namespace/2018/06/01"
-  exit 1
-fi
 
-if [ ! -d "${B}" ]; then
-  echo "Can't find backup path $B"
-  exit 1
-fi
+echo "Listing backups in ${BACKUP_DIRECTORY}"
 
-echo "Listing backups in $B"
+roots=`(cd db; echo *Root)`
 
-echo "userRoot backups"
-
-/opt/opendj/bin/restore --offline \
-  --backupDirectory "${B}"/userRoot \
-  --listBackups \
-  --hostname "$FQDN" \
-  -p 4444 -D "cn=Directory Manager"
-
-echo "ctsRoot backups"
-
-/opt/opendj/bin/restore --offline \
-  --backupDirectory "${B}"/ctsRoot \
-  --listBackups \
-  --hostname "$FQDN" \
-  -p 4444 -D "cn=Directory Manager"
+for root in $roots; do 
+  echo "$root backups"
+  /opt/opendj/bin/restore --offline \
+    --backupDirectory "${BACKUP_DIRECTORY}"/$root \
+    --listBackups \
+    --hostname "$FQDN" \
+    -p 4444 -D "cn=Directory Manager"
+done

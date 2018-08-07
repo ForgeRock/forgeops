@@ -58,6 +58,8 @@ RUN chown -R forgerock:root /opt/opendj
 
 USER 11111
 
+ENV PATH $PATH:/opt/opendj/scripts:/opt/opendj/bin
+
 
 ENTRYPOINT  ["/opt/opendj/docker-entrypoint.sh"]
 
