@@ -4,7 +4,7 @@ FROM forgerock/downloader
 
 ARG VERSION="6.0.0"
 RUN download -v $VERSION openidm 
-RUN mkdir -p /var/tmp/openidm && unzip /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
+RUN mkdir -p /var/tmp/openidm && unzip -q /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
 
 FROM forgerock/java:6.0.0
 

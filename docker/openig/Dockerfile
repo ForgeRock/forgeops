@@ -6,7 +6,7 @@ ARG VERSION="6.0.0"
 
 RUN download -v $VERSION openig
 
-RUN mkdir -p /var/tmp/openig && unzip /openig.war -d /var/tmp/openig
+RUN mkdir -p /var/tmp/openig && unzip -q /openig.war -d /var/tmp/openig
 
 FROM tomcat:8.5-alpine
 
