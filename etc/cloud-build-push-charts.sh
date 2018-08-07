@@ -38,11 +38,11 @@ gsutil cp gs://${BUCKET}/index.yaml .
 $helm repo index --url $URL --merge index.yaml .
 
 # Copy all the charts and index up to our bucket.
-gsutil -m rsync ./ gs://${BUCKET}
+gsutil -q -m rsync ./ gs://${BUCKET}
 
 # Make the charts world readable.
-gsutil -m acl set -R -a public-read gs://${BUCKET}
+gsutil -q -m acl set -R -a public-read gs://${BUCKET}
 
 # See https://github.com/kubernetes/helm/issues/2453.
 # This makes sure the bucket is not cached (default is to cache https:// objects for 1 hour).
-gsutil -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" "gs://${BUCKET}/*"
+gsutil -q -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" "gs://${BUCKET}/*"

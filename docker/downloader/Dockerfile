@@ -7,6 +7,7 @@ FROM alpine:latest
 ARG API_KEY
 
 RUN apk add --update \
+        wget \
         bash \
         curl \
     && rm -rf /var/cache/apk/* \
