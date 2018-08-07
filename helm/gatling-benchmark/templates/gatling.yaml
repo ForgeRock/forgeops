@@ -23,6 +23,8 @@ spec:
           - touch /ready && /custom-gatling.sh  -j '
             -Dam_host={{ .Values.benchmark.openam.host }}
             -Dam_port={{ .Values.benchmark.openam.port }}
+            -Didm_host={{ .Values.benchmark.openidm.host }}
+            -Didm_port={{ .Values.benchmark.opendim.port }}
             -DlogoutPercent={{ .Values.benchmark.logoutpercent }}
             -Dusers={{ .Values.benchmark.users }}
             -Dconcurrency={{ .Values.benchmark.concurrency }}
