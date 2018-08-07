@@ -98,6 +98,8 @@ while getopts "swv:d" opt; do
 done
 shift $((OPTIND -1))
 
+# experiment using wget as the default to see if it improves download reliability
+WGET="true"
 
 # Update release / milestone / RC builds here.
 AM_VERSION=$VERSION
