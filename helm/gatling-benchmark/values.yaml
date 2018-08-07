@@ -15,6 +15,15 @@ benchmark:
   # This benchmark supports following testnames
   #   - am.AMRestAuthNSim
   #   - am.AMAccessTokenSim
+  #
+  # For IDM it is:
+  # ( Always run Create test first to have users present for other tests)
+  # - idm.IDMCreateManagedUsers
+  # - idm.IDMReadManagedUsers
+  # - idm.IDMUpdateManagedUsers
+  # - idm.IDMDeleteManagedUsers
+  #
+
   testname: am.AMAccessTokenSim
 
   # How many users we want to use for benchmark
@@ -36,6 +45,9 @@ benchmark:
   # you need to specify host as a full fqdn. e.g openam.pyforge.forgeops.com
   openam:
     host: openam
+    port: 80
+  openidm:
+    host: openidm
     port: 80
 
 # Reporting related values.
