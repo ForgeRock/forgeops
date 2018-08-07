@@ -13,7 +13,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'
   entrypoint: './build.sh'
-  args: ['-g']
+  # -g tags with gcr.io, -n cloudbuild sets the docker network to cloudbuild so docker builds can access gsutil commands.
+  args: ['-g', '-n', 'cloudbuild']
   env:
   - 'API_KEY=${_ARTIFACTORY_API_KEY}'
 - name: 'gcr.io/cloud-builders/docker'
