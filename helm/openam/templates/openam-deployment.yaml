@@ -63,6 +63,11 @@ spec:
           mountPath: /home/forgerock/openam
         - name: git
           mountPath: /git
+        {{ if .Values.useConfigMapWebxml }}
+        - mountPath: /usr/local/tomcat/webapps/openam/WEB-INF/web.xml
+          name: webxml
+          subPath: webxml
+        {{ end }}
         envFrom:
         - configMapRef:
             name: am-configmap
@@ -101,6 +106,12 @@ spec:
           mountPath: /home/forgerock/openam
       {{- end }}
       volumes:
+      {{ if .Values.useConfigMapWebxml }}
+      - configMap:
+          defaultMode: 420
+          name: webxml
+        name: webxml
+      {{ end }}
       - name: openam-root
         emptyDir: {}
       - name: openam-secrets

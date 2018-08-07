@@ -48,6 +48,9 @@ useTLS: false
 # This is enabled by the following flag:
 useCertManager: true
 
+# To use a tomcat web.xml from a k8s config map instead of the one built into the container, set the following to true.
+useConfigMapWebxml: false
+
 # Suffix for OpenDJ config store. We reuse the default baseDN of o=userstore.
 rootSuffix:  "o=userstore"
 
