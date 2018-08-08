@@ -11,7 +11,7 @@
     "displayName" : "OpenIDM",
     "description" : null,
     "attributeNames" : [ ],
-    "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "createdBy" : "id=amadmin,ou=user,o=userstore",
     "conditions" : [ "LEAuthLevel", "Policy", "Script", "AuthenticateToService", "SimpleTime", "AMIdentityMembership", "OR", "IPv6", "IPv4", "SessionProperty", "AuthScheme", "AuthLevel", "NOT", "Transaction", "AuthenticateToRealm", "AND", "ResourceEnvIP", "LDAPFilter", "OAuth2Scope", "Session" ],
     "saveIndex" : null,
     "searchIndex" : null,
@@ -22,7 +22,7 @@
     "resourceComparator" : null,
     "creationDate" : 1504214076793,
     "lastModifiedDate" : 1515432378238,
-    "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "lastModifiedBy" : "id=amadmin,ou=user,o=userstore",
     "editable" : true,
     "name" : "openidm"
   }

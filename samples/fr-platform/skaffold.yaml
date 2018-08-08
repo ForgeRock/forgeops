@@ -8,8 +8,6 @@ build:
     workspace: rs
   - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client
     workspace: client
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj
-    workspace: dj
   - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am
     workspace: am
   - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
@@ -29,7 +27,6 @@ deploy:
         values:
           images.rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
           images.client: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client
-          images.dj: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj
           images.am: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am
           images.amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
           images.idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm

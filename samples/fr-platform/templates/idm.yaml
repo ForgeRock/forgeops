@@ -6,11 +6,6 @@ metadata:
   labels:
     role: management
 spec:
-  initContainers:
-  - name: wait-for-repo
-    image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
-    imagePullPolicy: IfNotPresent
-    args: [ "wait", "dj-0.dj-service", "1389" ]
   containers:
     - image: {{ .Values.images.idm }}
       imagePullPolicy: IfNotPresent

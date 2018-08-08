@@ -23,7 +23,7 @@
     },
     "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
     "creationDate" : 1422892465848,
-    "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "lastModifiedBy" : "id=amadmin,ou=user,o=userstore",
     "lastModifiedDate" : 1515432378099
   }
 }

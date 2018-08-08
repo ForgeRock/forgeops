@@ -32,10 +32,10 @@ If you don't want to use Facebook, the default values of "FakeID" and "FakeSecre
     This creates the minikube VM, enables the ingress addon, adds a new namespace to your kubectl config, and initializes the helm tiller:
 
     ```
-    minikube start --insecure-registry 10.0.0.0/24 --memory 4096
-    minikube addons enable ingress
-    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube
-    sleep 2
+    minikube start --insecure-registry 10.0.0.0/24 --memory 4096 && \
+    minikube addons enable ingress && \
+    kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube && \
+    sleep 2 && \
     helm init --wait
     ```
 
@@ -44,8 +44,8 @@ If you don't want to use Facebook, the default values of "FakeID" and "FakeSecre
     These commands fix a bug in minikube related to loopback networking, prepare your Docker environment to point to the minikube Docker service, and instructs kubectl to use the proper namespace for this sample.
 
     ```
-    minikube ssh "sudo ip link set docker0 promisc on"
-    eval $(minikube docker-env)
+    minikube ssh "sudo ip link set docker0 promisc on" && \
+    eval $(minikube docker-env) && \
     kubectl config use-context sample-context
     ```
 
@@ -130,7 +130,6 @@ Build the Docker images for this sample:
 
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest rs
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client:latest client
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:latest dj
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:latest am
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest amster
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest idm
@@ -148,7 +147,7 @@ You now have a file names something like fr-platform-6.5.0-SNAPSHOT.tgz that you
 
 To make the internal DJ cluster accessible locally:
 
-    kubectl port-forward dj-0 2389:1389 &
+    kubectl port-forward ds-0 2389:1389 &
 
 ## Saving configuration changes
 

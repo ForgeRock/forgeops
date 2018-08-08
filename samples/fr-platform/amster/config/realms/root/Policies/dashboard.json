@@ -20,9 +20,9 @@
       "type" : "AuthenticatedUsers"
     },
     "resourceTypeUuid" : "76656a38-5f8e-401b-83aa-4ccb74ce88d2",
-    "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "lastModifiedBy" : "id=amadmin,ou=user,o=userstore",
     "lastModifiedDate" : "2018-02-03T16:21:44.381Z",
-    "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "createdBy" : "id=amadmin,ou=user,o=userstore",
     "creationDate" : "2018-02-03T16:21:44.381Z"
   }
 }

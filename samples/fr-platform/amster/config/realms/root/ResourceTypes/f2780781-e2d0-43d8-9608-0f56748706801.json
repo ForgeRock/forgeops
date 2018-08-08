@@ -19,9 +19,9 @@
       "delete" : true,
       "write" : true
     },
-    "createdBy" : "id=dsameuser,ou=user,dc=example,dc=com",
+    "createdBy" : "id=dsameuser,ou=user,o=userstore",
     "creationDate" : 1515452641742,
-    "lastModifiedBy" : "id=dsameuser,ou=user,dc=example,dc=com",
+    "lastModifiedBy" : "id=dsameuser,ou=user,o=userstore",
     "lastModifiedDate" : 1515452641742
   }
 }
