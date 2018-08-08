@@ -13,7 +13,7 @@
             "heartBeatTimeoutMilliSeconds": 10000,
             "primaryLdapServers": [
                 {
-                    "hostname": "dj-0.dj-service",
+                    "hostname": "ds-0.ds",
                     "port": 1389
                 }
             ],
@@ -125,11 +125,11 @@
     },
     "resourceMapping": {
         "defaultMapping": {
-            "dnTemplate": "ou=generic,dc=example,dc=com"
+            "dnTemplate": "ou=generic,o=userstore"
         },
         "explicitMapping": {
             "internal/role": {
-                "dnTemplate": "ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=com",
+                "dnTemplate": "ou=roles,ou=internal,o=idm",
                 "objectClasses": [
                     "fr-idm-internal-role"
                 ],
@@ -147,7 +147,7 @@
                 }
             },
             "link": {
-                "dnTemplate": "ou=links,dc=openidm,dc=forgerock,dc=com",
+                "dnTemplate": "ou=links,o=idm",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-link"
@@ -178,7 +178,7 @@
                 }
             },
             "clusteredrecontargetids": {
-                "dnTemplate": "ou=clusteredrecontargetids,dc=openidm,dc=forgerock,dc=com",
+                "dnTemplate": "ou=clusteredrecontargetids,o=idm",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-recon-clusteredTargetIds"
@@ -201,7 +201,7 @@
                 }
             },
             "managed/user": {
-                "dnTemplate": "ou=People,dc=example,dc=com",
+                "dnTemplate": "ou=People,o=userstore",
                 "namingStrategy": {
                     "type": "serverNaming",
                     "dnAttribute": "uid",
@@ -342,13 +342,13 @@
         },
         "genericMapping": {
             "ui/*": {
-                "dnTemplate": "ou=ui,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=ui,o=idm"
             },
             "managed/*": {
-                "dnTemplate": "ou=managed,dc=example,dc=com"
+                "dnTemplate": "ou=managed,o=userstore"
             },
             "managed/role": {
-                "dnTemplate": "ou=role,ou=managed,dc=example,dc=com",
+                "dnTemplate": "ou=role,ou=managed,o=userstore",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-managed-role"
@@ -357,13 +357,13 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole"
             },
             "scheduler": {
-                "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=scheduler,o=idm"
             },
             "scheduler/*": {
-                "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=scheduler,o=idm"
             },
             "cluster/*": {
-                "dnTemplate": "ou=cluster,dc=openidm,dc=forgerock,dc=com",
+                "dnTemplate": "ou=cluster,o=idm",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-cluster-obj"
@@ -372,7 +372,7 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchClusterObject"
             },
             "relationships": {
-                "dnTemplate": "ou=relationships,dc=openidm,dc=forgerock,dc=com",
+                "dnTemplate": "ou=relationships,o=idm",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-relationship"
@@ -381,16 +381,16 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchRelationship"
             },
             "updates": {
-                "dnTemplate": "ou=updates,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=updates,o=idm"
             },
             "reconprogressstate": {
-                "dnTemplate": "ou=reconprogressstate,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=reconprogressstate,o=idm"
             },
             "jsonstorage": {
-                "dnTemplate": "ou=jsonstorage,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=jsonstorage,o=idm"
             },
             "internal/usermeta" : {
-                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=com"
+                "dnTemplate": "ou=usermeta,ou=internal,o=idm"
             }
         }
     }

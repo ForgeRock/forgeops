@@ -29,9 +29,9 @@
       "propertyName" : "organizationName",
       "propertyValues" : [ ]
     } ],
-    "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "lastModifiedBy" : "id=amadmin,ou=user,o=userstore",
     "lastModifiedDate" : "2018-02-03T19:49:17.296Z",
-    "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "createdBy" : "id=amadmin,ou=user,o=userstore",
     "creationDate" : "2018-02-03T16:21:44.211Z"
   }
 }

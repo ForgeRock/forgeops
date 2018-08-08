@@ -1,8 +1,8 @@
 {
     // This file defines an example Rest2Ldap API mapping exposing users, POSIX users, and groups, as follows:
     //
-    // /api/users/{uid} - users beneath ou=people,dc=example,dc=com, e.g. "/api/users/bjensen"
-    // /api/groups/{cn} - groups beneath ou=groups,dc=example,dc=com, e.g. "/api/groups/administrators"
+    // /api/users/{uid} - users beneath ou=people,o=userstore, e.g. "/api/users/bjensen"
+    // /api/groups/{cn} - groups beneath ou=groups,o=userstore, e.g. "/api/groups/administrators"
     //
     "version": "1.0",
 

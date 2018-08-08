@@ -33,9 +33,9 @@
       "propertyName" : "allowedFields",
       "propertyValues" : [ "password", "preferences" ]
     } ],
-    "lastModifiedBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "lastModifiedBy" : "id=amadmin,ou=user,o=userstore",
     "lastModifiedDate" : "2018-02-04T05:25:03.345Z",
-    "createdBy" : "id=amadmin,ou=user,dc=example,dc=com",
+    "createdBy" : "id=amadmin,ou=user,o=userstore",
     "creationDate" : "2018-02-04T05:15:22.243Z"
   }
 }

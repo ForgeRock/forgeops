@@ -7,7 +7,6 @@ images:
     am: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:latest
     amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
     client: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client:latest
-    dj: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/dj:latest
     idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest
     pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest
     rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest
