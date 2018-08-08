@@ -19,15 +19,13 @@ if [ -n "$CONFIG_REPLICATION" ]; then
     echo "##### Configuring directory server DSRS 2..."
     ./setup-ds.sh dsrs 2
 
-
-# Debug...
-jps -mlv
-pid=`jps  -m | grep Directory | awk '{print $1}'`
-echo "PId = $pid"
-# (while true; do jstack $pid; sleep 30; done)
-# This triggers a lot of debug...
-# tail -f ./run/dsrs1/logs/debug &
-
+    # Debug...
+    jps -mlv
+    pid=`jps  -m | grep Directory | awk '{print $1}'`
+    echo "PId = $pid"
+    # (while true; do jstack $pid; sleep 30; done)
+    # This triggers a lot of debug...
+    # tail -f ./run/dsrs1/logs/debug &
 
     echo "##### Configuring replication between DSRS 1 and DSRS 2..."
     ./run/dsrs1/bin/dsreplication configure \
@@ -54,6 +52,13 @@ fi
 
 ./stop-all.sh
 
+echo "Setting the Replication Purge Delay..."
+./bin/dsconfig \
+    set-replication-server-prop \
+      --provider-name Multimaster\ Synchronization \
+      --set replication-purge-delay:12\ h \
+      --offline \
+      --no-prompt
 
 convert_to_template()
 {
