@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ds-nfs-backup
+  name: ds-backup
   annotations:
     # We tell helm to not delete the backup PV for safety
     "helm.sh/resource-policy": keep
@@ -11,7 +11,7 @@ metadata:
 spec:
   capacity:
     storage: 1Ti
-  storageClassName: nfs-pv
+  storageClassName: nfs
   persistentVolumeReclaimPolicy: Retain
   accessModes: [ ReadWriteMany ]
   nfs:

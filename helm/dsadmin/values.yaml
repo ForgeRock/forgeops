@@ -37,9 +37,8 @@ backup:
   
 # For creating the PV, we need to speficy the server and the path to the export
 nfs:
-  server: 10.149.108.186
+  server: "10.191.193.66"
   path: /export
-
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"
