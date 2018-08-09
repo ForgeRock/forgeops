@@ -81,7 +81,7 @@ dl(){
 
     if [ -n "$GCS_CACHE" ]; then
         echo "Saving a cached copy of $2"
-        gsutil cp "$3" "$GCS_DIR/$2"
+        gsutil cp "$3" "$GCS_DIR/$2" || echo "Could not save to cache. Skipping"
     fi
 
 }

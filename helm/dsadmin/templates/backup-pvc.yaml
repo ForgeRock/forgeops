@@ -10,6 +10,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
+  storageClassName: nfs
   selector:
     matchLabels:
       bucket: backup
