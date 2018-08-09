@@ -245,7 +245,9 @@ if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     livecheck_stage1
     restart_openam
     scale_am
-    #deploy_hpa
+    if [ "${context}" != "minikube" ]; then
+        deploy_hpa
+    fi
 fi
 
 printf "\e[38;5;40m=> Deployment is now ready <=\n"
