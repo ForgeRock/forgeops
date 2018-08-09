@@ -41,33 +41,39 @@ replicas: 1
 # Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
+# Set storageClass only on clusters that support it (GCP / AWS).
+#storageClass: fast
+
+
 # StorageClass is optional. It can be the name of a fast (SSD) class.
 #storageClass: fast
 
 backup:
   # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
-  enabled: false
-  storageClass: "nfs-client"
+  enabled: true
+  storageClass: "nfs"
   storageSize: "20Gi"
-  # If you provide the name of a backup PVC, the default bak-$instance will NOT be created, and
-  # the named pvc will be used as the shared backup volume. This can be used to re-attach 
-  # a previous backup pvc - assuming it was not deleted.
-  # for example, to reuse the previous volume  pvcName: userstore-bak
-  #pvcName: 
-  # Backup schedule. The first backup is a full, subsequent backups are incremental
-  # Format is crontab: minutes hour day-of-month month day-of-week
-  schedule:  "*/60 * * * *"
-  # If true, run a verification job
-  verify: false
+ 
+  # This is an optional paramter that will mount the named PVC volume (most likely an NFS share)
+  # on the bak/ directory. If this is not specified, an emptyDir will be mounted instead.
+  # The pvc is usually created by the dsadmin/ chart.
+  #pvcClaimName: ds-backup
+  # This configures a subpath mount for the bak/ directory
+  # The pod will mount the pvc using a subpath of $subPathRoot/$instance-$namespace. This
+  # causes each instance backup to go to a different folder on the shared PVC drive. 
+  # Without using a subpath, all instances would backup to the same folder- causing collisions. 
+  # The pod itself only see bak/ - the subpath is not visible to it.
+  # The root here is set to "default". If you have only one cluster this is sufficient because the 
+  # instance and namespace are sufficient to disambiguate the folder. If you want to share a PVC
+  # across clusters, you change this to (for example) "cluster1"
+  subPathRoot: "default"
 
-
-# Set storageClass only on clusters that support it (GCP / AWS).
-#storageClass: fast
 
 # You need to be on JDK 8u131 or higher to enable these options.
 # todo: find JDK 11 args
 #opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMFraction=2"
 
+# These defaults work for a small test instance
 opendjJavaArgs: "-Xmx512m -XX:+UnlockDiagnosticVMOptions"
 
 # Resource limits.
@@ -94,24 +100,6 @@ podAntiAffinity: "soft"
 # Note you want to leave this value as is if you are deploying a single zone cluster and change the values only
 # if you have a multi-zone cluster.
 topologyKey: "kubernetes.io/hostname"
-
-gcs:
-  # Set this to true to enable backups to Google Cloud Storage. You need to create the top level bucket first.
-  backup: false
-  # Set to true to enable restoring data from a gcs bucket to the bak/ folder.
-  # Note: This does not trigger a DS restore. It only gets the data from GCS to the bak/ folder
-  # See the restore.enabled setting.
-  restore: false
-  # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
-  #add --scopes storage-full when you create the cluster.
-  # Note the namespace and DS instance name will be appended to this bucket path. This is done to avoid collisions where 
-  # multiple backups may be ocurring in different namespaces or dj instances.
-  backupBucket:  gs://forgeops/dj-backup/test
-  # Restore bucket. Note that in this case the namespace and instance name are *not* appended. This
-  # enables restoration across namespaces or instance types. For example, to restore data from production
-  # to QA, you might use something like:
-  #restoreBucket: gs://mybucket/dsbackups/prod/usestore
-  restoreBucket: gs://forgeops/dj-backup/test/default/userstore
 
 # Restore parameters. 
 restore:

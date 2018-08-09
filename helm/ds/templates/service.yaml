@@ -21,9 +21,9 @@ spec:
     - port: 1636
       name: ldaps
       targetPort: 1636
-    - port: 8081
+    - port: 8080
       protocol: TCP
-      name: prometheus
+      name: metrics
   selector:
     app: {{ template "fullname" . }}
     release: {{ .Release.Name }}

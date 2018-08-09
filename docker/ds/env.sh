@@ -62,4 +62,11 @@ fi
 COMMON_ARGS="--hostname ${FQDN} --bindPasswordFile ${DIR_MANAGER_PW_FILE} --port 4444 --trustAll --no-prompt"
 
 # Namespace should be set - but default just in case.
-NAMESPACE="${NAMESPACE:-default}"
+export NAMESPACE="${NAMESPACE:-default}"
+
+# Backup directory paths
+# The parent path must exist on the remote host.
+export BACKUP_ROOT_DIRECTORY="${BACKUP_ROOT_DIRECTORY:-/opt/opendj/bak}"
+export BACKUP_CLUSTER_NAME="${BACKUP_CLUSTER_NAME:-default}"
+export BACKUP_DIRECTORY="${BACKUP_DIRECTORY:-${BACKUP_ROOT_DIRECTORY}/${BACKUP_CLUSTER_NAME}/${DJ_INSTANCE}-${NAMESPACE}}"
+

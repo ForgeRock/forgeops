@@ -2,19 +2,21 @@
 # Export backends via ldif 
 # This can be initiated on any ds pod, but the export is performed on instance-0.
 
+cd /opt/opendj 
 source /opt/opendj/env.sh
-
-# The parent path must exist on the remote host.
-BACKUP_DIRECTORY=${BACKUP_DIRECTORY:-/opt/opendj/bak}
 
 
 echo "Exporting LDIF"
 
-for root in "userRoot" "ctsRoot"; do
+# TOOD: The calculation of roots only works within a single instance. 
+# We can update this script to support remote ldif export by passing in the list of roots and target destination.
+roots=`(cd db; echo *Root)`
+
+for root in $roots; do
     t=`date "+%m%d%H%M%Y.%S"`
 
     F="${BACKUP_DIRECTORY}/${root}-${t}.ldif"
-    echo "Backing up $root to $F"
+    echo "Exporting ldif of $root to $F"
 
     /opt/opendj/bin/export-ldif  --ldifFile "$F" \
       -p 4444 -D "cn=Directory Manager" -j "${DIR_MANAGER_PW_FILE}" --trustAll \

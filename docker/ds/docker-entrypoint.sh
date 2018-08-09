@@ -92,15 +92,8 @@ restore() {
 
     init_container
 
-    # We are currently using dsreplication initialize-all to load data from the first server 
-    # So we restore data only on the first server and let initialization copy the data.
-    # if [[ $HOSTNAME = *"0"* ]]; then 
-    #     echo "Restoring data from backup on host $HOSTNAME"
-    #     scripts/restore.sh -o
-    # fi
     echo "Restoring data from backup on host $HOSTNAME"
     scripts/restore.sh -o
-
 }
 
 
@@ -116,16 +109,11 @@ start)
     init_container
     start
     ;;
-restore-from-backup)
+restore)
     restore
     ;;
-restore-and-verify)
-    restore
+verify)
     scripts/verify.sh
-    ;;
-backup)
-    init_container
-    /opt/opendj/scripts/backup.sh
     ;;
 pause)
     pause
