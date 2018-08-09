@@ -56,6 +56,13 @@ chk_config()
     fi
     echo "=> k8s Context is: \"${context}\""
 
+    #if [ "${context}" = "minikube" ]; then
+    #    echo "=> Minikube deployment detected.  Installing tiller..."
+    #    helm init --service-account default --upgrade
+    #    echo "=> Giving tiller few seconds to get ready..."
+    #    sleep 30s
+    #fi
+
     if [ -z "${CFGDIR}" ] || [ ! -d "${CFGDIR}" ]; then
         echo "ERROR: Configuration directory path not given or inaccessable.  Exiting!"
         exit 1
@@ -158,7 +165,7 @@ deploy_charts()
 isalive_check()
 {
     PROTO="http"
-    if $(grep -q 'useTLS:\s*true' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
+    if $(grep -q '^useTLS:\s*true' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
         PROTO="https"
     fi
     ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
@@ -209,9 +216,14 @@ scale_am()
     echo "=> Scaling OpenAM to two replicas..."
     DEPNAME=$(kubectl get deployment -l app=openam -o name)
     kubectl scale --replicas=2 ${DEPNAME}
-    test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix manually"
+    test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix manually" 
+}
 
-    printf "\e[38;5;40m=> Deployment is now ready <=\n"
+deploy_hpa()
+{
+    echo "=> Deploying Horizontal Autoscale Chart..."
+    kubectl apply -f ${CFGDIR}/hpa.yaml
+    test $? -ne 0 && echo "Could not add HPA.  Please check error and fix manually"
 }
 
 # All helm chart paths are relative to this directory.
@@ -233,6 +245,10 @@ if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     livecheck_stage1
     restart_openam
     scale_am
+    if [ "${context}" != "minikube" ]; then
+        deploy_hpa
+    fi
 fi
 
+printf "\e[38;5;40m=> Deployment is now ready <=\n"
 kubectl get ing --namespace ${NAMESPACE}
