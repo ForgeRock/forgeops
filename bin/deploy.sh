@@ -56,12 +56,12 @@ chk_config()
     fi
     echo "=> k8s Context is: \"${context}\""
 
-    if [ "${context}" = "minikube" ]; then
-        echo "=> Minikube deployment detected.  Installing tiller..."
-        helm init --service-account default --upgrade
-        echo "=> Giving tiller few seconds to get ready..."
-        sleep 30s
-    fi
+    #if [ "${context}" = "minikube" ]; then
+    #    echo "=> Minikube deployment detected.  Installing tiller..."
+    #    helm init --service-account default --upgrade
+    #    echo "=> Giving tiller few seconds to get ready..."
+    #    sleep 30s
+    #fi
 
     if [ -z "${CFGDIR}" ] || [ ! -d "${CFGDIR}" ]; then
         echo "ERROR: Configuration directory path not given or inaccessable.  Exiting!"
