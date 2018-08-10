@@ -30,19 +30,3 @@ runPostSetupJob: false
 replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
-
-backup:
-  enabled: false
-  storageClass: "nfs-client"
-  storageSize: "20Gi"
-  schedule:  "*/30 * * * *"
-  verify: false
-
-gcs:
-  backup: false
-  restore: false
-  backupBucket: gs://forgeops/dj-backup/s-cluster
-  restoreBucket: gs://forgeops/dj-backup/s-cluster
-
-restore:
-  enabled: false

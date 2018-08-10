@@ -3,12 +3,20 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 
+CURRENT_PROJECT=$(gcloud config get-value project 2>/dev/null)
+
 . ../etc/gke-env.cfg
 
 echo "=> Read the following env variables from config file"
+echo "Project Name = $GKE_PROJECT_NAME"
 echo "Cluster Name = $GKE_CLUSTER_NAME"
 echo "Compute Zone = $GKE_PRIMARY_ZONE"
 echo ""
+if [ "$CURRENT_PROJECT" != "$GKE_PROJECT_NAME" ]; then
+    echo "=> Project mismatch detected. Current project is set to $CURRENT_PROJECT"
+    echo "=> Please set project by running 'gcloud config set project $GKE_PROJECT_NAME'"
+    exit 1
+fi
 echo "=> Do you want to delete the above cluster?"
 read -p "Continue (y/n)?" choice
 case "$choice" in 

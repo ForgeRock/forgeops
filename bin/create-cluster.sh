@@ -47,6 +47,9 @@ if [ ! -z "${GKE_NODE_LOCATIONS}" ]; then
       OPTS="${OPTS} --node-locations=${GKE_NODE_LOCATIONS}"
 fi
 
+# Experimental
+# export KUBE_PROXY_MODE=ipvs
+
 # Create cluster with values parsed from cfg file
 # scopes are required for gcs storage backup and cloud sql
 # If no service account is specified then the default one is used

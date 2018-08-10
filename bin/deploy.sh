@@ -151,8 +151,7 @@ deploy_charts()
         esac
 
         CHART_YAML=""
-        if [ -r  "${CFGDIR}/${comp}.yaml" ];
-        then
+        if [ -r  "${CFGDIR}/${comp}.yaml" ]; then
            CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
         fi
 
@@ -172,7 +171,7 @@ isalive_check()
     echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
-        echo "=> ${ALIVE_JSP} is not alive, waiting 10 seconds before retry..."
+        echo "   ${ALIVE_JSP} is not alive, waiting 10 seconds before retry..."
         sleep 10
         STATUS_CODE=$(curl -k -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -s)
     done
@@ -216,14 +215,14 @@ scale_am()
     echo "=> Scaling OpenAM to two replicas..."
     DEPNAME=$(kubectl get deployment -l app=openam -o name)
     kubectl scale --replicas=2 ${DEPNAME}
-    test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix manually" 
+    test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix" 
 }
 
 deploy_hpa()
 {
     echo "=> Deploying Horizontal Autoscale Chart..."
     kubectl apply -f ${CFGDIR}/hpa.yaml
-    test $? -ne 0 && echo "Could not add HPA.  Please check error and fix manually"
+    test $? -ne 0 && echo "Could not deploy HPA.  Please check error and fix"
 }
 
 # All helm chart paths are relative to this directory.
@@ -240,15 +239,23 @@ fi
 
 create_namespace
 deploy_charts
+
 if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     echo "AM is present in deployment, running AM livechecks"
     livecheck_stage1
     restart_openam
-    scale_am
-    if [ "${context}" != "minikube" ]; then
-        deploy_hpa
-    fi
 fi
 
-printf "\e[38;5;40m=> Deployment is now ready <=\n"
-kubectl get ing --namespace ${NAMESPACE}
+# Do not scale or deploy hpa on minikube
+if [ "${context}" != "minikube" ]; then
+    scale_am
+    #deploy_hpa
+fi
+
+printf "\e[38;5;40m=======> Deployment is now ready <========\n"
+
+#kubectl get ing --namespace ${NAMESPACE}
+
+
+
+
