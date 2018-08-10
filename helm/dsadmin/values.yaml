@@ -9,7 +9,7 @@ component: ds
 image:
   repository: gcr.io/engineering-devops
   pullPolicy: IfNotPresent
-  tag:  6.5.0
+  tag: 6.5.0-M0
 
 gcs:
   enabled: true
