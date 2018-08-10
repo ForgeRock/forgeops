@@ -29,7 +29,7 @@ spec:
             # deleted from both the backup filesystem AND the gcs bucket. Another option is to send gcs backups to yet another bucket
             # likely using offline or nearline storage.
             command: [ "/bin/sh", "-c", 
-              "gsutil -m rsync -r /backup {{ .Values.gcs.bucket }} && gsutil -m rsync -r {{ .Values.gcs.bucket }} /backup"]
+              "gsutil -m rsync -r /backup {{ .Values.gcs.bucket }} && gsutil -m rsync -r {{ .Values.gcs.bucket }} /backup; chmod -R g+rw /backup"]
             volumeMounts:
             - name: backup
               mountPath: /backup

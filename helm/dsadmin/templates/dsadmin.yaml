@@ -18,8 +18,7 @@ spec:
     spec:
       securityContext:
         fsGroup: 11111
-        # Needed for now so that we can read/write files to all the subpaths 
-        runAsUser: 0
+        runAsUser: 11111  
       initContainers: []
       containers:
       - name: opendj

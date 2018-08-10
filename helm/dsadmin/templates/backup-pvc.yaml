@@ -17,6 +17,5 @@ spec:
   resources:
     requests:
       storage: {{ .Values.backup.storageSize }}
-  # Don't need the storage class since we use the label selector
-  #storageClassName: nfs
+  storageClassName: nfs
 {{ end }}
