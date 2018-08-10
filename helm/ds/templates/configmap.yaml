@@ -11,3 +11,4 @@ data:
   SLACK_URL: {{ .Values.slackUrl }}
   DS_ENABLE_CTS: "{{ .Values.cts.enabled }}"
   DS_ENABLE_USERSTORE: "{{ .Values.userstore.enabled }}"
+  BACKUP_CLUSTER_NAME: {{ default "default" .Values.backup.clusterName }}

@@ -58,15 +58,13 @@ backup:
   # on the bak/ directory. If this is not specified, an emptyDir will be mounted instead.
   # The pvc is usually created by the dsadmin/ chart.
   #pvcClaimName: ds-backup
-  # This configures a subpath mount for the bak/ directory
-  # The pod will mount the pvc using a subpath of $subPathRoot/$instance-$namespace. This
-  # causes each instance backup to go to a different folder on the shared PVC drive. 
-  # Without using a subpath, all instances would backup to the same folder- causing collisions. 
-  # The pod itself only see bak/ - the subpath is not visible to it.
-  # The root here is set to "default". If you have only one cluster this is sufficient because the 
-  # instance and namespace are sufficient to disambiguate the folder. If you want to share a PVC
-  # across clusters, you change this to (for example) "cluster1"
-  subPathRoot: "default"
+
+  # This configures the top level directory under bak/
+  # The backup folder is set to $clusterName/$instance-$namespace. This
+  # forces each nstance backup to go to a different folder on the shared PVC drive. Without this
+  # you will get collisions on backup / restore.
+  # If you have many clusters backing up the same shared NFS volume, change the default here. For example, set it to "production"
+  clusterName: "default"
 
 
 # You need to be on JDK 8u131 or higher to enable these options.
@@ -111,14 +109,6 @@ restore:
   # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
   # is used to recover.
   enabled: false
-  # The value of path is either "latest" - which will attempt to restore from the latest backup folder,
-  # or a path *relative* to /opt/opendj/bak/ which is a direct path to the folder to restore.
-  # The later setting is used to restore from an explicit known good backup state. 
-  path: latest
-  # Example of restoring from a backup from a specific date
-  #path: 2018/05/15
-  #If the root directory contains the data:
-  #path: /
 
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"
@@ -130,4 +120,3 @@ slackUrl: undefined
 
 #  gcloud Image. You should not need to change this very often
 gcloudImage: gcr.io/cloud-builders/gcloud:latest
-#gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b
