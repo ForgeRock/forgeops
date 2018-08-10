@@ -21,24 +21,15 @@ replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
+cts:
+  enabled: false
+
 backup:
   enabled: true
-  storageClass: "nfs-client"
-  storageSize: "20Gi"
-  schedule:  "*/30 * * * *"
-  verify: false
-  # If you want to restore from a backup pvc then provide the name below and uncomment
-  #pvcName: "bak-userstore"
+  storageClass: nfs
+  storageSize: 100Gi
+  pvcClaimName: ds-backup
 
-gcs:
-  backup: true
-  restore: false
-  backupBucket: gs://forgeops/dj-backup/s-cluster
-  restoreBucket: gs://forgeops/dj-backup/s-cluster
-
-# Restore parameters.
 restore:
- enabled: false
-
-# This is where backup and restore notificaiton will be sent
-slackUrl: undefined
+  enabled: false
+  path: latest
