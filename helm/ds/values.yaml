@@ -63,7 +63,7 @@ backup:
   # The backup folder is set to $clusterName/$instance-$namespace. This
   # forces each nstance backup to go to a different folder on the shared PVC drive. Without this
   # you will get collisions on backup / restore.
-  # If you have many clusters backing up the same shared NFS volume, change the default here. For example, set it to "production"
+  # If you have many clusters backing up  same shared NFS volume, change the default here. For example, set it to "production"
   clusterName: "default"
 
 
