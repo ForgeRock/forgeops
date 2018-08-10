@@ -24,7 +24,7 @@ image:
   # For development use Always
   pullPolicy: IfNotPresent
   #pullPolicy: IfNotPresent
-  tag: 6.5.0
+  tag: 6.5.0-M0
 
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"

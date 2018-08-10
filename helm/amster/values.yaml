@@ -36,7 +36,7 @@ config:
 
 image:
   repository: gcr.io/engineering-devops
-  tag: 6.5.0
+  tag: 6.5.0-M0
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 

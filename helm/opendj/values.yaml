@@ -30,7 +30,7 @@ image:
   # For development we set this to Always to get the most current image.
   pullPolicy: Always
   #pullPolicy: IfNotPresent
-  tag:  6.5.0
+  tag: 6.5.0-M0
 
 # The number of instances in the StatefulSet. Each instance will be replicated to the master.
 replicas: 1
