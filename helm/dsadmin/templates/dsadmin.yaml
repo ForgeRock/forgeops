@@ -33,7 +33,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: OPENDJ_JAVA_ARGS
-          value: "-Xmx756m"
+          value: "-Xmx256m"
         volumeMounts:
         - name: backup
           mountPath: /opt/opendj/bak
@@ -43,9 +43,9 @@ spec:
         args: [ "pause" ]
         resources:
           requests:
-            memory: 1000Mi
+            memory: 300Mi
           limits:
-            memory: 1500Mi
+            memory: 350Mi
       volumes:
       - name: backup
         persistentVolumeClaim:
