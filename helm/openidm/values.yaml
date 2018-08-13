@@ -87,19 +87,21 @@ ingress:
     ingress.kubernetes.io/ssl-redirect: "true"
 
 # Audit log details for log streaming sidecar containers
-auditLogs:
-  - name: access-logs
-    path: "/opt/openidm/audit/access.audit.json"
-  - name: activity-logs
-    path: "/opt/openidm/audit/activity.audit.json"
-  - name: authentication-logs
-    path: "/opt/openidm/audit/authentication.audit.json"
-  - name: config-logs
-    path: "/opt/openidm/audit/config.audit.json"
-  - name: recon-logs
-    path: "/opt/openidm/audit/recon.audit.json"
-  - name: sync-logs
-    path: "/opt/openidm/audit/sync.audit.json"
+
+auditLogs: []
+# auditLogs:
+#   - name: access-logs
+#     path: "/opt/openidm/audit/access.audit.json"
+#   - name: activity-logs
+#     path: "/opt/openidm/audit/activity.audit.json"
+#   - name: authentication-logs
+#     path: "/opt/openidm/audit/authentication.audit.json"
+#   - name: config-logs
+#     path: "/opt/openidm/audit/config.audit.json"
+#   - name: recon-logs
+#     path: "/opt/openidm/audit/recon.audit.json"
+#   - name: sync-logs
+#     path: "/opt/openidm/audit/sync.audit.json"
     
 
     

@@ -68,20 +68,20 @@ convert_to_template()
 {
     cd run/$1
 
-   
-
-    echo "Converting $1 config.ldif to use commons configuration"
+    pwd
 
     echo "Rebuilding indexes"
-    ./bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
-    ./bin/rebuild-index --offline --baseDN "o=cts" --rebuildDegraded
-    ./bin/rebuild-index --offline --baseDN "o=idm" --rebuildDegraded
+    ./bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildAll
+    ./bin/rebuild-index --offline --baseDN "o=cts"  --rebuildAll
+    ./bin/rebuild-index --offline --baseDN "o=idm"  --rebuildAll
 
     for i in changelogDb/*.dom/*.server; do
         rm -rf $i
     done
 
     rm -rf changelogDb/changenumberindex/*
+
+    echo "Converting $1 config.ldif to use commons configuration"
 
     # update config.ldif. continue on error is set so we keep applying the changes
     # Some of the configuration changes won't apply if replication is not being configured.

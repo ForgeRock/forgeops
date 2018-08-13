@@ -33,6 +33,11 @@ objectClass: organizationalUnit
 objectClass: top
 ou: internal
 
+dn: ou=users,ou=internal,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: users
+
 # Internal Roles OU
 
 dn: ou=roles,ou=internal,o=idm

@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+
+echo "Applying IDM changes"
+
+set -x 
 
 ./bin/dsconfig \
  set-backend-prop \
@@ -5,6 +10,24 @@
  --add base-dn:o=idm \
  --offline \
  --no-prompt
+
+ ./bin/dsconfig \
+    create-schema-provider \
+    --provider-name "IDM managed/user Json Schema" \
+    --type json-query-equality-matching-rule \
+    --set enabled:true \
+    --set case-sensitive-strings:false \
+    --set ignore-white-space:true \
+    --set matching-rule-name:caseIgnoreJsonQueryMatchManagedUser \
+    --set matching-rule-oid:1.3.6.1.4.1.36733.2.3.4.1  \
+    --set indexed-field:userName \
+    --set indexed-field:givenName \
+    --set indexed-field:sn \
+    --set indexed-field:mail \
+    --set indexed-field:accountStatus \
+    --offline \
+    --no-prompt
+
 
 ./bin/dsconfig \
    create-schema-provider \
