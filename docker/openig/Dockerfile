@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2018 ForgeRock AS.
 FROM forgerock/downloader:latest
 
-ARG VERSION="6.0.0"
+ARG VERSION="6.5.0-M132"
 
 RUN download -v $VERSION openig
 

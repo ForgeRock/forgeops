@@ -1,13 +1,13 @@
 
 FROM forgerock/downloader 
 
-ARG VERSION="6.0.1-M1"
+ARG VERSION="6.5.0-M126.2"
 # We are getting the snapshot version of DS
 RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
-#FROM openjdk:11-jdk 
-FROM openjdk:8-jdk 
+FROM openjdk:11-jdk 
+#FROM openjdk:8-jdk 
 COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 
 WORKDIR /var/tmp/bootstrap
@@ -24,8 +24,8 @@ ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
 RUN ./setup.sh
 
 #####################  Runtime container ################
-#FROM openjdk:11-jdk
-FROM openjdk:8-jdk 
+FROM openjdk:11-jdk
+#FROM openjdk:8-jdk 
 
 
 COPY --from=1 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
