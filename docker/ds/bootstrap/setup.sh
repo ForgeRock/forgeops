@@ -47,23 +47,30 @@ if [ -n "$CONFIG_REPLICATION" ]; then
         --baseDn o=idm \
         --hostname dsrs1.example.com --port 1444 \
         --no-prompt
+
+    ./stop-all.sh 
+
+    echo "Setting replication purge delay"
+    (cd run/dsrs1 &&  ./bin/dsconfig \
+        set-replication-server-prop \
+      --provider-name Multimaster\ Synchronization \
+      --set replication-purge-delay:12\ h \
+      --offline \
+      --no-prompt)
 fi
 
 
 ./stop-all.sh
 
-echo "Setting the Replication Purge Delay..."
-./bin/dsconfig \
-    set-replication-server-prop \
-      --provider-name Multimaster\ Synchronization \
-      --set replication-purge-delay:12\ h \
-      --offline \
-      --no-prompt
+
 
 convert_to_template()
 {
-    echo "Converting $1 config.ldif to use commons configuration"
     cd run/$1
+
+   
+
+    echo "Converting $1 config.ldif to use commons configuration"
 
     echo "Rebuilding indexes"
     ./bin/rebuild-index --offline --baseDN "${BASE_DN}" --rebuildDegraded
