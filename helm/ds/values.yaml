@@ -72,7 +72,7 @@ backup:
 #opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMFraction=2"
 
 # These defaults work for a small test instance
-opendjJavaArgs: "-Xmx512m -XX:+UnlockDiagnosticVMOptions"
+opendjJavaArgs: "-Xmx512m"
 
 # Resource limits.
 # These help for pod placement in a larger cluster to ensure the DS instance gets sufficient resources.

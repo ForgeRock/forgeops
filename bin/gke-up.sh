@@ -62,9 +62,6 @@ do
     sleep 5s
 done
 
-# Creater the NFS provisioner for backups
-# Skip this until we get client provisioner going..
-#./create-nfs-provisioner.sh
 
 # Create the ingress controller
 ./gke-ingress-cntlr.sh ${GKE_INGRESS_IP}
