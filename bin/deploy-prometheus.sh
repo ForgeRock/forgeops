@@ -2,12 +2,12 @@
 # Deploys prometheus-operator Helm Chart, kube-prometheus charts and Forgerock metrics which include custom
 # endpoints, alerting rules and Grafana dashboards.
 # Script deploys to monitoring namespace by default but can be override by -n <namespace flag>
-# kube-prometheus and prometheus-operator Helm charts use values files provided in ../etc/prometheus_values.  
+# kube-prometheus and prometheus-operator Helm charts use values files provided in ../etc/prometheus-values.  
 # Prometheus and AlertManager can be configured via these values files.
-# forgerock-metrics uses ../etc/prometheus_values/custom.yaml which can be used to override the Helm chart values.
+# forgerock-metrics uses ../etc/prometheus-values/custom.yaml which can be used to override the Helm chart values.
 # You can deploy your own custom values file by using the -f <values file> flag.
 
-MONPATH="../etc/prometheus_values"
+MONPATH="../etc/prometheus-values"
 
 USAGE="Usage: $0 [-n <namespace>] [-f <values file>]"
 

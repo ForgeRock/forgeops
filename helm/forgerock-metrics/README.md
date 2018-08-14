@@ -15,13 +15,13 @@ Helm charts:
 * ***forgerock-metrics***  provides configurable ServiceMonitors, alerting rules and a job to automatically import Grafana dashboards for ForgeRock products.  ServiceMonitors define the ForgeRock Identity Platform component endpoints that are monitored by Prometheus.
 
 Scripts:
-* **bin/deploy_prometheus.sh**: deploys the Helm charts mentioned above:
-* **bin/remove_prometheus.sh**: remove all deployed Helm charts described above.
-* **bin/connect_prometheus.sh**: wrapper script for port-forwarding to Prometheus and Grafana endpoints.
+* **bin/deploy-prometheus.sh**: deploys the Helm charts mentioned above:
+* **bin/remove-prometheus.sh**: remove all deployed Helm charts described above.
+* **bin/connect-prometheus.sh**: wrapper script for port-forwarding to Prometheus and Grafana endpoints.
   
 Values files:
-* ***etc/prometheus_values/kube_prometheus.yaml***: override values for kube-prometheus Helm chart. Here you can configure Prometheus and Alertmanager as well as define which Kubernetes you would like monitored.
-* ***etc/prometheus_values/prometheus_operator.yaml***: override values for Prometheus Operator.  Main use so far is to configure the image version.
+* ***etc/prometheus-values/kube-prometheus.yaml***: override values for kube-prometheus Helm chart. Here you can configure Prometheus and Alertmanager as well as define which Kubernetes you would like monitored.
+* ***etc/prometheus-values/prometheus-operator.yaml***: override values for Prometheus Operator.  Main use so far is to configure the image version.
   
 Grafana auto import.
 * ***docker/auto-import*** folder which provides a Dockerfile for producing the docker image used by the import-dashboards job.
@@ -52,7 +52,7 @@ folder, formats them to bypass a couple of limitations in the Grafana import API
 
 # How Alertmanager works
 Alertmanager is used to redirect specific alerts from Prometheus to configured receivers.  
-To configure Alertmanager, there is an Alertmanager configuration section in etc/prometheus_values/kube-prometheus.yaml.  
+To configure Alertmanager, there is an Alertmanager configuration section in etc/prometheus-values/kube-prometheus.yaml.  
 Details about how Alertmanager works can be found in the link at the top of the page.  
 In summary:
 * global section defines attributes that apply to all alerts.
@@ -76,18 +76,18 @@ A PrometheusRules CRD has been included in the Helm chart which includes the fr-
 * Running the deployment without any overrides will use the default values file which deploys to 'monitoring' namespace and scrapes metrics  
  from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
  If you wish to override these values, create a new custom.yaml file, add your override configuration using helm/forgerock-metrics/values.yaml  
- as a guide, and run deploy_prometheus.sh -f \<custom yaml file\>.
+ as a guide, and run deploy-prometheus.sh -f \<custom yaml file\>.
 
 ### Deploy
 
-Run the deploy script ./deploy_prometheus.sh with the OPTIONAL flags:
+Run the deploy script ./deploy-prometheus.sh with the OPTIONAL flags:
 * -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
 * -f *values file* \[optional\] : absolute path to yaml file as defined in previous section.
 * -h / no flags : view help
 
 ### View Prometheus/Grafana
 
-The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs. Run ./connect_prometheus.sh with the following flags:
+The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs. Run ./connect-prometheus.sh with the following flags:
 * -G (Grafana) or -P (Prometheus).
 * -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or need to access  
@@ -142,7 +142,7 @@ If you want Prometheus to scrape metrics from a different product, you need to c
     ```
 * Update Prometheus with new ServiceMonitor
     ```
-    ./deploy_prometheus.sh [-n <namespace>]
+    ./deploy-prometheus.sh [-n <namespace>]
     ```
 
 ### Configure alerting rules
