@@ -30,7 +30,7 @@ do
 done
 
 # Deploy Cert Manager Helm chart
-helm upgrade -i cert-manager --namespace kube-system stable/cert-manager --values ../cert-manager/values.yaml
+helm upgrade -i cert-manager --namespace kube-system stable/cert-manager --values ../etc/cert-manager/values.yaml
 
 # Check that cert-manager is up before deploying the cluster-issuer
 while true;
