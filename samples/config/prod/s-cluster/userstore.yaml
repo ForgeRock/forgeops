@@ -1,31 +1,44 @@
 djInstance: userstore
 
-numberSampleUsers: "1000"
-
 resources:
   limits:
     memory: 6Gi
   requests:
     memory: 4Gi
 
-storageSize: "100Gi"
-storageClass: "fast"
+
 
 # Uncomment the next 3 line if you don't want to use cgroups which is the default JVM setting
 #opendjJavaArgs: >
 #  -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
 #  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
+# For JDK 8
+opendjJavaArgs: >
+  -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+  
+# For JDK 11
+#opendjJavaArgs: >
+#  -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+#  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
+
+
+cts:
+  enabled: false
+
+storageSize: 100Gi
+storageClass: fast
 
 replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
-cts:
-  enabled: false
+podAntiAffinity: hard
 
 backup:
-  enabled: true
+  enabled: false
   storageClass: nfs
   storageSize: 100Gi
   pvcClaimName: ds-backup

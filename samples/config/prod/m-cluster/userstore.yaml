@@ -1,7 +1,5 @@
 djInstance: userstore
 
-numberSampleUsers: 1000
-
 resources:
   limits:
     memory: 11Gi
@@ -29,6 +27,7 @@ replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
+podAntiAffinity: hard
 
 backup:
   enabled: true

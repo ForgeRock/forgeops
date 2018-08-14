@@ -8,8 +8,8 @@ resources:
   requests:
     memory: 6Gi
 
-storageSize: "100Gi"
-storageClass: "fast"
+storageSize: 100Gi
+storageClass: fast
 
 # For JDK 8
 opendjJavaArgs: >
@@ -23,7 +23,7 @@ opendjJavaArgs: >
 #  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 
-podAntiAffinity: "hard"
+podAntiAffinity: hard
 
 runPostSetupJob: false
 

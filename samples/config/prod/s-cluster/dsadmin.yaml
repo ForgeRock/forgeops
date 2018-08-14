@@ -1,0 +1,23 @@
+image:
+  repository: gcr.io/engineering-devops
+  pullPolicy: Always
+  tag: 6.5.0-M0
+
+gcs:
+  enabled: true
+  bucket: gs://forgeops/dj-backup/s-cluster
+
+nfs:
+  server: 10.191.193.66
+  path: /export
+
+backup:
+  pvcName: ds-backup
+  enabled: false
+  storageSize: 100Gi
+  schedule:  "*/60 * * * *"
+  verify: false
+
+createPVC: true
+
+slackUrl: undefined

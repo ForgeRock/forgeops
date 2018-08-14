@@ -1,0 +1,14 @@
+
+resources:
+  limits:
+    memory: 4Gi
+  requests:
+    memory: 2Gi
+
+# For JDK 8
+opendjJavaArgs: >
+  -server -Xms2g -Xmx2g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+
+replicaCount: 1

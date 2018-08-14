@@ -9,3 +9,5 @@ resources:
 replicas: 2
 
 topologyKey: "failure-domain.beta.kubernetes.io/zone"
+
+podAntiAffinity: hard
