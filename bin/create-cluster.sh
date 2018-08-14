@@ -47,8 +47,6 @@ if [ ! -z "${GKE_NODE_LOCATIONS}" ]; then
       OPTS="${OPTS} --node-locations=${GKE_NODE_LOCATIONS}"
 fi
 
-# Experimental
-# export KUBE_PROXY_MODE=ipvs
 
 # Create cluster with values parsed from cfg file
 # scopes are required for gcs storage backup and cloud sql
@@ -78,8 +76,8 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --disk-type=pd-ssd ${OPTS}
 
 
-# stackdriver beta is not really stable right now.
-#       --enable-stackdriver-kubernetes \
+#  --enable-stackdriver-kubernetes
 #  --scopes "gke-default"
+#  --preemptible
 
 

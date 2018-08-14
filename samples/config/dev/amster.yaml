@@ -1,10 +1,8 @@
-
-
 config:
-  name: frconfig
   importPath: /git/config/samples/am/R6.0
+  exportPath: /tmp/amster
 
-version: 6.0.0
+version: 6.5.0
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:

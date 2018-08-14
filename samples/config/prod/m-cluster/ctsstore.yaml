@@ -8,8 +8,8 @@ resources:
   requests:
     memory: 8Gi
 
-storageSize: "500Gi"
-storageClass: "fast"
+storageSize: 500Gi
+storageClass: fast
 
 # For JDK 8
 # opendjJavaArgs: >
@@ -22,7 +22,7 @@ opendjJavaArgs: >
  -server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
-podAntiAffinity: "hard"
+podAntiAffinity: hard
 
 runPostSetupJob: false
 

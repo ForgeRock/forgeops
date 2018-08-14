@@ -1,6 +1,6 @@
-#domain: .forgeops.com
 domain: .example.com
 
+fqdn: openam.mini.example.com
 
 image:
   # repository: gcr.io/engineering-devops
@@ -9,6 +9,6 @@ image:
   #pullPolicy: Always  
   pullPolicy: IfNotPresent
 
-
-#useTLS: true
+useTLS: false
+useCertManager: false
   
