@@ -25,15 +25,10 @@ createPVC: true
 backup:
   # The name of the PVC to create to hold backups from all ds instances.
   pvcName: ds-backup
-  
-  # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
-  enabled: false
+  # The size of the resource request to the PV
   storageSize: "20Gi"
-  # Backup schedule. The first backup is a full, subsequent backups are incremental
-  # Format is crontab: minutes hour day-of-month month day-of-week
-  schedule:  "*/60 * * * *"
-  # If true, run a verification job
-  verify: false
+  # Do not uncomment.  Place holder for future work
+  # verify: false
   
 # For creating the PV, we need to speficy the server and the path to the export
 nfs:
