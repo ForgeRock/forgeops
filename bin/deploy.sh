@@ -164,8 +164,10 @@ deploy_charts()
 isalive_check()
 {
     PROTO="http"
-    if $(grep -q '^useTLS:\s*true' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
-        PROTO="https"
+    if [[ -f ${CFGDIR}/openam.yaml || -f ${CFGDIR}/common.yaml ]]; then
+        if $(grep -sq '^useTLS:\s*true' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
+            PROTO="https"
+        fi
     fi
     ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
     echo "=> Testing ${ALIVE_JSP}"
