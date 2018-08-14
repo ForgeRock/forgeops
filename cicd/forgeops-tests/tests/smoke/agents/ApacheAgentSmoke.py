@@ -16,10 +16,8 @@ class ApacheAgentSmoke(unittest.TestCase):
     neu_url = '/neu.html'
 
     def test_0_create_test_user(self):
-        """
-                Setup a user that will be tested in user login.
+        """Setup a user that will be tested in user login."""
 
-                """
         headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
         resp = post(url=self.amcfg.rest_authn_url, headers=headers)
@@ -35,11 +33,13 @@ class ApacheAgentSmoke(unittest.TestCase):
         self.assertEqual(201, resp.status_code, "Expecting test user to be created - HTTP-201")
 
     def test_redirect(self):
+        """Test if agent redirects to AM"""
         resp = get(url=self.agent_cfg.agent_url, allow_redirects=False)
         self.assertEqual(302, resp.status_code, 'Expecting 302 redirect to AM login')
         self.assertTrue('openam' in resp.headers.get('location'), 'Expecting openam to be in location header')
 
     def test_access_allowed_resource(self):
+        """Test if we can access resource - allowed by policy"""
         s = session()
         s.headers = {'X-OpenAM-Username': 'testuser-apache', 'X-OpenAM-Password': 'password',
                      'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
@@ -56,6 +56,7 @@ class ApacheAgentSmoke(unittest.TestCase):
         s.close()
 
     def test_access_denied_resource(self):
+        """Test that we can't access resource - denied by policy"""
         s = session()
         s.headers = {'X-OpenAM-Username': 'testuser-apache', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
@@ -69,5 +70,6 @@ class ApacheAgentSmoke(unittest.TestCase):
         s.close()
 
     def test_access_neu_url(self):
+        """Test if we can access resource without login - allowed by not enforced url"""
         resp = get(self.agent_cfg.agent_url + self.neu_url)
         self.assertEqual(200, resp.status_code, "Expecting to have access to NEU url")
