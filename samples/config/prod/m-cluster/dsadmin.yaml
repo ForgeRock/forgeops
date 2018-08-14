@@ -1,7 +1,7 @@
 image:
   repository: gcr.io/engineering-devops
   pullPolicy: Always
-  tag: 6.5.0
+  tag: 6.5.0-M0
 
 gcs:
   enabled: true
@@ -13,10 +13,7 @@ nfs:
 
 backup:
   pvcName: ds-backup
-  enabled: false
   storageSize: 100Gi
-  schedule:  "*/60 * * * *"
-  verify: false
 
 createPVC: true
 

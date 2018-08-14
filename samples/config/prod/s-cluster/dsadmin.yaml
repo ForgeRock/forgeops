@@ -13,10 +13,7 @@ nfs:
 
 backup:
   pvcName: ds-backup
-  enabled: false
   storageSize: 100Gi
-  schedule:  "*/60 * * * *"
-  verify: false
 
 createPVC: true
 

@@ -3,7 +3,7 @@ config:
   importPath: /git/config/samples/am/m-cluster
   exportPath: /tmp/amster
 
-version: 6.5.0
+version: 6.5.0-M0
 
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
 ctsPassword: password
