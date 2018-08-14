@@ -4,10 +4,10 @@
 # Run ./deploy-cert-manager.sh .
 
 # Decrypt encoded service account
-./decrypt.sh ../etc/cert-manager.json
+./decrypt.sh ../etc/cert-manager/cert-manager.json
 
 # Create secret so the Cluster Issuer can gain access to CloudDNS
-kubectl create secret generic clouddns --from-file=../etc/cert-manager.json -n kube-system
+kubectl create secret generic clouddns --from-file=../etc/cert-manager/cert-manager.json -n kube-system
 
 # Check that tiller is running
 while true;
@@ -56,7 +56,7 @@ done
 sleep 5
 
 # Deploy Cluster Issuer
-kubectl create -f ../cert-manager/cluster-issuer.yaml -n kube-system
+kubectl create -f ../etc/cert-manager/cluster-issuer.yaml -n kube-system
 
 # Delete decrypted service account
-rm ../etc/cert-manager.json
+rm ../etc/cert-manager/cert-manager.json
