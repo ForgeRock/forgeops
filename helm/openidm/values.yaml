@@ -38,12 +38,18 @@ useCertManager: true
 # Specific values
 openidm:
   repo:
-    host: postgresql
-    port: 5432
-    user: openidm
-    password: openidm
-    schema: openidm
-    databaseName: openidm
+    # DS external repo
+    host: userstore-0.userstore
+    port: 1389
+    user: "cn=Directory Manager"
+    password: password
+    # postgres values
+    # host: postgresql
+    # port: 5432
+    # user: openidm
+    # password: openidm
+    # schema: openidm
+    # databaseName: openidm
   # Optional client secret for AM/IDM integration:
   idpconfig:
     clientsecret: password
