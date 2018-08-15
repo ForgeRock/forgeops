@@ -1,7 +1,7 @@
 
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0-M126.2"
+ARG VERSION="6.5.0-M127.1"
 # We are getting the snapshot version of DS
 RUN download -v $VERSION opendj
 

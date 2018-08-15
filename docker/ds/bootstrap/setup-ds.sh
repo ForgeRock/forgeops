@@ -140,11 +140,11 @@ cp ../../example-v1.json ./config/rest2ldap/endpoints/api
 # From util.sh. Consider moving the logic here...
 configure
 
+/var/tmp/bootstrap/setup-idm.sh
 
 #echo "Putting IDM schema extensions in place"
 cp /var/tmp/schema/* ./db/schema
 
-/var/tmp/bootstrap/setup-idm.sh
 
 ./bin/start-ds
 
