@@ -207,7 +207,7 @@ data:
       # Provides extra control for each logger.
       ############################################################
       #org.forgerock.openidm.provisioner.level = FINER
-      #org.forgerock.openidm.repo.level = FINER
+      org.forgerock.openidm.repo.level = FINER
       #org.forgerock.openidm.recon.level = FINER
 
       # OpenICF is noisy at INFO level

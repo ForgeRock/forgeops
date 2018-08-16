@@ -1,15 +1,16 @@
 #
-# Copyright 2017 ForgeRock AS. All Rights Reserved
+# Copyright 2017-2018 ForgeRock AS. All Rights Reserved
 #
 # Use of this code requires a commercial software license with ForgeRock AS.
 # or with one of its affiliates. All use shall be exclusively subject
 # to such license between the licensee and ForgeRock AS.
 #
-
 dn: o=idm
-dc: openidm
-objectClass: top
 objectClass: domain
+objectClass: top
+dc: openidm
+#aci: (targetattr="*")(version 3.0; acl "IDM Access"; allow (all)
+#  userdn="ldap:///uid=idm,ou=user,dc=managed,o=idm";)
 
 # Links OU
 
@@ -18,20 +19,14 @@ objectClass: organizationalUnit
 objectClass: top
 ou: links
 
-##
-# relationships
-##
-dn: ou=relationships,o=idm
-objectclass: organizationalunit
-objectclass: top
-ou: relationships
-
 # Internal OU
 
 dn: ou=internal,o=idm
 objectClass: organizationalUnit
 objectClass: top
 ou: internal
+
+# Internal Users OU
 
 dn: ou=users,ou=internal,o=idm
 objectClass: organizationalUnit
@@ -45,12 +40,47 @@ objectClass: organizationalUnit
 objectClass: top
 ou: roles
 
+# Internal Privilege OU
+
+dn: ou=privileges,ou=internal,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: privileges
+
 # Internal UserMeta OU
 
 dn: ou=usermeta,ou=internal,o=idm
 objectclass: organizationalunit
 objectclass: top
 ou: usermeta
+
+# Notification OU
+
+dn: ou=notification,ou=internal,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: notification
+
+# Config OU
+
+dn: ou=config,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: config
+
+# Security OU
+
+dn: ou=Security,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: Security
+
+# Security Keys OU
+
+dn: ou=Keys,ou=Security,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: Keys
 
 ##
 # Clustered Recon OUs
@@ -65,6 +95,14 @@ dn: ou=reconprogressstate,o=idm
 objectClass: organizationalUnit
 objectClass: top
 ou: reconprogressstate
+
+##
+# default generic object
+##
+dn: ou=generic,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: generic
 
 ##
 # scheduler
@@ -118,6 +156,14 @@ objectclass: top
 ou: events
 
 ##
+# relationships
+##
+dn: ou=relationships,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: relationships
+
+##
 # updates
 ##
 dn: ou=updates,o=idm
@@ -125,6 +171,34 @@ objectclass: organizationalunit
 objectclass: top
 ou: updates
 
+##
+# Managed Object OUs
+##
+
+dn: ou=managed,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: managed
+
+dn: ou=user,ou=managed,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: user
+
+dn: ou=role,ou=managed,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: role
+
+dn: ou=group,ou=managed,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: group
+
+dn: ou=assignment,ou=managed,o=idm
+objectClass: organizationalUnit
+objectClass: top
+ou: assignment
 
 ##
 # UI
@@ -149,40 +223,25 @@ objectclass: organizationalunit
 objectclass: top
 ou: jsonstorage
 
-# Populate objects
+##
+# locks
+##
 
-dn: cn=openidm-authorized,ou=roles,ou=internal,o=idm
-objectClass: fr-idm-internal-role
-objectClass: top
-cn: openidm-authorized
-description: Basic minimum user
+dn: ou=locks,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: locks
 
-dn: cn=openidm-admin,ou=roles,ou=internal,o=idm
-objectClass: fr-idm-internal-role
-objectClass: top
-cn: openidm-admin
-description: Administrative access
+##
+# syncqueue
+##
 
-dn: cn=openidm-del-admin,ou=roles,ou=internal,o=idm
-objectClass: fr-idm-internal-role
-objectClass: top
-cn: openidm-del-admin
-description: Delegated administrative access
+dn: ou=sync,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: sync
 
-dn: cn=openidm-cert,ou=roles,ou=internal,o=idm
-objectClass: fr-idm-internal-role
-objectClass: top
-cn: openidm-cert
-description: Authenticated via certificate
-
-dn: cn=openidm-task-manager,ou=roles,ou=internal,o=idm
-objectClass: fr-idm-internal-role
-objectClass: top
-cn: openidm-task-manager
-description: Allowed to reassign workflow tasks
-
-dn: cn=openidm-reg,ou=roles,ou=internal,o=idm
-objectClass: fr-idm-internal-role
-objectClass: top
-cn: openidm-reg
-description: Anonymous access
+dn: ou=queue,ou=sync,o=idm
+objectclass: organizationalunit
+objectclass: top
+ou: queue
