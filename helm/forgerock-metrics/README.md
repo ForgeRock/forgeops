@@ -75,8 +75,11 @@ A PrometheusRules CRD has been included in the Helm chart which includes the fr-
 
 * Running the deployment without any overrides will use the default values file which deploys to 'monitoring' namespace and scrapes metrics  
  from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
- If you wish to override these values, create a new custom.yaml file, add your override configuration using helm/forgerock-metrics/values.yaml  
+
+* To override these values, create a new custom.yaml file, add your override configuration using helm/forgerock-metrics/values.yaml  
  as a guide, and run deploy-prometheus.sh -f \<custom yaml file\>.
+
+* To provide custom Prometheus or Alertmanager configuration, see the **Overriding Prometheus and Alertmanager configuration values** How To below.
 
 ### Deploy
 
@@ -140,24 +143,43 @@ If you want Prometheus to scrape metrics from a different product, you need to c
       - staging
       - test
     ```
+* Include the new ServiceMonitor name in /etc/prometheus-values/kube-prometheus.yaml under the prometheus/serviceMonitorsSelector section.  If this a temporary addition  
+deploy it as an override as described in the **Overriding Prometheus and Alertmanager configuration values** How To.
 * Update Prometheus with new ServiceMonitor
     ```
     ./deploy-prometheus.sh [-n <namespace>]
     ```
 
 ### Configure alerting rules
-To add new alerting rules, add additional rules to fr-alerts.yaml. fr-alerts.yaml is split into groups with a group for each product and a  
-separate group for cluster rules.  
+To add new alerting rules, add additional rules to fr-alerts.yaml. fr-alerts.yaml is split into groups with a group for each product and a separate group for cluster rules.  
 
 See [Prometheus alerting](https://prometheus.io/docs/practices/alerting/) for details on configuring alerts. 
 
-### Configure the alert message output(Slack).
-The alert output can be configured in the Alertmanager section of the kube-prometheus.yaml. In the slack_configs section of the receiver block,  
-you can define the template for the alert output.  The output text also incorporates labels so the info can be dynamically imported from the original  
-alert definition(see the Configuring alerting rules how to).  
+### Overriding Prometheus and Alertmanager configuration values.
+The default Prometheus deployment uses configuration values in etc/prometheus-values/kube-prometheus.yaml. This file contains configuration  
+values for Prometheus and Alertmanager and flags to switch off generating metrics for specific areas of the platform.
+
+You can provide your own custom configuration by customizing a copy of the kube-prometheus.yaml and deploying as follows:
+```
+    ./deploy-prometheus.sh -k <path to custom kube-prometheus.yaml file>
+```
+
+The main uses of this custom file will be to:
+* customize the Alertmanager configuration which determines whether to send alert notifications to a particular receiver(Slack for example).
+* customize the Prometheus configuration to include new endpoints to monitor as described in the **Configure new endpoints to be scraped by Prometheus** How To (for example: an additional service that's running alongside FR products). 
+
+Documentation links are embedded in the values files for guidance.  
+Sample configuration files can be found in the samples/prometheus-values/ folder.
+
+### Configure alert notifications.
+The default Alertmanager configuration in etc/prometheus-values/kube-prometheus.yaml is not configured to send any alert notifications. This can be customized by  
+following the steps in the previous How To **Overriding Prometheus and Alertmanager configuration values.** and configuring the sections described below.  
+
+Alert grouping and filtering can be configured in the alertmanager/config/route section and the notifications are configured in the alertmanager/config/receivers  
+block where you can also define a template for the alert output text.  The output text also incorporates labels so the info can be dynamically  
+imported from the original alert definition(see the **Configuring alerting rules** How To).  
 
 See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
-
 
 ### Import Custom Grafana Dashboards
 
