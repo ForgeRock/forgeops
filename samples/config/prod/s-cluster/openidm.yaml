@@ -1,7 +1,7 @@
 
 resources:
   limits:
-    memory: 4Gi
+    memory: 3Gi
   requests:
     memory: 2Gi
 

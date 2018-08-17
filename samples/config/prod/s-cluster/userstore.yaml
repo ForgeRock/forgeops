@@ -2,9 +2,9 @@ djInstance: userstore
 
 resources:
   limits:
-    memory: 6Gi
+    memory: 5Gi
   requests:
-    memory: 4Gi
+    memory: 3Gi
 
 
 
@@ -15,13 +15,13 @@ resources:
 
 # For JDK 8
 opendjJavaArgs: >
-  -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
   
 # For JDK 11
 #opendjJavaArgs: >
-#  -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+#  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
 #  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 
@@ -38,7 +38,7 @@ topologyKey: "failure-domain.beta.kubernetes.io/zone"
 podAntiAffinity: hard
 
 backup:
-  enabled: false
+  enabled: true
   storageClass: nfs
   storageSize: 100Gi
   pvcClaimName: ds-backup
