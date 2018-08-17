@@ -18,7 +18,7 @@ Other requirements are:
 
 - The subdirectories contain custom values for deployments of two sizes.  The small `s-cluster` is recommended for upto 1M users whereas the medium `m-cluster` is recommended for upto 10M users. It is highly recommended to have 8 vCPU and 20GB RAM per node for the small cluster and 16vCPU and 40GB RAM per node for the medium cluster. Otherwise the deployment **could fail**. 
 
-- The cluster should atleast have 2 nodes in the primary zone. If HA is desired then either add 2 more nodes to the primary zone or add addtional zone(s).  See the HA section below for more details on multi-zone deployment.  The `s-cluster` and `m-cluster` samples are already designed for 2 zone HA.
+- The cluster should at least have 2 nodes in the primary zone. If HA is desired then either add 2 more nodes to the primary zone or add addtional zone(s).  See the HA section below for more details on multi-zone deployment.  The `s-cluster` and `m-cluster` samples are already designed for 2 zone HA.
 
 - Note: You can also use the `forgeops/bin/<provider>-up.sh` script to create a new cluster. For example `gke-up.sh` 
 
@@ -39,7 +39,7 @@ The `deploy.sh` script needs to point to a "config" directory.  There are severa
 
 The deployment will take anywhere from 3-10 minutes so be patient. For a successful deployment you will get a message saying "Deployment is now ready"
 
-Check out the CDM Guide on backstage.forgerock.com for more details.
+Check out the CDM Cookbook in the ForgeRock documentation for more details.
 
 ### Notes
 It's normal to see these errors repeated 4 or 5 times in the beginning of the deployment
