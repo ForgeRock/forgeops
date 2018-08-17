@@ -65,18 +65,6 @@ pause() {
 }
 
 
-
-restore() 
-{
-    echo "Attempting to restore from backup"
-    if [ -z "$RESTORE_PATH" ]; then 
-        scripts/restore.sh -o
-    else
-        scripts/restore.sh -o -p "$RESTORE_PATH"
-    fi
-}
-
-
 init_container() {
     relocate_data
     update_ds_password
