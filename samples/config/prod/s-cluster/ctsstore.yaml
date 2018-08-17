@@ -4,22 +4,22 @@ djInstance: ctsstore
 
 resources:
   limits:
-    memory: 8Gi
+    memory: 5Gi
   requests:
-    memory: 6Gi
+    memory: 3Gi
 
 storageSize: 100Gi
 storageClass: fast
 
 # For JDK 8
 opendjJavaArgs: >
-  -server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
 
 # For JDK 11
 #opendjJavaArgs: >
-#  -server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+#  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
 #  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 

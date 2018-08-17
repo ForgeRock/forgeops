@@ -21,6 +21,7 @@ echo -e "\tCluster Size =  ${GKE_CLUSTER_SIZE}"
 echo -e "\tVM Type = ${GKE_MACHINE_TYPE}"
 echo -e "\tNetwork = ${GKE_NETWORK_NAME}"
 echo -e "\tIngress Controller IP = ${GKE_INGRESS_IP}"
+echo -e "\tExtra Arguments = ${GKE_EXTRA_ARGS}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
@@ -37,14 +38,12 @@ echo ""
 
 MAX_NODES=`expr ${GKE_CLUSTER_SIZE} + 3`
 
-OPTS=""
-
-if [ ! -z "${GKE_OPTIONS}" ]; then 
-      OPTS="${GKE_OPTIONS}"
+if [ ! -z "${GKE_EXTRA_ARGS}" ]; then 
+      GKE_EXTRA_ARGS="${GKE_EXTRA_ARGS}"
 fi
 
 if [ ! -z "${GKE_NODE_LOCATIONS}" ]; then 
-      OPTS="${OPTS} --node-locations=${GKE_NODE_LOCATIONS}"
+      GKE_EXTRA_ARGS="${GKE_EXTRA_ARGS} --node-locations=${GKE_NODE_LOCATIONS}"
 fi
 
 
@@ -73,7 +72,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --scopes "https://www.googleapis.com/auth/cloud-platform" \
       --enable-cloud-logging \
       --enable-cloud-monitoring \
-      --disk-type=pd-ssd ${OPTS}
+      --disk-type=pd-ssd ${GKE_EXTRA_ARGS}
 
 
 #  --enable-stackdriver-kubernetes

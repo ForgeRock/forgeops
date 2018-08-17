@@ -1,11 +1,11 @@
 resources:
   limits:
-    memory: 6Gi
-  requests:
     memory: 4Gi
+  requests:
+    memory: 3Gi
 
 catalinaOpts: >
-  -server -Xms4g -Xmx4g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseNUMA -XX:G1MixedGCCountTarget=12
+  -server -Xms3g -Xmx3g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseNUMA -XX:G1MixedGCCountTarget=12
   -XX:+UseCompressedOops -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'

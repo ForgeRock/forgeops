@@ -2,7 +2,7 @@ djInstance: configstore
 
 resources:
   limits:
-    memory: 2Gi
+    memory: 1Gi
   requests:
     memory: 1Gi
 
