@@ -69,7 +69,7 @@ spec:
       initContainers:
       {{ if .Values.restore.enabled }}
       - name: restore
-        image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: db
@@ -90,13 +90,9 @@ spec:
       {{- end }}
       containers:
       - name: ds
-        image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        terminationGracePeriodSeconds: 30
-        lifecycle:
-          preStop:
-            exec:
-              command: ["/opt/opendj/bin/stop-ds"]
+        #terminationGracePeriodSeconds: 10
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:

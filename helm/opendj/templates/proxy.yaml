@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
       - name: proxy
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy:  {{ .Values.image.pullPolicy }}
       # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
         envFrom:

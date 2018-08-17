@@ -20,11 +20,13 @@ config:
   strategy: git
 
 image:
-  repository: gcr.io/engineering-devops
-  # For development use Always
-  pullPolicy: IfNotPresent
-  #pullPolicy: IfNotPresent
+  repository: gcr.io/engineering-devops/openidm
   tag: 6.5.0
+  pullPolicy: IfNotPresent
+
+  
+
+
 
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
