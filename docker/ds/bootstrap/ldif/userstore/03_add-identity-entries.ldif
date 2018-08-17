@@ -18,7 +18,7 @@ ds-privilege-name: subentry-write
 ds-privilege-name: update-schema
 ds-privilege-name: password-reset
 
-dn: uid=restadmin,ou=admins,@BASE_DN@
+dn: uid=saasadmin,ou=admins,@BASE_DN@
 objectclass: top
 objectclass: person
 objectclass: organizationalPerson
