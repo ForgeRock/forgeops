@@ -29,7 +29,7 @@ done
 if [ !  -z "${OFFLINE}" ]; then
     ARGS="--offline"
 else
-    ARGS="--hostname ${FQDN_DS0} --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
+    ARGS="--hostname localhost --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
 fi
 
 fail() 
