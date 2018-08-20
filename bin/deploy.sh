@@ -12,6 +12,10 @@
 #   - Restart OpenAM to take all configuration online
 ####################################################################################
 
+set -o errexit
+set -o pipefail
+set -o nounset
+
 usage()
 {
     echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
@@ -22,8 +26,12 @@ usage()
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
 }
-# Additional YAML options for helm
-YAML=""
+
+YAML="" # Additional YAML options for helm
+ENV_SH="" 
+OPT_NAMESPACE=""
+RMALL=false
+DRYRUN=""
 
 parse_args()
 {
@@ -45,6 +53,7 @@ parse_args()
     fi
 
     CFGDIR="$1"
+
 }
 
 chk_config()
@@ -180,20 +189,21 @@ isalive_check()
     echo "=> OpenAM is alive"
 }
 
-livecheck_stage1()
+import_check()
 {
-    # This livecheck waits for OpenAM config to be imported.
-    # We are looking to amster pod logs periodically.
-    echo "=> Livecheck stage1 - waiting for config to be imported to OpenAM";
+    # This live check waits for OpenAM config to be imported.
+    # We are looking at amster pod logs periodically.
+    echo "=> Live check - waiting for config to be imported to OpenAM";
     sleep 10
     FINISHED_STRING="Configuration script finished"
 
-    while true; do
     AMSTER_POD_NAME=$(kubectl -n=${NAMESPACE} get pods --selector=component=amster \
-      -o jsonpath='{.items[*].metadata.name}')
-    echo "Inspecting amster pod: ${AMSTER_POD_NAME}"
-    OUTPUT=$(kubectl -n=${NAMESPACE} logs ${AMSTER_POD_NAME} amster)
-        if [[ $OUTPUT = *$FINISHED_STRING* ]]; then
+        -o jsonpath='{.items[*].metadata.name}')
+
+    while true; do
+        echo "Inspecting amster pod: ${AMSTER_POD_NAME}"
+        OUTPUT=$(kubectl -n=${NAMESPACE} logs ${AMSTER_POD_NAME} amster || true)
+        if [[ "$OUTPUT" = *$FINISHED_STRING* ]]; then
             echo "=> OpenAM configuration import is finished"
             break
         fi
@@ -204,10 +214,12 @@ livecheck_stage1()
 
 restart_openam()
 {
-    # We need to restart OpenAM to take CTS settings online
+    
     OPENAM_POD_NAME=$(kubectl -n=${NAMESPACE} get pods --selector=app=openam \
         -o jsonpath='{.items[*].metadata.name}')
+    echo "=> Deleting \"${OPENAM_POD_NAME}\" to restart and read new configuration"
     kubectl delete pod $OPENAM_POD_NAME --namespace=${NAMESPACE}
+    test $? -ne 0 && echo "Could not delete AM pod.  Please check error and fix"
     sleep 10
     isalive_check
 }
@@ -243,21 +255,18 @@ create_namespace
 deploy_charts
 
 if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
-    echo "AM is present in deployment, running AM livechecks"
-    livecheck_stage1
+    echo "AM is present in deployment, running AM live checks"
+    import_check
     restart_openam
 fi
 
 # Do not scale or deploy hpa on minikube
 if [ "${context}" != "minikube" ]; then
     scale_am
-    #deploy_hpa
+    #deploy_hpa # TODO
 fi
 
-printf "\e[38;5;40m=======> Deployment is now ready <========\n"
-
-#kubectl get ing --namespace ${NAMESPACE}
-
+printf "\e[38;5;40m=======> Deployment is ready <========\n"
 
 
 
