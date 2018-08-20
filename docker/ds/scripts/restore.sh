@@ -44,7 +44,8 @@ restore()
 {
     echo "Restoring from backup at $RESTORE_PATH"
     cd $RESTORE_PATH || fail 
-    for dir in `ls` 
+
+    for dir in `ls -1` 
     do
         d="${RESTORE_PATH}/${dir}"
         echo /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
