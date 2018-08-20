@@ -14,7 +14,7 @@ chmod 775 "$BACKUP_DIRECTORY"
 # If no full backup exists, the --incremental option will create one.
 echo "Starting backup to ${BACKUP_DIRECTORY}"
 /opt/opendj/bin/backup --backupDirectory "${BACKUP_DIRECTORY}" \
-  --hostname "${FQDN_DS0}" \
+  --hostname localhost \
   -p 4444 -D "cn=Directory Manager" -j "${DIR_MANAGER_PW_FILE}" \
   --compress \
   --trustAll \
