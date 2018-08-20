@@ -2,7 +2,11 @@
 # Create an nfs client provisioner.
 # WIP: Update this when the nfs-client-provisioner is published to helm stable
 
-source ../etc/gke-env.cfg 
+set -o errexit
+set -o pipefail
+set -o nounset
+
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
 # This is the IP of our GCP filestore instance.
 NFS_SERVER="${NFS_SERVER:-10.149.108.186}"

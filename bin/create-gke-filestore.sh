@@ -2,7 +2,13 @@
 # Create a Google Cloud FileStore. This is used for DS backup volumes.
 # 1TB is the smallest filestore you can create.
 # This is a WIP.
-source etc/gke-env.cfg 
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
+
 
 NETWORK="${GKE_NETWORK_NAME:-default}"
 
