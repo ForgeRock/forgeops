@@ -207,7 +207,7 @@ data:
       # Provides extra control for each logger.
       ############################################################
       #org.forgerock.openidm.provisioner.level = FINER
-      org.forgerock.openidm.repo.level = FINER
+      #org.forgerock.openidm.repo.level = FINER
       #org.forgerock.openidm.recon.level = FINER
 
       # OpenICF is noisy at INFO level
@@ -232,7 +232,7 @@ data:
       # Override of global logging level
       #java.util.logging.ConsoleHandler.level = WARNING
       # For Docker
-      java.util.logging.ConsoleHandler.level = INFO
+      java.util.logging.ConsoleHandler.level = WARNING
       java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
       # specifies the name of the filter class to be associated with this handler,
       # defaults to {@code null} if this property is not found or has an invalid value.
