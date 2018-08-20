@@ -43,6 +43,6 @@ backup:
   storageSize: 100Gi
   pvcClaimName: ds-backup
 
+# If existing database is found then restore is always skipped
 restore:
   enabled: false
-  path: latest
