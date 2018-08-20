@@ -2,6 +2,10 @@
 # Sample wrapper script to initialize GKE. This creates the cluster and configures Helm, the nginx ingress,
 # and creates git credential secrets. Edit this for your requirements.
 
+set -o errexit
+set -o pipefail
+set -o nounset
+
 ask() {
 
 	read -p "Should i continue (y/n)?" choice
@@ -24,8 +28,8 @@ echo ""
 echo "You are authenticated and logged into GCP as \"${authn}\". If this is not correct then exit this script and run \"gcloud auth login\" to login into the correct account first."
 ask
 
-
-. ../etc/gke-env.cfg
+#source "$(dirname $0)/../etc/gke-env.cfg"
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
 # Set the GKE Project Name to the one parsed from the cfg file
 gcloud config set project ${GKE_PROJECT_NAME} 
