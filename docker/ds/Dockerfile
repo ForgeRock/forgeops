@@ -6,8 +6,8 @@ ARG VERSION="6.5.0-M127.1"
 RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
-FROM openjdk:11-jdk 
-#FROM openjdk:8-jdk 
+#FROM openjdk:11-jdk 
+FROM openjdk:8-jdk 
 COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 
 WORKDIR /var/tmp/bootstrap
@@ -24,9 +24,12 @@ ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
 RUN ./setup.sh
 
 #####################  Runtime container ################
-FROM openjdk:11-jdk
-#FROM openjdk:8-jdk 
+#FROM openjdk:11-jdk
+FROM openjdk:8-jdk
 
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin
+RUN chmod +x /usr/bin/tini
 
 COPY --from=1 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
 
