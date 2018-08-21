@@ -30,13 +30,13 @@ userstore:
 cts:
   enabled: true
 
-# TOOD: Decide if we want to sync this with the other chart format.
 image:
   repository: gcr.io/engineering-devops/ds
   pullPolicy: IfNotPresent
   tag:  6.5.0
 
-# The number of instances in the StatefulSet. Each instance will be replicated to the master.
+# The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
+# You can not change this after installation.
 replicas: 1
 
 # Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
@@ -44,7 +44,6 @@ storageSize: "10Gi"
 
 # Set storageClass only on clusters that support it (GCP / AWS).
 #storageClass: fast
-
 
 # StorageClass is optional. It can be the name of a fast (SSD) class.
 #storageClass: fast
@@ -62,9 +61,10 @@ backup:
 
   # This configures the top level directory under bak/
   # The backup folder is set to $clusterName/$instance-$namespace. This
-  # forces each nstance backup to go to a different folder on the shared PVC drive. Without this
+  # forces each instance backup to go to a different folder on the shared PVC drive. Without this
   # you will get collisions on backup / restore.
-  # If you have many clusters backing up  same shared NFS volume, change the default here. For example, set it to "production"
+  # If you have many clusters backing up same shared NFS volume, change the default here. For example, 
+  # set it to "production"
   clusterName: "default"
 
 
@@ -103,21 +103,8 @@ topologyKey: "kubernetes.io/hostname"
 # Restore parameters. 
 restore:
   # If true, runs the init containers that restores the directory from a backup folder in the bak/ folder.
-  # The backup data must be present in the bak/ folder. The gcs: settings can be used
-  # to copy data from a gcs bucket to the bak/ folder. If a previous backup PVC was not deleted,
-  # data can be restored from that PVC.
+  # The backup data must be present in the bak/ folder. 
   # Restore will not overwrite existing DS data.  
   # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
   # is used to recover.
   enabled: false
-
-# An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
-# If you don't have slack, set this to "undefined"
-slackUrl: undefined
-
-# Uncomment if you want to run an additional "admin" ds pod that you can exec into and run DS commands.
-# Useful for debugging.
-#adminContainer: true
-
-#  gcloud Image. You should not need to change this very often
-gcloudImage: gcr.io/cloud-builders/gcloud:latest
