@@ -1,4 +1,3 @@
-
 resources:
   limits:
     memory: 6Gi
@@ -6,9 +5,14 @@ resources:
     memory: 4Gi
 
 # For JDK 8
-opendjJavaArgs: >
+javaOpts: >
   -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
 
 replicaCount: 1
+
+config:
+  name: frconfig
+  path: /git/config/samples/idm/m-cluster
+  strategy: git

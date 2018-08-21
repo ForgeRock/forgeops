@@ -6,7 +6,11 @@
 # You must have the gcloud command installed and access to a GCP project.
 # See https://cloud.google.com/container-engine/docs/quickstart
 
-. ../etc/gke-env.cfg
+set -o errexit
+set -o pipefail
+set -o nounset
+
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
 
 echo "=> Read the following env variables from config file"
@@ -36,7 +40,8 @@ echo ""
 echo "=> Creating cluster called \"${GKE_CLUSTER_NAME}\" with specs \"${GKE_MACHINE_TYPE}\""
 echo ""
 
-MAX_NODES=`expr ${GKE_CLUSTER_SIZE} + 3`
+MAX_NODES=`expr ${GKE_CLUSTER_SIZE} + 2`
+MIN_NODES=${GKE_CLUSTER_SIZE}
 
 if [ ! -z "${GKE_EXTRA_ARGS}" ]; then 
       GKE_EXTRA_ARGS="${GKE_EXTRA_ARGS}"
@@ -62,7 +67,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --network="${GKE_NETWORK_NAME}" \
       --enable-ip-alias \
       --num-nodes=${GKE_CLUSTER_SIZE} \
-      --min-nodes=0 \
+      --min-nodes=${MIN_NODES} \
       --max-nodes=${MAX_NODES} \
       --labels="owner=sre" \
       --addons=HorizontalPodAutoscaling \

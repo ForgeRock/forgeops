@@ -29,7 +29,7 @@ update_ds_password()
         return
     fi
     echo "Updating the directory manager password"
-    pw=`bin/encode-password  -s PBKDF2 -f $DIR_MANAGER_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g'`
+    pw=`bin/encode-password  -s PBKDF2 -f $DIR_MANAGER_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null`
     pw="userPassword: $pw"
     head -n -2  db/rootUser/rootUser.ldif >/tmp/pw
     echo "$pw" >>/tmp/pw 
@@ -43,19 +43,18 @@ relocate_data()
         return
     fi
     mkdir -p data/db
-    for dir in ctsRoot userRoot ads-truststore admin idmRoot
+    for dir in ctsRoot userRoot ads-truststore adminRoot idmRoot
     do
         echo "Copying $dir"
         cp -r db/$dir data/db/$dir
     done
-    echo "Copying changelogDb"
-    cp -r changelogDb data/db/changelogDb
 }
 
 start() {
     echo "Starting OpenDJ"
     echo "Server id $SERVER_ID"
-    exec dumb-init -- ./bin/start-ds --nodetach
+    #exec dumb-init -- ./bin/start-ds --nodetach
+    exec tini -v -- ./bin/start-ds --nodetach
 }
 
 pause() {

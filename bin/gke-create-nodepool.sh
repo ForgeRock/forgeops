@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-. ../etc/gke-env.cfg
+set -o errexit
+set -o pipefail
+set -o nounset
+
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
+
 
 # This adds a small nodepool that is non preemtible. Used for services that can't go down (nfs...)
 gcloud beta container node-pools create "${GKE_CLUSTER_NAME}-pool1" \

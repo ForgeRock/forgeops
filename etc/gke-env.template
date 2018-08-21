@@ -23,6 +23,7 @@ GKE_CLUSTER_VERSION="latest"
 GKE_CLUSTER_SIZE="2"
 
 # VM Type
+# Allocatable memory is always less than specificed below by at least 2GB
 GKE_MACHINE_TYPE="custom-8-20480"
 
 # Kubernetes Namespace

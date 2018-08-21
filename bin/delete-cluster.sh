@@ -2,10 +2,13 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
+set -o errexit
+set -o pipefail
+set -o nounset
 
 CURRENT_PROJECT=$(gcloud config get-value project 2>/dev/null)
 
-. ../etc/gke-env.cfg
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
 echo "=> Read the following env variables from config file"
 echo "Project Name = $GKE_PROJECT_NAME"

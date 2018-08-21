@@ -3,7 +3,10 @@ domain: .frk8s.net
 fqdn: openam.prod.frk8s.net
 
 image:
-  tag: 6.5.0-M0
+  repository: gcr.io/engineering-devops
+  #repository: forgerock-docker-public.bintray.io/forgerock
+  #tag: 6.5.0-M0
+  tag: 6.5.0
   pullPolicy: Always
 
 # Note if you enable TLS then you have to either provide the certificate 
