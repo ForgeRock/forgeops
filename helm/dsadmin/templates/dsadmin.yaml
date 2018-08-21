@@ -22,7 +22,7 @@ spec:
       initContainers: []
       containers:
       - name: opendj
-        image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # envFrom:
         # - configMapRef:

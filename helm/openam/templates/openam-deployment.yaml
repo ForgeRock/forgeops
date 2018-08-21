@@ -53,7 +53,7 @@ spec:
         args:  ["bootstrap"]
       containers:
       - name: openam
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy:  {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080
@@ -61,8 +61,10 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
+        {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
+        {{ end }}
         {{ if .Values.useConfigMapWebxml }}
         - mountPath: /usr/local/tomcat/webapps/openam/WEB-INF/web.xml
           name: webxml

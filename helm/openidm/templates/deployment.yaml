@@ -38,7 +38,7 @@ spec:
       {{ end }}
       containers:
       - name: openidm
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
         - configMapRef:
@@ -68,8 +68,10 @@ spec:
           mountPath: /opt/openidm/logs
         - name: audit-logs
           mountPath: /opt/openidm/audit
+        {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
+        {{ end }}
         - name: boot-properties
           mountPath: /var/run/openidm/commons
         - name: logging-properties

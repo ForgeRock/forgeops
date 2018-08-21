@@ -23,7 +23,7 @@ build:
 deploy:
   helm:
     releases:
-      - name: fr-sample-platform
+      - name: sample-fr-platform
         chartPath: .
         namespace: sample
         values:

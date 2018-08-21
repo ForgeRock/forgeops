@@ -26,7 +26,7 @@ djInstance: ds
 component: opendj
 
 image:
-  repository: gcr.io/engineering-devops
+  repository: gcr.io/engineering-devops/opendj
   # For development we set this to Always to get the most current image.
   pullPolicy: Always
   #pullPolicy: IfNotPresent

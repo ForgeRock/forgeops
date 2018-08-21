@@ -21,7 +21,7 @@ spec:
           initContainers:
           # Backup to the bak/ folder
           - name: backup
-            image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+            image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             args: [ "/opt/opendj/scripts/backup.sh", "--incremental"]
             env:

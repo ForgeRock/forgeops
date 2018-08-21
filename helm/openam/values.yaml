@@ -5,7 +5,7 @@
 component: openam
 
 image:
-  repository: gcr.io/engineering-devops
+  repository: gcr.io/engineering-devops/openam
   tag: 6.5.0
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
