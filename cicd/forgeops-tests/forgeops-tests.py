@@ -24,6 +24,8 @@ def consolidate_reports():
 
     with open(os.path.join('reports', report_name), 'w') as f:
         f.write(report)
+    with open(os.path.join('reports', "latest.html"), 'w') as f:
+        f.write(report)
 
 
 if __name__ == '__main__':
