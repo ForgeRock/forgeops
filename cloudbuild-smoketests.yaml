@@ -54,11 +54,7 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gsutil'
   dir: 'cicd/forgeops-tests/'
-<<<<<<< 2afb6b4a4b57c5acdcad3f887b19574c20dabc6c
-  args: ['cp', '-r', 'logs', 'gs://forgeops-test-reports/']
-=======
-  args: ['cp', 'logs/*', 'gs://forgeops-test-reports/logs/']
->>>>>>> Fix for nginx agent. Fix for log copy(hope it's final one)
+  args: ['cp', '-r', 'logs/*', 'gs://forgeops-test-reports/logs/']
 
 # Send slack notifications
 # Don't forget to define SLACK_SERVICE in google container builder to receive
