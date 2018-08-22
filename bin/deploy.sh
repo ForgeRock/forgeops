@@ -7,9 +7,9 @@
 # Warning: This script will purge any existig deployments in the target namespace!
 #
 # This script will also do the following:
-#   - Deploy OpenAM along with DS (configstore, userstore and CTS)
+#   - Deploy AM along with DS (configstore, userstore and CTS)
 #   - Ensure configs are in place
-#   - Restart OpenAM to take all configuration online
+#   - Restart AM to take all configuration online
 ####################################################################################
 
 set -o errexit
@@ -27,11 +27,6 @@ usage()
     exit 1
 }
 
-YAML="" # Additional YAML options for helm
-ENV_SH="" 
-OPT_NAMESPACE=""
-RMALL=false
-DRYRUN=""
 
 parse_args()
 {
@@ -58,14 +53,14 @@ parse_args()
 
 chk_config()
 {
-    context=$(kubectl config current-context)
+    CONTEXT=$(kubectl config current-context)
     if [ $? != 0 ]; then
         echo "ERROR: Your k8s Context is not set.  Please set it before running this script. Exiting!"
         exit 1
     fi
-    echo "=> k8s Context is: \"${context}\""
+    echo "=> k8s Context is: \"${CONTEXT}\""
 
-    #if [ "${context}" = "minikube" ]; then
+    #if [ "${CONTEXT}" = "minikube" ]; then
     #    echo "=> Minikube deployment detected.  Installing tiller..."
     #    helm init --service-account default --upgrade
     #    echo "=> Giving tiller few seconds to get ready..."
@@ -186,14 +181,14 @@ isalive_check()
         sleep 10
         STATUS_CODE=$(curl -k -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -s)
     done
-    echo "=> OpenAM is alive"
+    echo "=> AM is alive"
 }
 
 import_check()
 {
-    # This live check waits for OpenAM config to be imported.
+    # This live check waits for AM config to be imported.
     # We are looking at amster pod logs periodically.
-    echo "=> Live check - waiting for config to be imported to OpenAM";
+    echo "=> Live check - waiting for config to be imported to AM";
     sleep 10
     FINISHED_STRING="Configuration script finished"
 
@@ -204,7 +199,7 @@ import_check()
         echo "Inspecting amster pod: ${AMSTER_POD_NAME}"
         OUTPUT=$(kubectl -n=${NAMESPACE} logs ${AMSTER_POD_NAME} amster || true)
         if [[ "$OUTPUT" = *$FINISHED_STRING* ]]; then
-            echo "=> OpenAM configuration import is finished"
+            echo "=> AM configuration import is finished"
             break
         fi
         echo "=> Configuration not finished yet. Waiting for 10 seconds...."
@@ -212,32 +207,49 @@ import_check()
     done
 }
 
-restart_openam()
-{
-    
+restart_am()
+{  
     OPENAM_POD_NAME=$(kubectl -n=${NAMESPACE} get pods --selector=app=openam \
         -o jsonpath='{.items[*].metadata.name}')
-    echo "=> Deleting \"${OPENAM_POD_NAME}\" to restart and read new configuration"
+    echo "=> Deleting \"${OPENAM_POD_NAME}\" to restart and read newly imported configuration"
     kubectl delete pod $OPENAM_POD_NAME --namespace=${NAMESPACE}
-    test $? -ne 0 && echo "Could not delete AM pod.  Please check error and fix"
+    if [ $? -ne 0 ]; then
+        echo "Could not delete AM pod.  Please check error and fix"
+    fi
     sleep 10
     isalive_check
 }
 
 scale_am()
 {
-    echo "=> Scaling OpenAM to two replicas..."
+    echo "=> Scaling AM to two replicas..."
     DEPNAME=$(kubectl get deployment -l app=openam -o name)
-    kubectl scale --replicas=2 ${DEPNAME}
-    test $? -ne 0 && echo "Could not scale AM pod.  Please check error and fix" 
+    kubectl scale --replicas=2 ${DEPNAME} || true
+    if [ $? -ne 0 ]; then
+        echo "Could not scale AM pod.  Please check error and fix" 
+    fi
 }
 
 deploy_hpa()
 {
     echo "=> Deploying Horizontal Autoscale Chart..."
-    kubectl apply -f ${CFGDIR}/hpa.yaml
-    test $? -ne 0 && echo "Could not deploy HPA.  Please check error and fix"
+    kubectl apply -f ${CFGDIR}/hpa.yaml || true
+    if [ $? -ne 0 ]; then
+        echo "Could not deploy HPA.  Please check error and fix" 
+    fi
 }
+
+
+###############################################################################
+# main
+###############################################################################
+
+YAML="" # Additional YAML options for helm
+ENV_SH="" 
+OPT_NAMESPACE=""
+RMALL=false
+DRYRUN=""
+CONTEXT=""
 
 # All helm chart paths are relative to this directory.
 DIR=`echo $(dirname "$0")/..`
@@ -257,11 +269,11 @@ deploy_charts
 if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     echo "AM is present in deployment, running AM live checks"
     import_check
-    restart_openam
+    restart_am
 fi
 
 # Do not scale or deploy hpa on minikube
-if [ "${context}" != "minikube" ]; then
+if [ "${CONTEXT}" != "minikube" ]; then
     scale_am
     #deploy_hpa # TODO
 fi
