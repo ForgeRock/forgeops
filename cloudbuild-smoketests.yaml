@@ -47,6 +47,8 @@ steps:
   dir: 'cicd/forgeops-tests/reports'
   args: ['cp', '*', 'gs://forgeops-test-reports/smoke-tests/']
 
+- name: 'gcr.io/engineering-devops/helm'
+  entrypoint: 'cicd/'
 # Send slack notifications
 # Don't forget to define SLACK_SERVICE in google container builder to receive
 # notifications on slack channel
