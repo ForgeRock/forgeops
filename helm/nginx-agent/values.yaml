@@ -28,6 +28,6 @@ agent:
 component: nginx-agent
 
 image:
-  repository: gcr.io/engineering-devops/nginx-agent
+  repository: gcr.io/engineering-devops
   tag: latest
   pullPolicy: Always
