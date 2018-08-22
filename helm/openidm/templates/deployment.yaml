@@ -24,7 +24,7 @@ spec:
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:
       - name: git-init
-        image: forgerock/git:6.0.0
+        image: gcr.io/engineering-devops/git:6.5.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
@@ -35,6 +35,11 @@ spec:
         envFrom:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
+        {{ if .Values.sedFilter }}
+        env: 
+        - name: SED_FILTER
+          value: {{ .Values.sedFilter }}
+        {{ end }}
       {{ end }}
       containers:
       - name: openidm
