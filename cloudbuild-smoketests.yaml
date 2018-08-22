@@ -47,6 +47,14 @@ steps:
   dir: 'cicd/forgeops-tests/reports'
   args: ['cp', '*', 'gs://forgeops-test-reports/smoke-tests/']
 
+- name: 'gcr.io/engineering-devops/helm'
+  entrypoint: 'bash'
+  args: ['cicd/forgeops-tests/get-logs-from-containers.sh']
+
+- name: 'gcr.io/cloud-builders/gsutil'
+  dir: 'cicd/forgeops-tests/logs'
+  args: ['cp', '-r', '*', 'gs://forgeops-test-reports/']
+
 # Send slack notifications
 # Don't forget to define SLACK_SERVICE in google container builder to receive
 # notifications on slack channel
