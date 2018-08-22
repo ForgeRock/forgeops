@@ -37,7 +37,7 @@ alertmanager:
     route:
       group_by: ['alertname', 'namespace']
       group_wait: 30s
-      group_interval: 15m
+      group_interval: 10m
       repeat_interval: 4h
       # All alerts to go to slack unless matched below
       receiver: 'slack-shared-cluster'
@@ -51,7 +51,7 @@ alertmanager:
     - name: 'slack-shared-cluster'
       slack_configs:
       - channel: '#alerts-shared-cluster'
-        text: "{{ range .Alerts }}Summary: {{ .CommonAnnotations.summary }}\nDescription: {{ .CommonAnnotations.description }}{{ end }}"
+        text: "Namespace: {{ .GroupLabels.namespace }}\nSummary: {{ .CommonAnnotations.summary }}\nDescription: {{ .CommonAnnotations.description }}"
        
 
   ## External URL at which Alertmanager will be reachable
