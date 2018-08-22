@@ -12,6 +12,8 @@ echo "Exporting LDIF"
 # We can update this script to support remote ldif export by passing in the list of roots and target destination.
 roots=`(cd db; echo *Root)`
 
+mkdir -p "${BACKUP_DIRECTORY}"
+
 for root in $roots; do
     t=`date "+%m%d%H%M%Y.%S"`
 
