@@ -35,6 +35,8 @@ RUN apk update && \
 
 RUN chown -R forgerock:forgerock /opt/openidm  && rm -fr /opt/openidm/samples
 
+RUN chmod 600 /opt/openidm/security/*
+
 COPY *.sh /opt/openidm/
 COPY logging.properties /opt/openidm/logging.properties
 

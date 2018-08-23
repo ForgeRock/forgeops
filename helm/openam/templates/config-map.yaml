@@ -34,8 +34,10 @@ kind: ConfigMap
 metadata:
   name: am-configmap
 data:
-  DOMAIN: "{{ .Values.domain }}"
+  # xxxDOMAIN: "{{ .Values.domain }}"
+  # xxxDOMAIN: {{ default ".forgeops.com" .Values.domain }}
   CATALINA_OPTS: "{{ .Values.catalinaOpts }}"
   {{ if .Values.config.amCustomizationScriptPath -}}
   CUSTOMIZE_AM: "{{ .Values.config.amCustomizationScriptPath }}"
   {{- end }}
+

@@ -13,6 +13,7 @@ metadata:
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
   annotations:
+      nginx.ingress.kubernetes.io/cors-allow-origin: "http://openidm.{{ .Release.Namespace }}{{ .Values.domain }}"
     {{- range $key, $value := .Values.ingress.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}

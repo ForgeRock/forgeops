@@ -37,7 +37,7 @@ fi
 
 if [ ! -z "$SED_FILTER" ]; then
     echo "Running sed replacement on checked out source using pattern $SED_FILTER"
-    echo $SED_FILTER >/tmp/sedfilter 
-    cat /tmp/sedfilter 
+    echo $SED_FILTER >/tmp/sedfilter
+    cat /tmp/sedfilter
     find . -type f -exec sed -i -f /tmp/sedfilter {} \;
 fi

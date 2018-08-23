@@ -14,7 +14,7 @@ serverBase: http://openam:80
 
 
 # The top level domain (including the leading .). This excludes the openam component. 
-domain: .example.com
+domain: .forgeops.com
 
 # Install passwords.
 amadminPassword: password
