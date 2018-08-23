@@ -35,27 +35,23 @@ alertmanager:
       resolve_timeout: 5m
       slack_api_url: 'https://hooks.slack.com/services/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'
     route:
-      group_by: [alertname]
+      group_by: ['alertname', 'job']
       group_wait: 30s
       group_interval: 5m
       repeat_interval: 4h
-      # All alerts to go to slack unless matched below
-      receiver: 'slack-notifications'
-      routes:
-      # Send non required alerts to null receiver
+      # All alerts to go to Slack by default
+      receiver: 'slack-medium-cluster'
+      routes: 
       - match:
-          alertname: K8SControllerManagerDown
-        receiver: 'null'
-      - match:
-          alertname: K8SSchedulerDown
+          alertname: DeadMansSwitch
         receiver: 'null'
       
     receivers:
     - name: 'null'
-    - name: 'slack-notifications'
+    - name: 'slack-medium-cluster'
       slack_configs:
       - channel: '#alerts-medium-cluster'
-        text: "Summary: {{ .CommonAnnotations.summary }}\nDescription: {{ .CommonAnnotations.description }}"
+        text: "Job: {{ .GroupLabels.job }}\nSummary: {{ .CommonAnnotations.summary }}\nDescription: {{ .CommonAnnotations.description }}\n"
        
 
   ## External URL at which Alertmanager will be reachable
