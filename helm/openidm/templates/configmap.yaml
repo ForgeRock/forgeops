@@ -8,6 +8,10 @@ data:
   LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
   IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
   JAVA_OPTS: {{ default "-Xmx1024m -server -XX:+UseG1GC" .Values.javaOpts }}
+  OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
+  OPENIDM_CONFIG_REPO_ENABLED: "false"
+  OPENIDM_ANONYMOUS_PASSWORD: "anonymous"
+  OPENIDM_ADMIN_PASSWORD: "openidm-admin"
 
 ---
 apiVersion: v1
