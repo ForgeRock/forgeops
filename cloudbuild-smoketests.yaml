@@ -55,7 +55,7 @@ steps:
 
 - name: 'gcr.io/cloud-builders/gsutil'
   dir: 'cicd/forgeops-tests/'
-  args: ['cp', '-r', 'logs/*', 'gs://forgeops-test-reports/smoke-tests/logs/']
+  args: ['cp', '-r', 'logs/*', 'gs://forgeops-test-reports/logs/']
 
 # Send slack notifications
 # Don't forget to define SLACK_SERVICE in google container builder to receive
