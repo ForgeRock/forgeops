@@ -1,7 +1,7 @@
 # Cloudbuild pipeline for smoke tests
 
 steps:
-# List helm to init everything
+## List helm to init everything
 - name: 'gcr.io/engineering-devops/helm'
   args: ['list']
   env:
@@ -24,6 +24,7 @@ steps:
   args: ['samples/config/smoke-deployment']
 
 # Run custom smoke test image
+
 - name: 'gcr.io/$PROJECT_ID/forgeops-tests:latest'
   dir: 'cicd/forgeops-tests/'
   env:
@@ -48,7 +49,7 @@ steps:
   args: ['cp', '*', 'gs://forgeops-test-reports/smoke-tests/']
 
 - name: 'gcr.io/engineering-devops/helm'
-  dir: 'cicd/fogeops-tests/'
+  dir: 'cicd/forgeops-tests/'
   entrypoint: 'bash'
   args: ['get-logs-from-containers.sh']
 
