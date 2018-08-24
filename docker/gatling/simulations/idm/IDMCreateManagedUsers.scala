@@ -15,13 +15,13 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 
 class IDMCreateManagedUsers extends Simulation {
     val concurrency: Integer = Integer.getInteger("concurrency", 10)
-    val warmup: Integer = Integer.getInteger("warmup", 1)
+    val warmup: Integer = Integer.getInteger("warmup", 10)
     val idmHost: String = System.getProperty("idm_host", "openidm.example.forgeops.com")
     val idmPort: String = System.getProperty("idm_port", "80")
     val idmProtocol: String = System.getProperty("idm_protocol", "http")
-    val duration: Integer = Integer.getInteger("duration", 10).toInt
+    val duration: Integer = Integer.getInteger("duration", 60).toInt
 
-    val idmUrl: String = "http://" + idmHost + ":" + idmPort
+    val idmUrl: String = idmProtocol + "://" + idmHost + ":" + idmPort
     val random = new util.Random
     val counter = new LongCounter
     def t: Integer = 0
@@ -38,13 +38,11 @@ class IDMCreateManagedUsers extends Simulation {
 
     def getGeneratedUser(userId: String) : String = {
         val stringJson: String =
-            """  {"userName": "%stestuser",
+            """  {"userName": "testuser%s",
                   "givenName": "givenname%s",
                   "sn": "tester%s",
                   "mail": "testuser%s@forgerock.com",
-                  "password": "Th3Password",
-                  "accountStatus": "active",
-                  "kba": [{"answer": "black", "questionId": "1"}]}
+                  "password": "Th3Password"}
             """.format(userId, userId, userId, userId).stripMargin
         stringJson
     }
@@ -53,16 +51,16 @@ class IDMCreateManagedUsers extends Simulation {
         .baseURLs(idmUrl)
         .inferHtmlResources()
         .contentTypeHeader("""application/json""")
+        .disableCaching // without this nginx ingress starts returning 412
 
     val createScenario: ScenarioBuilder = scenario("Create managed users").
         during(duration) {
             feed(userFeeder)
                 .exec(
-                    http("Create managed user - PUT")
-                        .put(idmUrl + "/openidm/managed/user/testuser${id}")
+                    http("Create managed user via POST")
+                        .post(idmUrl + "/openidm/managed/user?_action=create")
                         .body(StringBody(getGeneratedUser("${id}"))).asJSON
                         .headers(getXIDMHeaders("openidm-admin", "openidm-admin"))
-                        .header("if-none-match", "*")
                 )
         }
 
