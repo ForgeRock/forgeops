@@ -55,6 +55,9 @@ openidm:
   # Optional client secret for AM/IDM integration:
   idpconfig:
     clientsecret: password
+  prometheus:
+    username: prometheus
+    password: prometheus
 
 # Optional - if there is a DJ userstore configured
 userstore:

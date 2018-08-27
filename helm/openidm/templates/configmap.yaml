@@ -59,9 +59,15 @@ data:
       openidm.keystore.password=changeit
       openidm.truststore.password=changeit
 
+      {{ if .Values.openidm.staticUser }}
+      # Optional static credentials for custom authentication.json use cases
+      openidm.staticUser.username={{ .Values.openidm.staticUser.username }}
+      openidm.staticUser.password={{ .Values.openidm.staticUser.password }}
+      {{ end }}
+
       # Prometheus endpoint authentication
-      openidm.prometheus.username=prometheus
-      openidm.prometheus.password=prometheus
+      openidm.prometheus.username={{ .Values.openidm.prometheus.username }}
+      openidm.prometheus.password={{ .Values.openidm.prometheus.password }}
       openidm.prometheus.role=openidm-prometheus
 
       # Optionally use the crypto bundle to obfuscate the password and set one of these:
