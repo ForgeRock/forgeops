@@ -14,4 +14,4 @@ fqdn: openam.prod.frk8s.net
 useTLS: true
 
 # Only enable this if you have valid cert-manager deployed for your DNS domain
-useCertManager: false
+useCertManager: true
