@@ -6,17 +6,19 @@
 # Simple script to get all logs, descriptions, events from selected namespace.
 # Useful for faster debugging.
 #
+# Set NAMESPACE & EXPORT_PATH env vars to match your needs
+#
 : ${NAMESPACE:=smoke}
 : ${EXPORT_PATH:=.}
 
+# Get all running pods, services, deployments and ingresses in namespace
 POD_LIST=$(kubectl -n=${NAMESPACE} get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 SERVICE_LIST=$(kubectl -n=${NAMESPACE} get services -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 INGRESS_LIST=$(kubectl -n=${NAMESPACE} get ingress -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 DEPLOYMENT_LIST=$(kubectl -n=${NAMESPACE} get deployment -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
 
-
-E_TIME=$(date +%s)
 cd ${EXPORT_PATH}
+
 # Make folders for logs
 mkdir logs
 mkdir logs/pods
