@@ -2,11 +2,10 @@ domain: .frk8s.net
 
 fqdn: openam.small.frk8s.net
 
-#image:
-#  repository: gcr.io/engineering-devops
-#  #repository: forgerock-docker-public.bintray.io/forgerock
-#  tag: 6.5.0
-#  pullPolicy: Always
+# Override values for the whole deployment here
+image:
+  tag: 6.5.0
+  pullPolicy: Always
 
 # Note if you enable TLS then you have to either provide the certificate 
 # by running generate-tls.sh script or you have to have cert-manager deployed
@@ -14,4 +13,9 @@ fqdn: openam.small.frk8s.net
 useTLS: true
 
 # Only enable this if you have valid cert-manager deployed for your DNS domain
-useCertManager: false
+useCertManager: true
+
+# Install passwords.
+amadminPassword: password
+encryptionKey: "123456789012"
+policyAgentPassword: Passw0rd
