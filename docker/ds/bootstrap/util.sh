@@ -103,8 +103,8 @@ prepare()
 configure()
 {
     echo "Adding system account to admin backend..."
-    ADMIN_BACKEND=db/admin/admin-backend.ldif
-    ADMIN_BACKEND_TMP=db/admin/admin-backend.ldif.tmp
+    ADMIN_BACKEND=db/adminRoot/admin-backend.ldif
+    ADMIN_BACKEND_TMP=db/adminRoot/admin-backend.ldif.tmp
     ./bin/ldifmodify $ADMIN_BACKEND > $ADMIN_BACKEND_TMP << EOF
 dn: cn=OpenDJ,cn=Administrators,cn=admin data
 changetype: add
