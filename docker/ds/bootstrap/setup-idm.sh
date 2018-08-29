@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Applying IDM changes"
+echo "Applying configuration changes to DS backend for IDM"
 
 set -x 
 
@@ -70,68 +70,27 @@ set -x
    --set ignore-white-space:true \
    --set matching-rule-name:caseIgnoreJsonQueryMatchClusterObject \
    --set matching-rule-oid:1.3.6.1.4.1.36733.2.3.4.4  \
-   --set indexed-field:"timestamp" \
-   --set indexed-field:"state" \
+   --set indexed-field:timestamp \
+   --set indexed-field:state \
    --offline \
    --no-prompt
 
+# Add the index name to an array and since these are all "equality"
+# it is easy to execute the command in a loop 
+INDEX=(fr-idm-json fr-idm-managed-user-json fr-idm-managed-role-json 
+       fr-idm-link-firstid fr-idm-link-secondid fr-idm-link-qualifier 
+       fr-idm-link-type fr-idm-cluster-json fr-idm-relationship-json)
 
-./bin/dsconfig \
+for idx in ${INDEX[@]}; do
+  ./bin/dsconfig \
     create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-link-firstid \
+    --backend-name idmRoot \
+    --index-name ${idx} \
     --set index-type:equality \
     --offline \
     --no-prompt
+done
 
-./bin/dsconfig \
-    create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-link-secondid \
-    --set index-type:equality \
-    --offline \
-    --no-prompt
-
-./bin/dsconfig \
-    create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-link-qualifier \
-    --set index-type:equality \
-    --offline \
-    --no-prompt
-
-./bin/dsconfig \
-    create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-link-type \
-    --set index-type:equality \
-    --offline \
-    --no-prompt
-
-
-./bin/dsconfig \
-    create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-managed-role-json \
-    --set index-type:equality \
-    --offline \
-    --no-prompt
-
-./bin/dsconfig \
-    create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-cluster-json \
-    --set index-type:equality \
-    --offline \
-    --no-prompt
-
-./bin/dsconfig \
-    create-backend-index \
-    --backend-name userRoot \
-    --index-name fr-idm-relationship-json \
-    --set index-type:equality \
-    --offline \
-    --no-prompt
 
 
 # vlvs for admin UI usage
