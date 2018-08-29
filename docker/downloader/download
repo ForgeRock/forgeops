@@ -87,13 +87,16 @@ dl(){
 }
 
 
-# Note: Until we get 6.5 milestones, we are using the 6.0.0 product images.
-VERSION=${VERSION:-6.0.0}
+VERSION=${VERSION:-6.5.0}
+# you should not need to edit the paths below
+REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
 
 
 while getopts "swv:" opt; do
   case ${opt} in
-    s ) BUILD_SNAPSHOTS="true" ;;
+    s ) BUILD_SNAPSHOTS="true" 
+     REPO="https://maven.forgerock.org/repo/internal-snapshots/org/forgerock"
+        ;;
     w ) WGET="true" ;;
     v ) VERSION="${OPTARG}" ;;
     d ) DRYRUN="echo" ;;
@@ -111,10 +114,6 @@ done
 shift $((OPTIND -1))
 
 IMAGES="opendj openidm amster openam openig"
-
-# you should not need to edit the paths below
-REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
-SNAPSHOT_REPO=https://maven.forgerock.org/repo/internal-snapshots/org/forgerock
 
 
 WEB_AGENTS_SNAPSHOT_REPO=https://maven.forgerock.org/repo/forgerock-virtual/org/forgerock/openam/agents/web-agents/nightly
@@ -146,7 +145,6 @@ APACHE_AGENT_ZIP=web-agents-5.0.1-Apache_v24_Linux_64bit.zip
 
 
 HEADER="X-JFrog-Art-Api: $API_KEY"
-
 
 
 

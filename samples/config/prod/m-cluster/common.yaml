@@ -13,10 +13,11 @@ image:
 useTLS: true
 
 # Only enable this if you have valid cert-manager deployed for your DNS domain
-useCertManager: true
 
+useCertManager: true
 
 # Install passwords.
 amadminPassword: password
 encryptionKey: "123456789012"
 policyAgentPassword: Passw0rd
+

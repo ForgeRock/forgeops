@@ -20,6 +20,7 @@ domain: .example.com
 amadminPassword: password
 encryptionKey: "123456789012"
 policyAgentPassword: Passw0rd
+prometheusPassword: prometheus
 
 
 config:

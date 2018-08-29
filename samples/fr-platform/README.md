@@ -78,7 +78,8 @@ If you don't want to use Facebook, the default values of "FakeID" and "FakeSecre
     | sudo tee /etc/hosts && \
     echo "$(minikube ip) \
         client-service.sample.svc.cluster.local \
-        am-service.sample.svc.cluster.local" \
+        am-service.sample.svc.cluster.local \
+        rs-service.sample.svc.cluster.local" \
     | sudo tee -a /etc/hosts
     ```
 
@@ -89,7 +90,8 @@ If you don't want to use Facebook, the default values of "FakeID" and "FakeSecre
     echo "$( kubectl get ing -o \
         jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' ) \
         client-service.sample.svc.cluster.local \
-        am-service.sample.svc.cluster.local" \
+        am-service.sample.svc.cluster.local \
+        rs-service.sample.svc.cluster.local" \
     | sudo tee -a /etc/hosts
     ```
 
