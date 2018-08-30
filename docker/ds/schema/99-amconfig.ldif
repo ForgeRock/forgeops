@@ -35,7 +35,19 @@ attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.81 NAME ( 'sunsmspriority' ) DESC 'To 
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.82 NAME ( 'sunPluginSchema' ) DESC 'To store the plugin schema information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.83 NAME ( 'sunKeyValue' ) DESC 'Attribute to store the encoded key values of the services' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
 attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.84 NAME ( 'sunxmlKeyValue' ) DESC 'Attribute to store the key values in xml format' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Sun Java System Identity Management' )
+attributeTypes: ( 1.2.840.113556.1.2.102 NAME 'memberof' DESC 'Group that the entry belongs to' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 X-ORIGIN 'iPlanet Delegated Administrator' )
+attributeTypes: ( 2.16.840.1.113730.3.1.692 NAME 'inetUserStatus' DESC '"active", "inactive", or "deleted" status of a user' EQUALITY caseIgnoreMatch SINGLE-VALUE SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Nortel subscriber interoperability' )
+attributeTypes: ( 2.16.840.1.113730.3.1.693 NAME 'inetUserHttpURL' DESC 'A users Web addresses' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Nortel subscriber interoperability' )
+attributeTypes: ( 1.3.6.1.4.1.1466.101.120.42 NAME 'preferredLocale' DESC 'preferred locale for a person' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'iPlanet' )
+attributeTypes: ( 1.3.6.1.4.1.1466.101.120.43 NAME 'preferredTimeZone' DESC 'preferred time zone for a person' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'iPlanet' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.989 NAME 'sun-fm-saml2-nameid-infokey' DESC 'SAML 2.0 Name Identifier Information Key' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.990 NAME 'sun-fm-saml2-nameid-info' DESC 'SAML 2.0 Name Identifier Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+# ObjectClasses
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.25 NAME 'sunservice' DESC 'object containing service information' SUP top MUST ou MAY ( labeledURI $ sunServiceSchema $ sunKeyValue $ sunxmlKeyValue $ sunPluginSchema $ description ) X-ORIGIN 'Sun Java System Identity Management' )
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.104 NAME 'sunRealmService' DESC 'object containing service information for realms' SUP top MAY ( o $ labeledURI $ sunKeyValue $ sunxmlKeyValue $ description ) X-ORIGIN 'Sun Java System Identity Management' )
 objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.27 NAME 'sunservicecomponent' DESC 'Sub-components of the service' SUP organizationalUnit MUST ou MAY ( labeledURI $ sunserviceID $ sunsmspriority $ sunKeyValue $ sunxmlKeyValue $ description ) X-ORIGIN 'Sun Java System Identity Management' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.148 NAME 'sunFMSAML2NameIdentifier' DESC 'SAML 2.0 name identifier objectclass' SUP top AUXILIARY MAY ( sun-fm-saml2-nameid-infokey $ sun-fm-saml2-nameid-info ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 2.16.840.1.113730.3.2.130 NAME 'inetuser' DESC 'Auxiliary class which has to be present in an entry for delivery of subscriber services' SUP top AUXILIARY MAY ( uid $ inetUserStatus $ inetUserHttpURL $ userPassword $ memberof ) X-ORIGIN 'Nortel subscriber interoperability' )
+objectClasses: ( 1.3.6.1.4.1.1466.101.120.142 NAME 'iPlanetPreferences' AUXILIARY MAY ( preferredLanguage $ preferredLocale $ preferredTimeZone ) X-ORIGIN 'iPlanet' )
+
 

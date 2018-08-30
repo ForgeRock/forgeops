@@ -94,13 +94,11 @@ objectClasses: ( 1.3.6.1.4.1.36733.2.3.2.8 NAME 'fr-idm-cluster-obj' SUP top STR
 ###
 # Managed User
 ###
-# As per docs =https://ea.forgerock.com/docs/idm/integrators-guide/index.html#explicit-generic-mapping-ds 
-# Commenting this out as we are using explicit mapping
-# attributeTypes: ( 1.3.6.1.4.1.36733.2.3.1.13 NAME 'fr-idm-managed-user-json'
-#     SYNTAX 1.3.6.1.4.1.36733.2.1.3.1 EQUALITY caseIgnoreJsonQueryMatchManagedUser ORDERING caseIgnoreOrderingMatch SINGLE-VALUE X-ORIGIN 'OpenIDM DSRepoService')
-# objectClasses: ( 1.3.6.1.4.1.36733.2.3.2.6 NAME 'fr-idm-managed-user' SUP top STRUCTURAL
-#     MUST ( fr-idm-managed-user-json )
-#     X-ORIGIN 'OpenIDM DSRepoService' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.3.1.13 NAME 'fr-idm-managed-user-json'
+     SYNTAX 1.3.6.1.4.1.36733.2.1.3.1 EQUALITY caseIgnoreJsonQueryMatchManagedUser ORDERING caseIgnoreOrderingMatch SINGLE-VALUE X-ORIGIN 'OpenIDM DSRepoService')
+objectClasses: ( 1.3.6.1.4.1.36733.2.3.2.6 NAME 'fr-idm-managed-user' SUP top STRUCTURAL
+     MUST ( fr-idm-managed-user-json )
+     X-ORIGIN 'OpenIDM DSRepoService' )
 ###
 # Managed Role
 ###

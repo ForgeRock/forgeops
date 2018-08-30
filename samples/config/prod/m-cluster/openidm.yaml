@@ -9,6 +9,13 @@ javaOpts: >
   -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+#  -Dcom.sun.management.jmxremote
+#  -Dcom.sun.management.jmxremote.port=9010
+#  -Dcom.sun.management.jmxremote.local.only=false
+#  -Dcom.sun.management.jmxremote.authenticate=false
+#  -Dcom.sun.management.jmxremote.ssl=false
+#  -Djava.rmi.server.hostname=localhost
+#  -Dcom.sun.management.jmxremote.rmi.port=9010
 
 replicaCount: 1
 

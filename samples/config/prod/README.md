@@ -16,7 +16,7 @@ Other requirements are:
 
 ### Choosing the Deployment Size
 
-- The subdirectories contain custom values for deployments of two sizes.  The small `s-cluster` is recommended for upto 1M users whereas the medium `m-cluster` is recommended for upto 10M users. It is highly recommended to have 8 vCPU and 20GB RAM per node for the small cluster and 16vCPU and 40GB RAM per node for the medium cluster. Otherwise the deployment **could fail**. 
+- The subdirectories contain custom values for deployments of two sizes.  The small `s-cluster` is recommended for upto 1M users whereas the medium `m-cluster` is recommended for upto 10M users. It is highly recommended to have 4 vCPU and 14GB RAM per node for the small cluster and 16vCPU and 40GB RAM per node for the medium cluster. Otherwise the deployment **could fail**. 
 
 - The cluster should at least have 2 nodes in the primary zone. If HA is desired then either add 2 more nodes to the primary zone or add addtional zone(s).  See the HA section below for more details on multi-zone deployment.  The `s-cluster` and `m-cluster` samples are already designed for 2 zone HA.
 
