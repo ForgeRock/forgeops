@@ -1,7 +1,9 @@
 resources:
   limits:
+    cpu: 10000m
     memory: 6Gi
   requests:
+    cpu: 4000m
     memory: 4Gi
 
 # For JDK 8
@@ -23,3 +25,17 @@ config:
   name: frconfig
   path: /git/config/samples/idm/m-cluster
   strategy: git
+
+openidm:
+  repo:
+    host: postgresql
+    port: 5432
+    user: openidm
+    password: openidm
+    schema: openidm
+    #databaseName: openidm
+    # DS external repo
+    #host: userstore-0.userstore
+    #port: 1389
+    #user: "cn=Directory Manager"
+    #password: password
