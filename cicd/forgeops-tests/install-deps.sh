@@ -6,3 +6,4 @@
 
 pip3 install requests
 pip3 install html-testRunner
+pip3 install bs4
