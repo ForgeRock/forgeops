@@ -81,7 +81,7 @@ spec:
         configMap:
           name: openidm-sql
       - name: data
-      {{- if .Values.persistence.enabled }}
+      {{- if .Values.persistence }}
         persistentVolumeClaim:
           # If you want to run multiple instances in the same namespace, uncomment below:
           #claimName: {{ template "fullname" . }}
