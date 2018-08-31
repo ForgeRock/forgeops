@@ -25,9 +25,6 @@ image:
   pullPolicy: IfNotPresent
 
   
-
-
-
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
@@ -59,11 +56,12 @@ openidm:
     username: prometheus
     password: prometheus
 
-# Optional - if there is a DJ userstore configured
+# Optional - if there is a DJ userstore configured for synchornization or explict mapping when DJ is used as repo
 userstore:
   host: userstore-0.userstore
   password: password
   port: 1389
+  basecontext: "o=userstore"
 
 service:
   name: openidm
