@@ -30,11 +30,13 @@ data:
       # Client password for IDM/AM integration
       openidm.idpconfig.clientsecret={{ .Values.openidm.idpconfig.clientsecret }}
 
-      # Use a variable for our ldap host & password
+      # These are for the (ldap) provisioner i.e. used for synchronization
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
       userstore.port={{default "1389" .Values.userstore.port}}
       userstore.basecontext={{default "o=userstore" .Values.userstore.basecontext}}
+
+      # Ports openidm should listen on locally
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
