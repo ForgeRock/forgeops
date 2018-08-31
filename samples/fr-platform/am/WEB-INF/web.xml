@@ -177,7 +177,7 @@
     <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
     <init-param>
     <param-name>cors.allowed.origins</param-name>
-    <param-value>http://client-service.sample.svc.cluster.local</param-value>
+    <param-value>*</param-value>
     </init-param>
     <init-param>
     <param-name>cors.allowed.methods</param-name>
@@ -193,7 +193,7 @@
     </init-param>
     <init-param>
     <param-name>cors.support.credentials</param-name>
-    <param-value>true</param-value>
+    <param-value>false</param-value>
     </init-param>
     <init-param>
     <param-name>cors.preflight.maxage</param-name>
@@ -323,7 +323,7 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>CORSFilter</filter-name>
-        <url-pattern>/json/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>NotificationsWebSocketFilter</filter-name>
