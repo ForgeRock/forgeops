@@ -1,12 +1,12 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM forgerock/downloader 
+FROM forgerock/downloader
 
 # ARG VERSION="6.5.0-M2"
 # RUN download -v $VERSION openidm 
 
 ARG VERSION="6.5.0"
-RUN download -s -v $VERSION openidm 
+RUN download -s -v $VERSION openidm
 RUN mkdir -p /var/tmp/openidm && unzip -q /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
 
 FROM forgerock/java:6.0.0
@@ -34,8 +34,6 @@ RUN apk update && \
     apk add zip ttf-dejavu tini
 
 RUN chown -R forgerock:forgerock /opt/openidm  && rm -fr /opt/openidm/samples
-
-RUN chmod 600 /opt/openidm/security/*
 
 COPY *.sh /opt/openidm/
 COPY logging.properties /opt/openidm/logging.properties
