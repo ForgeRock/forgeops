@@ -5,10 +5,12 @@
 # Another alternative for product binaries is to replace this docker image and script with
 # an alternate version that copies the binaries from a source such as S3, GCS, etc.
 
+set -Eeuo pipefail
+
 API_KEY=${API_KEY:-`cat /api_key`}
 
 GCS_DIR=gs://forgeops-cache
-GCS_CACHE=true
+GCS_CACHE="true"
 
 if [ -z "$API_KEY" ]
 then
@@ -17,7 +19,6 @@ then
 fi
 
 # Update major versions / snapshots here. 
-
 
 # Download a binary specified by $1
 dl_binary() {
@@ -51,14 +52,14 @@ dl_binary() {
     esac
 }
 
-# Do the actual download. $1 - REPO patg,  $2 - artifact name, $3 destination
+# Do the actual download. $1 - REPO ,  $2 - artifact name, $3 destination
 dl(){
    
     src="$1/$2"
   
     echo "Downloading $src to $3"
 
-    if [ -n "$GCS_CACHE" ]; then
+    if [ "$GCS_CACHE" = "true" ]; then
         gsutil cp $GCS_DIR/$2 $3
         if [ "$?" -eq 0 ];  then
             return 0
@@ -66,11 +67,11 @@ dl(){
         echo "Can't find cached file $2 - will download"
     fi
 
-    if [ -z "${WGET}" ]
+    if [ -z "${WGET+x}" ]
     then
         curl --fail -s -H "$HEADER"  $src -o $3
     else
-        wget -q --inet4-only --timeout=20 --header "$HEADER" $src  -O $3
+        wget -q --inet4-only --timeout=20 --header "$HEADER" -O $3 $src
     fi
 
     if [ $? -ne 0 ] 
@@ -79,30 +80,28 @@ dl(){
         exit 1
     fi
 
-    if [ -n "$GCS_CACHE" ]; then
+    if [ "$GCS_CACHE" = "true" ]; then
         echo "Saving a cached copy of $2"
         gsutil cp "$3" "$GCS_DIR/$2" || echo "Could not save to cache. Skipping"
     fi
 
 }
 
-
 VERSION=${VERSION:-6.5.0}
 # you should not need to edit the paths below
 REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
 
 
-while getopts "swv:" opt; do
+while getopts "wv:" opt; do
   case ${opt} in
-    s ) BUILD_SNAPSHOTS="true" 
-     REPO="https://maven.forgerock.org/repo/internal-snapshots/org/forgerock"
-        ;;
     w ) WGET="true" ;;
-    v ) VERSION="${OPTARG}" ;;
-    d ) DRYRUN="echo" ;;
+    v ) VERSION="${OPTARG}" 
+        echo $VERSION | grep SNAPSHOT \
+                && REPO="https://maven.forgerock.org/repo/internal-snapshots/org/forgerock" \
+                && GCS_CACHE="false"
+        ;;
     \? )
-         echo "Usage: dl.sh [-s] [-w] images..."
-         echo "-s download snapshots instead of releases"
+         echo "Usage: dl.sh [-v version] images..."
          echo "-c Use curl instead of wget"
          echo "-v VERSION - download a specific version (example -v 6.5.0). Default $VERSION"
          echo "Images can be one or more of: $IMAGES"
@@ -118,10 +117,6 @@ IMAGES="opendj openidm amster openam openig"
 
 WEB_AGENTS_SNAPSHOT_REPO=https://maven.forgerock.org/repo/forgerock-virtual/org/forgerock/openam/agents/web-agents/nightly
 WEB_AGENTS_STABLE_REPO=https://maven.forgerock.org/repo/forgerock-virtual/org/forgerock/openam/agents/web-agents/5.0.1
-
-if [ -n "$BUILD_SNAPSHOTS" ]; then
-    VERSION="$VERSION-SNAPSHOT"
-fi
 
 AM_WAR=openam-server-$VERSION.war
 AM_REPO=$REPO/am/openam-server/$VERSION
@@ -145,7 +140,6 @@ APACHE_AGENT_ZIP=web-agents-5.0.1-Apache_v24_Linux_64bit.zip
 
 
 HEADER="X-JFrog-Art-Api: $API_KEY"
-
 
 
 if [ "$#" -ne 0 ]; then
