@@ -74,6 +74,15 @@ echo "Creating CTS UID index for uid=monitor search"
           --index-name uid \
           --offline \
           --no-prompt
+echo "Creating UID index on idmRoot"
+./bin/dsconfig create-backend-index \
+          --backend-name idmRoot \
+          --set index-type:equality \
+          --type generic \
+          --index-name uid \
+          --offline \
+          --no-prompt
+
 
 
 echo "Tuning the disk free space thresholds"
