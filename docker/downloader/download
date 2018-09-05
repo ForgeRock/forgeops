@@ -5,8 +5,6 @@
 # Another alternative for product binaries is to replace this docker image and script with
 # an alternate version that copies the binaries from a source such as S3, GCS, etc.
 
-set -Eeuo pipefail
-
 API_KEY=${API_KEY:-`cat /api_key`}
 
 GCS_DIR=gs://forgeops-cache
