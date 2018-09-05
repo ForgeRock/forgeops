@@ -5,7 +5,7 @@
 replicaCount: 1
 
 # Top level domain. Used to create the ingress
-domain: .forgeops.com
+domain: .example.com
 
 # Configuration parameters. Common to all charts that require configuration from a
 # source. Currently the only source is a git repo.
