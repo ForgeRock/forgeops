@@ -43,6 +43,8 @@ spec:
         envFrom:
         - configMapRef:
             name: amster-{{ .Release.Name }}
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
         env:
         - name: NAMESPACE
           valueFrom:

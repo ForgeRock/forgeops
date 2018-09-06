@@ -10,7 +10,7 @@ image:
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
-domain: .example.com
+domain: .forgeops.com
 
 config:
   name: frconfig
@@ -95,7 +95,8 @@ ingress:
     kubernetes.io/ingress.class: nginx
     # Do not use for nginx. TODO: Does warp need this?
     #ingress.kubernetes.io/rewrite-target: /
-    ingress.kubernetes.io/enable-cors: "false"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    ingress.kubernetes.io/enable-cors: "true"
     ingress.kubernetes.io/affinity: "cookie"
     ingress.kubernetes.io/session-cookie-name: "route"
     ingress.kubernetes.io/session-cookie-hash: "sha1"
@@ -104,6 +105,10 @@ ingress:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,OPTIONS,DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "cache-control,content-type,x-openidm-datastoretoken,x-openidm-oauth-login,x-requested-with"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "600"
     
 # Audit log details for log streaming sidecar containers
 
@@ -119,3 +124,5 @@ auditLogs: []
 #     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
 #   - name: config-logs
 #     path: "/home/forgerock/openam/openam/log/config.audit.json"
+
+
