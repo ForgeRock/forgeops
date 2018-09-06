@@ -49,12 +49,12 @@ steps:
   args: ['cp', '*', 'gs://forgeops-test-reports/smoke-tests/']
 
 - name: 'gcr.io/engineering-devops/helm'
-  dir: 'cicd/forgeops-tests/'
+  dir: 'bin/'
   entrypoint: 'bash'
-  args: ['get-logs-from-containers.sh']
+  args: ['get-logs-from-ns.sh']
 
 - name: 'gcr.io/cloud-builders/gsutil'
-  dir: 'cicd/forgeops-tests/'
+  dir: 'bin/'
   args: ['cp', '-r', 'logs/*', 'gs://forgeops-test-reports/logs/']
 
 # Send slack notifications
