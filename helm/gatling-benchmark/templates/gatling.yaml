@@ -21,6 +21,7 @@ spec:
           - /bin/bash
           - -c
           - touch /ready && /custom-gatling.sh  -j '
+            {{ .Values.javaopts }}
             -Dam_host={{ .Values.benchmark.openam.host }}
             -Dam_port={{ .Values.benchmark.openam.port }}
             -Didm_host={{ .Values.benchmark.openidm.host }}
@@ -52,10 +53,7 @@ spec:
             - mountPath: /etc/nginx/conf.d
               name: nginx-conf-vol
           resources:
-      #resources:
-      #  requests:
-      #    cpu: 1000m
-      #    memory: 2048Mi
+{{ toYaml .Values.resources | indent 14 }}
       imagePullSecrets:
         - name: forgerock-engkube-pull-secret
       volumes:

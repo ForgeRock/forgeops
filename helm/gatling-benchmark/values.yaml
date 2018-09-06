@@ -10,6 +10,17 @@ image:
   repository: gcr.io/engineering-devops/gatling:6.5.0
   pullPolicy: Always
 
+# Resources for gatling benchmark chart
+resources:
+  limits:
+    memory: 4096Mi
+  requests:
+    memory: 2048Mi
+
+# Gatling heap
+# Heap should be always max 75% of resource.limits.memory settings
+javaopts: -Xmx2G
+
 benchmark:
   # Name of scala test name to run
   # This benchmark supports following testnames
