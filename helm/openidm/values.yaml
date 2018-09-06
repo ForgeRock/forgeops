@@ -26,7 +26,7 @@ component: openidm
 
 image:
   repository: gcr.io/engineering-devops/openidm
-  tag: 6.5.0
+  tag: latest
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always

@@ -1,0 +1,14 @@
+# Build script for cloud builder.
+timeout: 1000s
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker'
+  entrypoint: './build.sh'
+  args: ['-a', '-n', 'cloudbuild', '-p','-C', 'csv/dev.csv' ]
+  env:
+  - 'API_KEY=${_ARTIFACTORY_API_KEY}'
+  - 'DOCKER_USER=${_DOCKER_USER}'
+  - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
+# Launch the smoke test
+- name: gcr.io/cloud-builders/gcloud
+  args: ['builds','submit', '--config', 'cloudbuild-smoketests.yaml', '--async', '--substitutions', '_SLACK_SERVICE=${_SLACK_SERVICE}', '.']
