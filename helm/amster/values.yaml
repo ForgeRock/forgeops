@@ -39,7 +39,7 @@ config:
 
 image:
   repository: gcr.io/engineering-devops/amster
-  tag: 6.5.0
+  tag: latest
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 

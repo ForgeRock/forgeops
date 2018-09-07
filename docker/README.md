@@ -75,3 +75,8 @@ Where:
 
 
  See the build.sh script for a complete list of options.
+
+## Process to update a dependency
+
+The file csv/dev.csv specifies the artifacts used in our CI Cloudbuild pipeline. To update to a new milestone, edit
+this file, and update the milestone (for example, for idm change 6.5.0-M2 to 6.5.0-M3). Commit the change, and submit a new PR. The build process will build and tag the new image.

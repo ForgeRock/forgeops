@@ -32,7 +32,7 @@ useCertManager: true
 
 image:
   repository: gcr.io/engineering-devops/openig
-  tag: 6.5.0
+  tag: latest
   pullPolicy: IfNotPresent
 
 resources:

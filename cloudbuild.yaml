@@ -1,4 +1,5 @@
 # Google Cloud builder steps to build our helm charts and docker images on gcr.io.
+# Deprecated and will soon be removed!!! See docker/cloudbuild.yaml
 # options:
 #   machineType: 'N1_HIGHCPU_8'
 timeout: 3500s
