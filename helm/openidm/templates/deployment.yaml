@@ -4,6 +4,7 @@ kind: Deployment
 metadata:
   name: {{ template "fullname" . }}
   labels:
+    app: {{ template "name" . }}
     component: {{ .Values.component }}
     vendor: forgerock
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
