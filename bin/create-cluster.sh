@@ -72,7 +72,6 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --labels="owner=sre" \
       --addons=HorizontalPodAutoscaling \
       --enable-autoscaling \
-      --enable-autoupgrade \
       --enable-autorepair \
       --scopes "https://www.googleapis.com/auth/cloud-platform" \
       --enable-cloud-logging \
@@ -83,5 +82,6 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
 #  --enable-stackdriver-kubernetes
 #  --scopes "gke-default"
 #  --preemptible
+#  --enable-autoupgrade 
 
 

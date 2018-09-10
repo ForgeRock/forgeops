@@ -214,7 +214,7 @@ restart_am()
     echo "=> Deleting \"${OPENAM_POD_NAME}\" to restart and read newly imported configuration"
     kubectl delete pod $OPENAM_POD_NAME --namespace=${NAMESPACE}
     if [ $? -ne 0 ]; then
-        echo "Could not delete AM pod.  Please check error and fix"
+        echo "Could not delete AM pod.  Please check error and fix."
     fi
     sleep 10
     isalive_check
@@ -222,11 +222,21 @@ restart_am()
 
 scale_am()
 {
-    echo "=> Scaling AM to two replicas..."
+    echo "=> Scaling AM deployment..."
     DEPNAME=$(kubectl get deployment -l app=openam -o name)
     kubectl scale --replicas=2 ${DEPNAME} || true
     if [ $? -ne 0 ]; then
-        echo "Could not scale AM pod.  Please check error and fix" 
+        echo "Could not scale AM deployment.  Please check error and fix."
+    fi
+}
+
+scale_idm()
+{
+    echo "=> Scaling IDM deployment..."
+    DEPNAME=$(kubectl get deployment -l app=openidm -o name)
+    kubectl scale --replicas=2 ${DEPNAME} || true
+    if [ $? -ne 0 ]; then
+        echo "Could not scale IDM deployment.  Please check error and fix."
     fi
 }
 
@@ -235,7 +245,7 @@ deploy_hpa()
     echo "=> Deploying Horizontal Autoscale Chart..."
     kubectl apply -f ${CFGDIR}/hpa.yaml || true
     if [ $? -ne 0 ]; then
-        echo "Could not deploy HPA.  Please check error and fix" 
+        echo "Could not deploy HPA.  Please check error and fix."
     fi
 }
 
@@ -275,6 +285,7 @@ fi
 # Do not scale or deploy hpa on minikube
 if [ "${CONTEXT}" != "minikube" ]; then
     scale_am
+    scale_idm
     #deploy_hpa # TODO
 fi
 

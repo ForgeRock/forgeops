@@ -91,7 +91,19 @@ for idx in ${INDEX[@]}; do
     --no-prompt
 done
 
+# userRoot also needs few of the above indexes if and when it is used
+# in explicit mapping for idm
+INDEX=(fr-idm-json fr-idm-managed-user-json fr-idm-managed-role-json)
 
+for idx in ${INDEX[@]}; do
+  ./bin/dsconfig \
+    create-backend-index \
+    --backend-name userRoot \
+    --index-name ${idx} \
+    --set index-type:equality \
+    --offline \
+    --no-prompt
+done
 
 # vlvs for admin UI usage
 
