@@ -8,13 +8,13 @@ RUN download -v $VERSION openig
 
 FROM tomcat:8.5-alpine
 
-# Delete the default webapps 
 
 
 # Default home for OpenIG config. Override this to set a different location.
 ENV OPENIG_BASE /var/openig
 ENV FORGEROCK_HOME /opt/forgerock
 
+# Delete the default webapps 
 RUN rm -fr ${CATALINA_HOME}/webapps/*  && mkdir -p ${OPENIG_BASE}
 
 COPY --from=0 /openig.war "$CATALINA_HOME"/webapps/ROOT.war

@@ -1,15 +1,22 @@
-
 amster:
   domain: .example.com
+  image:
+    repository: forgerock-docker-public.bintray.io/forgerock/amster
 
 openam:
   domain: .example.com
+  image:
+    repository: forgerock-docker-public.bintray.io/forgerock/openam
 
 openig:
   domain: .example.com
+  image:
+    repository: forgerock-docker-public.bintray.io/forgerock/openig
 
 openidm:
   domain: .example.com
+  image:
+    repository: forgerock-docker-public.bintray.io/forgerock/openidm
 
 userstore:
   djInstance: userstore
@@ -20,6 +27,8 @@ userstore:
       memory: 600Mi
     requests:
       memory: 400Mi
+  image:
+    repository: forgerock-docker-public.bintray.io/forgerock/ds
 
 configstore:
   djInstance: configstore
@@ -30,3 +39,5 @@ configstore:
       memory: 600Mi
     requests:
       memory: 400Mi
+  image:
+    repository: forgerock-docker-public.bintray.io/forgerock/ds

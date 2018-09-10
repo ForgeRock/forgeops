@@ -111,7 +111,7 @@ done
     create-backend-vlv-index \
     --backend-name userRoot \
     --index-name people-by-uid \
-    --set base-dn:ou=People,dc=example,dc=com \
+    --set base-dn:ou=People,o=userstore \
     --set filter:"(uid=*)" \
     --set scope:single-level \
     --set sort-order:"+uid" \
@@ -122,7 +122,7 @@ done
     create-backend-vlv-index \
     --backend-name userRoot \
     --index-name people-by-uid-matchall \
-    --set base-dn:ou=People,dc=example,dc=com \
+    --set base-dn:ou=People,o=userstore \
     --set filter:"(&)" \
     --set scope:single-level \
     --set sort-order:"+uid" \

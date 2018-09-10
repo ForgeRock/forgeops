@@ -37,7 +37,7 @@ spec:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
         {{ if .Values.sedFilter }}
-        env: 
+        env:
         - name: SED_FILTER
           value: {{ .Values.sedFilter }}
         {{ end }}
@@ -49,6 +49,8 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "fullname" . }}
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
         ports:
         - containerPort: 8080
         livenessProbe:

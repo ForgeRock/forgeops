@@ -8,11 +8,11 @@ dependencies:
 - name: amster
   repository: file://../amster
   version: 6.5.0
-- name: opendj
-  repository: file://../opendj
+- name: ds
+  repository: file://../ds
   version: 6.5.0
-- name: opendj
-  repository: file://../opendj
+- name: ds
+  repository: file://../ds
   version: 6.5.0
 - name: openidm
   repository: file://../openidm
@@ -23,5 +23,5 @@ dependencies:
 - name: openig
   repository: file://../openig
   version: 6.5.0
-digest: sha256:7761f2ba52d56da5967eb194667ee222596096a4c987e9e5d723d383bccf860e
-generated: 2018-05-17T12:53:28.706145785-06:00
+digest: sha256:6fbbca9a597f2e22ef3afb6ba140f4f26a9b4f6613df5f160319c0b8fc77e663
+generated: 2018-09-04T18:41:00.940182124-06:00

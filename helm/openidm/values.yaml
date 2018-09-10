@@ -5,7 +5,7 @@
 replicaCount: 1
 
 # Top level domain. Used to create the ingress
-domain: .forgeops.com
+domain: .example.com
 
 # Configuration parameters. Common to all charts that require configuration from a
 # source. Currently the only source is a git repo.
@@ -14,17 +14,23 @@ config:
   # the secret required to access it.
   name: frconfig
   # Path to our project
-  path: /git/config/6.5/default/idm/sync-with-ldap-bidirectional
+  path: /git/config/samples/idm/idm-am-ds-integration
+  # path: /git/config/6.5/default/idm/sync-with-ldap-bidirectional
+  #
   # strategy defines how products get their configuration .
   # Using the git strategy, each helm chart pulls the configurtion from git using an init container.
   strategy: git
 
+# Used to form the FQDN  - see _helpers.tpl
+component: openidm
+
 image:
   repository: gcr.io/engineering-devops/openidm
-  tag: 6.5.0
+  tag: latest
   pullPolicy: IfNotPresent
+  # For development use Always
+  # pullPolicy: Always
 
-  
 # override Java JVM options.
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
@@ -77,10 +83,6 @@ resources:
     cpu: 300m
     memory: 1024Mi
 
-
-# Used to form the FQDN  - see _helpers.tpl
-component: openidm
-
 # Default log level. See templates/configmap/logging.properties. For example, you can use FINE here to
 # see fine grained logging output using kubectl logs.
 logLevel: INFO
@@ -111,7 +113,6 @@ auditLogs: []
 #     path: "/opt/openidm/audit/recon.audit.json"
 #   - name: sync-logs
 #     path: "/opt/openidm/audit/sync.audit.json"
-    
 
 # Optional sed filter script that does search / replace after the configuration has been checked out
 # This is a work around until OPENIDM-11529 is fixed

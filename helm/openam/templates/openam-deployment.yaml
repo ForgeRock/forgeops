@@ -73,6 +73,8 @@ spec:
         envFrom:
         - configMapRef:
             name: am-configmap
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
         env:
         - name: NAMESPACE
           valueFrom:
