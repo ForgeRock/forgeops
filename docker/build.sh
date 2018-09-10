@@ -93,7 +93,8 @@ if [ -n "$BUILD_CSV" ]; then
       ${DRYRUN} docker build  $NETWORK --build-arg VERSION=$artifact -t $folder $folder
 
       # For each registry we support ()
-      for reg in "gcr.io/engineering-devops" "forgerock-docker-internal.bintray.io" 
+      for reg in "gcr.io/engineering-devops"
+      # for reg in "gcr.io/engineering-devops" "forgerock-docker-internal.bintray.io" 
       do
           # We always tag with the artifact
           img="${reg}/${folder}:${artifact}"
