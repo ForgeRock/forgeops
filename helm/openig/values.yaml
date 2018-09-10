@@ -57,17 +57,11 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    # Do not use for nginx. TODO: Does warp need this?
-    #ingress.kubernetes.io/rewrite-target: /
-    ingress.kubernetes.io/enable-cors: "false"
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "sha1"
-    ingress.kubernetes.io/ssl-redirect: "true"
-    # Nginx specific annotations
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "false"
     
 # Audit log details for log streaming sidecar containers
 
