@@ -14,5 +14,6 @@ replicaCount: 1
 
 config:
   name: frconfig
-  path: /git/config/samples/idm/m-cluster
+  #path: /git/config/6.5/m-cluster/idm/ds-repo-explicit
+  path: /git/config/6.5/default/idm/sync-with-ldap-bidirectional
   strategy: git

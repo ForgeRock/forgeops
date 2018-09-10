@@ -1,6 +1,5 @@
 config:
-  #importPath: /git/config/samples/am/R6.0
-  importPath: /git/config/samples/am/m-cluster
+  importPath: /git/config/6.0/m-cluster/am
   exportPath: /tmp/amster
 
 version: 6.5.0-M0
