@@ -9,5 +9,5 @@ data:
   GIT_AUTOSAVE_BRANCH:  autosave-{{ .Release.Namespace }}
   GIT_CHECKOUT_BRANCH:  {{ .Values.git.branch }}
 
-  # NAMESPACE: {{ .Release.Namespace }}
+  NAMESPACE: {{ .Release.Namespace }}
   DOMAIN: {{ default ".forgeops.com" .Values.domain }}
