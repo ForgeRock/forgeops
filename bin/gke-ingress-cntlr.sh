@@ -7,22 +7,29 @@
 
 # Set this IP to your reserved IP. Must be in the same zone as your cluster.
 
+# Handy app for testing your ingress (modify the ingress as needed)
+# https://github.com/kubernetes/kubernetes/tree/master/test/e2e/testing-manifests/ingress/http
+# commands:
+# k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/rc.yaml
+# k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/ing.yaml
+# k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/svc.yaml
+
+
 IP=$1
 
-if [ -z $IP ]; then
-  echo "Creating Ingress Controller without IP"
-  helm install --namespace nginx --name nginx  \
-    --set rbac.create=true \
-    --set controller.publishService.enabled=true \
-    --set controller.stats.enabled=true \
-    stable/nginx-ingress
+if [ -z $1 ]; then
+ IP_OPTS=""
 else
-  echo "Creating Ingress Controller with IP=$IP"
-  helm install --namespace nginx --name nginx  \
-    --set rbac.create=true \
-    --set controller.service.loadBalancerIP=$IP \
-    --set controller.publishService.enabled=true \
-    --set controller.stats.enabled=true \
-    stable/nginx-ingress
+ IP_OPTS="--set controller.service.loadBalancerIP=$1"
 fi
 
+# For now we fix the image version at 17.1 as the ingress is not load balancing properly
+# See https://github.com/kubernetes/ingress-nginx/issues/3056 
+helm install --namespace nginx --name nginx \
+  --set rbac.create=true \
+  --set controller.publishService.enabled=true \
+  --set controller.stats.enabled=true \
+  --set controller.service.externalTrafficPolicy=Local \
+  --set controller.service.type=LoadBalancer \
+  --set controller.image.tag="0.17.1" \
+   $IP_OPTS  stable/nginx-ingress
