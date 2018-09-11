@@ -9,7 +9,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: am-service
+          serviceName: openam
           servicePort: 80
   - host: client-service.sample.svc.cluster.local
     http:

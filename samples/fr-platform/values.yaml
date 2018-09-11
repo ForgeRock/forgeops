@@ -1,12 +1,31 @@
 social:
-    facebook:
-        id: "FakeID"
-        secret: "FakeSecret"
+  facebook:
+    id: "FakeID"
+    secret: "FakeSecret"
+
+openam:
+  config:
+    strategy: files
+  component: am-service
+  service:
+    name: am-service
+  openamInstance: http://am-service:80/openam
+
+configstore:
+  djInstance: configstore
+  djPersistence: false
+  opendjJavaArgs: "-Xmx400m"
+  resources:
+    limits:
+      memory: 600Mi
+    requests:
+      memory: 400Mi
+  image:
+    repository: forgerock-docker-internal.bintray.io/ds
 
 images:
-    am: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am:latest
-    amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
-    client: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client:latest
-    idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest
-    pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest
-    rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest
+  amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
+  client: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client:latest
+  idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest
+  pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest
+  rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest

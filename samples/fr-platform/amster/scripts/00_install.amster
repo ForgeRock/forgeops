@@ -4,7 +4,7 @@ install-openam --serverUrl OPENAM_INSTANCE \
 --cookieDomain cluster.local \
 --adminPwd password \
 --cfgStore dirServer \
---cfgStoreHost ds-0.ds \
+--cfgStoreHost configstore-0.configstore \
 --cfgStoreDirMgrPwd password  \
 --cfgStorePort 1389  \
 --cfgStoreRootSuffix o=userstore \
