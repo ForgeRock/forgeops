@@ -9,6 +9,7 @@ openam:
   component: am-service
   service:
     name: am-service
+  domain: .svc.cluster.local
   openamInstance: http://am-service:80/openam
 
 configstore:
@@ -25,7 +26,6 @@ configstore:
 
 images:
   amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
-  client: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client:latest
   idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest
   pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest
   rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest

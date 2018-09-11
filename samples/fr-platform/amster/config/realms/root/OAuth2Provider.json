@@ -52,7 +52,7 @@
       "requireRequestUriRegistration" : false,
       "alwaysAddClaimsToToken" : false,
       "supportedRequestParameterEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "RSA1_5", "A256KW", "dir", "A192KW" ],
-      "authorisedOpenIdConnectSSOClients" : [ "openidmClient" ],
+      "authorisedOpenIdConnectSSOClients" : [ ],
       "idTokenInfoClientAuthenticationEnabled" : true,
       "supportedRequestParameterSigningAlgorithms" : [ "PS384", "RS384", "ES384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
       "loaMapping" : { },

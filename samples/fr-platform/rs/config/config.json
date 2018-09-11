@@ -15,7 +15,7 @@
                                     "messageType": "request",
                                     "add": {
                                         "Authorization": [
-                                            "Basic ${encodeBase64('openidmClient:openidmClient')}"
+                                            "Basic ${encodeBase64('openidmRS:openidmRS')}"
                                         ]
                                     }
                                 }
