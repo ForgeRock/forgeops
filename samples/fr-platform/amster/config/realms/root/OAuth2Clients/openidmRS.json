@@ -3,11 +3,11 @@
     "realm" : "/",
     "amsterVersion" : "6.0.0-M4",
     "entityType" : "OAuth2Clients",
-    "entityId" : "openidmClient",
+    "entityId" : "openidmRS",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "openidmClient",
+    "_id" : "openidmRS",
     "signEncOAuth2ClientConfig" : {
       "idTokenEncryptionMethod" : "A128CBC-HS256",
       "jwkSet" : null,
@@ -51,7 +51,7 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : "openidmClient",
+      "userpassword" : "openidmRS",
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
       "defaultScopes" : [ ],
@@ -60,7 +60,7 @@
       "scopes" : [ "openid", "policy", "email", "am-introspect-all-tokens", "profile", "consent_read", "workflow_tasks", "notifications" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ "http://client-service.sample.svc.cluster.local:80/openid/callback" ],
+      "redirectionUris" : [ ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {

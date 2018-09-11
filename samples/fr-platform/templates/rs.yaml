@@ -45,3 +45,17 @@ spec:
       targetPort: 8080
   selector:
     role: rs
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: sample
+spec:
+  rules:
+  - host: rs-service.sample.svc.cluster.local
+    http:
+      paths:
+      - backend:
+          serviceName: rs-service
+          servicePort: 8080
