@@ -25,7 +25,7 @@
     "sun-idrepo-ldapv3-config-memberof" : null,
     "sun-idrepo-ldapv3-config-memberurl" : "memberUrl",
     "sunIdRepoClass" : "org.forgerock.openam.idrepo.ldap.DJLDAPv3Repo",
-    "sun-idrepo-ldapv3-config-ldap-server" : [ "ds-0.ds:1389" ],
+    "sun-idrepo-ldapv3-config-ldap-server" : [ "configstore-0.configstore:1389" ],
     "sun-idrepo-ldapv3-config-auth-naming-attr" : "uid",
     "sun-idrepo-ldapv3-config-createuser-attr-mapping" : [ "cn", "sn" ],
     "sun-idrepo-ldapv3-dncache-size" : 1500,

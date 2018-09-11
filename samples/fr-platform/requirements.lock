@@ -1,0 +1,9 @@
+dependencies:
+- name: ds
+  repository: file://../../helm/ds
+  version: 6.5.0
+- name: openam
+  repository: file://../../helm/openam
+  version: 6.5.0
+digest: sha256:25ba40bb11c6bc0e5d94889501cd74ae3a8fcc96a629cacb47e0dbe2c31d5ce3
+generated: 2018-09-10T16:36:19.279289156-07:00

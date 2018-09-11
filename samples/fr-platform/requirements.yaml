@@ -1,0 +1,8 @@
+dependencies:
+- name: ds
+  version: ">0.0.0"
+  repository: file://../../helm/ds
+  alias: configstore
+- name: openam
+  version: ">0.0.0"
+  repository: file://../../helm/openam

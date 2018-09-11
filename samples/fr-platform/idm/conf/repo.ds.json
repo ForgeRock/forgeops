@@ -13,7 +13,7 @@
             "heartBeatTimeoutMilliSeconds": 10000,
             "primaryLdapServers": [
                 {
-                    "hostname": "ds-0.ds",
+                    "hostname": "configstore-0.configstore",
                     "port": 1389
                 }
             ],

@@ -6,10 +6,6 @@ build:
   artifacts:
   - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
     workspace: rs
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client
-    workspace: client
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am
-    workspace: am
   - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
     workspace: amster
   - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
@@ -26,8 +22,6 @@ deploy:
         namespace: sample
         values:
           images.rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
-          images.client: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/client
-          images.am: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/am
           images.amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
           images.idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
           images.pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
