@@ -26,7 +26,7 @@ configLdapHost: configstore-0.configstore
 
 # This option:
 #  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450 
+# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
 # This may impact amster imports for some configurations (SAML entities)
 # If you need to renable this for amster, it should be disabled after the import is complete
 
@@ -44,7 +44,7 @@ catalinaOpts: >
 
 # To enable any of the products to use HTTPS on their external endpoint, set the following flag to true.
 useTLS: false
-# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  
+# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.
 # This is enabled by the following flag:
 useCertManager: true
 
@@ -109,7 +109,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "cache-control,content-type,x-openidm-datastoretoken,x-openidm-oauth-login,x-requested-with"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
-    
+
 # Audit log details for log streaming sidecar containers
 
 # We default this to not include the sidecar. TODO - remove the sidecars once the commons audit stdout stream is merged.
@@ -124,5 +124,3 @@ auditLogs: []
 #     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
 #   - name: config-logs
 #     path: "/home/forgerock/openam/openam/log/config.audit.json"
-
-
