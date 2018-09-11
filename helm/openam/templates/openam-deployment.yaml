@@ -73,8 +73,10 @@ spec:
         envFrom:
         - configMapRef:
             name: am-configmap
+        {{ if eq .Values.config.strategy  "git" }}
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
+        {{ end }}
         env:
         - name: NAMESPACE
           valueFrom:
@@ -104,7 +106,7 @@ spec:
         env:
         - name: LOGFILE
           value: {{ .path }}
-        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ] 
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
