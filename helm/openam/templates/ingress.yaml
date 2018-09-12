@@ -13,7 +13,6 @@ metadata:
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
   annotations:
-      nginx.ingress.kubernetes.io/cors-allow-origin: "http://openidm.{{ .Release.Namespace }}{{ .Values.domain }}"
     {{- range $key, $value := .Values.ingress.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}
@@ -26,5 +25,5 @@ spec:
       - path: /openam
         backend:
           serviceName: {{ .Values.service.name }}
-          servicePort: {{ .Values.service.externalPort }}   
+          servicePort: {{ .Values.service.externalPort }}
 {{- end -}}
