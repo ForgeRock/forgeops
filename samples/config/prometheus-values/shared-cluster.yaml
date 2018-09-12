@@ -44,6 +44,7 @@ alertmanager:
       routes: 
       - match:
           alertname: DeadMansSwitch
+          alertname: up
         receiver: 'null'
       
     receivers:
