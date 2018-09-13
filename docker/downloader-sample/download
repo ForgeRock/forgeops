@@ -3,17 +3,16 @@
 # This is a fake script that mimics the functionality of the ../downloader/download script. This 
 # example just assumes the artifacts are in place already.
 # The protocol you need to implement:
-# ./download [-v version] [-s] [openam,openig,opendj,opendidm]
-# Even if you dont use the version or -s (snapshot) implement them as args for compatibility with the other downloader.
+# ./download [-v version] [openam,openig,opendj,opendidm]
+# Even if you dont use the version implement them as args for compatibility with the other downloader.
 #
 # This is used in the first stage of a multi stage build to make the ForgeRock binaries available for subsequent builds.
 
 VERSION=${VERSION:-6.0.0}
 
 # parsing script -for completeness -but not used
-while getopts "swv:d" opt; do
+while getopts "wv:d" opt; do
   case ${opt} in
-    s ) BUILD_SNAPSHOTS="true" ;;
     w ) WGET="true" ;;
     v ) VERSION="${OPTARG}" ;;
     d ) DRYRUN="echo" ;;
