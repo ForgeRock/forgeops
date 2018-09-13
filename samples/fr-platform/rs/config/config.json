@@ -27,8 +27,20 @@
             }
         },
         {
+            "name": "capture",
+            "type": "CaptureDecorator",
+            "config": {
+                "captureEntity": true,
+                "captureContext": true
+            }
+        },
+        {
             "name": "IDMClient",
             "type": "ClientHandler",
+            "capture": [
+                "request",
+                "response"
+            ],
             "config": {
                 "hostnameVerifier": "ALLOW_ALL",
                 "sslContextAlgorithm": "TLSv1.2",
