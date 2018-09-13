@@ -1,5 +1,6 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copy this template to gke-env.cfg and adjust for your environment
 
 # Google Cloud Project ID
 GKE_PROJECT_NAME="my-gcp-project"
