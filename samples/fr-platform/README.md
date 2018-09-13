@@ -92,17 +92,26 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
 
     When all pods report that they are in a ready state, hit Ctrl^C to exit.
 
-6. You can access the platform by opening this URL:
+6. Create sample users in your environment:
+
+    ```
+    kubectl exec -it configstore-0 /opt/opendj/scripts/make-users.sh 10
+    ```
+
+    This will create 10 users (from user.0 through user.9) in your DS repository.
+
+7. You can access the platform by opening this URL:
 
     ```
     http://am-service.sample.svc.cluster.local/openam/console
     ```
 
-    You can use amadmin / password to login.
+    You can use amadmin / password to login as the am admin.
+    You can use user.0  / password to login as a basic end-user.
 
-7. You can now start a sample OAuth2 client from the [Example OAuth 2 Clients Project](https://github.com/ForgeRock/exampleOAuth2Clients).
+8. You can now start a sample OAuth2 client from the [Example OAuth 2 Clients Project](https://github.com/ForgeRock/exampleOAuth2Clients).
 
-8. You can remove the sample like so:
+9. You can remove the sample like so:
 
     If you started the sample with Option 1 from step 3, then stop it like so:
     ```
