@@ -21,8 +21,6 @@ configstore:
       memory: 600Mi
     requests:
       memory: 400Mi
-  image:
-    repository: forgerock-docker-internal.bintray.io/ds
 
 images:
   amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest
