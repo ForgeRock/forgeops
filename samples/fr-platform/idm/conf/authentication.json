@@ -71,7 +71,7 @@
                         "queryId" : "credential-query",
                         "queryOnResource": "endpoint/static/user",
                         "propertyMapping": {
-                            "authenticationId" : "_id"
+                            "authenticationId" : "userName"
                         },
                         "defaultUserRoles" : [ ],
                         "augmentSecurityContext" : {
