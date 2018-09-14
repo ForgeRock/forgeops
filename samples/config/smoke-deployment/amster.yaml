@@ -1,4 +1,6 @@
-
+image:
+  pullPolicy: Always
+  tag: latest
 
 config:
   claim: frconfig
