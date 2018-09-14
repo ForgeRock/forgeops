@@ -1,2 +1,6 @@
 bootstrapType: cts
 djInstance: ctsstore
+
+image:
+  pullPolicy: Always
+  tag: latest
