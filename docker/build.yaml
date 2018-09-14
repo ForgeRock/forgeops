@@ -2,7 +2,7 @@
 timeout: 1000s
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker'
+  dir: '.'
   entrypoint: './build.sh'
   args: ['-a', '-n', 'cloudbuild', '-p','-C', '${_CSV_FILE}' ]
   env:

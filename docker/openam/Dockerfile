@@ -4,7 +4,7 @@
 #
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0-M6"
+ARG VERSION="6.5.0-M4"
 RUN download -v $VERSION openam 
 RUN mkdir -p /var/tmp/openam && unzip -q /openam.war -d /var/tmp/openam
 
