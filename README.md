@@ -58,9 +58,9 @@ the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/ind
 ```sh
 
 # Make sure you have the ingress controller add on
-minikube addon enable ingress
+minikube addons enable ingress
 
-helm init
+helm init --upgrade
 
 cd helm/
 
