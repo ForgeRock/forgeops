@@ -35,7 +35,6 @@ metadata:
 data:
   EXPORT_PATH: {{  default .Values.config.importPath .Values.config.exportPath }}
   CONFIG_PATH: "{{ .Values.config.importPath }}"
-  VERSION: {{ .Values.version }}
   CTS_STORES: {{ default "ctsstore-0.ctsstore:1389" .Values.ctsStores }}
   CTS_PASSWORD: {{ default "password" .Values.ctsPassword }}
   FQDN: {{ template "fqdn" . }}

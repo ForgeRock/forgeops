@@ -13,7 +13,7 @@ component: amster
 serverBase: http://openam:80
 
 
-# The top level domain (including the leading .). This excludes the openam component. 
+# The top level domain (including the leading .). This excludes the openam component.
 domain: .forgeops.com
 
 # Install passwords.
@@ -78,16 +78,12 @@ resources:
 
 # Optional value overrides
 
-# version. This sets the environment variable VERSION which is used by amster / commons config to
-# mass update the amster version tag on import. The amster configuration contains &{version} (see forgeops-init)
-version: 6.0.0
-
 # fqdn - the openam server external fqdn.
 # If this is *not* set, it defaults to openam.{namespace}{{ .Values.domain }}
 #fqdn: openam.acme.com
 
 # ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on
-# import. 
+# import.
 #ctsStores: ctsstore-0.ctsstore:1389
 
 # ctsPassword - defaults to "password"
