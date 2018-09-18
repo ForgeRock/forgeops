@@ -35,7 +35,7 @@ source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 gcloud config set project ${GKE_PROJECT_NAME} 
 
 # Now create the cluster
-./create-cluster.sh
+./gke-create-cluster.sh
 
 if [ $? -ne 0 ]; then
     exit 1 
@@ -68,7 +68,7 @@ done
 
 
 # Create the ingress controller
-./gke-ingress-cntlr.sh ${GKE_INGRESS_IP}
+./create-ingress-cntlr.sh ${GKE_INGRESS_IP}
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh
