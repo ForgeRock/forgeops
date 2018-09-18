@@ -1,5 +1,5 @@
 # Build script for cloud builder.
-timeout: 1000s
+timeout: 2000s
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'
