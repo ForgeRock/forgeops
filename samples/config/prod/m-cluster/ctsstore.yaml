@@ -5,8 +5,10 @@ djInstance: ctsstore
 resources:
   limits:
     memory: 14Gi
+    cpu: 10000m
   requests:
     memory: 10Gi
+    cpu: 8000m
 
 storageSize: 500Gi
 storageClass: fast
