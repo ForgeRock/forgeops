@@ -40,7 +40,7 @@ benchmark:
   get_token_info: "false"
 
   # Product specific values that are passed into gatling.
-  # Will likely to exapand in future to cover all 4 products.
+  # Will likely to expand in future to cover all 4 products.
   # In case you are running gatling in different namespace
   # you need to specify host as a full fqdn. e.g openam.pyforge.forgeops.com
   openam:
