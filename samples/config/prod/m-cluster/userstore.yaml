@@ -3,8 +3,10 @@ djInstance: userstore
 resources:
   limits:
     memory: 11Gi
+    cpu: 8000m
   requests:
     memory: 8Gi
+    cpu: 2000m
 
 # For JDK 8
 opendjJavaArgs: >
