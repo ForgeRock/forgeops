@@ -73,8 +73,7 @@ openamHome: /home/forgerock/openam
 createBootstrap: true
 
 # This is an optional path to a script to execute before AM starts up. It can copy in images, update the web.xml, etc.
-# The path is *relative* to /git/config/{{ configPath.am }}.
-# For example:   /git/config/6.5/my-config/am/customize-am.sh
+# If you change set it to the full path to your cloned configuration.  Example: /git/config/default/6.5/my-openam/custom.sh
 amCustomizationScriptPath: "customize-am.sh"
 
 # Liveness probe tuning - time in seconds
