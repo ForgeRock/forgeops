@@ -7,7 +7,7 @@ CREATE SCHEMA openidm AUTHORIZATION openidm;
 
 CREATE TABLE openidm.objecttypes (
   id BIGSERIAL NOT NULL,
-  objecttype VARCHAR(255) DEFAULT NULL,
+  objecttype VARCHAR(255) NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT idx_objecttypes_objecttype UNIQUE (objecttype)
 );
@@ -121,6 +121,42 @@ CREATE TABLE openidm.configobjectproperties (
 CREATE INDEX fk_configobjectproperties_configobjects ON openidm.configobjectproperties (configobjects_id);
 CREATE INDEX idx_configobjectproperties_prop ON openidm.configobjectproperties (propkey,propvalue);
 
+
+-- -----------------------------------------------------
+-- Table openidm.notificationobjects
+-- -----------------------------------------------------
+
+CREATE TABLE openidm.notificationobjects (
+  id BIGSERIAL NOT NULL,
+  objecttypes_id BIGINT NOT NULL,
+  objectid VARCHAR(255) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  fullobject JSON,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_notificationobjects_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE UNIQUE INDEX idx_notificationobjects_object ON openidm.notificationobjects (objecttypes_id,objectid);
+CREATE INDEX fk_notificationobjects_objecttypes ON openidm.notificationobjects (objecttypes_id);
+
+
+-- -----------------------------------------------------
+-- Table openidm.notificationobjectproperties
+-- -----------------------------------------------------
+
+CREATE TABLE openidm.notificationobjectproperties (
+  notificationobjects_id BIGINT NOT NULL,
+  propkey VARCHAR(255) NOT NULL,
+  proptype VARCHAR(255) DEFAULT NULL,
+  propvalue TEXT,
+  PRIMARY KEY (notificationobjects_id, propkey),
+  CONSTRAINT fk_notificationobjectproperties_notificationobjects FOREIGN KEY (notificationobjects_id) REFERENCES openidm.notificationobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
+CREATE INDEX fk_notificationobjectproperties_notificationobjects ON openidm.notificationobjectproperties (notificationobjects_id);
+CREATE INDEX idx_notificationobjectproperties_prop ON openidm.notificationobjectproperties (propkey,propvalue);
+
+
 -- -----------------------------------------------------
 -- Table openidm.relationships
 -- -----------------------------------------------------
@@ -188,7 +224,6 @@ CREATE TABLE openidm.internaluser (
   objectid VARCHAR(255) NOT NULL,
   rev VARCHAR(38) NOT NULL,
   pwd VARCHAR(510) DEFAULT NULL,
-  roles VARCHAR(1024) DEFAULT NULL,
   PRIMARY KEY (objectid)
 );
 
@@ -200,7 +235,27 @@ CREATE TABLE openidm.internaluser (
 CREATE TABLE openidm.internalrole (
   objectid VARCHAR(255) NOT NULL,
   rev VARCHAR(38) NOT NULL,
+  name VARCHAR(64) DEFAULT NULL,
   description VARCHAR(510) DEFAULT NULL,
+  temporalConstraints VARCHAR(1024) DEFAULT NULL,
+  PRIMARY KEY (objectid)
+);
+
+
+-- -----------------------------------------------------
+-- Table openidm.internalprivilege
+-- -----------------------------------------------------
+
+CREATE TABLE openidm.internalprivilege (
+  objectid VARCHAR(255) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  name VARCHAR(64) DEFAULT NULL,
+  description VARCHAR(510) DEFAULT NULL,
+  path VARCHAR(1024) NOT NULL,
+  permissions VARCHAR(1024) NOT NULL,
+  actions VARCHAR(1024) DEFAULT NULL,
+  filter VARCHAR(1024) DEFAULT NULL,
+  accessflags TEXT DEFAULT NULL,
   PRIMARY KEY (objectid)
 );
 
@@ -272,6 +327,9 @@ CREATE TABLE openidm.clusterobjects (
 CREATE UNIQUE INDEX idx_clusterobjects_object ON openidm.clusterobjects (objecttypes_id,objectid);
 CREATE INDEX fk_clusterobjects_objectypes ON openidm.clusterobjects (objecttypes_id);
 
+CREATE INDEX idx_json_clusterobjects_timestamp ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'timestamp') );
+CREATE INDEX idx_json_clusterobjects_state ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'state') );
+
 
 -- -----------------------------------------------------
 -- Table openidm.clusterobjectproperties
@@ -334,24 +392,40 @@ CREATE TABLE openidm.updateobjectproperties (
 CREATE INDEX fk_updateobjectproperties_updateobjects ON openidm.updateobjectproperties (updateobjects_id);
 CREATE INDEX idx_updateobjectproperties_prop ON openidm.updateobjectproperties (propkey,propvalue);
 
+-- -----------------------------------------------------
+-- Table openidm.syncqueue
+-- -----------------------------------------------------
+CREATE TABLE openidm.syncqueue (
+  objectid VARCHAR(38) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  syncAction VARCHAR(38) NOT NULL,
+  resourceCollection VARCHAR(38) NOT NULL,
+  resourceId VARCHAR(255) NOT NULL,
+  mapping VARCHAR(255) NOT NULL,
+  objectRev VARCHAR(38) NOT NULL,
+  oldObject JSON,
+  newObject JSON,
+  context JSON,
+  state VARCHAR(38) NOT NULL,
+  nodeId VARCHAR(255) DEFAULT NULL,
+  remainingRetries VARCHAR(38) NOT NULL,
+  createDate VARCHAR(255) NOT NULL,
+  PRIMARY KEY (objectid)
+);
+CREATE INDEX indx_syncqueue_mapping_state ON openidm.syncqueue (mapping, state);
+CREATE INDEX indx_syncqueue_mapping_retries ON openidm.syncqueue (mapping, remainingRetries);
+CREATE INDEX indx_syncqueue_mapping_resourceid ON openidm.syncqueue (mapping, resourceId);
+
 
 -- -----------------------------------------------------
--- Data for table openidm.internaluser
+-- Table openidm.locks
 -- -----------------------------------------------------
-START TRANSACTION;
-INSERT INTO openidm.internaluser (objectid, rev, pwd, roles) VALUES ('openidm-admin', '0', 'openidm-admin', '[ { "_ref" : "repo/internal/role/openidm-admin" }, { "_ref" : "repo/internal/role/openidm-authorized" } ]');
-INSERT INTO openidm.internaluser (objectid, rev, pwd, roles) VALUES ('anonymous', '0', 'anonymous', '[ { "_ref" : "repo/internal/role/openidm-reg" } ]');
 
-INSERT INTO openidm.internalrole (objectid, rev, description)
-VALUES
-('openidm-authorized', '0', 'Basic minimum user'),
-('openidm-admin', '0', 'Administrative access'),
-('openidm-cert', '0', 'Authenticated via certificate'),
-('openidm-tasks-manager', '0', 'Allowed to reassign workflow tasks'),
-('openidm-reg', '0', 'Anonymous access'),
-('openidm-prometheus', '0', 'Prometheus access');
+CREATE TABLE openidm.locks (
+  objectid VARCHAR(38) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  nodeid VARCHAR(255),
+  PRIMARY KEY (objectid)
+);
 
-COMMIT;
-
-CREATE INDEX idx_json_clusterobjects_timestamp ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'timestamp') );
-CREATE INDEX idx_json_clusterobjects_state ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'state') );
+CREATE INDEX idx_locks_nodeid ON openidm.locks (nodeid);
