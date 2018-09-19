@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2016-2018 ForgeRock AS.
 
-FROM openjdk:8u151-jdk-alpine
+FROM openjdk:8-jdk-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 
