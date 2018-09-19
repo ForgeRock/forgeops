@@ -17,7 +17,6 @@ class IGReverseProxyWebSim extends Simulation {
     val igProtocol: String = System.getProperty("ig_protocol", "http")
 
     val igUrl: String = "http://" + igHost + ":" + igPort
-    val random = new util.Random
 
     val httpProtocol: HttpProtocolBuilder = http
         .baseURLs(igUrl)
@@ -30,7 +29,6 @@ class IGReverseProxyWebSim extends Simulation {
             exec(http("Rest")
               .get("/")
               .disableUrlEncoding)
-            //.headers(getXOpenAMHeaders("${username}", "${password}")))
         }
 
     setUp(request.inject(rampUsers(concurrency) over warmup)).protocols(httpProtocol)
