@@ -14,7 +14,7 @@ config:
   path: /git/config/6.5/ig-benchmark-reverse-nginx
 
 ingress:
-  hostname: openig.example.forgeops.com
+  hostname: openig.ig-benchmark.forgeops.com
 
 useTLS: false
 useCertManager: false
