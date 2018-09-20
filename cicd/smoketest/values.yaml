@@ -7,8 +7,8 @@ replicaCount: 1
 image:
   #repository: gcr.io/engineering-devops/helm
   #repository: lachlanevenson/k8s-helm
-  repository: lachlanevenson/k8s-kubectl
-  #repository: debian
+  #repository: lachlanevenson/k8s-kubectl
+  repository: gcr.io/engineering-devops/toolbox
   tag: latest
   pullPolicy: IfNotPresent
 

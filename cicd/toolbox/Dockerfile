@@ -1,7 +1,6 @@
-ARG  KUBE_LATEST_VERSION=v1.11.2
-ARG  HELM_VERSION 2.10.0
-
 FROM ubuntu:18.04
+ARG  KUBE_LATEST_VERSION=v1.11.2
+ARG  HELM_VERSION=v2.10.0
 
 # If cloning from git..
 ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
@@ -9,28 +8,30 @@ ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyCheck
 WORKDIR /
 
 RUN apt-get update \
-  && apt-get install -y ca-certificates git vim bash curl openssh-client 
+  && apt-get install -y ca-certificates git vim bash curl openssh-client python-pip \
+  && pip install requests html-testRunner html-testRunner
 
-ENV HELM_FILENAME helm-${HELM_VERSION}-linux-amd64.tar.gz
+#  
+# ADD https://storage.googleapis.com/kubernetes-helm/helm-v2.10.0-linux-amd64.tar.gz /tmp
+ADD https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz /tmp
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kubectl /bin/
+ADD https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens /bin/
+ADD https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx /bin/
 
-ADD http://storage.googleapis.com/kubernetes-helm/${HELM_FILENAME} /tmp
-ADD https://storage.googleapis.com/kubernetes-release/release/${KUBE_LATEST_VERSION}/bin/linux/amd64/kubectl /bin/
-
-RUN tar -zxvf /tmp/${HELM_FILENAME} -C /tmp \
+RUN tar -zxvf /tmp/helm*.tar.gz -C /tmp \
   && mv /tmp/linux-amd64/helm /bin/helm \
-  && chmod +x  /bin/kubectl \
+  && chmod +x  /bin/* \
   && rm -rf /tmp \
   && mkdir -p /opt/toolbox/bin \
   && git config --global user.email "forgeops-auto-export@forgerock.net" \
-  && git config --global user.name "ForgeRock Auto export user"
+  && git config --global user.name "ForgeRock Auto export user" \
+  && helm init --client-only
 
 
-WORKDIR /opt/toolbox
+# ADD bin /opt/toolbox/bin/
+ADD *.sh /
+# ADD templates /opt/toolbox/templates/
 
-ADD bin /opt/toolbox/bin/
-ADD *.sh /opt/toolbox/bin/
-ADD templates /opt/toolbox/templates/
-
-ENTRYPOINT ["/opt/toolbox/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["pause"]
