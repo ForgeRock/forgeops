@@ -25,6 +25,8 @@ spec:
             -Dam_port={{ .Values.benchmark.openam.port }}
             -Didm_host={{ .Values.benchmark.openidm.host }}
             -Didm_port={{ .Values.benchmark.openidm.port }}
+            -Dig_host={{ .Values.benchmark.openig.host }}
+            -Dig_port={{ .Values.benchmark.openig.port }}
             -DlogoutPercent={{ .Values.benchmark.logoutpercent }}
             -Dusers={{ .Values.benchmark.users }}
             -Dconcurrency={{ .Values.benchmark.concurrency }}
