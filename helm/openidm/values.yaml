@@ -36,7 +36,7 @@ javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
 # To enable any of the products to use HTTPS on their external endpoint, set the following flag to true.
 useTLS: false
-# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  
+# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.
 # This is enabled by the following flag:
 useCertManager: true
 
@@ -44,17 +44,17 @@ useCertManager: true
 openidm:
   repo:
     # DS external repo
-    host: userstore-0.userstore
-    port: 1389
-    user: "cn=Directory Manager"
-    password: password
+    # host: userstore-0.userstore
+    # port: 1389
+    # user: "cn=Directory Manager"
+    # password: password
     # postgres values
-    # host: postgresql
-    # port: 5432
-    # user: openidm
-    # password: openidm
-    # schema: openidm
-    # databaseName: openidm
+     host: postgresql
+     port: 5432
+     user: openidm
+     password: openidm
+     schema: openidm
+     databaseName: openidm
   # Optional client secret for AM/IDM integration:
   idpconfig:
     clientsecret: password

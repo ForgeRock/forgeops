@@ -43,4 +43,3 @@ CREATE INDEX idx_json_managedobjects_mail_gin ON openidm.managedobjects
   USING gin (json_extract_path_text(fullobject, 'mail') gin_trgm_ops);
 CREATE INDEX idx_json_managedobjects_accountStatus_gin ON openidm.managedobjects
   USING gin (json_extract_path_text(fullobject, 'accountStatus') gin_trgm_ops);
-
