@@ -23,6 +23,8 @@ benchmark:
   # - idm.IDMUpdateManagedUsers
   # - idm.IDMDeleteManagedUsers
   #
+  # For IG it is:
+  # - ig.IGReverseProxyWebSim
 
   testname: am.AMAccessTokenSim
 
@@ -48,6 +50,9 @@ benchmark:
     port: 80
   openidm:
     host: openidm
+    port: 80
+  openig:
+    host: openig
     port: 80
 
 # Reporting related values.
