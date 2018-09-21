@@ -22,6 +22,9 @@ EKS_VPC_ID=""
 # EKS Subnet
 EKS_SUBNETS=""
 
+# EKS Subnet for a control panel ec2 instance
+EKS_PANEL_SUBNET=""
+
 # EC2 Security Groups
 EKS_SECURITY_GROUPS=""
 
