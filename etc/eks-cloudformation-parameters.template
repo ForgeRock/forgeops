@@ -1,0 +1,46 @@
+[
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "{{EKS_CLUSTER_NAME}}"
+  },
+  {
+    "ParameterKey": "ClusterControlPlaneSecurityGroup",
+    "ParameterValue": "{{EKS_SECURITY_GROUPS}}"
+  },
+  {
+    "ParameterKey": "NodeGroupName",
+    "ParameterValue": "{{EKS_WORKER_NODES_GROUP}}"
+  },
+  {
+    "ParameterKey": "NodeAutoScalingGroupMinSize",
+    "ParameterValue": "{{EKS_MIN_NODES}}"
+  },
+  {
+    "ParameterKey": "NodeAutoScalingGroupMaxSize",
+    "ParameterValue": "{{EKS_MAX_NODES}}"
+  },
+  {
+    "ParameterKey": "NodeInstanceType",
+    "ParameterValue": "{{EKS_WORKER_NODE_INSTANCE_TYPE}}"
+  },
+  {
+    "ParameterKey": "NodeImageId",
+    "ParameterValue": "{{EKS_AMI_ID}}"
+  },
+  {
+    "ParameterKey": "NodeVolumeSize",
+    "ParameterValue": "{{EKS_WORKER_NODE_SIZE_IN_GB}}"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "{{EKS_SSH_KEYPAIR_NAME}}"
+  },
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "{{EKS_VPC_ID}}"
+  },
+  {
+    "ParameterKey": "Subnets",
+    "ParameterValue": "{{EKS_SUBNETS}}"
+  }
+]
