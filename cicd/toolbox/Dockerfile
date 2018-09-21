@@ -2,8 +2,8 @@ FROM ubuntu:18.04
 ARG  KUBE_LATEST_VERSION=v1.11.2
 ARG  HELM_VERSION=v2.10.0
 
-# If cloning from git..
-ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
+# Not used right now, but if we want this image to pull/push to a private repo, uncomment this and provide the secret:
+# ENV GIT_SSH_COMMAND ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /etc/git-secret/ssh
 
 WORKDIR /
 
@@ -11,8 +11,7 @@ RUN apt-get update \
   && apt-get install -y ca-certificates git vim bash curl openssh-client python-pip \
   && pip install requests html-testRunner html-testRunner
 
-#  
-# ADD https://storage.googleapis.com/kubernetes-helm/helm-v2.10.0-linux-amd64.tar.gz /tmp
+
 ADD https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz /tmp
 ADD https://storage.googleapis.com/kubernetes-release/release/v1.11.2/bin/linux/amd64/kubectl /bin/
 ADD https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens /bin/
@@ -28,9 +27,7 @@ RUN tar -zxvf /tmp/helm*.tar.gz -C /tmp \
   && helm init --client-only
 
 
-# ADD bin /opt/toolbox/bin/
 ADD *.sh /
-# ADD templates /opt/toolbox/templates/
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 

@@ -1,4 +1,5 @@
 # Build smoke tests docker image
+# Submit using: gcloud  builds  submit --config cloudbuild.yaml
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: '.'
@@ -7,5 +8,14 @@ steps:
           '-t', 'gcr.io/$PROJECT_ID/forgeops-tests:latest',
           'forgeops-tests'
         ]
+- name: 'gcr.io/cloud-builders/docker'
+  dir: '.'
+  args: [
+          'build',
+          '-t', 'gcr.io/$PROJECT_ID/toolbox:latest',
+          'toolbox'
+        ]
 images:
 - gcr.io/$PROJECT_ID/forgeops-tests:latest
+- gcr.io/$PROJECT_ID/toolbox:latest
+
