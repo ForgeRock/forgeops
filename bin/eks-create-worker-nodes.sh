@@ -23,10 +23,12 @@ sed "s|{{EKS_AMI_ID}}|$EKS_AMI_ID|" | \
 sed "s|{{EKS_WORKER_NODE_SIZE_IN_GB}}|$EKS_WORKER_NODE_SIZE_IN_GB|" | \
 sed "s|{{EKS_SSH_KEYPAIR_NAME}}|$EKS_SSH_KEYPAIR_NAME|" | \
 sed "s|{{EKS_VPC_ID}}|$EKS_VPC_ID|" | \
+sed "s|{{EKS_PANEL_SUBNET}}|$EKS_PANEL_SUBNET|" | \
 sed "s|{{EKS_SUBNETS}}|$EKS_SUBNETS|" > ../etc/eks-cloudformation-parameters.cfg
 
+CF_STACK_ID=`aws cloudformation create-stack --stack-name $EKS_STACK_NAME --template-body file://../etc/eks-cloudformation-template.yaml --parameters file://../etc/eks-cloudformation-parameters.cfg --capabilities CAPABILITY_IAM | jq -r '.StackId'`
 
-aws cloudformation create-stack --stack-name $EKS_STACK_NAME --template-body file://../etc/eks-cloudformation-template.yaml --parameters file://../etc/eks-cloudformation-parameters.cfg --capabilities CAPABILITY_IAM
+echo "Creating Stack with ID: $CF_STACK_ID"
 
 
 # TODO: Get status of CloudFormation

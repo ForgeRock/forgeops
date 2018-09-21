@@ -8,6 +8,10 @@ Parameters:
     Description: The EC2 Key Pair to allow SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
 
+  ControlPanelSubnet:
+    Description: Subnet Id for the control panel instance
+    Type: String
+
   NodeImageId:
     Type: AWS::EC2::Image::Id
     Description: AMI id for the node instances.
@@ -212,6 +216,17 @@ Resources:
       FromPort: 1025
       ToPort: 65535
 
+  SSHIngressSecurityGroup:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: NodeSecurityGroup
+    Properties:
+      Description: Allow SSH access
+      GroupId: !Ref NodeSecurityGroup
+      IpProtocol: tcp
+      CidrIp: 0.0.0.0/0
+      FromPort: 22
+      ToPort: 22
+
   NodeSecurityGroupFromControlPlaneOn443Ingress:
     Type: AWS::EC2::SecurityGroupIngress
     DependsOn: NodeSecurityGroup
@@ -248,12 +263,12 @@ Resources:
   ControlPanelEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: NodeImageId
+      ImageId: !Ref NodeImageId
       InstanceType: t2.micro
       KeyName: !Ref KeyName
+      SubnetId: !Ref ControlPanelSubnet
       SecurityGroupIds:
         - !Ref NodeSecurityGroup
-      SubnetId: !Ref Subnets
       Tags:
         - Key: Name
           Value: !Sub "${ClusterName}-ControlPanel"
