@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Sample script to create a self signed CA using cfssl, and create
-# server certs for DJ that are signed by this CA.
+# server certs for DS that are signed by this CA.
 # Used cfssl https://github.com/cloudflare/cfssl
 # On Mac OS you can install using brew install cfssl.
 
 
 # Where we store the CA certificates. If you retain this CA you can generate
-# future DJ certs signed by the same CA.
+# future DS certs signed by the same CA.
 CA_HOME=~/etc/ca
 
 SSL_CERT_ALIAS=opendj-ssl
@@ -54,7 +54,7 @@ cfssl gencert -initca  ${TMPDIR}/csr_ca.json  | \
     (cd ${CA_HOME};  cfssljson -bare ca)
 fi
 
-# Now generate a server certificate for OpenDJs SSL requirements.
+# Now generate a server certificate for OpenDSs SSL requirements.
 # Edit this template for your environment.
 
 cat >${TMPDIR}/csr_opendj.json <<EOF

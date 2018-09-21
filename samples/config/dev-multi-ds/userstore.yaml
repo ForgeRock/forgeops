@@ -1,7 +1,4 @@
-djInstance: userstore
-
-numberSampleUsers: "1000"
-
+instance: userstore
 
 replicas: 1
 

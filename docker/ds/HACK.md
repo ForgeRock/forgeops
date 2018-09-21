@@ -24,10 +24,10 @@ image:
   pullPolicy: IfNotPresent
   tag: 6.5.0
 
-djInstance: userstore
+instance: userstore
 
 replicas: 2
-djPersistence: false
+persistence: false
 ```
 
 Deploy with:

@@ -13,8 +13,8 @@ openam:
   openamInstance: http://am-service:80/openam
 
 configstore:
-  djInstance: configstore
-  djPersistence: false
+  instance: configstore
+  persistence: false
   opendjJavaArgs: "-Xmx400m"
   resources:
     limits:

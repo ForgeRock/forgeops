@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ################################################################################
-# ForgeOps DJ smoke tests definitions
+# ForgeOps DS smoke tests definitions
 #
 # This suite cointains a set of smoke tests that are intended to be run
 # as part of CI/CD process.

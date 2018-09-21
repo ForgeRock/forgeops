@@ -26,7 +26,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         # envFrom:
         # - configMapRef:
-        #     name: {{ .Values.djInstance }}
+        #     name: {{ .Values.instance }}
         env:
         - name: NAMESPACE
           valueFrom:
@@ -55,4 +55,4 @@ spec:
       # volumes:
       #   - name: dj-secrets
       #     secret:
-      #       secretName: {{ .Values.djInstance }}
+      #       secretName: {{ .Values.instance }}

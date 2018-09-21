@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Run the OpenDJ server
-# We consolidate all of the writable DJ directories to /opt/opendj/data
+# Run the DS server
+# We consolidate all of the writable DS directories to /opt/opendj/data
 # This allows us to to mount a data volume on that root which  gives us
-# persistence across restarts of OpenDJ.
+# persistence across DS restarts.
 # For Docker - mount a data volume on /opt/opendj/data
 # For Kubernetes mount a PV
 #
@@ -63,7 +63,7 @@ relocate_data()
 }
 
 start() {
-    echo "Starting OpenDJ"
+    echo "Starting DS"
     echo "Server id $SERVER_ID"
     #exec dumb-init -- ./bin/start-ds --nodetach
     exec tini -v -- ./bin/start-ds --nodetach

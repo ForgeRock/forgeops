@@ -1,4 +1,4 @@
-djInstance: userstore
+instance: userstore
 
 resources:
   limits:

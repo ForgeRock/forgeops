@@ -1,2 +1,1 @@
-djInstance: configstore
-numberSampleUsers: "1000"
+instance: configstore

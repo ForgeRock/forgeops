@@ -19,8 +19,8 @@ openidm:
     repository: forgerock-docker-public.bintray.io/forgerock/openidm
 
 userstore:
-  djInstance: userstore
-  djPersistence: false
+  instance: userstore
+  persistence: false
   opendjJavaArgs: "-Xmx400m"
   resources:
     limits:
@@ -31,8 +31,8 @@ userstore:
     repository: forgerock-docker-public.bintray.io/forgerock/ds
 
 configstore:
-  djInstance: configstore
-  djPersistence: false
+  instance: configstore
+  persistence: false
   opendjJavaArgs: "-Xmx400m"
   resources:
     limits:

@@ -1,5 +1,5 @@
 bootstrapType: cts
-djInstance: ctsstore
+instance: ctsstore
 
 image:
   pullPolicy: Always

@@ -70,6 +70,6 @@ echo "You are now ready to install the forgerock helm charts"
 
 echo "Example: You can use the following commands to deploy AM"
 
-echo "helm install -f ${CUSTOM_YAML} --set djInstance=configstore forgerock/opendj"
-echo "helm install -f ${CUSTOM_YAML} forgerock/amster"
-echo "helm install -f ${CUSTOM_YAML} forgerock/openam"
+echo "helm install -f ${CUSTOM_YAML} --set instance=configstore ds"
+echo "helm install -f ${CUSTOM_YAML} amster"
+echo "helm install -f ${CUSTOM_YAML} openam"

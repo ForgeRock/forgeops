@@ -1,4 +1,4 @@
-djInstance: ctsstore
+instance: ctsstore
 
 replicas: 2
 
