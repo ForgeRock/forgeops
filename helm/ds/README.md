@@ -7,9 +7,9 @@ and StatefulSets.
 
 To deploy to a Kubernetes cluster:
 
-`helm install --set "djInstance=userstore" opendj`
+`helm install --set "instance=userstore" ds`
 
-This will install a sample DJ userstore.
+This will install a sample DS userstore.
 
 The instance will be available in the cluster as userstore-0. 
 

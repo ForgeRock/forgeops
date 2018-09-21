@@ -1,6 +1,6 @@
 bootstrapType: cts
 
-djInstance: ctsstore
+instance: ctsstore
 
 resources:
   limits:

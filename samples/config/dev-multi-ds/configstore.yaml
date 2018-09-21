@@ -1,4 +1,4 @@
-djInstance: configstore
+instance: configstore
 
 replicas: 1
 

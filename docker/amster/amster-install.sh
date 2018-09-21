@@ -58,7 +58,7 @@ wait_for_openam()
       sleep 5
    done
 
-	# Sleep additional time in case OpenDJ is not quite up yet.
+	# Sleep additional time in case DS is not quite up yet.
 	echo "About to begin configuration"
 }
 

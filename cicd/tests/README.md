@@ -15,7 +15,7 @@ Modify config.cfg to contain host and port for specific product.
 - Login test
 - User login test
 
-### DJ
+### DS
 - TBD
 
 ### IDM

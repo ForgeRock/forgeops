@@ -50,7 +50,7 @@ If you are using your own private registry you must modify registry.sh with the 
 
 This directory contains Helm charts for:
 
-* opendj  - A chart to deploy one or more OpenDJ instances
+* ds  - A chart to deploy one or more DS instances
 * amster  - A chart to install and configure OpenAM 
 * openam - A chart for the OpenAM runtime. Assumes OpenAM is
 installed already. This can scale up horizontally by increasing the replica count.
@@ -70,10 +70,10 @@ your own value overrides in a custom.yaml file that override just the values you
 change. You can then invoke Helm with your custom values. 
 
 For example,
-assume your ```custom.yaml`` file sets the DJ image tag to "test-4.1".
-You can deploy the OpenDJ chart using:
+assume your ```custom.yaml`` file sets the DS image tag to "test-4.1".
+You can deploy the DS chart using:
 
-```helm install -f custom.yaml opendj```
+```helm install -f custom.yaml ds```
 
 Further documentation can be found in each chart's README.md
 
@@ -120,13 +120,13 @@ shell into the container and run the export.sh script. This script will run Amst
 current configuration to /git.  
 
 
-The default OpenDJ deployment uses persistent volume claims (PVC) and
+The default DS deployment uses persistent volume claims (PVC) and
 StatefulSets to provide stateful deployment of the data tier. If you
 wish to start from scratch you should delete the PVC volumes.
 PVCs and StatefulSets are features introduced in Kubernetes 1.5. 
 
 If you are using Minikube take note that host path PVCs get deleted
-every time Minikube is restarted.  The opendj/ chart is a StatefulSet,
+every time Minikube is restarted.  The ds/ chart is a StatefulSet,
 and relies on auto provisioning.  If you restart Minikube, you may find you
 need to re-install OpenAM.
 
@@ -136,7 +136,7 @@ The script `helm/update-deps.sh` will update all of the dependencies. You must r
 
 # Tips
 
-To connect an LDAP browser to OpenDJ running in the cluster, use
+To connect an LDAP browser to DS running in the cluster, use
 port forwarding:
 
 kubectl port-forward opendj-configstore-0 1389:1389

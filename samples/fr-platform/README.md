@@ -1,10 +1,10 @@
 # Platform OAuth2 Sample
 
-This is a sample project demonstrates one way to use four components of the ForgeRock Identity Platform (AM, DJ, IDM and IG). This sample demonstrates these capabilities:
+This is a sample project demonstrates one way to use four components of the ForgeRock Identity Platform (AM, DS, IDM and IG). This sample demonstrates these capabilities:
 
 IG protecting IDM as an OAuth2 Resource Server for end-user interaction
 
-External DJ cluster as a shared user store for AM and IDM
+External DS cluster as a shared user store for AM and IDM
 
 **There is no OAuth2 client shipped with this sample**. Refer to the [Example OAuth 2 Clients Project](https://github.com/ForgeRock/exampleOAuth2Clients) to find a sample client that will be the most useful for your needs.
 
@@ -147,7 +147,7 @@ You now have a file names something like fr-platform-6.5.0-SNAPSHOT.tgz that you
 
 ## Connecting to your cluster
 
-To make the internal DJ cluster accessible locally:
+To make the internal DS cluster accessible locally:
 
     kubectl port-forward ds-0 2389:1389 &
 

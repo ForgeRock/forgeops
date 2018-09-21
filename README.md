@@ -67,7 +67,7 @@ cd helm/
 # If you want to use the demonstration Helm chart repo, you can use this:
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts/
 helm repo update
-# deploy the AM development example. Deploys AM, amster, and DJ config store.
+# deploy the AM development example. Deploys AM, amster, and DS config store.
 # Using forgerock/ as a prefix deploys from the chart repository. For local development use the folder ./cmp-am-dev
 helm install -f my-custom.yaml forgerock/cmp-platform
 

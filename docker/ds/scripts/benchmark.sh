@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# A sample baseline benchmark that runs against the DJ user store. This modifies directory data. This should
+# A sample baseline benchmark that runs against the DS user store. This modifies directory data. This should
 # only be used for testing.
 
 cd /opt/opendj

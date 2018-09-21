@@ -2,14 +2,14 @@
 
 
 # If useDefaultSecrets is set to true (the default), the secret values in ../secrets will
-# be used to create a secret map with the same name as the instance ($djInstance).
+# be used to create a secret map with the same name as the instance ($instance).
 # If you set useDefaultSecrets to false, you must create this secret map yourself before the DS
 # instances will be provisioned. This allows you to inject your own secrets rather
 # than use the default ones bundled in the chart. An alternate strategy is to fork this chart.
 # and replace the secrets in ./secrets with your own.
 useDefaultSecrets: true
 
-# The default OpenDJ baseDN.
+# The default DS baseDN.
 # Note that the default install creates two backends: o=cts and o=userstore
 # The setting below changes the base dn for the o=userstore backend only!
 # We strongly suggest that you *NOT* change the default. There is very little value in
@@ -17,8 +17,8 @@ useDefaultSecrets: true
 baseDN: "o=userstore"
 
 # The default instance name. This will create a stateful set that can be resolved at
-#  $djInstance-0.$djInstance
-djInstance: ds
+#  $instance-0.$instance
+instance: ds
 
 component: ds
 
@@ -39,7 +39,7 @@ image:
 # You can not change this after installation.
 replicas: 1
 
-# Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
+# Size for DS database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
 
 # Set storageClass only on clusters that support it (GCP / AWS).
@@ -85,10 +85,10 @@ resources:
   limits:
    memory: 768Mi
 
-# DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
-# Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
+# DS persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
+# Used in testing environments without pv providers. When the pod is terminated, the DS data will be deleted!
 # If you run into issues with minikube set this to false. See https://github.com/kubernetes/minikube/issues/1990
-djPersistence: true
+persistence: true
 
 # Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".
 # The hard setting means that do not deploy more than one pod in a node which is critical for HA.

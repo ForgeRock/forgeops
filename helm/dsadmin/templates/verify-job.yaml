@@ -9,9 +9,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ .Values.djInstance }}-verify
+  name: {{ .Values.instance }}-verify
   labels:
-    djInstance: {{ .Values.djInstance }}
+    instance: {{ .Values.instance }}
     app: {{ template "fullname" . }}
     vendor: forgerock
     component: opendj
@@ -33,7 +33,7 @@ spec:
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             envFrom:
             - configMapRef:
-                name: {{ .Values.djInstance }}
+                name: {{ .Values.instance }}
             env:
             - name: NAMESPACE
               valueFrom:
@@ -51,7 +51,7 @@ spec:
           volumes:
           # - name: dj-secrets
           #   secret:
-          #     secretName: {{ .Values.djInstance }}
+          #     secretName: {{ .Values.instance }}
           - name: backup
             persistentVolumeClaim: 
               claimName: {{ .Values.backup.pvcName }}

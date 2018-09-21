@@ -19,7 +19,7 @@ volumeMounts:
     mountPath: /opt/opendj/data
 envFrom:
 - configMapRef:
-    name: {{ .Values.djInstance }}
+    name: {{ .Values.instance }}
 env:
 - name: NAMESPACE
   valueFrom:

@@ -62,7 +62,7 @@ openidm:
     username: prometheus
     password: prometheus
 
-# Optional - if there is a DJ userstore configured for synchornization or explict mapping when DJ is used as repo
+# Optional - if there is a DS userstore configured for synchornization or explict mapping when DS is used as repo
 userstore:
   host: userstore-0.userstore
   password: password
