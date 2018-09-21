@@ -12,24 +12,18 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
-
 echo "=> Read the following env variables from config file"
-echo -e "\tProject Name = ${EKS_PROJECT_NAME}"
-echo -e "\tPrimary Zone = ${EKS_PRIMARY_ZONE}"
-echo -e "\tAdditional Zones = ${EKS_NODE_LOCATIONS}"
+echo -e "\tStack Name = ${EKS_STACK_NAME}"
 echo -e "\tCluster Name = ${EKS_CLUSTER_NAME}"
-echo -e "\tCluster Namespace = ${EKS_CLUSTER_NS}"
-echo -e "\tCluster Monitoring Namespace = ${EKS_MONITORING_NS}"
 echo -e "\tCluster Version = ${EKS_CLUSTER_VERSION}"
-echo -e "\tCluster Size =  ${EKS_CLUSTER_SIZE}"
-echo -e "\tVM Type = ${EKS_MACHINE_TYPE}"
-echo -e "\tNetwork = ${EKS_NETWORK_NAME}"
-echo -e "\tIngress Controller IP = ${EKS_INGRESS_IP}"
-echo -e "\tExtra Arguments = ${EKS_EXTRA_ARGS}"
+echo -e "\tRole ARN = ${EKS_ROLE_ARN}"
+echo -e "\tVPC ID = ${EKS_VPC_ID}"
+echo -e "\tSubnets = ${EKS_SUBNETS}"
+echo -e "\tSecuity Group = ${EKS_SECURITY_GROUPS}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
-case "${choice}" in 
+case "${choice}" in
    y|Y|yes|YES ) echo "yes";;
    n|N|no|NO ) echo "no"; exit 1;;
    * ) echo "Invalid input, Bye!"; exit 1;;
@@ -37,22 +31,32 @@ esac
 
 
 echo ""
-echo "=> Creating cluster called \"${EKS_CLUSTER_NAME}\" with specs \"${EKS_MACHINE_TYPE}\""
+echo "=> Creating cluster called \"${EKS_CLUSTER_NAME}\""
 echo ""
 
-MAX_NODES=`expr ${EKS_CLUSTER_SIZE} + 2`
-MIN_NODES=${EKS_CLUSTER_SIZE}
+MAX_NODES=${EKS_MAX_NODES}
+MIN_NODES=${EKS_MIN_NODES}
 
-if [ ! -z "${EKS_EXTRA_ARGS}" ]; then 
-      EKS_EXTRA_ARGS="${EKS_EXTRA_ARGS}"
-fi
+CLUSTER_ARN=`aws eks create-cluster --name $EKS_CLUSTER_NAME \
+  --role-arn $EKS_ROLE_ARN \
+  --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS | jq -r '.cluster.arn'`
 
-if [ ! -z "${EKS_NODE_LOCATIONS}" ]; then 
-      EKS_EXTRA_ARGS="${EKS_EXTRA_ARGS} --node-locations=${EKS_NODE_LOCATIONS}"
-fi
+echo "EKS Cluster created with ARN: $CLUSTER_ARN"
+echo "Waiting for EKS cluster to be ready, usually takes 10 minutes..."
 
+while :
+do
+    CLUSTER_STATUS=`aws eks describe-cluster --name $EKS_CLUSTER_NAME | jq '.cluster.status'`
 
-aws eks create-cluster --name devel \
-  --role-arn arn:aws:iam::111122223333:role/eks-service-role-AWSServiceRoleForAmazonEKS-EXAMPLEBKZRQR \
-  --resources-vpc-config subnetIds=subnet-0a2d698ebae2fbb46,subnet-0bb82d2007138df3b,subnet-09594f97e0214d918,securityGroupIds=sg-0a9c85a3ed04623ef
+    if [ $CLUSTER_STATUS = "\"CREATING\"" ]; then
+      echo "Waiting for EKS cluster to be ready..."
+      sleep 1m
+    elif [ $CLUSTER_STATUS == "\"ACTIVE\"" ]; then
+      echo "EKS cluster is ready"
+      break
+    else
+      echo "Failed to create EKS cluster with status ${CLUSTER_STATUS}"
+      exit 1
+    fi
 
+done

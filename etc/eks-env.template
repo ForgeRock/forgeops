@@ -1,0 +1,57 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copy this template to eks-env.cfg and adjust for your environment
+
+
+# CloudFormation Stack Name
+EKS_STACK_NAME="worker-nodes"
+
+# EKS Cluster Name
+EKS_CLUSTER_NAME="my-cluster"
+
+# Kubernetes Cluster Version
+# To get specific cluster versions you can run the command
+EKS_CLUSTER_VERSION="1.10"
+
+# EKS Service Role Arn
+EKS_ROLE_ARN=""
+
+# EKS VPC ID
+EKS_VPC_ID=""
+
+# EKS Subnet
+EKS_SUBNETS=""
+
+# EC2 Security Groups
+EKS_SECURITY_GROUPS=""
+
+# Min Nodes per zone in Cluster
+EKS_MIN_NODES="1"
+
+# Max Nodes per zone in Cluster
+EKS_MAX_NODES="3"
+
+# Node Group Name
+EKS_WORKER_NODES_GROUP="worker-node-group"
+
+# Node Volumn Size
+EKS_WORKER_NODE_SIZE_IN_GB="20"
+
+# Worker Nodes Instance Type
+EKS_WORKER_NODE_INSTANCE_TYPES="t2.small"
+
+# Worker Nodes SSH Key/Pair
+EKS_SSH_KEYPAIR_NAME="keypairname"
+
+# VM Type
+EKS_AMI_ID="ami-0440e4f6b9713faf6"
+
+# Kubernetes Namespace
+EKS_CLUSTER_NS="prod"
+
+# Monitoring Namespace
+EKS_MONITORING_NS="monitoring"
+
+# Static (External) IP Address to assign to the Ingress Controller
+# Leave  blank "" if you don't know the IP or use the one set by GKE
+EKS_ELB_ARN=""
