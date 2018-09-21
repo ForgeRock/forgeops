@@ -42,5 +42,9 @@
   {
     "ParameterKey": "Subnets",
     "ParameterValue": "{{EKS_SUBNETS}}"
+  },
+  {
+    "ParameterKey": "ControlPanelSubnet",
+    "ParameterValue": "{{EKS_PANEL_SUBNET}}"
   }
 ]
