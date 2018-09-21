@@ -12,7 +12,7 @@ kubectl config set-context default
 kubectl config use-context default 
 
 
-do_pause() {
+pause() {
     echo "Sleeping awaiting your command" 
     while true
     do
@@ -22,11 +22,12 @@ do_pause() {
 # assume command is startall. TODO: add different entry points
 
 case $1 in
-startall)   
-    bin/start-all.sh;;
+smoke-tests)   
+    /run-smoke-tests.sh
+    ;;
     
 pause) 
-    do_pause ;;
+    pause ;;
 
 *) 
     exec $@ ;;
