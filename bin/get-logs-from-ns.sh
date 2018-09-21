@@ -40,9 +40,13 @@ mkdir ingress
 # Get pods/container logs & descriptions
 for pod in ${POD_LIST}; do
   echo "Getting POD details from:" ${pod}
+  init_containers=$(kubectl -n=${NAMESPACE} get pod ${pod} -o jsonpath='{.spec.initContainers[*].name}' | tr " " "\n")
   containers=$(kubectl -n=${NAMESPACE} get pod ${pod} -o jsonpath='{.spec.containers[*].name}' | tr " " "\n")
   kubectl -n=${NAMESPACE} describe pod ${pod} > pods/${pod}-description.log
   # Iterate through all containers in pod
+  for container in ${init_containers}; do
+        kubectl -n=${NAMESPACE} logs ${pod} ${container} > pods/${pod}-init-${container}.log
+  done
   for container in ${containers}; do
     kubectl -n=${NAMESPACE} logs ${pod} ${container} > pods/${pod}-${container}.log
   done

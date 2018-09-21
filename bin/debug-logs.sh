@@ -35,11 +35,18 @@ for pod in ${POD_LIST}; do
 
   echo "<li><a href=\"#${pod}\">${pod}</a></li>" >> $TOC 
 
+  init_containers=$(kubectl -n=${NAMESPACE} get pod ${pod} -o jsonpath='{.spec.initContainers[*].name}' | tr " " "\n")
   containers=$(kubectl -n=${NAMESPACE} get pod ${pod} -o jsonpath='{.spec.containers[*].name}' | tr " " "\n")
   echo "<p>Pod description: </p><pre>" >> $OUT
   kubectl -n=${NAMESPACE} describe pod ${pod} >> $OUT
   echo "</pre><br><p><a href=\"#toc\">Back to Index</a></p>" >> $OUT
 
+
+  for container in ${init_containers}; do 
+      echo "<h3>Logs for init container: $container</h3><br><pre>" >> $OUT
+       kubectl -n=${NAMESPACE} logs ${pod} ${container} | head -1000 >> $OUT
+       echo "</pre><br><hr>" >> $OUT 
+  done
 
   for container in ${containers}; do
     echo "<h3>Logs for container: $container</h3><br><pre>" >> $OUT
