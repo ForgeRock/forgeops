@@ -52,7 +52,7 @@ kubectl create namespace ${GKE_CLUSTER_NS}
 kubectl config set-context $(kubectl config current-context) --namespace=${GKE_CLUSTER_NS}
 
 # Create storage class
-./create-sc.sh
+./gke-create-sc.sh
 
 # Inatilize helm by creating a rbac role first
 ./helm-rbac-init.sh
