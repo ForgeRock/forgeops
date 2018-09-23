@@ -16,17 +16,17 @@ ask() {
 	esac
 }
 
-#echo -e "WARNING: This script requires a properly provisioned GCP Project with appropriate\n\t accounts, roles, privileges, keyrings, keys etc. These pre-requisites are\n\t outlined in the DevOps Documentation. Please ensure you have completed all\n\t before proceeding."
+echo -e "WARNING: This script requires a properly provisioned AWS EKS account and that the user is authenticated to AWS.\n\t These pre-requisites are outlined in the DevOps Documentation. Please ensure you have completed all before proceeding."
 
 
-#echo ""
-#echo "=> Have you copied the template file etc/eks-env.template to etc/eks-env.cfg and edited to cater to your enviroment?"
-#ask
+echo ""
+echo "=> Have you copied the template file etc/eks-env.template to etc/eks-env.cfg and edited to cater to your enviroment?"
+ask
 
-#authn=`gcloud auth list --filter=status:ACTIVE --format="value(account)"`
-#echo ""
-#echo "You are authenticated and logged into GCP as \"${authn}\". If this is not correct then exit this script and run \"gcloud auth login\" to login into the correct account first."
-#ask
+authn=$(aws sts get-caller-identity | grep arn | awk '{print $2}')
+echo ""
+echo "You are authenticated into AWS as \"${authn}\". If this is not correct then exit this script and set the correct \"aws profile\."
+ask
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
@@ -34,14 +34,19 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 #gcloud config set project ${EKS_PROJECT_NAME} 
 
 # Now create the cluster
-#./eks-create-cluster.sh
+./eks-create-cluster.sh
 
-#if [ $? -ne 0 ]; then
-#    exit 1 
-#fi
+if [ $? -ne 0 ]; then
+    exit 1 
+fi
 
-# Add a nodepool for nfs server
+# Launch the EKS "worker nodes"
 ./eks-create-nodes.sh 
+
+# Wait for the worker nodes to be ready
+# Instead of sleep we need to add proper logic such as loop that checks for success 
+# aws eks describe-cluster --name ${EKS_CLUSTER_NAME} --query cluster.status
+sleep 600s
 
 # Create monitoring namespace
 kubectl create namespace ${EKS_MONITORING_NS}
