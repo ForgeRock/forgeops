@@ -20,8 +20,8 @@ name in values.yaml to match your image.
 Benchmark configuration can be found in values.yaml file.
 You can configure all necessary test related variables there.
 
-## Run benchmark
-To run the benchmark, run following
+## Run benchmark automically
+To run the benchmark automatically after deployment, run following
 
 `helm install --name benchmark gatling-benchmark`
 
@@ -41,6 +41,13 @@ userstore-0                              1/1       Running    0          7m
 Benchmark pod will be in Init:0/1 state until tests are finished.
 
 To see gatling progress output, run `./logs.sh`.
+
+## Run benchmark manually
+To manually trigger a benchmark after deployment, you need to follow the following 2 steps:
+* Set ```runAfterDeployment: false``` in gatling-benchmark values.yaml under benchmark section.
+* When you want to run the test, add a ready file at the root of the forgeops-benchmark-gatling container e.g. ```kubectl exe <podname> -c forgeops-benchmark-gatling touch /ready```
+
+The presence of the above ready file will trigger the gatling job and start the simulation.
 
 ## Access benchmark results
 

@@ -32,7 +32,7 @@ benchmark:
   # Change to false force Gatling to wait for trigger.
   # To trigger simulation if false, add ready file to gatling init-container:
   # kubectl exe <podname> -c forgeops-benchmark-gatling touch /ready
-  runAfterDeployment: false
+  runAfterDeployment: true
   
 
   # How many users we want to use for benchmark
