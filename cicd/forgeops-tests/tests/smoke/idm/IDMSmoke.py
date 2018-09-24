@@ -128,7 +128,9 @@ class IDMSmoke(unittest.TestCase):
         token = resp.json()["token"]
         user_data["token"] = token
         resp = post(url=self.idmcfg.rest_selfreg_url, params=params, headers=headers, json=user_data)
+
         self.assertEqual(200, resp.status_code)
+        self.assertTrue(resp.json()['status']['success'], "Expecting success in returned json")
 
     def test_7_user_reset_pw(self):
         """Test to use self service password reset as user"""
@@ -160,7 +162,6 @@ class IDMSmoke(unittest.TestCase):
         }
 
         stage1 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload1)
-        print(stage1.content)
         self.assertEqual(200, stage1.status_code, "Try to find user with query for pw reset")
 
         payload2 = {
