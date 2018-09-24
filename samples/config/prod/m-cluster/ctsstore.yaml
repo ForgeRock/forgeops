@@ -10,7 +10,7 @@ resources:
     memory: 10Gi
     cpu: 8000m
 
-storageSize: 500Gi
+storageSize: 850Gi
 storageClass: fast
 
 # For JDK 8
