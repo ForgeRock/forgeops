@@ -27,6 +27,13 @@ benchmark:
   # - ig.IGReverseProxyWebSim
 
   testname: am.AMAccessTokenSim
+  
+  # By default, simulation will be run aumotically after deployment.
+  # Change to false force Gatling to wait for trigger.
+  # To trigger simulation if false, add ready file to gatling init-container:
+  # kubectl exec <podname> -c forgeops-benchmark-gatling touch /ready
+  runAfterDeployment: true
+  
 
   # How many users we want to use for benchmark
   users: "1000"

@@ -14,13 +14,29 @@ spec:
         app: forgeops-benchmark
     spec:
       initContainers:
+      {{ if eq .Values.config.strategy  "git" }}
+      - name: git-init
+        image: forgerock/git:6.0.0
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        volumeMounts:
+        - name: git
+          mountPath: /git
+        - name: git-secret
+          mountPath: /etc/git-secret
+        args: ["init"]
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+      {{ end }}
       - name: forgeops-benchmark-gatling
         image: {{ .Values.image.repository }}
         imagePullPolicy: Always
         command:
           - /bin/bash
           - -c
-          - touch /ready && /custom-gatling.sh  -j '
+          - cp -r /git/config/6.5/benchmarks/gatling-simulation-files/ /opt/gatling/user-files/simulations/ &&
+            {{ if .Values.benchmark.runAfterDeployment }}touch /ready && {{ end }}
+            /custom-gatling.sh  -j '
             -Dam_host={{ .Values.benchmark.openam.host }}
             -Dam_port={{ .Values.benchmark.openam.port }}
             -Didm_host={{ .Values.benchmark.openidm.host }}
@@ -38,8 +54,12 @@ spec:
             export FN=$(ls -t /opt/gatling/results | head -1) && tar -czvf /opt/gatling/results/$FN.tar.gz
             /opt/gatling/results/$FN
         volumeMounts:
-          - mountPath: "/opt/gatling/results"
-            name: gatling-results
+          - name: gatling-results
+            mountPath: "/opt/gatling/results"
+          {{ if eq .Values.config.strategy  "git" }}
+          - name: git
+            mountPath: /git
+          {{ end }}
       containers:
         - name: forgeops-benchmark-results
           image: nginx:1.11.0
@@ -67,3 +87,10 @@ spec:
       - name: gatling-results
         persistentVolumeClaim:
           claimName: forgeops-benchmark-pvc
+      {{ if eq .Values.config.strategy  "git" }}
+      - name: git
+        emptyDir: {}
+      - name: git-secret
+        secret:
+          secretName:  {{ default "frconfig" .Values.config.name }}
+      {{ end }}
