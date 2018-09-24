@@ -31,7 +31,7 @@ benchmark:
   # By default, simulation will be run aumotically after deployment.
   # Change to false force Gatling to wait for trigger.
   # To trigger simulation if false, add ready file to gatling init-container:
-  # kubectl exe <podname> -c forgeops-benchmark-gatling touch /ready
+  # kubectl exec <podname> -c forgeops-benchmark-gatling touch /ready
   runAfterDeployment: true
   
 
