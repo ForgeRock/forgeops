@@ -1,4 +1,4 @@
-djInstance: userstore
+instance: userstore
 
 resources:
   limits:
@@ -22,7 +22,7 @@ opendjJavaArgs: >
 cts:
   enabled: false
 
-storageSize: 500Gi
+storageSize: 512Gi
 storageClass: fast
 
 replicas: 2
