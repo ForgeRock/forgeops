@@ -24,8 +24,10 @@ class AMConfig(object):
         except KeyError:
             self.amadmin_pwd = 'password'
 
-        self.rest_authn_url = self.am_url + '/json/authenticate'
+        self.am_realm = "/"
+        self.rest_authn_url = self.am_url + '/json/authenticate?realm=%s' % self.am_realm
         self.rest_oauth2_authz_url = self.am_url + '/oauth2/authorize'
+        self.rest_oauth2_access_token_url = self.am_url + '/oauth2/access_token?realm=%s' % self.am_realm
 
 
 class IDMConfig(object):
@@ -83,3 +85,4 @@ class ApacheAgentConfig(object):
             self.agent_url = os.environ['APACHE_URL']
         except KeyError:
             self.agent_url = 'http://apache-agent.smoke.forgeops.com'
+
