@@ -96,18 +96,17 @@ Note that the details of the ingress will depend on the implementation. You may 
  
 # TLS
 
-To enable any of the products to use HTTPS on their external endpoint, set the following flag to true in your custom.yaml file.
-```
-useTLS: True
-```
+There is a single setting which controls the TLS strategy for your deployment: ```tlsStrategy: <value>```.   The values are as follows:
+* http  - no tls set. Using http only (unencrypted). This is the default setting.
+* https - tls enabled.  Provide own certificates.
+* https-cert-manager - tls enabled. Uses cert-Mmanager to automatically configure your certificate.
 
-The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  This is enabled by the following flag:
-```
-useCertManager: True
-```
+If ```tlsStrategy: https-cert-manager```, then the cert-manager deployment, which is deployed automatically as part of the bin/gke-ups.sh script, manages certificate request/renewal via Let's Encrypt. 
 
 If you want to use TLS but don't want cert-manager to manage the certificate request/renewal, then set
-useTLS to true, set useCertManager to false, and run the script ../bin/generate-tls.sh.
+```tlsStrategy: https```.  To use a self-signed certificate you can run the script ../bin/generate-tls.sh prior to deploying the helm chart.  This will automatically generate a self-signed certificate and deploy it into your namespace. Or you can provide your own.
+
+For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html#devops-implementation-env-https-access-secret).
 
 # Notes
 
