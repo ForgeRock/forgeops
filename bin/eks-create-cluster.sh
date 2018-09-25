@@ -12,19 +12,20 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
+# TODO: echo vars dynamically by reading cfg file
 
 echo "=> Read the following env variables from config file"
+echo -e "\tStack Name = ${EKS_STACK_NAME}"
 echo -e "\tCluster Name = ${EKS_CLUSTER_NAME}"
-#echo -e "\tCluster Namespace = ${EKS_CLUSTER_NS}"
-echo -e "\tCluster Role = ${EKS_ROLE_ARN}"
-echo -e "\tCluster Subnet IDs = ${EKS_SUBNET_IDS}"
-echo -e "\tCluster Security Group IDs = ${EKS_SECURITY_GROUP_IDS}"
-echo -e "\tIngress Controller IP = ${EKS_INGRESS_IP}"
-echo -e "\tExtra Arguments = ${EKS_EXTRA_ARGS}"
+echo -e "\tCluster Version = ${EKS_CLUSTER_VERSION}"
+echo -e "\tRole ARN = ${EKS_ROLE_ARN}"
+echo -e "\tVPC ID = ${EKS_VPC_ID}"
+echo -e "\tSubnets = ${EKS_SUBNETS}"
+echo -e "\tSecuity Group = ${EKS_SECURITY_GROUPS}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
-case "${choice}" in 
+case "${choice}" in
    y|Y|yes|YES ) echo "yes";;
    n|N|no|NO ) echo "no"; exit 1;;
    * ) echo "Invalid input, Bye!"; exit 1;;
@@ -32,20 +33,33 @@ esac
 
 
 echo ""
-echo "=> Creating Kubernetes Cluster called \"${EKS_CLUSTER_NAME}\""
+echo "=> Creating cluster called \"${EKS_CLUSTER_NAME}\""
 echo ""
 
+CLUSTER_ARN=$(aws eks create-cluster --name $EKS_CLUSTER_NAME \
+              --role-arn $EKS_ROLE_ARN \
+              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS \
+              --query cluster.arn --output text)
 
-#if [ ! -z "${EKS_EXTRA_ARGS}" ]; then 
-#      EKS_EXTRA_ARGS="${EKS_EXTRA_ARGS}"
-#fi
+echo "EKS Cluster created, usually takes 10 minutes..."
 
-#if [ ! -z "${EKS_NODE_LOCATIONS}" ]; then 
-#      EKS_EXTRA_ARGS="${EKS_EXTRA_ARGS} --node-locations=${EKS_NODE_LOCATIONS}"
-#fi
+while :
+do
+    CLUSTER_STATUS=$(aws eks describe-cluster \
+                      --name EKS_CLUSTER_NAME --query cluster.status --output text)
 
+    if [ $CLUSTER_STATUS == "CREATING" ]; then
+      echo "Waiting for EKS cluster to be ready..."
+      sleep 60
+    elif [ $CLUSTER_STATUS == "ACTIVE" ]; then
+      echo "EKS cluster is ready"
+      aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --kubeconfig ~/.kube/config-eks
+      kubectx $CLUSTER_ARN
+      export KUBECONFIG=~/.kube/config-eks
+      break
+    else
+      echo "Failed to create EKS cluster. Status: ${CLUSTER_STATUS}"
+      exit 1
+    fi
 
-aws eks create-cluster --name ${EKS_CLUSTER_NAME} \
-  --role-arn ${EKS_ROLE_ARN} \
-  --resources-vpc-config subnetIds=${EKS_SUBNET_IDS},securityGroupIds=${EKS_SECURITY_GROUP_IDS}
-
+done

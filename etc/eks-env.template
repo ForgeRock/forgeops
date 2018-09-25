@@ -1,21 +1,58 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-# Copy this template to gke-env.cfg and adjust for your environment
+# Copy this template to eks-env.cfg and adjust for your environment
 
-# Kubernetes Cluster Name
-EKS_CLUSTER_NAME="my-cluster"
 
-# Role ARN
-EKS_ROLE_ARN="arn:aws:iam::111122223333:role/eks-service-role-AWSServiceRoleForAmazonEKS-EXAMPLEBKZRQR"
+# CloudFormation Stack Name
+EKS_STACK_NAME="worker-nodes"
 
-# Subnet ID for resource-vpc-config
-EKS_SUBNET_IDS="subnet-a9189fe2,subnet-50432629"
+# EKS Cluster Name
+EKS_CLUSTER_NAME="eks-cluster-name"
 
-EKS_SECURITY_GROUP_IDS="sg-f5c54184"
+# Kubernetes Cluster Version
+# To get specific cluster versions you can run the command
+EKS_CLUSTER_VERSION="1.10"
 
-# Leave  blank "" if you don't know the IP or use the one set by EKS
-EKS_INGRESS_IP=""
+# EKS Service Role Arn
+EKS_ROLE_ARN="arn:aws:iam::111111111:role/eksServiceRole"
 
-# Add any extra arguments to be passed to "gcloud container clusters create" 
-# For example EKS_EXTRA_ARGS="--preemptible --enable-kubernetes-alpha"
-EKS_EXTRA_ARGS=""
+# EKS VPC ID
+EKS_VPC_ID="vpc-1111111"
+
+# EKS Subnet
+EKS_SUBNETS="subnet-324234,subnet-3425232"
+
+# EC2 Security Groups
+EKS_SECURITY_GROUPS="sg-3423ldsljfds23"
+
+# Min Nodes per zone in Cluster
+EKS_MIN_NODES="1"
+
+# Max Nodes per zone in Cluster
+EKS_MAX_NODES="3"
+
+# Node Group Name
+EKS_WORKER_NODES_GROUP="nodegrp"
+
+# Node Volumn Size
+EKS_WORKER_NODE_SIZE_IN_GB="30"
+
+# Worker Nodes Instance Type
+EKS_WORKER_NODE_INSTANCE_TYPE="t2.medium"
+
+# Worker Nodes SSH Key/Pair
+EKS_SSH_KEYPAIR_NAME="eks-east"
+
+# VM Type
+# Allocatable memory is always less than specificed below by at least 2GB
+EKS_AMI_ID="ami-0440e4f6b9713faf6"
+
+# Kubernetes Namespace
+EKS_CLUSTER_NS="prod"
+
+# Monitoring Namespace
+EKS_MONITORING_NS="monitoring"
+
+# Static (External) IP Address to assign to the Ingress Controller
+# Leave  blank "" if you don't know the IP or use the one set by GKE
+EKS_ELB_ARN=""
