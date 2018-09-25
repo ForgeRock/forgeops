@@ -9,7 +9,6 @@ FROM denvazh/gatling:2.3.1
 # through Helm charts
 COPY custom-gatling.sh /custom-gatling.sh
 RUN chmod +x /custom-gatling.sh
-COPY simulations /opt/gatling/user-files/simulations
 
 ENTRYPOINT ["/custom-gatling.sh"]
 CMD [""]
