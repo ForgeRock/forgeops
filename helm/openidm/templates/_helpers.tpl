@@ -23,7 +23,7 @@ Expand the name of the chart.
 
 {{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
 {{- define "tls-spec" -}}
-{{ if .Values.useTLS -}}
+{{ if or (eq .Values.tlsStrategy "https") (eq .Values.tlsStrategy "https-cert-manager") -}}
 tls:
 - hosts:
   - {{ template "externalFQDN" .  }}
