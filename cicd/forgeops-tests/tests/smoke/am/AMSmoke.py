@@ -63,7 +63,7 @@ class AMSmoke(unittest.TestCase):
         cookies = resp.cookies
 
         params = (('client_id', 'oauth2'),
-                  ('scope', 'openid'),
+                  ('scope', 'cn'),
                   ('state', '1234'),
                   ('redirect_uri', 'http://fake.com'),
                   ('response_type', 'code'),
