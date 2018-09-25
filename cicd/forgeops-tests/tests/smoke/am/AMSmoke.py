@@ -2,6 +2,7 @@
 Basic OpenAM smoke test suite.
 """
 import unittest
+import re
 from requests import get, post, delete
 
 from config.ProductConfig import AMConfig
@@ -47,7 +48,54 @@ class AMSmoke(unittest.TestCase):
         resp = post(url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'User authn REST')
 
-    def test_5_user_delete(self):
+    def test_5_oauth2_access_token(self):
+        """Test Oauth2 access token"""
+
+        headers = {'X-OpenAM-Username': 'testuser',
+                   'X-OpenAM-Password': 'password',
+                   'Content-Type': 'application/json',
+                   'Accept-API-Version': 'resource=2.0, protocol=1.0'}
+
+        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        self.assertEqual(200, resp.status_code, 'User authn REST')
+
+        tokenid = resp.json()['tokenId']
+        cookies = resp.cookies
+
+        params = (('client_id', 'oauth2'),
+                  ('scope', 'cn'),
+                  ('state', '1234'),
+                  ('redirect_uri', 'http://fake.com'),
+                  ('response_type', 'code'),
+                  ('realm', self.amcfg.am_realm))
+
+        headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+
+        data = {"decision": "Allow", "csrf": tokenid}
+
+        resp = post(url=self.amcfg.rest_oauth2_authz_url, data=data, headers=headers,
+                    cookies=cookies, params=params, allow_redirects=False)
+        self.assertEqual(302, resp.status_code, 'Oauth2 authz REST')
+
+        location = resp.headers['Location']
+
+        location_pattern = \
+            '(http://|https://:.*).*(code=.*)&(scope=.*)&(iss=.*)&(state=.*)&(client_id=.*).*'
+
+        prog = re.compile(location_pattern)
+        result = prog.match(location)
+
+        auth_code = result.group(2).split('=')[1]
+
+        data = (('grant_type', 'authorization_code'),
+                ('code', auth_code),
+                ('redirect_uri', 'http://fake.com'))
+
+        resp = post(url=self.amcfg.rest_oauth2_access_token_url, auth=('oauth2', 'password'),
+                    data=data, headers=headers)
+        self.assertEqual(200, resp.status_code, 'Oauth2 get access-token REST')
+
+    def test_6_user_delete(self):
         """Test to delete user as amadmin"""
         headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
