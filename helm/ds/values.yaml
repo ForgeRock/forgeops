@@ -33,7 +33,7 @@ cts:
 image:
   repository: forgerock-docker-public.bintray.io/ds
   pullPolicy: IfNotPresent
-  tag: 6.5.0-M128.1
+  tag: 6.5.0-M129.1
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.
@@ -48,12 +48,8 @@ storageSize: "10Gi"
 # StorageClass is optional. It can be the name of a fast (SSD) class.
 #storageClass: fast
 
+
 backup:
-  # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
-  enabled: false
-  storageClass: "nfs"
-  storageSize: "20Gi"
- 
   # This is an optional paramter that will mount the named PVC volume (most likely an NFS share)
   # on the bak/ directory. If this is not specified, an emptyDir will be mounted instead.
   # The pvc is usually created by the dsadmin/ chart.
