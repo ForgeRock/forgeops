@@ -36,10 +36,10 @@ echo ""
 echo "=> Creating cluster called \"${EKS_CLUSTER_NAME}\""
 echo ""
 
-#CLUSTER_ARN=$(aws eks create-cluster --name $EKS_CLUSTER_NAME \
-#              --role-arn $EKS_ROLE_ARN \
-#              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS \
-#              --query cluster.arn --output text)
+CLUSTER_ARN=$(aws eks create-cluster --name $EKS_CLUSTER_NAME \
+              --role-arn $EKS_ROLE_ARN \
+              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS \
+              --query cluster.arn --output text)
 
 echo "EKS Cluster created, usually takes 10 minutes..."
 
