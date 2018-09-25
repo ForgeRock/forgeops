@@ -12,6 +12,8 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
+# TODO: echo vars dynamically by reading cfg file
+
 echo "=> Read the following env variables from config file"
 echo -e "\tStack Name = ${EKS_STACK_NAME}"
 echo -e "\tCluster Name = ${EKS_CLUSTER_NAME}"
@@ -34,28 +36,29 @@ echo ""
 echo "=> Creating cluster called \"${EKS_CLUSTER_NAME}\""
 echo ""
 
-MAX_NODES=${EKS_MAX_NODES}
-MIN_NODES=${EKS_MIN_NODES}
-
 CLUSTER_ARN=`aws eks create-cluster --name $EKS_CLUSTER_NAME \
-  --role-arn $EKS_ROLE_ARN \
-  --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS | jq -r '.cluster.arn'`
+              --role-arn $EKS_ROLE_ARN \
+              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS \
+              --query cluster.arn --output text`
 
-echo "EKS Cluster created with ARN: $CLUSTER_ARN"
-echo "Waiting for EKS cluster to be ready, usually takes 10 minutes..."
+echo "EKS Cluster created, usually takes 10 minutes..."
 
 while :
 do
-    CLUSTER_STATUS=`aws eks describe-cluster --name $EKS_CLUSTER_NAME | jq '.cluster.status'`
+    CLUSTER_STATUS=`aws eks describe-cluster \
+                      --name $EKS_CLUSTER_NAME --query cluster.status --output text`
 
-    if [ $CLUSTER_STATUS = "\"CREATING\"" ]; then
+    if [ $CLUSTER_STATUS == "CREATING" ]; then
       echo "Waiting for EKS cluster to be ready..."
-      sleep 1m
-    elif [ $CLUSTER_STATUS == "\"ACTIVE\"" ]; then
+      sleep 60
+    elif [ $CLUSTER_STATUS == "ACTIVE" ]; then
       echo "EKS cluster is ready"
+      aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --kubeconfig ~/.kube/config-eks
+      kubectx $CLUSTER_ARN
+      export KUBECONFIG=~/.kube/config-eks
       break
     else
-      echo "Failed to create EKS cluster with status ${CLUSTER_STATUS}"
+      echo "Failed to create EKS cluster. Status: ${CLUSTER_STATUS}"
       exit 1
     fi
 

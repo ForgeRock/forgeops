@@ -32,7 +32,7 @@ ask
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 # Now create the cluster
-./eks-create-cluster.sh
+#./eks-create-cluster.sh
 
 # Create worker nodes
 ./eks-create-worker-nodes.sh

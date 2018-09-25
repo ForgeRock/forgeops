@@ -12,24 +12,38 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
-cat ../etc/eks-cloudformation-parameters.template | \
-sed "s|{{EKS_CLUSTER_NAME}}|$EKS_CLUSTER_NAME|" | \
-sed "s|{{EKS_SECURITY_GROUPS}}|$EKS_SECURITY_GROUPS|" | \
-sed "s|{{EKS_WORKER_NODES_GROUP}}|$EKS_WORKER_NODES_GROUP|" | \
-sed "s|{{EKS_MIN_NODES}}|$EKS_MIN_NODES|" | \
-sed "s|{{EKS_MAX_NODES}}|$EKS_MAX_NODES|" | \
-sed "s|{{EKS_WORKER_NODE_INSTANCE_TYPE}}|$EKS_WORKER_NODE_INSTANCE_TYPE|" | \
-sed "s|{{EKS_AMI_ID}}|$EKS_AMI_ID|" | \
-sed "s|{{EKS_WORKER_NODE_SIZE_IN_GB}}|$EKS_WORKER_NODE_SIZE_IN_GB|" | \
-sed "s|{{EKS_SSH_KEYPAIR_NAME}}|$EKS_SSH_KEYPAIR_NAME|" | \
-sed "s|{{EKS_VPC_ID}}|$EKS_VPC_ID|" | \
-sed "s|{{EKS_PANEL_SUBNET}}|$EKS_PANEL_SUBNET|" | \
-sed "s|{{EKS_SUBNETS}}|$EKS_SUBNETS|" > ../etc/eks-cloudformation-parameters.cfg
+aws cloudformation deploy \
+          --stack-name $EKS_STACK_NAME \
+          --template-file ../etc/amazon-eks-nodegroup.yaml \
+          --parameter-overrides KeyName=${EKS_SSH_KEYPAIR_NAME} \
+                                NodeImageId=${EKS_AMI_ID} \
+                                NodeInstanceType=${EKS_WORKER_NODE_INSTANCE_TYPE} \
+                                NodeAutoScalingGroupMinSize=${EKS_MIN_NODES} \
+                                NodeAutoScalingGroupMaxSize=${EKS_MAX_NODES} \
+                                NodeVolumeSize=${EKS_WORKER_NODE_SIZE_IN_GB} \
+                                ClusterName=${EKS_CLUSTER_NAME} \
+                                NodeGroupName=${EKS_WORKER_NODES_GROUP} \
+                                ClusterControlPlaneSecurityGroup=${EKS_SECURITY_GROUPS} \
+                                VpcId=${EKS_VPC_ID} \
+                                Subnets=${EKS_SUBNETS} \
+                                --capabilities CAPABILITY_IAM
 
-CF_STACK_ID=`aws cloudformation create-stack --stack-name $EKS_STACK_NAME --template-body file://../etc/eks-cloudformation-template.yaml --parameters file://../etc/eks-cloudformation-parameters.cfg --capabilities CAPABILITY_IAM | jq -r '.StackId'`
+NI_ROLE=`aws cloudformation describe-stacks --stack-name $EKS_STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text`
 
-echo "Creating Stack with ID: $CF_STACK_ID"
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aws-auth
+  namespace: kube-system
+data:
+  mapRoles: |
+    - rolearn: $NI_ROLE
+      username: system:node:{{EC2PrivateDNSName}}
+      groups:
+        - system:bootstrappers
+        - system:nodes
+EOF
 
 
-# TODO: Get status of CloudFormation
-# TODO: Get RoleInstance ARN Id
+#TARGET_ARN=`aws elbv2 create-target-group --name $EKS_CLUSTER_NAME-tg --protocol http --port 80 --vpc-id $EKS_VPC_ID --query 'TargetGroups[0].TargetGroupArn'`

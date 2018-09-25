@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'EKS Cluster'
+Description: 'Amazon EKS - Node Group - Released 2018-08-30'
 
 Parameters:
 
@@ -211,17 +211,6 @@ Resources:
       IpProtocol: tcp
       FromPort: 1025
       ToPort: 65535
-
-  SSHIngressSecurityGroup:
-    Type: AWS::EC2::SecurityGroupIngress
-    DependsOn: NodeSecurityGroup
-    Properties:
-      Description: Allow SSH access
-      GroupId: !Ref NodeSecurityGroup
-      IpProtocol: tcp
-      CidrIp: 0.0.0.0/0
-      FromPort: 22
-      ToPort: 22
 
   NodeSecurityGroupFromControlPlaneOn443Ingress:
     Type: AWS::EC2::SecurityGroupIngress
