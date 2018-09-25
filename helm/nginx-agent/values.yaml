@@ -28,6 +28,6 @@ agent:
 component: nginx-agent
 
 image:
-  repository: gcr.io/engineering-devops
+  repository: forgerock-docker-public.bintray.io
   tag: latest
   pullPolicy: Always
