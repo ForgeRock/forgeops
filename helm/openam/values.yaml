@@ -5,7 +5,7 @@
 component: openam
 
 image:
-  repository: gcr.io/engineering-devops/openam
+  repository: forgerock-docker-public.bintray.io/openam
   tag: latest
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent

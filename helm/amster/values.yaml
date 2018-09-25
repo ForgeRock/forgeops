@@ -38,8 +38,8 @@ config:
   strategy: git
 
 image:
-  repository: gcr.io/engineering-devops/amster
-  tag: latest
+  repository: forgerock-docker-public.bintray.io/amster
+  tag: 6.5.0-M7
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 

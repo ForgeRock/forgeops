@@ -31,9 +31,9 @@ cts:
   enabled: true
 
 image:
-  repository: gcr.io/engineering-devops/ds
+  repository: forgerock-docker-public.bintray.io/ds
   pullPolicy: IfNotPresent
-  tag: latest
+  tag: 6.5.0-M128.1
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.
@@ -50,7 +50,7 @@ storageSize: "10Gi"
 
 backup:
   # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
-  enabled: true
+  enabled: false
   storageClass: "nfs"
   storageSize: "20Gi"
  
