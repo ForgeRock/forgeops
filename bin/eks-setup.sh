@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # install packages
-sudo yum update -y && sudo yum install git docker jq -y
+sudo yum update -y && sudo yum install git docker -y
 
 # install AWS kubectl
 curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.10.3/2018-07-26/bin/linux/amd64/kubectl
