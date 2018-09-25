@@ -28,7 +28,7 @@ aws cloudformation deploy \
                                 Subnets=${EKS_SUBNETS} \
                                 --capabilities CAPABILITY_IAM
 
-NI_ROLE=`aws cloudformation describe-stacks --stack-name $EKS_STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text`
+NI_ROLE=$(aws cloudformation describe-stacks --stack-name $EKS_STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text)
 
 kubectl apply -f - <<EOF
 apiVersion: v1
