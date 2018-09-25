@@ -62,7 +62,7 @@ class AMSmoke(unittest.TestCase):
         tokenid = resp.json()['tokenId']
         cookies = resp.cookies
 
-        params = (('client_id', 'clientOIDC_0'),
+        params = (('client_id', 'oauth2'),
                   ('scope', 'openid'),
                   ('state', '1234'),
                   ('redirect_uri', 'http://fake.com'),
@@ -91,7 +91,7 @@ class AMSmoke(unittest.TestCase):
                 ('code', auth_code),
                 ('redirect_uri', 'http://fake.com'))
 
-        resp = post(url=self.amcfg.rest_oauth2_access_token_url, auth=('clientOIDC_0', 'password'),
+        resp = post(url=self.amcfg.rest_oauth2_access_token_url, auth=('oauth2', 'password'),
                     data=data, headers=headers)
         self.assertEqual(200, resp.status_code, 'Oauth2 get access-token REST')
 
