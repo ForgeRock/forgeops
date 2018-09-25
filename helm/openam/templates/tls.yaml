@@ -1,6 +1,6 @@
 # cert-manager certificate object created if 'tls.strategy: CertManager'. 
 # This object triggers a certificate request to Let's Encrypt via the cert-manager operator.
-{{ if and .Values.useCertManager .Values.useTLS }}
+{{ if eq .Values.tlsStrategy "https-cert-manager" }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:

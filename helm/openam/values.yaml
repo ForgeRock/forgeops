@@ -42,11 +42,13 @@ catalinaOpts: >
 #-Dcom.sun.management.jmxremote.rmi.port=<port>
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
 
-# To enable any of the products to use HTTPS on their external endpoint, set the following flag to true.
-useTLS: false
-# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.
-# This is enabled by the following flag:
-useCertManager: true
+# Select TLS strategy for your deployment:
+# 1) http  - no tls set. Using http only (unencrypted).
+# 2) https - tls enabled.  Provide own certificates.
+# 3) https-cert-manager - tls enabled. Uses Cert-Manager to automatically generate certificates.
+# For options 2 and 3, see ../helm/README.md for more information.
+tlsStrategy: http
+
 
 # To use a tomcat web.xml from a k8s config map instead of the one built into the container, set the following to true.
 useConfigMapWebxml: false
