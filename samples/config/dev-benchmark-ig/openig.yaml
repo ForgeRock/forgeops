@@ -16,8 +16,7 @@ config:
 ingress:
   hostname: openig.ig-benchmark.forgeops.com
 
-useTLS: false
-useCertManager: false
+tlsStrategy: http
 
 resources:
   limits:
