@@ -10,10 +10,8 @@ image:
 # Note if you enable TLS then you have to either provide the certificate 
 # by running generate-tls.sh script or you have to have cert-manager deployed
 # for your DNS domain 
-useTLS: true
 
-# Only enable this if you have valid cert-manager deployed for your DNS domain
-useCertManager: true
+tlsStrategy: https-cert-manager
 
 # Install passwords.
 amadminPassword: password

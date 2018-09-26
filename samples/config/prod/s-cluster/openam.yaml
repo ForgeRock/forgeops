@@ -1,3 +1,9 @@
+image:
+  repository: gcr.io/engineering-devops/openam
+  #repository: forgerock-docker-public.bintray.io/openam
+  tag: 6.5.0-M0
+  pullPolicy: Always
+  
 resources:
   limits:
     memory: 4Gi
@@ -5,9 +11,13 @@ resources:
     memory: 3Gi
 
 catalinaOpts: >
-  -server -Xms3g -Xmx3g -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:+UseNUMA -XX:G1MixedGCCountTarget=12
-  -XX:+UseCompressedOops -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
+  -server -Xms3g -Xmx3g -XX:+UseG1GC -XX:+UseNUMA -XX:+UseCompressedOops
+  -XX:MaxGCPauseMillis=200 -XX:G1MixedGCCountTarget=6 -XX:MetaspaceSize=128m  
+  -XX:ConcGCThreads=3 -XX:+PrintGCApplicationStoppedTime -XX:+PrintFlagsFinal
+  -XX:+ParallelRefProcEnabled -XX:InitiatingHeapOccupancyPercent=70
+  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
   -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCDetails
-  -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+  -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -XX:+PrintTenuringDistribution 
+  -Xloggc:/tmp/gc.log
