@@ -31,7 +31,7 @@ useTLS: false
 useCertManager: true
 
 image:
-  repository: forgerock-docker-public.bintray.io/openig
+  repository: forgerock-docker-public.bintray.io/forgerock/openig
   tag: 6.5.0-M134
   pullPolicy: IfNotPresent
 
