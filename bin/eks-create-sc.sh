@@ -16,8 +16,7 @@ metadata:
   name: fast
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: io1
-  zones: ${STORAGE_CLASS_ZONES}
+  type: io1  
   iopsPerGB: "15000"
   fstype: ext4
 ---
