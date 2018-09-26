@@ -6,7 +6,10 @@
 #
 # Usage:  Run ./build.sh -?
 set -e
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+# https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+cd $DIR
 
 # Default settings. You can set these all via command switches as well.
 REGISTRY="forgerock-docker-public.bintray.io"
