@@ -7,7 +7,7 @@ component: apache-agent
 
 domain: .forgeops.com
 image:
-  repository: forgerock-docker-public.bintray.io/apache-agent
+  repository: forgerock-docker-public.bintray.io/forgerock/apache-agent
   tag: latest
   pullPolicy: Always
 # If you set this to true, you must have a TLS secret with the same name as the FQDN.

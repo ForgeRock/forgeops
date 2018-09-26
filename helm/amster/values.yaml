@@ -38,7 +38,7 @@ config:
   strategy: git
 
 image:
-  repository: forgerock-docker-public.bintray.io/amster
+  repository: forgerock-docker-public.bintray.io/forgerock/amster
   tag: 6.5.0-M7
   pullPolicy: IfNotPresent
   #pullPolicy: Always

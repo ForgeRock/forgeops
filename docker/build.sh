@@ -94,7 +94,7 @@ if [ -n "$BUILD_CSV" ]; then
 
       # For each registry we support ()
       # for reg in "gcr.io/engineering-devops"
-      for reg in "gcr.io/engineering-devops" "forgerock-docker-public.bintray.io" 
+      for reg in "gcr.io/engineering-devops" "forgerock-docker-public.bintray.io/forgerock" 
       do
           # We always tag with the artifact
           img="${reg}/${folder}:${artifact}"

@@ -31,7 +31,7 @@ cts:
   enabled: true
 
 image:
-  repository: forgerock-docker-public.bintray.io/ds
+  repository: forgerock-docker-public.bintray.io/forgerock/ds
   pullPolicy: IfNotPresent
   tag: 6.5.0-M129.1
 
