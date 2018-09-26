@@ -37,6 +37,16 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 # Create worker nodes
 ./eks-create-worker-nodes.sh
 
+# Create helm rbac
+./helm-rbac-init.sh
+
+# Create Ingress controller
+./create-ingress-cntlr.sh
+
+# Create storage class
+./eks-create-sc.sh
+
+
 if [ $? -ne 0 ]; then
     exit 1
 fi

@@ -15,15 +15,15 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 aws cloudformation deploy \
           --stack-name $EKS_STACK_NAME \
           --template-file ../etc/amazon-eks-nodegroup.yaml \
-          --parameter-overrides KeyName=${EKS_SSH_KEYPAIR_NAME} \
+          --parameter-overrides KeyName=${EC2_KEYPAIR_NAME} \
                                 NodeImageId=${EKS_AMI_ID} \
                                 NodeInstanceType=${EKS_WORKER_NODE_INSTANCE_TYPE} \
                                 NodeAutoScalingGroupMinSize=${EKS_MIN_NODES} \
                                 NodeAutoScalingGroupMaxSize=${EKS_MAX_NODES} \
                                 NodeVolumeSize=${EKS_WORKER_NODE_SIZE_IN_GB} \
                                 ClusterName=${EKS_CLUSTER_NAME} \
-                                NodeGroupName=${EKS_WORKER_NODES_GROUP} \
-                                ClusterControlPlaneSecurityGroup=${EKS_SECURITY_GROUPS} \
+                                NodeGroupName=${EKS_WORKER_NODE_GROUP} \
+                                ClusterControlPlaneSecurityGroup=${EC2_SECURITY_GROUP} \
                                 VpcId=${EKS_VPC_ID} \
                                 Subnets=${EKS_SUBNETS} \
                                 --capabilities CAPABILITY_IAM

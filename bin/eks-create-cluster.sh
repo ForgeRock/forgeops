@@ -21,7 +21,7 @@ echo -e "\tCluster Version = ${EKS_CLUSTER_VERSION}"
 echo -e "\tRole ARN = ${EKS_ROLE_ARN}"
 echo -e "\tVPC ID = ${EKS_VPC_ID}"
 echo -e "\tSubnets = ${EKS_SUBNETS}"
-echo -e "\tSecuity Group = ${EKS_SECURITY_GROUPS}"
+echo -e "\tSecuity Group = ${EC2_SECURITY_GROUP}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
@@ -38,7 +38,7 @@ echo ""
 
 CLUSTER_ARN=$(aws eks create-cluster --name $EKS_CLUSTER_NAME \
               --role-arn $EKS_ROLE_ARN \
-              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_SECURITY_GROUPS \
+              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EC2_SECURITY_GROUP \
               --query cluster.arn --output text)
 
 echo "EKS Cluster created, usually takes 10 minutes..."
