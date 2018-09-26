@@ -167,10 +167,10 @@ deploy_charts()
 
 isalive_check()
 {
-    PROTO="http"
+    PROTO="https"
     if [[ -f ${CFGDIR}/openam.yaml || -f ${CFGDIR}/common.yaml ]]; then
-        if $(grep -sq '^useTLS:\s*true' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
-            PROTO="https"
+        if $(grep -sq -e '^tlsStrategy:\s*\bhttp\b' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
+            PROTO="http"
         fi
     fi
     ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
@@ -284,8 +284,13 @@ fi
 
 # Do not scale or deploy hpa on minikube
 if [ "${CONTEXT}" != "minikube" ]; then
-    scale_am
-    scale_idm
+    if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
+      scale_am
+    fi
+    
+    if [[ " ${COMPONENTS[@]} " =~ " openidm " ]]; then
+      scale_idm
+    fi
     #deploy_hpa # TODO
 fi
 
