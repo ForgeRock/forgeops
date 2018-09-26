@@ -24,8 +24,10 @@ POD_LIST=$(kubectl -n=${NAMESPACE} get pods -o go-template --template '{{range .
 # Go through all pods and get containers for each pod. Get logs from these containers
 E_TIME=`date`
 
-OUT=/tmp/log-template.html
-TOC=/tmp/log-toc.html
+mkdir -p /tmp/forgeops
+rm /tmp/forgeops/*
+OUT=/tmp/forgeops/log-template.html
+TOC=/tmp/forgeops/log-toc.html
 
 rm -fr $TOC $OUT 
 
@@ -56,7 +58,7 @@ for pod in ${POD_LIST}; do
 
 done
 
-FINAL=/tmp/log.html
+FINAL=/tmp/forgeops/log.html
 
 
 cat >$FINAL <<EOF 
