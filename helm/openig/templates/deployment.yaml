@@ -23,7 +23,7 @@ spec:
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:
       - name: git-init
-        image: forgerock-docker-public.bintray.io/forgerock/git:6.0.0
+        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
         volumeMounts:
         - name: git
           mountPath: /git
