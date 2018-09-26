@@ -6,6 +6,9 @@
 # You must have the gcloud command installed and access to a GCP project.
 # See https://cloud.google.com/container-engine/docs/quickstart
 
+
+source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
+
 kubectl create -f - <<EOF
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
@@ -14,7 +17,7 @@ metadata:
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: io1
-  zones: us-east-1a,us-east-1b
+  zones: ${STORAGE_CLASS_ZONES}
   iopsPerGB: "15000"
   fstype: ext4
 ---
@@ -29,4 +32,3 @@ EOF
 
 
 kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-

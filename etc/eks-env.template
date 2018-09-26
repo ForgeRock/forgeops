@@ -23,7 +23,10 @@ EKS_VPC_ID="vpc-1111111"
 EKS_SUBNETS="subnet-324234,subnet-3425232"
 
 # EC2 Security Groups
-EKS_SECURITY_GROUPS="sg-3423ldsljfds23"
+EC2_SECURITY_GROUP="sg-3423ldsljfds23"
+
+# EC2 Storage class zones
+STORAGE_CLASS_ZONES="us-east-1b,us-east-1c"
 
 # Min Nodes per zone in Cluster
 EKS_MIN_NODES="1"
@@ -32,7 +35,7 @@ EKS_MIN_NODES="1"
 EKS_MAX_NODES="3"
 
 # Node Group Name
-EKS_WORKER_NODES_GROUP="nodegrp"
+EKS_WORKER_NODE_GROUP="nodegrp"
 
 # Node Volumn Size
 EKS_WORKER_NODE_SIZE_IN_GB="30"
@@ -41,18 +44,8 @@ EKS_WORKER_NODE_SIZE_IN_GB="30"
 EKS_WORKER_NODE_INSTANCE_TYPE="t2.medium"
 
 # Worker Nodes SSH Key/Pair
-EKS_SSH_KEYPAIR_NAME="eks-east"
+EC2_KEYPAIR_NAME="eks-east"
 
 # VM Type
 # Allocatable memory is always less than specificed below by at least 2GB
 EKS_AMI_ID="ami-0440e4f6b9713faf6"
-
-# Kubernetes Namespace
-EKS_CLUSTER_NS="prod"
-
-# Monitoring Namespace
-EKS_MONITORING_NS="monitoring"
-
-# Static (External) IP Address to assign to the Ingress Controller
-# Leave  blank "" if you don't know the IP or use the one set by GKE
-EKS_ELB_ARN=""
