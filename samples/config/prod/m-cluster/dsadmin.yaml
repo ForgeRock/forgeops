@@ -1,3 +1,9 @@
+image:
+  #repository: forgerock-docker-public.bintray.io/ds
+  repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0-M0
+  pullPolicy: Always
+  
 gcs:
   enabled: true
   bucket: gs://forgeops/dj-backup/m-cluster

@@ -1,3 +1,9 @@
+image:
+  #repository: forgerock-docker-public.bintray.io/openidm
+  repository: gcr.io/engineering-devops/openidm
+  tag: 6.5.0-M0
+  pullPolicy: Always
+  
 resources:
   limits:
     memory: 3Gi
