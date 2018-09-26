@@ -14,7 +14,7 @@ metadata:
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: io1
-  zones: us-east-1d,us-east-1c
+  zones: us-east-1a,us-east-1b
   iopsPerGB: "15000"
   fstype: ext4
 ---
