@@ -41,7 +41,7 @@ CLUSTER_ARN=$(aws eks create-cluster --name $EKS_CLUSTER_NAME \
               --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EC2_SECURITY_GROUP \
               --query cluster.arn --output text)
 
-echo "EKS Cluster created, usually takes 10 minutes..."
+echo "EKS Cluster is being created.  Usually it takes 10 minutes..."
 
 while :
 do
