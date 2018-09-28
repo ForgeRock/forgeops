@@ -60,7 +60,7 @@ the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/ind
 # Make sure you have the ingress controller add on
 minikube addons enable ingress
 
-helm init --upgrade
+helm init --upgrade --service-account default
 
 cd helm/
 
