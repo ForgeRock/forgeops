@@ -22,7 +22,6 @@ spec:
       {{- range .hosts }}
         - {{ . }}
       {{- end }}
-      - www{{ .Values.domain }}
       secretName: {{ .secretName }}
   {{- end }}
 {{- end }}
