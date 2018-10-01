@@ -12,22 +12,30 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
+
+# Executing cloudformation script
 aws cloudformation deploy \
           --stack-name $EKS_STACK_NAME \
           --template-file ../etc/amazon-eks-nodegroup.yaml \
-          --parameter-overrides KeyName=${EKS_SSH_KEYPAIR_NAME} \
+          --parameter-overrides KeyName=${EC2_KEYPAIR_NAME} \
                                 NodeImageId=${EKS_AMI_ID} \
                                 NodeInstanceType=${EKS_WORKER_NODE_INSTANCE_TYPE} \
                                 NodeAutoScalingGroupMinSize=${EKS_MIN_NODES} \
                                 NodeAutoScalingGroupMaxSize=${EKS_MAX_NODES} \
                                 NodeVolumeSize=${EKS_WORKER_NODE_SIZE_IN_GB} \
                                 ClusterName=${EKS_CLUSTER_NAME} \
-                                NodeGroupName=${EKS_WORKER_NODES_GROUP} \
-                                ClusterControlPlaneSecurityGroup=${EKS_SECURITY_GROUPS} \
+                                NodeGroupName=${EKS_WORKER_NODE_GROUP} \
+                                ClusterControlPlaneSecurityGroup=${EC2_SECURITY_GROUP} \
                                 VpcId=${EKS_VPC_ID} \
                                 Subnets=${EKS_SUBNETS} \
                                 --capabilities CAPABILITY_IAM
 
+
+echo "Worker nodes provisioned. Sleeping for 15 seconds..."
+
+sleep 15
+
+# getting the output of the cloudformation execution. Needed to link the master and worker nodes
 NI_ROLE=$(aws cloudformation describe-stacks --stack-name $EKS_STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text)
 
 kubectl apply -f - <<EOF
@@ -44,6 +52,3 @@ data:
         - system:bootstrappers
         - system:nodes
 EOF
-
-
-#TARGET_ARN=`aws elbv2 create-target-group --name $EKS_CLUSTER_NAME-tg --protocol http --port 80 --vpc-id $EKS_VPC_ID --query 'TargetGroups[0].TargetGroupArn'`

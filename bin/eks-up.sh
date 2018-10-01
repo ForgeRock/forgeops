@@ -34,9 +34,40 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 # Now create the cluster
 ./eks-create-cluster.sh
 
-# Create worker nodes
-./eks-create-worker-nodes.sh
-
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+# Create worker nodes
+./eks-create-worker-nodes.sh
+
+# Create monitoring namespace
+kubectl create namespace ${EKS_MONITORING_NS}
+
+# Create the namespace parsed from cfg file and set the context
+kubectl create namespace ${EKS_CLUSTER_NS}
+kubectl config set-context $(kubectl config current-context) --namespace=${EKS_CLUSTER_NS}
+
+# Create helm rbac
+./helm-rbac-init.sh
+
+# Need as sometimes tiller is not ready immediately
+while :
+do
+    helm ls >/dev/null 2>&1
+    test $? -eq 0 && break
+    echo "Waiting on tiller to be ready..."
+    sleep 5s
+done
+
+# Create Ingress controller
+./create-ingress-cntlr.sh
+
+# Create storage class
+./eks-create-sc.sh
+
+# Deploy cert-manager. Disabled for now. -- use ./generate-tls.sh
+#./deploy-cert-manager.sh
+
+# Add Prometheus
+./deploy-prometheus.sh

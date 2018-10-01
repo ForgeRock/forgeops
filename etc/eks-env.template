@@ -4,55 +4,58 @@
 
 
 # CloudFormation Stack Name
-EKS_STACK_NAME="worker-nodes"
+EKS_STACK_NAME="cluster1"
 
 # EKS Cluster Name
-EKS_CLUSTER_NAME="eks-cluster-name"
+EKS_CLUSTER_NAME="cluster1"
 
 # Kubernetes Cluster Version
 # To get specific cluster versions you can run the command
-EKS_CLUSTER_VERSION="1.10"
+EKS_CLUSTER_VERSION="latest"
 
 # EKS Service Role Arn
-EKS_ROLE_ARN="arn:aws:iam::111111111:role/eksServiceRole"
+EKS_ROLE_ARN="arn:aws:iam::1111111:role/eksServiceRole"
 
 # EKS VPC ID
-EKS_VPC_ID="vpc-1111111"
+EKS_VPC_ID="vpc-74a1de0f"
+
+# Storage class zones
+STORAGE_CLASS_ZONES="us-east-1b,us-east-1c"
 
 # EKS Subnet
-EKS_SUBNETS="subnet-324234,subnet-3425232"
+EKS_SUBNETS="subnet-XXXXXX,subnet-XXXXXXX"
 
 # EC2 Security Groups
-EKS_SECURITY_GROUPS="sg-3423ldsljfds23"
+EC2_SECURITY_GROUP="sg-XXXXXXXXX"
 
 # Min Nodes per zone in Cluster
 EKS_MIN_NODES="1"
 
 # Max Nodes per zone in Cluster
-EKS_MAX_NODES="3"
+EKS_MAX_NODES="4"
 
 # Node Group Name
-EKS_WORKER_NODES_GROUP="nodegrp"
+EKS_WORKER_NODE_GROUP="nodegrp"
 
 # Node Volumn Size
 EKS_WORKER_NODE_SIZE_IN_GB="30"
 
 # Worker Nodes Instance Type
-EKS_WORKER_NODE_INSTANCE_TYPE="t2.medium"
+EKS_WORKER_NODE_INSTANCE_TYPE="m5.4xlarge"
 
 # Worker Nodes SSH Key/Pair
-EKS_SSH_KEYPAIR_NAME="eks-east"
+EC2_KEYPAIR_NAME="eks-east"
 
-# VM Type
-# Allocatable memory is always less than specificed below by at least 2GB
+# EKS AMI ID
+# Use one of the following AMIs based on your EKS VPC region
+# us-west-2 zone: ami-0a54c984b9f908c81
+# us-east-1 zone: ami-0440e4f6b9713faf6
+# eu-west-1 zone: ami-0c7a4976cb6fafd3a
+
 EKS_AMI_ID="ami-0440e4f6b9713faf6"
 
-# Kubernetes Namespace
+# EKS Cluster Namespace
 EKS_CLUSTER_NS="prod"
 
 # Monitoring Namespace
 EKS_MONITORING_NS="monitoring"
-
-# Static (External) IP Address to assign to the Ingress Controller
-# Leave  blank "" if you don't know the IP or use the one set by GKE
-EKS_ELB_ARN=""
