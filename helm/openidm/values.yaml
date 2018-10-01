@@ -18,7 +18,7 @@ config:
   path: /git/config/6.5/default/idm/sync-with-ldap-bidirectional
   #
   # strategy defines how products get their configuration .
-  # Using the git strategy, each helm chart pulls the configurtion from git using an init container.
+  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
   strategy: git
 
 # Used to form the FQDN  - see _helpers.tpl
