@@ -15,7 +15,7 @@ config:
   # the secret required to access it.
   name: frconfig
   # strategy defines how products get their configuration .
-  # Using the git strategy, each helm chart pulls the configurtion from git using an init container.
+  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
   strategy: git
 
 benchmark:
@@ -36,7 +36,7 @@ benchmark:
 
   testname: am.AMAccessTokenSim
   
-  # By default, simulation will be run aumotically after deployment.
+  # By default, simulation will be run automatically after deployment.
   # Change to false force Gatling to wait for trigger.
   # To trigger simulation if false, add ready file to gatling init-container:
   # kubectl exec <podname> -c forgeops-benchmark-gatling touch /ready
