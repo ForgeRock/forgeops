@@ -9,6 +9,9 @@ domain: .forgeops.com
 image:
   repository: forgerock-docker-public.bintray.io/gatling:6.5.0
   pullPolicy: Always
+  
+config:
+  strategy: git
 
 benchmark:
   # Name of scala test name to run
