@@ -61,7 +61,7 @@ do
 done
 
 # Create Ingress controller
-./create-ingress-cntlr.sh
+./eks-create-ingress-cntlr.sh
 
 # Create storage class
 ./eks-create-sc.sh
