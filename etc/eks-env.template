@@ -11,7 +11,7 @@ EKS_CLUSTER_NAME="cluster1"
 
 # Kubernetes Cluster Version
 # To get specific cluster versions you can run the command
-EKS_CLUSTER_VERSION="1.10"
+EKS_CLUSTER_VERSION="latest"
 
 # EKS Service Role Arn
 EKS_ROLE_ARN="arn:aws:iam::1111111:role/eksServiceRole"
