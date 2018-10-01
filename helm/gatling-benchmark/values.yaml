@@ -11,6 +11,11 @@ image:
   pullPolicy: Always
   
 config:
+  # Name of the configMap that holds the configuration repository URL and of
+  # the secret required to access it.
+  name: frconfig
+  # strategy defines how products get their configuration .
+  # Using the git strategy, each helm chart pulls the configurtion from git using an init container.
   strategy: git
 
 benchmark:
