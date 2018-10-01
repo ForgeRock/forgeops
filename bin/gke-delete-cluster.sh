@@ -11,13 +11,13 @@ CURRENT_PROJECT=$(gcloud config get-value project 2>/dev/null)
 source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
 echo "=> Read the following env variables from config file"
-echo "Project Name = $GKE_PROJECT_NAME"
+echo "Project ID = $GKE_PROJECT_ID"
 echo "Cluster Name = $GKE_CLUSTER_NAME"
 echo "Compute Zone = $GKE_PRIMARY_ZONE"
 echo ""
-if [ "$CURRENT_PROJECT" != "$GKE_PROJECT_NAME" ]; then
+if [ "$CURRENT_PROJECT" != "$GKE_PROJECT_ID" ]; then
     echo "=> Project mismatch detected. Current project is set to $CURRENT_PROJECT"
-    echo "=> Please set project by running 'gcloud config set project $GKE_PROJECT_NAME'"
+    echo "=> Please set project by running 'gcloud config set project $GKE_PROJECT_ID'"
     exit 1
 fi
 echo "=> Do you want to delete the above cluster?"

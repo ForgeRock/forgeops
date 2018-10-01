@@ -2,8 +2,8 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Copy this template to gke-env.cfg and adjust for your environment
 
-# Google Cloud Project ID
-GKE_PROJECT_NAME="my-gcp-project"
+# Google Cloud Project ID note this is not the project NAME
+GKE_PROJECT_ID="my-gcp-project"
 
 # Kubernetes Cluster Name
 GKE_CLUSTER_NAME="my-cluster"

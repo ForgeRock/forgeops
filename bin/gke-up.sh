@@ -31,8 +31,8 @@ ask
 #source "$(dirname $0)/../etc/gke-env.cfg"
 source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
-# Set the GKE Project Name to the one parsed from the cfg file
-gcloud config set project ${GKE_PROJECT_NAME} 
+# Set the GKE Project ID to the one parsed from the cfg file
+gcloud config set project ${GKE_PROJECT_ID} 
 
 # Now create the cluster
 ./gke-create-cluster.sh
