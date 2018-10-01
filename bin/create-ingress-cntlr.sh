@@ -23,8 +23,6 @@ else
  IP_OPTS="--set controller.service.loadBalancerIP=$1"
 fi
 
-echo "IP OPTS ${IP_OPTS}"
-
 # For now we fix the image version at 17.1 as the ingress is not load balancing properly
 # See https://github.com/kubernetes/ingress-nginx/issues/3056
 helm install --namespace nginx --name nginx \

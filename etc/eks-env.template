@@ -53,3 +53,9 @@ EC2_KEYPAIR_NAME="eks-east"
 # eu-west-1 zone: ami-0c7a4976cb6fafd3a
 
 EKS_AMI_ID="ami-0440e4f6b9713faf6"
+
+# EKS Cluster Namespace
+EKS_CLUSTER_NS="prod"
+
+# Monitoring Namespace
+EKS_MONITORING_NS="monitoring"
