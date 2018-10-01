@@ -14,7 +14,7 @@ source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
 
 echo "=> Read the following env variables from config file"
-echo -e "\tProject Name = ${GKE_PROJECT_NAME}"
+echo -e "\tProject ID = ${GKE_PROJECT_ID}"
 echo -e "\tPrimary Zone = ${GKE_PRIMARY_ZONE}"
 echo -e "\tAdditional Zones = ${GKE_NODE_LOCATIONS}"
 echo -e "\tCluster Name = ${GKE_CLUSTER_NAME}"
@@ -57,7 +57,7 @@ fi
 # If no service account is specified then the default one is used
 # It is recommended to create a service account
 gcloud container clusters create $GKE_CLUSTER_NAME \
-      --project="${GKE_PROJECT_NAME}" \
+      --project="${GKE_PROJECT_ID}" \
       --zone="${GKE_PRIMARY_ZONE}" \
       --cluster-version="${GKE_CLUSTER_VERSION}" \
       --machine-type="${GKE_MACHINE_TYPE}" \
