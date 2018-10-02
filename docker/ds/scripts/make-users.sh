@@ -69,5 +69,5 @@ bin/ldapmodify --hostname "${FQDN_DS0}" \
 
 # For offline only:
 # bin/import-ldif --templateFile /var/tmp/template --clearBackend \
-#    --backendId userRoot --tmpDirectory /opt/opendj/import-tmp --bindDn "cn=Directory Manager" \
+#    --backendId amIdentityStore --tmpDirectory /opt/opendj/import-tmp --bindDn "cn=Directory Manager" \
 #    --bindPasswordFile "$DIR_MANAGER_PW_FILE" --port 4444 --trustAll

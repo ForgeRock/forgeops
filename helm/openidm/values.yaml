@@ -68,7 +68,7 @@ userstore:
   host: userstore-0.userstore
   password: password
   port: 1389
-  basecontext: "o=userstore"
+  basecontext: "dc=data"
 
 service:
   name: openidm

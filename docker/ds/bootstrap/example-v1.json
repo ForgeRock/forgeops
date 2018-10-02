@@ -1,8 +1,8 @@
 {
     // This file defines an example Rest2Ldap API mapping exposing users, POSIX users, and groups, as follows:
     //
-    // /api/users/{uid} - users beneath ou=people,o=userstore, e.g. "/api/users/bjensen"
-    // /api/groups/{cn} - groups beneath ou=groups,o=userstore, e.g. "/api/groups/administrators"
+    // /api/users/{uid} - users beneath ou=people,dc=data, e.g. "/api/users/bjensen"
+    // /api/groups/{cn} - groups beneath ou=groups,dc=data, e.g. "/api/groups/administrators"
     //
     "version": "1.0",
 
@@ -14,7 +14,7 @@
             "subResources": {
                 "users": {
                     "type": "collection",
-                    "dnTemplate": "ou=People,o=userstore",
+                    "dnTemplate": "ou=People,dc=data",
                     "resource": "frapi:opendj:rest2ldap:user:1.0",
                     "namingStrategy": {
                         "type": "clientDnNaming",
@@ -23,7 +23,7 @@
                 },
                 "groups": {
                     "type": "collection",
-                    "dnTemplate": "ou=groups,o=userstore",
+                    "dnTemplate": "ou=groups,dc=data",
                     "resource": "frapi:opendj:rest2ldap:group:1.0",
                     "namingStrategy": {
                         "type": "clientDnNaming",

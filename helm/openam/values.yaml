@@ -53,8 +53,8 @@ tlsStrategy: http
 # To use a tomcat web.xml from a k8s config map instead of the one built into the container, set the following to true.
 useConfigMapWebxml: false
 
-# Suffix for DS config store. We reuse the default baseDN of o=userstore.
-rootSuffix:  "o=userstore"
+# Suffix for DS config store. We reuse the default baseDN of dc=data.
+rootSuffix:  "dc=data"
 
 # Valid logger types: fluent-bit, none
 # For audit logs it is suggested you configure AM to send directly to ElasticSearch.

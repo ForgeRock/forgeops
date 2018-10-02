@@ -50,12 +50,12 @@ update_ds_password()
 
 relocate_data() 
 {
-    if [ -d data/db/userRoot ]; then 
+    if [ -d data/db/amIdentityStore ]; then
         echo "Data volume contains existing data"
         return
     fi
     mkdir -p data/db
-    for dir in ctsRoot userRoot ads-truststore adminRoot idmRoot
+    for dir in amIdentityStore ads-truststore adminRoot
     do
         echo "Copying $dir"
         cp -r db/$dir data/db/$dir
@@ -84,7 +84,7 @@ init_container() {
 
 # Restore from a backup
 restore() {
-    if [ -d data/db/userRoot ]; then 
+    if [ -d data/db/amIdentityStore ]; then
         echo "Restore will not overwrite existing data."
         exit 0
     fi

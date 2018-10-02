@@ -125,7 +125,7 @@
     },
     "resourceMapping": {
         "defaultMapping": {
-            "dnTemplate": "ou=generic,o=userstore"
+            "dnTemplate": "ou=generic,dc=data"
         },
         "explicitMapping": {
             "internal/role": {
@@ -201,7 +201,7 @@
                 }
             },
             "managed/user": {
-                "dnTemplate": "ou=People,o=userstore",
+                "dnTemplate": "ou=People,dc=data",
                 "namingStrategy": {
                     "type": "serverNaming",
                     "dnAttribute": "uid",
@@ -345,10 +345,10 @@
                 "dnTemplate": "ou=ui,o=idm"
             },
             "managed/*": {
-                "dnTemplate": "ou=managed,o=userstore"
+                "dnTemplate": "ou=managed,dc=data"
             },
             "managed/role": {
-                "dnTemplate": "ou=role,ou=managed,o=userstore",
+                "dnTemplate": "ou=role,ou=managed,dc=data",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-managed-role"

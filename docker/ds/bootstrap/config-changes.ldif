@@ -9,16 +9,10 @@ changetype: modify
 replace: ds-cfg-server-fqdn
 ds-cfg-server-fqdn: &{fqdn}
 -
-
-dn: ds-cfg-backend-id=ctsRoot,cn=Backends,cn=config
-changetype: modify
-replace: ds-cfg-enabled
-ds-cfg-enabled: &{ds.enable.cts|true}
--
 replace: ds-cfg-db-directory
 ds-cfg-db-directory: &{data.dir|db}
 
-dn: cn=o=cts,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+dn: cn=ou=tokens,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.cts|true}
@@ -27,7 +21,7 @@ replace: ds-cfg-replication-server
 ds-cfg-replication-server: &{rs.servers}
 -
 
-dn: ds-cfg-backend-id=userRoot,cn=Backends,cn=config
+dn: ds-cfg-backend-id=amIdentityStore,cn=Backends,cn=config
 changetype: modify
 replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.userstore|true}
@@ -35,7 +29,7 @@ ds-cfg-enabled: &{ds.enable.userstore|true}
 replace: ds-cfg-db-directory
 ds-cfg-db-directory: &{data.dir|db}
 
-dn: cn=o=userstore,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+dn: cn=dc=data,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.userstore|true}
@@ -96,15 +90,3 @@ changetype: modify
 replace: ds-cfg-replication-db-directory
 ds-cfg-replication-db-directory: &{changelog.db.directory|changelogDb}
 
-dn: ds-cfg-backend-id=idmRoot,cn=Backends,cn=config
-changetype: modify
-replace: ds-cfg-enabled
-ds-cfg-enabled: &{ds.enable.idm|true}
--
-replace: ds-cfg-db-directory
-ds-cfg-db-directory: &{data.dir|db}
-
-dn: cn=o=idm,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
-changetype: modify
-replace: ds-cfg-replication-server
-ds-cfg-replication-server:  &{rs.servers}

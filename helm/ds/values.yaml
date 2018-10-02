@@ -10,11 +10,11 @@
 useDefaultSecrets: true
 
 # The default DS baseDN.
-# Note that the default install creates two backends: o=cts and o=userstore
-# The setting below changes the base dn for the o=userstore backend only!
+# Note that the default install creates two backends: ou=tokens and dc=data
+# The setting below changes the base dn for the dc=data backend only!
 # We strongly suggest that you *NOT* change the default. There is very little value in
 # having the basedn reflect a unique organizational structure.
-baseDN: "o=userstore"
+baseDN: "dc=data"
 
 # The default instance name. This will create a stateful set that can be resolved at
 #  $instance-0.$instance
