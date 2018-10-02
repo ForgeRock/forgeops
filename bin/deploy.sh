@@ -179,7 +179,7 @@ isalive_check()
     until [ "${STATUS_CODE}" = "200" ]; do
         echo "   ${ALIVE_JSP} is not alive, waiting 10 seconds before retry..."
         sleep 10
-        STATUS_CODE=$(curl -k -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -s)
+        STATUS_CODE=$(curl --connect-timeout 5 -k -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -sS || true)
     done
     echo "=> AM is alive"
 }
