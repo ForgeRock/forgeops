@@ -13,6 +13,9 @@ openam:
   openamInstance: http://am-service:80/openam
 
 configstore:
+  baseDN: "o=userstore"
+  image:
+    tag: 6.5.0-idm
   instance: configstore
   persistence: false
   opendjJavaArgs: "-Xmx400m"

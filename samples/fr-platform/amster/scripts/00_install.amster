@@ -7,7 +7,7 @@ install-openam --serverUrl OPENAM_INSTANCE \
 --cfgStoreHost configstore-0.configstore \
 --cfgStoreDirMgrPwd password  \
 --cfgStorePort 1389  \
---cfgStoreRootSuffix dc=data \
+--cfgStoreRootSuffix o=userstore \
 --acceptLicense \
 --cfgDir /home/forgerock/openam
 :exit

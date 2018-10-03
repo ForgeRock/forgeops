@@ -19,7 +19,7 @@
     "usersSearchScope" : "SCOPE_SUB",
     "subjectsResultTTL" : 10,
     "sslEnabled" : false,
-    "usersBaseDn" : "dc=data",
+    "usersBaseDn" : "o=userstore",
     "bindPassword" : null,
     "connectionPoolMaximumSize" : 10,
     "policyHeartbeatTimeUnit" : "SECONDS",
