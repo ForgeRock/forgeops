@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS.
 FROM forgerock/downloader
 
-ARG VERSION="6.5.0-M2"
+ARG VERSION="6.5.0-M4"
 RUN download -v $VERSION openidm 
 
 RUN mkdir -p /var/tmp/openidm && unzip -q /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
