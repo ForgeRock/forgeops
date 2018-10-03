@@ -9,7 +9,7 @@
 ##
 # default generic object
 ##
-dn: ou=generic,o=userstore
+dn: ou=generic,@BASE_DN@
 objectclass: organizationalunit
 objectclass: top
 ou: generic
@@ -18,27 +18,27 @@ ou: generic
 # Managed Object OUs
 ##
 
-dn: ou=managed,o=userstore
+dn: ou=managed,@BASE_DN@
 objectClass: organizationalUnit
 objectClass: top
 ou: managed
 
-dn: ou=role,ou=managed,o=userstore
+dn: ou=role,ou=managed,@BASE_DN@
 objectClass: organizationalUnit
 objectClass: top
 ou: role
 
-dn: ou=group,ou=managed,o=userstore
+dn: ou=group,ou=managed,@BASE_DN@
 objectClass: organizationalUnit
 objectClass: top
 ou: group
 
-dn: ou=assignment,ou=managed,o=userstore
+dn: ou=assignment,ou=managed,@BASE_DN@
 objectClass: organizationalUnit
 objectClass: top
 ou: assignment
 
-dn: ou=facebook,ou=managed,o=userstore
+dn: ou=facebook,ou=managed,@BASE_DN@
 objectClass: organizationalUnit
 objectClass: top
 ou: facebook

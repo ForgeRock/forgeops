@@ -9,7 +9,7 @@ USERS="${NUMBER_SAMPLE_USERS:-1000000}"
 [[ $# -eq 1 ]] && USERS=$1
 
 ITERATIONS=1000000
-BASE_DN="${BASE_DN:-o=userstore}"
+BASE_DN="${BASE_DN:-dc=data}"
 HOST=localhost
 CONNECTIONS=10
 

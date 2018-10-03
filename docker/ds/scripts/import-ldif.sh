@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # import ldif
 # This can be initiated on any ds pod, but the import is performed on instance-0.
-# Supply the path to the ldif file to import and the backend name (userRoot, ctsRoot, etc.)
+# Supply the path to the ldif file to import and the backend name (amIdentityStore, amCts, etc.)
 
 source /opt/opendj/env.sh
 

@@ -29,9 +29,9 @@
       "propertyName" : "allowedFields",
       "propertyValues" : [ "country", "telephoneNumber", "mail", "address2", "city", "givenName", "postalCode", "description", "stateProvince", "/preferences/marketing", "userName", "password", "postalAddress", "termsAccepted", "kbaInfo", "/preferences/updates", "consentedMappings", "sn", "/preferences" ]
     } ],
-    "lastModifiedBy" : "id=amadmin,ou=user,o=userstore",
+    "lastModifiedBy" : "id=amadmin,ou=user,dc=data",
     "lastModifiedDate" : "2018-02-03T16:21:43.474Z",
-    "createdBy" : "id=amadmin,ou=user,o=userstore",
+    "createdBy" : "id=amadmin,ou=user,dc=data",
     "creationDate" : "2018-02-03T16:21:43.474Z"
   }
 }

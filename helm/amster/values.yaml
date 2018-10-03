@@ -55,7 +55,7 @@ configStore:
   type: dirServer
    # If type is set to embedded, the attributes below are ignored.
   #suffix:  "dc=openam,dc=forgerock,dc=org"
-  suffix:  "o=userstore"
+  suffix:  "dc=data"
   # This is the first StatefulSet name:
   host: configstore-0.configstore
   port: 1389
@@ -69,7 +69,7 @@ userStore:
   port: 1389
   password: password
   dirManager: "cn=Directory Manager"
-  suffix:  "o=userstore"
+  suffix:  "dc=data"
 
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration

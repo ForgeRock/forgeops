@@ -10,7 +10,7 @@ Stage 1 scripts are in the bootstrap/ folder. This folder is not copied into the
 does the following:
 
 * Creates two ds instances that are replicated to each other. The instances have hard coded hostnames (ds1.example.com).
-* Two backends are configured (o=cts, o=userstore) making the instance suitable for a CTS and a userstore
+* Two backends are configured (ou=tokens, dc=data) making the instance suitable for a CTS and a userstore
 * Required schema is loaded into each backend. See bootstrap/ldif/*
 * Both instances are shut down
 * The second instance is deleted
