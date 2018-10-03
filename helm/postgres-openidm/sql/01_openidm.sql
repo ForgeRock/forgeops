@@ -28,7 +28,7 @@ CREATE TABLE openidm.genericobjects (
   CONSTRAINT fk_genericobjects_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT idx_genericobjects_object UNIQUE (objecttypes_id, objectid)
 );
-
+CREATE INDEX idx_genericobjects_reconid on openidm.genericobjects (json_extract_path_text(fullobject, 'reconId'), objecttypes_id);
 
 
 -- -----------------------------------------------------
@@ -238,6 +238,7 @@ CREATE TABLE openidm.internalrole (
   name VARCHAR(64) DEFAULT NULL,
   description VARCHAR(510) DEFAULT NULL,
   temporalConstraints VARCHAR(1024) DEFAULT NULL,
+  condition VARCHAR(1024) DEFAULT NULL,
   PRIMARY KEY (objectid)
 );
 
@@ -329,7 +330,7 @@ CREATE INDEX fk_clusterobjects_objectypes ON openidm.clusterobjects (objecttypes
 
 CREATE INDEX idx_json_clusterobjects_timestamp ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'timestamp') );
 CREATE INDEX idx_json_clusterobjects_state ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'state') );
-
+CREATE INDEX idx_json_clusterobjects_event_instanceid ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'type'), json_extract_path_text(fullobject, 'instanceId') );
 
 -- -----------------------------------------------------
 -- Table openidm.clusterobjectproperties
@@ -402,7 +403,7 @@ CREATE TABLE openidm.syncqueue (
   resourceCollection VARCHAR(38) NOT NULL,
   resourceId VARCHAR(255) NOT NULL,
   mapping VARCHAR(255) NOT NULL,
-  objectRev VARCHAR(38) NOT NULL,
+  objectRev VARCHAR(38) DEFAULT NULL,
   oldObject JSON,
   newObject JSON,
   context JSON,
@@ -412,7 +413,7 @@ CREATE TABLE openidm.syncqueue (
   createDate VARCHAR(255) NOT NULL,
   PRIMARY KEY (objectid)
 );
-CREATE INDEX indx_syncqueue_mapping_state ON openidm.syncqueue (mapping, state);
+CREATE INDEX indx_syncqueue_mapping_state_createdate ON openidm.syncqueue (mapping, state, createDate);
 CREATE INDEX indx_syncqueue_mapping_retries ON openidm.syncqueue (mapping, remainingRetries);
 CREATE INDEX indx_syncqueue_mapping_resourceid ON openidm.syncqueue (mapping, resourceId);
 
@@ -429,3 +430,16 @@ CREATE TABLE openidm.locks (
 );
 
 CREATE INDEX idx_locks_nodeid ON openidm.locks (nodeid);
+
+
+-- -----------------------------------------------------
+-- Table openidm.files
+-- -----------------------------------------------------
+
+CREATE TABLE openidm.files (
+  objectid VARCHAR(38) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  content TEXT,
+  PRIMARY KEY (objectid)
+);
+
