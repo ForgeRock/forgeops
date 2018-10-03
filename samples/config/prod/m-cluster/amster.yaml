@@ -5,7 +5,7 @@ image:
   pullPolicy: Always
 
 config:
-  importPath: /git/config/6.0/m-cluster/am
+  importPath: /git/config/6.0/cdm/m-cluster/am
   exportPath: /tmp/amster
 
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
