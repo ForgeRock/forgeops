@@ -159,7 +159,7 @@ deploy_charts()
            CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
         fi
 
-        ${DRYRUN} helm install --name ${NAMESPACE}-${comp} \
+        ${DRYRUN} helm upgrade -i ${NAMESPACE}-${comp} \
             ${YAML} ${CHART_YAML} \
             --namespace=${NAMESPACE} ${DIR}/helm/${chart}
     done
