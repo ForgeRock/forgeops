@@ -48,7 +48,7 @@
       "userAttributeSessionMapping" : [ ],
       "loginPostProcessClass" : [ ],
       "usernameGeneratorEnabled" : true,
-      "loginSuccessUrl" : [ "http://client-service.sample.svc.cluster.local/user/#profile/details" ]
+      "loginSuccessUrl" : [ ]
     },
     "core" : {
       "orgConfig" : "ldapService",
