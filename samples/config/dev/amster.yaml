@@ -1,5 +1,5 @@
 config:
-  importPath: /git/config/samples/am/R6.0
+  importPath: /git/config/6.0/identity-platform-examples/am-ds
   exportPath: /tmp/amster
 
 version: 6.5.0
