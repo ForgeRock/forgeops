@@ -70,7 +70,7 @@ commas, and the file must end in a newline.
 The format of the CSV file is:
 
 ```csv
-folder,artifact,tag1,tag2
+folder,artifact,tag
 
 ```
 
@@ -78,7 +78,9 @@ Where:
 
 * folder - is the name of the docker/ folder to build
 * artifact - is the version of the artifact in Artifactory. For example, for openam - 6.5.1-p2
-* tags - zero or more tags to apply to the image. The artifact version will always be applied as a tag. You only need to pass in additional tags.
+* tag - an additional tag to apply to the image. The artifact version will always be applied as a tag. You only need to pass in additional tags (latest, etc.).
+
+If the artifact does not change, but the docker image is significantly different, the suggested approach is to add an additional qualifier to the tag. For example, if the current artifact is `6.5.0-M129.1`  and the docker image is changed, the new tag becomes `6.5.0-M129.1.2`.
 
 
  See the build.sh script for a complete list of options.
@@ -87,3 +89,5 @@ Where:
 
 The file csv/dev.csv specifies the artifacts used in our CI Cloudbuild pipeline. To update to a new milestone, edit
 this file, and update the milestone (for example, for idm change 6.5.0-M2 to 6.5.0-M3). Commit the change, and submit a new PR. The build process will build and tag the new image.
+
+See `subtmit.sh` for creating one off builds of an artifact.

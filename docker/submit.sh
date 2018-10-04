@@ -6,10 +6,10 @@
 # csv/ folder for examples.
 # With called with two arugments, this will create the csv file and submit it for building
 #.
-# For example, to build AM from version 6.5.0-M3, and tag it with that version in addition to the extra tags "foo,bar", run this:
-# ./submit.sh openam 6.5.0-M3,foo,bar
+# For example, to build AM from version 6.5.0-M3, and tag it with that version in addition to the extra tags "foo", run this:
+# ./submit.sh openam 6.5.0-M3,foo
 #
-# Note that images always get tagged with articat version.  "./submit.sh openam 6.5.0-M6" will build and tag openam:6.5.0-M6   
+# Note that images always get tagged with artifact version.  "./submit.sh openam 6.5.0-M6" will build and tag openam:6.5.0-M6   
 
 
 mkdir -p tmp
