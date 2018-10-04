@@ -105,8 +105,7 @@ You can create the wildcard secret manually, but in these examples we assume
 that [cert-manager](https://github.com/jetstack/cert-manager) is installed and is provisioning certificates for you.
 
 
-The frconfig chart defaults to creating a cert-manager certifate issuer using that uses a CA issuer. This is a simple issuer that creates certifacates signed by a CA cert installed as part of the frconfig chart. We have included a default CA cert in frconfig/secrets. If
-you want to replace it with your own, there is a sample script in that directory that shows you how to generate a CA certificate.
+The frconfig chart defaults to creating a cert-manager certificate "CA" issuer. This is a simple issuer that creates certifacates signed by a CA cert installed as part of the frconfig chart. We have included a default CA cert in frconfig/secrets. You can replace this with your own using the sample script `frconfig/secrets/cm.sh`
 
 If you are on minikube, cert-manager can be installed using:
 
