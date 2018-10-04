@@ -106,9 +106,8 @@ chk_config()
     fi
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
-    AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}"
+    AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}" 
 }
-
 
 create_namespace()
 {
@@ -248,7 +247,6 @@ deploy_hpa()
         echo "Could not deploy HPA.  Please check error and fix."
     fi
 }
-
 
 ###############################################################################
 # main
