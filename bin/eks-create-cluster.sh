@@ -55,7 +55,7 @@ do
       echo "EKS cluster is ready"
       aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --kubeconfig ~/.kube/config-eks
       export KUBECONFIG=~/.kube/config-eks
-      kubectx ${CLUSTER_ARN}
+      kubectl config set-context ${CLUSTER_ARN}
       break
     else
       echo "Failed to create EKS cluster. Status: ${CLUSTER_STATUS}"

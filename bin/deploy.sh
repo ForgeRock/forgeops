@@ -107,8 +107,8 @@ chk_config()
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
     AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}"
+ 
 }
-
 
 create_namespace()
 {
@@ -177,7 +177,7 @@ isalive_check()
     echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
-        echo "   ${ALIVE_JSP} is not alive, waiting 10 seconds before retry..."
+        echo "   ${ALIVE_JSP} is not alive, waiting 20 seconds before retry..."
         sleep 10
         STATUS_CODE=$(curl --connect-timeout 5 -k -LI  ${ALIVE_JSP} -o /dev/null -w '%{http_code}\n' -sS || true)
     done
