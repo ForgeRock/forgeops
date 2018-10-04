@@ -14,6 +14,7 @@
 # k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/ing.yaml
 # k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/svc.yaml
 
+source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 IP=$1
 
@@ -35,3 +36,27 @@ helm install --namespace nginx --name nginx \
    $IP_OPTS stable/nginx-ingress
 
 #--set controller.image.tag="0.17.1" \
+
+while :
+do
+    NLB_STATUS=$(kubectl --namespace nginx get services nginx-nginx-ingress-controller --no-headers -o custom-columns=NAME:.status.loadBalancer.ingress[0].hostname)
+    if [ "$NLB_STATUS" == "<none>" ]; then
+      echo "Waiting for NLB to initialize DNS"
+      sleep 10
+    else
+      echo "NLB DNS is ready"
+      break
+    fi
+
+done
+
+echo "=> Creating route53 records for openam and openidm set to point to cluster url"
+
+AM_URL="openam.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
+IDM_URL="openidm.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
+
+NLB_DNS=$(kubectl --namespace nginx get services nginx-nginx-ingress-controller --no-headers -o custom-columns=NAME:.status.loadBalancer.ingress[0].hostname)
+
+HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name ${ROUTE53_DOMAIN} --query 'HostedZones[0].Id' | sed s/\"//g | sed s/,//g | sed s./hostedzone/..g)
+aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${AM_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
+aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${IDM_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
