@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Script to generate a CA cert used by cert manager to issue
-# Cut and paste the generated ca values into the charts values.yaml file.
+# Script to generate a CA cert used by cert manager to issue more certificates.
+# The generated ca.key and ca.crt files will get slurped up by helm and used to create a secret for cert-manager.
 
 COMMON_NAME="forgerock.com"
 
