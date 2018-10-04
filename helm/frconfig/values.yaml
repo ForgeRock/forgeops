@@ -13,3 +13,15 @@ git:
   # git repo to clone. The value below is a public git repo that does not require authentication.
   repo: "https://github.com/ForgeRock/forgeops-init.git"
   branch: master
+
+
+# Cert manager defaults
+certmanager:
+  enabled: true
+  # The default issuer is to use the CA certs ssuer. 
+  issuer: ca-issuer
+  # And a local to namespace issuer
+  issuerKind: Issuer
+  # For lets encrypt use this:
+  #issuer: letsencrypt-prod
+  #issuerKind: ClusterIssuer

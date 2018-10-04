@@ -5,24 +5,17 @@ replicaCount: 1
 
 component: apache-agent
 
-domain: .forgeops.com
+domain: .example.com
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/apache-agent
   tag: latest
   pullPolicy: Always
 
-# Select TLS strategy for your deployment:
-# 1) http  - no tls set. Using http only (unencrypted).
-# 2) https - tls enabled.  Provide own certificates.
-# 3) https-cert-manager - tls enabled. Uses Cert-Manager to automatically generate certificates.
-# For options 2 and 3, see ../helm/README.md for more information.
-tlsStrategy: http
-
 # To use this chart, you need to make sure you have agent profile configured
 # in selected amServer. User and password must match profile in amServer
 agent:
   user: apache
-  amServer: http://openam.example.forgeops.com/openam
+  amServer: https://openam.example.forgeops.com/openam
   realm: "/"
 
 service:

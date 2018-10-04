@@ -96,15 +96,28 @@ Note that the details of the ingress will depend on the implementation. You may 
  
 # TLS
 
-There is a single setting which controls the TLS strategy for your deployment: ```tlsStrategy: <value>```.   The values are as follows:
-* http  - no tls set. Using http only (unencrypted). This is the default setting.
-* https - tls enabled.  Provide own certificates.
-* https-cert-manager - tls enabled. Uses cert-Mmanager to automatically configure your certificate.
+All charts default to using TLS (https) for the inbound ingress.  
 
-If ```tlsStrategy: https-cert-manager```, then the cert-manager deployment, which is deployed automatically as part of the bin/gke-ups.sh script, manages certificate request/renewal via Let's Encrypt. 
+Within a namespace, it is assumed that a single wildcard certificate secret is present `wildcard.$namespace.$domain`. This
+secret is referenced by each ingress controller in the `tls` spec.
 
-If you want to use TLS but don't want cert-manager to manage the certificate request/renewal, then set
-```tlsStrategy: https```.  To use a self-signed certificate you can run the script ../bin/generate-tls.sh prior to deploying the helm chart.  This will automatically generate a self-signed certificate and deploy it into your namespace. Or you can provide your own.
+You can create the wildcard secret manually, but in these examples we assume
+that [cert-manager](https://github.com/jetstack/cert-manager) is installed and is provisioning certificates for you.
+
+
+The frconfig chart defaults to creating a cert-manager certifate issuer using that uses a CA issuer. This is a simple issuer that creates certifacates signed by a CA cert installed as part of the frconfig chart. We have included a default CA cert in frconfig/secrets. If
+you want to replace it with your own, there is a sample script in that directory that shows you how to generate a CA certificate.
+
+If you are on minikube, cert-manager can be installed using:
+
+`helm upgrade -i cert-manager --namespace kube-system stable/cert-manager`
+
+If you deploy the frconfig chart as-is: `helm install frconfig`  things should "just work". You will get 
+self signed certs in the browser. You must accept the browser warnings, or import the CA cert found in frconfig/secrets into your
+browser trusted certificate list.
+
+Alternatively, you can configure frconfig to create a cert-manager issuer for Let's Encrypt. Refer to the cert-manager docs for further details.
+
 
 For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html#devops-implementation-env-https-access-secret).
 

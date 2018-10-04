@@ -17,11 +17,11 @@ resources:
     memory: 256Mi
 
 # Default cookie domain. Include the leading dot.
-domain: .forgeops.com
+domain: .example.com
 
 agent:
   user: nginx
-  amServer: http://openam.example.forgeops.com/openam
+  amServer: https://openam.example.forgeops.com/openam
   realm: "/"
 
 

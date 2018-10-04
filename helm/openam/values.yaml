@@ -10,7 +10,7 @@ image:
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
-domain: .forgeops.com
+domain: .example.com
 
 config:
   name: frconfig
@@ -41,13 +41,6 @@ catalinaOpts: >
 #-Dcom.sun.management.jmxremote.ssl=false
 #-Dcom.sun.management.jmxremote.rmi.port=<port>
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
-
-# Select TLS strategy for your deployment:
-# 1) http  - no tls set. Using http only (unencrypted).
-# 2) https - tls enabled.  Provide own certificates.
-# 3) https-cert-manager - tls enabled. Uses Cert-Manager to automatically generate certificates.
-# For options 2 and 3, see ../helm/README.md for more information.
-tlsStrategy: http
 
 
 # To use a tomcat web.xml from a k8s config map instead of the one built into the container, set the following to true.
@@ -104,6 +97,17 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
+
+certmanager:
+  # The default issuer is to use the CA issuer. 
+  issuer: ca-issuer
+  # For lets encrypt
+  # issuer: letsencrypt-prod
+  # Whether to use a namespaced issuer, or a cluster wide one
+  #issuerKind: ClusterIssuer
+  issuerKind: Issuer
+
+
 
 # Audit log details for log streaming sidecar containers
 

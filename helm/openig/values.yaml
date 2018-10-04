@@ -24,13 +24,6 @@ config:
 # Tomcat JVM options.
 catalinaOpts: "-Xmx512m"
 
-# Select TLS strategy for your deployment:
-# 1) http  - no tls set. Using http only (unencrypted).
-# 2) https - tls enabled.  Provide own certificates.
-# 3) https-cert-manager - tls enabled. Uses Cert-Manager to automatically generate certificates.
-# For options 2 and 3, see ../helm/README.md for more information.
-tlsStrategy: https
-
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openig
   tag: 6.5.0-M134
@@ -59,8 +52,6 @@ ingress:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "route"
-    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/enable-cors: "false"
     

@@ -17,7 +17,10 @@ metadata:
       {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
-{{ include "tls-spec" . | indent 2 }}
+  tls:
+  - hosts:
+    - {{ template "externalFQDN" .  }}
+    secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
   - host: {{ template "externalFQDN" . }}
     http:

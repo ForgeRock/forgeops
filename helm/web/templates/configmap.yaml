@@ -16,13 +16,13 @@ data:
       <h3>Links</h3>
       <ul>
         <li>
-          <a href="http://openam.{{ .Release.Namespace }}{{ .Values.domain}}/openam" target="_blank">AM</a>
+          <a href="https://openam.{{ .Release.Namespace }}{{ .Values.domain}}/openam" target="_blank">AM</a>
         </li>
         <li>
-          <a href="http://openidm.{{ .Release.Namespace }}{{ .Values.domain}}" target="_blank">IDM</a>
+          <a href="https://openidm.{{ .Release.Namespace }}{{ .Values.domain}}" target="_blank">IDM</a>
         </li>
         <li>
-          <a href="http://openig.{{ .Release.Namespace }}{{ .Values.domain}}" target="_blank">IG</a>
+          <a href="https://openig.{{ .Release.Namespace }}{{ .Values.domain}}" target="_blank">IG</a>
         </li>
       </ul>
     </html>
