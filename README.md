@@ -64,16 +64,12 @@ helm init --upgrade --service-account default
 
 cd helm/
 
-# If you want to use the demonstration Helm chart repo, you can use this:
-helm repo add forgerock https://storage.googleapis.com/forgerock-charts/
-helm repo update
-# deploy the AM development example. Deploys AM, amster, and DS config store.
-# Using forgerock/ as a prefix deploys from the chart repository. For local development use the folder ./cmp-am-dev
-helm install -f my-custom.yaml forgerock/cmp-platform
-
 # Or, deploy from local helm charts..
-./update-deps.sh
-helm install -f my-custom.yaml ./cmp-platform
+helm install -f my-custom.yaml frconfig
+helm install amster
+helm install --set instance=configstore ds 
+helm install openam
+
 
 #Get your minikube ip
 minikube ip
@@ -83,15 +79,7 @@ minikube ip
 
 open http://openam.default.example.com
 
-# Alternatively, if you use something like xip.io for your domain, you access AM using the minikube IP:
-
-open http://openam.default.192.168.99.100.xip.io/openam
-
-
 ```
-
-To change the deployment parameters, FQDN, etc. please see the comments in helm/custom.yaml.
-
 
 ## Helm values.yaml overrides.
 
@@ -115,6 +103,7 @@ Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forg
 
 Troubleshooting Suggestions:
 
+* The script bin/debug-log.sh will generate an HTML file with log output. Useful for troubleshooting.
 * Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script and the cmp-platform composite charts are provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
 * Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.

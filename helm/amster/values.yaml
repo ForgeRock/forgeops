@@ -14,7 +14,7 @@ serverBase: http://openam:80
 
 
 # The top level domain (including the leading .). This excludes the openam component.
-domain: .forgeops.com
+domain: .example.com
 
 # Install passwords.
 amadminPassword: password
@@ -42,13 +42,6 @@ image:
   tag: 6.5.0-M7
   pullPolicy: IfNotPresent
   #pullPolicy: Always
-  
-# Select TLS strategy for your deployment:
-# 1) http  - no tls set. Using http only (unencrypted).
-# 2) https - tls enabled.  Provide own certificates.
-# 3) https-cert-manager - tls enabled. Uses Cert-Manager to automatically generate certificates.
-# For options 2 and 3, see ../helm/README.md for more information.
-tlsStrategy: http
 
 configStore:
   # type can be dirServer or embedded.
