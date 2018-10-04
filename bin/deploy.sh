@@ -107,8 +107,9 @@ chk_config()
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
     AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}"
+    IDM_URL="openidm.${NAMESPACE}.${DOMAIN}"
+ 
 }
-
 
 create_namespace()
 {
@@ -133,6 +134,16 @@ create_namespace()
 create_secrets()
 {
     echo "to do"
+}
+
+create_route53_records()
+{
+    echo "=> Creating route53 records for openam and openidm set to point to cluster url"
+    NLB_DNS=$(kubectl --namespace nginx get services nginx-nginx-ingress-controller --no-headers -o custom-columns=NAME:.status.loadBalancer.ingress[0].hostname)
+
+    HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name ${DOMAIN} --query 'HostedZones[0].Id' | sed s/\"//g | sed s/,//g | sed s./hostedzone/..g)
+    aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${AM_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
+    aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${IDM_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
 }
 
 #### Deploy methods
@@ -274,6 +285,7 @@ if [ ! -z "$DRYRUN" ]; then
 fi
 
 create_namespace
+create_route53_records
 deploy_charts
 
 if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then

@@ -16,8 +16,7 @@ ask() {
 	esac
 }
 
-echo -e "WARNING: This script requires a properly provisioned AWS Services with appropriate\n\t accounts, roles, privileges, keyrings, keys etc. These pre-requisites are\n\t outlined in the DevOps Documentation. Please ensure you have completed all\n\t before proceeding."
-
+echo -e "WARNING: The following components must be initialized before deployment:\n\t-IAM Service Role\n\t-VPC/Subnets\n\t-Control Plane Security Group\n These pre-requisites are outlined in the DevOps Documentation. Please ensure you have completed all before proceeding."
 
 echo ""
 echo "=> Have you copied the template file etc/eks-env.template to etc/eks-env.cfg and edited to cater to your enviroment?"
@@ -71,3 +70,5 @@ done
 
 # Add Prometheus
 ./deploy-prometheus.sh
+
+echo "Please add 'export KUBECONFIG=~/.kube/config-eks' to your bash_profile"
