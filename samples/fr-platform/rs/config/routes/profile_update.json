@@ -1,0 +1,82 @@
+{
+    "name": "profile_update",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${(matches(request.uri.path, '^/openidm/managed/user/.+$')) and matches(request.method, 'PATCH')}",
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "profile_update"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": "AccessTokenResolver",
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                },
+                {
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "includeUserNameInFields.groovy"
+                    }
+                },
+                {
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "checkOwnResource.groovy",
+                        "clientHandler": "IDMClient",
+                        "args": {
+                            "subjectField": "userName",
+                            "failureResponse": "${heap['authzFailureResponse']}"
+                        }
+                    }
+                },
+                {
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "checkAllowedFieldsForPatch.groovy",
+                        "args": {
+                            "allowedFields": [
+                                "country",
+                                "telephoneNumber",
+                                "mail",
+                                "address2",
+                                "city",
+                                "givenName",
+                                "postalCode",
+                                "description",
+                                "stateProvince",
+                                "/preferences/marketing",
+                                "userName",
+                                "password",
+                                "postalAddress",
+                                "termsAccepted",
+                                "kbaInfo",
+                                "/preferences/updates",
+                                "consentedMappings",
+                                "sn",
+                                "/preferences"
+                            ],
+                            "failureResponse": "${heap['authzFailureResponse']}"
+                        }
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

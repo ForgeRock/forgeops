@@ -57,7 +57,7 @@
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "openid", "policy", "email", "am-introspect-all-tokens", "profile", "consent_read", "workflow_tasks", "notifications" ],
+      "scopes" : [ "am-introspect-all-tokens" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ ],

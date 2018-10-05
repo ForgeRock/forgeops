@@ -35,6 +35,17 @@
             }
         },
         {
+            "name": "authzFailureResponse",
+            "type": "StaticResponseHandler",
+            "config": {
+                "status": 403,
+                "headers": {
+                    "Content-Type": [ "application/json" ]
+                },
+                "entity": "{\"code\": 403, \"message\":\"Access Denied\"}"
+            }
+        },
+        {
             "name": "IDMClient",
             "type": "ClientHandler",
             "capture": [
