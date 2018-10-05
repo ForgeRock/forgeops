@@ -12,7 +12,8 @@
                 "tokenIdleTimeMinutes" : "30",
                 "sessionOnly" : true,
                 "isHttpOnly" : true
-            }
+            },
+            "enabled" : false
         },
         "authModules" : [
             {

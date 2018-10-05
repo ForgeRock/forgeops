@@ -38,16 +38,7 @@
                         "onResponse": [
                             {
                                 "condition": "${response.entity.json.userName != contexts.oauth2.accessToken.info.sub}",
-                                "handler": {
-                                    "type": "StaticResponseHandler",
-                                    "config": {
-                                        "status": 403,
-                                        "headers": {
-                                            "Content-Type": [ "application/json" ]
-                                        },
-                                        "entity": "{\"code\": 403, \"message\":\"Access Denied to other profile\"}"
-                                    }
-                                }
+                                "handler": "authzFailureResponse"
                             }
                         ]
                     }
