@@ -29,11 +29,9 @@ case "$choice" in
 esac
 
 # This helps to release any IP address
-helm delete nginx 
+helm delete nginx || true
 
-sleep 10 
+sleep 5s
 
+echo "=> Deleting cluster \"${GKE_CLUSTER_NAME}\" ... you should consider deleting the remaining disks manually"
 gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE --quiet
-
-
-
