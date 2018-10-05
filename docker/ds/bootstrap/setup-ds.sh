@@ -10,13 +10,29 @@ echo "Setting up server..."
 cd $DJ
 
 
-SSL_KEYSTORE=$SECRETS/ssl-keystore.p12
+SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
+
+
+EXTRA_OPTS=""
+
+# Note the REAPER variable is set by ARG in the Dockerfile
+if [ "${REAPER_TYPE}" = "TTL" ]
+then
+  EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenExpirationDate"
+fi
+
+if [ "${REAPER_TYPE}" = "HYBRID" ]
+then
+   EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenTtlDate"
+fi
+
+echo "EXTRA_OPTS=${EXTRA_OPTS}"
 
 ./setup directory-server \
     --rootUserDn "cn=Directory Manager" \
     --rootUserPassword password \
     --monitorUserPassword password \
-    --hostname "$DSHOST" \
+    --hostname ${DSHOST} \
     --adminConnectorPort ${PORT_DIGIT}444 \
     --ldapPort ${PORT_DIGIT}389 \
     --enableStartTls \
@@ -28,11 +44,12 @@ SSL_KEYSTORE=$SECRETS/ssl-keystore.p12
     --set am-cts/amCtsAdminPassword:password \
     --profile am-identity-store \
     --set am-identity-store/amIdentityStoreAdminPassword:password \
-    --certNickname $SSL_CERT_ALIAS \
-    --usePkcs12KeyStore $SSL_KEYSTORE \
-    --keyStorePasswordFile $KEYSTORE_PIN \
+    --certNickname ${SSL_CERT_ALIAS} \
+    --usePkcs12KeyStore ${SSL_KEYSTORE} \
+    --keyStorePasswordFile ${KEYSTORE_PIN} \
     --acceptLicense \
-    --doNotStart
+    --doNotStart $EXTRA_OPTS
+
 
 # If the server is not the first, we can skip the rest of the setup, as only the first server is templated out.
 if [ "${PORT_DIGIT}" != "1" ]; then
