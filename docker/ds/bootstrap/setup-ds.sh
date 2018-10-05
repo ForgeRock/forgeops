@@ -15,7 +15,7 @@ SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
 
 EXTRA_OPTS=""
 
-# Note the REAPER variable is set by ARG in the Dockerfile
+# Note the REAPER_TYPE variable is set by ENV in the Dockerfile
 if [ "${REAPER_TYPE}" = "TTL" ]
 then
   EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenExpirationDate"
