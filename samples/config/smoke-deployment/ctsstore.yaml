@@ -1,6 +1,1 @@
-bootstrapType: cts
 instance: ctsstore
-
-image:
-  pullPolicy: Always
-  tag: latest

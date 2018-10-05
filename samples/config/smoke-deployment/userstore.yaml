@@ -1,5 +1,5 @@
 instance: userstore
 
-image:
-  pullPolicy: Always
-  tag: latest
+# image:
+#   pullPolicy: Always
+#   tag: latest

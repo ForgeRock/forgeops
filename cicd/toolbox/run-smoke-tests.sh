@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
-
-
+# Work in progress !
+# Assumes forgeops source is checked out to /workspace/forgeops
+cd /workspace/forgeops
 
 # Namespace is provided in $1
 clean_ns() {
     echo "Cleaning up older deployments"
     kubens $1
-    /forgeops/bin/remove-all.sh 
+    ./bin/remove-all.sh 
+    kubectl delete secret frconfig
+    kubectl delete configmap frconfig
 }
 
 deploy_smoke() {
     echo "deploying the smoke test configuration"
-    cd /forgeops
-    bin/deploy.sh samples/config/smoke-deployment
+    ./bin/deploy.sh samples/config/smoke-deployment
 }
 
 

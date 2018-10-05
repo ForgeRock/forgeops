@@ -2,3 +2,8 @@ agent:
   user: nginx
   amServer: http://openam.smoke.forgeops.com/openam
   realm: "/"
+
+
+image:
+  pullPolicy: Always
+  tag: 6.5.0 
