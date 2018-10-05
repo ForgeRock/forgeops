@@ -5,24 +5,7 @@
 # If this is not set a dynamic IP will be assigned.
 # The publishService.enabled attribute will tell nginx to publish the L4 IP as the ingress IP.
 
-# Set this IP to your reserved IP. Must be in the same zone as your cluster.
-
-# Handy app for testing your ingress (modify the ingress as needed)
-# https://github.com/kubernetes/kubernetes/tree/master/test/e2e/testing-manifests/ingress/http
-# commands:
-# k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/rc.yaml
-# k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/ing.yaml
-# k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/svc.yaml
-
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
-
-IP=$1
-
-if [ -z $1 ]; then
- IP_OPTS=""
-else
- IP_OPTS="--set controller.service.loadBalancerIP=$1"
-fi
 
 # For now we fix the image version at 17.1 as the ingress is not load balancing properly
 # See https://github.com/kubernetes/ingress-nginx/issues/3056
@@ -33,9 +16,7 @@ helm install --namespace nginx --name nginx \
   --set controller.service.externalTrafficPolicy=Local \
   --set controller.service.type=LoadBalancer \
   --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb" \
-   $IP_OPTS stable/nginx-ingress
-
-#--set controller.image.tag="0.17.1" \
+  stable/nginx-ingress
 
 while :
 do
