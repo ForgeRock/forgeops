@@ -68,7 +68,7 @@ done
 
 
 # Create the ingress controller
-./create-ingress-cntlr.sh ${GKE_INGRESS_IP}
+./gke-create-ingress-cntlr.sh ${GKE_INGRESS_IP}
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh
