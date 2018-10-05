@@ -1,5 +1,1 @@
 instance: configstore
-
-image:
-  pullPolicy: Always
-  tag: latest

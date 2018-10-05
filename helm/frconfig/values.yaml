@@ -1,6 +1,8 @@
 # Default values for frconfig.
 # This is a YAML-formatted file.
 
+# Top level domain, including the leading dot. This is used to form the wild-card cert request for cert-manager.
+domain: .example.com
 
 config:
   # The default name that products use when looking for the configmap and secret is `frconfig`.

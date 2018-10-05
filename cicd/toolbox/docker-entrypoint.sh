@@ -4,7 +4,9 @@
 echo "Cmd is $1"
 
 echo "Cloning forgeops"
-cd /
+mkdir -p /workspace
+
+cd /workspace
 git clone https://github.com/ForgeRock/forgeops.git 
 
 # configure context so kubens does not complain
