@@ -18,7 +18,7 @@ EXTRA_OPTS=""
 # Note the REAPER_TYPE variable is set by ENV in the Dockerfile
 if [ "${REAPER_TYPE}" = "TTL" ]
 then
-  EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenExpirationDate"
+   EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenExpirationDate"
 fi
 
 if [ "${REAPER_TYPE}" = "HYBRID" ]
@@ -48,7 +48,7 @@ echo "EXTRA_OPTS=${EXTRA_OPTS}"
     --usePkcs12KeyStore ${SSL_KEYSTORE} \
     --keyStorePasswordFile ${KEYSTORE_PIN} \
     --acceptLicense \
-    --doNotStart $EXTRA_OPTS
+    --doNotStart ${EXTRA_OPTS}
 
 
 # If the server is not the first, we can skip the rest of the setup, as only the first server is templated out.
@@ -110,10 +110,10 @@ if [ "${PORT_DIGIT}" = "1" ];
 then
     # TODO: Only for userstore (amIdentityStore) while OpenDJ-5531 is resolved.
     for file in ../../ldif/userstore/*.ldif; do
-        echo "Loading $file"
+        echo "Loading ${file}"
         # search + replace all placeholder variables. Naming conventions are from AM.
         sed -e "s/@BASE_DN@/$BASE_DN/"  <${file}  >/tmp/file.ldif
-        bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h $DSHOST -p ${PORT_DIGIT}389 -w password /tmp/file.ldif
+        bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h ${DSHOST} -p ${PORT_DIGIT}389 -w password /tmp/file.ldif
     done
 fi
 
