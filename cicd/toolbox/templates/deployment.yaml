@@ -29,14 +29,6 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
           env:
           - name: GIT_REPO
             value: "https://github.com/ForgeRock/forgeops-init.git"
@@ -46,17 +38,29 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          volumeMounts:
+          - name: html
+            mountPath: /usr/share/nginx/html
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-    {{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
+        - name: web 
+          image: nginx:latest 
+          ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+      volumes:
+      - name: html
+        emptyDir: {}
+

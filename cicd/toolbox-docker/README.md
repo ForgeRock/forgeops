@@ -9,6 +9,6 @@ This must be run using a service account that has cluster administration credent
 
 Build this using:
 
-docker build -t gcr.io/engineering-devops/toolbox:latest toolbox
+docker build -t gcr.io/engineering-devops/toolbox:latest toolbox-docker
 
 todo: Incorporate the build of this into our CI process

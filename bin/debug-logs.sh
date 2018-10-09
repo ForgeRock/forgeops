@@ -23,7 +23,7 @@ POD_LIST=$(kubectl -n=${NAMESPACE} get pods -o go-template --template '{{range .
 E_TIME=`date`
 
 mkdir -p /tmp/forgeops
-rm /tmp/forgeops/*
+rm -f /tmp/forgeops/*
 OUT=/tmp/forgeops/log-template.html
 
 rm -fr $OUT 
