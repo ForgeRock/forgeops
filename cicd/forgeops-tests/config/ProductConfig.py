@@ -17,7 +17,7 @@ class AMConfig(object):
         try:
             self.am_url = os.environ['AM_URL']
         except KeyError:
-            self.am_url = 'http://openam.smoke.forgeops.com/openam'
+            self.am_url = 'https://openam.smoke.forgeops.com/openam'
 
         try:
             self.amadmin_pwd = os.environ['AM_ADMIN_PWD']
@@ -35,7 +35,7 @@ class IDMConfig(object):
         try:
             self.idm_url = os.environ['IDM_URL']
         except KeyError:
-            self.idm_url = 'http://openidm.smoke.forgeops.com/openidm'
+            self.idm_url = 'https://openidm.smoke.forgeops.com/openidm'
 
         try:
             self.idm_admin_username = os.environ['IDM_ADMIN_USERNAME']
@@ -68,7 +68,7 @@ class IGConfig(object):
         try:
             self.ig_url = os.environ['IG_URL']
         except KeyError:
-            self.ig_url = 'http://openig.smoke.forgeops.com/'
+            self.ig_url = 'https://openig.smoke.forgeops.com/'
 
 
 class NginxAgentConfig(object):
@@ -76,7 +76,7 @@ class NginxAgentConfig(object):
         try:
             self.agent_url = os.environ['NGINX_URL']
         except KeyError:
-            self.agent_url = 'http://nginx-agent.smoke.forgeops.com'
+            self.agent_url = 'https://nginx-agent.smoke.forgeops.com'
 
 
 class ApacheAgentConfig(object):
@@ -84,5 +84,5 @@ class ApacheAgentConfig(object):
         try:
             self.agent_url = os.environ['APACHE_URL']
         except KeyError:
-            self.agent_url = 'http://apache-agent.smoke.forgeops.com'
+            self.agent_url = 'https://apache-agent.smoke.forgeops.com'
 
