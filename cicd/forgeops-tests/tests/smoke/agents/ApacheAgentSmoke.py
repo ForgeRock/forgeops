@@ -20,7 +20,7 @@ class ApacheAgentSmoke(unittest.TestCase):
 
         headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        resp = post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'Admin login')
         admin_token = resp.json()["tokenId"]
 
@@ -29,12 +29,12 @@ class ApacheAgentSmoke(unittest.TestCase):
         user_data = {'username': 'testuser-apache',
                      'userpassword': 'password',
                      'mail': 'testuser-nginx@forgerock.com'}
-        resp = post(self.amcfg.am_url + '/json/realms/root/users/?_action=create', headers=headers, json=user_data)
+        resp = post(verify=self.amcfg.ssl_verify, url=self.amcfg.am_url + '/json/realms/root/users/?_action=create', headers=headers, json=user_data)
         self.assertEqual(201, resp.status_code, "Expecting test user to be created - HTTP-201")
 
     def test_redirect(self):
         """Test if agent redirects to AM"""
-        resp = get(url=self.agent_cfg.agent_url, allow_redirects=False)
+        resp = get(verify=self.amcfg.ssl_verify, url=self.agent_cfg.agent_url, allow_redirects=False)
         self.assertEqual(302, resp.status_code, 'Expecting 302 redirect to AM login')
         self.assertTrue('openam' in resp.headers.get('location'), 'Expecting openam to be in location header')
 
@@ -43,10 +43,10 @@ class ApacheAgentSmoke(unittest.TestCase):
         s = session()
         s.headers = {'X-OpenAM-Username': 'testuser-apache', 'X-OpenAM-Password': 'password',
                      'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = s.post(url=self.amcfg.rest_authn_url, headers=s.headers)
+        resp = s.post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_authn_url, headers=s.headers)
         self.assertEqual(200, resp.status_code, 'User needs to login')
 
-        resp = s.get(self.agent_cfg.agent_url + self.policy_url)
+        resp = s.get(verify=self.amcfg.ssl_verify, url=self.agent_cfg.agent_url + self.policy_url)
         self.assertEqual(200, resp.status_code, 'Expecting HTTP-200 from autosubmit page')
 
         r = process_autosubmit_form(resp, s)
@@ -59,11 +59,11 @@ class ApacheAgentSmoke(unittest.TestCase):
         """Test that we can't access resource - denied by policy"""
         s = session()
         s.headers = {'X-OpenAM-Username': 'testuser-apache', 'X-OpenAM-Password': 'password',
-                   'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = s.post(url=self.amcfg.rest_authn_url, headers=s.headers)
+                     'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
+        resp = s.post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_authn_url, headers=s.headers)
         self.assertEqual(200, resp.status_code, 'User login, expecting HTTP-200')
 
-        resp = s.get(self.agent_cfg.agent_url + self.deny_policy_url)
+        resp = s.get(verify=self.amcfg.ssl_verify, url=self.agent_cfg.agent_url + self.deny_policy_url)
         r = process_autosubmit_form(resp, s)
         self.assertEqual(403, r.status_code, 'Expecting HTTP-403 when accessing allowed resource')
 
@@ -71,5 +71,5 @@ class ApacheAgentSmoke(unittest.TestCase):
 
     def test_access_neu_url(self):
         """Test if we can access resource without login - allowed by not enforced url"""
-        resp = get(self.agent_cfg.agent_url + self.neu_url)
+        resp = get(verify=self.amcfg.ssl_verify, url=self.agent_cfg.agent_url + self.neu_url)
         self.assertEqual(200, resp.status_code, "Expecting to have access to NEU url")

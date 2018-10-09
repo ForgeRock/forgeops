@@ -12,5 +12,5 @@ class IGSmoke(unittest.TestCase):
 
     def test_ping(self):
         """Test to check if we get to IG landing page"""
-        resp = get(self.igcfg.ig_url)
+        resp = get(verify=self.igcfg.ssl_verify, url=self.igcfg.ig_url)
         self.assertEqual(200, resp.status_code, "IG landing page")
