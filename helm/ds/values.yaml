@@ -33,7 +33,7 @@ cts:
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/ds
   pullPolicy: IfNotPresent
-  tag: 6.5.0-M129.1.2
+  tag: 6.5.0-M129.2
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.
