@@ -5,7 +5,7 @@
 
 
 # Max lines to print for pod logs
-NUM_LINES=200
+NUM_LINES=400
 
 kcontext=`kubectl config current-context`
 NS=`kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}"`
