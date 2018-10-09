@@ -20,13 +20,12 @@ service:
   port: 80
 
 ingress:
-  enabled: false
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  enabled: true
+  annotations: 
+    kubernetes.io/ingress.class: nginx
   path: /
   hosts:
-    - chart-example.local
+    - web.smoke.forgeops.com
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -43,9 +42,3 @@ resources: {}
   # requests:
   #  cpu: 100m
   #  memory: 128Mi
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
