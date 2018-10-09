@@ -28,10 +28,10 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/forgeops-tests:latest'
   dir: 'cicd/forgeops-tests/'
   env:
-  - 'IDM_URL=http://openidm.smoke.forgeops.com/openidm'
+  - 'IDM_URL=https://openidm.smoke.forgeops.com/openidm'
   - 'IDM_ADMIN_PWD=openidm-admin'
-  - 'IG_URL=http://openig.smoke.forgeops.com/'
-  - 'AM_URL=http://openam.smoke.forgeops.com/openam'
+  - 'IG_URL=https://openig.smoke.forgeops.com/'
+  - 'AM_URL=https://openam.smoke.forgeops.com/openam'
   - 'AM_ADMIN_PWD=password'
   entrypoint: 'bash'
   args: ['run-smoke-tests.sh']
