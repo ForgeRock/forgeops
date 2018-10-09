@@ -23,7 +23,8 @@ class IDMSmoke(unittest.TestCase):
 
     def test_0_ping(self):
         """Pings OpenIDM to see if server is alive using admin headers"""
-        resp = get(auth=('openidm-admin', 'openidm-admin'), url=self.idmcfg.rest_ping_url)
+        resp = get(verify=self.idmcfg.ssl_verify, auth=('openidm-admin', 'openidm-admin'),
+                   url=self.idmcfg.rest_ping_url)
         self.assertEqual(resp.status_code, 200)
 
     def test_1_create_managed_user(self):
@@ -42,7 +43,8 @@ class IDMSmoke(unittest.TestCase):
                    "password": "Th3Password",
                    "accountStatus": "active" } """
 
-        resp = put(url=self.idmcfg.rest_managed_user_url + self.testuser, headers=headers, data=payload)
+        resp = put(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_managed_user_url + self.testuser,
+                   headers=headers, data=payload)
         self.assertEqual(201, resp.status_code, 'Create test user')
 
     def test_2_update_managed_user(self):
@@ -59,7 +61,8 @@ class IDMSmoke(unittest.TestCase):
                    "password": "Th3RealPassword",
                    "accountStatus": "active"} """
 
-        resp = put(url=self.idmcfg.rest_managed_user_url + self.testuser, headers=headers, data=payload)
+        resp = put(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_managed_user_url + self.testuser,
+                   headers=headers, data=payload)
         self.assertEqual(200, resp.status_code, 'Update test user - ' + str(resp.text))
 
     def test_3_run_recon_to_ldap(self):
@@ -74,7 +77,7 @@ class IDMSmoke(unittest.TestCase):
             'waitForCompletion': 'True'
         }
 
-        resp = post(url=self.idmcfg.idm_url + '/recon', params=params, headers=headers)
+        resp = post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.idm_url + '/recon', params=params, headers=headers)
         self.assertEqual(200, resp.status_code, "Reconciliation")
 
     def test_4_login_managed_user(self):
@@ -83,7 +86,7 @@ class IDMSmoke(unittest.TestCase):
                    'X-OpenIDM-Password': 'Th3RealPassword',
                    'Content-Type': 'application/json',
                    }
-        resp = get(url=self.idmcfg.rest_ping_url, headers=headers)
+        resp = get(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_ping_url, headers=headers)
         self.assertEqual(200, resp.status_code, "Login managed user and access ping endpoint")
 
     def test_5_delete_managed_user(self):
@@ -92,7 +95,8 @@ class IDMSmoke(unittest.TestCase):
             'Content-Type': 'application/json',
             'if-match': '*',
         })
-        resp = delete(url=self.idmcfg.rest_managed_user_url + self.testuser, headers=headers)
+        resp = delete(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_managed_user_url + self.testuser,
+                      headers=headers)
         self.assertEqual(200, resp.status_code, "Delete test user")
 
     def test_6_user_self_registration(self):
@@ -124,10 +128,12 @@ class IDMSmoke(unittest.TestCase):
                    'X-OpenIDM-Password': 'anonymous',
                    'Cache-Control': 'no-cache'}
         params = {'_action': 'submitRequirements'}
-        resp = post(url=self.idmcfg.rest_selfreg_url, params=params, headers=headers, json=user_data)
+        resp = post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_selfreg_url, params=params,
+                    headers=headers, json=user_data)
         token = resp.json()["token"]
         user_data["token"] = token
-        resp = post(url=self.idmcfg.rest_selfreg_url, params=params, headers=headers, json=user_data)
+        resp = post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_selfreg_url, params=params,
+                    headers=headers, json=user_data)
 
         self.assertEqual(200, resp.status_code)
         self.assertTrue(resp.json()['status']['success'], "Expecting success in returned json")
@@ -161,7 +167,8 @@ class IDMSmoke(unittest.TestCase):
             }
         }
 
-        stage1 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload1)
+        stage1 = s.post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_selfpwreset_url, headers=headers_init,
+                        params=params, json=payload1)
         self.assertEqual(200, stage1.status_code, "Try to find user with query for pw reset")
 
         payload2 = {
@@ -170,7 +177,8 @@ class IDMSmoke(unittest.TestCase):
                 'queryFilter': 'userName eq \"rsutter\"'
             }
         }
-        stage2 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers_init, params=params, json=payload2)
+        stage2 = s.post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_selfpwreset_url, headers=headers_init,
+                        params=params, json=payload2)
         self.assertEqual(200, stage2.status_code, "Stage 2 - Query user")
 
         payload3 = {
@@ -180,7 +188,8 @@ class IDMSmoke(unittest.TestCase):
             }
         }
 
-        stage3 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload3)
+        stage3 = s.post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_selfpwreset_url, headers=headers,
+                        params=params, json=payload3)
         self.assertEqual(200, stage3.status_code, "Stage 3 - Answer question")
 
         payload4 = {
@@ -190,6 +199,7 @@ class IDMSmoke(unittest.TestCase):
             }
         }
 
-        stage4 = s.post(self.idmcfg.rest_selfpwreset_url, headers=headers, params=params, json=payload4)
+        stage4 = s.post(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_selfpwreset_url, headers=headers,
+                        params=params, json=payload4)
         self.assertEqual(200, stage4.status_code, "Stage 4 - Password reset")
         s.close()

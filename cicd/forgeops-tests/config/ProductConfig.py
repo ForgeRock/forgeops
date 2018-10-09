@@ -8,6 +8,12 @@ Also provides useful generated variables for products (rest endpoints url, etc..
 
 import os
 
+# Global flag to enable/disable verification of certificates
+try:
+    SSL_VERIFY = os.environ['SSL_VERIFY']
+except KeyError:
+    SSL_VERIFY = False
+
 
 class AMConfig(object):
     def __init__(self):
@@ -28,6 +34,7 @@ class AMConfig(object):
         self.rest_authn_url = self.am_url + '/json/authenticate?realm=%s' % self.am_realm
         self.rest_oauth2_authz_url = self.am_url + '/oauth2/authorize'
         self.rest_oauth2_access_token_url = self.am_url + '/oauth2/access_token?realm=%s' % self.am_realm
+        self.ssl_verify = SSL_VERIFY
 
 
 class IDMConfig(object):
@@ -51,6 +58,7 @@ class IDMConfig(object):
         self.rest_managed_user_url = self.idm_url + '/managed/user'
         self.rest_selfreg_url = self.idm_url + '/selfservice/registration'
         self.rest_selfpwreset_url = self.idm_url + '/selfservice/reset'
+        self.ssl_verify = SSL_VERIFY
 
     def get_admin_headers(self, headers):
         """
@@ -69,6 +77,7 @@ class IGConfig(object):
             self.ig_url = os.environ['IG_URL']
         except KeyError:
             self.ig_url = 'https://openig.smoke.forgeops.com/'
+        self.ssl_verify = SSL_VERIFY
 
 
 class NginxAgentConfig(object):
@@ -77,6 +86,7 @@ class NginxAgentConfig(object):
             self.agent_url = os.environ['NGINX_URL']
         except KeyError:
             self.agent_url = 'https://nginx-agent.smoke.forgeops.com'
+        self.ssl_verify = SSL_VERIFY
 
 
 class ApacheAgentConfig(object):
@@ -85,4 +95,4 @@ class ApacheAgentConfig(object):
             self.agent_url = os.environ['APACHE_URL']
         except KeyError:
             self.agent_url = 'https://apache-agent.smoke.forgeops.com'
-
+        self.ssl_verify = SSL_VERIFY

@@ -10,12 +10,13 @@ from config.ProductConfig import AMConfig
 
 class AMSmoke(unittest.TestCase):
     amcfg = AMConfig()
-
+    amcfg.ssl_verify
+    
     def test_0_setup(self):
         """Setup a user that will be tested in user login."""
         headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'Admin login')
         admin_token = resp.json()["tokenId"]
 
@@ -24,19 +25,20 @@ class AMSmoke(unittest.TestCase):
         user_data = {'username': 'testuser',
                      'userpassword': 'password',
                      'mail': 'testuser@forgerock.com'}
-        resp = post(self.amcfg.am_url + '/json/realms/root/users/?_action=create', headers=headers, json=user_data)
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.am_url + '/json/realms/root/users/?_action=create',
+                    headers=headers, json=user_data)
         self.assertEqual(201, resp.status_code, "Expecting test user to be created - HTTP-201")
 
     def test_1_ping(self):
         """Test if OpenAM is responding on isAlive endpoint"""
-        resp = get(url=self.amcfg.am_url + '/isAlive.jsp')
+        resp = get(verify=self.amcfg.ssl_verify,  url=self.amcfg.am_url + '/isAlive.jsp')
         self.assertEqual(200, resp.status_code, "Ping OpenAM isAlive.jsp")
 
     def test_2_admin_login(self):
         """Test AuthN as amadmin"""
         headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'Admin authn REST')
 
     def test_4_user_login(self):
@@ -45,7 +47,7 @@ class AMSmoke(unittest.TestCase):
                    'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json',
                    'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'User authn REST')
 
     def test_5_oauth2_access_token(self):
@@ -56,7 +58,7 @@ class AMSmoke(unittest.TestCase):
                    'Content-Type': 'application/json',
                    'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
-        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'User authn REST')
 
         tokenid = resp.json()['tokenId']
@@ -73,7 +75,7 @@ class AMSmoke(unittest.TestCase):
 
         data = {"decision": "Allow", "csrf": tokenid}
 
-        resp = post(url=self.amcfg.rest_oauth2_authz_url, data=data, headers=headers,
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_oauth2_authz_url, data=data, headers=headers,
                     cookies=cookies, params=params, allow_redirects=False)
         self.assertEqual(302, resp.status_code, 'Oauth2 authz REST')
 
@@ -91,7 +93,7 @@ class AMSmoke(unittest.TestCase):
                 ('code', auth_code),
                 ('redirect_uri', 'http://fake.com'))
 
-        resp = post(url=self.amcfg.rest_oauth2_access_token_url, auth=('oauth2', 'password'),
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_oauth2_access_token_url, auth=('oauth2', 'password'),
                     data=data, headers=headers)
         self.assertEqual(200, resp.status_code, 'Oauth2 get access-token REST')
 
@@ -99,12 +101,13 @@ class AMSmoke(unittest.TestCase):
         """Test to delete user as amadmin"""
         headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
-        resp = post(url=self.amcfg.rest_authn_url, headers=headers)
+        resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_authn_url, headers=headers)
         self.assertEqual(200, resp.status_code, 'Admin login')
         admin_token = resp.json()["tokenId"]
 
         headers = {'iPlanetDirectoryPro': admin_token, 'Content-Type': 'application/json',
                    'Accept-API-Version': 'resource=3.0, protocol=2.1'}
 
-        resp = delete(self.amcfg.am_url + '/json/realms/root/users/testuser', headers=headers)
+        resp = delete(verify=self.amcfg.ssl_verify, url=self.amcfg.am_url + '/json/realms/root/users/testuser',
+                      headers=headers)
         self.assertEqual(200, resp.status_code, "Expecting test user to be deleted - HTTP-200")
