@@ -1,0 +1,37 @@
+image:
+  #repository: forgerock-docker-public.bintray.io/ds
+  repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0-M129.1-TTL
+  pullPolicy: Always
+
+instance: ctsstore-local
+
+resources:
+  limits:
+    memory: 14Gi
+    cpu: 7000m
+  requests:
+    memory: 10Gi
+    cpu: 6000m
+
+storageSize: 375Gi
+storageClass: local-nvme
+
+# For JDK 8
+opendjJavaArgs: >
+   -server -Xms10g -Xmx10g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+
+# For JDK 11
+#opendjJavaArgs: >
+# -server -Xms10g -Xmx10g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+# -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
+
+podAntiAffinity: hard
+
+runPostSetupJob: false
+
+replicas: 2
+
+topologyKey: "failure-domain.beta.kubernetes.io/zone"
