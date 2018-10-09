@@ -14,12 +14,4 @@ metadata:
 provisioner: kubernetes.io/gce-pd
 parameters:
   type: pd-ssd
----
-
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: local-nvme
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
 EOF
