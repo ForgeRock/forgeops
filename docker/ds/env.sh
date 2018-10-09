@@ -20,10 +20,10 @@ export FQDN_RS0=${DJ_INSTANCE}-0.${DJ_INSTANCE}:8989
 export FQDN_RS1=${DJ_INSTANCE}-1.${DJ_INSTANCE}:8989
 export FQDN_RS2=${DJ_INSTANCE}-2.${DJ_INSTANCE}:8989
 export SERVER_FQDN="$FQDN"
-export DATA_DIR="data/db"
-export ADS_TRUSTSTORE_PIN="data/db/ads-truststore/ads-truststore.pin"
-export ADS_TRUSTSTORE="data/db/ads-truststore/ads-truststore"
 export CHANGELOG_DB_DIRECTORY="data/db/changelogDb"
+#export DATA_DIR="data/db"
+#export ADS_TRUSTSTORE_PIN="data/db/ads-truststore/ads-truststore.pin"
+#export ADS_TRUSTSTORE="data/db/ads-truststore/ads-truststore"
 
 # Admin id for replication.
 export ADMIN_ID=admin
