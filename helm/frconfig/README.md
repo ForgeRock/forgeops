@@ -29,7 +29,9 @@ git:
 ## git secret
 
 A dummy ssh secret `id_rsa` is stored in the `frconfig` secret. If you need ssh access to your git repository
-you must replace this secret with a real ssh key. For example:
+you must replace this secret with a real ssh key. There are two ways to do this: You can replace the contents of the file `secrets/id_rsa` with your ssh key, or alternatively you can use kubectl commands to replace the dummy secret with the 
+real value. For example:
+
 
 ```shell
 # Generate your own id_rsa and id_rsa.pub keypair, according to the instructions on github or stash,
@@ -39,6 +41,8 @@ kubectl create secret generic frconfig --from-file=id_rsa
 ```
 
 Note the secret file name (the key in the secret map) *must* be id_rsa.  This is the private key that has permissions to clone and/or update your repository (the public part of this key is uploaded to your github or stash repository).
+
+The id_rsa file must be kept private. Do not check this file into source control.
 
 ## Configuration per product
 
