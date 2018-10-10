@@ -31,10 +31,6 @@ spec:
           operator: In
           values:
           - local-nvme
-        - key: failure-domain.beta.kubernetes.io/zone
-          operator: In
-          values:
-          - us-east1-d
 ---
 
 apiVersion: v1
@@ -58,8 +54,4 @@ spec:
           operator: In
           values:
           - local-nvme
-        - key: failure-domain.beta.kubernetes.io/zone
-          operator: In
-          values:
-          - us-east-1c
 EOF
