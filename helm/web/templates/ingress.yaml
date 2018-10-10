@@ -26,6 +26,6 @@ spec:
       paths:
       - path: {{ .Values.ingress.path }}
         backend:
-          serviceName: {{ template "web.name" . }}
+          serviceName: {{ $fullName }}
           servicePort: {{ .Values.service.port }}  
 {{- end }}
