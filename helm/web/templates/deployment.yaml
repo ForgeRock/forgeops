@@ -23,6 +23,12 @@ spec:
       - name: html
         configMap:
           name: {{ template "web.fullname" . }}
+      - name: nginx
+        configMap:
+          name: nginx-conf
+      - name: passwd
+        configMap:
+          name: nginx-passwd
       containers:
         - name: {{ .Chart.Name }}
           image: nginx:latest
@@ -31,17 +37,21 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+#          livenessProbe:
+#            httpGet:
+#              path: /
+#              port: http
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port: http
           volumeMounts:
           - name: html
             mountPath: /usr/share/nginx/html
+          - name: nginx
+            mountPath: /etc/nginx/conf.d
+          - name: passwd
+            mountPath: /usr/share/nginx/
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
