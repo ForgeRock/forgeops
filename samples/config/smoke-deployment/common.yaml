@@ -1,7 +1,1 @@
 domain: .forgeops.com
-
-
-certmanager:
-  acme: true
-  issuer: letsencrypt-prod
-  issuerKind: ClusterIssuer
