@@ -1,7 +1,7 @@
 java,6.5.0
 ds,6.5.0-M129.2,6.5.0-M129.2.1
-openam,6.5.0-M7,latest
-amster,6.5.0-M7,latest
+openam,6.5.0-M9,6.5.0-M9
+amster,6.5.0-M9,6.5.0-M9
 openidm,6.5.0-M5,latest
 openig,6.5.0-M134,latest
 git,6.5.0

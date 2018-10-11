@@ -5,7 +5,7 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 FROM forgerock/downloader:latest
 
-ARG VERSION="6.5.0-M5"
+ARG VERSION="6.5.0-M9"
 RUN download -v $VERSION amster
 RUN mkdir -p /var/tmp/amster && unzip -q /amster.zip -d /var/tmp/amster
 
