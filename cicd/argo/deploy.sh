@@ -7,8 +7,9 @@
 # Helm values are relative to the helm chart, not the root
 #argocd app set ds-userstore --values ../../cicd/argo/userstore.yaml
 
-REPO=https://github.com/wstrange/forgeops
-REVISION=dev
+#REPO=https://github.com/wstrange/forgeops
+REPO=https://github.com/ForgeRock/forgeops
+REVISION=master
 NAMESPACE=test
 
 # Deploy ds instances
