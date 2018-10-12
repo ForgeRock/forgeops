@@ -21,6 +21,14 @@ And open up a connection to ldap://localhost:1389
 
 The default password is "password".
 
+## Persistent Disks
+
+The statefulset uses a Persistent volume claim template to allocate storage for each directory server pod. Persistent volume claims are not deleted when the statefulset is deleted.  In other words, performing a `helm delete ds-release`  will *not* delete the underlying storage. If you want to reclaim the storage, delete the PVC:
+
+```bash
+kubectl get pvc 
+kubectl delete pvc userstore-0
+```
 
 ## Values.yaml
 
