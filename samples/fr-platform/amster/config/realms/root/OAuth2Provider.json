@@ -20,7 +20,7 @@
     "advancedOAuth2Config" : {
       "customLoginUrlTemplate" : null,
       "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "profile|Your personal information", "profile_update|Allowed to update your personal information", "consent_read|Ability to read your consent preferences", "workflow_tasks|Manage tasks assigned to you", "notifications|Manage your notifications" ],
-      "codeVerifierEnforced" : false,
+      "codeVerifierEnforced" : "false",
       "tokenSigningAlgorithm" : "HS256",
       "authenticationAttributes" : [ "uid" ],
       "defaultScopes" : [ "address", "phone", "openid", "profile", "email" ],
