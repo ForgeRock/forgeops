@@ -61,6 +61,10 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
+        - name: configstore-secret
+          mountPath: /var/run/secrets/configstore
+        - name: openam-secrets
+          mountPath: /var/run/secrets/openam
         {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
