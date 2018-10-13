@@ -34,9 +34,11 @@ The provided cmp-platform chart bundles other foundational charts such opendj, f
  openam, etc. Performing a `helm install cmp-platform`  will deploy all the components.
  Remember to perform a `helm dep up cmp-platform` to update any dependencies that might have changed.
 
- In general we recommend that charts be deployed individually as it makes it easier to debug and
- to redeploy a single component at a time.
+This chart is a simple example for use only when working through the *DevOps 
+ Quick Start Guide* only.  
 
+For all other deployments, install individual Helm charts as described in the 
+ *DevOps Developer's Guide*. 
  
 # Using a private registry
 
