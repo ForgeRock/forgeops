@@ -11,3 +11,12 @@ prometheus:
         resources:
           requests:
             storage: 100Gi
+            
+grafana:
+  storageSpec:
+    class: fast
+    accessMode: "ReadWriteOnce"
+    resources:
+     requests:
+       storage: 50Gi
+    #selector: {}

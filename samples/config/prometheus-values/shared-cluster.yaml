@@ -26,6 +26,15 @@ global:
 # AlertManager
 deployAlertManager: True
 
+grafana:
+  storageSpec:
+    class: fast
+    accessMode: "ReadWriteOnce"
+    resources:
+     requests:
+       storage: 50Gi
+    #selector: {}
+    
 alertmanager:
   ## Alertmanager configuration directives
   ## Ref: https://prometheus.io/docs/alerting/configuration/
