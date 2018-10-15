@@ -26,6 +26,18 @@ global:
 # AlertManager
 deployAlertManager: True
 
+grafana:
+  # Grafana configuration overrides
+  
+  # Persistent Storage
+  storageSpec:
+    class: fast
+    accessMode: "ReadWriteOnce"
+    resources:
+     requests:
+       storage: 50Gi
+    #selector: {}
+    
 alertmanager:
   ## Alertmanager configuration directives
   ## Ref: https://prometheus.io/docs/alerting/configuration/
@@ -449,7 +461,6 @@ prometheus:
 
 # default rules are in templates/general.rules.yaml
 # prometheusRules: {}
-
 
 # Select Deployed DNS Solution
 deployCoreDNS: false
