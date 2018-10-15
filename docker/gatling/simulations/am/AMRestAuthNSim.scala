@@ -20,10 +20,10 @@ class AMRestAuthNSim extends Simulation {
     val duration: Integer = Integer.getInteger("duration", 60)
     val warmup: Integer = Integer.getInteger("warmup", 1)
     val amHost: String = System.getProperty("am_host", "openam.example.forgeops.com")
-    val amPort: String = System.getProperty("am_port", "80")
-    val amProtocol: String = System.getProperty("am_protocol", "http")
+    val amPort: String = System.getProperty("am_port", "443")
+    val amProtocol: String = System.getProperty("am_protocol", "https")
 
-    val amUrl: String = "http://" + amHost + ":" + amPort
+    val amUrl: String = amProtocol + "://" + amHost + ":" + amPort
     val random = new util.Random
 
     val userFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(
