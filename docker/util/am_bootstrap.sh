@@ -24,17 +24,6 @@ is_configured() {
     return $status
 }
 
-copy_secrets() {
-    echo "Copying secrets"
-    mkdir -p "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
-    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}/openam"
-}
-
 bootstrap() {
     if is_configured;
     then
@@ -44,5 +33,4 @@ bootstrap() {
     fi
 }
 
-copy_secrets
 bootstrap
