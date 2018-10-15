@@ -33,5 +33,5 @@ helm delete nginx || true
 
 sleep 5s
 
-echo "=> Deleting cluster \"${GKE_CLUSTER_NAME}\" ... you should consider deleting the remaining disks manually"
+echo "=> Deleting cluster \"${GKE_CLUSTER_NAME}\" ... you should consider deleting any left over disks manually"
 gcloud container clusters delete $GKE_CLUSTER_NAME --zone $GKE_PRIMARY_ZONE --quiet
