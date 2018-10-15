@@ -1,4 +1,4 @@
-# Test and debugging
+# Tests and debugging
 Following document hopes to provide detailed tests description along with usually observed failures.
 
 ## Test descriptions
