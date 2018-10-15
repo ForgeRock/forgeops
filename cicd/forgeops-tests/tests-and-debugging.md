@@ -71,10 +71,92 @@ Common AM problems:
  - **Amster import errors**: When we are bumping product version, it's important to check if there are any import failures. When there are failures, we need to deploy AM with empty import and export these failed imports again. There is also one bug with site.json exporting id field which can't be imported back.
 
 ### IDM tests
-TODO
+IDM tests are expecting additional couple of modifications in config(bi-dir sync with LDAP). They are:
+ - Enabled self-service registration
+ - Enabled self-service password reset
+
+It's important to keep in mind to manage these changes when updating configs. Specifically these files:
+ - ui-configuration.json (enabled registration & pw reset)
+ - selfservice.kba.json (1 question, 1 minimum)
+
+
+#### test_0_ping
+*Pings OpenIDM to see if server is alive using admin headers*
+
+**Flow:**
+ - GET request to `openidm/info/ping` with admin headers
+
+**Seen problems:**
+- [1,2](#previously-seen-problems-with-idm)
+
+#### test 1,2,4,5 (Create, update, login/read, delete)
+*Managed user operations as admin*
+
+**Flow:**
+ - Single call to `managed/user` endpoint with admin headers
+
+**Seen problems:**
+ - [1,2](#previously-seen-problems-with-idm)
+
+
+#### test_3_run_recon_to_ldap
+*Test to run reconciliation to ldap*
+
+**Flow:**
+ - POST request to `/recon` with admin headers
+
+**Seen problems:**
+ - [1,2,3](#previously-seen-problems-with-idm)
+
+#### test_6_user_self_registration
+*Test to use self service registration as user*
+
+*NOTE: test is recreating same requests as IDM UI is doing when user perform self-service*
+
+**Flow:**
+ 1. POST to self-reg endpoint, extract token as anonymous
+ 2. POST to self-reg endpoint, with token and json body as anonymous
+
+**Seen problems:**
+ - [1,2,3](#previously-seen-problems-with-idm)
+
+#### test_7_user_reset_pw
+*Test to use self service password reset as user*
+
+*NOTE: user changing password is created in previous step. If self reg fails, this test
+will too.*
+
+**Flow:**
+ 1. POST to pw reset endpoint, extract token as anonymous
+ 2. POST to pw reset endpoint, add search filter for user
+ 3. POST to pw reset, stage 2 - Answer security question
+ 4. POST to pw reset, stage 3 - change password
+
+ **Seen problems:**
+  - [1,2,3](#previously-seen-problems-with-idm)
+
+#### Previously seen problems with IDM
+ 1. **Config errors**: There are compatibility problems when bumping version. Getting logs from IDM pod usually displays these errors.
+ 2. **Repo scheme errors**: Smoke tests are using postgres as base repo. We've seen couple of times that scripts to configure DB are changing and it's important to keep it up to date. To check if scripts are up to date, look into `forgeops/helm/postgres-openidm/sql` and compare these with IDM repo init scripts(`openidm.zip/db/postgresql/scripts`). ! Make sure you are comparing same IDM revisions.
+ 3. **Userstore not reachable**: When doing reconciliation, it might fail when userstore is not ready. Check for pods if userstore is ready.
+
+
+### IG tests
+
+Currently there is only ping test for IG which checks if landing page is accessible.
+In case of failure, check common failures.
+
 
 ## Common failures
-TODO
-## Per product failures
-TODO 
-### AM
+This is unordered list deployment failures or problems we've seen previously
+In case something is not working in your environment, check for following things:
+
+ - Docker images are not downloaded(check with `kubectl describe pod <product pod>`):
+   - Wrong tag
+   - Repository not accessible
+   - Wrong image name  
+ - Products are restarted/keeps restarting:
+   - Sometimes products might be restarted as we are using preemptible cluster.
+   - There is error which prevents from product to start up correctly. Check log messages from product pods
+ - Configuration is not applied:
+  - Check git & product logs
