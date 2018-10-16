@@ -93,6 +93,12 @@ spec:
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         #terminationGracePeriodSeconds: 10
+        {{- if .Values.cts.enabled }}
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "/opt/opendj/scripts/cts-poststart.sh"]
+        {{ end }}
         resources:
 {{ toYaml .Values.resources | indent 12 }}
         envFrom:
