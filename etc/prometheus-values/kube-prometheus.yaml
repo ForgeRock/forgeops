@@ -178,7 +178,7 @@ alertmanager:
         resources:
           requests:
             storage: 50Gi
-      selector: {}
+      #selector: {}
 
 prometheus:
   ## Alertmanagers to which alerts will be sent
