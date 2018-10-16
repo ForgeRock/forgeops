@@ -45,8 +45,7 @@ No restarting of Prometheus is required.
 The Grafana Helm chart is deployed as part of the kube-prometheus chart.  Grafana automatically connects to Prometheus and syncs all  
 the metrics which are visible through Graphs.  
 
-Dashboards for ForgeRock products are imported into Grafana post-deployment. A Kubernetes job mounts the dashboard files from the helm/forgerock-metrics/dashboards  
-folder, formats them to bypass a couple of limitations in the Grafana import API, and then uses the API to import them.
+Dashboards for ForgeRock products are added to the helm/forgerock-metrics/dashboards folder.  Any new dashboards must be formatted using the 
 
 <br />
 
