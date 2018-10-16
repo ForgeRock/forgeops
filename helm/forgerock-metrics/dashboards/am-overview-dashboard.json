@@ -41,9 +41,9 @@
     },
     "editable": true,
     "gnetId": null,
-    "graphTooltip": 0,
+    "graphTooltip": 1,
     "id": null,
-    "iteration": 1526583768559,
+    "iteration": 1525083068004,
     "links": [],
     "panels": [
       {
@@ -54,1218 +54,443 @@
           "x": 0,
           "y": 0
         },
-        "id": 57,
-        "panels": [],
-        "title": "Authentications",
-        "type": "row"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "description": "",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 0,
-          "y": 1
-        },
-        "id": 68,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_session_count{job=~\"$instance\",session_type=~\"authentication-.*\",operation=\"create\",outcome=\"success\"}[$aggregation_window]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Started AuthN Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 6,
-          "y": 1
-        },
-        "id": 66,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_authentication_count{job=~\"$instance\",outcome=\"success\"}[$aggregation_window]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Successful AuthN Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 12,
-          "y": 1
-        },
-        "id": 67,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_authentication_count{job=~\"$instance\",outcome=\"failure\"}[$aggregation_window]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Failed AuthN Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "description": "",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 18,
-          "y": 1
-        },
-        "id": 69,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_session_count{job=~\"$instance\",session_type=~\"authentication-.*\",operation=\"max-timeout\"}[$aggregation_window]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Timed-out AuthN Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "decimals": 2,
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 0,
-          "y": 3
-        },
-        "id": 65,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum(irate(am_session_count{job=~\"$instance\",session_type=~\"authentication-.*\",operation=\"create\",outcome=\"success\"}[1m])) by (job)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Started AuthN Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "decimals": 2,
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 6,
-          "y": 3
-        },
-        "id": 80,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "irate(am_authentication_count{job=~\"$instance\",outcome=\"success\"}[1m])",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Successful AuthN Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "decimals": 2,
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 12,
-          "y": 3
-        },
-        "id": 81,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "irate(am_authentication_count{job=~\"$instance\",outcome=\"failure\"}[1m])",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Failed AuthN Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "decimals": 2,
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 18,
-          "y": 3
-        },
-        "id": 82,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum(irate(am_session_count{job=~\"$instance\",session_type=~\"authentication-.*\",operation=\"max-timeout\"}[1m])) by (job)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Timed-out AuthN Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "collapsed": false,
-        "gridPos": {
-          "h": 1,
-          "w": 24,
-          "x": 0,
-          "y": 9
-        },
-        "id": 72,
-        "panels": [],
-        "title": "Sessions",
-        "type": "row"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 8,
-          "x": 0,
-          "y": 10
-        },
-        "id": 105,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_session_count{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\",outcome=\"success\",operation=~\"create\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Session Creation Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 8,
-          "x": 8,
-          "y": 10
-        },
-        "id": 104,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_session_count{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\",outcome=\"success\",operation=~\"logout|destroy|idle-timeout|max-timeout\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Session Termination Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "s",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 8,
-          "x": 16,
-          "y": 10
-        },
-        "id": 109,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum (rate(am_session_lifetime_seconds_total{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\"}[$aggregation_window])) / sum (rate(am_session_lifetime_count{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Overall Average Session Lifetime [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 8,
-          "x": 0,
-          "y": 12
-        },
-        "id": 93,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum(irate(am_session_count{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\",outcome=\"success\",operation=~\"create\"}[1m])) by (job)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Session Creation Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 8,
-          "x": 8,
-          "y": 12
-        },
-        "id": 70,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum(irate(am_session_count{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\",outcome=\"success\",operation=~\"logout|destroy|idle-timeout|max-timeout\"}[1m])) by (job)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Session Termination Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 8,
-          "x": 16,
-          "y": 12
-        },
-        "id": 99,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "hideEmpty": false,
-          "hideZero": false,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum by (job) (rate(am_session_lifetime_seconds_total{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\"}[90s])) / sum by (job) (rate(am_session_lifetime_count{job=~\"$instance\",session_type!~\"authentication-client-based|authentication-cts-based|authentication-in-memory\"}[90s]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Average Session Lifetime",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "s",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "collapsed": false,
-        "gridPos": {
-          "h": 1,
-          "w": 24,
-          "x": 0,
-          "y": 18
-        },
         "id": 8,
         "panels": [],
-        "title": "CTS",
+        "repeat": null,
+        "title": "Expired Token Identification",
+        "type": "row"
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "prometheus",
+        "description": "",
+        "fill": 1,
+        "gridPos": {
+          "h": 9,
+          "w": 12,
+          "x": 0,
+          "y": 1
+        },
+        "id": 1,
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "expr": "am_cts_reaper_cache_size",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "{{job}}",
+            "refId": "A",
+            "target": "aliasByNode($host.$instance.cts.reaper.cache.size, 5)",
+            "textEditor": true
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Reaper Cache Size",
+        "tooltip": {
+          "msResolution": false,
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ]
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "datasource": "prometheus",
+        "decimals": null,
+        "format": "none",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 2,
+          "w": 6,
+          "x": 12,
+          "y": 1
+        },
+        "id": 13,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": false
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum(increase(am_cts_reaper_search_count{job=~\"$instance\"}[$aggregation_window]))",
+            "format": "time_series",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "thresholds": "",
+        "title": "Total Searches [$aggregation_window]",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "cacheTimeout": null,
+        "colorBackground": false,
+        "colorValue": false,
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a"
+        ],
+        "datasource": "prometheus",
+        "decimals": null,
+        "format": "s",
+        "gauge": {
+          "maxValue": 100,
+          "minValue": 0,
+          "show": false,
+          "thresholdLabels": false,
+          "thresholdMarkers": true
+        },
+        "gridPos": {
+          "h": 2,
+          "w": 6,
+          "x": 18,
+          "y": 1
+        },
+        "id": 14,
+        "interval": null,
+        "links": [],
+        "mappingType": 1,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "maxDataPoints": 100,
+        "nullPointMode": "connected",
+        "nullText": null,
+        "postfix": "",
+        "postfixFontSize": "50%",
+        "prefix": "",
+        "prefixFontSize": "50%",
+        "rangeMaps": [
+          {
+            "from": "null",
+            "text": "N/A",
+            "to": "null"
+          }
+        ],
+        "sparkline": {
+          "fillColor": "rgba(31, 118, 189, 0.18)",
+          "full": false,
+          "lineColor": "rgb(31, 120, 193)",
+          "show": true
+        },
+        "tableColumn": "",
+        "targets": [
+          {
+            "expr": "sum (rate(am_cts_reaper_search_seconds_total{job=~\"$instance\"}[$aggregation_window])) / sum (rate(am_cts_reaper_search_count{job=~\"$instance\"}[$aggregation_window]))",
+            "format": "time_series",
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "refId": "A"
+          }
+        ],
+        "thresholds": "",
+        "title": "Overall Average Search Service Time [$aggregation_window]",
+        "type": "singlestat",
+        "valueFontSize": "80%",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ],
+        "valueName": "current"
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "prometheus",
+        "fill": 1,
+        "gridPos": {
+          "h": 7,
+          "w": 6,
+          "x": 12,
+          "y": 3
+        },
+        "id": 4,
+        "legend": {
+          "avg": false,
+          "current": false,
+          "max": false,
+          "min": false,
+          "show": true,
+          "total": false,
+          "values": false
+        },
+        "lines": true,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "expr": "idelta(am_cts_reaper_search_count{job=~\"$instance\",outcome=~\"$outcome\"}[10m])",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "{{job}} {{outcome}}",
+            "refId": "A",
+            "target": "aliasByNode(perSecond($host.$instance.cts.reaper.search.$outcome.count), 4)",
+            "textEditor": true
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Search Throughput",
+        "tooltip": {
+          "msResolution": false,
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ]
+      },
+      {
+        "aliasColors": {},
+        "bars": false,
+        "dashLength": 10,
+        "dashes": false,
+        "datasource": "prometheus",
+        "fill": 1,
+        "gridPos": {
+          "h": 7,
+          "w": 6,
+          "x": 18,
+          "y": 3
+        },
+        "id": 5,
+        "legend": {
+          "alignAsTable": true,
+          "avg": true,
+          "current": true,
+          "max": true,
+          "min": true,
+          "show": true,
+          "total": false,
+          "values": true
+        },
+        "lines": true,
+        "linewidth": 1,
+        "links": [],
+        "nullPointMode": "null",
+        "percentage": false,
+        "pointradius": 5,
+        "points": false,
+        "renderer": "flot",
+        "seriesOverrides": [],
+        "spaceLength": 10,
+        "stack": false,
+        "steppedLine": false,
+        "targets": [
+          {
+            "expr": "am_cts_reaper_search_seconds{outcome=~\"$outcome\",quantile=~\"$quantile\"}",
+            "format": "time_series",
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "{{job}} {{outcome}} p{{quantile}}",
+            "refId": "A",
+            "target": "aliasByNode($host.$instance.cts.reaper.search.$outcome.$timing, 5)",
+            "textEditor": true
+          }
+        ],
+        "thresholds": [],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Search Service Time",
+        "tooltip": {
+          "msResolution": false,
+          "shared": true,
+          "sort": 0,
+          "value_type": "individual"
+        },
+        "type": "graph",
+        "xaxis": {
+          "buckets": null,
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        },
+        "yaxes": [
+          {
+            "format": "s",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          },
+          {
+            "format": "short",
+            "label": null,
+            "logBase": 1,
+            "max": null,
+            "min": null,
+            "show": true
+          }
+        ]
+      },
+      {
+        "collapsed": false,
+        "gridPos": {
+          "h": 1,
+          "w": 24,
+          "x": 0,
+          "y": 10
+        },
+        "id": 10,
+        "panels": [],
+        "repeat": null,
+        "title": "Token Deletions",
         "type": "row"
       },
       {
@@ -1289,11 +514,11 @@
         },
         "gridPos": {
           "h": 2,
-          "w": 6,
+          "w": 12,
           "x": 0,
-          "y": 19
+          "y": 11
         },
-        "id": 27,
+        "id": 15,
         "interval": null,
         "links": [],
         "mappingType": 1,
@@ -1308,7 +533,6 @@
           }
         ],
         "maxDataPoints": 100,
-        "minSpan": null,
         "nullPointMode": "connected",
         "nullText": null,
         "postfix": "",
@@ -1322,27 +546,24 @@
             "to": "null"
           }
         ],
-        "repeat": null,
-        "repeatDirection": "h",
         "sparkline": {
           "fillColor": "rgba(31, 118, 189, 0.18)",
           "full": false,
           "lineColor": "rgb(31, 120, 193)",
-          "show": true
+          "show": false
         },
         "tableColumn": "",
         "targets": [
           {
-            "expr": "sum(increase(am_cts_task_queue_count{job=~\"$instance\"}[$aggregation_window]))",
+            "expr": "sum(increase(am_cts_reaper_deletion_total{reaper_type=~\"cache\",outcome=~\"$outcome\"}[$aggregation_window]))",
             "format": "time_series",
-            "interval": "",
             "intervalFactor": 1,
             "legendFormat": "",
             "refId": "A"
           }
         ],
         "thresholds": "",
-        "title": "Total Task Throughput [$aggregation_window]",
+        "title": "Total Cache-based Deletions [$aggregation_window]",
         "type": "singlestat",
         "valueFontSize": "80%",
         "valueMaps": [
@@ -1375,96 +596,11 @@
         },
         "gridPos": {
           "h": 2,
-          "w": 6,
-          "x": 6,
-          "y": 19
-        },
-        "id": 34,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(am_cts_task_queue_size{job=~\"$instance\"})",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Tasks Waiting in Queues",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "format": "s",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
+          "w": 12,
           "x": 12,
-          "y": 19
+          "y": 11
         },
-        "id": 35,
+        "id": 16,
         "interval": null,
         "links": [],
         "mappingType": 1,
@@ -1479,7 +615,6 @@
           }
         ],
         "maxDataPoints": 100,
-        "minSpan": null,
         "nullPointMode": "connected",
         "nullText": null,
         "postfix": "",
@@ -1493,111 +628,24 @@
             "to": "null"
           }
         ],
-        "repeatDirection": "h",
         "sparkline": {
           "fillColor": "rgba(31, 118, 189, 0.18)",
           "full": false,
           "lineColor": "rgb(31, 120, 193)",
-          "show": true
+          "show": false
         },
         "tableColumn": "",
         "targets": [
           {
-            "expr": "sum (rate(am_cts_task_queue_seconds_total{job=~\"$instance\"}[$aggregation_window])) / sum (rate(am_cts_task_queue_count{job=~\"$instance\"}[$aggregation_window]))",
+            "expr": "sum(increase(am_cts_reaper_deletion_total{reaper_type=~\"search\",outcome=~\"$outcome\"}[$aggregation_window]))",
             "format": "time_series",
-            "interval": "",
             "intervalFactor": 1,
             "legendFormat": "",
             "refId": "A"
           }
         ],
         "thresholds": "",
-        "title": "Overall Average Task Queueing Time [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "format": "s",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 18,
-          "y": 19
-        },
-        "id": 42,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum (rate(am_cts_task_seconds_total{job=~\"$instance\"}[$aggregation_window])) / sum (rate(am_cts_task_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Overall Average Task Service Time [$aggregation_window]",
+        "title": "Total Search-based Deletions [$aggregation_window]",
         "type": "singlestat",
         "valueFontSize": "80%",
         "valueMaps": [
@@ -1615,101 +663,14 @@
         "dashLength": 10,
         "dashes": false,
         "datasource": "prometheus",
-        "decimals": 2,
         "fill": 1,
         "gridPos": {
-          "h": 6,
-          "w": 6,
+          "h": 7,
+          "w": 12,
           "x": 0,
-          "y": 21
+          "y": 13
         },
-        "id": 10,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "hideEmpty": false,
-          "hideZero": false,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "irate(am_cts_task_queue_count{job=~\"$instance\"}[90s])",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Task Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "transparent": false,
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 6,
-          "y": 21
-        },
-        "id": 19,
+        "id": 6,
         "legend": {
           "alignAsTable": true,
           "avg": true,
@@ -1734,19 +695,23 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "am_cts_task_queue_size{job=~\"$instance\"}",
+            "expr": "irate(am_cts_reaper_deletion_total{reaper_type=~\"cache\",outcome=~\"$outcome\"}[1m])",
             "format": "time_series",
+            "instant": false,
             "interval": "",
             "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
+            "legendFormat": "{{job}} {{token_type}} {{outcome}}",
+            "refId": "A",
+            "target": "aliasByNode(perSecond($host.$instance.cts.reaper.cache.*.deletion.$outcome.count), 5)",
+            "textEditor": true
           }
         ],
         "thresholds": [],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Tasks Waiting in Queue",
+        "title": "Cache-based Deletion Throughput",
         "tooltip": {
+          "msResolution": false,
           "shared": true,
           "sort": 0,
           "value_type": "individual"
@@ -1761,9 +726,8 @@
         },
         "yaxes": [
           {
-            "decimals": 0,
-            "format": "none",
-            "label": "",
+            "format": "short",
+            "label": "p/sec",
             "logBase": 1,
             "max": null,
             "min": null,
@@ -1785,99 +749,12 @@
         "dashLength": 10,
         "dashes": false,
         "datasource": "prometheus",
-        "decimals": 2,
         "fill": 1,
         "gridPos": {
-          "h": 6,
-          "w": 6,
+          "h": 7,
+          "w": 12,
           "x": 12,
-          "y": 21
-        },
-        "id": 18,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum by (job) (rate(am_cts_task_queue_seconds_total{job=~\"$instance\"}[90s])) / sum by (job) (rate(am_cts_task_queue_count{job=~\"$instance\"}[90s]))",
-            "format": "time_series",
-            "hide": false,
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Average Task Queueing Time",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "s",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "decimals": 2,
-        "description": "",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 18,
-          "y": 21
+          "y": 13
         },
         "id": 11,
         "legend": {
@@ -1892,441 +769,6 @@
         },
         "lines": true,
         "linewidth": 1,
-        "links": [
-          {
-            "dashUri": "db/am-6-0-0-cts",
-            "dashboard": "AM 6.0.0 CTS",
-            "includeVars": true,
-            "keepTime": true,
-            "targetBlank": true,
-            "title": "AM 6.0.0 CTS",
-            "type": "dashboard"
-          }
-        ],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum by (job) (rate(am_cts_task_seconds_total{job=~\"$instance\"}[90s])) / sum by (job) (rate(am_cts_task_count{job=~\"$instance\"}[90s]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Average Task Service Time",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "s",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "collapsed": false,
-        "gridPos": {
-          "h": 1,
-          "w": 24,
-          "x": 0,
-          "y": 27
-        },
-        "id": 84,
-        "panels": [],
-        "title": "OAuth2",
-        "type": "row"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 0,
-          "y": 28
-        },
-        "id": 88,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_oauth2_grant_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "timeFrom": null,
-        "title": "OAuth2 Grants Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 6,
-          "y": 28
-        },
-        "id": 90,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_oauth2_grant_revoke_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "timeFrom": null,
-        "title": "OAuth2 Grant Revokes Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 12,
-          "y": 28
-        },
-        "id": 92,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_oauth2_token_issue_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "timeFrom": null,
-        "title": "OAuth2 Token Issuance Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 6,
-          "x": 18,
-          "y": 28
-        },
-        "id": 107,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_oauth2_token_revoke_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "timeFrom": null,
-        "title": "OAuth2 Token Revocation Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 0,
-          "y": 30
-        },
-        "id": 86,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "hideEmpty": false,
-          "hideZero": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
         "links": [],
         "nullPointMode": "null",
         "percentage": false,
@@ -2339,738 +781,26 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "irate(am_oauth2_grant_count{job=~\"$instance\"}[90s]) ",
-            "format": "time_series",
-            "instant": false,
-            "intervalFactor": 1,
-            "legendFormat": "{{job}} - {{grant_type}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "OAuth2 Grant Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "ops",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 6,
-          "y": 30
-        },
-        "id": 114,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "hideEmpty": false,
-          "hideZero": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "irate(am_oauth2_grant_count{job=~\"$instance\"}[90s]) ",
-            "format": "time_series",
-            "instant": false,
-            "intervalFactor": 1,
-            "legendFormat": "{{job}} - {{grant_type}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "OAuth2 Grant Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "ops",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 12,
-          "y": 30
-        },
-        "id": 91,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "hideZero": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "irate(am_oauth2_token_issue_count{job=~\"$instance\"}[90s]) ",
-            "format": "time_series",
-            "instant": false,
-            "intervalFactor": 1,
-            "legendFormat": "{{job}} - {{token_type}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "OAuth2 Token Issuance Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "ops",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 6,
-          "x": 18,
-          "y": 30
-        },
-        "id": 108,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "hideZero": true,
-          "max": true,
-          "min": true,
-          "rightSide": false,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "irate(am_oauth2_token_revoke_count{job=~\"$instance\"}[90s]) ",
-            "format": "time_series",
-            "instant": false,
-            "intervalFactor": 1,
-            "legendFormat": "{{job}} - {{token_type}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "OAuth2 Token Revocation Throughput",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "ops",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "collapsed": false,
-        "gridPos": {
-          "h": 1,
-          "w": 24,
-          "x": 0,
-          "y": 36
-        },
-        "id": 95,
-        "panels": [],
-        "title": "Policy / Authorization",
-        "type": "row"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "format": "none",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 12,
-          "x": 0,
-          "y": 37
-        },
-        "id": 106,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum(increase(am_authorization_policy_set_evaluate_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Total Policy Evaluation Throughput [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "cacheTimeout": null,
-        "colorBackground": false,
-        "colorValue": false,
-        "colors": [
-          "#299c46",
-          "rgba(237, 129, 40, 0.89)",
-          "#d44a3a"
-        ],
-        "datasource": "prometheus",
-        "decimals": null,
-        "format": "s",
-        "gauge": {
-          "maxValue": 100,
-          "minValue": 0,
-          "show": false,
-          "thresholdLabels": false,
-          "thresholdMarkers": true
-        },
-        "gridPos": {
-          "h": 2,
-          "w": 12,
-          "x": 12,
-          "y": 37
-        },
-        "id": 110,
-        "interval": null,
-        "links": [],
-        "mappingType": 1,
-        "mappingTypes": [
-          {
-            "name": "value to text",
-            "value": 1
-          },
-          {
-            "name": "range to text",
-            "value": 2
-          }
-        ],
-        "maxDataPoints": 100,
-        "minSpan": null,
-        "nullPointMode": "connected",
-        "nullText": null,
-        "postfix": "",
-        "postfixFontSize": "50%",
-        "prefix": "",
-        "prefixFontSize": "50%",
-        "rangeMaps": [
-          {
-            "from": "null",
-            "text": "N/A",
-            "to": "null"
-          }
-        ],
-        "repeatDirection": "h",
-        "sparkline": {
-          "fillColor": "rgba(31, 118, 189, 0.18)",
-          "full": false,
-          "lineColor": "rgb(31, 120, 193)",
-          "show": true
-        },
-        "tableColumn": "",
-        "targets": [
-          {
-            "expr": "sum (rate(am_authorization_policy_set_evaluate_seconds_total{job=~\"$instance\"}[$aggregation_window])) / sum (rate(am_authorization_policy_set_evaluate_count{job=~\"$instance\"}[$aggregation_window]))",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 1,
-            "legendFormat": "",
-            "refId": "A"
-          }
-        ],
-        "thresholds": "",
-        "title": "Overall Average Policy Evaluation Service Time [$aggregation_window]",
-        "type": "singlestat",
-        "valueFontSize": "80%",
-        "valueMaps": [
-          {
-            "op": "=",
-            "text": "N/A",
-            "value": "null"
-          }
-        ],
-        "valueName": "current"
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "description": "",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 12,
-          "x": 0,
-          "y": 39
-        },
-        "id": 98,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": true,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum(irate(am_authorization_policy_set_evaluate_count{job=~\"$instance\"}[1m])) by (job)",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Policy Evaluation Outcomes",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "decimals": 2,
-            "format": "ops",
-            "label": "",
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "description": "",
-        "fill": 1,
-        "gridPos": {
-          "h": 6,
-          "w": 12,
-          "x": 12,
-          "y": 39
-        },
-        "id": 97,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 1,
-        "links": [],
-        "nullPointMode": "null",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "sum by (job) (rate(am_authorization_policy_set_evaluate_seconds_total{job=~\"$instance\"}[90s])) / sum by (job) (rate(am_authorization_policy_set_evaluate_count{job=~\"$instance\"}[90s]))",
-            "format": "time_series",
-            "intervalFactor": 1,
-            "legendFormat": "{{job}}",
-            "refId": "A"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Average Policy Evaluation Service Time",
-        "tooltip": {
-          "shared": true,
-          "sort": 0,
-          "value_type": "individual"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "s",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": true
-          }
-        ]
-      },
-      {
-        "collapsed": false,
-        "gridPos": {
-          "h": 1,
-          "w": 24,
-          "x": 0,
-          "y": 45
-        },
-        "id": 2,
-        "panels": [],
-        "repeat": "instance",
-        "title": "JVM ($instance)",
-        "type": "row"
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "editable": true,
-        "error": false,
-        "fill": 1,
-        "grid": {},
-        "gridPos": {
-          "h": 6,
-          "w": 12,
-          "x": 0,
-          "y": 46
-        },
-        "id": 6,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 2,
-        "links": [],
-        "nullPointMode": "connected",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "am_jvm_free_used_memory_bytes{job=~\"$instance\"}",
-            "format": "time_series",
-            "interval": "",
-            "intervalFactor": 2,
-            "legendFormat": "{{job}} JVM Free Memory",
-            "refId": "C",
-            "target": "*.ds.jvm-memory-usage.memory-usage.total.used"
-          },
-          {
-            "expr": "am_jvm_used_memory_bytes{job=~\"$instance\"}",
+            "expr": "irate(am_cts_reaper_deletion_total{reaper_type=~\"search\",outcome=~\"$outcome\"}[1m])",
             "format": "time_series",
             "instant": false,
             "interval": "",
-            "intervalFactor": 2,
-            "legendFormat": "{{job}} JVM Used Memory",
+            "intervalFactor": 1,
+            "legendFormat": "{{job}} {{token_type}} {{outcome}}",
             "refId": "A",
-            "target": "*.ds.jvm-memory-usage.memory-usage.total.used"
-          },
-          {
-            "expr": "am_jvm_max_memory_bytes{job=~\"$instance\"}",
-            "format": "time_series",
-            "hide": false,
-            "intervalFactor": 2,
-            "legendFormat": "{{job}} JVM Max Memory",
-            "refId": "B",
-            "target": "*.ds.jvm-memory-usage.memory-usage.total.used"
+            "target": "aliasByNode(perSecond($host.$instance.cts.reaper.cache.*.deletion.$outcome.count), 5)",
+            "textEditor": true
           }
         ],
         "thresholds": [],
         "timeFrom": null,
         "timeShift": null,
-        "title": "Memory Usage",
+        "title": "Search-based Deletion Throughput",
         "tooltip": {
           "msResolution": false,
           "shared": true,
           "sort": 0,
-          "value_type": "cumulative"
+          "value_type": "individual"
         },
         "type": "graph",
         "xaxis": {
@@ -3082,8 +812,8 @@
         },
         "yaxes": [
           {
-            "format": "bytes",
-            "label": null,
+            "format": "short",
+            "label": "p/sec",
             "logBase": 1,
             "max": null,
             "min": null,
@@ -3095,100 +825,7 @@
             "logBase": 1,
             "max": null,
             "min": null,
-            "show": false
-          }
-        ]
-      },
-      {
-        "aliasColors": {},
-        "bars": false,
-        "dashLength": 10,
-        "dashes": false,
-        "datasource": "prometheus",
-        "editable": true,
-        "error": false,
-        "fill": 1,
-        "grid": {},
-        "gridPos": {
-          "h": 6,
-          "w": 12,
-          "x": 12,
-          "y": 46
-        },
-        "id": 4,
-        "legend": {
-          "alignAsTable": true,
-          "avg": true,
-          "current": true,
-          "max": true,
-          "min": true,
-          "show": true,
-          "total": false,
-          "values": true
-        },
-        "lines": true,
-        "linewidth": 2,
-        "links": [],
-        "nullPointMode": "connected",
-        "percentage": false,
-        "pointradius": 5,
-        "points": false,
-        "renderer": "flot",
-        "seriesOverrides": [],
-        "spaceLength": 10,
-        "stack": false,
-        "steppedLine": false,
-        "targets": [
-          {
-            "expr": "rate(am_jvm_garbage_collector_ps_marksweep_count{job=~\"$instance\"}[1m])",
-            "format": "time_series",
-            "intervalFactor": 2,
-            "legendFormat": "{{job}} GC PS MarkSweep m1_rate",
-            "refId": "A",
-            "target": "perSecond(*.ds.jvm-memory-usage.garbage-collector.*.count)"
-          },
-          {
-            "expr": "rate(am_jvm_garbage_collector_ps_scavenge_count{job=~\"$instance\"}[1m])",
-            "format": "time_series",
-            "intervalFactor": 2,
-            "legendFormat": "{{job}} GC PS Scavenge m1_rate",
-            "refId": "B"
-          }
-        ],
-        "thresholds": [],
-        "timeFrom": null,
-        "timeShift": null,
-        "title": "Garbage Collections",
-        "tooltip": {
-          "msResolution": false,
-          "shared": true,
-          "sort": 0,
-          "value_type": "cumulative"
-        },
-        "type": "graph",
-        "xaxis": {
-          "buckets": null,
-          "mode": "time",
-          "name": null,
-          "show": true,
-          "values": []
-        },
-        "yaxes": [
-          {
-            "format": "ops",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
             "show": true
-          },
-          {
-            "format": "short",
-            "label": null,
-            "logBase": 1,
-            "max": null,
-            "min": null,
-            "show": false
           }
         ]
       }
@@ -3213,7 +850,7 @@
           "multi": true,
           "name": "instance",
           "options": [],
-          "query": "label_values(am_authentication_count, job)",
+          "query": "label_values(am_cts_reaper_deletion_total,job)",
           "refresh": 2,
           "regex": "",
           "sort": 1,
@@ -3226,7 +863,6 @@
         {
           "allValue": null,
           "current": {
-            "selected": true,
             "tags": [],
             "text": "1m",
             "value": "1m"
@@ -3265,6 +901,59 @@
           ],
           "query": "1m,5m,15m,1h,1d",
           "type": "custom"
+        },
+        {
+          "allValue": null,
+          "current": {},
+          "datasource": "prometheus",
+          "hide": 0,
+          "includeAll": true,
+          "label": "Percentile",
+          "multi": true,
+          "name": "quantile",
+          "options": [],
+          "query": "label_values(am_cts_reaper_search_seconds,quantile)",
+          "refresh": 2,
+          "regex": "",
+          "sort": 3,
+          "tagValuesQuery": "",
+          "tags": [],
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        },
+        {
+          "allValue": null,
+          "current": {
+            "text": "All",
+            "value": [
+              "$__all"
+            ]
+          },
+          "hide": 0,
+          "includeAll": true,
+          "label": "Outcome",
+          "multi": true,
+          "name": "outcome",
+          "options": [
+            {
+              "selected": true,
+              "text": "All",
+              "value": "$__all"
+            },
+            {
+              "selected": false,
+              "text": "success",
+              "value": "success"
+            },
+            {
+              "selected": false,
+              "text": "failure",
+              "value": "failure"
+            }
+          ],
+          "query": "success,failure",
+          "type": "custom"
         }
       ]
     },
@@ -3297,10 +986,10 @@
         "30d"
       ]
     },
-    "timezone": "",
-    "title": "AM 6.0.0 Overview",
-    "uid": "nO8AiJmmz",
-    "version": 46
+    "timezone": "browser",
+    "title": "AM 6.0. CTS Token Reaper",
+    "uid": "MP3-8vMiz",
+    "version": 27
   },
   "overwrite": true
 }
