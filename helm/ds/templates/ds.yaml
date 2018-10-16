@@ -93,7 +93,7 @@ spec:
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         #terminationGracePeriodSeconds: 10
-        {{- if .Values.cts.enabled }}
+        {{- if eq .Values.instance "ctsstore" }}
         lifecycle:
           postStart:
             exec:
