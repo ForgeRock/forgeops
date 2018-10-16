@@ -38,6 +38,9 @@ grafana:
        storage: 20Gi
     #selector: {}
     
+  serverDashboardConfigmaps:
+    - forgerock-dashboards
+    
 alertmanager:
   ## Alertmanager configuration directives
   ## Ref: https://prometheus.io/docs/alerting/configuration/
