@@ -1,27 +1,27 @@
-apiVersion: skaffold/v1alpha2
+apiVersion: skaffold/v1alpha4
 kind: Config
 build:
+  artifacts:
+  - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
+    context: rs
+  - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
+    context: amster
+  - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
+    context: idm
+  - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
+    context: pg
   tagPolicy:
     sha256: {}
-  artifacts:
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
-    workspace: rs
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
-    workspace: amster
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
-    workspace: idm
-  - imageName: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
-    workspace: pg
   local:
-    skipPush: true
+    push: false
 deploy:
   helm:
     releases:
-      - name: sample-fr-platform
-        chartPath: .
-        namespace: sample
-        values:
-          images.rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
-          images.amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
-          images.idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
-          images.pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
+    - name: sample-fr-platform
+      chartPath: .
+      values:
+        images.amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
+        images.idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
+        images.pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
+        images.rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
+      namespace: sample
