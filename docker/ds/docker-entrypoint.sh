@@ -42,7 +42,7 @@ update_ds_password()
     fi
 
     echo "Updating the monitor user password"
-    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password  -s PBKDF2 -f $MONITOR_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null`
+    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password -s PBKDF2 -f $MONITOR_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
     pw="userPassword: $pw"
     head -n -2  data/db/monitorUser/monitorUser.ldif >/tmp/pw
     echo "$pw" >>/tmp/pw 
