@@ -2,23 +2,26 @@
 # Script uses port-forwarding to connect to either Prometheus or Grafana.
 # Use connect-prometheus.sh -P to connect to Prometheus. Type localhost:9090 to access Prometheus UI.
 # Use connect-prometheus.sh -G to connect to Grafana. Type localhost:3000 to access Grafana UI.
+# Use connect-prometheus.sh -A to connect to Alertmanager. Type localhost:9093 to access Alertmanager UI.
 # Script defaults to monitoring namespace and the ports mentioned above but can be overriden. Run connect-prometheus.sh -h for guidance.
 
-USAGE="Usage: $0: [-G | -P] [-n <namespace>] [-p <port>]"
+USAGE="Usage: $0: [-G | -P | -A] [-n <namespace>] [-p <port>]"
 
 if [ $# -lt 1 ] || [ $1 == "-h" ];then
     echo "Usage: $0 [-G | -P] -n <namespace>\n"
     echo "-G                port-forward to Grafana"
     echo "-P                port-forward to Prometheus"
+    echo "-A                port-forward to Alertmanager"
     echo "-n <namespace>    namespace"
     echo "-p <port>         port"
     exit
 fi
 
-while getopts :GPn:p: option; do
+while getopts :GPAn:p: option; do
     case "${option}" in
         G) GRAFANA=1;;
         P) PROMETHEUS=1;;
+        A) ALERTMANAGER=1;;
         n) NAMESPACE=${OPTARG};;
         p) PORT=${OPTARG};;
         \?) echo "Error: Incorrect usage"
@@ -56,6 +59,16 @@ if [[ $PROMETHEUS -eq 1 ]]; then
     fi
 
     kubectl port-forward  prometheus-${NAMESPACE}-kube-prometheus-0 $PORT:9090 --namespace=$NAMESPACE
+fi
+
+# Port forward to Alertmanager
+if [[ $ALERTMANAGER -eq 1 ]]; then
+    # check to see if port arg was set
+    if ! [[ $PORT ]]; then
+        PORT=9093
+    fi
+
+    kubectl port-forward  alertmanager-${NAMESPACE}-kube-prometheus-0 $PORT:9093 --namespace=$NAMESPACE
 fi
 
 echo "Incorrect usage: "
