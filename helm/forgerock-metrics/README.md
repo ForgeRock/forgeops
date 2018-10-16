@@ -45,13 +45,14 @@ No restarting of Prometheus is required.
 The Grafana Helm chart is deployed as part of the kube-prometheus chart.  Grafana automatically connects to Prometheus and syncs all  
 the metrics which are visible through Graphs.  
 
-Dashboards for ForgeRock products are added to the helm/forgerock-metrics/dashboards folder.  Any new dashboards must be formatted using the 
+Dashboards for ForgeRock products are added to the helm/forgerock-metrics/dashboards folder.  Any new dashboards must be formatted  
+using the script ```bin/format-grafana-dashboards.sh```.  The dashboards are automatically added to a configmap and imported into Grafana. 
 
 <br />
 
 # How Alertmanager works
 Alertmanager is used to redirect specific alerts from Prometheus to configured receivers.  
-To configure Alertmanager, there is an Alertmanager configuration section in etc/prometheus-values/kube-prometheus.yaml.  
+To configure Alertmanager, there is an Alertmanager configuration section in ```etc/prometheus-values/kube-prometheus.yaml```.  
 Details about how Alertmanager works can be found in the link at the top of the page.  
 In summary:
 * global section defines attributes that apply to all alerts.
@@ -59,7 +60,7 @@ In summary:
 Currently we're sending all alerts to a Slack receiver.
 * receivers section defines named configurations of notification integrations.
 
-Prometheus alerts are configured, by product, in the helm/forgerock-metrics/fr-alerts.yaml file.  
+Prometheus alerts are configured, by product, in the ```helm/forgerock-metrics/fr-alerts.yaml``` file.  
 A PrometheusRules CRD has been included in the Helm chart which includes the fr-alerts.yaml file and syncs the rules with Prometheus using labels.
 
 # Deployment instructions
@@ -75,21 +76,21 @@ A PrometheusRules CRD has been included in the Helm chart which includes the fr-
 * Running the deployment without any overrides will use the default values file which deploys to 'monitoring' namespace and scrapes metrics  
  from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
 
-* To override these values, create a new custom.yaml file, add your override configuration using helm/forgerock-metrics/values.yaml  
- as a guide, and run deploy-prometheus.sh -f \<custom yaml file\>.
+* To override these values, create a new custom.yaml file, add your override configuration using ```helm/forgerock-metrics/values.yaml```  
+ as a guide, and run ```deploy-prometheus.sh -f \<custom yaml file\>```.
 
 * To provide custom Prometheus or Alertmanager configuration, see the **Overriding Prometheus and Alertmanager configuration values** How To below.
 
 ### Deploy
 
-Run the deploy script ./deploy-prometheus.sh with the OPTIONAL flags:
+Run the deploy script ```./deploy-prometheus.sh``` with the OPTIONAL flags:
 * -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
 * -f *values file* \[optional\] : absolute path to yaml file as defined in previous section.
 * -h / no flags : view help
 
 ### View Prometheus/Grafana
 
-The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs. Run ./connect-prometheus.sh with the following flags:
+The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs. Run ```./connect-prometheus.sh``` with the following flags:
 * -G (Grafana) or -P (Prometheus).
 * -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or need to access  
@@ -142,7 +143,7 @@ If you want Prometheus to scrape metrics from a different product, you need to c
       - staging
       - test
     ```
-* Include the new ServiceMonitor name in /etc/prometheus-values/kube-prometheus.yaml under the prometheus/serviceMonitorsSelector section.  If this a temporary addition  
+* Include the new ServiceMonitor name in ```/etc/prometheus-values/kube-prometheus.yaml``` under the prometheus/serviceMonitorsSelector section.  If this a temporary addition  
 deploy it as an override as described in the **Overriding Prometheus and Alertmanager configuration values** How To.
 * Update Prometheus with new ServiceMonitor
     ```
@@ -150,15 +151,15 @@ deploy it as an override as described in the **Overriding Prometheus and Alertma
     ```
 
 ### Configure alerting rules
-To add new alerting rules, add additional rules to fr-alerts.yaml. fr-alerts.yaml is split into groups with a group for each product and a separate group for cluster rules.  
+To add new alerting rules, add additional rules to ```fr-alerts.yaml```. fr-alerts.yaml is split into groups with a group for each product and a separate group for cluster rules.  
 
 See [Prometheus alerting](https://prometheus.io/docs/practices/alerting/) for details on configuring alerts. 
 
 ### Overriding Prometheus and Alertmanager configuration values.
-The default Prometheus deployment uses configuration values in etc/prometheus-values/kube-prometheus.yaml. This file contains configuration  
+The default Prometheus deployment uses configuration values in ```etc/prometheus-values/kube-prometheus.yaml```. This file contains configuration  
 values for Prometheus and Alertmanager and flags to switch off generating metrics for specific areas of the platform.
 
-You can provide your own custom configuration by customizing a copy of the kube-prometheus.yaml and deploying as follows:
+You can provide your own custom configuration by customizing a copy of the ```kube-prometheus.yaml``` and deploying as follows:
 ```
     ./deploy-prometheus.sh -k <path to custom kube-prometheus.yaml file>
 ```
@@ -171,7 +172,7 @@ Documentation links are embedded in the values files for guidance.
 Sample configuration files can be found in the samples/prometheus-values/ folder.
 
 ### Configure alert notifications.
-The default Alertmanager configuration in etc/prometheus-values/kube-prometheus.yaml is not configured to send any alert notifications. This can be customized by  
+The default Alertmanager configuration in ```etc/prometheus-values/kube-prometheus.yaml``` is not configured to send any alert notifications. This can be customized by  
 following the steps in the previous How To **Overriding Prometheus and Alertmanager configuration values.** and configuring the sections described below.  
 
 Alert grouping and filtering can be configured in the alertmanager/config/route section and the notifications are configured in the alertmanager/config/receivers  
@@ -181,13 +182,15 @@ imported from the original alert definition(see the **Configuring alerting rules
 See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
 
 ### Import Custom Grafana Dashboards
+Grafana comes with a set of predefined Grafana dashboards for viewing Kubernetes and cluster metrics.  Further custom dashboards can  
+be added to the deployment but required some specific formatting so they can be recognised by the Grafana watcher and imported into Grafana.  
 
-The easiest way to import dashboards is to manually import the JSON files in the GUI.  
-Currently exporting then importing dashboards via the HTTP API doesn't work correctly and requires manual amendments.
+There is a script called ```bin/format-grafana-dashboards.sh``` which takes care of the formatting.  Please read the notes in the script  
+prior to running.  Just ensure you edit the $BASH_DIR variable that stores the location of the new dashboards so its in a different  
+location to the formatted dashboards($PROCESSED_DIR).  Please don't change $PROCESSED_DIR 
 
-### Add new dashboards to the auto import job
-To add further custom Grafana dashboards as part of the deployment, a new method of importing dashboards will be developed shortly  
-to avoid the the limitations currently in the Grafana import API. Until now use the manual import option.
+
+
 
 
 
