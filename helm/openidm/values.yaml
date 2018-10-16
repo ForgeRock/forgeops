@@ -20,10 +20,11 @@ config:
   # strategy defines how products get their configuration .
   # Using the git strategy, each helm chart pulls the configuration from git using an init container.
   strategy: git
+  # If immutable is true, IDM  will not persist any configuration changes made in the admin UI (or via admin REST calls)
+  # back out to the file system. If you are developing and want to IDM to write configuration changes back out
+  # so they can saved and committed to git, set this to false.
+  immutable: true
 
-# If devMode is true, IDM will write changes made in the admin UI back to the file system where they can
-# be saved and committed to git.
-devMode: false
 
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm
