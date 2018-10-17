@@ -2,10 +2,6 @@ domain: .frk8s.net
 
 fqdn: openam.small.frk8s.net
 
-# Override values for the whole deployment here
-image:
-  tag: 6.5.0
-  pullPolicy: Always
 
 # Note if you enable TLS then you have to either provide the certificate 
 # by running generate-tls.sh script or you have to have cert-manager deployed

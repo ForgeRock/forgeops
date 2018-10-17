@@ -6,14 +6,14 @@ fqdn: openam.prod.frk8s.net
 
 # Override values for the whole deployment here
 #image:
-#  tag: 6.5.0-M0
+#  tag: 6.5.0-M7
 #  pullPolicy: Always
 
 # Note if you enable TLS then you have to either provide the certificate 
 # by running generate-tls.sh script or you have to have cert-manager deployed
 # for your DNS domain
  
-tlsStrategy: https-cert-manager    
+tlsStrategy: https
 
 # Install passwords.
 amadminPassword: password

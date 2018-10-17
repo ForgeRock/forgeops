@@ -1,10 +1,13 @@
 image:
   #repository: forgerock-docker-public.bintray.io/ds
   repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0-M0
+  tag: 6.5.0-M129.2
   pullPolicy: Always
   
 instance: userstore
+
+cts:
+  enabled: false
 
 resources:
   limits:
@@ -25,8 +28,7 @@ opendjJavaArgs: >
 # -server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
 # -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
-cts:
-  enabled: false
+
 
 storageSize: 512Gi
 storageClass: fast
