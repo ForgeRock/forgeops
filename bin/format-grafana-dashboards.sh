@@ -4,7 +4,7 @@
 # Grafana as part of the Helm release.
 #
 # PLEASE NOTE!! this script is specific for the currently released ForgeRock dashboards.  
-# New dashboards may required some modifications to this script. The Prometheus datasource is often configured as a 
+# New dashboards may required some modifications to this script. The Prometheus data source is often configured as a 
 # variable.  Look for this variable in any new dashboards and add an equivalent sed command to replace it with the string 'Prometheus'.
 
 # A folder containing unprepared exported dashboards from Grafana in JSON format.
