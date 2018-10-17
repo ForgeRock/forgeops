@@ -20,7 +20,7 @@ OVERWRITE=true
 # Loop through dashboards in the dashboards directory.  The following changes are needed to allow the dashboards to be accepted by Grafana:
 # 1 - Wrap JSON content in a dashboard: object
 # 2 - Add overwrite option after dashboard content to allow to overwrite current dashboards. Set to true
-# 3 - API import doesn't recognize the datasource variables. The values are replaced with `prometheus`.
+# 3 - API import doesn't recognize the data source variables. The values are replaced with `prometheus`.
 # 4 - Passed into jq command to remove the __input section and output in JSON format.
 for i in $DASH_DIR/*.json; do
     filename=$(basename $i) 
