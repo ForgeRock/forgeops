@@ -14,7 +14,7 @@ DASH_DIR='/path/to/dashboards'
 # Folder for processed dashboards.
 PROCESSED_DIR='../helm/forgerock-metrics/dashboards' 
 
-# Overwrites dashboards of the same name in Grafana.
+# Overwrites dashboards that have the same name in Grafana.
 OVERWRITE=true 
 
 # Loop through dashboards in the dashboards directory.  The following changes are needed to allow the dashboards to be accepted by Grafana:
