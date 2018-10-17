@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script formats exported Grafana dashboard json files so they are compatible for import into 
+# This script formats exported Grafana dashboard JSON files so they are compatible for import into 
 # Grafana as part of the Helm release.
 #
 # PLEASE NOTE!! this script is specific for the currently released ForgeRock dashboards.  
