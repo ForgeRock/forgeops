@@ -43,6 +43,10 @@
     <param-value>Content-Type,X-OpenIDM-NoSession,X-OpenIDM-Username,X-OpenIDM-Password,X-Requested-With,Cache-Control,authorization,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,If-Match</param-value>
     </init-param>
     <init-param>
+    <param-name>cors.exposed.headers</param-name>
+    <param-value>WWW-Authenticate</param-value>
+    </init-param>
+    <init-param>
     <param-name>cors.support.credentials</param-name>
     <param-value>false</param-value>
     </init-param>
