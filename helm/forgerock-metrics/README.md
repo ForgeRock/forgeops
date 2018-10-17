@@ -18,6 +18,7 @@ Scripts:
 * **bin/deploy-prometheus.sh**: deploys the Helm charts mentioned above:
 * **bin/remove-prometheus.sh**: remove all deployed Helm charts described above.
 * **bin/connect-prometheus.sh**: wrapper script for port-forwarding to Prometheus and Grafana endpoints.
+* **bin/format-grafana-dashboards.sh**: script to format Grafana dashboards to be included in the deployment.
   
 Values files:
 * ***etc/prometheus-values/kube-prometheus.yaml***: override values for kube-prometheus Helm chart. Here you can configure Prometheus and Alertmanager as well as define which Kubernetes you would like monitored.
@@ -46,7 +47,7 @@ The Grafana Helm chart is deployed as part of the kube-prometheus chart.  Grafan
 the metrics which are visible through Graphs.  
 
 Dashboards for ForgeRock products are added to the helm/forgerock-metrics/dashboards folder.  Any new dashboards must be formatted.
-using the script ```bin/format-grafana-dashboards.sh```.  The dashboards are automatically added to a configmap and imported into Grafana. 
+using the script ```bin/format-grafana-dashboards.sh```.  The dashboards are automatically added to a configmap and imported into Grafana.  For more info, see 'Import Custom Grafana Dashboards' in the 'How Tos' section below.
 
 <br />
 
@@ -187,7 +188,8 @@ be added to the deployment but required some specific formatting so they can be 
 
 There is a script called ```bin/format-grafana-dashboards.sh``` which takes care of the formatting.  Please read the notes in the script  
 prior to running.  Just ensure you edit the $BASH_DIR variable that stores the location of the new dashboards so its in a different  
-location to the formatted dashboards($PROCESSED_DIR).  Please don't change $PROCESSED_DIR 
+location to the formatted dashboards($PROCESSED_DIR).  Please don't change $PROCESSED_DIR.  
+NOTE: This script only needs to be ran once.
 
 
 
