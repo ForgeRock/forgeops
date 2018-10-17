@@ -1,1 +1,4 @@
 domain: .forgeops.com
+
+image:
+  pullPolicy: Always
