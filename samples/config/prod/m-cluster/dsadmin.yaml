@@ -1,7 +1,7 @@
 image:
   #repository: forgerock-docker-public.bintray.io/ds
   repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0-M0
+  tag: 6.5.0-M129.2
   pullPolicy: Always
   
 gcs:

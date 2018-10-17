@@ -1,18 +1,19 @@
 image:
   #repository: forgerock-docker-public.bintray.io/ds
   repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0-M0
+  tag: 6.5.0-M129.2
   pullPolicy: Always
 
 instance: userstore
+
+cts:
+  enabled: false
 
 resources:
   limits:
     memory: 5Gi
   requests:
     memory: 3Gi
-
-
 
 # Uncomment the next 3 line if you don't want to use cgroups which is the default JVM setting
 #opendjJavaArgs: >
@@ -30,9 +31,6 @@ opendjJavaArgs: >
 #  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
 #  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
-
-cts:
-  enabled: false
 
 storageSize: 100Gi
 storageClass: fast
