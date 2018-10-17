@@ -21,7 +21,7 @@
                                 }
                             }
                         ],
-                        "handler": "ClientHandler"
+                        "handler": "debugHandler"
                     }
                 }
             }
@@ -33,6 +33,14 @@
                 "captureEntity": true,
                 "captureContext": true
             }
+        },
+        {
+            "name": "debugHandler",
+            "type": "ClientHandler",
+            "capture": [
+                "request",
+                "response"
+            ]
         },
         {
             "name": "authzFailureResponse",
