@@ -100,14 +100,14 @@ namespace and scrapes metrics from all ForgeRock product endpoints, across all n
 
 Run the deploy script ```./deploy-prometheus.sh``` with the OPTIONAL flags:
 * -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
-* -f *foregrock-metrics values file* \[optional\] : absolute path to yaml file to override ```helm/forgerock-metrics/values.yaml```.
-* -k *kube-prometheus values file* \[optional\] : absolute path to yaml file to override ```etc/prometheus-values/kube-prometheus.yaml```.
+* -f *values file* \[optional\] : absolute path to yaml file to override ```helm/forgerock-metrics/values.yaml```.
+* -k *values file* \[optional\] : absolute path to yaml file to override ```etc/prometheus-values/kube-prometheus.yaml```.
 * -h / no flags : view help
 
 ### View Prometheus/Grafana
 
-The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs. Run ```./connect-prometheus.sh```  
-with the following flags:  
+The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs.  
+Run ```./connect-prometheus.sh``` with the following flags:  
 * -G (Grafana) or -P (Prometheus).
 * -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
 * -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or  
@@ -202,8 +202,8 @@ notifications. This can be customized by following the steps in the previous 'Ho
 Grafana configuration values.** and configuring the sections described below.  
 
 * Alert grouping and filtering can be configured in the alertmanager.config.route section
-* Notifications are configured in the alertmanager.config.receivers section where you can also define a template for the alert output  
-text.  The output text also incorporates labels so the info can be dynamically imported from the original alert definition  
+* Notifications are configured in the alertmanager.config.receivers section where you can also define a template for the alert  
+output text.  The output text also incorporates labels so the info can be dynamically imported from the original alert definition  
 (see the **Configuring alerting rules** 'How To').  
 
 See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
