@@ -46,7 +46,7 @@ if [ $FILE ]; then
     CUSTOM_FILE="--values ${MONPATH}/${FILE}"
 fi
 
-# set location of kube-prometheus.yaml if provided as an arg, otherwise set to default in etc folder
+# assign kube-prometheus override file if provided as -k arg. 
 if [ $KFILE ]; then
     OVERRIDE_VALUES="-f ${KFILE}"
 fi
