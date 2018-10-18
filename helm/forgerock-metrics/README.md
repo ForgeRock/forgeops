@@ -168,12 +168,6 @@ prometheus/serviceMonitorsSelector section.  If this a temporary addition deploy
     ./deploy-prometheus.sh [-n <namespace>]
     ```
 
-### Configure alerting rules
-To add new alerting rules, add additional rules to ```fr-alerts.yaml```. fr-alerts.yaml is split into groups with a  
-group for each product and a separate group for cluster rules.  
-
-See [Prometheus alerting](https://prometheus.io/docs/practices/alerting/) for details on configuring alerts. 
-
 ### Overriding Prometheus, Alertmanager and Grafana configuration values.
 The default deployment uses configuration values in ```etc/prometheus-values/kube-prometheus.yaml```. This file is just  
 a copy of the kube-prometheus Helm chart values file.  This file contains configuration values for Prometheus and  
@@ -194,7 +188,13 @@ FR products).
 * customize the Grafana configuration.  
 
 Documentation links are embedded in the values files for guidance.  
-Sample configuration files can be found in the samples/prometheus-values/ folder.
+Sample configuration files can be found in the samples/prometheus-values/ folder.  
+
+### Configure alerting rules
+To add new alerting rules, add additional rules to ```fr-alerts.yaml```. fr-alerts.yaml is split into groups with a  
+group for each product and a separate group for cluster rules.  
+
+See [Prometheus alerting](https://prometheus.io/docs/practices/alerting/) for details on configuring alerts.   
 
 ### Configure alert notifications.
 The default Alertmanager configuration in ```etc/prometheus-values/kube-prometheus.yaml``` is not configured to send any alert  
