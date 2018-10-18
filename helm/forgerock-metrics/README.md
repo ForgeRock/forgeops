@@ -209,14 +209,15 @@ output text.  The output text also incorporates labels so the info can be dynami
 See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
 
 ### Import Custom Grafana Dashboards
-Grafana comes with a set of predefined Grafana dashboards for viewing Kubernetes and cluster metrics.  Further custom dashboards  
-can be added to the deployment but required some specific formatting so they can be recognised by the Grafana watcher and imported  
-into Grafana.  
+Grafana comes with a set of predefined Grafana dashboards for viewing Kubernetes and cluster metrics.  Further custom  
+dashboards can be added to the deployment but required some specific formatting so they can be recognised by the Grafana  
+watcher and imported into Grafana.  
 
-There is a script called ```bin/format-grafana-dashboards.sh``` which takes care of the formatting.  Please read the notes in the  
-script prior to running.  Just ensure you edit the $BASH_DIR variable that stores the location of the new dashboards so its in a  
-different location to the formatted dashboards($PROCESSED_DIR).  Please don't change $PROCESSED_DIR.  
-NOTE: This script only needs to be ran once.
+There is a script called ```bin/format-grafana-dashboards.sh``` which takes care of the formatting.  Please read the notes  
+in the script prior to running.  Just ensure you edit the $BASH_DIR variable that stores the location of the new dashboards  
+so its in a different location to the formatted dashboards($PROCESSED_DIR).  Please don't change $PROCESSED_DIR.  
+
+**```NOTE:```** This script only needs to be ran once.
 
 
 
