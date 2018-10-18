@@ -186,9 +186,11 @@ You can provide your own custom configuration by customizing a copy of ```kube-p
 ```
 
 The main uses of this custom file will be to:
-* customize the Alertmanager configuration which determines whether to send alert notifications to a particular receiver(Slack for example).
+* customize the Alertmanager configuration which determines whether to send alert notifications to a particular receiver  
+(Slack for example).
 * customize the Prometheus configuration to include new endpoints to monitor as described in the  
-**Configure new endpoints to be scraped by Prometheus** 'How To' (e.g. an additional service that's running alongside FR products). 
+**Configure new endpoints to be scraped by Prometheus** 'How To' (e.g. an additional service that's running alongside  
+FR products). 
 * customize the Grafana configuration.  
 
 Documentation links are embedded in the values files for guidance.  
@@ -196,12 +198,13 @@ Sample configuration files can be found in the samples/prometheus-values/ folder
 
 ### Configure alert notifications.
 The default Alertmanager configuration in ```etc/prometheus-values/kube-prometheus.yaml``` is not configured to send any alert  
-notifications. This can be customized by following the steps in the previous How To **Overriding Prometheus, Alertmanager and Grafana configuration values.**  
-and configuring the sections described below.  
+notifications. This can be customized by following the steps in the previous 'How To' **Overriding Prometheus, Alertmanager and  
+Grafana configuration values.** and configuring the sections described below.  
 
-Alert grouping and filtering can be configured in the alertmanager/config/route section and the notifications are configured in the  
-alertmanager/config/receivers block where you can also define a template for the alert output text.  The output text also incorporates  
-labels so the info can be dynamically imported from the original alert definition(see the **Configuring alerting rules** How To).  
+* Alert grouping and filtering can be configured in the alertmanager.config.route section
+* Notifications are configured in the alertmanager.config.receivers section where you can also define a template for the alert output  
+text.  The output text also incorporates labels so the info can be dynamically imported from the original alert definition  
+(see the **Configuring alerting rules** 'How To').  
 
 See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
 
