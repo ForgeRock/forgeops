@@ -104,14 +104,14 @@ Run the deploy script ```./deploy-prometheus.sh``` with the OPTIONAL flags:
 * -k *values file* \[optional\] : absolute path to yaml file to override ```etc/prometheus-values/kube-prometheus.yaml```.
 * -h / no flags : view help
 
-### View Prometheus/Grafana
+### View Prometheus/Grafana/Alertmanager
 
 The following script uses kubectl port forwarding to access the Prometheus and Grafana UIs.  
 Run ```./connect-prometheus.sh``` with the following flags:  
 * -G (Grafana) or -P (Prometheus).
-* -n *namespace* \[optional\] : where Grafana/Prometheus is deployed.  Default = monitoring.
-* -p *port* \[optional\] : Grafana uses local port 3000 and Prometheus 9090. If you want to use different ports, or  
-need to access multiple instance of Grafana/Prometheus, use the -p flag.
+* -n *namespace* \[optional\] : where Grafana/Prometheus/Alertmanager is deployed.  Default = monitoring.
+* -p *port* \[optional\] : Grafana uses local port 3000, Prometheus 9090 and Alertmanager 9093. If you want to use different  
+ports, or need to access multiple instance of Grafana/Prometheus/Alertmanager, use the -p flag.
 * -h / no flags : view help
 
 View Prometheus:
@@ -124,6 +124,11 @@ View Grafana:
 * In browser: localhost:3000 (unless altered in the above script).
 * Login for Grafana: admin/admin.
 * View dashboards clicking top left icon then select dashboards.
+
+View Alertmanager:
+* In browser: localhost:9093 (unless altered in the above script).
+* Status: view Alertmanager configuration.
+* Alerts: current alerts.
 
 <br />
 
