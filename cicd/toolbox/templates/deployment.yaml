@@ -24,12 +24,16 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: ["smoke-tests"]
+          args: ["pause"]
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
           env:
+          - name: TEST_REPORT_LINK
+            value: {{ .Values.fqdn }}
+          - name: SLACK_SERVICE
+            value: {{ .Values.slackService }}
           - name: GIT_REPO
             value: "https://github.com/ForgeRock/forgeops-init.git"
           - name: GIT_BRANCH
@@ -39,28 +43,18 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
           volumeMounts:
-          - name: html
-            mountPath: /usr/share/nginx/html
+          - name: content
+            mountPath: /content
           resources:
 {{ toYaml .Values.resources | indent 12 }}
-        - name: web 
-          image: nginx:latest 
-          ports:
-          - name: http
-            containerPort: 80
-            protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: http
+        - name: web
+          image: "gcr.io/engineering-devops/dashboard-smoketests:latest"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
-            - name: html
-              mountPath: /usr/share/nginx/html
+          - name: content
+            mountPath: /content
+          ports:
+          - containerPort: 5000
       volumes:
-      - name: html
+      - name: content
         emptyDir: {}
-
