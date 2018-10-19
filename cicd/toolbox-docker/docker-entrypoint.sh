@@ -22,7 +22,7 @@ pause() {
         cd /workspace/forgeops
         git fetch
         MSG=$(git status)
-        echo "Git message:"
+        echo "$(date) - Git message:"
         echo $MSG
         if [[ "$MSG" = *$GIT_UPTODATE* ]]; then
             echo "$(date): Branch is up to date, tests postponed"
@@ -30,7 +30,7 @@ pause() {
             echo "$(date): We have a change on master, updating forgeops"
             git fetch -a; git reset --hard origin/master
             cd /
-            echo "Waiting 20 minutes to make sure new images are built properly"
+            echo "$(date): Waiting 20 minutes to make sure new images are built properly"
             sleep 1200
             ./run-smoke-tests.sh
         fi
