@@ -8,8 +8,8 @@ ARG  HELM_VERSION=v2.10.0
 WORKDIR /
 
 RUN apt-get update \
-  && apt-get install -y ca-certificates git vim bash curl openssh-client python-pip \
-  && pip install requests html-testRunner html-testRunner
+  && apt-get install -y ca-certificates git vim bash curl openssh-client python3-pip python3 \
+  && pip3 install requests html-testRunner html-testRunner
 
 
 ADD https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz /tmp
