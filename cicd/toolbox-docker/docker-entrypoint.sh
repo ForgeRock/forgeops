@@ -16,20 +16,22 @@ kubectl config use-context default
 
 pause() {
     GIT_UPTODATE="Your branch is up to date with 'origin/master'"
-    cd /workspace/forgeops
 
-    echo "Sleeping awaiting your command"
     while true
     do
+        cd /workspace/forgeops
         git fetch
         MSG=$(git status)
         echo "Git message:"
         echo $MSG
         if [[ "$MSG" = *$GIT_UPTODATE* ]]; then
-            echo "Branch is up to date, tests postponed"
+            echo "$(date): Branch is up to date, tests postponed"
         else
-            echo "We have a change on master, running tests(Tests will ensure that master is updated)"
+            echo "$(date): We have a change on master, updating forgeops"
+            git fetch -a; git reset --hard origin/master
             cd /
+            echo "Waiting 20 minutes to make sure new images are built properly"
+            sleep 1200
             ./run-smoke-tests.sh
         fi
         sleep 600

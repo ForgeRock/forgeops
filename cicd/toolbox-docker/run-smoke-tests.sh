@@ -28,7 +28,6 @@ prepare_folders() {
 
 deploy_smoke() {
     cd $WORKSPACE
-    git fetch -a; git reset --hard origin/master
     echo "deploying the smoke test configuration"
     ./bin/deploy.sh samples/config/smoke-deployment
 }
