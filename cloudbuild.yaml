@@ -31,9 +31,7 @@ steps:
   # These are the credentials needed to push images to your private docker registry.
   - 'DOCKER_USER=${_DOCKER_USER}'
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
-# Launch the smoke test
-- name: gcr.io/cloud-builders/gcloud
-  args: ['builds','submit', '--config', 'cloudbuild-smoketests.yaml', '--async', '--substitutions', '_SLACK_SERVICE=${_SLACK_SERVICE}', '.']
+
 images:
 - 'gcr.io/$PROJECT_ID/ds'
 - 'gcr.io/$PROJECT_ID/openidm'
