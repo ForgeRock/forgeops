@@ -16,6 +16,11 @@ ask() {
 	esac
 }
 
+if ! [ -x "$(command -v aws-iam-authenticator)" ]; then
+  echo "ERROR: aws-iam-authenticator is not found in your PATH." >&2
+  exit 1
+fi 
+
 echo -e "WARNING: The following components must be initialized before deployment:\n\t-IAM Service Role\n\t-VPC/Subnets\n\t-Control Plane Security Group\n These pre-requisites are outlined in the DevOps Documentation. Please ensure you have completed all before proceeding."
 
 echo ""
@@ -71,4 +76,4 @@ done
 # Add Prometheus
 ./deploy-prometheus.sh
 
-echo "Please add 'export KUBECONFIG=~/.kube/config-eks' to your bash_profile"
+echo "Please add 'export KUBECONFIG=$KUBECONFIG:~/.kube/config-eks' to your bash_profile"

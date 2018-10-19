@@ -5,8 +5,12 @@ image:
   pullPolicy: Always
 
 gcs:
-  enabled: true
+  enabled: false
   bucket: gs://forgeops/dj-backup/s-cluster
+
+s3:
+  enabled: true
+  bucket: s3://forgeops/dj-backup/s-cluster  
 
 nfs:
   server: 10.191.193.66

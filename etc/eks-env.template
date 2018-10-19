@@ -62,3 +62,9 @@ EKS_MONITORING_NS="monitoring"
 
 # Domain used to create Route53 records
 ROUTE53_DOMAIN="freng.org"
+
+#Arn for the iam role policy allowing S3 operations on bucket
+S3_POLICY_ARN="arn:aws:iam::XXXXXXXXXXX:policy/S3-Policy-ARN"
+
+#Security Group to allow nodes to mount EFS file system
+EFS_SECURITY_GROUP="sg-XXXXXXXXX"
