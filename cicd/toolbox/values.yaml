@@ -33,5 +33,6 @@ ingress:
 resources: {}
 
 # Add service when deploying, will fail when not filled
-slackService: # You must specify slack service here to where to send notification
+slackService:  # You must specify slack service here to where to send notification
 fqdn: smoke-tests.forgeops.com
+cluster: GKE
