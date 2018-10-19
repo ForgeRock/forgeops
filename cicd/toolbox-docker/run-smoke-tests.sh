@@ -36,7 +36,7 @@ run_tests() {
     # Run smoke tests
     echo "Running smoke tests"
     cd $WORKSPACE/cicd/forgeops-tests/
-    rm -rf reports/latest.html
+    rm -rf reports/*
     ./run-smoke-tests.sh
 
     # Modify report to contain last git commit revision + message
