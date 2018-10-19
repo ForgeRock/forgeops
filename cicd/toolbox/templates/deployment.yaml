@@ -30,6 +30,8 @@ spec:
               containerPort: 80
               protocol: TCP
           env:
+          - name: CLUSTER_NAME
+            value: {{ .Values.cluster }}
           - name: TEST_REPORT_LINK
             value: {{ .Values.fqdn }}
           - name: SLACK_SERVICE

@@ -75,7 +75,7 @@ send_slack_notification() {
 JSON_SLACK=$(cat <<EOF
   {
       "mrkdwn": true,
-      "text": "*Forgeops smoke tests results*",
+      "text": "*Forgeops smoke tests results* :${CLUSTER_NAME}",
       "attachments": [
         {
           "text": "$(cat results.txt)"
