@@ -49,7 +49,7 @@ Prometheus Operator also defines alerting rules CRDs which allow for easy deploy
 
 The Prometheus Helm chart is deployed as part of the kube-prometheus Helm chart.  The Prometheus scrape  
 configuration is generated and updated automatically by the Prometheus Operater as described above.  Prometheus  
-uses it's own config watcher to look for updated configurations.
+uses its own config watcher to look for updated configurations.
 
 <br />
 
