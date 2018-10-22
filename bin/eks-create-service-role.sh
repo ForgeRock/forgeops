@@ -12,7 +12,7 @@ set -o nounset
 
 ROLE_NAME="eksServiceRole"
 
-EKS_SERVICE_ROLE_ARN=$(aws iam create-role --role-name ${ROLE_NAME} --description "Allows EKS to manage clusters on your behalf." --assume-role-policy-document "{ \"Version\": \"2012-10-17\", \"Statement\": [ { \"Action\": \"sts:AssumeRole\", \"Effect\": \"Allow\", \"Principal\": { \"Service\": \"eks.amazonaws.com\" } } ] }" --query 'Role.Arn')
+EKS_SERVICE_ROLE_ARN=$(aws iam create-role --role-name ${ROLE_NAME} --description "Allows EKS to manage clusters on your behalf." --assume-role-policy-document file://../etc/eks-service-role.json --query 'Role.Arn')
 
 echo "EKS Role created with ARN ${EKS_SERVICE_ROLE_ARN}"
 
