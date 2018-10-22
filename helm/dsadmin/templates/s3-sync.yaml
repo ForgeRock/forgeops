@@ -9,7 +9,7 @@ metadata:
     vendor: forgerock
 spec:
   # Hours are UTC. 5:15 AM UTC is approx. 1 AM EST
-  schedule: " 15 5 * * * "
+  schedule: "15 5 * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -21,14 +21,14 @@ spec:
           - name: s3
             image: amazonlinux:2.0.20180827
             imagePullPolicy: IfNotPresent
-            # sync in both directions. First we sync our pvc backup to s3. Then we sync back again - which will pick up 
+            # sync in both directions. First we sync our pvc backup to s3. Then we sync back again - which will pick up
             # Any new files added to s3. If you don't want this bidirectional behaviour, take out the second s3 command.
-            # Note the use of the --delete (delete) option on the second sync. 
-            # This triggers deletion of files on /backup that do not 
+            # Note the use of the --delete (delete) option on the second sync.
+            # This triggers deletion of files on /backup that do not
             # exist on s3.  You may wish to disable this option for safety. If you do, to delete files you must ensure they are
             # deleted from both the backup filesystem AND the s3 bucket. Another option is to send s3 backups to yet another bucket
             # likely using offline or nearline storage.
-            command: [ "/bin/sh", "-c", 
+            command: [ "/bin/sh", "-c",
               "yum install -y awscli; aws s3 sync /backup {{ .Values.s3.bucket }}; aws s3 sync {{ .Values.s3.bucket }} /backup --delete; chmod -R g+rw /backup"]
             volumeMounts:
             - name: backup

@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+#
+# Sample script to create a Kubernetes cluster on Elastic Kubernetes Service (EKS)
+# You must have the aws command installed and access EKS cluster.
+# See https://docs.aws.amazon.com/cli/latest/userguide/awscli-install-bundle.html
+
 # Example of deploying an nginx ingress controller using Helm.
 # On EKS this will configure a Cloud L4 outer load balancer (TCP) and Nginx inside the cluster for L7.
 # The loadBalancerIP can be used if you have a static IP to assign to the outer L4 load balancer service.

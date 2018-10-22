@@ -2,9 +2,9 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-# Sample script to create a Kubernetes cluster on Google Kubernetes Engine (EKS)
-# You must have the gcloud command installed and access to a GCP project.
-# See https://cloud.google.com/container-engine/docs/quickstart
+# Sample script to create a Kubernetes cluster on Elastic Kubernetes Service (EKS)
+# You must have the aws command installed and access EKS cluster.
+# See https://docs.aws.amazon.com/cli/latest/userguide/awscli-install-bundle.html
 
 set -o errexit
 set -o pipefail
@@ -21,7 +21,7 @@ echo -e "\tCluster Version = ${EKS_CLUSTER_VERSION}"
 echo -e "\tRole ARN = ${EKS_ROLE_ARN}"
 echo -e "\tVPC ID = ${EKS_VPC_ID}"
 echo -e "\tSubnets = ${EKS_SUBNETS}"
-echo -e "\tSecuity Group = ${EC2_SECURITY_GROUP}"
+echo -e "\tSecurity Group = ${EC2_SECURITY_GROUP}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice

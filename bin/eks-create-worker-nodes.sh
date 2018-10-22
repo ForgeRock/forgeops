@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-# Sample script to create the worker nodes for a previously created EKS cluster using cloudformation
-
+# Sample script to create a Kubernetes cluster on Elastic Kubernetes Service (EKS)
+# You must have the aws command installed and access EKS cluster.
+# See https://docs.aws.amazon.com/cli/latest/userguide/awscli-install-bundle.html
 
 set -o errexit
 set -o pipefail
@@ -13,7 +13,7 @@ set -o nounset
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 
-# Executing cloudformation script
+# Executing cloudformation script to create worker nodes
 aws cloudformation deploy \
           --stack-name $EKS_STACK_NAME \
           --template-file ../etc/amazon-eks-nodegroup.yaml \
