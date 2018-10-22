@@ -106,7 +106,8 @@ chk_config()
     fi
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
-    AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}" 
+    AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}"
+    IDM_URL="${IDM_URL_PREFIX:-openidm}.${NAMESPACE}.${DOMAIN}"
 }
 
 create_namespace()
@@ -183,6 +184,29 @@ isalive_check()
     echo "=> AM is alive"
 }
 
+isalive_check_idm()
+{
+    PROTO="https"
+    if [[ -f ${CFGDIR}/openidm.yaml || -f ${CFGDIR}/common.yaml ]]; then
+        if $(grep -sq -e '^tlsStrategy:\s*\bhttp\b' ${CFGDIR}/common.yaml ${CFGDIR}/openidm.yaml); then
+            PROTO="http"
+        fi
+    fi
+
+    IDM_PING_ENDPOINT="${PROTO}://${IDM_URL}/openidm/info/ping"
+    echo "=> Testing ${IDM_PING_ENDPOINT}"
+    STATUS_CODE="503"
+    until [ "${STATUS_CODE}" = "200" ]; do
+        echo "   ${IDM_PING_ENDPOINT} is not alive, waiting 10 seconds before retry..."
+        sleep 10
+
+        STATUS_CODE=$(curl --header "X-OpenIDM-Username: openidm-admin" --header "X-OpenIDM-Password: openidm-admin" \
+          --connect-timeout 5 -k ${IDM_PING_ENDPOINT} -o /dev/null -w '%{http_code}\n' -sS || true)
+        echo "IDM Status code: $STATUS_CODE"
+    done
+    echo "=> IDM is alive"
+}
+
 import_check()
 {
     # This live check waits for AM config to be imported.
@@ -207,7 +231,7 @@ import_check()
 }
 
 restart_am()
-{  
+{
     OPENAM_POD_NAME=$(kubectl -n=${NAMESPACE} get pods --selector=app=openam \
         -o jsonpath='{.items[*].metadata.name}')
     echo "=> Deleting \"${OPENAM_POD_NAME}\" to restart and read newly imported configuration"
@@ -253,7 +277,7 @@ deploy_hpa()
 ###############################################################################
 
 YAML="" # Additional YAML options for helm
-ENV_SH="" 
+ENV_SH=""
 OPT_NAMESPACE=""
 RMALL=false
 DRYRUN=""
@@ -280,16 +304,23 @@ if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     restart_am
 fi
 
+
+
 # Do not scale or deploy hpa on minikube
 if [ "${CONTEXT}" != "minikube" ]; then
     if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
       scale_am
     fi
-    
+
     if [[ " ${COMPONENTS[@]} " =~ " openidm " ]]; then
       scale_idm
     fi
     #deploy_hpa # TODO
+fi
+
+if [[ " ${COMPONENTS[@]} " =~ " openidm " ]]; then
+    echo "IDM is present in deployment, running IDM live checks"
+    isalive_check_idm
 fi
 
 # Schedule directory backup
@@ -298,6 +329,3 @@ echo "=> For each directory pod you want to backup execute the following command
 echo "   $ kubectl exec -it <podname> scripts/schedule-backup.sh"
 
 printf "\e[38;5;40m=======> Deployment is ready <========\n"
-
-
-

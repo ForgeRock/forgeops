@@ -57,7 +57,9 @@ run_tests() {
     done
     # Copy latest report to shared volume for dashboard to pick it up
     cp -r reports/* $REPORTS/
-
+    # Clean up folders and logs older that week
+    find $REPORTS/* -mtime +7 -exec rm -rf {} \;
+    find $LOGS/* -mtime +7 -exec rm -rf {} \;
 }
 
 get_logs() {
