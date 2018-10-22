@@ -12,10 +12,15 @@ image:
   tag: 6.5.0-M129.2
 
 gcs:
-  enabled: true
+  enabled: false
   # GCS Bucket destination. You need the right scopes in container engine to write to this bucket.
   #add --scopes storage-full when you create the cluster.
   bucket:  gs://forgeops/ds-backups
+
+s3:
+  enabled: true
+  # S3 Bucket destination
+  bucket: s3://forgeops/dj-backup
   
 storage: {}
 

@@ -105,6 +105,10 @@ Parameters:
   ClusterControlPlaneSecurityGroup:
     Description: The security group of the cluster control plane.
     Type: AWS::EC2::SecurityGroup::Id
+  
+  EFSSecurityGroup:
+    Description: The security group of the EFS file system.
+    Type: AWS::EC2::SecurityGroup::Id
 
   VpcId:
     Description: The VPC of the worker instances
@@ -113,6 +117,10 @@ Parameters:
   Subnets:
     Description: The subnets where workers can be created.
     Type: List<AWS::EC2::Subnet::Id>
+  
+  S3PolicyArn:
+    Description: The arn of the s3 policy to be added to the IAM role
+    Type: String
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -168,6 +176,7 @@ Resources:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - !Ref S3PolicyArn
 
   NodeSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -189,6 +198,17 @@ Resources:
       IpProtocol: '-1'
       FromPort: 0
       ToPort: 65535
+
+  EFSSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    DependsOn: NodeSecurityGroup
+    Properties:
+      Description: Allow nodes to mount EFS volume
+      GroupId: !Ref EFSSecurityGroup
+      SourceSecurityGroupId: !Ref NodeSecurityGroup
+      IpProtocol: tcp
+      FromPort: 2049
+      ToPort: 2049
 
   NodeSecurityGroupFromControlPlaneIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -287,6 +307,7 @@ Resources:
           !Sub |
             #!/bin/bash
             set -o xtrace
+            sudo yum install -y amazon-efs-utils nfs-utils
             /etc/eks/bootstrap.sh ${ClusterName} ${BootstrapArguments}
             /opt/aws/bin/cfn-signal --exit-code $? \
                      --stack  ${AWS::StackName} \

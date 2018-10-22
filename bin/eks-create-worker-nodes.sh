@@ -28,6 +28,8 @@ aws cloudformation deploy \
                                 ClusterControlPlaneSecurityGroup=${EC2_SECURITY_GROUP} \
                                 VpcId=${EKS_VPC_ID} \
                                 Subnets=${EKS_SUBNETS} \
+                                S3PolicyArn=${S3_POLICY_ARN} \
+                                EFSSecurityGroup=${EFS_SECURITY_GROUP} \
                                 --capabilities CAPABILITY_IAM
 
 
