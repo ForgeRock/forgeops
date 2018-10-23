@@ -1,0 +1,32 @@
+{
+    "name": "user_admin",
+    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "condition": "${matches(request.uri.path, '^/openidm/managed/user($|(/.+$))') or matches(request.uri.path, '^/openidm/policy/managed/user($|(/.+$))')}",
+    "handler": {
+        "type": "Chain",
+        "config": {
+            "filters": [
+                {
+                    "type": "OAuth2ResourceServerFilter",
+                    "config": {
+                        "scopes": [
+                            "user_admin"
+                        ],
+                        "requireHttps": false,
+                        "accessTokenResolver": "AccessTokenResolver",
+                        "cacheExpiration": "2 minutes"
+                    }
+                },
+                {
+                    "name": "SetTrustedAttributeHeaders",
+                    "type": "ScriptableFilter",
+                    "config": {
+                        "type": "application/x-groovy",
+                        "file": "constructSecurityContextHeaders.groovy"
+                    }
+                }
+            ],
+            "handler": "IDMClient"
+        }
+    }
+}

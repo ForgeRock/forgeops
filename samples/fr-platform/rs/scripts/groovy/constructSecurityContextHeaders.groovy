@@ -16,4 +16,15 @@ if (sub.toLowerCase() == 'amadmin') {
     request.getHeaders().add('X-Authorization-Map', adminContext)
 }
 
+// The client will be the subject when using client credential flow
+if (contexts.oauth2.accessToken.info.client_id == contexts.oauth2.accessToken.info.sub) {
+    request.getHeaders().add('X-Authorization-Map', (new groovy.json.JsonBuilder([
+        "id" : contexts.oauth2.accessToken.info.client_id,
+        "component" : "endpoint/static/user",
+        "roles" : ["openidm-admin", "openidm-authorized"],
+        "moduleId" : "STATIC_USER"
+    ])).toString())
+}
+
+
 return next.handle(context, request)
