@@ -59,4 +59,5 @@ spec:
           - containerPort: 5000
       volumes:
       - name: content
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: forgeops-results
