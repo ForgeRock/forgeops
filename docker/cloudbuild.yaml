@@ -6,8 +6,8 @@ steps:
   entrypoint: './build.sh'
   # Invoke build scripts with -a (authenticate), -n cloudbuild - set the docker network to cloudbuild
   # -p - push the images, -C take the tags / artifacts from the csv file,  
-  # -i - incrementally  build only images changed in the last 2 commits.
-  args: ['-a', '-n', 'cloudbuild', '-p','-C', 'csv/dev.csv', '-i', '2' ]
+  # -i - incrementally  build only images changed in the last 2 commits. REVERT incremental
+  args: ['-a', '-n', 'cloudbuild', '-p','-C', 'csv/dev.csv']
   env:
   - 'API_KEY=${_ARTIFACTORY_API_KEY}'
   - 'DOCKER_USER=${_DOCKER_USER}'
