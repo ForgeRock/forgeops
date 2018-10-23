@@ -168,11 +168,6 @@ deploy_charts()
 isalive_check()
 {
     PROTO="https"
-    if [[ -f ${CFGDIR}/openam.yaml || -f ${CFGDIR}/common.yaml ]]; then
-        if $(grep -sq -e '^tlsStrategy:\s*\bhttp\b' ${CFGDIR}/common.yaml ${CFGDIR}/openam.yaml); then
-            PROTO="http"
-        fi
-    fi
     ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
     echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
@@ -187,12 +182,6 @@ isalive_check()
 isalive_check_idm()
 {
     PROTO="https"
-    if [[ -f ${CFGDIR}/openidm.yaml || -f ${CFGDIR}/common.yaml ]]; then
-        if $(grep -sq -e '^tlsStrategy:\s*\bhttp\b' ${CFGDIR}/common.yaml ${CFGDIR}/openidm.yaml); then
-            PROTO="http"
-        fi
-    fi
-
     IDM_PING_ENDPOINT="${PROTO}://${IDM_URL}/openidm/info/ping"
     echo "=> Testing ${IDM_PING_ENDPOINT}"
     STATUS_CODE="503"
