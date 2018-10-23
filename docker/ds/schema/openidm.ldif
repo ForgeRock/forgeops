@@ -160,4 +160,4 @@ objectClasses: ( 1.3.6.1.4.1.36733.2.3.2.7 NAME 'fr-idm-managed-user-explicit' S
     $ fr-idm-effectiveAssignment $ fr-idm-kbaInfo $ fr-idm-lastSync $ fr-idm-preferences $ fr-idm-meta $ fr-idm-termsAccepted
     $ fr-idm-photos $ fr-idm-x509-certificates $ fr-idm-emails $ fr-idm-title $ fr-idm-addresses $ fr-idm-locale $ fr-idm-ims
     $ fr-idm-user-type $ fr-idm-name $ fr-idm-preferred-language $ fr-idm-phone-numbers $ fr-idm-timezone $ fr-idm-nick-name
-    $ fr-idm-profile-url $ fr-idm-lastChanged $ fr-idm-consentedMapping fr-idm-external-id ) X-ORIGIN 'OpenIDM OpenDJRepoService' )
+    $ fr-idm-profile-url $ fr-idm-lastChanged $ fr-idm-consentedMapping $ fr-idm-external-id ) X-ORIGIN 'OpenIDM OpenDJRepoService' )
