@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "6.0.0-M13",
+    "amsterVersion" : "6.5.0-M9",
     "entityType" : "OAuth2Provider",
     "entityId" : "OAuth2Provider",
     "pathParams" : { }
@@ -19,7 +19,7 @@
     },
     "advancedOAuth2Config" : {
       "customLoginUrlTemplate" : null,
-      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "profile|Your personal information", "profile_update|Allowed to update your personal information", "consent_read|Ability to read your consent preferences", "workflow_tasks|Manage tasks assigned to you", "notifications|Manage your notifications" ],
+      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "profile|Your personal information", "profile_update|Allowed to update your personal information", "consent_read|Ability to read your consent preferences", "workflow_tasks|Manage tasks assigned to you", "notifications|Manage your notifications", "user_admin|Allowed to make changes to users" ],
       "codeVerifierEnforced" : "false",
       "tokenSigningAlgorithm" : "HS256",
       "authenticationAttributes" : [ "uid" ],

@@ -93,13 +93,13 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,OPTIONS,DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
     nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
 
 certmanager:
-  # The default issuer is to use the CA issuer. 
+  # The default issuer is to use the CA issuer.
   issuer: ca-issuer
   # For lets encrypt
   # issuer: letsencrypt-prod
