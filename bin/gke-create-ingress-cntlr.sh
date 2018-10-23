@@ -26,7 +26,7 @@ fi
 # For now we disable dynamic configuration due to bug https://github.com/kubernetes/ingress-nginx/issues/3056
 # Or else you have to use 0.17.1
 helm install --namespace nginx --name nginx \
-  --enable-dynamic-configuration=false \
+  --set enable-dynamic-configuration=false \
   --set rbac.create=true \
   --set controller.publishService.enabled=true \
   --set controller.stats.enabled=true \
