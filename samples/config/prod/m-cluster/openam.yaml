@@ -11,7 +11,7 @@ resources:
     cpu: 12000m
   requests:
     memory: 8Gi
-    cpu: 8000m
+    cpu: 11000m
 
 # Use these for JDK8
 catalinaOpts: >
@@ -26,7 +26,7 @@ catalinaOpts: >
   -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -XX:+PrintTenuringDistribution 
   -Xloggc:/tmp/gc.log
 
-# -XX:+PrintGCApplicationConcurrentTime -XX:ParallelGCThreads=12 -XX:+UseStringDeduplication -XX:G1HeapWastePercent=4
+# -XX:+PrintGCApplicationConcurrentTime -XX:ParallelGCThreads=12 -XX:+UseStringDeduplication -XX:G1HeapWastePercent=4 -XX:+CMSScavengeBeforeRemark
 
 # Use these for JDK11
 #catalinaOpts: >

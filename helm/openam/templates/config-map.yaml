@@ -14,8 +14,8 @@ data:
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {
-         "keyStorePasswordFile" : "/var/run/secrets/openam/password/.storepass",
-         "keyPasswordFile" : "/var/run/secrets/openam/password/.keypass",
+         "keyStorePasswordFile" : "/var/run/secrets/openam/password/storepass",
+         "keyPasswordFile" : "/var/run/secrets/openam/password/keypass",
          "keyStoreType" : "JCEKS",
          "keyStoreFile" : "/var/run/secrets/openam/keystore/keystore.jceks"
        }
