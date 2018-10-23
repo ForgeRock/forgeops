@@ -4,7 +4,10 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: 'docker'
   entrypoint: './build.sh'
-  args: ['-a', '-n', 'cloudbuild', '-p','-C', 'csv/dev.csv' ]
+  # Invoke build scripts with -a (authenticate), -n cloudbuild - set the docker network to cloudbuild
+  # -p - push the images, -C take the tags / artifacts from the csv file,  
+  # -i - incrementally  build only images changed in the last 2 commits.
+  args: ['-a', '-n', 'cloudbuild', '-p','-C', 'csv/dev.csv', '-i', '2' ]
   env:
   - 'API_KEY=${_ARTIFACTORY_API_KEY}'
   - 'DOCKER_USER=${_DOCKER_USER}'

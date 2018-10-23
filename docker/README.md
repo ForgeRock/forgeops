@@ -65,7 +65,7 @@ Will authenticate (-a option) to the docker registry, build, tag and push (-p op
 The CSV option is  intended for automating the build process. 
 
 The CSV input file is parsed by bash, and is is *very* finicky about formatting. There are no comments allowed, no extra spaces after
-commas, and the file must end in a newline. 
+commas, and the file must end in a newline.
 
 The format of the CSV file is:
 
