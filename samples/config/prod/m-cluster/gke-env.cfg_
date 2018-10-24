@@ -1,0 +1,40 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+
+# Google Cloud Project ID
+GKE_PROJECT_ID="forgeops-production-XXXXXXXX"
+
+# Kubernetes Cluster Name
+GKE_CLUSTER_NAME="prod-medium-cluster"
+
+# Primay Zone
+GKE_PRIMARY_ZONE="us-east1-d"
+
+# Additional Zone(s) in the same region
+# Must include primary zone in comma separated list
+GKE_NODE_LOCATIONS="us-east1-d,us-east1-c"
+
+# Kubernetes Cluster Version
+GKE_CLUSTER_VERSION="latest"
+
+# Nodes per zone in Cluster
+GKE_CLUSTER_SIZE="2"
+
+# VM Type
+GKE_MACHINE_TYPE="custom-16-65536"
+
+# Kubernetes Namespace
+GKE_CLUSTER_NS="prod"
+
+# IP of the Ingress Controller
+# Leave  blank "" if you don't know the IP or want to dynamically set it
+GKE_INGRESS_IP="35.237.XXX.XXX"
+
+# Monitoring Namespace
+GKE_MONITORING_NS="monitoring"
+
+# The vpc network that the cluster is created with
+GKE_NETWORK_NAME="forgeops"
+
+#
+GKE_EXTRA_ARGS=""
