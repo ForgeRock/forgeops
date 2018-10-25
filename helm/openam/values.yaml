@@ -34,6 +34,7 @@ catalinaOpts: >
   -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
+  -Dcom.iplanet.services.stats.state=off
 
 # For visualVM debug, you can add this to the above:
 #-Dcom.sun.management.jmxremote.port=<port>
