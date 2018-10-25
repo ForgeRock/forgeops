@@ -75,7 +75,7 @@ if [ ! -z "$INCREMENTAL" ]; then
     exit 0
   fi
 
-   echo "Incremental build of changed in the last $INCREMENTAL commits"
+   echo "Incremental build of changed in the last $INCREMENTAL commits. Changes: $IMAGES"
 fi
 
 # Test for the forgerock downloader image - needed to download bits
@@ -84,11 +84,20 @@ DL=`docker images -q forgerock/downloader`
 
 if [ -z "$DL" ]; then 
   echo "Can't find forgerock/downloader image needed to download ForgeRock binaries. I will attempt to build it"
-  if [ -z "$API_KEY" ]; then
-    echo "Artifactory API_KEY environment variable is not set. You must export API_KEY=your_artifactory_api_key"
-    exit 1
+
+  # Optimization for cloudbuild - see if we can pull a pre-existing downloader 
+
+  if docker pull gcr.io/engineering-devops/downloader; then
+    if [ -z "$API_KEY" ]; then
+      echo "Artifactory API_KEY environment variable is not set. You must export API_KEY=your_artifactory_api_key"
+      exit 1
+    fi  
+    echo "Building downloader"
+    docker build -t forgerock/downloader --build-arg API_KEY=$API_KEY downloader
+  else
+    echo "Using cached downloader"
+    docker tag gcr.io/engineering-devops/downloader forgerock/downloader
   fi
-  docker build -t forgerock/downloader --build-arg API_KEY=$API_KEY downloader
 fi 
 
 # Take the build list from a CSV file..
