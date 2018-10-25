@@ -17,7 +17,7 @@ These are subject to change!
 * An init container is used to copy in the files needed to boot AM into the home directory ~/openam. This includes the boot.json
   and the keystore files.
 * AM needs a writable home directory (see https://bugster.forgerock.org/jira/browse/OPENAM-13841). It wants to
-  rewrite the bootstrap file. For this reason, we can not mount the keystore.jceks and other files directly under ~/openam. This is why we use the init container approach to copy in the template files. We will revist this in 7.0.
+  rewrite the bootstrap file. For this reason, we can not mount the keystore.jceks and other files directly under ~/openam. This is why we use the init container approach to copy in the template files. We will revisit this in 7.0.
 
  ## Keystores
 
