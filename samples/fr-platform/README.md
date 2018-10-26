@@ -104,7 +104,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
 7. You can access the platform by opening this URL:
 
     ```
-    http://am-service.sample.svc.cluster.local/openam/console
+    http://am-service.sample.svc.cluster.local/console
     ```
 
     You can use amadmin / password to login as the am admin.

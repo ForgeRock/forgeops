@@ -44,7 +44,7 @@ docker push  gcr.io/engineering-devops/forgeops-tests
 To provide configuration you have to set following environmental variables for products
 
 ### AM
- - `AM_URL` : e.g. http://openam.default.forgeops.com/openam
+ - `AM_URL` : e.g. http://login.default.forgeops.com/
  - 'AM_ADMIN_PWD' : AM admin password
 
 ### IDM
@@ -94,7 +94,7 @@ bin/deploy.sh ${MY_CONFIG}
 
 echo ""
 echo "Configure"
-AM_URL=http://openam.${MY_NAMESPACE}.forgeops.com/openam
+AM_URL=http://login.${MY_NAMESPACE}.forgeops.com/
 IG_URL=http://openig.${MY_NAMESPACE}.forgeops.com
 IDM_URL=http://openidm.${MY_NAMESPACE}.forgeops.com/openidm
 echo "export AM_URL=${AM_URL}"

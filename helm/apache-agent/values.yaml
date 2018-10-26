@@ -15,7 +15,7 @@ image:
 # in selected amServer. User and password must match profile in amServer
 agent:
   user: apache
-  amServer: https://openam.example.forgeops.com/openam
+  amServer: https://login.example.forgeops.com/
   realm: "/"
 
 service:

@@ -75,9 +75,9 @@ helm install openam
 minikube ip
 
 # You can put DNS entries in an entry in /etc/hosts. For example:
-# 192.168.99.100 openam.default.example.com openidm.default.example.com openig.default.example.com
+# 192.168.99.100 login.default.example.com openidm.default.example.com openig.default.example.com
 
-open http://openam.default.example.com
+open http://login.default.example.com
 
 ```
 

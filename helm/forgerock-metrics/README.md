@@ -148,7 +148,7 @@ exporter-forgerock Helm chart.  Please follow these steps:
     <product name>:
         component: am   # product name to define the ServiceMonitor
         enabled: false      # overriden in custom.yaml
-        path: /openam/json/metrics/prometheus       # metrics path
+        path: /json/metrics/prometheus       # metrics path
         labelSelectorComponent: openam      # kubernetes service label name
         secretUser: cHJvbWV0aGV1cw==        # username in base64 encode if required
         secretPassword: cHJvbWV0aGV1cw==        # password in base64 encode if required

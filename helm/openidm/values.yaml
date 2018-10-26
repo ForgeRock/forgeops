@@ -114,4 +114,4 @@ auditLogs: []
 # Optional sed filter script that does search / replace after the configuration has been checked out
 # This is a work around until OPENIDM-11529 is fixed
 # example - search for qa and replace with prod:
-# sedFilter: "s/openam.qa.acme.com/openam.prod.acme.com/g
+# sedFilter: "s/login.qa.acme.com/login.prod.acme.com/g

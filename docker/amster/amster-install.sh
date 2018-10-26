@@ -15,7 +15,7 @@ POST_INSTALL_SCRIPTS=${POST_INSTALL_SCRIPTS:-"${AMSTER_SCRIPTS}"}
 
 # Use 'openam' as the internal cluster dns name.
 export SERVER_URL=${OPENAM_INSTANCE:-http://openam:80}
-export URI=${SERVER_URI:-/openam}
+export URI=${SERVER_URI:-/}
 
 export INSTANCE="${SERVER_URL}${URI}"
 

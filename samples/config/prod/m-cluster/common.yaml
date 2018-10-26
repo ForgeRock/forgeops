@@ -1,8 +1,8 @@
 domain: .frk8s.net
 #domain: .freng.org
 
-fqdn: openam.prod.frk8s.net
-#fqdn: openam.prod.freng.org
+fqdn: login.prod.frk8s.net
+#fqdn: login.prod.freng.org
 
 # Override values for the whole deployment here
 #image:

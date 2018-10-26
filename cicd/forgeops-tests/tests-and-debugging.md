@@ -19,7 +19,7 @@ This test creates a user in AM that will be used later for login testing.
 *Test if OpenAM is responding on the isAlive.jsp endpoint*
 
 **Flow:**
- - GET request to `/openam/isAlive.jsp`
+ - GET request to `//isAlive.jsp`
 
 **Problems seen previously:**
  - [2](#previously-seen-problems-with-am)
@@ -58,7 +58,7 @@ This test creates a user in AM that will be used later for login testing.
 Problems:
  1. **Userstore not reachable**: Run `kubectl -n=smoke get pods` to check that the userstore is running and passed live check (1/1).
 
- 2. **AM not reachable**: Ensure you can get to the openam.smoke.forgeops.com/openam/ page in a browser. If not, try to get logs from
+ 2. **AM not reachable**: Ensure you can get to the login.smoke.forgeops.com// page in a browser. If not, try to get logs from
  the openam pod using `kubectl -n=smoke logs <am_podname>`. Also, getting the pod description might point you to problems - run `kubectl -n=smoke describe pod <am_podname>`
 
  3. **Wrong CTS config**: Previously, we have seen that after updating config, CTS was not reachable due to wrong CTS configuration - admin was not able to login and create user.

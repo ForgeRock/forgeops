@@ -25,7 +25,7 @@ spec:
     - host: {{ template "externalFQDN" . }}
       http:
         paths:
-        - path: /openam
+        - path: /
           backend:
             serviceName: {{ .Values.service.name }}
             servicePort: {{ .Values.service.externalPort }}

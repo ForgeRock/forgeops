@@ -13,7 +13,7 @@ To do so, make sure these properties match agent profile in AM:
 ```
 agent:
   user: apache # Agent profile name
-  amServer: http://openam.example.forgeops.com/openam # Location of AM server
+  amServer: http://openam.example.forgeops.com/ # Location of AM server
   realm: "/" # Realm in which agent is configured
 ```
 

@@ -1,6 +1,6 @@
 domain: .example.com
 
-fqdn: openam.mini.example.com
+fqdn: login.mini.example.com
 
 image:
   tag: 6.5.0

@@ -12,7 +12,7 @@ FROM tomcat:8.5-alpine
 
 RUN rm -fr "$CATALINA_HOME"/webapps/*
 
-COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/openam
+COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/ROOT
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for setting the AM home directory:

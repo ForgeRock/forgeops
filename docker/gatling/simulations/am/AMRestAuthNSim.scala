@@ -19,7 +19,7 @@ class AMRestAuthNSim extends Simulation {
     val concurrency: Integer = Integer.getInteger("concurrency", 10)
     val duration: Integer = Integer.getInteger("duration", 60)
     val warmup: Integer = Integer.getInteger("warmup", 1)
-    val amHost: String = System.getProperty("am_host", "openam.example.forgeops.com")
+    val amHost: String = System.getProperty("am_host", "login.example.forgeops.com")
     val amPort: String = System.getProperty("am_port", "443")
     val amProtocol: String = System.getProperty("am_protocol", "https")
 
