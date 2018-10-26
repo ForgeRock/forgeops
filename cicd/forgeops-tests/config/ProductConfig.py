@@ -23,7 +23,7 @@ class AMConfig(object):
         try:
             self.am_url = os.environ['AM_URL']
         except KeyError:
-            self.am_url = 'https://openam.smoke.forgeops.com/openam'
+            self.am_url = 'https://login.smoke.forgeops.com/'
 
         try:
             self.amadmin_pwd = os.environ['AM_ADMIN_PWD']

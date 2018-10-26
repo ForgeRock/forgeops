@@ -45,7 +45,7 @@
             "name" : "openAMAutoLogin",
             "identityUsernameField" : "userName",
             "identityPasswordField" : "password",
-            "openAMBaseUrl" : "http://am-service.sample.svc.cluster.local/openam/",
+            "openAMBaseUrl" : "http://am-service.sample.svc.cluster.local/",
             "authenticationEndpoint" : "json/realms/root/authenticate"
         }
     ],

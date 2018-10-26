@@ -12,7 +12,7 @@ COPY --from=0 /var/tmp/web_agents /opt/web_agents
 
 WORKDIR /opt
 
-ARG AM_SERVER=http://openam.example.forgeops.com:80/openam
+ARG AM_SERVER=http://login.example.forgeops.com:80/openam
 ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 
 # Copy nginx.conf with included agent module

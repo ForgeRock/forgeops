@@ -10,7 +10,7 @@ metadata:
 data:
   boot.json: |
    {
-     "instance" : "{{ default "http://openam:80/openam" .Values.openamInstance }}",
+     "instance" : "{{ default "http://openam:80/" .Values.openamInstance }}",
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {

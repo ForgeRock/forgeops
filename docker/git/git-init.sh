@@ -33,7 +33,7 @@ fi
 
 # Run optional sed substitutions. This is most commonly use to change the FQDN.
 # For example:
-# SED_FILTER="-e s/openam.foo.com/openam.bar.com/ -e s/baz.com/boo.com/"
+# SED_FILTER="-e s/login.foo.com/login.bar.com/ -e s/baz.com/boo.com/"
 
 if [ ! -z "$SED_FILTER" ]; then
     echo "Running sed replacement on checked out source using pattern $SED_FILTER"

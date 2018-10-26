@@ -4,7 +4,7 @@
 if [ $# -ne 1 ];
 then
     echo "Usage: $0  FQDN"
-    echo "Where FQDN is something like openam.default.example.com"
+    echo "Where FQDN is something like login.default.example.com"
     exit 1
 fi
 hostname=$1

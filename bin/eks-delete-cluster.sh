@@ -22,7 +22,7 @@ case "$choice" in
 esac
 
 # echo "=> Deleting route53 records for openam and openidm"
-AM_URL="openam.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
+AM_URL="login.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
 IDM_URL="openidm.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
 
 NLB_DNS=$(kubectl --namespace nginx get services nginx-nginx-ingress-controller --no-headers -o custom-columns=NAME:.status.loadBalancer.ingress[0].hostname)

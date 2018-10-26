@@ -11,7 +11,7 @@
 
 # Variables to be replaced
 CURRENT_VERSION="6.5.0-M7" # amsterVersion in config
-CURRENT_FQDN="openam.small.lbk8s.net" # fqdn in config
+CURRENT_FQDN="login.small.lbk8s.net" # fqdn in config
 
 if [ ! -d "global" ]; then
     echo "No global config directory.  Please cd into the relevant config directory. There should be a global/ and realm/ sub directory only"

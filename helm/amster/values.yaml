@@ -39,7 +39,7 @@ config:
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 6.5.0-M9
+  tag: 6.5.0-M9.1
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
@@ -72,8 +72,8 @@ resources:
 # Optional value overrides
 
 # fqdn - the openam server external fqdn.
-# If this is *not* set, it defaults to openam.{namespace}{{ .Values.domain }}
-#fqdn: openam.acme.com
+# If this is *not* set, it defaults to login.{namespace}{{ .Values.domain }}
+#fqdn: login.acme.com
 
 # ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on
 # import.

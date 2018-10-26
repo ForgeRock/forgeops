@@ -21,7 +21,7 @@ domain: .example.com
 
 agent:
   user: nginx
-  amServer: https://openam.example.forgeops.com/openam
+  amServer: https://login.example.forgeops.com/
   realm: "/"
 
 

@@ -92,7 +92,7 @@ ingress host name. The format is:
 
  For example:
 
- `openam.default.example.com`
+ `login.default.example.com`
 
 Note that the details of the ingress will depend on the implementation. You may need to modify the ingress definitions. 
  

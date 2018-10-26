@@ -59,7 +59,7 @@ fqdn in your /etc/hosts file.
 kubectl get ingress
 NAME      HOSTS                          ADDRESS         PORTS     AGE
 gatling   gatling.pyforge.forgeops.com   35.227.42.137   80        3m
-openam    openam.pyforge.forgeops.com    35.227.42.137   80        7m
+openam    login.pyforge.forgeops.com    35.227.42.137   80        7m
 ```
 Then you can simply access results by going to :
 `http://gatling.[NAMESPACE].[DOMAIN]/` e.g. `http://gatling.pyforge.forgeops.com`
