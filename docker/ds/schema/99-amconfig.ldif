@@ -25,6 +25,9 @@
 ## Portions Copyrighted 2011-2017 ForgeRock AS.
 ##
 
+
+# TODO: Find out what we can delete here when DS profiles lands
+
 dn: cn=schema
 objectClass: top
 objectClass: ldapSubentry
