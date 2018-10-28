@@ -48,21 +48,14 @@ configStore:
   type: dirServer
    # If type is set to embedded, the attributes below are ignored.
   #suffix:  "dc=openam,dc=forgerock,dc=org"
-  suffix:  "dc=data"
+  suffix:  "ou=am-config"
   # This is the first StatefulSet name:
   host: configstore-0.configstore
   port: 1389
-  dirManager: "cn=Directory Manager"
+  #dirManager: "cn=Directory Manager"
+  dirManager: "uid=am-config,ou=admins,ou=am-config"
   adminPort: 4444
   password: password
-
-# This is not currently supported on install by amster. You must import a user store config.
-userStore:
-  host:  userstore-0.userstore
-  port: 1389
-  password: password
-  dirManager: "cn=Directory Manager"
-  suffix:  "dc=data"
 
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration

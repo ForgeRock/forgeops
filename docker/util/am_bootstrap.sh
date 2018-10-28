@@ -4,7 +4,7 @@
 # TODO: Deprecate this when we get boot from json support
 set -x
 
-BASE_DN="${BASE_DN:-dc=openam,dc=forgerock,dc=org}"
+BASE_DN="${BASE_DN:-ou=am-config}"
 
 # Configuration store LDAP. Defaults to the configuration store stateful set running in the same namespace.
 CONFIGURATION_LDAP="${CONFIGURATION_LDAP:-configstore-0.configstore:1389}"
@@ -24,6 +24,19 @@ is_configured() {
     return $status
 }
 
+
+copy_secrets() {
+    echo "Copying secrets"
+    mkdir -p "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
+    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}/openam"
+}
+
+
 bootstrap() {
     if is_configured;
     then
@@ -33,4 +46,5 @@ bootstrap() {
     fi
 }
 
+copy_secrets
 bootstrap

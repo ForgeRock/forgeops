@@ -22,7 +22,7 @@ data:
      },
      "configStoreList" : [ {
        "baseDN" : "{{.Values.rootSuffix }}",
-       "dirManagerDN" : "cn=Directory Manager",
+       "dirManagerDN" : "uid=am-config,ou=admins,ou=am-config",
        "ldapHost" : "{{ default "opendj-configstore-0.opendj-configstore" .Values.configLdapHost }}",
        "ldapPort" : {{ default 1389 .Values.configLdapPort }},
        "ldapProtocol" : "ldap"
