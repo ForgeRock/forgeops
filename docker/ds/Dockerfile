@@ -1,7 +1,7 @@
 
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0-M129.2"
+ARG VERSION="6.5.0-M130.1"
 RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
@@ -15,7 +15,7 @@ COPY bootstrap/ /var/tmp/bootstrap/
 COPY schema /var/tmp/schema
 
 # The default BASE_DN of the directory tree.
-ENV BASE_DN dc=data
+ENV BASE_DN dc=ou=identities
 
 # This speeds up docker cloudbuild considerably
 ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"

@@ -21,7 +21,7 @@ changetype: modify
 replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.userstore|true}
 
-dn: cn=dc=data,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+dn: cn=ou=identities,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-enabled
 ds-cfg-enabled: &{ds.enable.userstore|true}

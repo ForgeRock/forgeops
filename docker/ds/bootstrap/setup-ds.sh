@@ -26,6 +26,9 @@ then
    EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenTtlDate"
 fi
 
+# Todo:
+# Removed:     --set domain:data \
+ 
 echo "EXTRA_OPTS=${EXTRA_OPTS}"
 
 ./setup directory-server \
@@ -39,11 +42,12 @@ echo "EXTRA_OPTS=${EXTRA_OPTS}"
     --ldapsPort ${PORT_DIGIT}636 \
     --httpPort ${PORT_DIGIT}8080 \
     --httpsPort ${PORT_DIGIT}8443 \
-    --set domain:data \
     --profile am-cts:6.5.0 \
     --set am-cts/amCtsAdminPassword:password \
     --profile am-identity-store \
     --set am-identity-store/amIdentityStoreAdminPassword:password \
+    --profile am-config \
+    --set am-config/amConfigAdminPassword:password \
     --certNickname ${SSL_CERT_ALIAS} \
     --usePkcs12KeyStore ${SSL_KEYSTORE} \
     --keyStorePasswordFile ${KEYSTORE_PIN} \
@@ -99,22 +103,6 @@ cp ../../example-v1.json ./config/rest2ldap/endpoints/api
 # From util.sh. Consider moving the logic here...
 configure
 
-echo "Copy schema extensions in place. Only AM config schema is copied."
-cp /var/tmp/schema/* ./db/schema
-
-
 ./bin/start-ds
-
-# We only import the ldif on server 1 since we are going to initialize replication from it anyway.
-if [ "${PORT_DIGIT}" = "1" ];
-then
-    # TODO: Only for userstore (amIdentityStore) while OpenDJ-5531 is resolved.
-    for file in ../../ldif/userstore/*.ldif; do
-        echo "Loading ${file}"
-        # search + replace all placeholder variables. Naming conventions are from AM.
-        sed -e "s/@BASE_DN@/$BASE_DN/"  <${file}  >/tmp/file.ldif
-        bin/ldapmodify -D "cn=Directory Manager"  --continueOnError -h ${DSHOST} -p ${PORT_DIGIT}389 -w password /tmp/file.ldif
-    done
-fi
 
 cd ..
