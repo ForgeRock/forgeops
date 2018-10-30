@@ -75,3 +75,6 @@ done
 
 # Add Prometheus
 ./deploy-prometheus.sh
+
+# Filestore is needed if you enable backups.  Uncomment the next line to create one.
+# ./gke-create-filestore.sh
