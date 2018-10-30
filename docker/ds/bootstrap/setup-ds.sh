@@ -25,9 +25,6 @@ if [ "${REAPER_TYPE}" = "HYBRID" ]
 then
    EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenTtlDate"
 fi
-
-# Todo:
-# Removed:     --set domain:data \
  
 echo "EXTRA_OPTS=${EXTRA_OPTS}"
 
