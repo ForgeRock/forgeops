@@ -10,6 +10,4 @@ if (authzHeaderValue) {
     security.authorization = modifiedMap;
 }
 
-security.authorization.logoutUrl = '/logout';
-
 security;

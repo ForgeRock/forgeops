@@ -6,6 +6,11 @@ metadata:
   labels:
     role: management
 spec:
+  initContainers:
+    - name: wait-for-configstore
+      image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
+      imagePullPolicy: "IfNotPresent"
+      args: [ "wait", "configstore-0.configstore", "1389" ]
   containers:
     - image: {{ .Values.images.idm }}
       imagePullPolicy: IfNotPresent
@@ -17,16 +22,6 @@ spec:
         value: "true"
       - name: OPENIDM_CONFIG_REPO_ENABLED
         value: "false"
-      - name: IDP_FACEBOOK_CLIENTID
-        valueFrom:
-          secretKeyRef:
-            name: social-credentials
-            key: IDP_FACEBOOK_CLIENTID
-      - name: IDP_FACEBOOK_CLIENTSECRET
-        valueFrom:
-          secretKeyRef:
-            name: social-credentials
-            key: IDP_FACEBOOK_CLIENTSECRET
       - name: OPENIDM_ANONYMOUS_PASSWORD
         value: "anonymous"
       - name: OPENIDM_ADMIN_PASSWORD

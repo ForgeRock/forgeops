@@ -1,21 +1,11 @@
-FROM forgerock-docker-public.bintray.io/forgerock/openidm:6.0.0
+FROM forgerock-docker-public.bintray.io/forgerock/openidm:6.5.0-M6
 
 USER root
 
-RUN mkdir /tmp/workflow && \
-    chown -R forgerock:forgerock /opt/openidm /tmp/workflow && \
-    chmod 600 /opt/openidm/security/* && \
-    chmod 755 /tmp/workflow
+RUN chmod 600 /opt/openidm/security/*
 
 USER forgerock
 
 COPY conf /opt/openidm/conf
 COPY script /opt/openidm/script
 COPY security /opt/openidm/security
-COPY workflow /tmp/workflow
-COPY ui /opt/openidm/ui
-
-RUN mkdir /opt/openidm/workflow && \
-    cd /tmp/workflow && \
-    zip chess.bar chess* && \
-    mv /tmp/workflow/chess.bar /opt/openidm/workflow

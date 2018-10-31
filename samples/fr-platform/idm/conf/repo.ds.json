@@ -125,11 +125,11 @@
     },
     "resourceMapping": {
         "defaultMapping": {
-            "dnTemplate": "ou=generic,o=userstore"
+            "dnTemplate": "ou=generic,dc=openidm,dc=example,dc=com"
         },
         "explicitMapping": {
             "internal/role": {
-                "dnTemplate": "ou=roles,ou=internal,o=idm",
+                "dnTemplate": "ou=roles,ou=internal,dc=openidm,dc=example,dc=com",
                 "objectClasses": [
                     "fr-idm-internal-role"
                 ],
@@ -140,14 +140,109 @@
                         "isRequired": true,
                         "writability": "createOnly"
                     },
+                    "name": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-name"
+                    },
                     "description": {
                         "type": "simple",
                         "ldapAttribute": "description"
+                    },
+                    "temporalConstraints": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-temporal-constraints",
+                        "isMultiValued": true
+                    },
+                    "condition": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-condition"
+                    }
+                }
+            },
+            "locks": {
+                "dnTemplate": "ou=locks,ou=internal,dc=openidm,dc=example,dc=com",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-lock"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "uid",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "nodeId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-lock-nodeid"
+                    }
+                }
+            },
+            "sync/queue": {
+                "dnTemplate": "ou=queue,ou=sync,dc=openidm,dc=example,dc=com",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-syncqueue"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "uid",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "syncAction": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-syncaction"
+                    },
+                    "resourceCollection": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-resourcecollection"
+                    },
+                    "resourceId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-resourceid"
+                    },
+                    "mapping": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-mapping"
+                    },
+                    "objectRev": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-objectRev"
+                    },
+                    "oldObject": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-syncqueue-oldobject"
+                    },
+                    "newObject": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-syncqueue-newobject"
+                    },
+                    "context": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-syncqueue-context"
+                    },
+                    "state": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-state"
+                    },
+                    "nodeId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-nodeid"
+                    },
+                    "remainingRetries": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-remainingretries"
+                    },
+                    "createDate": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-createdate"
                     }
                 }
             },
             "link": {
-                "dnTemplate": "ou=links,o=idm",
+                "dnTemplate": "ou=links,dc=openidm,dc=example,dc=com",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-link"
@@ -178,7 +273,7 @@
                 }
             },
             "clusteredrecontargetids": {
-                "dnTemplate": "ou=clusteredrecontargetids,o=idm",
+                "dnTemplate": "ou=clusteredrecontargetids,dc=openidm,dc=example,dc=com",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-recon-clusteredTargetIds"
@@ -201,7 +296,7 @@
                 }
             },
             "managed/user": {
-                "dnTemplate": "ou=People,o=userstore",
+                "dnTemplate": "ou=people,ou=identities",
                 "namingStrategy": {
                     "type": "serverNaming",
                     "dnAttribute": "uid",
@@ -311,14 +406,6 @@
                         "type": "json",
                         "ldapAttribute": "fr-idm-lastSync"
                     },
-                    "termsAccepted": {
-                        "type": "json",
-                        "ldapAttribute": "fr-idm-termsAccepted"
-                    },
-                    "lastChanged": {
-                        "type": "json",
-                        "ldapAttribute": "fr-idm-lastChanged"
-                    },
                     "consentedMappings": {
                         "type": "json",
                         "ldapAttribute": "fr-idm-consentedMapping",
@@ -332,23 +419,22 @@
                     "preferences": {
                         "type": "json",
                         "ldapAttribute": "fr-idm-preferences"
-                    },
-                    "_meta": {
-                        "type": "json",
-                        "ldapAttribute": "fr-idm-meta"
                     }
                 }
             }
         },
         "genericMapping": {
+            "config": {
+                "dnTemplate": "ou=config,dc=openidm,dc=example,dc=com"
+            },
             "ui/*": {
-                "dnTemplate": "ou=ui,o=idm"
+                "dnTemplate": "ou=ui,dc=openidm,dc=example,dc=com"
             },
             "managed/*": {
-                "dnTemplate": "ou=managed,o=userstore"
+                "dnTemplate": "ou=managed,dc=openidm,dc=example,dc=com"
             },
             "managed/role": {
-                "dnTemplate": "ou=role,ou=managed,o=userstore",
+                "dnTemplate": "ou=role,ou=managed,dc=openidm,dc=example,dc=com",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-managed-role"
@@ -357,13 +443,13 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole"
             },
             "scheduler": {
-                "dnTemplate": "ou=scheduler,o=idm"
+                "dnTemplate": "ou=scheduler,dc=openidm,dc=example,dc=com"
             },
             "scheduler/*": {
-                "dnTemplate": "ou=scheduler,o=idm"
+                "dnTemplate": "ou=scheduler,dc=openidm,dc=example,dc=com"
             },
             "cluster/*": {
-                "dnTemplate": "ou=cluster,o=idm",
+                "dnTemplate": "ou=cluster,dc=openidm,dc=example,dc=com",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-cluster-obj"
@@ -372,7 +458,7 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchClusterObject"
             },
             "relationships": {
-                "dnTemplate": "ou=relationships,o=idm",
+                "dnTemplate": "ou=relationships,dc=openidm,dc=example,dc=com",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-relationship"
@@ -381,16 +467,22 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchRelationship"
             },
             "updates": {
-                "dnTemplate": "ou=updates,o=idm"
+                "dnTemplate": "ou=updates,dc=openidm,dc=example,dc=com"
             },
             "reconprogressstate": {
-                "dnTemplate": "ou=reconprogressstate,o=idm"
+                "dnTemplate": "ou=reconprogressstate,dc=openidm,dc=example,dc=com"
             },
             "jsonstorage": {
-                "dnTemplate": "ou=jsonstorage,o=idm"
+                "dnTemplate": "ou=jsonstorage,dc=openidm,dc=example,dc=com"
             },
             "internal/usermeta" : {
-                "dnTemplate": "ou=usermeta,ou=internal,o=idm"
+                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=example,dc=com"
+            },
+            "internal/notification" : {
+                "dnTemplate": "ou=notification,ou=internal,dc=openidm,dc=example,dc=com"
+            },
+            "file" : {
+                "dnTemplate": "ou=file,dc=openidm,dc=example,dc=com"
             }
         }
     }
