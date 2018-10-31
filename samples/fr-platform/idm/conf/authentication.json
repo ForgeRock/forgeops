@@ -21,14 +21,14 @@
                 "properties": {
                     "queryOnResource": "endpoint/static/user",
                     "defaultUserRoles": [
-                        "openidm-cert"
+                        "internal/role/openidm-cert"
                     ],
                     "allowedAuthenticationIdPatterns": [
                         "CN=ig, O=forgerock"
                     ],
                     "runAsProperties": {
                         "adminRoles": [
-                            "openidm-cert"
+                            "internal/role/openidm-cert"
                         ],
                         "disallowedRunAsRoles": [ ],
                         "queryOnResource": "managed/user",
@@ -37,7 +37,7 @@
                             "userRoles": "authzRoles"
                         },
                         "defaultUserRoles" : [
-                            "openidm-authorized"
+                            "internal/role/openidm-authorized"
                         ],
                         "augmentSecurityContext" : {
                             "type" : "text/javascript",
@@ -59,14 +59,14 @@
                 "properties": {
                     "queryOnResource": "endpoint/static/user",
                     "defaultUserRoles": [
-                        "openidm-cert"
+                        "internal/role/openidm-cert"
                     ],
                     "allowedAuthenticationIdPatterns": [
                         "CN=ig, O=forgerock"
                     ],
                     "runAsProperties": {
                         "adminRoles": [
-                            "openidm-cert"
+                            "internal/role/openidm-cert"
                         ],
                         "disallowedRunAsRoles": [ ],
                         "queryId" : "credential-query",
@@ -97,7 +97,7 @@
                     "username" : "anonymous",
                     "password" : "&{openidm.anonymous.password}",
                     "defaultUserRoles" : [
-                        "openidm-reg"
+                        "internal/role/openidm-reg"
                     ]
                 },
                 "enabled" : true
@@ -109,8 +109,8 @@
                     "username" : "openidm-admin",
                     "password" : "&{openidm.admin.password}",
                     "defaultUserRoles" : [
-                        "openidm-admin",
-                        "openidm-authorized"
+                        "internal/role/openidm-admin",
+                        "internal/role/openidm-authorized"
                     ]
                 },
                 "enabled" : true

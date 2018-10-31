@@ -14,16 +14,6 @@ spec:
       imagePullPolicy: IfNotPresent
       name: amster
       env:
-      - name: IDP_FACEBOOK_CLIENTID
-        valueFrom:
-          secretKeyRef:
-            name: social-credentials
-            key: IDP_FACEBOOK_CLIENTID
-      - name: IDP_FACEBOOK_CLIENTSECRET
-        valueFrom:
-          secretKeyRef:
-            name: social-credentials
-            key: IDP_FACEBOOK_CLIENTSECRET
       - name: OPENAM_INSTANCE
         value: "http://am-service.sample.svc.cluster.local/openam"
       resources:
