@@ -15,7 +15,7 @@ COPY bootstrap/ /var/tmp/bootstrap/
 COPY schema /var/tmp/schema
 
 # The default BASE_DN of the directory tree.
-ENV BASE_DN dc=ou=identities
+ENV BASE_DN ou=identities
 
 # This speeds up docker cloudbuild considerably
 ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
