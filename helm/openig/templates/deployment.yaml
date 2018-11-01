@@ -38,11 +38,18 @@ spec:
       - name: {{ .Chart.Name }}
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         #imagePullPolicy: {{ .Values.image.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
         env:
         - name: OPENIG_BASE
           value: "{{ .Values.config.path }}"
         - name: CATALINA_OPTS
           value: "{{ .Values.catalinaOpts }}"
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
