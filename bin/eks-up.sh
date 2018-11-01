@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+#
 # Sample wrapper script to initialize AWS. This creates the cluster and configures Helm, the nginx ingress,
 # and creates git credential secrets. Edit this for your requirements.
 
@@ -19,9 +22,9 @@ ask() {
 if ! [ -x "$(command -v aws-iam-authenticator)" ]; then
   echo "ERROR: aws-iam-authenticator is not found in your PATH." >&2
   exit 1
-fi 
+fi
 
-echo -e "WARNING: The following components must be initialized before deployment:\n\t-IAM Service Role\n\t-VPC/Subnets\n\t-Control Plane Security Group\n These pre-requisites are outlined in the DevOps Documentation. Please ensure you have completed all before proceeding."
+echo -e "WARNING: The following components must be initialized before deployment:\n\t-Elastic File System (EFS)\n\t-IAM Service Role\n\t-VPC/Subnets\n\t-Control Plane Security Group\n These pre-requisites are outlined in the DevOps Documentation. Please ensure you have completed all before proceeding."
 
 echo ""
 echo "=> Have you copied the template file etc/eks-env.template to etc/eks-env.cfg and edited to cater to your enviroment?"

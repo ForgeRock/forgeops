@@ -4,7 +4,17 @@
 #
 # Script to create a policy to allow access to the specified s3 bucket
 
-BUCKET_ARN="arn:aws:s3:::forgeops"
+set -o errexit
+set -o pipefail
+set -o nounset
 
-POLICY_ARN=$(aws iam create-policy --policy-name ForgeOps-S3-Test --policy-document "{    \"Version\": \"2012-10-17\",    \"Statement\": [        {            \"Effect\": \"Allow\",            \"Action\": \"s3:*\",            \"Resource\": [                \"$BUCKET_ARN\",                \"$BUCKET_ARN/*\"            ]        }    ]}" --query Policy.Arn)
-echo "ARN for the policy: ${POLICY_ARN}"
+BUCKET_NAME="forgeops"
+IAM_POLICY_NAME="ForgeOps-Sync-Policy"
+
+S3_BUCKET=$(aws s3api create-bucket --bucket ${BUCKET_NAME})
+
+BUCKET_ARN="arn:aws:s3:::${BUCKET_NAME}"
+
+POLICY_ARN=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME} --policy-document file://../etc/s3-bucket-policy.json --query Policy.Arn)
+
+echo "IAM policy created with ARN: ${POLICY_ARN}. Please set this ARN value to the S3_POLICY_ARN attribute in your eks-env.cfg file."

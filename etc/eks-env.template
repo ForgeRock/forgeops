@@ -17,7 +17,7 @@ EKS_CLUSTER_VERSION="latest"
 EKS_ROLE_ARN="arn:aws:iam::1111111:role/eksServiceRole"
 
 # EKS VPC ID
-EKS_VPC_ID="vpc-74a1de0f"
+EKS_VPC_ID="vpc-11111"
 
 # Storage class zones
 STORAGE_CLASS_ZONES="us-east-1b,us-east-1c"
@@ -47,7 +47,7 @@ EKS_WORKER_NODE_INSTANCE_TYPE="m5.4xlarge"
 EC2_KEYPAIR_NAME="eks-east"
 
 # EKS AMI ID
-# Use one of the following AMIs based on your EKS VPC region
+# Use one of the following AMIs based on your EKS VPC region. Defaulting to us-east-1 zone
 # us-west-2 zone: ami-0a54c984b9f908c81
 # us-east-1 zone: ami-0440e4f6b9713faf6
 # eu-west-1 zone: ami-0c7a4976cb6fafd3a
