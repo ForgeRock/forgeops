@@ -25,5 +25,6 @@ certmanager:
   # And a local to namespace issuer
   issuerKind: Issuer
   # For lets encrypt use this:
+  #acme: true
   #issuer: letsencrypt-prod
   #issuerKind: ClusterIssuer
