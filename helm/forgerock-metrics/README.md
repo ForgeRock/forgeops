@@ -225,10 +225,10 @@ so its in a different location to the formatted dashboards($PROCESSED_DIR).  Ple
 **```NOTE:```** This script only needs to be ran once.
 
 ### Expose Prometheus and Grafana externally.
-To expose monitoring endpoints externally, add the following ingress section under Prometheus, Grafana and Alertmanager values sections in you override configuration as described in an earlier 'How To'. Here's an example for the Prometheus section:
+To expose monitoring endpoints externally, add the following ingress section under Prometheus, Grafana and Alertmanager values sections in you override configuration as described in an earlier 'How To'. Here's an example for the Grafana section:
 
 ```
-prometheus:
+grafana:
   ingress:
     enabled: true
 
