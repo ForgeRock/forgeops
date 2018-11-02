@@ -132,9 +132,9 @@ View Alertmanager:
 
 <br />
 
-# How Tos
+# How Tos.
 
-### Configure new endpoints to be scraped by Prometheus
+### Configure new endpoints to be scraped by Prometheus.
 
 If you want Prometheus to scrape metrics from a different product, you need to create a new ServiceMonitor in the  
 exporter-forgerock Helm chart.  Please follow these steps:
@@ -195,7 +195,7 @@ FR products).
 Documentation links are embedded in the values files for guidance.  
 Sample configuration files can be found in the samples/prometheus-values/ folder.  
 
-### Configure alerting rules
+### Configure alerting rules.
 To add new alerting rules, add additional rules to ```fr-alerts.yaml```. fr-alerts.yaml is split into groups with a  
 group for each product and a separate group for cluster rules.  
 
@@ -213,7 +213,7 @@ output text.  The output text also incorporates labels so the info can be dynami
 
 See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
 
-### Import Custom Grafana Dashboards
+### Import Custom Grafana Dashboards.
 Grafana comes with a set of predefined Grafana dashboards for viewing Kubernetes and cluster metrics.  Further custom  
 dashboards can be added to the deployment but required some specific formatting so they can be recognised by the Grafana  
 watcher and imported into Grafana.  
@@ -224,7 +224,32 @@ so its in a different location to the formatted dashboards($PROCESSED_DIR).  Ple
 
 **```NOTE:```** This script only needs to be ran once.
 
+### Expose Prometheus and Grafana externally.
+To expose monitoring endpoints externally, add the following ingress section under Prometheus, Grafana and Alertmanager values sections in you override configuration as described in an earlier 'How To'. Here's an example for the Prometheus section:
 
+```
+prometheus:
+  ingress:
+    enabled: true
+
+    annotations: 
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+
+    labels:
+      group: monitoring-ingress
+      product: grafana
+      
+    hosts:
+      - grafana.monitoring.example.com
+      
+    tls:
+      - secretName: wildcard.monitoring.example.com
+        hosts:
+          - grafana.monitoring.example.com
+```
+
+The labels are optional and the hostname and secret name align with the current deployment of forgeops with cert-manager.
 
 
 
