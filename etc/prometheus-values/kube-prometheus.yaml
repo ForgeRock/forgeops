@@ -1,3 +1,6 @@
+# tls domain if ingress enabled
+# domain: .forgeops.com
+
 # exporter-node configuration
 deployExporterNode: True
 
