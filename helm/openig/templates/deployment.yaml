@@ -89,9 +89,6 @@ spec:
           mountPath: /tmp/logs
       {{- end }}
       volumes:
-      - name: openig-secrets
-        secret:
-          secretName: openig-secrets
       - name: logs
         emptyDir: {}
       {{ if eq .Values.config.strategy  "git" }}
