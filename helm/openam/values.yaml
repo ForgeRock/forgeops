@@ -99,17 +99,6 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
 
-certmanager:
-  # The default issuer is to use the CA issuer.
-  issuer: ca-issuer
-  # For lets encrypt
-  # issuer: letsencrypt-prod
-  # Whether to use a namespaced issuer, or a cluster wide one
-  #issuerKind: ClusterIssuer
-  issuerKind: Issuer
-
-
-
 # Audit log details for log streaming sidecar containers
 
 # We default this to not include the sidecar. TODO - remove the sidecars once the commons audit stdout stream is merged.
