@@ -57,6 +57,11 @@ if read -t 10 -p "Installing Prometheus Operator and Grafana to '${NAMESPACE}' n
 # Add coreos repo to helm
 helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
 
+# Add frconfig chart to use cert-manager to provide TLS certificate for external access
+if [ $OVERRIDE_VALUES ]; then
+  helm upgrade -i ${NAMESPACE}-frconfig ../helm/frconfig/ $OVERRIDE_VALUES
+fi
+
 # Install/Upgrade prometheus-operator
 helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values ${MONPATH}/prometheus-operator.yaml --namespace=$NAMESPACE
 
