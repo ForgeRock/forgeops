@@ -12,9 +12,10 @@ cd $DJ
 
 SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
 
-# The amCts profile with "ttlAttribute" set to "coreTokenExpirationDate" is chosen below.  
+# The amCts profile with --set am-cts/tokenExpirationPolicy:ds uses the directory to reap tokens.
+# Other choices are am-cts/tokenExpirationPolicy:am and am-cts/tokenExpirationPolicy:am-sessions-only
 # Note this choice has some restrictions with respect to AM session notifications.
-# Please refer to the docuemntation for futher details.
+# Please refer to the documentation for futher details.
 
 ./setup directory-server \
     --rootUserDn "cn=Directory Manager" \
@@ -29,8 +30,7 @@ SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
     --httpsPort ${PORT_DIGIT}8443 \
     --profile am-cts:6.5.0 \
     --set am-cts/amCtsAdminPassword:password \
-    --set am-cts/useAmReaper:false \
-    --set am-cts/ttlAttribute:coreTokenExpirationDate \
+    --set am-cts/tokenExpirationPolicy:ds \
     --profile am-identity-store \
     --set am-identity-store/amIdentityStoreAdminPassword:password \
     --profile am-config \
