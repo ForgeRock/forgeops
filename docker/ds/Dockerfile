@@ -1,7 +1,7 @@
 
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0-M130.1"
+ARG VERSION="6.5.0-RC3"
 RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
@@ -12,7 +12,6 @@ COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 WORKDIR /var/tmp/bootstrap
 
 COPY bootstrap/ /var/tmp/bootstrap/
-COPY schema /var/tmp/schema
 
 # The default BASE_DN of the directory tree.
 ENV BASE_DN ou=identities
