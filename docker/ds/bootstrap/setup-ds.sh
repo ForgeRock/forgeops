@@ -35,6 +35,7 @@ SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
     --set am-identity-store/amIdentityStoreAdminPassword:password \
     --profile am-config \
     --set am-config/amConfigAdminPassword:password \
+    --profile idm-repo:6.5.0 \
     --certNickname ${SSL_CERT_ALIAS} \
     --usePkcs12KeyStore ${SSL_KEYSTORE} \
     --keyStorePasswordFile ${KEYSTORE_PIN} \
