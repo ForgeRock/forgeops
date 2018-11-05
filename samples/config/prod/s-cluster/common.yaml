@@ -1,13 +1,10 @@
-domain: .frk8s.net
-
-fqdn: openam.small.frk8s.net
-
-
 # Note if you enable TLS then you have to either provide the certificate 
 # by running generate-tls.sh script or you have to have cert-manager deployed
 # for your DNS domain 
 
-tlsStrategy: https-cert-manager
+domain: .frk8s.net
+
+fqdn: openam.small.frk8s.net
 
 # Install passwords.
 amadminPassword: password

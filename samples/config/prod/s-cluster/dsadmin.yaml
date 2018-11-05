@@ -9,11 +9,11 @@ gcs:
   bucket: gs://forgeops/dj-backup/s-cluster
 
 s3:
-  enabled: true
+  enabled: false
   bucket: s3://forgeops/dj-backup/s-cluster  
 
 nfs:
-  server: 10.191.193.66
+  server: 10.201.33.74
   path: /export
 
 backup:

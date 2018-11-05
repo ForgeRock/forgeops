@@ -11,14 +11,12 @@ cts:
 
 resources:
   limits:
+    cpu: 3000m
     memory: 5Gi
   requests:
+    cpu: 2000m
     memory: 3Gi
 
-# Uncomment the next 3 line if you don't want to use cgroups which is the default JVM setting
-#opendjJavaArgs: >
-#  -server -Xms4g -Xmx4g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
-#  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 # For JDK 8
 opendjJavaArgs: >
@@ -42,11 +40,11 @@ topologyKey: "failure-domain.beta.kubernetes.io/zone"
 podAntiAffinity: hard
 
 backup:
-  enabled: true
+  enabled: false
   storageClass: nfs
   storageSize: 100Gi
   pvcClaimName: ds-backup
-
+  
 # If existing database is found then restore is always skipped
 restore:
-  enabled: false
+  enabled: true

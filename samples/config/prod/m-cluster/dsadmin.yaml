@@ -9,7 +9,7 @@ gcs:
   bucket: gs://forgeops/dj-backup/m-cluster
 
 nfs:
-  server: 10.191.193.66
+  server: 10.201.33.74
   path: /export
 
 backup:
