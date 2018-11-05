@@ -29,6 +29,14 @@ ds-cfg-enabled: &{ds.enable.userstore|true}
 replace: ds-cfg-replication-server
 ds-cfg-replication-server: &{rs.servers}
 
+dn: cn=ou=am-config,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
+changetype: modify
+replace: ds-cfg-enabled
+ds-cfg-enabled: &{ds.enable.configstore|true}
+-
+replace: ds-cfg-replication-server
+ds-cfg-replication-server: &{rs.servers}
+
 dn: cn=cn=admin data,cn=domains,cn=Multimaster Synchronization,cn=Synchronization Providers,cn=config
 changetype: modify
 replace: ds-cfg-replication-server
