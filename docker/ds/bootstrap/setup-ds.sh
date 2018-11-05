@@ -12,21 +12,9 @@ cd $DJ
 
 SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
 
-
-EXTRA_OPTS=""
-
-# Note the REAPER_TYPE variable is set by ENV in the Dockerfile
-if [ "${REAPER_TYPE}" = "TTL" ]
-then
-   EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenExpirationDate"
-fi
-
-if [ "${REAPER_TYPE}" = "HYBRID" ]
-then
-   EXTRA_OPTS="--set am-cts/useAmReaper:false --set am-cts/ttlAttribute:coreTokenTtlDate"
-fi
- 
-echo "EXTRA_OPTS=${EXTRA_OPTS}"
+# The amCts profile with "ttlAttribute" set to "coreTokenExpirationDate" is chosen below.  
+# Note this choice has some restrictions with respect to AM session notifications.
+# Please refer to the docuemntation for futher details.
 
 ./setup directory-server \
     --rootUserDn "cn=Directory Manager" \
@@ -41,6 +29,8 @@ echo "EXTRA_OPTS=${EXTRA_OPTS}"
     --httpsPort ${PORT_DIGIT}8443 \
     --profile am-cts:6.5.0 \
     --set am-cts/amCtsAdminPassword:password \
+    --set am-cts/useAmReaper:false \
+    --set am-cts/ttlAttribute:coreTokenExpirationDate \
     --profile am-identity-store \
     --set am-identity-store/amIdentityStoreAdminPassword:password \
     --profile am-config \
@@ -49,7 +39,7 @@ echo "EXTRA_OPTS=${EXTRA_OPTS}"
     --usePkcs12KeyStore ${SSL_KEYSTORE} \
     --keyStorePasswordFile ${KEYSTORE_PIN} \
     --acceptLicense \
-    --doNotStart ${EXTRA_OPTS}
+    --doNotStart
 
 
 # If the server is not the first, we can skip the rest of the setup, as only the first server is templated out.
