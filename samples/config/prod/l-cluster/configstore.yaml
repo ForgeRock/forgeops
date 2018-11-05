@@ -1,0 +1,22 @@
+image:
+  #repository: forgerock-docker-public.bintray.io/ds
+  repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0-M129.2
+  pullPolicy: IfNotPresent
+  
+instance: configstore
+
+cts:
+  enabled: false
+
+resources:
+  limits:
+    memory: 2Gi
+  requests:
+    memory: 1Gi
+
+replicas: 2
+
+topologyKey: "failure-domain.beta.kubernetes.io/zone"
+
+podAntiAffinity: hard

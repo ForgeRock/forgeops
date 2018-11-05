@@ -1,0 +1,21 @@
+image:
+  #repository: forgerock-docker-public.bintray.io/ds
+  repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0-M129.2
+  pullPolicy: IfNotPresent
+  
+gcs:
+  enabled: true
+  bucket: gs://forgeops/dj-backup/m-cluster
+
+nfs:
+  server: 10.238.128.26
+  path: /export
+
+backup:
+  pvcName: ds-backup
+  storageSize: 100Gi
+
+createPVC: true
+
+slackUrl: undefined
