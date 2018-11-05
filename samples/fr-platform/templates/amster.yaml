@@ -15,7 +15,7 @@ spec:
       name: amster
       env:
       - name: OPENAM_INSTANCE
-        value: "http://am-service.sample.svc.cluster.local/openam"
+        value: "http://login.sample.svc.cluster.local"
       resources:
           requests:
             memory: "64Mi"

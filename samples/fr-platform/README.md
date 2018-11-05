@@ -69,7 +69,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
     grep -v rs-service.sample.svc.cluster.local /etc/hosts \
     | sudo tee /etc/hosts && \
     echo "$(minikube ip) \
-        am-service.sample.svc.cluster.local \
+        login.sample.svc.cluster.local \
         rs-service.sample.svc.cluster.local" \
     | sudo tee -a /etc/hosts
     ```
@@ -80,7 +80,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
     | sudo tee /etc/hosts && \
     echo "$( kubectl get ing -o \
         jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}' ) \
-        am-service.sample.svc.cluster.local \
+        login.sample.svc.cluster.local \
         rs-service.sample.svc.cluster.local" \
     | sudo tee -a /etc/hosts
     ```
@@ -104,7 +104,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
 7. You can access the platform by opening this URL:
 
     ```
-    http://am-service.sample.svc.cluster.local/console
+    http://login.sample.svc.cluster.local/console
     ```
 
     You can use amadmin / password to login as the am admin.
@@ -149,14 +149,14 @@ You now have a file names something like fr-platform-6.5.0-SNAPSHOT.tgz that you
 
 To make the internal DS cluster accessible locally:
 
-    kubectl port-forward ds-0 2389:1389 &
+    kubectl port-forward configstore-0 2389:1389 &
 
 ## Saving configuration changes
 
 To export changes made to AM:
 
     kubectl exec -it amster /opt/amster/amster
-      connect http://am-service.sample.svc.cluster.local/openam -k /var/run/secrets/amster/id_rsa
+      connect http://login.sample.svc.cluster.local/openam -k /var/run/secrets/amster/id_rsa
       export-config --path /tmp/export
       :quit
 

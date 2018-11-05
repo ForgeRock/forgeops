@@ -1,21 +1,14 @@
-social:
-  facebook:
-    id: "FakeID"
-    secret: "FakeSecret"
-
 openam:
   config:
     strategy: files
-  component: am-service
+  component: login
   service:
-    name: am-service
+    name: login
   domain: .svc.cluster.local
-  openamInstance: http://am-service:80/openam
+  openamInstance: http://login:80
 
 configstore:
-  baseDN: "o=userstore"
-  image:
-    tag: 6.5.0-idm
+  baseDN: "ou=identities"
   instance: configstore
   persistence: false
   opendjJavaArgs: "-Xmx400m"

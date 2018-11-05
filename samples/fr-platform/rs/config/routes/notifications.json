@@ -1,7 +1,7 @@
 {
     "name": "notifications",
     "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
-    "condition": "${matches(request.uri.path, '^/openidm/endpoint/usernotifications')}",
+    "condition": "${matches(request.uri.path, '^/openidm/notification')}",
     "handler": {
         "type": "Chain",
         "config": {
