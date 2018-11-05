@@ -4,6 +4,8 @@
 
 echo "Rebuilding indexes"
 
+BASE_DN="ou=identities"
+
 bin/rebuild-index \
  --port 4444 \
  --hostname localhost \

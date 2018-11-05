@@ -32,8 +32,9 @@ if [ -n "$CONFIG_REPLICATION" ]; then
         -I admin -w password -X \
         --bindDn1 "cn=directory manager" --bindPassword1 password \
         --bindDn2 "cn=directory manager" --bindPassword2 password \
-        --baseDn $BASE_DN \
+        --baseDn ou=identities \
         --baseDn ou=tokens \
+        --baseDn ou=am-config \
         --host1 dsrs1.example.com --port1 1444 --replicationPort1 1989 \
         --host2 dsrs2.example.com --port2 2444 --replicationPort2 2989 \
         --no-prompt
@@ -41,8 +42,9 @@ if [ -n "$CONFIG_REPLICATION" ]; then
     echo "##### Initializing replication between DSRS 1 and DSRS 2..."
     ./run/dsrs1/bin/dsreplication initialize-all \
         -I admin -w password -X \
-        --baseDn $BASE_DN \
+        --baseDn ou=identities \
         --baseDn ou=tokens \
+        --baseDn ou=am-config \
         --hostname dsrs1.example.com --port 1444 \
         --no-prompt
 

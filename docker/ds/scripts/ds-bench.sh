@@ -5,7 +5,7 @@ DJ_HOME="${DJ_HOME:-/opt/opendj}"
 DUR="${2:-60}"
 HOST="${3:-ds-0.ds}"
 USERS="${4:-1000000}"
-BASE_DN="${BASE_DN:-dc=data}"
+BASE_DN="${BASE_DN:-ou=identities}"
 PW_FILE="${DIR_MANAGER_PW_FILE:-/var/tmp/.passwd}"
 
 if [ ! -r ${PW_FILE} ] 

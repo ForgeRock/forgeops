@@ -13,9 +13,6 @@ WORKDIR /var/tmp/bootstrap
 
 COPY bootstrap/ /var/tmp/bootstrap/
 
-# The default BASE_DN of the directory tree.
-ENV BASE_DN ou=identities
-
 # This speeds up docker cloudbuild considerably
 ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
 
