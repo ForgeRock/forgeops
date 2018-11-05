@@ -19,8 +19,6 @@ ENV BASE_DN ou=identities
 
 # This speeds up docker cloudbuild considerably
 ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
-# REAPER can be "TTL", "HYBRID". If REAPER is "" or missing then AM reaping profile will be used.
-ENV REAPER_TYPE=""
 
 RUN ./setup.sh
 
