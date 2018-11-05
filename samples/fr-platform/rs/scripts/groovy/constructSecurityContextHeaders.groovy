@@ -6,7 +6,7 @@ request.getHeaders().add('X-Requested-With', 'IG')
 String adminContext = (new groovy.json.JsonBuilder([
     "id" : "amAdmin",
     "component" : "endpoint/static/user",
-    "roles" : ["openidm-admin", "openidm-authorized"],
+    "roles" : ["internal/role/openidm-admin", "internal/role/openidm-authorized"],
     "moduleId" : "STATIC_USER"
 ])).toString()
 

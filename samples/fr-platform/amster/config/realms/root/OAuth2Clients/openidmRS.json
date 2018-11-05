@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "6.5.0-M9",
+    "amsterVersion" : "6.5.0-M11",
     "entityType" : "OAuth2Clients",
     "entityId" : "openidmRS",
     "pathParams" : { }
@@ -24,7 +24,7 @@
       "jwkStoreCacheMissCacheTime" : 60000,
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
-      "jwksUri" : "http://am-service.sample.svc.cluster.local:80/oauth2/connect/jwk_uri",
+      "jwksUri" : "http://login.sample.svc.cluster.local:80/oauth2/connect/jwk_uri",
       "userinfoEncryptedResponseAlg" : null,
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null

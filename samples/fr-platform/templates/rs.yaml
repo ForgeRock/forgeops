@@ -15,7 +15,7 @@ spec:
           memory: "128Mi"
     env:
     - name: WELL_KNOWN_ENDPOINT
-      value: "http://am-service.sample.svc.cluster.local/openam/oauth2/.well-known/openid-configuration"
+      value: "http://login.sample.svc.cluster.local/oauth2/.well-known/openid-configuration"
     command:
     - /wellKnownCheck.sh
   containers:
@@ -31,7 +31,7 @@ spec:
             memory: "128Mi"
       env:
       - name: OPENAM_INSTANCE
-        value: "http://am-service.sample.svc.cluster.local/openam"
+        value: "http://login.sample.svc.cluster.local"
 ---
 kind: Service
 apiVersion: v1
@@ -51,6 +51,17 @@ kind: Ingress
 metadata:
   name: ingress
   namespace: sample
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with,cache-control,content-type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
+    nginx.ingress.kubernetes.io/cors-max-age: "600"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "Access-Control-Expose-Headers: WWW-Authenticate";
+
 spec:
   rules:
   - host: rs-service.sample.svc.cluster.local
