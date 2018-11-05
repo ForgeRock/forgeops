@@ -6,8 +6,10 @@ image:
   
 resources:
   limits:
+    cpu: 2000m
     memory: 3Gi
   requests:
+    cpu: 2000m
     memory: 2Gi
 
 # For JDK 8
