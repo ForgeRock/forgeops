@@ -1,0 +1,4 @@
+git:
+  repo: https://github.com/ForgeRock/forgeops-init.git
+  #repo: https://github.com/wajihahmed/forgeops-init.git
+  branch: master
