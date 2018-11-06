@@ -24,18 +24,19 @@ is_configured() {
     return $status
 }
 
-
+# Note - because AM is installed at the context root (ROOT/) it impacts
+# the location of bootstrap and keystore files (the context is used in forming the path)
+# If you ever change the am context (not recommended), you need to copy these files to OPENAM_HOME/$context
 copy_secrets() {
     echo "Copying secrets"
     mkdir -p "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}"
+    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}"
+    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}"
+    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}"
     cp  -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
-    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}"
 }
-
 
 bootstrap() {
     if is_configured;
