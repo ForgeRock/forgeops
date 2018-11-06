@@ -9,9 +9,10 @@ prototype image that is then copied to the second stage to create the final dock
 Stage 1 scripts are in the bootstrap/ folder. This folder is not copied into the final docker image. At a high level stage 1
 does the following:
 
+* The new DS profiles feature is used to create backends based on the profile templates.
+* Several backends are configured (ou=tokens, ou=identities, ou=am-config, dc=openidm,dc=example,dc=com) making the instance suitable multiple
+purposes. Backends can be disabled at runtime if they are not required.
 * Creates two ds instances that are replicated to each other. The instances have hard coded hostnames (ds1.example.com).
-* Two backends are configured (ou=tokens, dc=data) making the instance suitable for a CTS and a userstore
-* Required schema is loaded into each backend. See bootstrap/ldif/*
 * Both instances are shut down
 * The second instance is deleted
 * The first instance configuration is modified to use commons confiugration expressions to replace the hard 

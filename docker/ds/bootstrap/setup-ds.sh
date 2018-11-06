@@ -84,7 +84,7 @@ echo "Enabling the /api endpoint"
     --no-prompt
 
 
-# load API schema with correct DN's (ie dc=data)
+# load API schema with correct DN's (ie ou=identities)
 echo "Installing rest2ldap endpoint map"
 cp ../../example-v1.json ./config/rest2ldap/endpoints/api
 
