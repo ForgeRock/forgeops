@@ -14,10 +14,10 @@ data:
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {
-         "keyStorePasswordFile" : "/home/forgerock/openam/openam/.storepass",
-         "keyPasswordFile" : "/home/forgerock/openam/openam/.keypass",
+         "keyStorePasswordFile" : "/home/forgerock/openam/.storepass",
+         "keyPasswordFile" : "/home/forgerock/openam/.keypass",
          "keyStoreType" : "JCEKS",
-         "keyStoreFile" : "/home/forgerock/openam/openam/keystore.jceks"
+         "keyStoreFile" : "/home/forgerock/openam/keystore.jceks"
        }
      },
      "configStoreList" : [ {
