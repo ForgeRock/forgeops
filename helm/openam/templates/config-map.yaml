@@ -10,14 +10,14 @@ metadata:
 data:
   boot.json: |
    {
-     "instance" : "{{ default "http://openam:80/" .Values.openamInstance }}",
+     "instance" : "{{ default "http://openam:80" .Values.openamInstance }}",
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {
-         "keyStorePasswordFile" : "{{ .Values.openamHome }}/openam/.storepass",
-         "keyPasswordFile" : "{{ .Values.openamHome }}/openam/.keypass",
+         "keyStorePasswordFile" : "/home/forgerock/openam/openam/.storepass",
+         "keyPasswordFile" : "/home/forgerock/openam/openam/.keypass",
          "keyStoreType" : "JCEKS",
-         "keyStoreFile" : "{{ .Values.openamHome }}/openam/keystore.jceks"
+         "keyStoreFile" : "/home/forgerock/openam/openam/keystore.jceks"
        }
      },
      "configStoreList" : [ {
@@ -28,6 +28,7 @@ data:
        "ldapProtocol" : "ldap"
      } ]
    }
+
 ---
 apiVersion: v1
 kind: ConfigMap
