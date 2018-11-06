@@ -19,7 +19,6 @@ mkdir -p $SECRETS
 
 echo "password" >$KEYSTORE_PIN
 
-
 create_keystores()
 {
     # if [ -d $SECRETS ]; then 

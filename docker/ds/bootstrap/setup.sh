@@ -59,10 +59,10 @@ if [ -n "$CONFIG_REPLICATION" ]; then
       --no-prompt)
 fi
 
+# Occasiionally we see build issues with timing. Wait a bit before shutdown.
+sleep 5
 
 ./stop-all.sh
-
-
 
 convert_to_template()
 {

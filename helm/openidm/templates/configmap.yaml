@@ -38,7 +38,7 @@ data:
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
       userstore.port={{default "1389" .Values.userstore.port}}
-      userstore.basecontext={{default "dc=data" .Values.userstore.basecontext}}
+      userstore.basecontext={{default "ou=identities" .Values.userstore.basecontext}}
 
       # Ports openidm should listen on locally
       openidm.port.http=8080
