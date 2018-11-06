@@ -18,7 +18,7 @@ config:
 
 openamReplicaCount: 1
 
-openamInstance: http://openam:80/openam
+openamInstance: http://openam:80
 
 configLdapPort:  1389
 configLdapHost: configstore-0.configstore
@@ -61,9 +61,6 @@ resources:
    memory: 1300Mi
  requests:
    memory: 1200Mi
-
-
-openamHome: /home/forgerock/openam
 
 # Set to true to create a boot.json file to bootstrap AM. If set to false, AM will come up to the configurator page.
 createBootstrap: true
