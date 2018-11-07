@@ -1,6 +1,6 @@
 # Copyright (c) 2016-2018 ForgeRock AS. All rights reserved.
 apiVersion: apps/v1beta1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ template "fullname" . }}
   labels:
@@ -11,6 +11,7 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  serviceName: idm
   template:
     metadata:
       labels:
