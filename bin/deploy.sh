@@ -106,7 +106,7 @@ chk_config()
     fi
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
-    AM_URL="${URL_PREFIX:-openam}.${NAMESPACE}.${DOMAIN}"
+    AM_URL="${URL_PREFIX:-login}.${NAMESPACE}.${DOMAIN}"
     IDM_URL="${IDM_URL_PREFIX:-openidm}.${NAMESPACE}.${DOMAIN}"
 }
 
