@@ -2,7 +2,7 @@ DROP SCHEMA IF EXISTS openidm CASCADE;
 CREATE SCHEMA openidm AUTHORIZATION openidm;
 
 -- -----------------------------------------------------
--- Table openidm.objecttpyes
+-- Table openidm.objecttypes
 -- -----------------------------------------------------
 
 CREATE TABLE openidm.objecttypes (
@@ -32,22 +32,6 @@ CREATE INDEX idx_genericobjects_reconid on openidm.genericobjects (json_extract_
 
 
 -- -----------------------------------------------------
--- Table openidm.genericobjectproperties
--- -----------------------------------------------------
-
-CREATE TABLE openidm.genericobjectproperties (
-  genericobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(32) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (genericobjects_id, propkey),
-  CONSTRAINT fk_genericobjectproperties_genericobjects FOREIGN KEY (genericobjects_id) REFERENCES openidm.genericobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-CREATE INDEX fk_genericobjectproperties_genericobjects ON openidm.genericobjectproperties (genericobjects_id);
-CREATE INDEX idx_genericobjectproperties_prop ON openidm.genericobjectproperties (propkey,propvalue);
-
-
--- -----------------------------------------------------
 -- Table openidm.managedobjects
 -- -----------------------------------------------------
 
@@ -70,24 +54,6 @@ CREATE INDEX idx_json_managedobjects_roleTemporalConstraints ON openidm.managedo
 
 
 -- -----------------------------------------------------
--- Table openidm.managedobjectproperties
--- -----------------------------------------------------
-
-CREATE TABLE openidm.managedobjectproperties (
-  managedobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(32) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (managedobjects_id, propkey),
-  CONSTRAINT fk_managedobjectproperties_managedobjects FOREIGN KEY (managedobjects_id) REFERENCES openidm.managedobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE INDEX fk_managedobjectproperties_managedobjects ON openidm.managedobjectproperties (managedobjects_id);
-CREATE INDEX idx_managedobjectproperties_prop ON openidm.managedobjectproperties (propkey,propvalue);
-
-
-
--- -----------------------------------------------------
 -- Table openidm.configobjects
 -- -----------------------------------------------------
 
@@ -103,24 +69,6 @@ CREATE TABLE openidm.configobjects (
 
 CREATE UNIQUE INDEX idx_configobjects_object ON openidm.configobjects (objecttypes_id,objectid);
 CREATE INDEX fk_configobjects_objecttypes ON openidm.configobjects (objecttypes_id);
-
-
--- -----------------------------------------------------
--- Table openidm.configobjectproperties
--- -----------------------------------------------------
-
-CREATE TABLE openidm.configobjectproperties (
-  configobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(255) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (configobjects_id, propkey),
-  CONSTRAINT fk_configobjectproperties_configobjects FOREIGN KEY (configobjects_id) REFERENCES openidm.configobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE INDEX fk_configobjectproperties_configobjects ON openidm.configobjectproperties (configobjects_id);
-CREATE INDEX idx_configobjectproperties_prop ON openidm.configobjectproperties (propkey,propvalue);
-
 
 -- -----------------------------------------------------
 -- Table openidm.notificationobjects
@@ -138,23 +86,6 @@ CREATE TABLE openidm.notificationobjects (
 
 CREATE UNIQUE INDEX idx_notificationobjects_object ON openidm.notificationobjects (objecttypes_id,objectid);
 CREATE INDEX fk_notificationobjects_objecttypes ON openidm.notificationobjects (objecttypes_id);
-
-
--- -----------------------------------------------------
--- Table openidm.notificationobjectproperties
--- -----------------------------------------------------
-
-CREATE TABLE openidm.notificationobjectproperties (
-  notificationobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(255) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (notificationobjects_id, propkey),
-  CONSTRAINT fk_notificationobjectproperties_notificationobjects FOREIGN KEY (notificationobjects_id) REFERENCES openidm.notificationobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE INDEX fk_notificationobjectproperties_notificationobjects ON openidm.notificationobjectproperties (notificationobjects_id);
-CREATE INDEX idx_notificationobjectproperties_prop ON openidm.notificationobjectproperties (propkey,propvalue);
 
 
 -- -----------------------------------------------------
@@ -181,22 +112,6 @@ CREATE TABLE openidm.relationships (
 CREATE INDEX idx_json_relationships ON openidm.relationships ( json_extract_path_text(fullobject, 'firstResourceCollection'), json_extract_path_text(fullobject, 'firstResourceId'), json_extract_path_text(fullobject, 'firstPropertyName'), json_extract_path_text(fullobject, 'secondResourceCollection'), json_extract_path_text(fullobject, 'secondResourceId'), json_extract_path_text(fullobject, 'secondPropertyName') );
 CREATE INDEX idx_json_relationships_first_object ON openidm.relationships ( firstresourcecollection, firstresourceid, firstpropertyname );
 CREATE INDEX idx_json_relationships_second_object ON openidm.relationships ( secondresourcecollection, secondresourceid, secondpropertyname );
-
--- -----------------------------------------------------
--- Table openidm.relationshipproperties (not used in postgres)
--- -----------------------------------------------------
-
-CREATE TABLE openidm.relationshipproperties (
-  relationships_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(32) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (relationships_id, propkey),
-  CONSTRAINT fk_relationshipproperties_relationships FOREIGN KEY (relationships_id) REFERENCES openidm.relationships (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-CREATE INDEX fk_relationshipproperties_relationships ON openidm.relationshipproperties (relationships_id);
-CREATE INDEX idx_relationshipproperties_prop ON openidm.relationshipproperties (propkey,propvalue);
-
 
 -- -----------------------------------------------------
 -- Table openidm.links
@@ -279,29 +194,13 @@ CREATE INDEX fk_schedulerobjects_objectypes ON openidm.schedulerobjects (objectt
 
 
 -- -----------------------------------------------------
--- Table openidm.schedulerobjectproperties
--- -----------------------------------------------------
-CREATE TABLE openidm.schedulerobjectproperties (
-  schedulerobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(32) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (schedulerobjects_id, propkey),
-  CONSTRAINT fk_schedulerobjectproperties_schedulerobjects FOREIGN KEY (schedulerobjects_id) REFERENCES openidm.schedulerobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE INDEX fk_schedulerobjectproperties_schedulerobjects ON openidm.schedulerobjectproperties (schedulerobjects_id);
-CREATE INDEX idx_schedulerobjectproperties_prop ON openidm.schedulerobjectproperties (propkey,propvalue);
-
-
--- -----------------------------------------------------
 -- Table openidm.uinotification
 -- -----------------------------------------------------
 CREATE TABLE openidm.uinotification (
   objectid VARCHAR(38) NOT NULL,
   rev VARCHAR(38) NOT NULL,
   notificationType VARCHAR(255) NOT NULL,
-  createDate VARCHAR(255) NOT NULL,
+  createDate VARCHAR(38) NOT NULL,
   message TEXT NOT NULL,
   requester VARCHAR(255) NULL,
   receiverId VARCHAR(255) NOT NULL,
@@ -331,21 +230,6 @@ CREATE INDEX fk_clusterobjects_objectypes ON openidm.clusterobjects (objecttypes
 CREATE INDEX idx_json_clusterobjects_timestamp ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'timestamp') );
 CREATE INDEX idx_json_clusterobjects_state ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'state') );
 CREATE INDEX idx_json_clusterobjects_event_instanceid ON openidm.clusterobjects ( json_extract_path_text(fullobject, 'type'), json_extract_path_text(fullobject, 'instanceId') );
-
--- -----------------------------------------------------
--- Table openidm.clusterobjectproperties
--- -----------------------------------------------------
-CREATE TABLE openidm.clusterobjectproperties (
-  clusterobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(32) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (clusterobjects_id, propkey),
-  CONSTRAINT fk_clusterobjectproperties_clusterobjects FOREIGN KEY (clusterobjects_id) REFERENCES openidm.clusterobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-
-CREATE INDEX fk_clusterobjectproperties_clusterobjects ON openidm.clusterobjectproperties (clusterobjects_id);
-CREATE INDEX idx_clusterobjectproperties_prop ON openidm.clusterobjectproperties (propkey,propvalue);
 
 -- -----------------------------------------------------
 -- Table openidm.clusteredrecontargetids
@@ -379,21 +263,6 @@ CREATE TABLE openidm.updateobjects (
 
 
 -- -----------------------------------------------------
--- Table openidm.updateobjectproperties
--- -----------------------------------------------------
-
-CREATE TABLE openidm.updateobjectproperties (
-  updateobjects_id BIGINT NOT NULL,
-  propkey VARCHAR(255) NOT NULL,
-  proptype VARCHAR(32) DEFAULT NULL,
-  propvalue TEXT,
-  PRIMARY KEY (updateobjects_id, propkey),
-  CONSTRAINT fk_updateobjectproperties_updateobjects FOREIGN KEY (updateobjects_id) REFERENCES openidm.updateobjects (id) ON DELETE CASCADE ON UPDATE NO ACTION
-);
-CREATE INDEX fk_updateobjectproperties_updateobjects ON openidm.updateobjectproperties (updateobjects_id);
-CREATE INDEX idx_updateobjectproperties_prop ON openidm.updateobjectproperties (propkey,propvalue);
-
--- -----------------------------------------------------
 -- Table openidm.syncqueue
 -- -----------------------------------------------------
 CREATE TABLE openidm.syncqueue (
@@ -410,12 +279,11 @@ CREATE TABLE openidm.syncqueue (
   state VARCHAR(38) NOT NULL,
   nodeId VARCHAR(255) DEFAULT NULL,
   remainingRetries VARCHAR(38) NOT NULL,
-  createDate VARCHAR(255) NOT NULL,
+  createDate VARCHAR(38) NOT NULL,
   PRIMARY KEY (objectid)
 );
 CREATE INDEX indx_syncqueue_mapping_state_createdate ON openidm.syncqueue (mapping, state, createDate);
 CREATE INDEX indx_syncqueue_mapping_retries ON openidm.syncqueue (mapping, remainingRetries);
-CREATE INDEX indx_syncqueue_mapping_resourceid ON openidm.syncqueue (mapping, resourceId);
 
 
 -- -----------------------------------------------------

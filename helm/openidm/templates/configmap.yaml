@@ -147,6 +147,10 @@ data:
 
       # This needs to be true to boot from json files.
       openidm.fileinstall.enabled=true
+
+      # Filtered headers in audit.json that may be customized
+      com.iplanet.am.cookie.name=iPlanetDirectoryPro
+      com.sun.identity.auth.cookieName=AMAuthCookie
 ---
 apiVersion: v1
 kind: ConfigMap
