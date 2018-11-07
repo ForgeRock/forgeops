@@ -18,7 +18,7 @@ metadata:
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: io1
-  iopsPerGB: "15000"
+  iopsPerGB: "5000"
   fstype: ext4
 ---
 kind: StorageClass
