@@ -1,8 +1,7 @@
 image:
-  repository: gcr.io/engineering-devops/openam
-  #tag: 6.1.0
-  #repository: forgerock-docker-public.bintray.io/openam
-  tag: 6.5.0-M9
+  #repository: gcr.io/engineering-devops/openam
+  repository: forgerock-docker-public.bintray.io/forgerock/openam
+  tag: 6.5.0-M11
   pullPolicy: Always
   
 resources:

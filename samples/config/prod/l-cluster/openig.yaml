@@ -1,4 +1,8 @@
-replicaCount: 2
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/openig
+  tag: 6.5.0-M134
+  pullPolicy: IfNotPresent
+
 
 config:
   name: frconfig
@@ -12,11 +16,6 @@ catalinaOpts:  >
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
 
-image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openig
-  tag: 6.5.0-M134
-  pullPolicy: IfNotPresent
-
 resources:
   limits:
     cpu: 3000m
@@ -25,7 +24,5 @@ resources:
     cpu: 2000m
     memory: 2Gi
 	
-    
-    
-
+replicaCount: 2
 

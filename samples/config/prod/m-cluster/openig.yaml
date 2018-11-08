@@ -1,21 +1,18 @@
-replicaCount: 2
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/openig
+  tag: 6.5.0-M134
+  pullPolicy: IfNotPresent
 
 config:
   name: frconfig
   path: /git/config/6.5/default/ig/basic-sample 
   strategy: git
 
-
 # Tomcat JVM options.
 catalinaOpts:  >
   -server -Xms2g -Xmx2g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
-
-image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openig
-  tag: 6.5.0-M134
-  pullPolicy: IfNotPresent
 
 resources:
   limits:
@@ -25,7 +22,4 @@ resources:
     cpu: 1000m
     memory: 2Gi
 	
-    
-    
-
-
+replicaCount: 2

@@ -1,7 +1,7 @@
 image:
   #repository: forgerock-docker-public.bintray.io/ds
   repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0-M129.2
+  tag: 6.5.0-RC4
   pullPolicy: IfNotPresent
   
 gcs:
@@ -9,7 +9,7 @@ gcs:
   bucket: gs://forgeops/dj-backup/m-cluster
 
 nfs:
-  server: 10.238.128.26
+  server: 10.201.33.74
   path: /export
 
 backup:
