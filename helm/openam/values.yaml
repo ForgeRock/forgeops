@@ -96,9 +96,8 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
 
-# Audit log details for log streaming sidecar containers
-
-# We default this to not include the sidecar. TODO - remove the sidecars once the commons audit stdout stream is merged.
+# Audit log details for log streaming sidecar containers.
+# AM can now stream audit logs to stdout. This option may be removed in the future.
 auditLogs: []
 
 # auditLogs:

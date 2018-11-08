@@ -1,8 +1,10 @@
 # Dockerfile to download artifacts from the ForgeRock maven repository
 # Build this with:
 # docker build --build-arg API_KEY=$API_KEY -t forgerock/downloader downloader
-# See the download script.
+# See the download script and ../README.md
 #FROM alpine:latest
+
+# Inherit from the gcloud container so we can use gcs as a cache.
 FROM gcr.io/cloud-builders/gcloud:latest
 
 ARG API_KEY

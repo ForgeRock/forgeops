@@ -2,14 +2,9 @@
 # A sample shell script to manually submit a build to cloud builder. You need to be authenicated
 # to the engineering-devops project.
 #
-# With one argument, it takes a csv file in $1 that contains the images to build. See the README.md for the format, or look in the
-# csv/ folder for examples.
-# With called with two arugments, this will create the csv file and submit it for building
-#.
-# For example, to build AM from version 6.5.0-M3, and tag it with that version in addition to the extra tags "foo", run this:
+# For example, to build AM from version 6.5.0-M3, and tag it with "foo", run this:
 # ./submit.sh openam 6.5.0-M3,foo
 #
-# Note that images always get tagged with artifact version.  "./submit.sh openam 6.5.0-M6" will build and tag openam:6.5.0-M6   
 
 
 mkdir -p tmp
