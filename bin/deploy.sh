@@ -168,7 +168,7 @@ deploy_charts()
 isalive_check()
 {
     PROTO="https"
-    ALIVE_JSP="${PROTO}://${AM_URL}//isAlive.jsp"
+    ALIVE_JSP="${PROTO}://${AM_URL}/isAlive.jsp"
     echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
