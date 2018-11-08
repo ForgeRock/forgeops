@@ -9,8 +9,8 @@
 # and replace the secrets in ./secrets with your own.
 useDefaultSecrets: true
 
-# The default DS baseDN.  Note the ds image creates several backends that are hard coded - so this
-# setting does not change the backend.
+# The default DS baseDN for the user store.  Note the ds image creates several backends that are hard coded and this
+# setting will have no  impact on those backends. This setting will be removed in the future.
 baseDN: "ou=identities"
 
 # The default instance name. This will create a stateful set that can be resolved at
@@ -42,12 +42,9 @@ storageSize: "10Gi"
 # Set storageClass only on clusters that support it (GCP / AWS).
 #storageClass: fast
 
-# StorageClass is optional. It can be the name of a fast (SSD) class.
-#storageClass: fast
-
 
 backup:
-  # This is an optional paramter that will mount the named PVC volume (most likely an NFS share)
+  # This is an optional parameter that will mount the named PVC volume (most likely an NFS share)
   # on the bak/ directory. If this is not specified, an emptyDir will be mounted instead.
   # The pvc is usually created by the dsadmin/ chart.
   #pvcClaimName: ds-backup
@@ -80,11 +77,11 @@ resources:
 
 # DS persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
 # Used in testing environments without pv providers. When the pod is terminated, the DS data will be deleted!
-# If you run into issues with minikube set this to false. See https://github.com/kubernetes/minikube/issues/1990
 persistence: true
 
 # Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".
-# The hard setting means that do not deploy more than one pod in a node which is critical for HA.
+# The hard setting will force ds pods to be spread out over multiple hosts/zones. soft is best efforts
+# but pods will still be scheduled together if sufficient resources are not available.
 podAntiAffinity: "soft"
 
 # This is the exact value for TopologyKey. The other possible value is "failure-domain.beta.kubernetes.io/zone"

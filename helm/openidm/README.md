@@ -2,21 +2,19 @@
 
 This chart depends on the postgresql chart for the OpenIDM repository database. The
 postgresql chart has been kept separate so that OpenIDM can be started / stopped
-independent of the database. 
+independent of the database.
 
 ## Design
 
 The chart assumes that the OpenIDM configuration files (/conf/*.json, scripts/* , etc.) are 
-mounted on the OpenIDM container as a volume at runtime.  This is an alternative
-to making an immutable Docker container with the configuration baked into the container. 
+mounted on the OpenIDM container as a volume at runtime.
 
 
 ## Configuration settings
 
 See [frconfig] (../frconfig/README.md) for instructions on how to install a configuration repository.
 
-The frconfig chart creates a PVC that contains the idm configuration. This is mounted by the idm pod, and used
-to bootstrap the idm configuration. 
+The IDM configuration is cloned from git and made available to IDM at startup.
 
 The `config.path` variable in values.yaml
 should point to the absolute path of the idm project.  The git repo is checked out under a top level path
@@ -31,11 +29,12 @@ Create a custom.yaml file that overrides any required values found in the chart 
 see the comments in values.yaml to understand what you can override.
 
 Deploy PostgreSQL and OpenIDM to Minikube:
-```
+
+```shell
 helm install --name postgresql postgresql
-sleep 60 
+sleep 30 
 helm install --name openidm -f custom-openidm.yaml openidm 
 
 ```
 
-You should be able to access OpenIDM at the ingress defined path:  https://openidm.default.example.com
+You can access OpenIDM at the ingress defined path: https://openidm.default.example.com

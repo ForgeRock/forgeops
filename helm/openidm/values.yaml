@@ -95,7 +95,7 @@ ingress:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
 # Audit log details for log streaming sidecar containers
-
+# IDM can now stream logs to stdout. This setting will be deprecated in the future.
 auditLogs: []
 # auditLogs:
 #   - name: access-logs

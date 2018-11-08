@@ -3,7 +3,7 @@
 # This is used in the first stage of a multi stage build to download the ForgeRock binaries. If you are ForgeRock customer
 # you can obtain an API key as part of your backstage subscription.
 # Another alternative for product binaries is to replace this docker image and script with
-# an alternate version that copies the binaries from a source such as S3, GCS, etc.
+# an alternate version that copies the binaries from a source such as S3, GCS, etc. See ../downloader-sample
 
 API_KEY=${API_KEY:-`cat /api_key`}
 

@@ -31,10 +31,10 @@ git checkout release/x.y.0
 
 ## Contents 
 
-* docker/ -  contains the Dockerfiles for the various containers. 
+* docker/ -  contains the Dockerfiles for the various containers.
 * helm/ - contains Kubernetes helm charts to deploy those containers. See the helm/README.md
 * etc/ - contains various scripts and utilities
-* bin/  - Utility shell scripts to deploy the helm charts
+* bin/  - Utility shell scripts to deploy the helm charts and create and manage clusters.
 
 ## Docker images 
 
@@ -50,24 +50,20 @@ The documentation for the current release can be found on
 
 ## Sample Session
 
-* Knowledge of Kubernetes and Helm is assumed. Please read 
+* Knowledge of Kubernetes and Helm is assumed. Please read
 the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/index.md) before proceeding.
-* This assumes minikube is running (8G of RAM), and helm and kubectl are installed. 
-* See bin/setup.sh for a sample setup script.
+* This assumes minikube is running (8G of RAM), and helm and kubectl are installed.
+* cert-manager must be installed (use the helm chart)
+* See bin/setup.sh and bin/minikube-up.sh for sample scripts.
 
 ```sh
 
-# Make sure you have the ingress controller add on
-minikube addons enable ingress
-
-helm init --upgrade --service-account default
-
 cd helm/
 
-# Or, deploy from local helm charts..
+# Sample that brings up domain .example.com
 helm install -f my-custom.yaml frconfig
 helm install amster
-helm install --set instance=configstore ds 
+helm install --set instance=configstore ds
 helm install openam
 
 
@@ -77,7 +73,7 @@ minikube ip
 # You can put DNS entries in an entry in /etc/hosts. For example:
 # 192.168.99.100 login.default.example.com openidm.default.example.com openig.default.example.com
 
-open http://login.default.example.com
+open https://login.default.example.com
 
 ```
 
@@ -86,7 +82,7 @@ open http://login.default.example.com
 The individual charts all have parmeters which you can override to control the deployment. For example,
 setting the domain FQDN. 
 
-Please refer to the chart settings.
+Please refer to the chart README.md files.
 
 
 ## Setting a namespace
@@ -111,7 +107,6 @@ Troubleshooting Suggestions:
     3. Did the main container enter a crashloop? Retrieve the logs using `kubectl logs pod-xxx`.
     4. Did a docker image fail to be pulled?  Check for the correct docker image name and tag. If you are using a private registry, verify your image pull secret is correct.
     5. You can use `kubectl logs -p pod-xxx` to examine the logs of previous (exited) pods.
-* A common problem with 6.0 charts is the `git-ssh-secret` has not been properly created, or an existing secret is present and the helm chart is attempting to recreate it. Look at the init logs where git is used (amster, openidm, openig). You may find errors in attempting to clone the forgeops configuration repo. Even if you are cloning the public read only forgeops-init repo, you still need a "dummy" git-ssh-key (this process is being simplified for 6.5)
 * If the pods are coming up successfully, but you can't reach the service, you likely have ingress issues:
     1. Use `kubectl describe ing` and `kubectl get ing ingress-name -o yaml` to view the ingress object.
     2. Describe the service using `kubectl get svc; kubectl describe svc xxx`.  Does the service have an `Endpoint:` binding? If the service endpoint binding is not present, it means the service did not match any running pods.
@@ -119,4 +114,4 @@ Troubleshooting Suggestions:
     1. `kubectl describe node`
     2. `kubectl get events -w`
 * Most images provide the ability to exec into the pod using bash, and examine processes and logs.  Use `kubectl exec pod-name -it bash`.
-* For 6.5, the Kubernetes cluster must support a read-write-many (RWX) volume type, such as NFS, or Minikube's hostpath provisioner. You can describe persistent volumes using `kubectl describe pvc`. If a PVC is in a pending state, your cluster may not support the required storage class.
+* If you wish to backup the directory server, the Kubernetes cluster must support a read-write-many (RWX) volume type, such as NFS, or Minikube's hostpath provisioner. You can describe persistent volumes using `kubectl describe pvc`. If a PVC is in a pending state, your cluster may not support the required storage class.

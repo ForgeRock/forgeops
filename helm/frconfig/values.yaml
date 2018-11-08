@@ -20,7 +20,7 @@ git:
 # Cert manager defaults
 certmanager:
   enabled: true
-  # The default issuer is to use the CA certs ssuer. 
+  # The default issuer is to use the CA certs issuer. 
   issuer: ca-issuer
   # And a local to namespace issuer
   issuerKind: Issuer

@@ -11,25 +11,3 @@ To run:
 To use the sample configuration, mount the samples-config directory on /var/openig in the container:
 
 `docker run --rm -p 28080:8080 -v `pwd`/sample-config:/var/openig -it forgerock/openig`
-
-(Also see the sample docker-compose.yaml file for an example.)
-
-## Sample configuration to test OpenIG 
-
-### Sample 1) Policy Enforcement
-
-Route configuration file: 01-pep.json
-
-As a prerequisite, you need a fully functional OpenAM installation with a policy agent configuration used by OpenIG. The following environment variables must be set:
-OPENAM_URL 
-POLICY_ADMIN
-POLICY_ADMIN_PWD
-
-Point your web browser to <baseURL>/pep - you should be redirected to OpenAM for authentication. Authorization policies determine whether you are allowed to get to the (static) page or not.
-
-### Sample 2) Throttling
-
-Route configuration file: 20-simplethrottle.json
-
-Point your client to <baseURL>/simplethrottle. The global throttling rate can be modified in the route configuration file.
-
