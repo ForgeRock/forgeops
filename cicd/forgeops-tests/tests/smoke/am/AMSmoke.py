@@ -80,17 +80,10 @@ class AMSmoke(unittest.TestCase):
         self.assertEqual(302, resp.status_code, 'Oauth2 authz REST')
 
         location = resp.headers['Location']
-
-        location_pattern = \
-            '(http://|https://:.*).*(code=.*)&(scope=.*)&(iss=.*)&(state=.*)&(client_id=.*).*'
-
-        prog = re.compile(location_pattern)
-        result = prog.match(location)
-
-        auth_code = result.group(2).split('=')[1]
+        auth_code = re.findall('(?<=code=)(\w*)', location)
 
         data = (('grant_type', 'authorization_code'),
-                ('code', auth_code),
+                ('code', auth_code[0]),
                 ('redirect_uri', 'http://fake.com'))
 
         resp = post(verify=self.amcfg.ssl_verify,  url=self.amcfg.rest_oauth2_access_token_url, auth=('oauth2', 'password'),
