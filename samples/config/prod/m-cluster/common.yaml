@@ -8,12 +8,6 @@ domain: .frk8s.net
 fqdn: login.prod.frk8s.net
 #fqdn: login.prod.freng.org
 
-# Override values for the whole deployment here
-#image:
-#  tag: 6.5.0-M7
-#  pullPolicy: Always
-
-
 # Install passwords.
 amadminPassword: password
 encryptionKey: "123456789012"
