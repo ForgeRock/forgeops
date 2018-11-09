@@ -1,7 +1,7 @@
 {
     "name": "anonymous",
     "baseURI": "https://idm-service.sample.svc.cluster.local:8444/",
-    "condition": "${matches(request.uri.path, '^/openidm/info/features') or matches(request.uri.path, '^/openidm/info/uiconfig') or (matches(request.uri.path, '^/openidm/authentication$') and matches(request.method, 'GET'))}",
+    "condition": "${matches(request.uri.path, '^/openidm/info/features') or matches(request.uri.path, '^/openidm/info/uiconfig') or matches(request.uri.path, '^/openidm/config/ui/themeconfig') or (matches(request.uri.path, '^/openidm/authentication$') and matches(request.method, 'GET'))}",
     "handler": {
         "type": "Chain",
         "config": {

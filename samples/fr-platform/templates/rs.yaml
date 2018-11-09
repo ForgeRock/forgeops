@@ -56,7 +56,7 @@ metadata:
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with,cache-control,content-type"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with,cache-control,content-type,x-openidm-nosession,x-openidm-password,x-openidm-username"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
     nginx.ingress.kubernetes.io/configuration-snippet: |
