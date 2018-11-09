@@ -35,7 +35,6 @@ echo ""
 echo "You are authenticated and logged into AWS as \"${EKS_AUTH}\". If this is not correct then exit this script and run \"aws configure\" to login into the correct account first."
 ask
 
-#source "$(dirname $0)/../etc/eks-env.cfg"
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 # Now create the cluster
@@ -73,8 +72,8 @@ done
 # Create storage class
 ./eks-create-sc.sh
 
-# Deploy cert-manager. Disabled for now. -- use ./generate-tls.sh
-#./deploy-cert-manager.sh
+# Deploy cert-manager 
+./deploy-cert-manager.sh
 
 # Add Prometheus
 ./deploy-prometheus.sh
