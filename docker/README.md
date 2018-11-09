@@ -60,7 +60,7 @@ build.sh can also use a CSV file to determine which images to build and how to t
 
 Will authenticate (-a option) to the docker registry, build, tag and push (-p option) all images found in dev.csv. The -d option is a "dry-run" which will show you the commands to be executed but will not peform any builds.
 
-The CSV option is  intended for automating the build process.
+The CSV option is intended for automating the build process.
 
 The CSV input file is parsed by bash, and is is *very* finicky about formatting. There are no comments allowed, no extra spaces after
 commas, and the file must end in a newline.
