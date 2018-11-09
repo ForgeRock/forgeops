@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sample setup for mac os. 
+# Sample setup for macOs. 
 # Edit this based on your environment! 
 # Prerequisites: you must have homebrew installed.
 brew update

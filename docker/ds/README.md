@@ -44,5 +44,3 @@ for example, will not report the correct status.
 The directories internal metrics (exposed via Prometheus) report accurate status and can be used for monitoring and alerting. In addition
 the directory replication logs (logs/replication) show replication activity.
 
-These limitations will be removed in the 7.0 time frame.
-

@@ -62,4 +62,4 @@ As an example, to create a custom configuration for openig, use the following pr
 
 cert-manager is used to provision a wildcard SSL certificate of the form `wildcard.$namespace.$domain`.  The default in values.yaml
 configures cert-manager to issue self signed certificates (the CA issuer). You can  configure cert-manager to issue certificates
-using LetsEncrypt. Please refer to the [cert-manager](https://github.com/jetstack/cert-manager) project.
+using  Let's Encrypt. Please refer to the [cert-manager](https://github.com/jetstack/cert-manager) project.

@@ -10,7 +10,7 @@
 useDefaultSecrets: true
 
 # The default DS baseDN for the user store.  Note the ds image creates several backends that are hard coded and this
-# setting will have no  impact on those backends. This setting will be removed in the future.
+# setting will have no impact on those backends. This setting will be removed in the future.
 baseDN: "ou=identities"
 
 # The default instance name. This will create a stateful set that can be resolved at
@@ -80,7 +80,7 @@ resources:
 persistence: true
 
 # Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".
-# The hard setting will force ds pods to be spread out over multiple hosts/zones. soft is best efforts
+# The hard setting will force ds pods to be spread out over multiple hosts/zones. soft is best effort
 # but pods will still be scheduled together if sufficient resources are not available.
 podAntiAffinity: "soft"
 
