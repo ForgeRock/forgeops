@@ -50,7 +50,7 @@
       "claimsParameterSupported" : false,
       "amrMappings" : { },
       "requireRequestUriRegistration" : false,
-      "alwaysAddClaimsToToken" : false,
+      "alwaysAddClaimsToToken" : true,
       "supportedRequestParameterEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "RSA1_5", "A256KW", "dir", "A192KW" ],
       "authorisedOpenIdConnectSSOClients" : [ ],
       "idTokenInfoClientAuthenticationEnabled" : true,
