@@ -17,7 +17,7 @@ For example:
 ```
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0-RC4"
+ARG VERSION="6.5.0-RC5"
 RUN download -v $VERSION opendj
 ```
 

@@ -26,7 +26,7 @@ catalinaOpts: "-Xmx512m"
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openig
-  tag: 6.5.0-M134
+  tag: 6.5.0-RC1
   pullPolicy: IfNotPresent
 
 resources:
