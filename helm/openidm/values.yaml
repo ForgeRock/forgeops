@@ -31,12 +31,13 @@ component: openidm
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openidm
-  tag: 6.5.0-M6
+  tag: 6.5.0-M7
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
 
 # override Java JVM options.
+# For JDK 11 add -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
 
 # Specific values

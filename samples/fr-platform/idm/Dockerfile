@@ -1,4 +1,4 @@
-FROM forgerock-docker-public.bintray.io/forgerock/openidm:6.5.0-M6
+FROM forgerock-docker-public.bintray.io/forgerock/openidm:6.5.0-M7
 
 USER root
 
