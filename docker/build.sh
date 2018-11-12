@@ -110,8 +110,9 @@ if [ -n "$BUILD_CSV" ]; then
       # for reg in "gcr.io/engineering-devops"
       for reg in "gcr.io/engineering-devops" "forgerock-docker-public.bintray.io/forgerock" 
       do
-          img="${reg}/${folder}:${tag}"
-          ${DRYRUN} docker tag ${folder} "${img}"
+          img="${reg}/${folder}"
+          ${DRYRUN} docker tag ${folder} "${img}:${tag}"
+          ${DRYRUN} docker tag ${folder} "${img}:latest"
         
           # Push all tags.
            if [ -n "$PUSH" ]; then
