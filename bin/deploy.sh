@@ -191,7 +191,7 @@ isalive_check_idm()
 
         STATUS_CODE=$(curl --header "X-OpenIDM-Username: openidm-admin" --header "X-OpenIDM-Password: openidm-admin" \
           --connect-timeout 5 -k ${IDM_PING_ENDPOINT} -o /dev/null -w '%{http_code}\n' -sS || true)
-        echo "IDM Status code: $STATUS_CODE"
+        #echo "IDM Status code: $STATUS_CODE"
     done
     echo "=> IDM is alive"
 }
@@ -245,7 +245,7 @@ scale_am()
 scale_idm()
 {
     echo "=> Scaling IDM deployment..."
-    DEPNAME=$(kubectl get deployment -l app=openidm -o name)
+    DEPNAME=$(kubectl get statefulset -l app=openidm -o name)
     kubectl scale --replicas=2 ${DEPNAME} || true
     if [ $? -ne 0 ]; then
         echo "Could not scale IDM deployment.  Please check error and fix."
