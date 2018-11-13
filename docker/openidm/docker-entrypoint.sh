@@ -43,8 +43,8 @@ if [ "$1" = 'openidm' ]; then
 
     SLF4J_PATHS="$SLF4J_API:$SLF4J_JDK14"
     JACKSON_PATHS="$JACKSON_CORE:$JACKSON_DATABIND:$JACKSON_ANNOTATIONS"
-    OPENIDM_SYSTEM_PATH=`echo $BUNDLE_PATH/openidm-system-*.jar`
-    OPENIDM_UTIL_PATH="$BUNDLE_PATH/openidm-util-*.jar"
+    OPENIDM_SYSTEM_PATH=$(echo $BUNDLE_PATH/openidm-system-*.jar)
+    OPENIDM_UTIL_PATH=$(echo $BUNDLE_PATH/openidm-util-*.jar)
     CLASSPATH="$OPENIDM_HOME/bin/*:$OPENIDM_HOME/framework/*:$SLF4J_PATHS:$JACKSON_PATHS:$OPENIDM_SYSTEM_PATH:$OPENIDM_UTIL_PATH"
 
    exec tini -v -- java \
