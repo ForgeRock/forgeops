@@ -1,6 +1,6 @@
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openig
-  tag: 6.5.0-RC1
+  tag: 6.5.0-RC2
   pullPolicy: IfNotPresent
 
 
