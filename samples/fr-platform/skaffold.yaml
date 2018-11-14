@@ -8,8 +8,6 @@ build:
     context: amster
   - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
     context: idm
-  - image: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
-    context: pg
   tagPolicy:
     sha256: {}
   local:
@@ -22,6 +20,5 @@ deploy:
       values:
         images.amster: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
         images.idm: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
-        images.pg: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg
         images.rs: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
       namespace: sample

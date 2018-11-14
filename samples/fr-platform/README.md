@@ -23,14 +23,15 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
 
 1. *(Optional - initial minikube vm setup)* If you want to run the sample locally in minikube, you first need to prepare your minikube VM. This is only needed the first time you setup your minikube VM; if you restart your host or your VM, you do not need to repeat this setup.
 
-    This creates the minikube VM, enables the ingress addon, adds a new namespace to your kubectl config, and initializes the helm tiller:
+    This creates the minikube VM, enables the ingress addon, adds a new namespace to your kubectl config, initializes the helm tiller, and installs the cert-manager chart:
 
     ```
     minikube start --insecure-registry 10.0.0.0/24 --memory 4096 && \
     minikube addons enable ingress && \
     kubectl config set-context sample-context --namespace=sample --cluster=minikube --user=minikube && \
     sleep 2 && \
-    helm init --wait
+    helm init --wait && \
+    helm upgrade -i cert-manager --namespace kube-system stable/cert-manager
     ```
 
 2. *(Optional - prep minikube for use)* If you are using minikube, you will need to run these commands every time the VM starts (after first setup as well as after every reboot).
@@ -104,7 +105,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
 7. You can access the platform by opening this URL:
 
     ```
-    http://login.sample.svc.cluster.local/console
+    https://login.sample.svc.cluster.local/console
     ```
 
     You can use amadmin / password to login as the am admin.
@@ -135,7 +136,6 @@ Build the Docker images for this sample:
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest rs
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest amster
     docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest idm
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/pg:latest pg
 
 You can now push these to a docker registry, if that is needed.
 

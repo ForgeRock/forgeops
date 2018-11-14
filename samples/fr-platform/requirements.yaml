@@ -1,4 +1,7 @@
 dependencies:
+- name: frconfig
+  version: ">0.0.0"
+  repository: file://../../helm/frconfig
 - name: ds
   version: ">0.0.0"
   repository: file://../../helm/ds
@@ -6,3 +9,14 @@ dependencies:
 - name: openam
   version: ">0.0.0"
   repository: file://../../helm/openam
+- name: amster
+  version: ">0.0.0"
+  repository: file://../../helm/amster
+- name: openidm
+  version: ">0.0.0"
+  repository: file://../../helm/openidm
+  alias: idm
+- name: openig
+  version: ">0.0.0"
+  repository: file://../../helm/openig
+  alias: rs
