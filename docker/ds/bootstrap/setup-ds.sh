@@ -88,6 +88,9 @@ echo "Enabling the /api endpoint"
 echo "Installing rest2ldap endpoint map"
 cp ../../example-v1.json ./config/rest2ldap/endpoints/api
 
+#echo "Putting IDM schema extensions in place"
+cp /var/tmp/schema/60-repo-schema.ldif ./db/schema/60-repo-schema.ldif
+
 # From util.sh. Consider moving the logic here...
 configure
 

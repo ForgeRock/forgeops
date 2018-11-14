@@ -12,6 +12,7 @@ COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 WORKDIR /var/tmp/bootstrap
 
 COPY bootstrap/ /var/tmp/bootstrap/
+COPY schema /var/tmp/schema
 
 # This speeds up docker cloudbuild considerably
 ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
