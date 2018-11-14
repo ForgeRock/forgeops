@@ -2,14 +2,14 @@ image:
   repository: forgerock-docker-public.bintray.io/forgerock/openidm
   #repository: gcr.io/engineering-devops/openidm
   tag: 6.5.0-M7
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   
 resources:
   limits:
-    cpu: 2000m
+    cpu: 3000m
     memory: 3Gi
   requests:
-    cpu: 2000m
+    cpu: 1500m
     memory: 2Gi
 
 # For JDK 8

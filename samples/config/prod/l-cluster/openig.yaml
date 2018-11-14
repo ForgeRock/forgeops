@@ -3,12 +3,18 @@ image:
   tag: 6.5.0-RC2
   pullPolicy: IfNotPresent
 
-
 config:
   name: frconfig
   path: /git/config/6.5/default/ig/basic-sample 
   strategy: git
-
+  
+resources:
+  limits:
+    cpu: 4000m
+    memory: 4Gi
+  requests:
+    cpu: 2000m
+    memory: 2Gi
 
 # Tomcat JVM options.
 catalinaOpts:  >
@@ -16,13 +22,5 @@ catalinaOpts:  >
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
 
-resources:
-  limits:
-    cpu: 3000m
-    memory: 4Gi
-  requests:
-    cpu: 2000m
-    memory: 2Gi
-	
 replicaCount: 2
 

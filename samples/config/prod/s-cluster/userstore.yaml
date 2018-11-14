@@ -14,7 +14,7 @@ resources:
     cpu: 3000m
     memory: 5Gi
   requests:
-    cpu: 2000m
+    cpu: 1500m
     memory: 3Gi
 
 
@@ -39,8 +39,11 @@ topologyKey: "failure-domain.beta.kubernetes.io/zone"
 
 podAntiAffinity: hard
 
+# if you want to disable backup, comment out this whole section.  Setting enabled to "false"
+# will not work
+
 backup:
-  enabled: false
+  enabled: true
   storageClass: nfs
   storageSize: 100Gi
   pvcClaimName: ds-backup

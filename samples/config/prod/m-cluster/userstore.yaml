@@ -29,7 +29,6 @@ opendjJavaArgs: >
 # -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 
-
 storageSize: 512Gi
 storageClass: fast
 

@@ -59,4 +59,4 @@ sleep 5
 kubectl create -f ../etc/cert-manager/cluster-issuer.yaml -n kube-system
 
 # Delete decrypted service account
-rm ../etc/cert-manager/cert-manager.json || true
+rm -f ../etc/cert-manager/cert-manager.json || true
