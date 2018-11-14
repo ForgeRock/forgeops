@@ -29,7 +29,6 @@ opendjJavaArgs: >
 # -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
 
-
 storageSize: 512Gi
 storageClass: fast
 
@@ -47,4 +46,4 @@ backup:
 
 # If existing database is found then restore is always skipped
 restore:
-  enabled: false
+  enabled: true

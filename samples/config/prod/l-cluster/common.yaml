@@ -5,7 +5,7 @@
 domain: .frk8s.net
 #domain: .freng.org
 
-fqdn: login.large.frk8s.net
+fqdn: login.prod.frk8s.net
 
 
 # Install passwords.
