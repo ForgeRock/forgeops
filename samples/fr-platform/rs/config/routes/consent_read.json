@@ -1,7 +1,7 @@
 {
     "name": "consent_read",
     "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
-    "condition": "${matches(request.uri.path, '^/openidm/consent$') and matches(request.uri.query, '_action=getConsentMappings') and matches(request.method, 'POST')}",
+    "condition": "${matches(request.uri.path, '^/openidm/consent$') and matches(request.uri.query, '(^|&)_action=getConsentMappings($|&)') and matches(request.method, 'POST')}",
     "handler": {
         "type": "Chain",
         "config": {

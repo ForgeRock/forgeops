@@ -59,10 +59,11 @@ spec:
               fieldPath: metadata.namespace
         ports:
         - containerPort: 8080
+        - containerPort: 8444
         livenessProbe:
           httpGet:
             path: /openidm/info/ping
-            port: {{ .Values.service.internalPort }}
+            port: 8080
             httpHeaders:
             - name: X-OpenIDM-Username
               value: anonymous
@@ -113,7 +114,7 @@ spec:
         env:
         - name: LOGFILE
           value: {{ .path }}
-        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ] 
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
         volumeMounts:
         - name: audit-logs
           mountPath: /opt/openidm/audit
@@ -139,4 +140,3 @@ spec:
         secret:
           secretName:  {{ default "frconfig" .Values.config.name }}
       {{ end }}
-   

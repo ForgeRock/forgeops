@@ -3,7 +3,7 @@
 kind: Deployment
 apiVersion: apps/v1beta1
 metadata:
-  # If you want to run more than one IG deployment in the same namespace, change the deployment name 
+  # If you want to run more than one IG deployment in the same namespace, change the deployment name
   # below to the {{ template "fullname" . }} to make the name unique.
   name:  {{ template "fullname" . }}
   labels:
@@ -37,7 +37,7 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        #imagePullPolicy: {{ .Values.image.pullPolicy }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}

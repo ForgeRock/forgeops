@@ -4,7 +4,7 @@
             "name": "AccessTokenResolver",
             "type": "TokenIntrospectionAccessTokenResolver",
             "config": {
-                "endpoint": "${env['OPENAM_INSTANCE']}/oauth2/introspect",
+                "endpoint": "http://openam:80/oauth2/introspect",
                 "providerHandler": {
                     "type": "Chain",
                     "config": {
@@ -62,28 +62,33 @@
             ],
             "config": {
                 "hostnameVerifier": "ALLOW_ALL",
-                "sslContextAlgorithm": "TLSv1.2",
-                "keyManager": {
-                    "type": "KeyManager",
+                "tls": {
+                    "type": "TlsOptions",
                     "config": {
-                        "keystore": {
-                            "type": "KeyStore",
+                        "sslContextAlgorithm": "TLSv1.2",
+                        "keyManager": {
+                            "type": "KeyManager",
                             "config": {
-                                "url": "file:///var/openig/keystore.jks",
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                },
                                 "password": "changeit"
                             }
                         },
-                        "password": "changeit"
-                    }
-                },
-                "trustManager": {
-                    "type": "TrustManager",
-                    "config": {
-                        "keystore": {
-                            "type": "KeyStore",
+                        "trustManager": {
+                            "type": "TrustManager",
                             "config": {
-                                "url": "file:///var/openig/keystore.jks",
-                                "password": "changeit"
+                                "keystore": {
+                                    "type": "KeyStore",
+                                    "config": {
+                                        "url": "file:///var/openig/keystore.jks",
+                                        "password": "changeit"
+                                    }
+                                }
                             }
                         }
                     }

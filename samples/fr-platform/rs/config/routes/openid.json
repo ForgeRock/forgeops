@@ -1,7 +1,7 @@
 {
     "name": "openid",
     "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
-    "condition": "${(matches(request.uri.path, '^/openidm/authentication') and matches(request.uri.query, '_action=login') and matches(request.method, 'POST')) or (matches(request.uri.path, '^/openidm/privilege') and matches(request.uri.query, '(^|&)_action=listPrivileges') and matches(request.method, 'POST')) or matches(request.uri.path, '^/openidm/info/login') or matches(request.uri.path, '^/openidm/info/version') or matches(request.uri.path, '^/openidm/config/ui/profile$') or matches(request.uri.path, '^/openidm/config/ui/dashboard$') or matches(request.uri.path, '^/openidm/policy/.+') or matches(request.uri.path, '^/openidm/schema/.+')}",
+    "condition": "${(matches(request.uri.path, '^/openidm/authentication') and matches(request.uri.query, '(^|&)_action=login($|&)') and matches(request.method, 'POST')) or (matches(request.uri.path, '^/openidm/privilege') and matches(request.uri.query, '(^|&)_action=listPrivileges($|&)') and matches(request.method, 'POST')) or matches(request.uri.path, '^/openidm/info/login') or matches(request.uri.path, '^/openidm/info/version') or matches(request.uri.path, '^/openidm/config/ui/profile$') or matches(request.uri.path, '^/openidm/config/ui/dashboard$') or matches(request.uri.path, '^/openidm/policy/.+') or matches(request.uri.path, '^/openidm/schema/.+')}",
     "handler": {
         "type": "Chain",
         "config": {
