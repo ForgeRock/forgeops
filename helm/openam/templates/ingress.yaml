@@ -29,4 +29,9 @@ spec:
           backend:
             serviceName: {{ .Values.service.name }}
             servicePort: {{ .Values.service.externalPort }}
+        - path: /openam
+          backend:
+            serviceName: {{ .Values.service.name }}
+            servicePort: {{ .Values.service.externalPort }}
+
 {{- end -}}

@@ -6,7 +6,7 @@ component: openam
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 6.5.0-M12
+  tag: 6.5.0-M13
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
@@ -95,6 +95,7 @@ ingress:
     nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
     nginx.ingress.kubernetes.io/cors-max-age: "600"
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
 
 # Audit log details for log streaming sidecar containers.
 # AM can now stream audit logs to stdout. This option may be removed in the future.

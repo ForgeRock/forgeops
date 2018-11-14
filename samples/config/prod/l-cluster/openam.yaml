@@ -2,7 +2,8 @@ image:
   repository: gcr.io/engineering-devops/openam
   #repository: forgerock-docker-public.bintray.io/openam
   tag: 6.5.0-M13
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
+
   
 resources:
   limits:
