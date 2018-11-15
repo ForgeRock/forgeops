@@ -24,7 +24,7 @@
       "jwkStoreCacheMissCacheTime" : 60000,
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
-      "jwksUri" : "http://login.sample.svc.cluster.local:80/oauth2/connect/jwk_uri",
+      "jwksUri" : "https://login.sample.svc.cluster.local/oauth2/connect/jwk_uri",
       "userinfoEncryptedResponseAlg" : null,
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
