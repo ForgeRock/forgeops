@@ -13,36 +13,26 @@
  *
  */
 (function () {
-    var userId = context.security.authorization.id, res, ret, params, notification;
 
     if (request.method === "read") {
-        res = {};
-        params = {
-            "_queryId": "get-notifications-for-user",
-            "userId": userId
-        };
-        ret = openidm.query("repo/ui/notification", params);
 
-        if(ret && ret.result) {
-            res = ret.result;
-        }
+        var response = openidm.read(context.security.authorization.component + "/" + context.security.authorization.id, null, ["_notifications/*"]);
 
         return {
-            "notifications" : res
+            "notifications" : response['_notifications']
         };
 
     } else if (request.method === "delete") {
-        notification = openidm.read("repo/ui/notification/"+request.resourcePath);
+        var notificationQuery = openidm.query(context.security.authorization.component + "/" + context.security.authorization.id + "/_notifications",
+            {"_queryFilter": "_refResourceCollection eq 'internal/notification' AND _refResourceId eq '"+request.resourcePath+"'"});
 
-        if(notification !== null) {
-            if (notification.receiverId === userId) {
-                return openidm['delete']('repo/ui/notification/' + notification._id, notification._rev);
-            } else {
-                throw {
-                    "code": 403,
-                    "message": "Access denied"
-                };
-            }
+        if (notificationQuery.result.length === 1) {
+            return openidm['delete'](notificationQuery.result[0]._ref, null);
+        } else {
+            throw {
+                "code": 403,
+                "message": "Access denied"
+            };
         }
     } else {
         throw {

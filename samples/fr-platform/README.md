@@ -156,7 +156,7 @@ To make the internal DS cluster accessible locally:
 To export changes made to AM:
 
     kubectl exec -it amster /opt/amster/amster
-      connect http://login.sample.svc.cluster.local/openam -k /var/run/secrets/amster/id_rsa
+      connect http://openam -k /var/run/secrets/amster/id_rsa
       export-config --path /tmp/export
       :quit
 
