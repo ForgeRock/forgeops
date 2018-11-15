@@ -13,7 +13,7 @@ Expand the name of the chart.
 
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
-{{- define "externalFQDN" -}}
+{{- define "idmFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
 {{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
