@@ -22,7 +22,7 @@ spec:
     - {{ template "externalFQDN" .  }}
     secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
-  - host: {{ template "externalFQDN" . }}
+  - host: {{ template "idmFQDN" . }}
     http:
       paths:
       - path: /
