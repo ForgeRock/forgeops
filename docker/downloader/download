@@ -7,8 +7,8 @@
 
 API_KEY=${API_KEY:-`cat /api_key`}
 
-GCS_DIR=gs://forgeops-cache
-GCS_CACHE="true"
+# Pass this in via the environment to use a GCS cache for the artifacts. You must have RW access to this bucket
+#GCS_DIR=gs://forgeops-cache
 
 if [ -z "$API_KEY" ]
 then
@@ -57,7 +57,7 @@ dl(){
   
     echo "Downloading $src to $3"
 
-    if [ "$GCS_CACHE" = "true" ]; then
+    if [ -n "$GCS_DIR" ]; then
         gsutil cp $GCS_DIR/$2 $3
         if [ "$?" -eq 0 ];  then
             return 0
@@ -78,7 +78,7 @@ dl(){
         exit 1
     fi
 
-    if [ "$GCS_CACHE" = "true" ]; then
+    if [ -n "$GCS_DIR" ]; then
         echo "Saving a cached copy of $2"
         gsutil cp "$3" "$GCS_DIR/$2" || echo "Could not save to cache. Skipping"
     fi
@@ -95,8 +95,8 @@ while getopts "wv:" opt; do
     w ) WGET="true" ;;
     v ) VERSION="${OPTARG}" 
         echo $VERSION | grep SNAPSHOT \
-                && REPO="https://maven.forgerock.org/repo/internal-snapshots/org/forgerock" \
-                && GCS_CACHE="false"
+                && REPO="https://maven.forgerock.org/repo/internal-snapshots/org/forgerock"
+                SNAPSHOT="true"
         ;;
     \? )
          echo "Usage: dl.sh [-v version] images..."
