@@ -1,6 +1,6 @@
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/ds
-  tag: 6.5.0-RC5
+  tag: 6.5.0-RC6
   pullPolicy: IfNotPresent
   
 instance: configstore

@@ -1,8 +1,8 @@
 java,6.5.0,6.5.0
-ds,6.5.0-RC5,6.5.0-RC5
+ds,6.5.0-RC6,6.5.0-RC6
 openam,6.5.0-M13,6.5.0-M13
 amster,6.5.0-M13,6.5.0-M13
-openidm,6.5.0-M7,6.5.0-M7
+openidm,6.5.0-M8,6.5.0-M8
 openig,6.5.0-RC2,6.5.0-RC2
 git,6.5.0,6.5.0
 nginx-agent,6.5.0,6.5.0
