@@ -16,6 +16,7 @@ steps:
   - 'API_KEY=${_ARTIFACTORY_API_KEY}'
   - 'DOCKER_USER=${_DOCKER_USER}'
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
+  - 'GCS_DIR=${_GCS_DIR}'
 # Launch the smoke test
 # NOTE: We no longer trigger the smoke test from cloudbuild.
 # - name: gcr.io/cloud-builders/gcloud
