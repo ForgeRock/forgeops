@@ -44,7 +44,7 @@ data:
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
-      openidm.host={{ template "externalFQDN" . }}
+      openidm.host={{ template "idmFQDN" . }}
 
       # Define external load balancer ports.
       openidm.lb.port.http=80
