@@ -44,11 +44,4 @@ nfs:
 # If you don't have slack, set this to "undefined"
 slackUrl: undefined
 
-# This configures the top level directory under bak/
-# The backup folder is set to $clusterName/$instance-$namespace. This
-# forces each instance backup to go to a different folder on the shared PVC drive. Without this
-# you will get collisions on backup / restore.
-# If you have many clusters backing up same shared NFS volume, change the default here. For example, 
-# set it to "production"
-clusterName: "default"
 

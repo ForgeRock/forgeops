@@ -23,8 +23,7 @@ spec:
       # a top level folder for backups, and chown the permisions to the forgerock user.
       - name: chmod
         image: busybox
-        command: ['sh', '-c', 
-          'mkdir -p /bak/{{ .Values.clusterName }}; chown 11111 /bak/{{ .Values.clusterName }}; chmod 775 /bak/{{ .Values.clusterName }}']
+        command: ['sh', '-c', 'chown 11111 /bak/; chmod 775 /bak/*']
         volumeMounts:
         - name: backup
           mountPath: /bak
