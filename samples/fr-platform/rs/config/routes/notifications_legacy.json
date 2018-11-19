@@ -1,7 +1,7 @@
 {
-    "name": "notifications",
+    "name": "notifications_legacy",
     "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
-    "condition": "${matches(request.uri.path, '^/openidm/notification') or matches(request.uri.path, '^/openidm/internal/notification')}",
+    "condition": "${matches(request.uri.path, '^/openidm/endpoint/usernotifications')}",
     "handler": {
         "type": "Chain",
         "config": {
@@ -15,20 +15,6 @@
                         "requireHttps": false,
                         "accessTokenResolver": "AccessTokenResolver",
                         "cacheExpiration": "2 minutes"
-                    }
-                },
-                {
-                    "name": "CheckNotificationTarget",
-                    "type": "ScriptableFilter",
-                    "config": {
-                        "type": "application/x-groovy",
-                        "file": "checkNotificationTarget.groovy",
-                        "clientHandler": "IDMClient",
-                        "args": {
-                            "subjectField": "userName",
-                            "targetComponent": "managed/user",
-                            "failureResponse": "${heap['authzFailureResponse']}"
-                        }
                     }
                 },
                 {
