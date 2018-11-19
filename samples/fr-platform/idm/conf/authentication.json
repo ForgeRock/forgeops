@@ -46,10 +46,6 @@
                                 "authzHeaderName" : "X-Authorization-Map"
                             }
                         }
-                    },
-                    "augmentSecurityContext" : {
-                        "type" : "text/javascript",
-                        "file" : "augmentVerifyRunAs.js"
                     }
                 },
                 "enabled": true
@@ -82,10 +78,6 @@
                                 "authzHeaderName" : "X-Authorization-Map"
                             }
                         }
-                    },
-                    "augmentSecurityContext" : {
-                        "type" : "text/javascript",
-                        "file" : "augmentVerifyRunAs.js"
                     }
                 },
                 "enabled": true

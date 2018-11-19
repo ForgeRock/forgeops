@@ -29,7 +29,10 @@
                     "type": "ScriptableFilter",
                     "config": {
                         "type": "application/x-groovy",
-                        "file": "includeUserNameInFields.groovy"
+                        "file": "includeInFields.groovy",
+                        "args": {
+                            "field": "userName"
+                        }
                     }
                 },
                 {
@@ -43,7 +46,6 @@
                         ]
                     }
                 }
-
             ],
             "handler": "IDMClient"
         }
