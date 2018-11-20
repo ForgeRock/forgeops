@@ -59,41 +59,7 @@
             "capture": [
                 "request",
                 "response"
-            ],
-            "config": {
-                "hostnameVerifier": "ALLOW_ALL",
-                "tls": {
-                    "type": "TlsOptions",
-                    "config": {
-                        "sslContextAlgorithm": "TLSv1.2",
-                        "keyManager": {
-                            "type": "KeyManager",
-                            "config": {
-                                "keystore": {
-                                    "type": "KeyStore",
-                                    "config": {
-                                        "url": "file:///var/openig/keystore.jks",
-                                        "password": "changeit"
-                                    }
-                                },
-                                "password": "changeit"
-                            }
-                        },
-                        "trustManager": {
-                            "type": "TrustManager",
-                            "config": {
-                                "keystore": {
-                                    "type": "KeyStore",
-                                    "config": {
-                                        "url": "file:///var/openig/keystore.jks",
-                                        "password": "changeit"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            ]
         },
         {
             "name": "_router",

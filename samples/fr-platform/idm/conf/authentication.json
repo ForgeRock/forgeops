@@ -17,18 +17,30 @@
         },
         "authModules" : [
             {
-                "name": "CLIENT_CERT",
-                "properties": {
-                    "queryOnResource": "endpoint/static/user",
-                    "defaultUserRoles": [
-                        "internal/role/openidm-cert"
-                    ],
-                    "allowedAuthenticationIdPatterns": [
-                        "CN=ig, O=forgerock"
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "anonymous",
+                    "password" : "&{openidm.anonymous.password}",
+                    "defaultUserRoles" : [
+                        "internal/role/openidm-reg"
+                    ]
+                },
+                "enabled" : true
+            },
+            {
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "&{ig.client.username}",
+                    "password" : "&{ig.client.password}",
+                    "defaultUserRoles" : [
+                        "internal/role/openidm-admin",
+                        "internal/role/openidm-authorized"
                     ],
                     "runAsProperties": {
                         "adminRoles": [
-                            "internal/role/openidm-cert"
+                            "internal/role/openidm-admin"
                         ],
                         "disallowedRunAsRoles": [ ],
                         "queryOnResource": "managed/user",
@@ -48,21 +60,21 @@
                         }
                     }
                 },
-                "enabled": true
+                "enabled" : true
             },
             {
-                "name": "CLIENT_CERT",
-                "properties": {
-                    "queryOnResource": "endpoint/static/user",
-                    "defaultUserRoles": [
-                        "internal/role/openidm-cert"
-                    ],
-                    "allowedAuthenticationIdPatterns": [
-                        "CN=ig, O=forgerock"
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "endpoint/static/user",
+                    "username" : "&{ig.client.username}",
+                    "password" : "&{ig.client.password}",
+                    "defaultUserRoles" : [
+                        "internal/role/openidm-admin",
+                        "internal/role/openidm-authorized"
                     ],
                     "runAsProperties": {
                         "adminRoles": [
-                            "internal/role/openidm-cert"
+                            "internal/role/openidm-admin"
                         ],
                         "disallowedRunAsRoles": [ ],
                         "queryId" : "credential-query",
@@ -79,31 +91,6 @@
                             }
                         }
                     }
-                },
-                "enabled": true
-            },
-            {
-                "name" : "STATIC_USER",
-                "properties" : {
-                    "queryOnResource" : "endpoint/static/user",
-                    "username" : "anonymous",
-                    "password" : "&{openidm.anonymous.password}",
-                    "defaultUserRoles" : [
-                        "internal/role/openidm-reg"
-                    ]
-                },
-                "enabled" : true
-            },
-            {
-                "name" : "STATIC_USER",
-                "properties" : {
-                    "queryOnResource" : "endpoint/static/user",
-                    "username" : "openidm-admin",
-                    "password" : "&{openidm.admin.password}",
-                    "defaultUserRoles" : [
-                        "internal/role/openidm-admin",
-                        "internal/role/openidm-authorized"
-                    ]
                 },
                 "enabled" : true
             }

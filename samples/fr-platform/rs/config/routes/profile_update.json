@@ -1,6 +1,6 @@
 {
     "name": "profile_update",
-    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "baseURI": "http://idm-service.sample.svc.cluster.local:8080",
     "condition": "${(matches(request.uri.path, '^/openidm/managed/user/.+$')) and matches(request.method, 'PATCH')}",
     "handler": {
         "type": "Chain",

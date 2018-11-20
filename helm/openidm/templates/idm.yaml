@@ -52,6 +52,8 @@ spec:
             name: {{ template "fullname" . }}
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
+        - secretRef:
+            name: {{ default "openidm-secrets-env" .Values.secret.name  }}
         env:
         - name: NAMESPACE
           valueFrom:
@@ -59,7 +61,6 @@ spec:
               fieldPath: metadata.namespace
         ports:
         - containerPort: 8080
-        - containerPort: 8444
         livenessProbe:
           httpGet:
             path: /openidm/info/ping

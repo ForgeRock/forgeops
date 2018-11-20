@@ -2,6 +2,7 @@ import org.forgerock.http.util.Uris
 import java.util.ArrayList
 
 String sub = contexts.oauth2.accessToken.info.sub
+def env = System.getenv()
 
 // In this case, we validate the request by reading the value of the target and make sure that
 // the target object matches the subject from the accessToken
@@ -25,6 +26,9 @@ if (request.form.getFirst('_action') == "deleteNotificationsForTarget") {
             null,
             null
         ))
+
+    readRequest.getHeaders().add('X-OpenIDM-Username', env["IG_CLIENT_USERNAME"])
+    readRequest.getHeaders().add('X-OpenIDM-Password', env["IG_CLIENT_PASSWORD"])
 
     return http.send(readRequest).thenAsync( new AsyncFunction() {
         Promise apply (response) {
@@ -50,6 +54,9 @@ if (request.form.getFirst('_action') == "deleteNotificationsForTarget") {
         .setMethod("GET")
     readRequest.getUri().setQuery("_fields=target/${subjectField},target/_refResourceCollection")
     readRequest.getHeaders().remove('if-match')
+
+    readRequest.getHeaders().add('X-OpenIDM-Username', env["IG_CLIENT_USERNAME"])
+    readRequest.getHeaders().add('X-OpenIDM-Password', env["IG_CLIENT_PASSWORD"])
 
     return http.send(readRequest).thenAsync( new AsyncFunction() {
         Promise apply (response) {

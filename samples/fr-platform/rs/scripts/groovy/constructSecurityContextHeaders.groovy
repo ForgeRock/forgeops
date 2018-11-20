@@ -1,5 +1,9 @@
 
 String sub = contexts.oauth2.accessToken.info.sub
+
+def env = System.getenv()
+request.getHeaders().add('X-OpenIDM-Username', env["IG_CLIENT_USERNAME"])
+request.getHeaders().add('X-OpenIDM-Password', env["IG_CLIENT_PASSWORD"])
 request.getHeaders().add('X-OpenIDM-RunAs', sub)
 request.getHeaders().add('X-Requested-With', 'IG')
 
