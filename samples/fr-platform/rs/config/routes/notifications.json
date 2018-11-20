@@ -1,6 +1,6 @@
 {
     "name": "notifications",
-    "baseURI": "http://idm-service.sample.svc.cluster.local:8080",
+    "baseURI": "http://idm-service.&{namespace}&{domain}:8080",
     "condition": "${matches(request.uri.path, '^/openidm/notification') or matches(request.uri.path, '^/openidm/internal/notification')}",
     "handler": {
         "type": "Chain",
