@@ -8,6 +8,8 @@ USERS="${4:-1000000}"
 BASE_DN="${BASE_DN:-ou=identities}"
 PW_FILE="${DIR_MANAGER_PW_FILE:-/var/tmp/.passwd}"
 
+export OPENDJ_JAVA_ARGS="-Xmx512m"
+
 if [ ! -r ${PW_FILE} ] 
 then
 	#echo "No file found...creating one"
