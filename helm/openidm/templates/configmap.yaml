@@ -11,7 +11,6 @@ data:
   OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
   OPENIDM_CONFIG_REPO_ENABLED: "false"
   OPENIDM_ANONYMOUS_PASSWORD: "anonymous"
-  OPENIDM_ADMIN_PASSWORD: "openidm-admin"
 
 ---
 apiVersion: v1
@@ -139,7 +138,7 @@ data:
 
       # To disable the persisted configuration store set this property to false.
       # This will store the configurations only in memory.
-      # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration 
+      # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration
       openidm.config.repo.enabled={{ not .Values.config.immutable }}
 
       # To stop writes to configuration files, set this property to false; suitable for read-only installations.

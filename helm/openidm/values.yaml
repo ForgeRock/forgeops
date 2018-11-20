@@ -25,6 +25,8 @@ config:
   # so they can saved and committed to git, set this to false.
   immutable: true
 
+secret:
+  name: openidm-secrets-env
 
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm

@@ -3,10 +3,12 @@ frconfig:
 
 idm:
   domain: .svc.cluster.local
+  secret:
+    name: ig-idm-secrets
   service:
     name: idm-service
-    externalPort: 8444
-    internalPort: 8444
+    externalPort: 8080
+    internalPort: 8080
   resources:
     requests:
       memory: "512Mi"
@@ -35,6 +37,8 @@ amster:
 
 rs:
   domain: .svc.cluster.local
+  secret:
+    name: ig-idm-secrets
   service:
     name: rs-service
   resources:

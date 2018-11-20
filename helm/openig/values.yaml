@@ -17,9 +17,11 @@ config:
   # Path to our project
   path: /git/config/6.5/default/ig/basic-sample
   # strategy defines how products get their configuration .
-  # Using the git strategy, each helm chart pulls the configuration from git using an init container. 
+  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
   strategy: git
 
+secret:
+  name: openig-secrets-env
 
 # Tomcat JVM options.
 catalinaOpts: "-Xmx512m"
@@ -54,7 +56,7 @@ ingress:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/enable-cors: "false"
-    
+
 # Audit log details for log streaming sidecar containers
 
 auditLogs: []
@@ -63,7 +65,3 @@ auditLogs: []
 #     path: "/tmp/logs/access.audit.json"
 #   - name: debug-logs
 #     path: "/tmp/logs/route-system.log"
-    
-    
-
-

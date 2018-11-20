@@ -1,9 +1,13 @@
 String sub = contexts.oauth2.accessToken.info.sub
+def env = System.getenv()
 
 Request readRequest = new Request(request)
     .setMethod("GET")
 
 readRequest.getHeaders().remove('if-match')
+
+readRequest.getHeaders().add('X-OpenIDM-Username', env["IG_CLIENT_USERNAME"])
+readRequest.getHeaders().add('X-OpenIDM-Password', env["IG_CLIENT_PASSWORD"])
 
 return http.send(readRequest).thenAsync( new AsyncFunction() {
     Promise apply (response) {

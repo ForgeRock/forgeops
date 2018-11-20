@@ -1,6 +1,6 @@
 {
     "name": "notifications_legacy",
-    "baseURI": "https://idm-service.sample.svc.cluster.local:8444",
+    "baseURI": "http://idm-service.sample.svc.cluster.local:8080",
     "condition": "${matches(request.uri.path, '^/openidm/endpoint/usernotifications')}",
     "handler": {
         "type": "Chain",
