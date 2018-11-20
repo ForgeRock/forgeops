@@ -8,14 +8,11 @@ External DS cluster as a shared user store for AM and IDM
 
 **There is no OAuth2 client shipped with this sample**. Refer to the [Example OAuth 2 Clients Project](https://github.com/ForgeRock/exampleOAuth2Clients) to find a sample client that will be the most useful for your needs.
 
-Docker, Kubernetes and Helm are used to automate the deployment of this sample. The main "openam" and "ds" helm charts are used to start those services. The configuration for all of the products is stored within this sample folder:
+Docker, Kubernetes and Helm are used to automate the deployment of this sample. The forgeops "frconfig", "openam", "ds", "amster", "openidm" and "openig" helm charts are used to start these services. The configuration for all of these products is stored within this sample folder. For development simplicity, that configuration is managed by extending the docker images rather than using "git" init containers to load it at runtime.
 
  - "amster" contains the AM configuration
  - "rs" contains the IG configuration
  - "idm" contains the IDM configuration
- - "pg" contains the PostgreSQL configuration (used for IDM workflow)
-
- The helm charts included under the "templates" folder are intentionally oversimplified in terms of their Kubernetes configuration. They should not be considered a pattern for a production deployment. Refer to the other areas of forgeops for production-ready templates.
 
 ## Running the Sample
 
@@ -57,7 +54,7 @@ Docker, Kubernetes and Helm are used to automate the deployment of this sample. 
     **Option 2:** If you want to work on the sample, you can use the "[skaffold](https://github.com/GoogleContainerTools/skaffold)" tool to quickly build and deploy the images:
 
     ```
-    skaffold dev
+    skaffold dev 2> /dev/null
     ```
 
     This will build the docker images and incorporate them into the helm templates, followed by managing the release of the chart. Any changes made to the configuration files for each docker image will be watched by skaffold, and will result in an automatic rebuild of the image followed by a redeployment into the cluster.

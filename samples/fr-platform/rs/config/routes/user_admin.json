@@ -1,6 +1,6 @@
 {
     "name": "user_admin",
-    "baseURI": "http://idm-service.sample.svc.cluster.local:8080",
+    "baseURI": "http://idm-service.&{namespace}&{domain}:8080",
     "condition": "${matches(request.uri.path, '^/openidm/managed/user($|(/.+$))') or matches(request.uri.path, '^/openidm/policy/managed/user($|(/.+$))')}",
     "handler": {
         "type": "Chain",

@@ -8,7 +8,7 @@
   },
   "data" : {
     "_id" : "",
-    "fixedValue" : "https://login.sample.svc.cluster.local",
+    "fixedValue" : "https://&{fqdn}",
     "source" : "FIXED_VALUE",
     "_type" : {
       "_id" : "baseurl",
