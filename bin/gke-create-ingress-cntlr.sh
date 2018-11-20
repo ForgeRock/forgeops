@@ -23,10 +23,7 @@ else
  IP_OPTS="--set controller.service.loadBalancerIP=$1"
 fi
 
-# For now we disable dynamic configuration due to bug https://github.com/kubernetes/ingress-nginx/issues/3056
-# Or else you have to use 0.17.1
 helm install --namespace nginx --name nginx \
-  --set controller.image.tag="0.17.1" \
   --set rbac.create=true \
   --set controller.publishService.enabled=true \
   --set controller.stats.enabled=true \
