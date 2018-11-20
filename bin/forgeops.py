@@ -4,7 +4,7 @@ Simple UI for deploy.sh script.
 """
 from tkinter import *
 from tkinter import ttk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, filedialog
 
 from threading import Thread
 from queue import Queue, Empty
@@ -15,24 +15,43 @@ import os
 import subprocess
 
 from subprocess import PIPE
-from yaml import dump
+try:
+    from yaml import dump
+except ImportError:
+    print("Pyyaml package is not installed. Run 'pip3 install pyyaml' to install it.")
 
 class ForgeopsGUI(object):
 
     def __init__(self):
         # Root window definition
         self._root = Tk()
-        self._root.geometry('800x825')
-        self._root.title('Forgeops UI')
+        self._root.geometry('1115x825')
+        self._root.title('Forgeops deployer UI')
         
         # Vars & globally accessible UI parts
-        self.check_btns_state = None
-        self.check_btns = None
-        self.product_textbox_input = None
-        self.product_textbox_input_val = None
+        self.check_btns_state = {}
+        self.check_btns = {}
+
+        # Product image vars
+        self.product_textbox_input = {}
+        self.product_textbox_input_val = {}
+        self.product_image_textbox_input = {}
+        self.product_image_textbox_val = {}
+        self.product_image_tag_textbox_input = {}
+        self.product_image_tag_textbox_input_val = {}
+        self.product_image_check_btn = {}
+        self.product_image_check_btn_val = {}
+
+        self.product_yaml_file_picker = {}        
+        self.product_yaml_file_path = {}
+        self.product_yaml_check_val = {}
+        self.product_yaml_check = {}
+
         self.deploy_button = None
         self.cleanup_button = None
+        
         self.terminal_output = None
+        
         self.domain_input_var = None
         self.namespace_input_var = None
         self.product_list = ['openam', 'openidm', 'openig', 'userstore', 'configstore', 'ctsstore']
@@ -64,20 +83,28 @@ class ForgeopsGUI(object):
        
 
         terminal_frame = Frame(self._root)
-        terminal_frame.grid(column=0, row=2, pady=10, padx=10, sticky=(W, E, S, N))
+        terminal_frame.grid(column=0, columnspan=5, row=2, pady=10, padx=10, sticky=(W, E, S, N))
+
+        menubar = Menu(self._root)
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label='About')
+        filemenu.add_command(label='Exit', command=self.exit_gui)
+        menubar.add_cascade(label='File', menu=filemenu)
+
+        self._root.config(menu=menubar)
 
         Label(select_frame, text='Forgeops product deployment', font=('Arial', 16), pady=10).grid(column=0, row=1)
-        ttk.Separator(select_frame, orient=HORIZONTAL).grid(row=2, columnspan=5, sticky='we')
+        ttk.Separator(select_frame, orient=HORIZONTAL).grid(row=2, columnspan=6, sticky='we')
 
-        Label(select_frame, text='Select products to deploy', font=('Arial', 12)).grid(row=3, column=0, sticky='w')
-        Label(select_frame, text='Config path', font=('Arial', 12)).grid(row=3, column=1, sticky='w')
+        Label(select_frame, text='Select products to deploy', font=('Arial', 10)).grid(row=3, column=0, sticky='w')
+        Label(select_frame, text='Config path', font=('Arial', 10)).grid(row=3, column=1, sticky='w')
+        Label(select_frame, text='Override', font=('Arial',10)).grid(row=3, column=2, sticky='w')
+        Label(select_frame, text='Image', font=('Arial', 10)).grid(row=3, column=3, sticky='w')
+        Label(select_frame, text='Tag', font=('Arial', 10)).grid(row=3, column=4, sticky='w')
+        Label(select_frame, text='Custom yaml file', font=('Arial', 10)).grid(row=3, column=5, sticky='w')
 
         ttk.Separator(select_frame, orient=HORIZONTAL).grid(row=4, columnspan=5, sticky='w')
 
-        self.check_btns_state = {}
-        self.check_btns = {}
-        self.product_textbox_input = {}
-        self.product_textbox_input_val = {}
         i = 5
 
         for product in self.product_list:
@@ -87,11 +114,33 @@ class ForgeopsGUI(object):
                                                    var=self.check_btns_state[product])
             self.check_btns[product].grid(row=i, column=0, sticky=W)
 
+            self.product_image_textbox_val[product] = StringVar()
+            self.product_image_tag_textbox_input_val[product] = StringVar()
+            
+            self.product_image_tag_textbox_input[product] = Entry(select_frame, textvariable=self.product_image_tag_textbox_input_val[product], state=DISABLED)
+            self.product_image_textbox_input[product] = Entry(select_frame, textvariable=self.product_image_textbox_val[product], state=DISABLED)
+
+            self.product_image_check_btn_val[product] = BooleanVar()
+            self.product_image_check_btn[product] = Checkbutton(select_frame, var=self.product_image_check_btn_val[product],
+                command=lambda entry1=self.product_image_textbox_input[product], entry2=self.product_image_tag_textbox_input[product], 
+                val=self.product_image_check_btn_val[product]: self.override_checks(entry1, entry2, val))
+            self.product_image_check_btn[product].grid(row=i, column=2, sticky='w')
+
+            self.product_image_textbox_input[product].grid(row=i, column=3, sticky='w')
+            self.product_image_tag_textbox_input[product].grid(row=i, column=4, sticky='w')
+
+
             if product in ['openam', 'openidm', 'openig']:
                 self.product_textbox_input_val[product] = StringVar()
-                self.product_textbox_input[product] = \
-                    Entry(select_frame,
-                          textvariable=self.product_textbox_input_val[product], width=50).grid(row=i, column=1)
+                self.product_textbox_input[product] = Entry(select_frame, textvariable=self.product_textbox_input_val[product], width=50)
+                self.product_textbox_input[product].grid(row=i, column=1)
+            
+
+            self.product_yaml_check_val[product] = BooleanVar()
+            self.product_yaml_check[product] = Checkbutton(select_frame, var=self.product_yaml_check_val[product],
+                command=lambda product=product: self.load_yaml_file(product))
+            self.product_yaml_check[product].grid(row=i, column=5)
+
             i += 1
 
         self.product_textbox_input_val['openam'].set('/git/config/6.5/smoke-tests/am/')
@@ -101,7 +150,7 @@ class ForgeopsGUI(object):
         ttk.Separator(select_frame, orient=HORIZONTAL).grid(row=i, columnspan=5, sticky='we')
         i += 1
 
-        Label(select_frame, text='Global settings', font=('Arial', 12), pady=10).grid(row=i, column=0, sticky=W)
+        Label(select_frame, text='Global settings', font=('Arial', 10), pady=10).grid(row=i, column=0, sticky=W)
         self.deploy_button = Button(select_frame, text='Deploy', command=self.deploy)
         self.cleanup_button = Button(select_frame, text='Remove deployment', command=self.delete_deployment, state=DISABLED)
        
@@ -138,7 +187,7 @@ class ForgeopsGUI(object):
         
         i += 1
         self.terminal_output = scrolledtext.ScrolledText(terminal_frame)
-        self.terminal_output.grid(row=1, sticky=S)
+        self.terminal_output.pack(fill='both')
         self._root.mainloop()
         
     # Deploy process related methods
@@ -149,6 +198,10 @@ class ForgeopsGUI(object):
         self.domain_text_field.config(state=state)
         self.namespace_text_field.config(state=state)
 
+    def set_product_inputs_state(self, product, state):
+        self.product_image_check_btn[product].config(state=state)
+        self.product_textbox_input[product].config(state=state)
+        
     def delete_deployment(self):
         print('Removing...')
         self.deploy_process = subprocess.Popen([self.forgeops_path + '/remove-all.sh', '-N', self.namespace_input_var.get()], 
@@ -193,6 +246,27 @@ class ForgeopsGUI(object):
 
     # Product deployment configuration methods
 
+    def load_yaml_file(self, product):
+        if self.product_yaml_check_val[product].get() == 1:
+            filepath = filedialog.askopenfilename()
+            print(filepath)
+            print(type(filepath))
+            if filepath == "" or len(filepath) == 0:
+                print('No file specified... defaulting to none')
+                self.product_yaml_file_path[product] = None
+                self.product_yaml_check_val[product].set(0)
+                self.set_product_inputs_state(product, NORMAL)
+            else:
+                print('Filepath set to: ' + filepath)
+                self.product_yaml_file_path[product] = filepath
+                print(self.product_yaml_file_path[product])
+                self.set_product_inputs_state(product, DISABLED)
+            
+        else:
+            self.set_product_inputs_state(product, NORMAL)
+            self.product_yaml_file_path[product] = None
+
+
     def generate_product_yaml(self):
         try:
             shutil.rmtree(self.config_folder, ignore_errors=True)
@@ -218,6 +292,7 @@ class ForgeopsGUI(object):
         self.ig_config_gen()
         self.idm_config_gen()
         self.ds_config_gen()
+        self.frconfig_gen()
 
         with open(os.path.join(self.config_folder, 'env.sh'), 'w') as f:
             f.write('DOMAIN="' + self.domain_input_var.get() + '"\n')
@@ -236,6 +311,18 @@ class ForgeopsGUI(object):
         configstore = {'instance': 'configstore'}
         ctsstore = {'instance': 'ctsstore'}
 
+        if self.product_image_check_btn_val['userstore'].get() == 1:
+            userstore['image']['repository'] = self.product_image_textbox_input['userstore'].get()
+            userstore['image']['tag'] = self.product_image_tag_textbox_input_val['userstore'].get()
+
+        if self.product_image_check_btn_val['configstore'].get() == 1:
+            configstore['image']['repository'] = self.product_image_textbox_input['configstore'].get()
+            configstore['image']['tag'] = self.product_image_tag_textbox_input_val['configstore'].get()
+
+        if self.product_image_check_btn_val['ctsstore'].get() == 1:
+            ctsstore['image']['repository'] = self.product_image_textbox_input['ctsstore'].get()
+            ctsstore['image']['tag'] = self.product_image_tag_textbox_input_val['ctsstore'].get()
+
         with open(os.path.join(self.config_folder, userstore_filename), 'w') as f:
             dump(userstore, f, default_flow_style=False)
         with open(os.path.join(self.config_folder, configstore_filename), 'w') as f:
@@ -248,7 +335,11 @@ class ForgeopsGUI(object):
         openam_filename = 'openam.yaml'
 
         amster = {'config': {'claim': 'frconfig', 'importPath': self.product_textbox_input_val['openam'].get()}}
+
         openam = {'image': {'pullPolicy': 'Always'}}
+        if self.product_image_check_btn_val['openam'].get() == 1:
+            openam['image']['repository'] = self.product_image_textbox_input['openam'].get()
+            openam['image']['tag'] = self.product_image_tag_textbox_input_val['openam'].get()
 
         with open (os.path.join(self.config_folder, amster_filename), 'w') as f:
             dump(amster, f, default_flow_style=False)
@@ -258,6 +349,9 @@ class ForgeopsGUI(object):
     def idm_config_gen(self):
         idm_filename = 'openidm.yaml'
         idm = {'config': {'path': self.product_textbox_input_val['openidm'].get()}}
+        if self.product_image_check_btn_val['openidm'].get() == 1:
+            idm['image']['repository'] = self.product_image_textbox_input['openidm'].get()
+            idm['image']['tag'] = self.product_image_tag_textbox_input_val['openidm'].get()
 
         with open (os.path.join(self.config_folder, idm_filename), 'w') as f:
             dump(idm, f, default_flow_style=False)
@@ -265,10 +359,32 @@ class ForgeopsGUI(object):
     def ig_config_gen(self):
         ig_filename = 'openig.yaml'
         ig = {'config': {'path': self.product_textbox_input_val['openig'].get()}}
+        if self.product_image_check_btn_val['openig'].get() == 1:
+            ig['image']['repository'] = self.product_image_textbox_input['openig'].get()
+            ig['image']['tag'] = self.product_image_tag_textbox_input_val['openig'].get()
 
         with open (os.path.join(self.config_folder, ig_filename), 'w') as f:
             dump(ig, f, default_flow_style=False)
 
+    def frconfig_gen(self):
+        frconfig_filename = 'frconfig.yaml'
+        frconfig = {'git': {'repo': self.frconfig_git_repo.get(), 'branch': self.frconfig_git_branch.get()}}
+
+        with open(os.path.join(self.config_folder, frconfig_filename), 'w') as f:
+            dump(frconfig, f, default_flow_style=False)
+    
+    # Helper methods
+
+    def override_checks(self, entry1, entry2, val):
+        if val.get() == 0:
+            entry1.config(state=DISABLED)
+            entry2.config(state=DISABLED)
+        else:
+            entry1.config(state=NORMAL)
+            entry2.config(state=NORMAL)
+
+    def exit_gui(self):
+        self._root.quit()
 
 if __name__ == "__main__":
     gui = ForgeopsGUI()
