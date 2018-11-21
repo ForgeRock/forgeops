@@ -1,0 +1,3 @@
+config:
+  claim: frconfig
+  importPath: /git/config/6.5/smoke-tests/am/
