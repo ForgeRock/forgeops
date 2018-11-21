@@ -35,6 +35,8 @@ case "${choice}" in
    * ) echo "Invalid input, Bye!"; exit 1;;
 esac
 
+# Who created this cluster.
+CREATOR="${USER:-unknown}"
 
 echo ""
 echo "=> Creating cluster called \"${GKE_CLUSTER_NAME}\" with specs \"${GKE_MACHINE_TYPE}\""
@@ -69,7 +71,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --num-nodes=${GKE_CLUSTER_SIZE} \
       --min-nodes=${MIN_NODES} \
       --max-nodes=${MAX_NODES} \
-      --labels="owner=sre" \
+      --labels="createdBy=${CREATOR}" \
       --addons=HorizontalPodAutoscaling \
       --enable-autoscaling \
       --enable-autorepair \
