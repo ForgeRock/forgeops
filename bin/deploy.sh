@@ -4,12 +4,18 @@
 # Deployment script that can be used for CI automation, etc.
 # This script assumes that kubectl and helm are available, and have been configured
 # with the correct context for the cluster.
-# Warning: This script will purge any existig deployments in the target namespace!
+# Warning: 
+#   - This script will purge any existig deployments in the target namespace!
+#   - This script is not supported by Forgerock
+#   
+# Usage:
+#   - You must provide folder that contains env.sh script that contains:
+#       - DOMAIN, NAMESPACE, COMPONENTS vars
+#   - You may provide yaml files for each component. Values in these files will
+#     override default values for helm charts
+#   - For examples look into: forgeops/samples/config/
 #
-# This script will also do the following:
-#   - Deploy AM along with DS (configstore, userstore and CTS)
-#   - Ensure configs are in place
-#   - Restart AM to take all configuration online
+#
 ####################################################################################
 
 set -o errexit

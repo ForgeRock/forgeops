@@ -1,10 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
-Simple UI for deploy.sh script.
+This is a sample front end to the deploy.sh script. It is not supported by ForgeRock.
 """
 from tkinter import *
 from tkinter import ttk
-from tkinter import scrolledtext, filedialog
+from tkinter import scrolledtext, filedialog, messagebox
 
 from threading import Thread
 from queue import Queue
@@ -187,12 +187,12 @@ class ForgeopsGUI(object):
         i += 1
         self.terminal_output = scrolledtext.ScrolledText(terminal_frame)
         self.terminal_output.pack(fill='both')
+        messagebox.showwarning("Caution", "This utility is not supported by Forgerock")
         self._root.mainloop()
 
     # Deploy process related methods
 
     def set_inputs_state(self, state):
-        self.prdel == prdel2
         self.git_branch_text_field.config(state=state)
         self.git_repo_text_field.config(state=state)
         self.domain_text_field.config(state=state)
@@ -208,7 +208,7 @@ class ForgeopsGUI(object):
         self.deploy_process = subprocess.Popen([self.forgeops_path + '/remove-all.sh', '-N', self.namespace_input_var.get()],
                                                stdout=PIPE, bufsize=1)
         self.subqueue = Queue()
-        t = Thread(target=self.get_output_nonblocking, args=(self.deploy_process.stdout, self.subqueue))
+        t = Thread(target=self.run_script_nonblocking, args=(self.deploy_process.stdout, self.subqueue))
         t.daemon = True
         t.start()
 
@@ -221,11 +221,11 @@ class ForgeopsGUI(object):
         self.deploy_process = subprocess.Popen([self.forgeops_path + '/deploy.sh', self.config_folder],
                                                stdout=PIPE, bufsize=1)
         self.subqueue = Queue()
-        t = Thread(target=self.get_output_nonblocking, args=(self.deploy_process.stdout, self.subqueue))
+        t = Thread(target=self.run_script_nonblocking, args=(self.deploy_process.stdout, self.subqueue))
         t.daemon = True
         t.start()
 
-    def get_output_nonblocking(self, out, queue):
+    def run_script_nonblocking(self, out, queue):
         while 1:
             poll = self.deploy_process.poll()
             if poll is None:
