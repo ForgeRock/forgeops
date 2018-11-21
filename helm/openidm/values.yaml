@@ -33,7 +33,7 @@ component: openidm
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openidm
-  tag: 6.5.0-M8
+  tag: 6.5.0-M9
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
