@@ -37,7 +37,7 @@ config:
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 6.5.0-M13
+  tag: 6.5.0-M17
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
