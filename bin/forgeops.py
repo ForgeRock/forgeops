@@ -171,7 +171,7 @@ class ForgeopsGUI(object):
         i += 1
         Label(select_frame, text='Namespace').grid(row=i, column=0, sticky=W)
         self.namespace_input_var = StringVar()
-        self.namespace_input_var.set('pavel')
+        self.namespace_input_var.set('changeme')
         self.namespace_text_field = Entry(select_frame, textvariable=self.namespace_input_var, width=50)
         self.namespace_text_field.grid(row=i, column=1, sticky=W)
 
