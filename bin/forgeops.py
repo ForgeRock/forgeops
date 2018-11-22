@@ -4,7 +4,7 @@ This is a sample front end to the deploy.sh script. It is not supported by Forge
 """
 from tkinter import *
 from tkinter import ttk
-from tkinter import scrolledtext, filedialog, messagebox
+from tkinter import scrolledtext, messagebox
 
 from threading import Thread
 from queue import Queue
@@ -67,14 +67,21 @@ class ForgeopsGUI(object):
 
         # Misc
         self.init_message = """
+        Experimental UI for deploying Forgerock products into cloud. It's not supported by Forgerock. Use with caution.
+
+        Prerequisites:
+            This utility expects following conditions to be met:
+                - Have connection to cluster setup
+                - Have kubectl, helm, kubens binaries setup and in the PATH
         Usage:
             Select products which you want to deploy. If you want to use custom image and tag, please check override
             and provide custom image and tag. If you are deploying openam, remember you need to deploy
             userstore/ctsstore/configstore based on configuration you are going to provide to this product.
 
-            Once products are selected, you can proceed to deploy products.
+            Once products are selected, you can proceed to deploy products. Utility doesn't save existing deployment
+            anywhere. If you quit utility before cleaning up namespace, products will stay in cloud.
 
-        WARNING: Remove deployment button will delete whole namespace with persistent volumes.
+        WARNING: Remove deployment button will delete whole namespace with persistent volumes. Be careful
         """
 
     # UI design
