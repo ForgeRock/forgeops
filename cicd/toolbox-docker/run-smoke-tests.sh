@@ -11,7 +11,7 @@ clean_ns() {
     echo "Cleaning up older deployments"
     kubens $1
     cd $WORKSPACE
-    ./bin/remove-all.sh -N smoke
+    ./bin/remove-all.sh -N $1
     kubectl delete secret frconfig
     kubectl delete configmap frconfig
     echo "Sleeping for 60 seconds to let namespace clean up"
