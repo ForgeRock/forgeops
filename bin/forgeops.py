@@ -25,7 +25,7 @@ class ForgeopsGUI(object):
     def __init__(self):
         # Root window definition
         self._root = Tk()
-        self._root.geometry('1115x825')
+        self._root.geometry('1015x825')
         self._root.title('Forgeops deployer UI')
 
         # Vars & globally accessible UI parts
@@ -41,10 +41,6 @@ class ForgeopsGUI(object):
         self.product_image_tag_textbox_input_val = {}
         self.product_image_check_btn = {}
         self.product_image_check_btn_val = {}
-        self.product_yaml_file_picker = {}
-        self.product_yaml_file_path = {}
-        self.product_yaml_check_val = {}
-        self.product_yaml_check = {}
 
         self.deploy_button = None
         self.cleanup_button = None
@@ -69,6 +65,18 @@ class ForgeopsGUI(object):
         self.forgeops_path = os.path.dirname(os.path.abspath(__file__))
         self.config_folder = os.path.join(self.forgeops_path, 'config-deploy')
 
+        # Misc
+        self.init_message = """
+        Usage:
+            Select products which you want to deploy. If you want to use custom image and tag, please check override
+            and provide custom image and tag. If you are deploying openam, remember you need to deploy
+            userstore/ctsstore/configstore based on configuration you are going to provide to this product.
+
+            Once products are selected, you can proceed to deploy products.
+
+        WARNING: Remove deployment button will delete whole namespace with persistent volumes.
+        """
+
     # UI design
 
     def run(self):
@@ -83,7 +91,7 @@ class ForgeopsGUI(object):
 
         menubar = Menu(self._root)
         filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label='About')
+        filemenu.add_command(label='About', command=self.about_dialog)
         filemenu.add_command(label='Exit', command=self.exit_gui)
         menubar.add_cascade(label='File', menu=filemenu)
 
@@ -97,7 +105,6 @@ class ForgeopsGUI(object):
         Label(select_frame, text='Override', font=('Arial', 10)).grid(row=3, column=2, sticky='w')
         Label(select_frame, text='Image', font=('Arial', 10)).grid(row=3, column=3, sticky='w')
         Label(select_frame, text='Tag', font=('Arial', 10)).grid(row=3, column=4, sticky='w')
-        Label(select_frame, text='Custom yaml file', font=('Arial', 10)).grid(row=3, column=5, sticky='w')
 
         ttk.Separator(select_frame, orient=HORIZONTAL).grid(row=4, columnspan=5, sticky='w')
 
@@ -133,12 +140,6 @@ class ForgeopsGUI(object):
                 self.product_textbox_input_val[product] = StringVar()
                 self.product_textbox_input[product] = Entry(select_frame, textvariable=self.product_textbox_input_val[product], width=50)
                 self.product_textbox_input[product].grid(row=i, column=1)
-
-            self.product_yaml_check_val[product] = BooleanVar()
-            self.product_yaml_check[product] = \
-                Checkbutton(select_frame, var=self.product_yaml_check_val[product],
-                            command=lambda product=product: self.load_yaml_file(product))
-            self.product_yaml_check[product].grid(row=i, column=5)
 
             i += 1
 
@@ -187,10 +188,14 @@ class ForgeopsGUI(object):
         i += 1
         self.terminal_output = scrolledtext.ScrolledText(terminal_frame)
         self.terminal_output.pack(fill='both')
+        self.terminal_output.insert(END, self.init_message)
         messagebox.showwarning("Caution", "This utility is not supported by Forgerock")
         self._root.mainloop()
 
     # Deploy process related methods
+
+    def about_dialog(self):
+        messagebox.showinfo("About", "Simple utility to deploy Forgerock product into cloud")
 
     def set_inputs_state(self, state):
         self.git_branch_text_field.config(state=state)
@@ -243,28 +248,6 @@ class ForgeopsGUI(object):
             self.cleanup_button.config(state=NORMAL)
 
         out.close()
-
-    # Product deployment configuration methods
-
-    def load_yaml_file(self, product):
-        if self.product_yaml_check_val[product].get() == 1:
-            filepath = filedialog.askopenfilename()
-            print(filepath)
-            print(type(filepath))
-            if filepath == "" or len(filepath) == 0:
-                print('No file specified... defaulting to none')
-                self.product_yaml_file_path[product] = None
-                self.product_yaml_check_val[product].set(0)
-                self.set_product_inputs_state(product, NORMAL)
-            else:
-                print('Filepath set to: ' + filepath)
-                self.product_yaml_file_path[product] = filepath
-                print(self.product_yaml_file_path[product])
-                self.set_product_inputs_state(product, DISABLED)
-
-        else:
-            self.set_product_inputs_state(product, NORMAL)
-            self.product_yaml_file_path[product] = None
 
     def generate_product_yaml(self):
         try:
