@@ -37,6 +37,9 @@ esac
 
 # Who created this cluster.
 CREATOR="${USER:-unknown}"
+# Labels can not contain dots that may be present in the user.name
+CREATOR=$(echo $CREATOR | sed 's/\./_/')
+
 
 echo ""
 echo "=> Creating cluster called \"${GKE_CLUSTER_NAME}\" with specs \"${GKE_MACHINE_TYPE}\""
@@ -71,7 +74,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --num-nodes=${GKE_CLUSTER_SIZE} \
       --min-nodes=${MIN_NODES} \
       --max-nodes=${MAX_NODES} \
-      --labels="createdBy=${CREATOR}" \
+      --labels="createdby=${CREATOR}" \
       --addons=HorizontalPodAutoscaling \
       --enable-autoscaling \
       --enable-autorepair \
