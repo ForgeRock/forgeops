@@ -25,4 +25,4 @@ resources:
 replicaCount: 2
 
 # commons parameters
-amurl: "login.small.freng.org"
+amurl: "login.prod.frk8s.net"
