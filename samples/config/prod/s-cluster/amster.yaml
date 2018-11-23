@@ -1,7 +1,7 @@
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
   #repository: gcr.io/engineering-devops/amster
-  tag: 6.5.0-M17
+  tag: 6.5.0-RC1
   pullPolicy: Always
   
 config:
