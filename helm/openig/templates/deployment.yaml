@@ -56,6 +56,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        envFrom:
+        - configMapRef:
+            name: openig-{{ .Release.Name }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
