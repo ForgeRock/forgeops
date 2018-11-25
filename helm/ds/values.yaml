@@ -24,8 +24,14 @@ component: ds
 userstore:
   enabled: true
 
-# If you wan to disable the cts backend, set to false.
+# If you want to disable specific backends, set to false:
 cts:
+  enabled: true
+
+configstore:
+  enabled: true
+
+idmRepo:
   enabled: true
 
 image:
