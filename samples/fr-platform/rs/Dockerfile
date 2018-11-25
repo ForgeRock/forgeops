@@ -1,4 +1,4 @@
-FROM forgerock-docker-public.bintray.io/forgerock/openig:6.5.0-RC1
+FROM forgerock-docker-public.bintray.io/forgerock/openig:6.5.0-RC2
 
 ADD config /var/openig/config
 ADD scripts /var/openig/scripts

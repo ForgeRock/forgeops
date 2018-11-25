@@ -43,10 +43,6 @@ done
 
 export RS_SERVERS
 
-#  Selectively enable or disable backends
-export DS_ENABLE_USERSTORE=true
-export DS_ENABLE_CTS=true
-
 export SERVER_ID=1
 
 # Try to grab the server id from the statefulset hostname

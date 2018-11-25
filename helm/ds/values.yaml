@@ -14,7 +14,8 @@ useDefaultSecrets: true
 baseDN: "ou=identities"
 
 # The default instance name. This will create a stateful set that can be resolved at
-#  $instance-0.$instance
+#  $instance-0.$instance. You can also use the service name $instance - which will get (randomly)
+# load balanced to an instance (not recommended )
 instance: ds
 
 component: ds
