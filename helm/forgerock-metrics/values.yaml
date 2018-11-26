@@ -42,8 +42,8 @@ ig:
   enabled: true
   path: /openig/metrics/prometheus
   labelSelectorComponent: openig
-  secretUser: b3BlbmlkbS1hZG1pbg==
-  secretPassword: b3BlbmlkbS1hZG1pbg==
+  secretUser: cHJvbWV0aGV1cw==
+  secretPassword: cHJvbWV0aGV1cw==
   
 additionalRulesLabels:
   prometheus: monitoring-kube-prometheus
