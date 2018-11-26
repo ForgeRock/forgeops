@@ -130,9 +130,9 @@ When you are done making changes to the base configuration, you can create final
 
 Build the Docker images for this sample:
 
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:latest rs
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:latest amster
-    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:latest idm
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs:6.5.0 rs
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster:6.5.0 amster
+    docker build -t forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm:6.5.0 idm
 
 You can now push these to a docker registry, if that is needed.
 

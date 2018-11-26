@@ -17,7 +17,7 @@ idm:
     path: /opt/openidm
   image:
     repository: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/idm
-    tag: latest
+    tag: 6.5.0
   ingress:
     enabled: false
 
@@ -33,7 +33,7 @@ amster:
     importPath: /opt/amster/config/
   image:
     repository: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/amster
-    tag: latest
+    tag: 6.5.0
 
 rs:
   domain: .svc.cluster.local
@@ -50,7 +50,7 @@ rs:
     path: /var/openig
   image:
     repository: forgerock-docker-public.bintray.io/forgerock/sample-fr-platform/rs
-    tag: latest
+    tag: 6.5.0
   ingress:
     hostname: rs-service.sample.svc.cluster.local
     annotations:
