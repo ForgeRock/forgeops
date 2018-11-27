@@ -11,6 +11,7 @@ config:
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
 ctsPassword: password
 
+cookieDomain: forgeops.com
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:
