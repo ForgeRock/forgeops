@@ -23,3 +23,6 @@ service:
   type: ClusterIP
   externalPort: 80
   internalPort: 80
+
+securityContext:
+  privileged: true

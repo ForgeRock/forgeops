@@ -31,3 +31,6 @@ image:
   repository: forgerock-docker-public.bintray.io
   tag: latest
   pullPolicy: Always
+
+securityContext:
+  privileged: true
