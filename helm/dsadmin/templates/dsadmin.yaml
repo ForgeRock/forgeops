@@ -17,7 +17,7 @@ spec:
         app: dsadmin
     spec:
       securityContext:
-        fsGroup: 11111
+{{ toYaml .Values.securityContext | indent 8 }}
       initContainers:
       # When the NFS share has just been created it is owned by root. We need to run as root, create
       # a top level folder for backups, and chown the permisions to the forgerock user.

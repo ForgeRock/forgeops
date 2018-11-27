@@ -105,3 +105,8 @@ restore:
   # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
   # is used to recover.
   enabled: false
+
+securityContext:
+  runAsUser: 11111
+  fsGroup: 11111
+  supplementalGroups: [ 0 ]

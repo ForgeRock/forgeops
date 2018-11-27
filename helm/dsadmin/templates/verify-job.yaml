@@ -25,7 +25,7 @@ spec:
         spec:
           # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
           securityContext:
-            fsGroup: 11111
+{{ toYaml .Values.securityContext | indent 8 }}
           restartPolicy: Never      
           containers:
           - name: opendj

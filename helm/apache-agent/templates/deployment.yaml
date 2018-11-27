@@ -30,7 +30,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args: ["install"]
         securityContext:
-          privileged: true
+{{ toYaml .Values.securityContext | indent 8 }}
         volumeMounts:
         - name: logs
           mountPath: /logmount

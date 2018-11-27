@@ -44,4 +44,5 @@ nfs:
 # If you don't have slack, set this to "undefined"
 slackUrl: undefined
 
-
+securityContext:
+  fsGroup: 11111
