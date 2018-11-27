@@ -48,7 +48,7 @@ kind: Secret
 metadata:
   name: prometheus-ds
 data:
-  user: {{ .Values.ds.secretUser }}
-  password: {{ .Values.ds.secretPassword }}
+  user: {{ .Values.ds.secretUser | b64enc }}
+  password: {{ .Values.ds.secretPassword | b64enc }}
 type: Opaque
 {{- end -}}
