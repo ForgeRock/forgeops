@@ -43,6 +43,8 @@ spec:
             name:  {{ default "frconfig" .Values.config.name  }}
         - secretRef:
             name: {{ default "openig-secrets-env" .Values.secret.name  }}
+        - configMapRef:
+            name: openig-{{ .Release.Name }}
         env:
         - name: OPENIG_BASE
           value: "{{ .Values.config.path }}"
@@ -56,9 +58,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        envFrom:
-        - configMapRef:
-            name: openig-{{ .Release.Name }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
