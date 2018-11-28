@@ -57,6 +57,7 @@ dl(){
   
     echo "Downloading $src to $3"
 
+    echo "GCS_CACHE is: $GCS_DIR"
     if [ -n "$GCS_DIR" ]; then
         gsutil cp $GCS_DIR/$2 $3
         if [ "$?" -eq 0 ];  then
