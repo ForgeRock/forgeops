@@ -16,11 +16,15 @@ git:
   repo: "https://github.com/ForgeRock/forgeops-init.git"
   branch: master
 
+platform:
+  idmProtectedByIg: false
+  #igClientUsername: openig
+  #igClientPassword: openig
 
 # Cert manager defaults
 certmanager:
   enabled: true
-  # The default issuer is to use the CA certs issuer. 
+  # The default issuer is to use the CA certs issuer.
   issuer: ca-issuer
   # And a local to namespace issuer
   issuerKind: Issuer

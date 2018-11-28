@@ -53,6 +53,8 @@ spec:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
         - secretRef:
+            name: {{ default "frconfig" .Values.config.name }}-platform
+        - secretRef:
             name: {{ default "openidm-secrets-env" .Values.secret.name  }}
         env:
         - name: NAMESPACE
