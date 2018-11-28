@@ -11,7 +11,7 @@ cts:
 
 resources:
   limits:
-    memory: 24Gi
+    memory: 27Gi
     cpu: 10000m
   requests:
     memory: 20Gi
