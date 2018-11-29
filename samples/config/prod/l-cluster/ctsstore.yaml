@@ -11,7 +11,7 @@ userstore:
 
 resources:
   limits:
-    memory: 26Gi
+    memory: 28Gi
     cpu: 20000m
   requests:
     memory: 21Gi
