@@ -1,6 +1,6 @@
 image:
-  repository: gcr.io/engineering-devops/openam
-  #repository: forgerock-docker-public.bintray.io/openam
+  #repository: gcr.io/engineering-devops/openam
+  repository: forgerock-docker-public.bintray.io/openam
   tag: 6.5.0
   pullPolicy: IfNotPresent
 
