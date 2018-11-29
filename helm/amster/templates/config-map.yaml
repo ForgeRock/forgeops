@@ -41,5 +41,5 @@ data:
   PROMETHEUS_PASSWORD: "{{ .Values.prometheusPassword }}"
   AMADMIN_PASSWORD_HASHED: "{{ .Values.amadminPasswordHashed }}"
   DOMAIN: {{ .Values.domain }}
-  COOKIE_DOMAIN: {{ .Values.cookieDomain }}
+  COOKIE_DOMAIN: {{ .Values.domain }}
   
