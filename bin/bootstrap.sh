@@ -34,7 +34,6 @@ if ! kubectl get namespace "$NAMESPACE" > /dev/null 2>&1; then
     kubectl create namespace "$NAMESPACE" > /dev/null
 fi
 
-# set -x
 if ! kubectl get secret --namespace "$NAMESPACE" "${secretName}" > /dev/null 2>&1; then
 
     echo
