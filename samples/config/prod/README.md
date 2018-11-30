@@ -9,20 +9,20 @@ Shell scripts and custom helm chart values that facilitate the deployment of the
 This guide assumes you have access to Kubernetes cluster and appropriate permissions to do deployments.  
 Other requirements are:
 
-- `kubectl` is fully functional
+- `kubectl` is fully functional and latest version
 - You have an existing cluster, context and proper permissions/roles
-- *Helm* is installed (Kubernetes package manager) with RBAC
+- *Helm* is installed (Kubernetes package manager) with RBAC and tiller is up and running
 - *Ingress* is deployed and you can access the cluster endpoint
-- You have `curl` binary installed
-- You have modified `*.yaml` files in `samples/config/prod/x-cluster` to cater to your environment.
+- You have the `curl` binary installed
+- You have modified `*.yaml` files in `samples/config/prod/x-cluster` to cater to your environment
 
 
 
 ### Choosing the Deployment Size
 
-- The subdirectories contain custom values for deployments of three sizes.  The small `s-cluster` is recommended for up to 1M users, the medium `m-cluster` for up to 10M users and the large `l-cluster` for up to 100M users. 
+- The subdirectories contain custom values for "pre-sized" deployments of three categories.  The small `s-cluster` is recommended for up to 1M users, the medium `m-cluster` for up to 10M users and the large `l-cluster` for up to 100M users. 
 
-- Sizing and benchmarking is a very objective exercise and highly depends on the use cases, data, (virtual) hardware and other indirect variables such as cost and networking. In these samples we prescribe the sizing for certain use cases.  This will enable you to ascertain the throughput and latency under these conditions.  Hence the results can be used to size your environment, estimate the cost and benchmark your environment.  
+- Keep in mind that sizing and benchmarking is a very objective exercise and highly depends on the use cases, data, (virtual) hardware and other indirect variables such as cost and networking. In these samples we prescribe the sizing for certain use cases.  This will enable you to ascertain the throughput and latency under these conditions.  Hence the results can be used to size your environment, estimate the cost and benchmark your environment.  
 
 - If you require higher performance, you have also have the choice of horizontal and vertical scaling. Horizontal scaling can be achieved by adding more nodes to the node pool or enabling auto-scaling features of your Kuberntes cluster. Vertical scaling can be achieved by adding higher CPU and Memory nodes to your existing cluster and then re-schedule the pods under stress using any of the available techniques such node selection via resource limits, taints/tolerances. Bear in mind that under certain scenerios even if your user population fits one category, you might still need the next higher category to attain better performance SLA's.
 
@@ -53,7 +53,7 @@ Other requirements are:
 
 ### Usage
 
-- Ensure the value of password fields, domains and namespaces in various yaml files are changed before you deploy.
+- Ensure the value of password fields, domains and namespaces in various yaml files are changed before you deploy.  
  
 - The `deploy.sh` script needs to point to a "config" directory.  There are several "config" examples provided under the `forgeops/samples` directory. For example to deploy the medium size (m-cluster) execute 
 
@@ -61,7 +61,7 @@ Other requirements are:
     $ ./deploy.sh ../samples/config/prod/m-cluster
     ```
 
-- The deployment will take anywhere from 3-10 minutes so be patient. For a successful deployment you will get a message saying "Deployment is now ready"
+- The deployment will take anywhere from 3-10 minutes so be patient. For a successful deployment you will get a message saying "Deployment is now ready".
 
 - Check out the CDM Cookbook on http://backstage.forgerock.com for more details.
 
