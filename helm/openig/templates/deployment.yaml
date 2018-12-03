@@ -45,8 +45,6 @@ spec:
             name: {{ default "frconfig" .Values.config.name }}-platform
         - secretRef:
             name: {{ default "openig-secrets-env" .Values.secret.name  }}
-        - configMapRef:
-            name: openig-{{ .Release.Name }}
         env:
         - name: OPENIG_BASE
           value: "{{ .Values.config.path }}"
