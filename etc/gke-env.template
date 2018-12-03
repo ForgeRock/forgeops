@@ -19,6 +19,7 @@ GKE_NODE_LOCATIONS="us-east1-d,us-east1-c"
 # To get specific cluster versions you can run the command
 # $ gcloud container get-server-config
 GKE_CLUSTER_VERSION="latest"
+#GKE_CLUSTER_VERSION="1.11.3-gke.18"
 
 # Nodes per zone in Cluster
 GKE_CLUSTER_SIZE="2"

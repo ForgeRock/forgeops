@@ -21,7 +21,7 @@ done < $CFGDIR/common.yaml
 URL_PREFIX="${FQDN%%.*}"
 
 # k8s namespace to deploy in
-NAMESPACE="large"
+NAMESPACE="prod"
 
 # Top level domain. Do not include the leading "."
 # You can override by just providing a string here 

@@ -14,7 +14,8 @@ useDefaultSecrets: true
 baseDN: "ou=identities"
 
 # The default instance name. This will create a stateful set that can be resolved at
-#  $instance-0.$instance
+#  $instance-0.$instance. You can also use the service name $instance - which will get (randomly)
+# load balanced to an instance (not recommended )
 instance: ds
 
 component: ds
@@ -23,14 +24,20 @@ component: ds
 userstore:
   enabled: true
 
-# If you wan to disable the cts backend, set to false.
+# If you want to disable specific backends, set to false:
 cts:
+  enabled: true
+
+configstore:
+  enabled: true
+
+idmRepo:
   enabled: true
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/ds
   pullPolicy: IfNotPresent
-  tag: 6.5.0-RC5
+  tag: 6.5.0
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.
@@ -98,3 +105,8 @@ restore:
   # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
   # is used to recover.
   enabled: false
+
+securityContext:
+  runAsUser: 11111
+  fsGroup: 11111
+  supplementalGroups: [ 0 ]

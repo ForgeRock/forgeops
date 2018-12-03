@@ -18,13 +18,13 @@ gcs:
   bucket:  gs://forgeops/ds-backups
 
 s3:
-  enabled: true
+  enabled: false
   # S3 Bucket destination
   bucket: s3://forgeops/dj-backup
   
 storage: {}
 
-# If the pvc / pv already exists, use --set backup.createPVC=false
+# If the pvc / pv already exists, use --set createPVC=false
 createPVC: true
 
 backup:
@@ -35,7 +35,7 @@ backup:
   # Do not uncomment.  Place holder for future work
   # verify: false
   
-# For creating the PV, we need to speficy the server and the path to the export
+# For creating the PV, we need to specify the server and the path to the export
 nfs:
   server: 10.191.193.66
   path: /export
@@ -43,3 +43,6 @@ nfs:
 # An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
 # If you don't have slack, set this to "undefined"
 slackUrl: undefined
+
+securityContext:
+  fsGroup: 11111

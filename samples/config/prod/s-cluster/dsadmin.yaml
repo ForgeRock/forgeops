@@ -1,7 +1,7 @@
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/ds
   #repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0-RC5
+  tag: 6.5.0
   pullPolicy: Always
 
 gcs:
@@ -14,6 +14,7 @@ s3:
 
 nfs:
   server: 10.201.33.74
+  #server: fs-ab7e17e1.efs.us-east-1.amazonaws.com
   path: /export
 
 backup:

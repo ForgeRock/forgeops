@@ -1,7 +1,7 @@
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openidm
   #repository: gcr.io/engineering-devops/openidm
-  tag: 6.5.0-M6
+  tag: 6.5.0
   pullPolicy: IfNotPresent
   
 resources:

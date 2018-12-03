@@ -1,7 +1,7 @@
 image:
-  #repository: forgerock-docker-public.bintray.io/forgerock/ds
-  repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0-RC5
+  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  #repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0
   pullPolicy: IfNotPresent
 
 instance: ctsstore
@@ -11,13 +11,13 @@ userstore:
 
 resources:
   limits:
-    memory: 24Gi
+    memory: 28Gi
     cpu: 20000m
   requests:
     memory: 21Gi
     cpu: 16000m
 
-storageSize: 850Gi
+storageSize: 1000Gi
 storageClass: fast
 
 # For JDK 8

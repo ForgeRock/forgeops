@@ -22,6 +22,13 @@ spec:
   # targetPort is the pod port *NOT* the service port
   - targetPort: 8080
     path: {{ .Values.ig.path }}
+    basicAuth:
+      password:
+        name: prometheus-ig
+        key: password
+      username:
+        name: prometheus-ig
+        key: user
   # This targets the service using a label.
   selector:
     matchLabels:
@@ -41,7 +48,7 @@ kind: Secret
 metadata:
   name: prometheus-ig
 data:
-  user: {{ .Values.ig.secretUser }}
-  password: {{ .Values.ig.secretPassword }}
+  user: {{ .Values.ig.secretUser | b64enc }}
+  password: {{ .Values.ig.secretPassword | b64enc }}
 type: Opaque
 {{- end -}}

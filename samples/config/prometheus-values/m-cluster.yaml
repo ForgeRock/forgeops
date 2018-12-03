@@ -8,6 +8,35 @@ deployKubeScheduler: False
 # Controller Manager
 deployKubeControllerManager: False
 
+domain: .perf.forgerock-qa.com
+
+grafana:
+  storageSpec:
+    class: fast
+    accessMode: "ReadWriteOnce"
+    resources:
+     requests:
+       storage: 20Gi
+    #selector: {}
+  ingress:
+    enabled: true
+
+    annotations: 
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+
+    labels:
+      group: monitoring-ingress
+      product: grafana
+      
+    hosts:
+      - grafana.monitoring.perf.forgerock-qa.com
+      
+    tls:
+      - secretName: wildcard.monitoring.perf.forgerock-qa.com
+        hosts:
+          - grafana.monitoring.perf.forgerock-qa.com
+          
 alertmanager:
   ## Alertmanager configuration directives
   ## Ref: https://prometheus.io/docs/alerting/configuration/
@@ -54,6 +83,25 @@ alertmanager:
           requests:
             storage: 50Gi
       #selector: {}
+      
+  ingress:
+    enabled: true
+
+    annotations: 
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+
+    labels:
+      group: monitoring-ingress
+      product: alertmanager
+      
+    hosts:
+      - alertmanager.monitoring.perf.forgerock-qa.com
+      
+    tls:
+      - secretName: wildcard.monitoring.perf.forgerock-qa.com
+        hosts:
+          - alertmanager.monitoring.perf.forgerock-qa.com
 
 prometheus:
   storageSpec:
@@ -69,11 +117,21 @@ prometheus:
           requests:
             storage: 100Gi
             
-grafana:
-  storageSpec:
-    class: fast
-    accessMode: "ReadWriteOnce"
-    resources:
-     requests:
-       storage: 20Gi
-    #selector: {}
+  ingress:
+    enabled: true
+
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+
+    labels:
+      group: monitoring-ingress
+      product: prometheus
+
+    hosts:
+      - prometheus.monitoring.perf.forgerock-qa.com
+
+    tls:
+      - secretName: wildcard.monitoring.perf.forgerock-qa.com
+        hosts:
+          - prometheus.monitoring.perf.forgerock-qa.com

@@ -20,8 +20,8 @@ spec:
         app: {{ template "fullname" . }}
         component:  {{ .Values.component }}
     spec:
-      terminationGracePeriodSeconds: 5 
-      {{ if eq .Values.config.strategy "git" -}}  
+      terminationGracePeriodSeconds: 5
+      {{ if eq .Values.config.strategy "git" -}}
       initContainers:
       - name: git-init
         image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
@@ -45,13 +45,15 @@ spec:
             name: amster-{{ .Release.Name }}
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
+        - secretRef:
+            name: {{ default "frconfig" .Values.config.name }}-platform
         env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
         volumeMounts:
-        {{ if eq .Values.config.strategy "git" -}}  
+        {{ if eq .Values.config.strategy "git" -}}
         - name: git
           mountPath: /git
         {{- end }}
@@ -65,7 +67,7 @@ spec:
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-      {{ if eq .Values.config.strategy "git" -}}  
+      {{ if eq .Values.config.strategy "git" -}}
       - name: git
         image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -89,7 +91,7 @@ spec:
         configMap:
           name: amster-config
       # the amster and git pods share access to this volume
-      {{ if eq .Values.config.strategy "git" -}}  
+      {{ if eq .Values.config.strategy "git" -}}
       - name: git
         emptyDir: {}
       - name: git-secret

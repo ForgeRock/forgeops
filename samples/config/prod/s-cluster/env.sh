@@ -21,7 +21,7 @@ done < $CFGDIR/common.yaml
 URL_PREFIX="${FQDN%%.*}"
 
 # k8s namespace to deploy in
-NAMESPACE="small"
+NAMESPACE="prod"
 
 # Top level domain. Do not include the leading "."
 # You can override by just providing a string here 
@@ -30,4 +30,4 @@ DOMAIN="${DOMAIN/\./}"
 # The components to deploy
 # Note the opendj stores are aliased as configstore, 
 # userstore, ctstore - but they all use the opendj chart
-COMPONENTS=(frconfig dsadmin configstore userstore ctsstore openam amster postgres-openidm openidm)
+COMPONENTS=(frconfig dsadmin configstore userstore ctsstore openam amster postgres-openidm openidm openig)

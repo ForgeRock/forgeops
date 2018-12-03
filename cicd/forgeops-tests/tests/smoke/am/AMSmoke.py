@@ -80,7 +80,7 @@ class AMSmoke(unittest.TestCase):
         self.assertEqual(302, resp.status_code, 'Oauth2 authz REST')
 
         location = resp.headers['Location']
-        auth_code = re.findall('(?<=code=)(\w*)', location)
+        auth_code = re.findall('(?<=code=)(.+?)(?=&)', location)
 
         data = (('grant_type', 'authorization_code'),
                 ('code', auth_code[0]),

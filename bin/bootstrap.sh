@@ -1,51 +1,68 @@
 #!/usr/bin/env bash
 # Sample bootstrap script
-#set -x
 
-msg() { echo -e "\e[32mINFO ---> $1\e[0m"; }
-err() { echo -e "\e[31mERR ---> $1\e[0m" ; exit 1; }
+set -euo pipefail
+IFS=$'\n\t'
+
+msg() { echo -e "\\e[32mINFO ---> $1\\e[0m"; }
+err() { echo -e "\\e[31mERR ---> $1\\e[0m" ; exit 1; }
 check() { command -v "$1" >/dev/null 2>&1 || err "$1 utility is required!"; }
 
 check kubectl
 check helm
 
-if ! kubectl cluster-info; then
-    echo "It looks like your cluster is not running or kubectl is not configured"
-    exit 1
+if ! kubectl cluster-info > /dev/null 2>&1; then
+    err "It looks like your cluster is not running or kubectl is not configured"
 fi
 
+helmRepoName="forgerock"
 
-helm repo add forgerock https://storage.googleapis.com/forgerock-charts
-
+helm repo add "$helmRepoName" https://storage.googleapis.com/forgerock-charts > /dev/null
 
 secretName="git-ssh-key"
 
-echo "Checking for the secret ${secretName}"
+msg "Checking for the secret ${secretName}"
 
-if ! kubectl get secret --namespace "${NAMESPACE}" "${secretName}"; then
+: "${NAMESPACE:=}"
+if [[ -z "$NAMESPACE" ]]; then
+    msg "NAMESPACE environment variable is unset, defaulting to default"
+    NAMESPACE="default"
+fi
+
+if ! kubectl get namespace "$NAMESPACE" > /dev/null 2>&1; then
+    msg "Namespace $NAMESPACE does not exist, creating"
+    kubectl create namespace "$NAMESPACE" > /dev/null
+fi
+
+if ! kubectl get secret --namespace "$NAMESPACE" "${secretName}" > /dev/null 2>&1; then
+
+    echo
     echo "No ${secretName} secret found for accessing git. A secret will be created for you that allows"
     echo "public read only access to the forgeops-init repo. To create your own secret use "
     echo "the following command to generate a secret:"
-    echo "ssh-keygen -t rsa -C \"forgeopsrobot@forgrock.com\" -f id_rsa -N ''"
+    echo
+    echo "ssh-keygen -t rsa -C \"forgeopsrobot@forgrock.com\" -f id_rsa -N \"\""
+    echo
     echo "The id_rsa.pub file should be uploaded to github and configured as a deployment key for your Git repository"
     echo "Create the Kubernetes secret using the private key:"
-    echo "kubectl create secret generic "${secretName}" --from-file=id_rsa"
+    echo
+    echo "  kubectl create secret generic \"${secretName}\" --from-file=\"id_rsa\" --namespace \"$NAMESPACE\""
+    echo
 
-    ssh-keygen -t rsa -C "forgeopsrobot@forgrock.com" -f id_rsa -N ''
+    ssh-keygen -t rsa -C "forgeopsrobot@forgrock.com" -f id_rsa -N '' > /dev/null
 
-    kubectl create secret generic "${secretName}" --from-file=id_rsa
-
+    kubectl create secret generic "${secretName}" --from-file=id_rsa --namespace "$NAMESPACE" > /dev/null
 fi
 
+CUSTOM_YAML="config/custom.yaml"
 
-CUSTOM_YAML=config/custom.yaml
-
-# If there is a conf/custom.yaml present, then use it, otherwise create a default one:
+# If there is a config/custom.yaml present, then use it, otherwise create a default one:
 if [ ! -r "${CUSTOM_YAML}" ]; then
-    echo "I can't find custom.yaml values for the helm chart deployment. I will create a sample for you"
+    msg "I can't find custom.yaml values for the helm chart deployment. I will create a sample for you"
 
-    CUSTOM_YAML=/tmp/custom.yaml
-    DOMAIN=.example.com
+    CUSTOM_YAML="/tmp/custom.yaml"
+    DOMAIN=".example.com"
+    # TODO: Unused, or meant to be exported?
     REPO="forgerock-docker-public.bintray.io/forgerock/forgerock"
 
     cat > ${CUSTOM_YAML} <<EOF
@@ -64,12 +81,15 @@ EOF
 
 fi
 
-echo "Using values.yaml settings in ${CUSTOM_YAML}"
+msg "Using values.yaml settings in ${CUSTOM_YAML}"
 
-echo "You are now ready to install the forgerock helm charts"
+cat << EOF
 
-echo "Example: You can use the following commands to deploy AM"
+You are now ready to install the forgerock helm charts
 
-echo "helm install -f ${CUSTOM_YAML} --set instance=configstore ds"
-echo "helm install -f ${CUSTOM_YAML} amster"
-echo "helm install -f ${CUSTOM_YAML} openam"
+Example: You can use the following commands to deploy AM
+
+  helm install --namespace "$NAMESPACE" -f ${CUSTOM_YAML} --set instance=configstore $helmRepoName/ds
+  helm install --namespace "$NAMESPACE" -f ${CUSTOM_YAML} $helmRepoName/amster
+  helm install --namespace "$NAMESPACE" -f ${CUSTOM_YAML} $helmRepoName/openam
+EOF

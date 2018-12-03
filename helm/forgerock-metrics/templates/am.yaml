@@ -48,7 +48,7 @@ kind: Secret
 metadata:
   name: prometheus-am
 data:
-  user: {{ .Values.am.secretUser }}
-  password: {{ .Values.am.secretPassword }}
+  user: {{ .Values.am.secretUser | b64enc }}
+  password: {{ .Values.am.secretPassword | b64enc }}
 type: Opaque
 {{- end -}}

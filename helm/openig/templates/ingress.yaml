@@ -19,10 +19,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ template "externalFQDN" .  }}
+    - {{ template "igFQDN" .  }}
     secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
-  - host: {{ template "externalFQDN" . }}
+  - host: {{ template "igFQDN" . }}
     http:
       paths:
       - path: /

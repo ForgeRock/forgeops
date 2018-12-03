@@ -25,13 +25,15 @@ config:
   # so they can saved and committed to git, set this to false.
   immutable: true
 
+secret:
+  name: openidm-secrets-env
 
 # Used to form the FQDN  - see _helpers.tpl
 component: openidm
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openidm
-  tag: 6.5.0-M7
+  tag: 6.5.0
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
