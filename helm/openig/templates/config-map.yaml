@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: openig-{{ .Release.Name }}
-data:
-  AMURL: "{{ .Values.amurl }}"
