@@ -8,6 +8,9 @@ data:
   LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
   IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
   JAVA_OPTS: {{ default "-Xmx1024m -server -XX:+UseG1GC" .Values.javaOpts }}
+  OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
+  OPENIDM_CONFIG_REPO_ENABLED: "false"
+  OPENIDM_ANONYMOUS_PASSWORD: "anonymous"
 
 ---
 apiVersion: v1
@@ -30,16 +33,21 @@ data:
       # Client password for IDM/AM integration
       openidm.idpconfig.clientsecret={{ .Values.openidm.idpconfig.clientsecret }}
 
-      # Use a variable for our ldap host & password
+      # These are for the (ldap) provisioner i.e. used for synchronization
       userstore.host={{.Values.userstore.host}}
       userstore.password={{.Values.userstore.password}}
       userstore.port={{default "1389" .Values.userstore.port}}
-      userstore.basecontext={{default "o=userstore" .Values.userstore.basecontext}}
+      userstore.basecontext={{default "ou=identities" .Values.userstore.basecontext}}
+
+      # Ports openidm should listen on locally
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
-      openidm.host={{ template "externalFQDN" . }}
+      openidm.host={{ template "idmFQDN" . }}
 
+      # Define external load balancer ports.
+      openidm.lb.port.http=80
+      openidm.ln.port.https=443
       openidm.auth.clientauthonlyports=8444
 
       openidm.https.keystore.cert.alias=openidm-localhost
@@ -55,9 +63,15 @@ data:
       openidm.keystore.password=changeit
       openidm.truststore.password=changeit
 
+      {{ if .Values.openidm.staticUser }}
+      # Optional static credentials for custom authentication.json use cases
+      openidm.staticUser.username={{ .Values.openidm.staticUser.username }}
+      openidm.staticUser.password={{ .Values.openidm.staticUser.password }}
+      {{ end }}
+
       # Prometheus endpoint authentication
-      openidm.prometheus.username=prometheus
-      openidm.prometheus.password=prometheus
+      openidm.prometheus.username={{ .Values.openidm.prometheus.username }}
+      openidm.prometheus.password={{ .Values.openidm.prometheus.password }}
       openidm.prometheus.role=openidm-prometheus
 
       # Optionally use the crypto bundle to obfuscate the password and set one of these:
@@ -66,7 +80,6 @@ data:
 
       # PKCS#11 configuration file
       #openidm.security.pkcs11.config=
-
       openidm.servlet.alias=/openidm
 
       # key in keystore to handle config encryption
@@ -125,16 +138,18 @@ data:
 
       # To disable the persisted configuration store set this property to false.
       # This will store the configurations only in memory.
-      # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration 
-      openidm.config.repo.enabled=false
+      # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration
+      openidm.config.repo.enabled={{ not .Values.config.immutable }}
 
       # To stop writes to configuration files, set this property to false; suitable for read-only installations.
-      felix.fileinstall.enableConfigSave=false
+      felix.fileinstall.enableConfigSave={{ not .Values.config.immutable }}
 
       # This needs to be true to boot from json files.
       openidm.fileinstall.enabled=true
 
-
+      # Filtered headers in audit.json that may be customized
+      com.iplanet.am.cookie.name=iPlanetDirectoryPro
+      com.sun.identity.auth.cookieName=AMAuthCookie
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -144,7 +159,6 @@ data:
    logging.properties: |
       # Properties file that configures the operation of the JDK
       # logging facility.
-
       # The system will look for this configuration file, first using
       # a System property specified at startup:
       #
@@ -154,7 +168,6 @@ data:
       # retrieved from its default location at:
       #
       # JDK_HOME/jre/lib/logging.properties
-
       ############################################################
       #      Global properties
       ############################################################
@@ -169,11 +182,8 @@ data:
       # MemoryHandler: A handler that buffers log records in memory.
       # handlers=java.util.logging.ConsoleHandler
       # handlers=java.util.logging.FileHandler, java.util.logging.ConsoleHandler
-
       # For Docker, write everything to the console
       handlers=java.util.logging.ConsoleHandler
-
-
       # Default global logging level.
       # This specifies which kinds of events are logged across
       # all loggers.  For any given facility this global level
@@ -182,7 +192,6 @@ data:
       # setting to limit messages printed to the console.
       # Loggers and Handlers may override this level
       .level={{ default "INFO" .Values.logLevel }}
-
       # Loggers
       # ------------------------------------------
       # Loggers are usually attached to packages.
@@ -197,7 +206,6 @@ data:
       #   FINE
       #   FINER
       #   FINEST (lowest value)
-
       ############################################################
       # Facility specific properties.
       # Provides extra control for each logger.
@@ -205,59 +213,46 @@ data:
       #org.forgerock.openidm.provisioner.level = FINER
       #org.forgerock.openidm.repo.level = FINER
       #org.forgerock.openidm.recon.level = FINER
-
       # OpenICF is noisy at INFO level
       org.forgerock.openicf.level=WARNING
-
       # Logs the output from OSGi logging
       org.forgerock.openidm.Framework.level=WARNING
-
       # On restart the BarURLHandler can create warning noise
       org.activiti.osgi.BarURLHandler.level=SEVERE
-
       # Suppress warnings of failed connector loading
       org.identityconnectors.framework.impl.api.local.LocalConnectorInfoManagerImpl.level=SEVERE
-
       ############################################################
       # Handler specific properties.
       # Describes specific configuration info for Handlers.
       ############################################################
-
       # --- ConsoleHandler ---
       # Default: java.util.logging.ConsoleHandler.level = INFO
       # Override of global logging level
       #java.util.logging.ConsoleHandler.level = WARNING
       # For Docker
-      java.util.logging.ConsoleHandler.level = INFO
+      java.util.logging.ConsoleHandler.level = WARNING
       java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
       # specifies the name of the filter class to be associated with this handler,
       # defaults to {@code null} if this property is not found or has an invalid value.
       java.util.logging.ConsoleHandler.filter=org.forgerock.openidm.logging.util.LogFilter
-
       # --- FileHandler ---
       # Override of global logging level
       java.util.logging.FileHandler.level = ALL
-
       # Naming style for the output file:
       # (The output file is placed in the directory
       # defined by the "user.home" System property.)
       # java.util.logging.FileHandler.pattern = %h/java%u.log
       java.util.logging.FileHandler.pattern = logs/openidm%u.log
-
       # Limiting size of output file in bytes:
       java.util.logging.FileHandler.limit = 5242880
-
       # Number of output files to cycle through, by appending an
       # integer to the base file name:
       java.util.logging.FileHandler.count = 5
-
       # Style of output (Simple or XML):
       # Writes brief "human-readable" summaries of log records.
       java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
-
       # Writes detailed XML-structured information.
       # java.util.logging.FileHandler.formatter = java.util.logging.XMLFormatter
-
       # specifies the character set encoding name.
       # defaults to the default platform encoding
       java.util.logging.FileHandler.encoding = UTF-8

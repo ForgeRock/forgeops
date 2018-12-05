@@ -20,7 +20,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
 {{- define "externalFQDN2" -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
+{{- printf "login.%s%s"  .Release.Namespace .Values.domain -}}
 {{- end -}}
 
 
@@ -29,7 +29,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 {{- define "externalFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
+{{- printf "login.%s%s" .Release.Namespace .Values.domain -}}
 {{- end -}}
 {{- end -}}
 
@@ -41,15 +41,4 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 
 {{- define "openam.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-
-{{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
-{{- define "tls-spec" -}}
-{{ if .Values.useTLS -}}
-tls:
-- hosts:
-  - {{ template "externalFQDN" .  }}
-  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
-{{- end -}}
 {{- end -}}

@@ -1,24 +1,24 @@
 #
 # Copyright (c) 2016-2018 ForgeRock AS.
-FROM forgerock/downloader:latest
+FROM forgerock/downloader
 
-ARG VERSION="6.0.0"
+ARG VERSION="6.5.0"
 
 RUN download -v $VERSION openig
 
-RUN mkdir -p /var/tmp/openig && unzip /openig.war -d /var/tmp/openig
-
 FROM tomcat:8.5-alpine
 
-COPY --from=0 /var/tmp/openig "$CATALINA_HOME/webapps/openig"
 
-ENV FORGEROCK_HOME /opt/forgerock
 
 # Default home for OpenIG config. Override this to set a different location.
 ENV OPENIG_BASE /var/openig
+ENV FORGEROCK_HOME /opt/forgerock
 
+# Delete the default webapps 
+RUN rm -fr ${CATALINA_HOME}/webapps/*  && mkdir -p ${OPENIG_BASE}
 
-#ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+COPY --from=0 /openig.war "$CATALINA_HOME"/webapps/ROOT.war
+
 ENV CATALINA_OPTS -server -Xmx756m
 
 # bind-tools for dig (dns diagnostics)
@@ -42,4 +42,4 @@ COPY server.xml "$CATALINA_HOME"/conf/server.xml
 
 USER 11111
 
-CMD ["tini", "-v", "--", "catalina.sh", "run"]
+CMD ["/sbin/tini", "-v", "--", "catalina.sh", "run"]

@@ -26,11 +26,11 @@ spec:
           mountPath: /logmount
       # Agent/Server container
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args: ["install"]
         securityContext:
-          privileged: true
+{{ toYaml .Values.securityContext | indent 8 }}
         volumeMounts:
         - name: logs
           mountPath: /logmount

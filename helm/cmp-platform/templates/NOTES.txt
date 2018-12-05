@@ -5,7 +5,7 @@ If you are on minikube, get your ip address using `minikube ip`
 
 In your /etc/hosts file you will have an entry like:
 
-192.168.100.1 openam.{{.Release.Namespace}}{{.Values.domain}} openidm.{{.Release.Namespace}}{{.Values.domain}} openig.{{.Release.Namespace}}{{.Values.domain}}
+192.168.100.1 login.{{.Release.Namespace}}{{.Values.domain}} openidm.{{.Release.Namespace}}{{.Values.domain}} openig.{{.Release.Namespace}}{{.Values.domain}}
 
 
 Get the pod status using:
@@ -20,7 +20,7 @@ kubectl get ing
 
 When the pods are ready, you can open up the consoles:
 
-http://openam.{{.Release.Namespace}}{{.Values.openam.domain}}/openam
+http://login.{{.Release.Namespace}}{{.Values.openam.domain}}/
 http://openidm.{{.Release.Namespace}}{{.Values.openidm.domain}}/admin
 http://openig.{{.Release.Namespace}}{{.Values.openig.domain}}/
 

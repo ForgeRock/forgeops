@@ -8,7 +8,7 @@
 : ${AM_AGENT_KEY:="ZGJlYzA4NTUtNjE4Mi04OQ=="}
 : ${AM_AGENT_NAME:="apache"}
 : ${AM_AGENT_REALM:="/"}
-: ${AM_OPENAM_URL:="http://openam.example.forgeops.com:80/openam"}
+: ${AM_OPENAM_URL:="http://login.example.forgeops.com:80/"}
 : ${AM_AGENT_URL:="http://agent:80"}
 : ${AM_PDP_TEMP_PATH:="/tmp/"}
 : ${AM_DEBUG_FILE_PATH:="/tmp/"}

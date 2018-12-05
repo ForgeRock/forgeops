@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# Script to rebuild indexes. If you find the DJ indexes are degraded, exec
+# Script to rebuild indexes. If you find the DS indexes are degraded, exec
 # into the container and run this command.
 
 echo "Rebuilding indexes"
+
+BASE_DN="ou=identities"
 
 bin/rebuild-index \
  --port 4444 \

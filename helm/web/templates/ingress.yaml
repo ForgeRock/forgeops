@@ -13,34 +13,23 @@ metadata:
 {{- with .Values.ingress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
-{{- end }}
+{{ end }}
+
 spec:
-{{- if .Values.ingress.tls }}
   tls:
-  {{- range .Values.ingress.tls }}
-    - hosts:
-      {{- range .hosts }}
-        - {{ . }}
-      {{- end }}
-      - www{{ .Values.domain }}
-      secretName: {{ .secretName }}
-  {{- end }}
-{{- end }}
+  - hosts:
+    - {{ printf "www.%s%s" .Release.Namespace .Values.domain }}
+  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ . }}
-      http:
-        paths:
-          - path: {{ $ingressPath }}
-            backend:
-              serviceName: {{ $fullName }}
-              servicePort: http
-  {{- end }}
-    - host: {{ .Release.Namespace}}{{ .Values.domain }}
-      http:
-        paths:
-        - path: {{ $ingressPath }}
-          backend:
-            serviceName: {{ $fullName }}
-            servicePort: http
+  - host: {{ printf "www.%s%s" .Release.Namespace .Values.domain }}
+    http:
+      paths:
+      - path: {{ .Values.ingress.path }}
+        backend:
+          serviceName: {{ template "web.fullname" . }}
+          servicePort: {{ .Values.service.port }}  
+      - path: {{ .Values.ingress.rewritePath }}
+        backend:
+          serviceName: {{ template "web.fullname" . }}
+          servicePort: {{ .Values.service.port }}  
 {{- end }}

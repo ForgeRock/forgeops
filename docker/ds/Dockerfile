@@ -2,12 +2,11 @@
 FROM forgerock/downloader 
 
 ARG VERSION="6.5.0"
-# We are getting the snapshot version of DS
-RUN download -v $VERSION -s opendj
+RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
-FROM openjdk:11-jdk 
-#FROM openjdk:8-jdk 
+#FROM openjdk:11-jdk 
+FROM openjdk:8-jdk 
 COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 
 WORKDIR /var/tmp/bootstrap
@@ -15,23 +14,23 @@ WORKDIR /var/tmp/bootstrap
 COPY bootstrap/ /var/tmp/bootstrap/
 COPY schema /var/tmp/schema
 
-# The default BASE_DN of the directory tree.
-ENV BASE_DN o=userstore
-
-#ENV OPENDJ_JAVA_ARGS "-Xmx256m"
-#ENV OPENDJ_JAVA_ARGS "-Djava.net.preferIPv4Stack=true"
+# This speeds up docker cloudbuild considerably
+ENV OPENDJ_JAVA_ARGS "-Djava.security.egd=file:/dev/./urandom"
 
 RUN ./setup.sh
 
 #####################  Runtime container ################
-FROM openjdk:11-jdk
-#FROM openjdk:8-jdk 
+#FROM openjdk:11-jdk
+FROM openjdk:8-jdk
 
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin
+RUN chmod +x /usr/bin/tini
 
 COPY --from=1 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
 
 RUN useradd -d /opt/opendj -G root -m -u 11111 forgerock \
-    && apt-get update && apt-get install -y --no-install-recommends dumb-init vim
+    && apt-get update && apt-get install -y --no-install-recommends dumb-init vim fio
    
 WORKDIR /opt/opendj 
 
@@ -57,6 +56,8 @@ COPY scripts/ /opt/opendj/scripts/
 RUN chown -R forgerock:root /opt/opendj
 
 USER 11111
+
+ENV PATH $PATH:/opt/opendj/scripts:/opt/opendj/bin
 
 
 ENTRYPOINT  ["/opt/opendj/docker-entrypoint.sh"]

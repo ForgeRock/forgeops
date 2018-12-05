@@ -10,7 +10,7 @@ Expand the name of the chart.
 
 {{/* work in progress. TODO reduce dj image boilerplate */}}
 {{define "dscontainer"}}
-image:  {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
 imagePullPolicy: {{ .Values.image.pullPolicy }}
 volumeMounts:
 - name: dj-secrets
@@ -19,7 +19,7 @@ volumeMounts:
     mountPath: /opt/opendj/data
 envFrom:
 - configMapRef:
-    name: {{ .Values.djInstance }}
+    name: {{ .Values.instance }}
 env:
 - name: NAMESPACE
   valueFrom:

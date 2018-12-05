@@ -1,4 +1,3 @@
-
 amster:
   domain: .example.com
 
@@ -12,8 +11,8 @@ openidm:
   domain: .example.com
 
 userstore:
-  djInstance: userstore
-  djPersistence: false
+  instance: userstore
+  persistence: false
   opendjJavaArgs: "-Xmx400m"
   resources:
     limits:
@@ -22,8 +21,8 @@ userstore:
       memory: 400Mi
 
 configstore:
-  djInstance: configstore
-  djPersistence: false
+  instance: configstore
+  persistence: false
   opendjJavaArgs: "-Xmx400m"
   resources:
     limits:

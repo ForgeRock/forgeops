@@ -3,7 +3,7 @@
 kind: Deployment
 apiVersion: apps/v1beta1
 metadata:
-  # If you want to run more than one IG deployment in the same namespace, change the deployment name 
+  # If you want to run more than one IG deployment in the same namespace, change the deployment name
   # below to the {{ template "fullname" . }} to make the name unique.
   name:  {{ template "fullname" . }}
   labels:
@@ -23,8 +23,7 @@ spec:
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:
       - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
         volumeMounts:
         - name: git
           mountPath: /git
@@ -37,29 +36,44 @@ spec:
       {{ end }}
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+        - secretRef:
+            name: {{ default "frconfig" .Values.config.name }}-platform
+        - secretRef:
+            name: {{ default "openig-secrets-env" .Values.secret.name  }}
         env:
         - name: OPENIG_BASE
           value: "{{ .Values.config.path }}"
         - name: CATALINA_OPTS
           value: "{{ .Values.catalinaOpts }}"
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
+        {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
-        - name: logs
-          mountPath: /tmp/logs
+        {{ end }}
         livenessProbe:
           httpGet:
-           path: /
+           path: /kube/liveness
            port: {{ .Values.service.internalPort }}
           timeoutSeconds: 10
           periodSeconds: 30
         readinessProbe:
           httpGet:
-            path: /
+            path: /kube/readiness
             port: {{ .Values.service.internalPort }}
           initialDelaySeconds: 5
         resources:

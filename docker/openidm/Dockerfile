@@ -1,19 +1,20 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
-FROM forgerock/downloader 
+FROM forgerock/downloader
 
-ARG VERSION="6.0.0"
+ARG VERSION="6.5.0"
 RUN download -v $VERSION openidm 
-RUN mkdir -p /var/tmp/openidm && unzip /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
 
-FROM forgerock/java:6.0.0
+RUN mkdir -p /var/tmp/openidm && unzip -q /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
+
+FROM forgerock-docker-public.bintray.io/forgerock/java:6.5.0
 
 COPY --from=0 /var/tmp/openidm /opt/openidm
 
 WORKDIR /opt
 
 # Override these to change the JVM:
-ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
+ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
 # Use this for Java 8 u131 or later. This sets the size of the VM heap according to the container size.
 #ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 

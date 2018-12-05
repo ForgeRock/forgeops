@@ -17,7 +17,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this 
 
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
-{{- define "externalFQDN" -}}
+{{- define "igFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
 {{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
@@ -26,7 +26,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this 
 
 {{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
 {{- define "tls-spec" -}}
-{{ if .Values.useTLS -}}
+{{ if or (eq .Values.tlsStrategy "https") (eq .Values.tlsStrategy "https-cert-manager") -}}
 tls:
 - hosts:
   - {{ template "externalFQDN" .  }}

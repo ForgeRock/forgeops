@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Export backends via ldif 
-# This can be initiated on any ds pod, but the export is performed on instance-0.
+# import ldif
+# This can be initiated on any ds pod, but the import is performed on instance-0.
+# Supply the path to the ldif file to import and the backend name (amIdentityStore, amCts, etc.)
 
 source /opt/opendj/env.sh
 

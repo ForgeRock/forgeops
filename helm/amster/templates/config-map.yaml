@@ -5,7 +5,7 @@ metadata:
 data:
   00_install.amster: |
     install-openam \
-    --serverUrl http://openam:80/openam \
+    --serverUrl http://openam:80/ \
     --authorizedKey  /var/run/secrets/amster/authorized_keys \
     --cookieDomain {{.Values.domain }} \
     --adminPwd {{ .Values.amadminPassword }} \
@@ -20,11 +20,11 @@ data:
     --pwdEncKey {{ .Values.encryptionKey }} \
     --acceptLicense \
     --lbSiteName site1 \
-    --lbPrimaryUrl {{ if .Values.useTLS }}https{{else}}http{{end}}://{{ template "fqdn" . }}/openam \
+    --lbPrimaryUrl https://{{ template "fqdn" . }}/ \
     --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |
-    connect http://openam/openam -k /var/run/secrets/amster/id_rsa
+    connect http://openam -k /var/run/secrets/amster/id_rsa
     import-config --path {{ .Values.config.importPath }}  --clean {{.Values.amsterClean }}
     :exit
 ---
@@ -35,7 +35,11 @@ metadata:
 data:
   EXPORT_PATH: {{  default .Values.config.importPath .Values.config.exportPath }}
   CONFIG_PATH: "{{ .Values.config.importPath }}"
-  VERSION: {{ default .Values.image.tag .Values.version }}
   CTS_STORES: {{ default "ctsstore-0.ctsstore:1389" .Values.ctsStores }}
   CTS_PASSWORD: {{ default "password" .Values.ctsPassword }}
   FQDN: {{ template "fqdn" . }}
+  PROMETHEUS_PASSWORD: "{{ .Values.prometheusPassword }}"
+  AMADMIN_PASSWORD_HASHED: "{{ .Values.amadminPasswordHashed }}"
+  DOMAIN: {{ .Values.domain }}
+  COOKIE_DOMAIN: {{ trimPrefix "." .Values.domain }}
+  

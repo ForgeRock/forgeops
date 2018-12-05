@@ -1,7 +1,7 @@
 # Cloudbuild pipeline for smoke tests
 
 steps:
-# List helm to init everything
+## List helm to init everything
 - name: 'gcr.io/engineering-devops/helm'
   args: ['list']
   env:
@@ -24,13 +24,14 @@ steps:
   args: ['samples/config/smoke-deployment']
 
 # Run custom smoke test image
+
 - name: 'gcr.io/$PROJECT_ID/forgeops-tests:latest'
   dir: 'cicd/forgeops-tests/'
   env:
-  - 'IDM_URL=http://openidm.smoke.forgeops.com/openidm'
+  - 'IDM_URL=https://openidm.smoke.forgeops.com/openidm'
   - 'IDM_ADMIN_PWD=openidm-admin'
-  - 'IG_URL=http://openig.smoke.forgeops.com/'
-  - 'AM_URL=http://openam.smoke.forgeops.com/openam'
+  - 'IG_URL=https://openig.smoke.forgeops.com/'
+  - 'AM_URL=https://login.smoke.forgeops.com/'
   - 'AM_ADMIN_PWD=password'
   entrypoint: 'bash'
   args: ['run-smoke-tests.sh']
@@ -47,6 +48,15 @@ steps:
   dir: 'cicd/forgeops-tests/reports'
   args: ['cp', '*', 'gs://forgeops-test-reports/smoke-tests/']
 
+- name: 'gcr.io/engineering-devops/helm'
+  dir: 'bin/'
+  entrypoint: 'bash'
+  args: ['get-logs-from-ns.sh']
+
+- name: 'gcr.io/cloud-builders/gsutil'
+  dir: 'bin/'
+  args: ['cp', '-r', 'logs/*', 'gs://forgeops-test-reports/logs/']
+
 # Send slack notifications
 # Don't forget to define SLACK_SERVICE in google container builder to receive
 # notifications on slack channel
@@ -54,7 +64,7 @@ steps:
   env:
   - 'SLACK_SERVICE=${_SLACK_SERVICE}'
   - 'TEST_NAME=Forgeops smoke tests'
-  - 'TEST_REPORT_LINK=http://results.forgeops.com/smoke-tests/'
+  - 'TEST_REPORT_LINK=http://smoke-tests.forgeops.com/'
   - 'TEST_RESULTS_FILE=forgeops-tests/results.txt'
   dir: 'cicd/'
   entrypoint: 'bash'

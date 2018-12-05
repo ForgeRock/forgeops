@@ -1,0 +1,70 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+# Copy this template to eks-env.cfg and adjust for your environment
+
+
+# CloudFormation Stack Name
+EKS_STACK_NAME="cluster1"
+
+# EKS Cluster Name
+EKS_CLUSTER_NAME="cluster1"
+
+# Kubernetes Cluster Version
+# To get specific cluster versions you can run the command
+EKS_CLUSTER_VERSION="latest"
+
+# EKS Service Role Arn
+EKS_ROLE_ARN="arn:aws:iam::1111111:role/eksServiceRole"
+
+# EKS VPC ID
+EKS_VPC_ID="vpc-11111"
+
+# Storage class zones
+STORAGE_CLASS_ZONES="us-east-1b,us-east-1c"
+
+# EKS Subnet
+EKS_SUBNETS="subnet-XXXXXX,subnet-XXXXXXX"
+
+# EC2 Security Groups
+EC2_SECURITY_GROUP="sg-XXXXXXXXX"
+
+# Min Nodes per zone in Cluster
+EKS_MIN_NODES="1"
+
+# Max Nodes per zone in Cluster
+EKS_MAX_NODES="4"
+
+# Node Group Name
+EKS_WORKER_NODE_GROUP="nodegrp"
+
+# Node Volumn Size
+EKS_WORKER_NODE_SIZE_IN_GB="30"
+
+# Worker Nodes Instance Type
+EKS_WORKER_NODE_INSTANCE_TYPE="m5.4xlarge"
+
+# Worker Nodes SSH Key/Pair
+EC2_KEYPAIR_NAME="eks-east"
+
+# EKS AMI ID
+# Use one of the following AMIs based on your EKS VPC region. Defaulting to us-east-1 zone
+# us-west-2 zone: ami-0a54c984b9f908c81
+# us-east-1 zone: ami-0440e4f6b9713faf6
+# eu-west-1 zone: ami-0c7a4976cb6fafd3a
+
+EKS_AMI_ID="ami-0440e4f6b9713faf6"
+
+# EKS Cluster Namespace
+EKS_CLUSTER_NS="prod"
+
+# Monitoring Namespace
+EKS_MONITORING_NS="monitoring"
+
+# Domain used to create Route53 records
+ROUTE53_DOMAIN="freng.org"
+
+#Arn for the iam role policy allowing S3 operations on bucket
+S3_POLICY_ARN="arn:aws:iam::XXXXXXXXXXX:policy/S3-Policy-ARN"
+
+#Security Group to allow nodes to mount EFS file system
+EFS_SECURITY_GROUP="sg-XXXXXXXXX"

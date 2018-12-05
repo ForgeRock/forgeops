@@ -5,7 +5,7 @@
 replicaCount: 1
 
 # Top level domain. Used to create the ingress
-domain: .forgeops.com
+domain: .example.com
 
 # Configuration parameters. Common to all charts that require configuration from a
 # source. Currently the only source is a git repo.
@@ -14,45 +14,62 @@ config:
   # the secret required to access it.
   name: frconfig
   # Path to our project
+  # path: /git/config/samples/idm/idm-am-ds-integration
   path: /git/config/6.5/default/idm/sync-with-ldap-bidirectional
+  #
   # strategy defines how products get their configuration .
-  # Using the git strategy, each helm chart pulls the configurtion from git using an init container.
+  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
   strategy: git
+  # If immutable is true, IDM  will not persist any configuration changes made in the admin UI (or via admin REST calls)
+  # back out to the file system. If you are developing and want to IDM to write configuration changes back out
+  # so they can saved and committed to git, set this to false.
+  immutable: true
+
+secret:
+  name: openidm-secrets-env
+
+# Used to form the FQDN  - see _helpers.tpl
+component: openidm
 
 image:
-  repository: gcr.io/engineering-devops
-  # For development use Always
-  pullPolicy: IfNotPresent
-  #pullPolicy: IfNotPresent
+  repository: forgerock-docker-public.bintray.io/forgerock/openidm
   tag: 6.5.0
+  pullPolicy: IfNotPresent
+  # For development use Always
+  # pullPolicy: Always
 
 # override Java JVM options.
+# For JDK 11 add -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
-
-# To enable any of the products to use HTTPS on their external endpoint, set the following flag to true.
-useTLS: false
-# The default behaviour when useTLS = true, is to have cert-manager to manage the certificate request/renewal via Let's Encrypt.  
-# This is enabled by the following flag:
-useCertManager: true
 
 # Specific values
 openidm:
   repo:
-    host: postgresql
-    port: 5432
-    user: openidm
-    password: openidm
-    schema: openidm
-    databaseName: openidm
+    # DS external repo
+    # host: userstore-0.userstore
+    # port: 1389
+    # user: "cn=Directory Manager"
+    # password: password
+    # postgres values
+     host: postgresql
+     port: 5432
+     user: openidm
+     password: openidm
+     schema: openidm
+     databaseName: openidm
   # Optional client secret for AM/IDM integration:
   idpconfig:
     clientsecret: password
+  prometheus:
+    username: prometheus
+    password: prometheus
 
-# Optional - if there is a DJ userstore configured
+# Optional - if there is a DS userstore configured for synchornization or explict mapping when DS is used as repo
 userstore:
   host: userstore-0.userstore
   password: password
   port: 1389
+  basecontext: "ou=identities"
 
 service:
   name: openidm
@@ -68,10 +85,6 @@ resources:
     cpu: 300m
     memory: 1024Mi
 
-
-# Used to form the FQDN  - see _helpers.tpl
-component: openidm
-
 # Default log level. See templates/configmap/logging.properties. For example, you can use FINE here to
 # see fine grained logging output using kubectl logs.
 logLevel: INFO
@@ -82,24 +95,26 @@ ingress:
   annotations:
     # Nginx specific annotations
     nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "route"
-    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
-    ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
 # Audit log details for log streaming sidecar containers
-auditLogs:
-  - name: access-logs
-    path: "/opt/openidm/audit/access.audit.json"
-  - name: activity-logs
-    path: "/opt/openidm/audit/activity.audit.json"
-  - name: authentication-logs
-    path: "/opt/openidm/audit/authentication.audit.json"
-  - name: config-logs
-    path: "/opt/openidm/audit/config.audit.json"
-  - name: recon-logs
-    path: "/opt/openidm/audit/recon.audit.json"
-  - name: sync-logs
-    path: "/opt/openidm/audit/sync.audit.json"
-    
+# IDM can now stream logs to stdout. This setting will be deprecated in the future.
+auditLogs: []
+# auditLogs:
+#   - name: access-logs
+#     path: "/opt/openidm/audit/access.audit.json"
+#   - name: activity-logs
+#     path: "/opt/openidm/audit/activity.audit.json"
+#   - name: authentication-logs
+#     path: "/opt/openidm/audit/authentication.audit.json"
+#   - name: config-logs
+#     path: "/opt/openidm/audit/config.audit.json"
+#   - name: recon-logs
+#     path: "/opt/openidm/audit/recon.audit.json"
+#   - name: sync-logs
+#     path: "/opt/openidm/audit/sync.audit.json"
 
-    
+# Optional sed filter script that does search / replace after the configuration has been checked out
+# This is a work around until OPENIDM-11529 is fixed
+# example - search for qa and replace with prod:
+# sedFilter: "s/login.qa.acme.com/login.prod.acme.com/g

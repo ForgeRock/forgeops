@@ -1,32 +1,36 @@
-bootstrapType: cts
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  #repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0
+  pullPolicy: Always
 
-djInstance: ctsstore
+instance: ctsstore
+
+userstore:
+  enabled: false
 
 resources:
   limits:
-    memory: 8Gi
+    memory: 5Gi
   requests:
-    memory: 6Gi
+    memory: 3Gi
 
-storageSize: "100Gi"
-storageClass: "fast"
+storageSize: 100Gi
+storageClass: fast
 
+# For JDK 8
 opendjJavaArgs: >
-  -server -Xms5g -Xmx5g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
   -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
   -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
 
+# For JDK 11
+#opendjJavaArgs: >
+#  -server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+#  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
 
-podAntiAffinity: "hard"
 
-gcs:
-  backup: false
-  restore: false
-  sleepSeconds: 600
-  backupBucket:  gs://forgeops/dj-backup/1m
-  restoreBucket: gs://forgeops/dj-backup/1m
-restore:
-  enabled: false
+podAntiAffinity: hard
 
 runPostSetupJob: false
 

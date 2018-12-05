@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Full amster install.
 
 
@@ -15,7 +15,7 @@ POST_INSTALL_SCRIPTS=${POST_INSTALL_SCRIPTS:-"${AMSTER_SCRIPTS}"}
 
 # Use 'openam' as the internal cluster dns name.
 export SERVER_URL=${OPENAM_INSTANCE:-http://openam:80}
-export URI=${SERVER_URI:-/openam}
+export URI=${SERVER_URI:-/}
 
 export INSTANCE="${SERVER_URL}${URI}"
 
@@ -58,7 +58,7 @@ wait_for_openam()
       sleep 5
    done
 
-	# Sleep additional time in case OpenDJ is not quite up yet.
+	# Sleep additional time in case DS is not quite up yet.
 	echo "About to begin configuration"
 }
 
@@ -66,6 +66,12 @@ echo "Waiting for AM server at ${CONFIG_URL} "
 
 wait_for_openam
 
+# Extract amster version for commons parameter to modify configs
+echo "Extracting amster version"
+VER=$(./amster --version)
+[[ "$VER" =~ ([0-9].[0-9].[0-9]-([a-zA-Z][0-9]+|SNAPSHOT|RC[0-9]+)|[0-9].[0-9].[0-9]) ]]
+export VERSION=${BASH_REMATCH[1]}
+echo "Amster version is: " $VERSION
 
 # Execute Amster if the configuration is found.
 if [ -d  ${AMSTER_SCRIPTS} ]; then

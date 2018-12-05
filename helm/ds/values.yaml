@@ -2,23 +2,21 @@
 
 
 # If useDefaultSecrets is set to true (the default), the secret values in ../secrets will
-# be used to create a secret map with the same name as the instance ($djInstance).
+# be used to create a secret map with the same name as the instance ($instance).
 # If you set useDefaultSecrets to false, you must create this secret map yourself before the DS
 # instances will be provisioned. This allows you to inject your own secrets rather
 # than use the default ones bundled in the chart. An alternate strategy is to fork this chart.
 # and replace the secrets in ./secrets with your own.
 useDefaultSecrets: true
 
-# The default OpenDJ baseDN.
-# Note that the default install creates two backends: o=cts and o=userstore
-# The setting below changes the base dn for the o=userstore backend only!
-# We strongly suggest that you *NOT* change the default. There is very little value in
-# having the basedn reflect a unique organizational structure.
-baseDN: "o=userstore"
+# The default DS baseDN for the user store.  Note the ds image creates several backends that are hard coded and this
+# setting will have no impact on those backends. This setting will be removed in the future.
+baseDN: "ou=identities"
 
 # The default instance name. This will create a stateful set that can be resolved at
-#  $djInstance-0.$djInstance
-djInstance: ds
+#  $instance-0.$instance. You can also use the service name $instance - which will get (randomly)
+# load balanced to an instance (not recommended )
+instance: ds
 
 component: ds
 
@@ -26,49 +24,53 @@ component: ds
 userstore:
   enabled: true
 
-# If you wan to disable the cts backend, set to false.
+# If you want to disable specific backends, set to false:
 cts:
   enabled: true
 
-image:
-  repository: gcr.io/engineering-devops
-  pullPolicy: IfNotPresent
-  tag:  6.5.0
+configstore:
+  enabled: true
 
-# The number of instances in the StatefulSet. Each instance will be replicated to the master.
+idmRepo:
+  enabled: true
+
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  pullPolicy: IfNotPresent
+  tag: 6.5.0
+
+# The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
+# You can not change this after installation.
 replicas: 1
 
-# Size for OpenDJ database storage. Note GKE IOPS scale based on the size of the volume.
+# Size for DS database storage. Note GKE IOPS scale based on the size of the volume.
 storageSize: "10Gi"
-
-# StorageClass is optional. It can be the name of a fast (SSD) class.
-#storageClass: fast
-
-backup:
-  # If true this will mount a PVC of the given storage class on /opt/opendj/bak/
-  enabled: false
-  storageClass: "nfs"
-  storageSize: "20Gi"
-  # If you provide the name of a backup PVC, the default bak-$instance will NOT be created, and
-  # the named pvc will be used as the shared backup volume. This can be used to re-attach 
-  # a previous backup pvc - assuming it was not deleted.
-  # for example, to reuse the previous volume  pvcName: userstore-bak
-  #pvcName: 
-  # Backup schedule. The first backup is a full, subsequent backups are incremental
-  # Format is crontab: minutes hour day-of-month month day-of-week
-  schedule:  "*/60 * * * *"
-  # If true, run a verification job
-  verify: false
-
 
 # Set storageClass only on clusters that support it (GCP / AWS).
 #storageClass: fast
+
+
+backup:
+  # This is an optional parameter that will mount the named PVC volume (most likely an NFS share)
+  # on the bak/ directory. If this is not specified, an emptyDir will be mounted instead.
+  # The pvc is usually created by the dsadmin/ chart.
+  #pvcClaimName: ds-backup
+
+  # This configures the top level directory under bak/
+  # The backup folder is set to $clusterName/$instance-$namespace. This
+  # forces each instance backup to go to a different folder on the shared PVC drive. Without this
+  # you will get collisions on backup / restore.
+  # If you have many clusters backing up same shared NFS volume, change the default here. For example, 
+  # set it to "production"
+  clusterName: "default"
+
 
 # You need to be on JDK 8u131 or higher to enable these options.
 # todo: find JDK 11 args
 #opendjJavaArgs: "-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:+UseCompressedOops -XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMFraction=2"
 
-opendjJavaArgs: "-Xmx512m -XX:+UnlockDiagnosticVMOptions"
+# These defaults work for a small test instance
+opendjJavaArgs: "-Xmx512m"
 
 # Resource limits.
 # These help for pod placement in a larger cluster to ensure the DS instance gets sufficient resources.
@@ -80,13 +82,13 @@ resources:
   limits:
    memory: 768Mi
 
-# DJ persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
-# Used in testing environments without pv providers. When the pod is terminated, the DJ data will be deleted!
-# If you run into issues with minikube set this to false. See https://github.com/kubernetes/minikube/issues/1990
-djPersistence: true
+# DS persistence switch. Setting this to false disables volume claims - all data is stored inside the docker image.
+# Used in testing environments without pv providers. When the pod is terminated, the DS data will be deleted!
+persistence: true
 
 # Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft".
-# The hard setting means that do not deploy more than one pod in a node which is critical for HA.
+# The hard setting will force ds pods to be spread out over multiple hosts/zones. soft is best effort
+# but pods will still be scheduled together if sufficient resources are not available.
 podAntiAffinity: "soft"
 
 # This is the exact value for TopologyKey. The other possible value is "failure-domain.beta.kubernetes.io/zone"
@@ -95,51 +97,16 @@ podAntiAffinity: "soft"
 # if you have a multi-zone cluster.
 topologyKey: "kubernetes.io/hostname"
 
-gcs:
-  # Set this to true to enable backups to Google Cloud Storage. You need to create the top level bucket first.
-  backup: false
-  # Set to true to enable restoring data from a gcs bucket to the bak/ folder.
-  # Note: This does not trigger a DS restore. It only gets the data from GCS to the bak/ folder
-  # See the restore.enabled setting.
-  restore: false
-  # backup Bucket destination. You need the right scopes in container engine to write to this bucket.
-  #add --scopes storage-full when you create the cluster.
-  # Note the namespace and DS instance name will be appended to this bucket path. This is done to avoid collisions where 
-  # multiple backups may be ocurring in different namespaces or dj instances.
-  backupBucket:  gs://forgeops/dj-backup/test
-  # Restore bucket. Note that in this case the namespace and instance name are *not* appended. This
-  # enables restoration across namespaces or instance types. For example, to restore data from production
-  # to QA, you might use something like:
-  #restoreBucket: gs://mybucket/dsbackups/prod/usestore
-  restoreBucket: gs://forgeops/dj-backup/test/default/userstore
-
 # Restore parameters. 
 restore:
   # If true, runs the init containers that restores the directory from a backup folder in the bak/ folder.
-  # The backup data must be present in the bak/ folder. The gcs: settings can be used
-  # to copy data from a gcs bucket to the bak/ folder. If a previous backup PVC was not deleted,
-  # data can be restored from that PVC.
+  # The backup data must be present in the bak/ folder. 
   # Restore will not overwrite existing DS data.  
   # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
   # is used to recover.
   enabled: false
-  # The value of path is either "latest" - which will attempt to restore from the latest backup folder,
-  # or a path *relative* to /opt/opendj/bak/ which is a direct path to the folder to restore.
-  # The later setting is used to restore from an explicit known good backup state. 
-  path: latest
-  # Example of restoring from a backup from a specific date
-  #path: 2018/05/15
-  #If the root directory contains the data:
-  #path: /
 
-# An optional slack webhook url. It can be used by the backup and verification processes to post notifications to slack.
-# If you don't have slack, set this to "undefined"
-slackUrl: undefined
-
-# Uncomment if you want to run an additional "admin" ds pod that you can exec into and run DS commands.
-# Useful for debugging.
-#adminContainer: true
-
-#  gcloud Image. You should not need to change this very often
-gcloudImage: gcr.io/cloud-builders/gcloud:latest
-#gcloudImage: gcr.io/cloud-builders/gcloud@sha256:92166f0671d049e203ab86dd7fed80058c75b1faed01ca2f8ea8b48a97ea081b
+securityContext:
+  runAsUser: 11111
+  fsGroup: 11111
+  supplementalGroups: [ 0 ]

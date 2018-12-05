@@ -1,12 +1,15 @@
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/amster
+  #repository: gcr.io/engineering-devops/amster
+  tag: 6.5.0
+  pullPolicy: Always
+  
 config:
-  importPath: /git/config/samples/am/R6.0
+  importPath: /git/config/6.5/cdm/m-cluster/am
   exportPath: /tmp/amster
-
-version: 6.5.0
 
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
 ctsPassword: password
-
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:

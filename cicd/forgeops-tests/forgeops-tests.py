@@ -3,10 +3,11 @@ Main entry-point for forgeops testing suite.
 """
 import argparse
 import os
-from time import gmtime, strftime
+from time import strftime, gmtime
 
-from HtmlTestRunner import HTMLTestRunner
+
 from unittest import TestLoader, TestSuite
+from HtmlTestRunner import HTMLTestRunner
 
 
 def consolidate_reports():
@@ -14,7 +15,7 @@ def consolidate_reports():
     Workaround for reports being separated by suite. For now we want only one consolidated report.
     """
     report_name = 'forgeops_' + strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + '_report.html'
-    report = '<h1> ForgeOps report </h1>'
+    report = ''
     for filename in os.listdir('reports/'):
         if not filename.startswith('forgeops_'):
             with open(os.path.join('reports', filename), 'r') as f:
@@ -22,6 +23,8 @@ def consolidate_reports():
             os.remove(os.path.join('reports', filename))
 
     with open(os.path.join('reports', report_name), 'w') as f:
+        f.write(report)
+    with open(os.path.join('reports', "latest.html"), 'w') as f:
         f.write(report)
 
 
@@ -39,7 +42,7 @@ if __name__ == '__main__':
     except ImportError:
         print("Suite cannot be found. Check if --suite points to folder with tests.")
         exit(0)
-
-    runner = HTMLTestRunner('.')
+    runner = HTMLTestRunner(output=".")
     results = runner.run(suite)
     consolidate_reports()
+

@@ -5,19 +5,17 @@ replicaCount: 1
 
 component: apache-agent
 
-domain: .forgeops.com
+domain: .example.com
 image:
-  repository: gcr.io/engineering-devops
+  repository: forgerock-docker-public.bintray.io/forgerock/apache-agent
   tag: latest
   pullPolicy: Always
-# If you set this to true, you must have a TLS secret with the same name as the FQDN.
-useTLS: false
 
 # To use this chart, you need to make sure you have agent profile configured
 # in selected amServer. User and password must match profile in amServer
 agent:
   user: apache
-  amServer: http://openam.example.forgeops.com/openam
+  amServer: https://login.example.forgeops.com/
   realm: "/"
 
 service:
@@ -25,3 +23,6 @@ service:
   type: ClusterIP
   externalPort: 80
   internalPort: 80
+
+securityContext:
+  privileged: true

@@ -1,23 +1,21 @@
 #!/usr/bin/env bash
 # This will do an online restore of a previous backup. 
-# The backup folder structure is organized by date: bak/year/month/day/.
 
-usage()
-{ 
-    echo "$0 [-o] [-p path] [-n]"
-    echo "-o  do an offline restore. DS must not be running."
-    echo "-p path. Restore files starting at the path. If this option is not provided, the most recent backup is restored"
-    echo "-n  dry-run option. Show what would be restored"
-    exit 1
-}
 
 cd /opt/opendj
 
 source env.sh 
 
-# The default root of the backup folder includes the namespace and instance name. 
-# This disambiguates backups running on the same cluster.
-BACKUP_DIRECTORY="/opt/opendj/bak/"
+usage()
+{ 
+    echo "$0 [-o] [-p path] [-n]"
+    echo "-o  do an offline restore. DS must not be running."
+    echo "-p path. Restore files starting at this path. If this option is not provided, the most recent backup at $BACKUP_DIRECTORY is restored"
+    echo "-n  dry-run option. Show what would be restored"
+    exit 1
+}
+
+RESTORE_PATH="$BACKUP_DIRECTORY"
 
 while getopts ":p:on" opt; do
     case $opt in 
@@ -31,7 +29,7 @@ done
 if [ !  -z "${OFFLINE}" ]; then
     ARGS="--offline"
 else
-    ARGS="--hostname ${FQDN_DS0} --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
+    ARGS="--hostname localhost --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
 fi
 
 fail() 
@@ -44,48 +42,21 @@ ERR=0
 
 restore() 
 {
-    echo "Restore path is $RESTORE_PATH"
+    echo "Restoring from backup at $RESTORE_PATH"
     cd $RESTORE_PATH || fail 
-    for dir in `ls` 
+
+    for dir in `ls -1` 
     do
         d="${RESTORE_PATH}/${dir}"
-        if [ "$dir" = "userRoot" ] || [ "$dir" = "ctsRoot" ]; 
-        then 
-           echo /opt/opendj/bin/restore $ARGS --backupDirectory "$d" 
-            eval /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
-             if [ "$?" -ne 0 ]; then
-                ERR="$?"
-                echo "warning: restore had a non zero exit $ERR"
-            fi
+        echo /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
+        eval /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
+        if [ "$?" -ne 0 ]; then
+            ERR="$?"
+            echo "warning: restore had a non zero exit $ERR"
         fi
     done
-    cd /opt/opendj
 }
 
-# Recurses from the root of the instance backup folder to find the latest backup.
-# This assumes the directory folders is organized by year/month/day/
-find_latest() 
-{
-   cd ${BACKUP_DIRECTORY} || fail
-   year=`ls . | sort -r | head -1`
-   cd $year || fail
-   month=`ls -t | sort -r | head -1` 
-   cd $month || fail
-   day=`ls -t  | sort -r | head -1`
-   cd $day || fail
-   RESTORE_PATH=`pwd`
-   if [ ! -d "${RESTORE_PATH}" ]; then 
-	fail
-   fi 
-   cd /opt/opendj
-}
-
-# If no restore path is specified, find the lastest backup.
-# This sets RESTORE_PATH as a side effect.
-if [ -z "${RESTORE_PATH}" ]; then 
-    find_latest
-fi
-
-restore "$RESTORE_PATH"
+restore
 
 exit $ERR

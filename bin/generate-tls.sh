@@ -8,6 +8,10 @@
 # otherwise the deployment will try to generate a cert-manager Certificate object and will override the secret if cert-manager is installed.
 # Copy the etc/generate-tls.template file to etc/generate-tls.cfg and specify your values as required.
 
+set -o errexit
+set -o pipefail
+set -o nounset
+
 echo "=> Have you copied the template file etc/generate-tls.template to etc/generate-tls.cfg and edited to cater to your requirement?"
 read -p "Continue (y/n)?" choice
 case "$choice" in 
@@ -16,7 +20,7 @@ case "$choice" in
    * ) echo "Invalid input, Bye!"; exit 1;;
 esac
 
-. ../etc/generate-tls.cfg
+source "${BASH_SOURCE%/*}/../etc/generate-tls.cfg"
 
 FQDN="*.${NAMESPACE}.${DOMAIN}" # FQDN for self signed cert based on namespace
 

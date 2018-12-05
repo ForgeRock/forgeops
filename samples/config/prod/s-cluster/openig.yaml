@@ -1,0 +1,25 @@
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/openig
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
+config:
+  name: frconfig
+  path: /git/config/6.5/cdm/m-cluster/ig
+  strategy: git
+
+# Tomcat JVM options.
+catalinaOpts:  >
+  -server -Xms1g -Xmx1g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+replicaCount: 2

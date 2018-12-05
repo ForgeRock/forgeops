@@ -46,7 +46,7 @@ kind: Secret
 metadata:
   name: prometheus-idm
 data:
-  user:  {{ .Values.idm.secretUser }}
-  password: {{ .Values.idm.secretPassword }}
+  user:  {{ .Values.idm.secretUser | b64enc }}
+  password: {{ .Values.idm.secretPassword | b64enc }}
 type: Opaque
 {{- end -}}

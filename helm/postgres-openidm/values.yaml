@@ -1,8 +1,4 @@
 
-## postgres image version
-## ref: https://hub.docker.com/r/library/postgres/tags/
-##
-imageTag: "9.5.4"
 
 ## Specify a imagePullPolicy.
 ## 'Always' if imageTag is 'latest', else set to 'IfNotPresent'.
@@ -23,17 +19,18 @@ imageTag: "9.5.4"
 # For postgres we  use the standard vanilla image on the Docker hub.
 postgres:
   image: postgres
-  tag: 9-alpine
+  tag: 10.5-alpine
 
 postgresUser: openidm
 postgresPassword: openidm
 
-## Persist data to a persitent volume.
-persistence:
-  enabled: true
-  storageClass: generic
-  accessMode: ReadWriteOnce
-  size: 8Gi
+## Persist data
+persistence: true
+  
+accessMode: ReadWriteOnce
+storageClassName: standard
+storageSize: 8Gi
+
 
 # The metrics configuration has been taken from the master Helm postgres chart
 # This has not been tested.

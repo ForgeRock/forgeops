@@ -4,4 +4,4 @@
 # while having stdout in file to send to slack
 
 python3 forgeops-tests.py --suite tests/smoke/ &> res.txt
-tail -n 7 res.txt > results.txt
+tail -n 4 res.txt > results.txt

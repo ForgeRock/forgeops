@@ -13,7 +13,7 @@ Expand the name of the chart.
 
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
-{{- define "externalFQDN" -}}
+{{- define "idmFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
 {{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
@@ -23,7 +23,7 @@ Expand the name of the chart.
 
 {{/* Inject the TLS spec into the ingress if tls is globally enabled */}}
 {{- define "tls-spec" -}}
-{{ if .Values.useTLS -}}
+{{ if or (eq .Values.tlsStrategy "https") (eq .Values.tlsStrategy "https-cert-manager") -}}
 tls:
 - hosts:
   - {{ template "externalFQDN" .  }}
@@ -34,7 +34,7 @@ tls:
 {{- define "git-init" -}}
 {{ if eq .Values.config.strategy "git" }}
 - name: git-init
-  image: forgerock/git:6.0.0
+  image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
   imagePullPolicy: {{ .Values.image.pullPolicy }}
   volumeMounts:
   - name: git
@@ -54,7 +54,7 @@ tls:
 {{- define "git-sync" -}}
 {{ if eq .Values.config.strategy "git" }}
 - name: git
-  image: forgerock/git:6.0.0
+  image: forgerock/git:6.5.0
   imagePullPolicy: {{ .Values.image.pullPolicy }}
   volumeMounts:
   - name: git

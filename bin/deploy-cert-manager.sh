@@ -4,39 +4,59 @@
 # Run ./deploy-cert-manager.sh .
 
 # Decrypt encoded service account
-./decrypt.sh ../etc/cert-manager.json
+./decrypt.sh ../etc/cert-manager/cert-manager.json
 
 # Create secret so the Cluster Issuer can gain access to CloudDNS
-kubectl create secret generic clouddns --from-file=../etc/cert-manager.json -n kube-system
+kubectl create secret generic clouddns --from-file=../etc/cert-manager/cert-manager.json -n kube-system
 
-# Need as sometimes tiller is not ready immediately
-while :
+# Check that tiller is running
+while true;
 do
-    helm ls >/dev/null 2>&1
-    test $? -eq 0 && break
-    echo "Waiting on tiller to be ready..."
-    sleep 5s
+  STATUS=$(kubectl get pod -n kube-system | grep tiller | awk '{ print $3 }')
+  # kubectl get pods returns an empty string if the cluster is not available
+  if [ -z ${STATUS} ]
+  then
+    echo "The cluster is temporarily unavailable..."
+  else
+    if [ ${STATUS} == "Running" ]
+    then
+      echo "The tiller pod is available..."
+      break
+    else
+      echo "The tiller pod is not available..."
+    fi
+  fi
+  sleep 5
 done
 
 # Deploy Cert Manager Helm chart
-helm upgrade -i cert-manager --namespace kube-system stable/cert-manager --values ../cert-manager/values.yaml
+helm upgrade -i cert-manager --namespace kube-system stable/cert-manager
 
 # Check that cert-manager is up before deploying the cluster-issuer
-while true; do
-    if [ $(kubectl get pod -n kube-system | grep cert-manager | awk '{ print $3 }') == "Running"  ]; then
-        echo "cert-manager is running..."
-        break
+while true;
+do
+  STATUS=$(kubectl get pod -n kube-system | grep cert-manager | awk '{ print $3 }')
+  # kubectl get pods returns an empty string if the cluster is not available
+  if [ -z ${STATUS} ]
+  then
+    echo "The cluster is temporarily unavailable..."
+  else
+    if [ ${STATUS} == "Running" ]
+    then
+      echo "The cert-manager pod is available..."
+      break
     else
-        echo "cert-manager is still starting up..."
+      echo "The cert-manager pod is not available..."
     fi
-    sleep 5
+  fi
+  sleep 5
 done
 
 # Allow time for operator to be deployed so CRDs are recognized
 sleep 5
 
 # Deploy Cluster Issuer
-kubectl create -f ../cert-manager/cluster-issuer.yaml -n kube-system
+kubectl create -f ../etc/cert-manager/cluster-issuer.yaml -n kube-system
 
 # Delete decrypted service account
-rm ../etc/cert-manager.json
+rm -f ../etc/cert-manager/cert-manager.json || true

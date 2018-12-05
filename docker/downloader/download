@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Script to download binaries from the ForgeRock Artifactory repository.
-# This is used in the first stage of a multi stage build to download the ForgeRock binaries. If you are ForegeRock customer
+# This is used in the first stage of a multi stage build to download the ForgeRock binaries. If you are ForgeRock customer
 # you can obtain an API key as part of your backstage subscription.
 # Another alternative for product binaries is to replace this docker image and script with
-# an alternate version that copies the binaries from a source such as S3, GCS, etc.
-
+# an alternate version that copies the binaries from a source such as S3, GCS, etc. See ../downloader-sample
 
 API_KEY=${API_KEY:-`cat /api_key`}
+
+# Pass this in via the environment to use a GCS cache for the artifacts. You must have RW access to this bucket
+#GCS_DIR=gs://forgeops-cache
 
 if [ -z "$API_KEY" ]
 then
@@ -16,32 +18,31 @@ fi
 
 # Update major versions / snapshots here. 
 
-
 # Download a binary specified by $1
 dl_binary() {
 
     # We supply both the snapshot source and the non snapshot source to the dl function
     case "$1" in
     amster)
-        dl $AMSTER_SNAPSHOT $AMSTER amster.zip
+        dl $AMSTER_REPO $AMSTER_ZIP amster.zip
         ;;
     openam)
-        dl $AM_SNAPSHOT $AM openam.war
+        dl $AM_REPO $AM_WAR openam.war
         ;;
     openidm)
-        dl $IDM_SNAPSHOT $IDM openidm.zip
+        dl $IDM_REPO $IDM_ZIP openidm.zip
         ;;
    openig)      
-        dl $IG_SNAPSHOT $IG openig.war
+        dl $IG_REPO $IG_WAR openig.war
         ;;
     opendj)
-        dl $DJ_SNAPSHOT $DJ opendj.zip
+        dl $DJ_REPO $DJ_ZIP opendj.zip
         ;;
     nginx-agent)
-        dl $NGINX_AGENT_SNAPSHOT $NGINX_AGENT_STABLE nginx-agent.zip
+        dl $WEB_AGENTS_STABLE_REPO $NGINX_AGENT_ZIP nginx-agent.zip
         ;;
     apache-agent)
-        dl $APACHE_AGENT_SNAPSHOT $APACHE_AGENT_STABLE apache-agent.zip
+        dl $WEB_AGENTS_STABLE_REPO $APACHE_AGENT_ZIP apache-agent.zip
         ;;
     *) 
         echo "Invalid image to downoad $1"
@@ -49,22 +50,27 @@ dl_binary() {
     esac
 }
 
-# Do the actual download. $1 - snapshot source $2 - release source, $3 destination
-# Based on the value of -s argument, we download either the snapshot or the normal release
+# Do the actual download. $1 - REPO ,  $2 - artifact name, $3 destination
 dl(){
-    if [ -z "$BUILD_SNAPSHOTS" ]; 
-    then
-        src="$2"
-    else
-        src="$1"
+   
+    src="$1/$2"
+  
+    echo "Downloading $src to $3"
+
+    echo "GCS_CACHE is: $GCS_DIR"
+    if [ -n "$GCS_DIR" ]; then
+        gsutil cp $GCS_DIR/$2 $3
+        if [ "$?" -eq 0 ];  then
+            return 0
+        fi
+        echo "Can't find cached file $2 - will download"
     fi
 
-    echo "Downloading $src to $3"
-    if [ -z "${WGET}" ]
+    if [ -z "${WGET+x}" ]
     then
-        $DRYRUN curl --fail -s -H "$HEADER"  $src -o $3
+        curl --fail -s -H "$HEADER"  $src -o $3
     else
-        $DRYRUN wget -q --header "$HEADER" $src  -O $3
+        wget -q --inet4-only --timeout=20 --header "$HEADER" -O $3 $src
     fi
 
     if [ $? -ne 0 ] 
@@ -72,23 +78,30 @@ dl(){
         echo "Download failed"
         exit 1
     fi
+
+    if [ -n "$GCS_DIR" ]; then
+        echo "Saving a cached copy of $2"
+        gsutil cp "$3" "$GCS_DIR/$2" || echo "Could not save to cache. Skipping"
+    fi
+
 }
 
+VERSION=${VERSION:-6.5.0}
+# you should not need to edit the paths below
+REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
 
-# Note: Until we get 6.5 milestones, we are using the 6.0.0 product images.
-VERSION=${VERSION:-6.0.0}
 
-
-while getopts "swv:d" opt; do
+while getopts "wv:" opt; do
   case ${opt} in
-    s ) BUILD_SNAPSHOTS="true" ;;
     w ) WGET="true" ;;
-    v ) VERSION="${OPTARG}" ;;
-    d ) DRYRUN="echo" ;;
+    v ) VERSION="${OPTARG}" 
+        echo $VERSION | grep SNAPSHOT \
+                && REPO="https://maven.forgerock.org/repo/internal-snapshots/org/forgerock"
+                SNAPSHOT="true"
+        ;;
     \? )
-         echo "Usage: dl.sh [-s] [-w] images..."
-         echo "-s download snapshots instead of releases"
-         echo "-w Use wget instead of curl"
+         echo "Usage: dl.sh [-v version] images..."
+         echo "-c Use curl instead of wget"
          echo "-v VERSION - download a specific version (example -v 6.5.0). Default $VERSION"
          echo "Images can be one or more of: $IMAGES"
          echo "If not specified, all images are downloaded"
@@ -98,54 +111,34 @@ while getopts "swv:d" opt; do
 done
 shift $((OPTIND -1))
 
-
-# Update release / milestone / RC builds here.
-AM_VERSION=$VERSION
-IDM_VERSION=$VERSION
-DJ_VERSION=$VERSION
-IG_VERSION=$VERSION
-
 IMAGES="opendj openidm amster openam openig"
-
-SNAPSHOT="${VERSION}-SNAPSHOT"
-
-# you should not need to edit the paths below
-REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
-SNAPSHOT_REPO=https://maven.forgerock.org/repo/internal-snapshots/org/forgerock
 
 
 WEB_AGENTS_SNAPSHOT_REPO=https://maven.forgerock.org/repo/forgerock-virtual/org/forgerock/openam/agents/web-agents/nightly
 WEB_AGENTS_STABLE_REPO=https://maven.forgerock.org/repo/forgerock-virtual/org/forgerock/openam/agents/web-agents/5.0.1
 
-AM=$REPO/am/openam-server/$AM_VERSION/openam-server-$AM_VERSION.war
-AM_SNAPSHOT=$SNAPSHOT_REPO/am/openam-server/$SNAPSHOT/openam-server-$SNAPSHOT.war
-
-AMSTER=$REPO/am/openam-amster/$AM_VERSION/openam-amster-$AM_VERSION.zip
-AMSTER_SNAPSHOT=$SNAPSHOT_REPO/am/openam-amster/$SNAPSHOT/openam-amster-$SNAPSHOT.zip
+AM_WAR=openam-server-$VERSION.war
+AM_REPO=$REPO/am/openam-server/$VERSION
 
 
-IDM=$REPO/openidm/openidm-zip/$IDM_VERSION/openidm-zip-$IDM_VERSION.zip
-IDM_SNAPSHOT=$SNAPSHOT_REPO/openidm/openidm-zip/$SNAPSHOT/openidm-zip-$SNAPSHOT.zip
+AMSTER_ZIP=openam-amster-$VERSION.zip
+AMSTER_REPO=$REPO/am/openam-amster/$VERSION
 
-DJ=$REPO/opendj/opendj-server/$DJ_VERSION/opendj-server-$DJ_VERSION.zip
-DJ_SNAPSHOT=$SNAPSHOT_REPO/opendj/opendj-server/$SNAPSHOT/opendj-server-$SNAPSHOT.zip
+IDM_ZIP=openidm-zip-$VERSION.zip
+IDM_REPO=$REPO/openidm/openidm-zip/$VERSION
 
+DJ_ZIP=opendj-server-$VERSION.zip
+DJ_REPO=$REPO/opendj/opendj-server/$VERSION
 
-IG=$REPO/openig/openig-war/$IG_VERSION/openig-war-$IG_VERSION.war
-IG_SNAPSHOT=$SNAPSHOT_REPO/openig/openig-war/$SNAPSHOT/openig-war-$SNAPSHOT.war
+IG_WAR=openig-war-$VERSION.war
+IG_REPO=$REPO/openig/openig-war/$VERSION
 
+NGINX_AGENT_ZIP=web-agents-5.0.1-NGINX_r12_Ubuntu16_64bit.zip
 
-NGINX_AGENT_SNAPSHOT=$WEB_AGENTS_SNAPSHOT_REPO/web-agents-nightly-NGINX_r12_Debian9_64bit.zip
-NGINX_AGENT_STABLE=$WEB_AGENTS_STABLE_REPO/web-agents-5.0.1-NGINX_r12_Ubuntu16_64bit.zip
-
-APACHE_AGENT_SNAPSHOT=$WEB_AGENTS_SNAPSHOT_REPO/web-agents-nightly-Apache_v24_Linux_64bit.zip
-APACHE_AGENT_STABLE=$WEB_AGENTS_STABLE_REPO/web-agents-5.0.1-Apache_v24_Linux_64bit.zip
-
+APACHE_AGENT_ZIP=web-agents-5.0.1-Apache_v24_Linux_64bit.zip
 
 
 HEADER="X-JFrog-Art-Api: $API_KEY"
-
-
 
 
 if [ "$#" -ne 0 ]; then

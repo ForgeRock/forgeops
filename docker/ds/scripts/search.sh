@@ -17,6 +17,6 @@ $PROXY/bin/ldapsearch \
         --keyStorePasswordFile $KEYSTORE_PIN \
         --trustStorePath $SSL_KEYSTORE \
         --trustStorePasswordFile $KEYSTORE_PIN \
-        --baseDN o=userstore \
+        --baseDN ou=identities \
         --searchScope base \
         "(objectClass=*)"

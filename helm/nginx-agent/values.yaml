@@ -17,17 +17,20 @@ resources:
     memory: 256Mi
 
 # Default cookie domain. Include the leading dot.
-domain: .forgeops.com
+domain: .example.com
 
 agent:
   user: nginx
-  amServer: http://openam.example.forgeops.com/openam
+  amServer: https://login.example.forgeops.com/
   realm: "/"
 
 
 component: nginx-agent
 
 image:
-  repository: gcr.io/engineering-devops
+  repository: forgerock-docker-public.bintray.io
   tag: latest
   pullPolicy: Always
+
+securityContext:
+  privileged: true

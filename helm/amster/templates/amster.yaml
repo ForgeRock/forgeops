@@ -20,10 +20,11 @@ spec:
         app: {{ template "fullname" . }}
         component:  {{ .Values.component }}
     spec:
-      terminationGracePeriodSeconds: 5   
+      terminationGracePeriodSeconds: 5
+      {{ if eq .Values.config.strategy "git" -}}
       initContainers:
       - name: git-init
-        image: forgerock/git:6.0.0
+        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
@@ -34,21 +35,28 @@ spec:
         envFrom:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
+      {{- end }}
       containers:
       - name: amster
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{  .Values.image.pullPolicy }}
         envFrom:
         - configMapRef:
             name: amster-{{ .Release.Name }}
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+        - secretRef:
+            name: {{ default "frconfig" .Values.config.name }}-platform
         env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
         volumeMounts:
+        {{ if eq .Values.config.strategy "git" -}}
         - name: git
           mountPath: /git
+        {{- end }}
         # The ssh key for Amster authN
         - name: amster-secrets
           mountPath: /var/run/secrets/amster
@@ -59,8 +67,9 @@ spec:
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+      {{ if eq .Values.config.strategy "git" -}}
       - name: git
-        image: forgerock/git:6.0.0
+        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
@@ -73,6 +82,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         args: [ "pause"]
+      {{ end }}
       volumes:
       - name: amster-secrets
         secret:
@@ -81,8 +91,10 @@ spec:
         configMap:
           name: amster-config
       # the amster and git pods share access to this volume
+      {{ if eq .Values.config.strategy "git" -}}
       - name: git
         emptyDir: {}
       - name: git-secret
         secret:
           secretName:  {{ default "frconfig" .Values.config.name }}
+      {{- end }}

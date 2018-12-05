@@ -1,10 +1,10 @@
-# Base Java Image for ForgeRock Identity Platform. Used for DJ, amster, IG and IDM (Anything that does not need a web
+# Base Java Image for ForgeRock Identity Platform. Used for DS, amster, IG and IDM (Anything that does not need a web
 # container)
 #
 #
 # Copyright (c) 2016-2018 ForgeRock AS.
 
-FROM openjdk:8u151-jdk-alpine
+FROM openjdk:8-jdk-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 

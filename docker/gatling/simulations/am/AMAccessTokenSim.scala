@@ -19,9 +19,9 @@ class AMAccessTokenSim extends Simulation {
     val concurrency: Integer = Integer.getInteger("concurrency", 10)
     val duration: Integer = Integer.getInteger("duration", 60)
     val warmup: Integer = Integer.getInteger("warmup", 1)
-    val amHost: String = System.getProperty("am_host", "openam.example.forgeops.com")
-    val amPort: String = System.getProperty("am_port", "80")
-    val amProtocol: String = System.getProperty("am_protocol", "http")
+    val amHost: String = System.getProperty("am_host", "login.example.forgeops.com")
+    val amPort: String = System.getProperty("am_port", "443")
+    val amProtocol: String = System.getProperty("am_protocol", "https")
 
     val oauth2ClientId: String = System.getProperty("oauth2_client_id", "oauth2")
     val oauth2ClientPassword: String = System.getProperty("oauth2_client_pw", "password")
@@ -35,7 +35,7 @@ class AMAccessTokenSim extends Simulation {
     val codeVarName = "authcode"
     var accessTokenVarName = "access_token"
 
-    val amUrl: String = "http://" + amHost + ":" + amPort
+    val amUrl: String = amProtocol + "://" + amHost + ":" + amPort
     val random = new util.Random
 
     val userFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(
@@ -59,7 +59,7 @@ class AMAccessTokenSim extends Simulation {
             feed(userFeeder)
             .exec(
                 http("Rest login stage")
-                    .post("/openam/json/authenticate")
+                    .post("/json/authenticate")
                     .disableUrlEncoding
                     .header("Content-Type", "application/json")
                     .headers(getXOpenAMHeaders("${username}", "${password}"))
@@ -68,7 +68,7 @@ class AMAccessTokenSim extends Simulation {
                 addCookie(Cookie("iPlanetDirectoryPro", _.get(tokenVarName).as[String]))
             ).exec(
                 http("Authorize stage")
-                    .post("/openam/oauth2/authorize")
+                    .post("/oauth2/authorize")
                     .queryParam("client_id", oauth2ClientId)
                     .queryParam("scope", scope)
                     .queryParam("state", state)
@@ -84,7 +84,7 @@ class AMAccessTokenSim extends Simulation {
 
             ).exec(
                 http("AccessToken stage")
-                  .post("/openam/oauth2/access_token")
+                  .post("/oauth2/access_token")
                   .queryParam("realm", realm)
                   .formParam("grant_type", "authorization_code")
                   .formParam("code", _.get(codeVarName).as[String])
@@ -94,7 +94,7 @@ class AMAccessTokenSim extends Simulation {
             ).doIf(getTokenInfo.toLowerCase.equals("true")) {
                 exec(
                     http("IdTokenInfo stage")
-                    .get("/openam/oauth2/tokeninfo")
+                    .get("/oauth2/tokeninfo")
                     .queryParam("access_token", _.get(accessTokenVarName).as[String])
                     .check(jsonPath("$.access_token").exists)
                 )

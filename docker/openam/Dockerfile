@@ -4,15 +4,15 @@
 #
 FROM forgerock/downloader 
 
-ARG VERSION="6.0.0"
+ARG VERSION="6.5.0"
 RUN download -v $VERSION openam 
-RUN mkdir -p /var/tmp/openam && unzip /openam.war -d /var/tmp/openam
+RUN mkdir -p /var/tmp/openam && unzip -q /openam.war -d /var/tmp/openam
 
 FROM tomcat:8.5-alpine
 
 RUN rm -fr "$CATALINA_HOME"/webapps/*
 
-COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/openam
+COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/ROOT
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for setting the AM home directory:
@@ -47,7 +47,7 @@ RUN apk add --no-cache su-exec unzip curl bash tini \
   && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G root \
   && mkdir -p "$OPENAM_HOME" \
   && mkdir -p "$FORGEROCK_HOME"/.openamcfg \
-  && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_openam_  \
+  && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_ROOT_  \
   && chown -R forgerock:root "$CATALINA_HOME" \
   && chown -R forgerock:root  "$FORGEROCK_HOME" \
   && chmod -R g+rwx "$CATALINA_HOME"

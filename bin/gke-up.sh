@@ -2,6 +2,10 @@
 # Sample wrapper script to initialize GKE. This creates the cluster and configures Helm, the nginx ingress,
 # and creates git credential secrets. Edit this for your requirements.
 
+set -o errexit
+set -o pipefail
+set -o nounset
+
 ask() {
 
 	read -p "Should i continue (y/n)?" choice
@@ -13,7 +17,7 @@ ask() {
 }
 
 echo -e "WARNING: This script requires a properly provisioned GCP Project with appropriate\n\t accounts, roles, privileges, keyrings, keys etc. These pre-requisites are\n\t outlined in the DevOps Documentation. Please ensure you have completed all\n\t before proceeding."
-ask
+
 
 echo ""
 echo "=> Have you copied the template file etc/gke-env.template to etc/gke-env.cfg and edited to cater to your enviroment?"
@@ -24,21 +28,21 @@ echo ""
 echo "You are authenticated and logged into GCP as \"${authn}\". If this is not correct then exit this script and run \"gcloud auth login\" to login into the correct account first."
 ask
 
+#source "$(dirname $0)/../etc/gke-env.cfg"
+source "${BASH_SOURCE%/*}/../etc/gke-env.cfg"
 
-. ../etc/gke-env.cfg
-
-# Set the GKE Project Name to the one parsed from the cfg file
-gcloud config set project ${GKE_PROJECT_NAME} 
+# Set the GKE Project ID to the one parsed from the cfg file
+gcloud config set project ${GKE_PROJECT_ID} 
 
 # Now create the cluster
-./create-cluster.sh
+./gke-create-cluster.sh
 
 if [ $? -ne 0 ]; then
     exit 1 
 fi
 
 # Add a nodepool for nfs server
-./gke-create-nodepool.sh 
+#./gke-create-nodepool.sh 
 
 # Create monitoring namespace
 kubectl create namespace ${GKE_MONITORING_NS}
@@ -48,7 +52,7 @@ kubectl create namespace ${GKE_CLUSTER_NS}
 kubectl config set-context $(kubectl config current-context) --namespace=${GKE_CLUSTER_NS}
 
 # Create storage class
-./create-sc.sh
+./gke-create-sc.sh
 
 # Inatilize helm by creating a rbac role first
 ./helm-rbac-init.sh
@@ -62,14 +66,15 @@ do
     sleep 5s
 done
 
-# Creater the NFS provisioner for backups
-./create-nfs-provisioner.sh
 
 # Create the ingress controller
-./gke-ingress-cntlr.sh ${GKE_INGRESS_IP}
+./gke-create-ingress-cntlr.sh ${GKE_INGRESS_IP}
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh
 
 # Add Prometheus
-./deploy_prometheus.sh
+./deploy-prometheus.sh
+
+# Filestore is needed if you enable backups.  Uncomment the next line to create one.
+# ./gke-create-filestore.sh

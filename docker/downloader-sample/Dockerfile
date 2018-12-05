@@ -6,6 +6,7 @@
 #
 # Build it with:
 # docker build -t forgerock/downloader downloader-sample
+# Note the tag above is set to forgerock/downloader. The multi-stage build expects to pull this image.
 # See the download script for more details.
 
 FROM alpine:latest

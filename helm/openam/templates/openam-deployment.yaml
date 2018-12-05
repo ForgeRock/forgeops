@@ -18,7 +18,7 @@ spec:
       initContainers:
        {{ if eq .Values.config.strategy  "git" }}
       - name: git-init
-        image: forgerock/git:6.0.0
+        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         volumeMounts:
         - name: git
@@ -30,13 +30,13 @@ spec:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
       {{ end }}
+      # The init containers below should be removed once file based configuration is in place.
       - name: wait-for-configstore
         image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         args: [ "wait", "{{ .Values.configLdapHost }}", "{{ .Values.configLdapPort }}" ]
-      # todo: pull the util image scripts into a generic alpine image. Use a configmap for the scripts
       - name: bootstrap
-        image: forgerock/util:6.0.0
+        image: forgerock-docker-public.bintray.io/forgerock/util:6.5.0
         imagePullPolicy:  {{ .Values.image.pullPolicy }}
         env:
         - name: BASE_DN
@@ -53,7 +53,7 @@ spec:
         args:  ["bootstrap"]
       containers:
       - name: openam
-        image: {{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy:  {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080
@@ -61,11 +61,28 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
+        - name: configstore-secret
+          mountPath: /var/run/secrets/configstore
+        - name: openam-secrets
+          mountPath: /var/run/secrets/openam/keystore
+        - name: openam-pstore-secrets
+          mountPath: /var/run/secrets/openam/password
+        {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
+        {{ end }}
+        {{ if .Values.useConfigMapWebxml }}
+        - mountPath: /usr/local/tomcat/webapps/WEB-INF/web.xml
+          name: webxml
+          subPath: webxml
+        {{ end }}
         envFrom:
         - configMapRef:
             name: am-configmap
+        {{ if eq .Values.config.strategy  "git" }}
+        - configMapRef:
+            name:  {{ default "frconfig" .Values.config.name  }}
+        {{ end }}
         env:
         - name: NAMESPACE
           valueFrom:
@@ -76,14 +93,14 @@ spec:
         # For slow environments like Minikube you need to give OpenAM time to come up.
         readinessProbe:
           httpGet:
-            path: /openam/isAlive.jsp
+            path: /isAlive.jsp
             port: 8080
           initialDelaySeconds: 30
           timeoutSeconds: 5
           periodSeconds: 20
         livenessProbe:
           httpGet:
-            path: /openam/isAlive.jsp
+            path: /isAlive.jsp
             port: 8080
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
@@ -95,17 +112,26 @@ spec:
         env:
         - name: LOGFILE
           value: {{ .path }}
-        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ] 
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
       {{- end }}
       volumes:
+      {{ if .Values.useConfigMapWebxml }}
+      - configMap:
+          defaultMode: 420
+          name: webxml
+        name: webxml
+      {{ end }}
       - name: openam-root
         emptyDir: {}
       - name: openam-secrets
         secret:
           secretName: openam-secrets
+      - name: openam-pstore-secrets
+        secret:
+          secretName: openam-pstore-secrets
       - name: openam-boot
         configMap:
           name: boot-json

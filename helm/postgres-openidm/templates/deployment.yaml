@@ -41,6 +41,8 @@ spec:
             secretKeyRef:
               name: {{ template "name" . }}
               key: postgres-password
+        # Adding the default values here just to provide a place to tune further
+        args: ['-c','shared_buffers=128MB','-c','max_connections=100']
         ports:
         - name: postgresql
           containerPort: 5432
@@ -81,7 +83,7 @@ spec:
         configMap:
           name: openidm-sql
       - name: data
-      {{- if .Values.persistence.enabled }}
+      {{- if .Values.persistence }}
         persistentVolumeClaim:
           # If you want to run multiple instances in the same namespace, uncomment below:
           #claimName: {{ template "fullname" . }}

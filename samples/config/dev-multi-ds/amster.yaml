@@ -1,8 +1,8 @@
 
 config:
   claim: frconfig
-  #importPath: /git/config/default/am/empty-import
-  importPath: /git/config/samples/am/R6.0
+  #importPath: /git/config/6.0/default/am/empty-import
+  importPath: /git/config/6.0/identity-platform-examples/am-ds
   #exportPath: /tmp/amster
   exportPath:  /git/config/default/am/export
 
