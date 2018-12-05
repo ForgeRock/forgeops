@@ -34,8 +34,8 @@ tls:
 {{- define "git-init" -}}
 {{ if eq .Values.config.strategy "git" }}
 - name: git-init
-  image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
-  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+  imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
   volumeMounts:
   - name: git
     mountPath: /git
@@ -54,8 +54,8 @@ tls:
 {{- define "git-sync" -}}
 {{ if eq .Values.config.strategy "git" }}
 - name: git
-  image: forgerock/git:6.5.0
-  imagePullPolicy: {{ .Values.image.pullPolicy }}
+  image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+  imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
   volumeMounts:
   - name: git
     mountPath: /git

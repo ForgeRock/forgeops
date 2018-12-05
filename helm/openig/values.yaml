@@ -31,6 +31,11 @@ image:
   tag: 6.5.0
   pullPolicy: IfNotPresent
 
+gitImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
 resources:
 #  limits:
 #    cpu: 1000m

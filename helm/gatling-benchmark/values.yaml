@@ -10,6 +10,11 @@ image:
   repository: forgerock-docker-public.bintray.io/forgerock/gatling:6.5.0
   pullPolicy: Always
   
+gitImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
 config:
   # Name of the configMap that holds the configuration repository URL and of
   # the secret required to access it.
