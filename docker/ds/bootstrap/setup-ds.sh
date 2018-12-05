@@ -31,9 +31,9 @@ SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
     --profile am-cts:6.5.0 \
     --set am-cts/amCtsAdminPassword:password \
     --set am-cts/tokenExpirationPolicy:ds \
-    --profile am-identity-store \
+    --profile am-identity-store:6.5.0 \
     --set am-identity-store/amIdentityStoreAdminPassword:password \
-    --profile am-config \
+    --profile am-config:6.5.0 \
     --set am-config/amConfigAdminPassword:password \
     --profile idm-repo:6.5.0 \
     --certNickname ${SSL_CERT_ALIAS} \
