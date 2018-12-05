@@ -37,7 +37,7 @@ esac
 # Who created this cluster.
 CREATOR="${USER:-unknown}"
 # Labels can not contain dots that may be present in the user.name
-CREATOR=$(echo $CREATOR | sed 's/\./_/')
+CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
 
 echo ""
