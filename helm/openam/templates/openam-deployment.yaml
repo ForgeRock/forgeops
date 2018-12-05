@@ -18,8 +18,8 @@ spec:
       initContainers:
        {{ if eq .Values.config.strategy  "git" }}
       - name: git-init
-        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -32,12 +32,12 @@ spec:
       {{ end }}
       # The init containers below should be removed once file based configuration is in place.
       - name: wait-for-configstore
-        image: "forgerock-docker-public.bintray.io/forgerock/util:6.0.0"
-        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        image: {{ .Values.utilImage.repository }}:{{ .Values.utilImage.tag }}
+        imagePullPolicy: {{ .Values.utilImage.pullPolicy }}
         args: [ "wait", "{{ .Values.configLdapHost }}", "{{ .Values.configLdapPort }}" ]
       - name: bootstrap
-        image: forgerock-docker-public.bintray.io/forgerock/util:6.5.0
-        imagePullPolicy:  {{ .Values.image.pullPolicy }}
+        image: {{ .Values.utilImage.repository }}:{{ .Values.utilImage.tag }}
+        imagePullPolicy: {{ .Values.utilImage.pullPolicy }}
         env:
         - name: BASE_DN
           value: {{ .Values.rootSuffix }}

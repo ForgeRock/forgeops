@@ -26,8 +26,8 @@ spec:
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:
       - name: git-init
-        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -96,8 +96,8 @@ spec:
           mountPath: /var/run/openidm/logging
       {{ if eq .Values.config.strategy  "git" }}
       - name: git
-        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
