@@ -1,5 +1,5 @@
 git:
-  repo: https://github.com/ForgeRock/forgeops-init.git
+  repo: https://github.com/Forgerock/forgeops-init.git
   branch: master
 
 
