@@ -323,4 +323,4 @@ echo ""
 echo "=> For each directory pod you want to backup execute the following command"
 echo "   $ kubectl exec -it <podname> scripts/schedule-backup.sh"
 
-printf "\e[38;5;40m=======> Deployment is ready <========\n"
+printf "\e[38;5;40m=======> Deployment is ready <========\e[m\n"
