@@ -46,12 +46,31 @@ class IGSmoke(unittest.TestCase):
         resp = post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_oauth2_access_token_url,
                     auth=('oauth2', 'password'), data=data)
         access_token = resp.json()['access_token']
-
         header = {'Authorization': 'Bearer ' + access_token}
 
         resp = post(verify=self.igcfg.ssl_verify, url=self.igcfg.ig_url + '/rs-tokeninfo', headers=header)
         self.assertTrue(str(resp.content).__contains__('access_token='+access_token),
                         'Check if IG page contains access token and info')
+
+    def test_oauth2_tokenintrospect(self):
+        """Test to check oauth2 token from AM"""
+
+        data = {
+            'grant_type': 'password',
+            'username': 'igtestuser',
+            'password': 'password',
+            'scope': 'mail employeenumber'
+        }
+        resp = post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_oauth2_access_token_url,
+                    auth=('oauth2', 'password'), data=data)
+        access_token = resp.json()['access_token']
+
+        header = {'Authorization': 'Bearer ' + access_token}
+
+        resp = post(verify=self.igcfg.ssl_verify, url=self.igcfg.ig_url + '/rs-tokenintrospect', headers=header)
+        self.assertEquals(resp.status_code, 200, 'Get HTTP-200 on introspect endpoint')
+        self.assertTrue(str(resp.content).__contains__('user_id=igtestuser'), 'Expecting username on page')
+        self.assertTrue(str(resp.content).__contains__('client_id=oauth2'), 'Expecting client to be oauth2')
 
     def tearDown(self):
         """Remove user from AM"""
