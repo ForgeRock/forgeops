@@ -16,8 +16,8 @@ spec:
       initContainers:
       {{ if eq .Values.config.strategy  "git" }}
       - name: git-init
-        image: forgerock-docker-public.bintray.io/forgerock/git:6.5.0
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git

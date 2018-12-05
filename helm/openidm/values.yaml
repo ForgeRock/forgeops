@@ -38,6 +38,11 @@ image:
   # For development use Always
   # pullPolicy: Always
 
+gitImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
 # override Java JVM options.
 # For JDK 11 add -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
 javaOpts: "-Xmx1024m -server -XX:+UseG1GC"
