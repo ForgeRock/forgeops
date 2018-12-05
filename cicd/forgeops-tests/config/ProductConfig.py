@@ -76,7 +76,7 @@ class IGConfig(object):
         try:
             self.ig_url = os.environ['IG_URL']
         except KeyError:
-            self.ig_url = 'https://openig.smoke.forgeops.com/'
+            self.ig_url = 'https://openig.smoke.forgeops.com'
         self.ssl_verify = SSL_VERIFY
 
 
