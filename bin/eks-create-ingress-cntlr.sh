@@ -43,9 +43,11 @@ echo "=> Creating route53 records for openam and openidm set to point to cluster
 
 AM_URL="login.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
 IDM_URL="openidm.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
+IG_URL="openig.${EKS_CLUSTER_NS}.${ROUTE53_DOMAIN}"
 
 NLB_DNS=$(kubectl --namespace nginx get services nginx-nginx-ingress-controller --no-headers -o custom-columns=NAME:.status.loadBalancer.ingress[0].hostname)
 
 HOSTED_ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name ${ROUTE53_DOMAIN} --query 'HostedZones[0].Id' | sed s/\"//g | sed s/,//g | sed s./hostedzone/..g)
 aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${AM_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
 aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${IDM_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
+aws route53 change-resource-record-sets --hosted-zone-id ${HOSTED_ZONE_ID} --change-batch '{"Comment":"UPSERT a record ","Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"${IG_URL}"'","Type":"CNAME","TTL":300,"ResourceRecords":[{"Value":"'"${NLB_DNS}"'"}]}}]}'
