@@ -12,9 +12,15 @@ data:
     --cfgStore {{ .Values.configStore.type }} \
     {{ if eq .Values.configStore.type "dirServer" -}}
     --cfgStoreHost {{.Values.configStore.host }} \
-    --cfgStoreDirMgrPwd {{.Values.configStore.password }}  \
-    --cfgStorePort {{.Values.configStore.port }}  \
+    --cfgStoreDirMgrPwd {{.Values.configStore.password }} \
+    --cfgStorePort {{.Values.configStore.port }} \
     --cfgStoreRootSuffix {{ .Values.configStore.suffix }} \
+    --userStoreDirMgr "{{ .Values.userStore.dirManager }}" \
+    --userStoreDirMgrPwd  {{ .Values.userStore.password }} \
+    --userStoreHost {{ .Values.userStore.host }} \
+    --userStorePort {{ .Values.userStore.port }} \
+    --userStoreRootSuffix {{ .Values.userStore.suffix }} \
+    --userStoreType {{ .Values.userStore.storeType }} \
     {{ end -}}
     --policyAgentPwd {{ .Values.policyAgentPassword }}  \
     --pwdEncKey {{ .Values.encryptionKey }} \
