@@ -60,6 +60,18 @@ configStore:
   adminPort: 4444
   password: password
 
+# By default, userstore points to configstore - which is default
+# place for users when empty-import config is used. 
+userStore:
+  suffix: "ou=identities"
+  # If userstore is deployed as well but empty import configuration 
+  # is used, override this to userstore-0.userstore to use that store
+  host: configstore-0.configstore
+  port: 1389
+  dirManager: "cn=Directory manager"
+  password: "password"
+  storeType: "LDAPv3ForOpenDS"
+
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration
 # and set to 'false' if importing partial/incremental configurations
