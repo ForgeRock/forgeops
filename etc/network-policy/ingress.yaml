@@ -1,0 +1,19 @@
+# See https://github.com/ahmetb/kubernetes-network-policy-recipes
+# Sample ingress rule
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ds-ingress-policy
+  # default to current namespace
+  #namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      # Policy applies to opendj pods
+      component: ds
+  ingress:
+  - from:
+    - podSelector:
+        # Allow ingress from other ds pods, openidm, or openam
+        matchExpressions:
+        - { key: component, operator: In, values: [openam,ds,openidm]}

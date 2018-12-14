@@ -1,0 +1,25 @@
+# See https://github.com/ahmetb/kubernetes-network-policy-recipes/blob/master/14-deny-external-egress-traffic.md
+# This allows outbound dns, but disallows connections outside of the cluster.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: forgeops-egress-policy
+  # default to current namespace
+  #namespace: default
+spec:
+  podSelector:
+      # Note that AM may require egress for OIDC, jwt signature verification or SAML
+      # Applies to ds pod
+      # Note that IG needs access to github.com. We would need to white list this
+      matchExpressions:
+        - { key: component, operator: In, values: [ds]}
+  policyTypes:
+  - Egress
+  egress:
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+  - to:
+    - namespaceSelector: {}
