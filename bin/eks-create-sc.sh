@@ -14,7 +14,7 @@
 # For io1 the maximum ratio of provisioned IOPS to requested volume size (in GiB) is 50:1.
 # For example, a 100 GiB volume can be provisioned with up to 5,000 IOPS.
 # Check this page out for more details https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html
-# For the "fast" sc, add "iopsPerGB" parameter if you want to specify IOPS for io1.
+
 
 kubectl create -f - <<EOF
 kind: StorageClass
@@ -23,8 +23,7 @@ metadata:
   name: fast
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: io1
-  fstype: ext4
+  type: gp2
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
@@ -33,7 +32,19 @@ metadata:
 provisioner: kubernetes.io/aws-ebs
 parameters:
   type: gp2
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: fast10
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: io1
+  fstype: ext4
+  iopsPerGB: "10"
 EOF
 
 
 kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+
