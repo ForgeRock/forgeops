@@ -20,6 +20,10 @@ source /opt/opendj/env.sh
 rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
+update_password()
+{
+    sed -ibak "s/userPassword: .*/userPassword: $1/" $2
+}
 
 # At runtime we set the Directory Manager password using the mounted secrets
 update_ds_password()
@@ -31,7 +35,7 @@ update_ds_password()
 
     echo "Updating the directory manager password"
     export pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password  -s PBKDF2 -f $DIR_MANAGER_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
-    sed -ibak "s/userPassword: .*/userPassword: $pw/" data/db/rootUser/rootUser.ldif
+    update_password $pw "data/db/rootUser/rootUser.ldif"
 
     if [ ! -f "$MONITOR_PW_FILE" ]; then
         echo "Can't find the monitor user password file. Won't change the password"
@@ -40,7 +44,7 @@ update_ds_password()
 
     echo "Updating the monitor user password"
     export pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password -s PBKDF2 -f $MONITOR_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
-    sed -ibak "s/userPassword: .*/userPassword: $pw/" data/db/monitorUser/monitorUser.ldif
+    update_password $pw "data/db/monitorUser/monitorUser.ldif"
 }
 
 relocate_data() 
