@@ -32,10 +32,6 @@ update_ds_password()
     echo "Updating the directory manager password"
     export pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password  -s PBKDF2 -f $DIR_MANAGER_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
     sed -ibak "s/userPassword: .*/userPassword: $pw/" data/db/rootUser/rootUser.ldif
-    #pw="userPassword: $pw"
-    #head -n -2  data/db/rootUser/rootUser.ldif >/tmp/pw
-    #echo -e "$pw\n" >>/tmp/pw 
-    #mv /tmp/pw data/db/rootUser/rootUser.ldif
 
     if [ ! -f "$MONITOR_PW_FILE" ]; then
         echo "Can't find the monitor user password file. Won't change the password"
@@ -45,10 +41,6 @@ update_ds_password()
     echo "Updating the monitor user password"
     export pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password -s PBKDF2 -f $MONITOR_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
     sed -ibak "s/userPassword: .*/userPassword: $pw/" data/db/monitorUser/monitorUser.ldif
-    #pw="userPassword: $pw"
-    #head -n -2  data/db/monitorUser/monitorUser.ldif >/tmp/pw
-    #echo "$pw" >>/tmp/pw 
-    #mv /tmp/pw data/db/monitorUser/monitorUser.ldif
 }
 
 relocate_data() 
