@@ -14,51 +14,64 @@ spec:
         agent: {{ .Values.component }}
         app: {{ template "fullname" . }}
     spec:
-      # Note: the privileged container and mounting the /dev/shm are needed to give the agent enough shared
-      # memory.  See https://bugster.forgerock.org/jira/browse/AMAGENTS-273 and
-      # https://github.com/kubernetes/kubernetes/issues/28272.
       terminationGracePeriodSeconds: 5
       containers:
+      # Sidecar container to tail out logs from shared volume
+      - name: logs-sidecar
+        image: alpine
+        command: ["/bin/sh"]
+        args: ["-c", "while ! [ -f /logmount/debug.log ]; do sleep 1; done && tail -f /logmount/debug.log"]
+        volumeMounts:
+        - name: logs
+          mountPath: /logmount
+      # Agent/Server container
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}/{{ .Values.component }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        args: ["httpd-foreground"]
+        args: ["install"]
         securityContext:
-          privileged: true
+{{ toYaml .Values.securityContext | indent 8 }}
+        volumeMounts:
+        - name: logs
+          mountPath: /logmount
+        - name: agent-secrets
+          mountPath: /var/run/secrets/agent
+        - name: dshm
+          mountPath: /dev/shm
+        # This can be extended for any configurable properties. Look to forgeops/docker/apache-agent/docker-entrypoint.sh
+        # for list of supported env variables.
         env:
-        # 1 GB session cache
         - name: AM_MAX_SESSION_CACHE_SIZE
           value: "0x40000000"
         - name: AM_MAX_SHARED_POOL_SIZE
           value: "0x20000000"
+        - name: AM_AGENT_PASSWORD
+          value: "{{ .Values.agent.password }}"
+        - name: AM_AGENT_USER
+          value: "{{ .Values.agent.user }}"
+        - name: AM_OPENAM_URL
+          value: "{{ .Values.agent.amServer }}"
+        - name: AM_AGENT_URL
+          value: "http://{{ template "externalFQDN" . }}:80"
+        - name: AM_AGENT_REALM
+          value: "{{ .Values.agent.realm }}"
+        - name: AM_PDP_TEMP_PATH
+          value: "{{ default "/logmount"  .Values.agent.pdpPath }}"
+        - name: AM_DEBUG_FILE_PATH
+          value: "{{ default "/logmount/"  .Values.agent.debugFilePath }}"
+        - name: AM_AUDIT_FILE_PATH
+          value: "{{ default "/logmount/"  .Values.agent.auditFilePath }}"
         ports:
         - containerPort: {{ .Values.service.internalPort }}
-        # todo: The agent will force a 302 redirect - but any codes between 200 and 399 are considered healthy
-        # However - it appears as if Kube tries to follow the 302 redirect, and this results in an error. For
-        # now we disable the probes.
-        # livenessProbe:
-        #   httpGet:
-        #     path: /
-        #     host: localhost
-        #     port: {{ .Values.service.internalPort }}
-        #   initialDelaySeconds: 5
-        #   periodSeconds: 10
-        # readinessProbe:
-        #   httpGet:
-        #     path: /
-        #     port: {{ .Values.service.internalPort }}
-        #   initialDelaySeconds: 5
-        resources:
-{{ toYaml .Values.resources | indent 12 }}
-        volumeMounts:
-        - name: dshm
-          mountPath: /dev/shm
-        - name: agent-conf
-          mountPath: /opt/web_agents/apache24_agent/instances/agent_1/config
-      volumes:
+      volumeMounts:
       - name: dshm
-        hostPath: 
+        mountPath: /dev/shm
+      volumes:
+      - name: agent-secrets
+        secret:
+          secretName: apache-agent-secrets
+      - name: dshm
+        hostPath:
           path: /dev/shm
-      - name: agent-conf
-        configMap:
-          name: {{ template "fullname" . }}
+      - name: logs
+        emptyDir: {}

@@ -1,28 +1,32 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Ingress definition to configure external routes.
+{{- if .Values.ingress.enabled }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Values.component }}
+  labels:
+    app: {{ template "fullname" . }}
+    vendor: forgerock
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    release: "{{ .Release.Name }}"
+    heritage: "{{ .Release.Service }}"
   annotations:
-    kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
-    # This causes issues when idm redirects to /admin
-    #ingress.kubernetes.io/rewrite-target: /
-    # Note that not all ingress controllers implement all these features..
-    ingress.kubernetes.io/enable-cors: "true"
-    ingress.kubernetes.io/ssl-redirect: "true"
-    kubernetes.io/tls-acme: "true"
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "sha1"
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
-{{ include "tls-spec" . | indent 2 }}
+  tls:
+  - hosts:
+    - {{ template "idmFQDN" .  }}
+    secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
-  - host: {{ template "externalFQDN" . }}
+  - host: {{ template "idmFQDN" . }}
     http:
       paths:
       - path: /
         backend:
-          serviceName: {{  .Values.service.name }}
-          servicePort: {{ .Values.service.externalPort }}
+          serviceName: {{ .Values.service.name }}
+          servicePort: {{ .Values.service.externalPort }}   
+{{- end -}}

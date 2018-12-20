@@ -1,6 +1,6 @@
 {
   "properties": {
-    "openamUrl": "http://openam.example.com:8080/openam/"
+    "openamUrl": "http://login.example.com:8080/"
   },
   "handler": {
     "type": "Chain",
@@ -15,7 +15,7 @@
         {
           "type": "PolicyEnforcementFilter",
           "config": {
-            "openamUrl": "http://openam:80/openam/",
+            "openamUrl": "http://openam:80/",
             "application": "PEP policy set",
             "pepUsername": "policyAdmin",
             "pepPassword": "password",

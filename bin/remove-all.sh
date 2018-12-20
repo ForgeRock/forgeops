@@ -2,12 +2,26 @@
 # This removes *all* helm charts in the current namespace and deletes all PVCs / PV in the current namespace
 # Use with caution - this deletes all of your data as well...
 
-#set -x
-
 kcontext=`kubectl config current-context`
 NS=`kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}"`
 
+while getopts "N" opt; do
+        case ${opt} in
+            N)  REMOVE_NS="yes" ;;
+            \? ) echo "$0 [-N]  Remove helm charts and delete the namespace" ;;
+        esac
+done
+shift $((OPTIND -1))
+
+if [ $# -eq 1 ];
+then
+    NS=$1
+fi
+
 NAMESPACE=${NS:-default}
+
+
+echo "Removing all releases for namespace $NAMESPACE"
 
 # Delete helm charts in specified namespace (of default namespace, if none specified).
 # Use --all to make sure charts with DELETED status are removed.
@@ -25,6 +39,27 @@ pvclist=`kubectl get pvc --namespace ${NAMESPACE} -o jsonpath='{.items[*].metada
 for pvc in ${pvclist}
 do
     echo "Deleting $pvc"
-    kubectl delete pvc ${pvc}
+    kubectl delete pvc --namespace ${NAMESPACE}  ${pvc}
 done
 
+kubectl delete job --namespace  ${NAMESPACE} --all
+
+if [ -n "$REMOVE_NS" ]; then
+    echo "Deleting namespace $NAMESPACE"
+    kubectl delete ns "$NAMESPACE"
+
+    while true; do
+        OK_STRING="NotFound"
+        echo "Waiting for ns to be deleted completely"
+        OUTPUT=$(kubectl get ns $NAMESPACE)
+            if [[ $OK_STRING = *$OUTPUT* ]]; then
+                echo "Namespace is deleted"
+                break
+            fi
+          echo "=> Namespace $NAMESPACE is being deleted. Waiting for 5 more seconds..."
+          sleep 5
+    done
+fi
+
+# Needed for cloudbuild
+exit 0

@@ -11,6 +11,10 @@ metadata:
     ingress.kubernetes.io/session-cookie-name: "route"
     ingress.kubernetes.io/session-cookie-hash: "sha1"
 spec:
+  tls:
+  - hosts:
+    - {{ template "externalFQDN" .  }}
+    secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
   # If you are forwarding from another load balancer, make
   # sure the LB sets the appropiate X-forwarded headers.

@@ -1,0 +1,49 @@
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  #repository: gcr.io/engineering-devops/ds
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+  
+instance: userstore
+
+cts:
+  enabled: false
+
+resources:
+  limits:
+    memory: 27Gi
+    cpu: 10000m
+  requests:
+    memory: 20Gi
+    cpu: 4000m
+
+# For JDK 8
+opendjJavaArgs: >
+  -server -Xms20g -Xmx20g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log
+
+# For JDK 11
+#opendjJavaArgs: >
+# -server -Xms8g -Xmx8g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA  
+# -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log
+
+
+storageSize: 512Gi
+storageClass: fast
+
+replicas: 2
+
+topologyKey: "failure-domain.beta.kubernetes.io/zone"
+
+podAntiAffinity: hard
+
+backup:
+  enabled: false
+  storageClass: nfs
+  storageSize: 100Gi
+  pvcClaimName: ds-backup
+
+# If existing database is found then restore is always skipped
+restore:
+  enabled: true

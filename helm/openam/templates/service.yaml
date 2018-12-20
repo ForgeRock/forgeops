@@ -3,11 +3,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: openam
+  name: {{ .Values.service.name }}
   labels:
     app: {{ template "fullname" . }}
-    vendor: forgerock
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     component: {{ .Values.component }}
+    vendor: forgerock
 spec:
   type: {{ .Values.service.type }}
   ports:

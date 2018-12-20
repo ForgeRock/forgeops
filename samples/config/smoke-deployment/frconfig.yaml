@@ -1,0 +1,6 @@
+git:
+  repo: https://github.com/Forgerock/forgeops-init.git
+  branch: master
+
+
+domain: .forgeops.com

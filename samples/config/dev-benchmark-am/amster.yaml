@@ -1,0 +1,13 @@
+config:
+  claim: frconfig
+  importPath: /git/config/6.5/smoke-tests/am/
+  exportPath: /tmp/amster
+
+version: 6.0.0
+fqdn: login.pavel.forgeops.com
+# For production set CPU limits to help Kube Schedule the pods.
+resources:
+ limits:
+   memory: 756Mi
+ requests:
+   memory: 756Mi

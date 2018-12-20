@@ -1,12 +1,12 @@
-# Setup 
+# Helm Charts
 
-1) If you have not already done so, install (helm)[https://github.com/kubernetes/helm] and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
+## Setup 
 
-2) See the comments in custom.yaml. You can copy this file and customize.
+1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
 
-3) Build your Docker images, or set up access to a registry where those images can be pulled. 
-The default docker repository and tag names are set in each helm chart in values.yaml. You can 
-override these in your custom.yaml file.  The default assumes the docker images are in the docker cache 
+2) Build your Docker images, or set up access to a registry where those images can be pulled.
+The default docker repository and tag names are set in each helm chart in values.yaml. You can
+override these in your custom.yaml file.  The default assumes the docker images are in the docker cache
 (i.e. you have done a docker build direct to the Minikube docker machine). See the
  README in the docker/ folder for more information.
 
@@ -23,17 +23,22 @@ global:
      branch: master
 ```
 
-forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it. 
+forgeops-init.git has public read-only access.  You can clone this repository but you can not write to it.
 
-If you wish to use your own Git repository based on the forgeops-init repository, 
-you can fork and clone the forgeops-init repository.
+If you wish to use your own Git repository based on the forgeops-init repository,
+you can fork and clone the forgeops-init repository. See [frconfig/README.md](frconfig/README.md).
 
 # Composite Charts
 
+The provided cmp-platform chart bundles other foundational charts such opendj, frconfig,
+ openam, etc. Performing a `helm install cmp-platform`  will deploy all the components.
+ Remember to perform a `helm dep up cmp-platform` to update any dependencies that might have changed.
 
-Composite charts have names that begin with cmp-. These charts assemble foundational charts such opendj, git, 
- openam, etc. Refer to the values.yaml in each composite chart.  If you are building the
- charts yourself, remember to perform a `helm dep up cmp-chart` to update any dependencies that might have changed.
+This chart is a simple example for use only when working through the *DevOps 
+ Quick Start Guide* only.  
+
+For all other deployments, install individual Helm charts as described in the 
+ *DevOps Developer's Guide*. 
  
 # Using a private registry
 
@@ -47,7 +52,7 @@ If you are using your own private registry you must modify registry.sh with the 
 
 This directory contains Helm charts for:
 
-* opendj  - A chart to deploy one or more OpenDJ instances
+* ds  - A chart to deploy one or more DS instances
 * amster  - A chart to install and configure OpenAM 
 * openam - A chart for the OpenAM runtime. Assumes OpenAM is
 installed already. This can scale up horizontally by increasing the replica count.
@@ -67,10 +72,10 @@ your own value overrides in a custom.yaml file that override just the values you
 change. You can then invoke Helm with your custom values. 
 
 For example,
-assume your ```custom.yaml`` file sets the DJ image tag to "test-4.1".
-You can deploy the OpenDJ chart using:
+assume your ```custom.yaml`` file sets the DS image tag to "test-4.1".
+You can deploy the DS chart using:
 
-```helm install -f custom.yaml opendj```
+```helm install -f custom.yaml ds```
 
 Further documentation can be found in each chart's README.md
 
@@ -87,10 +92,36 @@ ingress host name. The format is:
 
  For example:
 
- `openam.default.example.com`
+ `login.default.example.com`
 
 Note that the details of the ingress will depend on the implementation. You may need to modify the ingress definitions. 
  
+# TLS
+
+All charts default to using TLS (https) for the inbound ingress.  
+
+Within a namespace, it is assumed that a single wildcard certificate secret is present `wildcard.$namespace.$domain`. This
+secret is referenced by each ingress controller in the `tls` spec.
+
+You can create the wildcard secret manually, but in these examples we assume
+that [cert-manager](https://github.com/jetstack/cert-manager) is installed and is provisioning certificates for you.
+
+
+The frconfig chart defaults to creating a cert-manager "CA" issuer. This is a simple issuer that issues certificates signed by a CA certificate installed as part of the frconfig chart. We have included a default CA certificate in frconfig/secrets. You can replace this with your own using the sample script `frconfig/secrets/cm.sh`, or replace it with an intermediate signing certificate issued by your organization.
+
+If you are on minikube, cert-manager can be installed using:
+
+`helm upgrade -i cert-manager --namespace kube-system stable/cert-manager`
+
+If you deploy the frconfig chart as-is: `helm install frconfig`  things should "just work". You will get a
+self signed certificate presented to the browser. You must accept the browser warnings, or import the CA cert found in frconfig/secrets into your browser's trusted certificate list.
+
+Alternatively, you can configure frconfig to create a cert-manager issuer for Let's Encrypt. Refer to the cert-manager docs for further details.
+
+If you do not see a secret `wildcard.$namespace.$domain`, it means that something has gone wrong with cert manager. Look in the cert-manager logs to find the cause. If you are using the Let's Encrypt issuer, keep in mind that it can take up to 10 minutes to provision a certificate.
+
+
+For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html#devops-implementation-env-https-access-secret).
 
 # Notes
 
@@ -103,13 +134,13 @@ shell into the container and run the export.sh script. This script will run Amst
 current configuration to /git.  
 
 
-The default OpenDJ deployment uses persistent volume claims (PVC) and
+The default DS deployment uses persistent volume claims (PVC) and
 StatefulSets to provide stateful deployment of the data tier. If you
 wish to start from scratch you should delete the PVC volumes.
 PVCs and StatefulSets are features introduced in Kubernetes 1.5. 
 
 If you are using Minikube take note that host path PVCs get deleted
-every time Minikube is restarted.  The opendj/ chart is a StatefulSet,
+every time Minikube is restarted.  The ds/ chart is a StatefulSet,
 and relies on auto provisioning.  If you restart Minikube, you may find you
 need to re-install OpenAM.
 
@@ -119,7 +150,7 @@ The script `helm/update-deps.sh` will update all of the dependencies. You must r
 
 # Tips
 
-To connect an LDAP browser to OpenDJ running in the cluster, use
+To connect an LDAP browser to DS running in the cluster, use
 port forwarding:
 
 kubectl port-forward opendj-configstore-0 1389:1389

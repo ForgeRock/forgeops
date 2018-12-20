@@ -1,4 +1,0 @@
-dependencies:
-- name: frcommon
-  version: ">0.0.0"
-  repository: file://../frcommon

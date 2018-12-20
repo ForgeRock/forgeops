@@ -1,16 +1,31 @@
-
-
-global:
+amster:
   domain: .example.com
-  git:
-    # This is a public repo, so we need to use https:// to clone.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
 
+openam:
+  domain: .example.com
+
+openig:
+  domain: .example.com
+
+openidm:
+  domain: .example.com
 
 userstore:
-  djInstance: userstore
-  numberSampleUsers: 500
+  instance: userstore
+  persistence: false
+  opendjJavaArgs: "-Xmx400m"
+  resources:
+    limits:
+      memory: 600Mi
+    requests:
+      memory: 400Mi
 
 configstore:
-  djInstance: configstore
-
+  instance: configstore
+  persistence: false
+  opendjJavaArgs: "-Xmx400m"
+  resources:
+    limits:
+      memory: 600Mi
+    requests:
+      memory: 400Mi

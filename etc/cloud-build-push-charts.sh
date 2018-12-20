@@ -8,7 +8,6 @@ URL="https://storage.googleapis.com/forgerock-charts"
 # Where our helm charts are located.
 hdir=`pwd`/helm
 
-
 # The previous build step downloaded Helm to our working directory. We need to unpack it.
 tar xvf helm.tar.gz
 
@@ -22,7 +21,7 @@ dir=/tmp/charts
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-charts="opendj amster openam openidm openig postgres-openidm git opendj-cluster cmp-idm-dj-postgres cmp-am-dj cmp-platform"
+charts="frconfig ds amster openam openidm openig postgres-openidm cmp-platform web apache-agent"
 for chart in $charts
 do
     echo "Packaging $chart"
@@ -30,17 +29,20 @@ do
     $helm package $hdir/$chart
 done
 
+# include the unsupported sample fr-platform chart along with the others
+# $helm package $hdir/../samples/fr-platform
+
 # Fetch a copy of the existing index.
 gsutil cp gs://${BUCKET}/index.yaml .
 # Merge the new charts with the existing index.
 $helm repo index --url $URL --merge index.yaml .
 
 # Copy all the charts and index up to our bucket.
-gsutil -m rsync ./ gs://${BUCKET}
+gsutil -q -m rsync ./ gs://${BUCKET}
 
 # Make the charts world readable.
-gsutil -m acl set -R -a public-read gs://${BUCKET}
+gsutil -q -m acl set -R -a public-read gs://${BUCKET}
 
 # See https://github.com/kubernetes/helm/issues/2453.
 # This makes sure the bucket is not cached (default is to cache https:// objects for 1 hour).
-gsutil -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" "gs://${BUCKET}/*"
+gsutil -q -m setmeta -h "Content-Type:text/html" -h "Cache-Control:private, max-age=0, no-transform" "gs://${BUCKET}/*"

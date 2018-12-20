@@ -3,7 +3,7 @@
 kind: Deployment
 apiVersion: apps/v1beta1
 metadata:
-  # If you want to run more than one IG deployment in the same namespace, change the deployment name 
+  # If you want to run more than one IG deployment in the same namespace, change the deployment name
   # below to the {{ template "fullname" . }} to make the name unique.
   name:  {{ template "fullname" . }}
   labels:
@@ -20,10 +20,11 @@ spec:
         component: {{ .Values.component }}
         vendor: forgerock
     spec:
+      {{ if eq .Values.config.strategy  "git" }}
       initContainers:
       - name: git-init
-        image: forgerock/git:6.0.0
-        imagePullPolicy:  {{ .Values.image.pullPolicy }}
+        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
+        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
         volumeMounts:
         - name: git
           mountPath: /git
@@ -32,44 +33,71 @@ spec:
         args: ["init"]
         envFrom:
         - configMapRef:
-            name:  {{ template "fullname" . }}
-        # This is here so that a change in the git branch or commit triggers a rollout.
-        # See https://github.com/kubernetes/helm/issues/2639
-        env:
-        - name: GIT_CHECKOUT_BRANCH
-          value: "{{ .Values.global.git.branch }}"
+            name:  {{ default "frconfig" .Values.config.name  }}
+      {{ end }}
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         envFrom:
         - configMapRef:
-            name: {{ template "fullname" . }}
+            name:  {{ default "frconfig" .Values.config.name  }}
+        - secretRef:
+            name: {{ default "frconfig" .Values.config.name }}-platform
+        - secretRef:
+            name: {{ default "openig-secrets-env" .Values.secret.name  }}
+        env:
+        - name: OPENIG_BASE
+          value: "{{ .Values.config.path }}"
+        - name: CATALINA_OPTS
+          value: "{{ .Values.catalinaOpts }}"
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
         ports:
         - containerPort: {{ .Values.service.internalPort }}
         volumeMounts:
+        {{ if eq .Values.config.strategy  "git" }}
         - name: git
           mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-# todo: Create a health check URL
-#        livenessProbe:
-#          httpGet:
-#            path: /
-#            port: {{ .Values.service.internalPort }}
-#          timeoutSeconds: 10
-#        readinessProbe:
-#          httpGet:
-#            path: /
-#            port: {{ .Values.service.internalPort }}
-#          initialDelaySeconds: 30
+        {{ end }}
+        livenessProbe:
+          httpGet:
+           path: /kube/liveness
+           port: {{ .Values.service.internalPort }}
+          timeoutSeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /kube/readiness
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 5
         resources:
 {{ toYaml .Values.resources | indent 12 }}
+      # audit logging containers
+      {{- range .Values.auditLogs }}
+      - name: {{ .name }}
+        image: busybox
+        env:
+        - name: LOGFILE
+          value: {{ .path }}
+        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
+        volumeMounts:
+        - name: logs
+          mountPath: /tmp/logs
+      {{- end }}
       volumes:
+      - name: logs
+        emptyDir: {}
+      {{ if eq .Values.config.strategy  "git" }}
       - name: git
         emptyDir: {}
       - name: git-secret
         secret:
-          secretName:  git-ssh-key
-          # The forgerock user needs to be able to read this file.
-          #defaultMode: 256
+          secretName:  {{ default "frconfig" .Values.config.name }}
+      {{ end }}

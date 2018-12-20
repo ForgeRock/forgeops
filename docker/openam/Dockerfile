@@ -1,9 +1,18 @@
 # AM Dockerfile
 #
-# Copyright (c) 2016-2017 ForgeRock AS.
+# Copyright (c) 2016-2018 ForgeRock AS.
 #
-FROM tomcat:8.5.28-jre8-alpine
+FROM forgerock/downloader 
 
+ARG VERSION="6.5.0"
+RUN download -v $VERSION openam 
+RUN mkdir -p /var/tmp/openam && unzip -q /openam.war -d /var/tmp/openam
+
+FROM tomcat:8.5-alpine
+
+RUN rm -fr "$CATALINA_HOME"/webapps/*
+
+COPY --from=0 /var/tmp/openam "$CATALINA_HOME"/webapps/ROOT
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for setting the AM home directory:
@@ -16,8 +25,13 @@ FROM tomcat:8.5.28-jre8-alpine
 # See also https://forum.forgerock.com/topic/openamcfg-location/
 
 
+# This option:
+#  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450 
+# This may impact amster imports for some configurations (SAML entities)
+# If you need to renable this for amster, it should be disabled after the import is complete
+
 ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap \
-  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider \
   -Dcom.sun.identity.shared.debug.file.format=\"%PREFIX% %MSG%\\n%STACKTRACE%\"
 
@@ -26,20 +40,14 @@ ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryL
 ENV FORGEROCK_HOME /home/forgerock
 ENV OPENAM_HOME /home/forgerock/openam
 
-
-COPY openam.war  /tmp/openam.war
-
 # Note that we are adding the forgerock user to the root group - which is consistent with OpenShift.
 # This is a work around for: https://github.com/docker-library/tomcat/issues/35
-RUN apk add --no-cache su-exec unzip curl bash  \
-  && rm -fr /usr/local/tomcat/webapps/* \
-  && unzip -q /tmp/openam.war -d  "$CATALINA_HOME"/webapps/openam \
-  && rm /tmp/openam.war \
+RUN apk add --no-cache su-exec unzip curl bash tini \
   && addgroup -g 11111 forgerock \
   && adduser -s /bin/bash -h "$FORGEROCK_HOME" -u 11111 -D forgerock -G root \
   && mkdir -p "$OPENAM_HOME" \
   && mkdir -p "$FORGEROCK_HOME"/.openamcfg \
-  && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_openam_  \
+  && echo "$OPENAM_HOME" >  "$FORGEROCK_HOME"/.openamcfg/AMConfig_usr_local_tomcat_webapps_ROOT_  \
   && chown -R forgerock:root "$CATALINA_HOME" \
   && chown -R forgerock:root  "$FORGEROCK_HOME" \
   && chmod -R g+rwx "$CATALINA_HOME"
@@ -55,7 +63,8 @@ USER 11111
 
 # Generate a default keystore for SSL - only needed if you want SSL inside the cluster.
 # You can mount your own keystore on the ssl/ directory to override this.
-# Because of the complexity of configuring ssl, we should look at using istio.io to handle intercomponent ssl
+# Because of the complexity of configuring ssl, we recommend using something like istio to provide
+# SSL within the cluster.
 #RUN mkdir -p /usr/local/tomcat/ssl && \
 #   keytool -genkey -noprompt \
 #     -keyalg RSA \

@@ -1,0 +1,9 @@
+agent:
+  user: apache
+  amServer: http://login.smoke.forgeops.com/
+  realm: "/"
+
+
+image:
+  pullPolicy: Always
+  tag: 6.5.0 

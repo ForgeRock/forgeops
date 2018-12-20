@@ -27,10 +27,6 @@ if [ "$1" = 'openidm' ]; then
     # Copy any patch files to the project home
     cp /opt/openidm/conf/*.patch ${PROJECT_HOME}/conf
 
-    # Uncomment this to print experimental VM settings to the stdout.
-    #java -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1 -XshowSettings:vm -version
-
-
     # Bundle directory
     BUNDLE_PATH="$OPENIDM_HOME/bundle"
 
@@ -47,11 +43,11 @@ if [ "$1" = 'openidm' ]; then
 
     SLF4J_PATHS="$SLF4J_API:$SLF4J_JDK14"
     JACKSON_PATHS="$JACKSON_CORE:$JACKSON_DATABIND:$JACKSON_ANNOTATIONS"
-    OPENIDM_SYSTEM_PATH=`echo $BUNDLE_PATH/openidm-system-*.jar`
+    OPENIDM_SYSTEM_PATH=$(echo $BUNDLE_PATH/openidm-system-*.jar)
+    OPENIDM_UTIL_PATH=$(echo $BUNDLE_PATH/openidm-util-*.jar)
+    CLASSPATH="$OPENIDM_HOME/bin/*:$OPENIDM_HOME/framework/*:$SLF4J_PATHS:$JACKSON_PATHS:$OPENIDM_SYSTEM_PATH:$OPENIDM_UTIL_PATH"
 
-    CLASSPATH="$OPENIDM_HOME/bin/*:$OPENIDM_HOME/framework/*:$SLF4J_PATHS:$JACKSON_PATHS:$OPENIDM_SYSTEM_PATH"
-
-   exec java \
+   exec tini -v -- java \
        "-Djava.util.logging.config.file=${LOGGING_PROPERTIES}" \
         ${JAVA_OPTS}  \
        -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \

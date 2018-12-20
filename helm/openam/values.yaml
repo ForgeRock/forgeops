@@ -6,38 +6,45 @@ component: openam
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 6.0.0
+  tag: 6.5.0
   # For development we set this to Always to get the most current image:
-  #pullPolicy: Always
   pullPolicy: IfNotPresent
 
-global:
-  domain: .forgeops.com
-  git:
-    # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
-    branch: master
-    projectDirectory: "forgeops-init"
-  configPath:
-    am: default/am/empty-import
-  exportPath:
-      am: default/am/autosave
-  # If you set this to true, you must have a TLS secret with the same name as the FQDN.
-  useTLS: false
+gitImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
+utilImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/util
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
+domain: .example.com
+
+config:
+  name: frconfig
+  strategy: git
 
 openamReplicaCount: 1
 
-openamInstance: http://openam:80/openam
+openamInstance: http://openam:80
 
 configLdapPort:  1389
 configLdapHost: configstore-0.configstore
 
 
+# This option:
+#  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
+# This may impact amster imports for some configurations (SAML entities)
+# If you need to renable this for amster, it should be disabled after the import is complete
+
 catalinaOpts: >
   -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true
   -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
+  -Dcom.iplanet.services.stats.state=off
 
 # For visualVM debug, you can add this to the above:
 #-Dcom.sun.management.jmxremote.port=<port>
@@ -46,8 +53,12 @@ catalinaOpts: >
 #-Dcom.sun.management.jmxremote.rmi.port=<port>
 #-Djava.rmi.server.hostname=$HOST_HOSTNAME
 
-# Suffix for OpenDJ config store. We reuse the default baseDN of o=userstore.
-rootSuffix:  "o=userstore"
+
+# To use a tomcat web.xml from a k8s config map instead of the one built into the container, set the following to true.
+useConfigMapWebxml: false
+
+# Suffix for DS config store.
+rootSuffix:  "ou=am-config"
 
 # Valid logger types: fluent-bit, none
 # For audit logs it is suggested you configure AM to send directly to ElasticSearch.
@@ -61,24 +72,16 @@ resources:
  requests:
    memory: 1200Mi
 
-
-openamHome: /home/forgerock/openam
-
 # Set to true to create a boot.json file to bootstrap AM. If set to false, AM will come up to the configurator page.
 createBootstrap: true
 
 # This is an optional path to a script to execute before AM starts up. It can copy in images, update the web.xml, etc.
-# The path is *relative* to /git/config/{{ configPath.am }}.
-# For example:   /git/config/default/am/my-config/customize-am.sh
+# If you change set it to the full path to your cloned configuration.  Example: /git/config/default/6.5/my-openam/custom.sh
 amCustomizationScriptPath: "customize-am.sh"
 
 # Liveness probe tuning - time in seconds
 livenessPeriod: 60
 livenessTimeout: 15
-
-rbac:
-  enabled: true
-
 
 service:
   name: openam
@@ -92,10 +95,28 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    # Do not use for nginx. TODO: Does warp need this?
-    #ingress.kubernetes.io/rewrite-target: /
-    ingress.kubernetes.io/enable-cors: "false"
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "sha1"
-    ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
+    nginx.ingress.kubernetes.io/cors-max-age: "600"
+    nginx.ingress.kubernetes.io/rewrite-target: "/"
+
+# Audit log details for log streaming sidecar containers.
+# AM can now stream audit logs to stdout. This option may be removed in the future.
+auditLogs: []
+
+# auditLogs:
+#   - name: access-logs
+#     path: "/home/forgerock/openam/openam/log/access.audit.json"
+#   - name: activity-logs
+#     path: "/home/forgerock/openam/openam/log/activity.audit.json"
+#   - name: authentication-logs
+#     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
+#   - name: config-logs
+#     path: "/home/forgerock/openam/openam/log/config.audit.json"

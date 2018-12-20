@@ -1,0 +1,10 @@
+postgresUser: openidm
+postgresPassword: openidm
+
+storageClassName: fast
+storageSize: 100Gi
+
+resources:
+  requests:
+    memory: 2000Mi
+    cpu: 2000m

@@ -1,73 +1,81 @@
-# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-# Default values for openam-install.
-# This is a YAML-formatted file.
-# Declare name/value pairs to be passed into your templates.
-# name: value
 
 
 component: amster
-
 
 # Server base URL *within* the Kubernetes cluster - not the external LB URL.
 # No /openam appended here.
 serverBase: http://openam:80
 
-# See the _helpers template to change the *external* load balancer fqdn
-# By default it expands to  openam.$namespace.$baseDomain
 
-# Install passwords.
+# The top level domain (including the leading .). This excludes the openam component.
+domain: .example.com
+
+# Default install passwords.
 amadminPassword: password
+# see AM Java source code org.forgerock.openam.shared.security.crypto.Hashes.secureHash(s)
+amadminPasswordHashed: "{SSHA-512}FBLj2oKbyR3ccq0Ydivp2PdsH5q7wbgh+UYwZdKjA6j0XB5Qu6wvzbMoCNyMRkAqsmu8E6rPIH2dUFuCPtiHBFAfdMsKvg/TBjTz+gQQU/g/NDgQRA=="
 encryptionKey: "123456789012"
 policyAgentPassword: Passw0rd
+prometheusPassword: prometheus
 
+
+config:
+  # Name of the configMap that holds the configuration repository URL and of
+  # the secret required to access it.
+  name: frconfig
+  # The path where we import the configuration from. Your git repo will usually be mounted on /git/config.
+  importPath: /git/config/6.5/default/am/empty-import
+  # Where we perform export to. If not set, this defaults to the importPath
+  #exportPath: /tmp/amster
+  # strategy defines how products get their configuration .
+  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
+  # If strategy is set to anything other than git (e.g. file), it is assumed some other process will make
+  # files available to the container (baked in to the docker image, or provided by skaffold, etc.)
+  strategy: git
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 6.0.0
-  #pullPolicy: IfNotPresent
-  pullPolicy: Always
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+  #pullPolicy: Always
 
+gitImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
 
 configStore:
-  # type can be dirServer or embedded.
+  # type can be dirServer or embedded. Only dirServer is supported
   type: dirServer
    # If type is set to embedded, the attributes below are ignored.
   #suffix:  "dc=openam,dc=forgerock,dc=org"
-  suffix:  "o=userstore"
-  # This is the first StatefulSet name:
+  suffix:  "ou=am-config"
+  # This is the first StatefulSet name of the configstore:
   host: configstore-0.configstore
   port: 1389
-  dirManager: "cn=Directory Manager"
+  #dirManager: "cn=Directory Manager"
+  dirManager: "uid=am-config,ou=admins,ou=am-config"
   adminPort: 4444
   password: password
 
-# This is not currently supported on install by amster. You must import a user store config.
+# By default, userstore points to configstore - which is default
+# place for users when empty-import config is used. 
 userStore:
-  host:  userstore-0.userstore
+  suffix: "ou=identities"
+  # If userstore is deployed as well but empty import configuration 
+  # is used, override this to userstore-0.userstore to use that store
+  host: configstore-0.configstore
   port: 1389
-  password: password
-  dirManager: "cn=Directory Manager"
-  suffix:  "o=userstore"
-
+  dirManager: "cn=Directory manager"
+  password: "password"
+  storeType: "LDAPv3ForOpenDS"
 
 # determines if '--clean true' is used for the import-config.
 # suggest this is 'true' if importing a complete configuration
 # and set to 'false' if importing partial/incremental configurations
 amsterClean: false
-
-# Defines default global values. These can get overridden with -f custom.yaml
-global:
-  domain: .forgeops.com
-  git:
-    # git repo to clone. The value below is a public git repo that does not require authentication.
-    repo: "https://github.com/ForgeRock/forgeops-init.git"
-    branch: master
-  configPath:
-    am: default/am/empty-import
-  # If exportPath.am is not set it defaults to configPath.am
-  exportPath: {}
-    #am: default/am/autosave
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:
@@ -76,6 +84,15 @@ resources:
  requests:
    memory: 756Mi
 
-# The default value is openam + . {Release.Namespace} .{Values.global.domain }
-# Uncomment or set this to explicity set the FQDN
-#openamFQDN: openam.example.com
+# Optional value overrides
+
+# fqdn - the openam server external fqdn.
+# If this is *not* set, it defaults to login.{namespace}{{ .Values.domain }}
+#fqdn: login.acme.com
+
+# ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on
+# import.
+#ctsStores: ctsstore-0.ctsstore:1389
+
+# ctsPassword - defaults to "password"
+#ctsPassword: password

@@ -1,0 +1,63 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ include "smoketest.fullname" . }}
+  labels:
+    app: {{ include "smoketest.name" . }}
+    chart: {{ include "smoketest.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "smoketest.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "smoketest.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      serviceAccountName: toolbox-{{ .Release.Namespace }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: ["pause"]
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+          - name: CLUSTER_NAME
+            value: {{ .Values.cluster }}
+          - name: TEST_REPORT_LINK
+            value: {{ .Values.fqdn }}
+          - name: SLACK_SERVICE
+            value: {{ .Values.slackService }}
+          - name: GIT_REPO
+            value: "https://github.com/ForgeRock/forgeops-init.git"
+          - name: GIT_BRANCH
+            value: master
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          volumeMounts:
+          - name: content
+            mountPath: /content
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+        - name: web
+          image: "gcr.io/engineering-devops/dashboard-smoketests:latest"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          - name: content
+            mountPath: /content
+          ports:
+          - containerPort: 5000
+      volumes:
+      - name: content
+        persistentVolumeClaim:
+          claimName: forgeops-results

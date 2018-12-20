@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Edit this based on your environment!
+# Sample setup for macOs. 
+# Edit this based on your environment! 
 # Prerequisites: you must have homebrew installed.
 brew update
 
@@ -19,19 +20,10 @@ minikube start --memory 8096
 
 minikube status
 
-
 echo "Enabling the ingress controller"
 minikube addons enable ingress
 
 helm init
-
-# Install useful helm plugins
-helm plugin install https://github.com/adamreese/helm-nuke
-
-
-# Add ForgeRock chart repo.
-helm repo add forgerock https://storage.googleapis.com/forgerock-charts/
-
 
 minikube dashboard
 

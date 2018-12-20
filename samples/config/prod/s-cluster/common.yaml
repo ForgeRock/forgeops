@@ -1,0 +1,14 @@
+# Note if you enable TLS then you have to either provide the certificate 
+# by running generate-tls.sh script or you have to have cert-manager deployed
+# for your DNS domain 
+
+#domain: .freng.org
+domain: .frk8s.net
+
+#fqdn: login.small.freng.org
+fqdn: login.prod.frk8s.net
+
+# Install passwords.
+amadminPassword: password
+encryptionKey: "123456789012"
+policyAgentPassword: Passw0rd

@@ -1,17 +1,22 @@
 #
 # Copyright (c) 2016-2017 ForgeRock AS.
+FROM forgerock/downloader
 
-FROM forgerock/java:6.0.0
+ARG VERSION="6.5.0"
+RUN download -v $VERSION openidm 
+
+RUN mkdir -p /var/tmp/openidm && unzip -q /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
+
+FROM forgerock-docker-public.bintray.io/forgerock/java:6.5.0
+
+COPY --from=0 /var/tmp/openidm /opt/openidm
 
 WORKDIR /opt
 
 # Override these to change the JVM:
-#ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC
+ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
 # Use this for Java 8 u131 or later. This sets the size of the VM heap according to the container size.
-ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-
-# Download or add OpenIDM nightly build and unzip.
-COPY openidm.zip /tmp/openidm.zip
+#ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 
 # For a Debian base image use the RUN stanza below.
 #
@@ -24,11 +29,9 @@ COPY openidm.zip /tmp/openidm.zip
 
 RUN apk update && \
     apk upgrade && \
-    apk add zip ttf-dejavu
+    apk add zip ttf-dejavu tini
 
-RUN unzip -q /tmp/openidm.zip && \
-    chown -R forgerock:forgerock /opt/openidm && \
-    rm -f /tmp/openidm.zip  && rm -fr /opt/openidm/samples
+RUN chown -R forgerock:forgerock /opt/openidm  && rm -fr /opt/openidm/samples
 
 COPY *.sh /opt/openidm/
 COPY logging.properties /opt/openidm/logging.properties

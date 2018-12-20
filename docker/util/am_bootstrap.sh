@@ -4,7 +4,7 @@
 # TODO: Deprecate this when we get boot from json support
 set -x
 
-BASE_DN="${BASE_DN:-dc=openam,dc=forgerock,dc=org}"
+BASE_DN="${BASE_DN:-ou=am-config}"
 
 # Configuration store LDAP. Defaults to the configuration store stateful set running in the same namespace.
 CONFIGURATION_LDAP="${CONFIGURATION_LDAP:-configstore-0.configstore:1389}"
@@ -24,15 +24,23 @@ is_configured() {
     return $status
 }
 
+# Note - because AM is installed at the context root (ROOT/) it impacts
+# the location of bootstrap and keystore files (the context is used in forming the path)
+# If you ever change the am context (not recommended), you need to copy these files to OPENAM_HOME/$context
 copy_secrets() {
     echo "Copying secrets"
-    mkdir -p "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}/openam"
-    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}/openam"
+    mkdir -p "${OPENAM_HOME}/secrets"
+    cp  -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}"
+    cp  -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}"
+    cp  -L /var/run/secrets/openam/keystore.jceks "${OPENAM_HOME}"
+    cp  -L /var/run/secrets/openam/keystore.jks "${OPENAM_HOME}"
     cp  -L /var/run/secrets/openam/authorized_keys "$OPENAM_HOME"
-    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}/openam"
+    cp  -L /var/run/secrets/openam/openam_mon_auth "${OPENAM_HOME}"
+    # The new AM secrets API specifies a directory for password secrets. Each file is a key, and the contents are the secret value
+    # You can NOT use a leading dot 
+    # In your global -> Secret Stores -> default-password-store - configure /home/forgerock/openam/secrets as your Directory
+    cp -L /var/run/secrets/openam/.keypass "${OPENAM_HOME}/secrets/entrypass"
+    cp -L /var/run/secrets/openam/.storepass "${OPENAM_HOME}/secrets/storepass"
 }
 
 bootstrap() {

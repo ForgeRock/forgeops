@@ -1,0 +1,5 @@
+instance: userstore
+
+# image:
+#   pullPolicy: Always
+#   tag: latest

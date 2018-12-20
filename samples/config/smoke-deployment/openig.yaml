@@ -1,0 +1,5 @@
+# image:
+#   pullPolicy: Always
+#   tag: latest
+config:
+  path: /git/config/6.5/smoke-tests/ig/

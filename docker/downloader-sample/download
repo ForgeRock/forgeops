@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Script to "download" binaries from the ForgeRock Artifactory repository.
+# This is a fake script that mimics the functionality of the ../downloader/download script. This 
+# example just assumes the artifacts are in place already.
+# The protocol you need to implement:
+# ./download [-v version] [openam,openig,opendj,opendidm]
+# Even if you dont use the version implement them as args for compatibility with the other downloader.
+#
+# This is used in the first stage of a multi stage build to make the ForgeRock binaries available for subsequent builds.
+
+VERSION=${VERSION:-6.0.0}
+
+# parsing script -for completeness -but not used
+while getopts "wv:d" opt; do
+  case ${opt} in
+    w ) WGET="true" ;;
+    v ) VERSION="${OPTARG}" ;;
+    d ) DRYRUN="echo" ;;
+    \? )
+         echo "Usage: dl.sh [-s] [-w] images..."
+         echo "-s download snapshots instead of releases"
+         echo "-w Use wget instead of curl"
+         echo "-v VERSION - download a specific version (example -v 6.5.0). Default $VERSION"
+         echo "Images can be one or more of: $IMAGES"
+         echo "If not specified, all images are downloaded"
+         exit 1
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+echo "Nothing to see here - I assume the binaries are already here in the / directory:"
+ls -l /

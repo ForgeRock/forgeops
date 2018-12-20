@@ -1,0 +1,38 @@
+# Default values for smoketest.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: gcr.io/engineering-devops/toolbox
+  tag: latest
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    #nginx.ingress.kubernetes.io/auth-signin: http://smoke-tests.forgeops.com/oauth2/start?rd=$escaped_request_uri
+    #nginx.ingress.kubernetes.io/auth-url: http://smoke-tests.forgeops.com/oauth2/auth
+  path: /
+  hosts:
+    - smoke-tests.forgeops.com
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+
+# Add service when deploying, will fail when not filled
+slackService:  # You must specify slack service here to where to send notification
+fqdn: smoke-tests.forgeops.com
+cluster: GKE

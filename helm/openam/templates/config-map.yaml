@@ -10,36 +10,33 @@ metadata:
 data:
   boot.json: |
    {
-     "instance" : "{{ default "http://openam:80/openam" .Values.openamInstance }}",
+     "instance" : "{{ default "http://openam:80" .Values.openamInstance }}",
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {
-         "keyStorePasswordFile" : "{{ .Values.openamHome }}/openam/.storepass",
-         "keyPasswordFile" : "{{ .Values.openamHome }}/openam/.keypass",
+         "keyStorePasswordFile" : "/home/forgerock/openam/.storepass",
+         "keyPasswordFile" : "/home/forgerock/openam/.keypass",
          "keyStoreType" : "JCEKS",
-         "keyStoreFile" : "{{ .Values.openamHome }}/openam/keystore.jceks"
+         "keyStoreFile" : "/home/forgerock/openam/keystore.jceks"
        }
      },
      "configStoreList" : [ {
        "baseDN" : "{{.Values.rootSuffix }}",
-       "dirManagerDN" : "cn=Directory Manager",
+       "dirManagerDN" : "uid=am-config,ou=admins,ou=am-config",
        "ldapHost" : "{{ default "opendj-configstore-0.opendj-configstore" .Values.configLdapHost }}",
        "ldapPort" : {{ default 1389 .Values.configLdapPort }},
        "ldapProtocol" : "ldap"
      } ]
    }
+
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: am-configmap
 data:
-  DOMAIN: "{{ .Values.global.domain }}"
   CATALINA_OPTS: "{{ .Values.catalinaOpts }}"
-  GIT_REPO: "{{ .Values.global.git.repo }}"
-  GIT_CHECKOUT_BRANCH: "{{ .Values.global.git.branch }}"
-  GIT_AUTOSAVE_BRANCH:  autosave-am-{{ .Release.Namespace }}
-  CONFIG_PATH: "{{ .Values.global.configPath.am }}"
-  {{ if .Values.amCustomizationScriptPath -}}
-  CUSTOMIZE_AM: "/git/config/{{ .Values.global.configPath.am }}/{{ .Values.amCustomizationScriptPath }}"
+  {{ if .Values.config.amCustomizationScriptPath -}}
+  CUSTOMIZE_AM: "{{ .Values.config.amCustomizationScriptPath }}"
   {{- end }}
+

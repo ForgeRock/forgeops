@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 # Sync git configuration upstream. This assumes that the git project has already been cloned.
 
-set -x
 
-DEF_BRANCH="autosave-${COMPONENT}-${NAMESPACE}"
+cd /git/config 
+
+DEF_BRANCH="autosave-${NAMESPACE}"
 
 GIT_AUTOSAVE_BRANCH="${GIT_AUTOSAVE_BRANCH:-$DEF_BRANCH}"
-
-
-cd "${GIT_ROOT}"
 
 # This configures git to ignore file mode changes.
 git config core.filemode false

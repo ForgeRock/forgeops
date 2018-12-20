@@ -1,10 +1,10 @@
-# Base Java Image for ForgeRock Identity Platform. Used for DJ, amster, IG and IDM (Anything that does not need a web
+# Base Java Image for ForgeRock Identity Platform. Used for DS, amster, IG and IDM (Anything that does not need a web
 # container)
 #
 #
 # Copyright (c) 2016-2018 ForgeRock AS.
 
-FROM openjdk:8u151-jdk-alpine
+FROM openjdk:8-jdk-alpine
 
 ENV FORGEROCK_HOME /opt/forgerock
 
@@ -13,7 +13,7 @@ ENV FORGEROCK_HOME /opt/forgerock
 # bind-tools for dig (dns diagnostics)
 # iputils - ping command
 # CDIC-72 - find / -perm +6000 -type f -exec chmod a-s {} \; || true
-RUN apk add --no-cache su-exec unzip curl bash bind-tools iputils sysstat \
+RUN apk add --no-cache su-exec unzip curl bash bind-tools iputils sysstat tini \
     && apk del --no-cache bind \
     && mkdir -p "${FORGEROCK_HOME}" \
     && addgroup -g 11111 forgerock \
