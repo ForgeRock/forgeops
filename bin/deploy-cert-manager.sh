@@ -3,8 +3,8 @@
 # Script to deploy Cert-Manager into kube-system namespace.
 # Run ./deploy-cert-manager.sh .
 
-PROVIDER=$(kubectl config current-context)
-if [[ "${PROVIDER}" =~ "gke" ]]; then
+PROVIDER=$(kubectl get nodes -o jsonpath={.items[0].spec.providerID} | awk -F: '{print $1}')
+if [[ "${PROVIDER}" == "gce" ]]; then
   # Decrypt encoded service account
   ./decrypt.sh ../etc/cert-manager/cert-manager.json
 fi
