@@ -20,33 +20,19 @@ source /opt/opendj/env.sh
 rm -f /opt/opendj/locks/server.lock
 mkdir -p locks
 
-
-# At runtime we set the Directory Manager password using the mounted secrets
-update_ds_password()
-{
-    if [ ! -f "$DIR_MANAGER_PW_FILE" ]; then
-        echo "Can't find the directory manager password file. Won't change the password"
+# Given a file $1 containing a new password, and an ldif file $2
+# Replace the userPassword attribute with the new password
+update_pw() {
+     if [ ! -f "$1" ]; then
+        echo "Can't find the password file $1. Won't change the password in $2"
         return
     fi
 
-    echo "Updating the directory manager password"
-    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password  -s PBKDF2 -f $DIR_MANAGER_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
-    pw="userPassword: $pw"
-    head -n -2  data/db/rootUser/rootUser.ldif >/tmp/pw
-    echo "$pw" >>/tmp/pw 
-    mv /tmp/pw data/db/rootUser/rootUser.ldif
-
-    if [ ! -f "$MONITOR_PW_FILE" ]; then
-        echo "Can't find the monitor user password file. Won't change the password"
-        return
-    fi
-
-    echo "Updating the monitor user password"
-    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password -s PBKDF2 -f $MONITOR_PW_FILE | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
-    pw="userPassword: $pw"
-    head -n -2  data/db/monitorUser/monitorUser.ldif >/tmp/pw
-    echo "$pw" >>/tmp/pw 
-    mv /tmp/pw data/db/monitorUser/monitorUser.ldif
+    echo "Updating the password in $2"
+    # Set the JVM args so we dont blow up the container memory.
+    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password  -s PBKDF2 -f $1 | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
+    # $pw can contian / - so need to use alternate sed delimiter.
+    sed -ibak "s#userPassword: .*#userPassword: $pw#" "$2"
 }
 
 relocate_data() 
@@ -86,9 +72,10 @@ pause() {
 
 init_container() {
     relocate_data
-    update_ds_password
+    # Set the passwords to the values of the mounted secrets.
+    update_pw "$DIR_MANAGER_PW_FILE" data/db/rootUser/rootUser.ldif
+    update_pw "$MONITOR_PW_FILE"  data/db/monitorUser/monitorUser.ldif
 }
-
 
 # Restore from a backup
 restore() {
