@@ -45,7 +45,7 @@ echo "=> Creating cluster called \"${GKE_CLUSTER_NAME}\" with specs \"${GKE_MACH
 echo ""
 
 MAX_NODES=`expr ${GKE_CLUSTER_SIZE} + 2`
-MIN_NODES=${GKE_CLUSTER_SIZE}
+MIN_NODES=0
 
 if [ ! -z "${GKE_EXTRA_ARGS}" ]; then 
       GKE_EXTRA_ARGS="${GKE_EXTRA_ARGS}"
