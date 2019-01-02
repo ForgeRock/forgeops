@@ -55,6 +55,14 @@ echo "export TILLER_NAMESPACE=tiller" >> /etc/environment
 helm init --client-only
 oc process -f ../etc/tiller-template.yaml -p \
    TILLER_NAMESPACE="${TILLER_NAMESPACE}" -p HELM_VERSION=v2.11.0 | oc create -f -
+# Need as sometimes tiller is not ready immediately
+while :
+do
+    helm ls >/dev/null 2>&1
+    test $? -eq 0 && break
+    echo "Waiting on tiller to be ready..."
+    sleep 5s
+done
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts
 helm version
 
