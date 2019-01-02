@@ -53,7 +53,7 @@ cp ./linux-amd64/helm /usr/bin/helm
 export TILLER_NAMESPACE=tiller
 echo "export TILLER_NAMESPACE=tiller" >> /etc/environment
 helm init --client-only
-oc process -f https://github.com/openshift/origin/raw/master/examples/helm/tiller-template.yaml -p \
+oc process -f ../etc/tiller-template.yaml -p \
    TILLER_NAMESPACE="${TILLER_NAMESPACE}" -p HELM_VERSION=v2.11.0 | oc create -f -
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts
 helm version
