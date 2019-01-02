@@ -9,7 +9,7 @@ component: ds
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/ds
   pullPolicy: IfNotPresent
-  tag: 6.5.0-RC3
+  tag: 6.5.0
 
 gcs:
   enabled: false
