@@ -9,7 +9,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# Install Docker CE 18.09.0
+source ../etc/os-aws-env.cfg
+
+# Install Docker CE 18.09.0 and dependencies
 yum install -y device-mapper-persistent-data \
   lvm2
 yum-config-manager \
@@ -44,17 +46,19 @@ cp stern_linux_amd64 /usr/bin/stern
 stern -v
 
 
-# Install Helm 2.11.0 into it's own OpenShift project and add ForgeRock charts
-oc new-project tiller
+# Create the prod Openshift project and namespace
+oc new-project prod
+
+# Install Helm 2.11.0 into the prod project
 curl -LO https://kubernetes-helm.storage.googleapis.com/helm-v2.11.0-linux-amd64.tar.gz
 gunzip helm-v2.11.0-linux-amd64.tar.gz
 tar -xvf helm-v2.11.0-linux-amd64.tar
 cp ./linux-amd64/helm /usr/bin/helm
-export TILLER_NAMESPACE=tiller
-echo "export TILLER_NAMESPACE=tiller" >> /etc/environment
+echo "export TILLER_NAMESPACE=${OS_AWS_CLUSTER_NS}" >> /etc/environment
 helm init --client-only
 oc process -f ../etc/tiller-template.yaml -p \
-   TILLER_NAMESPACE="${TILLER_NAMESPACE}" -p HELM_VERSION=v2.11.0 | oc create -f -
+   TILLER_NAMESPACE="${OS_AWS_CLUSTER_NS}" -p HELM_VERSION=v2.11.0 | oc create -f -
+
 # Need as sometimes tiller is not ready immediately
 while :
 do
@@ -63,20 +67,34 @@ do
     echo "Waiting on tiller to be ready..."
     sleep 5s
 done
+
+# Add forgerock chart repo and display helm version
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts
 helm version
 
-# Create the prod Openshift project and namespace
-oc new-project prod
 
 # Enable helm to deploy a helm chart and pods in the prod project
 oc adm policy add-scc-to-user anyuid -n prod -z default
 oc policy add-role-to-user admin "system:serviceaccount:${TILLER_NAMESPACE}:tiller"
+oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:prod:tiller
 
 # Clean up temporary directory and files
 cd ..
 rm -rf tmp
 cd bin
 
+# Set the correct region on the AWS CLI
+echo [default] > ~/.aws/config
+echo region = ${OS_AWS_REGION} >> ~/.aws/config
+
+# Exit the current shell and prompt user to create a new one to ensure TILLER_NAMESPACE variable is set
+# If it is not set helm commands will fail
+echo ""
+echo "This script will exit the current shell. Enter \"sudo -s\" before continuing with"
+echo "helm chart installations"
+echo ""
+read -p "Press [Enter] to continue..."
+
+exit
 
 
