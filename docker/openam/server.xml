@@ -44,7 +44,9 @@
                SSLEnabled="false"
                connectionTimeout="20000"
                URIEncoding="UTF-8"
-               redirectPort="8443" />
+	       redirectPort="8443"
+               proxyPort="443"
+               scheme="https" />
 
       <!--  We terminate ssl externally
 
