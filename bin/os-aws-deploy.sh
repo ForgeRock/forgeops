@@ -211,7 +211,7 @@ import_check()
 
     while true; do
         echo "Inspecting amster pod: ${AMSTER_POD_NAME}"
-        OUTPUT=$(oc -n=${NAMESPACE} logs ${AMSTER_POD_NAME} amster || true)
+        OUTPUT=$(kubectl -n=${NAMESPACE} logs ${AMSTER_POD_NAME} amster || true)
         if [[ "$OUTPUT" = *$FINISHED_STRING* ]]; then
             echo "=> AM configuration import is finished"
             break

@@ -9,10 +9,14 @@
 # Create secret so the Cluster Issuer can gain access to CloudDNS
 # kubectl create secret generic clouddns --from-file=../etc/cert-manager/cert-manager.json -n kube-system
 
+
+source ../etc/os-aws-env.cfg
+
+
 # Check that tiller is running
 while true;
 do
-  STATUS=$(oc get pod -n tiller | grep tiller | awk '{ print $3 }')
+  STATUS=$(oc get pod -n kube-system | grep tiller | awk '{ print $3 }')
   # kubectl get pods returns an empty string if the cluster is not available
   if [ -z ${STATUS} ]
   then
@@ -35,7 +39,7 @@ helm upgrade -i cert-manager --namespace kube-system stable/cert-manager
 # Check that cert-manager is up before deploying the cluster-issuer
 while true;
 do
-  STATUS=$(oc get pod -n tiller | grep cert-manager | awk '{ print $3 }')
+  STATUS=$(oc get pod -n kube-system | grep cert-manager | awk '{ print $3 }')
   # kubectl get pods returns an empty string if the cluster is not available
   if [ -z ${STATUS} ]
   then
