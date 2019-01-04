@@ -69,6 +69,7 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --image-type=COS \
       --disk-size=80 \
       --network="${GKE_NETWORK_NAME}" \
+      --subnetwork="${GKE_NETWORK_NAME}" \
       --enable-ip-alias \
       --num-nodes=${GKE_CLUSTER_SIZE} \
       --min-nodes=${MIN_NODES} \
