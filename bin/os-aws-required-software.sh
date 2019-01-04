@@ -45,11 +45,8 @@ chmod +x stern_linux_amd64
 cp stern_linux_amd64 /usr/bin/stern
 stern -v
 
-
-# Create the Openshift project and namespace
-oc new-project ${OS_AWS_CLUSTER_NS}
-
 # Install Helm 2.11.0 into the project
+oc project kube-system
 curl -LO https://kubernetes-helm.storage.googleapis.com/helm-v2.11.0-linux-amd64.tar.gz
 gunzip helm-v2.11.0-linux-amd64.tar.gz
 tar -xvf helm-v2.11.0-linux-amd64.tar
@@ -88,6 +85,9 @@ cd bin
 mkdir ~/.aws
 echo [default] > ~/.aws/config
 echo region = ${OS_AWS_REGION} >> ~/.aws/config
+
+# Create the Openshift project and namespace
+oc new-project ${OS_AWS_CLUSTER_NS}
 
 # Prompt user to exit current shell annd create a new one to ensure TILLER_NAMESPACE variable is set
 # If it is not set helm commands will fail
