@@ -13,6 +13,8 @@ metadata:
 spec:
   serviceName: {{ .Values.instance }}
   replicas: {{default 1 .Values.replicas }}
+  updateStrategy:
+    type: RollingUpdate
   {{- if .Values.persistence }}
   volumeClaimTemplates:
   - metadata:
@@ -146,7 +148,7 @@ spec:
         emptyDir: {}
       {{- if .Values.backup.pvcClaimName }}
       - name: backup
-        persistentVolumeClaim: 
+        persistentVolumeClaim:
           claimName: {{ .Values.backup.pvcClaimName }}
       {{ else }}
       - name: backup
