@@ -1,7 +1,8 @@
 #!/bin/bash
 #
-# Installs and configures required software onto the ansible-config server. 
-# Run this script from the ansible-config server after you've cloned the ForgeOps repo.
+# Installs and configures required software onto the ansible-config server
+# and into the cluster. 
+# 
 #
 
 
@@ -71,33 +72,24 @@ helm repo add forgerock https://storage.googleapis.com/forgerock-charts
 helm version
 
 
+# Create the Openshift project and namespace
+oc new-project ${OS_AWS_CLUSTER_NS}
+
 # Enable helm to deploy a helm chart and pods
 oc adm policy add-scc-to-user anyuid -n ${OS_AWS_CLUSTER_NS} -z default
 oc policy add-role-to-user admin "system:serviceaccount:${TILLER_NAMESPACE}:tiller"
 oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:kube-system:tiller
+
 
 # Clean up temporary directory and files
 cd ..
 rm -rf tmp
 cd bin
 
-# Set the correct region on the AWS CLI
-mkdir ~/.aws
-echo [default] > ~/.aws/config
-echo region = ${OS_AWS_REGION} >> ~/.aws/config
 
-# Create the Openshift project and namespace
-oc new-project ${OS_AWS_CLUSTER_NS}
-
-# Prompt user to exit current shell annd create a new one to ensure TILLER_NAMESPACE variable is set
-# If it is not set helm commands will fail
 echo ""
 echo "Prerequisite software installation and configuration completed."
 echo ""
-echo "Exit the current shell after this script completes and enter \"sudo -s\" before continuing with"
-echo "helm chart installations."
-echo ""
-read -p "Press [Enter] to continue..."
 
 
 

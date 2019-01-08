@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 
 # Script to deploy Cert-Manager into kube-system namespace.
-# Run ./deploy-cert-manager.sh .
-
-# Decrypt encoded service account
-# ./decrypt.sh ../etc/cert-manager/cert-manager.json
-
-# Create secret so the Cluster Issuer can gain access to CloudDNS
-# kubectl create secret generic clouddns --from-file=../etc/cert-manager/cert-manager.json -n kube-system
 
 
 source ../etc/os-aws-env.cfg
@@ -17,7 +10,7 @@ source ../etc/os-aws-env.cfg
 while true;
 do
   STATUS=$(oc get pod -n kube-system | grep tiller | awk '{ print $3 }')
-  # kubectl get pods returns an empty string if the cluster is not available
+  # oc get pods returns an empty string if the cluster is not available
   if [ -z ${STATUS} ]
   then
     echo "The cluster is temporarily unavailable..."
@@ -40,7 +33,7 @@ helm upgrade -i cert-manager --namespace kube-system stable/cert-manager
 while true;
 do
   STATUS=$(oc get pod -n kube-system | grep cert-manager | awk '{ print $3 }')
-  # kubectl get pods returns an empty string if the cluster is not available
+  # oc get pods returns an empty string if the cluster is not available
   if [ -z ${STATUS} ]
   then
     echo "The cluster is temporarily unavailable..."

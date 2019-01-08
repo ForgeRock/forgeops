@@ -44,9 +44,9 @@ echo "This script will create a new VPC and deploy an OpenShift Cluster within i
 echo "CloudFormation. A root stack and two nested stacks will be created as part of this process."
 echo "It will take approximately 90 minutes for all 3 stacks to reach \"CREATE_COMPLETE\" status."
 echo "As a result, the AWS CLI may time out and return the message \"Failed to create/update the stack,\""
-echo "and the script will exit. This is a limitation of the AWS CLI itself and will not affect the" 
+echo "and the script will exit. This is a limitation of the AWS CLI itself which will not affect the" 
 echo "deployment. If this occurs, monitor the status of the stacks in the CloudFormation console"
-echo "and when they complete, continue this process by manually executing ./os-aws-connect.sh"
+echo "to verify successful completion."
 echo ""
 echo ""
 read -p "Press [Enter] to continue..."
@@ -72,8 +72,6 @@ echo "If the answer is \"no\", be sure you've created an appropriate role and sp
 echo "in os-aws-env.cfg, or exit this script to correct before continuing."
 ask-iam
 
-# Display information about the container ELB and web interface (if enabled).
-# Then connect to the ansible-config host. This script can also be run as needed after the deployment.
-./os-aws-connect.sh
+
 
 
