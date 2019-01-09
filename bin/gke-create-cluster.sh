@@ -60,7 +60,7 @@ fi
 # scopes are required for gcs storage backup and cloud sql
 # If no service account is specified then the default one is used
 # It is recommended to create a service account
-gcloud container clusters create $GKE_CLUSTER_NAME \
+gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --project="${GKE_PROJECT_ID}" \
       --zone="${GKE_PRIMARY_ZONE}" \
       --cluster-version="${GKE_CLUSTER_VERSION}" \
@@ -81,7 +81,8 @@ gcloud container clusters create $GKE_CLUSTER_NAME \
       --scopes "https://www.googleapis.com/auth/cloud-platform" \
       --enable-cloud-logging \
       --enable-cloud-monitoring \
-      --disk-type=pd-ssd ${GKE_EXTRA_ARGS}
+      --disk-type=pd-ssd ${GKE_EXTRA_ARGS} \
+      --update-addons=Istio=ENABLED --istio-config=auth=MTLS_PERMISSIVE
 
 
 #  --enable-stackdriver-kubernetes
