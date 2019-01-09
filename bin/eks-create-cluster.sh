@@ -54,7 +54,7 @@ do
     elif [ $CLUSTER_STATUS == "ACTIVE" ]; then
       echo "EKS cluster is ready"
       aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --kubeconfig ~/.kube/config-eks
-      export KUBECONFIG=$KUBECONFIG:~/.kube/config-eks
+      export KUBECONFIG=~/.kube/config-eks
       kubectl config set-context ${CLUSTER_ARN}
       break
     else
