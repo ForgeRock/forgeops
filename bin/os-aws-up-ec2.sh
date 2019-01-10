@@ -80,7 +80,7 @@ aws ec2 authorize-security-group-ingress --group-id ${OS_AWS_ELB_SG_ID} --protoc
 # Deploy EFS
 ./os-aws-create-filesystem.sh
 
-# Switch to the OpenShift 'prod' project (and corresponding kubernetes namespace)
+# Make sure we are on the OpenShift 'prod' project (and corresponding kubernetes namespace)
 oc project prod
 
 # Prompt user to exit current shell annd create a new one to ensure TILLER_NAMESPACE variable is set

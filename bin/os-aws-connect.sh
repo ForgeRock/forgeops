@@ -29,10 +29,10 @@ echo ""
 ssh-add ${OS_AWS_PRIVATE_KEY_PATH}
 echo ""
 echo ""
-echo "Establishing an interactive SSH session to the ansible jumbox in the VPC."
+echo "Attempting to establish an interactive SSH session to the ansible jumbox in the VPC."
 echo "Once connected, enter \"sudo -s\" and you will now have access to the OpenShift \"oc\" commands"
-echo "and can view the ansible configuration in \"/etc/ansible/hosts\". Respond \"yes\" when asked if"
-echo "you are sure you want to connect. If the connection fails, check the os-aws-env.cfg file and" 
+echo "and can view the ansible configuration in \"/etc/ansible/hosts\". Respond \"yes\" if prompted"
+echo "to confirm you want to connect. If the connection fails, check the os-aws-env.cfg file and" 
 echo "verify your private key settings and that you are connecting from the IP network you specified."
 echo ""
 ssh -A ec2-user@${OS_AWS_ANSIBLE_HOST}

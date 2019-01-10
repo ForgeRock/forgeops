@@ -62,4 +62,51 @@ aws cloudformation create-stack \
                         ParameterKey=OutputBucketName,ParameterValue=${OS_AWS_OUTPUT_BUCKET_NAME} \
           --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
 
+echo "Sleeping 10 seconds to wait for stack status"
+sleep 10
 
+while :
+do
+    STACK_STATUS=$(aws cloudformation describe-stacks --stack-name ${OS_AWS_STACK_NAME}|grep StackStatus|sed 's/\"StackStatus\"\: \"//g'|sed 's/\",//g')
+
+    if [ $STACK_STATUS == "REVIEW_IN_PROGRESS" ]; then
+      echo ""
+      echo "Current stack status --> REVIEW_IN_PROGRESS"
+      echo "Sleeping 1 minute to wait for review to complete"
+      sleep 60
+    elif [ $STACK_STATUS == "CREATE_IN_PROGRESS" ]; then
+      TIME=$(date "+%H:%M:%S")
+      echo ""
+      echo "Current stack status --> CREATE_IN_PROGRESS"
+      echo "Time is now --> ${TIME}"
+      echo "Will check status in approximately another 10 minutes"
+      echo ""
+      sleep 600
+    elif [ $STACK_STATUS == "CREATE_COMPLETE" ]; then
+      echo ""
+      echo "Stack deployment completed successfully!"
+      break
+    elif [ $STACK_STATUS == "DELETE_IN_PROGRESS" ] || [ $STACK_STATUS == "CREATE_FAILED" ] || [ $STACK_STATUS == "ROLLBACK_IN_PROGRESS" ]; then
+      echo ""
+      echo "Stack deployment failed. Exiting the script. Next steps:"
+      echo ""
+      echo "1) Check cloudformation events for errors and identify / address any issues"
+      echo "2) Verify that parameter value settings are correct"
+      echo "3) Verify that adequate OpenShift subscription entitlements are available,"
+      echo "   and delete any systems that may have registered with subscription manager during"
+      echo "   the failed deployment"
+      echo "4) Delete the root cloudformation stack (it will delete the nested stacks automatically)"
+      echo "5) Retry the stack deployment"
+      echo ""
+      exit 1
+    else
+      echo ""
+      echo "Unable to determine stack status. Exiting..."
+      exit 1
+    fi
+
+done
+
+# Display information about OpenShift and establish an SSH session to the ansible-config server
+# in the VPC
+./os-aws-connect.sh

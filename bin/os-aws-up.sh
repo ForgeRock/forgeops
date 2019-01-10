@@ -42,12 +42,8 @@ echo ""
 echo ""
 echo "This script will create a new VPC and deploy an OpenShift Cluster within it using AWS"
 echo "CloudFormation. A root stack and two nested stacks will be created as part of this process."
-echo "It will take approximately 90 minutes for all 3 stacks to reach \"CREATE_COMPLETE\" status."
-echo "As a result, the AWS CLI may time out and return the message \"Failed to create/update the stack,\""
-echo "and the script will exit. This is a limitation of the AWS CLI itself which will not affect the" 
-echo "deployment. If this occurs, monitor the status of the stacks in the CloudFormation console"
-echo "to verify successful completion."
-echo ""
+echo "A successful deployment will take approximately 90 minutes to complete, at which time all"
+echo "3 stacks will have a status of \"CREATE_COMPLETE\"."
 echo ""
 read -p "Press [Enter] to continue..."
 
@@ -71,6 +67,7 @@ echo "=> Is your AWS CLI configured to use an IAM account with full rights to al
 echo "If the answer is \"no\", be sure you've created an appropriate role and specified it"
 echo "in os-aws-env.cfg, or exit this script to correct before continuing."
 ask-iam
+
 
 
 

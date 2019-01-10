@@ -32,11 +32,16 @@ do
                       --file-system-id ${OS_AWS_EFS_ID} --query 'FileSystems[0].LifeCycleState' --output text)
 
     if [ $OS_AWS_EFS_STATUS == "available" ]; then
-      echo "File system created with ID: ${OS_AWS_EFS_ID}. Please record this Id to configure backup and restore."
+      echo ""
+      echo ""
+      echo "File system created with ID --> ${OS_AWS_EFS_ID}"
+      echo "Please record this ID to configure backup and restore."
+      echo ""
+      echo ""
       break
     else
       sleep 10
-      echo "Waiting for EFS volume..."
+      echo "Waiting for EFS service..."
     fi
 
 done
@@ -51,11 +56,11 @@ aws efs create-mount-target --file-system-id ${OS_AWS_EFS_ID} --subnet-id ${OS_A
 sudo yum install -y nfs-utils
 mkdir /efs
 echo ""
-echo "Sleep for two minutes to give the EFS public DNS record time to propagate"
-sleep 2m
+echo "Sleeping for 5 minutes to give the EFS DNS record time to propagate"
+sleep 5m
 mount -t nfs -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport ${OS_AWS_EFS_ID}.efs.${OS_AWS_REGION}.amazonaws.com:/ /efs
 mkdir /efs/export
-chmod 755 /efs/export
+chmod 777 /efs/export
 
 
 echo ""
