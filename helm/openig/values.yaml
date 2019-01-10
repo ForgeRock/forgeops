@@ -70,3 +70,6 @@ auditLogs: []
 #     path: "/tmp/logs/access.audit.json"
 #   - name: debug-logs
 #     path: "/tmp/logs/route-system.log"
+
+istio:
+  enabled: false
