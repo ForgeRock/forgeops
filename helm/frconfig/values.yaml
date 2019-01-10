@@ -32,3 +32,6 @@ certmanager:
   #acme: true
   #issuer: letsencrypt-prod
   #issuerKind: ClusterIssuer
+
+istio:
+  enabled: false
