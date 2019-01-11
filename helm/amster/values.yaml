@@ -14,8 +14,6 @@ domain: .example.com
 
 # Default install passwords.
 amadminPassword: password
-# see AM Java source code org.forgerock.openam.shared.security.crypto.Hashes.secureHash(s)
-amadminPasswordHashed: "{SSHA-512}FBLj2oKbyR3ccq0Ydivp2PdsH5q7wbgh+UYwZdKjA6j0XB5Qu6wvzbMoCNyMRkAqsmu8E6rPIH2dUFuCPtiHBFAfdMsKvg/TBjTz+gQQU/g/NDgQRA=="
 encryptionKey: "123456789012"
 policyAgentPassword: Passw0rd
 prometheusPassword: prometheus
