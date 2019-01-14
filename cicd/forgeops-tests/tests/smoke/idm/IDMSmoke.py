@@ -222,7 +222,3 @@ class IDMSmoke(unittest.TestCase):
         resp = delete(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_managed_user_url + '/' + _id,
                       headers=headers2)
         self.assertEqual(instance, resp.status_code, 200)
-
-
-
-
