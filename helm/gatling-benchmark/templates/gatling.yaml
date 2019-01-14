@@ -31,6 +31,9 @@ spec:
       - name: forgeops-benchmark-gatling
         image: {{ .Values.image.repository }}
         imagePullPolicy: Always
+        env:
+          - name: TESTS
+            value: {{ .Values.benchmark.testname }}
         command:
           - /bin/bash
           - -c
@@ -55,7 +58,7 @@ spec:
             -Doauth2_client_id={{ .Values.benchmark.oauth2_client_id }}
             -Doauth2_client_pw={{ .Values.benchmark.oauth2_client_pw }}
             '
-            -g '-m -s {{ .Values.benchmark.testname }} -rd {{ .Values.benchmark.testname }}' &&
+            -g '-m -s TESTNAME -rd TESTNAME' &&
             export FN=$(ls -t /opt/gatling/results | head -1) && tar -czvf /opt/gatling/results/$FN.tar.gz
             /opt/gatling/results/$FN
         volumeMounts:
