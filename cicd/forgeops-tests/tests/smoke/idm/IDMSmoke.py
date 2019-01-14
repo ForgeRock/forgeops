@@ -21,6 +21,7 @@ class IDMSmoke(unittest.TestCase):
     idmcfg = IDMConfig()
     testuser = '/forgeops-testuser'
 
+
     def test_0_ping(self):
         """Pings OpenIDM to see if server is alive using admin headers"""
         resp = get(verify=self.idmcfg.ssl_verify, auth=('openidm-admin', 'openidm-admin'),
@@ -203,3 +204,21 @@ class IDMSmoke(unittest.TestCase):
                         params=params, json=payload4)
         self.assertEqual(200, stage4.status_code, "Stage 4 - Password reset")
         s.close()
+
+    @classmethod
+    def tearDownClass(self):
+        instance = IDMSmoke()
+        """Delete user rsutter"""
+        headers1 = self.idmcfg.get_admin_headers({
+            'Content-Type': 'application/json'
+        })
+        resp = get(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_managed_user_url + '?_queryFilter=true',
+                   headers=headers1).json()
+        _id = resp["result"][0]["_id"]
+        headers2 = self.idmcfg.get_admin_headers({
+            'Content-Type': 'application/json',
+            'if-match': '*',
+        })
+        resp = delete(verify=self.idmcfg.ssl_verify, url=self.idmcfg.rest_managed_user_url + '/' + _id,
+                      headers=headers2)
+        self.assertEqual(instance, resp.status_code, 200)
