@@ -8,6 +8,8 @@ Also provides useful generated variables for products (rest endpoints url, etc..
 # Lib imports
 import os
 import subprocess
+import time
+import socket
 
 # Global flag to enable/disable verification of certificates
 try:
@@ -89,6 +91,7 @@ class IGConfig(object):
 
 class DSConfig(object):
     def __init__(self):
+        self.reserved_ports = []
         if is_cluster_mode():
             self.ds0_url = 'https://userstore-0.userstore:8080'
             self.ds1_url = 'https://userstore-1.userstore:8080'
@@ -106,12 +109,28 @@ class DSConfig(object):
             eval('self.ds%s_popen' % instance_nb).kill()
 
     def start_ds_port_forward(self, instance_nb=0):
-        ds_local_port = 8080 + instance_nb
-        cmd = self.helm_cmd + ' --namespace %s port-forward pod/userstore-%s %s:8080' % \
-            (tests_namespace(), instance_nb, ds_local_port)
+        ds_local_port = self.get_free_port(8080)
+        ds_pod_name = 'userstore-%s' % instance_nb
+        cmd = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
+            (tests_namespace(), ds_pod_name, ds_local_port)
         ds_popen = self.run_cmd_process(cmd)
         ds_url = 'http://localhost:%s' % ds_local_port
-        return ds_url, ds_popen
+
+        duration = 20
+        start_time = time.time()
+        while time.time() - start_time < duration:
+            soc = socket.socket()
+            result = soc.connect_ex(("", ds_local_port))
+            soc.close()
+            if result != 0:
+                print('Port-forward for pod %s on port %s not ready, waiting 5s...' % (ds_pod_name, ds_local_port))
+                time.sleep(5)
+            else:
+                print('Port-forward for pod %s on port %s is ready' % (ds_pod_name, ds_local_port))
+                return ds_url, ds_popen
+
+        raise Exception('Port-forward for pod %s on port %s not ready after %ss' %
+                        (ds_pod_name, ds_local_port, duration))
 
     @staticmethod
     def run_cmd_process(cmd):
@@ -123,6 +142,23 @@ class DSConfig(object):
         print('Running following command as process: ' + cmd)
         popen = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         return popen
+
+    def get_free_port(self, initial_port=8080):
+        max_range = 1000
+        for port_value in range(initial_port, initial_port + max_range):
+            if port_value in self.reserved_ports:
+                continue
+            try:
+                soc = socket.socket()
+                result = soc.connect_ex(("", port_value))
+                soc.close()
+                if result != 0:
+                    self.reserved_ports.append(port_value)
+                    return port_value
+            except Exception as exc:
+                print('Fail to check port %s.  Got: %s' % (port_value, repr(exc)))
+
+        raise Exception('Failed to get a free port in range [%s, %s]' % (initial_port, initial_port + max_range))
 
 
 class NginxAgentConfig(object):
