@@ -48,7 +48,9 @@ that utilize AWS CloudFormation. Refer to the [Red Hat OpenShift Container Platf
 for more information. You can also review the original source repos:
 
 [aws-quickstart/quickstart-redhat-openshift](https://github.com/aws-quickstart/quickstart-redhat-openshift)
+
 [aws-quickstart/quickstart-aws-vpc](https://github.com/aws-quickstart/quickstart-aws-vpc)
+
 [aws-quickstart/quickstart-linux-utilities](https://github.com/aws-quickstart/quickstart-linux-utilities)
 
 
