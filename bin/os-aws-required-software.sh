@@ -71,6 +71,10 @@ done
 helm repo add forgerock https://storage.googleapis.com/forgerock-charts
 helm version
 
+# Clean up temporary directory and files
+cd ..
+rm -rf tmp
+cd bin
 
 # Create the Openshift project and namespace
 oc new-project ${OS_AWS_CLUSTER_NS}
@@ -85,11 +89,6 @@ sed -ie "s/OS_AWS_CLUSTER_NS/${OS_AWS_CLUSTER_NS}/g" ./os-aws-rbac.sh
 
 # Enable helm to deploy a helm chart and pods
 ./os-aws-rbac.sh
-
-# Clean up temporary directory and files
-cd ..
-rm -rf tmp
-cd bin
 
 
 echo ""
