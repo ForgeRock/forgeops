@@ -61,7 +61,7 @@ for more information. You can also review the original source repos:
 The CloudFormation scripts will require write access to a wide range of AWS services, including IAM,
 in order to deploy successfully. 
 
-Note: If you will be running these scripts using an IAM account with full priviliges, you may skip
+Note: If you will be running these scripts using an IAM account with full privileges, you may skip
 this section. 
 
 If you are using an IAM account with limited privilges, you
