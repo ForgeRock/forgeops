@@ -120,6 +120,7 @@ OpenShiftUI that is displayed on the screen after the installation completes, an
 URL in a browser.
 
 login ID --> forgerock
+
 pass --> 1ForgeRock!  (or the value you entered in the os-aws-env.cfg file)
 
 
@@ -177,12 +178,18 @@ TODO
 
 ## Modifications to Quick Start files
 
+
 File: forgeops/etc/quickstart-redhat-openshift/scripts/templates/openshift.template
+
 Modification: added 'arn:aws:iam::aws:policy/AmazonElasticFileSystemFullAccess' to the role used with
   the EC2 instance profile. This enables the automated deployment and configuration of EFS from the 
   scripts.
 
+
+
+
 File: forgeops/etc/quickstart-redhat-openshift/scripts/ansibleconfigserver_bootstrap.sh
+
 Modification: added 'ansible masters -a "htpasswd -b /etc/origin/master/htpasswd forgerock ${OCP_PASS}"'
   to create the forgerock user account in OpenShift.
 
