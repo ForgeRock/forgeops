@@ -75,11 +75,16 @@ helm version
 # Create the Openshift project and namespace
 oc new-project ${OS_AWS_CLUSTER_NS}
 
-# Enable helm to deploy a helm chart and pods
-oc adm policy add-scc-to-user anyuid -n ${OS_AWS_CLUSTER_NS} -z default
-oc policy add-role-to-user admin "system:serviceaccount:${TILLER_NAMESPACE}:tiller"
-oc adm policy add-cluster-role-to-user cluster-admin system:serviceaccount:kube-system:tiller
+# Get the hostname of the first OpenShift master. We need this because oc adm
+# commands should only be run from the first master.
+OS_AWS_FIRST_MASTER_HOSTNAME=$(ansible-inventory --list|jq '.masters.hosts[0]'|sed 's/\"//g')
 
+# Configure the os-aws-rbac.sh script
+sed -ie "s/OS_AWS_FIRST_MASTER_HOSTNAME/${OS_AWS_FIRST_MASTER_HOSTNAME}/g" ./os-aws-rbac.sh
+sed -ie "s/OS_AWS_CLUSTER_NS/${OS_AWS_CLUSTER_NS}/g" ./os-aws-rbac.sh
+
+# Enable helm to deploy a helm chart and pods
+./os-aws-rbac.sh
 
 # Clean up temporary directory and files
 cd ..

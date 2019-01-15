@@ -30,8 +30,10 @@ OS_AWS_STACK_NAME="ForgeOps-OpenShift"
 # VPC and you will be using AWS EIP addresses to connect, these values should pose no conflict 
 # to your environment.
 
-# VPC Availability Zones (comma delimited list), 3 required (required)
-OS_AWS_AVAILABILITY_ZONES="us-east-1a,us-east-1b,us-east-1c"
+# VPC Availability Zones, 3 required (required)
+OS_AWS_AVAILABILITY_ZONE_1="us-east-1a"
+OS_AWS_AVAILABILITY_ZONE_2="us-east-1b"
+OS_AWS_AVAILABILITY_ZONE_3="us-east-1c"
 
 # VPC CIDR (required)
 OS_AWS_VPC_CIDR="10.80.0.0/16"
@@ -106,9 +108,11 @@ OS_AWS_NUMBER_OF_ETCD="3"
 # Number of Kubernetes nodes for scheduling applications (required)
 OS_AWS_NUMBER_OF_NODES="3"
 
-# Minimum EC2 instance type for master, etcd, and worker nodes is m4.xlarge. Although the 
-# underlying cloudformation template has t2.large as an allowed value, your deployment may fail
-# to complete if you use it
+# Minimum EC2 instance type for master and etcd nodes is m4.xlarge.
+# Minimum EC2 instance type for worker nodes is m4.2xlarge. A larger instance
+# type for worker nodes is recommended when installing anything larger than 
+# the ForgeRock s-cluster example. 
+
 
 # EC2 instance type for master nodes (required)
 OS_AWS_MASTER_INSTANCE_TYPE="m4.xlarge"
@@ -117,7 +121,7 @@ OS_AWS_MASTER_INSTANCE_TYPE="m4.xlarge"
 OS_AWS_ETCD_INSTANCE_TYPE="m4.xlarge"
 
 # EC2 instance type for worker nodes (required)
-OS_AWS_NODES_INSTANCE_TYPE="m4.xlarge"
+OS_AWS_NODES_INSTANCE_TYPE="m4.2xlarge"
 
 # Password for OpenShift Admin UI Must be at least 8 and no more than 12 characters containing 
 # letters and (minimum 1 capital letter), numbers and symbols. A default has been configured 
@@ -148,7 +152,8 @@ OS_AWS_ANSIBLE_FROM_GIT="False"
 OS_AWS_CLUSTER_NAME="ForgeOps"
 
 # Enable / Disable GlusterFS storage nodes to be created. You can enable this if you want to
-# use OpenShift Gluster Storage. (required)
+# use OpenShift Gluster Storage, however we do not use it for the ForgeRock examples
+# (required)
 OS_AWS_GLUSTER_FS="Disabled"
 
 # Size of GlusterFS storage volumes in GB. Will create EBS volume for each GlusterFS node. 
@@ -213,7 +218,7 @@ OS_AWS_REDHAT_SUBSCRIPTION_POOL_ID=""
 OS_AWS_QS_S3_BUCKET_NAME="aws-quickstart"
 
 # Quick Start S3 Key Prefix - this specifies the correct AWS Quickstart directory in the
-# AWS owned bucket. Do not modify. (required)
+# S3 bucket containing the Quickstart artifacts. Do not modify. (required)
 OS_AWS_QS_S3_KEY_PREFIX="quickstart-redhat-openshift/"
 
 # Name of bucket that will be created where the zip file output generated during the deployment
@@ -223,8 +228,8 @@ OS_AWS_OUTPUT_BUCKET_NAME=""
 
 ## Set Kubernetes namespaces  ##
 
-# Cluster application namespace (required)
+# Cluster application namespace. Do not modify. (required)
 OS_AWS_CLUSTER_NS="prod"
 
-# Monitoring namespace (required)
+# Monitoring namespace. Do not modify. (required)
 OS_AWS_MONITORING_NS="monitoring"

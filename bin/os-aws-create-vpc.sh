@@ -16,6 +16,26 @@ set -o nounset
 
 source ../etc/os-aws-env.cfg
 
+function timer()
+{
+    if [[ $# -eq 0 ]]; then
+        echo $(date '+%s')
+    else
+        local  stime=$1
+        etime=$(date '+%s')
+
+        if [[ -z "$stime" ]]; then stime=$etime; fi
+
+        dt=$((etime - stime))
+        ds=$((dt % 60))
+        dm=$(((dt / 60) % 60))
+        dh=$((dt / 3600))
+        printf '%d:%02d:%02d' $dh $dm $ds
+    fi
+}
+
+tmr=$(timer)
+
 aws cloudformation create-stack \
           --stack-name $OS_AWS_STACK_NAME \
           --template-url https://s3.amazonaws.com/${OS_AWS_QS_S3_BUCKET_NAME}/${OS_AWS_QS_S3_KEY_PREFIX}templates/openshift-master.template \
@@ -67,7 +87,9 @@ sleep 10
 
 while :
 do
-    STACK_STATUS=$(aws cloudformation describe-stacks --stack-name ${OS_AWS_STACK_NAME}|grep StackStatus|sed 's/\"StackStatus\"\: \"//g'|sed 's/\",//g')
+    STACK_STATUS=$(aws cloudformation describe-stacks --stack-name ${OS_AWS_STACK_NAME}|grep StackStatus \
+           |sed 's/\"StackStatus\"\: \"//g'|sed 's/\",//g' \
+           |sed 's/\"StackStatusReason\"\: \"Stack Create Cancelled//g')
 
     if [ $STACK_STATUS == "REVIEW_IN_PROGRESS" ]; then
       echo ""
@@ -79,14 +101,19 @@ do
       echo ""
       echo "Current stack status --> CREATE_IN_PROGRESS"
       echo "Time is now --> ${TIME}"
-      echo "Will check status in approximately another 10 minutes"
+      printf 'Elapsed time --> %s\n' $(timer $tmr)
+      echo "Will check status again in about 10 minutes"
       echo ""
       sleep 600
     elif [ $STACK_STATUS == "CREATE_COMPLETE" ]; then
       echo ""
       echo "Stack deployment completed successfully!"
+      printf 'Total elapsed time --> %s\n' $(timer $tmr)
+      echo ""
+      echo ""
       break
-    elif [ $STACK_STATUS == "DELETE_IN_PROGRESS" ] || [ $STACK_STATUS == "CREATE_FAILED" ] || [ $STACK_STATUS == "ROLLBACK_IN_PROGRESS" ]; then
+    elif [ $STACK_STATUS == "DELETE_IN_PROGRESS" ] || [ $STACK_STATUS == "CREATE_FAILED" ] \
+            || [ $STACK_STATUS == "ROLLBACK_IN_PROGRESS" ]; then
       echo ""
       echo "Stack deployment failed. Exiting the script. Next steps:"
       echo ""

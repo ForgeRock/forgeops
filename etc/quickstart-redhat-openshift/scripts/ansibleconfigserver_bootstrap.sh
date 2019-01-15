@@ -176,6 +176,7 @@ AWSSB_SETUP_HOST=$(head -n 1 /tmp/openshift_initial_masters)
 set +x
 OCP_PASS=$(aws secretsmanager get-secret-value --secret-id  ${OCP_PASS_ARN} --region ${AWS_REGION} --query SecretString --output text)
 ansible masters -a "htpasswd -b /etc/origin/master/htpasswd admin ${OCP_PASS}"
+ansible masters -a "htpasswd -b /etc/origin/master/htpasswd forgerock ${OCP_PASS}"
 set -x
 
 mkdir -p ~/.kube/
