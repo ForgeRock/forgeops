@@ -64,10 +64,10 @@ in order to deploy successfully.
 Note: If you will be running these scripts using an IAM account with full privileges, you may skip
 this section. 
 
-If you are using an IAM account with limited privilges, you
-will first need to create an IAM role and associated policy that has the necessary privilges. 
-A sample policy file is included in the repo in forgeops/etc/os-aws-policy. This will work without
-modifications or you can tailor it to suit your environment.
+If you are using an IAM account with limited privileges, you will first need to create an IAM role and
+associated policy that has the necessary privileges. A sample policy file is included in the repo in 
+forgeops/etc/os-aws-policy. This will work without modifications or you can tailor it to suit your 
+environment.
 
 Create the policy:
 
