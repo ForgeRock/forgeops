@@ -123,7 +123,7 @@ URL in a browser.
 
 login ID --> forgerock
 
-pass --> 1ForgeRock!  (or the value you entered in the os-aws-env.cfg file)
+pass --> (the value you entered in the os-aws-env.cfg file)
 
 
 
