@@ -104,6 +104,13 @@ class DSConfig(object):
         self.ds1_rest_ping_url = self.ds1_url + '/alive'
         self.ssl_verify = SSL_VERIFY
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stop_ds_port_forward(instance_nb=0)
+        self.stop_ds_port_forward(instance_nb=1)
+
     def stop_ds_port_forward(self, instance_nb=0):
         if not is_cluster_mode():
             eval('self.ds%s_popen' % instance_nb).kill()
