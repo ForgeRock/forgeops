@@ -54,6 +54,15 @@ for more information. You can also review the original source repos:
 [aws-quickstart/quickstart-linux-utilities](https://github.com/aws-quickstart/quickstart-linux-utilities)
 
 
+## AWS CLI
+
+The scripts that will be executed as part of this deployment assume that you have an up to date version
+of the AWS CLI locally installed and configured with your security credentials for your AWS account. and the correct region set. 
+
+Note: These scripts have been tested in the us-east-1 region. 
+
+If you don't have this installed and configured, refer to [Installing the AWS Command Line Interface](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html) documentation and follow the procedure for the appropriate platform before continuing.
+
 
 
 ## Creating an IAM Policy and Role
@@ -176,7 +185,29 @@ os-aws-env.cfg file prior to deploying the cluster.
 
 ## Uninstall OpenShift and the AWS VPC
 
-TODO
+The following steps need to be taken to cleanly uninstall the OpenShift cluster and VPC
+
+1) In the AWS console, navigate to the EFS service and delete the file system that was created. 
+   In addition to matching the File System ID you should see 3 mount targets that are associated with 
+   the VPC that was created for OpenShift.
+2) We need to remove rules that were added to the security group associated with the container 
+   access ELB after the cloudformation stack was deployed. Identify the ELB -- this information 
+   is presented when you run the bin/os-aws-connect.sh script, or you can find it in EC2 with 
+   the name format [Cluster Name]-Containe-[string]-[aws region].elb.amazonaws.com. In the description
+   tab, click on the link for the Source Security Group. Edit the inbound rules and delete the
+   2 rules that specify the elastic IP address of the ansible-config instance as the source, and save.
+3) In the AWS console, navigate to the EC2 service. Identify the private DNS names in the properties 
+   of all instances that were created in the deployment.
+4) In the AWS console, navigate to the CloudFormation service. Identify the root OpenShift stack--it has
+   the shortest name of the 3 and uses the format [stackname]-OpenShift. Delete this stack. It will
+   automatically delete the 2 nested stacks along with it. This will take several minutes to complete.
+   Verify that all 3 stacks deleted successfully.
+5) Login to your Redhat Subscription Manager console and remove the registered systems that match the
+   private DNS names identified in step 3. This will return the entitlements to the pool.
+6) In the AWS console, navigate to the EC2 service (volumes). Delete any leftover EBS volumes created
+   during the installation that are no longer needed.
+
+
 
 ## Modifications to Quick Start files
 
