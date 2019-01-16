@@ -31,7 +31,7 @@ def tests_namespace():
 
 def tests_domain():
     if 'TESTS_DOMAIN' in os.environ:
-        return os.environ['TESTS_DOMAIN']
+        return os.environ['TESTS_DOMAIN'].lstrip('.')
     else:
         return 'forgeops.com'
 
@@ -93,8 +93,8 @@ class DSConfig(object):
     def __init__(self):
         self.reserved_ports = []
         if is_cluster_mode():
-            self.ds0_url = 'https://userstore-0.userstore:8080'
-            self.ds1_url = 'https://userstore-1.userstore:8080'
+            self.ds0_url = 'http://userstore-0.userstore:8080'
+            self.ds1_url = 'http://userstore-1.userstore:8080'
         else:
             self.helm_cmd = 'kubectl'
             (self.ds0_url, self.ds0_popen) = self.start_ds_port_forward(instance_nb=0)
