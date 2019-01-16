@@ -34,7 +34,7 @@ do
     if [ $OS_AWS_EFS_STATUS == "available" ]; then
       echo ""
       echo ""
-      echo "File system created with ID --> ${OS_AWS_EFS_ID}"
+      echo "File system created with ID --> ${OS_AWS_EFS_ID}.efs.${OS_AWS_REGION}.amazonaws.com"
       echo "Please record this ID to configure backup and restore."
       echo ""
       echo ""
