@@ -66,10 +66,10 @@ cd forgeops/cicd/forgeops-tests
 #### Through pycharm
 For test developing purposes, it's possible to run tests directly from pycharm as it has integration for python unittest
 #### Through command line
-`python3 forgeops-tests.py --suite [path to folder]`
+`python3 forgeops-tests.py [path to folder]`
 Folder is run recursively
 
-Example: `python3 forgeops-tests.py --suite tests/smoke`
+Example: `python3 forgeops-tests.py tests/smoke`
 
 ## Example to deploy and run the test
 ```

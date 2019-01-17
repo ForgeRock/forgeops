@@ -37,7 +37,17 @@ run_tests() {
     echo "Running smoke tests"
     cd $WORKSPACE/cicd/forgeops-tests/
     rm -rf reports/*
-    ./run-smoke-tests.sh
+    export TESTS_NAMESPACE=csovant
+    ./run-smoke-tests.sh > debug.txt
+    if [ $? -eq 0 ]
+    then
+        status='SUCCESS'
+    else
+        status='FAIL'
+    fi
+    echo "${status} (`cat debug.txt | tail -1 | sed 's@=@@g'`)" > status.txt
+
+    /opt/toolbox/allure-*/bin/allure generate reports/allure-files -o reports/allure-report
 
     # Modify report to contain last git commit revision + message
     git log -n 1 > git.cm.slack
@@ -46,14 +56,18 @@ run_tests() {
     echo "</pre>" >> git.cm
 
     # Update all new reports with git info
-    mkdir tmp
-    cp reports/* tmp/
+    mkdir -p tmp
+    rm -rf tmp/*
+    cp -r reports/* tmp/
     rm -rf reports/*
     FILES=tmp/*
     for f in $FILES
     do
-        echo "Updating report files with git info"
-        awk -v "var=$(cat git.cm)" '/<body>/ && !x {print var; x=1} 1' $f > reports/$(basename $f)
+        if [[ ! -h "$f" && -f "$f" ]]
+        then
+            echo "Updating report files with git info"
+            awk -v "var=$(cat git.cm)" '/<head>/ && !x {print var; x=1} 1' $f > reports/$(basename $f)
+        fi
     done
     # Copy latest report to shared volume for dashboard to pick it up
     cp -r reports/* $REPORTS/
@@ -80,7 +94,7 @@ JSON_SLACK=$(cat <<EOF
       "text": "*Forgeops smoke tests results* :${CLUSTER_NAME}",
       "attachments": [
         {
-          "text": "$(cat results.txt)"
+          "text": "$(cat status.txt)"
         },
         {
           "color": "good",

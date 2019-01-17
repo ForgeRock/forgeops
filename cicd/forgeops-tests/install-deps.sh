@@ -4,6 +4,8 @@
 #
 # Otherwise this will be taken care by docker image
 
+pip3 install pytest
+pip3 install allure-pytest
+pip3 install pytest-html
+pip3 install pytest-metadata
 pip3 install requests
-pip3 install html-testRunner
-pip3 install bs4
