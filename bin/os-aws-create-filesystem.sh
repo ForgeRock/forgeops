@@ -1,7 +1,6 @@
 #!/bin/bash
 #
 # Installs and configures AWS EFS. 
-# Run this script from the ansible-config server.
 #
 
 set -o errexit
