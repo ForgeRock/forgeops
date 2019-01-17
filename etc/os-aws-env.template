@@ -79,7 +79,8 @@ OS_AWS_HOSTED_ZONE_ID=""
 # OpenShift related DNS record sets will be created (required)
 OS_AWS_SUB_DOMAIN_PREFIX=""
 
-# The fully qualied domain name (FQDN) for creating Route53 records (required)
+# The fully qualied domain name (FQDN) for creating Route53 records made up of the domain and 
+# subdomain (required)
 OS_AWS_ROUTE53_DOMAIN=""
 
 
@@ -89,7 +90,8 @@ OS_AWS_ROUTE53_DOMAIN=""
 # Name of the existing Key Pair in EC2 that will be assigned to your EC2 instances (required)
 OS_AWS_KEY_PAIR_NAME=""
 
-# Full path of private key of EC2 Key Pair that will be assigned to your EC2 instances (required)
+# Full path of private key of EC2 Key Pair (including the file name) that will be assigned to your
+# EC2 instances (required)
 OS_AWS_PRIVATE_KEY_PATH=""
 
 # AMI ID if using custom AMI. In most installs this should be left blank (optional)
@@ -123,7 +125,7 @@ OS_AWS_ETCD_INSTANCE_TYPE="m4.xlarge"
 # EC2 instance type for worker nodes (required)
 OS_AWS_NODES_INSTANCE_TYPE="m4.2xlarge"
 
-# Password for OpenShift Admin UI Must be at least 8 and no more than 12 characters containing 
+# Password for OpenShift Web UI Must be at least 8 and no more than 12 characters containing 
 # letters and (minimum 1 capital letter), numbers and symbols. A default has been configured 
 # for you but you can change it here (required) 
 OS_AWS_OPENSHIFT_ADMIN_PASSWORD="1ForgeRock!"
@@ -182,7 +184,7 @@ OS_AWS_NUMBER_OF_GLUSTER="3"
 # Enable / Disable the OpenShift Automation Service Broker. (required)
 OS_AWS_AUTOMATION_BROKER="Enabled"
 
-# Enable / Disabler the Cluster Console - Requires OpenShift 3.11 (required)
+# Enable / Disabler the Cluster Console (Web UI) - Requires OpenShift 3.11 (required)
 OS_AWS_CLUSTER_CONSOLE="Enabled"
 
 
@@ -213,9 +215,9 @@ OS_AWS_REDHAT_SUBSCRIPTION_POOL_ID=""
 
 ## AWS Quick Start Configuration ##
 
-# Quick Start s3 Bucket Name - this is an AWS owned bucket with Quick Start artifacts. 
-# Do not modify. (required)
-OS_AWS_QS_S3_BUCKET_NAME="aws-quickstart"
+# Quick Start s3 Bucket Name - this is the bucket in your AWS account where you have 
+# uploaded the AWS OpenShift Quickstart artifacts. (required)
+OS_AWS_QS_S3_BUCKET_NAME=""
 
 # Quick Start S3 Key Prefix - this specifies the correct AWS Quickstart directory in the
 # S3 bucket containing the Quickstart artifacts. Do not modify. (required)
