@@ -93,8 +93,8 @@ class DSConfig(object):
     def __init__(self):
         self.reserved_ports = []
         if is_cluster_mode():
-            self.ds0_url = 'http://userstore-0.userstore:8080'
-            self.ds1_url = 'http://userstore-1.userstore:8080'
+            self.ds0_url = 'http://userstore-0.userstore.%s.svc.cluster.local:8080' % tests_namespace()
+            self.ds1_url = 'http://userstore-1.userstore.%s.svc.cluster.local:8080' % tests_namespace()
         else:
             self.helm_cmd = 'kubectl'
             (self.ds0_url, self.ds0_popen) = self.start_ds_port_forward(instance_nb=0)
