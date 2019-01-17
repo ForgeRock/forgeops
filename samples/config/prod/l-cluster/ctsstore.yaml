@@ -12,16 +12,16 @@ userstore:
 resources:
   limits:
     memory: 28Gi
-    cpu: 20000m
+    cpu: 16000m
   requests:
     memory: 21Gi
-    cpu: 16000m
+    cpu: 12000m
 
 storageSize: 1000Gi
 storageClass: fast
 
 # For JDK 8
-opendjJavaArgs: >  
+opendjJavaArgs: >
   -server -Xms20g -Xmx20g -XX:+UseG1GC -XX:+UseNUMA -XX:+UseCompressedOops
   -XX:MaxGCPauseMillis=200 -XX:G1MixedGCCountTarget=16 -XX:MetaspaceSize=256m  
   -XX:ConcGCThreads=10 -XX:+PrintGCApplicationStoppedTime

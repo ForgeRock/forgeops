@@ -43,18 +43,16 @@ docker push  gcr.io/engineering-devops/forgeops-tests
 ## Configuration
 To provide configuration you have to set following environmental variables for products
 
+### ALL
+ - `TESTS_NAMESPACE` : default is `smoke`
+ - `TESTS_DOMAIN` : default is `forgeops.com`
+
 ### AM
- - `AM_URL` : e.g. http://login.default.forgeops.com/
  - 'AM_ADMIN_PWD' : AM admin password
 
 ### IDM
- - `IDM_URL` : IDM URL e.g. http://openidm.default.forgeops.com/openidm
  - `IDM_ADMIN_USERNAME` : IDM admin username, default is `openidm-admin`
- - `IDM_ADMIN_PWD` : IDM admin password, defaul is `openidm-admin`
-
-### IG
- - `IG_URL` : IG URL, e.g. http://openig.default.forgeops.com
-
+ - `IDM_ADMIN_PWD` : IDM admin password, default is `openidm-admin`
 
 ## Running tests
 
@@ -94,15 +92,12 @@ bin/deploy.sh ${MY_CONFIG}
 
 echo ""
 echo "Configure"
-AM_URL=http://login.${MY_NAMESPACE}.forgeops.com/
-IG_URL=http://openig.${MY_NAMESPACE}.forgeops.com
-IDM_URL=http://openidm.${MY_NAMESPACE}.forgeops.com/openidm
-echo "export AM_URL=${AM_URL}"
-export AM_URL=${AM_URL}
-echo "export IDM_URL=${IDM_URL}"
-export IDM_URL=${IDM_URL}
-echo "export IG_URL=${IG_URL}"
-export IG_URL=${IG_URL}
+TESTS_NAMESPACE=${MY_NAMESPACE}
+TESTS_DOMAIN=forgeops.com
+echo "export TESTS_NAMESPACE=${TESTS_NAMESPACE}"
+export TESTS_NAMESPACE=${TESTS_NAMESPACE}
+echo "export TESTS_DOMAIN=${TESTS_DOMAIN}"
+export TESTS_DOMAIN=${TESTS_DOMAIN}
 
 echo ""
 echo "Run tests"

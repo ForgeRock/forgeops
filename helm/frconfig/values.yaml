@@ -11,15 +11,14 @@ config:
   # See README.md for more information.
   name: frconfig
 
+secret:
+  env:
+    {}
+
 git:
   # git repo to clone. The value below is a public git repo that does not require authentication.
   repo: "https://github.com/ForgeRock/forgeops-init.git"
   branch: master
-
-platform:
-  idmProtectedByIg: false
-  #igClientUsername: openig
-  #igClientPassword: openig
 
 # Cert manager defaults
 certmanager:
@@ -32,3 +31,6 @@ certmanager:
   #acme: true
   #issuer: letsencrypt-prod
   #issuerKind: ClusterIssuer
+
+istio:
+  enabled: false

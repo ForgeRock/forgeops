@@ -1,0 +1,49 @@
+# See "az aks create -h" for complete options
+
+# Service Principal a.k.a appId a.k.a client id
+# This needs to be an existing service princial
+AKS_SERVICE_PRINCIPAL="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Service Princiapl Secret a.k.a password a.k.a client secret
+AKS_SERVICE_PRINCIPAL_SECRET="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Admin Username.  This is the node OS administrator such as root on Linux
+AKS_ADMIN_USERNAME="forgerock"
+
+# Resource Group.  This resource group will be created.
+AKS_RESOURCE_GROUP_NAME="prod-resource-group"
+
+# Kubernetes Cluster Name.  This cluster will be created.
+AKS_CLUSTER_NAME="prod-cluster"
+
+# Primay Zone Location
+AKS_LOCATION="eastus"
+
+# Note as of 12-28-2018 AKS does not support mutizone clusters
+#AKS_NODE_LOCATIONS="eastus,eastus2"
+
+# Kubernetes Version "az aks get-versions -l <zone>"
+AKS_KUBERNETES_VERSION="1.11.5"
+
+# Nodes per zone in Cluster
+AKS_NODE_COUNT="1"
+
+# VM Size
+# s-cluster (4x16)
+AKS_NODE_VM_SIZE="Standard_D4s_v3"
+# m-cluster (16x64)
+# AKS_NODE_VM_SIZE="Standard_D16s_v3"
+# l-cluster (32x64)
+# AKS_NODE_VM_SIZE="Standard_F32s_v2"
+
+# Size is in GB
+AKS_NODE_OSDISK_SIZE="50"
+
+# Kubernetes Namespace
+AKS_CLUSTER_NS="prod"
+
+# Monitoring Namespace
+AKS_MONITORING_NS="monitoring"
+
+# Any extra aguments to be passed to the CLI
+AKS_EXTRA_ARGS=""

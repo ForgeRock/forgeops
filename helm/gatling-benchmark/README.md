@@ -23,7 +23,11 @@ name in values.yaml to match your image.
 Benchmark configuration can be found in values.yaml file.
 You can configure all necessary test related variables there.
 
-## Run benchmark automically
+## Run benchmark automatically
+
+Go to Gatling release folder
+
+`cd /path/to/forgeops/helm/gatling-benchmark`
 
 To run the benchmark automatically after deployment, run following
 
@@ -44,7 +48,7 @@ userstore-0                              1/1       Running    0          7m
 
 The benchmark pod will be in Init:0/1 state until tests are finished.
 
-To see gatling progress output, run `./logs.sh`.
+To see gatling progress output, run `./get-logs.sh`.
 
 ## Run benchmark manually
 
