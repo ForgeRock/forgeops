@@ -11,7 +11,7 @@ the ForgeRock Devops examples into it.
 
 ## Prerequisites
 
-1) An AWS account that can be used to where the OpenShift cluster will be deployed.
+1) An AWS account that can be used to deploy the OpenShift cluster.
 2) An active Redhat OpenShift Enterprise 2 Core subscription with a minimum of 10 available
    entitlements (paid or evaluation). 
 
