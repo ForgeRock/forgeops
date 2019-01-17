@@ -45,13 +45,16 @@ A description of this environment is as follows:
 
 The VPC and OpenShift cluster deployment are based on a customized version of AWS 'Quick Start' resources
 that utilize AWS CloudFormation. Refer to the [Red Hat OpenShift Container Platform on the AWS Cloud](https://aws-quickstart.s3.amazonaws.com/quickstart-redhat-openshift/doc/red-hat-openshift-on-the-aws-cloud.pdf)
-for more information. You can also review the original source repos:
+for more information. You can also review the original source repos and OpenShift Documentation:
 
 [aws-quickstart/quickstart-redhat-openshift](https://github.com/aws-quickstart/quickstart-redhat-openshift)
 
 [aws-quickstart/quickstart-aws-vpc](https://github.com/aws-quickstart/quickstart-aws-vpc)
 
 [aws-quickstart/quickstart-linux-utilities](https://github.com/aws-quickstart/quickstart-linux-utilities)
+
+[OpenShift 3.11 Documentation](https://docs.openshift.com/container-platform/3.11/welcome/index.html)
+
 
 
 ## AWS CLI
