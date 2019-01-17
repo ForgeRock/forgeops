@@ -60,7 +60,7 @@ for more information. You can also review the original source repos and OpenShif
 ## AWS CLI
 
 The scripts that will be executed as part of this deployment assume that you have an up to date version
-of the AWS CLI locally installed and configured with your security credentials for your AWS account. and the correct region set. 
+of the AWS CLI locally installed and configured with your security credentials for your AWS account, and the correct region set. 
 
 Note: These scripts have been tested in the us-east-1 region. 
 
