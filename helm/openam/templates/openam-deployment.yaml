@@ -72,7 +72,7 @@ spec:
           mountPath: /git
         {{ end }}
         {{ if .Values.useConfigMapWebxml }}
-        - mountPath: /usr/local/tomcat/webapps/WEB-INF/web.xml
+        - mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
           name: webxml
           subPath: webxml
         {{ end }}
