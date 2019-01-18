@@ -55,7 +55,7 @@ cp ./linux-amd64/helm /usr/bin/helm
 export TILLER_NAMESPACE=kube-system
 echo "export TILLER_NAMESPACE=kube-system" >> /etc/environment
 helm init --client-only
-oc process -f ../etc/tiller-template.yaml -p \
+oc process -f ../etc/os-aws-tiller-template.yaml -p \
    TILLER_NAMESPACE="${TILLER_NAMESPACE}" -p HELM_VERSION=v2.11.0 | oc create -f -
 
 # Need as sometimes tiller is not ready immediately
