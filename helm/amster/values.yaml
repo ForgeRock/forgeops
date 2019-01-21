@@ -78,9 +78,9 @@ amsterClean: false
 # For production set CPU limits to help Kube Schedule the pods.
 resources:
  limits:
-   memory: 756Mi
+   memory: 1080Mi
  requests:
-   memory: 756Mi
+   memory: 1080Mi
 
 # Optional value overrides
 
