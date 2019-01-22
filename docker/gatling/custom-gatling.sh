@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Custom gatling runtime script
 # Useful for making it easier to pass arguments to gatling from helm charts
 #
@@ -45,7 +45,7 @@ echo "----------------------------"
 echo "Provided script parameters:"
 echo "java_options:${JAVA_OPTIONS}"
 echo "cmd_options:${CMD_OPTIONS}"
-echo "gatling_args:${GATLING_ARGS}"
+echo "tests to run: ${TESTS}"
 echo "----------------------------"
 echo ""
 echo "Starting gatling simulation"
@@ -62,9 +62,16 @@ then
     echo "----------------------------"
     sed -i -e "s/ io.gatling.app.Gatling/ ${CMD_OPTIONS} io.gatling.app.Gatling/g" /opt/gatling/bin/gatling.sh
 fi
-echo ""
-echo "----------------------------"
-echo "GATLING COMMAND: gatling.sh ${GATLING_ARGS}"
-echo "----------------------------"
+# Workaround for running multiple tests. A list of tests(whitespace separated string with test names) is parsed
+# and gatling is run multiple times
+for test in $TESTS; do 
+    RUN_ARG=$(sed "s/TESTNAME/$test/g" <<< ${GATLING_ARGS})
+    echo ""
+    echo "----------------------------"
+    echo "GATLING COMMAND: gatling.sh ${RUN_ARG}"
+    echo "----------------------------"
 
-gatling.sh ${GATLING_ARGS}
+    gatling.sh ${RUN_ARG}    
+done
+
+
