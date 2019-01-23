@@ -9,6 +9,7 @@ def process_autosubmit_form(resp, session):
     :return: Response from autosubmit page. As redirect is enabled by default, this will simply return originally
              requested page
     """
+
     autosub = BeautifulSoup(resp.text, 'html.parser')
     cdsso_url = autosub.body.form['action']
     idtoken_value = autosub.body.form.input['value']

@@ -11,6 +11,9 @@ import subprocess
 import time
 import socket
 
+# Framework imports
+from utils import logger
+
 # Global flag to enable/disable verification of certificates
 try:
     SSL_VERIFY = os.environ['SSL_VERIFY']
@@ -97,8 +100,10 @@ class DSConfig(object):
             self.ds1_url = 'http://userstore-1.userstore.%s.svc.cluster.local:8080' % tests_namespace()
         else:
             self.helm_cmd = 'kubectl'
-            (self.ds0_url, self.ds0_popen) = self.start_ds_port_forward(instance_nb=0)
-            (self.ds1_url, self.ds1_popen) = self.start_ds_port_forward(instance_nb=1)
+            self.ds0_local_port = self.get_free_port(8080)
+            self.ds0_url = 'http://localhost:%s' % self.ds0_local_port
+            self.ds1_local_port = self.get_free_port(8080)
+            self.ds1_url = 'http://localhost:%s' % self.ds1_local_port
 
         self.ds0_rest_ping_url = self.ds0_url + '/alive'
         self.ds1_rest_ping_url = self.ds1_url + '/alive'
@@ -109,28 +114,29 @@ class DSConfig(object):
             eval('self.ds%s_popen' % instance_nb).kill()
 
     def start_ds_port_forward(self, instance_nb=0):
-        ds_local_port = self.get_free_port(8080)
-        ds_pod_name = 'userstore-%s' % instance_nb
-        cmd = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
-            (tests_namespace(), ds_pod_name, ds_local_port)
-        ds_popen = self.run_cmd_process(cmd)
-        ds_url = 'http://localhost:%s' % ds_local_port
+        if not is_cluster_mode():
+            ds_pod_name = 'userstore-%s' % instance_nb
+            ds_local_port = eval('self.ds%s_local_port' % instance_nb)
+            cmd = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
+                  (tests_namespace(), ds_pod_name, ds_local_port)
+            ds_popen = self.run_cmd_process(cmd)
 
-        duration = 20
-        start_time = time.time()
-        while time.time() - start_time < duration:
-            soc = socket.socket()
-            result = soc.connect_ex(("", ds_local_port))
-            soc.close()
-            if result != 0:
-                print('Port-forward for pod %s on port %s not ready, waiting 5s...' % (ds_pod_name, ds_local_port))
-                time.sleep(5)
-            else:
-                print('Port-forward for pod %s on port %s is ready' % (ds_pod_name, ds_local_port))
-                return ds_url, ds_popen
+            duration = 30
+            start_time = time.time()
+            while time.time() - start_time < duration:
+                soc = socket.socket()
+                result = soc.connect_ex(("", ds_local_port))
+                soc.close()
+                if result != 0:
+                    logger.warning('Port-forward for pod %s on port %s not ready, waiting 5s...' %
+                                   (ds_pod_name, ds_local_port))
+                    time.sleep(5)
+                else:
+                    logger.info('Port-forward for pod %s on port %s is ready' % (ds_pod_name, ds_local_port))
+                    return ds_popen
 
-        raise Exception('Port-forward for pod %s on port %s not ready after %ss' %
-                        (ds_pod_name, ds_local_port, duration))
+            raise Exception('Port-forward for pod %s on port %s not ready after %ss' %
+                            (ds_pod_name, ds_local_port, duration))
 
     @staticmethod
     def run_cmd_process(cmd):
