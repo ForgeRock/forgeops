@@ -195,6 +195,11 @@ FR products).
 Documentation links are embedded in the values files for guidance.  
 Sample configuration files can be found in the samples/prometheus-values/ folder.  
 
+**```IMPORTANT:```** If using a Slack receiver to direct alerts to Slack, please do not add the config.global.slack_api_url  
+value into your custom values file as it contains an api key.  Please use one of the following options:
+* If using the deploy-prometheus.sh script, use the -s flag followed by the Slack webhook url.
+* If deploying the Helm charts separately, add the following arg '--set alertmanager.config.global.slack_api_url=<Slack webhook url>' to the kube-prometheus Helm chart.
+
 ### Configure alerting rules.
 To add new alerting rules, add additional rules to ```fr-alerts.yaml```. fr-alerts.yaml is split into groups with a  
 group for each product and a separate group for cluster rules.  

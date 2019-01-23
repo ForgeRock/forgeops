@@ -23,7 +23,7 @@ if [[ $1 == "-h" ]];then
     echo "-n <namespace>    namespace"
     echo "-f <values file>  add custom values file for forgerocks-metrics. Default: custom.yaml"
     echo "-k <values file>  add custom values file for kube-prometheus. Default: etc/kube-prometheus.yaml"
-    echo "-s <slack webhook url> add the url for a slack webhook for custom values"
+    echo "-s <slack webhook url> add the url for a slack webhook url for custom values"
     exit
 fi
 

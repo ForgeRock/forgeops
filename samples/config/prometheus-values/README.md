@@ -9,3 +9,5 @@ The main uses of this override file will be to:
 * customize the Prometheus configuration to apply new endpoints to capture metrics from(for example: an additional service that's running alongside FR products). 
 
 Documentation links are embedded into the override values files.
+
+Full implementation details can be found in the foregrock-metrics Helm chart README.md.
