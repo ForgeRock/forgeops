@@ -28,7 +28,8 @@ if __name__ == '__main__':
     html_report_path = os.path.join(report_path, html_report_name)
     allure_report_path = os.path.join(report_path, 'allure-files')
 
-    args = sys.argv + f'--html={html_report_path} --self-contained-html --alluredir={allure_report_path}'.split()
+    custom_args = '--html=%s --self-contained-html --alluredir=%s' % (html_report_path, allure_report_path)
+    args = sys.argv + custom_args.split()
     res = pytest.main(args=args)
 
     latest_link = os.path.join(report_path, 'latest.html')
