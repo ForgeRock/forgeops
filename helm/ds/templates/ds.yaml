@@ -66,8 +66,8 @@ spec:
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
-      initContainers:
       {{ if .Values.restore.enabled }}
+      initContainers:
       - name: restore
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
