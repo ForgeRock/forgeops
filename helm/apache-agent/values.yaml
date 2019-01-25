@@ -5,7 +5,7 @@ replicaCount: 1
 
 component: apache-agent
 
-domain: .example.com
+domain: example.com
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/apache-agent
   tag: latest

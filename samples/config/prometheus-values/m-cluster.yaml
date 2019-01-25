@@ -8,7 +8,7 @@ deployKubeScheduler: False
 # Controller Manager
 deployKubeControllerManager: False
 
-domain: .perf.forgerock-qa.com
+domain: perf.forgerock-qa.com
 
 grafana:
   storageSpec:

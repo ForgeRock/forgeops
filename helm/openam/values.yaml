@@ -6,7 +6,7 @@ component: openam
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 6.5.0
+  tag: 7.0.0
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
@@ -17,10 +17,12 @@ gitImage:
 
 utilImage:
   repository: forgerock-docker-public.bintray.io/forgerock/util
-  tag: 6.5.0
+  tag: 7.0.0
   pullPolicy: IfNotPresent
+  #pullPolicy: Always
 
-domain: .example.com
+domain: example.com
+subdomain: iam
 
 config:
   name: frconfig
@@ -28,7 +30,6 @@ config:
 
 openamReplicaCount: 1
 
-openamInstance: http://openam:80
 
 configLdapPort:  1389
 configLdapHost: configstore-0.configstore
@@ -59,6 +60,14 @@ useConfigMapWebxml: false
 
 # Suffix for DS config store.
 rootSuffix:  "ou=am-config"
+
+am:
+  home: /home/forgerock/openam
+  context: am
+  bootstrapDir: /home/forgerock/openam/am
+  instance: http://openam:80/am
+
+
 
 # Valid logger types: fluent-bit, none
 # For audit logs it is suggested you configure AM to send directly to ElasticSearch.
@@ -95,17 +104,14 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
-    nginx.ingress.kubernetes.io/cors-max-age: "600"
-    nginx.ingress.kubernetes.io/rewrite-target: "/"
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
+    # nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
+    # nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
 
 # Audit log details for log streaming sidecar containers.
 # AM can now stream audit logs to stdout. This option may be removed in the future.
@@ -120,3 +126,8 @@ auditLogs: []
 #     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
 #   - name: config-logs
 #     path: "/home/forgerock/openam/openam/log/config.audit.json"
+
+
+istio:
+  enabled: false
+

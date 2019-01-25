@@ -8,7 +8,7 @@ deployKubeScheduler: False
 # Controller Manager
 deployKubeControllerManager: False
 
-domain: .large.frk8s.net
+domain: large.frk8s.net
 
 grafana:
   storageSpec:

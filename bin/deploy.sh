@@ -112,8 +112,10 @@ chk_config()
     fi
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
-    AM_URL="${URL_PREFIX:-login}.${NAMESPACE}.${DOMAIN}"
-    IDM_URL="${IDM_URL_PREFIX:-openidm}.${NAMESPACE}.${DOMAIN}"
+    SUBDOMAIN="iam"
+    BASE_FQDN="${NAMESPACE}.${SUBDOMAIN}.${DOMAIN}"
+    AM_URL="${BASE_FQDN}/am"
+    IDM_URL="${BASE_FQDN}/idm"
 }
 
 create_namespace()

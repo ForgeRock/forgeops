@@ -9,8 +9,8 @@ component: amster
 serverBase: http://openam:80
 
 
-# The top level domain (including the leading .). This excludes the openam component.
-domain: .example.com
+# The top level domain. This excludes the openam component.
+domain: example.com
 
 # Default install passwords.
 amadminPassword: password
@@ -35,7 +35,7 @@ config:
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 6.5.0
+  tag: 7.0.0
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
@@ -94,3 +94,9 @@ resources:
 
 # ctsPassword - defaults to "password"
 #ctsPassword: password
+
+
+istio:
+  enabled: false
+  subdomain: iam
+  

@@ -1,6 +1,6 @@
 
 certmanager:
-  enabled: true
+  enabled: false
   # The default issuer is to use the CA certs ssuer. 
   # issuer: ca-issuer
   # And a local to namespace issuer
@@ -10,4 +10,4 @@ certmanager:
   issuer: letsencrypt-prod
   issuerKind: ClusterIssuer
 
-domain: .forgeops.com
+domain: forgeops.com

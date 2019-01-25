@@ -1,4 +1,4 @@
-domain: .forgeops.com
+domain: forgeops.com
 
 image:
   tag: 6.5.0

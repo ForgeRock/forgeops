@@ -27,7 +27,7 @@ kind: Certificate
 metadata:
   name:  wildcard.{{ .Release.Namespace }}{{ .Values.domain }}
 spec:
-  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
+  secretName: {{ printf "wildcard.%s.%s" .Release.Namespace .Values.domain }}
   issuerRef:
     name: {{ .Values.certmanager.issuer }}
     kind: {{ default "Issuer" .Values.certmanager.issuerKind }}

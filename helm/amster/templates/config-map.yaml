@@ -5,7 +5,7 @@ metadata:
 data:
   00_install.amster: |
     install-openam \
-    --serverUrl http://openam:80/ \
+    --serverUrl http://openam:80/am \
     --authorizedKey  /var/run/secrets/amster/authorized_keys \
     --cookieDomain {{.Values.domain }} \
     --adminPwd {{ .Values.amadminPassword }} \
@@ -26,7 +26,7 @@ data:
     --pwdEncKey {{ .Values.encryptionKey }} \
     --acceptLicense \
     --lbSiteName site1 \
-    --lbPrimaryUrl https://{{ template "fqdn" . }}/ \
+    --lbPrimaryUrl https://{{ .Release.Namespace }}.{{ .Values.istio.subdomain }}.{{ .Values.domain }}/am \
     --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |

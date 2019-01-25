@@ -93,14 +93,14 @@ spec:
         # For slow environments like Minikube you need to give OpenAM time to come up.
         readinessProbe:
           httpGet:
-            path: /isAlive.jsp
+            path: /am/isAlive.jsp
             port: 8080
           initialDelaySeconds: 30
           timeoutSeconds: 5
           periodSeconds: 20
         livenessProbe:
           httpGet:
-            path: /isAlive.jsp
+            path: /am/isAlive.jsp
             port: 8080
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}

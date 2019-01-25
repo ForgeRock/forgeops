@@ -1,5 +1,5 @@
 
-# Creates an SSL certifate request for the istio gateway.
+# Creates an SSL certifcate request for the istio gateway.
 # This should be installed for once per istio gateway - generally once per cluster
 # install using:
 # kubectl apply -f cluster-cert.yaml
