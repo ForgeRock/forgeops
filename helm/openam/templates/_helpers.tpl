@@ -20,7 +20,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 
 {{/* expands to the fqdn using the component name. Note domain has a leading . */}}
 {{- define "externalFQDN2" -}}
-{{- printf "login.%s%s"  .Release.Namespace .Values.domain -}}
+{{- printf "login.%s.%s"  .Release.Namespace .Values.domain -}}
 {{- end -}}
 
 
@@ -29,7 +29,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 {{- define "externalFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
-{{- printf "login.%s%s" .Release.Namespace .Values.domain -}}
+{{- printf "login.%s.%s" .Release.Namespace .Values.domain -}}
 {{- end -}}
 {{- end -}}
 

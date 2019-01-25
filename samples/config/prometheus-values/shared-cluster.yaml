@@ -1,5 +1,5 @@
 # tls domain if ingress enabled
-domain: .forgeops.com
+domain: forgeops.com
 
 grafana:
   ingress:

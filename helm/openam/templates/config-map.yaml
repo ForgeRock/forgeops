@@ -10,14 +10,14 @@ metadata:
 data:
   boot.json: |
    {
-     "instance" : "{{ default "http://openam:80" .Values.openamInstance }}",
+     "instance" : "{{ .Values.am.instance }}",
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {
-         "keyStorePasswordFile" : "/home/forgerock/openam/.storepass",
-         "keyPasswordFile" : "/home/forgerock/openam/.keypass",
+         "keyStorePasswordFile" : "{{ .Values.am.bootstrapDir }}/.storepass",
+         "keyPasswordFile" : "{{ .Values.am.bootstrapDir }}/.keypass",
          "keyStoreType" : "JCEKS",
-         "keyStoreFile" : "/home/forgerock/openam/keystore.jceks"
+         "keyStoreFile" : "{{ .Values.am.bootstrapDir }}/keystore.jceks"
        }
      },
      "configStoreList" : [ {

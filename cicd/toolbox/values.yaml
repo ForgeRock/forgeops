@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-domain: .forgeops.com
+domain: forgeops.com
 
 replicaCount: 1
 

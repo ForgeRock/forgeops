@@ -32,6 +32,8 @@ spec:
   {{- end }}
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
       labels:
         instance: {{ .Values.instance }}
         app: {{ template "fullname" . }}

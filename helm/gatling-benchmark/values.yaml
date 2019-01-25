@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 
 # Domain on which reports will be available
-domain: .forgeops.com
+domain: forgeops.com
 
 # Gatling image with tests.
 # Dockerfile for this image can be found in forgeops/docker/gatling

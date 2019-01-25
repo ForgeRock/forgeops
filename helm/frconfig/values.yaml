@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 
 # Top level domain, including the leading dot. This is used to form the wild-card cert request for cert-manager.
-domain: .example.com
+domain: example.com
 
 config:
   # The default name that products use when looking for the configmap and secret is `frconfig`.
@@ -22,7 +22,7 @@ git:
 
 # Cert manager defaults
 certmanager:
-  enabled: true
+  enabled: false
   # The default issuer is to use the CA certs issuer.
   issuer: ca-issuer
   # And a local to namespace issuer
@@ -34,3 +34,4 @@ certmanager:
 
 istio:
   enabled: false
+  subdomain: iam

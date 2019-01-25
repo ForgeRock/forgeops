@@ -19,14 +19,15 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ template "igFQDN" .  }}
-    secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
+    - "{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}"
+  # We default to using the nginx self signed cert.
+  #   secretName: {{ printf "wildcard.%s.%s" .Release.Namespace .Values.domain }}
   rules:
-  - host: {{ template "igFQDN" . }}
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: {{ .Values.service.name }}
-          servicePort: {{ .Values.service.externalPort }}  
+    - host: "{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}"
+      http:
+        paths:
+        - path: /ig
+          backend:
+            serviceName: {{ .Values.service.name }}
+            servicePort: {{ .Values.service.externalPort }}
 {{- end -}}
