@@ -82,7 +82,7 @@ gcloud beta container clusters create $GKE_CLUSTER_NAME \
       --enable-cloud-logging \
       --enable-cloud-monitoring \
       --disk-type=pd-ssd ${GKE_EXTRA_ARGS} \
-      --update-addons=Istio=ENABLED --istio-config=auth=MTLS_PERMISSIVE
+      --addons=Istio --istio-config=auth=MTLS_PERMISSIVE
 
 
 #  --enable-stackdriver-kubernetes
