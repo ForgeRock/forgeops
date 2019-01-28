@@ -145,13 +145,16 @@ create_secrets()
 deploy_charts()
 {
     # Add any provider specific values here for helm to override
+    # For example for EKS/AWS VALUE_OVERIDE="storageClass=fast10"
+    # or for AKS/Azure VALUE_OVERIDE="storageClass=managed-premium"
+
     PROVIDER=$(kubectl get nodes -o jsonpath={.items[0].spec.providerID} | awk -F: '{print $1}')
     if [ "${PROVIDER}" == "gce" ]; then
         VALUE_OVERIDE=""
     elif [ "${PROVIDER}" == "aws" ]; then
-        VALUE_OVERIDE="storageClass=fast10"
+        VALUE_OVERIDE=""
     elif [ "${PROVIDER}" == "azure" ]; then
-        VALUE_OVERIDE="storageClass=managed-premium"
+        VALUE_OVERIDE=""
     else
         VALUE_OVERIDE=""
     fi
