@@ -144,8 +144,20 @@ create_secrets()
 #### Deploy methods
 deploy_charts()
 {
-    echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\""
+    # Add any provider specific values here for helm to override
+    PROVIDER=$(kubectl get nodes -o jsonpath={.items[0].spec.providerID} | awk -F: '{print $1}')
+    if [ "${PROVIDER}" == "gce" ]; then
+        VALUE_OVERIDE=""
+    elif [ "${PROVIDER}" == "aws" ]; then
+        VALUE_OVERIDE="storageClass=fast10"
+    elif [ "${PROVIDER}" == "azure" ]; then
+        VALUE_OVERIDE="storageClass=managed-premium"
+    else
+        VALUE_OVERIDE=""
+    fi
 
+    echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\" on provider \"${PROVIDER}\""
+    
     # If the deploy directory contains a common.yaml, prepend it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
         YAML="-f ${CFGDIR}/common.yaml $YAML"
@@ -165,9 +177,16 @@ deploy_charts()
            CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
         fi
 
-        ${DRYRUN} helm upgrade -i ${NAMESPACE}-${comp} \
+        if [ -z "${VALUE_OVERIDE}" ]; then
+            ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} \
             ${YAML} ${CHART_YAML} \
             --namespace=${NAMESPACE} ${DIR}/helm/${chart}
+        else
+            ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} \
+            ${YAML} ${CHART_YAML} --set ${VALUE_OVERIDE} \
+            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
+        fi
+
     done
 }
 
@@ -267,6 +286,7 @@ deploy_hpa()
     fi
 }
 
+
 ###############################################################################
 # main
 ###############################################################################
@@ -277,6 +297,7 @@ OPT_NAMESPACE=""
 RMALL=false
 DRYRUN=""
 CONTEXT=""
+VALUE_OVERRIDE=""
 
 # All helm chart paths are relative to this directory.
 DIR=`echo $(dirname "$0")/..`
@@ -298,8 +319,6 @@ if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     import_check
     restart_am
 fi
-
-
 
 # Do not scale or deploy hpa on minikube
 if [ "${CONTEXT}" != "minikube" ]; then
@@ -323,4 +342,4 @@ echo ""
 echo "=> For each directory pod you want to backup execute the following command"
 echo "   $ kubectl exec -it <podname> scripts/schedule-backup.sh"
 
-printf "\e[38;5;40m=======> Deployment is ready <========\e[m\n"
+echo "=======> Deployment is ready <========="
