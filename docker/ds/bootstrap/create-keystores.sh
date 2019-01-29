@@ -48,6 +48,17 @@ create_keystores()
             -dname "$SSL_CERT_CN" \
             -keypass:file $KEYSTORE_PIN
 
+   echo "CA_CERT is $CA_CERT"
+
+    keytool -import \
+            -alias ${CA_CERT_ALIAS} \
+            -trustcacerts \
+            -noprompt \
+            -deststorepass:file ${KEYSTORE_PIN} \
+            -destkeystore ${SSL_KEYSTORE} \
+            -file ${CA_CERT} \
+            -srcstorepass:file ${KEYSTORE_PIN}
+
     keytool -keystore $SSL_KEYSTORE \
             -storetype PKCS12 \
             -storepass:file $KEYSTORE_PIN \
@@ -84,14 +95,14 @@ create_ca()
     -validity 9999
 
     # Export the exampleCA public certificate so that it can be used in trust stores..
-    # keytool -export -v \
-    # -alias $CA_CERT_ALIAS \
-    # -file exampleca.crt \
-    # -keypass:file $KEYSTORE_PIN \
-    # -storepass:file $KEYSTORE_PIN \
-    # -keystore $CA_KEYSTORE \
-    # -storetype PKCS12 \
-    # -rfc
+    keytool -export -v \
+    -alias $CA_CERT_ALIAS \
+    -file $CA_CERT \
+    -keypass:file $KEYSTORE_PIN \
+    -storepass:file $KEYSTORE_PIN \
+    -keystore $CA_KEYSTORE \
+    -storetype PKCS12 \
+    -rfc
 }
 
 create_ca
