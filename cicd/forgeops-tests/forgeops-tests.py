@@ -24,37 +24,17 @@ sys.path.insert(0, os.path.join(root_dir, 'config'))
 
 def set_allure_environment_props(filename):
     # Get os environment properties as dictionary
-    environment_properities = dict(os.environ)
+    environment_properties = dict(os.environ)
 
-    # Read in the properties currently specified in environment.properties
-    current_properties = {}
-    if os.path.exists(filename):
-        with open(filename, 'r') as file:
-            for line in file:
-                line = line.rstrip()
-                if "=" not in line: continue
-                if line.startswith("#"): continue
-                key, value = line.split("=", 1)
-                current_properties[key] = value
+    # Get properties that start with TESTS_ from environment.properties
+    tests_properties = {}
+    for key, value in environment_properties.items():
+        if key.startswith("TESTS_"):
+            tests_properties[key] = environment_properties[key]
 
-    # Remove properties contained previously in current properties that are not specified in environment properties
-    for key in list(current_properties.keys()):
-        if key not in environment_properities:
-            del current_properties[key]
-
-    # Iterate through environment properties and if contained in current properties
-    # change current properties value if they differ.  Otherwise, if environment properties
-    # contains a new property beginning with TESTS_ that isn't in current properties, add it.
-    for key, value in environment_properities.items():
-        if key in current_properties:
-            if value != current_properties[key]:
-                current_properties[key] = value
-        if key not in current_properties and key.startswith("TESTS_"):
-            current_properties[key] = environment_properities[key]
-
-    # Update environment.properties with properties for this test run
+    # Write properties to environment.properties file
     with open(filename, 'w') as file:
-        for key, value in current_properties.items():
+        for key, value in tests_properties.items():
             file.write('%s=%s\n' % (key, value))
 
 
