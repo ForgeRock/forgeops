@@ -5,9 +5,6 @@
 #domain: freng.org
 domain: frk8s.net
 
-#fqdn: login.small.freng.org
-fqdn: login.prod.frk8s.net
-
 # Install passwords.
 amadminPassword: password
 encryptionKey: "123456789012"
