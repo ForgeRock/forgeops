@@ -74,13 +74,14 @@ By default charts  deploy to the `default` namespace in Kubernetes.
 You can deploy multiple product instances in different namespaces and they will not 
 interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
 
-To provide external ingress routes that are unique, the namespace can be used when forming the 
-ingress host name. The format is:
- {openam,openidm,openig}.{namespace}.{domain} 
+The default format used for the FQDN is:
+{namespace}.{subdomain}.{domain}/{am|idm|ig|openidm}
+
+subdomain defaults to "iam"
 
  For example:
 
- `login.default.example.com`
+ `default.iam.example.com`
 
 Note that the details of the ingress will depend on the implementation. You may need to modify the ingress definitions. 
  
@@ -88,26 +89,12 @@ Note that the details of the ingress will depend on the implementation. You may 
 
 All charts default to using TLS (https) for the inbound ingress.  
 
-Within a namespace, it is assumed that a single wildcard certificate secret is present `wildcard.$namespace.$domain`. This
-secret is referenced by each ingress controller in the `tls` spec.
+If you use nginx on minikube, the ingress will default to using the nginx self signed certificate. If you want to use nginx and a "real" SSL certificate you must modify the ingress.yaml in each chart, and provide a TLS secret.
 
-You can create the wildcard secret manually, but in these examples we assume
-that [cert-manager](https://github.com/jetstack/cert-manager) is installed and is provisioning certificates for you.
+For istio,  we assume  a wildcard certificate is obtained for the istio ingress for the entire cluster. 
+This certificate handles SSL for all namespaces: *.$subdomain.$domain. 
 
-
-The frconfig chart defaults to creating a cert-manager "CA" issuer. This is a simple issuer that issues certificates signed by a CA certificate installed as part of the frconfig chart. We have included a default CA certificate in frconfig/secrets. You can replace this with your own using the sample script `frconfig/secrets/cm.sh`, or replace it with an intermediate signing certificate issued by your organization.
-
-If you are on minikube, cert-manager can be installed using:
-
-`helm upgrade -i cert-manager --namespace kube-system stable/cert-manager`
-
-If you deploy the frconfig chart as-is: `helm install frconfig`  things should "just work". You will get a
-self signed certificate presented to the browser. You must accept the browser warnings, or import the CA cert found in frconfig/secrets into your browser's trusted certificate list.
-
-Alternatively, you can configure frconfig to create a cert-manager issuer for Let's Encrypt. Refer to the cert-manager docs for further details.
-
-If you do not see a secret `wildcard.$namespace.$domain`, it means that something has gone wrong with cert manager. Look in the cert-manager logs to find the cause. If you are using the Let's Encrypt issuer, keep in mind that it can take up to 10 minutes to provision a certificate.
-
+Note: The frconfig chart no longer defaults to enabling cert-manager - as it is not required by default.
 
 For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html#devops-implementation-env-https-access-secret).
 

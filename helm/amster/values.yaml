@@ -85,7 +85,7 @@ resources:
 # Optional value overrides
 
 # fqdn - the openam server external fqdn.
-# If this is *not* set, it defaults to login.{namespace}{{ .Values.domain }}
+# If this is *not* set, it defaults to {namespace}{subdomain}{domain}
 #fqdn: login.acme.com
 
 # ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on

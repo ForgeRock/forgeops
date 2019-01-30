@@ -11,9 +11,8 @@ FROM nginx:1.11.10
 COPY --from=0 /var/tmp/web_agents /opt/web_agents
 
 WORKDIR /opt
-
-ARG AM_SERVER=http://login.example.forgeops.com:80/openam
-ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
+ARG AM_SERVER=http://default.iam.forgeops.com:80/am
+ARG AGENT_SERVER=http://default.iam.forgeops.com/nginx-agent
 
 # Copy nginx.conf with included agent module
 COPY nginx.conf /etc/nginx/
