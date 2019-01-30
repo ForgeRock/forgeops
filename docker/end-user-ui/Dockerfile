@@ -13,6 +13,6 @@ RUN git checkout 6.5.0 && npm install && npm run build
 
 WORKDIR /tmp/end-user-ui/dist
 
-EXPOSE 8888
+EXPOSE 8080
 
-CMD ["http-server", "-p", "8888"]
+CMD ["http-server", "-p", "8080"]
