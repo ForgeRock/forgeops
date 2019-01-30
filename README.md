@@ -102,7 +102,7 @@ Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forg
 Troubleshooting suggestions:
 
 * The script `bin/debug-log.sh` will generate an HTML file with log output. Useful for troubleshooting.
-* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script and the `helm/cmp-platform` composite charts are provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
+* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script is provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
 * Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.
     2. Examine all the init containers. Did each init container complete with a zero (success) exit code? If not, examine the logs from that failed init container using `kubectl logs pod-xxx -c init-container-name`

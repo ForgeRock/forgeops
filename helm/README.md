@@ -28,17 +28,6 @@ forgeops-init.git has public read-only access.  You can clone this repository bu
 If you wish to use your own Git repository based on the forgeops-init repository,
 you can fork and clone the forgeops-init repository. See [frconfig/README.md](frconfig/README.md).
 
-# Composite Charts
-
-The provided cmp-platform chart bundles other foundational charts such opendj, frconfig,
- openam, etc. Performing a `helm install cmp-platform`  will deploy all the components.
- Remember to perform a `helm dep up cmp-platform` to update any dependencies that might have changed.
-
-This chart is a simple example for use only when working through the *DevOps 
- Quick Start Guide* only.  
-
-For all other deployments, install individual Helm charts as described in the 
- *DevOps Developer's Guide*. 
  
 # Using a private registry
 
@@ -59,7 +48,6 @@ installed already. This can scale up horizontally by increasing the replica coun
 * openidm - OpenIDM
 * postgres-opendim - Configures a Postgresql repository database for OpenIDM
 * openig -  OpenIG
-* cmp-*  - charts that begin with cmp are "composite" charts that include other charts
 
 
 
