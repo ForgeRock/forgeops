@@ -19,7 +19,7 @@ service:
   name: end-user-ui
   type: ClusterIP
   externalPort: 80
-  internalPort: 8888
+  internalPort: 8080
 
 
 ingress:
