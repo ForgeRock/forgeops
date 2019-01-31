@@ -1,46 +1,10 @@
 # ds - ForgeRock Directory Service Docker Image
 
 
-## Build
-
-This Dockerfile uses a multi-stage docker build to create a final docker image. The first stage creates a
-prototype image that is then copied to the second stage to create the final docker image.
-
-Stage 1 scripts are in the bootstrap/ folder. This folder is not copied into the final docker image. At a high level stage 1
-does the following:
-
-* The new DS profiles feature is used to create backends based on the profile templates.
-* Several backends are configured (ou=tokens, ou=identities, ou=am-config, dc=openidm,dc=example,dc=com) making the instance suitable multiple
-purposes. Backends can be disabled at runtime if they are not required.
-* Creates two ds instances that are replicated to each other. The instances have hard coded hostnames (ds1.example.com).
-* Both instances are shut down
-* The second instance is deleted
-* The first instance configuration is modified to use commons confiugration expressions to replace the hard
- coded values. For example, the hostname `ds1.example.com` is replaced with `&{fqdn}`. The idea is that
- these values will be provided at runtime by the helm chart.
-
- At stage 2, the first instance configuration is copied in /opt/opendj - and becomes the final runtime instance.
-
-Refer to the corresponing helm chart (helm/ds) to see how to deploy this docker image. It is essential to 
-supply the appropriate environment variables in order for the intance to run correctly. 
-
-## Docker-entrypoint
-
-The image assumes that a persistent volume will be mounted on the /opt/opendj/data directory. This is where volatile
-data lives - and persists across container restarts.
-
-At runtime, the docker entry point looks to see if this directory is empty, and if it is, copies the initial backends (e.g. userstore, cts) to this volume
-to use as starter databases.  If data exists in the pvc, the copy will not occur.
-
-The file `env.sh` set a number of environment variables that are used to template out the config.ldif file. For example,
-RS_SERVERS is a list of all the DS/RS hostnames and ports. 
+The Directory Server Docker builds have been moved upstream to the ds/ project. See https://stash.forgerock.org/projects/OPENDJ/repos/opendj/browse 
 
 
-## Limitations
+These ds images are published to bintray. See https://bintray.com/beta/#/forgerock/public/forgerock:ds-paas?tab=overview
 
-The admin-backend and other LDIF backends currently do not use commons configuration. As a consequence some commands do not work correctly. `dsreplication status`,
-for example, will not report the correct status.
-
-The directories internal metrics (exposed via Prometheus) report accurate status and can be used for monitoring and alerting. In addition
-the directory replication logs (logs/replication) show replication activity.
+You can pull these using: `docker pull forgerock-docker-public.bintray.io/forgerock:ds-paas:7.0.0-SNAPSHOT`
 
