@@ -48,7 +48,7 @@ if __name__ == '__main__':
     html_report_path = os.path.join(report_path, html_report_name)
     allure_report_path = os.path.join(report_path, 'allure-files')
 
-    set_allure_environment_props(os.path.join(allure_report_path, 'environment.properties'))
+    set_allure_environment_props(os.path.join(root_dir, report_path, 'environment.properties'))
 
     custom_args = '--html=%s --self-contained-html --alluredir=%s' % (html_report_path, allure_report_path)
     args = sys.argv + custom_args.split()

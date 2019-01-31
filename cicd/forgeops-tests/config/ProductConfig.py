@@ -41,7 +41,7 @@ def tests_domain():
 
 class AMConfig(object):
     def __init__(self):
-        self.am_url = 'https://login.%s.%s' % (tests_namespace(), tests_domain())
+        self.am_url = 'https://%s.iam.%s/am' % (tests_namespace(), tests_domain())
 
         if 'AM_ADMIN_PWD' in os.environ:
             self.amadmin_pwd = os.environ['AM_ADMIN_PWD']
@@ -57,7 +57,7 @@ class AMConfig(object):
 
 class IDMConfig(object):
     def __init__(self):
-        self.idm_url = 'https://openidm.%s.%s/openidm' % (tests_namespace(), tests_domain())
+        self.idm_url = 'https://%s.iam.%s/openidm' % (tests_namespace(), tests_domain())
 
         if 'IDM_ADMIN_USERNAME' in os.environ:
             self.idm_admin_username = os.environ['IDM_ADMIN_USERNAME']
@@ -88,7 +88,7 @@ class IDMConfig(object):
 
 class IGConfig(object):
     def __init__(self):
-        self.ig_url = 'https://openig.%s.%s' % (tests_namespace(), tests_domain())
+        self.ig_url = 'https://%s.iam.%s/ig' % (tests_namespace(), tests_domain())
         self.ssl_verify = SSL_VERIFY
 
 
