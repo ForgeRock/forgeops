@@ -120,5 +120,4 @@ auditLogs: []
 # sedFilter: "s/login.qa.acme.com/login.prod.acme.com/g
 
 # K8sServiceAccountName is the serviceAccountName to use in the deployment.
-# This will default to 'default' if not specified
 K8sServiceAccountName:
