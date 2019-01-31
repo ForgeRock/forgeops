@@ -115,7 +115,7 @@ chk_config()
     SUBDOMAIN="iam"
     BASE_FQDN="${NAMESPACE}.${SUBDOMAIN}.${DOMAIN}"
     AM_URL="${BASE_FQDN}/am"
-    IDM_URL="${BASE_FQDN}/idm"
+    IDM_URL="${BASE_FQDN}"
 }
 
 create_namespace()
