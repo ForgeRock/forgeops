@@ -14,6 +14,7 @@ spec:
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
     spec:
+      serviceAccountName: {{ .Values.K8sServiceAccountName }}
       terminationGracePeriodSeconds: 10
       initContainers:
        {{ if eq .Values.config.strategy  "git" }}

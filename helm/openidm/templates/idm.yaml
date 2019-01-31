@@ -23,6 +23,7 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
     spec:
+      serviceAccountName: {{ .Values.K8sServiceAccountName }}
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:
       - name: git-init
