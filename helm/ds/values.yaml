@@ -110,3 +110,7 @@ securityContext:
   runAsUser: 11111
   fsGroup: 11111
   supplementalGroups: [ 0 ]
+
+# K8sServiceAccountName is the serviceAccountName to use in the deployment.
+# spec.template.spec.serviceAccountName will be ignored if this value is left blank
+K8sServiceAccountName:

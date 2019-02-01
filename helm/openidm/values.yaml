@@ -118,3 +118,7 @@ auditLogs: []
 # This is a work around until OPENIDM-11529 is fixed
 # example - search for qa and replace with prod:
 # sedFilter: "s/login.qa.acme.com/login.prod.acme.com/g
+
+# K8sServiceAccountName is the serviceAccountName to use in the deployment.
+# spec.template.spec.serviceAccountName will be ignored if this value is left blank
+K8sServiceAccountName:

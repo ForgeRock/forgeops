@@ -37,6 +37,7 @@ spec:
         release: {{ .Release.Name }}
         component: opendj
     spec:
+      serviceAccountName: {{ .Values.K8sServiceAccountName }}
       affinity:
         podAntiAffinity:
         {{- if eq .Values.podAntiAffinity "hard" }}

@@ -20,6 +20,7 @@ spec:
         app: {{ template "fullname" . }}
         component:  {{ .Values.component }}
     spec:
+      serviceAccountName: {{ .Values.K8sServiceAccountName }}
       terminationGracePeriodSeconds: 5
       {{ if eq .Values.config.strategy "git" -}}
       initContainers:

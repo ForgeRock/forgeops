@@ -110,3 +110,7 @@ auditLogs: []
 #     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
 #   - name: config-logs
 #     path: "/home/forgerock/openam/openam/log/config.audit.json"
+
+# K8sServiceAccountName is the serviceAccountName to use in the deployment.
+# spec.template.spec.serviceAccountName will be ignored if this value is left blank
+K8sServiceAccountName:
