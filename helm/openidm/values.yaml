@@ -120,4 +120,5 @@ auditLogs: []
 # sedFilter: "s/login.qa.acme.com/login.prod.acme.com/g
 
 # K8sServiceAccountName is the serviceAccountName to use in the deployment.
+# spec.template.spec.serviceAccountName will be ignored if this value is left blank
 K8sServiceAccountName:
