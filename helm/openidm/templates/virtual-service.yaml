@@ -22,4 +22,18 @@ spec:
       } 
     }]
   }] 
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: "{{ .Values.component }}"
+spec:
+  host:  "{{ .Values.service.name }}"
+  trafficPolicy:
+     loadBalancer:
+       consistentHash:
+         httpCookie:
+           name: istiolb
+           ttl: 0s
+
 {{ end }}

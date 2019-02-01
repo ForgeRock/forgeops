@@ -29,6 +29,6 @@ spec:
      loadBalancer:
        consistentHash:
          httpCookie:
-           name: iPlanetDirectoryPro
+           name: istiolb
            ttl: 0s
 {{ end }}

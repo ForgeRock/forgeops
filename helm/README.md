@@ -2,13 +2,14 @@
 
 ## Setup 
 
-1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
+1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. 
 
 2) Build your Docker images, or set up access to a registry where those images can be pulled.
 The default docker repository and tag names are set in each helm chart in values.yaml. You can
-override these in your custom.yaml file.  The default assumes the docker images are in the docker cache
-(i.e. you have done a docker build direct to the Minikube docker machine). See the
- README in the docker/ folder for more information.
+override these in your custom.yaml file.  
+
+*TIP* If you are using minikube, you can docker build images directly to your docker cache, and set the chart policy to
+`image.pullPolicy: IfNotPresent`
 
 
 # Configuration

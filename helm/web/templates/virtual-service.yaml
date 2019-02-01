@@ -13,10 +13,12 @@ spec:
   http:
   - match:
     - uri:
-        prefix: /ig
+        prefix: /web
+    rewrite:
+      uri: /
     route:
     - destination:
         host: {{ .Values.service.name }}
         port:
-          number: {{ .Values.service.externalPort }}
+          number: {{ .Values.service.port }}
 {{ end }}
