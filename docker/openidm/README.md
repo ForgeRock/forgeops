@@ -1,15 +1,12 @@
-# Dockerfile for ForgeRock IDM
+# The Dockerfile for ForgeRock IDM has moved to the IDM source tree
 
-Note - within the container, OpenIDM runs on port 8080.
+The docker image is being built and
 
-# Secrets 
 
-The docker-entrypoint.sh script looks for secrets mounted at /opt/openidm/secrets, and uses these
-for the keystore, keystore pin, etc. Use a Kubernetes secret volume to mount these. The relevant files are:
+The ForgeRock IDM builds have been moved upstream to the idm/ project. See https://stash.forgerock.org/projects/OPENIDM/repos/openidm/browse
 
-* keystore.jceks - the OpenIDM keystore
-* truststore  - trust store for cert chain verification 
-* keystore.pin - file that contains the keystore / truststore password in clear text
 
-You do not need to provide all of these files - the start script will use the defaults 
-in conf/boot/boot.properties.
+These idm images are published to bintray. See https://bintray.com/forgerock/public/forgerock:idm
+
+
+
