@@ -33,8 +33,8 @@ secret:
 component: openidm
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openidm
-  tag: 6.5.0
+  repository: forgerock-docker-public.bintray.io/forgerock/idm
+  tag: 7.0.0-M1
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
