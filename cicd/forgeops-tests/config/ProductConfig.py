@@ -7,12 +7,12 @@ Also provides useful generated variables for products (rest endpoints url, etc..
 """
 # Lib imports
 import os
-import subprocess
 import time
 import socket
 
 # Framework imports
 from utils import logger
+import utils.cmd
 
 # Global flag to enable/disable verification of certificates
 try:
@@ -23,6 +23,11 @@ except KeyError:
 
 def is_cluster_mode():
     return 'CLUSTER_NAME' in os.environ
+
+
+def is_minikube_context():
+    out, err = utils.cmd.run_cmd('kubectl config current-context')
+    return out.decode("utf-8").strip() == 'minikube'
 
 
 def tests_namespace():
@@ -39,9 +44,16 @@ def tests_domain():
         return 'forgeops.com'
 
 
+def base_url():
+    protocol = 'http'
+    if is_minikube_context():
+        protocol = 'https'
+    return '%s://%s.iam.%s' % (protocol, tests_namespace(), tests_domain())
+
+
 class AMConfig(object):
     def __init__(self):
-        self.am_url = 'https://%s.iam.%s/am' % (tests_namespace(), tests_domain())
+        self.am_url = '%s/am' % base_url()
 
         if 'AM_ADMIN_PWD' in os.environ:
             self.amadmin_pwd = os.environ['AM_ADMIN_PWD']
@@ -57,7 +69,7 @@ class AMConfig(object):
 
 class IDMConfig(object):
     def __init__(self):
-        self.idm_url = 'https://%s.iam.%s/openidm' % (tests_namespace(), tests_domain())
+        self.idm_url = '%s/openidm' % base_url()
 
         if 'IDM_ADMIN_USERNAME' in os.environ:
             self.idm_admin_username = os.environ['IDM_ADMIN_USERNAME']
@@ -88,7 +100,7 @@ class IDMConfig(object):
 
 class IGConfig(object):
     def __init__(self):
-        self.ig_url = 'https://%s.iam.%s/ig' % (tests_namespace(), tests_domain())
+        self.ig_url = '%s/ig' % base_url()
         self.ssl_verify = SSL_VERIFY
 
 
@@ -119,9 +131,9 @@ class DSConfig(object):
             ds_local_port = eval('self.ds%s_local_port' % instance_nb)
             cmd = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
                   (tests_namespace(), ds_pod_name, ds_local_port)
-            ds_popen = self.run_cmd_process(cmd)
+            ds_popen = utils.cmd.run_cmd_process(cmd)
 
-            duration = 30
+            duration = 60
             start_time = time.time()
             while time.time() - start_time < duration:
                 soc = socket.socket()
@@ -137,17 +149,6 @@ class DSConfig(object):
 
             raise Exception('Port-forward for pod %s on port %s not ready after %ss' %
                             (ds_pod_name, ds_local_port, duration))
-
-    @staticmethod
-    def run_cmd_process(cmd):
-        """
-        Useful for getting flow output
-        :param cmd: command to run
-        :return: Process handle
-        """
-        print('Running following command as process: ' + cmd)
-        popen = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return popen
 
     def get_free_port(self, initial_port=8080):
         max_range = 1000
