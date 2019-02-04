@@ -6,6 +6,7 @@ replicaCount: 1
 
 # Top level domain. Used to create the ingress
 domain: example.com
+subdomain: iam
 
 # These are both used to form the FQDN for the load balancer.  See _helpers.tpl
 component: end-user-ui

@@ -11,6 +11,7 @@ serverBase: http://openam:80
 
 # The top level domain. This excludes the openam component.
 domain: example.com
+subdomain: iam
 
 # Default install passwords.
 amadminPassword: password
@@ -59,10 +60,10 @@ configStore:
   password: password
 
 # By default, userstore points to configstore - which is default
-# place for users when empty-import config is used. 
+# place for users when empty-import config is used.
 userStore:
   suffix: "ou=identities"
-  # If userstore is deployed as well but empty import configuration 
+  # If userstore is deployed as well but empty import configuration
   # is used, override this to userstore-0.userstore to use that store
   host: configstore-0.configstore
   port: 1389
@@ -99,4 +100,3 @@ resources:
 istio:
   enabled: false
   subdomain: iam
-  
