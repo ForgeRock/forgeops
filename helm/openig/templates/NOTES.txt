@@ -16,4 +16,4 @@
 
 
 If you have an ingress controller, you can also access IG at
-https://"{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}"/ig
+https://{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}/ig

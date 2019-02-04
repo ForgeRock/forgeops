@@ -28,9 +28,10 @@ secret:
 catalinaOpts: "-Xmx512m"
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openig
-  tag: 6.5.0
-  pullPolicy: IfNotPresent
+  repository: forgerock-docker-public.bintray.io/forgerock/ig
+  tag: latest
+  # Switch to IfNotPresent once we have milestone builds
+  pullPolicy: Always
 
 gitImage:
   repository: forgerock-docker-public.bintray.io/forgerock/git
@@ -73,3 +74,6 @@ auditLogs: []
 
 istio:
   enabled: false
+
+healthURI: /
+readinessURI: /

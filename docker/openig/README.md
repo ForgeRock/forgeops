@@ -1,13 +1,7 @@
-# Dockerfile for OpenIG
 
-To build:
+# The Dockerfile for ForgeRock IG has moved to the IG source tree
 
-`docker build -t forgerock/openig:latest . `
+See https://stash.forgerock.org/projects/OPENIG/repos/openig/browse/openig-docker
 
-To run:
 
-`docker run -p 8080:8080 -it forgerock/openig`
-
-To use the sample configuration, mount the samples-config directory on /var/openig in the container:
-
-`docker run --rm -p 28080:8080 -v `pwd`/sample-config:/var/openig -it forgerock/openig`
+These ig images are published to bintray. See https://bintray.com/forgerock/public/forgerock:ig
