@@ -33,7 +33,6 @@ steps:
   - 'DOCKER_PASSWORD=${_DOCKER_PASSWORD}'
 
 images:
-- 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'
 - 'gcr.io/$PROJECT_ID/amster'
 - 'gcr.io/$PROJECT_ID/util'
