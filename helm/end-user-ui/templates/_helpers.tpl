@@ -11,16 +11,6 @@ Expand the name of the chart.
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
-{{/* expands to the fqdn using the component name. Note domain has a leading . */}}
-{{- define "uiFQDN" -}}
-{{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
-{{- else -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
-{{- end -}}
-{{- end -}}
-
-
 {{- define "end-user-ui.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

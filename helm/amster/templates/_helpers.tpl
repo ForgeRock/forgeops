@@ -19,6 +19,6 @@ We truncate at 24 characters because some Kubernetes name fields are limited to 
 {{- define "fqdn" -}}
 {{- if .Values.fqdn }}{{- printf "%s" .Values.fqdn -}}
 {{- else -}}
-{{- printf "login.%s%s" .Release.Namespace .Values.domain -}}
+{{- printf "%s.%s.%s" .Release.Namespace .Values.subdomain .Values.domain -}}
 {{- end -}}
 {{- end -}}

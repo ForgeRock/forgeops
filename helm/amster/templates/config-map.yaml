@@ -30,7 +30,7 @@ data:
     --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |
-    connect http://openam -k /var/run/secrets/amster/id_rsa
+    connect http://openam/am -k /var/run/secrets/amster/id_rsa
     import-config --path {{ .Values.config.importPath }}  --clean {{.Values.amsterClean }}
     :exit
 ---
@@ -48,4 +48,3 @@ data:
   AMADMIN_PASSWORD_HASHED: "{{ .Values.amadminPasswordHashed }}"
   DOMAIN: {{ .Values.domain }}
   COOKIE_DOMAIN: {{ trimPrefix "." .Values.domain }}
-  
