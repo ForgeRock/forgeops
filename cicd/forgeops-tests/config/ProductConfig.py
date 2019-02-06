@@ -108,35 +108,27 @@ class DSConfig(object):
     def __init__(self):
         self.reserved_ports = []
         if is_cluster_mode():
-            self.userstore0_url = 'http://userstore-0.userstore.%s.svc.cluster.local:8080' % tests_namespace()
-            self.userstore1_url = 'http://userstore-1.userstore.%s.svc.cluster.local:8080' % tests_namespace()
-            self.ctsstore0_url = 'http://ctsstore-0.ctsstore.%s.svc.cluster.local:8080' % tests_namespace()
-            self.confistore0_url = 'http://configstore-0.configstore.%s.svc.cluster.local:8080' % tests_namespace()
+            self.ds0_url = 'http://userstore-0.userstore.%s.svc.cluster.local:8080' % tests_namespace()
+            self.ds1_url = 'http://userstore-1.userstore.%s.svc.cluster.local:8080' % tests_namespace()
         else:
             self.helm_cmd = 'kubectl'
-            self.userstore0_local_port = self.get_free_port(8080)
-            self.userstore0_url = 'http://localhost:%s' % self.userstore0_local_port
-            self.userstore1_local_port = self.get_free_port(8080)
-            self.userstore1_url = 'http://localhost:%s' % self.userstore1_local_port
-            self.ctsstore0_local_port = self.get_free_port(8080)
-            self.ctsstore0_url = 'http://localhost:%s' % self.ctsstore0_local_port
-            self.configstore0_local_port = self.get_free_port(8080)
-            self.configstore0_url = 'http://localhost:%s' % self.configstore0_local_port
+            self.ds0_local_port = self.get_free_port(8080)
+            self.ds0_url = 'http://localhost:%s' % self.ds0_local_port
+            self.ds1_local_port = self.get_free_port(8080)
+            self.ds1_url = 'http://localhost:%s' % self.ds1_local_port
 
-        self.userstore0_rest_ping_url = self.userstore0_url + '/alive'
-        self.userstore1_rest_ping_url = self.userstore1_url + '/alive'
-        self.ctsstore0_rest_ping_url = self.ctsstore0_url + '/alive'
-        self.configstore0_rest_ping_url = self.configstore0_url + '/alive'
+        self.ds0_rest_ping_url = self.ds0_url + '/alive'
+        self.ds1_rest_ping_url = self.ds1_url + '/alive'
         self.ssl_verify = SSL_VERIFY
 
-    def stop_ds_port_forward(self, instance_name='userstore', instance_nb=0):
+    def stop_ds_port_forward(self, instance_nb=0):
         if not is_cluster_mode():
-            eval('self.%s%s_popen' % (instance_name, instance_nb)).kill()
+            eval('self.ds%s_popen' % instance_nb).kill()
 
-    def start_ds_port_forward(self, instance_name='userstore', instance_nb=0):
+    def start_ds_port_forward(self, instance_nb=0):
         if not is_cluster_mode():
-            ds_pod_name = '%s-%s' % (instance_name, instance_nb)
-            ds_local_port = eval('self.%s%s_local_port' % (instance_name, instance_nb))
+            ds_pod_name = 'userstore-%s' % instance_nb
+            ds_local_port = eval('self.ds%s_local_port' % instance_nb)
             cmd = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
                   (tests_namespace(), ds_pod_name, ds_local_port)
             ds_popen = utils.cmd.run_cmd_process(cmd)
