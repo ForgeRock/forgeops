@@ -3,6 +3,7 @@
 
 # Top level domain, including the leading dot. This is used to form the wild-card cert request for cert-manager.
 domain: example.com
+subdomain: iam
 
 config:
   # The default name that products use when looking for the configmap and secret is `frconfig`.
@@ -34,4 +35,3 @@ certmanager:
 
 istio:
   enabled: false
-  subdomain: iam
