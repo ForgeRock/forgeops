@@ -15,7 +15,7 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "{{ .Release.Namespace}}.{{ .Values.istio.subdomain }}.{{.Values.domain}}"
+    - "{{ .Release.Namespace}}.{{ .Values.subdomain }}.{{.Values.domain}}"
     tls:
       httpsRedirect: true
   - port:
@@ -23,7 +23,7 @@ spec:
       name: https
       protocol: HTTPS
     hosts:
-    - "{{ .Release.Namespace}}.{{ .Values.istio.subdomain }}.{{.Values.domain}}"
+    - "{{ .Release.Namespace}}.{{ .Values.subdomain }}.{{.Values.domain}}"
     tls:
       mode: SIMPLE
       privateKey: /etc/istio/ingressgateway-certs/tls.key
