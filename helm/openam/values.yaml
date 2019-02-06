@@ -1,60 +1,133 @@
-am:
-  bootstrapDir: /home/forgerock/openam/am
-  context: am
-  home: /home/forgerock/openam
-  instance: http://openam:80/am
-amCustomizationScriptPath: customize-am.sh
-auditLogs: []
-catalinaOpts: '-server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
-  -Dcom.sun.identity.shared.debug.file.format=''%PREFIX% %MSG%\\n%STACKTRACE%'' -Dcom.iplanet.services.stats.state=off
+# Default values for openam runtime chart
+# This is a YAML-formatted file.
+# Declare name/value pairs to be passed into the templates.
 
-  '
 component: openam
+
+image:
+  repository: forgerock-docker-public.bintray.io/forgerock/openam
+  tag: 7.0.0
+  # For development we set this to Always to get the most current image:
+  pullPolicy: IfNotPresent
+
+gitImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/git
+  tag: 6.5.0
+  pullPolicy: IfNotPresent
+
+utilImage:
+  repository: forgerock-docker-public.bintray.io/forgerock/util
+  tag: 7.0.0
+  pullPolicy: IfNotPresent
+  #pullPolicy: Always
+
+domain: example.com
+subdomain: iam
+
 config:
   name: frconfig
   strategy: git
+
+openamReplicaCount: 1
+
+
+configLdapPort:  1389
 configLdapHost: configstore-0.configstore
-configLdapPort: 1389
+
+
+# This option:
+#  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
+# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
+# This may impact amster imports for some configurations (SAML entities)
+# If you need to renable this for amster, it should be disabled after the import is complete
+
+catalinaOpts: >
+  -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
+  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
+  -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
+  -Dcom.iplanet.services.stats.state=off
+
+# For visualVM debug, you can add this to the above:
+#-Dcom.sun.management.jmxremote.port=<port>
+#-Dcom.sun.management.jmxremote.authenticate=false
+#-Dcom.sun.management.jmxremote.ssl=false
+#-Dcom.sun.management.jmxremote.rmi.port=<port>
+#-Djava.rmi.server.hostname=$HOST_HOSTNAME
+
+
+# To use a tomcat web.xml from a k8s config map instead of the one built into the container, set the following to true.
+useConfigMapWebxml: false
+
+# Suffix for DS config store.
+rootSuffix:  "ou=am-config"
+
+am:
+  home: /home/forgerock/openam
+  context: am
+  bootstrapDir: /home/forgerock/openam/am
+  instance: http://openam:80/am
+
+
+
+# Valid logger types: fluent-bit, none
+# For audit logs it is suggested you configure AM to send directly to ElasticSearch.
+logDriver: none
+
+# The defaults below are small and OK for testing.
+# For production you wil want to set CPU limits to help Kube Schedule the pods.
+resources:
+ limits:
+   memory: 1300Mi
+ requests:
+   memory: 1200Mi
+
+# Set to true to create a boot.json file to bootstrap AM. If set to false, AM will come up to the configurator page.
 createBootstrap: true
-domain: example.com
-gitImage:
-  pullPolicy: IfNotPresent
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
-image:
-  pullPolicy: Always
-  repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 7.0.0
-ingress:
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/affinity: cookie
-    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
-    nginx.ingress.kubernetes.io/session-cookie-name: route
-    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
-  class: nginx
-  enabled: true
-istio:
-  enabled: false
+
+# This is an optional path to a script to execute before AM starts up. It can copy in images, update the web.xml, etc.
+# If you change set it to the full path to your cloned configuration.  Example: /git/config/default/6.5/my-openam/custom.sh
+amCustomizationScriptPath: "customize-am.sh"
+
+# Liveness probe tuning - time in seconds
 livenessPeriod: 60
 livenessTimeout: 15
-logDriver: none
-openamReplicaCount: 1
-resources:
-  limits:
-    memory: 1300Mi
-  requests:
-    memory: 1200Mi
-rootSuffix: ou=am-config
+
 service:
+  name: openam
+  #type: NodePort
+  type: ClusterIP
   externalPort: 80
   internalPort: 8080
-  name: openam
-  type: ClusterIP
-subdomain: iam
-useConfigMapWebxml: false
-utilImage:
-  pullPolicy: IfNotPresent
-  repository: forgerock-docker-public.bintray.io/forgerock/util
-  tag: 7.0.0
+
+ingress:
+  class: nginx
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
+    # nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
+    # nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
+
+# Audit log details for log streaming sidecar containers.
+# AM can now stream audit logs to stdout. This option may be removed in the future.
+auditLogs: []
+
+# auditLogs:
+#   - name: access-logs
+#     path: "/home/forgerock/openam/openam/log/access.audit.json"
+#   - name: activity-logs
+#     path: "/home/forgerock/openam/openam/log/activity.audit.json"
+#   - name: authentication-logs
+#     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
+#   - name: config-logs
+#     path: "/home/forgerock/openam/openam/log/config.audit.json"
+
+
+istio:
+  enabled: false
+
