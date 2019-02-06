@@ -30,6 +30,7 @@ deploy_smoke() {
     cd $WORKSPACE
     echo "deploying the smoke test configuration"
     ./bin/deploy.sh samples/config/smoke-deployment
+    sleep 120
 }
 
 run_tests() {
@@ -37,8 +38,8 @@ run_tests() {
     echo "Running smoke tests"
     cd $WORKSPACE/cicd/forgeops-tests/
     rm -rf reports/*
-    export TESTS_NAMESPACE=csovant
-    ./run-smoke-tests.sh > debug.txt
+    export TESTS_NAMESPACE=smoke
+    ./forgeops-tests.py tests/smoke > debug.txt
     if [ $? -eq 0 ]
     then
         status='SUCCESS'
@@ -59,7 +60,6 @@ run_tests() {
     mkdir -p tmp
     rm -rf tmp/*
     cp -r reports/* tmp/
-    rm -rf reports/*
     FILES=tmp/*
     for f in $FILES
     do

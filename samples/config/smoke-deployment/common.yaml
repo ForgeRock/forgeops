@@ -4,7 +4,7 @@ image:
   pullPolicy: Always
 
 istio:
-  enabled: true
+  enabled: false
 
 ingress:
-    enabled: false
+  enabled: true

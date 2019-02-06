@@ -1,102 +1,44 @@
-# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
-# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
-
-
-component: amster
-
-# Server base URL *within* the Kubernetes cluster - not the external LB URL.
-# No /openam appended here.
-serverBase: http://openam:80
-
-
-# The top level domain. This excludes the openam component.
-domain: example.com
-subdomain: iam
-
-# Default install passwords.
 amadminPassword: password
-encryptionKey: "123456789012"
-policyAgentPassword: Passw0rd
-prometheusPassword: prometheus
-
-
+amsterClean: false
+component: amster
 config:
-  # Name of the configMap that holds the configuration repository URL and of
-  # the secret required to access it.
-  name: frconfig
-  # The path where we import the configuration from. Your git repo will usually be mounted on /git/config.
   importPath: /git/config/6.5/default/am/empty-import
-  # Where we perform export to. If not set, this defaults to the importPath
-  #exportPath: /tmp/amster
-  # strategy defines how products get their configuration .
-  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
-  # If strategy is set to anything other than git (e.g. file), it is assumed some other process will make
-  # files available to the container (baked in to the docker image, or provided by skaffold, etc.)
+  name: frconfig
   strategy: git
-
-image:
-  repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 7.0.0
-  pullPolicy: IfNotPresent
-  #pullPolicy: Always
-
+configStore:
+  adminPort: 4444
+  dirManager: uid=am-config,ou=admins,ou=am-config
+  host: configstore-0.configstore
+  password: password
+  port: 1389
+  suffix: ou=am-config
+  type: dirServer
+domain: example.com
+encryptionKey: '123456789012'
 gitImage:
+  pullPolicy: IfNotPresent
   repository: forgerock-docker-public.bintray.io/forgerock/git
   tag: 6.5.0
-  pullPolicy: IfNotPresent
-
-configStore:
-  # type can be dirServer or embedded. Only dirServer is supported
-  type: dirServer
-   # If type is set to embedded, the attributes below are ignored.
-  #suffix:  "dc=openam,dc=forgerock,dc=org"
-  suffix:  "ou=am-config"
-  # This is the first StatefulSet name of the configstore:
-  host: configstore-0.configstore
-  port: 1389
-  #dirManager: "cn=Directory Manager"
-  dirManager: "uid=am-config,ou=admins,ou=am-config"
-  adminPort: 4444
-  password: password
-
-# By default, userstore points to configstore - which is default
-# place for users when empty-import config is used.
-userStore:
-  suffix: "ou=identities"
-  # If userstore is deployed as well but empty import configuration
-  # is used, override this to userstore-0.userstore to use that store
-  host: configstore-0.configstore
-  port: 1389
-  dirManager: "cn=Directory manager"
-  password: "password"
-  storeType: "LDAPv3ForOpenDS"
-
-# determines if '--clean true' is used for the import-config.
-# suggest this is 'true' if importing a complete configuration
-# and set to 'false' if importing partial/incremental configurations
-amsterClean: false
-
-# For production set CPU limits to help Kube Schedule the pods.
-resources:
- limits:
-   memory: 1080Mi
- requests:
-   memory: 1080Mi
-
-# Optional value overrides
-
-# fqdn - the openam server external fqdn.
-# If this is *not* set, it defaults to {namespace}{subdomain}{domain}
-#fqdn: login.acme.com
-
-# ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on
-# import.
-#ctsStores: ctsstore-0.ctsstore:1389
-
-# ctsPassword - defaults to "password"
-#ctsPassword: password
-
-
+image:
+  pullPolicy: Always
+  repository: forgerock-docker-public.bintray.io/forgerock/amster
+  tag: 7.0.0
 istio:
   enabled: false
   subdomain: iam
+policyAgentPassword: Passw0rd
+prometheusPassword: prometheus
+resources:
+  limits:
+    memory: 1080Mi
+  requests:
+    memory: 1080Mi
+serverBase: http://openam:80
+subdomain: iam
+userStore:
+  dirManager: cn=Directory manager
+  host: configstore-0.configstore
+  password: password
+  port: 1389
+  storeType: LDAPv3ForOpenDS
+  suffix: ou=identities
