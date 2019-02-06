@@ -9,5 +9,7 @@ pip3 install allure-pytest
 pip3 install pytest-html
 pip3 install pytest-metadata
 pip3 install requests
+pip3 install beautifulsoup4
+pip3 install pyyaml
 pip3 install multiset
 pip3 install kubernetes
