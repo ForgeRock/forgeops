@@ -13,11 +13,11 @@ spec:
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer  
-  commonName: "*.iam.forgeops.com"
+  commonName: "*.istio.forgeops.com"
   acme:
     config:
     - dns01:
         provider:  prod-dns
       domains:
-      - "*.iam.forgeops.com"
+      - "*.istio.forgeops.com"
    
