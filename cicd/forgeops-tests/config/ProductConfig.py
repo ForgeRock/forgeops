@@ -45,10 +45,7 @@ def tests_domain():
 
 
 def base_url():
-    protocol = 'http'
-    if is_minikube_context():
-        protocol = 'https'
-    return '%s://%s.iam.%s' % (protocol, tests_namespace(), tests_domain())
+    return 'https://%s.iam.%s' % (tests_namespace(), tests_domain())
 
 
 class AMConfig(object):
