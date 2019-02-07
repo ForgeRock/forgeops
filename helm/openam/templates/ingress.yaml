@@ -19,11 +19,11 @@ metadata:
 spec:
   tls:
   - hosts:
-    - "{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}"
+    -  {{ template "externalFQDN" .  }}
   # We default to using the nginx self signed cert.
   #   secretName: {{ printf "wildcard.%s.%s" .Release.Namespace .Values.domain }}
   rules:
-    - host: "{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}"
+    - host:  {{ template "externalFQDN" .  }}
       http:
         paths:
         - path: /am

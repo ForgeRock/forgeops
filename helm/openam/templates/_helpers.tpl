@@ -29,7 +29,7 @@ We truncate at 24 chars because some Kubernetes name fields are limited to this
 {{- define "externalFQDN" -}}
 {{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
 {{- else -}}
-{{- printf "login.%s.%s" .Release.Namespace .Values.domain -}}
+{{- printf "%s.%s.%s" .Release.Namespace .Values.subdomain .Values.domain -}}
 {{- end -}}
 {{- end -}}
 
