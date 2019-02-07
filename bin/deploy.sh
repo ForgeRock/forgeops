@@ -197,10 +197,7 @@ deploy_charts()
 
 isalive_check()
 {
-    PROTO="http"
-    if [ "${CONTEXT}" = "minikube" ]; then
-        PROTO="https"
-    fi
+    PROTO="https"
     ALIVE_JSP="${PROTO}://${AM_URL}/isAlive.jsp"
     echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
@@ -214,10 +211,7 @@ isalive_check()
 
 isalive_check_idm()
 {
-    PROTO="http"
-    if [ "${CONTEXT}" = "minikube" ]; then
-        PROTO="https"
-    fi
+    PROTO="https"
     IDM_PING_ENDPOINT="${PROTO}://${IDM_URL}/openidm/info/ping"
     echo "=> Testing ${IDM_PING_ENDPOINT}"
     STATUS_CODE="503"

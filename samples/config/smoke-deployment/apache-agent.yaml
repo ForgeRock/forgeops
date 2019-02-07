@@ -1,6 +1,6 @@
 agent:
   user: apache
-  amServer: http://login.smoke.forgeops.com/
+  amServer: http://smoke.iam.forgeops.com/am
   realm: "/"
 
 
