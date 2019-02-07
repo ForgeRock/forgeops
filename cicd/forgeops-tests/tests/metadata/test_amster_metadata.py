@@ -17,7 +17,7 @@ from utils.amster_pod import AmsterPod
 
 
 class TestAmsterMetadata(object):
-    MANIFEST_FILEPATH = os.path.join('config', '6.5.0-manifest.txt') # TODO:
+    MANIFEST_FILEPATH = os.path.join(pod.Pod.test_root_directory(), 'config', '6.5.0-manifest.txt')
     pods = []
 
     @classmethod

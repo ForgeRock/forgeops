@@ -52,6 +52,19 @@ class Pod(object):
         return self._manifest
 
     @staticmethod
+    def test_root_directory():
+        """
+        Compute test root directory"
+        :return: Test root directory
+
+        """
+        original_directory = os.getcwd()
+        os.chdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..'))
+        test_root = os.getcwd()
+        os.chdir(original_directory)
+        return test_root
+
+    @staticmethod
     def is_expected_am_amster_version(am_manifest, amster_manifest):
         """
         :param am_manifest: Manifest of version information
