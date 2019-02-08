@@ -45,5 +45,12 @@ AKS_CLUSTER_NS="prod"
 # Monitoring Namespace
 AKS_MONITORING_NS="monitoring"
 
+# Static (External) IP Address to assign to the Ingress Controller
+# Leave  blank "" if you don't know the IP or use the one set by GKE
+AKS_INGRESS_IP=""
+
+# Resource group of static IP address if provided above
+AKS_IP_RESOURCE_GROUP_NAME=""
+
 # Any extra aguments to be passed to the CLI
 AKS_EXTRA_ARGS=""
