@@ -46,7 +46,7 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
-        - name: openam-secrets
+        - name: openam-keys
           mountPath: /var/run/secrets/openam
         - name: openam-boot
           mountPath: /var/run/openam
@@ -65,9 +65,9 @@ spec:
           mountPath: /home/forgerock/openam
         - name: configstore-secret
           mountPath: /var/run/secrets/configstore
-        - name: openam-secrets
+        - name: openam-keys
           mountPath: /var/run/secrets/openam/keystore
-        - name: openam-pstore-secrets
+        - name: openam-keystore-passwords
           mountPath: /var/run/secrets/openam/password
         {{ if eq .Values.config.strategy  "git" }}
         - name: git
@@ -128,12 +128,12 @@ spec:
       {{ end }}
       - name: openam-root
         emptyDir: {}
-      - name: openam-secrets
+      - name: openam-keys
         secret:
-          secretName: openam-secrets
-      - name: openam-pstore-secrets
+          secretName: {{ default "openam-keys" .Values.existingSecrets.openamKeys }}
+      - name: openam-keystore-passwords
         secret:
-          secretName: openam-pstore-secrets
+          secretName: {{ default "openam-keystore-passwords" .Values.existingSecrets.openamKeystorePasswords }}
       - name: openam-boot
         configMap:
           name: boot-json
