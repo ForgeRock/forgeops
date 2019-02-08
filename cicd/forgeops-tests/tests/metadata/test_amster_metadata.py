@@ -18,6 +18,8 @@ from utils.amster_pod import AmsterPod
 
 class TestAmsterMetadata(object):
     MANIFEST_FILEPATH = os.path.join(pod.Pod.test_root_directory(), 'config', '6.5.0-manifest.txt')
+    environment_properties = dict(os.environ)
+    NAMESPACE= environment_properties.get('TESTS_NAMESPACE')
     pods = []
 
     @classmethod
@@ -25,8 +27,7 @@ class TestAmsterMetadata(object):
         """Populate the lists of pods"""
 
         logger.test_step('Get pods')
-        environment_properties = dict(os.environ)
-        podnames = kubectl.get_product_pod_names(AmsterPod.PRODUCT_TYPE, environment_properties.get('TESTS_NAMESPACE'))
+        podnames = kubectl.get_product_pod_names(TestAmsterMetadata.NAMESPACE, AmsterPod.PRODUCT_TYPE)
         assert len(podnames) > 0,  'There are no Amster pods'
         for podname in podnames:
             TestAmsterMetadata.pods.append(AmsterPod(podname, TestAmsterMetadata.MANIFEST_FILEPATH))
@@ -46,11 +47,11 @@ class TestAmsterMetadata(object):
 
         for pod in TestAmsterMetadata.pods:
             logger.test_step('Setting up for commons version check for: ' + pod.name)
-            pod.setup_commons_check()
+            pod.setup_commons_check(TestAmsterMetadata.NAMESPACE)
         yield
         for pod in TestAmsterMetadata.pods:
             logger.test_step('Cleaning up after commons version check for: ' + pod.name)
-            pod.cleanup_commons_check()
+            pod.cleanup_commons_check(TestAmsterMetadata.NAMESPACE)
 
     def test_commons_version(self, get_commons_library):
         """Check the version of a commons library"""
@@ -58,7 +59,7 @@ class TestAmsterMetadata(object):
         logger.test_step('Check commons version')
         for pod in TestAmsterMetadata.pods:
             logger.info('Check commons version for: ' +  pod.name)
-            pod.is_expected_commons_version()
+            pod.is_expected_commons_version(TestAmsterMetadata.NAMESPACE)
 
 
     def test_legal_notices(self):
@@ -66,14 +67,14 @@ class TestAmsterMetadata(object):
 
         logger.test_step('Check legal Notices')
         for pod in TestAmsterMetadata.pods:
-            logger.info('Check the contents of the legal-notices for: ' + pod.name)
-            pod.is_expected_legal_notices()
+            logger.info('Check legal-notices exist for: ' + pod.name)
+            pod.is_expected_legal_notices(TestAmsterMetadata.NAMESPACE)
 
     def test_version(self):
         """Check the version"""
 
         representative_pod = TestAmsterMetadata.pods[0]
-        representative_pod.is_expected_version()
+        representative_pod.is_expected_version(TestAmsterMetadata.NAMESPACE)
 
     def test_pods_jdk(self):
         """Check the JDK for the pods"""
@@ -81,4 +82,4 @@ class TestAmsterMetadata(object):
         logger.test_step('Check JDK version')
         for pod in TestAmsterMetadata.pods:
             logger.info('Check JDK version for ' + pod.name)
-            pod.is_expected_jdk()
+            pod.is_expected_jdk(TestAmsterMetadata.NAMESPACE)

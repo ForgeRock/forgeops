@@ -56,45 +56,44 @@ class AMPod(Pod):
         assert response.json()['date'] == self.manifest['date'], 'Unexpected AM build date'
         return True
 
-    def is_expected_legal_notices(self):
+    def setup_commons_check(self, namespace):
         """
-        Return True if legal notices are as expected, otherwise assert.
-        :return: True if legal notices are as expected
+        Setup for checking commons library version
+        :param namespace The kubernetes namespace.
         """
-
-        super(AMPod, self).is_expected_legal_notices(os.path.join(AMPod.ROOT, 'webapps', 'am', 'legal-notices'))
-
-
-    def setup_commons_check(self):
-        """Setup for checking commons library version"""
 
         logger.debug('Setting up for commons version check')
         config_version_jar = 'config-%s.jar' % self.manifest['commons_version']
         test_jar_filepath = os.path.join(AMPod.ROOT, 'webapps', 'am', 'WEB-INF', 'lib', config_version_jar)
-        return super(AMPod, self).setup_commons_check(test_jar_filepath, AMPod.TEMP)
+        super(AMPod, self).setup_commons_check(namespace, test_jar_filepath, AMPod.TEMP)
 
-    def cleanup_commons_check(self):
-        """Cleanup after checking commons library version"""
+    def cleanup_commons_check(self, namespace):
+        """
+        Cleanup after checking commons library version
+        :param namespace The kubernetes namespace.
+        """
 
         logger.debug('Cleaning up after commons version check')
-        return super(AMPod, self).cleanup_commons_check(AMPod.TEMP)
+        super(AMPod, self).cleanup_commons_check(namespace, AMPod.TEMP)
 
-    def is_expected_commons_version(self):
+    def is_expected_commons_version(self, namespace):
         """
         Return true if the commons version is as expected, otherwise return assert.
+        :param namespace The kubernetes namespace.
         This check inspects a sample commons .jar to see what version is in use.
         :return: True is the commons version is as expected.
         """
 
         config_jar_properties = os.path.join('META-INF', 'maven', 'org.forgerock.commons', 'config', 'pom.properties')
         logger.debug('Check commons version for config.jar')
-        return super(AMPod, self).is_expected_commons_version(AMPod.TEMP, config_jar_properties)
+        return super(AMPod, self).is_expected_commons_version(namespace, AMPod.TEMP, config_jar_properties)
 
 
-    def is_expected_jdk(self):
+    def is_expected_jdk(self, namespace):
         """
         Return True if jdk is as expected, otherwise assert.
+        :param namespace The kubernetes namespace.
         :return: True if jdk is as expected
         """
 
-        return super(AMPod, self).is_expected_jdk(' '.join(['--' , 'java', '-version']))
+        return super(AMPod, self).is_expected_jdk(namespace, ' '.join(['--' , 'java', '-version']))
