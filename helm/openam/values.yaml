@@ -83,6 +83,13 @@ amCustomizationScriptPath: "customize-am.sh"
 livenessPeriod: 60
 livenessTimeout: 15
 
+# Set the names below to provide custom secrets mounted in the AM pods (keystore, etc.). You must provide all secrets.
+# See templates/secrets.yaml and secrets/... for details
+existingSecrets: {}
+# existingSecrets: 
+#   openamKeys: openam-keys
+#   openamKeystorePasswords: openam-kesytore-passwords
+
 service:
   name: openam
   #type: NodePort
