@@ -19,4 +19,12 @@ jre_version = OpenJDK Runtime Environment (IcedTea 3.6.0) (Alpine 8.151.12-r0)
 jdk_full_version = OpenJDK 64-Bit Server VM (build 25.151-b12, mixed mode)
 commons_version = 24.0.1
 amster_jvm = 1.8.0_151
-    
+
+[openidm]
+version = 7.0.0-M1
+revision = 9c368d2
+date = 20190123140439
+jdk_version = openjdk version "11.0.1" 2018-10-16
+jre_version = OpenJDK Runtime Environment (build 11.0.1+13-Debian-2bpo91)
+jdk_full_version = OpenJDK 64-Bit Server VM (build 11.0.1+13-Debian-2bpo91, mixed mode)
+commons_version = 25.0.0-alpha-14
