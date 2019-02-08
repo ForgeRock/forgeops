@@ -26,6 +26,7 @@ echo -e "\tNode Disk Size = ${AKS_NODE_OSDISK_SIZE}"
 echo -e "\tDefault Namespace = ${AKS_CLUSTER_NS}"
 echo -e "\tMonitoring Namespace = ${AKS_MONITORING_NS}"
 echo -e "\tStatic IP = ${AKS_INGRESS_IP}"
+echo -e "\tStatic IP Resource Group = ${AKS_IP_RESOURCE_GROUP_NAME}"
 echo -e "\tExtra Arguments = ${AKS_EXTRA_ARGS}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
@@ -36,19 +37,23 @@ case "${choice}" in
    * ) echo "Invalid input, Bye!"; exit 1;;
 esac
 
-
 # Who created this cluster.
 CREATOR="${USER:-unknown}"
 # Labels can not contain dots that may be present in the user.name
 CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
-# Check first to see if SPN exists
-az ad sp show --id ${AKS_SERVICE_PRINCIPAL} > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    echo "Service Principal \"${AKS_SERVICE_PRINCIPAL}\" not found.  Please create first"
-    exit 1
+# Check first to see if Service Principal has been provide and whether it exist
+if [ -n "$AKS_SERVICE_PRINCIPAL" ]; then
+    az ad sp show --id ${AKS_SERVICE_PRINCIPAL} > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "Service Principal \"${AKS_SERVICE_PRINCIPAL}\" not found.  Please check and try again."
+        exit 1
+    fi
+    SP='--service-principal ${AKS_SERVICE_PRINCIPAL} --client-secret ${AKS_SERVICE_PRINCIPAL_SECRET}'
+else
+    echo "Service Principal \"${AKS_SERVICE_PRINCIPAL}\" not added.  Letting AKS create default Service Principal."
+    SP=""    
 fi
-
 
 echo ""
 echo "=> Creating Resoure Group"
@@ -65,23 +70,35 @@ if [ ! -z "${AKS_EXTRA_ARGS}" ]; then
 fi
 
 # Create Cluster using CLI
-az aks create \
+az aks create --verbose\
     --resource-group ${AKS_RESOURCE_GROUP_NAME} \
     --name ${AKS_CLUSTER_NAME} \
     --admin-username ${AKS_ADMIN_USERNAME} \
     --location ${AKS_LOCATION} \
-    --service-principal ${AKS_SERVICE_PRINCIPAL} \
-    --client-secret ${AKS_SERVICE_PRINCIPAL_SECRET} \
     --kubernetes-version ${AKS_KUBERNETES_VERSION} \
     --node-vm-size ${AKS_NODE_VM_SIZE} \
     --node-osdisk-size ${AKS_NODE_OSDISK_SIZE} \
     --node-count ${AKS_NODE_COUNT} \
     --tag "createdby=${CREATOR}"  \
-	--enable-addons monitoring \
-    --generate-ssh-keys | tee -a "${HOME}/${AKS_CLUSTER_NAME}-create-output.json"
+    --generate-ssh-keys | tee -a "${HOME}/${AKS_CLUSTER_NAME}-create-output.json" \
+    --enable-addons monitoring
 
 # Get cluster credentials to populate .kube/config 
 az aks get-credentials \
 	--resource-group ${AKS_RESOURCE_GROUP_NAME} \
     --name ${AKS_CLUSTER_NAME}
+    
+## Get service principal client-id
+#SP_ID=$(az ad app list --query "[?displayName=='${AKS_CLUSTER_NAME}'].{Name:displayName,Id:appId}" --output table | grep ${AKS_CLUSTER_NAME} | awk '{  print $2 }')
+#
+## Get Azure subscription ID
+#SUB=$(az account show |grep \"id\" | cut -d \" -f4)
+#
+## Delegate permission for Service Principal to access Static IP resource group
+#az role assignment create\
+#   --assignee ${SP_ID} \
+#   --role "Network Contributor" \
+#   --scope /subscriptions/${SUB}/resourceGroups/${AKS_IP_RESOURCE_GROUP_NAME}
+   
+
     
