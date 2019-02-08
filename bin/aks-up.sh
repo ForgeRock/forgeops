@@ -46,6 +46,7 @@ kubectl config set-context $(kubectl config current-context) --namespace=${AKS_C
 
 # Create storage class
 ./aks-create-sc.sh
+echo "8"
 
 # Inatilize helm by creating a rbac role first
 ./helm-rbac-init.sh
