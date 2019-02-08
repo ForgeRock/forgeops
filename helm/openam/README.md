@@ -35,5 +35,6 @@ The current approach is to copy in a prototype keystore from a k8s secret mounte
 are all configured to point to this keystore.  The global password secret provider must be changed to use clear text passwords to open the 
 keystore. This is found in the forgeops-init configuration that is imported by amster.
 
+### Using custom keystores
 
-
+You can override the default keystores in this chart by setting `existingSecrets.openamKeys` and `existingSecrets.openamKeystorePasswords` and providing your own secrets separately. This makes it easier to replace the default secrets without modifying this chart. Make sure to provide all required keys in these secrets.
