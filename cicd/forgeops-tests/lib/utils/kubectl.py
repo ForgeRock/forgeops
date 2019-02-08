@@ -15,16 +15,16 @@ from utils import logger
 
 KUBECTL_COMMAND = 'kubectl'
 
-def exec(command):
+def exec(namespace, command):
     """
     Run a kubectl exec command
     :param command: command to run
     :return: (stdout, stderr) from running the command
     """
-    command = ' '.join([KUBECTL_COMMAND, 'exec', command])
+    command = ' '.join([KUBECTL_COMMAND, '-n', namespace, 'exec', command])
     return __run_cmd_process(command)
 
-def get_product_pod_names(product, namespace):
+def get_product_pod_names(namespace, product):
     """
     Get the names of the pods for the given platform product
     :param product: Name of platform product
@@ -54,7 +54,7 @@ def __run_cmd_process(cmd):
     :param cmd: command to run
     :return: (stdout, stderr)
     """
-    logger.info('Running following command as process: ' + cmd)
+    logger.debug('Running following command as process: ' + cmd)
     response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     stdout, stderr = response.communicate()
     assert response.returncode == 0, ' Unexpected return code from Popen() ' + stderr

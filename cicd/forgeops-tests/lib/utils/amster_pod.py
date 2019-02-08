@@ -26,13 +26,14 @@ class AmsterPod(Pod):
         Pod.__init__(self, AmsterPod.PRODUCT_TYPE, name, manifest_filepath)
         self.manifest['amster_jvm'] = self.config[self.product_type]['amster_jvm']
 
-    def is_expected_version(self):
+    def is_expected_version(self, namespace):
         """
+        :param namespace The kubernetes namespace.
         Return True if the version is as expected, otherwise assert.
         :return: True if the version is as expected.
         """
 
-        stdout, stderr = kubectl.exec(' '.join([self.name, '--', './amster', '--version']))
+        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, '--', './amster', '--version']))
         version_strings = stdout[0].split()
         version = version_strings[3].lstrip('v')
         build = version_strings[5].rstrip(',')
@@ -44,31 +45,24 @@ class AmsterPod(Pod):
         assert jvm == self.manifest['amster_jvm'], 'Unexpected JVM for amster'
         return True
 
-    def is_expected_legal_notices(self):
+    def setup_commons_check(self, namespace):
         """
-        Return True if legal notices are as expected, otherwise assert.
-        :return: True if legal notices are as expected
+        Setup for checking commons library version
+        :param namespace The kubernetes namespace.
         """
-
-        legal_notices_directory = os.path.join(AmsterPod.ROOT, 'legal-notices')
-        return super(AmsterPod, self).is_expected_legal_notices(legal_notices_directory)
-
-
-    def setup_commons_check(self):
-        """Setup for checking commons library version"""
 
         logger.debug('Setting up for commons version check')
         amster_version_jar = 'amster-%s.jar' % self.manifest['version']
         test_jar_filepath = os.path.join(AmsterPod.ROOT, amster_version_jar)
-        return super(AmsterPod, self).setup_commons_check(test_jar_filepath, AmsterPod.TEMP)
+        super(AmsterPod, self).setup_commons_check(namespace, test_jar_filepath, AmsterPod.TEMP)
 
-    def cleanup_commons_check(self):
+    def cleanup_commons_check(self, namespace):
         """Cleanup after checking commons library version"""
 
         logger.debug('Cleaning up after commons version check')
-        return super(AmsterPod, self).cleanup_commons_check(AmsterPod.TEMP)
+        super(AmsterPod, self).cleanup_commons_check(namespace, AmsterPod.TEMP)
 
-    def is_expected_commons_version(self):
+    def is_expected_commons_version(self, namespace):
         """
         Return true if the commons version is as expected, otherwise return assert.
         This check inspects a sample commons .jar to see what version is in use.
@@ -77,13 +71,13 @@ class AmsterPod(Pod):
 
         logger.debug('Check commons version for config.jar')
         config_jar_properties = os.path.join('META-INF', 'maven', 'org.forgerock.commons', 'config', 'pom.properties')
-        return super(AmsterPod, self).is_expected_commons_version(AmsterPod.TEMP, config_jar_properties)
+        return super(AmsterPod, self).is_expected_commons_version(namespace, AmsterPod.TEMP, config_jar_properties)
 
 
-    def is_expected_jdk(self):
+    def is_expected_jdk(self, namespace):
         """
         Return True if jdk is as expected, otherwise assert.
         :return: True if jdk is as expected
         """
 
-        return super(AmsterPod, self).is_expected_jdk(' '.join(['-c', 'amster', '--', 'java', '-version']))
+        return super(AmsterPod, self).is_expected_jdk(namespace, ' '.join(['-c', 'amster', '--', 'java', '-version']))

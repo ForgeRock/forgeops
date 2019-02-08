@@ -1,14 +1,7 @@
 [DEFAULT]
-legal_notices = Forgerock_License.txt copyrights.txt third-party-copyrights.txt third-party-licenses
-    Apache-2.0.txt BSD-2-Clause.txt BSD-3-Clause.txt BSD.txt Bouncy_Castle_License.txt
-    CC0-1.0.txt CDDL-1.0.txt CDDL-1.1.txt CDDL_or_GPLv2_with_exceptions.txt CPL-1.0.txt
-    EPL-1.0.txt JSON.txt MIT.txt MPL-2.0.txt
 version = 6.5.0
                  
 [openam]
-legal_notices = /usr/local/tomcat/webapps/am/legal-notices:
-    /usr/local/tomcat/webapps/am/legal-notices/third-party-licenses:
-    CDDL-1.0.txt
 version = 6.5.0
 revision = f8ac1261d9
 date = 2018-November-28 15:19
@@ -18,8 +11,6 @@ jdk_full_version = OpenJDK 64-Bit Server VM (build 25.191-b12, mixed mode)
 commons_version = 24.0.1
 
 [amster]
-legal_notices = /opt/amster/legal-notices:
-    /opt/amster/legal-notices/third-party-licenses:
 version = 6.5.0
 revision = f8ac1261d9
 date = 2018-November-28 15:19
