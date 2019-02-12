@@ -31,7 +31,7 @@ class TestIDMMetadata(object):
         for podname in podnames:
             TestIDMMetadata.pods.append(IDMPod(podname, TestIDMMetadata.MANIFEST_FILEPATH))
 
-    def test_idm_version_info(self):
-        """Check the AM and Amster versions match"""
+    def test_version(self):
+        """Check the IDM version info"""
 
         TestIDMMetadata.pods[0].is_expected_version()

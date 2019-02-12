@@ -1,7 +1,7 @@
 # Environment settings for the deployment
 
 # k8s namespace to deploy in
-NAMESPACE=markg
+NAMESPACE=smoke
 
 # Top level domain. Do not include the leading .
 DOMAIN="forgeops.com"
