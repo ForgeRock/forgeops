@@ -82,7 +82,6 @@ class Pod(object):
         if am_manifest['jdk_version'] != amster_manifest['jdk_version']:
             logger.warning("Different versions of java are in use.")
 
-
     def is_expected_version(self):
         """
         Return True if the version is as expected, otherwise assert.
@@ -137,7 +136,6 @@ class Pod(object):
         assert stdout[2].strip() == 'version=' + self.manifest['commons_version'], 'Unexpected commons version'
         assert stdout[3].strip() == 'groupId=org.forgerock.commons', ' Unexpected groupId for commons library'
         return True
-
 
     def is_expected_jdk(self, namespace, sub_command):
         """

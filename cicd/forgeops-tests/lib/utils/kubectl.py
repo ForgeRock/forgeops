@@ -15,6 +15,7 @@ from utils import logger
 
 KUBECTL_COMMAND = 'kubectl'
 
+
 def exec(namespace, command):
     """
     Run a kubectl exec command
@@ -23,6 +24,7 @@ def exec(namespace, command):
     """
     command = ' '.join([KUBECTL_COMMAND, '-n', namespace, 'exec', command])
     return __run_cmd_process(command)
+
 
 def get_product_pod_names(namespace, product):
     """
@@ -39,6 +41,7 @@ def get_product_pod_names(namespace, product):
             pod_names.append(pod_name)
     return pod_names
 
+
 def __get_namespaced_pods(namespace):
 
     config.load_kube_config()
@@ -47,6 +50,7 @@ def __get_namespaced_pods(namespace):
     for pod in pods.items:
         logger.debug('%s\t%s\t%s' % (pod.status.pod_ip, pod.metadata.namespace, pod.metadata.name))
     return pods
+
 
 def __run_cmd_process(cmd):
     """

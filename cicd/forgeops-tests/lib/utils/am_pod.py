@@ -25,8 +25,7 @@ class AMPod(Pod):
         :param name: Pod name
         :param manifest_filepath: Path to product manifest file
         """
-
-        Pod.__init__(self, AMPod.PRODUCT_TYPE, name, manifest_filepath)
+        super().__init__(AMPod.PRODUCT_TYPE, name, manifest_filepath)
 
     def is_expected_version(self):
         """

@@ -13,7 +13,7 @@ import pytest
 from utils import logger, kubectl, pod, amster_pod
 from utils.am_pod import AMPod
 
-#TODO checksum check on docker images
+# TODO checksum check on docker images
 
 
 class TestAMMetadata(object):
@@ -38,9 +38,8 @@ class TestAMMetadata(object):
 
         logger.test_step('Check AM and Amster versions match')
         representative_am_pod = TestAMMetadata.pods[0]
-        representative_amster_pod =  amster_pod.AmsterPod("representative_amster_pod", TestAMMetadata.MANIFEST_FILEPATH)
+        representative_amster_pod = amster_pod.AmsterPod("representative_amster_pod", TestAMMetadata.MANIFEST_FILEPATH)
         pod.Pod.is_expected_am_amster_version(representative_am_pod.manifest, representative_amster_pod.manifest)
-
 
     @pytest.fixture()
     def get_commons_library(self):
@@ -61,7 +60,6 @@ class TestAMMetadata(object):
         for pod in TestAMMetadata.pods:
             logger.info('Check commons version for: ' +  pod.name)
             pod.is_expected_commons_version(TestAMMetadata.NAMESPACE)
-
 
     def test_legal_notices(self):
         """Check the presence of legal-notices"""
