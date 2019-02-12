@@ -7,7 +7,6 @@ Metadata related to kubernetes pods
 # Lib imports
 import os
 from configparser import ConfigParser
-import multiset
 
 # Framework imports
 from utils import logger, kubectl
