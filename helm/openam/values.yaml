@@ -129,7 +129,7 @@ auditLogs: []
 #     path: "/home/forgerock/openam/openam/log/config.audit.json"
 
 # Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft" or leave empty.
-# The hard setting will force ds pods to be spread out over multiple hosts/zones. soft is best effort
+# The hard setting will force openam pods to be spread out over multiple hosts/zones. soft is best effort
 # but pods will still be scheduled together if sufficient resources are not available. Setting "none" or any other
 # value will result in no affinity settings.
 podAntiAffinity: "none"
