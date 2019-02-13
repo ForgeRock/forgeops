@@ -130,7 +130,7 @@ if __name__ == "__main__":
                     print(exc)
 
             if dependencies not in env_components:
-                env_components = "%s %s %s" % (env_components, dependencies)
+                env_components = "%s %s" % (env_components, dependencies)
         env_components = "%s %s" % (env_components, component)
 
     print("The following components will be installed: %s" % env_components)
@@ -149,8 +149,10 @@ if __name__ == "__main__":
     with open(env_file, 'w') as stream:
         stream.write(env_content)
 
-    print("TO DEPLOY        : ../../bin/deploy.sh -n %s %s" % (TESTS_NAMESPACE, config_dir))
-    print("TO RUN AM TESTS  : ./forgeops-tests.py tests/postcommit/am")
-    print("TO RUN DJ TESTS  : ./forgeops-tests.py tests/postcommit/ds")
-    print("TO RUN IDM TESTS : ./forgeops-tests.py tests/postcommit/idm")
-    print("TO RUN IG TESTS  : ./forgeops-tests.py tests/postcommit/ig")
+    if "JOB_NAME" not in os.environ:
+        # Only print these information whne running outside Jenkins
+        print("TO DEPLOY        : ../../bin/deploy.sh -n %s %s" % (TESTS_NAMESPACE, config_dir))
+        print("TO RUN AM TESTS  : ./forgeops-tests.py tests/postcommit/am")
+        print("TO RUN DJ TESTS  : ./forgeops-tests.py tests/postcommit/ds")
+        print("TO RUN IDM TESTS : ./forgeops-tests.py tests/postcommit/idm")
+        print("TO RUN IG TESTS  : ./forgeops-tests.py tests/postcommit/ig")
