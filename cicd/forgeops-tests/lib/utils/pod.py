@@ -82,7 +82,6 @@ class Pod(object):
         if am_manifest['jdk_version'] != amster_manifest['jdk_version']:
             logger.warning("Different versions of java are in use.")
 
-
     def is_expected_version(self):
         """
         Return True if the version is as expected, otherwise assert.
@@ -90,86 +89,63 @@ class Pod(object):
         """
         assert False, 'Not implemented, please override in subclass'
 
-    def is_expected_legal_notices(self, legal_notices_path):
+    def is_expected_legal_notices(self, namespace):
         """
-        :param legal_notices_path: Path to legal notices
-        Return True if legal notices are as expected, otherwise assert.
-        :return: True if legal notices are as expected
+        :param namespace The kubernetes namespace.
+        Return True if the representative license file is present on the pod, otherwise assert.
+        :return: True if file present
         """
 
-        default_legal_notices = set(self._config["DEFAULT"]["legal_notices"].split())
-        legal_notices = multiset.Multiset(self._config[self.product_type]["legal_notices"].split())
-        legal_notices += default_legal_notices
-
-        stdout, stderr =  kubectl.exec(' '.join([self.name, '-- ls -R ' + legal_notices_path]))
-        for line in stdout:
-            logger.debug('Found legal notice ' + self.name)
-            if line:
-                legal_notices.remove(line, 1)
-        assert len(legal_notices) == 0, 'Did not find all legal notices'
+        ignored, ignored =  kubectl.exec(namespace, ' '.join([self.name, '--', 'find', '.', '-name', 'Forgerock_License.txt']))
         return True
 
-    def setup_commons_check(self):
-        """Setup for checking commons library version"""
-        assert False, 'Not implemented, please override in subclass'
 
-    def cleanup_commons_check(self):
-        """Cleanup after checking commons library version"""
-        assert False, 'Not implemented, please override in subclass'
-
-    def is_expected_commons_version(self):
+    def setup_commons_check(self, namespace, filepath, temp_directory):
         """
-        Return true if the commons version is as expected, otherwise return assert.
-        This check inspects a sample commons .jar to see what version is in use.
-        :return: True is the commons version is as expected.
-        """
-        assert False, 'Not implemented, please override in subclass'
-
-
-    def setup_commons_check(self, filepath, temp_directory):
-        """
+        :param namespace The kubernetes namespace.
         :param filepath Path to a common .jar
         :param temp_directory directory used for exploding the sample .jar file
         Setup for checking commons library version
         """
 
         logger.debug('Setting up for commons version check')
-        ignored = kubectl.exec(' '.join([self.name, '-- unzip', filepath, '-d', temp_directory]))
+        ignored, ignored = kubectl.exec(namespace, ' '.join([self.name, '-- unzip', filepath, '-d', temp_directory]))
 
-    def cleanup_commons_check(self, temp_directory):
+    def cleanup_commons_check(self, namespace, temp_directory):
         """
+        :param namespace The kubernetes namespace.
         :param temp_directory Directory to be deleted
         Cleanup after checking commons library version
         """
 
         logger.debug('Cleaning up after commons version check')
-        ignored, ignored = kubectl.exec(' '.join([self.name, '-- rm', '-rf', temp_directory]))
+        ignored, ignored = kubectl.exec(namespace, ' '.join([self.name, '-- rm', '-rf', temp_directory]))
 
-    def is_expected_commons_version(self, subpath, temp_directory):
+    def is_expected_commons_version(self, namespace, subpath, temp_directory):
         """
+        :param namespace The kubernetes namespace.
         Return true if the commons version is as expected, otherwise return assert.
         This check inspects a sample commons .jar to see what version is in use.
         :return: True is the commons version is as expected.
         """
 
         test_filepath = os.path.join(temp_directory, subpath, temp_directory)
-        stdout, stderr = kubectl.exec \
-            (' '.join([self.name, '--', 'cat', test_filepath]))
+        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, '--', 'cat', test_filepath]))
 
         logger.debug('Check commons version for: ' +  self.name)
         assert stdout[2].strip() == 'version=' + self.manifest['commons_version'], 'Unexpected commons version'
         assert stdout[3].strip() == 'groupId=org.forgerock.commons', ' Unexpected groupId for commons library'
         return True
 
-
-    def is_expected_jdk(self, sub_command):
+    def is_expected_jdk(self, namespace, sub_command):
         """
+        :param namespace The kubernetes namespace.
         :param sub_command: Command passed onto kubectl to obtain jdk version information.
         Return True if jdk is as expected, otherwise assert.
         :return: True if jdk is as expected
         """
 
-        stdout, stderr = kubectl.exec(' '.join([self.name, sub_command]))
+        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, sub_command]))
 
         logger.debug('Check JDK version for ' + self.name)
         assert stderr[0].strip() == self.manifest['jdk_version'], 'Unexpected JDK in use'  # TODO: why stderr
