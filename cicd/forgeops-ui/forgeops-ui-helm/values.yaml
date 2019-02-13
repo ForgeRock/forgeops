@@ -17,13 +17,14 @@ service:
   port: 80
 
 ingress:
-  enabled: false
+  enabled: true
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   path: /
+    # Change to reflect your env.
   hosts:
-    - chart-example.local
+    - ui.iam.forgeops.com
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
