@@ -15,6 +15,31 @@ spec:
         heritage: {{ .Release.Service }}
     spec:
       terminationGracePeriodSeconds: 10
+      {{- if eq .Values.podAntiAffinity "hard" }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: {{ .Values.topologyKey }}
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - {{ .Values.component }}
+      {{- else if eq .Values.podAntiAffinity "soft" }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - {{ .Values.component }}
+                topologyKey: {{ .Values.topologyKey }}
+      {{- end }}
       initContainers:
        {{ if eq .Values.config.strategy  "git" }}
       - name: git-init
