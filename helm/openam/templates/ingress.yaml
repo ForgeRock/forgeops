@@ -20,8 +20,7 @@ spec:
   tls:
   - hosts:
     -  {{ template "externalFQDN" .  }}
-  # We default to using the nginx self signed cert.
-  #   secretName: {{ printf "wildcard.%s.%s" .Release.Namespace .Values.domain }}
+    secretName: '{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}'
   rules:
     - host:  {{ template "externalFQDN" .  }}
       http:
