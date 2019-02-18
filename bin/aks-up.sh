@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sample wrapper script to initialize AKS. This creates the cluster and configures Helm, the nginx ingress,
+# Sample wrapper script to initialize AKS. This creates the cluster and configures Helm, the Nginx ingress,
 # and creates git credential secrets. Edit this for your requirements.
 
 set -o errexit
@@ -16,7 +16,7 @@ ask() {
         esac
 }
 
-echo -e "WARNING: This script requires an existing Service Principal. Other\n\t pre-requisites are outlined in the DevOps Documentation.\n\t Please ensure you have completed all before proceeding."
+echo -e "NOTE: AKS requires a Service Principal to run. Either provide your own Service Principal client ID and secret in the template, or leave as empty strings and AKS will create it's own.  Other\n\t pre-requisites are outlined in the DevOps Documentation.\n\t Please ensure you have completed all before proceeding."
 
 
 echo ""
@@ -25,7 +25,7 @@ ask
 
 authn=$(az ad signed-in-user show | grep userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
 echo ""
-echo -e "=> You are authenticated and logged into Azure as ${authn}. \n   If this is not correct then exit this script and run \"az login\" to login with the correct user.\n   NOTE: The Service Principal for creating the Kubernetes Cluster can be different and should\n   already exist in the aks-env.cfg file."
+echo -e "=> You are authenticated and logged into Azure as ${authn}. \n   If this is not correct then exit this script and run \"az login\" to login with the correct user."
 ask
 
 source "${BASH_SOURCE%/*}/../etc/aks-env.cfg"
@@ -46,7 +46,6 @@ kubectl config set-context $(kubectl config current-context) --namespace=${AKS_C
 
 # Create storage class
 ./aks-create-sc.sh
-echo "8"
 
 # Inatilize helm by creating a rbac role first
 ./helm-rbac-init.sh
@@ -62,7 +61,7 @@ done
 
 
 # Create the ingress controller
-./aks-create-ingress-cntlr.sh ${EKS_INGRESS_IP}
+./aks-create-ingress-cntlr.sh ${AKS_INGRESS_IP}
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh
