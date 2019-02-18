@@ -72,7 +72,7 @@ if [ ! -z "${AKS_EXTRA_ARGS}" ]; then
 fi
 
 # Create Cluster using CLI
-az aks create --verbose \
+az aks create \
     --resource-group ${AKS_RESOURCE_GROUP_NAME} \
     --name ${AKS_CLUSTER_NAME} \
     --admin-username ${AKS_ADMIN_USERNAME} \
