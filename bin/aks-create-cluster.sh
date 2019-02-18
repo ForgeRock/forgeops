@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-# Sample script to create a kubernetes cluster on AKS
+# Sample script to create a Kubernetes cluster on AKS
 # You must have the az command installed and access to a Azure account
 
 set -o errexit
@@ -49,10 +49,12 @@ if [ -n "$AKS_SERVICE_PRINCIPAL" ]; then
         echo "Service Principal \"${AKS_SERVICE_PRINCIPAL}\" not found.  Please check and try again."
         exit 1
     fi
-    SP='--service-principal ${AKS_SERVICE_PRINCIPAL} --client-secret ${AKS_SERVICE_PRINCIPAL_SECRET}'
+    SP="--service-principal ${AKS_SERVICE_PRINCIPAL} --client-secret ${AKS_SERVICE_PRINCIPAL_SECRET}"
 else
     echo "Service Principal \"${AKS_SERVICE_PRINCIPAL}\" not added.  Letting AKS create default Service Principal."
-    SP=""    
+    SP=""  
+    # Remove previous cached Service Principal otherwise AKS will try to use it even if it doesn't exist.
+    rm -f ~/.azure/aksServicePrincipal.json
 fi
 
 echo ""
@@ -70,7 +72,7 @@ if [ ! -z "${AKS_EXTRA_ARGS}" ]; then
 fi
 
 # Create Cluster using CLI
-az aks create --verbose\
+az aks create --verbose \
     --resource-group ${AKS_RESOURCE_GROUP_NAME} \
     --name ${AKS_CLUSTER_NAME} \
     --admin-username ${AKS_ADMIN_USERNAME} \
@@ -80,25 +82,29 @@ az aks create --verbose\
     --node-osdisk-size ${AKS_NODE_OSDISK_SIZE} \
     --node-count ${AKS_NODE_COUNT} \
     --tag "createdby=${CREATOR}"  \
-    --generate-ssh-keys | tee -a "${HOME}/${AKS_CLUSTER_NAME}-create-output.json" \
-    --enable-addons monitoring
+    --enable-addons monitoring \
+    --generate-ssh-keys \
+    ${SP} | tee -a "${HOME}/${AKS_CLUSTER_NAME}-create-output.json"
+
 
 # Get cluster credentials to populate .kube/config 
 az aks get-credentials \
 	--resource-group ${AKS_RESOURCE_GROUP_NAME} \
-    --name ${AKS_CLUSTER_NAME}
-    
+    --name ${AKS_CLUSTER_NAME} \
+    --overwrite-existing
+
 ## Get service principal client-id
-#SP_ID=$(az ad app list --query "[?displayName=='${AKS_CLUSTER_NAME}'].{Name:displayName,Id:appId}" --output table | grep ${AKS_CLUSTER_NAME} | awk '{  print $2 }')
-#
-## Get Azure subscription ID
-#SUB=$(az account show |grep \"id\" | cut -d \" -f4)
-#
-## Delegate permission for Service Principal to access Static IP resource group
-#az role assignment create\
-#   --assignee ${SP_ID} \
-#   --role "Network Contributor" \
-#   --scope /subscriptions/${SUB}/resourceGroups/${AKS_IP_RESOURCE_GROUP_NAME}
+SP_ID=$(az aks list --resource-group ${AKS_RESOURCE_GROUP_NAME} | grep -i clientId | awk '{ print $2 }' | cut -d \" -f2)
+
+# Get Azure subscription ID
+SUB=$(az account show |grep \"id\" | cut -d \" -f4)
+
+# Delegate permission for Service Principal to access Static IP resource group
+az role assignment create\
+   --assignee ${SP_ID} \
+   --role "Network Contributor" \
+   --scope /subscriptions/${SUB}/resourceGroups/${AKS_IP_RESOURCE_GROUP_NAME} || true
+  
    
 
     
