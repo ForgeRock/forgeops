@@ -13,9 +13,14 @@ serverBase: http://openam:80
 domain: .example.com
 
 # Default install passwords.
-amadminPassword: password
-encryptionKey: "123456789012"
-policyAgentPassword: Passw0rd
+# If these are not set (example: helm install --set amadminPassword=foo amster) a random password
+# will be generated. The password can viewed using:
+# kubectl get configmaps amster-config -o yaml
+# You may wish to delete this configmap once you have saved the passwords. 
+apiVersion: v1
+# amadminPassword: password
+# encryptionKey: "123456789012"
+# policyAgentPassword: Passw0rd
 prometheusPassword: prometheus
 
 
