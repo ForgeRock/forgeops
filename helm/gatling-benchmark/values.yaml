@@ -38,6 +38,9 @@ benchmark:
   #
   # For IG it is:
   # - ig.IGReverseProxyWebSim
+  # - ig.IGAccessTokensSim
+  # - ig.IGAccessTokensNoCacheSim
+  # - ig.IGGenerateTokensSim
   # 
   # To run multiple tests, syntax is as following:
   # testname: "am.AMAccessTokenSim am.AMRestAuthNSim"

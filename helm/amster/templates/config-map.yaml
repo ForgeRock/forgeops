@@ -48,3 +48,4 @@ data:
   AMADMIN_PASSWORD_HASHED: "{{ .Values.amadminPasswordHashed }}"
   DOMAIN: {{ .Values.domain }}
   COOKIE_DOMAIN: {{ trimPrefix "." .Values.domain }}
+  SERVER_URI: "/am"
