@@ -14,12 +14,12 @@ set -o nounset
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 aws cloudformation deploy \
-          --stack-name $VPC_STACK_NAME \
+          --stack-name $EKS_VPC_STACK_NAME \
           --template-file ../etc/amazon-eks-vpc.yaml \
           --capabilities CAPABILITY_IAM
 
 
-aws cloudformation describe-stacks --stack-name $VPC_STACK_NAME --output table --query 'Stacks[0].Outputs'
+aws cloudformation describe-stacks --stack-name $EKS_VPC_STACK_NAME --output table --query 'Stacks[0].Outputs'
 
 echo "Please record the above values for creating your EKS cluster."
 echo "SecurityGroups: This security group allows the EKS cluster to communicate with your worker nodes. Value should be set to EC2_SECURITY_GROUP in your eks-env.cfg file."
