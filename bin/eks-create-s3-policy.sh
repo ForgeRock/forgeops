@@ -8,12 +8,14 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-BUCKET_NAME="forgeops"
-IAM_POLICY_NAME="ForgeOps-Sync-Policy"
+source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
-S3_BUCKET=$(aws s3api create-bucket --bucket ${BUCKET_NAME})
+#BUCKET_NAME="forgeops"
+IAM_POLICY_NAME="${S3_BUCKET_NAME}-Sync-Policy"
 
-BUCKET_ARN="arn:aws:s3:::${BUCKET_NAME}"
+aws s3 mb s3://${S3_BUCKET_NAME}
+
+BUCKET_ARN="arn:aws:s3:::${S3_BUCKET_NAME}"
 
 POLICY_ARN=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME} --policy-document file://../etc/s3-bucket-policy.json --query Policy.Arn)
 
