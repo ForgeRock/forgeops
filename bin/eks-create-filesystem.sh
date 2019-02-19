@@ -41,3 +41,18 @@ for subnet in $(echo $EKS_SUBNETS | tr "," "\n")
 do
   aws efs create-mount-target --file-system-id ${EFS_ID} --subnet-id ${subnet}
 done
+
+# Allow worker nodes access to EFS
+aws ec2 authorize-security-group-ingress --group-id ${EFS_GROUP_ID} \
+    --protocol tcp \
+    --port 2049 \
+    --source-group ${EC2_SECURITY_GROUP}
+    
+#MOUNT_TARGETS=$(aws efs describe-mount-targets --file-system-id fs-1f1082d7 | grep MountTargetId | awk '{ print $2 }' | cut -d \" -f2)
+
+# need to include all security groups
+#for i in ${MOUNT_TARGETS}
+#do
+#    aws efs modify-mount-target-security-groups --mount-target-id $i --security-groups ${EC2_SECURITY_GROUP}
+#done
+
