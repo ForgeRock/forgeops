@@ -14,9 +14,7 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
-GROUP_NAME="eks-efs-sg"
-
-EFS_GROUP_ID=$(aws ec2 create-security-group --description "Security group used for NFS mount" --group-name ${GROUP_NAME} --vpc-id ${EKS_VPC_ID} --query 'GroupId' --output text)
+EFS_GROUP_ID=$(aws ec2 create-security-group --description "Security group used for NFS mount" --group-name ${EFS_SECURITY_GROUP_NAME} --vpc-id ${EKS_VPC_ID} --query 'GroupId' --output text)
 
 echo "EFS Security Group created with ID: ${EFS_GROUP_ID}. Please set this value to the EFS_SECURITY_GROUP attribute in your eks-env.cfg file."
 
