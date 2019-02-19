@@ -8,7 +8,7 @@ data:
     --serverUrl http://openam:80/ \
     --authorizedKey  /var/run/secrets/amster/authorized_keys \
     --cookieDomain {{.Values.domain }} \
-    --adminPwd {{ .Values.amadminPassword }} \
+    --adminPwd {{ if .Values.amadminPassword }}{{ .Values.amadminPassword }}{{ else }}{{ randAlphaNum 10 | quote }}{{end}} \
     --cfgStore {{ .Values.configStore.type }} \
     {{ if eq .Values.configStore.type "dirServer" -}}
     --cfgStoreHost {{.Values.configStore.host }} \
@@ -22,8 +22,8 @@ data:
     --userStoreRootSuffix {{ .Values.userStore.suffix }} \
     --userStoreType {{ .Values.userStore.storeType }} \
     {{ end -}}
-    --policyAgentPwd {{ .Values.policyAgentPassword }}  \
-    --pwdEncKey {{ .Values.encryptionKey }} \
+    --policyAgentPwd {{ if .Values.policyAgentPassword }}{{ .Values.policyAgentPassword }}{{ else }}{{ randAlphaNum 10 | quote }}{{end}} \
+    --pwdEncKey {{ if .Values.encryptionKey}}{{ .Values.encryptionKey }}{{ else }}{{ randAlphaNum 10 | quote }}{{end}} \
     --acceptLicense \
     --lbSiteName site1 \
     --lbPrimaryUrl https://{{ template "fqdn" . }}/ \
