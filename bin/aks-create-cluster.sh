@@ -25,8 +25,8 @@ echo -e "\tNode VM Size = ${AKS_NODE_VM_SIZE}"
 echo -e "\tNode Disk Size = ${AKS_NODE_OSDISK_SIZE}"
 echo -e "\tDefault Namespace = ${AKS_CLUSTER_NS}"
 echo -e "\tMonitoring Namespace = ${AKS_MONITORING_NS}"
-echo -e "\tStatic IP = ${AKS_INGRESS_IP}"
-echo -e "\tStatic IP Resource Group = ${AKS_IP_RESOURCE_GROUP_NAME}"
+echo -e "\tIngress Controller IP = ${AKS_INGRESS_IP}"
+echo -e "\tIngress Controller IP Resource Group = ${AKS_IP_RESOURCE_GROUP_NAME}"
 echo -e "\tExtra Arguments = ${AKS_EXTRA_ARGS}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
@@ -42,7 +42,7 @@ CREATOR="${USER:-unknown}"
 # Labels can not contain dots that may be present in the user.name
 CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
-# Check first to see if Service Principal has been provide and whether it exist
+# Check first to see if a Service Principal has been provided and whether it exist
 if [ -n "$AKS_SERVICE_PRINCIPAL" ]; then
     az ad sp show --id ${AKS_SERVICE_PRINCIPAL} > /dev/null 2>&1
     if [ $? -ne 0 ]; then
