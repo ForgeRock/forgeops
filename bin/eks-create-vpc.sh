@@ -11,7 +11,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-VPC_STACK_NAME="forgeops-eks-vpc"
+source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 aws cloudformation deploy \
           --stack-name $VPC_STACK_NAME \
