@@ -47,4 +47,6 @@ EOF
 
 kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
+kubectl delete storageclass gp2
+
 
