@@ -1,18 +1,6 @@
-# AM Dockerfile 
+# The Dockerfile for ForgeRock AM has moved to the AM source tree
+
+See https://stash.forgerock.org/projects/OPENAM/repos/openam/browse/openam-docker
 
 
-This is designed to be a flexible AM image that can be used in 
-different deployment styles. 
-
-If you have an existing configuration store, you can configure AM to use it by creating 
-an appropriate boot.json file with boot passwords stored in keystore.jceks.
-
-
-# Customizing the Web App 
-
-If you wish to customize the AM web app, there are two strategies that you can use:
-
-* Inherit FROM this image, and overlay your changes on /usr/local/tomcat/webapps/openam/
-* Before you start AM, dynamically copy in the changes. This is the strategy used in the Helm charts. Set
- the CUSTOMIZE_AM variable to the path to a customization script.
-
+These am images are published to bintray. See https://bintray.com/forgerock/public/forgerock:am

@@ -5,8 +5,8 @@
 component: openam
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 7.0.0
+  repository: forgerock-docker-public.bintray.io/forgerock/am
+  tag: 7.0.0-SNAPSHOT
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
@@ -42,9 +42,8 @@ configLdapHost: configstore-0.configstore
 # If you need to renable this for amster, it should be disabled after the import is complete
 
 catalinaOpts: >
-  -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
-  -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
+  -server
+  -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
   -Dcom.iplanet.services.stats.state=off
 
 # For visualVM debug, you can add this to the above:
