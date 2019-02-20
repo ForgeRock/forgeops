@@ -10,7 +10,7 @@ import os
 import pytest
 
 # Framework imports
-from utils import logger, kubectl, pod, idm_pod
+from utils import logger, kubectl, pod
 from utils.idm_pod import IDMPod
 
 
@@ -34,4 +34,10 @@ class TestIDMMetadata(object):
     def test_version(self):
         """Check the IDM version info"""
 
-        TestIDMMetadata.pods[0].is_expected_version()
+        self.pods[0].is_expected_version()
+
+    def test_commons_version(self):
+        TestIDMMetadata.pods[0].is_expected_commons_version(TestIDMMetadata.NAMESPACE)
+
+    def test_jdk_version(self):
+        TestIDMMetadata.pods[0].is_expected_jdk(TestIDMMetadata.NAMESPACE)

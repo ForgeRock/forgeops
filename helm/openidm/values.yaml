@@ -34,10 +34,10 @@ component: openidm
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/idm
-  tag: 7.0.0-M1
-  pullPolicy: IfNotPresent
+  tag: 7.0.0-M2
+  #pullPolicy: IfNotPresent
   # For development use Always
-  # pullPolicy: Always
+  pullPolicy: Always
 
 gitImage:
   repository: forgerock-docker-public.bintray.io/forgerock/git

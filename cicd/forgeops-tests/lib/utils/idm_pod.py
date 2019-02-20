@@ -18,7 +18,7 @@ from utils.pod import Pod
 class IDMPod(Pod):
     PRODUCT_TYPE = 'openidm'
     ROOT = os.path.join(os.sep, 'opt', 'openidm')
-#    TEMP = os.path.join(ROOT, 'fr-tmp')
+    TEMP = os.path.join(ROOT, 'fr-tmp')
 
     def __init__(self, name, manifest_filepath):
         """
@@ -51,9 +51,28 @@ class IDMPod(Pod):
                                                                                 response.json()['productBuildDate'])
         return True
 
-    def is_expected_commons_version(self):
+    def is_expected_commons_version(self, namespace):
         """
-        Return True if config jar is the expected version
-        :return: True if jar filename contains expected version
+        Return true if the commons version is as expected, otherwise return assert.
+        :param namespace The kubernetes namespace.
+        This check inspects a sample commons .jar to see what version is in use.
+        :return: True is the commons version is as expected.
         """
-        config_jar_path = os.path.join(IDMPod.ROOT, 'bundles', 'config-')
+
+        logger.debug('Setting up for commons version check')
+        config_version_jar = 'config-%s.jar' % self.manifest['commons_version']
+        test_jar_filepath = os.path.join(IDMPod.ROOT, 'bundle', config_version_jar)
+        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, '-c openidm', '-- ls', test_jar_filepath]))
+
+        logger.debug('Check commons version for: ' +  self.name)
+        assert stderr[0].strip() == '', 'Did not find ' + test_jar_filepath
+        return True
+
+    def is_expected_jdk(self, namespace):
+        """
+        Return True if jdk is as expected, otherwise assert.
+        :param namespace The kubernetes namespace.
+        :return: True if jdk is as expected
+        """
+
+        return Pod.is_expected_jdk(self, namespace, ' '.join(['-c openidm', '-- java -version']))

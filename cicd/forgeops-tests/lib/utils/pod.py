@@ -98,7 +98,6 @@ class Pod(object):
         ignored, ignored =  kubectl.exec(namespace, ' '.join([self.name, '--', 'find', '.', '-name', 'Forgerock_License.txt']))
         return True
 
-
     def setup_commons_check(self, namespace, filepath, temp_directory):
         """
         :param namespace The kubernetes namespace.

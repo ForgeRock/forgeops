@@ -62,4 +62,4 @@ def __run_cmd_process(cmd):
     response = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     stdout, stderr = response.communicate()
     assert response.returncode == 0, ' Unexpected return code from Popen() ' + stderr
-    return (stdout.split('\n'), stderr.split('\n'))
+    return stdout.split('\n'), stderr.split('\n')
