@@ -33,6 +33,10 @@ TESTS_COMPONENTS = ""
 if "TESTS_COMPONENTS" in os.environ:
     TESTS_COMPONENTS = os.environ["TESTS_COMPONENTS"]
 
+TESTS_USE_EMPTY_CONFIG = "False"
+if "TESTS_USE_EMPTY_CONFIG" in os.environ:
+    TESTS_USE_EMPTY_CONFIG = os.environ["TESTS_USE_EMPTY_CONFIG"]
+
 IMAGE_BASE_URL = 'forgerock-docker-public.bintray.io/forgerock'
 IMAGE_PULL_POLICY = 'Always'
 
@@ -121,6 +125,12 @@ if __name__ == "__main__":
             image_dict['tag'] = TESTS_IMAGE_TAG
             image_dict['pullPolicy'] = IMAGE_PULL_POLICY
             values_yaml_content['image'] = image_dict
+
+            if TESTS_USE_EMPTY_CONFIG == "True":
+                config_dict = dict()
+                config_dict['claim'] = 'frconfig'
+                config_dict['importPath'] = '/git/config/6.5/default/am/empty-import'
+                values_yaml_content['config'] = config_dict
 
             # save new content
             with open(values_yaml_file, 'w') as stream:
