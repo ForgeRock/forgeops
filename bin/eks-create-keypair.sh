@@ -10,7 +10,7 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
-aws ec2 create-key-pair --key-name ${EKS_CLUSTER_NAME}-key  --query 'KeyMaterial' --output text > ${HOME}/.ssh/${EKS_CLUSTER_NAME}-key.pem
+aws ec2 create-key-pair --key-name ${EC2_KEYPAIR_NAME}  --query 'KeyMaterial' --output text > ${HOME}/.ssh/${EC2_KEYPAIR_NAME}.pem
 
 
 
