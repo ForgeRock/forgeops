@@ -26,7 +26,7 @@ do
                       --file-system-id ${EFS_ID} --query 'FileSystems[0].LifeCycleState' --output text)
 
     if [ $EFS_STATUS == "available" ]; then
-      echo "File system created with ID: ${EFS_ID}. Please record this Id to configure backup and restore."
+      echo "File system created with ID: ${EFS_ID}. Please add this ID to the EFS_ID value in the template. This id will also be used to configure backup and restore."
       break
     else
       sleep 10
@@ -45,12 +45,3 @@ aws ec2 authorize-security-group-ingress --group-id ${EFS_GROUP_ID} \
     --protocol tcp \
     --port 2049 \
     --source-group ${EC2_SECURITY_GROUP}
-    
-#MOUNT_TARGETS=$(aws efs describe-mount-targets --file-system-id fs-1f1082d7 | grep MountTargetId | awk '{ print $2 }' | cut -d \" -f2)
-
-# need to include all security groups
-#for i in ${MOUNT_TARGETS}
-#do
-#    aws efs modify-mount-target-security-groups --mount-target-id $i --security-groups ${EC2_SECURITY_GROUP}
-#done
-
