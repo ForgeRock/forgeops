@@ -79,6 +79,9 @@ ROUTE53_DOMAIN="freng.org"
 # Arn for the iam role policy allowing S3 operations on bucket
 S3_POLICY_ARN="arn:aws:iam::XXXXXXXXXXX:policy/S3-Policy-ARN"
 
+# File System ID
+EFS_ID="fs-XXXXXXXX"
+
 # Name of the EFS security group
 EFS_SECURITY_GROUP_NAME="sg-efs-1"
 
