@@ -29,7 +29,7 @@ aws cloudformation deploy \
                                 VpcId=${EKS_VPC_ID} \
                                 Subnets=${EKS_SUBNETS} \
                                 S3PolicyArn=${S3_POLICY_ARN} \
-                                EFSSecurityGroup=${EFS_SECURITY_GROUP} \
+                                EFSSecurityGroup=${EFS_SECURITY_GROUP_ID} \
                                 --capabilities CAPABILITY_IAM
 
 
