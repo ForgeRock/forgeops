@@ -9,7 +9,7 @@ WORKDIR /
 
 RUN apt-get update \
   && apt-get install -y ca-certificates git vim bash curl openssh-client unzip python3-pip python3 openjdk-8-jdk \
-  && pip3 install pytest allure-pytest pytest-html pytest-metadata requests beautifulsoup4 multiset kubernetes
+  && pip3 install pytest allure-pytest pytest-html pytest-metadata requests beautifulsoup4 kubernetes prettytable
 
 ADD https://dl.bintray.com/qameta/maven/io/qameta/allure/allure-commandline/2.9.0/allure-commandline-2.9.0.zip /tmp
 ADD https://storage.googleapis.com/kubernetes-helm/helm-${HELM_VERSION}-linux-amd64.tar.gz /tmp

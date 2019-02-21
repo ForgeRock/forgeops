@@ -2,11 +2,13 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 """
-Metadata related to kubernetes Amster pods
+Metadata related to a kubernetes Amster pod.
 """
 
 # Lib imports
 import os
+import shutil
+import zipfile
 # Framework imports
 from utils import kubectl, logger
 from utils.pod import Pod
@@ -15,69 +17,101 @@ from utils.pod import Pod
 class AmsterPod(Pod):
     PRODUCT_TYPE = 'amster'
     ROOT = os.path.join(os.sep, 'opt', 'amster')
-    TEMP = os.path.join(ROOT, 'fr-tmp')
+    LOCAL_TEMP = os.path.join(os.sep, 'tmp', 'fr-tmp')
+    REPRESENTATIVE_COMMONS_JAR_NAME = 'config'
+    REPRESENTATIVE_COMMONS_JAR = REPRESENTATIVE_COMMONS_JAR_NAME + '.jar'
 
-    def __init__(self, name, manifest_filepath):
+    def __init__(self, name):
         """
         :param name: Pod name
-        :param manifest_filepath: Path to product manifest file
         """
 
-        Pod.__init__(self, AmsterPod.PRODUCT_TYPE, name, manifest_filepath)
-        self.manifest['amster_jvm'] = self.config[self.product_type]['amster_jvm']
+        super().__init__(AmsterPod.PRODUCT_TYPE, name)
 
-    def is_expected_version(self, namespace):
-        """
-        :param namespace The kubernetes namespace.
-        Return True if the version is as expected, otherwise assert.
-        :return: True if the version is as expected.
-        """
-
-        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, '--', './amster', '--version']))
-        version_strings = stdout[0].split()
-        version = version_strings[3].lstrip('v')
-        build = version_strings[5].rstrip(',')
-        jvm = version_strings[7]
+    def get_version(self):
+        """Get the application's version."""
 
         logger.test_step('Check Amster version for pod: ' + self.name)
-        assert version == self.manifest['version'], 'Unexpected Amster version'
-        assert build == self.manifest['revision'], 'Unexpected Amster build revision'
-        assert jvm == self.manifest['amster_jvm'], 'Unexpected JVM for amster'
-        return True
+        stdout, ignored = kubectl.exec(
+            Pod.NAMESPACE, [self.name, '--', './amster', '-c', self.product_type, '--version'])
+        version_text = stdout[0].strip()
 
-    def setup_commons_check(self, namespace):
+        version_key = 'Amster OpenAM Shell v'
+        build_key = ' build '
+        revision_length = 10
+        build_position = version_text.find(build_key)
+        version = version_text[len(version_key): build_position]
+        start = build_position + len(build_key)
+        revision = version_text[start: start + revision_length]
+
+        amster_metadata = {'TITLE': self.product_type,
+                           'DESCRIPTION': self.name,
+                           'VERSION_TEXT': version_text,
+                           'VERSION': version,
+                           'REVISION': revision}
+
+        return amster_metadata
+
+    def is_expected_version(self):
         """
-        Setup for checking commons library version
-        :param namespace The kubernetes namespace.
+        Check if the version is as expected.
         """
+
+        amster_metadata = self.get_version()
+        Pod.print_table(amster_metadata)
+
+    def setup_commons_check(self):
+        """Setup for checking commons library version."""
 
         logger.debug('Setting up for commons version check')
-        amster_version_jar = 'amster-%s.jar' % self.manifest['version']
-        test_jar_filepath = os.path.join(AmsterPod.ROOT, amster_version_jar)
-        super(AmsterPod, self).setup_commons_check(namespace, test_jar_filepath, AmsterPod.TEMP)
+        source = os.path.join(AmsterPod.ROOT)
+        destination = os.path.join(AmsterPod.LOCAL_TEMP, self.name)
+        kubectl.cp_from_pod(Pod.NAMESPACE, self.name, source, destination, self.product_type)
 
-    def cleanup_commons_check(self, namespace):
-        """Cleanup after checking commons library version"""
+    def cleanup_commons_check(self):
+        """Cleanup for checking commons library version."""
 
         logger.debug('Cleaning up after commons version check')
-        super(AmsterPod, self).cleanup_commons_check(namespace, AmsterPod.TEMP)
+        shutil.rmtree(os.path.join(AmsterPod.LOCAL_TEMP, self.name))
 
-    def is_expected_commons_version(self, namespace):
+    def is_expected_commons_version(self):
+        """Check the commons library version."""
+
+        logger.debug('Check commons version for ' + self.name + ':' + AmsterPod.REPRESENTATIVE_COMMONS_JAR)
+        test_temp = os.path.join(AmsterPod.LOCAL_TEMP, self.name)
+        stdout, ignored = kubectl.exec(
+            Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', AmsterPod.ROOT, '-name', 'amster-*.jar'])
+        amster_filepath = stdout[0]
+        head, tail = os.path.split(amster_filepath)  # get versioned amster jar name
+        exploded_directory = os.path.join(test_temp, 'exploded')
+        amster_jar_filepath = os.path.join(test_temp, tail)
+        with zipfile.ZipFile(amster_jar_filepath) as commons_zip_file:
+            commons_zip_file.extractall(exploded_directory)
+
+        test_jar_properties_path = os.path.join(exploded_directory, 'META-INF', 'maven', 'org.forgerock.commons',
+                                                AmsterPod.REPRESENTATIVE_COMMONS_JAR_NAME, 'pom.properties')
+        logger.debug("Checking commons version in " + test_jar_properties_path)
+        assert os.path.isfile(test_jar_properties_path), 'Failed to find ' + test_jar_properties_path
+
+        with open(test_jar_properties_path) as fp:
+            lines = fp.readlines()
+
+        attribute_of_interest = {'version', 'groupId', 'artifactId'}
+        os_metadata = Pod.get_metadata_of_interest('Commons', self.name, lines, attribute_of_interest)
+        Pod.print_table(os_metadata)
+
+    def is_expected_jdk(self):
         """
-        Return true if the commons version is as expected, otherwise return assert.
-        This check inspects a sample commons .jar to see what version is in use.
-        :return: True is the commons version is as expected.
+        Check if jdk is as expected, otherwise assert.
         """
 
-        logger.debug('Check commons version for config.jar')
-        config_jar_properties = os.path.join('META-INF', 'maven', 'org.forgerock.commons', 'config', 'pom.properties')
-        return super(AmsterPod, self).is_expected_commons_version(namespace, AmsterPod.TEMP, config_jar_properties)
+        logger.debug('Check Java version for ' + self.name)
+        super(AmsterPod, self).is_expected_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
 
-
-    def is_expected_jdk(self, namespace):
+    def is_expected_os(self):
         """
-        Return True if jdk is as expected, otherwise assert.
-        :return: True if jdk is as expected
+        Check if OS is as expected, otherwise assert.
         """
 
-        return super(AmsterPod, self).is_expected_jdk(namespace, ' '.join(['-c', 'amster', '--', 'java', '-version']))
+        logger.debug('Check OS version for ' + self.name)
+        return super(AmsterPod, self).is_expected_os({'NAME', 'ID', 'VERSION_ID'})
