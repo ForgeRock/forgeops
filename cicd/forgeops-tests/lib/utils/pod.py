@@ -6,7 +6,7 @@ Metadata related to kubernetes pods
 """
 # Lib imports
 import os
-from configparser import ConfigParser
+from prettytable import PrettyTable
 
 # Framework imports
 from utils import logger, kubectl
@@ -14,25 +14,20 @@ from utils import logger, kubectl
 
 class Pod(object):
 
-    def __init__(self, product_type, name, manifest_filepath):
+    environment_properties = dict(os.environ)
+    NAMESPACE = environment_properties.get('TESTS_NAMESPACE')
+
+    def __init__(self, product_type, name):
         """
         :param product_type: ForgeRock Platform product type
         :param name: Pod name
-        :param manifest_filepath: Path to product manifest file
         """
+
+        assert isinstance(product_type, str), 'Invalid product type type %s' % type(product_type)
+        assert isinstance(name, str), 'Invalid name type %s' % type(name)
+
         self._product_type = product_type
         self._name = name
-        self._config = ConfigParser()
-        assert os.path.exists(manifest_filepath), 'Unable to locate ' + manifest_filepath
-        self._config.read(manifest_filepath)
-
-        self._manifest = {'version': self._config[product_type]["version"],
-                          'revision': self._config[product_type]["revision"],
-                          'date': self._config[product_type]["date"],
-                          'jdk_version': self._config[product_type]["jdk_version"],
-                          'jre_version': self._config[product_type]["jre_version"],
-                          'jdk_full_version': self._config[product_type]["jdk_full_version"],
-                          'commons_version': self._config[product_type]["commons_version"]}
 
     @property
     def product_type(self):
@@ -42,111 +37,119 @@ class Pod(object):
     def name(self):
         return self._name
 
-    @property
-    def config(self):
-        return self._config
+    @staticmethod
+    def get_metadata_of_interest(title, description, metadata, get_attributes):
+        """
+        Obtain a dictionary containing attributes of interest.
+        :param title: The title for the attributes.
+        :param description: Description of the data
+        :param metadata: Pod metadata
+        :param get_attributes: Keys ot attributes that are required in the dictionary.
+        :return: Metadata dictionary indexed by the attribute keys.
+        """
+        assert isinstance(title, str), 'Invalid title type %s' % type(title)
+        assert isinstance(description, str), 'Invalid descripton type %s' % type(description)
+        assert isinstance(metadata, list), 'Invalid metadata type %s' % type(metadata)
+        assert isinstance(get_attributes, set), 'Invalid get attributes type %s' % type(get_attributes)
 
-    @property
-    def manifest(self):
-        return self._manifest
+        metadata_of_interest = {'TITLE': title,
+                                'DESCRIPTION': description}
+
+        found_keys = set()
+        for line in metadata:
+            logger.debug('Reading metdata: ' + line)
+            for info_key in get_attributes:
+                if line.strip().startswith(info_key):
+                    info = line.strip().split(info_key)
+                    if len(info) == 2:
+                        metadata_of_interest[info_key] = info[1].strip(' :=')
+                        found_keys.add(info_key)
+                        logger.debug('Found ' + info_key)
+                        continue
+        assert found_keys == get_attributes
+
+        return metadata_of_interest
 
     @staticmethod
-    def test_root_directory():
+    def print_table(table_data):
         """
-        Compute test root directory"
-        :return: Test root directory
-
-        """
-        original_directory = os.getcwd()
-        os.chdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', '..'))
-        test_root = os.getcwd()
-        os.chdir(original_directory)
-        return test_root
-
-    @staticmethod
-    def is_expected_am_amster_version(am_manifest, amster_manifest):
-        """
-        :param am_manifest: Manifest of version information
-        :param amster_manifest: Manifest of version information
-        Return True if the AM and Amster versions match, otherwise assert.
-        :return: True if the versions are as expected.
+        Print a table of version metadata.
+        :param table_data: Dictionary of data to be printed
         """
 
-        logger.debug('Checking AM and Amster versions match')
-        assert am_manifest['version'] == amster_manifest['version'], 'AM and Amster versions should match'
-        assert am_manifest['revision'] == amster_manifest['revision'], 'AM and Amster build revisions should match'
-        assert am_manifest['date'] == amster_manifest['date'], 'AM and Amster build date should match'
-        assert am_manifest['commons_version'] == amster_manifest['commons_version'], 'AM and Amster commons version should match'
+        assert isinstance(table_data, dict), 'Invalid title type %s' % type(table_data)
 
-        if am_manifest['jdk_version'] != amster_manifest['jdk_version']:
-            logger.warning("Different versions of java are in use.")
+        table = PrettyTable([table_data['TITLE'], table_data['DESCRIPTION']])
+        for key, value in table_data.items():
+            if key in ['TITLE', 'DESCRIPTION']:
+                continue
+            table.add_row([key, value])
+        logger.info(table)
 
     def is_expected_version(self):
         """
-        Return True if the version is as expected, otherwise assert.
-        :return: True if the version is as expected.
+        Check if the version is as expected.
         """
+
         assert False, 'Not implemented, please override in subclass'
 
-    def is_expected_legal_notices(self, namespace):
+    def is_expected_legal_notices(self):
         """
-        :param namespace The kubernetes namespace.
-        Return True if the representative license file is present on the pod, otherwise assert.
-        :return: True if file present
+        Check if the representative license file is present on the pod, otherwise assert.
         """
 
-        ignored, ignored =  kubectl.exec(namespace, ' '.join([self.name, '--', 'find', '.', '-name', 'Forgerock_License.txt']))
-        return True
+        file_of_interest = 'Forgerock_License.txt'
+        stdout, ignored = kubectl.exec(
+            Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', '.', '-name', file_of_interest])
+        file_path = stdout[0].strip()
+        logger.debug('Found legal notice: ' + file_path)
+        assert (file_path.endswith('legal-notices/' + file_of_interest)), 'Unable to find ' + file_of_interest
 
-    def setup_commons_check(self, namespace, filepath, temp_directory):
+    def is_expected_versioned_commons_jar(self, lib_path, jar_name):
         """
-        :param namespace The kubernetes namespace.
-        :param filepath Path to a common .jar
-        :param temp_directory directory used for exploding the sample .jar file
-        Setup for checking commons library version
+        Check if the commons version is as expected.
+        :param lib_path: Path to jar library.
+        :param jar_name: Jar file to check.
         """
+        logger.debug('Check commons version for %s*.jar' % jar_name)
+        stdout, ignored = kubectl.exec(
+            Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', lib_path, '-name', jar_name + '-*.jar'])
+        config_filepath = stdout[0]  # first line of output
+        start = config_filepath.find(jar_name)
+        end = config_filepath.find('.jar')
+        commons_version = config_filepath[start + len(jar_name) + 1: end]
+        metadata = {'TITLE': "Commons",
+                    'DESCRIPTION': self.name,
+                    'VERSION': commons_version,
+                    'FILE': config_filepath}
+        Pod.print_table(metadata)
 
-        logger.debug('Setting up for commons version check')
-        ignored, ignored = kubectl.exec(namespace, ' '.join([self.name, '-- unzip', filepath, '-d', temp_directory]))
-
-    def cleanup_commons_check(self, namespace, temp_directory):
+    def is_expected_jdk(self, attributes_of_interest):
         """
-        :param namespace The kubernetes namespace.
-        :param temp_directory Directory to be deleted
-        Cleanup after checking commons library version
-        """
-
-        logger.debug('Cleaning up after commons version check')
-        ignored, ignored = kubectl.exec(namespace, ' '.join([self.name, '-- rm', '-rf', temp_directory]))
-
-    def is_expected_commons_version(self, namespace, subpath, temp_directory):
-        """
-        :param namespace The kubernetes namespace.
-        Return true if the commons version is as expected, otherwise return assert.
-        This check inspects a sample commons .jar to see what version is in use.
-        :return: True is the commons version is as expected.
-        """
-
-        test_filepath = os.path.join(temp_directory, subpath, temp_directory)
-        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, '--', 'cat', test_filepath]))
-
-        logger.debug('Check commons version for: ' +  self.name)
-        assert stdout[2].strip() == 'version=' + self.manifest['commons_version'], 'Unexpected commons version'
-        assert stdout[3].strip() == 'groupId=org.forgerock.commons', ' Unexpected groupId for commons library'
-        return True
-
-    def is_expected_jdk(self, namespace, sub_command):
-        """
-        :param namespace The kubernetes namespace.
-        :param sub_command: Command passed onto kubectl to obtain jdk version information.
-        Return True if jdk is as expected, otherwise assert.
-        :return: True if jdk is as expected
+        Check if Java is as expected.
+        :param attributes_of_interest: Set of attribute keys to check.
         """
 
-        stdout, stderr = kubectl.exec(namespace, ' '.join([self.name, sub_command]))
+        assert isinstance(attributes_of_interest, set),\
+            'Invalid attributes of interest type %s' % type(attributes_of_interest)
 
-        logger.debug('Check JDK version for ' + self.name)
-        assert stderr[0].strip() == self.manifest['jdk_version'], 'Unexpected JDK in use'  # TODO: why stderr
-        assert stderr[1].strip() == self.manifest['jre_version'], 'Unexpected JRE in use'
-        assert stderr[2].strip() == self.manifest['jdk_full_version'], 'Unexpected JDK in use'
-        return True
+        logger.debug('Check Jaa version for ' + self.name)
+        ignored, metadata = kubectl.exec(
+            Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'java', '-version'])  # TODO: why stderr
+        java_metadata = Pod.get_metadata_of_interest('Java', self.name, metadata, attributes_of_interest)
+        Pod.print_table(java_metadata)
+
+    def is_expected_os(self, attributes_of_interest):
+        """
+        Check if operating system is as expected.
+        :param attributes_of_interest: Set of attribute keys to check.
+        """
+
+        assert isinstance(attributes_of_interest, set),\
+            'Invalid attributes of interest type %s' % type(attributes_of_interest)
+
+        logger.debug('Check OS version for ' + self.name)
+        metadata, ignored = kubectl.exec(
+            Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'cat', '/etc/os-release'])
+        os_metadata = Pod.get_metadata_of_interest('OS', self.name, metadata, attributes_of_interest)
+        Pod.print_table(os_metadata)
