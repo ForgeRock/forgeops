@@ -68,4 +68,20 @@ do
 done
 
 # Add inbound SSH access to worker nodes
-aws ec2 authorize-security-group-ingress --group-id $SG  --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id $SG  --protocol tcp --port 22 --cidr 0.0.0.0/0 || true
+
+# Get array of worker node external ips
+EXTERNAL_IPS=$(kubectl get nodes -o jsonpath={.items[*].status.addresses[?\(@.type==\"ExternalIP\"\)].address})
+
+# Get region name for efs hostname
+REGION=$(aws configure get region)
+
+# Loop through each worker node and mount nfs
+for ip in ${EXTERNAL_IPS}
+do
+    ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${ip} sudo mkdir /export || true
+    ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${ip} sudo mount -t nfs ${EFS_ID}.efs.${REGION}.amazonaws.com: /export || true
+    ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${ip} sudo mkdir /export/export || true
+    ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${ip} sudo mkdir /export/export/bak || true
+done
+
