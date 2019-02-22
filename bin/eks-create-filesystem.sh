@@ -16,7 +16,7 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 EFS_GROUP_ID=$(aws ec2 create-security-group --description "Security group used for NFS mount" --group-name ${EFS_SECURITY_GROUP_NAME} --vpc-id ${EKS_VPC_ID} --query 'GroupId' --output text)
 
-echo "EFS Security Group created with ID: ${EFS_GROUP_ID}. Please set this value to the EFS_SECURITY_GROUP attribute in your eks-env.cfg file."
+echo "EFS Security Group created with ID: ${EFS_GROUP_ID}. Please set this value to the EFS_SECURITY_GROUP_ID attribute in your eks-env.cfg file."
 
 EFS_ID=$(aws efs create-file-system --performance-mode maxIO --creation-token EKSNFSMount --query 'FileSystemId' --output text)
 
