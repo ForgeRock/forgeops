@@ -29,7 +29,7 @@ catalinaOpts: "-Xmx512m"
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/ig
-  tag: latest
+  tag: 7.0.0-SNAPSHOT
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
 
