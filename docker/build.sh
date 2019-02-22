@@ -23,7 +23,7 @@ TAG=${TAG:-7.0.0}
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam amster util git java gatling apache-agent nginx-agent"
+IMAGES="util git java gatling apache-agent nginx-agent"
 
 # --cache-from multistage issue: https://github.com/moby/moby/issues/34715
 while getopts "adgpt:r:R:P:i:c:n:C:" opt; do

@@ -1,6 +1,4 @@
 java,7.0.0,7.0.0
-openam,6.5.0,7.0.0
-amster,6.5.0,7.0.0
 git,7.0.0,7.0.0
 nginx-agent,7.0.0,7.0.0
 apache-agent,7.0.0,7.0.0
