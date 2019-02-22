@@ -41,7 +41,7 @@ IMAGE_BASE_URL = 'forgerock-docker-public.bintray.io/forgerock'
 IMAGE_PULL_POLICY = 'Always'
 
 OPENAM_HELM_SUBFOLDER = "openam"
-OPENAM_IMAGE_NAME = "openam"
+OPENAM_IMAGE_NAME = "am"
 OPENAM_DEPENDENCIES = "configstore"
 
 AMSTER_HELM_SUBFOLDER = "amster"
