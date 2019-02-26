@@ -37,7 +37,7 @@ spec:
         command:
           - /bin/bash
           - -c
-          - cp -r /git/config/6.5/benchmarks/gatling-simulation-files/ /opt/gatling/user-files/simulations/ &&
+          - cp -r /git/config/7.0/benchmarks/gatling-simulation-files/ /opt/gatling/user-files/simulations/ &&
             {{ if .Values.benchmark.runAfterDeployment }}touch /ready && {{ end }}
             /custom-gatling.sh  -j '
             -Dam_host={{ .Values.benchmark.openam.host }}
