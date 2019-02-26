@@ -1,3 +1,7 @@
+# Copyright 2019 ForgeRock AS. All Rights Reserved
+# Use of this code requires a commercial software license with ForgeRock AS. or with one of its affiliates.
+# All use shall be exclusively subject to such license between the licensee and ForgeRock AS.
+
 # Lib imports
 import os
 from requests import get, post
@@ -5,10 +9,9 @@ from utils import logger, rest
 from ProductConfig import IDMConfig, AMConfig, IGConfig, DSConfig
 
 
-root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
-
-
 def pytest_configure(config):
+    root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+
     properties = get_tests_properties()
     if 'TESTS_NAMESPACE' in properties:
         config._metadata['TESTS_NAMESPACE'] = properties['TESTS_NAMESPACE']
@@ -30,7 +33,7 @@ def pytest_configure(config):
     if not os.path.exists(report_path):
         os.makedirs(report_path)
 
-    set_allure_environment_props(os.path.join(root_dir, report_path, 'allure-files', 'environment.properties'),
+    set_allure_environment_props(os.path.join(root_dir, report_path, 'allure-files/environment.properties'),
                                  properties)
 
 
@@ -82,6 +85,10 @@ def get_am_version_info():
 
 
 def get_tests_properties():
+    """
+    :return: dictionary containing the environment properties starting with TESTS_
+    """
+
     # Get os environment properties as dictionary
     environment_properties = dict(os.environ)
 
@@ -94,7 +101,12 @@ def get_tests_properties():
 
 
 def set_allure_environment_props(filename, properties):
+    """
+    :param filename: file to write properties to
+    :param properties: dictionary containing the properties
+    """
+
     # Write properties to environment.properties file
     with open(filename, 'w') as file:
         for key, value in properties.items():
-            file.write('%s=%s\n' % (key, value))
+            file.write('{}={}\n'.format(key, value))
