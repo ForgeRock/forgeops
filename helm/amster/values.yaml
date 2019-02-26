@@ -70,7 +70,7 @@ userStore:
   suffix: "ou=identities"
   # If userstore is deployed as well but empty import configuration
   # is used, override this to userstore-0.userstore to use that store
-  host: configstore-0.configstore
+  host: userstore-0.userstore
   port: 1389
   dirManager: "cn=Directory manager"
   password: "password"
