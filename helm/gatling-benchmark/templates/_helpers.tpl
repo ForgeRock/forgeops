@@ -15,6 +15,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/* expands to the fqdn using the component name. Note domain has a leading . */}}
 {{- define "externalFQDN" -}}
-{{- printf "%s.%s%s" .Values.component .Release.Namespace .Values.domain -}}
+{{- if .Values.ingress.hostname  }}{{- printf "%s" .Values.ingress.hostname -}}
+{{- else -}}
+{{- printf "%s.%s.%s" .Release.Namespace .Values.subdomain .Values.domain -}}
+{{- end -}}
 {{- end -}}

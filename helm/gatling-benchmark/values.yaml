@@ -2,7 +2,8 @@
 # This is a YAML-formatted file.
 
 # Domain on which reports will be available
-domain: .forgeops.com
+domain: forgeops.com
+subdomain: iam
 
 # Gatling image with tests.
 # Dockerfile for this image can be found in forgeops/docker/gatling
@@ -59,7 +60,7 @@ benchmark:
   # How many user threads we want to use for benchmark
   concurrency: 5
   # Duration of test in seconds
-  duration: 60
+  duration: 20
   # Logout percent in authn testnames(0 disables logout)
   logoutpercent: 0
   # Warmup duration
