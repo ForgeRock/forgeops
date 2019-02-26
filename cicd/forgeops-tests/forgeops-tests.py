@@ -22,22 +22,6 @@ sys.path.insert(0, os.path.join(root_dir, 'lib'))
 sys.path.insert(0, os.path.join(root_dir, 'config'))
 
 
-def set_allure_environment_props(filename):
-    # Get os environment properties as dictionary
-    environment_properties = dict(os.environ)
-
-    # Get properties that start with TESTS_ from environment.properties
-    tests_properties = {}
-    for key, value in environment_properties.items():
-        if key.startswith("TESTS_"):
-            tests_properties[key] = environment_properties[key]
-
-    # Write properties to environment.properties file
-    with open(filename, 'w') as file:
-        for key, value in tests_properties.items():
-            file.write('%s=%s\n' % (key, value))
-
-
 if __name__ == '__main__':
 
     report_path = 'reports'
@@ -47,8 +31,6 @@ if __name__ == '__main__':
     html_report_name = 'forgeops_' + strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + '_report.html'
     html_report_path = os.path.join(report_path, html_report_name)
     allure_report_path = os.path.join(report_path, 'allure-files')
-
-    set_allure_environment_props(os.path.join(root_dir, report_path, 'environment.properties'))
 
     custom_args = '--html=%s --self-contained-html --alluredir=%s' % (html_report_path, allure_report_path)
     args = sys.argv + custom_args.split()
