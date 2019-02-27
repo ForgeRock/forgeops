@@ -2,41 +2,23 @@
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 # Copy this template to eks-env.cfg and adjust for your environment
 
+#########################################################################
+### POPULATE THE FOLLOWING VALUES PRIOR TO RUNNING ANY OF THE SCRIPTS ###
+#########################################################################
 
-# CloudFormation Stack Name
-EKS_STACK_NAME="cluster1"
-
-# EKS Cluster Name
-EKS_CLUSTER_NAME="cluster1"
-
-# Kubernetes Cluster Version
-# To get specific cluster versions you can run the command
-EKS_CLUSTER_VERSION="latest"
-
-# EKS Service Role
-EKS_SERVICE_ROLE="eksServiceRole"
-
-# EKS Service Role Arn
-# Populate value after running ./bin/eks-create-service-role.sh
-EKS_ROLE_ARN="arn:aws:iam::1111111:role/eksServiceRole"
+#### ** ENVIRONMENT SETUP ** ####
 
 # EKS VPC stack name
 EKS_VPC_STACK_NAME="vpc1"
 
-# EKS VPC ID
-# Populate value after running ./bin/eks-create-vpc.sh
-EKS_VPC_ID="vpc-11111"
+# Name of the EFS security group
+EFS_SECURITY_GROUP_NAME="sg-efs-1"
 
-# Storage class zones
-STORAGE_CLASS_ZONES="us-east-1b,us-east-1c"
+# CloudFormation Stack Name
+EKS_STACK_NAME="cluster1"
 
-# EKS Subnet
-# Populate value after running ./bin/eks-create-vpc.sh
-EKS_SUBNETS="subnet-XXXXXX,subnet-XXXXXXX"
-
-# EC2 Security Groups
-# Populate value after running ./bin/eks-create-vpc.sh
-EC2_SECURITY_GROUP="sg-XXXXXXXXX"
+# Node Group Name
+EKS_WORKER_NODE_GROUP="nodegrp"
 
 # Min Nodes per zone in Cluster
 EKS_MIN_NODES="1"
@@ -44,19 +26,14 @@ EKS_MIN_NODES="1"
 # Max Nodes per zone in Cluster
 EKS_MAX_NODES="4"
 
-# Node Group Name
-EKS_WORKER_NODE_GROUP="nodegrp"
-
 # Node Volumn Size
 EKS_WORKER_NODE_SIZE_IN_GB="30"
 
 # Worker Nodes Instance Type
 EKS_WORKER_NODE_INSTANCE_TYPE="m5.4xlarge"
 
-# EKS Service Role
-EKS_SERVICE_ROLE="eksServiceRole"
-
 # Worker Nodes SSH Key/Pair
+# Either include current key name or populate and run ./bin/eks-create-keypair.sh.
 EC2_KEYPAIR_NAME="eks-east"
 
 # EKS AMI ID
@@ -67,24 +44,64 @@ EC2_KEYPAIR_NAME="eks-east"
 
 EKS_AMI_ID="ami-0440e4f6b9713faf6"
 
+# Domain used to create Route53 records
+ROUTE53_DOMAIN="freng.org"
+
+# S3 Bucket name
+S3_BUCKET_NAME="my-bucket"
+
+
+#### ** CLUSTER SETUP ** ####
+
+# EKS Cluster Name
+EKS_CLUSTER_NAME="cluster1"
+
+# Kubernetes Cluster Version
+EKS_CLUSTER_VERSION="latest"
+
+# EKS Service Role
+EKS_SERVICE_ROLE="eksServiceRole"
+
 # EKS Cluster Namespace
 EKS_CLUSTER_NS="prod"
 
 # Monitoring Namespace
 EKS_MONITORING_NS="monitoring"
 
-# Domain used to create Route53 records
-ROUTE53_DOMAIN="freng.org"
 
-# Arn for the iam role policy allowing S3 operations on bucket
-S3_POLICY_ARN="arn:aws:iam::XXXXXXXXXXX:policy/S3-Policy-ARN"
+#####################################################################################
+### POPULATE THE FOLLOWING VALUES AFTER RUNNING  ./bin/eks-create-vpc.sh          ###
+#####################################################################################
+
+# EKS VPC ID
+EKS_VPC_ID="vpc-XXXXXXXX"
+
+# EKS Subnet
+EKS_SUBNETS="subnet-XXXXXX,subnet-XXXXXX"
+
+# EC2 Security group for the cluster control plane communication with worker nodes
+EC2_SECURITY_GROUP="sg-XXXXXXXX"
+
+#####################################################################################
+### POPULATE THE FOLLOWING VALUES AFTER RUNNING  ./bin/eks-create-filesystem.sh   ###
+#####################################################################################
 
 # File System ID
-EFS_ID="fs-XXXXXXXX"
+EFS_ID="fs-XXXXXX"
 
-# Name of the EFS security group
-EFS_SECURITY_GROUP_NAME="sg-efs-1"
+# Security Group ID to allow nodes to mount EFS file system
+EFS_SECURITY_GROUP_ID="sg-XXXXXXXX"
 
-# Security Group to allow nodes to mount EFS file system
-# Populate value after running ./bin/eks-create-filesystem.sh
-EFS_SECURITY_GROUP="sg-XXXXXXXXX"
+#####################################################################################
+### POPULATE THE FOLLOWING VALUES AFTER RUNNING  ./bin/eks-create-s3-policy.sh    ###
+#####################################################################################
+
+# Arn for the iam role policy allowing S3 operations on bucket
+S3_POLICY_ARN="arn:aws:iam::XXXXXXXX:policy/XXXXXXXX"
+
+#####################################################################################
+### POPULATE THE FOLLOWING VALUES AFTER RUNNING  ./bin/eks-create-service-role.sh ###
+#####################################################################################
+
+# EKS Service Role Arn
+EKS_ROLE_ARN="arn:aws:iam::XXXXXXXX:role/XXXXXXXX"
