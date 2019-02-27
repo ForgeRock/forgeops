@@ -106,6 +106,10 @@ def set_allure_environment_props(filename, properties):
     :param properties: dictionary containing the properties
     """
 
+    # Check path structure for environment.properties exists otherwise create it
+    if not os.path.exists(os.path.dirname(filename)):
+        os.makedirs(os.path.dirname(filename))
+
     # Write properties to environment.properties file
     with open(filename, 'w') as file:
         for key, value in properties.items():
