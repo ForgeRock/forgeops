@@ -69,3 +69,5 @@ fi
 
 # Wait for the reconciling
 echo "Please allow the cluster ${CLUSTER_NAME} to reconcile before using the pool. This process can take several minutes."
+echo "To monitor reconciliation, run command :"
+echo "\$(gcloud container clusters list --filter=\"status:reconciling AND name:${GKE_CLUSTER_NAME}\" --format=\"table[no-heading](status)\""
