@@ -57,6 +57,13 @@ parse_args()
 
 }
 
+print_sep_line() {
+    str=$1
+    num=$2
+    v=$(printf "%-${num}s" "$str")
+    echo "${v// /*}"
+}
+
 chk_config()
 {
     CONTEXT=$(kubectl config current-context)
@@ -160,13 +167,22 @@ deploy_charts()
     else
         VALUE_OVERIDE=""
     fi
+    # list of options to overwrite through --set
+    SET_OPTIONS=""
+    if [ -n "${VALUE_OVERIDE}" ] ; then
+        SET_OPTIONS="--set ${VALUE_OVERIDE}"
+    fi
+    if [ "${DOMAIN}" != "forgeops" ] ; then
+        SET_OPTIONS="${SET_OPTIONS} --set domain=${DOMAIN}"
+    fi
 
     echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\" on provider \"${PROVIDER}\""
-    
+
     # If the deploy directory contains a common.yaml, prepend it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
         YAML="-f ${CFGDIR}/common.yaml $YAML"
     fi
+
 
     # These are the charts (components) that will be deployed via helm
     for comp in ${COMPONENTS[@]}; do
@@ -182,15 +198,12 @@ deploy_charts()
            CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
         fi
 
-        if [ -z "${VALUE_OVERIDE}" ]; then
-            ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} \
-            ${YAML} ${CHART_YAML} \
-            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
-        else
-            ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} \
-            ${YAML} ${CHART_YAML} --set ${VALUE_OVERIDE} \
-            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
-        fi
+        print_sep_line "*" 30
+        echo "${DRYRUN}helm upgrade --install ${NAMESPACE}-${comp} ${YAML} ${CHART_YAML} ${SET_OPTIONS} \
+        --namespace=${NAMESPACE} ${DIR}/helm/${chart}"
+
+        ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} ${YAML} ${CHART_YAML} ${SET_OPTIONS} \
+        --namespace=${NAMESPACE} ${DIR}/helm/${chart}
 
     done
 }
