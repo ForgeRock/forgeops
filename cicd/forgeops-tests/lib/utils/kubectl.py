@@ -23,9 +23,6 @@ def exec(namespace, sub_command):
     :return: (stdout, stderr) from running the command
     """
 
-    assert isinstance(namespace, str), 'Invalid namespace type %s' % type(namespace)
-    assert isinstance(sub_command, list), 'Invalid sub command type %s' % type(sub_command)
-
     command_list = [KUBECTL_COMMAND, '-n', namespace, 'exec'] + sub_command
     command = ' '.join(command_list)
     return __run_cmd_process(command)
@@ -42,14 +39,9 @@ def cp_from_pod(namespace, pod_name, source, destination, container_name):
     :return: (stdout, stderr) from running the command
     """
 
-    assert isinstance(namespace, str), 'Invalid namespace type %s' % type(namespace)
-    assert isinstance(pod_name, str), 'Invalid pod name type %s' % type(pod_name)
-    assert isinstance(source, str), 'Invalid source type %s' % type(source)
-    assert isinstance(destination, str), 'Invalid destination type %s' % type(destination)
-    assert isinstance(container_name, str), 'Invalid product type type %s' % type(container_name)
-
-    logger.debug('Copying %s to %s for %s:%s in %s' % (source, destination, container_name, pod_name, namespace))
-    source_command = namespace + '/' + pod_name + ':' + source
+    logger.debug('Copying {source} to {destination} for {container_name}:{pod_name} in {namespace}'.format(
+        source=source, destination=destination, container_name=container_name, pod_name= pod_name, namespace=namespace))
+    source_command = '{namespace}/{pod_name}:{source}'.format(namespace=namespace, pod_name=pod_name, source=source)
     command = ' '.join([KUBECTL_COMMAND, 'cp', source_command, destination, '-c', container_name])
     return __run_cmd_process(command)
 
@@ -62,14 +54,12 @@ def get_product_component_names(namespace, product_type):
     :return: List of pod names
     """
 
-    assert isinstance(namespace, str), 'Invalid namespace type %s' % type(namespace)
-    assert isinstance(product_type, str), 'Invalid product type type %s' % type(product_type)
-
-    command = ' '.join([KUBECTL_COMMAND, '-n', namespace, 'get', 'pods', '--selector=component=' + product_type])
+    command = ' '.join([KUBECTL_COMMAND, '-n', namespace, 'get', 'pods',
+                        '--selector=component={product_type}'.format(product_type=product_type)])
     stdout, ignored = __run_cmd_process(command)
     pod_names = []
     for line in stdout:
-        logger.debug('Found component' + line)
+        logger.debug('Found component {component}'.format(component=line))
         line_contents = line.split(' ')
         if line_contents[0] != 'NAME' and len(line_contents) > 1:
             pod_names.append(line_contents[0])
@@ -83,12 +73,11 @@ def __run_cmd_process(cmd):
     :return: Duple of string lists (stdout, stderr)
     """
 
-    assert isinstance(cmd, str), 'Invalid cmd type %s' % type(cmd)
-
-    logger.debug('Running following command as process: ' + cmd)
+    logger.debug('Running following command as process: {cmd}'.format(cmd=cmd))
     response = subprocess.Popen(
         cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
     stdout, stderr = response.communicate()
 
-    assert response.returncode == 0, ' Unexpected return code %s from cmd %s' % (response.returncode, stderr)
+    assert response.returncode == 0, ' Unexpected return code {return_code} from cmd {stderr}'.format(
+        return_code=response.returncode, stderr=stderr)
     return stdout.split('\n'), stderr.split('\n')

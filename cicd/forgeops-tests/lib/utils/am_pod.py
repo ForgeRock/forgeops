@@ -25,8 +25,11 @@ class AMPod(Pod):
         """
         super().__init__(AMPod.PRODUCT_TYPE, name)
 
-    def get_version(self):
-        """Get the application's version."""
+    def version(self):
+        """
+        Return the product version information.
+        :return: Dictionary
+        """
 
         amcfg = AMConfig()
 
@@ -55,27 +58,22 @@ class AMPod(Pod):
 
         return am_metadata
 
-    def is_expected_version(self):
-        """Check if the version is as expected."""
+    def log_commons_version(self):
+        """Report version of commons for pod's forgerock product."""
 
-        am_metadata = self.get_version()
-        Pod.print_table(am_metadata)
-
-    def is_expected_commons_version(self):
-        """Check if the commons version is as expected."""
-
+        logger.debug('Report commons version for {name}'.format(name=self.name))
         representative_commons_jar = AMPod.REPRESENTATIVE_COMMONS_JAR_NAME
         lib_path = os.path.join(os.sep, 'usr', 'local', 'tomcat', 'webapps', 'am', 'WEB-INF', 'lib', )
-        super(AMPod, self).is_expected_versioned_commons_jar(lib_path, representative_commons_jar)
+        super(AMPod, self).log_versioned_commons_jar(lib_path, representative_commons_jar)
 
-    def is_expected_jdk(self):
-        """Check if jdk is as expected."""
+    def log_jdk(self):
+        """Report Java version on the pod."""
 
-        logger.debug('Check Java version for ' + self.name)
-        return super(AMPod, self).is_expected_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
+        logger.debug('Report Java version for {name}'.format(name=self.name))
+        return super(AMPod, self).log_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
 
-    def is_expected_os(self):
-        """Check if OS is as expected."""
+    def log_os(self):
+        """Report Operating System on the pod."""
 
-        logger.debug('Check OS version for ' + self.name)
-        super(AMPod, self).is_expected_os({'NAME', 'ID', 'VERSION_ID'})
+        logger.debug('Report OS version for {name}'.format(name=self.name))
+        super(AMPod, self).log_os({'NAME', 'ID', 'VERSION_ID'})

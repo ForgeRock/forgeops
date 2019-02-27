@@ -33,49 +33,49 @@ class TestAmsterMetadata(object):
         """Setup and cleanup for checking commons library version"""
 
         for amster_pod in TestAmsterMetadata.pods:
-            logger.test_step('Setting up for commons version check for: ' + amster_pod.name)
+            logger.test_step('Setting up for commons version check for {name}'.format(name=amster_pod.name))
             amster_pod.setup_commons_check()
         yield
         for amster_pod in TestAmsterMetadata.pods:
-            logger.test_step('Cleaning up after commons version check for: ' + amster_pod.name)
+            logger.test_step('Cleaning up after commons version check for {name}'.format(name=amster_pod.name))
             amster_pod.cleanup_commons_check()
 
     def test_commons_version(self, get_commons_library):
-        """Check the version of a commons library"""
+        """Report the version of a commons library"""
 
-        logger.test_step('Check commons version')
+        logger.test_step('Report commons version')
         for amster_pod in TestAmsterMetadata.pods:
-            logger.info('Check commons version for: ' + amster_pod.name)
-            amster_pod.is_expected_commons_version()
+            logger.info('Report commons version for {name}'.format(name=amster_pod.name))
+            amster_pod.log_commons_version()
 
     def test_legal_notices(self):
         """Check the presence of legal-notices"""
 
         logger.test_step('Check legal notices')
         for amster_pod in TestAmsterMetadata.pods:
-            logger.info('Check legal-notices exist for: ' + amster_pod.name)
-            amster_pod.is_expected_legal_notices()
+            logger.info('Check legal-notices exist for {name}'.format(name=amster_pod.name))
+            amster_pod.are_legal_notices_present()
 
     def test_version(self):
-        """Check the version"""
+        """Report the version"""
 
-        logger.test_step('Check version')
+        logger.test_step('Report version')
         for amster_pod in TestAmsterMetadata.pods:
-            logger.info('Check JDK version for ' + amster_pod.name)
-            amster_pod.is_expected_version()
+            logger.info('Report JDK version for {name}'.format(name=amster_pod.name))
+            amster_pod.log_version()
 
     def test_pods_jdk(self):
-        """Check the JDK running in the pods"""
+        """Report the JDK running in the pods"""
 
-        logger.test_step('Check Jaa version')
+        logger.test_step('Report Java version')
         for amster_pod in TestAmsterMetadata.pods:
-            logger.info('Check Java version for ' + amster_pod.name)
-            amster_pod.is_expected_jdk()
+            logger.info('Report Java version for {name}'.format(name=amster_pod.name))
+            amster_pod.log_jdk()
 
     def test_image_os(self):
-        """Check the OS for the pods"""
+        """Report the OS for the pods"""
 
-        logger.test_step('Check the operating system')
+        logger.test_step('Report the operating system')
         for amster_pod in TestAmsterMetadata.pods:
-            logger.info('Check OS for ' + amster_pod.name)
-            amster_pod.is_expected_os()
+            logger.info('Report OS for {name}'.format(name=amster_pod.name))
+            amster_pod.log_os()

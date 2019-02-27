@@ -26,11 +26,11 @@ class IDMPod(Pod):
 
         super().__init__(IDMPod.PRODUCT_TYPE, name)
 
-    def is_expected_version(self):
+    def version(self):
         """
-        Check if the version is as expected.
+        Return the product version information.
+        :return: Dictionary
         """
-
         idm_cfg = IDMConfig()
 
         logger.info("Get software version of the OpenIDM instance")
@@ -38,30 +38,28 @@ class IDMPod(Pod):
         response = get(verify=idm_cfg.ssl_verify, url=idm_cfg.idm_url + '/info/version', headers=headers)
         rest.check_http_status(http_result=response, expected_status=200)
 
-        idm_metadata = {'TITLE': self.product_type,
-                        'DESCRIPTION': self.name,
-                        'VERSION': response.json()['productVersion'],
-                        'REVISION': response.json()['productRevision'],
-                        'DATE': response.json()['productBuildDate']}
-        Pod.print_table(idm_metadata)
+        return {'TITLE': self.product_type,
+                'DESCRIPTION': self.name,
+                'VERSION': response.json()['productVersion'],
+                'REVISION': response.json()['productRevision'],
+                'DATE': response.json()['productBuildDate']}
 
-    def is_expected_commons_version(self):
-        """Check if the commons version is as expected."""
+    def log_commons_version(self):
+        """Report version of commons for pod's forgerock product."""
 
+        logger.debug('Report commons version for {name}'.format(name=self.name))
         representative_commons_jar = IDMPod.REPRESENTATIVE_COMMONS_JAR_NAME
         lib_path = os.path.join(os.sep, 'opt', 'openidm', 'bundle')
-        super(IDMPod, self).is_expected_versioned_commons_jar(lib_path, representative_commons_jar)
+        super(IDMPod, self).log_versioned_commons_jar(lib_path, representative_commons_jar)
 
-    def is_expected_jdk(self):
-        """
-        Check if Java is as expected.
-        """
+    def log_jdk(self):
+        """Report Java version on the pod."""
 
-        super(IDMPod, self).is_expected_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
+        logger.debug('Report Java version for {name}'.format(name=self.name))
+        super(IDMPod, self).log_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
 
-    def is_expected_os(self):
-        """
-        Check if OS is as expected.
-        """
+    def log_os(self):
+        """Report Operating System on the pod."""
 
-        super(IDMPod, self).is_expected_os({'PRETTY_NAME', 'NAME', 'ID'})
+        logger.debug('Report OS version for {name}'.format(name=self.name))
+        super(IDMPod, self).log_os({'PRETTY_NAME', 'NAME', 'ID'})

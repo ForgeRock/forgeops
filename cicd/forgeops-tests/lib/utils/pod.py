@@ -23,9 +23,6 @@ class Pod(object):
         :param name: Pod name
         """
 
-        assert isinstance(product_type, str), 'Invalid product type type %s' % type(product_type)
-        assert isinstance(name, str), 'Invalid name type %s' % type(name)
-
         self._product_type = product_type
         self._name = name
 
@@ -47,24 +44,20 @@ class Pod(object):
         :param get_attributes: Keys ot attributes that are required in the dictionary.
         :return: Metadata dictionary indexed by the attribute keys.
         """
-        assert isinstance(title, str), 'Invalid title type %s' % type(title)
-        assert isinstance(description, str), 'Invalid descripton type %s' % type(description)
-        assert isinstance(metadata, list), 'Invalid metadata type %s' % type(metadata)
-        assert isinstance(get_attributes, set), 'Invalid get attributes type %s' % type(get_attributes)
 
         metadata_of_interest = {'TITLE': title,
                                 'DESCRIPTION': description}
 
         found_keys = set()
         for line in metadata:
-            logger.debug('Reading metdata: ' + line)
+            logger.debug('Reading metdata: {data}'.format(data=line))
             for info_key in get_attributes:
                 if line.strip().startswith(info_key):
                     info = line.strip().split(info_key)
                     if len(info) == 2:
                         metadata_of_interest[info_key] = info[1].strip(' :=')
                         found_keys.add(info_key)
-                        logger.debug('Found ' + info_key)
+                        logger.debug('Found {key}'.format(key=info_key))
                         continue
         assert found_keys == get_attributes
 
@@ -77,8 +70,6 @@ class Pod(object):
         :param table_data: Dictionary of data to be printed
         """
 
-        assert isinstance(table_data, dict), 'Invalid title type %s' % type(table_data)
-
         table = PrettyTable([table_data['TITLE'], table_data['DESCRIPTION']])
         for key, value in table_data.items():
             if key in ['TITLE', 'DESCRIPTION']:
@@ -86,14 +77,21 @@ class Pod(object):
             table.add_row([key, value])
         logger.info(table)
 
-    def is_expected_version(self):
+    def version(self):
         """
-        Check if the version is as expected.
+        Return the product version information.
+        :return: Dictionary
         """
 
         assert False, 'Not implemented, please override in subclass'
 
-    def is_expected_legal_notices(self):
+    def log_version(self):
+        """Report the product version."""
+
+        logger.debug('Check version for {name}'.format(name=self.name))
+        Pod.print_table(self.version())
+
+    def are_legal_notices_present(self):
         """
         Check if the representative license file is present on the pod, otherwise assert.
         """
@@ -102,16 +100,17 @@ class Pod(object):
         stdout, ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', '.', '-name', file_of_interest])
         file_path = stdout[0].strip()
-        logger.debug('Found legal notice: ' + file_path)
-        assert (file_path.endswith('legal-notices/' + file_of_interest)), 'Unable to find ' + file_of_interest
+        logger.debug('Found legal notice: {file}'.format(file=file_path))
+        assert (file_path.endswith('legal-notices/{file}'.format(file=file_of_interest))),\
+            'Unable to find {file_of_interest}'.format(file_of_interest=file_of_interest)
 
-    def is_expected_versioned_commons_jar(self, lib_path, jar_name):
+    def log_versioned_commons_jar(self, lib_path, jar_name):
         """
-        Check if the commons version is as expected.
+        Report version of commons; obtained from the name of a sample commons .jar.
         :param lib_path: Path to jar library.
         :param jar_name: Jar file to check.
         """
-        logger.debug('Check commons version for %s*.jar' % jar_name)
+        logger.debug('Check commons version for {name}*.jar'.format(name=jar_name))
         stdout, ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', lib_path, '-name', jar_name + '-*.jar'])
         config_filepath = stdout[0]  # first line of output
@@ -124,31 +123,25 @@ class Pod(object):
                     'FILE': config_filepath}
         Pod.print_table(metadata)
 
-    def is_expected_jdk(self, attributes_of_interest):
+    def log_jdk(self, attributes_of_interest):
         """
-        Check if Java is as expected.
+        Report Java versions for pod.
         :param attributes_of_interest: Set of attribute keys to check.
         """
 
-        assert isinstance(attributes_of_interest, set),\
-            'Invalid attributes of interest type %s' % type(attributes_of_interest)
-
-        logger.debug('Check Jaa version for ' + self.name)
+        logger.debug('Check Jaa version for {name}'.format(name=self.name))
         ignored, metadata = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'java', '-version'])  # TODO: why stderr
         java_metadata = Pod.get_metadata_of_interest('Java', self.name, metadata, attributes_of_interest)
         Pod.print_table(java_metadata)
 
-    def is_expected_os(self, attributes_of_interest):
+    def log_os(self, attributes_of_interest):
         """
-        Check if operating system is as expected.
+        Report Operating System on the pod.
         :param attributes_of_interest: Set of attribute keys to check.
         """
 
-        assert isinstance(attributes_of_interest, set),\
-            'Invalid attributes of interest type %s' % type(attributes_of_interest)
-
-        logger.debug('Check OS version for ' + self.name)
+        logger.debug('Check OS version for {name}'.format(name=self.name))
         metadata, ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'cat', '/etc/os-release'])
         os_metadata = Pod.get_metadata_of_interest('OS', self.name, metadata, attributes_of_interest)

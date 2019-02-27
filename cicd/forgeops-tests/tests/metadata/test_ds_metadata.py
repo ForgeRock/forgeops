@@ -29,52 +29,52 @@ class TestDSMetadata(object):
             TestDSMetadata.pods.append(DSPod(podname))
 
     def test_version(self):
-        """Check the version"""
+        """Report the version"""
 
-        logger.test_step('Check product version')
+        logger.test_step('Report product version')
         for ds_pod in TestDSMetadata.pods:
-            ds_pod.is_expected_version()
+            ds_pod.log_version()
 
     @pytest.fixture()
     def __get_commons_library(self):
         """Setup and cleanup for checking commons library version"""
 
         for ds_pod in TestDSMetadata.pods:
-            logger.test_step('Setting up for commons version check for: ' + ds_pod.name)
+            logger.test_step('Setting up for commons version check for {name}'.format(name=ds_pod.name))
             ds_pod.setup_commons_check()
         yield
         for ds_pod in TestDSMetadata.pods:
-            logger.test_step('Cleaning up after commons version check for: ' + ds_pod.name)
+            logger.test_step('Cleaning up after commons version check for {name}'.format(name=ds_pod.name))
             ds_pod.cleanup_commons_check()
 
     def test_commons_version(self, __get_commons_library):
-        """Check the version of a commons library"""
+        """Report the version of a commons library"""
 
-        logger.test_step('Check commons version')
+        logger.test_step('Report commons version')
         for ds_pod in TestDSMetadata.pods:
-            logger.info('Check commons version for: ' + ds_pod.name)
-            ds_pod.is_expected_commons_version()
+            logger.info('Report commons version for {name}'.format(name=ds_pod.name))
+            ds_pod.log_commons_version()
 
     def test_legal_notices(self):
         """Check the presence of legal-notices"""
 
         logger.test_step('Check legal notices')
         for ds_pod in TestDSMetadata.pods:
-            logger.info('Check legal-notices exist for: ' + ds_pod.name)
-            ds_pod.is_expected_legal_notices()
+            logger.info('Check legal-notices exist for {name}'.format(name=ds_pod.name))
+            ds_pod.are_legal_notices_present()
 
     def test_pods_jdk(self):
-        """Check Java running in the pods"""
+        """Report Java running in the pods"""
 
-        logger.test_step('Check Java version')
+        logger.test_step('Report Java version')
         for ds_pod in TestDSMetadata.pods:
-            logger.info('Check Java version for ' + ds_pod.name)
-            ds_pod.is_expected_jdk()
+            logger.info('Report Java version for {name}'.format(name=ds_pod.name))
+            ds_pod.log_jdk()
 
     def test_image_os(self):
-        """Check the os for the pods"""
+        """Report the os for the pods"""
 
-        logger.test_step('Check the operating system')
+        logger.test_step('Report the operating system')
         for ds_pod in TestDSMetadata.pods:
-            logger.info('Check OS for ' + ds_pod.name)
-            ds_pod.is_expected_os()
+            logger.info('Report OS for {name}'.format(name=ds_pod.name))
+            ds_pod.log_os()

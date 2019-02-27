@@ -28,10 +28,13 @@ class AmsterPod(Pod):
 
         super().__init__(AmsterPod.PRODUCT_TYPE, name)
 
-    def get_version(self):
-        """Get the application's version."""
+    def version(self):
+        """
+        Return the product version information.
+        :return: Dictionary
+        """
 
-        logger.test_step('Check Amster version for pod: ' + self.name)
+        logger.test_step('Check Amster version for pod {name}'.format(name=self.name))
         stdout, ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '--', './amster', '-c', self.product_type, '--version'])
         version_text = stdout[0].strip()
@@ -52,14 +55,6 @@ class AmsterPod(Pod):
 
         return amster_metadata
 
-    def is_expected_version(self):
-        """
-        Check if the version is as expected.
-        """
-
-        amster_metadata = self.get_version()
-        Pod.print_table(amster_metadata)
-
     def setup_commons_check(self):
         """Setup for checking commons library version."""
 
@@ -74,10 +69,11 @@ class AmsterPod(Pod):
         logger.debug('Cleaning up after commons version check')
         shutil.rmtree(os.path.join(AmsterPod.LOCAL_TEMP, self.name))
 
-    def is_expected_commons_version(self):
-        """Check the commons library version."""
+    def log_commons_version(self):
+        """Report version of commons for pod's forgerock product."""
 
-        logger.debug('Check commons version for ' + self.name + ':' + AmsterPod.REPRESENTATIVE_COMMONS_JAR)
+        logger.debug('Check commons version for {name}:{commons_jar}'.
+                     format(name=self.name, commons_jar=AmsterPod.REPRESENTATIVE_COMMONS_JAR))
         test_temp = os.path.join(AmsterPod.LOCAL_TEMP, self.name)
         stdout, ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', AmsterPod.ROOT, '-name', 'amster-*.jar'])
@@ -90,8 +86,8 @@ class AmsterPod(Pod):
 
         test_jar_properties_path = os.path.join(exploded_directory, 'META-INF', 'maven', 'org.forgerock.commons',
                                                 AmsterPod.REPRESENTATIVE_COMMONS_JAR_NAME, 'pom.properties')
-        logger.debug("Checking commons version in " + test_jar_properties_path)
-        assert os.path.isfile(test_jar_properties_path), 'Failed to find ' + test_jar_properties_path
+        logger.debug('Checking commons version in {path}'.format(path=test_jar_properties_path))
+        assert os.path.isfile(test_jar_properties_path), 'Failed to find {path}'.format(path=test_jar_properties_path)
 
         with open(test_jar_properties_path) as fp:
             lines = fp.readlines()
@@ -100,18 +96,14 @@ class AmsterPod(Pod):
         os_metadata = Pod.get_metadata_of_interest('Commons', self.name, lines, attribute_of_interest)
         Pod.print_table(os_metadata)
 
-    def is_expected_jdk(self):
-        """
-        Check if jdk is as expected, otherwise assert.
-        """
+    def log_jdk(self):
+        """Report Java version on the pod."""
 
-        logger.debug('Check Java version for ' + self.name)
-        super(AmsterPod, self).is_expected_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
+        logger.debug('Report Java version for {name}'.format(name=self.name))
+        super(AmsterPod, self).log_jdk({'openjdk version', 'openjdk version', 'openjdk version'})
 
-    def is_expected_os(self):
-        """
-        Check if OS is as expected, otherwise assert.
-        """
+    def log_os(self):
+        """Report Operating System on the pod."""
 
-        logger.debug('Check OS version for ' + self.name)
-        return super(AmsterPod, self).is_expected_os({'NAME', 'ID', 'VERSION_ID'})
+        logger.debug('Report OS version for {name}'.format(name=self.name))
+        return super(AmsterPod, self).log_os({'NAME', 'ID', 'VERSION_ID'})
