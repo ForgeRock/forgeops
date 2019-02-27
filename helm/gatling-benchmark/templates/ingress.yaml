@@ -3,7 +3,9 @@ kind: Ingress
 metadata:
   name: {{ .Values.component }}
   annotations:
-    kubernetes.io/ingress.class: {{ default "nginx" .Values.ingress.class }}
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
 spec:
   tls:
   - hosts:
