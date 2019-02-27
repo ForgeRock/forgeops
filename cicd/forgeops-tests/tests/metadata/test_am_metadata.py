@@ -27,40 +27,41 @@ class TestAMMetadata(object):
             TestAMMetadata.pods.append(AMPod(podname))
 
     def test_version(self):
-        """Check the version"""
+        """Report the version"""
 
-        logger.test_step('Check the version')
+        logger.test_step('Report the version')
         representative_pod = TestAMMetadata.pods[0]
-        representative_pod.is_expected_version()
+        logger.info('Report commons version for {name}'.format(name=representative_pod.name))
+        representative_pod.log_version()
 
     def test_commons_version(self):
-        """Check the version of a commons library"""
+        """Report the version of a commons library"""
 
-        logger.test_step('Check commons version')
+        logger.test_step('Report commons version')
         for am_pod in TestAMMetadata.pods:
-            logger.info('Check commons version for: ' + am_pod.name)
-            am_pod.is_expected_commons_version()
+            logger.info('Report commons version for {name}'.format(name=am_pod.name))
+            am_pod.log_commons_version()
 
     def test_legal_notices(self):
         """Check the presence of legal-notices"""
 
         logger.test_step('Check legal notices')
         for am_pod in TestAMMetadata.pods:
-            logger.info('Check legal-notices exist for: ' + am_pod.name)
-            am_pod.is_expected_legal_notices()
+            logger.info('Check legal-notices exist for {name}'.format(name=am_pod.name))
+            am_pod.are_legal_notices_present()
 
     def test_pods_jdk(self):
-        """Check the Java for the pods"""
+        """Report the Java for the pods"""
 
-        logger.test_step('Check Java version')
+        logger.test_step('Report Java version')
         for am_pod in TestAMMetadata.pods:
-            logger.info('Check Java version for ' + am_pod.name)
-            am_pod.is_expected_jdk()
+            logger.info('Report Java version for {name}'.format(name=am_pod.name))
+            am_pod.log_jdk()
 
     def test_image_os(self):
-        """Check the OS for the pods"""
+        """Report the OS for the pods"""
 
-        logger.test_step('Check the operating system')
+        logger.test_step('Report the operating system')
         for am_pod in TestAMMetadata.pods:
-            logger.info('Check OS for ' + am_pod.name)
-            am_pod.is_expected_os()
+            logger.info('Report OS for {name}'.format(name=am_pod.name))
+            am_pod.log_os()

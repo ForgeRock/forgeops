@@ -25,35 +25,41 @@ class TestIDMMetadata(object):
             TestIDMMetadata.pods.append(IDMPod(podname))
 
     def test_version(self):
-        """Check the version"""
+        """Report the version"""
 
-        logger.test_step('Check the version')
-        self.pods[0].is_expected_version()
+        logger.test_step('Report the version')
+        representative_pod = self.pods[0]
+        logger.info('Report commons version for {name}'.format(name=representative_pod.name))
+        representative_pod.log_version()
 
     def test_commons_version(self):
-        """Check the commons version"""
+        """Report the commons version"""
 
-        logger.test_step('Check the commons version')
-        self.pods[0].is_expected_commons_version()
+        logger.test_step('Report the commons version')
+        for idm_pod in TestIDMMetadata.pods:
+            logger.info('Report OS for {name}'.format(name=idm_pod.name))
+            idm_pod.log_commons_version()
 
     def test_legal_notices(self):
-        """Check the presence of legal-notices"""
+        """Report the presence of legal-notices"""
 
         logger.test_step('Check legal Notices')
         for idm_pod in TestIDMMetadata.pods:
-            logger.info('Check legal-notices exist for: ' + idm_pod.name)
-            idm_pod.is_expected_legal_notices()
+            logger.info('Check legal-notices exist for {name}'.format(name=idm_pod.name))
+            idm_pod.are_legal_notices_present()
 
     def test_jdk_version(self):
-        """Check Java running in the pods"""
+        """Report Java running in the pods"""
 
-        logger.test_step('Check legal Notices')
-        TestIDMMetadata.pods[0].is_expected_jdk()
+        logger.test_step('Report the Java version')
+        for idm_pod in TestIDMMetadata.pods:
+            logger.info('Report Java version for {name}'.format(name=idm_pod.name))
+            idm_pod.log_jdk()
 
     def test_image_os(self):
         """Check the OS running in the pods"""
 
-        logger.test_step('Check the operating system')
+        logger.test_step('Report the operating system')
         for idm_pod in TestIDMMetadata.pods:
-            logger.info('Check OS for ' + idm_pod.name)
-            idm_pod.is_expected_os()
+            logger.info('Report OS for {name}'.format(name=idm_pod.name))
+            idm_pod.log_os()
