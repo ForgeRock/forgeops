@@ -24,10 +24,11 @@ set -o nounset
 
 usage()
 {
-    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
+    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-o domain] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
     echo "-e extra env.sh that will be sourced to set environment variables."
     echo "-n set the namespace. Override values in env.sh."
+    echo "-o set the domain. Override values in env.sh."
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
@@ -36,13 +37,14 @@ usage()
 
 parse_args()
 {
-    while getopts "df:e:n:R" opt; do
+    while getopts "df:e:n:o:R" opt; do
         case ${opt} in
             f ) YAML="$YAML -f ${OPTARG} " ;;
             e ) ENV_SH="${OPTARG}" ;;
             R ) RMALL=true ;;
             d ) DRYRUN="echo " ;;
             n ) OPT_NAMESPACE="${OPTARG}" ;;
+            o ) OPT_DOMAIN="${OPTARG}" ;;
             \? ) usage ;;
         esac
     done
@@ -98,7 +100,7 @@ chk_config()
     fi
 
     # Allow overriding namespace
-    if [ ! -z "$OPT_NAMESPACE" ]; then
+    if [ -n "$OPT_NAMESPACE" ]; then
         NAMESPACE="$OPT_NAMESPACE"
     fi
 
@@ -108,6 +110,10 @@ chk_config()
     fi
     echo -e "=>\tNamespace: \"${NAMESPACE}\""
 
+    # Allow overriding domain
+    if [ -n "${OPT_DOMAIN}" ]; then
+        DOMAIN="$OPT_DOMAIN"
+    fi
     if [ -z "${DOMAIN}" ]; then
         echo "ERROR: Your Domain is not set for the deployment. Exiting!"
         exit 1
