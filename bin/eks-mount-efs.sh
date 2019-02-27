@@ -38,11 +38,10 @@ REGION=$(aws configure get region)
 for ip in ${EXTERNAL_IPS}
 do
     ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${ip} /bin/bash <<EOF
-        sudo mkdir /export
-        sudo mount -t nfs ${EFS_ID}.efs.${REGION}.amazonaws.com: /export
-        if [ ! -d '/export/export' ]; then
-            sudo mkdir /export/export
-            sudo mkdir /export/export/bak
+        sudo mount -t nfs ${EFS_ID}.efs.${REGION}.amazonaws.com: /mnt
+        if [ ! -d '/mnt/export' ]; then
+            sudo mkdir /mnt/export
+            sudo mkdir /mnt/export/bak
         fi
         echo -e "Worker node ${ip} mounted to EFS \n"
 EOF
