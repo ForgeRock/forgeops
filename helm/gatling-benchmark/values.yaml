@@ -60,7 +60,7 @@ benchmark:
   # How many user threads we want to use for benchmark
   concurrency: 5
   # Duration of test in seconds
-  duration: 20
+  duration: 60
   # Logout percent in authn testnames(0 disables logout)
   logoutpercent: 0
   # Warmup duration
