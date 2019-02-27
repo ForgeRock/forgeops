@@ -24,10 +24,11 @@ set -o nounset
 
 usage()
 {
-    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
+    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-o domain] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
     echo "-e extra env.sh that will be sourced to set environment variables."
     echo "-n set the namespace. Override values in env.sh."
+    echo "-o set the domain. Override values in env.sh."
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
@@ -36,13 +37,14 @@ usage()
 
 parse_args()
 {
-    while getopts "df:e:n:R" opt; do
+    while getopts "df:e:n:o:R" opt; do
         case ${opt} in
             f ) YAML="$YAML -f ${OPTARG} " ;;
             e ) ENV_SH="${OPTARG}" ;;
             R ) RMALL=true ;;
             d ) DRYRUN="echo " ;;
             n ) OPT_NAMESPACE="${OPTARG}" ;;
+            o ) OPT_DOMAIN="${OPTARG}" ;;
             \? ) usage ;;
         esac
     done
@@ -55,6 +57,13 @@ parse_args()
 
     CFGDIR="$1"
 
+}
+
+print_sep_line() {
+    str=$1
+    num=$2
+    v=$(printf "%-${num}s" "$str")
+    echo "${v// /*}"
 }
 
 chk_config()
@@ -91,7 +100,7 @@ chk_config()
     fi
 
     # Allow overriding namespace
-    if [ ! -z "$OPT_NAMESPACE" ]; then
+    if [ -n "$OPT_NAMESPACE" ]; then
         NAMESPACE="$OPT_NAMESPACE"
     fi
 
@@ -101,6 +110,10 @@ chk_config()
     fi
     echo -e "=>\tNamespace: \"${NAMESPACE}\""
 
+    # Allow overriding domain
+    if [ -n "${OPT_DOMAIN}" ]; then
+        DOMAIN="$OPT_DOMAIN"
+    fi
     if [ -z "${DOMAIN}" ]; then
         echo "ERROR: Your Domain is not set for the deployment. Exiting!"
         exit 1
@@ -147,26 +160,35 @@ create_secrets()
 deploy_charts()
 {
     # Add any provider specific values here for helm to override
-    # For example for EKS/AWS VALUE_OVERIDE="storageClass=fast10"
-    # or for AKS/Azure VALUE_OVERIDE="storageClass=managed-premium"
+    # For example for EKS/AWS VALUE_OVERRIDE="storageClass=fast10"
+    # or for AKS/Azure VALUE_OVERRIDE="storageClass=managed-premium"
 
     PROVIDER=$(kubectl get nodes -o jsonpath={.items[0].spec.providerID} | awk -F: '{print $1}')
     if [ "${PROVIDER}" == "gce" ]; then
-        VALUE_OVERIDE=""
+        VALUE_OVERRIDE=""
     elif [ "${PROVIDER}" == "aws" ]; then
-        VALUE_OVERIDE=""
+        VALUE_OVERRIDE=""
     elif [ "${PROVIDER}" == "azure" ]; then
-        VALUE_OVERIDE=""
+        VALUE_OVERRIDE=""
     else
-        VALUE_OVERIDE=""
+        VALUE_OVERRIDE=""
+    fi
+    # list of options to overwrite through --set
+    SET_OPTIONS=""
+    if [ -n "${VALUE_OVERRIDE}" ] ; then
+        SET_OPTIONS="--set ${VALUE_OVERRIDE}"
+    fi
+    if [ "${DOMAIN}" != "forgeops" ] ; then
+        SET_OPTIONS="${SET_OPTIONS} --set domain=${DOMAIN}"
     fi
 
     echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\" on provider \"${PROVIDER}\""
-    
+
     # If the deploy directory contains a common.yaml, prepend it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
         YAML="-f ${CFGDIR}/common.yaml $YAML"
     fi
+
 
     # These are the charts (components) that will be deployed via helm
     for comp in ${COMPONENTS[@]}; do
@@ -182,15 +204,12 @@ deploy_charts()
            CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
         fi
 
-        if [ -z "${VALUE_OVERIDE}" ]; then
-            ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} \
-            ${YAML} ${CHART_YAML} \
-            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
-        else
-            ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} \
-            ${YAML} ${CHART_YAML} --set ${VALUE_OVERIDE} \
-            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
-        fi
+        print_sep_line "*" 30
+        echo "${DRYRUN}helm upgrade --install ${NAMESPACE}-${comp} ${YAML} ${CHART_YAML} ${SET_OPTIONS} \
+        --namespace=${NAMESPACE} ${DIR}/helm/${chart}"
+
+        ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} ${YAML} ${CHART_YAML} ${SET_OPTIONS} \
+        --namespace=${NAMESPACE} ${DIR}/helm/${chart}
 
     done
 }
