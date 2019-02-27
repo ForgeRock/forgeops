@@ -322,6 +322,7 @@ RMALL=false
 DRYRUN=""
 CONTEXT=""
 VALUE_OVERRIDE=""
+OPT_DOMAIN=""
 
 # All helm chart paths are relative to this directory.
 DIR=`echo $(dirname "$0")/..`
