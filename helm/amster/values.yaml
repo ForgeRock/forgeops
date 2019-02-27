@@ -99,3 +99,10 @@ resources:
 
 # ctsPassword - defaults to "password"
 #ctsPassword: password
+
+# If useDefaultSecrets is set to true (the default), the secret values in templates/secrets will be used 
+# to create the secret amster-secrets. If you set useDefaultSecrets to false, you must create these 
+# secrets yourself. This allows you to inject your own secrets rather than use the default ones bundled 
+# in the chart. An alternate strategy is to fork this chart and replace the secrets in templates/secrets 
+# with your own.
+useDefaultSecrets: true

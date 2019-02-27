@@ -153,10 +153,10 @@ spec:
         emptyDir: {}
       - name: openam-keys
         secret:
-          secretName: {{ default "openam-keys" .Values.existingSecrets.openamKeys }}
+          secretName: openam-keys
       - name: openam-keystore-passwords
         secret:
-          secretName: {{ default "openam-keystore-passwords" .Values.existingSecrets.openamKeystorePasswords }}
+          secretName: openam-keystore-passwords
       - name: openam-boot
         configMap:
           name: boot-json
