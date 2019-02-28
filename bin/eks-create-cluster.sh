@@ -15,7 +15,7 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 # TODO: echo vars dynamically by reading cfg file
 
 echo "=> Read the following env variables from config file"
-echo -e "\tStack Name = ${EKS_STACK_NAME}"
+echo -e "\tStack Name = ${EKS_WORKER_NODE_STACK_NAME}"
 echo -e "\tCluster Name = ${EKS_CLUSTER_NAME}"
 echo -e "\tCluster Version = ${EKS_CLUSTER_VERSION}"
 echo -e "\tRole ARN = ${EKS_ROLE_ARN}"

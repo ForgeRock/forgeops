@@ -8,14 +8,14 @@
 
 #### ** ENVIRONMENT SETUP ** ####
 
-# EKS VPC stack name
+# EKS VPC CloudFormation Stack Name
 EKS_VPC_STACK_NAME="vpc1"
 
-# Name of the EFS security group
+# Name of the EFS Security Group
 EFS_SECURITY_GROUP_NAME="sg-efs-1"
 
-# CloudFormation Stack Name
-EKS_STACK_NAME="cluster1"
+# EKS Worker Node CloudFormation Stack Name
+EKS_WORKER_NODE_STACK_NAME="cluster1"
 
 # Node Group Name
 EKS_WORKER_NODE_GROUP="nodegrp"
@@ -26,7 +26,7 @@ EKS_MIN_NODES="1"
 # Max Nodes per zone in Cluster
 EKS_MAX_NODES="4"
 
-# Node Volumn Size
+# Node Volume Size
 EKS_WORKER_NODE_SIZE_IN_GB="30"
 
 # Worker Nodes Instance Type
@@ -47,7 +47,7 @@ EKS_AMI_ID="ami-0440e4f6b9713faf6"
 # Domain used to create Route53 records
 ROUTE53_DOMAIN="freng.org"
 
-# S3 Bucket name
+# S3 Bucket Name
 S3_BUCKET_NAME="my-bucket"
 
 
@@ -79,7 +79,7 @@ EKS_VPC_ID="vpc-XXXXXXXX"
 # EKS Subnet
 EKS_SUBNETS="subnet-XXXXXX,subnet-XXXXXX"
 
-# EC2 Security group for the cluster control plane communication with worker nodes
+# EC2 Security Group for the Cluster Control Plane communication with Worker Nodes
 EC2_SECURITY_GROUP="sg-XXXXXXXX"
 
 #####################################################################################
@@ -89,14 +89,14 @@ EC2_SECURITY_GROUP="sg-XXXXXXXX"
 # File System ID
 EFS_ID="fs-XXXXXX"
 
-# Security Group ID to allow nodes to mount EFS file system
+# Security Group ID to allow Worker Nodes to mount EFS File System
 EFS_SECURITY_GROUP_ID="sg-XXXXXXXX"
 
 #####################################################################################
 ### POPULATE THE FOLLOWING VALUES AFTER RUNNING  ./bin/eks-create-s3-policy.sh    ###
 #####################################################################################
 
-# Arn for the iam role policy allowing S3 operations on bucket
+# Arn for the IAM Role Policy allowing S3 operations on Bucket
 S3_POLICY_ARN="arn:aws:iam::XXXXXXXX:policy/XXXXXXXX"
 
 #####################################################################################

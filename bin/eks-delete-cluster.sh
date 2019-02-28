@@ -10,7 +10,7 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 echo "=> Read the following env variables from config file"
 echo "Cluster Name = $EKS_CLUSTER_NAME"
-echo "Stack Name = $EKS_STACK_NAME"
+echo "Stack Name = $EKS_WORKER_NODE_STACK_NAME"
 echo ""
 
 echo "=> Do you want to delete the above cluster?"
@@ -43,8 +43,8 @@ echo "Removing storage classes..."
 kubectl delete storageclass fast || true
 kubectl delete storageclass standard || true
 
-echo "Deleting the stack: ${EKS_STACK_NAME}"
-aws cloudformation delete-stack --stack-name ${EKS_STACK_NAME}
+echo "Deleting the stack: ${EKS_WORKER_NODE_STACK_NAME}"
+aws cloudformation delete-stack --stack-name ${EKS_WORKER_NODE_STACK_NAME}
 
 echo "Deleting the cluster: ${EKS_CLUSTER_NAME}"
 DELETE_CLUSTER=$(aws eks delete-cluster --name ${EKS_CLUSTER_NAME})
