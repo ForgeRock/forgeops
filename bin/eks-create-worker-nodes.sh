@@ -14,7 +14,7 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 # Executing cloudformation script to create worker nodes
 aws cloudformation deploy \
-          --stack-name $EKS_STACK_NAME \
+          --stack-name $EKS_WORKER_NODE_STACK_NAME \
           --template-file ../etc/amazon-eks-nodegroup.yaml \
           --parameter-overrides KeyName=${EC2_KEYPAIR_NAME} \
                                 NodeImageId=${EKS_AMI_ID} \
@@ -37,7 +37,7 @@ echo "Worker nodes provisioned. Sleeping for 15 seconds..."
 sleep 15
 
 # getting the output of the cloudformation execution. Needed to link the master and worker nodes
-NI_ROLE=$(aws cloudformation describe-stacks --stack-name $EKS_STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text)
+NI_ROLE=$(aws cloudformation describe-stacks --stack-name $EKS_WORKER_NODE_STACK_NAME --query 'Stacks[0].Outputs[0].OutputValue' --output text)
 
 kubectl apply -f - <<EOF
 apiVersion: v1

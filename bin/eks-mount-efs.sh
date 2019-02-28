@@ -2,7 +2,7 @@
 # Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 #
-# Sample script to create a Kubernetes cluster on Elastic Kubernetes Service (EKS)
+# Sample script to mount EFS on EKS cluster worker nodes
 # You must have the aws command installed and access EKS cluster.
 # See https://docs.aws.amazon.com/cli/latest/userguide/awscli-install-bundle.html
 
@@ -13,7 +13,7 @@ set -o nounset
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
 # Get worker node security group id
-SG=$(aws ec2 describe-security-groups --filters Name=group-name,Values=*${EKS_STACK_NAME}-NodeSecurityGroup* --query "SecurityGroups[*].{ID:GroupId}"  | grep ID | awk '{ print $2 }' | cut -d \" -f2)
+SG=$(aws ec2 describe-security-groups --filters Name=group-name,Values=*${EKS_WORKER_NODE_STACK_NAME}-NodeSecurityGroup* --query "SecurityGroups[*].{ID:GroupId}"  | grep ID | awk '{ print $2 }' | cut -d \" -f2)
 
 # Create array of mount target IDs 
 MOUNT_TARGETS=$(aws efs describe-mount-targets --file-system-id ${EFS_ID} | grep MountTargetId | awk '{ print $2 }' | cut -d \" -f2)
