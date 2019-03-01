@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2019 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2019 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 """
@@ -34,7 +34,7 @@ class AmsterPod(Pod):
         :return: Dictionary
         """
 
-        logger.test_step('Check Amster version for pod {name}'.format(name=self.name))
+        logger.test_step('Report Amster version for pod {name}'.format(name=self.name))
         stdout, ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '--', './amster', '-c', self.product_type, '--version'])
         version_text = stdout[0].strip()
@@ -89,8 +89,8 @@ class AmsterPod(Pod):
         logger.debug('Checking commons version in {path}'.format(path=test_jar_properties_path))
         assert os.path.isfile(test_jar_properties_path), 'Failed to find {path}'.format(path=test_jar_properties_path)
 
-        with open(test_jar_properties_path) as fp:
-            lines = fp.readlines()
+        with open(test_jar_properties_path) as file_pointer:
+            lines = file_pointer.readlines()
 
         attribute_of_interest = {'version', 'groupId', 'artifactId'}
         os_metadata = Pod.get_metadata_of_interest('Commons', self.name, lines, attribute_of_interest)

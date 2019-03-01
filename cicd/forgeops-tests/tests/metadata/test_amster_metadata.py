@@ -28,6 +28,14 @@ class TestAmsterMetadata(object):
         for podname in podnames:
             TestAmsterMetadata.pods.append(AmsterPod(podname))
 
+    def test_version(self):
+        """Report the version"""
+
+        logger.test_step('Report the version')
+        for amster_pod in TestAmsterMetadata.pods:
+            logger.info('Report the version for {name}'.format(name=amster_pod.name))
+            amster_pod.log_version()
+
     @pytest.fixture()
     def get_commons_library(self):
         """Setup and cleanup for checking commons library version"""
@@ -55,14 +63,6 @@ class TestAmsterMetadata(object):
         for amster_pod in TestAmsterMetadata.pods:
             logger.info('Check legal-notices exist for {name}'.format(name=amster_pod.name))
             amster_pod.are_legal_notices_present()
-
-    def test_version(self):
-        """Report the version"""
-
-        logger.test_step('Report version')
-        for amster_pod in TestAmsterMetadata.pods:
-            logger.info('Report JDK version for {name}'.format(name=amster_pod.name))
-            amster_pod.log_version()
 
     def test_pods_jdk(self):
         """Report the JDK running in the pods"""
