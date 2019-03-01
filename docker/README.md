@@ -40,7 +40,7 @@ mounted for secrets, configuration and persistent data. As such, they are not su
 
 ## Image Builds
 
-The product images are built automatically (using Conatainer Builder) when a commit is made to ForgeOps. These images are pushed to https://bintray.com/forgerock.
+The product images are built automatically (using Container Builder) when a commit is made to ForgeOps. These images are pushed to https://bintray.com/forgerock.
 
 
 ## build.sh
@@ -88,4 +88,4 @@ If the artifact does not change, but the docker image is significantly different
 The file csv/dev.csv specifies the artifacts used in our CI Cloudbuild pipeline. To update to a new milestone, edit
 this file, and update the milestone (for example, for idm change 6.5.0-M2 to 6.5.0-M3). Commit the change, and submit a new PR. The build process will build and tag the new image. You should also update the corresponding helm charts.
 
-See `subtmit.sh` for creating one off builds of an artifact.
+See `submit.sh` for creating one off builds of an artifact.
