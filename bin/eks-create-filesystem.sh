@@ -44,4 +44,4 @@ done
 aws ec2 authorize-security-group-ingress --group-id ${EFS_GROUP_ID} \
     --protocol tcp \
     --port 2049 \
-    --source-group ${EC2_SECURITY_GROUP}
+    --source-group ${EKS_CONTROL_PLANE_SECURITY_GROUP}

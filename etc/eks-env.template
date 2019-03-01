@@ -80,7 +80,7 @@ EKS_VPC_ID="vpc-XXXXXXXX"
 EKS_SUBNETS="subnet-XXXXXX,subnet-XXXXXX"
 
 # EC2 Security Group for the Cluster Control Plane communication with Worker Nodes
-EC2_SECURITY_GROUP="sg-XXXXXXXX"
+EKS_CONTROL_PLANE_SECURITY_GROUP="sg-XXXXXXXX"
 
 #####################################################################################
 ### POPULATE THE FOLLOWING VALUES AFTER RUNNING  ./bin/eks-create-filesystem.sh   ###

@@ -24,7 +24,7 @@ aws cloudformation deploy \
                                 NodeVolumeSize=${EKS_WORKER_NODE_SIZE_IN_GB} \
                                 ClusterName=${EKS_CLUSTER_NAME} \
                                 NodeGroupName=${EKS_WORKER_NODE_GROUP} \
-                                ClusterControlPlaneSecurityGroup=${EC2_SECURITY_GROUP} \
+                                ClusterControlPlaneSecurityGroup=${EKS_CONTROL_PLANE_SECURITY_GROUP} \
                                 VpcId=${EKS_VPC_ID} \
                                 Subnets=${EKS_SUBNETS} \
                                 S3PolicyArn=${S3_POLICY_ARN} \
