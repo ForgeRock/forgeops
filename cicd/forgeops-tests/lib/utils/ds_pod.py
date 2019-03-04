@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2019 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2019 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 """
@@ -73,11 +73,11 @@ class DSPod(Pod):
         logger.debug('Checking commons version in {path}'.format(path=test_jar_properties_path))
         assert os.path.isfile(test_jar_properties_path), 'Failed to find {path}'.format(path=test_jar_properties_path)
 
-        with open(test_jar_properties_path) as fp:
-            lines = fp.readlines()
+        with open(test_jar_properties_path) as file_pointer:
+            lines = file_pointer.readlines()
 
-        attribute_of_interest = {'version', 'groupId', 'artifactId'}
-        os_metadata = Pod.get_metadata_of_interest('Commons', self.name, lines, attribute_of_interest)
+        attributes_of_interest = {'version', 'groupId', 'artifactId'}
+        os_metadata = Pod.get_metadata_of_interest('Commons', self.name, lines, attributes_of_interest)
         Pod.print_table(os_metadata)
 
     def log_jdk(self):

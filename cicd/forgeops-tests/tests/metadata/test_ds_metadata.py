@@ -31,8 +31,9 @@ class TestDSMetadata(object):
     def test_version(self):
         """Report the version"""
 
-        logger.test_step('Report product version')
+        logger.test_step('Report the version')
         for ds_pod in TestDSMetadata.pods:
+            logger.info('Report the version for {name}'.format(name=ds_pod.name))
             ds_pod.log_version()
 
     @pytest.fixture()

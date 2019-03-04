@@ -31,7 +31,7 @@ class TestAMMetadata(object):
 
         logger.test_step('Report the version')
         representative_pod = TestAMMetadata.pods[0]
-        logger.info('Report commons version for {name}'.format(name=representative_pod.name))
+        logger.info('Report version for {name}'.format(name=representative_pod.name))
         representative_pod.log_version()
 
     def test_commons_version(self):
