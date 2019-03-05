@@ -37,6 +37,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Delegate permission for Service Principal to access Static IP resource group
+./aks-assign-role-to-sp.sh
+
 # Create monitoring namespace
 kubectl create namespace ${AKS_MONITORING_NS}
 

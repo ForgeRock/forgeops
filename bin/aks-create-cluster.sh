@@ -92,18 +92,6 @@ az aks get-credentials \
 	--resource-group ${AKS_RESOURCE_GROUP_NAME} \
     --name ${AKS_CLUSTER_NAME} \
     --overwrite-existing
-
-## Get service principal client-id
-SP_ID=$(az aks list --resource-group ${AKS_RESOURCE_GROUP_NAME} | grep -i clientId | awk '{ print $2 }' | cut -d \" -f2)
-
-# Get Azure subscription ID
-SUB=$(az account show |grep \"id\" | cut -d \" -f4)
-
-# Delegate permission for Service Principal to access Static IP resource group
-az role assignment create\
-   --assignee ${SP_ID} \
-   --role "Network Contributor" \
-   --scope /subscriptions/${SUB}/resourceGroups/${AKS_IP_RESOURCE_GROUP_NAME} || true
   
    
 
