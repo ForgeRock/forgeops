@@ -7,7 +7,7 @@
 
 API_KEY=${API_KEY:-`cat /api_key`}
 
-
+echo "key: $API_KEY"
 VERSION=${VERSION:-6.5.0}
 
 # Internal -  for milestone releases
@@ -17,7 +17,7 @@ INTERNAL_REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
 PRIVATE_REPO=https://maven.forgerock.org/repo/private-releases/org/forgerock
 
 # Default to private (release) repo
-REPO=$PRIVATE_REPO
+REPO=$INTERNAL_REPO
 
 # Pass this in via the environment to use a GCS cache for the artifacts. You must have RW access to this bucket
 #GCS_DIR=gs://forgeops-cache

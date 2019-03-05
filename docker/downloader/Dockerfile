@@ -22,5 +22,3 @@ RUN echo $API_KEY >/api_key && \
 COPY download /usr/bin/
 
 ENTRYPOINT [ "/usr/bin/download" ]
-
-CMD [ "-I" ]
