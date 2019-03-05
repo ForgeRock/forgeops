@@ -68,6 +68,15 @@ spec:
           - name: git
             mountPath: /git
           {{ end }}
+      {{ if eq .Values.taints.enabled true }}
+      tolerations:
+        - key: {{ .Values.taints.key | quote }}
+          operator: "Equal"
+          value: {{ .Values.taints.value | quote }}
+          effect: "NoSchedule"
+      nodeSelector:
+        {{ .Values.taints.key }} : {{ .Values.taints.value }}
+      {{end}}
       containers:
         - name: forgeops-benchmark-results
           image: nginx:1.11.0
