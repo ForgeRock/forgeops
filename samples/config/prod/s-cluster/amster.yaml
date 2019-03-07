@@ -8,6 +8,8 @@ config:
   importPath: /git/config/6.5/cdm/m-cluster/am
   exportPath: /tmp/amster
 
+amadminPassword: password
+
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
 ctsPassword: password
 
