@@ -1,0 +1,27 @@
+timeout: 500s
+steps:
+# Run skaffold build with the gcb profile. This creates a docker image
+# that is tagged with the short sha git commit tag.
+- name: gcr.io/$PROJECT_ID/skaffold:alpha
+  args: ['build', '-p', 'gcb']
+  #args: ['build']
+  dir: cicd/ig
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-east1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=eng-shared'
+- name: gcr.io/$PROJECT_ID/kustomize:latest
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-east1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=eng-shared'
+  - 'GCLOUD_PROJECT=$PROJECT_ID'
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    gcloud container clusters get-credentials --zone "$$CLOUDSDK_COMPUTE_ZONE" "$$CLOUDSDK_CONTAINER_CLUSTER"
+    cd cicd/ig/overlays/gke
+    kustomize edit set imagetag gcr.io/engineering-devops/sk-ig:$SHORT_SHA
+    kustomize edit set namespace test 
+    kustomize build | kubectl apply -f -   
+images:
+- 'gcr.io/$PROJECT_ID/sk-ig'

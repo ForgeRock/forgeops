@@ -1,0 +1,22 @@
+apiVersion: skaffold/v1beta6
+kind: Config
+build:
+  artifacts:
+  - image: gcr.io/engineering-devops/sk-ig
+    context: docker
+  tagPolicy:
+    sha256: {}
+deploy:
+  helm:
+    releases:
+    - name: sk-ig
+      chartPath: ../../helm/ig
+      values:
+        image: gcr.io/engineering-devops/sk-ig
+      valuesFiles:
+      - ../helm-common.yaml
+profiles:
+  - name: gcb
+    build:
+      tagPolicy:
+        gitCommit: {}
