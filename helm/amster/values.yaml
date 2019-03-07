@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2016-2019 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 
@@ -18,37 +18,15 @@ subdomain: iam
 # will be generated. The password can viewed using:
 # kubectl get configmaps amster-config -o yaml
 # You may wish to delete this configmap once you have saved the passwords. 
-apiVersion: v1
 # amadminPassword: password
 # encryptionKey: "123456789012"
 # policyAgentPassword: Passw0rd
 prometheusPassword: prometheus
 
 
-config:
-  # Name of the configMap that holds the configuration repository URL and of
-  # the secret required to access it.
-  name: frconfig
-  # The path where we import the configuration from. Your git repo will usually be mounted on /git/config.
-  importPath: /git/config/6.5/default/am/empty-import
-  # Where we perform export to. If not set, this defaults to the importPath
-  #exportPath: /tmp/amster
-  # strategy defines how products get their configuration .
-  # Using the git strategy, each helm chart pulls the configuration from git using an init container.
-  # If strategy is set to anything other than git (e.g. file), it is assumed some other process will make
-  # files available to the container (baked in to the docker image, or provided by skaffold, etc.)
-  strategy: git
+image: forgerock-docker-public.bintray.io/forgerock/amster:7.0.0-SNAPSHOT
 
-image:
-  repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 7.0.0-SNAPSHOT
-  pullPolicy: IfNotPresent
-  #pullPolicy: Always
-
-gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
-  pullPolicy: IfNotPresent
+pullPolicy: IfNotPresent
 
 configStore:
   # type can be dirServer or embedded. Only dirServer is supported
@@ -102,7 +80,7 @@ resources:
 
 istio:
   enabled: false
-  subdomain: iam
+ 
 
 # Amster scripts
 # 

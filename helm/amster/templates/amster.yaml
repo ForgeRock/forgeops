@@ -21,80 +21,27 @@ spec:
         component:  {{ .Values.component }}
     spec:
       terminationGracePeriodSeconds: 5
-      {{ if eq .Values.config.strategy "git" -}}
-      initContainers:
-      - name: git-init
-        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
-        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name:  {{ default "frconfig" .Values.config.name  }}
-      {{- end }}
       containers:
       - name: amster
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy: {{  .Values.image.pullPolicy }}
+        image: {{ .Values.image }}
+        imagePullPolicy: {{  .Values.pullPolicy }}
         envFrom:
         - configMapRef:
             name: amster-{{ .Release.Name }}
-        - configMapRef:
-            name:  {{ default "frconfig" .Values.config.name  }}
-        - secretRef:
-            name: {{ default "frconfig" .Values.config.name }}-platform
         env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
         volumeMounts:
-        {{ if eq .Values.config.strategy "git" -}}
-        - name: git
-          mountPath: /git
-        {{- end }}
         # The ssh key for Amster authN
         - name: amster-secrets
           mountPath: /var/run/secrets/amster
           readOnly: true
-        # The Amster scripts - not configuration.
-        - name: scripts
-          mountPath: /opt/amster/scripts
         args: ["configure", "sync"]
         resources:
 {{ toYaml .Values.resources | indent 12 }}
-      {{ if eq .Values.config.strategy "git" -}}
-      - name: git
-        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
-        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        env:
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        args: [ "pause"]
-      {{ end }}
       volumes:
       - name: amster-secrets
         secret:
           secretName: amster-secrets
-      - name: scripts
-        configMap:
-          name: amster-config
-      # the amster and git pods share access to this volume
-      {{ if eq .Values.config.strategy "git" -}}
-      - name: git
-        emptyDir: {}
-      - name: git-secret
-        secret:
-          secretName:  {{ default "frconfig" .Values.config.name }}
-      {{- end }}
