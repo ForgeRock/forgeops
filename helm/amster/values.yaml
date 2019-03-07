@@ -106,3 +106,18 @@ resources:
 # in the chart. An alternate strategy is to fork this chart and replace the secrets in templates/secrets 
 # with your own.
 useDefaultSecrets: true
+
+# Amster scripts
+# 
+# You can set your own amster scripts here. They will be run in alphabetical order when the Amster pod detects an unconfigured AM.
+# You can list amster commands or invoke other scripts - it is good practice to keep your Amster scripts in version control:
+# e.g.:
+#
+# scripts:
+#   02_my_script: |-
+#     delete LdapModule --realm / --id LDAP
+#     delete HotpModule --realm / --id HOTP
+#   03_invoke_other_scripts: |-
+#     :load /git/config/scripts/do_stuff.amster
+
+scripts: {}
