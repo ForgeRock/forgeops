@@ -125,10 +125,8 @@ chk_config()
     fi
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
-    SUBDOMAIN="iam"
-    BASE_FQDN="${NAMESPACE}.${SUBDOMAIN}.${DOMAIN}"
-    AM_URL="${BASE_FQDN}/am"
-    IDM_URL="${BASE_FQDN}"
+    AM_URL="${URL_PREFIX:-login}.${NAMESPACE}${DOMAIN}"
+    IDM_URL="${IDM_URL_PREFIX:-openidm}.${NAMESPACE}${DOMAIN}"
 }
 
 create_namespace()
@@ -217,7 +215,7 @@ deploy_charts()
 isalive_check()
 {
     PROTO="https"
-    ALIVE_JSP="${PROTO}://${AM_URL}/isAlive.jsp"
+    ALIVE_JSP="${PROTO}://${AM_URL}/openam/isAlive.jsp"
     echo "=> Testing ${ALIVE_JSP}"
     STATUS_CODE="503"
     until [ "${STATUS_CODE}" = "200" ]; do
