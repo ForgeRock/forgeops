@@ -9,6 +9,8 @@ config:
   #importPath: /git/config/6.5/default/am/empty-import
   exportPath: /tmp/amster
 
+amadminPassword: password
+
 ctsStores: ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389
 ctsPassword: password
 
