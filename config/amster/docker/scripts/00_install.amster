@@ -1,4 +1,4 @@
- // todo: Paramterize DOMAIN and passwords with env vars
+ // todo: Parameterize DOMAIN and passwords with env vars
  install-openam \
     --serverUrl http://openam:80/am \
     --authorizedKey  /var/run/secrets/amster/authorized_keys \
