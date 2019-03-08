@@ -1,0 +1,59 @@
+# Copyright (c) 2016-2017 ForgeRock AS. Use of this source code is subject to the
+# Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+kind: Deployment
+apiVersion: apps/v1beta1
+metadata:
+  # If you want to run more than one IG deployment in the same namespace, change the deployment name
+  # below to the {{ template "fullname" . }} to make the name unique.
+  name:  {{ template "fullname" . }}
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    vendor: forgerock
+    component: {{ .Values.component }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}
+        release: {{ .Release.Name }}
+        component: {{ .Values.component }}
+        vendor: forgerock
+      annotations:
+         sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image:  {{ .Values.image }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        envFrom:
+        - secretRef:
+            name: {{ default "openig-secrets-env" .Values.secret.name  }}
+        env:
+        - name: OPENIG_BASE
+          value: "/config"
+        - name: CATALINA_OPTS
+          value: "{{ .Values.catalinaOpts }}"
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports:
+        - containerPort: {{ .Values.service.internalPort }}
+        livenessProbe:
+          httpGet:
+           path: {{ .Values.healthURI }}
+           port: {{ .Values.service.internalPort }}
+          timeoutSeconds: 5
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.readinessURI }}
+            port: {{ .Values.service.internalPort }}
+          initialDelaySeconds: 5
+        resources:
+{{ toYaml .Values.resources | indent 12 }}

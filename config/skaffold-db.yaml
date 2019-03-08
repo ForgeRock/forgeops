@@ -1,0 +1,19 @@
+# Persistence services
+# This skaffold is used if you want to  deploy the persistence services separately. In theory, these
+# services need to be recycled less often.
+# skaffold -f skaffold-db.yaml run
+# To cleanup
+# skaffold -f skaffold-db.yaml delete
+apiVersion: skaffold/v1beta6
+kind: Config
+deploy:
+  helm:
+    releases:
+    - name: userstore
+      chartPath: ../helm/ds
+      setValues:
+        instance: userstore
+    - name: configstore
+      chartPath: ../helm/ds
+      setValues:
+        instance: configstore

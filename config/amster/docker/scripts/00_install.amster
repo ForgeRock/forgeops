@@ -14,4 +14,10 @@
     --userStoreHost "userstore" \
     --userStorePort 1389 \
     --userStoreRootSuffix "ou=identities" \
-    --userStoreType "LDAPv3ForOpenDS"
+    --userStoreType "LDAPv3ForOpenDS" \
+    --policyAgentPwd "Passw0rd" \
+    --pwdEncKey "C00lBeans" \
+    --acceptLicense \
+    --lbSiteName site1 \
+    --lbPrimaryUrl https://default.iam.example.com \
+    --cfgDir /home/forgerock/openam

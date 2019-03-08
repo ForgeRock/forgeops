@@ -23,8 +23,8 @@ data:
      "configStoreList" : [ {
        "baseDN" : "{{.Values.rootSuffix }}",
        "dirManagerDN" : "uid=am-config,ou=admins,ou=am-config",
-       "ldapHost" : "{{ default "opendj-configstore-0.opendj-configstore" .Values.configLdapHost }}",
-       "ldapPort" : {{ default 1389 .Values.configLdapPort }},
+       "ldapHost" : "{{ .Values.configLdapHost }}",
+       "ldapPort" : {{ .Values.configLdapPort }},
        "ldapProtocol" : "ldap"
      } ]
    }
@@ -36,7 +36,3 @@ metadata:
   name: am-configmap
 data:
   CATALINA_OPTS: "{{ .Values.catalinaOpts }}"
-  {{ if .Values.config.amCustomizationScriptPath -}}
-  CUSTOMIZE_AM: "{{ .Values.config.amCustomizationScriptPath }}"
-  {{- end }}
-

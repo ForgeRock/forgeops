@@ -43,20 +43,6 @@ spec:
                 topologyKey: {{ .Values.topologyKey }}
       {{- end }}
       initContainers:
-       {{ if eq .Values.config.strategy  "git" }}
-      - name: git-init
-        image: {{ .Values.gitImage.repository }}:{{ .Values.gitImage.tag }}
-        imagePullPolicy: {{ .Values.gitImage.pullPolicy }}
-        volumeMounts:
-        - name: git
-          mountPath: /git
-        - name: git-secret
-          mountPath: /etc/git-secret
-        args: ["init"]
-        envFrom:
-        - configMapRef:
-            name:  {{ default "frconfig" .Values.config.name  }}
-      {{ end }}
       # The init containers below should be removed once file based configuration is in place.
       - name: wait-for-configstore
         image: {{ .Values.utilImage.repository }}:{{ .Values.utilImage.tag }}
@@ -80,8 +66,8 @@ spec:
         args:  ["bootstrap"]
       containers:
       - name: openam
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        imagePullPolicy:  {{ .Values.image.pullPolicy }}
+        image: {{ .Values.image }}
+        imagePullPolicy:  {{ .Values.pullPolicy }}
         ports:
         - containerPort: 8080
           name: http
@@ -94,22 +80,9 @@ spec:
           mountPath: /var/run/secrets/openam/keystore
         - name: openam-keystore-passwords
           mountPath: /var/run/secrets/openam/password
-        {{ if eq .Values.config.strategy  "git" }}
-        - name: git
-          mountPath: /git
-        {{ end }}
-        {{ if .Values.useConfigMapWebxml }}
-        - mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
-          name: webxml
-          subPath: webxml
-        {{ end }}
         envFrom:
         - configMapRef:
             name: am-configmap
-        {{ if eq .Values.config.strategy  "git" }}
-        - configMapRef:
-            name:  {{ default "frconfig" .Values.config.name  }}
-        {{ end }}
         env:
         - name: NAMESPACE
           valueFrom:
@@ -132,25 +105,7 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
           periodSeconds: {{ .Values.livenessPeriod }}
-      # audit logging containers
-      {{- range .Values.auditLogs }}
-      - name: {{ .name }}
-        image: busybox
-        env:
-        - name: LOGFILE
-          value: {{ .path }}
-        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
-        volumeMounts:
-        - name: openam-root
-          mountPath: /home/forgerock/openam
-      {{- end }}
       volumes:
-      {{ if .Values.useConfigMapWebxml }}
-      - configMap:
-          defaultMode: 420
-          name: webxml
-        name: webxml
-      {{ end }}
       - name: openam-root
         emptyDir: {}
       - name: openam-keys
@@ -164,12 +119,4 @@ spec:
           name: boot-json
       - name: configstore-secret
         secret:
-          secretName: configstore
-          #defaultMode: 256
-      {{ if eq .Values.config.strategy  "git" }}
-      - name: git
-        emptyDir: {}
-      - name: git-secret
-        secret:
-          secretName:  {{ default "frconfig" .Values.config.name }}
-      {{ end }}
+          secretName: configstore  
