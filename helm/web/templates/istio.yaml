@@ -1,0 +1,54 @@
+{{ if .Values.istio.enabled }}
+# Istio virtual service for ig. We route /ig/* to OpenIG
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ .Values.component }}
+spec:
+  hosts:
+  -  "{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}"
+  # The gateway referenced here is defined in the frconfig/ chart.
+  gateways:
+  - iam-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /web
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: {{ .Values.service.name }}
+        port:
+          number: {{ .Values.service.port }}
+---
+# Defines an istio gateway for all IAM services running in this namespace. This handles *all* traffic 
+# destined for $namespace.iam.forgeops.com.  Each virtual service in the namespace routes through this gateway 
+# based on a path expression (/ -> AM, /ig -> openig, etc.)
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: iam-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+    tls:
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "*"
+    tls:
+      mode: SIMPLE
+      privateKey: /etc/istio/ingressgateway-certs/tls.key
+      serverCertificate: /etc/istio/ingressgateway-certs/tls.crt
+  {{ end }}

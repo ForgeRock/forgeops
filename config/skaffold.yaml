@@ -1,0 +1,49 @@
+# Skaffold for the full stack (eventually). Run:
+# skaffold dev 
+# If you quite skaffold, the directory PVC are not deleted. You need to manually delete:
+# kubectl delete pvc --all
+apiVersion: skaffold/v1beta6
+kind: Config
+build:
+  artifacts:
+  - image: gcr.io/engineering-devops/sk-ig
+    context: ig/docker
+  - image: gcr.io/engineering-devops/sk-amster
+    context: amster/docker
+  - image: gcr.io/engineering-devops/sk-am
+    context: am/docker
+  tagPolicy:
+    sha256: {}
+deploy:
+  helm:
+    # todo: this does not seem to work for setting a global -f 
+    # flags:
+    #   install:
+    #   - "values: helm-common.yaml"
+    releases:
+    - name: userstore
+      chartPath: ../helm/ds
+      setValues:
+        instance: userstore
+    - name: configstore
+      chartPath: ../helm/ds
+      setValues:
+        instance: configstore
+    - name: ig
+      chartPath: ../helm/ig
+      values:
+        image: gcr.io/engineering-devops/sk-ig
+      valuesFiles:
+      - helm-common.yaml
+    - name: sk-am
+      chartPath: ../helm/am
+      values:
+        image: gcr.io/engineering-devops/sk-am
+      valuesFiles:
+      - helm-common.yaml
+    - name: sk-amster
+      chartPath: ../helm/amster
+      values:
+        image: gcr.io/engineering-devops/sk-amster
+      valuesFiles:
+      - helm-common.yaml

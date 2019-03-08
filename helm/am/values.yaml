@@ -4,35 +4,22 @@
 
 component: openam
 
-image:
-  repository: forgerock-docker-public.bintray.io/forgerock/am
-  tag: 7.0.0-SNAPSHOT
-  # For development we set this to Always to get the most current image:
-  pullPolicy: IfNotPresent
-
-gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
-  pullPolicy: IfNotPresent
+image: forgerock-docker-public.bintray.io/forgerock/am:7.0.0-SNAPSHOT
+pullPolicy: IfNotPresent
 
 utilImage:
   repository: forgerock-docker-public.bintray.io/forgerock/util
   tag: 7.0.0
   pullPolicy: IfNotPresent
-  #pullPolicy: Always
 
 domain: example.com
 subdomain: iam
-
-config:
-  name: frconfig
-  strategy: git
 
 openamReplicaCount: 1
 
 
 configLdapPort:  1389
-configLdapHost: configstore-0.configstore
+configLdapHost: configstore
 
 
 # This option:
@@ -118,20 +105,6 @@ ingress:
     # nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
     # nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
     # nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
-
-# Audit log details for log streaming sidecar containers.
-# AM can now stream audit logs to stdout. This option may be removed in the future.
-auditLogs: []
-
-# auditLogs:
-#   - name: access-logs
-#     path: "/home/forgerock/openam/openam/log/access.audit.json"
-#   - name: activity-logs
-#     path: "/home/forgerock/openam/openam/log/activity.audit.json"
-#   - name: authentication-logs
-#     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
-#   - name: config-logs
-#     path: "/home/forgerock/openam/openam/log/config.audit.json"
 
 
 istio:

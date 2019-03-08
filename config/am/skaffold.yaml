@@ -1,0 +1,17 @@
+apiVersion: skaffold/v1beta6
+kind: Config
+build:
+  artifacts:
+  - image: gcr.io/engineering-devops/sk-am
+    context: docker
+  tagPolicy:
+    sha256: {}
+deploy:
+  helm:
+    releases:
+    - name: sk-am
+      chartPath: ../../helm/openam
+      values:
+        image: gcr.io/engineering-devops/sk-am
+      valuesFiles:
+      - ../helm-common.yaml
