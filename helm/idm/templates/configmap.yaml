@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: {{ template "fullname" . }}
 data:
-  PROJECT_HOME:  "{{ .Values.config.path }}"
+  PROJECT_HOME:  "/opt/openidm"
   LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
   IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
   JAVA_OPTS: {{ default "-Xmx1024m -server -XX:+UseG1GC" .Values.javaOpts }}
@@ -80,8 +80,7 @@ data:
 
       # PKCS#11 configuration file
       #openidm.security.pkcs11.config=
-      openidm.servlet.alias=/openidm
-
+      openidm.servlet.alias="{{ .Values.rootContext }}"
       # key in keystore to handle config encryption
       openidm.config.crypto.alias=openidm-sym-default
       openidm.script.javascript.debug=transport=socket,suspend=y,address=9888,trace=true
@@ -139,10 +138,10 @@ data:
       # To disable the persisted configuration store set this property to false.
       # This will store the configurations only in memory.
       # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration
-      openidm.config.repo.enabled={{ not .Values.config.immutable }}
+      openidm.config.repo.enabled={{ not .Values.immutableConfig }}
 
       # To stop writes to configuration files, set this property to false; suitable for read-only installations.
-      felix.fileinstall.enableConfigSave={{ not .Values.config.immutable }}
+      felix.fileinstall.enableConfigSave={{ not .Values.immutableConfig }}
 
       # This needs to be true to boot from json files.
       openidm.fileinstall.enabled=true

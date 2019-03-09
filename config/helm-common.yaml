@@ -1,1 +1,8 @@
 domain: example.com
+
+openidm:
+  repo:
+    host: idrepo
+    port: 1389
+    user: "cn=Directory Manager"
+    password: password

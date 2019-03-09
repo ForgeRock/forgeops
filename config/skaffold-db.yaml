@@ -9,10 +9,10 @@ kind: Config
 deploy:
   helm:
     releases:
-    - name: userstore
+    - name: idrepo
       chartPath: ../helm/ds
       setValues:
-        instance: userstore
+        instance: idrepo
     - name: configstore
       chartPath: ../helm/ds
       setValues:

@@ -29,20 +29,20 @@ spec:
           backend:
             serviceName: {{ .Values.service.name }}
             servicePort: {{ .Values.service.externalPort }}
-        - path: /api
-          backend:
-            serviceName: {{ .Values.service.name }}
-            servicePort: {{ .Values.service.externalPort }}
-        - path: /openidm
-          backend:
-            serviceName: {{ .Values.service.name }}
-            servicePort: {{ .Values.service.externalPort }}
-        - path: /oauthReturn
-          backend:
-            serviceName: {{ .Values.service.name }}
-            servicePort: {{ .Values.service.externalPort }}
-        - path: /admin
-          backend:
-            serviceName: {{ .Values.service.name }}
-            servicePort: {{ .Values.service.externalPort }}
+        # - path: /api
+        #   backend:
+        #     serviceName: {{ .Values.service.name }}
+        #     servicePort: {{ .Values.service.externalPort }}
+        # - path: /openidm
+        #   backend:
+        #     serviceName: {{ .Values.service.name }}
+        #     servicePort: {{ .Values.service.externalPort }}
+        # - path: /oauthReturn
+        #   backend:
+        #     serviceName: {{ .Values.service.name }}
+        #     servicePort: {{ .Values.service.externalPort }}
+        # - path: /admin
+        #   backend:
+        #     serviceName: {{ .Values.service.name }}
+        #     servicePort: {{ .Values.service.externalPort }}
 {{- end -}}

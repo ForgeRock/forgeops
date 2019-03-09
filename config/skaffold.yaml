@@ -7,11 +7,13 @@ kind: Config
 build:
   artifacts:
   - image: gcr.io/engineering-devops/sk-ig
-    context: ig/docker
+    context: ig
   - image: gcr.io/engineering-devops/sk-amster
-    context: amster/docker
+    context: amster
   - image: gcr.io/engineering-devops/sk-am
-    context: am/docker
+    context: am
+  - image: gcr.io/engineering-devops/sk-idm
+    context: idm
   tagPolicy:
     sha256: {}
 deploy:
@@ -45,5 +47,11 @@ deploy:
       chartPath: ../helm/amster
       values:
         image: gcr.io/engineering-devops/sk-amster
+      valuesFiles:
+      - helm-common.yaml
+    - name: sk-amster
+      chartPath: ../helm/idm
+      values:
+        image: gcr.io/engineering-devops/sk-idm
       valuesFiles:
       - helm-common.yaml

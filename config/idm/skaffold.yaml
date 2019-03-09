@@ -2,15 +2,15 @@ apiVersion: skaffold/v1beta6
 kind: Config
 build:
   artifacts:
-  - image: gcr.io/engineering-devops/sk-amster
+  - image: gcr.io/engineering-devops/sk-idm
   tagPolicy:
     sha256: {}
 deploy:
   helm:
     releases:
-    - name: sk-amster
-      chartPath: ../../helm/amster
+    - name: sk-idm
+      chartPath: ../../helm/idm 
       values:
-        image: gcr.io/engineering-devops/sk-amster
+        image: gcr.io/engineering-devops/sk-idm
       valuesFiles:
       - ../helm-common.yaml

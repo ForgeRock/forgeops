@@ -1,0 +1,17 @@
+{
+    "classPathURLs" : [ ],
+    "systemProperties" : { },
+    "requestAttributes" : { },
+    "scriptExtensions" : { },
+    "initParams" : {
+        "allowedOrigins" : "https://localhost:&{openidm.port.https}",
+        "allowedMethods" : "GET,POST,PUT,DELETE,PATCH",
+        "allowedHeaders" : "accept,x-openidm-password,x-openidm-nosession,x-openidm-username,content-type,origin,x-requested-with",
+        "allowCredentials" : true,
+        "chainPreflight" : false
+    },
+    "urlPatterns" : [
+        "/*"
+    ],
+    "filterClass" : "org.eclipse.jetty.servlets.CrossOriginFilter"
+}

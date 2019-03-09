@@ -1,0 +1,84 @@
+# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved.
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+    app: {{ template "name" . }}
+    component: {{ .Values.component }}
+    vendor: forgerock
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    type: RollingUpdate
+  serviceName: idm
+  template:
+    metadata:
+      labels:
+        app: {{ template "name" . }}
+        release: {{ .Release.Name }}
+        component: {{ .Values.component }}
+        vendor: forgerock
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
+    spec:  
+      containers:
+      - name: openidm
+        image: {{ .Values.image }}
+        imagePullPolicy: {{ .Values.pullPolicy }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "fullname" . }}
+        # Todo: need to decide if we have global env vars / secrets across all charts
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /idm/info/ping
+            port: 8080
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value:  "true"
+          initialDelaySeconds: 120
+          timeoutSeconds: 5
+          periodSeconds: 30
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
+        volumeMounts:
+        - name: openidm-secrets
+          mountPath: /opt/openidm/secrets
+        - name: logs
+          mountPath: /opt/openidm/logs
+        - name: audit-logs
+          mountPath: /opt/openidm/audit
+        - name: boot-properties
+          mountPath: /var/run/openidm/commons
+        - name: logging-properties
+          mountPath: /var/run/openidm/logging
+      volumes:
+      - name: openidm-secrets
+        secret:
+          secretName: openidm-secrets
+      - name: logs
+        emptyDir: {}
+      - name: audit-logs
+        emptyDir: {}
+      - name: boot-properties
+        configMap:
+          name: idm-boot-properties
+      - name: logging-properties
+        configMap:
+          name: idm-logging-properties

@@ -11,7 +11,7 @@
     --cfgStoreRootSuffix "ou=am-config" \
     --userStoreDirMgr "cn=Directory Manager" \
     --userStoreDirMgrPwd  "password" \
-    --userStoreHost "userstore" \
+    --userStoreHost "idrepo" \
     --userStorePort 1389 \
     --userStoreRootSuffix "ou=identities" \
     --userStoreType "LDAPv3ForOpenDS" \
