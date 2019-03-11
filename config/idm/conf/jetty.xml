@@ -45,6 +45,12 @@
             <Arg>
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
+                    <!-- 
+                    
+                    See https://backstage.forgerock.com/docs/idm/6.5/integrators-guide/#clustering-load-balancer 
+                    When IDM is behind a load balancer (ingress) we leave URL hijacking support up the ingress.
+                    The settings below use the internal idm port - which causes redirects to fail
+
                     <Set name="hostHeader">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>
@@ -52,6 +58,7 @@
                         <Arg>openidm.port.http</Arg>
                     </Call>
                     </Set>
+                    -->
                 </New>
             </Arg>
         </Call>

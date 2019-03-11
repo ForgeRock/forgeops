@@ -43,7 +43,7 @@ spec:
         - containerPort: 8080
         livenessProbe:
           httpGet:
-            path: /idm/info/ping
+            path: /openidm/info/ping
             port: 8080
             httpHeaders:
             - name: X-OpenIDM-Username
@@ -65,7 +65,8 @@ spec:
         - name: audit-logs
           mountPath: /opt/openidm/audit
         - name: boot-properties
-          mountPath: /var/run/openidm/commons
+          #mountPath: /var/run/openidm/commons
+          mountPath: /opt/openidm/resolver
         - name: logging-properties
           mountPath: /var/run/openidm/logging
       volumes:

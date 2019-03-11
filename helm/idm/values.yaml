@@ -89,4 +89,5 @@ ingress:
 istio:
   enabled: false
 
-rootContext: /idm
+# Must start with a /, and do not quote it..
+rootContext: /openidm

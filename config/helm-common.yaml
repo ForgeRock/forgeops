@@ -6,3 +6,5 @@ openidm:
     port: 1389
     user: "cn=Directory Manager"
     password: password
+
+immutableConfig: true

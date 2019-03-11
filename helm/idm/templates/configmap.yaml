@@ -6,7 +6,8 @@ metadata:
 data:
   PROJECT_HOME:  "/opt/openidm"
   LOGGING_PROPERTIES: "/var/run/openidm/logging/logging.properties"
-  IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
+  #IDM_ENVCONFIG_DIRS: "/var/run/openidm/commons"
+  IDM_ENVCONFIG_DIRS: "/opt/openidm/resolver"
   JAVA_OPTS: {{ default "-Xmx1024m -server -XX:+UseG1GC" .Values.javaOpts }}
   OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
   OPENIDM_CONFIG_REPO_ENABLED: "false"
@@ -80,7 +81,8 @@ data:
 
       # PKCS#11 configuration file
       #openidm.security.pkcs11.config=
-      openidm.servlet.alias="{{ .Values.rootContext }}"
+      # Do not quote this string
+      openidm.servlet.alias={{ .Values.rootContext }}
       # key in keystore to handle config encryption
       openidm.config.crypto.alias=openidm-sym-default
       openidm.script.javascript.debug=transport=socket,suspend=y,address=9888,trace=true
