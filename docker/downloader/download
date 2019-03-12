@@ -69,14 +69,6 @@ dl(){
   
     echo "Downloading $src to $3"
 
-    echo "GCS_CACHE is: $GCS_DIR"
-    if [ -n "$GCS_DIR" ]; then
-        gsutil cp $GCS_DIR/$2 $3
-        if [ "$?" -eq 0 ];  then
-            return 0
-        fi
-        echo "Can't find cached file $2 - will download"
-    fi
 
     if [ -z "${WGET+x}" ]
     then
@@ -90,12 +82,6 @@ dl(){
         echo "Download failed"
         exit 1
     fi
-
-    if [ -n "$GCS_DIR" ]; then
-        echo "Saving a cached copy of $2"
-        gsutil cp "$3" "$GCS_DIR/$2" || echo "Could not save to cache. Skipping"
-    fi
-
 }
 
 while getopts "Iwv:" opt; do

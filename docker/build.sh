@@ -12,15 +12,19 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $DIR
 
 # Default settings. You can set these all via command switches as well.
-REGISTRY="forgerock-docker-public.bintray.io"
+#REGISTRY="forgerock-docker-public.bintray.io"
+REGISTRY="gcr.io/forgerock-io"
 #REGISTRY="forgerock-docker-internal.bintray.io"
 
-REPO="forgerock"
+#REPO="forgerock"
+# For gcr - the project name is used as the repo.
+REPO="forgerock-io"
+
 # Default tag if none is specified.
 TAG=${TAG:-6.5.1}
 
 # If you want to push to Google gcr.io, replace the repository name with your project name.
-PROJECT="engineering-devops"
+PROJECT="forgerock-io"
 
 # These are the default images that will be built if no images are specified on the command line.
 IMAGES="openam ds openidm openig amster util git java gatling apache-agent nginx-agent"
@@ -107,16 +111,15 @@ if [ -n "$BUILD_CSV" ]; then
       ${DRYRUN} docker build  $NETWORK --build-arg VERSION=$artifact -t $folder $folder
 
       # For each registry we support ()
-      # for reg in "gcr.io/engineering-devops"
-      for reg in "gcr.io/engineering-devops" "forgerock-docker-public.bintray.io/forgerock" 
+      # 
+      for reg in "gcr.io" 
       do
-          img="${reg}/${folder}"
+          img="${reg}/${REPO}/${folder}"
           ${DRYRUN} docker tag ${folder} "${img}:${tag}"
-          ${DRYRUN} docker tag ${folder} "${img}:latest"
         
           # Push all tags.
            if [ -n "$PUSH" ]; then
-            ${DRYRUN} docker push "${img}"
+            ${DRYRUN} docker push "${img}:${tag}"
           fi
       done
      
