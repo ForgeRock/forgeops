@@ -13,7 +13,7 @@ cd $DIR
 
 # Default settings. You can set these all via command switches as well.
 #REGISTRY="forgerock-docker-public.bintray.io"
-REGISTRY="gcr.io/forgerock-io"
+REGISTRY="gcr.io"
 #REGISTRY="forgerock-docker-internal.bintray.io"
 
 #REPO="forgerock"
