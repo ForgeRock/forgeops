@@ -102,7 +102,6 @@ resources:
 
 istio:
   enabled: false
-  subdomain: iam
 
 # Amster scripts
 # 

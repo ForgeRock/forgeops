@@ -26,7 +26,7 @@ data:
     --pwdEncKey {{ if .Values.encryptionKey}}{{ .Values.encryptionKey }}{{ else }}{{ randAlphaNum 10 | quote }}{{end}} \
     --acceptLicense \
     --lbSiteName site1 \
-    --lbPrimaryUrl https://{{ .Release.Namespace }}.{{ .Values.istio.subdomain }}.{{ .Values.domain }}/am \
+    --lbPrimaryUrl https://{{ .Release.Namespace }}.{{ .Values.subdomain }}.{{ .Values.domain }}/am \
     --cfgDir /home/forgerock/openam
     :exit
   01_import.amster: |
