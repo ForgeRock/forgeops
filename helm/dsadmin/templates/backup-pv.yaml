@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ds-backup
+  name: ds-backup-{{ .Release.Namespace }}
   annotations:
     # We tell helm to not delete the backup PV for safety
     "helm.sh/resource-policy": keep
