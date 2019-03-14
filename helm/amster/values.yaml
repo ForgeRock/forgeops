@@ -121,3 +121,5 @@ useDefaultSecrets: true
 #     :load /git/config/scripts/do_stuff.amster
 
 scripts: {}
+
+# serviceAccountName: my-amster-serviceaccount

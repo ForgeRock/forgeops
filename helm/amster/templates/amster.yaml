@@ -21,6 +21,9 @@ spec:
         component:  {{ .Values.component }}
     spec:
       terminationGracePeriodSeconds: 5
+      {{- with .Values.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
       {{ if eq .Values.config.strategy "git" -}}
       initContainers:
       - name: git-init
