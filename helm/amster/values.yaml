@@ -118,4 +118,4 @@ istio:
 
 scripts: {}
 
-# serviceAccountName
+# serviceAccountName: my-amster-serviceaccount
