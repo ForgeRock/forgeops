@@ -28,8 +28,8 @@ agent:
 component: nginx-agent
 
 image:
-  repository: forgerock-docker-public.bintray.io
-  tag: latest
+  repository: gcr.io/forgerock-io
+  tag: 6.5.1
   pullPolicy: Always
 
 securityContext:

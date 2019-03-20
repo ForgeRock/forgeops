@@ -3,7 +3,7 @@
 
 SRC="gcr.io/engineering-devops"
 DEST="forgerock-docker-internal.bintray.io/forgerock"
-TAG="6.5.0"
+TAG="6.5.1"
 
 if [ -n "$1" ];
     then TAG=$1

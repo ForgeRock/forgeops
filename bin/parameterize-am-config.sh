@@ -10,7 +10,7 @@
 
 
 # Variables to be replaced
-CURRENT_VERSION="6.5.0-M7" # amsterVersion in config
+CURRENT_VERSION="6.5.1-M7" # amsterVersion in config
 CURRENT_FQDN="login.small.lbk8s.net" # fqdn in config
 
 if [ ! -d "global" ]; then

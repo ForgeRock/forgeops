@@ -7,9 +7,9 @@ replicaCount: 1
 component: ds
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  repository: gcr.io/forgerock-io/ds
   pullPolicy: IfNotPresent
-  tag: 6.5.0
+  tag: 6.5.1
 
 gcs:
   enabled: false

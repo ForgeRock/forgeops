@@ -5,19 +5,19 @@
 component: openam
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/openam
+  tag: 6.5.1
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
 gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/git
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 utilImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/util
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/util
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 domain: .example.com

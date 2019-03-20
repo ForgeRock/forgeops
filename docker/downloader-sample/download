@@ -20,7 +20,7 @@ while getopts "wv:d" opt; do
          echo "Usage: dl.sh [-s] [-w] images..."
          echo "-s download snapshots instead of releases"
          echo "-w Use wget instead of curl"
-         echo "-v VERSION - download a specific version (example -v 6.5.0). Default $VERSION"
+         echo "-v VERSION - download a specific version (example -v 6.5.1). Default $VERSION"
          echo "Images can be one or more of: $IMAGES"
          echo "If not specified, all images are downloaded"
          exit 1

@@ -1,5 +1,5 @@
 name: postgres-openidm
-version: 6.5.0
+version: 6.5.1
 description: Chart for PostgreSQL for OpenIDM
 keywords:
 - postgresql

@@ -6,4 +6,4 @@ agent:
 
 image:
   pullPolicy: Always
-  tag: 6.5.0 
+  tag: 6.5.1 

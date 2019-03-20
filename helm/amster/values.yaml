@@ -39,14 +39,14 @@ config:
   strategy: git
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/amster
+  tag: 6.5.1
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
 gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/git
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 configStore:

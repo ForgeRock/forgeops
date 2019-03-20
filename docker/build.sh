@@ -12,9 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $DIR
 
 # Default settings. You can set these all via command switches as well.
-#REGISTRY="forgerock-docker-public.bintray.io"
 REGISTRY="gcr.io"
-#REGISTRY="forgerock-docker-internal.bintray.io"
 
 #REPO="forgerock"
 # For gcr - the project name is used as the repo.

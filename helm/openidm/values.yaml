@@ -32,15 +32,15 @@ secret:
 component: openidm
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openidm
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/openidm
+  tag: 6.5.1
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
 
 gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/git
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 # override Java JVM options.

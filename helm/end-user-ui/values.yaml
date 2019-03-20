@@ -11,8 +11,8 @@ domain: .example.com
 component: end-user-ui
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/end-user-ui
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/end-user-ui
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 service:

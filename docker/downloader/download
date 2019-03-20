@@ -8,7 +8,7 @@
 API_KEY=${API_KEY:-`cat /api_key`}
 
 echo "key: $API_KEY"
-VERSION=${VERSION:-6.5.0}
+VERSION=${VERSION:-6.5.1}
 
 # Internal -  for milestone releases
 INTERNAL_REPO=https://maven.forgerock.org/repo/internal-releases/org/forgerock
@@ -97,7 +97,7 @@ while getopts "Iwv:" opt; do
          echo "Usage: download [-I] [-v version] images..."
          echo "-c Use curl instead of wget"
          echo "-I Use the internal repo for milestones"
-         echo "-v VERSION - download a specific version (example -v 6.5.0). Default $VERSION"
+         echo "-v VERSION - download a specific version (example -v 6.5.1). Default $VERSION"
          echo "Images can be one or more of: $IMAGES"
          echo "If not specified, all images are downloaded"
          exit 1

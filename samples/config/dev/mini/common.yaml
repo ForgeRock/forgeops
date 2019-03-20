@@ -3,7 +3,7 @@ domain: .example.com
 fqdn: login.mini.example.com
 
 image:
-  tag: 6.5.0
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 tlsStrategy: http

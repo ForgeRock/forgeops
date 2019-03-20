@@ -11,7 +11,7 @@ This helm chart expects product deployment to be running and configured.
 
 ### Gatling benchmark image
 
-You can either get gatling benchmark image from bintray forgerock repository
+You can either get gatling benchmark image from GCR forgerock repository
 or build it by yourself. Docker image dockerfile can be found in `forgeops/docker/gatling`.
 To add custom benchmarks, you need to add them to `forgeops/docker/gatling/simulations` folder.
 

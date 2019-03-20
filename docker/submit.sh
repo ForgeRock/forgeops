@@ -2,8 +2,8 @@
 # A sample shell script to manually submit a build to cloud builder. You need to be authenicated
 # to the engineering-devops project.
 #
-# For example, to build AM from version 6.5.0-M3, and tag it with "foo", run this:
-# ./submit.sh openam 6.5.0-M3,foo
+# For example, to build AM from version 6.5.1-M3, and tag it with "foo", run this:
+# ./submit.sh openam 6.5.1-M3,foo
 #
 
 

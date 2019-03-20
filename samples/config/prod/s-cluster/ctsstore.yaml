@@ -1,7 +1,7 @@
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  repository: gcr.io/forgerock-io/ds
   #repository: gcr.io/engineering-devops/ds
-  tag: 6.5.0
+  tag: 6.5.1
   pullPolicy: Always
 
 instance: ctsstore

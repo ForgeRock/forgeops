@@ -27,13 +27,13 @@ secret:
 catalinaOpts: "-Xmx512m"
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openig
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/openig
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/git
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 resources:

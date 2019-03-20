@@ -18,7 +18,7 @@ kind: ConfigMap
 metadata:
   name: idm-boot-properties
 data:
-  # todo: These need to be reviewed for 6.0.0
+  # todo: These need to be reviewed for 6.5.1
    boot.properties: |
       openidm.repo.host={{.Values.openidm.repo.host}}
       openidm.repo.port={{.Values.openidm.repo.port}}
