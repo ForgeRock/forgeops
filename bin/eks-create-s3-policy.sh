@@ -11,7 +11,7 @@ set -o nounset
 BUCKET_NAME="forgeops"
 IAM_POLICY_NAME="ForgeOps-Sync-Policy"
 
-S3_BUCKET=$(aws s3api create-bucket --bucket ${BUCKET_NAME})
+S3_BUCKET=$(aws s3api create-bucket --bucket ${BUCKET_NAME} --create-bucket-configuration LocationConstraint=$(aws configure get region))
 
 BUCKET_ARN="arn:aws:s3:::${BUCKET_NAME}"
 
