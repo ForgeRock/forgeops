@@ -14,8 +14,6 @@ cd $DIR
 # Default settings. You can set these all via command switches as well.
 REGISTRY="gcr.io"
 
-#REPO="forgerock"
-# For gcr - the project name is used as the repo.
 REPO="forgerock-io"
 
 # Default tag if none is specified.
@@ -36,8 +34,8 @@ while getopts "adgpt:r:R:P:i:c:n:C:" opt; do
             exit 1
        fi
        # This is a bit kludgy - but we are hard coding the login to both bintray registires
-       docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" forgerock-docker-public.bintray.io
-       docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" forgerock-docker-internal.bintray.io
+       # docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" forgerock-docker-public.bintray.io
+       # docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" forgerock-docker-internal.bintray.io
         ;;
     t ) TAG="${OPTARG}" ;;
     d ) DRYRUN="echo" ;;

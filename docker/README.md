@@ -40,7 +40,7 @@ mounted for secrets, configuration and persistent data. As such, they are not su
 
 ## Image Builds
 
-The product images are built automatically (using Container Builder) when a commit is made to ForgeOps. These images are pushed to gcr.io/forgerock-io/forgerock.
+The product images are built automatically (using Container Builder) when a commit is made to ForgeOps. These images are pushed to gcr.io/forgerock-io.
 
 
 ## build.sh
