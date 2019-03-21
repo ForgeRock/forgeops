@@ -2,7 +2,8 @@
 # This is a YAML-formatted file.
 
 # Top level domain, including the leading dot. This is used to form the wild-card cert request for cert-manager.
-domain: .example.com
+domain: example.com
+subdomain: iam
 
 config:
   # The default name that products use when looking for the configmap and secret is `frconfig`.
@@ -11,19 +12,18 @@ config:
   # See README.md for more information.
   name: frconfig
 
+secret:
+  env:
+    {}
+
 git:
   # git repo to clone. The value below is a public git repo that does not require authentication.
   repo: "https://github.com/ForgeRock/forgeops-init.git"
   branch: master
 
-platform:
-  idmProtectedByIg: false
-  #igClientUsername: openig
-  #igClientPassword: openig
-
 # Cert manager defaults
 certmanager:
-  enabled: true
+  enabled: false
   # The default issuer is to use the CA certs issuer.
   issuer: ca-issuer
   # And a local to namespace issuer
@@ -32,3 +32,6 @@ certmanager:
   #acme: true
   #issuer: letsencrypt-prod
   #issuerKind: ClusterIssuer
+
+istio:
+  enabled: false

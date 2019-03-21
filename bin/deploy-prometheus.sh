@@ -10,10 +10,12 @@
 # forgerock-metrics uses ../etc/prometheus-values/custom.yaml which can be used to override the forgerock-metrics Helm chart values.
 # You can deploy your own custom values file by using the -f <values file> flag.
 
+set -e
+
 MONPATH="../etc/prometheus-values"
 DEFAULT_VALUES="${MONPATH}/kube-prometheus.yaml"
 
-USAGE="Usage: $0 [-n <namespace>] [-f <values file>] [-k <kube-prometheus values file>]"
+USAGE="Usage: $0 [-n <namespace>] [-f <values file>] [-k <kube-prometheus values file>] [-s <slack-webhook-url>]"
 
 # Output help if no arguments or -h is included
 if [[ $1 == "-h" ]];then
@@ -21,15 +23,17 @@ if [[ $1 == "-h" ]];then
     echo "-n <namespace>    namespace"
     echo "-f <values file>  add custom values file for forgerocks-metrics. Default: custom.yaml"
     echo "-k <values file>  add custom values file for kube-prometheus. Default: etc/kube-prometheus.yaml"
+    echo "-s <slack webhook url> add the url for a slack webhook url for custom values"
     exit
 fi
 
 # Read arguments
-while getopts :n:f:k: option; do
+while getopts :n:f:k:s: option; do
     case "${option}" in
         n) NAMESPACE=${OPTARG};;
         f) FILE=${OPTARG};;
         k) KFILE=${OPTARG};;
+        s) SLACKURL=${OPTARG};;
         \?) echo "Error: Incorrect usage"
             echo $USAGE
             exit 1;;
@@ -51,6 +55,11 @@ if [ $KFILE ]; then
     OVERRIDE_VALUES="-f ${KFILE}"
 fi
 
+# assign slack url if provided as -s arg
+if [ $SLACKURL ]; then
+    SLACK_VALUES="--set alertmanager.config.global.slack_api_url=${SLACKURL}"
+fi
+
 # Deploy to cluster
 if read -t 10 -p "Installing Prometheus Operator and Grafana to '${NAMESPACE}' namespace in 10 seconds or when enter is pressed...";then echo;fi
 
@@ -66,7 +75,7 @@ fi
 helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values ${MONPATH}/prometheus-operator.yaml --namespace=$NAMESPACE
 
 # Install/Upgrade kube-prometheus
-helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f $DEFAULT_VALUES $OVERRIDE_VALUES --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f $DEFAULT_VALUES $OVERRIDE_VALUES $SLACK_VALUES --namespace=$NAMESPACE
 
 # Install/Upgrade forgerock-servicemonitors
 helm upgrade -i ${NAMESPACE}-forgerock-metrics ../helm/forgerock-metrics $CUSTOM_FILE --set=rbac.install=true --namespace=$NAMESPACE

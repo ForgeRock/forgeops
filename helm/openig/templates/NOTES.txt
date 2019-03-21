@@ -16,4 +16,4 @@
 
 
 If you have an ingress controller, you can also access IG at
-http://{{ template "igFQDN" . }}
+https://{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}/ig

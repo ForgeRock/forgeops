@@ -1,4 +1,10 @@
-domain: .forgeops.com
+domain: forgeops.com
 
 image:
   pullPolicy: Always
+
+istio:
+  enabled: false
+
+ingress:
+  enabled: true

@@ -21,7 +21,7 @@ dir=/tmp/charts
 rm -fr $dir
 mkdir -p $dir
 cd $dir
-charts="frconfig ds amster openam openidm openig postgres-openidm cmp-platform web apache-agent"
+charts="frconfig ds amster openam openidm openig postgres-openidm web apache-agent"
 for chart in $charts
 do
     echo "Packaging $chart"

@@ -14,11 +14,9 @@ set -o nounset
 
 source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 
-GROUP_NAME="eks-efs-sg"
+EFS_GROUP_ID=$(aws ec2 create-security-group --description "Security group used for NFS mount" --group-name ${EFS_SECURITY_GROUP_NAME} --vpc-id ${EKS_VPC_ID} --query 'GroupId' --output text)
 
-EFS_GROUP_ID=$(aws ec2 create-security-group --description "Security group used for NFS mount" --group-name ${GROUP_NAME} --vpc-id ${EKS_VPC_ID} --query 'GroupId' --output text)
-
-echo "EFS Security Group created with ID: ${EFS_GROUP_ID}. Please set this value to the EFS_SECURITY_GROUP attribute in your eks-env.cfg file."
+echo "EFS Security Group created with ID: ${EFS_GROUP_ID}. Please set this value to the EFS_SECURITY_GROUP_ID attribute in your eks-env.cfg file."
 
 EFS_ID=$(aws efs create-file-system --performance-mode maxIO --creation-token EKSNFSMount --query 'FileSystemId' --output text)
 
@@ -28,7 +26,7 @@ do
                       --file-system-id ${EFS_ID} --query 'FileSystems[0].LifeCycleState' --output text)
 
     if [ $EFS_STATUS == "available" ]; then
-      echo "File system created with ID: ${EFS_ID}. Please record this Id to configure backup and restore."
+      echo "File system created with ID: ${EFS_ID}. Please add this ID to the EFS_ID value in the template. This id will also be used to configure backup and restore."
       break
     else
       sleep 10
@@ -41,3 +39,9 @@ for subnet in $(echo $EKS_SUBNETS | tr "," "\n")
 do
   aws efs create-mount-target --file-system-id ${EFS_ID} --subnet-id ${subnet}
 done
+
+# Allow worker nodes access to EFS
+aws ec2 authorize-security-group-ingress --group-id ${EFS_GROUP_ID} \
+    --protocol tcp \
+    --port 2049 \
+    --source-group ${EKS_CONTROL_PLANE_SECURITY_GROUP}

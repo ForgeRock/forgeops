@@ -43,7 +43,7 @@ data:
       openidm.port.http=8080
       openidm.port.https=8443
       openidm.port.mutualauth=8444
-      openidm.host={{ template "idmFQDN" . }}
+      openidm.host={{ printf "%s.%s.%s" .Release.Namespace .Values.subdomain .Values.domain }}
 
       # Define external load balancer ports.
       openidm.lb.port.http=80
@@ -230,7 +230,7 @@ data:
       # Override of global logging level
       #java.util.logging.ConsoleHandler.level = WARNING
       # For Docker
-      java.util.logging.ConsoleHandler.level = WARNING
+      java.util.logging.ConsoleHandler.level = {{ .Values.logLevel }}
       java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
       # specifies the name of the filter class to be associated with this handler,
       # defaults to {@code null} if this property is not found or has an invalid value.

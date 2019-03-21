@@ -1,48 +1,46 @@
-"""
-Main entry-point for forgeops testing suite.
-"""
-import argparse
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Python Imports
 import os
+import sys
 from time import strftime, gmtime
+import pytest
+import urllib3
 
+# Framework imports
 
-from unittest import TestLoader, TestSuite
-from HtmlTestRunner import HTMLTestRunner
+urllib3.disable_warnings()
 
+# root_dir : computed using relative position from this file
+root_dir = os.path.abspath(os.path.dirname(__file__))
 
-def consolidate_reports():
-    """
-    Workaround for reports being separated by suite. For now we want only one consolidated report.
-    """
-    report_name = 'forgeops_' + strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + '_report.html'
-    report = ''
-    for filename in os.listdir('reports/'):
-        if not filename.startswith('forgeops_'):
-            with open(os.path.join('reports', filename), 'r') as f:
-                report += f.read()
-            os.remove(os.path.join('reports', filename))
+# Insert lib folder (as very first lib directory - rank 0) to python path
+sys.path.insert(0, os.path.join(root_dir, 'lib'))
 
-    with open(os.path.join('reports', report_name), 'w') as f:
-        f.write(report)
-    with open(os.path.join('reports', "latest.html"), 'w') as f:
-        f.write(report)
+# Insert config folder (rank 1) to python path
+sys.path.insert(0, os.path.join(root_dir, 'config'))
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--suite', help='Test suite to run (e.g tests/smoke)', required=True)
-    args = parser.parse_args()
-    suite_name = vars(args)['suite']
 
-    tl = TestLoader()
-    suite = TestSuite()
+    report_path = 'reports'
+    if not os.path.exists(report_path):
+        os.makedirs(report_path)
 
-    try:
-        suite.addTests(tl.discover(suite_name, pattern='*.py'))
-    except ImportError:
-        print("Suite cannot be found. Check if --suite points to folder with tests.")
-        exit(0)
-    runner = HTMLTestRunner(output=".")
-    results = runner.run(suite)
-    consolidate_reports()
+    html_report_name = 'forgeops_' + strftime("%Y-%m-%d_%H:%M:%S", gmtime()) + '_report.html'
+    html_report_path = os.path.join(report_path, html_report_name)
+    allure_report_path = os.path.join(report_path, 'allure-files')
 
+    custom_args = '--html=%s --self-contained-html --alluredir=%s' % (html_report_path, allure_report_path)
+    args = sys.argv + custom_args.split()
+    res = pytest.main(args=args)
+
+    latest_link = os.path.join(report_path, 'latest.html')
+    if os.path.lexists(latest_link):
+        os.unlink(latest_link)
+    if os.path.exists(latest_link):
+        os.remove(latest_link)
+    os.symlink(html_report_name, latest_link)
+
+    sys.exit(res)

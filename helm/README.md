@@ -2,13 +2,14 @@
 
 ## Setup 
 
-1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. The script `bin/setup.sh` will install these on a Mac using homebrew. You may have to ajdust this script for your environment.
+1) If you have not already done so, install [helm](https://github.com/kubernetes/helm) and other dependencies. 
 
 2) Build your Docker images, or set up access to a registry where those images can be pulled.
 The default docker repository and tag names are set in each helm chart in values.yaml. You can
-override these in your custom.yaml file.  The default assumes the docker images are in the docker cache
-(i.e. you have done a docker build direct to the Minikube docker machine). See the
- README in the docker/ folder for more information.
+override these in your custom.yaml file.  
+
+*TIP* If you are using minikube, you can docker build images directly to your docker cache, and set the chart policy to
+`image.pullPolicy: IfNotPresent`
 
 
 # Configuration
@@ -28,17 +29,6 @@ forgeops-init.git has public read-only access.  You can clone this repository bu
 If you wish to use your own Git repository based on the forgeops-init repository,
 you can fork and clone the forgeops-init repository. See [frconfig/README.md](frconfig/README.md).
 
-# Composite Charts
-
-The provided cmp-platform chart bundles other foundational charts such opendj, frconfig,
- openam, etc. Performing a `helm install cmp-platform`  will deploy all the components.
- Remember to perform a `helm dep up cmp-platform` to update any dependencies that might have changed.
-
-This chart is a simple example for use only when working through the *DevOps 
- Quick Start Guide* only.  
-
-For all other deployments, install individual Helm charts as described in the 
- *DevOps Developer's Guide*. 
  
 # Using a private registry
 
@@ -59,7 +49,6 @@ installed already. This can scale up horizontally by increasing the replica coun
 * openidm - OpenIDM
 * postgres-opendim - Configures a Postgresql repository database for OpenIDM
 * openig -  OpenIG
-* cmp-*  - charts that begin with cmp are "composite" charts that include other charts
 
 
 
@@ -86,13 +75,14 @@ By default charts  deploy to the `default` namespace in Kubernetes.
 You can deploy multiple product instances in different namespaces and they will not 
 interfere with each other. For example, you might have 'dev', 'qa', and 'prod' namespaces. 
 
-To provide external ingress routes that are unique, the namespace can be used when forming the 
-ingress host name. The format is:
- {openam,openidm,openig}.{namespace}.{domain} 
+The default format used for the FQDN is:
+{namespace}.{subdomain}.{domain}/{am|idm|ig|openidm}
+
+subdomain defaults to "iam"
 
  For example:
 
- `login.default.example.com`
+ `default.iam.example.com`
 
 Note that the details of the ingress will depend on the implementation. You may need to modify the ingress definitions. 
  
@@ -100,26 +90,12 @@ Note that the details of the ingress will depend on the implementation. You may 
 
 All charts default to using TLS (https) for the inbound ingress.  
 
-Within a namespace, it is assumed that a single wildcard certificate secret is present `wildcard.$namespace.$domain`. This
-secret is referenced by each ingress controller in the `tls` spec.
+If you use nginx on minikube, the ingress will default to using the nginx self signed certificate. If you want to use nginx and a "real" SSL certificate you must modify the ingress.yaml in each chart, and provide a TLS secret.
 
-You can create the wildcard secret manually, but in these examples we assume
-that [cert-manager](https://github.com/jetstack/cert-manager) is installed and is provisioning certificates for you.
+For istio,  we assume  a wildcard certificate is obtained for the istio ingress for the entire cluster. 
+This certificate handles SSL for all namespaces: *.$subdomain.$domain. 
 
-
-The frconfig chart defaults to creating a cert-manager "CA" issuer. This is a simple issuer that issues certificates signed by a CA certificate installed as part of the frconfig chart. We have included a default CA certificate in frconfig/secrets. You can replace this with your own using the sample script `frconfig/secrets/cm.sh`, or replace it with an intermediate signing certificate issued by your organization.
-
-If you are on minikube, cert-manager can be installed using:
-
-`helm upgrade -i cert-manager --namespace kube-system stable/cert-manager`
-
-If you deploy the frconfig chart as-is: `helm install frconfig`  things should "just work". You will get a
-self signed certificate presented to the browser. You must accept the browser warnings, or import the CA cert found in frconfig/secrets into your browser's trusted certificate list.
-
-Alternatively, you can configure frconfig to create a cert-manager issuer for Let's Encrypt. Refer to the cert-manager docs for further details.
-
-If you do not see a secret `wildcard.$namespace.$domain`, it means that something has gone wrong with cert manager. Look in the cert-manager logs to find the cause. If you are using the Let's Encrypt issuer, keep in mind that it can take up to 10 minutes to provision a certificate.
-
+Note: The frconfig chart no longer defaults to enabling cert-manager - as it is not required by default.
 
 For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html#devops-implementation-env-https-access-secret).
 

@@ -8,7 +8,7 @@ deployKubeScheduler: False
 # Controller Manager
 deployKubeControllerManager: False
 
-domain: .perf.forgerock-qa.com
+domain: perf.forgerock-qa.com
 
 grafana:
   storageSpec:
@@ -44,7 +44,10 @@ alertmanager:
   config:
     global:
       resolve_timeout: 5m
-      slack_api_url: 'https://hooks.slack.com/services/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'
+      # If using a Slack receiver, the slack_api_url value must be provided in the global section.  
+      # To prevent storing this in a git repo, please follow the instructions in the forgerock-metrics
+      # Helm chart in the 'Overriding Prometheus, Alertmanager and Grafana configuration values' section
+      # slack_api_url: ''
     route:
       group_by: ['alertname', 'job']
       group_wait: 30s

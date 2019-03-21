@@ -9,8 +9,6 @@ FROM alpine:3.7
 #  -Dcom.iplanet.services.debug.level=error
 
 ENV FORGEROCK_HOME /home/forgerock
-ENV OPENAM_HOME /home/forgerock/openam
-
 
 ENV KUBE_LATEST_VERSION="v1.10.1"
 

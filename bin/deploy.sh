@@ -24,10 +24,11 @@ set -o nounset
 
 usage()
 {
-    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-R] [-d] config_directory"
+    echo "Usage: $0 [-f config.yaml] [-e env.sh] [-n namespace] [-o domain] [-R] [-d] config_directory"
     echo "-f extra config yaml that will be passed to helm. May be repeated."
     echo "-e extra env.sh that will be sourced to set environment variables."
     echo "-n set the namespace. Override values in env.sh."
+    echo "-o set the domain. Override values in env.sh."
     echo "-R Remove all.  Purge any existing deployment (Warning - destructive)."
     echo "-d dryrun. Show the helm commands that would be executed but do not deploy any charts."
     exit 1
@@ -36,13 +37,14 @@ usage()
 
 parse_args()
 {
-    while getopts "df:e:n:R" opt; do
+    while getopts "df:e:n:o:R" opt; do
         case ${opt} in
             f ) YAML="$YAML -f ${OPTARG} " ;;
             e ) ENV_SH="${OPTARG}" ;;
             R ) RMALL=true ;;
             d ) DRYRUN="echo " ;;
             n ) OPT_NAMESPACE="${OPTARG}" ;;
+            o ) OPT_DOMAIN="${OPTARG}" ;;
             \? ) usage ;;
         esac
     done
@@ -55,6 +57,13 @@ parse_args()
 
     CFGDIR="$1"
 
+}
+
+print_sep_line() {
+    str=$1
+    num=$2
+    v=$(printf "%-${num}s" "$str")
+    echo "${v// /*}"
 }
 
 chk_config()
@@ -91,7 +100,7 @@ chk_config()
     fi
 
     # Allow overriding namespace
-    if [ ! -z "$OPT_NAMESPACE" ]; then
+    if [ -n "$OPT_NAMESPACE" ]; then
         NAMESPACE="$OPT_NAMESPACE"
     fi
 
@@ -101,6 +110,10 @@ chk_config()
     fi
     echo -e "=>\tNamespace: \"${NAMESPACE}\""
 
+    # Allow overriding domain
+    if [ -n "${OPT_DOMAIN}" ]; then
+        DOMAIN="$OPT_DOMAIN"
+    fi
     if [ -z "${DOMAIN}" ]; then
         echo "ERROR: Your Domain is not set for the deployment. Exiting!"
         exit 1
@@ -112,8 +125,10 @@ chk_config()
     fi
     echo -e "=>\tComponents: \"${COMPONENTS[*]}\""
 
-    AM_URL="${URL_PREFIX:-login}.${NAMESPACE}.${DOMAIN}"
-    IDM_URL="${IDM_URL_PREFIX:-openidm}.${NAMESPACE}.${DOMAIN}"
+    SUBDOMAIN="iam"
+    BASE_FQDN="${NAMESPACE}.${SUBDOMAIN}.${DOMAIN}"
+    AM_URL="${BASE_FQDN}/am"
+    IDM_URL="${BASE_FQDN}"
 }
 
 create_namespace()
@@ -144,12 +159,36 @@ create_secrets()
 #### Deploy methods
 deploy_charts()
 {
-    echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\""
+    # Add any provider specific values here for helm to override
+    # For example for EKS/AWS VALUE_OVERRIDE="storageClass=fast10"
+    # or for AKS/Azure VALUE_OVERRIDE="storageClass=managed-premium"
+
+    PROVIDER=$(kubectl get nodes -o jsonpath={.items[0].spec.providerID} | awk -F: '{print $1}')
+    if [ "${PROVIDER}" == "gce" ]; then
+        VALUE_OVERRIDE=""
+    elif [ "${PROVIDER}" == "aws" ]; then
+        VALUE_OVERRIDE=""
+    elif [ "${PROVIDER}" == "azure" ]; then
+        VALUE_OVERRIDE=""
+    else
+        VALUE_OVERRIDE=""
+    fi
+    # list of options to overwrite through --set
+    SET_OPTIONS=""
+    if [ -n "${VALUE_OVERRIDE}" ] ; then
+        SET_OPTIONS="--set ${VALUE_OVERRIDE}"
+    fi
+    if [ "${DOMAIN}" != "forgeops" ] ; then
+        SET_OPTIONS="${SET_OPTIONS} --set domain=${DOMAIN}"
+    fi
+
+    echo "=> Deploying charts into namespace \"${NAMESPACE}\" with URL \"${AM_URL}\" on provider \"${PROVIDER}\""
 
     # If the deploy directory contains a common.yaml, prepend it to the helm arguments.
     if [ -r "${CFGDIR}"/common.yaml ]; then
         YAML="-f ${CFGDIR}/common.yaml $YAML"
     fi
+
 
     # These are the charts (components) that will be deployed via helm
     for comp in ${COMPONENTS[@]}; do
@@ -165,9 +204,13 @@ deploy_charts()
            CHART_YAML="-f ${CFGDIR}/${comp}.yaml"
         fi
 
-        ${DRYRUN} helm upgrade -i ${NAMESPACE}-${comp} \
-            ${YAML} ${CHART_YAML} \
-            --namespace=${NAMESPACE} ${DIR}/helm/${chart}
+        print_sep_line "*" 30
+        echo "${DRYRUN}helm upgrade --install ${NAMESPACE}-${comp} ${YAML} ${CHART_YAML} ${SET_OPTIONS} \
+        --namespace=${NAMESPACE} ${DIR}/helm/${chart}"
+
+        ${DRYRUN} helm upgrade --install ${NAMESPACE}-${comp} ${YAML} ${CHART_YAML} ${SET_OPTIONS} \
+        --namespace=${NAMESPACE} ${DIR}/helm/${chart}
+
     done
 }
 
@@ -267,6 +310,7 @@ deploy_hpa()
     fi
 }
 
+
 ###############################################################################
 # main
 ###############################################################################
@@ -277,6 +321,8 @@ OPT_NAMESPACE=""
 RMALL=false
 DRYRUN=""
 CONTEXT=""
+VALUE_OVERRIDE=""
+OPT_DOMAIN=""
 
 # All helm chart paths are relative to this directory.
 DIR=`echo $(dirname "$0")/..`
@@ -298,8 +344,6 @@ if [[ " ${COMPONENTS[@]} " =~ " openam " ]]; then
     import_check
     restart_am
 fi
-
-
 
 # Do not scale or deploy hpa on minikube
 if [ "${CONTEXT}" != "minikube" ]; then
@@ -323,4 +367,4 @@ echo ""
 echo "=> For each directory pod you want to backup execute the following command"
 echo "   $ kubectl exec -it <podname> scripts/schedule-backup.sh"
 
-printf "\e[38;5;40m=======> Deployment is ready <========\e[m\n"
+echo "=======> Deployment is ready <========="

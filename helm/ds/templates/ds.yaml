@@ -13,6 +13,8 @@ metadata:
 spec:
   serviceName: {{ .Values.instance }}
   replicas: {{default 1 .Values.replicas }}
+  updateStrategy:
+    type: RollingUpdate
   {{- if .Values.persistence }}
   volumeClaimTemplates:
   - metadata:
@@ -30,6 +32,8 @@ spec:
   {{- end }}
   template:
     metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
       labels:
         instance: {{ .Values.instance }}
         app: {{ template "fullname" . }}
@@ -64,8 +68,8 @@ spec:
       # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
       securityContext:
 {{ toYaml .Values.securityContext | indent 8 }}
-      initContainers:
       {{ if .Values.restore.enabled }}
+      initContainers:
       - name: restore
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}
         imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -146,7 +150,7 @@ spec:
         emptyDir: {}
       {{- if .Values.backup.pvcClaimName }}
       - name: backup
-        persistentVolumeClaim: 
+        persistentVolumeClaim:
           claimName: {{ .Values.backup.pvcClaimName }}
       {{ else }}
       - name: backup

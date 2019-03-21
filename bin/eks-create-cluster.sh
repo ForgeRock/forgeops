@@ -15,13 +15,13 @@ source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
 # TODO: echo vars dynamically by reading cfg file
 
 echo "=> Read the following env variables from config file"
-echo -e "\tStack Name = ${EKS_STACK_NAME}"
+echo -e "\tStack Name = ${EKS_WORKER_NODE_STACK_NAME}"
 echo -e "\tCluster Name = ${EKS_CLUSTER_NAME}"
 echo -e "\tCluster Version = ${EKS_CLUSTER_VERSION}"
 echo -e "\tRole ARN = ${EKS_ROLE_ARN}"
 echo -e "\tVPC ID = ${EKS_VPC_ID}"
 echo -e "\tSubnets = ${EKS_SUBNETS}"
-echo -e "\tSecurity Group = ${EC2_SECURITY_GROUP}"
+echo -e "\tSecurity Group = ${EKS_CONTROL_PLANE_SECURITY_GROUP}"
 echo ""
 echo "=> Do you want to continue creating the cluster with these settings?"
 read -p "Continue (y/n)?" choice
@@ -38,7 +38,7 @@ echo ""
 
 CLUSTER_ARN=$(aws eks create-cluster --name $EKS_CLUSTER_NAME \
               --role-arn $EKS_ROLE_ARN \
-              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EC2_SECURITY_GROUP \
+              --resources-vpc-config subnetIds=$EKS_SUBNETS,securityGroupIds=$EKS_CONTROL_PLANE_SECURITY_GROUP \
               --query cluster.arn --output text)
 
 echo "EKS Cluster is being created.  Usually it takes 10 minutes..."

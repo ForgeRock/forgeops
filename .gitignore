@@ -17,3 +17,8 @@ settings.xml
 etc/cert-manager.json
 *.pyc
 .vscode/
+/cicd/forgeops-tests/.pytest_cache/
+/cicd/forgeops-tests/reports/
+/cicd/forgeops-tests/res.txt
+/cicd/forgeops-tests/results.txt
+/venv/

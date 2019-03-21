@@ -5,7 +5,8 @@
 replicaCount: 1
 
 # Top level domain. Used to create the ingress
-domain: .example.com
+domain: example.com
+subdomain: iam
 
 # Configuration parameters. Common to all charts that require configuration from a
 # source. Currently the only source is a git repo.
@@ -15,7 +16,7 @@ config:
   name: frconfig
   # Path to our project
   # path: /git/config/samples/idm/idm-am-ds-integration
-  path: /git/config/6.5/default/idm/sync-with-ldap-bidirectional
+  path: /git/config/7.0/default/idm/sync-with-ldap-bidirectional
   #
   # strategy defines how products get their configuration .
   # Using the git strategy, each helm chart pulls the configuration from git using an init container.
@@ -32,8 +33,8 @@ secret:
 component: openidm
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openidm
-  tag: 6.5.0
+  repository: forgerock-docker-public.bintray.io/forgerock/idm
+  tag: 7.0.0-SNAPSHOT
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
@@ -78,7 +79,8 @@ userstore:
 
 service:
   name: openidm
-  type: NodePort
+  # default to ClusterIP
+  #type: NodePort
   externalPort: 80
   internalPort: 8080
 
@@ -99,8 +101,14 @@ ingress:
   enabled: true
   annotations:
     # Nginx specific annotations
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+
+istio:
+  enabled: false
 
 # Audit log details for log streaming sidecar containers
 # IDM can now stream logs to stdout. This setting will be deprecated in the future.

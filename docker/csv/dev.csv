@@ -1,11 +1,6 @@
-java,6.5.0,6.5.0
-ds,6.5.0,6.5.0
-openam,6.5.0,6.5.0
-amster,6.5.0,6.5.0
-openidm,6.5.0,6.5.0
-openig,6.5.0,6.5.0
-git,6.5.0,6.5.0
-nginx-agent,6.5.0,6.5.0
-apache-agent,6.5.0,6.5.0
-gatling,6.5.0,6.5.0
-util,6.5.0,6.5.0
+java,7.0.0,7.0.0
+git,7.0.0,7.0.0
+nginx-agent,7.0.0,7.0.0
+apache-agent,7.0.0,7.0.0
+gatling,7.0.0,7.0.0
+util,7.0.0,7.0.0

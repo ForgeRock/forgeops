@@ -31,10 +31,13 @@ spec:
       - name: forgeops-benchmark-gatling
         image: {{ .Values.image.repository }}
         imagePullPolicy: Always
+        env:
+          - name: TESTS
+            value: {{ .Values.benchmark.testname }}
         command:
           - /bin/bash
           - -c
-          - cp -r /git/config/6.5/benchmarks/gatling-simulation-files/ /opt/gatling/user-files/simulations/ &&
+          - cp -r /git/config/7.0/benchmarks/gatling-simulation-files/ /opt/gatling/user-files/simulations/ &&
             {{ if .Values.benchmark.runAfterDeployment }}touch /ready && {{ end }}
             /custom-gatling.sh  -j '
             -Dam_host={{ .Values.benchmark.openam.host }}
@@ -55,16 +58,25 @@ spec:
             -Doauth2_client_id={{ .Values.benchmark.oauth2_client_id }}
             -Doauth2_client_pw={{ .Values.benchmark.oauth2_client_pw }}
             '
-            -g '-m -s {{ .Values.benchmark.testname }} -rd {{ .Values.benchmark.testname }}' &&
-            export FN=$(ls -t /opt/gatling/results | head -1) && tar -czvf /opt/gatling/results/$FN.tar.gz
-            /opt/gatling/results/$FN
+            -g '-m -s TESTNAME -rd TESTNAME' && mkdir -p /opt/gatling/results/gatling &&
+            export FN=$(ls -t /opt/gatling/results | head -1) && tar -czvf /opt/gatling/results/gatling/${FN}.tar.gz
+            /opt/gatling/results/${FN} &&  cp -a /opt/gatling/results/${FN} /opt/gatling/results/gatling
         volumeMounts:
           - name: gatling-results
-            mountPath: "/opt/gatling/results"
+            mountPath: "/opt/gatling/results/gatling"
           {{ if eq .Values.config.strategy  "git" }}
           - name: git
             mountPath: /git
           {{ end }}
+      {{ if eq .Values.taints.enabled true }}
+      tolerations:
+        - key: {{ .Values.taints.key | quote }}
+          operator: "Equal"
+          value: {{ .Values.taints.value | quote }}
+          effect: "NoSchedule"
+      nodeSelector:
+        {{ .Values.taints.key }} : {{ .Values.taints.value }}
+      {{end}}
       containers:
         - name: forgeops-benchmark-results
           image: nginx:1.11.0

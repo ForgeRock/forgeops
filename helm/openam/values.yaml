@@ -5,8 +5,8 @@
 component: openam
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openam
-  tag: 6.5.0
+  repository: forgerock-docker-public.bintray.io/forgerock/am
+  tag: 7.0.0-SNAPSHOT
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
@@ -17,10 +17,12 @@ gitImage:
 
 utilImage:
   repository: forgerock-docker-public.bintray.io/forgerock/util
-  tag: 6.5.0
+  tag: 7.0.0
   pullPolicy: IfNotPresent
+  #pullPolicy: Always
 
-domain: .example.com
+domain: example.com
+subdomain: iam
 
 config:
   name: frconfig
@@ -28,7 +30,6 @@ config:
 
 openamReplicaCount: 1
 
-openamInstance: http://openam:80
 
 configLdapPort:  1389
 configLdapHost: configstore-0.configstore
@@ -41,9 +42,8 @@ configLdapHost: configstore-0.configstore
 # If you need to renable this for amster, it should be disabled after the import is complete
 
 catalinaOpts: >
-  -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
-  -Dcom.sun.identity.shared.debug.file.format='%PREFIX% %MSG%\\n%STACKTRACE%'
+  -server
+  -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
   -Dcom.iplanet.services.stats.state=off
 
 # For visualVM debug, you can add this to the above:
@@ -59,6 +59,14 @@ useConfigMapWebxml: false
 
 # Suffix for DS config store.
 rootSuffix:  "ou=am-config"
+
+am:
+  home: /home/forgerock/openam
+  context: am
+  bootstrapDir: /home/forgerock/openam/am
+  instance: http://openam:80/am
+
+
 
 # Valid logger types: fluent-bit, none
 # For audit logs it is suggested you configure AM to send directly to ElasticSearch.
@@ -83,6 +91,13 @@ amCustomizationScriptPath: "customize-am.sh"
 livenessPeriod: 60
 livenessTimeout: 15
 
+# Set the names below to provide custom secrets mounted in the AM pods (keystore, etc.). You must provide all secrets.
+# See templates/secrets.yaml and secrets/... for details
+existingSecrets: {}
+# existingSecrets: 
+#   openamKeys: openam-keys
+#   openamKeystorePasswords: openam-kesytore-passwords
+
 service:
   name: openam
   #type: NodePort
@@ -95,17 +110,14 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
     nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
-    nginx.ingress.kubernetes.io/cors-max-age: "600"
-    nginx.ingress.kubernetes.io/rewrite-target: "/"
+    # nginx.ingress.kubernetes.io/enable-cors: "true"
+    # nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
+    # nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
+    # nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
 
 # Audit log details for log streaming sidecar containers.
 # AM can now stream audit logs to stdout. This option may be removed in the future.
@@ -120,3 +132,19 @@ auditLogs: []
 #     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
 #   - name: config-logs
 #     path: "/home/forgerock/openam/openam/log/config.audit.json"
+
+
+istio:
+  enabled: false
+
+# Pod Anti Affinity switch. For production this should be set to "hard", otherwise use "soft" or leave empty.
+# The hard setting will force openam pods to be spread out over multiple hosts/zones. soft is best effort
+# but pods will still be scheduled together if sufficient resources are not available. Setting "none" or any other
+# value will result in no affinity settings.
+podAntiAffinity: "none"
+
+# This is the exact value for TopologyKey. The other possible value is "failure-domain.beta.kubernetes.io/zone"
+# which will ensure that pod is scheduled on nodes in different zones thus allowing for HA across zones.
+# Note you want to leave this value as is if you are deploying a single zone cluster and change the values only
+# if you have a multi-zone cluster.
+topologyKey: "kubernetes.io/hostname"

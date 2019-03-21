@@ -1,5 +1,5 @@
 config:
-  path: /git/config/6.5/smoke-tests/idm/
+  path: /git/config/7.0/smoke-tests/idm/
 
 # image:
 #   pullPolicy: Always

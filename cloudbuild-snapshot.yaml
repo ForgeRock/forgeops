@@ -25,7 +25,6 @@ steps:
 images:
 - 'gcr.io/$PROJECT_ID/opendj'
 - 'gcr.io/$PROJECT_ID/openidm'
-- 'gcr.io/$PROJECT_ID/openig'
 - 'gcr.io/$PROJECT_ID/openam'
 - 'gcr.io/$PROJECT_ID/amster'
 

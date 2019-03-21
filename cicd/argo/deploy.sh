@@ -36,7 +36,4 @@ for app in frconfig openam amster; do
         --values ../../cicd/argo/$app.yaml
 
     argocd app sync test-$app
-
 done
-
-

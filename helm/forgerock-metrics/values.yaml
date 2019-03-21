@@ -16,7 +16,7 @@ namespaceSelectorStrategy: any
 am:
   component: am
   enabled: true
-  path: /json/metrics/prometheus
+  path: /am/json/metrics/prometheus
   labelSelectorComponent: openam
   secretUser: prometheus
   secretPassword: prometheus

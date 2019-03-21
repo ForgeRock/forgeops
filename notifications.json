@@ -1,0 +1,12 @@
+{
+  "rules":[{
+    "inverted":false,
+    "match": "/**/*",
+    "notifications":[{
+      "address":"cloud-deployment@forgerock.com",
+      "prefix":"",
+      "sendSeparate":false,
+      "includeDiff":true
+    }]
+  }]
+}

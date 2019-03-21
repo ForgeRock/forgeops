@@ -2,7 +2,7 @@
 
 config:
   claim: frconfig
-  importPath: /git/config/6.5/smoke-tests/am/
+  importPath: /git/config/7.0/smoke-tests/am/
 
 
 # For production set CPU limits to help Kube Schedule the pods.

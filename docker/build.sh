@@ -17,13 +17,13 @@ REGISTRY="forgerock-docker-public.bintray.io"
 
 REPO="forgerock"
 # Default tag if none is specified.
-TAG=${TAG:-6.5.0}
+TAG=${TAG:-7.0.0}
 
 # If you want to push to Google gcr.io, replace the repository name with your project name.
 PROJECT="engineering-devops"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam ds openidm openig amster util git java gatling apache-agent nginx-agent"
+IMAGES="util git java gatling apache-agent nginx-agent"
 
 # --cache-from multistage issue: https://github.com/moby/moby/issues/34715
 while getopts "adgpt:r:R:P:i:c:n:C:" opt; do

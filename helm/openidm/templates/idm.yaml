@@ -11,6 +11,8 @@ metadata:
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    type: RollingUpdate
   serviceName: idm
   template:
     metadata:
@@ -22,6 +24,7 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
+        sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
     spec:
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:

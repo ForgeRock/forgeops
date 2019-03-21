@@ -9,15 +9,19 @@ component: amster
 serverBase: http://openam:80
 
 
-# The top level domain (including the leading .). This excludes the openam component.
-domain: .example.com
+# The top level domain. This excludes the openam component.
+domain: example.com
+subdomain: iam
 
 # Default install passwords.
-amadminPassword: password
-# see AM Java source code org.forgerock.openam.shared.security.crypto.Hashes.secureHash(s)
-amadminPasswordHashed: "{SSHA-512}FBLj2oKbyR3ccq0Ydivp2PdsH5q7wbgh+UYwZdKjA6j0XB5Qu6wvzbMoCNyMRkAqsmu8E6rPIH2dUFuCPtiHBFAfdMsKvg/TBjTz+gQQU/g/NDgQRA=="
-encryptionKey: "123456789012"
-policyAgentPassword: Passw0rd
+# If these are not set (example: helm install --set amadminPassword=foo amster) a random password
+# will be generated. The password can viewed using:
+# kubectl get configmaps amster-config -o yaml
+# You may wish to delete this configmap once you have saved the passwords. 
+apiVersion: v1
+# amadminPassword: password
+# encryptionKey: "123456789012"
+# policyAgentPassword: Passw0rd
 prometheusPassword: prometheus
 
 
@@ -37,7 +41,7 @@ config:
 
 image:
   repository: forgerock-docker-public.bintray.io/forgerock/amster
-  tag: 6.5.0
+  tag: 7.0.0-SNAPSHOT
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
@@ -61,12 +65,10 @@ configStore:
   password: password
 
 # By default, userstore points to configstore - which is default
-# place for users when empty-import config is used. 
+# place for users when empty-import config is used.
 userStore:
   suffix: "ou=identities"
-  # If userstore is deployed as well but empty import configuration 
-  # is used, override this to userstore-0.userstore to use that store
-  host: configstore-0.configstore
+  host: userstore-0.userstore
   port: 1389
   dirManager: "cn=Directory manager"
   password: "password"
@@ -80,14 +82,14 @@ amsterClean: false
 # For production set CPU limits to help Kube Schedule the pods.
 resources:
  limits:
-   memory: 756Mi
+   memory: 1080Mi
  requests:
-   memory: 756Mi
+   memory: 1080Mi
 
 # Optional value overrides
 
 # fqdn - the openam server external fqdn.
-# If this is *not* set, it defaults to login.{namespace}{{ .Values.domain }}
+# If this is *not* set, it defaults to {namespace}{subdomain}{domain}
 #fqdn: login.acme.com
 
 # ctsStores - is a csv separated list of avaiable cts servers. This is referenced in the amster configuration as &{ctsStores} on
@@ -96,3 +98,24 @@ resources:
 
 # ctsPassword - defaults to "password"
 #ctsPassword: password
+
+
+istio:
+  enabled: false
+
+# Amster scripts
+# 
+# You can set your own amster scripts here. They will be run in alphabetical order when the Amster pod detects an unconfigured AM.
+# You can list amster commands or invoke other scripts - it is good practice to keep your Amster scripts in version control:
+# e.g.:
+#
+# scripts:
+#   02_my_script: |-
+#     delete LdapModule --realm / --id LDAP
+#     delete HotpModule --realm / --id HOTP
+#   03_invoke_other_scripts: |-
+#     :load /git/config/scripts/do_stuff.amster
+
+scripts: {}
+
+# serviceAccountName: my-amster-serviceaccount

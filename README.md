@@ -31,10 +31,10 @@ git checkout release/x.y.0
 
 ## Contents 
 
-* docker/ -  contains the Dockerfiles for the various containers.
-* helm/ - contains Kubernetes helm charts to deploy those containers. See the helm/README.md
-* etc/ - contains various scripts and utilities
-* bin/  - Utility shell scripts to deploy the helm charts and create and manage clusters.
+* `docker/` -  contains the Dockerfiles for the various containers.
+* `helm/` - contains Kubernetes helm charts to deploy those containers. See the helm/README.md
+* `etc/` - contains various scripts and utilities
+* `bin/`  - Utility shell scripts to deploy the helm charts and create and manage clusters.
 
 ## Docker images 
 
@@ -54,7 +54,7 @@ The documentation for the current release can be found on
 the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/index.md) before proceeding.
 * This assumes minikube is running (8G of RAM), and helm and kubectl are installed.
 * cert-manager must be installed (use the helm chart)
-* See bin/setup.sh and bin/minikube-up.sh for sample scripts.
+* See `bin/setup.sh` and `bin/minikube-up.sh` for sample scripts.
 
 ```sh
 
@@ -71,9 +71,9 @@ helm install openam
 minikube ip
 
 # You can put DNS entries in an entry in /etc/hosts. For example:
-# 192.168.99.100 login.default.example.com openidm.default.example.com openig.default.example.com
+# 192.168.99.100 default.iam.example.com
 
-open https://login.default.example.com
+open https://default.iam.example.com/am
 
 ```
 
@@ -89,7 +89,9 @@ Please refer to the chart README.md files.
 
 If you do not want to use the 'default' namespace, set your namespace using:
 
+```
 kubectl config set-context $(kubectl config current-context) --namespace=<insert-namespace-name-here>
+```
 
 The `kubectx` and `kubens` utilities are recommended.
 
@@ -97,10 +99,10 @@ The `kubectx` and `kubens` utilities are recommended.
 
 Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forgerock.com/docs/platform/6/devops-guide/#chap-devops-troubleshoot).
 
-Troubleshooting Suggestions:
+Troubleshooting suggestions:
 
-* The script bin/debug-log.sh will generate an HTML file with log output. Useful for troubleshooting.
-* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script and the cmp-platform composite charts are provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
+* The script `bin/debug-log.sh` will generate an HTML file with log output. Useful for troubleshooting.
+* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script is provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
 * Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.
     2. Examine all the init containers. Did each init container complete with a zero (success) exit code? If not, examine the logs from that failed init container using `kubectl logs pod-xxx -c init-container-name`

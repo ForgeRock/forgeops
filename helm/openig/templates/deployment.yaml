@@ -19,6 +19,8 @@ spec:
         release: {{ .Release.Name }}
         component: {{ .Values.component }}
         vendor: forgerock
+      annotations:
+         sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
     spec:
       {{ if eq .Values.config.strategy  "git" }}
       initContainers:
@@ -68,13 +70,13 @@ spec:
         {{ end }}
         livenessProbe:
           httpGet:
-           path: /kube/liveness
+           path: {{ .Values.healthURI }}
            port: {{ .Values.service.internalPort }}
           timeoutSeconds: 10
           periodSeconds: 30
         readinessProbe:
           httpGet:
-            path: /kube/readiness
+            path: {{ .Values.readinessURI }}
             port: {{ .Values.service.internalPort }}
           initialDelaySeconds: 5
         resources:

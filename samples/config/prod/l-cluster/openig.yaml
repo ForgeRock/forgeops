@@ -5,7 +5,7 @@ image:
 
 config:
   name: frconfig
-  path: /git/config/6.5/default/ig/basic-sample 
+  path: /git/config/6.5/cdm/m-cluster/ig 
   strategy: git
   
 resources:

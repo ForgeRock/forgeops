@@ -15,8 +15,8 @@ ENV AM_MAX_SHARED_POOL_SIZE 1048576000
 ENV AM_DEFAULT_LOG_LEVEL All
 
 # For testing purposes, you can build this image with ARGs to match your deployment
-ARG AM_SERVER=http://login.example.forgeops.com:80/
-ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
+ARG AM_SERVER=http://default.iam.forgeops.com:80/am
+ARG AGENT_SERVER=http://default.iam.forgeops.com/apache-agent
 
 # Install needed sw
 RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim && \

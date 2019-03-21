@@ -13,8 +13,35 @@ spec:
         vendor: forgerock
         release: {{ .Release.Name }}
         heritage: {{ .Release.Service }}
+      annotations:
+        sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
     spec:
       terminationGracePeriodSeconds: 10
+      {{- if eq .Values.podAntiAffinity "hard" }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: {{ .Values.topologyKey }}
+              labelSelector:
+                matchExpressions:
+                  - key: component
+                    operator: In
+                    values:
+                      - {{ .Values.component }}
+      {{- else if eq .Values.podAntiAffinity "soft" }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - {{ .Values.component }}
+                topologyKey: {{ .Values.topologyKey }}
+      {{- end }}
       initContainers:
        {{ if eq .Values.config.strategy  "git" }}
       - name: git-init
@@ -44,7 +71,7 @@ spec:
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
-        - name: openam-secrets
+        - name: openam-keys
           mountPath: /var/run/secrets/openam
         - name: openam-boot
           mountPath: /var/run/openam
@@ -63,9 +90,9 @@ spec:
           mountPath: /home/forgerock/openam
         - name: configstore-secret
           mountPath: /var/run/secrets/configstore
-        - name: openam-secrets
+        - name: openam-keys
           mountPath: /var/run/secrets/openam/keystore
-        - name: openam-pstore-secrets
+        - name: openam-keystore-passwords
           mountPath: /var/run/secrets/openam/password
         {{ if eq .Values.config.strategy  "git" }}
         - name: git
@@ -93,14 +120,14 @@ spec:
         # For slow environments like Minikube you need to give OpenAM time to come up.
         readinessProbe:
           httpGet:
-            path: /isAlive.jsp
+            path: /am/isAlive.jsp
             port: 8080
           initialDelaySeconds: 30
           timeoutSeconds: 5
           periodSeconds: 20
         livenessProbe:
           httpGet:
-            path: /isAlive.jsp
+            path: /am/isAlive.jsp
             port: 8080
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
@@ -126,12 +153,12 @@ spec:
       {{ end }}
       - name: openam-root
         emptyDir: {}
-      - name: openam-secrets
+      - name: openam-keys
         secret:
-          secretName: openam-secrets
-      - name: openam-pstore-secrets
+          secretName: {{ default "openam-keys" .Values.existingSecrets.openamKeys }}
+      - name: openam-keystore-passwords
         secret:
-          secretName: openam-pstore-secrets
+          secretName: {{ default "openam-keystore-passwords" .Values.existingSecrets.openamKeystorePasswords }}
       - name: openam-boot
         configMap:
           name: boot-json
