@@ -29,7 +29,8 @@ ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC -XX:+IgnoreUnrecognizedVMOptions --
 
 RUN apk update && \
     apk upgrade && \
-    apk add zip ttf-dejavu tini
+    apk add zip ttf-dejavu tini && \
+    apk add --no-cache nss
 
 RUN chown -R forgerock:forgerock /opt/openidm  && rm -fr /opt/openidm/samples
 
