@@ -1,7 +1,6 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
-
 component: amster
 
 # Server base URL *within* the Kubernetes cluster - not the external LB URL.
@@ -30,7 +29,7 @@ config:
   name: frconfig
   # The path where we import the configuration from. Your git repo will usually be mounted on /git/config.
   importPath: /git/config/6.5/default/am/empty-import
-  # Where we perform export to. If not set, this defaults to the importPath
+  # Where we perform export to. If not set, this defaults to the importPath.
   #exportPath: /tmp/amster
   # strategy defines how products get their configuration .
   # Using the git strategy, each helm chart pulls the configuration from git using an init container.
