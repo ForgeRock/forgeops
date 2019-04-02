@@ -16,6 +16,8 @@ RUN jlink --compress=2 \
 
 FROM debian:sid-slim
 
-COPY --from=0 /opt/jdk /opt/
+COPY --from=0 /opt/jdk /opt/jdk
 
 RUN adduser --home "/home/forgerock" -uid 11111 --gid 0 forgerock --disabled-password --gecos "forgerock user"
+
+ENV JAVA_HOME /opt/jdk
