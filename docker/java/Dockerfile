@@ -8,7 +8,9 @@ RUN jlink --compress=2 \
           --no-header-files \
           --no-man-pages \
           --strip-debug \
-          --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management.rmi,java.prefs,java.security.jgss,java.security.sasl,java.sql,jdk.security.auth,jdk.unsupported \
+          --add-modules java.base,java.compiler,java.desktop,java.instrument,java.management.rmi,java.prefs,java.security.jgss,\
+java.security.sasl,java.sql,jdk.security.auth,jdk.unsupported,java.datatransfer,java.logging,java.naming,java.rmi,java.scripting,\
+java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.xml.dom\
           --output /opt/jdk \
    && apt-get update && apt-get install -y binutils \
    && strip -p --strip-unneeded /opt/jdk/lib/server/libjvm.so 
