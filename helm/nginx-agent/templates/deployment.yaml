@@ -10,8 +10,8 @@ spec:
   template:
     metadata:
       labels:
-        name: apache
-        agent: apache
+        name: nginx
+        agent: nginx
         app: {{ template "fullname" . }}
     spec:
       terminationGracePeriodSeconds: 5

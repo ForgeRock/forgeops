@@ -1,8 +1,18 @@
-# ForgeRock DevOps and Cloud Deployment 
+# ForgeRock DevOps and Cloud Deployment
 
-Docker and Kubernetes DevOps artifacts for the ForgeRock platform. 
+Kubernetes DevOps artifacts for the ForgeRock platform.
 
-## Disclaimer 
+** IMPORTANT: The current supported branch is release/6.5.1. The master branch is under development **
+
+Please refer to the [Platform Documentation for 6.5](https://backstage.forgerock.com/docs/platform/6.5). In
+particular refer to the [What's New section of the release notes.](https://backstage.forgerock.com/docs/platform/6.5/release-notes/#chap-rnotes-whats-new)
+
+This GitHub repository is a read-only mirror of 
+ForgeRock's [https://stash.forgerock.org/projects/CLOUD/repos/forgeops] (Bitbucket Server repository). Users
+with BackStage accounts can make pull requests on our Bitbucket Server repository. ForgeRock does not 
+accept pull requests on this GitHub mirror.
+
+## Disclaimer
 
 These samples are provided on an “as is” basis, without warranty of any kind, to the fullest extent
 permitted by law. ForgeRock does not warrant or guarantee the individual success developers
@@ -18,20 +28,19 @@ to the samples.
 ## Branches
 
 The master branch targets
-features that are still in development and may not be stable. Please checkout the 
+features that are still in development and may not be stable. Please checkout the
  branch that matches the targeted release.
 
 
 For example, if you have the source checked out from git:
 
 ```bash
-git checkout release/x.y.0 
+git checkout release/6.5.1
 ```
 
 
 ## Contents 
 
-* `docker/` -  contains the Dockerfiles for the various containers.
 * `helm/` - contains Kubernetes helm charts to deploy those containers. See the helm/README.md
 * `etc/` - contains various scripts and utilities
 * `bin/`  - Utility shell scripts to deploy the helm charts and create and manage clusters.
@@ -45,7 +54,7 @@ See the [docker/README.md](docker/README.md) for instructions on how to build yo
 The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html)
 tracks the master branch.
 
-The documentation for the current release can be found on 
+The documentation for the current release can be found on
 [backstage](https://backstage.forgerock.com/docs/platform).
 
 ## Sample Session
