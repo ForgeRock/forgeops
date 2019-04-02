@@ -2,7 +2,17 @@
 
 Docker and Kubernetes DevOps artifacts for the ForgeRock platform. 
 
-## Disclaimer 
+** IMPORTANT: The current supported branch is release/6.5.1. The master branch is under development **
+
+Please refer to the [Platform Documentation for 6.5](https://backstage.forgerock.com/docs/platform/6.5). In
+particular refer to the [What's New section of the release notes.](https://backstage.forgerock.com/docs/platform/6.5/release-notes/#chap-rnotes-whats-new)
+
+This GitHub repository is a read-only mirror of 
+ForgeRock's [https://stash.forgerock.org/projects/CLOUD/repos/forgeops] (Bitbucket Server repository). Users
+with BackStage accounts can make pull requests on our Bitbucket Server repository. ForgeRock does not 
+accept pull requests on this GitHub mirror.
+
+## Disclaimer
 
 These samples are provided on an “as is” basis, without warranty of any kind, to the fullest extent
 permitted by law. ForgeRock does not warrant or guarantee the individual success developers
