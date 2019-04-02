@@ -14,7 +14,7 @@ RUN jlink --compress=2 \
    && strip -p --strip-unneeded /opt/jdk/lib/server/libjvm.so 
 
 
-FROM debian:sid-slim
+FROM debian:stretch-slim
 
 COPY --from=0 /opt/jdk /opt/jdk
 
