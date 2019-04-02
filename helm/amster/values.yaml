@@ -46,7 +46,7 @@ image:
   #pullPolicy: Always
 
 gitImage:
-  repository: forgerock-docker-public.bintray.io/forgerock/git
+  repository: gcr.io/forgerock-io/git
   tag: 6.5.0
   pullPolicy: IfNotPresent
 

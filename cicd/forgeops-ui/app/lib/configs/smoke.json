@@ -8,12 +8,12 @@
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/git",
+        "repository": "gcr.io/forgerock-io/git",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
       "utilImage": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/util",
+        "repository": "gcr.io/forgerock-io/util",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -58,7 +58,7 @@
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/git",
+        "repository": "gcr.io/forgerock-io/git",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -109,7 +109,7 @@
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/git",
+        "repository": "gcr.io/forgerock-io/git",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -212,7 +212,7 @@
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/git",
+        "repository": "gcr.io/forgerock-io/git",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
