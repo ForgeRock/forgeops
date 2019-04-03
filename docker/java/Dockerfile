@@ -16,7 +16,7 @@ java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.xml.dom\
    && strip -p --strip-unneeded /opt/jdk/lib/server/libjvm.so 
 
 
-FROM debian:stretch-slim
+FROM debian:stable-slim
 
 COPY --from=0 /opt/jdk /opt/jdk
 
