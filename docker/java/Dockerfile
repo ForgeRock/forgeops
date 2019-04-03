@@ -1,8 +1,12 @@
 # Base Java Image for ForgeRock Identity Platform. Used for DS, amster, IGx and IDM (Anything that does not need a web
 # container)
 #
+# Copyright 2016-2019 ForgeRock AS. All Rights Reserved
 #
-# Copyright (c) 2016-2019 ForgeRock AS.
+# Use of this code requires a commercial software license with ForgeRock AS.
+# or with one of its affiliates. All use shall be exclusively subject
+# to such license between the licensee and ForgeRock AS.
+#
 FROM openjdk:11-jdk
 RUN jlink --compress=2 \
           --no-header-files \
