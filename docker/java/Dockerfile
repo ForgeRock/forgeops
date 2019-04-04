@@ -7,7 +7,7 @@
 # or with one of its affiliates. All use shall be exclusively subject
 # to such license between the licensee and ForgeRock AS.
 #
-FROM openjdk:11-jdk
+FROM openjdk:11-jdk-slim
 RUN jlink --compress=2 \
           --no-header-files \
           --no-man-pages \
