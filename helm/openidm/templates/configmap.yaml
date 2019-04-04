@@ -24,6 +24,7 @@ data:
       openidm.repo.user={{.Values.openidm.repo.user}}
       openidm.repo.password={{.Values.openidm.repo.password}}
       openidm.repo.databaseName={{.Values.openidm.repo.databaseName}}
+      openidm.repo.schema={{.Values.openidm.repo.schema}}
 
       # This is here to suppress IDM crypting the password and writing out authentication.json
       openidm.anonymous.password=anonymous
