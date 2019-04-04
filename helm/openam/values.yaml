@@ -5,10 +5,10 @@
 component: openam
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/am
-  tag: 7.0.0-SNAPSHOT
+  repository: gcr.io/forgerock-io/am/qa-smoke
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
+  tag: 7.0.0-4b569b9612
 
 gitImage:
   repository: gcr.io/forgerock-io/git

@@ -35,10 +35,10 @@ idmRepo:
   enabled: true
 
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/ds
+  repository: gcr.io/forgerock-io/ds
   #pullPolicy: IfNotPresent
   pullPolicy: Always
-  tag: 7.0.0-SNAPSHOT
+  tag: 6.5.1
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.
