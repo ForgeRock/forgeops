@@ -1,0 +1,17 @@
+kind: ""
+apiversion: ""
+# Experimental - grabs the namespace from a deployed object
+# Making it available for use in templates.
+vars:
+- name: NAMESPACE
+  objref:
+    apiVersion: v1
+    kind: Secret
+    name: platform-secrets
+  fieldref:
+    fieldpath: metadata.namespace
+resources:
+- config-map.yaml
+- secret-platform.yaml
+configurations:
+- var.yaml

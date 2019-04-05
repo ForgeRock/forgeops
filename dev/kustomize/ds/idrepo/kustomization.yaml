@@ -1,0 +1,8 @@
+kind: ""
+apiversion: ""
+nameprefix: idrepo-
+bases:
+- ../base
+patchesStrategicMerge:
+- ds.yaml
+- service.yaml

@@ -1,0 +1,9 @@
+# Enabled file based configuration in AM.
+namespace: default
+bases:
+- ../../frconfig/frconfig-cert-manager
+- ../../idrepo/base
+- ../../am/base
+- ../../amster/base
+patchesStrategicMerge:
+- am-configmap.yaml

@@ -1,0 +1,19 @@
+{
+  "instance" : "http://openam:80/am",
+  "dsameUser" : "cn=dsameuser,ou=DSAME Users,ou=am-config",
+  "keystores" : {
+    "default" : {
+      "keyStorePasswordFile" : "/var/run/secrets/openam/keystore/storepass",
+      "keyPasswordFile" : "/var/run/secrets/openam/keystore/keypass",
+      "keyStoreType" : "JCEKS",
+      "keyStoreFile" : "/var/run/secrets/openam/keystore/keystore.jceks"
+    }
+  },
+  "configStoreList" : [ {
+    "baseDN" : "ou=am-config",
+    "dirManagerDN" : "uid=admin",
+    "ldapHost" : "idrepo",
+    "ldapPort" : 1389,
+    "ldapProtocol" : "ldap"
+  } ]
+}

@@ -1,0 +1,12 @@
+# Everything except for IG 
+namespace: default
+bases:
+#- ../../ig/base
+- ../../frconfig/frconfig-cert-manager
+- ../../idrepo/base
+- ../../am/base
+- ../../amster/base
+- ../../idm/base
+
+
+

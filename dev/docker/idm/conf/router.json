@@ -1,0 +1,89 @@
+{
+    "filters" : [
+        {
+            "condition" : {
+                "type" : "text/javascript",
+                "source" : "context.caller.external === true"
+            },
+            "onRequest" : {
+                "type" : "groovy",
+                "file" : "scopeCheck.groovy",
+                "globals" : {
+                    "routes" : [
+                        {
+                            "pattern": "^managed/user/.+$",
+                            "methods": [
+                                "read"
+                            ],
+                            "scopes": [
+                                "fr:idm:profile"
+                            ]
+                        },
+                        {
+                            "pattern": "(^notification)|(^internal/notification)|(^endpoint/usernotifications)",
+                            "methods": [
+                                "read"
+                            ],
+                            "scopes": [
+                                "fr:idm:notifications"
+                            ]
+                        },
+                        {
+                            "pattern": "^consent$",
+                            "methods": [
+                                "action"
+                            ],
+                            "actions": [
+                                "getConsentMappings"
+                            ],
+                            "scopes": [
+                                "fr:idm:consent_read"
+                            ]
+                        },
+                        {
+                            "pattern": "^managed/user/.+$",
+                            "methods": [
+                                "patch"
+                            ],
+                            "scopes": [
+                                "fr:idm:profile_update"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "condition" : {
+                "type" : "text/javascript",
+                "source" : "context.caller.external === true"
+            },
+            "onRequest" : {
+                "type" : "text/javascript",
+                "source" : "require('router-authz').testAccess()"
+            }
+        },
+        {
+            "pattern" : "^(managed|system|internal)($|(/.+))",
+            "onRequest" : {
+                "type" : "text/javascript",
+                "file" : "policyFilter.js"
+            },
+            "methods" : [
+                "create",
+                "update"
+            ]
+        },
+        {
+            "pattern" : "^(managed|internal)($|(/.+))",
+            "condition" : {
+                "type" : "text/javascript",
+                "source" : "context.caller.external === true || context.current.name === 'selfservice'"
+            },
+            "onResponse" : {
+                "type" : "text/javascript",
+                "source" : "require('relationshipFilter').filterResponse()"
+            }
+        }
+    ]
+}

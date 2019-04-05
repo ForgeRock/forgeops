@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am
+data:
+  # This is for file based config. Suggest using overlay for this
+  # CATALINA_OPTS: '-server -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
+  #   -Dcom.sun.identity.sm.sms_object_filebased_enabled=true -Dcom.forgerock.am.fileconfig.filelocation=/home/forgerock/openam/config/services
+  #   -Dcom.iplanet.services.stats.state=off -Dorg.forgerock.donotupgrade '
+  CATALINA_OPTS: '-server -Dcom.sun.identity.configuration.directory=/home/forgerock/openam'
+

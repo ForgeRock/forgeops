@@ -1,0 +1,19 @@
+kind: ""
+apiversion: ""
+commonLabels:
+  vendor: forgerock
+  app: ds
+resources:
+- configmap.yaml
+- ds.yaml
+- secrets.yaml
+- service.yaml
+# Only string fieldref's are currently supported. This does not currently work...
+# vars:
+# - name: DS_SET_SIZE
+#   objref:
+#     kind: StatefulSet
+#     name: ds
+#     apiVersion: apps/v1beta1
+#   fieldref:
+#     fieldpath: spec.template.spec.replicas

@@ -1,0 +1,35 @@
+apiVersion: skaffold/v1beta7
+kind: Config
+build:
+  artifacts:
+  # - image: ig
+  #   context: docker/ig
+  - image: am
+    context: docker/am
+  - image: amster
+    context: docker/amster
+  - image: idm
+    context: docker/idm
+  tagPolicy:
+    sha256: {}
+deploy:
+  kustomize:
+    path: ./kustomize/platform/full
+profiles:
+- name: idm
+  deploy:
+    kustomize:
+      path: ./kustomize/platform/idm-dev
+- name: am
+  deploy:
+    kustomize:
+      path: ./kustomize/platform/am-dev
+# AM with File Based Config
+- name: am-fbc
+  build:
+    artifacts:
+    - image: am
+      context: docker/am-fbc
+  deploy:
+    kustomize:
+      path: ./kustomize/platform/am-fbc

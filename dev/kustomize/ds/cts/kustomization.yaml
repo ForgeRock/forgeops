@@ -1,0 +1,5 @@
+kind: ""
+apiversion: ""
+nameprefix: cts-
+bases:
+- ../base
