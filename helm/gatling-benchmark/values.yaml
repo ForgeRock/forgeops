@@ -8,12 +8,12 @@ subdomain: iam
 # Gatling image with tests.
 # Dockerfile for this image can be found in forgeops/docker/gatling
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/gatling:6.5.1
+  repository: gcr.io/forgerock-io/gatling:6.5.1
   pullPolicy: Always
   
 gitImage:
   repository: gcr.io/forgerock-io/git
-  tag: 6.5.0
+  tag: 6.5.1
   pullPolicy: IfNotPresent
 
 config:
