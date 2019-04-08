@@ -8,7 +8,7 @@ subdomain: iam
 # Gatling image with tests.
 # Dockerfile for this image can be found in forgeops/docker/gatling
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/gatling:6.5.0
+  repository: forgerock-docker-public.bintray.io/forgerock/gatling:6.5.1
   pullPolicy: Always
   
 gitImage:
@@ -95,6 +95,11 @@ benchmark:
     host: openig
     port: 80
     proto: http
+
+# For creating the PV, we need to specify the server and the path to the export
+nfs:
+  server: 10.191.193.66
+  path: /export
 
 # Reporting related values.
 component: gatling
