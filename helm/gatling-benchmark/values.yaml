@@ -85,6 +85,11 @@ benchmark:
     port: 80
     proto: http
 
+# For creating the PV, we need to specify the server and the path to the export
+nfs:
+  server: 10.191.193.66
+  path: /export
+
 # Reporting related values.
 component: gatling
 service:
