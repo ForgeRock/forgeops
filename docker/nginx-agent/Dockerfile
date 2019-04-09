@@ -19,8 +19,13 @@ ARG AGENT_SERVER=http://apache-agent.example.forgeops.com
 COPY nginx.conf /etc/nginx/
 COPY default.conf /etc/nginx/conf.d/
 
+RUN echo "deb [check-valid-until=no] http://cdn-fastly.deb.debian.org/debian jessie main" > /etc/apt/sources.list.d/jessie.list
+RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
+RUN sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
+RUN apt-get -o Acquire::Check-Valid-Until=false update
+
 # Install necessary dependencies
-RUN apt-get update && apt-get install --no-install-recommends  -y unzip curl vim openssl && \
+RUN apt-get install --no-install-recommends  -y unzip curl vim openssl && \
       echo "password" >/var/tmp/pw.txt  && chmod 0400 /var/tmp/pw.txt && \
       rm -rf /var/lib/apt/lists/*
 
