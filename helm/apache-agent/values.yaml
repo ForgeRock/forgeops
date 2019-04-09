@@ -7,7 +7,7 @@ component: apache-agent
 
 domain: example.com
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/apache-agent
+  repository: gcr.io/forgerock-io/apache-agent
   tag: latest
   pullPolicy: Always
 

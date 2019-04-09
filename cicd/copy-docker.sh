@@ -2,7 +2,7 @@
 # Copy from one registry to another
 
 SRC="gcr.io/engineering-devops"
-DEST="forgerock-docker-internal.bintray.io/forgerock"
+DEST="gcr.io/forgerock-io"
 TAG="6.5.0"
 
 if [ -n "$1" ];

@@ -40,7 +40,7 @@ mounted for secrets, configuration and persistent data. As such, they are not su
 
 ## Image Builds
 
-The product images are built automatically (using Conatainer Builder) when a commit is made to ForgeOps. These images are pushed to https://bintray.com/forgerock.
+The product images are built automatically (using Conatainer Builder) when a commit is made to ForgeOps. These images are pushed to gcr.io/forgerock-io
 
 
 ## build.sh

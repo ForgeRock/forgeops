@@ -1,5 +1,5 @@
 image:
-  repository: forgerock-docker-public.bintray.io/forgerock/openig
+  repository: gcr.io/forgerock-io/openig
   tag: 6.5.0
   pullPolicy: IfNotPresent
 

@@ -4,4 +4,4 @@
 See https://stash.forgerock.org/projects/OPENIG/repos/openig/browse/openig-docker
 
 
-These ig images are published to bintray. See https://bintray.com/forgerock/public/forgerock:ig
+These ig images are published to gcr.io. See gcr.io/forgerock-io/ig

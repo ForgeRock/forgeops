@@ -28,7 +28,7 @@ agent:
 component: nginx-agent
 
 image:
-  repository: forgerock-docker-public.bintray.io
+  repository: gcr.io/forgerock-io
   tag: latest
   pullPolicy: Always
 

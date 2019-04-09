@@ -3,7 +3,7 @@
     "am": {
       "component": "openam",
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/openam",
+        "repository": "gcr.io/forgerock-io/openam",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -53,7 +53,7 @@
         "strategy": "git"
       },
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/amster",
+        "repository": "gcr.io/forgerock-io/amster",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -104,7 +104,7 @@
       },
       "component": "openidm",
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/openidm",
+        "repository": "gcr.io/forgerock-io/openidm",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -207,7 +207,7 @@
       },
       "catalinaOpts": "-Xmx512m",
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/openig",
+        "repository": "gcr.io/forgerock-io/openig",
         "tag": "6.5.0",
         "pullPolicy": "IfNotPresent"
       },
@@ -262,7 +262,7 @@
         "enabled": true
       },
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/ds",
+        "repository": "gcr.io/forgerock-io/ds",
         "pullPolicy": "IfNotPresent",
         "tag": "6.5.0"
       },
@@ -312,7 +312,7 @@
         "enabled": true
       },
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/ds",
+        "repository": "gcr.io/forgerock-io/ds",
         "pullPolicy": "IfNotPresent",
         "tag": "6.5.0"
       },
@@ -362,7 +362,7 @@
         "enabled": true
       },
       "image": {
-        "repository": "forgerock-docker-public.bintray.io/forgerock/ds",
+        "repository": "gcr.io/forgerock-io/ds",
         "pullPolicy": "IfNotPresent",
         "tag": "6.5.0"
       },

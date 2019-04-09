@@ -3,4 +3,4 @@
 See https://stash.forgerock.org/projects/OPENAM/repos/openam/browse/openam-docker
 
 
-These am images are published to bintray. See https://bintray.com/forgerock/public/forgerock:am
+These am images are published to gcr.io. See gcr.io/forgerock-io/am

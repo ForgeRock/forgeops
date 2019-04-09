@@ -12,8 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $DIR
 
 # Default settings. You can set these all via command switches as well.
-REGISTRY="forgerock-docker-public.bintray.io"
-#REGISTRY="forgerock-docker-internal.bintray.io"
+REGISTRY="gcr.io/forgerock-io"
 
 REPO="forgerock"
 # Default tag if none is specified.
@@ -33,9 +32,8 @@ while getopts "adgpt:r:R:P:i:c:n:C:" opt; do
             echo "Environment variable DOCKER_USER and DOCKER_PASSWORD not set"
             exit 1
        fi
-       # This is a bit kludgy - but we are hard coding the login to both bintray registires
-       docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" forgerock-docker-public.bintray.io
-       docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" forgerock-docker-internal.bintray.io
+       # This is a bit kludgy - but we are hard coding the login to forgerock registries
+       docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD" gcr.io/forgerock-io
         ;;
     t ) TAG="${OPTARG}" ;;
     d ) DRYRUN="echo" ;;
@@ -108,7 +106,7 @@ if [ -n "$BUILD_CSV" ]; then
 
       # For each registry we support ()
       # for reg in "gcr.io/engineering-devops"
-      for reg in "gcr.io/engineering-devops" "forgerock-docker-public.bintray.io/forgerock" 
+      for reg in "gcr.io/engineering-devops" "gcr.io/forgerock-io" 
       do
           img="${reg}/${folder}"
           ${DRYRUN} docker tag ${folder} "${img}:${tag}"

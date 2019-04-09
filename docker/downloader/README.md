@@ -5,7 +5,7 @@ The purpose of this image is to download the ForgeRock platform binaries that ar
 This image *must* be built and tagged as `forgerock/downloader:latest`.  It is used as the first stage of a multi-stage build
 in order to fetch the platform binaries.
 
-To build this image you must have an API_KEY that has permission to pull from the ForgeRock bintray repository. See ../README.md for further information.
+To build this image you must have an API_KEY that has permission to pull from the ForgeRock gcr.io/forgerock-io repository. See ../README.md for further information.
 
 The build.sh script will attempt to build this image if it is not found in your docker cache.
 

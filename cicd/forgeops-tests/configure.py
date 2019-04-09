@@ -37,7 +37,7 @@ TESTS_USE_EMPTY_CONFIG = "False"
 if "TESTS_USE_EMPTY_CONFIG" in os.environ:
     TESTS_USE_EMPTY_CONFIG = os.environ["TESTS_USE_EMPTY_CONFIG"]
 
-IMAGE_BASE_URL = 'forgerock-docker-public.bintray.io/forgerock'
+IMAGE_BASE_URL = 'gcr.io/forgerock-io'
 IMAGE_PULL_POLICY = 'Always'
 
 OPENAM_HELM_SUBFOLDER = "openam"

@@ -3,4 +3,4 @@
 See https://stash.forgerock.org/projects/OPENAM/repos/openam/browse/openam-amster
 
 
-These am images are published to bintray. See https://bintray.com/forgerock/public/forgerock:amster
+These am images are published to gcr.io. See gcr.io/forgerock-io/amster
