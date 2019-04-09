@@ -3,7 +3,7 @@
     "am": {
       "image": {
         "repository": "gcr.io/forgerock-io/openam",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "Always"
       },
       "resources": {
@@ -21,7 +21,7 @@
     "amster": {
       "image": {
         "repository": "gcr.io/forgerock-io/amster",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "Always"
       },
       "config": {
@@ -42,7 +42,7 @@
     "idm": {
       "image": {
         "repository": "gcr.io/forgerock-io/openidm",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "resources": {
@@ -66,7 +66,7 @@
     "ig": {
       "image": {
         "repository": "gcr.io/forgerock-io/openig",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "config": {
@@ -102,7 +102,7 @@
     "userstore": {
       "image": {
         "repository": "gcr.io/forgerock-io/ds",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "Always"
       },
       "instance": "userstore",
@@ -138,7 +138,7 @@
     "configstore": {
       "image": {
         "repository": "gcr.io/forgerock-io/ds",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "Always"
       },
       "instance": "configstore",
@@ -160,7 +160,7 @@
     "ctsstore": {
       "image": {
         "repository": "gcr.io/forgerock-io/ds",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "Always"
       },
       "instance": "ctsstore",

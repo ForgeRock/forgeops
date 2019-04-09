@@ -1,6 +1,6 @@
 image:
   repository: gcr.io/forgerock-io/ds
-  tag: 6.5.0
+  tag: 6.5.1
   pullPolicy: IfNotPresent
   
 instance: configstore

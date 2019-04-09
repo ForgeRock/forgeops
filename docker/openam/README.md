@@ -3,4 +3,4 @@
 See https://stash.forgerock.org/projects/OPENAM/repos/openam/browse/openam-docker
 
 
-These am images are published to gcr.io. See gcr.io/forgerock-io/am
+These am images are published to gcr.io. See gcr.io/forgerock-io/openam

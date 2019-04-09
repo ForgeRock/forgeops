@@ -1,7 +1,7 @@
 image:
   repository: gcr.io/forgerock-io/amster
   #repository: gcr.io/engineering-devops/amster
-  tag: 6.5.0
+  tag: 6.5.1
   pullPolicy: Always
 
 config:

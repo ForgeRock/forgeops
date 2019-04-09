@@ -7,10 +7,10 @@ replicaCount: 1
 component: ds
 
 image:
-  repository: gcr.io/forgerock-io/ds-pass
+  repository: gcr.io/forgerock-io/ds
   #pullPolicy: IfNotPresent
   pullPolicy: Always
-  tag: latest
+  tag: 6.5.1
 
 gcs:
   enabled: false

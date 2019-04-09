@@ -1,6 +1,6 @@
 image:
-  repository: gcr.io/forgerock-io/idm
-  tag: 6.5.0
+  repository: gcr.io/forgerock-io/openidm
+  tag: 6.5.1
   pullPolicy: IfNotPresent
   
 resources:

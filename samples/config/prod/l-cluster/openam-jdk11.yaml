@@ -1,6 +1,6 @@
 image:
-  repository: gcr.io/engineering-devops/openam
-  tag: 6.5.0-jdk11
+  repository: gcr.io/forgerock-io/openam
+  tag: 6.5.1
   pullPolicy: Always
   
 resources:

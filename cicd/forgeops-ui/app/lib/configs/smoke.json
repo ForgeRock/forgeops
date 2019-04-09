@@ -4,17 +4,17 @@
       "component": "openam",
       "image": {
         "repository": "gcr.io/forgerock-io/openam",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
         "repository": "gcr.io/forgerock-io/git",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "utilImage": {
         "repository": "gcr.io/forgerock-io/util",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "domain": ".forgeops.com",
@@ -54,12 +54,12 @@
       },
       "image": {
         "repository": "gcr.io/forgerock-io/amster",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
         "repository": "gcr.io/forgerock-io/git",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "configStore": {
@@ -105,12 +105,12 @@
       "component": "openidm",
       "image": {
         "repository": "gcr.io/forgerock-io/openidm",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
         "repository": "gcr.io/forgerock-io/git",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "javaOpts": "-Xmx1024m -server -XX:+UseG1GC",
@@ -208,12 +208,12 @@
       "catalinaOpts": "-Xmx512m",
       "image": {
         "repository": "gcr.io/forgerock-io/openig",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "gitImage": {
         "repository": "gcr.io/forgerock-io/git",
-        "tag": "6.5.0",
+        "tag": "6.5.1",
         "pullPolicy": "IfNotPresent"
       },
       "resources": {
@@ -264,7 +264,7 @@
       "image": {
         "repository": "gcr.io/forgerock-io/ds",
         "pullPolicy": "IfNotPresent",
-        "tag": "6.5.0"
+        "tag": "6.5.1"
       },
       "replicas": 2,
       "storageSize": "10Gi",
@@ -314,7 +314,7 @@
       "image": {
         "repository": "gcr.io/forgerock-io/ds",
         "pullPolicy": "IfNotPresent",
-        "tag": "6.5.0"
+        "tag": "6.5.1"
       },
       "replicas": 1,
       "storageSize": "10Gi",
@@ -364,7 +364,7 @@
       "image": {
         "repository": "gcr.io/forgerock-io/ds",
         "pullPolicy": "IfNotPresent",
-        "tag": "6.5.0"
+        "tag": "6.5.1"
       },
       "replicas": 1,
       "storageSize": "10Gi",

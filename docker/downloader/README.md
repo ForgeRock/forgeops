@@ -17,10 +17,10 @@ For example:
 ```
 FROM forgerock/downloader 
 
-ARG VERSION="6.5.0"
+ARG VERSION="6.5.1"
 RUN download -v $VERSION opendj
 ```
 
-Will download RC4 of the directory server, and leave it in the root folder named opendj.zip. Subsequent stages in the docker build will copy this file from the root directory for installation in the final docker image.
+Will download 6.5.1 release of the directory server, and leave it in the root folder named opendj.zip. Subsequent stages in the docker build will copy this file from the root directory for installation in the final docker image.
 
 See ../downloader-sample for an alternate approach.
