@@ -66,12 +66,6 @@ echo "Waiting for AM server at ${CONFIG_URL} "
 
 wait_for_openam
 
-# Extract amster version for commons parameter to modify configs
-echo "Extracting amster version"
-VER=$(./amster --version)
-[[ "$VER" =~ ([0-9].[0-9].[0-9](.[0-9]*)?-([a-zA-Z][0-9]+|SNAPSHOT|RC[0-9]+)|[0-9].[0-9].[0-9](.[0-9]*)?) ]]
-export VERSION=${BASH_REMATCH[1]}
-echo "Amster version is: " $VERSION
 
 # Execute Amster if the configuration is found.
 if [ -d  ${AMSTER_SCRIPTS} ]; then
