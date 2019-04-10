@@ -40,7 +40,7 @@ mounted for secrets, configuration and persistent data. As such, they are not su
 
 ## Image Builds
 
-The product images are built automatically (using Conatainer Builder) when a commit is made to ForgeOps. These images are pushed to gcr.io/forgerock-io
+The product Dockerfiles are now managed in the openam repo and are built using maven in Jenkins.   These images are pushed to gcr.io/forgerock-io
 
 
 ## build.sh
@@ -48,9 +48,9 @@ The product images are built automatically (using Conatainer Builder) when a com
 The `build.sh` script can be used for one-off builds during development. For example:
 
 ```
-./build.sh openam 
+./build.sh git 
 ```
-Will build openam using the default tag and registry.
+Will build git using the default tag and registry.
 
 ## CSV Format
 
