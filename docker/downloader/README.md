@@ -5,7 +5,7 @@ The purpose of this image is to download the ForgeRock platform binaries that ar
 This image *must* be built and tagged as `forgerock/downloader:latest`.  It is used as the first stage of a multi-stage build
 in order to fetch the platform binaries.
 
-To build this image you must have an API_KEY that has permission to pull from the ForgeRock gcr.io/forgerock-io repository. See ../README.md for further information.
+To build this image you must have an API_KEY that has permission to pull from ForgeRock's Maven repository. See ../README.md for further information.
 
 The build.sh script will attempt to build this image if it is not found in your docker cache.
 
@@ -21,6 +21,6 @@ ARG VERSION="6.5.1"
 RUN download -v $VERSION opendj
 ```
 
-Will download 6.5.1 release of the directory server, and leave it in the root folder named opendj.zip. Subsequent stages in the docker build will copy this file from the root directory for installation in the final docker image.
+Will download the 6.5.1 release of the directory server, and leave it in the root folder named opendj.zip. Subsequent stages in the docker build will copy this file from the root directory for installation in the final docker image.
 
 See ../downloader-sample for an alternate approach.

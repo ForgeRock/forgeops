@@ -8,8 +8,6 @@
 # needs to be done once, so that the docker daemon can authenticate to the registry.
 
 # Put your env vars in this file, or set them through some other means.
-# Note that if you are using gcr.io/forgerock-io as your registry, specify your API key,
-# not your login password, as $REGISTRY_PASSWORD.
 env_settings=~/etc/registry_env
 
 if [ -r $env_settings ]; then
