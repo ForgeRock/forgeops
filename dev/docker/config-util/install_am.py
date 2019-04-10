@@ -5,6 +5,7 @@ Performs initial configuration.
 
 For customization, look into am_install.cfg
 """
+import os
 import threading
 import configparser
 import time
@@ -15,13 +16,11 @@ from requests import post, get
 
 urllib3.disable_warnings()
 
-cfg_parser = configparser.ConfigParser()
-cfg_parser.read('am-install.cfg')
+# Load env properties
 
-# Properties loaded from am-install.cfg
-DOMAIN = cfg_parser.get('am', 'DOMAIN')
-ADMIN_PASSWORD = cfg_parser.get('am', 'ADMIN_PASSWORD')
-AM_FQDN = cfg_parser.get('am', 'AM_FQDN')
+DOMAIN = os.getenv('DOMAIN', 'forgeops.com')
+ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'password')
+AM_FQDN = os.getenv('FQDN', 'pavel.iam.forgeops.com')
 
 # List of AM initial configuration properties
 properties = {
@@ -70,6 +69,9 @@ def configure():
     Do AM initial configuration. Configuration is executed in separate thread to allow main thread to
     read setup progress.
     """
+
+    # Dump values used for configuration
+    print(properties)
 
     # Start configure thread
     t = threading.Thread(target=config_thread)

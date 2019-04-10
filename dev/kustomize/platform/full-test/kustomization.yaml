@@ -1,0 +1,8 @@
+namespace: pavel
+bases:
+- ../../frconfig/frconfig-cert-manager
+- ../../idrepo/base
+- ../../am/base
+- ../../ig/base
+- ../../idm/base
+- ../../config-util/base

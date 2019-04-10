@@ -1,6 +1,7 @@
 """
 AM Simple runtime config library
 """
+
 import time
 
 from requests import get, post, put
@@ -27,8 +28,8 @@ class AMConfig(object):
                 else:
                     print("AM not ready yet, waiting for 10 seconds")
                     time.sleep(10)
-            except Exception:
-
+            except Exception as e:
+                print(e.with_traceback())
                 pass
 
     def admin_login(self, password='password'):
@@ -131,7 +132,7 @@ class AMConfig(object):
 if __name__ == '__main__':
     print('Doing minimal AM smoke test config')
     cfg = AMConfig()
-    # cfg.create_oauth2_provider()
+    cfg.create_oauth2_provider()
     cfg.create_oauth2_client()
     cfg.create_policy_all_authenticated(name='test-policy',
                                         resource='http://test-policy.com/test',

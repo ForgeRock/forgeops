@@ -10,6 +10,8 @@ build:
     context: docker/amster
   - image: idm
     context: docker/idm
+  - image: config-util
+    context: docker/config-util
   tagPolicy:
     sha256: {}
 deploy:
@@ -33,3 +35,17 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/platform/am-fbc
+- name: platform-test
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: idm
+      context: docker/idm
+    - image: ig 
+      context: docker/ig 
+    - image: config-util
+      context: docker/config-util
+  deploy:
+    kustomize:
+      path: ./kustomize/env/smoke/
