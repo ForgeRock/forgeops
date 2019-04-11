@@ -41,6 +41,9 @@ spec:
         release: {{ .Release.Name }}
         component: {{ .Values.component }}
     spec:
+      {{- with .Values.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
       affinity:
         podAntiAffinity:
         {{- if eq .Values.podAntiAffinity "hard" }}
@@ -65,9 +68,10 @@ spec:
               topologyKey: {{ .Values.topologyKey }}
          {{- end }}
       terminationGracePeriodSeconds: 30
-      # This will make sure the mounted PVCs are writable by the forgerock user with gid 111111.
+      {{- with .Values.securityContext }}
       securityContext:
-{{ toYaml .Values.securityContext | indent 8 }}
+{{ toYaml . | trim | indent 8 }}
+      {{- end }}
       {{ if .Values.restore.enabled }}
       initContainers:
       - name: restore

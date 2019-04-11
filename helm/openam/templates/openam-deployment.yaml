@@ -16,6 +16,13 @@ spec:
       annotations:
         sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
     spec:
+      {{- with .Values.serviceAccountName }}
+      serviceAccountName: {{ . }}
+      {{- end }}
+      {{- with .Values.securityContext }}
+      securityContext:
+{{ toYaml . | trim | indent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: 10
       {{- if eq .Values.podAntiAffinity "hard" }}
       affinity:
