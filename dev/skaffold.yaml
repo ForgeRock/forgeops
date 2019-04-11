@@ -10,8 +10,6 @@ build:
     context: docker/amster
   - image: idm
     context: docker/idm
-  - image: config-util
-    context: docker/config-util
   tagPolicy:
     sha256: {}
 deploy:

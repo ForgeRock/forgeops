@@ -11,6 +11,18 @@ patchesJson6902:
     name: openig
   path: ingress-patch.yaml
 - target:
+    group: extensions
+    version: v1beta1
+    kind: Ingress
+    name: openam
+  path: ingress-patch.yaml
+- target:
+    group: extensions
+    version: v1beta1
+    kind: Ingress
+    name: openidm
+  path: ingress-patch.yaml
+- target:
     group: certmanager.k8s.io
     version: v1alpha1
     kind: Certificate
