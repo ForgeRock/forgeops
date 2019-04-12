@@ -18,8 +18,7 @@ gitImage:
 utilImage:
   repository: gcr.io/forgerock-io/util
   tag: 7.0.0
-  pullPolicy: IfNotPresent
-  #pullPolicy: Always
+  pullPolicy: Always
 
 domain: example.com
 subdomain: iam
