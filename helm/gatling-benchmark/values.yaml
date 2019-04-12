@@ -24,6 +24,10 @@ config:
   # Using the git strategy, each helm chart pulls the configuration from git using an init container.
   strategy: git
 
+taints:
+  # Taint checking. Turned off by default.
+  enabled: false
+
 benchmark:
   # Name of scala test name to run
   # This benchmark supports following testnames
