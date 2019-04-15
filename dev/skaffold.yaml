@@ -25,6 +25,8 @@ profiles:
     artifacts:
     - image: config-util
       context: docker/config-util
+    - image: am
+      context: docker/am
   deploy:
     kustomize:
       path: ./kustomize/platform/am-dev

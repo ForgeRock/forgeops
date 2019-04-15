@@ -59,25 +59,6 @@ class AMConfig(object):
                 'Accept-API-Version': 'resource=1.0',
                 'Content-Type': 'application/json'}
 
-    # OAUTH2 RELATED CONFIG
-    def create_oauth2_provider(self, custom_config=None):
-        """
-        Creates a oauth2 provider in root realm
-        :param custom_config: If specified, custom config values will be used instead of default ones.
-        """
-        if custom_config is not None:
-            config = custom_config
-        else:
-            template_request = post(
-                url=f'{self.am_url}/json/realms/root/realm-config/services/oauth-oidc?_action=template',
-                headers=self.admin_headers, verify=False)
-            config = template_request.json()
-
-        create_request = post(url=f'{self.am_url}/json/realms/root/realm-config/services/oauth-oidc?_action=create',
-                              headers=self.admin_headers, verify=False,
-                              json=config)
-        print(create_request.status_code)
-
     # Slurp a json file in amster format. Does search/replace on the string &{fqdn}
     def read_json(self,path,fqdn):
         with open(path) as jsonfile:
@@ -96,12 +77,13 @@ class AMConfig(object):
             name = _type['name']
             if id == "LDAPv3ForOpenDS":
                 self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}',data)
-            elif id == "baseurl":
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}',data)
             else:
-                print(f'I dont know how to import type {id}')
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}',data)
+            # TODO: More error checking here...
+            # else:
+            #     print(f'I dont know how to import type {id}')
 
-    #   Import oauth2 configs in amster format
+    #  Import oauth2 configs in amster format
     def import_oauth2_configs(self, dir, fqdn):
         for filename in os.listdir(dir):
             data = self.read_json(f'{dir}/{filename}',fqdn)
@@ -171,7 +153,6 @@ if __name__ == '__main__':
 
     print(f'Doing minimal AM config with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url)
-    cfg.create_oauth2_provider()
     cfg.import_global_configs('./global', am_fqdn)
     cfg.import_realm_config('./realm',am_fqdn)
     cfg.import_oauth2_configs('./oauth2', am_fqdn)
