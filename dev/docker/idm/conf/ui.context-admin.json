@@ -4,6 +4,6 @@
     "defaultDir" : "&{idm.install.dir}/ui/admin/default",
     "extensionDir" : "&{idm.install.dir}/ui/admin/extension",
     "responseHeaders" : {
-        "X-Frame-Options" : "DENY"
+        "X-Frame-Options" : "SAMEORIGIN"
     }
 }
