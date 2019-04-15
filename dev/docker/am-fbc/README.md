@@ -39,16 +39,7 @@ Steps:
 Eventually this will be supported via commons expressions. For now, your choices are:
 
 * Using your ide, search and replace the FQDN. The site is config/services/realm/root/iplanetamplatformservice/1.0/globalconfig/default/com-sun-identity-sites/site1/accesspoint.json
-* Using a sed command, do the same as above.
 
-Sample sed script (executed in the container, before AM starts - you would need to update the entry-point)
-```bash
-find /home/forgerock/config -type f -print0 | xargs -0 sed -i -e s/default\.iam\.example\.com/test.iam.example.com/g
-```
 
-Sed script, executed locally (Note: for Mac, we use gsed as Mac sed behaves differently)
-```
-find tmp/config  -type f -exec gsed -i -e 's/default\.iam\.example\.com/test.iam.forgeops.com/g' {} \;
-# Search for string you just changed
-find tmp/config  -type f -print0 | xargs -0 grep test.iam.forgeops.com
-```
+Use the script `./fix-fqdn.sh`
+

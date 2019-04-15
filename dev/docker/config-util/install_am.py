@@ -9,6 +9,7 @@ import os
 import threading
 import configparser
 import time
+import sys
 
 import urllib3
 
@@ -20,7 +21,7 @@ urllib3.disable_warnings()
 
 DOMAIN = os.getenv('DOMAIN', 'forgeops.com')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'password')
-AM_FQDN = os.getenv('FQDN', 'pavel.iam.forgeops.com')
+AM_FQDN = os.getenv('FQDN', 'default.iam.forgeops.com')
 
 # List of AM initial configuration properties
 properties = {
@@ -95,8 +96,9 @@ def wait_for_am():
     while not ready:
         try:
             print("Trying endpoints.")
-            am_request = get(url='http://openam:80/am', timeout=10, verify=False)
+            am_request = get(url='http://openam:80/am/', timeout=10, verify=False)
             print(am_request.url)
+            print( f'am_url, {am_request}')
             ds_request = get(url='http://idrepo:8080/alive', timeout=10, verify=False)
 
             if 'options.htm' in am_request.url:
@@ -106,6 +108,9 @@ def wait_for_am():
                     return
                 else:
                     print("DS not ready yet.")
+            elif am_request.status_code == 200:
+                print("AM is already installed! Exiting")
+                sys.exit(0)
             else:
                 print("AM not yet ready to be configured, waiting 10 seconds")
                 time.sleep(10)

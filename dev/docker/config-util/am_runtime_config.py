@@ -3,6 +3,10 @@ AM Simple runtime config library
 """
 
 import time
+import argparse
+import os
+import json
+
 
 from requests import get, post, put
 import requests
@@ -11,9 +15,13 @@ requests.packages.urllib3.disable_warnings()
 
 
 class AMConfig(object):
-    def __init__(self):
-        self.am_fqdn = 'openam'
-        self.am_url = f'http://{self.am_fqdn}:80/am'
+    def __init__(self,url):
+        self.domain = os.getenv('DOMAIN', 'forgeops.com')
+        self.admin_password = os.getenv('ADMIN_PASSWORD', 'password')
+     
+        # self.am_url = f'https://{self.am_fqdn}:443/am'
+        # self.am_internal_url = 'http://openam:80/am'
+        self.am_url = url
         self.wait_for_am()
         self.admin_token = self.admin_login()
 
@@ -21,6 +29,7 @@ class AMConfig(object):
     def wait_for_am(self):
         while 1:
             try:
+                print(f'Wating for AM {self.am_url}')
                 request = get(url=self.am_url, verify=False)
                 if request.status_code is 200:
                     print('AM ready for runtime config')
@@ -69,31 +78,48 @@ class AMConfig(object):
                               json=config)
         print(create_request.status_code)
 
-    def create_oauth2_client(self, client_name='oauth2', custom_config=None):
-        """
-        Method to create oauth2 client profile
-        :param client_name: Name of the client
-        :param custom_config: If specified, this will be used as payload. Expecting dictionary with values.
-        """
-        default_config = {
-            '_id': 'oauth2',
-            'coreOAuth2ClientConfig': {
-                'defaultScopes': ['cn', 'mail'],
-                'redirectionUris': ['http://fake.com'],
-                'scopes': ['profile', 'uid'],
-                'userpassword': 'password'
-            }
-        }
+    # Slurp a json file in amster format. Does search/replace on the string &{fqdn}
+    def read_json(self,path,fqdn):
+        with open(path) as jsonfile:
+            text = jsonfile.read()
+            # This is a hack - we only support FQDN replacement for now...
+            text = text.replace(r'&{fqdn}', fqdn)
+            json_data = json.loads(text)
+            return json_data['data']
 
-        if custom_config is not None:
-            config = custom_config
-        else:
-            config = default_config
+    # Import all config files for the root realm
+    def import_realm_config(self,dir,fqdn):
+         for filename in os.listdir(dir):
+            data = self.read_json(f'{dir}/{filename}', fqdn)
+            _type = data['_type']
+            id = _type['_id']
+            name = _type['name']
+            if id == "LDAPv3ForOpenDS":
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}',data)
+            elif id == "baseurl":
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}',data)
+            else:
+                print(f'I dont know how to import type {id}')
 
-        create_request = put(url=f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{client_name}',
-                             headers=self.admin_headers, verify=False,
-                             json=config)
+    #   Import oauth2 configs in amster format
+    def import_oauth2_configs(self, dir, fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json(f'{dir}/{filename}',fqdn)
+            id = data['_id']
+            self.put(f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}', data)
+
+    def put(self,url,config):
+        print(f'Put url={url}')
+        create_request = put(url=url,headers=self.admin_headers, verify=False,json=config)
         print(create_request.status_code)
+        
+    def import_global_configs(self,dir,fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json(f'{dir}/{filename}',fqdn)
+            _type = data['_type']
+            id = _type['_id']
+            self.put(f'{self.am_url}/json/global-config/services/{id}', data)
+
 
     def create_policy_all_authenticated(self, name, resource, allow):
         """
@@ -125,16 +151,31 @@ class AMConfig(object):
             }
         }
         url = f'{self.am_url}/json/policies/{name}'
-        policy_request = put(url=url, json=policy, headers=self.admin_headers, verify=False)
-        print(policy_request.status_code)
-
+        self.put(url=url, config=policy)
+    
 
 if __name__ == '__main__':
-    print('Doing minimal AM smoke test config')
-    cfg = AMConfig()
+
+    parser = argparse.ArgumentParser(description='Configure AM')
+    # This option is for debugging  / testing from your laptop. If you
+    # run in the cluster you can omit this.
+    parser.add_argument('--useFQDN', action='store_true', help='Use the external FQDN to configure AM, not the internal service')
+
+    args = parser.parse_args()
+
+    am_fqdn = os.getenv('FQDN', 'default.iam.forgeops.com')
+    am_url = f'https://{am_fqdn}:443/am'
+    if not args.useFQDN:
+        am_url = 'http://openam:80/am'
+    
+
+    print(f'Doing minimal AM config with url {am_url} external fqdn {am_fqdn}')
+    cfg = AMConfig(am_url)
     cfg.create_oauth2_provider()
-    cfg.create_oauth2_client()
+    cfg.import_global_configs('./global', am_fqdn)
+    cfg.import_realm_config('./realm',am_fqdn)
+    cfg.import_oauth2_configs('./oauth2', am_fqdn)
     cfg.create_policy_all_authenticated(name='test-policy',
                                         resource='http://test-policy.com/test',
                                         allow=True)
-    print('Runtime config finished')
+    print('Runtime config finished!')

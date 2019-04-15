@@ -4,11 +4,19 @@ NOTE: This is a work in progress, For the 7.0.0 release, this folder will contai
 
 These skaffold and kustomize artifacts in this folder provide an environment for
 rapid and iterative development of configurations.  `skaffold dev` is used during development,
-and will continually redeploy changes as they are made. 
+and will continually redeploy changes as they are made.
 
 When assets are ready to be tested in QA or production, `skaffold run` is used to deploy the configurations.
-Typically this will be a CD procerss triggered from a git commit or pull request.
+Typically this will be a CD process triggered from a git commit or pull request.
 
+## Limitations - READ THIS
+
+* Currently this is aimed at iterative development - not a production deployment.
+* The AM pod in non file based mode will come up fresh everytime - it will not retain its boot configuration
+    This is because the boot.json and other bootstrap files are not mounted in the container. We are waiting for file based
+    configuration to address this. See the comments in docker/am/Dockerfile.
+* AM file based configuration is a work in progress. See docker/am-fbc/README.md
+* The FQDN defaults to default.iam.forgeops.com. Work is in progress to make this more configurable.
 
 ## SETUP - READ THIS FIRST
 

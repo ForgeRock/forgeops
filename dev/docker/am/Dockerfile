@@ -9,7 +9,7 @@ FROM gcr.io/forgerock-io/am/docker-build:7.0.0-latest-postcommit
 # are just doing development and are OK with AM being ephemeral - leave this commmented out.
 # Note that if AM comes up faster than the configstore, it may error out. This gets
 # fixed by K8S by restarting the pod - but it can take a couple of minutes.
-#COPY --chown=forgerock:root openam /home/forgerock/openam
+# COPY --chown=forgerock:root openam /home/forgerock/openam
 
 # Overide teh entrypoint and just start tomcat
 CMD ["catalina.sh", "run"]

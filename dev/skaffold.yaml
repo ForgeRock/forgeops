@@ -21,6 +21,10 @@ profiles:
     kustomize:
       path: ./kustomize/platform/idm-dev
 - name: am
+  build:
+    artifacts:
+    - image: config-util
+      context: docker/config-util
   deploy:
     kustomize:
       path: ./kustomize/platform/am-dev

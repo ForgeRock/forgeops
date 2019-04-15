@@ -3,4 +3,4 @@ bases:
 - ../../frconfig/frconfig-cert-manager
 - ../../idrepo/base
 - ../../am/base
-- ../../amster/base
+- ../../config-util/base
