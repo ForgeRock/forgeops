@@ -1,0 +1,6 @@
+kind: ""
+apiversion: ""
+resources:
+- deployment.yaml
+- ingress.yaml
+- service.yaml
