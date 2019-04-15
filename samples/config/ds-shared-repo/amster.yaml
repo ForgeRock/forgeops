@@ -1,0 +1,7 @@
+config:
+  claim: frconfig
+  importPath: /git/config/platform/idm-am-common-user/amster
+configStore:
+  host: userstore-0.userstore
+userStore:
+  dirManager: "uid=admin"

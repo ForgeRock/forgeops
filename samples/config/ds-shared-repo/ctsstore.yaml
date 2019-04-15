@@ -1,0 +1,11 @@
+instance: ctsstore
+image:
+  repository: gcr.io/forgerock-io/ds/qa-smoke
+  tag: 7.0.0-480022a
+  pullPolicy: IfNotPresent
+configstore:
+  enabled: false
+userstore:
+  enabled: false
+idmRepo:
+  enabled: false

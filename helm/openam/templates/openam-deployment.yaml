@@ -75,6 +75,8 @@ spec:
         env:
         - name: BASE_DN
           value: {{ .Values.rootSuffix }}
+        - name: CONFIGURATION_LDAP
+          value: {{ .Values.configLdapHost }}:{{ .Values.configLdapPort }}
         volumeMounts:
         - name: openam-root
           mountPath: /home/forgerock/openam
