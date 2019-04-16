@@ -1,0 +1,23 @@
+# Requests cert manager create a certificate based on the Issuer (CA, lets encrypt, etc.)
+# A secret containing the cert will be created if the request is succesful. Ingress controllers
+# Should reference the secret by name in their tls spec.
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name:  sslcert
+spec:
+  secretName: 'sslcert'
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  # If commonName is not provided, the first value in dnsNames is used.
+  #commonName: ""
+  dnsNames:
+  - 'default.iam.forgeops.com'
+  # This is used by Acme / Let's encrypt
+  acme:
+    config:
+    - dns01:
+        provider: prod-dns
+      domains:
+      - 'default.iam.forgeops.com'

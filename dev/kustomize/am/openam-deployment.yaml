@@ -1,0 +1,66 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: am
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: am
+        image: am
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /am/isAlive.jsp
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        name: openam
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /am/isAlive.jsp
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 1000Mi
+          requests:
+            memory: 900Mi
+        volumeMounts:
+        - name: am-boot-secrets
+          mountPath: /var/run/secrets/am/boot
+        - name: am-runtime-passwords
+          mountPath: /var/run/secrets/am/password
+        - name: am-runtime-keystore
+          mountPath: /var/run/secrets/am/keystore
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: am-boot-secrets
+        secret:
+          secretName: am-boot-secrets
+      - name: am-runtime-keystore
+        secret:
+          secretName: am-runtime-keystore
+      - name: am-runtime-passwords
+        secret:
+          secretName: am-runtime-passwords
+      - configMap:
+          name: boot-json
+        name: openam-boot

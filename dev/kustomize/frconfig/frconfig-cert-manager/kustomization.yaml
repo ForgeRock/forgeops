@@ -1,7 +1,0 @@
-kind: ""
-apiversion: ""
-bases:
-- ../base
-- ../cert-manager
-patchesStrategicMerge:
-- config-map.yaml

@@ -1,7 +1,0 @@
-kind: ""
-apiversion: ""
-resources:
-- deployment.yaml
-- ingress.yaml
-- openig-secrets-env.yaml
-- service.yaml

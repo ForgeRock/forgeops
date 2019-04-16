@@ -1,0 +1,10 @@
+# Source: frconfig/templates/cert-manager.yaml
+
+# Create a namespaced issuer that uses cert managers built in CA issuer
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: ca-issuer
+spec:
+  ca:
+    secretName: certmanager-ca-secret

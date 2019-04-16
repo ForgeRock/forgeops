@@ -1,5 +1,0 @@
-namespace: default
-bases:
-- ../../frconfig/frconfig-cert-manager
-- ../../idrepo/base
-- ../../idm/base

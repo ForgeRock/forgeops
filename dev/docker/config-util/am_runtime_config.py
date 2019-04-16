@@ -102,6 +102,12 @@ class AMConfig(object):
             id = _type['_id']
             self.put(f'{self.am_url}/json/global-config/services/{id}', data)
 
+    def import_secrets_configs(self,dir,fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json(f'{dir}/{filename}',fqdn)
+            _id = data['_id']
+            _type = data['_type']['_id']
+            self.put(f'{self.am_url}/json/global-config/secrets/stores/{_type}/{_id}', data)
 
     def create_policy_all_authenticated(self, name, resource, allow):
         """
@@ -156,6 +162,8 @@ if __name__ == '__main__':
     cfg.import_global_configs('./global', am_fqdn)
     cfg.import_realm_config('./realm',am_fqdn)
     cfg.import_oauth2_configs('./oauth2', am_fqdn)
+    cfg.import_secrets_configs('./secrets', am_fqdn)
+
     cfg.create_policy_all_authenticated(name='test-policy',
                                         resource='http://test-policy.com/test',
                                         allow=True)

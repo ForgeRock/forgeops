@@ -1,15 +1,18 @@
 kind: ""
 apiversion: ""
-namespace: smoke
+namespace: default
 bases:
 - ../../frconfig
 - ../../idrepo
 - ../../am
 - ../../config-util
 - ../../idm
-- ../../ig
+- ../../cert-manager/ca-issuer
+- ../../end-user-ui
 resources:
 - ingress.yaml
 - cert-manager.yaml
+configurations:
+- var.yaml
 patchesStrategicMerge:
 - platform-config.yaml

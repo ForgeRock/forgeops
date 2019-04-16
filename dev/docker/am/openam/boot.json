@@ -3,10 +3,10 @@
   "dsameUser" : "cn=dsameuser,ou=DSAME Users,ou=am-config",
   "keystores" : {
     "default" : {
-      "keyStorePasswordFile" : "/var/run/secrets/openam/keystore/storepass",
-      "keyPasswordFile" : "/var/run/secrets/openam/keystore/keypass",
+      "keyStorePasswordFile" : "/var/run/secrets/am/boot/.storepass",
+      "keyPasswordFile" : "/var/run/secrets/am/boot/.keypass",
       "keyStoreType" : "JCEKS",
-      "keyStoreFile" : "/var/run/secrets/openam/keystore/keystore.jceks"
+      "keyStoreFile" : "/var/run/secrets/am/boot/keystore.jceks"
     }
   },
   "configStoreList" : [ {

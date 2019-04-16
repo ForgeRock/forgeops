@@ -1,3 +1,0 @@
-- op: replace 
-  path: /spec/dnsNames
-  value: [ smoke.iam.forgeops.com ]

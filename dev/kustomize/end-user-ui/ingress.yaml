@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  labels:
+    app: end-user-ui-end-user-ui
+    release: end-user-ui
+    vendor: forgerock
+  name: end-user-ui
+spec:
+  rules:
+  - host: default.iam.example.com
+    http:
+      paths:
+      - backend:
+          serviceName: end-user-ui
+          servicePort: 80
+        path: /enduser/?(.*)
+  tls:
+  - hosts:
+    - default.iam.example.com
+    secretName: sslcert
