@@ -1,0 +1,11 @@
+kind: ""
+apiversion: ""
+commonLabels:
+  app: forgeops-tests
+  vendor: forgerock
+  component: forgeops-tests
+resources:
+- ingress.yaml
+- tests-deployment.yaml
+- service.yaml
+
