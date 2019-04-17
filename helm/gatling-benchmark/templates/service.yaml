@@ -14,4 +14,4 @@ spec:
     protocol: TCP
     name: {{ .Values.service.name }}
   selector:
-    app: forgeops-benchmark
+    app: forgeops-benchmark-web
