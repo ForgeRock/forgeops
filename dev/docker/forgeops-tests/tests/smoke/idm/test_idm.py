@@ -42,7 +42,7 @@ class TestIDM(object):
         headers = self.idmcfg.get_admin_headers({'Content-Type': 'application/json',
                                                  'If-Match': '*'})
 
-        id = self.get_userid_by_name(self.testuser)
+        user_id = self.idmcfg.get_userid_by_name(self.testuser)
         payload = """{"userName": "forgeops-testuser",
                           "telephoneNumber": "6669876987",
                           "givenName": "devopsguy",
@@ -53,7 +53,7 @@ class TestIDM(object):
                           "accountStatus": "active" } """
 
         logger.test_step('Update test user')
-        response = put(verify=self.idmcfg.ssl_verify, url=f'{self.idmcfg.rest_managed_user_url}/{id}',
+        response = put(verify=self.idmcfg.ssl_verify, url=f'{self.idmcfg.rest_managed_user_url}/{user_id}',
                         headers=headers, data=payload)
         rest.check_http_status(response, expected_status=200)
 
