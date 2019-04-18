@@ -5,7 +5,6 @@ commonLabels:
   vendor: forgerock
   component: forgeops-tests
 resources:
-- ingress.yaml
 - tests-deployment.yaml
 - service.yaml
 
