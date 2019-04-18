@@ -42,6 +42,10 @@ spec:
           serviceName: openig
           servicePort: 80
         path: /ig
+      - backend:
+          serviceName: forgeops-tests
+          servicePort: 80
+        path: /tests
   tls:
   - hosts:
     - smoke.iam.forgeops.com

@@ -12,6 +12,8 @@ build:
     context: docker/idm
   - image: config-util
     context: docker/config-util
+  - image: forgeops-tests
+    context: docker/forgeops-tests
   tagPolicy:
     sha256: {}
 deploy:

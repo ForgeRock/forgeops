@@ -8,6 +8,7 @@ bases:
 - ../../config-util
 - ../../idm
 - ../../ig
+- ../../forgeops-tests
 resources:
 - ingress.yaml
 - cert-manager.yaml
