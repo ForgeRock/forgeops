@@ -4,11 +4,7 @@ metadata:
   name: forgeops-benchmark-pvc
 spec:
   accessModes:
-    - ReadWriteMany
-  selector:
-    matchLabels:
-      bucket: results
+    - ReadWriteOnce
   resources:
     requests:
       storage: 20Gi
-  storageClassName: nfs

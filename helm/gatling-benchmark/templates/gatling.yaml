@@ -1,10 +1,10 @@
 # Gatling template for forgeops benchmark suite
 # This is a YAML-formatted file.
 
-kind: Job
-apiVersion: batch/v1
+kind: Deployment
+apiVersion: apps/v1beta1
 metadata:
-  name: forgeops-benchmark-{{ .Release.Namespace }}
+  name: forgeops-benchmark
   labels:
     vendor: forgerock
 spec:
@@ -28,7 +28,6 @@ spec:
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
       {{ end }}
-      containers:
       - name: forgeops-benchmark-gatling
         image: {{ .Values.image.repository }}
         imagePullPolicy: Always
@@ -69,6 +68,33 @@ spec:
           - name: git
             mountPath: /git
           {{ end }}
+      {{ if eq .Values.taints.enabled true }}
+      tolerations:
+        - key: {{ .Values.taints.key | quote }}
+          operator: "Equal"
+          value: {{ .Values.taints.value | quote }}
+          effect: "NoSchedule"
+      nodeSelector:
+        {{ .Values.taints.key }} : {{ .Values.taints.value }}
+      {{end}}
+      containers:
+        - name: forgeops-benchmark-results
+          image: nginx:1.11.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html
+              name: gatling-results
+            - mountPath: /etc/nginx/conf.d
+              name: nginx-conf-vol
+          resources:
+      #resources:
+      #  requests:
+      #    cpu: 1000m
+      #    memory: 2048Mi
       imagePullSecrets:
         - name: forgerock-engkube-pull-secret
       volumes:
@@ -85,13 +111,3 @@ spec:
         secret:
           secretName:  {{ default "frconfig" .Values.config.name }}
       {{ end }}
-      {{ if eq .Values.taints.enabled true }}
-      tolerations:
-        - key: {{ .Values.taints.key | quote }}
-          operator: "Equal"
-          value: {{ .Values.taints.value | quote }}
-          effect: "NoSchedule"
-      nodeSelector:
-        {{ .Values.taints.key }} : {{ .Values.taints.value }}
-      {{end}}
-      restartPolicy: Never
