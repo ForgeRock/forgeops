@@ -24,7 +24,11 @@ FROM debian:stable-slim
 
 COPY --from=0 /opt/jdk /opt/jdk
 
-RUN adduser --home "/home/forgerock" -uid 11111 --gid 0 forgerock --disabled-password --gecos "forgerock user"
+# Add in ca-certificates needed for uploads to google cloud storage.
+RUN adduser --home "/home/forgerock" -uid 11111 --gid 0 forgerock --disabled-password --gecos "forgerock user" && \
+   apt-get update && \
+   apt-get install -y ca-certificates  && \
+   rm -rf /var/lib/apt/lists/*
 
 ENV JAVA_HOME /opt/jdk
 
