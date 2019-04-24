@@ -1,0 +1,3 @@
+- op: replace 
+  path: /spec/dnsNames
+  value: [ prod.iam.forgeops.com ]

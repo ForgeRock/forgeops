@@ -1,0 +1,44 @@
+{
+  "name": "02-rs-tokeninfo",
+  "condition": "${matches(request.uri.path, '^/rs-tokeninfo')}",
+  "monitor": false,
+  "heap": [],
+  "handler": {
+    "type": "Chain",
+    "config": {
+      "filters": [
+        {
+          "name": "OAuth2ResourceServerFilter-1",
+          "type": "OAuth2ResourceServerFilter",
+          "config": {
+            "scopes": [
+              "mail",
+              "employeenumber"
+            ],
+            "requireHttps": false,
+            "realm": "OpenIG",
+            "accessTokenResolver": {
+              "name": "token-resolver-1",
+              "type": "OpenAmAccessTokenResolver",
+              "config": {
+                "amService": "AmService-1"
+              }
+            },
+            "cache": {
+              "enabled": true,
+              "defaultTimeout": "1 hour",
+              "maxTimeout": "1 day"
+            }
+          }
+        }
+      ],
+      "handler": {
+        "type": "StaticResponseHandler",
+        "config": {
+          "status": 200,
+          "entity": "<html><body><h2>Decoded access token with tokeninfo endpoint: ${contexts.oauth2.accessToken.info}</h2></body></html>"
+        }
+      } 
+    }
+  }
+}
