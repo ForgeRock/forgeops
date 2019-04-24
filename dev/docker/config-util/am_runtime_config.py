@@ -7,7 +7,6 @@ import argparse
 import os
 import json
 
-
 from requests import get, post, put
 import requests
 
@@ -15,11 +14,11 @@ requests.packages.urllib3.disable_warnings()
 
 
 class AMConfig(object):
-    def __init__(self,url):
+    def __init__(self, url):
         self.domain = os.getenv('DOMAIN', 'forgeops.com')
         self.admin_password = os.getenv('ADMIN_PASSWORD', 'password')
-     
-        # self.am_url = f'https://{self.am_fqdn}:443/am'
+
+        # self.am_url = f'https://smoke.iam.forgeops.com:443/am'
         # self.am_internal_url = 'http://openam:80/am'
         self.am_url = url
         self.wait_for_am()
@@ -60,55 +59,66 @@ class AMConfig(object):
                 'Content-Type': 'application/json'}
 
     # Slurp a json file in amster format. Does search/replace on the string &{fqdn}
-    def read_json(self,path,fqdn):
+    def read_json_data(self, path, fqdn):
+        return self.read_json_full(path, fqdn)['data']
+
+    def read_json_full(self, path, fqdn):
         with open(path) as jsonfile:
             text = jsonfile.read()
-            # This is a hack - we only support FQDN replacement for now...
             text = text.replace(r'&{fqdn}', fqdn)
             json_data = json.loads(text)
-            return json_data['data']
+            return json_data
 
     # Import all config files for the root realm
-    def import_realm_config(self,dir,fqdn):
-         for filename in os.listdir(dir):
-            data = self.read_json(f'{dir}/{filename}', fqdn)
+    def import_realm_config(self, dir, fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json_data(f'{dir}/{filename}', fqdn)
             _type = data['_type']
             id = _type['_id']
             name = _type['name']
             if id == "LDAPv3ForOpenDS":
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}',data)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data)
             else:
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}',data)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}', data)
             # TODO: More error checking here...
             # else:
             #     print(f'I dont know how to import type {id}')
 
-    #  Import oauth2 configs in amster format
+    # ############## AMSTER-LIKE IMPORTS ##########################
+
     def import_oauth2_configs(self, dir, fqdn):
         for filename in os.listdir(dir):
-            data = self.read_json(f'{dir}/{filename}',fqdn)
+            data = self.read_json_data(f'{dir}/{filename}', fqdn)
             id = data['_id']
             self.put(f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}', data)
 
-    def put(self,url,config):
+    def put(self, url, config):
         print(f'Put url={url}')
-        create_request = put(url=url,headers=self.admin_headers, verify=False,json=config)
+        create_request = put(url=url, headers=self.admin_headers, verify=False, json=config)
         print(create_request.status_code)
-        
-    def import_global_configs(self,dir,fqdn):
+
+    def import_global_configs(self, dir, fqdn):
         for filename in os.listdir(dir):
-            data = self.read_json(f'{dir}/{filename}',fqdn)
+            data = self.read_json_data(f'{dir}/{filename}', fqdn)
             _type = data['_type']
             id = _type['_id']
             self.put(f'{self.am_url}/json/global-config/services/{id}', data)
 
-    def import_secrets_configs(self,dir,fqdn):
+    def import_secrets_configs(self, dir, fqdn):
         for filename in os.listdir(dir):
-            data = self.read_json(f'{dir}/{filename}',fqdn)
+            data = self.read_json_data(f'{dir}/{filename}', fqdn)
             _id = data['_id']
             _type = data['_type']['_id']
             self.put(f'{self.am_url}/json/global-config/secrets/stores/{_type}/{_id}', data)
 
+    def import_policies(self, dir, fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json_full(f'{dir}/{filename}', fqdn)
+            _id = data['data']['_id']
+            _type = data['metadata']['entityType'].lower()
+            self.put(f'{self.am_url}/json/{_type}/{_id}', data['data'])
+
+    # ############## REST CONFIG METHODS ##########################
     def create_policy_all_authenticated(self, name, resource, allow):
         """
         Simple example method to create policy to allow/deny all authenticated users to access resource
@@ -140,14 +150,15 @@ class AMConfig(object):
         }
         url = f'{self.am_url}/json/policies/{name}'
         self.put(url=url, config=policy)
-    
+
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Configure AM')
     # This option is for debugging  / testing from your laptop. If you
     # run in the cluster you can omit this.
-    parser.add_argument('--useFQDN', action='store_true', help='Use the external FQDN to configure AM, not the internal service')
+    parser.add_argument('--useFQDN', action='store_true',
+                        help='Use the external FQDN to configure AM, not the internal service')
 
     args = parser.parse_args()
 
@@ -155,16 +166,12 @@ if __name__ == '__main__':
     am_url = f'https://{am_fqdn}:443/am'
     if not args.useFQDN:
         am_url = 'http://openam:80/am'
-    
 
     print(f'Doing minimal AM config with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url)
     cfg.import_global_configs('./global', am_fqdn)
-    cfg.import_realm_config('./realm',am_fqdn)
+    cfg.import_realm_config('./realm', am_fqdn)
     cfg.import_oauth2_configs('./oauth2', am_fqdn)
     cfg.import_secrets_configs('./secrets', am_fqdn)
-
-    cfg.create_policy_all_authenticated(name='test-policy',
-                                        resource='http://test-policy.com/test',
-                                        allow=True)
+    cfg.import_policies('./policies', am_fqdn)
     print('Runtime config finished!')
