@@ -9,6 +9,10 @@ spec:
     port: 80
     protocol: TCP
     targetPort: 80
+  - name: forgeops-tests-run
+    port: 81
+    protocol: TCP
+    targetPort: 8081
   selector:
     app: forgeops-tests
   type: ClusterIP
