@@ -11,7 +11,8 @@ vars:
   fieldref:
     fieldpath: metadata.namespace
 resources:
-- config-map.yaml
-- secret-platform.yaml
+- platform-config.yaml
+- platform-secrets.yaml
 configurations:
 - var.yaml
+

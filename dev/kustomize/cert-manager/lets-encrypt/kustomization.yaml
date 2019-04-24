@@ -2,3 +2,5 @@ kind: Kustomization
 apiversion: ""
 resources:
 - cert-manager.yaml
+configurations:
+- configurations.yaml

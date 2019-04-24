@@ -1,0 +1,5 @@
+varReference:
+- path: spec/dnsNames
+  kind: Certificate
+- path: spec/acme/config/domains
+  kind: Certificate

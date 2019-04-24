@@ -5,14 +5,14 @@ kind: Deployment
 metadata:
   name: ig
 spec:
-  replicas: 1
+  replicas: 3
   template:
     spec:
       containers:
       - name: ig
         resources:
           limits:
-            cpu: 100m
+            cpu: 500m
             memory: 800Mi
           requests:
             cpu: 75m

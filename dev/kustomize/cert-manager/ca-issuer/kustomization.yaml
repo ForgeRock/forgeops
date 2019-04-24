@@ -10,3 +10,5 @@ secretGenerator:
     - secret/tls.crt
     - secret/tls.key
   type: "kubernetes.io/tls"
+configurations:
+- configurations.yaml

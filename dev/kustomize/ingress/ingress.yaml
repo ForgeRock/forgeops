@@ -18,7 +18,7 @@ metadata:
   name: forgerock
 spec:
   rules:
-  - host: default.iam.example.com
+  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     http:
       paths:
       - backend:
@@ -44,5 +44,5 @@ spec:
         path: /ig
   tls:
   - hosts:
-    - default.iam.example.com
+    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert

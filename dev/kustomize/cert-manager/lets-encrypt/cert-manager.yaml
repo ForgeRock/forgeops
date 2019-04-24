@@ -13,11 +13,11 @@ spec:
   # If commonName is not provided, the first value in dnsNames is used.
   #commonName: ""
   dnsNames:
-  - 'default.iam.forgeops.com'
+  - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
   # This is used by Acme / Let's encrypt
   acme:
     config:
     - dns01:
         provider: prod-dns
       domains:
-      - 'default.iam.forgeops.com'
+      - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)

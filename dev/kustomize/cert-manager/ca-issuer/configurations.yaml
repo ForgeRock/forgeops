@@ -1,0 +1,3 @@
+varReference:
+- path: spec/dnsNames
+  kind: Certificate

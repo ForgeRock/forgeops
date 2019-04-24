@@ -10,7 +10,7 @@ metadata:
   name: end-user-ui
 spec:
   rules:
-  - host: default.iam.example.com
+  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     http:
       paths:
       - backend:
@@ -19,5 +19,5 @@ spec:
         path: /enduser/?(.*)
   tls:
   - hosts:
-    - default.iam.example.com
+    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert

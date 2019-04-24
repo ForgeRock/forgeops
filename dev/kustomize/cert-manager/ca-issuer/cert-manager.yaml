@@ -8,3 +8,17 @@ metadata:
 spec:
   ca:
     secretName: certmanager-ca-secret
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name:  sslcert
+spec:
+  secretName: 'sslcert'
+  issuerRef:
+    name: ca-issuer
+    kind: Issuer
+  # If commonName is not provided, the first value in dnsNames is used.
+  #commonName: ""
+  dnsNames:
+  - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)

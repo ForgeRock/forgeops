@@ -8,13 +8,7 @@ bases:
 - ../../config-util
 - ../../idm
 - ../../end-user-ui
-- ../../cert-manager/ca-issuer
-resources:
-- ingress.yaml
-- cert-manager.yaml
-# - config-map.yaml
-# - secret-platform.yaml
-configurations:
-- var.yaml
+- ../../cert-manager/lets-encrypt
+- ../../ingress
 patchesStrategicMerge:
 - platform-config.yaml
