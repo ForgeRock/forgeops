@@ -1,18 +1,8 @@
-namespace: prod
+namespace: lee
 bases:
+- ../../frconfig
+- ../../ingress
+- ../../cert-manager/ca-issuer
 - ../../ig
 patchesStrategicMerge:
 - ig.yaml
-patchesJson6902:
-- target:
-    group: extensions
-    version: v1beta1
-    kind: Ingress
-    name: openig
-  path: ingress-patch.yaml
-- target:
-    group: certmanager.k8s.io
-    version: v1alpha1
-    kind: Certificate
-    name: sslcert
-  path: cert-patch.yaml

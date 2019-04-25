@@ -23,3 +23,5 @@ etc/cert-manager.json
 /cicd/forgeops-tests/results.txt
 /venv/
 /dev/skaffold-dev.yaml
+/medium/skaffold-dev.yaml
+/small/skaffold-dev.yaml

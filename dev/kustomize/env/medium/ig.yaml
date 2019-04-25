@@ -5,7 +5,7 @@ kind: Deployment
 metadata:
   name: ig
 spec:
-  replicas: 2
+  replicas: 1
   template:
     spec:
       containers:
@@ -16,12 +16,12 @@ spec:
             cpu: 2000m
             memory: 4Gi
           requests:
-            cpu: 1000m
+            cpu: 1050m
             memory: 2Gi
         env: 
-        - name: CATALINA_OPTS
-          value: "-server -Xms2g -Xmx2g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
-  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
-  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log"
+#        - name: CATALINA_OPTS
+#          value: "-server -Xms2g -Xmx2g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA 
+#  -XX:MaxGCPauseMillis=100 -verbose:gc -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps 
+#  -XX:+PrintGCDetails -XX:+PrintPromotionFailure -XX:+PrintAdaptiveSizePolicy -Xloggc:/tmp/gc.log"
         - name: OPENIG_BASE
           value: "/var/openig"
