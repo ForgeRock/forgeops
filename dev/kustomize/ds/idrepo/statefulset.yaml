@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+spec:
+  selector:
+    matchLabels:
+      app: ds-idrepo
+  serviceName: ds-idrepo
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: instance
+                      operator: In
+                      values:
+                        - ds-idrepo
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      initContainers:
+        - name: initialize
+          image: ds-idrepo
+          imagePullPolicy: IfNotPresent
+          args:
+            - initialize-only
+          envFrom:
+            - configMapRef:
+                name: ds-idrepo
+          resources:
+            requests:
+              memory: 512Mi
+            limits:
+              memory: 768Mi
+          volumeMounts:
+            - mountPath: /opt/opendj/data
+              name: data
+      containers:
+        - name: ds-idrepo
+          image: ds-idrepo
+          # FIXME ?
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            - configMapRef:
+                name: ds-idrepo
+          livenessProbe:
+            initialDelaySeconds: 60
+            periodSeconds: 120
+            httpGet:
+              path: /alive
+              port: http
+          ports:
+            - name: ldap
+              containerPort: 1389
+            - name: ldaps
+              containerPort: 1636
+            - name: admin
+              containerPort: 4444
+            - name: replication
+              containerPort: 8989
+            - name: http
+              containerPort: 8080
+            - name: https
+              containerPort: 8443
+          resources:
+            requests:
+              memory: 512Mi
+            limits:
+              memory: 768Mi
+          volumeMounts:
+            - mountPath: /opt/opendj/data
+              name: data
+#           - mountPath: /opt/opendj/secrets
+#             name: secrets
+      securityContext:
+        fsGroup: 0
+        # FIXME: seems to be needed when running in minikube with a host mounted data directory
+        runAsUser: 0
+      terminationGracePeriodSeconds: 30
+#      volumes:
+#        - name: secrets
+#          secret:
+#            secretName: ds-cts
+  updateStrategy:
+    type: RollingUpdate
+  # FIXME: remove when https://github.com/kubernetes-sigs/kustomize/issues/504 is fixed.
+  volumeClaimTemplates: []

@@ -1,8 +1,8 @@
-kind: ""
-apiversion: ""
-nameprefix: idrepo-
-bases:
-- ../base
-patchesStrategicMerge:
-- ds.yaml
-- service.yaml
+commonLabels:
+  vendor: forgerock
+  app: ds-idrepo
+resources:
+  - configmap.yaml
+  - secrets.yaml
+  - service.yaml
+  - statefulset.yaml

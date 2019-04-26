@@ -1,14 +1,16 @@
-kind: ""
-apiversion: ""
 namespace: default
 bases:
-- ../../frconfig
-- ../../idrepo
-- ../../am
-- ../../config-util
-- ../../idm
-- ../../end-user-ui
-- ../../cert-manager/lets-encrypt
-- ../../ingress
+  - ../../frconfig
+  - ../../idrepo
+  - ../../ds/cts
+  - ../../ds/idrepo
+  - ../../am
+  - ../../config-util
+  - ../../idm
+  - ../../end-user-ui
+  - ../../cert-manager/lets-encrypt
+  - ../../ingress
 patchesStrategicMerge:
-- platform-config.yaml
+  - platform-config.yaml
+  - ds-cts.yaml
+  - ds-idrepo.yaml

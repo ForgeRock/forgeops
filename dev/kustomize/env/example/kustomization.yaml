@@ -1,15 +1,19 @@
-kind: ""
-apiversion: ""
 namespace: default
 bases:
-- ../../frconfig
-- ../../idrepo
-- ../../am
-- ../../config-util
-- ../../idm
-- ../../cert-manager/ca-issuer
-#- ../../cert-manager/lets-encrypt
-- ../../end-user-ui
-- ../../ingress
+  - ../../frconfig
+  - ../../idrepo
+  - ../../ds/cts
+  - ../../ds/idrepo
+  - ../../am
+  - ../../config-util
+  - ../../idm
+  - ../../cert-manager/ca-issuer
+  #- ../../cert-manager/lets-encrypt
+  - ../../end-user-ui
+  - ../../ingress
+resources:
+  - local-storage-class.yaml
 patchesStrategicMerge:
-- platform-config.yaml
+  - platform-config.yaml
+  - ds-cts.yaml
+  - ds-idrepo.yaml

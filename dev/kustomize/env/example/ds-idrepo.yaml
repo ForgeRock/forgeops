@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+spec:
+  replicas: 1
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        annotations:
+          pv.beta.kubernetes.io/gid: "0"
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: local-storage

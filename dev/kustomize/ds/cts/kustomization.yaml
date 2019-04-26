@@ -1,5 +1,8 @@
-kind: ""
-apiversion: ""
-nameprefix: cts-
-bases:
-- ../base
+commonLabels:
+  vendor: forgerock
+  app: ds-cts
+resources:
+  - configmap.yaml
+  - secrets.yaml
+  - service.yaml
+  - statefulset.yaml

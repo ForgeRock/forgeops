@@ -1,5 +1,3 @@
-kind: ""
-apiversion: ""
 namespace: smoke
 bases:
 - ../dev
