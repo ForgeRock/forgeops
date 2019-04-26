@@ -4,5 +4,6 @@ bases:
 - ../../ingress
 - ../../cert-manager/ca-issuer
 - ../../ig
+- ../../idrepo
 patchesStrategicMerge:
 - ig.yaml
