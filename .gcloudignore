@@ -1,3 +1,4 @@
-*.zip
-*.war
+/*
+!/dev
+.git
 tmp/
