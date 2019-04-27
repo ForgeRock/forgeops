@@ -10,6 +10,10 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 CMD ["/home/forgerock/openam/boot.sh"]
 # END 
 
+
+COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
+
+
 # There is a sequencing issue 
 # where if boot.json is present and the idrepo store is *not* configured, AM will go into an error
 # state which it will not recover from.

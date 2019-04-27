@@ -11,10 +11,8 @@ spec:
     spec:
       volumes:
       - name: reports
-        emptyDir: {}
-      
+        emptyDir: {}    
       containers:
-
       - name: forgeops-tests
         image: forgeops-tests
         imagePullPolicy: Always
@@ -35,7 +33,6 @@ spec:
               fieldPath: metadata.namespace
         ports:
           - containerPort: 8081
-
       - name: forgeops-tests-reports
         image: nginx
         imagePullPolicy: IfNotPresent

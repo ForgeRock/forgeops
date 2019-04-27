@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1beta8
+apiVersion: skaffold/v1beta9
 kind: Config
 build:
   artifacts:
@@ -10,8 +10,6 @@ build:
     context: docker/config-util
   - image: idm
     context: docker/idm
-  - image: config-util
-    context: docker/config-util
   - image: forgeops-tests
     context: docker/forgeops-tests
   tagPolicy:
