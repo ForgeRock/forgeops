@@ -4,5 +4,5 @@ namespace: smoke
 bases:
 - ../dev
 - ../../forgeops-tests
-resources:
-- ns.yaml
+#resources:
+#- ns.yaml
