@@ -1,0 +1,19 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "ScriptTypes",
+    "entityId" : "AUTHENTICATION_TREE_DECISION_NODE",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "AUTHENTICATION_TREE_DECISION_NODE",
+    "languages" : [ "JAVASCRIPT", "GROOVY" ],
+    "defaultScript" : "01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "_type" : {
+      "_id" : "contexts",
+      "name" : "Scripting",
+      "collection" : true
+    }
+  }
+}

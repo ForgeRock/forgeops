@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "UmaProvider",
+    "entityId" : "UmaProvider",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "deletePoliciesOnDeleteRS" : true,
+      "resharingMode" : "IMPLICIT",
+      "permissionTicketLifetime" : 120,
+      "emailRequestingPartyOnPendingRequestApproval" : true,
+      "userProfileLocaleAttribute" : "inetOrgPerson",
+      "grantRptConditions" : [ "REQUEST_PARTIAL", "REQUEST_NONE", "TICKET_PARTIAL" ],
+      "pendingRequestsEnabled" : true,
+      "deleteResourceSetsOnDeleteRS" : true,
+      "emailResourceOwnerOnPendingRequestCreation" : true
+    },
+    "_type" : {
+      "_id" : "uma",
+      "name" : "UMA Provider",
+      "collection" : false
+    }
+  }
+}

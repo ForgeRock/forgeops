@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "ScriptedModule",
+    "entityId" : "ScriptedModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "authenticationLevel" : 1,
+      "clientScript" : "[Empty]",
+      "clientScriptEnabled" : true,
+      "serverScript" : "7e3d7067-d50f-4674-8c76-a3e13a810c33"
+    },
+    "_type" : {
+      "_id" : "scripted",
+      "name" : "Scripted Module",
+      "collection" : false
+    }
+  }
+}

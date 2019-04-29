@@ -1,0 +1,19 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "ScriptTypes",
+    "entityId" : "AUTHENTICATION_CLIENT_SIDE",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "AUTHENTICATION_CLIENT_SIDE",
+    "languages" : [ "JAVASCRIPT" ],
+    "defaultScript" : "[Empty]",
+    "_type" : {
+      "_id" : "contexts",
+      "name" : "Scripting",
+      "collection" : true
+    }
+  }
+}

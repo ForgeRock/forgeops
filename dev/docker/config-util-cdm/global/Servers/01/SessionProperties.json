@@ -1,0 +1,58 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SessionProperties",
+    "entityId" : "http://openam:80",
+    "pathParams" : {
+      "serverName" : "http://openam:80"
+    }
+  },
+  "data" : {
+    "_id" : "01/properties/session",
+    "amconfig.header.sessionthresholds" : {
+      "org.forgerock.openam.session.service.access.persistence.caching.maxsize" : {
+        "value" : "5000",
+        "inherited" : true
+      },
+      "com.iplanet.am.session.invalidsessionmaxtime" : {
+        "value" : "3",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.sessionlogging" : {
+      "com.iplanet.am.stats.interval" : {
+        "value" : "60",
+        "inherited" : true
+      },
+      "com.iplanet.services.stats.state" : {
+        "value" : "file",
+        "inherited" : true
+      },
+      "com.iplanet.services.stats.directory" : {
+        "value" : "%BASE_DIR%/%SERVER_URI%/stats",
+        "inherited" : true
+      },
+      "com.sun.am.session.enableHostLookUp" : {
+        "value" : false,
+        "inherited" : true
+      }
+    },
+    "amconfig.header.sessionnotification" : {
+      "com.iplanet.am.notification.threadpool.size" : {
+        "value" : "1",
+        "inherited" : true
+      },
+      "com.iplanet.am.notification.threadpool.threshold" : {
+        "value" : "5000",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.sessionvalidation" : {
+      "com.sun.am.session.caseInsensitiveDN" : {
+        "value" : true,
+        "inherited" : true
+      }
+    }
+  }
+}

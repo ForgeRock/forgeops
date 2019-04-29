@@ -1,0 +1,17 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SupportedIds",
+    "entityId" : "filteredrole",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "filteredrole",
+    "_type" : {
+      "_id" : "SupportedIdentities",
+      "name" : "SupportedIdentities",
+      "collection" : true
+    }
+  }
+}

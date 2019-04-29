@@ -1,0 +1,45 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "Json",
+    "entityId" : "Global JSON Handler",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "Global JSON Handler",
+    "jsonFileRotation" : {
+      "rotationInterval" : "-1",
+      "rotationTimes" : [ ],
+      "rotationEnabled" : true,
+      "rotationFileSuffix" : "-yyyy.MM.dd-HH.mm.ss",
+      "rotationMaxFileSize" : "100000000"
+    },
+    "jsonBuffering" : {
+      "bufferingMaxSize" : "100000",
+      "bufferingWriteInterval" : "5"
+    },
+    "commonHandler" : {
+      "topics" : [ "access", "activity", "config", "authentication" ],
+      "enabled" : true
+    },
+    "jsonFileRetention" : {
+      "retentionMinFreeSpaceRequired" : "-1",
+      "retentionMaxNumberOfHistoryFiles" : "1",
+      "retentionMaxDiskSpaceToUse" : "-1"
+    },
+    "commonHandlerPlugin" : {
+      "handlerFactory" : "org.forgerock.openam.audit.events.handlers.JsonAuditEventHandlerFactory"
+    },
+    "jsonConfig" : {
+      "location" : "%BASE_DIR%/%SERVER_URI%/log/",
+      "elasticsearchCompatible" : false,
+      "rotationRetentionCheckInterval" : "5"
+    },
+    "_type" : {
+      "_id" : "JSON",
+      "name" : "JSON",
+      "collection" : true
+    }
+  }
+}

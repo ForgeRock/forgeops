@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "KeyStoreMappings",
+    "entityId" : "am.default.authentication.modules.persistentcookie.encryption",
+    "pathParams" : {
+      "KeyStoreSecretStore" : "default-keystore"
+    }
+  },
+  "data" : {
+    "_id" : "am.default.authentication.modules.persistentcookie.encryption",
+    "secretId" : "am.default.authentication.modules.persistentcookie.encryption",
+    "aliases" : [ "test" ],
+    "_type" : {
+      "_id" : "mappings",
+      "name" : "Mappings",
+      "collection" : true
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "RadiusServer",
+    "entityId" : "RadiusServer",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "radiusThreadPoolMaxSize" : 10,
+    "radiusThreadPoolQueueSize" : 20,
+    "radiusListenerEnabled" : "NO",
+    "radiusThreadPoolCoreSize" : 1,
+    "radiusServerPort" : 1812,
+    "radiusThreadPoolKeepaliveSeconds" : 10,
+    "_type" : {
+      "_id" : "RadiusServerService",
+      "name" : "RADIUS Server",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SocialAuthentication",
+    "entityId" : "SocialAuthentication",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "enabledKeys" : [ ],
+      "displayNames" : { },
+      "icons" : { },
+      "authenticationChains" : { }
+    },
+    "_type" : {
+      "_id" : "socialauthentication",
+      "name" : "Social Authentication Implementations",
+      "collection" : false
+    }
+  }
+}

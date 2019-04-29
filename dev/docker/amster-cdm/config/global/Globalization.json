@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "Globalization",
+    "entityId" : "Globalization",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "charsetMappings" : [ "locale=zh|charset=UTF-8;GB2312", "locale=ar|charset=UTF-8;ISO-8859-6", "locale=es|charset=UTF-8;ISO-8859-15", "locale=de|charset=UTF-8;ISO-8859-15", "locale=zh_TW|charset=UTF-8;BIG5", "locale=fr|charset=UTF-8;ISO-8859-15", "locale=en|charset=UTF-8;ISO-8859-1", "locale=ko|charset=UTF-8;EUC-KR", "locale=th|charset=UTF-8;TIS-620", "locale=ja|charset=UTF-8;Shift_JIS;EUC-JP" ],
+    "sun-identity-g11n-settings-charset-alias-mapping" : [ "mimeName=EUC-KR|javaName=EUC_KR", "mimeName=EUC-JP|javaName=EUC_JP", "mimeName=Shift_JIS|javaName=SJIS" ],
+    "defaults" : {
+      "commonNameFormats" : [ "zh={sn}{givenname}" ]
+    },
+    "_type" : {
+      "_id" : "globalization",
+      "name" : "Globalization Settings",
+      "collection" : false
+    }
+  }
+}

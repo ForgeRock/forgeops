@@ -1,0 +1,39 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "Naming",
+    "entityId" : "Naming",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "generalConfig" : {
+      "sessionUrl" : "%protocol://%host:%port%uri/sessionservice",
+      "profileUrl" : "%protocol://%host:%port%uri/profileservice",
+      "policyUrl" : "%protocol://%host:%port%uri/policyservice",
+      "authUrl" : "%protocol://%host:%port%uri/authservice",
+      "loggingUrl" : "%protocol://%host:%port%uri/loggingservice"
+    },
+    "endpointConfig" : {
+      "stsMexUrl" : "%protocol://%host:%port%uri/sts/mex",
+      "idsvcsRestUrl" : "%protocol://%host:%port%uri/identity/",
+      "securityTokenManagerUrl" : "%protocol://%host:%port%uri/SecurityTokenManagerServlet/SecurityTokenManagerIF",
+      "stsUrl" : "%protocol://%host:%port%uri/sts",
+      "jaxwsUrl" : "%protocol://%host:%port%uri/identityservices/",
+      "federationAssertionManagerUrl" : "%protocol://%host:%port%uri/FSAssertionManagerServlet/FSAssertionManagerIF"
+    },
+    "federationConfig" : {
+      "samlAssertionManagerUrl" : "%protocol://%host:%port%uri/AssertionManagerServlet/AssertionManagerIF",
+      "samlAwareServletUrl" : "%protocol://%host:%port%uri/SAMLAwareServlet",
+      "jaxrpcUrl" : "%protocol://%host:%port%uri/jaxrpc/",
+      "samlSoapReceiverUrl" : "%protocol://%host:%port%uri/SAMLSOAPReceiver",
+      "samlPostServletUrl" : "%protocol://%host:%port%uri/SAMLPOSTProfileServlet"
+    },
+    "_type" : {
+      "_id" : "naming",
+      "name" : "Naming",
+      "collection" : false
+    }
+  }
+}

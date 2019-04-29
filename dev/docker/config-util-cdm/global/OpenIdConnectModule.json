@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "OpenIdConnectModule",
+    "entityId" : "OpenIdConnectModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "cryptoContextValue" : "https://accounts.google.com/.well-known/openid-configuration",
+      "jwtToLdapAttributeMappings" : [ "sub=uid", "email=mail" ],
+      "useSubClaimIfNoMatch" : false,
+      "principalMapperClass" : "org.forgerock.openam.authentication.modules.oidc.JwtAttributeMapper",
+      "idTokenHeaderName" : "oidc_id_token",
+      "acceptedAuthorizedParties" : [ "http://www.example.com/authorized/party", "AuthorizedPartyExample" ],
+      "idTokenIssuer" : "accounts.google.com",
+      "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+      "cryptoContextType" : ".well-known/openid-configuration_url",
+      "audienceName" : "example"
+    },
+    "_type" : {
+      "_id" : "openidconnect",
+      "name" : "OpenID Connect id_token bearer",
+      "collection" : false
+    }
+  }
+}

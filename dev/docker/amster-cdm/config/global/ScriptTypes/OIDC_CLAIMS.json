@@ -1,0 +1,19 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "ScriptTypes",
+    "entityId" : "OIDC_CLAIMS",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "OIDC_CLAIMS",
+    "languages" : [ "JAVASCRIPT", "GROOVY" ],
+    "defaultScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
+    "_type" : {
+      "_id" : "contexts",
+      "name" : "Scripting",
+      "collection" : true
+    }
+  }
+}

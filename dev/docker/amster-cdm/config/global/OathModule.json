@@ -1,0 +1,35 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "OathModule",
+    "entityId" : "OathModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "stepsInWindow" : 2,
+      "forgerock-oath-sharedsecret-implementation-class" : "org.forgerock.openam.authentication.modules.oath.plugins.DefaultSharedSecretProvider",
+      "hotpWindowSize" : 100,
+      "passwordLength" : "6",
+      "forgerock-oath-maximum-clock-drift" : 0,
+      "authenticationLevel" : 0,
+      "secretKeyAttribute" : "",
+      "hotpCounterAttribute" : "",
+      "timeStepSize" : 30,
+      "minimumSecretKeyLength" : "32",
+      "lastLoginTimeAttribute" : "",
+      "forgerock-oath-observed-clock-drift-attribute-name" : "",
+      "oathOtpMaxRetry" : 3,
+      "oathAlgorithm" : "HOTP",
+      "addChecksum" : "False",
+      "truncationOffset" : -1
+    },
+    "_type" : {
+      "_id" : "oath",
+      "name" : "OATH",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "KeyStoreMappings",
+    "entityId" : "am.services.oauth2.oidc.signing.RSA",
+    "pathParams" : {
+      "KeyStoreSecretStore" : "default-keystore"
+    }
+  },
+  "data" : {
+    "_id" : "am.services.oauth2.oidc.signing.RSA",
+    "secretId" : "am.services.oauth2.oidc.signing.RSA",
+    "aliases" : [ "rsajwtsigningkey" ],
+    "_type" : {
+      "_id" : "mappings",
+      "name" : "Mappings",
+      "collection" : true
+    }
+  }
+}

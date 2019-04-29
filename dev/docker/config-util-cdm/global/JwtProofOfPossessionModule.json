@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "JwtProofOfPossessionModule",
+    "entityId" : "JwtProofOfPossessionModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "responseEncryptionMethod" : "ECDHE",
+      "responseEncryptionCipher" : "A128GCM",
+      "enableTlsSessionBinding" : true,
+      "authenticationLevel" : 0
+    },
+    "_type" : {
+      "_id" : "authJwtPoP",
+      "name" : "JWT Proof of Possession (PoP)",
+      "collection" : false
+    }
+  }
+}

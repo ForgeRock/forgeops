@@ -1,0 +1,31 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "Saml2Module",
+    "entityId" : "Saml2Module",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "authenticationLevel" : 0,
+      "metaAlias" : "/sp",
+      "isPassive" : "false",
+      "sloRelay" : "http://",
+      "forceAuthn" : "false",
+      "entityName" : "http://",
+      "nameIdFormat" : "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",
+      "authComparison" : "exact",
+      "reqBinding" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
+      "sloEnabled" : "false",
+      "binding" : "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact",
+      "allowCreate" : "true"
+    },
+    "_type" : {
+      "_id" : "authSaml",
+      "name" : "SAML2",
+      "collection" : false
+    }
+  }
+}

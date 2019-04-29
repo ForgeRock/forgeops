@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "KeyStoreMappings",
+    "entityId" : "am.services.oauth2.oidc.decryption.RSA.OAEP",
+    "pathParams" : {
+      "KeyStoreSecretStore" : "default-keystore"
+    }
+  },
+  "data" : {
+    "_id" : "am.services.oauth2.oidc.decryption.RSA.OAEP",
+    "secretId" : "am.services.oauth2.oidc.decryption.RSA.OAEP",
+    "aliases" : [ "test" ],
+    "_type" : {
+      "_id" : "mappings",
+      "name" : "Mappings",
+      "collection" : true
+    }
+  }
+}

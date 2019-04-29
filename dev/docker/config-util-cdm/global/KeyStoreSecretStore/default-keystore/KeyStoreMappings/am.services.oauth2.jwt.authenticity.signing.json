@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "KeyStoreMappings",
+    "entityId" : "am.services.oauth2.jwt.authenticity.signing",
+    "pathParams" : {
+      "KeyStoreSecretStore" : "default-keystore"
+    }
+  },
+  "data" : {
+    "_id" : "am.services.oauth2.jwt.authenticity.signing",
+    "secretId" : "am.services.oauth2.jwt.authenticity.signing",
+    "aliases" : [ "hmacsigningtest" ],
+    "_type" : {
+      "_id" : "mappings",
+      "name" : "Mappings",
+      "collection" : true
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "DefaultSdkProperties",
+    "entityId" : "DefaultSdkProperties",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "null/properties/sdk",
+    "amconfig.header.datastore" : {
+      "com.sun.identity.sm.enableDataStoreNotification" : false,
+      "com.sun.identity.sm.notification.threadpool.size" : "10"
+    },
+    "amconfig.header.eventservice" : {
+      "com.iplanet.am.event.connection.num.retries" : "3",
+      "com.iplanet.am.event.connection.delay.between.retries" : "3000",
+      "com.iplanet.am.event.connection.ldap.error.codes.retries" : "80,81,91",
+      "com.sun.am.event.connection.disable.list" : "aci,um,sm"
+    },
+    "amconfig.header.ldapconnection" : {
+      "com.iplanet.am.ldap.connection.num.retries" : "3",
+      "com.iplanet.am.ldap.connection.delay.between.retries" : "1000",
+      "com.iplanet.am.ldap.connection.ldap.error.codes.retries" : "80,81,91"
+    },
+    "amconfig.header.cachingreplica" : {
+      "com.iplanet.am.sdk.cache.maxSize" : "10000"
+    },
+    "amconfig.header.sdktimetoliveconfig" : {
+      "com.iplanet.am.sdk.cache.entry.expire.enabled" : false,
+      "com.iplanet.am.sdk.cache.entry.user.expire.time" : "15",
+      "com.iplanet.am.sdk.cache.entry.default.expire.time" : "30"
+    }
+  }
+}

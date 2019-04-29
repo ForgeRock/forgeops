@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "IdRepository",
+    "entityId" : "IdRepository",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "sunIdRepoAttributeCombiner" : "com.iplanet.am.sdk.AttributeCombiner",
+      "sunIdRepoAttributeValidator" : [ "class=com.sun.identity.idm.server.IdRepoAttributeValidatorImpl", "minimumPasswordLength=8", "usernameInvalidChars=*|(|)|&|!" ]
+    },
+    "_type" : {
+      "_id" : "id-repositories",
+      "name" : "sunIdentityRepositoryService",
+      "collection" : false
+    }
+  }
+}

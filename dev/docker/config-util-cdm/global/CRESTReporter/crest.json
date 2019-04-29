@@ -1,0 +1,18 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "CRESTReporter",
+    "entityId" : "crest",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "crest",
+    "enabled" : false,
+    "_type" : {
+      "_id" : "crest",
+      "name" : "CREST Reporter",
+      "collection" : true
+    }
+  }
+}

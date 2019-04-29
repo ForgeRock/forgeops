@@ -1,0 +1,17 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "AgentService",
+    "entityId" : "AgentService",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "_type" : {
+      "_id" : "AgentService",
+      "name" : "AgentService",
+      "collection" : false
+    }
+  }
+}

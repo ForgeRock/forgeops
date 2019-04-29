@@ -1,0 +1,18 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SamlV2SoapBinding",
+    "entityId" : "SamlV2SoapBinding",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "requestHandlers" : [ ],
+    "_type" : {
+      "_id" : "federation/saml2soapbinding",
+      "name" : "SAML v2.0 SOAP Binding",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "DefaultSessionProperties",
+    "entityId" : "DefaultSessionProperties",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "null/properties/session",
+    "amconfig.header.sessionthresholds" : {
+      "org.forgerock.openam.session.service.access.persistence.caching.maxsize" : "5000",
+      "com.iplanet.am.session.invalidsessionmaxtime" : "3"
+    },
+    "amconfig.header.sessionlogging" : {
+      "com.iplanet.am.stats.interval" : "60",
+      "com.iplanet.services.stats.state" : "file",
+      "com.iplanet.services.stats.directory" : "%BASE_DIR%/%SERVER_URI%/stats",
+      "com.sun.am.session.enableHostLookUp" : false
+    },
+    "amconfig.header.sessionnotification" : {
+      "com.iplanet.am.notification.threadpool.size" : "1",
+      "com.iplanet.am.notification.threadpool.threshold" : "5000"
+    },
+    "amconfig.header.sessionvalidation" : {
+      "com.sun.am.session.caseInsensitiveDN" : true
+    }
+  }
+}

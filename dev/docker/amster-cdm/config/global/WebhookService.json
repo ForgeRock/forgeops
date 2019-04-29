@@ -1,0 +1,17 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "WebhookService",
+    "entityId" : "WebhookService",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "_type" : {
+      "_id" : "webhooks",
+      "name" : "Webhook Service",
+      "collection" : false
+    }
+  }
+}

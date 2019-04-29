@@ -1,0 +1,76 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SdkProperties",
+    "entityId" : "http://openam:80",
+    "pathParams" : {
+      "serverName" : "http://openam:80"
+    }
+  },
+  "data" : {
+    "_id" : "01/properties/sdk",
+    "amconfig.header.datastore" : {
+      "com.sun.identity.sm.enableDataStoreNotification" : {
+        "value" : true,
+        "inherited" : false
+      },
+      "com.sun.identity.sm.notification.threadpool.size" : {
+        "value" : "10",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.eventservice" : {
+      "com.iplanet.am.event.connection.num.retries" : {
+        "value" : "3",
+        "inherited" : true
+      },
+      "com.iplanet.am.event.connection.delay.between.retries" : {
+        "value" : "3000",
+        "inherited" : true
+      },
+      "com.iplanet.am.event.connection.ldap.error.codes.retries" : {
+        "value" : "80,81,91",
+        "inherited" : true
+      },
+      "com.sun.am.event.connection.disable.list" : {
+        "value" : "aci,um",
+        "inherited" : false
+      }
+    },
+    "amconfig.header.ldapconnection" : {
+      "com.iplanet.am.ldap.connection.num.retries" : {
+        "value" : "3",
+        "inherited" : true
+      },
+      "com.iplanet.am.ldap.connection.delay.between.retries" : {
+        "value" : "1000",
+        "inherited" : true
+      },
+      "com.iplanet.am.ldap.connection.ldap.error.codes.retries" : {
+        "value" : "80,81,91",
+        "inherited" : false
+      }
+    },
+    "amconfig.header.cachingreplica" : {
+      "com.iplanet.am.sdk.cache.maxSize" : {
+        "value" : "10000",
+        "inherited" : true
+      }
+    },
+    "amconfig.header.sdktimetoliveconfig" : {
+      "com.iplanet.am.sdk.cache.entry.expire.enabled" : {
+        "value" : false,
+        "inherited" : true
+      },
+      "com.iplanet.am.sdk.cache.entry.user.expire.time" : {
+        "value" : "15",
+        "inherited" : true
+      },
+      "com.iplanet.am.sdk.cache.entry.default.expire.time" : {
+        "value" : "30",
+        "inherited" : true
+      }
+    }
+  }
+}

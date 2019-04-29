@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "KeyStoreMappings",
+    "entityId" : "am.applications.agents.remote.consent.request.signing.RSA",
+    "pathParams" : {
+      "KeyStoreSecretStore" : "default-keystore"
+    }
+  },
+  "data" : {
+    "_id" : "am.applications.agents.remote.consent.request.signing.RSA",
+    "secretId" : "am.applications.agents.remote.consent.request.signing.RSA",
+    "aliases" : [ "rsajwtsigningkey" ],
+    "_type" : {
+      "_id" : "mappings",
+      "name" : "Mappings",
+      "collection" : true
+    }
+  }
+}

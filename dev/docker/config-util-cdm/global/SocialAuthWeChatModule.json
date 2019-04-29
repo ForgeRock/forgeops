@@ -1,0 +1,50 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SocialAuthWeChatModule",
+    "entityId" : "SocialAuthWeChatModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "core" : {
+        "usesBasicAuth" : false,
+        "tokenEndpoint" : "https://api.wechat.com/sns/oauth2/access_token",
+        "subjectProperty" : "openid",
+        "provider" : "WeChat",
+        "scope" : [ "snsapi_login" ],
+        "ssoProxyUrl" : "http://openam:80/oauth2c/OAuthProxy.jsp",
+        "userInfoEndpoint" : "https://api.wechat.com/sns/userinfo",
+        "authorizeEndpoint" : "https://open.weixin.qq.com/connect/qrconnect",
+        "authenticationLevel" : 0
+      },
+      "emailSettings" : {
+        "emailGateway" : "org.forgerock.openam.authentication.modules.oauth2.DefaultEmailGatewayImpl",
+        "smtpPort" : "25",
+        "smtpUsername" : "",
+        "smtpHost" : "localhost",
+        "emailAttribute" : ""
+      },
+      "accountProvisioning" : {
+        "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+        "attributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|uid|wechat-" ],
+        "accountMapperConfiguration" : [ "openid=uid" ],
+        "mapToAnonymousUser" : false,
+        "attributeMapperConfiguration" : [ "nickname=givenName", "openid=uid", "nickname=sn", "nickname=cn" ],
+        "createAccount" : true,
+        "enableRegistrationService" : false,
+        "accountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|*|wechat-",
+        "promptPasswordFlag" : false,
+        "anonymousUserName" : "anonymous",
+        "saveAttributesInSession" : true
+      }
+    },
+    "_type" : {
+      "_id" : "authSocialWeChat",
+      "name" : "Social Auth WeChat",
+      "collection" : false
+    }
+  }
+}

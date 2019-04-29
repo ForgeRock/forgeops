@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "IDMProvisioning",
+    "entityId" : "IDMProvisioning",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "provisioningEncryptionKeyAlias" : "selfservice",
+      "provisioningEncryptionAlgorithm" : "RSAES_PKCS1_V1_5",
+      "provisioningEncryptionMethod" : "A128CBC_HS256",
+      "provisioningSigningKeyAlias" : "openidm-selfservice-key",
+      "jwtSigningCompatibilityMode" : false,
+      "enabled" : false,
+      "provisioningSigningAlgorithm" : "HS256"
+    },
+    "_type" : {
+      "_id" : "idm-integration",
+      "name" : "IDM Provisioning",
+      "collection" : false
+    }
+  }
+}

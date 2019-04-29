@@ -1,0 +1,86 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "AdaptiveRiskModule",
+    "entityId" : "AdaptiveRiskModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "authfailed" : {
+        "invertFailureScore" : false,
+        "failureScore" : 1,
+        "failedAuthenticationCheckEnabled" : false
+      },
+      "iphistory" : {
+        "ipHistoryCount" : 5,
+        "invertIPHistoryScore" : false,
+        "ipHistoryScore" : 1,
+        "ipHistoryProfileAttribute" : "iphistory",
+        "saveSuccessfulIP" : false,
+        "ipHistoryCheckEnabled" : false
+      },
+      "knowncookie" : {
+        "knownCookieValue" : "",
+        "knownCookieScore" : 1,
+        "knownCookieName" : "",
+        "invertKnownCookieScore" : false,
+        "createKnownCookieOnSuccessfulLogin" : false,
+        "knownCookieCheckEnabled" : false
+      },
+      "requestheader" : {
+        "requestHeaderCheckEnabled" : false,
+        "requestHeaderValue" : "",
+        "invertRequestHeaderScore" : false,
+        "requestHeaderScore" : 1,
+        "requestHeaderName" : ""
+      },
+      "devicecookie" : {
+        "deviceCookieCheckEnabled" : false,
+        "saveDeviceCookieValueOnSuccessfulLogin" : false,
+        "invertDeviceCookieScore" : false,
+        "deviceCookieName" : "Device",
+        "deviceCookieScore" : 1
+      },
+      "geolocation" : {
+        "geolocationCheckEnabled" : false,
+        "geolocationDatabaseLocation" : "",
+        "geolocationScore" : 1,
+        "geolocationValidCountryCodes" : "",
+        "invertGeolocationScore" : false
+      },
+      "iprange" : {
+        "ipRangeCheckEnabled" : false,
+        "ipRangeScore" : 1,
+        "ipRange" : [ "10.0.0.0/24" ],
+        "invertIPRangeScoreEnabled" : false
+      },
+      "attributecheck" : {
+        "profileRiskAttributeCheckEnabled" : false,
+        "profileRiskAttributeScore" : 1,
+        "profileRiskAttributeName" : "",
+        "profileRiskAttributeValue" : "",
+        "invertProfileRiskAttributeScore" : false
+      },
+      "lastlogin" : {
+        "timeSinceLastLoginCookieName" : "",
+        "saveLastLoginTimeOnSuccessfulLogin" : false,
+        "invertTimeSinceLastLoginScore" : false,
+        "timeSinceLastLoginScore" : 1,
+        "maxTimeSinceLastLogin" : "",
+        "timeSinceLastLoginCheckEnabled" : false
+      },
+      "general" : {
+        "authenticationLevel" : 0,
+        "riskThreshold" : 1
+      }
+    },
+    "_type" : {
+      "_id" : "adaptiverisk",
+      "name" : "Adaptive Risk ",
+      "collection" : false
+    }
+  }
+}

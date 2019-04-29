@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SessionPropertyWhiteList",
+    "entityId" : "SessionPropertyWhiteList",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "sessionPropertyWhitelist" : [ "AMCtxId" ]
+    },
+    "_type" : {
+      "_id" : "amSessionPropertyWhitelist",
+      "name" : "Session Property Whitelist Service",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "DefaultGeneralProperties",
+    "entityId" : "DefaultGeneralProperties",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "null/properties/general",
+    "amconfig.header.installdir" : {
+      "com.iplanet.services.configpath" : "%BASE_DIR%",
+      "com.iplanet.am.locale" : "en_US",
+      "com.sun.identity.client.notification.url" : "%SERVER_PROTO%://%SERVER_HOST%:%SERVER_PORT%/%SERVER_URI%/notificationservice",
+      "com.iplanet.am.util.xml.validating" : "off"
+    },
+    "amconfig.header.debug" : {
+      "com.iplanet.services.debug.level" : "error",
+      "com.sun.services.debug.mergeall" : "off",
+      "com.iplanet.services.debug.directory" : "%BASE_DIR%/%SERVER_URI%/debug"
+    },
+    "amconfig.header.mailserver" : {
+      "com.iplanet.am.smtphost" : "localhost",
+      "com.iplanet.am.smtpport" : "25"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "RemoteConsentService",
+    "entityId" : "RemoteConsentService",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "jwkStoreCacheTimeout" : 60,
+      "jwkStoreCacheMissCacheTime" : 1,
+      "consentResponseTimeLimit" : 2
+    },
+    "_type" : {
+      "_id" : "RemoteConsentService",
+      "name" : "Remote Consent Service",
+      "collection" : false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "6.5.1",
+    "entityType" : "DataStoreModule",
+    "entityId" : "DataStore",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "DataStore",
+    "authenticationLevel" : 0,
+    "_type" : {
+      "_id" : "datastore",
+      "name" : "Data Store",
+      "collection" : true
+    }
+  }
+}

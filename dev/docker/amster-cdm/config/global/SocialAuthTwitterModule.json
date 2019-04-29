@@ -1,0 +1,42 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "SocialAuthTwitterModule",
+    "entityId" : "SocialAuthTwitterModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "core" : {
+        "usesBasicAuth" : false,
+        "authenticationLevel" : 0,
+        "tokenEndpoint" : "https://api.twitter.com/oauth/access_token",
+        "subjectProperty" : "id_str",
+        "requestTokenEndpoint" : "https://api.twitter.com/oauth/request_token",
+        "provider" : "Twitter",
+        "ssoProxyUrl" : "http://openam:80/oauth2c/OAuthProxy.jsp",
+        "authorizeEndpoint" : "https://api.twitter.com/oauth/authenticate",
+        "userInfoEndpoint" : "https://api.twitter.com/1.1/account/verify_credentials.json"
+      },
+      "accountProvisioning" : {
+        "accountProviderClass" : "org.forgerock.openam.authentication.modules.common.mapping.DefaultAccountProvider",
+        "createAccount" : true,
+        "enableRegistrationService" : false,
+        "attributeMappingClasses" : [ "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|uid|twitter-" ],
+        "accountMapperClass" : "org.forgerock.openam.authentication.modules.common.mapping.JsonAttributeMapper|*|twitter-",
+        "accountMapperConfiguration" : [ "id_str=uid" ],
+        "mapToAnonymousUser" : false,
+        "anonymousUserName" : "anonymous",
+        "attributeMapperConfiguration" : [ "full_name=sn", "username=cn", "username=givenName", "id_str=uid" ],
+        "saveAttributesInSession" : true
+      }
+    },
+    "_type" : {
+      "_id" : "authSocialTwitter",
+      "name" : "Social Auth Twitter",
+      "collection" : false
+    }
+  }
+}

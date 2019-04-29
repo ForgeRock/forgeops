@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "TransactionAuthentication",
+    "entityId" : "TransactionAuthentication",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "timeToLive" : "180"
+    },
+    "_type" : {
+      "_id" : "transaction",
+      "name" : "Transaction Authentication Service",
+      "collection" : false
+    }
+  }
+}

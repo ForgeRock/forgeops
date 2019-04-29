@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "AdvancedProperties",
+    "entityId" : "http://openam:80",
+    "pathParams" : {
+      "serverName" : "http://openam:80"
+    }
+  },
+  "data" : {
+    "_id" : "01/properties/advanced",
+    "com.sun.identity.urlconnection.useCache" : false,
+    "com.iplanet.am.serverMode" : true,
+    "com.sun.identity.sm.sms_object_class_name" : "com.sun.identity.sm.SmsWrapperObject",
+    "com.sun.embedded.sync.servers" : "on",
+    "com.sun.embedded.replicationport" : "",
+    "com.iplanet.security.SSLSocketFactoryImpl" : "com.sun.identity.shared.ldap.factory.JSSESocketFactory",
+    "com.sun.identity.common.systemtimerpool.size" : "3",
+    "com.iplanet.am.lbcookie.value" : "01",
+    "opensso.protocol.handler.pkgs" : "",
+    "bootstrap.file" : "/home/forgerock/.openamcfg/AMConfig_usr_local_tomcat_webapps_ROOT_"
+  }
+}

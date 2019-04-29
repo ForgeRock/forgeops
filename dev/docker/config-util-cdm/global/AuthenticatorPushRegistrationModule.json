@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "AuthenticatorPushRegistrationModule",
+    "entityId" : "AuthenticatorPushRegistrationModule",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "authenticationLevel" : 0,
+      "bgcolour" : "#519387",
+      "googleLink" : "https://play.google.com/store/apps/details?id=com.forgerock.authenticator",
+      "timeoutInMilliSecconds" : 120000,
+      "issuer" : "ForgeRock",
+      "appleLink" : "https://itunes.apple.com/app/forgerock-authenticator/id1038442926"
+    },
+    "_type" : {
+      "_id" : "authPushReg",
+      "name" : "ForgeRock Authenticator (Push) Registration",
+      "collection" : false
+    }
+  }
+}

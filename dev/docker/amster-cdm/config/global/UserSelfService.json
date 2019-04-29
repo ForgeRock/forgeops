@@ -1,0 +1,69 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "UserSelfService",
+    "entityId" : "UserSelfService",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaults" : {
+      "forgottenPassword" : {
+        "forgottenPasswordCaptchaEnabled" : false,
+        "forgottenPasswordEnabled" : false,
+        "forgottenPasswordEmailVerificationEnabled" : true,
+        "forgottenPasswordEmailSubject" : [ "en|Forgotten password email" ],
+        "numberOfAllowedAttempts" : 1,
+        "forgottenPasswordKbaEnabled" : false,
+        "numberOfAttemptsEnforced" : false,
+        "forgottenPasswordEmailBody" : [ "en|<h2>Click on this <a href=\"%link%\">link</a> to reset your password.</h2>" ],
+        "forgottenPasswordTokenTTL" : 300
+      },
+      "forgottenUsername" : {
+        "forgottenUsernameKbaEnabled" : false,
+        "forgottenUsernameEmailBody" : [ "en|<h2>Your username is <span style=\"color:blue\">%username%</span>.</h2>" ],
+        "forgottenUsernameCaptchaEnabled" : false,
+        "forgottenUsernameEnabled" : false,
+        "forgottenUsernameShowUsernameEnabled" : false,
+        "forgottenUsernameEmailUsernameEnabled" : true,
+        "forgottenUsernameTokenTTL" : 300,
+        "forgottenUsernameEmailSubject" : [ "en|Forgotten username email" ]
+      },
+      "advancedConfig" : {
+        "forgottenUsernameServiceConfigClass" : "org.forgerock.openam.selfservice.config.flows.ForgottenUsernameConfigProvider",
+        "userRegistrationServiceConfigClass" : "org.forgerock.openam.selfservice.config.flows.UserRegistrationConfigProvider",
+        "forgottenPasswordServiceConfigClass" : "org.forgerock.openam.selfservice.config.flows.ForgottenPasswordConfigProvider",
+        "forgottenPasswordConfirmationUrl" : "http://openam:80/XUI/?realm=${realm}#passwordReset/",
+        "userRegistrationConfirmationUrl" : "http://openam:80/XUI/?realm=${realm}#register/"
+      },
+      "userRegistration" : {
+        "userRegistrationEmailVerificationFirstEnabled" : false,
+        "userRegistrationKbaEnabled" : false,
+        "userRegistrationEmailVerificationEnabled" : true,
+        "userRegistrationEmailBody" : [ "en|<h2>Click on this <a href=\"%link%\">link</a> to register.</h2>" ],
+        "userRegisteredDestination" : "default",
+        "userRegistrationEnabled" : false,
+        "userRegistrationTokenTTL" : 300,
+        "userRegistrationEmailSubject" : [ "en|Registration email" ],
+        "userRegistrationCaptchaEnabled" : false,
+        "userRegistrationValidUserAttributes" : [ "userPassword", "mail", "kbaInfo", "givenName", "inetUserStatus", "sn", "username" ]
+      },
+      "generalConfig" : {
+        "minimumAnswersToDefine" : 1,
+        "minimumAnswersToVerify" : 1,
+        "captchaVerificationUrl" : "https://www.google.com/recaptcha/api/siteverify",
+        "kbaQuestions" : [ "4|en|What is your mother's maiden name?", "3|en|What was the name of your childhood pet?", "2|en|What was the model of your first car?", "1|en|What is the name of your favourite restaurant?" ],
+        "validQueryAttributes" : [ "uid", "mail", "givenName", "sn" ]
+      },
+      "profileManagement" : {
+        "profileProtectedUserAttributes" : [ ]
+      }
+    },
+    "_type" : {
+      "_id" : "selfService",
+      "name" : "User Self-Service",
+      "collection" : false
+    }
+  }
+}

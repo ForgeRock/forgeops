@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "6.5.1",
+    "entityType" : "DashboardInstance",
+    "entityId" : "ZenDesk",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "ZenDesk",
+    "login" : "http://www.ZenDesk.com",
+    "icon" : "images/logos/zendesk.png",
+    "className" : "SAML2ApplicationClass",
+    "icfIdentifier" : "idm magic 56",
+    "displayName" : "ZenDesk",
+    "name" : "ZenDesk",
+    "_type" : {
+      "_id" : "instances",
+      "name" : "Dashboard",
+      "collection" : true
+    }
+  }
+}
