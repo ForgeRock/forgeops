@@ -12,11 +12,7 @@ Typically this will be a CD process triggered from a git commit or pull request.
 ## Limitations - READ THIS
 
 * Currently this is aimed at iterative development - not a production deployment.
-* The AM pod in non file based mode will come up fresh everytime - it will not retain its boot configuration
-    This is because the boot.json and other bootstrap files are not mounted in the container. We are waiting on file based
-    configuration to address this. See the comments in docker/am/Dockerfile for a work around.
 * AM file based configuration is a work in progress. See docker/am-fbc/README.md
-  
 
 ## SETUP - READ THIS FIRST
 
@@ -46,7 +42,7 @@ repo must be accessible to your cluster. Skaffold
 
 ## Setting your skaffold default repo
 
-If you want to omit the --default-repo flag for certain kubectl contexts, you can set up defaults on a per context basis:
+If you want to omit the --default-repo flag for specific kubectl contexts, you can set up defaults on a per context basis:
 
 `skaffold config set default-repo gcr.io/engineering-devops -k eng`
 
@@ -73,11 +69,8 @@ cp -r dev test-gke
 * Copy skaffold.yaml to skaffold-dev.yaml. This file is in .gitignore so it does not get checked in or overlayed on a git checkout.
 * In skaffold-dev.yaml, edit the `path` for kustomize to point to your new environment folder (example: `kustomize/env/test-gke`).
 * Run your new configuration:  `skaffold dev -f skaffold-dev.yaml [--default-repo gcr.io/your-default-repo]`
-
 * Warning: The AM install and config utility parameterizes the FQDN - but you may need to fix up other configurations in
 IDM, IG, end user UI, etc. This is a WIP.
-
-
 
 ## Cleaning up
 
@@ -87,13 +80,31 @@ If you want to delete the persistent volumes for the directory:
 
 `kubectl delete pvc --all`
 
+## Continuous Deployment
+
+The file `../cloudbuild.yaml` is a sample [Google Cloud Builder](https://cloud.google.com/cloud-build/) project
+that performs a continuous deployment to a running GKE cluster. Until AM file based configuration supports upgrade,
+the deployment is done fresh each time.
+
+The deployment is triggered from a `git commit` to [forgeops](https://github.com/ForgeRock/forgeops). See the
+documentation on [automated build triggers](https://cloud.google.com/cloud-build/docs/running-builds/automate-builds) for more information.  You can also manually submit a build using:
+
+```bash
+cd forgeops
+gcloud builds submit
+```
+
+Track the build progress in the [GCP console](https://console.cloud.google.com/cloud-build/builds).
+
+Once deployed, the following URLs are available:
+
+* [Smoke test report](https://smoke.iam.forgeops.com/tests/latest.html)
+* [Access Manager](https://smoke.iam.forgeops.com/am/XUI/#login/) 
+* [IDM admin console](https://smoke.iam.forgeops.com/admin/#dashboard/0) 
+* [End user UI](https://smoke.iam.forgeops.com/enduser/#/dashboard)
 
 ## TODO
 
 * Create AM file based config process. See am-fbc/
-* If skaffold restarts, AM will go through configuration again with amster. Configurations do not persist. For development 
-   this work OK, but we need to enable a persistent mode. 
-* The fqdn needs to be updated in the various configurations. For now - use sed, etc. but we need to get a good procedure for
+* The fqdn needs to be updated in the various configurations. For now - use sed, etc. but we need to a good procedure for
    setting environmental parameters
-* Create "CDM" sizing configurations in kustomize/env
-
