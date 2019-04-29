@@ -6,7 +6,7 @@ steps:
   args: ['--default-repo', 'gcr.io/$PROJECT_ID', '-p', 'smoke', 'delete']
   dir: 'dev'
 - name: 'gcr.io/cloud-builders/kubectl'
-  args: ['delete', 'pvc', '--all']
+  args: ['-n=smoke','delete', 'pvc', '--all']
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   args: ['--default-repo', 'gcr.io/$PROJECT_ID', '-p', 'smoke', 'run']
   dir: 'dev'
