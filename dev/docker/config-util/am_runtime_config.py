@@ -163,15 +163,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     am_fqdn = os.getenv('FQDN', 'default.iam.forgeops.com')
+    am_cfg_folder = os.getenv('CONFIG_FOLDER', 'configs/amidm')
     am_url = f'https://{am_fqdn}:443/am'
     if not args.useFQDN:
         am_url = 'http://openam:80/am'
 
-    print(f'Doing minimal AM config with url {am_url} external fqdn {am_fqdn}')
+    print(f'Doing minimal AM config using {am_cfg_folder} with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url)
-    cfg.import_global_configs('./global', am_fqdn)
-    cfg.import_realm_config('./realm', am_fqdn)
-    cfg.import_oauth2_configs('./oauth2', am_fqdn)
-    cfg.import_secrets_configs('./secrets', am_fqdn)
-    cfg.import_policies('./policies', am_fqdn)
+    cfg.import_global_configs(f'./{am_cfg_folder}/global', am_fqdn)
+    cfg.import_realm_config(f'./{am_cfg_folder}/realm', am_fqdn)
+    cfg.import_oauth2_configs(f'./{am_cfg_folder}/oauth2', am_fqdn)
+    cfg.import_secrets_configs(f'./{am_cfg_folder}/secrets', am_fqdn)
+    cfg.import_policies(f'./{am_cfg_folder}/policies', am_fqdn)
     print('Runtime config finished!')
