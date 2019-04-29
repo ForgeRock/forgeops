@@ -2,8 +2,14 @@ apiVersion: skaffold/v1beta8
 kind: Config
 build:
   artifacts:
-  - image: ig
-    context: ../../../docker/ig
+#  - image: ig
+#    context: ../../../docker/ig
+  - image: amster-cdm
+    context: ../../../docker/amster-cdm
+  - image: am
+    context: ../../../docker/am
+#  - image: config-util
+#    context: ../../../docker/config-util-cdm
   tagPolicy:
     sha256: {}
 deploy:

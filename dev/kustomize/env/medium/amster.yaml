@@ -1,0 +1,18 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: amster
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: amster
+        imagePullPolicy: Always
+        image: amster-cdm
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "100m"
+          requests:
+            memory: 450Mi

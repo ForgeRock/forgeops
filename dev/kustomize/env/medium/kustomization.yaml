@@ -3,7 +3,13 @@ bases:
 - ../../frconfig
 - ../../ingress
 - ../../cert-manager/ca-issuer
-- ../../ig
+#- ../../ig
 - ../../idrepo
+- ../../am
+- ../../amster/base
+#- ../../config-util
 patchesStrategicMerge:
-- ig.yaml
+#- ig.yaml
+- am.yaml
+- amster.yaml
+- ds.yaml
