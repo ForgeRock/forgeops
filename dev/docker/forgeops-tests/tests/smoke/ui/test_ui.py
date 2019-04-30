@@ -26,7 +26,7 @@ class TestUI(object):
         # Needed for docker
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-gpu')
-        
+
         cls.driver = webdriver.Chrome(options=options,
                                       executable_path='/usr/bin/chromedriver')
 
