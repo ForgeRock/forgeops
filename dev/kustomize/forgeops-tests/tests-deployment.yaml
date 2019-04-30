@@ -19,10 +19,10 @@ spec:
         command: ["bash", "entrypoint.sh"]
         resources:
           limits:
-            memory: 500Mi
+            memory: 1Gi
             cpu: 1
           requests:
-            memory: 250Mi
+            memory: 1Gi
         volumeMounts:
         - mountPath: /usr/src/app/reports
           name: reports
