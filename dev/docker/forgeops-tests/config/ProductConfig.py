@@ -325,6 +325,11 @@ class DSConfig(object):
         raise Exception('Failed to get a free port in range [%s, %s]' % (initial_port, initial_port + max_range))
 
 
+class EndUserUIConfig(object):
+    def __init__(self):
+        self.ui_url = f'{base_url()}/enduser/#/dashboard'
+
+
 class NginxAgentConfig(object):
     def __init__(self):
         self.agent_url = 'https://nginx-agent.%s.%s' % (tests_namespace(), tests_domain())
