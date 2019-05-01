@@ -1,0 +1,34 @@
+#!/usr/bin/env groovy
+
+@Library('forgerock-pipeline-libs') _
+
+BASE_VERSION = '7.0.0'
+
+// Temporarily comment out directories to prevent that image being built
+buildDirectories = [
+    // [ name: 'apache-agent',     forceBuild: false ],
+    [ name: 'downloader',       forceBuild: false ],
+    // [ name: 'downloader-sample',forceBuild: false ],
+    [ name: 'gatling',          forceBuild: false ],
+    [ name: 'git',              forceBuild: false ],
+    [ name: 'java',             forceBuild: false ],
+    // [ name: 'nginx-agent',      forceBuild: false ],
+    [ name: 'util',             forceBuild: false ],
+]
+
+timestamps {
+
+    def pipeline
+    def jobLocation = 'jenkins-scripts/pipelines/build'
+
+    if (env.TAG_NAME) {
+        currentBuild.result = 'ABORTED'
+        error 'This pipeline does not currently support building from a tag'
+    } else if (isPR()) {
+        pipeline = evaluate readTrusted("${jobLocation}/pr.groovy")
+    } else {
+        pipeline = evaluate readTrusted("${jobLocation}/postcommit.groovy")
+    }
+
+    pipeline.build()
+}
