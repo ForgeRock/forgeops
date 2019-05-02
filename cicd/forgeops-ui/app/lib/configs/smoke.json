@@ -75,7 +75,7 @@
         "suffix": "ou=identities",
         "host": "configstore-0.configstore",
         "port": 1389,
-        "dirManager": "cn=Directory manager",
+        "dirManager": "uid=admin",
         "password": "password",
         "storeType": "LDAPv3ForOpenDS"
       },

@@ -35,10 +35,9 @@ idmRepo:
   enabled: true
 
 image:
-  repository: gcr.io/forgerock-io/ds
-  #pullPolicy: IfNotPresent
-  pullPolicy: Always
-  tag: 6.5.1
+  repository: gcr.io/forgerock-io/ds/qa-smoke
+  tag: 7.0.0-480022a
+  pullPolicy: IfNotPresent
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.

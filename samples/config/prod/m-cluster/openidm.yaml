@@ -44,5 +44,5 @@ openidm:
     # DS external repo
     #host: userstore-0.userstore
     #port: 1389
-    #user: "cn=Directory Manager"
+    #user: "uid=admin"
     #password: password

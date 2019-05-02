@@ -21,8 +21,7 @@ AM_CTX="${OPENAM_HOME}/${OPENAM_CTX}"
 is_configured() {
     echo "Testing if the configuration store is configured with an AM installation"
     test="ou=services,$BASE_DN"
-    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H "ldap://${CONFIGURATION_LDAP}" -D "cn=Directory Manager" -s base -l 5 -b "$test" > /dev/null 2>&1 \
-	    || ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H "ldap://${CONFIGURATION_LDAP}" -D "uid=admin" -s base -l 5 -b "$test"  > /dev/null 2>&1`
+    r=`ldapsearch -y ${DIR_MANAGER_PW_FILE} -A -H "ldap://${CONFIGURATION_LDAP}" -D "uid=admin" -s base -l 5 -b "$test"  > /dev/null 2>&1`
     status=$?
     echo "Is configured exit status is $status"
     return $status
