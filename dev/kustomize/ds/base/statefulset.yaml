@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ds-idrepo
+  name: ds
 spec:
   selector:
     matchLabels:
-      app: ds-idrepo
-  serviceName: ds-idrepo
+      app: ds
+  serviceName: ds
   replicas: 1
   template:
     metadata:
@@ -22,18 +22,18 @@ spec:
                     - key: instance
                       operator: In
                       values:
-                        - ds-idrepo
+                        - ds
                 topologyKey: kubernetes.io/hostname
               weight: 100
       initContainers:
         - name: initialize
-          image: ds-idrepo
+          image: ds
           imagePullPolicy: IfNotPresent
           args:
             - initialize-only
           envFrom:
             - configMapRef:
-                name: ds-idrepo
+                name: ds
           resources:
             requests:
               memory: 512Mi
@@ -43,9 +43,8 @@ spec:
             - mountPath: /opt/opendj/data
               name: data
       containers:
-        - name: ds-idrepo
-          image: ds-idrepo
-          # FIXME ?
+        - name: ds
+          image: ds
           imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACE
@@ -54,7 +53,7 @@ spec:
                   fieldPath: metadata.namespace
           envFrom:
             - configMapRef:
-                name: ds-idrepo
+                name: ds
           livenessProbe:
             initialDelaySeconds: 60
             periodSeconds: 120
@@ -87,13 +86,22 @@ spec:
       securityContext:
         fsGroup: 0
         # FIXME: seems to be needed when running in minikube with a host mounted data directory
-        runAsUser: 0
+        #runAsUser: 0
       terminationGracePeriodSeconds: 30
 #      volumes:
 #        - name: secrets
 #          secret:
-#            secretName: ds-cts
+#            secretName: ds
   updateStrategy:
     type: RollingUpdate
   # FIXME: remove when https://github.com/kubernetes-sigs/kustomize/issues/504 is fixed.
-  volumeClaimTemplates: []
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi

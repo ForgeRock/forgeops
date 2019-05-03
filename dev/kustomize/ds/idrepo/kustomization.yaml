@@ -1,8 +1,8 @@
 commonLabels:
-  vendor: forgerock
   app: ds-idrepo
-resources:
-  - configmap.yaml
-  - secrets.yaml
-  - service.yaml
-  - statefulset.yaml
+bases:
+- ../base
+nameSuffix: -idrepo
+images:
+  - newName: ds-idrepo
+    name: ds

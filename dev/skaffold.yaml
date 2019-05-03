@@ -31,3 +31,17 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/smoke
+# For testing DS
+- name: ds-dev
+  build:
+    artifacts:
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    googleCloudBuild:
+      projectId: engineering-devops
+  deploy:
+    kustomize:
+      path: ./kustomize/ds/small
+    

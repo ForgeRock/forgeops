@@ -1,6 +1,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ds-cts
+  name: ds
 data:
   OPENDJ_JAVA_ARGS: -server

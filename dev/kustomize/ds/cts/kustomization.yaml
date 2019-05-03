@@ -1,8 +1,8 @@
 commonLabels:
-  vendor: forgerock
   app: ds-cts
-resources:
-  - configmap.yaml
-  - secrets.yaml
-  - service.yaml
-  - statefulset.yaml
+bases:
+- ../base
+nameSuffix: -cts
+images:
+- newName: ds-cts
+  name: ds
