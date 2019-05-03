@@ -9,7 +9,7 @@ spec:
       containers:
       - name: amster
         imagePullPolicy: Always
-        image: amster-cdm
+        image: amster
         resources:
           limits:
             memory: 512Mi

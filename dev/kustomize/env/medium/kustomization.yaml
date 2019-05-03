@@ -13,3 +13,4 @@ patchesStrategicMerge:
 - am.yaml
 - amster.yaml
 - ds.yaml
+- amster-config-map.yaml

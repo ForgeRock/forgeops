@@ -4,7 +4,7 @@ build:
   artifacts:
 #  - image: ig
 #    context: ../../../docker/ig
-  - image: amster-cdm
+  - image: amster
     context: ../../../docker/amster-cdm
   - image: am
     context: ../../../docker/am

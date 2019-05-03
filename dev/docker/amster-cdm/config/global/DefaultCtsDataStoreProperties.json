@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : null,
-    "amsterVersion" : "6.5.1",
+    "amsterVersion" : "&{version}",
     "entityType" : "DefaultCtsDataStoreProperties",
     "entityId" : "DefaultCtsDataStoreProperties",
     "pathParams" : { }
@@ -17,10 +17,10 @@
     },
     "amconfig.org.forgerock.services.cts.store.external.section" : {
       "org.forgerock.services.cts.store.ssl.enabled" : false,
-      "org.forgerock.services.cts.store.directory.name" : "ctsstore-0.ctsstore:1389,ctsstore-1.ctsstore:1389",
-      "org.forgerock.services.cts.store.loginid" : "cn=Directory Manager",
+      "org.forgerock.services.cts.store.directory.name" : "&{cts_stores}",
+      "org.forgerock.services.cts.store.loginid" : "uid=admin",
       "org.forgerock.services.cts.store.password" : null,
-      "org.forgerock.services.cts.store.password-encrypted" : "AAAAA0FFUwIQ1kspdRDzj2XhvR0AsujLVGA41M2ponyGieEHsICA0XhX6HrTHBy2jg==",
+      "org.forgerock.services.cts.store.password-encrypted" : "AAAAA0FFUwIQePX0x8zEgGnGrtlpu642+23M0mLAoXAKczZUR7RHFqaFWZU5eFLohw==",
       "org.forgerock.services.cts.store.heartbeat" : "10",
       "org.forgerock.services.cts.store.affinity.enabled" : true
     }

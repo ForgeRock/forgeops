@@ -3,11 +3,11 @@
     "realm" : "/",
     "amsterVersion" : "&{version}",
     "entityType" : "OAuth2Clients",
-    "entityId" : "client-application",
+    "entityId" : "clientOIDC_0.json",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "client-application",
+    "_id" : "clientOIDC_0.json",
     "signEncOAuth2ClientConfig" : {
       "idTokenEncryptionMethod" : "A128CBC-HS256",
       "jwkSet" : null,
@@ -33,7 +33,7 @@
       "clientJwtPublicKey" : null
     },
     "advancedOAuth2ClientConfig" : {
-      "grantTypes" : [ "authorization_code", "password" ],
+      "grantTypes" : [ "authorization_code" ],
       "updateAccessToken" : null,
       "requestUris" : [ ],
       "clientUri" : [ ],
@@ -60,14 +60,15 @@
     },
     "coreOAuth2ClientConfig" : {
       "userpassword" : null,
-      "authorizationCodeLifetime" : 0,
-      "accessTokenLifetime" : 0,
-      "defaultScopes" : [ ],
+      "authorizationCodeLifetime" : 120,
+      "accessTokenLifetime" : 3600,
+      "defaultScopes" : [ "cn" ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "mail", "employeenumber" ],
-      "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ ],
+      "scopes" : [ "profile", "email", "openid" ],
+      "agentgroup" : null,
+      "refreshTokenLifetime" : 604800,
+      "redirectionUris" : [ "http://fake.com" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {

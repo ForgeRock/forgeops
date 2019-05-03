@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : null,
-    "amsterVersion" : "6.5.1",
+    "amsterVersion" : "&{version}",
     "entityType" : "RestApis",
     "entityId" : "RestApis",
     "pathParams" : { }
@@ -10,7 +10,7 @@
     "_id" : "",
     "defaultProtocolVersion" : "Latest",
     "defaultVersion" : "Latest",
-    "csrfFilterEnabled" : true,
+    "csrfFilterEnabled" : false,
     "warningHeader" : false,
     "descriptionsState" : "STATIC",
     "_type" : {

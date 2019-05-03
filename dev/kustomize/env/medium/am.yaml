@@ -8,6 +8,7 @@ spec:
     spec:
       containers:
       - name: openam
+        imagePullPolicy: Always
         resources:
           limits:
             cpu: 3000m

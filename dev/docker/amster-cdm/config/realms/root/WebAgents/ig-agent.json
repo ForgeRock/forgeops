@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "6.5.1",
+    "amsterVersion" : "&{version}",
     "entityType" : "WebAgents",
     "entityId" : "ig-agent",
     "pathParams" : { }
@@ -13,7 +13,7 @@
       "cookieName" : "iPlanetDirectoryPro",
       "cdsso" : false,
       "cdssoCookieDomain" : [ "" ],
-      "cdssoUrls" : [ "http://openam.lee.svc.cluster.local:80/openam/cdcservlet" ],
+      "cdssoUrls" : [ "http://openam.lee.svc.cluster.local:80/am/cdcservlet" ],
       "cdssoRedirectUri" : "agent/cdsso-oauth2",
       "cookieResetEnabled" : false,
       "cookieResetList" : [ "" ]
@@ -23,7 +23,7 @@
       "auditLogLocation" : "REMOTE",
       "fqdnMapping" : { },
       "notificationsEnabled" : true,
-      "remoteLogFilename" : "amAgent_openig.log",
+      "remoteLogFilename" : "amAgent_openig_lee_svc_cluster_local_80.log",
       "remoteLogSendInterval" : 5,
       "ssoOnlyMode" : false,
       "agentUriPrefix" : "http://openig.lee.svc.cluster.local:80/amagent",
@@ -35,7 +35,6 @@
       "webSocketConnectionIntervalInMinutes" : 30,
       "agentConfigChangeNotificationsEnabled" : true,
       "userpassword" : null,
-      "userpassword-encrypted" : "AAAAA0FFUwIQAIj06KIh7GrTWnuO2mqR7oqxPVaOCFxw1+XhC1HvsLhEyqDGvgMQ0rnr7YDHxDgyzS3AwmkCjsepI8EqEUHA6AAhMvbnL//G+754ZjNBsQ5CyeUyNqQmOP4rnclrvqzTMUFQvCLN8YxF0NljCIMM2OPNJdesiLaNUnO9dWHMTUyfIW85zD78ne1YhhRNXbJ4h22DZ/su4Hc=",
       "debugLogRotation" : true,
       "auditAccessType" : "LOG_NONE",
       "cdssoRootUrl" : [ "agentRootURL=http://openig.lee.svc.cluster.local:80/" ],
@@ -111,7 +110,7 @@
       "policyEvaluationApplication" : "iPlanetAMWebAgentService",
       "policyEvaluationRealm" : "/",
       "retrieveClientHostname" : false,
-      "amLogoutUrl" : [ "http://openam.lee.svc.cluster.local:80/openam/UI/Logout" ],
+      "amLogoutUrl" : [ "http://openam.lee.svc.cluster.local:80/am/UI/Logout" ],
       "userIdParameterType" : "session",
       "amLoginUrl" : [ ],
       "ssoCachePollingInterval" : 3,

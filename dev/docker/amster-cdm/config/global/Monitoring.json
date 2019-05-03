@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : null,
-    "amsterVersion" : "6.5.1",
+    "amsterVersion" : "&{version}",
     "entityType" : "Monitoring",
     "entityId" : "Monitoring",
     "pathParams" : { }
