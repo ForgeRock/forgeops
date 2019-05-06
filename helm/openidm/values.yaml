@@ -33,8 +33,8 @@ secret:
 component: openidm
 
 image:
-  repository: gcr.io/forgerock-io/idm/qa-smoke
-  tag: 7.0.0-63702f6
+  repository: gcr.io/forgerock-io/idm
+  tag: 7.0.0-M1
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always

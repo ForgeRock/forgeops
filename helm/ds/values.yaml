@@ -35,8 +35,8 @@ idmRepo:
   enabled: true
 
 image:
-  repository: gcr.io/forgerock-io/ds/qa-smoke
-  tag: 7.0.0-480022a
+  repository: gcr.io/forgerock-io/ds
+  tag: 7.0.0-M1
   pullPolicy: IfNotPresent
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
@@ -60,7 +60,7 @@ backup:
   # The backup folder is set to $clusterName/$instance-$namespace. This
   # forces each instance backup to go to a different folder on the shared PVC drive. Without this
   # you will get collisions on backup / restore.
-  # If you have many clusters backing up same shared NFS volume, change the default here. For example, 
+  # If you have many clusters backing up same shared NFS volume, change the default here. For example,
   # set it to "production"
   clusterName: "default"
 
@@ -97,12 +97,12 @@ podAntiAffinity: "soft"
 # if you have a multi-zone cluster.
 topologyKey: "kubernetes.io/hostname"
 
-# Restore parameters. 
+# Restore parameters.
 restore:
   # If true, runs the init containers that restores the directory from a backup folder in the bak/ folder.
-  # The backup data must be present in the bak/ folder. 
-  # Restore will not overwrite existing DS data.  
-  # A backup folder contains a full backup and a number of incrementals. The most up to date incremental 
+  # The backup data must be present in the bak/ folder.
+  # Restore will not overwrite existing DS data.
+  # A backup folder contains a full backup and a number of incrementals. The most up to date incremental
   # is used to recover.
   enabled: false
 

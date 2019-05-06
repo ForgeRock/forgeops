@@ -17,7 +17,7 @@ subdomain: iam
 # If these are not set (example: helm install --set amadminPassword=foo amster) a random password
 # will be generated. The password can viewed using:
 # kubectl get configmaps amster-config -o yaml
-# You may wish to delete this configmap once you have saved the passwords. 
+# You may wish to delete this configmap once you have saved the passwords.
 apiVersion: v1
 # amadminPassword: password
 # encryptionKey: "123456789012"
@@ -40,8 +40,8 @@ config:
   strategy: git
 
 image:
-  repository: gcr.io/forgerock-io/amster/qa-smoke
-  tag: 7.0.0-e8f19fd1a1
+  repository: gcr.io/forgerock-io/amster
+  tag: 7.0.0-M1
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
@@ -103,7 +103,7 @@ istio:
   enabled: false
 
 # Amster scripts
-# 
+#
 # You can set your own amster scripts here. They will be run in alphabetical order when the Amster pod detects an unconfigured AM.
 # You can list amster commands or invoke other scripts - it is good practice to keep your Amster scripts in version control:
 # e.g.:

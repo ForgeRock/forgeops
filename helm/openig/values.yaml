@@ -28,8 +28,8 @@ secret:
 catalinaOpts: "-Xmx512m"
 
 image:
-  repository: gcr.io/forgerock-io/ig/qa-smoke
-  tag: 7.0.0-ecd6327
+  repository: gcr.io/forgerock-io/ig
+  tag: 7.0.0-M1
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
 
