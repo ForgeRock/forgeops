@@ -23,7 +23,7 @@ TAG=${TAG:-6.5.1}
 PROJECT="forgerock-io"
 
 # These are the default images that will be built if no images are specified on the command line.
-IMAGES="openam ds openidm openig amster util git java gatling apache-agent nginx-agent"
+IMAGES="openam ds openidm openig amster util git java gatling"
 
 # --cache-from multistage issue: https://github.com/moby/moby/issues/34715
 while getopts "adgpt:r:R:P:i:c:n:C:" opt; do
