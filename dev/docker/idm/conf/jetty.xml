@@ -73,13 +73,13 @@
             <Arg>
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
-                    <Set name="hostHeader">
+                    <!-- <Set name="hostHeader">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>
                         </Call>:<Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                         <Arg>openidm.port.https</Arg>
                     </Call>
-                    </Set>
+                    </Set> -->
                 </New>
             </Arg>
         </Call>
@@ -100,13 +100,13 @@
             <Arg>
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
-                    <Set name="hostHeader">
+                    <!-- <Set name="hostHeader">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>
                         </Call>:<Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                         <Arg>openidm.port.mutualauth</Arg>
                     </Call>
-                    </Set>
+                    </Set> -->
                 </New>
             </Arg>
         </Call>

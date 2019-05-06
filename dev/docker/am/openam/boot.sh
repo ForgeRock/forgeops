@@ -26,6 +26,13 @@ if [ $status -ne 0 ]; then
     rm /home/forgerock/openam/boot.json
 else
     echo "idrepo configured - keeping boot.json"
+    echo "Making log path to avoid audit service startup error "
+    mkdir -p /home/forgerock/openam/am/log
+    echo "Copying bootstrap files for legacy AMKeyProvider"
+    cp /var/run/secrets/am/boot/.storepass /home/forgerock/openam/am
+    cp /var/run/secrets/am/boot/.keypass /home/forgerock/openam/am
+    cp /var/run/secrets/am/boot/keystore.jceks /home/forgerock/openam/am
+
 fi
 
 exec catalina.sh run 

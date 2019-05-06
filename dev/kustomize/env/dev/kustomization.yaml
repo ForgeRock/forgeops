@@ -1,9 +1,10 @@
 namespace: default
 bases:
   - ../../frconfig
-  - ../../idrepo
   - ../../ds/cts
-  - ../../ds/idrepo
+# until we get config changes - used old idrepo
+ # - ../../ds/idrepo
+  - ../../idrepo
   - ../../am
   - ../../config-util
   - ../../idm
@@ -12,5 +13,3 @@ bases:
   - ../../ingress
 patchesStrategicMerge:
   - platform-config.yaml
-  - ds-cts.yaml
-  - ds-idrepo.yaml

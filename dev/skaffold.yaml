@@ -2,8 +2,6 @@ apiVersion: skaffold/v1beta9
 kind: Config
 build:
   artifacts:
-  - image: ig
-    context: docker/ig
   - image: am
     context: docker/am
   - image: config-util
@@ -14,8 +12,6 @@ build:
     context: docker/ds/cts
   - image: ds-idrepo
     context: docker/ds/idrepo
-  - image: forgeops-tests
-    context: docker/forgeops-tests
   tagPolicy:
     sha256: {}
 deploy:
@@ -28,6 +24,24 @@ profiles:
     kustomize:
       path: ./kustomize/env/dev
 - name: smoke
+  build:
+    artifacts:
+    - image: ig
+      context: docker/ig
+    - image: forgeops-tests
+      context: docker/forgeops-tests
+    - image: am
+      context: docker/am
+    - image: config-util
+      context: docker/config-util
+    - image: idm
+      context: docker/idm
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    tagPolicy:
+      gitCommit: {}
   deploy:
     kustomize:
       path: ./kustomize/env/smoke
