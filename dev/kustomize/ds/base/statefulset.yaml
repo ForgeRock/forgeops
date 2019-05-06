@@ -85,8 +85,6 @@ spec:
 #             name: secrets
       securityContext:
         fsGroup: 0
-        # FIXME: seems to be needed when running in minikube with a host mounted data directory
-        #runAsUser: 0
       terminationGracePeriodSeconds: 30
 #      volumes:
 #        - name: secrets
@@ -94,7 +92,6 @@ spec:
 #            secretName: ds
   updateStrategy:
     type: RollingUpdate
-  # FIXME: remove when https://github.com/kubernetes-sigs/kustomize/issues/504 is fixed.
   volumeClaimTemplates:
   - metadata:
       name: data
