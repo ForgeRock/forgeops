@@ -173,7 +173,7 @@ spec:
           name: boot-json
       - name: configstore-secret
         secret:
-          secretName: configstore
+          secretName: {{ default "configstore" .Values.configSecretName }}
           #defaultMode: 256
       {{ if eq .Values.config.strategy  "git" }}
       - name: git

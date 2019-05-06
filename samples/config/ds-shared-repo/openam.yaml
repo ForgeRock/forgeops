@@ -1,1 +1,2 @@
 configLdapHost: userstore-0.userstore
+configSecretName: userstore
