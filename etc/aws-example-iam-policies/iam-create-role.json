@@ -1,0 +1,14 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:CreatePolicy"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
+}
