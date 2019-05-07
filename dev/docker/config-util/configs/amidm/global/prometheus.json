@@ -1,0 +1,21 @@
+{
+    "metadata": {
+        "realm": null,
+        "amsterVersion": "&{version}",
+        "entityType": "PrometheusReporter",
+        "entityId": "prometheus",
+        "pathParams": {}
+    },
+    "data": {
+        "authenticationType": "BASIC",
+        "password": "prometheus",
+        "enabled": true,
+        "username": "prometheus",
+        "_id": "prometheus",
+        "_type": {
+            "_id": "prometheus",
+            "name": "Prometheus Reporter",
+            "collection": true
+        }
+    }
+}

@@ -7,7 +7,7 @@
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "",
+    "_id" : "rest",
     "defaultProtocolVersion" : "Latest",
     "defaultVersion" : "Latest",
     "csrfFilterEnabled" : false,
