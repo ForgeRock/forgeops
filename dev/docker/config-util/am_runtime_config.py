@@ -127,8 +127,25 @@ class AMConfig(object):
             url = f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}'
             self.put(url, data,self.admin_headers_crest2)
 
-    def import_global_configs(self):
-        dir = f'{self.config_dir}/global'
+    def put(self, url, config):
+        print(f'Put url={url}')
+        create_request = put(url=url, headers=self.admin_headers, verify=False, json=config)
+        print(create_request.status_code)
+
+    def import_global_configs(self, dir, fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json_data(f'{dir}/{filename}', fqdn)
+            _type = data['_type']
+            id = _type['_id']
+            self.put(f'{self.am_url}/json/global-config/services/{id}', data)
+    
+    def import_properties_configs(self, dir, fqdn):
+        for filename in os.listdir(dir):
+            data = self.read_json_data(f'{dir}/{filename}', fqdn)
+            #id = data['_id'].strip('null/')
+            self.put(f'{self.am_url}/json/global-config/servers/server-default/properties/cts', data)
+
+    def import_secrets_configs(self, dir, fqdn):
         for filename in os.listdir(dir):
             data = self.read_json_full(f'{dir}/{filename}', self.fqdn)
             url = self.type_to_url(data)
@@ -164,9 +181,14 @@ if __name__ == '__main__':
         am_url = 'http://openam:80/am'
 
     print(f'Doing minimal AM config using {am_cfg_folder} with url {am_url} external fqdn {am_fqdn}')
-    cfg = AMConfig(am_url, am_fqdn, am_cfg_folder)
-    cfg.import_global_configs()
-    cfg.import_realm_config()
-    cfg.import_oauth2_configs()
-    cfg.import_policies()
+    cfg = AMConfig(am_url)
+    cfg.import_global_configs(f'./{am_cfg_folder}/global', am_fqdn)
+    cfg.import_realm_config(f'./{am_cfg_folder}/realm', am_fqdn)
+    cfg.import_oauth2_configs(f'./{am_cfg_folder}/oauth2', am_fqdn)
+    cfg.import_secrets_configs(f'./{am_cfg_folder}/secrets', am_fqdn)
+    #cfg.import_policies(f'./{am_cfg_folder}/policies', am_fqdn)
+    cfg.import_monitoring_configs(f'./{am_cfg_folder}/prometheus', am_fqdn)
+    #cfg.import_agents_configs(f'./{am_cfg_folder}/agents', am_fqdn)
+    cfg.import_authentication_configs(f'./{am_cfg_folder}/authentication', am_fqdn)
+    cfg.import_properties_configs(f'./{am_cfg_folder}/properties', am_fqdn)
     print('Runtime config finished!')

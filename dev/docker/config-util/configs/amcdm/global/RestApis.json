@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "RestApis",
+    "entityId" : "RestApis",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "",
+    "defaultProtocolVersion" : "Latest",
+    "defaultVersion" : "Latest",
+    "csrfFilterEnabled" : false,
+    "warningHeader" : false,
+    "descriptionsState" : "STATIC",
+    "_type" : {
+      "_id" : "rest",
+      "name" : "REST APIs",
+      "collection" : false
+    }
+  }
+}

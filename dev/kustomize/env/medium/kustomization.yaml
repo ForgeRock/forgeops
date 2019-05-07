@@ -6,11 +6,11 @@ bases:
 #- ../../ig
 - ../../idrepo
 - ../../am
-- ../../amster/base
-#- ../../config-util
+#- ../../amster/base
+- ../../config-util
 patchesStrategicMerge:
 #- ig.yaml
 - am.yaml
-- amster.yaml
+#- amster.yaml
 - ds.yaml
-- amster-config-map.yaml
+- config-util-deployment.yaml
