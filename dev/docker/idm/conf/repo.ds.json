@@ -322,8 +322,6 @@
                     "pushDeviceProfilesContainer",
                     "sunAMAuthAccountLockout",
                     "sunFMSAML2NameIdentifier",
-                    "sunFederationManagerDataStore",
-                    "sunIdentityServerLibertyPPService",
                     "webauthnDeviceProfilesContainer"
                 ],
                 "properties": {

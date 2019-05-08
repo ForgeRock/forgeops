@@ -20,7 +20,7 @@
     },
     "userconfig" : {
       "sun-idrepo-ldapv3-config-auth-kba-attempts-attr" : [ "kbaInfoAttempts" ],
-      "sun-idrepo-ldapv3-config-user-objectclass" : [ "iplanet-am-managed-person", "inetuser", "sunFMSAML2NameIdentifier", "inetorgperson", "devicePrintProfilesContainer", "iplanet-am-user-service", "iPlanetPreferences", "pushDeviceProfilesContainer", "forgerock-am-dashboard-service", "organizationalperson", "top", "kbaInfoContainer", "person", "sunAMAuthAccountLockout", "oathDeviceProfilesContainer", "webauthnDeviceProfilesContainer", "iplanet-am-auth-configuration-service", "sunFederationManagerDataStore", "sunIdentityServerLibertyPPService", "fr-idm-managed-user-explicit" ],
+      "sun-idrepo-ldapv3-config-user-objectclass" : [ "iplanet-am-managed-person", "inetuser", "sunFMSAML2NameIdentifier", "inetorgperson", "devicePrintProfilesContainer", "iplanet-am-user-service", "iPlanetPreferences", "pushDeviceProfilesContainer", "forgerock-am-dashboard-service", "organizationalperson", "top", "kbaInfoContainer", "person", "sunAMAuthAccountLockout", "oathDeviceProfilesContainer", "webauthnDeviceProfilesContainer", "iplanet-am-auth-configuration-service", "fr-idm-managed-user-explicit" ],
       "sun-idrepo-ldapv3-config-people-container-name" : "ou",
       "sun-idrepo-ldapv3-config-auth-kba-attr" : [ "kbaInfo" ],
       "sun-idrepo-ldapv3-config-isactive" : "inetuserstatus",
