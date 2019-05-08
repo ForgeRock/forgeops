@@ -16,19 +16,26 @@ buildDirectories = [
     [ name: 'util',             forceBuild: false ],
 ]
 
+def pipeline
+
 timestamps {
+    node ('build&&linux') {
 
-    def pipeline
-    def jobLocation = 'jenkins-scripts/pipelines/build'
+        stage ('Clone repo') {
+            checkout scm
 
-    if (env.TAG_NAME) {
-        currentBuild.result = 'ABORTED'
-        error 'This pipeline does not currently support building from a tag'
-    } else if (isPR()) {
-        pipeline = evaluate readTrusted("${jobLocation}/pr.groovy")
-    } else {
-        pipeline = evaluate readTrusted("${jobLocation}/postcommit.groovy")
+            def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
+
+            if (env.TAG_NAME) {
+                currentBuild.result = 'ABORTED'
+                error 'This pipeline does not currently support building from a tag'
+            } else if (isPR()) {
+                pipeline = load("${jobLocation}/pr.groovy")
+            } else {
+                pipeline = load("${jobLocation}/postcommit.groovy")
+            }
+        }
+
+        pipeline.build()
     }
-
-    pipeline.build()
 }

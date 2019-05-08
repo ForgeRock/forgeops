@@ -17,28 +17,25 @@ def build() {
     def currentImage
 
     try {
-        node('build&&linux') {
-            stage ('Clone repo') {
-                checkout scm
-                SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
-                currentBuild.description = 'built:'
-            }
-
-            for (buildDirectory in buildDirectories) {
-                if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
-                    stage ("Build ${buildDirectory['name']} image") {
-                        echo "Building 'docker/${buildDirectory['name']}' ..."
-                        currentImage = buildDirectory['name']
-                        buildImage(buildDirectory['name'])
-                        currentBuild.description += " ${buildDirectory['name']}"
-                    }
-                } else {
-                    echo "Skipping build for 'docker/${buildDirectory['name']}'"
-                }
-            }
+        stage ('Clone repo') {
+            checkout scm
+            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
+            currentBuild.description = 'built:'
         }
 
+        for (buildDirectory in buildDirectories) {
+            if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
+                stage ("Build ${buildDirectory['name']} image") {
+                    echo "Building 'docker/${buildDirectory['name']}' ..."
+                    currentImage = buildDirectory['name']
+                    buildImage(buildDirectory['name'])
+                    currentBuild.description += " ${buildDirectory['name']}"
+                }
+            } else {
+                echo "Skipping build for 'docker/${buildDirectory['name']}'"
+            }
+        }
     } catch (FlowInterruptedException ex) {
         currentBuild.result = 'ABORTED'
         throw ex

@@ -16,24 +16,22 @@ def build() {
     def bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
 
     try {
-        node('build&&linux') {
-            stage ('Clone repo') {
-                checkout scm
-                SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-                currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
-                currentBuild.description = 'built:'
-            }
+        stage ('Clone repo') {
+            checkout scm
+            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
+            currentBuild.description = 'built:'
+        }
 
-            for (buildDirectory in buildDirectories) {
-                if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
-                    stage ("Build ${buildDirectory['name']} image") {
-                        echo "Building 'docker/${buildDirectory['name']}' ..."
-                        buildImage(buildDirectory['name'])
-                        currentBuild.description += " ${buildDirectory['name']}"
-                    }
-                } else {
-                    echo "Skipping build for 'docker/${buildDirectory['name']}'"
+        for (buildDirectory in buildDirectories) {
+            if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
+                stage ("Build ${buildDirectory['name']} image") {
+                    echo "Building 'docker/${buildDirectory['name']}' ..."
+                    buildImage(buildDirectory['name'])
+                    currentBuild.description += " ${buildDirectory['name']}"
                 }
+            } else {
+                echo "Skipping build for 'docker/${buildDirectory['name']}'"
             }
         }
 
