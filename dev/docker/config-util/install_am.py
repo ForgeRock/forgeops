@@ -33,7 +33,7 @@ properties = {
     'AM_ENC_KEY': 'C00lBeans',
     'ADMIN_PWD': ADMIN_PASSWORD,
     'ADMIN_CONFIRM_PWD': ADMIN_PASSWORD,
-    'DIRECTORY_SERVER': 'idrepo-0.idrepo',
+    'DIRECTORY_SERVER': 'ds-idrepo',
     'DIRECTORY_PORT': '1389',
     'DS_DIRMGRPASSWD': 'password',
     'DIRECTORY_ADMIN_PORT': '4444',
@@ -43,7 +43,7 @@ properties = {
     'DATA_STORE': 'external',
     'USERSTORE_TYPE': 'LDAPv3ForOpenDS',
     'USERSTORE_MGRDN': 'uid=admin',
-    'USERSTORE_HOST': 'idrepo-0.idrepo',
+    'USERSTORE_HOST': 'ds-idrepo',
     'USERSTORE_PASSWD': 'password',
     'USERSTORE_SSL': 'SIMPLE',
     'USERSTORE_PORT': '1389',
@@ -99,7 +99,7 @@ def wait_for_am():
             am_request = get(url='http://openam:80/am/', timeout=10, verify=False)
             print(am_request.url)
             print( f'am_url, {am_request}')
-            ds_request = get(url='http://idrepo:8080/alive', timeout=10, verify=False)
+            ds_request = get(url='http://ds-idrepo:8080/alive', timeout=10, verify=False)
 
             if 'options.htm' in am_request.url:
                 print("AM ready to be configured")

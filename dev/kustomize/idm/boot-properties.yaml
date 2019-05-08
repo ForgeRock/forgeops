@@ -1,7 +1,7 @@
 apiVersion: v1
 data:
   boot.properties: |
-    openidm.repo.host=idrepo
+    openidm.repo.host=ds-idrepo
     openidm.repo.port=1389
     openidm.repo.user=uid=admin
     openidm.repo.password=password

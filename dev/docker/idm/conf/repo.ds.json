@@ -127,11 +127,11 @@
     },
     "resourceMapping": {
         "defaultMapping": {
-            "dnTemplate": "ou=generic,dc=openidm,dc=example,dc=com"
+            "dnTemplate": "ou=generic,dc=openidm,dc=forgerock,dc=io"
         },
         "explicitMapping": {
             "internal/role": {
-                "dnTemplate": "ou=roles,ou=internal,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "fr-idm-internal-role"
                 ],
@@ -162,7 +162,7 @@
                 }
             },
             "locks": {
-                "dnTemplate": "ou=locks,ou=internal,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=locks,ou=internal,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-lock"
@@ -181,7 +181,7 @@
                 }
             },
             "sync/queue": {
-                "dnTemplate": "ou=queue,ou=sync,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=queue,ou=sync,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-syncqueue"
@@ -244,7 +244,7 @@
                 }
             },
             "link": {
-                "dnTemplate": "ou=links,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=links,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-link"
@@ -275,7 +275,7 @@
                 }
             },
             "clusteredrecontargetids": {
-                "dnTemplate": "ou=clusteredrecontargetids,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=clusteredrecontargetids,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-recon-clusteredTargetIds"
@@ -434,16 +434,16 @@
         },
         "genericMapping": {
             "config": {
-                "dnTemplate": "ou=config,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=config,dc=openidm,dc=forgerock,dc=io"
             },
             "ui/*": {
-                "dnTemplate": "ou=ui,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=ui,dc=openidm,dc=forgerock,dc=io"
             },
             "managed/*": {
-                "dnTemplate": "ou=managed,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=managed,dc=openidm,dc=forgerock,dc=io"
             },
             "managed/role": {
-                "dnTemplate": "ou=role,ou=managed,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=role,ou=managed,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-managed-role"
@@ -452,13 +452,13 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole"
             },
             "scheduler": {
-                "dnTemplate": "ou=scheduler,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=io"
             },
             "scheduler/*": {
-                "dnTemplate": "ou=scheduler,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=io"
             },
             "cluster/*": {
-                "dnTemplate": "ou=cluster,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=cluster,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-cluster-obj"
@@ -467,7 +467,7 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchClusterObject"
             },
             "relationships": {
-                "dnTemplate": "ou=relationships,dc=openidm,dc=example,dc=com",
+                "dnTemplate": "ou=relationships,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-relationship"
@@ -476,22 +476,22 @@
                 "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchRelationship"
             },
             "updates": {
-                "dnTemplate": "ou=updates,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=updates,dc=openidm,dc=forgerock,dc=io"
             },
             "reconprogressstate": {
-                "dnTemplate": "ou=reconprogressstate,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=reconprogressstate,dc=openidm,dc=forgerock,dc=io"
             },
             "jsonstorage": {
-                "dnTemplate": "ou=jsonstorage,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=jsonstorage,dc=openidm,dc=forgerock,dc=io"
             },
             "internal/usermeta" : {
-                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=io"
             },
             "internal/notification" : {
-                "dnTemplate": "ou=notification,ou=internal,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=notification,ou=internal,dc=openidm,dc=forgerock,dc=io"
             },
             "file" : {
-                "dnTemplate": "ou=file,dc=openidm,dc=example,dc=com"
+                "dnTemplate": "ou=file,dc=openidm,dc=forgerock,dc=io"
             }
         }
     }

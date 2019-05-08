@@ -2,17 +2,17 @@
 
 File Based Config (FBC) requires a config store to be present (this will be fixed for 7.x).
 
-We are using the "idrepo" instance as the all in one DS instance for the userstore, configstore, and CTS. For production deployments
+We are using the "ds-idrepo" instance as the all in one DS instance for the userstore, configstore, and CTS. For production deployments
 a separate ctsstore will also be configured.
 
 IMPORTANT: The file based configuration must match the AM war file version that created it. There
 is currently no upgrade capability. If you update the war file (to say a new nightly build), you must regenerate
 the configuration. For this reason the file configurations are not currently checked in to git (am-fbc/tmp is in .gitignore)
 
-## Preparing the idrepo and initial FBC
+## Preparing the ds-idrepo and initial FBC
 
-You must prepare the idrepo instance with an amster install. You can not do this currently using file based configuration - the
-AM installer must run. Once you have your idrepo prepared, you are advised to retain the PVC between development sessions
+You must prepare the ds-idrepo instance with an amster install. You can not do this currently using file based configuration - the
+AM installer must run. Once you have your ds-idrepo prepared, you are advised to retain the PVC between development sessions
 so that you do not have to repeat this procedure.
 
 Steps:
@@ -23,7 +23,7 @@ Steps:
 * Let amster finish, and then run the `dump-config.sh` script:  `cd am-fbc; ./dump-config.sh`
 * This script connects to the running AM instance and copies the file based configuration to the tmp/ directory on your local workstation.
 * Shut down skaffold (control-c, or run `skaffold delete -p am-fbc` if it does not clean up)
-* Important: Do NOT delete the idrepo PVC. This has now been initialized with the structure that AM requires.
+* Important: Do NOT delete the ds-idrepo PVC. This has now been initialized with the structure that AM requires.
 
 ## Running with File Based Configuration
 

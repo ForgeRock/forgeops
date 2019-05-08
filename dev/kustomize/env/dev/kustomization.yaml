@@ -2,9 +2,7 @@ namespace: default
 bases:
   - ../../frconfig
   - ../../ds/cts
-# until we get config changes - used old idrepo
- # - ../../ds/idrepo
-  - ../../idrepo
+  - ../../ds/idrepo
   - ../../am
   - ../../config-util
   - ../../idm

@@ -19,14 +19,14 @@ install-openam \
    --cookieDomain cookieDomain \
    --adminPwd amadminPassword \
    --cfgStore dirServer \
-   --cfgStoreHost idrepo \
+   --cfgStoreHost ds-idrepo \
    --cfgStoreDirMgr uid=admin \
    --cfgStoreDirMgrPwd password \
    --cfgStorePort 1389 \
    --cfgStoreRootSuffix "ou=am-config" \
    --userStoreDirMgr "uid=admin" \
    --userStoreDirMgrPwd  "password" \
-   --userStoreHost "idrepo" \
+   --userStoreHost "ds-idrepo" \
    --userStorePort 1389 \
    --userStoreRootSuffix "ou=identities" \
    --userStoreType "LDAPv3ForOpenDS" \

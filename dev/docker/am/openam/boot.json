@@ -12,7 +12,7 @@
   "configStoreList" : [ {
     "baseDN" : "ou=am-config",
     "dirManagerDN" : "uid=admin",
-    "ldapHost" : "idrepo",
+    "ldapHost" : "ds-idrepo",
     "ldapPort" : 1389,
     "ldapProtocol" : "ldap"
   } ]
