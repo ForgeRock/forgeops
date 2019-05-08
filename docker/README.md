@@ -1,91 +1,10 @@
-# Docker Build Files for ForgeRock Identity Platform
+# Utility Docker Images
 
-## About
+The `java` image is the foundational docker image for ForgeRock DS, IDM and IG.
 
-You will need to modify the Dockerfiles here to suit your needs. The Dockerfiles
-are changing often as we find better ways to build these images for a wide range
- of requirements.
+## Product docker images
 
-## Binary Downloads
+For the 7.x release, the product docker images for ForgeRock AM, IDM, DS and IG are built upstream
+and hosted on gcr.io/forgerock-io/.
 
-The forgerock/downloader docker image downloads artifacts from the ForgeRock maven repository. This downloader image
-is the first stage in a multistage build process. The downloader image is unique to each user as it embeds 
-the API_KEY needed to pull images from ForgeRock's Artifactory reposistory.  
-
-IMPORTANT: *YOU MUST BUILD THIS IMAGE FOR YOUR OWN ENVIRONMENT!!*
-
-To build this image you need a API Key for the maven repository.
-
-ForgeRock customers should follow the backstage procedure for maven access.  
-
-Internal users can obtain their API keys as follows:
-
-* Navigate to http://docker-public.forgerock.io/repo/webapp/#/profile
-* Log in. The User Profile page should appear.
-* Re-enter your password in the Current Password field and click Unlock.
-* Click Show API Key (the "eye" icon to the right of the API Key field).
-* Copy your API Key.
-
-Export an environment variable API_KEY=your_api_key before attempting to build Docker images using the downloader. For more information, see the  downloader/download script.
-
-See the downloader-sample/ for an alternative way of sourcing ForgeRock binaries. 
-
-
-## How to Run These Images
-
-These images are intended to be
-orchestrated using Kubernetes. They depend on external volumes being
-mounted for secrets, configuration and persistent data. As such, they are not supported in non Kubernetes environments (docker compose, docker swarm, etc.)
-
-
-## Image Builds
-
-The product Dockerfiles are now managed in the openam repo and are built using maven in Jenkins.   These images are pushed to gcr.io/forgerock-io
-
-
-## build.sh
-
-The `build.sh` script can be used for one-off builds during development. For example:
-
-```
-./build.sh git 
-```
-Will build git using the default tag and registry.
-
-## CSV Format
-
-build.sh can also use a CSV file to determine which images to build and how to tag those images. For example:
-
-```build.sh -C csv/dev.csv -a -p -d``` 
-
-Will authenticate (-a option) to the docker registry, build, tag and push (-p option) all images found in dev.csv. The -d option is a "dry-run" which will show you the commands to be executed but will not peform any builds.
-
-The CSV option is intended for automating the build process.
-
-The CSV input file is parsed by bash, and is is *very* finicky about formatting. There are no comments allowed, no extra spaces after
-commas, and the file must end in a newline.
-
-The format of the CSV file is:
-
-```csv
-folder,artifact,tag
-
-```
-
-Where:
-
-* folder - is the name of the docker/ folder to build
-* artifact - is the version of the artifact in Artifactory. For example, for openam - 6.5.1-p2
-* tag - a tag to apply to the image.
-
-If the artifact does not change, but the docker image is significantly different, the suggested approach is to add an additional qualifier to the tag. For example, if the current artifact is `6.5.0-M129.1`  and the docker image is changed, the new tag becomes `6.5.0-M129.1.2`.
-
-
- See the build.sh script for a complete list of options.
-
-## Process to update a dependency
-
-The file csv/dev.csv specifies the artifacts used in our CI Cloudbuild pipeline. To update to a new milestone, edit
-this file, and update the milestone (for example, for idm change 6.5.0-M2 to 6.5.0-M3). Commit the change, and submit a new PR. The build process will build and tag the new image. You should also update the corresponding helm charts.
-
-See `subtmit.sh` for creating one off builds of an artifact.
+The source for the dockerfiles can be found in the respective product source code repository. 

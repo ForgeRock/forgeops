@@ -1,4 +1,0 @@
-apiVersion: v1
-description: A Helm chart to deploy an Apache web server with a ForgeRock policy agent.
-name: apache-agent
-version: 7.0.0
