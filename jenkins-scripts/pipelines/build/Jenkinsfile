@@ -6,13 +6,9 @@ BASE_VERSION = '7.0.0'
 
 // Temporarily comment out directories to prevent that image being built
 buildDirectories = [
-    // [ name: 'apache-agent',     forceBuild: false ],
-    [ name: 'downloader',       forceBuild: false ],
-    // [ name: 'downloader-sample',forceBuild: false ],
     [ name: 'gatling',          forceBuild: false ],
     [ name: 'git',              forceBuild: false ],
     [ name: 'java',             forceBuild: false ],
-    // [ name: 'nginx-agent',      forceBuild: false ],
     [ name: 'util',             forceBuild: false ],
 ]
 
