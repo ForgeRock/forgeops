@@ -4,6 +4,8 @@ data:
     openidm.repo.host=ds-idrepo
     openidm.repo.port=1389
     openidm.repo.user=uid=admin
+    # todo: When the idm profile switches to this user, use this instead:
+    #openidm.repo.user=uid=am-identity-bind-account,ou=admins,ou=identities
     openidm.repo.password=password
     openidm.repo.databaseName=openidm
     openidm.repo.schema=openidm
