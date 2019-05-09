@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This is a temporary work around until file based config is integrated
-# This removes the boot.json file if the config store (idrepo) is not yet configured
+# This removes the boot.json file if the config store (ds-idrepo) is not yet configured
 
 TEST_DN="ou=sunIdentityRepositoryService,ou=services,ou=am-config"
 
