@@ -23,6 +23,9 @@ timestamps {
 
         stage ('Clone repo') {
             checkout scm
+            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
+            currentBuild.description = 'built:'
 
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
 

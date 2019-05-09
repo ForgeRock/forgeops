@@ -16,13 +16,6 @@ def build() {
     def bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
 
     try {
-        stage ('Clone repo') {
-            checkout scm
-            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
-            currentBuild.description = 'built:'
-        }
-
         for (buildDirectory in buildDirectories) {
             if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
                 stage ("Build ${buildDirectory['name']} image") {

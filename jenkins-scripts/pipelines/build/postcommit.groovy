@@ -17,13 +17,6 @@ def build() {
     def currentImage
 
     try {
-        stage ('Clone repo') {
-            checkout scm
-            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
-            currentBuild.description = 'built:'
-        }
-
         for (buildDirectory in buildDirectories) {
             if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
                 stage ("Build ${buildDirectory['name']} image") {
