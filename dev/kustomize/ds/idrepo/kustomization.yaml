@@ -4,5 +4,5 @@ bases:
 - ../base
 nameSuffix: -idrepo
 images:
-  - newName: ds-idrepo
-    name: ds
+- newName: ds-idrepo
+  name: ds

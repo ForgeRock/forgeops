@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/docker-build:latest
+FROM gcr.io/forgerock-io/ds/docker-build:7.0.0-98f5024
 
 USER forgerock 
 

@@ -1,5 +1,6 @@
 # The ds-empty image configures https/https, and monitoring
 FROM gcr.io/forgerock-io/ds-empty/docker-build:latest
+
 USER forgerock 
 
 RUN setup-profile --profile am-config \
