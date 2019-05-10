@@ -24,11 +24,13 @@ class AMConfig(object):
         self.admin_token = self.admin_login()
         self.config_dir = folder
         self.fqdn = fqdn
-        self.entityMapper = {
-            "rest" : "global-config/services",
-            "prometheus" : "global-config/services/monitoring/prometheus",
+        self.entityMap = {
+            "RestApis" : "global-config/services",
+            "PrometheusReporter" : "global-config/services/monitoring/prometheus",
             "KeyStoreSecretStore" :  "global-config/secrets/stores/KeyStoreSecretStore",
             "FileSystemSecretStore" : "global-config/secrets/stores/FileSystemSecretStore",
+            "CtsDataStoreProperties" : "global-config/servers",
+            "DefaultCtsDataStoreProperties": "global-config/servers/server-default/properties/cts"
         }
 
     # UTILITY METHODS
@@ -51,8 +53,10 @@ class AMConfig(object):
         headers = {
             'X-OpenAM-Username': 'amadmin',
             'X-OpenAM-Password': password,
-            'Accept-API-Version': 'resource=2.0, protocol=1.0'
+            'accept-api-version': 'protocol=1.0,resource=1.0',
         }
+
+        # resource=1.0,protocol=1.0
 
         login_request = post(f'{self.am_url}/json/authenticate', headers=headers, verify=False)
         token = login_request.json()['tokenId']
@@ -62,7 +66,7 @@ class AMConfig(object):
     @property
     def admin_headers(self):
         return {'iPlanetDirectoryPro': self.admin_token,
-                'Accept-API-Version': 'resource=1.0',
+                'accept-api-version': 'protocol=1.0,resource=1.0',
                 'Content-Type': 'application/json'}
 
     # Slurp a json file in amster format/ - return just the data payload
@@ -78,21 +82,20 @@ class AMConfig(object):
             return json_data
     
     def put(self, url, config):
-        print(f'Put url={url}')
-        create_request = put(url=url, headers=self.admin_headers, verify=False, json=config)
-        print(create_request.status_code)
+        #print(f'Put url={url} data={config}')
+        r = put(url=url, headers=self.admin_headers, verify=False, json=config)
+        #print(f'status={r} {r.text}')
 
-    # Calculates the json path from data payload. 
-    def type_to_url(self,data):
+    # Calculates the json path from the payload. 
+    def type_to_url(self,payload):
         # payload contains a _type struct
-        type = data['_type']
+        type = payload['metadata']['entityType']
         # The _id is the object type
-        _t = type['_id']
-        # get the json path
-        t = self.entityMapper[_t]
-        # The object instance is the _id of the data field
-        id = data['_id']
-        return f'{self.am_url}/json/{t}/{id}'
+        id = payload['data']['_id']
+        u = self.entityMap[type]
+        if (id == None or id.startswith("null")):
+            return f'{self.am_url}/json/{u}'
+        return f'{self.am_url}/json/{u}/{id}'
 
     # Import all config files for the root realm
     def import_realm_config(self):
@@ -120,9 +123,12 @@ class AMConfig(object):
     def import_global_configs(self):
         dir = f'{self.config_dir}/global'
         for filename in os.listdir(dir):
-            data = self.read_json_data(f'{dir}/{filename}', self.fqdn)
+            data = self.read_json_full(f'{dir}/{filename}', self.fqdn)
             url = self.type_to_url(data)
-            self.put(url, data)
+            payload = data['data']
+            # Remove the id from the payload - not required for PUT
+            payload.pop('_id')
+            self.put(url, payload)
 
     def import_policies(self):
         dir =  f'{self.config_dir}/policies'
