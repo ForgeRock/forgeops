@@ -16,7 +16,7 @@
     },
     "amconfig.org.forgerock.services.cts.store.external.section" : {
       "org.forgerock.services.cts.store.ssl.enabled" : false,
-      "org.forgerock.services.cts.store.directory.name" : "idrepo-0.idrepo:1389",
+      "org.forgerock.services.cts.store.directory.name" : "ds-idrepo-0.ds-idrepo:1389",
       "org.forgerock.services.cts.store.loginid" : "uid=admin",
       "org.forgerock.services.cts.store.password" : "password",
       "org.forgerock.services.cts.store.heartbeat" : "10",

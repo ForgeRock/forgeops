@@ -19,7 +19,7 @@
     "beheraPasswordPolicySupportEnabled" : true,
     "userProfileRetrievalAttribute" : "uid",
     "minimumPasswordLength" : "8",
-    "primaryLdapServer" : [ "idrepo:1389" ],
+    "primaryLdapServer" : [ "ds-idrepo:1389" ],
     "openam-auth-ldap-connection-mode" : "LDAP",
     "connectionHeartbeatInterval" : 10,
     "secondaryLdapServer" : [ ],

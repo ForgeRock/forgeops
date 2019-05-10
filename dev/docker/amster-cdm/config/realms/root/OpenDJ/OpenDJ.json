@@ -36,7 +36,7 @@
     "ldapsettings" : {
       "sun-idrepo-ldapv3-config-connection_pool_max_size" : 50,
       "openam-idrepo-ldapv3-behera-support-enabled" : true,
-      "sun-idrepo-ldapv3-config-authid" : "uid=admin",
+      "sun-idrepo-ldapv3-config-authid" : "uid=am-identity-bind-account,ou=admins,ou=identities",
       "openam-idrepo-ldapv3-proxied-auth-enabled" : false,
       "openam-idrepo-ldapv3-contains-iot-identities-enriched-as-oauth2client" : false,
       "sun-idrepo-ldapv3-config-max-result" : 1000,
@@ -44,7 +44,7 @@
       "sun-idrepo-ldapv3-config-time-limit" : 10,
       "sun-idrepo-ldapv3-config-connection_pool_min_size" : 1,
       "openam-idrepo-ldapv3-heartbeat-interval" : 10,
-      "sun-idrepo-ldapv3-config-ldap-server" : [ "idrepo-0.idrepo:1389" ],
+      "sun-idrepo-ldapv3-config-ldap-server" : [ "ds-idrepo:1389" ],
       "openam-idrepo-ldapv3-heartbeat-timeunit" : "SECONDS",
       "sun-idrepo-ldapv3-config-organization_name" : "ou=identities",
       "sun-idrepo-ldapv3-config-connection-mode" : "LDAP",

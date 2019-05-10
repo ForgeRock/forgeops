@@ -1,18 +1,17 @@
 namespace: lee
 bases:
-- ../../frconfig
-- ../../ingress
-- ../../cert-manager/ca-issuer
-#- ../../ig
-- ../../idrepo
-#- ../../ds/cts-medium
-- ../../am
-- ../../amster/base
-#- ../../config-util
+  - ../../frconfig
+  #- ../../ds/cts
+  #- ../../ds/idrepo
+  - ../../ingress
+  - ../../cert-manager/ca-issuer
+  #- ../../ig
+  - ../../ds/cts-medium
+  - ../../ds/idrepo-medium
+  - ../../am
+  - ../../amster/base
+  #- ../../config-util
 patchesStrategicMerge:
-#- ig.yaml
-- am.yaml
-- amster.yaml
-- amster-configmap.yaml
-- idrepo-configmap.yaml
-#- config-util-deployment.yaml
+  #- ig.yaml
+  - am.yaml
+  - amster.yaml

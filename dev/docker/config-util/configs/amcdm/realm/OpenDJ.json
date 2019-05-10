@@ -44,7 +44,7 @@
       "sun-idrepo-ldapv3-config-time-limit" : 10,
       "sun-idrepo-ldapv3-config-connection_pool_min_size" : 1,
       "openam-idrepo-ldapv3-heartbeat-interval" : 10,
-      "sun-idrepo-ldapv3-config-ldap-server" : [ "idrepo-0.idrepo:1389" ],
+      "sun-idrepo-ldapv3-config-ldap-server" : [ "ds-idrepo:1389" ],
       "openam-idrepo-ldapv3-heartbeat-timeunit" : "SECONDS",
       "sun-idrepo-ldapv3-config-organization_name" : "ou=identities",
       "sun-idrepo-ldapv3-config-connection-mode" : "LDAP",

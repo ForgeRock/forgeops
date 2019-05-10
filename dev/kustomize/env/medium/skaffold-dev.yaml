@@ -8,10 +8,10 @@ build:
     context: ../../../docker/amster-cdm
   - image: am
     context: ../../../docker/am
-#  - image: idrepo
-#    context: ../../../docker/idrepo
-#  - image: ds-cts
-#    context: ../../../docker/ds/cts
+  - image: ds-idrepo
+    context: ../../../docker/ds/idrepo
+  - image: ds-cts
+    context: ../../../docker/ds/cts
 #  - image: config-util
 #    context: ../../../docker/config-util
   tagPolicy:

@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: idrepo
-data:
-  DS_ENABLE_CTS: "false"
