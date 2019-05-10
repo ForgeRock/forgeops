@@ -5,4 +5,5 @@ metadata:
 data:
   # todo: get the cts password from the cts..
   CTS_STORES: "idrepo-0.idrepo:1389"
+  #IDREPO: "ds-idrepo"
 

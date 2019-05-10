@@ -4,12 +4,16 @@ build:
   artifacts:
 #  - image: ig
 #    context: ../../../docker/ig
-#  - image: amster
-#    context: ../../../docker/amster-cdm
+  - image: amster
+    context: ../../../docker/amster-cdm
   - image: am
     context: ../../../docker/am
-  - image: config-util
-    context: ../../../docker/config-util
+#  - image: idrepo
+#    context: ../../../docker/idrepo
+#  - image: ds-cts
+#    context: ../../../docker/ds/cts
+#  - image: config-util
+#    context: ../../../docker/config-util
   tagPolicy:
     sha256: {}
 deploy:

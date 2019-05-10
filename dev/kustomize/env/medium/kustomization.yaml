@@ -5,12 +5,14 @@ bases:
 - ../../cert-manager/ca-issuer
 #- ../../ig
 - ../../idrepo
+#- ../../ds/cts-medium
 - ../../am
-#- ../../amster/base
-- ../../config-util
+- ../../amster/base
+#- ../../config-util
 patchesStrategicMerge:
 #- ig.yaml
 - am.yaml
-#- amster.yaml
-- ds.yaml
-- config-util-deployment.yaml
+- amster.yaml
+- amster-configmap.yaml
+- idrepo-configmap.yaml
+#- config-util-deployment.yaml
