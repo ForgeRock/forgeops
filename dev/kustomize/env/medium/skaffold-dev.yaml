@@ -5,7 +5,7 @@ build:
 #  - image: ig
 #    context: ../../../docker/ig
   - image: amster
-    context: ../../../docker/amster-cdm
+    context: ../../../docker/amster
   - image: am
     context: ../../../docker/am
   - image: ds-idrepo
