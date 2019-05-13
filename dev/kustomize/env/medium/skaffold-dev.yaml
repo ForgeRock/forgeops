@@ -12,6 +12,8 @@ build:
     context: ../../../docker/ds/idrepo
   - image: ds-cts
     context: ../../../docker/ds/cts
+  - image: idm
+    context: ../../../docker/idm
 #  - image: config-util
 #    context: ../../../docker/config-util
   tagPolicy:

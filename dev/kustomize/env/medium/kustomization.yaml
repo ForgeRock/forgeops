@@ -8,6 +8,8 @@ bases:
   - ../../ds/idrepo-medium
   - ../../am
   - ../../amster/base
+  - ../../end-user-ui
+  - ../../idm
   #- ../../config-util
 patchesStrategicMerge:
   #- ig.yaml
