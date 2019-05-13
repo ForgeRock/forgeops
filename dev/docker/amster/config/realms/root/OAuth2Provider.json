@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : "/",
-    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "amsterVersion" : "&{version}",
     "entityType" : "OAuth2Provider",
     "entityId" : "OAuth2Provider",
     "pathParams" : { }
@@ -13,8 +13,8 @@
       "accessTokenLifetime" : 3600,
       "usePolicyEngineForScope" : false,
       "codeLifetime" : 120,
-      "issueRefreshTokenOnRefreshedToken" : false,
-      "issueRefreshToken" : false,
+      "issueRefreshTokenOnRefreshedToken" : true,
+      "issueRefreshToken" : true,
       "accessTokenModificationScript" : "d22f9a0c-426a-4466-b95e-d0f125b0d5fa",
       "statelessTokensEnabled" : false
     },
