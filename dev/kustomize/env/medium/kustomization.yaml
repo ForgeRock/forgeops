@@ -1,8 +1,6 @@
 namespace: lee
 bases:
   - ../../frconfig
-  #- ../../ds/cts
-  #- ../../ds/idrepo
   - ../../ingress
   - ../../cert-manager/ca-issuer
   #- ../../ig
