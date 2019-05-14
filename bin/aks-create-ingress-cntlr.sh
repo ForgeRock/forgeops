@@ -14,10 +14,13 @@
 # k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/ing.yaml
 # k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/svc.yaml
 
+source "${BASH_SOURCE%/*}/../etc/aks-env.cfg"
 
-IP=$1
+echo "=> Read the following env variables from config file"
+echo -e "\tStatic IP Address = ${AKS_INGRESS_IP}"
+echo -e "\tStatic IP resource group = ${AKS_IP_RESOURCE_GROUP_NAME}"
 
-if [ -z $1 ]; then
+if [ -z $AKS_INGRESS_IP ]; then
  IP_OPTS=""
 else
  IP_OPTS="--set controller.service.loadBalancerIP=$1"
@@ -29,7 +32,7 @@ helm install --namespace nginx --name nginx \
   --set controller.stats.enabled=true \
   --set controller.service.externalTrafficPolicy=Local \
   --set controller.service.type=LoadBalancer \
-  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=forgeopsIPs \
+  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=${AKS_IP_RESOURCE_GROUP_NAME} \
   --set controller.image.tag="0.21.0" \
    $IP_OPTS stable/nginx-ingress
 

@@ -64,7 +64,7 @@ done
 
 
 # Create the ingress controller
-./aks-create-ingress-cntlr.sh ${AKS_INGRESS_IP}
+./aks-create-ingress-cntlr.sh
 
 # Deploy cert-manager
 ./deploy-cert-manager.sh

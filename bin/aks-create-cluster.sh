@@ -58,7 +58,7 @@ else
 fi
 
 echo ""
-echo "=> Creating Resoure Group"
+echo "=> Creating Resource Group"
 az group create \
    --name ${AKS_RESOURCE_GROUP_NAME} \
    --location ${AKS_LOCATION}
