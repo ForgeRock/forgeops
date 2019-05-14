@@ -5,3 +5,4 @@ configStore:
   host: userstore-0.userstore
 userStore:
   dirManager: "uid=admin"
+  storeType: "LDAPv3ForForgeRockIAM"
