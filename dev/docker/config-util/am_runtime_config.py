@@ -53,11 +53,8 @@ class AMConfig(object):
         headers = {
             'X-OpenAM-Username': 'amadmin',
             'X-OpenAM-Password': password,
-            'accept-api-version': 'protocol=1.0,resource=1.0',
+            'accept-api-version': 'resource=1.0,protocol=2.0',   
         }
-
-        # resource=1.0,protocol=1.0
-
         login_request = post(f'{self.am_url}/json/authenticate', headers=headers, verify=False)
         token = login_request.json()['tokenId']
         print(f'Have admin access token: {token}')
@@ -68,6 +65,16 @@ class AMConfig(object):
         return {'iPlanetDirectoryPro': self.admin_token,
                 'accept-api-version': 'protocol=1.0,resource=1.0',
                 'Content-Type': 'application/json'}
+
+    # This header is needed for CREST 2.0 PUT requests          
+    # 'if-none-match' : '*',
+    @property
+    def admin_headers_crest2(self):
+        return {'iPlanetDirectoryPro': self.admin_token,
+                'accept-api-version': 'protocol=2.0,resource=1.0',
+                'if-none-match' : '*',
+                'Content-Type': 'application/json'}
+
 
     # Slurp a json file in amster format/ - return just the data payload
     def read_json_data(self, path, fqdn):
@@ -81,10 +88,9 @@ class AMConfig(object):
             json_data = json.loads(text)
             return json_data
     
-    def put(self, url, config):
-        #print(f'Put url={url} data={config}')
-        r = put(url=url, headers=self.admin_headers, verify=False, json=config)
-        #print(f'status={r} {r.text}')
+    def put(self, url, config,headers):
+        r = put(url=url, headers=headers, verify=False, json=config)
+        print(f'Put url={url} status={r}')
 
     # Calculates the json path from the payload. 
     def type_to_url(self,payload):
@@ -106,9 +112,9 @@ class AMConfig(object):
             id = _type['_id']
             name = _type['name']
             if id == "LDAPv3ForOpenDS":
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data,self.admin_headers)
             else:
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}', data)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}', data,self.admin_headers_crest2)
             # TODO: More error checking here...
             # else:
             #     print(f'I dont know how to import type {id}')
@@ -118,7 +124,8 @@ class AMConfig(object):
         for filename in os.listdir(dir):
             data = self.read_json_data(f'{dir}/{filename}', self.fqdn)
             id = data['_id']
-            self.put(f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}', data)
+            url = f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}'
+            self.put(url, data,self.admin_headers_crest2)
 
     def import_global_configs(self):
         dir = f'{self.config_dir}/global'
@@ -128,7 +135,7 @@ class AMConfig(object):
             payload = data['data']
             # Remove the id from the payload - not required for PUT
             payload.pop('_id')
-            self.put(url, payload)
+            self.put(url, payload,self.admin_headers)
 
     def import_policies(self):
         dir =  f'{self.config_dir}/policies'
@@ -136,7 +143,7 @@ class AMConfig(object):
             data = self.read_json_full(f'{dir}/{filename}', self.fqdn)
             _id = data['data']['_id']
             _type = data['metadata']['entityType'].lower()
-            self.put(f'{self.am_url}/json/{_type}/{_id}', data['data'])
+            self.put(f'{self.am_url}/json/{_type}/{_id}', data['data'],self.admin_headers_crest2)
 
 if __name__ == '__main__':
 
