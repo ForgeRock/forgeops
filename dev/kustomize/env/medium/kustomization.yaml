@@ -7,11 +7,11 @@ bases:
   - ../../ds/cts-medium
   - ../../ds/idrepo-medium
   - ../../am
-  - ../../amster/base
+  #- ../../amster/base
   - ../../end-user-ui
   - ../../idm
-  #- ../../config-util
+  - ../../config-util
 patchesStrategicMerge:
   #- ig.yaml
   - am.yaml
-  - amster.yaml
+  #- amster.yaml

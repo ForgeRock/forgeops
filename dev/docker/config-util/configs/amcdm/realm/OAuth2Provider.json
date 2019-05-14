@@ -13,8 +13,8 @@
       "accessTokenLifetime" : 3600,
       "usePolicyEngineForScope" : false,
       "codeLifetime" : 120,
-      "issueRefreshTokenOnRefreshedToken" : true,
-      "issueRefreshToken" : true,
+      "issueRefreshTokenOnRefreshedToken" : false,
+      "issueRefreshToken" : false,
       "accessTokenModificationScript" : "d22f9a0c-426a-4466-b95e-d0f125b0d5fa",
       "statelessTokensEnabled" : false
     },

@@ -1,7 +1,7 @@
 {
     "metadata": {
         "realm": null,
-        "amsterVersion": "&{version}",
+        "amsterVersion": "7.0.0-SNAPSHOT",
         "entityType": "PrometheusReporter",
         "entityId": "prometheus",
         "pathParams": {}

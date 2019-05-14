@@ -20,7 +20,7 @@
     },
     "userconfig" : {
       "sun-idrepo-ldapv3-config-auth-kba-attempts-attr" : [ "kbaInfoAttempts" ],
-      "sun-idrepo-ldapv3-config-user-objectclass" : [ "iplanet-am-managed-person", "inetuser", "sunFMSAML2NameIdentifier", "inetorgperson", "devicePrintProfilesContainer", "iplanet-am-user-service", "iPlanetPreferences", "pushDeviceProfilesContainer", "forgerock-am-dashboard-service", "organizationalperson", "top", "kbaInfoContainer", "person", "sunAMAuthAccountLockout", "oathDeviceProfilesContainer", "webauthnDeviceProfilesContainer", "iplanet-am-auth-configuration-service", "sunFederationManagerDataStore", "sunIdentityServerLibertyPPService", "fr-idm-managed-user-explicit" ],
+      "sun-idrepo-ldapv3-config-user-objectclass" : [ "iplanet-am-managed-person", "inetuser", "sunFMSAML2NameIdentifier", "inetorgperson", "devicePrintProfilesContainer", "iplanet-am-user-service", "iPlanetPreferences", "pushDeviceProfilesContainer", "forgerock-am-dashboard-service", "organizationalperson", "top", "kbaInfoContainer", "person", "sunAMAuthAccountLockout", "oathDeviceProfilesContainer", "webauthnDeviceProfilesContainer", "iplanet-am-auth-configuration-service", "fr-idm-managed-user-explicit" ],
       "sun-idrepo-ldapv3-config-people-container-name" : "ou",
       "sun-idrepo-ldapv3-config-auth-kba-attr" : [ "kbaInfo" ],
       "sun-idrepo-ldapv3-config-isactive" : "inetuserstatus",
@@ -34,15 +34,14 @@
       "sun-idrepo-ldapv3-config-inactive" : "Inactive"
     },
     "ldapsettings" : {
-      "sun-idrepo-ldapv3-config-connection_pool_max_size" : 50,
+      "sun-idrepo-ldapv3-config-connection_pool_max_size" : 10,
       "openam-idrepo-ldapv3-behera-support-enabled" : true,
-      "sun-idrepo-ldapv3-config-authid" : "uid=admin",
+      "sun-idrepo-ldapv3-config-authid" : "uid=am-identity-bind-account,ou=admins,ou=identities",
       "openam-idrepo-ldapv3-proxied-auth-enabled" : false,
       "openam-idrepo-ldapv3-contains-iot-identities-enriched-as-oauth2client" : false,
       "sun-idrepo-ldapv3-config-max-result" : 1000,
       "sun-idrepo-ldapv3-config-search-scope" : "SCOPE_SUB",
       "sun-idrepo-ldapv3-config-time-limit" : 10,
-      "sun-idrepo-ldapv3-config-connection_pool_min_size" : 1,
       "openam-idrepo-ldapv3-heartbeat-interval" : 10,
       "sun-idrepo-ldapv3-config-ldap-server" : [ "ds-idrepo:1389" ],
       "openam-idrepo-ldapv3-heartbeat-timeunit" : "SECONDS",
