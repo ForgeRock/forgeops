@@ -19,16 +19,30 @@ Typically this will be a CD process triggered from a git commit or pull request.
 * Install [skaffold](https://skaffold-latest.firebaseapp.com/) and [kustomize](https://kustomize.io/)
 * Install cert-manager:  `3rdparty/cert-manager.sh`
 * Add an entry in /etc/hosts for `default.iam.example.com` that points to your ingress ip (`minikube ip`, for example)
-* Point docker at your minikube daemon: `eval $(minkube docker-env)`
 
 ## Quick Start - minikube
 
-Make sure your namespace is set to default. `kubens default`. Run the following command in this directory:
+When starting minikube, make sure it gets enough memory. For example:
+`minikube start --memory=8192 --disk-size=30g --vm-driver=virtualbox --bootstrapper kubeadm --kubernetes-version=v1.13.2`
+
+After starting minikube for the first time, enable the built-in ingress controller plugin:
+`minikube addons enable ingress`
+
+Each time you start minikube, enable the workaround for the bug in loopback networking,
+and point docker at your minikube daemon:
+```
+minikube ssh "sudo ip link set docker0 promisc on"
+eval $(minikube docker-env)
+```
+
+Make sure your namespace is set to `default`: `kubens default`
+
+Run the following command in this directory:
 
 `skaffold dev`
 
 This will bring up AM, IDM and the idrepo (DS). Open https://default.iam.example.com/am in your browser. AM will
-protect IDM. You can access the IDM admin console at: https://default.iam.example.com/admin/ 
+protect IDM. You can access the IDM admin console at: https://default.iam.example.com/admin/
 
 ## Quick Start - GKE using default.iam.forgeops.com
 
@@ -99,8 +113,8 @@ Track the build progress in the [GCP console](https://console.cloud.google.com/c
 Once deployed, the following URLs are available:
 
 * [Smoke test report](https://smoke.iam.forgeops.com/tests/latest.html)
-* [Access Manager](https://smoke.iam.forgeops.com/am/XUI/#login/) 
-* [IDM admin console](https://smoke.iam.forgeops.com/admin/#dashboard/0) 
+* [Access Manager](https://smoke.iam.forgeops.com/am/XUI/#login/)
+* [IDM admin console](https://smoke.iam.forgeops.com/admin/#dashboard/0)
 * [End user UI](https://smoke.iam.forgeops.com/enduser/#/dashboard)
 
 ## TODO
