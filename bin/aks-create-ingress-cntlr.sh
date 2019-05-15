@@ -26,15 +26,21 @@ else
  IP_OPTS="--set controller.service.loadBalancerIP=$1"
 fi
 
+if [ -z $AKS_IP_RESOURCE_GROUP_NAME ]; then
+ IP_GROUP_OPTS=""
+else
+ IP_GROUP_OPTS="--set controller.service.annotations.'service\.beta\.kubernetes\.io/azure-load-balancer-resource-group'=${AKS_IP_RESOURCE_GROUP_NAME}"
+fi
+
 helm install --namespace nginx --name nginx \
   --set rbac.create=true \
   --set controller.publishService.enabled=true \
   --set controller.stats.enabled=true \
   --set controller.service.externalTrafficPolicy=Local \
   --set controller.service.type=LoadBalancer \
-  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=${AKS_IP_RESOURCE_GROUP_NAME} \
   --set controller.image.tag="0.21.0" \
-   $IP_OPTS stable/nginx-ingress
+   $IP_OPTS $IP_GROUP_OPTS stable/nginx-ingress
 
+#  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=${AKS_IP_RESOURCE_GROUP_NAME} \
 #--set controller.image.tag="0.17.1"
 #--set enable-dynamic-configuration=false \
