@@ -1,6 +1,22 @@
-namespace: small
+kind: ""
+apiversion: ""
+namespace: prod
+# namespace: alex
 bases:
-- ../dev
-- ../../ig
+- ../../frconfig
+- ../../ds/idrepo
+- ../../ds/cts
+- ../../am
+- ../../config-util
+- ../../idm
+- ../../end-user-ui
+- ../../cert-manager/lets-encrypt
+- ../../ingress
+# - ../../ig
 patchesStrategicMerge:
-- ig.yaml
+- platform-config.yaml
+# - ds-cts.yaml
+# - ds-idrepo.yaml
+- am.yaml
+- idm.yaml
+# - ig.yaml

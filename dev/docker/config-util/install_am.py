@@ -91,7 +91,7 @@ def configure():
 
 
 def wait_for_am():
-    print("Waiting for AM and idrepo to boot up")
+    print("Waiting for AM and ds-idrepo to boot up")
     ready = False
     while not ready:
         try:

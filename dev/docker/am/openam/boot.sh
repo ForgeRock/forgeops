@@ -4,17 +4,17 @@
 
 TEST_DN="ou=sunIdentityRepositoryService,ou=services,ou=am-config"
 
-# First we wait for idrepo to be up
+# First we wait for ds-idrepo to be up
 
-echo "Waiting for idrepo to be available. Trying ds-idrepo:8080/alive endpoint"
+echo "Waiting for ds-idrepo to be available. Trying ds-idrepo:8080/alive endpoint"
 while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ds-idrepo:8080/alive)" != "200" ]]; 
 do 
         sleep 5; 
 done
-echo "idrepo is responding"
+echo "ds-idrepo is responding"
 
 # Test the configstore to see if it contains a configuration. Return 0 if configured.
-# This is not currently foolproof - it the idrepo is not started yet the ldap search will also fail. This
+# This is not currently foolproof - it the ds-idrepo is not started yet the ldap search will also fail. This
 # can result in util installer running again - which in most cases is fine - it will refresh the configuraition.
 
 SVC="ou=services,$BASE_DN"

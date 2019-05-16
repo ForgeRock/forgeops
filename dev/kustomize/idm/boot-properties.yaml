@@ -26,7 +26,7 @@ data:
     openidm.port.http=8080
     openidm.port.https=8443
     openidm.port.mutualauth=8444
-    openidm.host=default.iam.forgeops.com
+    # openidm.host=&{fqdn}   It's not required since it's referenced in docker/idm/conf/jetty.xml
 
     # Define external load balancer ports.
     openidm.lb.port.http=80
