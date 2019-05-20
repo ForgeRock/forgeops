@@ -1,17 +1,21 @@
-namespace: lee
+namespace: prod
 bases:
   - ../../frconfig
   - ../../ingress
   - ../../cert-manager/ca-issuer
-  #- ../../ig
   - ../../ds/cts-medium
   - ../../ds/idrepo-medium
   - ../../am
+  - ../../ig
   #- ../../amster/base
-  - ../../end-user-ui
-  - ../../idm
+  #- ../../end-user-ui
+  #- ../../idm
   - ../../config-util
 patchesStrategicMerge:
-  #- ig.yaml
   - am.yaml
-  #- amster.yaml
+#  - am-configmap.yaml
+  - ig.yaml
+  - platform-config.yaml
+  #- end-user-ui.yaml
+  
+  

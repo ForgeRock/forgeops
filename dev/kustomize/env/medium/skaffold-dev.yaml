@@ -2,8 +2,8 @@ apiVersion: skaffold/v1beta8
 kind: Config
 build:
   artifacts:
-#  - image: ig
-#    context: ../../../docker/ig
+  - image: ig
+    context: ../../../docker/ig
 #  - image: amster
 #    context: ../../../docker/amster
   - image: am
@@ -12,8 +12,8 @@ build:
     context: ../../../docker/ds/idrepo
   - image: ds-cts
     context: ../../../docker/ds/cts
-  - image: idm
-    context: ../../../docker/idm
+  #- image: idm
+  #  context: ../../../docker/idm
   - image: config-util
     context: ../../../docker/config-util
   tagPolicy:

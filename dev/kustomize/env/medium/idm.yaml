@@ -1,18 +1,19 @@
 apiVersion: apps/v1beta1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: am
+  name: idm
 spec:
   replicas: 1
   template:
     spec:
       containers:
-      - name: openam
+      - name: openidm
         imagePullPolicy: Always
         resources:
           limits:
-            cpu: 12000m
-            memory: 11Gi
+            cpu: 1000m
+            memory: 900Mi
           requests:
-            cpu: 11000m
-            memory: 8Gi
+            cpu: 300m
+            memory: 800Mi
+
