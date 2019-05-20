@@ -3,3 +3,4 @@ bases:
 - ../cts
 patchesStrategicMerge:
 - cts.yaml
+- cts-configmap.yaml

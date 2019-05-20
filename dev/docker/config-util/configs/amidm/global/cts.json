@@ -17,7 +17,7 @@
         },
         "amconfig.org.forgerock.services.cts.store.external.section": {
             "org.forgerock.services.cts.store.ssl.enabled": false,
-            "org.forgerock.services.cts.store.directory.name": "ds-cts:1389",
+            "org.forgerock.services.cts.store.directory.name": "ds-cts-0.ds-cts:1389",
             "org.forgerock.services.cts.store.loginid": "uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens",
             "org.forgerock.services.cts.store.password": "password",
             "org.forgerock.services.cts.store.heartbeat": 10,

@@ -3,3 +3,4 @@ bases:
 - ../idrepo
 patchesStrategicMerge:
 - idrepo.yaml
+- idrepo-configmap.yaml

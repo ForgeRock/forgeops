@@ -59,13 +59,13 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : null,
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Confidential",
       "scopes" : [ "mail", "employeenumber" ],
+      "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ ],
       "status" : "Active"

@@ -1,6 +1,7 @@
 
 # Nightly build
-FROM gcr.io/forgerock-io/am/docker-build:7.0.0-latest-postcommit
+#FROM gcr.io/forgerock-io/am/docker-build:7.0.0-latest-postcommit
+FROM gcr.io/forgerock-io/am/pit1:7.0.0-45e3f2728b
 
 # BEGIN - temporary work around for testing if the ds-idrepo is configured before AM starts. Remove when FBC is integrated
 USER root
