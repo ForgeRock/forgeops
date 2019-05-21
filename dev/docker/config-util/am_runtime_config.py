@@ -133,7 +133,7 @@ class AMConfig(object):
             self.put(url, data, self.admin_headers_crest2)
 
     def import_auth_modules(self):
-        dir = f'{self.config_dir}/realm_auth'
+        dir = f'{self.config_dir}/chains'
         for filename in os.listdir(dir):
             data = self.read_json_full(f'{dir}/{filename}', self.fqdn)
             _chainId = data['data']['_id']
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     print(f'Doing minimal AM config using {am_cfg_folder} with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url, am_fqdn, am_cfg_folder)
     cfg.import_global_configs()
-    #cfg.import_auth_modules()
+    #cfg.import_auth_chains()
     cfg.import_realm_config()
     cfg.import_oauth2_configs()
     cfg.import_policies()
