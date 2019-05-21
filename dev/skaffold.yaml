@@ -45,3 +45,23 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/smoke
+- name: medium
+  build:
+    artifacts:
+    - image: ig
+      context: docker/ig
+    - image: am
+      context: docker/am
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: idm
+      context: docker/idm
+    - image: config-util
+      context: docker/config-util
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/medium

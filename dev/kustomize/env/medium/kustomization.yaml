@@ -6,13 +6,11 @@ bases:
   - ../../ds/cts-medium
   - ../../ds/idrepo-medium
   - ../../am
-  #- ../../ig
   - ../../end-user-ui
   - ../../idm
   - ../../config-util
 patchesStrategicMerge:
   - am.yaml
-  #- ig.yaml
   - platform-config.yaml
   
   
