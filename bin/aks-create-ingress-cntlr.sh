@@ -23,7 +23,7 @@ echo -e "\tStatic IP resource group = ${AKS_IP_RESOURCE_GROUP_NAME}"
 if [ -z $AKS_INGRESS_IP ]; then
  IP_OPTS=""
 else
- IP_OPTS="--set controller.service.loadBalancerIP=$1"
+ IP_OPTS="--set controller.service.loadBalancerIP=${AKS_INGRESS_IP}"
 fi
 
 if [ -z $AKS_IP_RESOURCE_GROUP_NAME ]; then
@@ -32,7 +32,7 @@ else
  IP_GROUP_OPTS="--set controller.service.annotations.'service\.beta\.kubernetes\.io/azure-load-balancer-resource-group'=${AKS_IP_RESOURCE_GROUP_NAME}"
 fi
 
-helm install --namespace nginx --name nginx \
+helm upgrade -i nginx --namespace nginx \
   --set rbac.create=true \
   --set controller.publishService.enabled=true \
   --set controller.stats.enabled=true \
@@ -41,6 +41,3 @@ helm install --namespace nginx --name nginx \
   --set controller.image.tag="0.21.0" \
    $IP_OPTS $IP_GROUP_OPTS stable/nginx-ingress
 
-#  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=${AKS_IP_RESOURCE_GROUP_NAME} \
-#--set controller.image.tag="0.17.1"
-#--set enable-dynamic-configuration=false \
