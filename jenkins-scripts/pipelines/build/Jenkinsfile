@@ -9,6 +9,7 @@ buildDirectories = [
     [ name: 'gatling',          forceBuild: false ],
     [ name: 'git',              forceBuild: false ],
     [ name: 'java',             forceBuild: false ],
+    [ name: 'java-11',          forceBuild: false ],
     [ name: 'util',             forceBuild: false ],
 ]
 

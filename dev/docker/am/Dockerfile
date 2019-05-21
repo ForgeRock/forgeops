@@ -25,7 +25,7 @@ COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
 # fixed by K8S by restarting the pod - but it can take a couple of minutes.
 
 # This copies in the boot.json and other files...
-# COPY --chown=forgerock:root openam /home/forgerock/openam
+COPY --chown=forgerock:root openam /home/forgerock/openam
 
 # Override the entrypoint and just start tomcat
 #CMD ["catalina.sh", "run"]
