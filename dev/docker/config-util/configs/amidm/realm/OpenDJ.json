@@ -34,7 +34,7 @@
       "sun-idrepo-ldapv3-config-inactive" : "Inactive"
     },
     "ldapsettings" : {
-      "sun-idrepo-ldapv3-config-connection_pool_max_size" : 10,
+      "sun-idrepo-ldapv3-config-connection_pool_max_size" : 50,
       "openam-idrepo-ldapv3-behera-support-enabled" : true,
       "sun-idrepo-ldapv3-config-authid" : "uid=am-identity-bind-account,ou=admins,ou=identities",
       "openam-idrepo-ldapv3-proxied-auth-enabled" : false,

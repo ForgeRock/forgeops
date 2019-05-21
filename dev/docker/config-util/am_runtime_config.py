@@ -31,7 +31,10 @@ class AMConfig(object):
             "KeyStoreSecretStore": "global-config/secrets/stores/KeyStoreSecretStore",
             "FileSystemSecretStore": "global-config/secrets/stores/FileSystemSecretStore",
             "CtsDataStoreProperties": "global-config/servers",
-            "DefaultCtsDataStoreProperties": "global-config/servers/server-default/properties/cts"
+            "DefaultCtsDataStoreProperties": "global-config/servers/server-default/properties/cts",
+            "Authentication": "global-config/authentication",
+            "DefaultAdvancedProperties": "global-config/servers/server-default/properties/advanced",
+            "neoLdapService": "realms/root/realm-config/authentication/modules/ldap/neoLdapService"      
         }
 
     # UTILITY METHODS
@@ -112,8 +115,9 @@ class AMConfig(object):
             id = _type['_id']
             name = _type['name']
             if id == "LDAPv3ForOpenDS":
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data,
-                         self.admin_headers)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data, self.admin_headers)
+            elif name == "Core":
+                self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers)
             else:
                 self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}', data, self.admin_headers_crest2)
             # TODO: More error checking here...
@@ -127,6 +131,21 @@ class AMConfig(object):
             id = data['_id']
             url = f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}'
             self.put(url, data, self.admin_headers_crest2)
+
+    def import_auth_modules(self):
+        dir = f'{self.config_dir}/realm_auth'
+        for filename in os.listdir(dir):
+            data = self.read_json_full(f'{dir}/{filename}', self.fqdn)
+            _chainId = data['data']['_id']
+            _chainConfig = data['data']['authChainConfiguration']
+            url = f'{self.am_url}/json/realms/root/realm-config/authentication'
+            # Create chain
+            post(f'{url}/chains?_action=create', json={"_id" : _chainId}, headers=self.admin_headers)
+            # Update chain configuration
+            put(f'{url}/chains/{_chainId}', json={"authChainConfiguration": _chainConfig}, headers=self.admin_headers)
+            # if filename == "Authentication.json":
+            #     self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers)
+            
 
     def import_global_configs(self):
         dir = f'{self.config_dir}/global'
@@ -168,6 +187,7 @@ if __name__ == '__main__':
     print(f'Doing minimal AM config using {am_cfg_folder} with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url, am_fqdn, am_cfg_folder)
     cfg.import_global_configs()
+    #cfg.import_auth_modules()
     cfg.import_realm_config()
     cfg.import_oauth2_configs()
     cfg.import_policies()
