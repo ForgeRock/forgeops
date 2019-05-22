@@ -11,9 +11,11 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: 1Gi
+              memory: 8Gi
+              cpu: 2000m
             limits:
-              memory: 2Gi
+              memory: 11Gi
+              cpu: 8000m
   volumeClaimTemplates:
   - metadata:
       name: data
