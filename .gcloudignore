@@ -2,3 +2,5 @@
 !/dev
 .git
 tmp/
+ __pycache__/
+ *.pyc

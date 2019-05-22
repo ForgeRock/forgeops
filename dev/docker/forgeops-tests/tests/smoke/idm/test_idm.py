@@ -4,7 +4,7 @@ Test are sorted automatically so that's why it's needed to keep test_0[1,2,3]_ n
 """
 
 # Lib imports
-from requests import get, post, put, delete, session
+from requests import get, post, put, delete, session, patch
 
 # Framework imports
 from ProductConfig import IDMConfig
@@ -43,17 +43,10 @@ class TestIDM(object):
                                                  'If-Match': '*'})
 
         user_id = self.idmcfg.get_userid_by_name(self.testuser)
-        payload = """{"userName": "forgeops-testuser",
-                          "telephoneNumber": "6669876987",
-                          "givenName": "devopsguy",
-                          "description": "Just another user",
-                          "sn": "sutter",
-                          "mail": "rick@example.com",
-                          "password": "Th3RealPassword",
-                          "accountStatus": "active" } """
+        payload = """[{"operation":"replace", "field":"/telephoneNumber", "value":"15031234567"}]"""
 
         logger.test_step('Update test user')
-        response = put(verify=self.idmcfg.ssl_verify, url=f'{self.idmcfg.rest_managed_user_url}/{user_id}',
+        response = patch(verify=self.idmcfg.ssl_verify, url=f'{self.idmcfg.rest_managed_user_url}/{user_id}',
                         headers=headers, data=payload)
         rest.check_http_status(response, expected_status=200)
 

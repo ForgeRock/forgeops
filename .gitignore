@@ -25,3 +25,4 @@ etc/cert-manager.json
 /dev/skaffold-dev.yaml
 /medium/skaffold-dev.yaml
 /small/skaffold-dev.yaml
+ __pycache__/
