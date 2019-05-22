@@ -1,7 +1,7 @@
 kind: ""
 apiversion: ""
-# namespace: prod
-namespace: alex
+namespace: prod
+# namespace: alex
 bases:
 - ../../frconfig
 - ../../ds/idrepo-small
