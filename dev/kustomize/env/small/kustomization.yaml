@@ -1,11 +1,11 @@
 kind: ""
 apiversion: ""
-namespace: prod
-# namespace: alex
+# namespace: prod
+namespace: alex
 bases:
 - ../../frconfig
-- ../../ds/idrepo
-- ../../ds/cts
+- ../../ds/idrepo-small
+- ../../ds/cts-small
 - ../../am
 - ../../config-util
 - ../../idm
@@ -15,8 +15,6 @@ bases:
 # - ../../ig
 patchesStrategicMerge:
 - platform-config.yaml
-# - ds-cts.yaml
-# - ds-idrepo.yaml
 - am.yaml
 - idm.yaml
 # - ig.yaml

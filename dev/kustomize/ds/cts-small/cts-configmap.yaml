@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds
+data:
+  OPENDJ_JAVA_ARGS: '-server -Xms3g -Xmx3g -XX:+UseCompressedOops -XX:+UseG1GC -XX:+UseNUMA
+  -XX:MaxGCPauseMillis=100 -verbose:gc -Xlog:gc:/tmp/gc.log'
