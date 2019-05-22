@@ -8,8 +8,8 @@ BASE_VERSION = '7.0.0'
 buildDirectories = [
     [ name: 'gatling',          forceBuild: false ],
     [ name: 'git',              forceBuild: false ],
-    [ name: 'java',             forceBuild: false ],
-    [ name: 'java-11',          forceBuild: false ],
+    [ name: 'java',             forceBuild: true ],
+    [ name: 'java-11',          forceBuild: true ],
     [ name: 'util',             forceBuild: false ],
 ]
 

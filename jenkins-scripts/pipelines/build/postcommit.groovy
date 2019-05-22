@@ -10,7 +10,10 @@ import com.forgerock.pipeline.Build
 
 def build() {
 
-    properties([buildDiscarder(logRotator(numToKeepStr: '20'))])
+    properties([
+        buildDiscarder(logRotator(numToKeepStr: '20')),
+        pipelineTriggers([cron('@daily')])
+    ])
 
     def postcommitBuild = new Build(steps, env, currentBuild)
     def slackChannel = '#cloud-deploy-notify'
