@@ -18,18 +18,16 @@ Familiarity with Kubernetes / Minikube is assumed.
 * Install [skaffold](https://skaffold-latest.firebaseapp.com/) and [kustomize](https://kustomize.io/). On a mac:
    `brew install skaffold kustomize`
 * kubens / kubectx are not required but super handy:  `brew install kubectx`
-* Start minikube: `minikube start --memory 8196` 
+* Start minikube: `minikube start --memory 8196`.  8 GB of RAM is recommended.
 * Make sure the ingress add-on is enabled: `minikube addons enable ingress`
 * Install cert-manager by running this script:  `3rdparty/cert-manager.sh`
-* Add an entry in /etc/hosts for `default.iam.example.com` that points to your ingress ip (`minikube ip`, for example)
+* Add an entry in /etc/hosts for `default.iam.example.com` that points to your ingress ip (`minikube ip`, for example).
 
 ## Quick Start
 
-When starting minikube, make sure it gets enough memory. For example:
-`minikube start --memory=8192 --disk-size=30g --vm-driver=virtualbox --bootstrapper kubeadm --kubernetes-version=v1.13.2`
 
-After starting minikube for the first time, enable the built-in ingress controller plugin:
-`minikube addons enable ingress`
+Note: minikube has an outstanding bug where pods can not reach themselves. AM sometimes tries
+to call back to it's own JWKKS endpoint.  This will still work - but it will be slow.
 
 Each time you start minikube, enable the workaround for the bug in loopback networking,
 and point docker at your minikube daemon:
@@ -47,11 +45,6 @@ Run the following command in this directory:
 This will bring up AM, IDM and the idrepo (DS). Open https://default.iam.example.com/am in your browser. AM will
 protect IDM. You can access the IDM admin console at: https://default.iam.example.com/admin/
 
-Note: minikube has an outstanding bug where pods can not reach themselves. AM sometimes tries
-to call back to it's own JWKKS endpoint.  This will still work - but it will be slow. To 
-work around this bug, issue the following command:
-
-`minikube ssh "sudo ip link set docker0 promisc on"`
 
 ## Quick Start - GKE using default.iam.forgeops.com
 
