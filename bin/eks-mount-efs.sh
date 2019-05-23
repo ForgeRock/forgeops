@@ -39,9 +39,8 @@ for ip in ${EXTERNAL_IPS}
 do
     ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${ip} /bin/bash <<EOF
         sudo mount -t nfs ${EFS_ID}.efs.${REGION}.amazonaws.com: /mnt
-        if [ ! -d '/mnt/export' ]; then
-            sudo mkdir /mnt/export
-            sudo mkdir /mnt/export/bak
+        if [ ! -d '/mnt/export/bak' ]; then
+            sudo mkdir -p /mnt/export/bak
         fi
         echo -e "Worker node ${ip} mounted to EFS \n"
 EOF
