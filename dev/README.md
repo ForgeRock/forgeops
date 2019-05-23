@@ -1,26 +1,29 @@
-# Development Configurations using Skaffold and Kustomize
+# ForgeOps Deployment using Skaffold and Kustomize
 
 NOTE: This is a work in progress, For the 7.0.0 release, this folder will contain one or more platform samples.
 
-These skaffold and kustomize artifacts in this folder provide an environment for
+These skaffold and kustomize artifacts provide an environment for
 rapid and iterative development of configurations.  `skaffold dev` is used during development,
 and will continually redeploy changes as they are made.
 
-When assets are ready to be tested in QA or production, `skaffold run` is used to deploy the configurations.
-Typically this will be a CD process triggered from a git commit or pull request.
-
-## Limitations - READ THIS
-
-* Currently this is aimed at iterative development - not a production deployment.
-* AM file based configuration is a work in progress. See docker/am-fbc/README.md
+When assets are ready to be tested in QA or production, `skaffold run` deploys the final configurations.
+Typically this will be a CD process triggered from a git commit or a pull request.
 
 ## SETUP - READ THIS FIRST
 
-* Install [skaffold](https://skaffold-latest.firebaseapp.com/) and [kustomize](https://kustomize.io/)
-* Install cert-manager:  `3rdparty/cert-manager.sh`
+Familiarity with Kubernetes / Minikube is assumed.
+
+* Install [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+* Install the Kubernetes Client. Using a mac:  `brew install kubernetes-cli`
+* Install [skaffold](https://skaffold-latest.firebaseapp.com/) and [kustomize](https://kustomize.io/). On a mac:
+   `brew install skaffold kustomize`
+* kubens / kubectx are not required but super handy:  `brew install kubectx`
+* Start minikube: `minikube start --memory 8196` 
+* Make sure the ingress add-on is enabled: `minikube addons enable ingress`
+* Install cert-manager by running this script:  `3rdparty/cert-manager.sh`
 * Add an entry in /etc/hosts for `default.iam.example.com` that points to your ingress ip (`minikube ip`, for example)
 
-## Quick Start - minikube
+## Quick Start
 
 When starting minikube, make sure it gets enough memory. For example:
 `minikube start --memory=8192 --disk-size=30g --vm-driver=virtualbox --bootstrapper kubeadm --kubernetes-version=v1.13.2`
@@ -43,6 +46,12 @@ Run the following command in this directory:
 
 This will bring up AM, IDM and the idrepo (DS). Open https://default.iam.example.com/am in your browser. AM will
 protect IDM. You can access the IDM admin console at: https://default.iam.example.com/admin/
+
+Note: minikube has an outstanding bug where pods can not reach themselves. AM sometimes tries
+to call back to it's own JWKKS endpoint.  This will still work - but it will be slow. To 
+work around this bug, issue the following command:
+
+`minikube ssh "sudo ip link set docker0 promisc on"`
 
 ## Quick Start - GKE using default.iam.forgeops.com
 
@@ -120,5 +129,22 @@ Once deployed, the following URLs are available:
 ## TODO
 
 * Create AM file based config process. See am-fbc/
-* The fqdn needs to be updated in the various configurations. For now - use sed, etc. but we need to a good procedure for
-   setting environmental parameters
+
+## How this works
+
+TL;DR - You should really read the skaffold and kustomize documentation, but in a nutshell
+here is what is happening:
+
+* Skaffold does a docker build of images found in the docker/ folder.
+* These docker images inherit FROM a generic base image (am, idm ,etc.) that contains the product binary. The specific configuration of the product is then COPYed into the new child image. For example, for IDM, the conf/*.json files are 
+  bundled into the final docker image.
+* Skaffold tags the image with a unique tag (sha256 or a git commit). This ensures images are completely unique
+  and reproducible.
+* Skaffold optionally pushes those images to a registry. If you are on minikube a push is not required as the
+   images are built direct to minikube.
+* Skaffold deploys the images using Kustomize configurations found in the `kustomize/` folder. The
+  `kustomize/env/` folder (environments) is the top level Kustomization that assembles the product Kustomizations into a 
+   a complete deployment.
+* In "dev" mode -this cycle is repeated as changes are made to any files in the dev/ folder. Once the first iteration is complete,
+ subsequent updates are usually very fast. In most cases, a rolling deployment will occur - where the old docker images
+ are spun down and replaced with the updated image.
