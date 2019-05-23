@@ -11,6 +11,8 @@ bases:
   - ../../config-util
 patchesStrategicMerge:
   - am.yaml
+  - am-configmap.yaml
+  - idm.yaml
   - platform-config.yaml
   
   
