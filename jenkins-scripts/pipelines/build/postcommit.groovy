@@ -47,7 +47,8 @@ def build() {
 }
 
 boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
-    return forceBuild || BUILD_NUMBER == '1' || scmUtils.changesInFolder("docker/${directoryName}")
+    return forceBuild || BUILD_NUMBER == '1' ||
+            scmUtils.directoryContentsHaveChangedSincePreviousBuild("docker/${directoryName}")
 }
 
 void buildImage(String directoryName) {

@@ -16,6 +16,9 @@ def build() {
     def bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
 
     try {
+        def repoUrl = "${scm.getRepositoryByName('origin').getURIs()[0]}"
+        scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, repoUrl)
+
         for (buildDirectory in buildDirectories) {
             if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
                 stage ("Build ${buildDirectory['name']} image") {
@@ -45,7 +48,8 @@ def build() {
 // Since it's not straightforward to detect changes between the PR branch and master, on the first PR build
 // we build everything. This can be disabled by temporarily commenting various lines out of buildDirectories.
 boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
-    return forceBuild || BUILD_NUMBER == '1' || scmUtils.changesInFolder("docker/${directoryName}")
+    return forceBuild || BUILD_NUMBER == '1' ||
+            scmUtils.directoryContentsHaveChangedComparedToBranch(env.CHANGE_TARGET, "docker/${directoryName}")
 }
 
 void buildImage(String directoryName) {
