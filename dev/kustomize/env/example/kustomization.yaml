@@ -1,5 +1,21 @@
+# This deploys to default.iam.example.com. It uses the ca-issuer 
+# for self signed SSL certs. It is suitable for local minikube development
 namespace: default
 bases:
 - ../dev
 patchesStrategicMerge:
   - platform-config.yaml
+# This patches the ingress object to use the ca-issuer instead of the letsencrypt-prod
+patchesJson6902:
+  - target:
+      group: extensions
+      version: v1beta1
+      kind: Ingress
+      name: forgerock
+    path: ingress_patch.json
+  - target:
+      group: extensions
+      version: v1beta1
+      kind: Ingress
+      name: end-user-ui
+    path: ingress_patch.json

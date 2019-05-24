@@ -1,3 +1,4 @@
+# Deploys to default.iam.forgeops.com. Uses the LE issuer for SSL.
 namespace: default
 bases:
   - ../../frconfig
@@ -7,7 +8,6 @@ bases:
   - ../../config-util
   - ../../idm
   - ../../end-user-ui
-  - ../../cert-manager/lets-encrypt
   - ../../ingress
 patchesStrategicMerge:
   - platform-config.yaml

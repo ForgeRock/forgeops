@@ -1,0 +1,16 @@
+kind: Kustomization
+namespace: cert-manager
+resources:
+# Note - we deploy the Let's encrypt issuer separately - for
+# environments that do not have LE support.
+# - le-issuer.yaml
+- ca-issuer.yaml
+secretGenerator:
+- name: certmanager-ca-secret
+  namespace: cert-manager
+  files:
+    - secret/tls.crt
+    - secret/tls.key
+  type: "kubernetes.io/tls"
+generatorOptions:
+    disableNameSuffixHash: true

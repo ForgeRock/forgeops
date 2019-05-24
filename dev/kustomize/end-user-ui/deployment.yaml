@@ -3,9 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app.kubernetes.io/instance: end-user-ui
-    app.kubernetes.io/managed-by: Tiller
     app.kubernetes.io/name: end-user-ui
-    helm.sh/chart: end-user-ui-0.1.0
   name: end-user-ui
 spec:
   replicas: 1
