@@ -329,6 +329,10 @@
                         "type": "simple",
                         "ldapAttribute": "fr-idm-uuid"
                     },
+                    "_rev": {
+                        "type": "simple",
+                        "ldapAttribute": "etag"
+                    },
                     "userName": {
                         "type": "simple",
                         "ldapAttribute": "uid"

@@ -6,6 +6,9 @@ build:
     context: docker/am
   - image: config-util
     context: docker/config-util
+  # Uncomment this if you want to use amster instead of config-util
+  # - image: amster
+  #   context: docker/amster
   - image: idm
     context: docker/idm
   - image: ds-cts

@@ -41,7 +41,7 @@ properties = {
     'DS_DIRMGRDN': 'uid=admin',
     'DIRECTORY_SSL': 'SIMPLE',
     'DATA_STORE': 'external',
-    'USERSTORE_TYPE': 'LDAPv3ForOpenDS',
+    'USERSTORE_TYPE': 'LDAPv3ForForgeRockIAM',
     'USERSTORE_MGRDN': 'uid=admin',
     'USERSTORE_HOST': 'ds-idrepo',
     'USERSTORE_PASSWD': 'password',

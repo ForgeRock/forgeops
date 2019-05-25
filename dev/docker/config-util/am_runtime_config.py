@@ -6,7 +6,6 @@ import time
 import argparse
 import os
 import json
-
 from requests import get, post, put
 import requests
 
@@ -94,6 +93,8 @@ class AMConfig(object):
     def put(self, url, config, headers):
         r = put(url=url, headers=headers, verify=False, json=config)
         print(f'Put url={url} status={r}')
+        if r.status_code > 300:
+            print(f'Error is {r.content} ')
 
     # Calculates the json path from the payload. 
     def type_to_url(self, payload):
@@ -114,7 +115,9 @@ class AMConfig(object):
             _type = data['_type']
             id = _type['_id']
             name = _type['name']
-            if id == "LDAPv3ForOpenDS":
+            # /am/json/realm-config/services/id-repositories/LDAPv3ForForgeRockIAM/DS%20for%20ForgeRock%20IAM
+            
+            if id.startswith("LDAPv3"):
                 self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data, self.admin_headers)
             elif name == "Core":
                 self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers)

@@ -29,7 +29,7 @@ install-openam \
    --userStoreHost "ds-idrepo" \
    --userStorePort 1389 \
    --userStoreRootSuffix "ou=identities" \
-   --userStoreType "LDAPv3ForOpenDS" \
+   --userStoreType "LDAPv3ForForgeRockIAM" \
    --policyAgentPwd "Passw0rd" \
    --pwdEncKey "C00lBeans" \
    --acceptLicense \
