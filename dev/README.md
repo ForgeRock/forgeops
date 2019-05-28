@@ -20,7 +20,8 @@ Familiarity with Kubernetes / Minikube is assumed.
 * kubens / kubectx are not required but super handy:  `brew install kubectx`
 * Start minikube: `minikube start --memory 8196`.  8 GB of RAM is recommended.
 * Make sure the ingress add-on is enabled: `minikube addons enable ingress`
-* Install cert-manager by running this script:  `3rdparty/cert-manager.sh`
+* Install cert-manager by running this script:  `../bin/deploy-cert-manager.sh` (note - if you get errors
+   run this script twice).
 * Add an entry in /etc/hosts for `default.iam.example.com` that points to your ingress ip (`minikube ip`, for example).
 
 ## Quick Start
