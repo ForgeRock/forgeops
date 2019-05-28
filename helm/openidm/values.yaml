@@ -34,9 +34,9 @@ component: openidm
 image:
   repository: gcr.io/forgerock-io/openidm
   tag: 6.5.1
-  pullPolicy: IfNotPresent
+  # pullPolicy: IfNotPresent
   # For development use Always
-  # pullPolicy: Always
+  pullPolicy: Always
 
 gitImage:
   repository: gcr.io/forgerock-io/git

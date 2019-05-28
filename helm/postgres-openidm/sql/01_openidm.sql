@@ -154,9 +154,9 @@ CREATE TABLE openidm.internalrole (
   description VARCHAR(510) DEFAULT NULL,
   temporalConstraints VARCHAR(1024) DEFAULT NULL,
   condition VARCHAR(1024) DEFAULT NULL,
+  privs TEXT DEFAULT NULL,
   PRIMARY KEY (objectid)
 );
-
 
 -- -----------------------------------------------------
 -- Table openidm.internalprivilege
