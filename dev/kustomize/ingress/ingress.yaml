@@ -43,7 +43,7 @@ spec:
       # - backend:
       #     serviceName: end-user-ui
       #     servicePort: 80
-      #   path: /enduser-ui          
+      #   path: /enduser-ui
       - backend:
           serviceName: openig
           servicePort: 80
@@ -78,4 +78,3 @@ spec:
   - hosts:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert
-

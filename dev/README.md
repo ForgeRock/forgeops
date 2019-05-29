@@ -130,15 +130,22 @@ TL;DR - You should really read the skaffold and kustomize documentation, but in 
 here is what is happening:
 
 * Skaffold does a docker build of images found in the docker/ folder.
-* These docker images inherit FROM a generic base image (am, idm ,etc.) that contains the product binary. The specific configuration of the product is then COPYed into the new child image. For example, for IDM, the conf/*.json files are 
+* These docker images inherit FROM a generic base image (am, idm ,etc.) that contains the product binary. The specific configuration of the product is then COPYed into the new child image. For example, for IDM, the conf/*.json files are
   bundled into the final docker image.
 * Skaffold tags the image with a unique tag (sha256 or a git commit). This ensures images are completely unique
   and reproducible.
 * Skaffold optionally pushes those images to a registry. If you are on minikube a push is not required as the
    images are built direct to minikube.
 * Skaffold deploys the images using Kustomize configurations found in the `kustomize/` folder. The
-  `kustomize/env/` folder (environments) is the top level Kustomization that assembles the product Kustomizations into a 
+  `kustomize/env/` folder (environments) is the top level Kustomization that assembles the product Kustomizations into a
    a complete deployment.
 * In "dev" mode -this cycle is repeated as changes are made to any files in the dev/ folder. Once the first iteration is complete,
  subsequent updates are usually very fast. In most cases, a rolling deployment will occur - where the old docker images
  are spun down and replaced with the updated image.
+
+## Troubleshooting
+
+* Problem: `skaffold dev` complains that it does not have permissions to push a docker image. It attempts to push
+   an image to the docker hub. Solution: Skaffold
+   assumes certain contexts are local, and does not perform a push. Make sure your minikube context is named `minikube`. An alternate solution
+   is to modify the docker build to set local.push to false. See the skaffold.dev documentation.

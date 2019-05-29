@@ -35,9 +35,8 @@ if [[ "${PROVIDER}" == "gce" ]]; then
   # Create secret so the Cluster Issuer can gain access to CloudDNS
   kubectl create secret generic clouddns --from-file=../etc/cert-manager/cert-manager.json -n cert-manager
 
-  kubectl apply -n cert-manager -f ../etc/cert-manager/le-issuer.yaml 
+  kubectl apply -n cert-manager -f ../etc/cert-manager/le-issuer.yaml
 
   # Delete decrypted service account
   rm -f ../etc/cert-manager/cert-manager.json || true
 fi
-
