@@ -12,6 +12,7 @@ spec:
           resources:
             requests:
               memory: 3Gi
+              cpu: 2000m
             limits:
               memory: 5Gi
   volumeClaimTemplates:

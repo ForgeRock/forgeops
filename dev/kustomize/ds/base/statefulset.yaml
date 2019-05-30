@@ -37,6 +37,7 @@ spec:
           resources:
             requests:
               memory: 512Mi
+              cpu: 250m
             limits:
               memory: 768Mi
           volumeMounts:
@@ -76,8 +77,10 @@ spec:
           resources:
             requests:
               memory: 512Mi
+              cpu: 250m
             limits:
               memory: 768Mi
+              cpu: 2000m
           volumeMounts:
             - mountPath: /opt/opendj/data
               name: data

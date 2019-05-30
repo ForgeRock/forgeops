@@ -43,6 +43,7 @@ spec:
             memory: 1000Mi
           requests:
             memory: 900Mi
+            cpu: 250m
         volumeMounts:
         - name: am-boot-secrets
           mountPath: /var/run/secrets/am/boot
