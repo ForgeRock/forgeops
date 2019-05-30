@@ -1,4 +1,4 @@
-{{ if .Values.createPVCs }} 
+{{ if .Values.createPVC }} 
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -11,7 +11,7 @@ metadata:
 spec:
   capacity:
     storage: 1Ti
-  storageClassName: efs
+  storageClassName: nfs
   persistentVolumeReclaimPolicy: Retain
   accessModes: [ ReadWriteMany ]
   nfs:

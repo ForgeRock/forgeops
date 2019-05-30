@@ -42,8 +42,13 @@ parameters:
   type: io1
   fstype: ext4
   iopsPerGB: "10"
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: nfs
+provisioner: kubernetes.io/aws-efs
 EOF
-
 
 kubectl patch storageclass standard -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 

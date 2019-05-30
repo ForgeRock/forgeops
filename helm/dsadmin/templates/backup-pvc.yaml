@@ -10,12 +10,12 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs
+  storageClassName: nfs
   selector:
     matchLabels:
       bucket: backup
   resources:
     requests:
       storage: {{ .Values.backup.storageSize }}
-  storageClassName: efs
+  storageClassName: nfs
 {{ end }}
