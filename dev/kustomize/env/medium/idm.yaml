@@ -10,10 +10,10 @@ spec:
       - name: openidm
         imagePullPolicy: Always
         resources:
-        limits:
-          cpu: 10000m
-          memory: 6Gi
-        requests:
-          cpu: 2000m
-          memory: 4Gi
+          limits:
+            cpu: 10000m
+            memory: 6Gi
+          requests:
+            cpu: 2000m
+            memory: 4Gi
 
