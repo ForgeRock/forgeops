@@ -40,8 +40,7 @@ IP=$(echo $EXTERNAL_IPS | cut -d' ' -f1 )
 
 ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${IP} /bin/bash <<EOF
     sudo mount -t nfs ${EFS_ID}.efs.${REGION}.amazonaws.com: /mnt
-    if [ ! -d '/mnt/export/bak' ]; then
-        sudo mkdir -p /mnt/export/tmp
-    fi
+    sudo mkdir -p /mnt/export/tmp
+    
     echo -e "EFS activate on on worker node ${IP} \n"
 EOF
