@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: platform-config
 data:
-  FQDN: $(NAMESPACE).iam.rockforge.com
+  FQDN: $(NAMESPACE).iam.forgeops.com
   SUBDOMAIN: iam
-  DOMAIN: rockforge.com
+  DOMAIN: forgeops.com
