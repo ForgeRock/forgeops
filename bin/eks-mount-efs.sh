@@ -38,7 +38,7 @@ REGION=$(aws configure get region)
 # Get the first worker node IP from the string
 IP=$(echo $EXTERNAL_IPS | cut -d' ' -f1 )
 
-ssh -oStrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${IP} /bin/bash <<EOF
+ssh -o StrictHostKeyChecking=no -i ~/.ssh/${EC2_KEYPAIR_NAME}.pem ec2-user@${IP} /bin/bash <<EOF
     sudo mount -t nfs ${EFS_ID}.efs.${REGION}.amazonaws.com: /mnt
     sudo mkdir -p /mnt/export/tmp
     
