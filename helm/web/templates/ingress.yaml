@@ -19,7 +19,7 @@ spec:
   tls:
   - hosts:
     - {{ printf "www.%s%s" .Release.Namespace .Values.domain }}
-  secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
+    secretName: {{ printf "wildcard.%s%s" .Release.Namespace .Values.domain }}
   rules:
   - host: {{ printf "www.%s%s" .Release.Namespace .Values.domain }}
     http:
