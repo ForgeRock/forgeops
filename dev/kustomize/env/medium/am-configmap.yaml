@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: am
-data:
-  CATALINA_OPTS: '-Xms7g -Xmx7g -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Xlog:gc*:/tmp/gc.log -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider -Dcom.sun.identity.shared.debug.file.format="%PREFIX% %MSG%\\n%STACKTRACE%"'
-

@@ -3,9 +3,24 @@ kind: ConfigMap
 metadata:
   name: am
 data:
-  # This is for file based config. Suggest using overlay for this
-  # CATALINA_OPTS: '-server -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
-  #   -Dcom.sun.identity.sm.sms_object_filebased_enabled=true -Dcom.forgerock.am.fileconfig.filelocation=/home/forgerock/openam/config/services
-  #   -Dcom.iplanet.services.stats.state=off -Dorg.forgerock.donotupgrade '
-  CATALINA_OPTS: '-server -XX:+PrintFlagsFinal -XX:MaxRAMPercentage=75 -Dcom.sun.identity.configuration.directory=/home/forgerock/openam'
-
+  #
+  # -Dcom.sun.identity.sm.sms_object_filebased_enabled=true
+  # -Dcom.forgerock.am.fileconfig.filelocation=/home/forgerock/openam/config/services
+  #    -Dorg.forgerock.donotupgrade '
+  # Options:
+  # -Dcom.sun.identity.configuration.directory=/home/forgerock/openam   - sets the home directory
+  # -Xloggc:/tmp/gc.log - log gc
+  # -Dcom.sun.identity.sm.sms_object_filebased_enabled=true    - enable file based configuration
+  #
+  # Example of comlex GC logging
+  # -Xlog:gc*,gc+ref=debug,gc+heap=debug,gc+age=trace:file=/tmp/gc-%p-%t.log:tags,uptime,time,level:filecount=10,filesize=10m
+  # Options that may not longer be used:
+  #
+  #  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
+  CATALINA_OPTS: >
+    -server
+    -XX:+PrintFlagsFinal
+    -XX:MaxRAMPercentage=75
+    -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
+    -Dcom.iplanet.services.stats.state=off
+    -Xlog:gc*,gc+ref=debug,gc+heap=debug,gc+age=trace:file=/tmp/gc-%p-%t.log:tags,uptime,time,level:filecount=10,filesize=10m

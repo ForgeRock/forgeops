@@ -26,9 +26,9 @@ spec:
         resources:
           limits:
             memory: 512Mi
-            cpu: "100m"
           requests:
-            memory: 400Mi
+            memory: 512Mi
+            cpu: "100m"
         volumeMounts:
         - mountPath: /var/run/secrets/amster
           name: amster-secrets

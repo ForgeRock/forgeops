@@ -42,7 +42,7 @@ spec:
           limits:
             memory: 1000Mi
           requests:
-            memory: 900Mi
+            memory: 1000Mi
             cpu: 250m
         volumeMounts:
         - name: am-boot-secrets

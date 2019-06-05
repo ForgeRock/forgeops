@@ -12,7 +12,6 @@ spec:
       - name: ig
         resources:
           limits:
-            cpu: 1000m
             memory: 2Gi
           requests:
             cpu: 1000m

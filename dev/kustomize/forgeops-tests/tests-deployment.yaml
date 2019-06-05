@@ -11,7 +11,7 @@ spec:
     spec:
       volumes:
       - name: reports
-        emptyDir: {}    
+        emptyDir: {}
       containers:
       - name: forgeops-tests
         image: forgeops-tests
@@ -38,10 +38,10 @@ spec:
         imagePullPolicy: IfNotPresent
         resources:
           limits:
-            memory: 500Mi
-            cpu: 1 
+            memory: 250Mi
           requests:
             memory: 250Mi
+            cpu: 1
         ports:
           - containerPort: 80
         volumeMounts:

@@ -18,7 +18,8 @@ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.8
 
 
 # Allow time for operator to be deployed so CRDs are recognized
-sleep 5
+echo "Waiting for cert-manager to deploy"
+sleep 30
 
 # Deploy base cert manager Issuer
 kubectl apply -k ../etc/cert-manager
