@@ -11,11 +11,11 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: 4Gi
-              cpu: 1500m
+              memory: 21Gi
+              cpu: 4000m
             limits:
-              memory: 6Gi
-              #cpu: 3000m
+              memory: 29Gi
+              #cpu: 14000m
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -25,5 +25,5 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Gi
+          storage: 512Gi
       storageClassName: fast

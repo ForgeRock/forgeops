@@ -2,7 +2,6 @@ namespace: prod
 bases:
   - ../../frconfig
   - ../../ingress
-  - ../../cert-manager/ca-issuer
   - ../../ds/cts-medium
   - ../../ds/idrepo-medium
   - ../../am

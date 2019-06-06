@@ -4,8 +4,8 @@ namespace: prod
 # namespace: alex
 bases:
 - ../../frconfig
-- ../../ds/idrepo-small
-- ../../ds/cts-small
+- ../../ds/idrepo-large
+- ../../ds/cts-large
 - ../../am
 - ../../config-util
 - ../../idm

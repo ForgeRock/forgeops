@@ -15,7 +15,7 @@ spec:
               cpu: 2000m
             limits:
               memory: 11Gi
-              cpu: 8000m
+              #cpu: 8000m
   volumeClaimTemplates:
   - metadata:
       name: data

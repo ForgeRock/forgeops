@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: idm
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: openidm
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: 4000m
+            memory: 4Gi

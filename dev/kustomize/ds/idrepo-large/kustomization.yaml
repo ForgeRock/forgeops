@@ -1,0 +1,4 @@
+bases:
+- ../idrepo
+patchesStrategicMerge:
+- idrepo.yaml
