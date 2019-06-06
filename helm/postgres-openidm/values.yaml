@@ -26,9 +26,9 @@ postgresPassword: openidm
 
 ## Persist data
 persistence: true
-  
+
 accessMode: ReadWriteOnce
-storageClassName: standard
+#storageClass: standard
 storageSize: 8Gi
 
 

@@ -13,7 +13,9 @@ metadata:
 spec:
   accessModes:
     - {{ .Values.accessMode | quote }}
-  storageClassName:  {{ .Values.storageClassName }}
+  {{- if .Values.storageClass }}
+  storageClassName:  {{ .Values.storageClass }}
+  {{ end }}
   resources:
     requests:
       storage: {{ .Values.storageSize | quote }}
