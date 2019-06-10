@@ -3,23 +3,18 @@ kind: ConfigMap
 metadata:
   name: am
 data:
-  #
-  # -Dcom.sun.identity.sm.sms_object_filebased_enabled=true
-  # -Dcom.forgerock.am.fileconfig.filelocation=/home/forgerock/openam/config/services
-  #    -Dorg.forgerock.donotupgrade '
   # Options:
+  # -Dcom.forgerock.am.fileconfig.filelocation=/home/forgerock/openam/config/services   - let this default
+  # -Dorg.forgerock.donotupgrade  - work around to tell AM to ignore upgrade.
   # -Dcom.sun.identity.configuration.directory=/home/forgerock/openam   - sets the home directory
-  # -Xloggc:/tmp/gc.log - log gc
-  # -Dcom.sun.identity.sm.sms_object_filebased_enabled=true    - enable file based configuration
-  #
+  # -Xloggc:/tmp/gc.log - log gc - simple
+  # -Dcom.sun.identity.sm.sms_object_filebased_enabled=true    - enable file based configuration.
+  #   We set the above fbc flag in the am-fbc dockerfile
+  # -XX:+PrintFlagsFinal - useful during development to view the final flags, gc, heap size, etc.
   # Example of comlex GC logging
   # -Xlog:gc*,gc+ref=debug,gc+heap=debug,gc+age=trace:file=/tmp/gc-%p-%t.log:tags,uptime,time,level:filecount=10,filesize=10m
-  # Options that may not longer be used:
-  #
-  #  -Dcom.sun.identity.util.debug.provider=com.sun.identity.shared.debug.impl.StdOutDebugProvider
   CATALINA_OPTS: >
     -server
-    -XX:+PrintFlagsFinal
     -XX:MaxRAMPercentage=75
     -Dcom.sun.identity.configuration.directory=/home/forgerock/openam
     -Dcom.iplanet.services.stats.state=off

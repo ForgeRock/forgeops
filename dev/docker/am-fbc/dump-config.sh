@@ -8,5 +8,5 @@ pod=`kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}'`
 kubectl cp $pod:/home/forgerock ./tmp
 
 # clean up non essential files
-rm -fr ./tmp/openam/{log,debug,install.log} ./tmp/oepnam/am/{log,debug,install.log}
+rm -fr ./tmp/openam/{log,debug,install.log} ./tmp/openam/am/{log,debug,install.log}
 
