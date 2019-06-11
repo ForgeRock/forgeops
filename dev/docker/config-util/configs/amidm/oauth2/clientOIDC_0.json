@@ -3,11 +3,11 @@
     "realm" : "/",
     "amsterVersion" : "7.0.0-SNAPSHOT",
     "entityType" : "OAuth2Clients",
-    "entityId" : "clientOIDC_0.json",
+    "entityId" : "clientOIDC_0",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "clientOIDC_0.json",
+    "_id" : "clientOIDC_0",
     "signEncOAuth2ClientConfig" : {
       "idTokenEncryptionMethod" : "A128CBC-HS256",
       "jwkSet" : null,
@@ -59,7 +59,7 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : null,
+      "userpassword" : "password",
       "authorizationCodeLifetime" : 120,
       "accessTokenLifetime" : 3600,
       "defaultScopes" : [ "cn" ],

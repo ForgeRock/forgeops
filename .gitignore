@@ -26,5 +26,6 @@ etc/cert-manager.json
 /medium/skaffold-dev.yaml
 /small/skaffold-dev.yaml
  __pycache__/
- build/
+build/
 .gradle/
+key.json

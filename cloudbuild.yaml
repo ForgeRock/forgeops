@@ -1,7 +1,6 @@
-# Cloud build that is triggered from a git commit. Note: You can not run this from this directory as it
-# references the relative location 'dir'.  Consider moving this to the root folder.
+# Cloud build that is triggered from a git commit.
 steps:
-# Clean up any older deploys. 
+# Clean up any older deploys.
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   args: ['--default-repo', 'gcr.io/$PROJECT_ID', '-p', 'smoke', 'delete']
   dir: 'dev'

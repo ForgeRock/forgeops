@@ -1,0 +1,14 @@
+# Runs the gatling job against the smoke namespace
+# See docker/gatling/README.md
+#
+apiVersion: skaffold/v1beta11
+kind: Config
+build:
+  artifacts:
+  - image: gatling
+    context: docker/gatling
+  tagPolicy:
+      gitCommit: {}
+deploy:
+  kustomize:
+    path: ./kustomize/gatling
