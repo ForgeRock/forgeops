@@ -15,6 +15,9 @@ spec:
         heritage: {{ .Release.Service }}
       annotations:
         sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
+{{- with .Values.extraAnnotations }}
+{{ toYaml . | trim | indent 8 }}
+{{- end }}
     spec:
       {{- with .Values.serviceAccountName }}
       serviceAccountName: {{ . }}

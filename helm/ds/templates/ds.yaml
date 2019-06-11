@@ -34,6 +34,9 @@ spec:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+{{- with .Values.extraAnnotations }}
+{{ toYaml . | trim | indent 8 }}
+{{- end }}
       labels:
         instance: {{ .Values.instance }}
         app: {{ template "fullname" . }}
