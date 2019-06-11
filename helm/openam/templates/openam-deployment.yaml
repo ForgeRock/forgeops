@@ -3,6 +3,8 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "openam.fullname" . }}
+  labels:
+    app: {{ template "openam.name" . }}
 spec:
   replicas: {{default 1 .Values.openamReplicaCount }}
   template:
@@ -156,6 +158,9 @@ spec:
         - name: openam-root
           mountPath: /home/forgerock/openam
       {{- end }}
+{{- with .Values.extraContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       volumes:
       {{ if .Values.useConfigMapWebxml }}
       - configMap:

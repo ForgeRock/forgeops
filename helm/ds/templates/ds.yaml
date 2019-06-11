@@ -149,6 +149,9 @@ spec:
             port: metrics
           initialDelaySeconds: 60
           periodSeconds: 120
+{{- with .Values.extraContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       volumes:
       - name: dj-secrets
         secret:

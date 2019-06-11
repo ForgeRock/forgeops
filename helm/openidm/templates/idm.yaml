@@ -135,6 +135,9 @@ spec:
         - name: audit-logs
           mountPath: /opt/openidm/audit
       {{- end }}
+{{- with .Values.extraContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       volumes:
       - name: openidm-secrets
         secret:
