@@ -1,4 +1,5 @@
-FROM gcr.io/forgerock-io/ds-empty/docker-build:latest
+# Image passed pit1 test phase
+FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-latest-postcommit
 
 USER forgerock 
 
