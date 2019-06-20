@@ -3,4 +3,5 @@ kind: ConfigMap
 metadata:
   name: ds
 data:
-  OPENDJ_JAVA_ARGS: "-server -XX:+PrintFlagsFinal -XX:MaxRAMPercentage=75"
+  # -XX:+PrintFlagsFinal
+  OPENDJ_JAVA_ARGS: "-server -XX:MaxRAMPercentage=75"

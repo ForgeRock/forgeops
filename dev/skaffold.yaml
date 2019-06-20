@@ -22,10 +22,27 @@ deploy:
     path: ./kustomize/env/example
 profiles:
 # Example.forgeops deployment to default.iam.forgeops.com - uses a LE cert.
-- name: dev
+- name: gke
   deploy:
     kustomize:
       path: ./kustomize/env/dev
+# AM with File Based Config
+- name: fbc
+  build:
+    artifacts:
+    - image: am
+      context: docker/am-fbc
+    - image: config-util
+      context: docker/config-util
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: idm
+      context: docker/idm
+  deploy:
+    kustomize:
+      path: ./kustomize/env/example
 - name: smoke
   build:
     artifacts:
