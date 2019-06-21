@@ -6,7 +6,7 @@ kind: Config
 build:
   artifacts:
   - image: gatling
-    context: docker/gatling-sk
+    context: docker/gatling
   tagPolicy:
       gitCommit: {}
 deploy:
