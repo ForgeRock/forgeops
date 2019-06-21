@@ -7,6 +7,13 @@ and will continually redeploy changes as they are made.
 When assets are ready to be tested in QA or production, `skaffold run` deploys the final configurations.
 Typically this will be a CD process triggered from a git commit or a pull request.
 
+## EA Documentation
+
+Please see [here](https://ea.forgerock.com/docs/platform/devops-guide-minikube/index.html#devops-implementation-env-about-the-env)
+
+You will need a ForgeRock backstage account to access this content.
+
+
 ## SETUP - READ THIS FIRST
 
 Familiarity with Kubernetes / Minikube is assumed.

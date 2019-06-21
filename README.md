@@ -50,47 +50,11 @@ git checkout release/6.5.1
 
 ## Documentation 
 
-The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html)
+The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide-minikube/index.html#devops-implementation-env-about-the-env)
 tracks the master branch.
 
 The documentation for the current release can be found on
 [backstage](https://backstage.forgerock.com/docs/platform).
-
-## Sample Session
-
-* Knowledge of Kubernetes and Helm is assumed. Please read
-the [helm documentation](https://github.com/kubernetes/helm/blob/master/docs/index.md) before proceeding.
-* This assumes minikube is running (8G of RAM), and helm and kubectl are installed.
-* cert-manager must be installed (use the helm chart)
-* See `bin/setup.sh` and `bin/minikube-up.sh` for sample scripts.
-
-```sh
-
-cd helm/
-
-# Sample that brings up domain .example.com
-helm install -f my-custom.yaml frconfig
-helm install amster
-helm install --set instance=configstore ds
-helm install openam
-
-
-#Get your minikube ip
-minikube ip
-
-# You can put DNS entries in an entry in /etc/hosts. For example:
-# 192.168.99.100 default.iam.example.com
-
-open https://default.iam.example.com/am
-
-```
-
-## Helm values.yaml overrides.
-
-The individual charts all have parmeters which you can override to control the deployment. For example,
-setting the domain FQDN. 
-
-Please refer to the chart README.md files.
 
 
 ## Setting a namespace
@@ -110,7 +74,7 @@ Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forg
 Troubleshooting suggestions:
 
 * The script `bin/debug-log.sh` will generate an HTML file with log output. Useful for troubleshooting.
-* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script is provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
+* Simplify. Deploy a single product at a time (for example, ds), and make sure it is working correctly before deploying the next product. 
 * Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.
     2. Examine all the init containers. Did each init container complete with a zero (success) exit code? If not, examine the logs from that failed init container using `kubectl logs pod-xxx -c init-container-name`
