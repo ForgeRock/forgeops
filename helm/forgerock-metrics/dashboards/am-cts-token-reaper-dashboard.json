@@ -835,7 +835,7 @@
     "style": "dark",
     "tags": [
       "AM",
-      "6.5.1",
+      "6.5.2",
       "Prometheus"
     ],
     "templating": {
@@ -987,7 +987,7 @@
       ]
     },
     "timezone": "browser",
-    "title": "AM 6.5.1 CTS Token Reaper",
+    "title": "AM 6.5.2 CTS Token Reaper",
     "uid": "MP3-8vMiz",
     "version": 27
   },

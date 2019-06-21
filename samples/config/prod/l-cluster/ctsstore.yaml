@@ -1,7 +1,7 @@
 image:
   repository: gcr.io/forgerock-io/ds
   #repository: gcr.io/engineering-devops/ds
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
 
 instance: ctsstore

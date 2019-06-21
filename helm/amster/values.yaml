@@ -39,13 +39,13 @@ config:
 
 image:
   repository: gcr.io/forgerock-io/amster
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
 gitImage:
   repository: gcr.io/forgerock-io/git
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
 
 configStore:

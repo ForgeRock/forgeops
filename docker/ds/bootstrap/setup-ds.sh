@@ -28,14 +28,14 @@ SSL_KEYSTORE=${SECRETS}/ssl-keystore.p12
     --ldapsPort ${PORT_DIGIT}636 \
     --httpPort ${PORT_DIGIT}8080 \
     --httpsPort ${PORT_DIGIT}8443 \
-    --profile am-cts:6.5.1 \
+    --profile am-cts:6.5.2 \
     --set am-cts/amCtsAdminPassword:password \
     --set am-cts/tokenExpirationPolicy:ds \
-    --profile am-identity-store:6.5.1 \
+    --profile am-identity-store:6.5.2 \
     --set am-identity-store/amIdentityStoreAdminPassword:password \
-    --profile am-config:6.5.1 \
+    --profile am-config:6.5.2 \
     --set am-config/amConfigAdminPassword:password \
-    --profile idm-repo:6.5.1 \
+    --profile idm-repo:6.5.2 \
     --certNickname ${SSL_CERT_ALIAS} \
     --usePkcs12KeyStore ${SSL_KEYSTORE} \
     --keyStorePasswordFile ${KEYSTORE_PIN} \

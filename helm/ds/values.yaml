@@ -37,7 +37,7 @@ idmRepo:
 image:
   repository: gcr.io/forgerock-io/ds
   pullPolicy: IfNotPresent
-  tag: 6.5.1
+  tag: 6.5.2
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
 # You can not change this after installation.

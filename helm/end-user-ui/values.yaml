@@ -12,7 +12,7 @@ component: end-user-ui
 
 image:
   repository: gcr.io/forgerock-io/end-user-ui
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
 
 service:

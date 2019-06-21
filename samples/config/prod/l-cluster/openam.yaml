@@ -1,7 +1,7 @@
 image:
   #repository: gcr.io/engineering-devops/openam
   repository: gcr.io/forgerock-io/openam
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
   
 resources:

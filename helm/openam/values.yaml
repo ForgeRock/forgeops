@@ -6,18 +6,18 @@ component: openam
 
 image:
   repository: gcr.io/forgerock-io/openam
-  tag: 6.5.1
+  tag: 6.5.2
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
 
 gitImage:
   repository: gcr.io/forgerock-io/git
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
 
 utilImage:
   repository: gcr.io/forgerock-io/util
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
 
 domain: .example.com

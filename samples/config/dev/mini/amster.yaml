@@ -2,7 +2,7 @@
 #   importPath: /git/config/6.0/identity-platform-examples/am-ds
 #   exportPath: /tmp/amster
 
-# version: 6.5.1
+# version: 6.5.2
 
 # For production set CPU limits to help Kube Schedule the pods.
 resources:

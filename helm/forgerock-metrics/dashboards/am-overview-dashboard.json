@@ -1894,12 +1894,12 @@
         "linewidth": 1,
         "links": [
           {
-            "dashUri": "db/am-6-5-1-cts",
-            "dashboard": "AM 6.5.1 CTS",
+            "dashUri": "db/am-6.5.2-cts",
+            "dashboard": "AM 6.5.2 CTS",
             "includeVars": true,
             "keepTime": true,
             "targetBlank": true,
-            "title": "AM 6.5.1 CTS",
+            "title": "AM 6.5.2 CTS",
             "type": "dashboard"
           }
         ],
@@ -3198,7 +3198,7 @@
     "style": "dark",
     "tags": [
       "AM",
-      "6.5.1",
+      "6.5.2",
       "Prometheus"
     ],
     "templating": {
@@ -3298,7 +3298,7 @@
       ]
     },
     "timezone": "",
-    "title": "AM 6.5.1 Overview",
+    "title": "AM 6.5.2 Overview",
     "uid": "nO8AiJmmz",
     "version": 46
   },

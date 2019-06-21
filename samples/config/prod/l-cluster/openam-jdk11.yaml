@@ -1,6 +1,6 @@
 image:
   repository: gcr.io/engineering-devops/openam
-  tag: 6.5.1-jdk11
+  tag: 6.5.2-jdk11
   pullPolicy: Always
   
 resources:

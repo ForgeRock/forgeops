@@ -1130,7 +1130,7 @@
     "style": "dark",
     "tags": [
       "AM",
-      "6.5.1",
+      "6.5.2",
       "Prometheus"
     ],
     "templating": {
@@ -1322,7 +1322,7 @@
       ]
     },
     "timezone": "",
-    "title": "AM 6.5.1 CTS",
+    "title": "AM 6.5.2 CTS",
     "uid": "cWG6ysiiz",
     "version": 34
   },
