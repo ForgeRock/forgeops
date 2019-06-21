@@ -3,7 +3,7 @@ ds,6.5.2,6.5.2
 openam,6.5.2,6.5.2
 amster,6.5.2,6.5.2
 openig,6.5.1,6.5.1
-openidm,6.5.0,6.5.1
+openidm,6.5.0.1,6.5.1
 git,6.5.2,6.5.2
 nginx-agent,6.5.1,6.5.1
 apache-agent,6.5.1,6.5.1
