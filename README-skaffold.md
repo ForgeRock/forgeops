@@ -1,8 +1,6 @@
 # ForgeOps Deployment using Skaffold and Kustomize
 
-NOTE: This is a work in progress, For the 7.0.0 release, this folder will contain one or more platform samples.
-
-These skaffold and kustomize artifacts provide an environment for
+These skaffold and kustomize artifacts provide for
 rapid and iterative development of configurations.  `skaffold dev` is used during development,
 and will continually redeploy changes as they are made.
 
@@ -20,12 +18,10 @@ Familiarity with Kubernetes / Minikube is assumed.
 * kubens / kubectx are not required but super handy:  `brew install kubectx`
 * Start minikube: `minikube start --memory 8196`.  8 GB of RAM is recommended.
 * Make sure the ingress add-on is enabled: `minikube addons enable ingress`
-* Install cert-manager by running this script:  `../bin/deploy-cert-manager.sh` (note - if you get errors
-   run this script twice).
+* Install cert-manager by running this script:  `./bin/deploy-cert-manager.sh`
 * Add an entry in /etc/hosts for `default.iam.example.com` that points to your ingress ip (`minikube ip`, for example).
 
 ## Quick Start
-
 
 Note: minikube has an outstanding bug where pods can not reach themselves. AM sometimes tries
 to call back to it's own JWKKS endpoint.  This will still work - but it will be slow.
@@ -51,7 +47,7 @@ protect IDM. You can access the IDM admin console at: https://default.iam.exampl
 
 Run:
 
-`skaffold dev -p dev --default-repo gcr.io/engineering-devops`
+`skaffold dev -p gke --default-repo gcr.io/engineering-devops`
 
 Setting the default repo tells skaffold to tag and push the images to that destination repo. This
 repo must be accessible to your cluster. Skaffold
@@ -99,7 +95,7 @@ If you want to delete the persistent volumes for the directory:
 
 ## Continuous Deployment
 
-The file `../cloudbuild.yaml` is a sample [Google Cloud Builder](https://cloud.google.com/cloud-build/) project
+The file `cloudbuild.yaml` is a sample [Google Cloud Builder](https://cloud.google.com/cloud-build/) project
 that performs a continuous deployment to a running GKE cluster. Until AM file based configuration supports upgrade,
 the deployment is done fresh each time.
 

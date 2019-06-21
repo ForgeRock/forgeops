@@ -1,0 +1,30 @@
+namespace: prod
+bases:
+  - ../../frconfig
+  - ../../ingress
+  - ../../ds/cts-medium
+  - ../../ds/idrepo-medium
+  - ../../am
+  - ../../end-user-ui
+  - ../../idm
+  - ../../config-util
+patchesStrategicMerge:
+  - am.yaml
+  - idm.yaml
+  - platform-config.yaml
+# TODO: We should be able to factor this out to a common base
+vars:
+  - fieldref:
+      fieldPath: data.DOMAIN
+    name: DOMAIN
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: platform-config
+  - fieldref:
+      fieldPath: data.SUBDOMAIN
+    name: SUBDOMAIN
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: platform-config
