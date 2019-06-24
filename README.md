@@ -2,7 +2,7 @@
 
 Docker and Kubernetes DevOps artifacts for the ForgeRock platform. 
 
-** IMPORTANT: The current supported branch is release/6.5.1. The master branch is under development **
+** IMPORTANT: The current supported branch is release/6.5.2. The master branch is under development **
 
 Please refer to the [Platform Documentation for 6.5](https://backstage.forgerock.com/docs/platform/6.5). In
 particular refer to the [What's New section of the release notes.](https://backstage.forgerock.com/docs/platform/6.5/release-notes/#chap-rnotes-whats-new)

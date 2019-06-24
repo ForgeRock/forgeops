@@ -33,14 +33,14 @@ component: openidm
 
 image:
   repository: gcr.io/forgerock-io/openidm
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
 
 gitImage:
   repository: gcr.io/forgerock-io/git
-  tag: 6.5.1
+  tag: 6.5.2
   pullPolicy: IfNotPresent
 
 # override Java JVM options.

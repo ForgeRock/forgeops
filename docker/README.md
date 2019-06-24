@@ -75,10 +75,10 @@ folder,artifact,tag
 Where:
 
 * folder - is the name of the docker/ folder to build
-* artifact - is the version of the artifact in Artifactory. For example, for openam - 6.5.1-p2
+* artifact - is the version of the artifact in Artifactory. For example, for openam - 6.5.2-p2
 * tag - a tag to apply to the image.
 
-If the artifact does not change, but the docker image is significantly different, the suggested approach is to add an additional qualifier to the tag. For example, if the current artifact is `6.5.1-M129.1`  and the docker image is changed, the new tag becomes `6.5.1-M129.1.2`.
+If the artifact does not change, but the docker image is significantly different, the suggested approach is to add an additional qualifier to the tag. For example, if the current artifact is `6.5.2-M129.1`  and the docker image is changed, the new tag becomes `6.5.2-M129.1.2`.
 
 
  See the build.sh script for a complete list of options.
@@ -86,6 +86,6 @@ If the artifact does not change, but the docker image is significantly different
 ## Process to update a dependency
 
 The file csv/dev.csv specifies the artifacts used in our CI Cloudbuild pipeline. To update to a new milestone, edit
-this file, and update the milestone (for example, for idm change 6.5.1-M2 to 6.5.1-M3). Commit the change, and submit a new PR. The build process will build and tag the new image. You should also update the corresponding helm charts.
+this file, and update the milestone (for example, for idm change 6.5.2-M2 to 6.5.2-M3). Commit the change, and submit a new PR. The build process will build and tag the new image. You should also update the corresponding helm charts.
 
 See `submit.sh` for creating one off builds of an artifact.
