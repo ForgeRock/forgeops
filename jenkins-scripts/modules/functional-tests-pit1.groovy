@@ -3,7 +3,7 @@
 void runStage(String scope) {
 
     node("google-cloud") {
-        stage("Run K8s FTs") {
+        stage("Run PIT1 FTs") {
             def cfg = [
                     TESTS_SCOPE         : "tests/smoke",
                     SAMPLE_NAME         : "smoke-deployment",

@@ -31,10 +31,10 @@ timestamps {
                 error 'This pipeline does not currently support building from a tag'
             } else if (isPR()) {
                 pipeline = load("${jobLocation}/pr.groovy")
-                k8sTestStage = load("${modulesLocation}/functional-tests-k8s.groovy")
+                pit1TestStage = load("${modulesLocation}/functional-tests-pit1.groovy")
             } else {
                 pipeline = load("${jobLocation}/postcommit.groovy")
-                k8sTestStage = load("${modulesLocation}/functional-tests-k8s.groovy")
+                pit1TestStage = load("${modulesLocation}/functional-tests-pit1.groovy")
             }
         }
 
