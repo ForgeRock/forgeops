@@ -11,7 +11,7 @@ Try:
 ```
 gradle gatlingRun-idm.IDMSimulation
 gradle gatlingRun-am.AMRestAuthNSim
-``
+```
 See the varioous gatling simulations for details on how to configure the target host name, etc.
 
 If you just want to compile the simulation code:
