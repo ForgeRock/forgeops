@@ -24,14 +24,17 @@ timestamps {
             currentBuild.description = 'built:'
 
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
+            def modulesLocation = "${env.WORKSPACE}/jenkins-scripts/modules"
 
             if (env.TAG_NAME) {
                 currentBuild.result = 'ABORTED'
                 error 'This pipeline does not currently support building from a tag'
             } else if (isPR()) {
                 pipeline = load("${jobLocation}/pr.groovy")
+                k8sTestStage = load("${modulesLocation}/functional-tests-k8s.groovy")
             } else {
                 pipeline = load("${jobLocation}/postcommit.groovy")
+                k8sTestStage = load("${modulesLocation}/functional-tests-k8s.groovy")
             }
         }
 
