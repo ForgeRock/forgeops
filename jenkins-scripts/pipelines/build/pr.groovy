@@ -59,4 +59,18 @@ void buildImage(String directoryName) {
     sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
 }
 
+def postBuildTests() {
+
+    try {
+        // PIT #1 tests
+        stageErrorMessage = "The PIT #1 functional tests failed, please have a look at the console output"
+        pit1TestStage.runStage("tests/smoke")
+    }
+    catch (exception) {
+        currentBuild.result = 'FAILURE'
+        postcommitBuild.sendSlackNotification(cfg.SLACK_CHANNEL)
+        throw exception
+    }
+}
+
 return this

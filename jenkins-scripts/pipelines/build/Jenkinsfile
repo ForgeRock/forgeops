@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('forgerock-pipeline-libs') _
+@Library(value=['forgerock-pipeline-libs', 'QaCloudUtils']) _
 
 BASE_VERSION = '7.0.0'
 
@@ -39,4 +39,6 @@ timestamps {
 
         pipeline.build()
     }
+
+    pipeline.postBuildTests()
 }

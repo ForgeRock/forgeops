@@ -5,7 +5,7 @@ void runStage(String scope) {
     node("google-cloud") {
         stage("Run PIT1 FTs") {
             def cfg = [
-                    TESTS_SCOPE         : "tests/smoke",
+                    TESTS_SCOPE         : scope,
                     SAMPLE_NAME         : "smoke-deployment",
                     CLUSTER_IMAGE_TAG   : "7.0.0-latest-postcommit",
                     CLUSTER_IMAGE_LEVEL : "pit1",
