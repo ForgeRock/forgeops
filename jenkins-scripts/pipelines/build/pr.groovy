@@ -68,7 +68,6 @@ def postBuildTests() {
     }
     catch (exception) {
         currentBuild.result = 'FAILURE'
-        postcommitBuild.sendSlackNotification(cfg.SLACK_CHANNEL)
         throw exception
     }
 }
