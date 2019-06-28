@@ -43,5 +43,7 @@ timestamps {
         pipeline.build()
     }
 
-    pipeline.postBuildTests()
+    if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+        pipeline.postBuildTests()
+    }
 }
