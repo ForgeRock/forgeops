@@ -12,11 +12,12 @@ def build() {
 
     properties([buildDiscarder(logRotator(daysToKeepStr: '14', numToKeepStr: '10'))])
 
-    def prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
-    def bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
+    prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
+    bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
 
     try {
         def repoUrl = "${scm.getRepositoryByName('origin').getURIs()[0]}"
+        // in order to compare the PR with the target branch, we first need to fetch the target branch
         scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, repoUrl)
 
         for (buildDirectory in buildDirectories) {
@@ -30,10 +31,6 @@ def build() {
                 echo "Skipping build for 'docker/${buildDirectory['name']}'"
             }
         }
-
-        currentBuild.result = 'SUCCESS'
-        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
-
     } catch (FlowInterruptedException ex) {
         currentBuild.result = 'ABORTED'
         prBuild.commentOnPullRequest(buildStatus: 'ABORTED', originalCommentId: bitbucketCommentId)
@@ -65,9 +62,12 @@ def postBuildTests() {
         // PIT #1 tests
         stageErrorMessage = "The PIT #1 functional tests failed, please have a look at the console output"
         pit1TestStage.runStage("tests/smoke")
+        currentBuild.result = 'SUCCESS'
+        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
     }
     catch (exception) {
         currentBuild.result = 'FAILURE'
+        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
         throw exception
     }
 }
