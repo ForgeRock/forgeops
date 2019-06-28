@@ -18,6 +18,9 @@ timestamps {
 
         stage ('Clone repo') {
             checkout scm
+            // Stash workspace to be able to reuse it in the tests
+            stash includes: '**', name: "workspace", useDefaultExcludes: false // if true .git is not included in stash
+
             SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
             currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
             currentBuild.description = 'built:'
