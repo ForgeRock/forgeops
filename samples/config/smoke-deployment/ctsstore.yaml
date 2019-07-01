@@ -1,1 +1,7 @@
 instance: ctsstore
+configstore:
+  enabled: false
+userstore:
+  enabled: false
+idmRepo:
+  enabled: false

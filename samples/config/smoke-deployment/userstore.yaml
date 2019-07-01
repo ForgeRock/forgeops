@@ -2,6 +2,9 @@ instance: userstore
 
 replicas: 2
 
-# image:
-#   pullPolicy: Always
-#   tag: latest
+cts:
+  enabled: false
+configstore:
+  enabled: false
+idmRepo:
+  enabled: false
