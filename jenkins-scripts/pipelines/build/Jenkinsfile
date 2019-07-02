@@ -19,9 +19,10 @@ timestamps {
         stage ('Clone repo') {
             checkout scm
             // Stash workspace to be able to reuse it in the tests
-            stash includes: '**', name: "workspace", useDefaultExcludes: false // if true .git is not included in stash
+            stash includes: '**', name: "workspace" // omit 'useDefaultExcludes: false' - no need to stash .git folder
 
             SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+            GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
             currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
             currentBuild.description = 'built:'
 
@@ -34,6 +35,7 @@ timestamps {
             } else if (isPR()) {
                 pipeline = load("${jobLocation}/pr.groovy")
                 pit1TestStage = load("${modulesLocation}/functional-tests-pit1.groovy")
+                prAutomation = load("${modulesLocation}/prAutomation.groovy")
             } else {
                 pipeline = load("${jobLocation}/postcommit.groovy")
                 pit1TestStage = load("${modulesLocation}/functional-tests-pit1.groovy")
@@ -45,5 +47,9 @@ timestamps {
 
     if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
         pipeline.postBuildTests()
+
+        if (isPR()) {
+            prAutomation.mergeIfAutomatedProductVersionUpdate(GIT_COMMIT)
+        }
     }
 }

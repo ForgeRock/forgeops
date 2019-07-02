@@ -16,9 +16,8 @@ def build() {
     bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
 
     try {
-        def repoUrl = "${scm.getRepositoryByName('origin').getURIs()[0]}"
         // in order to compare the PR with the target branch, we first need to fetch the target branch
-        scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, repoUrl)
+        scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 
         for (buildDirectory in buildDirectories) {
             if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
