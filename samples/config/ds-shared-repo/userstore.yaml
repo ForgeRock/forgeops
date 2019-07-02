@@ -3,12 +3,6 @@ image:
   repository: gcr.io/forgerock-io/ds/qa-smoke
   tag: 7.0.0-480022a
   pullPolicy: IfNotPresent
-
-replicas: 1
-
 cts:
   enabled: false
-configstore:
-  enabled: false
-idmRepo:
-  enabled: false
+replicas: 1

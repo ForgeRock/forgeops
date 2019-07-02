@@ -1,7 +1,1 @@
 instance: configstore
-cts:
-  enabled: false
-userstore:
-  enabled: false
-idmRepo:
-  enabled: false
