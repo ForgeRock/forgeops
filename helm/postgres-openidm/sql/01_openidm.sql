@@ -104,6 +104,7 @@ CREATE TABLE openidm.relationships (
   secondresourcecollection VARCHAR(255),
   secondresourceid VARCHAR(56),
   secondpropertyname VARCHAR(100),
+  properties JSON,
   PRIMARY KEY (id),
   CONSTRAINT fk_relationships_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT idx_relationships_object UNIQUE (objecttypes_id, objectid)
@@ -154,6 +155,23 @@ CREATE TABLE openidm.internalrole (
   temporalConstraints VARCHAR(1024) DEFAULT NULL,
   condition VARCHAR(1024) DEFAULT NULL,
   privs TEXT DEFAULT NULL,
+  PRIMARY KEY (objectid)
+);
+
+-- -----------------------------------------------------
+-- Table openidm.internalprivilege
+-- -----------------------------------------------------
+
+CREATE TABLE openidm.internalprivilege (
+  objectid VARCHAR(255) NOT NULL,
+  rev VARCHAR(38) NOT NULL,
+  name VARCHAR(64) DEFAULT NULL,
+  description VARCHAR(510) DEFAULT NULL,
+  path VARCHAR(1024) NOT NULL,
+  permissions VARCHAR(1024) NOT NULL,
+  actions VARCHAR(1024) DEFAULT NULL,
+  filter VARCHAR(1024) DEFAULT NULL,
+  accessflags TEXT DEFAULT NULL,
   PRIMARY KEY (objectid)
 );
 
@@ -293,19 +311,3 @@ CREATE TABLE openidm.files (
   PRIMARY KEY (objectid)
 );
 
-
--- -----------------------------------------------------
--- Table openidm.metaobjects
--- -----------------------------------------------------
-
-CREATE TABLE openidm.metaobjects (
-  id BIGSERIAL NOT NULL,
-  objecttypes_id BIGINT NOT NULL,
-  objectid VARCHAR(255) NOT NULL,
-  rev VARCHAR(38) NOT NULL,
-  fullobject JSON,
-  PRIMARY KEY (id),
-  CONSTRAINT fk_metaobjects_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT idx_metaobjects_object UNIQUE (objecttypes_id, objectid)
-);
-CREATE INDEX idx_metaobjects_reconid on openidm.metaobjects (json_extract_path_text(fullobject, 'reconId'), objecttypes_id);
