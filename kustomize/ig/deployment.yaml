@@ -1,10 +1,6 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  labels:
-    app: ig
-    component: ig
-    vendor: forgerock
   name: ig
 spec:
   replicas: 1
@@ -12,10 +8,6 @@ spec:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
-      labels:
-        app: ig
-        component: ig
-        vendor: forgerock
     spec:
       containers:
       - name: ig

@@ -1,21 +1,10 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  labels:
-    app.kubernetes.io/instance: end-user-ui
-    app.kubernetes.io/name: end-user-ui
   name: end-user-ui
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app.kubernetes.io/instance: end-user-ui
-      app.kubernetes.io/name: end-user-ui
   template:
-    metadata:
-      labels:
-        app.kubernetes.io/instance: end-user-ui
-        app.kubernetes.io/name: end-user-ui
     spec:
       containers:
       - image: gcr.io/engineering-devops/end-user-ui:fraasEndUserClient

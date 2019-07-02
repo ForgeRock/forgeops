@@ -1,5 +1,4 @@
 kind: ""
 apiversion: ""
-namespace: default
 resources:
 - ingress.yaml

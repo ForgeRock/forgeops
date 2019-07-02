@@ -24,15 +24,15 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: openam
+          serviceName: am
           servicePort: 80
         path: /am
       - backend:
-          serviceName: openidm
+          serviceName: idm
           servicePort: 80
         path: /openidm
       - backend:
-          serviceName: openidm
+          serviceName: idm
           servicePort: 80
         path: /admin
       - backend:
@@ -45,7 +45,7 @@ spec:
       #     servicePort: 80
       #   path: /enduser-ui
       - backend:
-          serviceName: openig
+          serviceName: ig
           servicePort: 80
         path: /ig
   tls:
@@ -60,10 +60,6 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
     #certmanager.k8s.io/cluster-issuer: "ca-issuer"
-  labels:
-    app: end-user-ui-end-user-ui
-    release: end-user-ui
-    vendor: forgerock
   name: end-user-ui
 spec:
   rules:

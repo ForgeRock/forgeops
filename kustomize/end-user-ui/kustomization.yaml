@@ -1,5 +1,7 @@
 kind: ""
 apiversion: ""
+commonLabels:
+  app: end-user-ui
 resources:
 - deployment.yaml
 - service.yaml

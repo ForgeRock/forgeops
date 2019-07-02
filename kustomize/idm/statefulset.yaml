@@ -11,7 +11,6 @@ spec:
       annotations:
         prometheus.io/port: "8080"
         prometheus.io/scrape: "true"
-        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - env:

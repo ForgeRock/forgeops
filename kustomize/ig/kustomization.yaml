@@ -1,5 +1,7 @@
 kind: ""
 apiversion: ""
+commonLabels:
+  app: ig
 resources:
 - deployment.yaml
 - openig-secrets-env.yaml

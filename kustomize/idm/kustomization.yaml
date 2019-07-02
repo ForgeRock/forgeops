@@ -1,14 +1,12 @@
 kind: ""
 apiversion: ""
 commonLabels:
-    app: openidm
-    component: idm
+    app: idm
 resources:
 - boot-properties.yaml
 - logging-properties.yaml
 - configmap.yaml
-- idm.yaml
-# - ingress.yaml
+- statefulset.yaml
 - idm-secrets.yaml
 - secrets.yaml
 - service.yaml

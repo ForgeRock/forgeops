@@ -2,7 +2,6 @@ kind: ""
 apiversion: ""
 commonLabels:
   app: forgeops-tests
-  component: forgeops-tests
 resources:
 - tests-deployment.yaml
 - service.yaml
