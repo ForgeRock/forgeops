@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1beta11
+apiVersion: skaffold/v1beta12
 kind: Config
 build:
   artifacts:
@@ -20,6 +20,11 @@ build:
 deploy:
   kustomize:
     path: ./kustomize/env/example
+portForward:
+  - resourceType: StatefulSet
+    resourceName: ds-idrepo
+    port: 1389
+    localPort: 1389
 profiles:
 # Example.forgeops deployment to default.iam.forgeops.com - uses a LE cert.
 - name: gke
