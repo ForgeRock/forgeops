@@ -7,6 +7,11 @@ resources:
 - logging-properties.yaml
 - configmap.yaml
 - statefulset.yaml
-- idm-secrets.yaml
-- secrets.yaml
 - service.yaml
+secretGenerator:
+- name: idm
+  type: Opaque
+  files:
+  - secrets/keystore.jceks
+  - secrets/truststore
+  - secrets/realm.properties

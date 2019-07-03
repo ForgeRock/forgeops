@@ -35,8 +35,25 @@ features that are still in development and may not be stable. Please checkout th
 For example, if you have the source checked out from git:
 
 ```bash
-git checkout release/6.5.1
+git checkout release/6.5.2
 ```
+
+## Skaffold preview branch
+
+The branch `skaffold-6.5` is a preview of the upcoming 7.x workflow that simplifies deployment
+by bundling the product configuration into the docker image for deployment. This workflow speeds iterative
+development and greatly simplifies the Kubernetes runtime manifests. It eliminates the need for "git" init containers
+and the complexity around configuring different git repositories and branches in the helm charts.
+
+The new workflow combines the previously 
+independent `forgeops` and `forgeops-init` into a single git repository that holds configuration and Kubernetes
+manifests.  See [README-skaffold.md](README-skaffold.md).
+
+Documentation for this workflow is in progress. Please
+ see  the [early access documentation](https://ea.forgerock.com/docs/platform/devops-guide-minikube/#devops-guide-minikube).
+
+This preview branch enables the use of supported ForgeRock binaries in your 
+ deployment. Adopting this workflow is recommended as it will ease transition to the 7.x platform. 
 
 
 ## Contents 
