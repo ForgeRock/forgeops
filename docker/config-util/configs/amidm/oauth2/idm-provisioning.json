@@ -28,7 +28,7 @@
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
       "userinfoEncryptedResponseAlg" : null,
-      "jwksUri" : "http://openam/am/oauth2/connect/jwk_uri",
+      "jwksUri" : "http://am/am/oauth2/connect/jwk_uri",
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
     },

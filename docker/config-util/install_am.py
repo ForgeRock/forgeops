@@ -26,7 +26,7 @@ AM_FQDN = os.getenv('FQDN', 'default.iam.forgeops.com')
 # List of AM initial configuration properties
 properties = {
     'DEPLOYMENT_URI': 'am',
-    'SERVER_URL': 'http://openam:80',
+    'SERVER_URL': 'http://am:80',
     'COOKIES_DOMAIN': DOMAIN,
     'BASE_DIR': '/home/forgerock/openam',
     'locale': 'en_US',
@@ -58,7 +58,7 @@ def config_thread():
     """
     Configuration thread.
     """
-    url = f'http://openam:80/am/config/configurator'
+    url = f'http://am:80/am/config/configurator'
 
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     install_request = post(url=url, verify=False, headers=headers, params=properties)
@@ -79,7 +79,7 @@ def configure():
     t.start()
 
     # Connect to progress. Read output.
-    listener = get(url=f'http://openam:80/am/setup/setSetupProgress?mode=text',
+    listener = get(url=f'http://am:80/am/setup/setSetupProgress?mode=text',
                    verify=False, stream=True)
     if listener.encoding is None:
         listener.encoding = 'utf-8'
@@ -96,7 +96,7 @@ def wait_for_am():
     while not ready:
         try:
             print("Trying endpoints.")
-            am_request = get(url='http://openam:80/am/', timeout=10, verify=False)
+            am_request = get(url='http://am:80/am/', timeout=10, verify=False)
             print(am_request.url)
             print( f'am_url, {am_request}')
             ds_request = get(url='http://ds-idrepo:8080/alive', timeout=10, verify=False)

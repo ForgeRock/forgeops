@@ -1,5 +1,5 @@
 {
-  "instance" : "http://openam:80/am",
+  "instance" : "http://am:80/am",
   "dsameUser" : "cn=dsameuser,ou=DSAME Users,ou=am-config",
   "keystores" : {
     "default" : {

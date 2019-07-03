@@ -2,7 +2,7 @@
     "rsFilter" : {
         "clientId" : "rsFilterClient",
         "clientSecret" : "rsFilterClient",
-        "tokenIntrospectUrl" : "http://openam/am/oauth2/introspect",
+        "tokenIntrospectUrl" : "http://am/am/oauth2/introspect",
         "scopes" : [ ],
         "queryOnResource" : "managed/user",
         "propertyMapping" : {

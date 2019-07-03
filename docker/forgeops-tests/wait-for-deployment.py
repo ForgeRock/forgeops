@@ -17,7 +17,7 @@ def wait_for_products():
         print("Trying admin login to see if AM is ready")
 
         try:
-            response = post(verify=False, url='http://openam:80/am/json/authenticate', headers=headers)
+            response = post(verify=False, url='http://am:80/am/json/authenticate', headers=headers)
             if response.status_code is 200:
                 print("Admin login successful, exiting...")
                 return

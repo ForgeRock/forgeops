@@ -1,3 +1,3 @@
-connect http://openam/am -k /var/run/secrets/amster/id_rsa
+connect http://am/am -k /var/run/secrets/amster/id_rsa
 import-config --path /opt/amster/config/  --clean false
 :exit

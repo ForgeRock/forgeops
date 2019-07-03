@@ -18,7 +18,7 @@ class AMConfig(object):
         self.admin_password = os.getenv('ADMIN_PASSWORD', 'password')
 
         # self.am_url = f'https://smoke.iam.forgeops.com:443/am'
-        # self.am_internal_url = 'http://openam:80/am'
+        # self.am_internal_url = 'http://am:80/am'
         self.am_url = url
         self.wait_for_am()
         self.admin_token = self.admin_login()
@@ -174,7 +174,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Configure AM')
     # This option is for debugging  / testing from your laptop. If you
     # run in the cluster you can omit this. This lets you 
-    # run against the ingress (external) URL, instead of the internal (http://openam)
+    # run against the ingress (external) URL, instead of the internal (http://am)
     # To use this export FQDN=default.iam.example.com; python3 ./am_runtime_config.py
     parser.add_argument('--useFQDN', action='store_true',
                         help='Use the external FQDN to configure AM, not the internal service')
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     am_cfg_folder = os.getenv('CONFIG_FOLDER', 'configs/amidm')
     am_url = f'https://{am_fqdn}:443/am'
     if not args.useFQDN:
-        am_url = 'http://openam:80/am'
+        am_url = 'http://am:80/am'
 
     print(f'Doing minimal AM config using {am_cfg_folder} with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url, am_fqdn, am_cfg_folder)
