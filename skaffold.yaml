@@ -70,6 +70,28 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/smoke
+- name: fbc-smoke
+  build:
+    artifacts:
+    - image: ig
+      context: docker/ig
+    - image: forgeops-tests
+      context: docker/forgeops-tests
+    - image: am
+      context: docker/am-fbc
+    - image: config-util
+      context: docker/config-util
+    - image: idm
+      context: docker/idm
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/smoke
 - name: medium
   build:
     artifacts:

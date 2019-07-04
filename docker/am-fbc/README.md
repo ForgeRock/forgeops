@@ -22,7 +22,7 @@ Steps:
 * In the dev/ folder, run `skaffold -p am-fbc dev`. This will bring up AM in FBC mode, and will also start amster to create an initial configuration.
 * Let amster finish, and then run the `dump-config.sh` script:  `cd am-fbc; ./dump-config.sh`
 * This script connects to the running AM instance and copies the file based configuration to the tmp/ directory on your local workstation.
-* Shut down skaffold (control-c, or run `skaffold delete -p am-fbc` if it does not clean up)
+* Shut down skaffold (control-c, or run `skaffold delete -p fbc` if it does not clean up)
 * Important: Do NOT delete the ds-idrepo PVC. This has now been initialized with the structure that AM requires.
 
 ## Running with File Based Configuration
