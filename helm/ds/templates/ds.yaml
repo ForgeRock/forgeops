@@ -26,9 +26,13 @@ spec:
       resources:
         requests:
           storage: {{ default "5Gi"  .Values.storageSize }}
-      {{- if .Values.storageClass }}
-      storageClassName:  {{ .Values.storageClass }}
-      {{- end }}
+    {{- if .Values.storageClass }}
+    {{- if eq .Values.storageClass "-" }}
+      storageClassName: ""
+    {{- else }}
+      storageClassName: "{{ .Values.storageClass }}"
+    {{- end }}
+    {{- end }}
   {{- end }}
   template:
     metadata:
