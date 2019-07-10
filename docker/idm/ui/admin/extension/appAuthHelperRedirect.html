@@ -4,31 +4,25 @@
     <script type="text/javascript">
     /*
     This placeholder file handles the query string parameters provided by the AS
-    when returning from the authorization endpoint. It uses them in the construction of a
-    link to the default document for the same folder that this file is hosted within. The
-    query string parameters are passed along within the hash fragment.
+    when returning from the authorization endpoint.
     */
-    var queryString = window.location.search.substring(1); // includes '?'
+    var queryString = window.location.search.substring(1); // removes the '?'
+    // appAuth expects the details to be provided via hash, so copy them there
+    window.location.hash = queryString;
 
     if (parent === window) { // if not in a frame
-        document.addEventListener('DOMContentLoaded', function() {
+        // Will receive a message event when the fetch tokens script has finished
+        window.addEventListener("message", function (e) {
             var spaLocation = document.createElement("a");
-            spaLocation.href = ".";
-            spaLocation.hash = queryString;
+            spaLocation.href = "."; // assumes SPA is the default document in the folder this file resides within
 
             setTimeout(function() {
                 window.location.assign(spaLocation.href);
             }, 0);
         });
-    } else {
-        // we are within a frame - handle the query parameters directly
-        window.location.hash = queryString;
-
-        var appAuthHelperRedirectScript = document.createElement("script");
-        appAuthHelperRedirectScript.src = "node_modules/appauthhelper/appAuthHelperFetchTokensBundle.js";
-        appAuthHelperRedirectScript.async = false;
-        document.getElementsByTagName("head")[0].appendChild(appAuthHelperRedirectScript);
     }
+
   </script>
+  <script src="appAuthHelperFetchTokensBundle.js"></script>
 </head>
 </html>

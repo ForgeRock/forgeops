@@ -42,23 +42,18 @@
             commonSettings = {
                 clientId: 'idmAdminClient',
                 authorizationEndpoint: AM_URL + '/oauth2/authorize'
-            }
-            //,redirectToLogin = () => {
-            //    window.location.href = '{{PLATFORM_LOGIN_URL}}';
-            //}
-            ;
+            },
+            resourceServers = {};
+
+        resourceServers[window.location.origin + "/openidm"] = 'openid fr:idm:.*';
 
         AppAuthHelper.init({
             clientId: commonSettings.clientId,
             authorizationEndpoint: commonSettings.authorizationEndpoint,
-            scopes: 'openid fr:idm:.*',
             tokenEndpoint: AM_URL + '/oauth2/access_token',
             revocationEndpoint: AM_URL + '/oauth2/token/revoke',
             endSessionEndpoint: AM_URL + '/oauth2/connect/endSession',
-/*            interactionRequiredHandler: function () {
-                redirectToLogin();
-            },
-*/
+            resourceServers: resourceServers,
             tokensAvailableHandler: function (claims) {
                 // this function is called every time the tokens are either
                 // originally obtained or renewed
@@ -68,7 +63,7 @@
                     subject: claims.sub,
                     invalidSessionHandler: function () {
                         AppAuthHelper.logout().then(function () {
-                            redirectToLogin();
+                            window.location.href = '/admin/';
                         });
                     },
                     cooldownPeriod: 5
@@ -76,10 +71,6 @@
                 // check the validity of the session immediately
                 sessionCheck.triggerSessionCheck();
 
-                // check every minute
-                setInterval(function () {
-                    sessionCheck.triggerSessionCheck();
-                }, 60000);
                 // check with every captured event
                 document.addEventListener('click', function () {
                     sessionCheck.triggerSessionCheck();

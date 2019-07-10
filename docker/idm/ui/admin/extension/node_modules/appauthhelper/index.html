@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AppAuth Client</title>
+    <style>
+    #userDetails {
+        display:block;
+        width:600px;
+        height:400px;
+        background-color:lightgray;
+        font-family: monospace;
+        white-space: pre;
+        padding: 10px;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="userDetails"></div>
+    <a href='#' onclick='AppAuthHelper.logout().then(() => location.reload())'>Logout</a>
+</body>
+
+<script src="appAuthHelperBundle.js"></script>
+<script>
+(function () {
+    AppAuthHelper.init({
+        clientId: "appAuthClient",
+        authorizationEndpoint: "https://login.sample.forgeops.com/oauth2/authorize",
+        tokenEndpoint: "https://login.sample.forgeops.com/oauth2/access_token",
+        revocationEndpoint: "https://login.sample.forgeops.com/oauth2/token/revoke",
+        endSessionEndpoint: "https://login.sample.forgeops.com/oauth2/connect/endSession",
+        resourceServers: {
+            "https://login.sample.forgeops.com/oauth2/userinfo": "profile",
+            "https://rs.sample.forgeops.com/openidm": "openid"
+        },
+        /*
+        interactionRequiredHandler: function () {
+            // If you want to handle login at the IDP using some mechanism other than
+            // the default (standard OAuth2 redirection to the authorizationEndpoint),
+            // you can add that logic here.
+            // Call AppAuthHelper.getTokens(); again when login is finished.
+        },
+        */
+        tokensAvailableHandler: function (claims) {
+            // This is a great place to startup the parts of your SPA that are for logged-in users.
+            // The "claims" parameter is the content of the id_token, which tells you useful details
+            // about the logged-in user.
+
+            // Here is a sample "application" that just makes some requests to
+            // resource servers and outputs the response on the page.
+            Promise.all([
+                // Appropriate access tokens will be automatically included in these requests
+                fetch("https://login.sample.forgeops.com/oauth2/userinfo").then((resp) => resp.json()),
+                fetch("https://rs.sample.forgeops.com/openidm/info/login").then((resp) => resp.json())
+            ]).then((responses) => {
+                document.getElementById('userDetails').innerText = JSON.stringify({
+                    "userinfo": responses[0],
+                    "info/login": responses[1]
+                }, null, 4);
+            });
+        }
+    });
+    // In this application, we want tokens immediately. If you want to support
+    // any anonymous interaction, this should be delayed.
+    AppAuthHelper.getTokens();
+}());
+</script>
+</html>
