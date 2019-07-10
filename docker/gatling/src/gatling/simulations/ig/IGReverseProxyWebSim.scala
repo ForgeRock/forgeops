@@ -20,7 +20,7 @@ class IGReverseProxyWebSim extends Simulation {
     val random = new util.Random
     
     val httpProtocol: HttpProtocolBuilder = http
-        .baseURLs(igUrl)
+        .baseUrl(igUrl)
         .inferHtmlResources()
         .contentTypeHeader("""application/json""")
         .header("Accept-API-Version", "resource=2.0, protocol=1.0")
@@ -33,5 +33,5 @@ class IGReverseProxyWebSim extends Simulation {
             //.headers(getXOpenAMHeaders("${username}", "${password}")))
         }
         
-    setUp(request.inject(rampUsers(concurrency) over warmup)).protocols(httpProtocol)
+    setUp(request.inject(rampUsers(concurrency) during warmup)).protocols(httpProtocol)
 }

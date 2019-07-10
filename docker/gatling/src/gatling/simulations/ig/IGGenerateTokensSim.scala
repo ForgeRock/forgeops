@@ -49,7 +49,7 @@ class IGGenerateTokensSim extends Simulation {
   }
   
   val httpProtocol: HttpProtocolBuilder = http
-    .baseURLs(amUrl)
+    .baseUrl(amUrl)
     .inferHtmlResources()
     .header("Accept-API-Version", "resource=2.0, protocol=1.0")
     

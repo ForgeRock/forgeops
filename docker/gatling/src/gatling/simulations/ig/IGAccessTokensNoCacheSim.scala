@@ -21,7 +21,7 @@ class IGAccessTokensNoCacheSim extends Simulation {
   val csvFile: String = System.getProperty("csv_file_path", "/tmp/tokens.csv")
   
   val httpProtocol: HttpProtocolBuilder = http
-    .baseURLs(igUrl)
+    .baseUrl(igUrl)
     .inferHtmlResources()
     .header("Accept-API-Version", "resource=2.0, protocol=1.0")
     
@@ -36,5 +36,5 @@ class IGAccessTokensNoCacheSim extends Simulation {
         )
     }
     
-  setUp(accessTokenScenario.inject(rampUsers(concurrency) over warmup)).protocols(httpProtocol)
+  setUp(accessTokenScenario.inject(rampUsers(concurrency) during warmup)).protocols(httpProtocol)
 }
