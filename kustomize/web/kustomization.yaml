@@ -1,0 +1,10 @@
+kind: ""
+apiversion: ""
+commonLabels:
+  app: web
+  component: web
+resources:
+- web-deployment.yaml
+- service.yaml
+- ingress.yaml
+- configmap.yaml
