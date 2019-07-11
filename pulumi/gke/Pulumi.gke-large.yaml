@@ -1,0 +1,6 @@
+encryptionsalt: v1:VjheTQ4LR1U=:v1:bjn1LLyB+wgucUoA:O417tG1IjVlYCSUuixD2XQCdqtP4lg==
+config:
+  gcp:project: engineering-devops
+  gcp:zone: us-east1-b
+  gke-cdm:nodeCount: "2"
+  gke-cdm:nodeMachineType: custom-32-73728

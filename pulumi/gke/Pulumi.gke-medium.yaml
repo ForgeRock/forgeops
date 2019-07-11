@@ -1,0 +1,7 @@
+encryptionsalt: v1:VjheTQ4LR1U=:v1:bjn1LLyB+wgucUoA:O417tG1IjVlYCSUuixD2XQCdqtP4lg==
+config:
+  gcp:project: engineering-devops
+  gcp:zone: us-east1-c
+  gke-cdm:nodeCount: "2"
+  gke-cdm:nodeMachineType: custom-16-65536
+  gke-cdm:clusterName: lee-medium
