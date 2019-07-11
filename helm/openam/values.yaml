@@ -5,7 +5,7 @@
 component: openam
 
 image:
-  repository: gcr.io/forgerock-io/am
+  repository: gcr.io/forgerock-io/am/pit1
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
   tag: 7.0.0-1f4295b5ae
