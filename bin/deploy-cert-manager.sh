@@ -3,9 +3,13 @@
 # Script to deploy Cert-Manager into cert-manager namespace.
 # Run ./deploy-cert-manager.sh .
 #
-# NOTE: You need to be on kubectl version >= 1.13
+# NOTE: You need to be on kubectl version >= 1.14
 
 cd "$(dirname "$0")"
+
+printf "\n\nPlease ensure you have kubectl version >= 1.14 deployed as this script requires the Kustomize integration..\n\n"
+
+sleep 5
 
 # Create namespace to run cert-manager in
 kubectl create namespace cert-manager
