@@ -104,8 +104,8 @@ The *Pulumi.\<stackname\>.yaml* contains 2 types of variables:
 
 Also your stack file can contain encrypted variables using a unique stack key(encryption salt) string at the top of your stack file.  These values are decrypted by Pulumi at runtime.
 
-Values can be added directly to *Pulumi.\<stackname\>.yaml* file or  
-Add configuration values using cmdline:
+Values can be added directly to *Pulumi.\<stackname\>.yaml* file or add configuration values using cmdline: 
+
 ```
 pulumi config set <var> <value>
 ```
@@ -114,7 +114,7 @@ Add an encrypted secret:
 ```
 pulumi config set --secret <secretVar> <secret>
 ```
-
+```NOTE```: Using cmdline reformats the stackfile into alphabetical order.
 
 #### Deploy your stack
 Once you have configure you're stack, select stack and deploy(or add the -s <stack> flag each time to the up command):
@@ -171,7 +171,7 @@ pulumi stack import --file output
 
 View decryted secret values
 ```
-pulumi stack --show-secrets
+pulumi config --show-secrets
 ```
 
 View stack logs

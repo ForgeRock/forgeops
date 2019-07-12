@@ -2,8 +2,8 @@ import * as k8s from "@pulumi/kubernetes";
 import * as gcp from "@pulumi/gcp";
 import { clusterProvider, k8sConfig } from "./cluster";
 import "./nginx-controller";
-import { lbIp } from "./nginx-controller";
-//import "./cert-manager";
+//import { lbIp } from "./nginx-controller";
+import "./cert-manager";
 //import "./prometheus";
 import {
     bucketName,
@@ -32,7 +32,7 @@ const nsprod = new k8s.core.v1.Namespace("prod", { metadata: { name: "prod" }}, 
 
 // Export the Kubeconfig so that clients can easily access our cluster.
 export const kubeconfig = k8sConfig;
-export const loadbalancerIp = lbIp;
+//export const loadbalancerIp = lbIp;
 
 
 

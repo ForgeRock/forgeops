@@ -1,21 +1,12 @@
+import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 
 import { ConfigFile, ConfigGroup } from "@pulumi/kubernetes/yaml";
-import { Config } from "@pulumi/pulumi";
+import { Config, ResourceOptions } from "@pulumi/pulumi";
 import { clusterProvider } from "./cluster";
 import { nginx } from "./nginx-controller"
 
 const config = new Config();
-
-// //Create cert-manager namespace
-//  const nscertmanager = new k8s.core.v1.Namespace("cert-manager", { 
-//     metadata: { 
-//         name: "cert-manager",
-//         labels: {
-//             'certmanager.k8s.io/disable-validation': 'true'
-//         }
-//     }
-// }, { dependsOn: [nginx], provider: clusterProvider });
 
 // Deploy cert-manager
 const certmanagerResources = new ConfigFile("cmResources", {
