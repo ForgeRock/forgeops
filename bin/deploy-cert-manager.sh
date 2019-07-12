@@ -7,7 +7,8 @@
 
 cd "$(dirname "$0")"
 
-printf "\n\nPlease ensure you have kubectl version >= 1.14 deployed as this script requires the Kustomize integration..\n\n"
+printf "\n\nPlease ensure you have the following kubernetes versions to allow for cert-manager to deploy successfully and kubectl to use kustomize integration: \n"
+printf "client version >= 1.14 and server version >= 1.13.\n\n"
 
 sleep 5
 
