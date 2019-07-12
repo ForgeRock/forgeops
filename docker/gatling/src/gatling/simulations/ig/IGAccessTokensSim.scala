@@ -9,9 +9,9 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 class IGAccessTokensSim extends Simulation {
 
   val concurrency: Integer = Integer.getInteger("concurrency", 10)
-  val duration: Integer = Integer.getInteger("duration", 600)
+  val duration: Integer = Integer.getInteger("duration", 60)
   val warmup: Integer = Integer.getInteger("warmup", 1)
-  val igHost: String = System.getProperty("ig_host", "openig.prod.perf.forgerock-qa.com")
+  val igHost: String = System.getProperty("ig_host", "default.iam.forgeops.com")
   val igPort: String = System.getProperty("ig_port", "443")
   val igProtocol: String = System.getProperty("ig_protocol", "https")
     
@@ -30,7 +30,7 @@ class IGAccessTokensSim extends Simulation {
       feed(csv(csvFile).random)
         .exec(
           http("tokeninfo")
-            .post("/rs-tokeninfo")
+            .post("/ig/rs-tokeninfo")
             .header("Authorization", "Bearer ${tokens}")
             .check(status.is(200))
         )

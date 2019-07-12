@@ -37,7 +37,7 @@
       "name": "AmService-1",
       "type": "AmService",
       "config": {
-          "url": "http://am",
+          "url": "http://am/am",
           "realm": "/",
           "agent": {
               "username": "ig-agent",

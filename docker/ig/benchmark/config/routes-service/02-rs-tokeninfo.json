@@ -1,6 +1,6 @@
 {
   "name": "02-rs-tokeninfo",
-  "condition": "${matches(request.uri.path, '^/rs-tokeninfo')}",
+  "condition": "${matches(request.uri.path, '^/ig/rs-tokeninfo')}",
   "monitor": false,
   "heap": [],
   "handler": {
@@ -12,8 +12,7 @@
           "type": "OAuth2ResourceServerFilter",
           "config": {
             "scopes": [
-              "mail",
-              "employeenumber"
+              "mail"
             ],
             "requireHttps": false,
             "realm": "OpenIG",

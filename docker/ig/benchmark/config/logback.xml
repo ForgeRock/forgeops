@@ -49,8 +49,7 @@
         </sift>
     </appender>
      
-    <root level="INFO">
-        <appender-ref ref="SIFT"/>
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

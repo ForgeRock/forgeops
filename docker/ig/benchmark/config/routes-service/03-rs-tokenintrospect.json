@@ -1,7 +1,7 @@
 {
   "name": "03-rs-tokenintrospect",
   "monitor": false,
-  "condition": "${matches(request.uri.path, '^/rs-tokenintrospect')}",
+  "condition": "${matches(request.uri.path, '^/ig/rs-tokenintrospect')}",
   "handler": {
     "type": "Chain",
     "config": {
@@ -11,8 +11,7 @@
           "type": "OAuth2ResourceServerFilter",
           "config": {
             "scopes": [
-              "mail",
-              "employeenumber"
+              "mail"
             ],
             "requireHttps": false,
             "realm": "/",
@@ -20,7 +19,7 @@
               "name": "token-resolver-1",
               "type": "TokenIntrospectionAccessTokenResolver",
               "config": {
-                "endpoint": "http://am.&{namespace}.svc.cluster.local/oauth2/introspect",
+                "endpoint": "http://am.&{namespace}.svc.cluster.local/am/oauth2/introspect",
                 "providerHandler": {
                   "type": "Chain",
                   "config": {

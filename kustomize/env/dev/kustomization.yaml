@@ -9,6 +9,7 @@ bases:
   # - ../../amster
   - ../../idm
   - ../../end-user-ui
+  - ../../ig
   - ../../ingress
 patchesStrategicMerge:
   - platform-config.yaml

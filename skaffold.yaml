@@ -15,6 +15,8 @@ build:
     context: docker/ds/cts
   - image: ds-idrepo
     context: docker/ds/idrepo
+  - image: ig
+    context: docker/ig
   tagPolicy:
     sha256: {}
 deploy:
