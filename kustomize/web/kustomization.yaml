@@ -6,5 +6,4 @@ commonLabels:
 resources:
 - web-deployment.yaml
 - service.yaml
-- ingress.yaml
 - configmap.yaml

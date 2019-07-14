@@ -9,19 +9,24 @@ data:
       <h2>ForgeOps Deployment</h2>
       <h3>Deployment Information</h3>
       <table>
-        <tr><td>Namespace:</td> <td>$(NAMESPACE)</td></tr>
+        <tr><td>NAMESPACE:</td> <td>$(NAMESPACE)</td></tr>
+        <tr><td>DOMAIN:</td> <td>$(DOMAIN)</td></tr>
+        <tr><td>SUBDOMAIN:</td> <td>$(SUBDOMAIN)</td></tr>
       </table>
 
       <h3>Links</h3>
       <ul>
         <li>
-          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/am/XUI/#login" target="_blank">AM</a>
+          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/am/XUI/#login" target="_blank">AM Console</a>
         </li>
         <li>
-          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/admin" target="_blank">IDM Admin</a>
+          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/admin" target="_blank">IDM Admin Console</a>
         </li>
         <li>
           <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/enduser/#/dashboard" target="_blank">End-user-UI</a>
+        </li>
+        <li>
+          <a href="https://smoke.$(SUBDOMAIN).$(DOMAIN)/tests/latest.html" target="_blank">Smoke test report</a>
         </li>
       </ul>
     </html>
