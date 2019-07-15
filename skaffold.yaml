@@ -152,6 +152,7 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/large
+# Profiles to launch / test just a specific product
 - name: ig
   build:
     artifacts:
@@ -160,3 +161,23 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/ig
+- name: am-only
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: config-util
+      context: docker/config-util
+    # Uncomment this if you want to use amster instead of config-util
+    # - image: amster
+    #   context: docker/amster
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: config-util
+      context: docker/config-util
+  deploy:
+    kustomize:
+      path: ./kustomize/env/am-only
+

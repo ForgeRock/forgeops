@@ -135,6 +135,16 @@ class AMConfig(object):
             url = f'{self.am_url}/json/realms/root/realm-config/agents/OAuth2Client/{id}'
             self.put(url, data, self.admin_headers_crest2)
 
+    # import agent - todo: this has only been tested with an IG agent
+    def import_agent_configs(self):
+        dir = f'{self.config_dir}/agents'
+        for filename in os.listdir(dir):
+            data = self.read_json_data(f'{dir}/{filename}', self.fqdn)
+            id = data['_id']
+            type = data["_type"]["_id"]
+            url = f'{self.am_url}/json/realms/root/realm-config/agents/{type}/{id}'
+            self.put(url, data, self.admin_headers_crest2)
+
     def import_auth_modules(self):
         dir = f'{self.config_dir}/chains'
         for filename in os.listdir(dir):
@@ -193,5 +203,6 @@ if __name__ == '__main__':
     #cfg.import_auth_chains()
     cfg.import_realm_config()
     cfg.import_oauth2_configs()
+    cfg.import_agent_configs()
     cfg.import_policies()
     print('Runtime config finished!')

@@ -2,7 +2,7 @@
   "metadata": {
     "realm": "/",
     "amsterVersion": "&{version}",
-    "entityType": "WebAgents",
+    "entityType": "IdentityGatewayAgent",
     "entityId": "ig-agent",
     "pathParams": {}
   },
