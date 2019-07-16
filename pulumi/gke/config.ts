@@ -18,7 +18,7 @@ export const ip = config.get<string>("staticIp") || undefined;
 export const clusterName = config.require("clusterName");
 // Add 'gke-cdm:enablePreemptible: true' to use Preemptible nodes.
 export const enablePreemptible = config.getBoolean("enablePreemptible") || false;
-export const nodeZones = config.getObject<string[]>("nodeZones");
+export const nodeZones = config.requireObject<string[]>("nodeZones");
 export const k8sVersion = config.get("k8sVersion") || "latest";
 
 // ** NODE POOL CONFIG **
