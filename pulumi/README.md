@@ -144,6 +144,8 @@ Remove the selected stack:
 pulumi destroy
 ```
 
+```NOTE``` Sometimes, you may find that one of the Helm chart components doesn't succeed.  This is often to do with the ordering of deployed resources within a Helm chart. If this happens, running Pulumi up a 2nd time usually resolves this.
+
 ## Switching projects
 
 As the kubeconfig file is set local to a project, remember to reset when switching:

@@ -2,9 +2,14 @@ import * as k8s from "@pulumi/kubernetes";
 import { clusterProvider } from "./cluster";
 import * as gcp from "@pulumi/gcp";
 import { ip } from "./config";
+import { primaryPool } from "./cluster";
 
 // Create nginx namespace
-const nsnginx = new k8s.core.v1.Namespace("nginx", { metadata: { name: "nginx" }}, { provider: clusterProvider });
+export const nsnginx = new k8s.core.v1.Namespace("nginx", { 
+    metadata: { 
+        name: "nginx" 
+    }
+}, { dependsOn: [ primaryPool ], provider: clusterProvider });
 
 // Adds namespace to correct Helm field
 function addNamespace(o: any) {
@@ -48,7 +53,3 @@ export const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
         }
     }
 }, { dependsOn: [nsnginx], provider: clusterProvider });
-
-
-
-

@@ -3,30 +3,35 @@ import { Config } from "@pulumi/pulumi";
 
 const config = new Config();
 
-// Project config
+// ** PROJECT CONFIG **
 export const project = new pulumi.Config(pulumi.getProject())
-//export const region = config.get("region") || "us-east1";
 
-// Network config
+// ** NETWORK CONFIG **
+// Add 'gke-cdm:network: <network name>' if you already have a network configured. 
+// If not, Pulumi will generate one for you.
 export const network = config.get("network");
+//  Add 'gke-cdm:staticIp <IP name>' if you already have a reserved a staticIp. 
+// If not, Pulumi will generate 1 for you.
 export const ip = config.get<string>("staticIp") || undefined;
 
-// Cluster config
+// ** CLUSTER CONFIG **
 export const clusterName = config.require("clusterName");
+// Add 'gke-cdm:enablePreemptible: true' to use Preemptible nodes.
 export const enablePreemptible = config.getBoolean("enablePreemptible") || false;
 export const nodeZones = config.getObject<string[]>("nodeZones");
 export const k8sVersion = config.get("k8sVersion") || "latest";
 
-// Node Pool config
+// ** NODE POOL CONFIG **
 export const nodeCount = config.getNumber("initialNodeCount") || 2;
 export const cpuPlatform = config.get("cpuPlatform") || "Intel Skylake";
 export const nodeMachineType = config.get("nodeMachineType") || "n1-standard-2";
 export const diskSize = config.getNumber("diskSizeGb") || 80;
 export const diskType = config.getNumber("diskType") || "pd-ssd";
-export const minNodes = config.getNumber("minNodes") || 1;
-export const maxNodes = config.getNumber("maxNodes") || 4;
+export let minNodes = config.getNumber("min") || 2;
+export let maxNodes = config.getNumber("max") || 4;
 
-// Additional GCP resources
+// ** ADDITIONAL GCP RESOURCES **
+// Please add 'gke-cdm:bucketName <bucketName>' to stack file if you would like a bucket created for DS exports.
 export const bucketName= config.get("bucketName")
 
 
