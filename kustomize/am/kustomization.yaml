@@ -7,8 +7,7 @@ commonLabels:
 # - ingress.yaml
 resources:
 - configmap.yaml
-- boot-json.yaml
-- openam-deployment.yaml
+- deployment.yaml
 - service.yaml
 secretGenerator:
 - name: am-boot-secrets

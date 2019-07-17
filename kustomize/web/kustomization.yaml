@@ -4,6 +4,6 @@ commonLabels:
   app: web
   component: web
 resources:
-- web-deployment.yaml
+- deployment.yaml
 - service.yaml
 - configmap.yaml

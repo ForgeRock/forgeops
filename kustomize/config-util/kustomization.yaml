@@ -5,4 +5,4 @@ commonLabels:
   vendor: forgerock
   component: config-util
 resources:
-- config-util-deployment.yaml
+- deployment.yaml
