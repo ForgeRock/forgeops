@@ -4,5 +4,5 @@ commonLabels:
   app: ig
 resources:
 - deployment.yaml
-- openig-secrets-env.yaml
+- secret.yaml
 - service.yaml

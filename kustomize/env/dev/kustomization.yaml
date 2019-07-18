@@ -10,6 +10,7 @@ bases:
   - ../../idm
   - ../../end-user-ui
   - ../../ig
+  - ../../web
   - ../../ingress
 patchesStrategicMerge:
   - platform-config.yaml

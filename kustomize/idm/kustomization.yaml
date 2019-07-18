@@ -3,8 +3,6 @@ apiversion: ""
 commonLabels:
     app: idm
 resources:
-- boot-properties.yaml
-- logging-properties.yaml
 - configmap.yaml
 - statefulset.yaml
 - service.yaml

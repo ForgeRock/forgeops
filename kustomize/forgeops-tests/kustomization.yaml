@@ -3,6 +3,6 @@ apiversion: ""
 commonLabels:
   app: forgeops-tests
 resources:
-- tests-deployment.yaml
+- deployment.yaml
 - service.yaml
 - ingress.yaml
