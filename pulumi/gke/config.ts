@@ -20,6 +20,7 @@ export const clusterName = config.require("clusterName");
 export const enablePreemptible = config.getBoolean("enablePreemptible") || false;
 export const nodeZones = config.requireObject<string[]>("nodeZones");
 export const k8sVersion = config.get("k8sVersion") || "latest";
+export const nginxVersion = config.get("nginxVersion") || "0.24.1";
 
 // ** NODE POOL CONFIG **
 export const nodeCount = config.getNumber("initialNodeCount") || 2;

@@ -3,14 +3,14 @@ import * as k8s from "@pulumi/kubernetes";
 import { ConfigFile, ConfigGroup } from "@pulumi/kubernetes/yaml";
 import { Config } from "@pulumi/pulumi";
 import { clusterProvider, primaryPool } from "./cluster";
-import { nsnginx } from "./nginx-controller"
+import { nginxControllerChart } from "./nginx-controller"
 
 const config = new Config();
 
 // Deploy cert-manager
 const certmanagerResources = new ConfigFile("cmResources", {
     file: "https://github.com/jetstack/cert-manager/releases/download/v0.8.1/cert-manager.yaml", 
-},{ dependsOn: [nsnginx, primaryPool], provider: clusterProvider });
+},{ dependsOn: [nginxControllerChart, primaryPool], provider: clusterProvider });
 
 // Deploy secret - certificate for cert-manager ca certificate(self signed)
 const caSecret = new k8s.core.v1.Secret("certmanager-ca-secret",{
@@ -26,7 +26,7 @@ const caSecret = new k8s.core.v1.Secret("certmanager-ca-secret",{
 },{ dependsOn: [certmanagerResources], provider: clusterProvider });
 
 // Deploy secret - service account for access to Cloud DNS
-const clouddns = new k8s.core.v1.Secret("clouddns",{
+export const clouddns = new k8s.core.v1.Secret("clouddns",{
     metadata: {
         name: "clouddns",
         namespace: "cert-manager"
@@ -38,7 +38,7 @@ const clouddns = new k8s.core.v1.Secret("clouddns",{
 },{ dependsOn: [certmanagerResources], provider: clusterProvider });
 
  // Deploy cert-manager issuers
-export const certmanager = new ConfigGroup("certManager", {
+const certmanager = new ConfigGroup("certManager", {
     files: [
         'files/cert-manager/ca-issuer.yaml',
         'files/cert-manager/le-issuer.yaml'

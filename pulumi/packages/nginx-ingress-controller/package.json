@@ -1,0 +1,19 @@
+{
+    "name": "@forgerock/pulumi-nginx-ingress-controller",
+    "version": "1.0.0",
+    "author": "lee.baines@forgerock.com",
+    "description": "Pulumi package to deploy Nginx Ingress Controller for Kubernetes",
+    "license": "APACHE-2.0",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc"
+    },
+    "devDependencies": {
+        "@types/node": "latest"
+    },
+    "dependencies": {
+        "@pulumi/kubernetes": "^0.24.0",
+        "@pulumi/pulumi": "^0.17.17"
+    }
+}
