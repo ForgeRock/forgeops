@@ -20,7 +20,7 @@
 
 <body>
     <div id="userDetails"></div>
-    <a href='#' onclick='AppAuthHelper.logout().then(() => location.reload())'>Logout</a>
+    <a href='#' onclick='AppAuthHelper.logout().then(function () { location.reload(); })'>Logout</a>
 </body>
 
 <script src="appAuthHelperBundle.js"></script>
@@ -28,13 +28,13 @@
 (function () {
     AppAuthHelper.init({
         clientId: "appAuthClient",
-        authorizationEndpoint: "https://login.sample.forgeops.com/oauth2/authorize",
-        tokenEndpoint: "https://login.sample.forgeops.com/oauth2/access_token",
-        revocationEndpoint: "https://login.sample.forgeops.com/oauth2/token/revoke",
-        endSessionEndpoint: "https://login.sample.forgeops.com/oauth2/connect/endSession",
+        authorizationEndpoint: "https://default.iam.example.com/am/oauth2/authorize",
+        tokenEndpoint: "https://default.iam.example.com/am/oauth2/access_token",
+        revocationEndpoint: "https://default.iam.example.com/am/oauth2/token/revoke",
+        endSessionEndpoint: "https://default.iam.example.com/am/oauth2/connect/endSession",
         resourceServers: {
-            "https://login.sample.forgeops.com/oauth2/userinfo": "profile",
-            "https://rs.sample.forgeops.com/openidm": "openid"
+            "https://default.iam.example.com/am/oauth2/userinfo": "profile",
+            "https://default.iam.example.com/openidm": "openid"
         },
         /*
         interactionRequiredHandler: function () {
@@ -51,11 +51,12 @@
 
             // Here is a sample "application" that just makes some requests to
             // resource servers and outputs the response on the page.
+
             Promise.all([
                 // Appropriate access tokens will be automatically included in these requests
-                fetch("https://login.sample.forgeops.com/oauth2/userinfo").then((resp) => resp.json()),
-                fetch("https://rs.sample.forgeops.com/openidm/info/login").then((resp) => resp.json())
-            ]).then((responses) => {
+                fetch("https://default.iam.example.com/am/oauth2/userinfo").then(function(resp) { return resp.json();}),
+                fetch("https://default.iam.example.com/openidm/info/login").then(function(resp) { return resp.json();})
+            ]).then(function (responses) {
                 document.getElementById('userDetails').innerText = JSON.stringify({
                     "userinfo": responses[0],
                     "info/login": responses[1]

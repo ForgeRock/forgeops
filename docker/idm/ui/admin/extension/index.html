@@ -38,7 +38,7 @@
 
 <script>
     (function () {
-        var AM_URL = '/am',
+        var AM_URL = window.location.origin + '/am',
             commonSettings = {
                 clientId: 'idmAdminClient',
                 authorizationEndpoint: AM_URL + '/oauth2/authorize'
