@@ -6,4 +6,4 @@ commonLabels:
 resources:
 - deployment.yaml
 - configmap.yaml
-- secrets.yaml
+- secret.yaml
