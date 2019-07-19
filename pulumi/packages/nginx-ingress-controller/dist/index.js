@@ -4,13 +4,13 @@ var k8s = require("@pulumi/kubernetes");
 /**
  * Nginx Ingress Controller Helm chart
  */
-function nginxChart(ip, version, ns, clusterProvider, metaNs) {
+function nginxChart(ip, version, clusterProvider, metaNs, nodePool, ns) {
     var nginx = new k8s.helm.v2.Chart("nginx-ingress", {
         repo: "stable",
         version: version,
         chart: "nginx-ingress",
         transformations: [metaNs],
-        namespace: ns,
+        namespace: ns.metadata.name,
         values: {
             rbac: { create: true },
             controller: {
@@ -24,7 +24,7 @@ function nginxChart(ip, version, ns, clusterProvider, metaNs) {
                 image: { tag: version }
             }
         }
-    }, { provider: clusterProvider });
+    }, { dependsOn: [nodePool, ns], provider: clusterProvider });
     return nginx;
 }
 /**
@@ -41,13 +41,16 @@ var NginxIngressController = /** @class */ (function () {
         var ip = chartArgs.ip;
         var version = chartArgs.version;
         var clusterProvider = chartArgs.clusterProvider;
+        var nodePool = chartArgs.nodePool;
         var ns = chartArgs.namespace;
+        // set namespace field in k8s manifest after Helm chart as been transformed.
         function metaNamespace(o) {
             if (o !== undefined) {
-                o.metadata.namespace = ns;
+                o.metadata.namespace = ns.metadata.name;
             }
         }
-        var nginx = nginxChart(ip, version, ns, clusterProvider, metaNamespace);
+        // Deploy Ingress Controller Helm chart
+        var nginx = nginxChart(ip, version, clusterProvider, metaNamespace, nodePool, ns);
         return nginx;
     }
     return NginxIngressController;

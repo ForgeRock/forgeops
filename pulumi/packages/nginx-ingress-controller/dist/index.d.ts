@@ -1,12 +1,15 @@
 import * as k8s from "@pulumi/kubernetes";
+import * as gcp from "@pulumi/gcp";
+import * as pulumi from "@pulumi/pulumi";
 /**
  * Nginx Ingress Controller configuration values
  */
 export interface ChartArgs {
-    ip: string;
+    ip: pulumi.Output<string>;
     version: string;
     clusterProvider: k8s.Provider;
-    namespace: string;
+    nodePool: gcp.container.NodePool;
+    namespace: k8s.core.v1.Namespace;
 }
 /**
  * Nginx Ingress Controller used for deploying ForgeRock CDM samples with Pulumi

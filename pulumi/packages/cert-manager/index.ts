@@ -1,5 +1,5 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as pulumi from "@pulumi/pulumi";
+import * as gcp from "@pulumi/gcp";
 import { ConfigFile, ConfigGroup } from "@pulumi/kubernetes/yaml";
 
 /**
@@ -16,6 +16,8 @@ export interface ChartArgs {
 
     // Cloud DNS Service Account
     cloudDnsSa: string;
+
+    nodePoolDependency: gcp.container.NodePool;
 }
 
 /**
@@ -35,21 +37,12 @@ export class CertManager {
     * @param opts  A bag of options that control this resource's behavior.
     */
 
-    constructor(name: string, chartArgs: ChartArgs, opts?: pulumi.ResourceOptions) {
-
-        const inputs: pulumi.Inputs = {
-            options: opts,
-        };
-
-        //super("pulumi-contrib:components:CertManager", name, inputs, opts);
-
-        // Default resource options for this component's child resources.
-        //const defaultResourceOptions: pulumi.ResourceOptions = { parent: this };
+    constructor(chartArgs: ChartArgs) {
 
         // Deploy cert-manager
         this.certmanagerResources = new ConfigFile("cmResources", {
             file: "https://github.com/jetstack/cert-manager/releases/download/v0.8.1/cert-manager.yaml", 
-        },{ provider: chartArgs.clusterProvider });
+        },{ dependsOn: chartArgs.nodePoolDependency, provider: chartArgs.clusterProvider });
 
         // Deploy secret - certificate for cert-manager ca certificate(self signed)
         this.caSecret = new k8s.core.v1.Secret("certmanager-ca-secret",{

@@ -1,5 +1,5 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as pulumi from "@pulumi/pulumi";
+import * as gcp from "@pulumi/gcp";
 import { ConfigFile, ConfigGroup } from "@pulumi/kubernetes/yaml";
 /**
  * cert-manager configuration values
@@ -9,6 +9,7 @@ export interface ChartArgs {
     tlsCrt: string;
     clusterProvider: k8s.Provider;
     cloudDnsSa: string;
+    nodePoolDependency: gcp.container.NodePool;
 }
 /**
  * cert-manager used in ForgeRock CDM samples deployed by Pulumi
@@ -24,5 +25,5 @@ export declare class CertManager {
     * @param chartArgs  The values to configure Nginx Controller Helm chart.
     * @param opts  A bag of options that control this resource's behavior.
     */
-    constructor(name: string, chartArgs: ChartArgs, opts?: pulumi.ResourceOptions);
+    constructor(chartArgs: ChartArgs);
 }

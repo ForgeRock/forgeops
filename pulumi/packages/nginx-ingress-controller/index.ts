@@ -1,16 +1,18 @@
 import * as k8s from "@pulumi/kubernetes";
+import * as gcp from "@pulumi/gcp";
+import * as pulumi from "@pulumi/pulumi";
 
 /** 
  * Nginx Ingress Controller Helm chart
  */ 
-function nginxChart(ip: string, version: string, ns: string, clusterProvider: k8s.Provider, metaNs: any) {
+function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider: k8s.Provider, metaNs: any, nodePool: gcp.container.NodePool, ns: k8s.core.v1.Namespace) {
     
     const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
         repo: "stable",
         version: version,
         chart: "nginx-ingress",
         transformations: [metaNs],
-        namespace: ns,
+        namespace: ns.metadata.name,
         values: {
             rbac: {create: true},
             controller: {
@@ -24,7 +26,7 @@ function nginxChart(ip: string, version: string, ns: string, clusterProvider: k8
                 image: {tag: version}
             }
         }
-    }, { provider: clusterProvider });
+    },{dependsOn: [nodePool, ns], provider:  clusterProvider});
 
     return nginx;
 }
@@ -34,7 +36,7 @@ function nginxChart(ip: string, version: string, ns: string, clusterProvider: k8
  */
 export interface ChartArgs {
     // Static IP address
-    ip: string;
+    ip: pulumi.Output<string>;
 
     // Nginx version for Ingress Controller
     version: string;
@@ -42,8 +44,10 @@ export interface ChartArgs {
     // The cluster provider containing the kubeconfig
     clusterProvider: k8s.Provider;
 
+    nodePool: gcp.container.NodePool;
+
     // Namespace
-    namespace: string;
+    namespace: k8s.core.v1.Namespace;
 }
 
 /**
@@ -63,16 +67,18 @@ export class NginxIngressController {
         const ip = chartArgs.ip;
         const version = chartArgs.version;
         const clusterProvider = chartArgs.clusterProvider;
+        const nodePool = chartArgs.nodePool;
         const ns = chartArgs.namespace;
 
         // set namespace field in k8s manifest after Helm chart as been transformed.
         function metaNamespace(o: any) {
             if (o !== undefined) {
-                o.metadata.namespace = ns;
+                o.metadata.namespace = ns.metadata.name;
             }
         }
 
-        const nginx = nginxChart(ip, version, ns, clusterProvider, metaNamespace);
+        // Deploy Ingress Controller Helm chart
+        const nginx = nginxChart(ip, version, clusterProvider, metaNamespace, nodePool, ns);
 
         return nginx;
     }

@@ -7,7 +7,7 @@
         "@pulumi/gcp": "^0.18.7",
         "@pulumi/kubernetes": "^0.24.0",
         "@pulumi/pulumi": "^0.17.17",
-        "@forgerock/pulumi-nginx-ingress-controller": "1.0.0",
-        "@forgerock/pulumi-cert-manager": "1.0.0"
+        "@forgerock/pulumi-nginx-ingress-controller": "1.0.2",
+        "@forgerock/pulumi-cert-manager": "1.0.1"
     }
 }

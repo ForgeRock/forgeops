@@ -12,17 +12,11 @@ var CertManager = /** @class */ (function () {
     * @param chartArgs  The values to configure Nginx Controller Helm chart.
     * @param opts  A bag of options that control this resource's behavior.
     */
-    function CertManager(name, chartArgs, opts) {
-        var inputs = {
-            options: opts,
-        };
-        //super("pulumi-contrib:components:CertManager", name, inputs, opts);
-        // Default resource options for this component's child resources.
-        //const defaultResourceOptions: pulumi.ResourceOptions = { parent: this };
+    function CertManager(chartArgs) {
         // Deploy cert-manager
         this.certmanagerResources = new yaml_1.ConfigFile("cmResources", {
             file: "https://github.com/jetstack/cert-manager/releases/download/v0.8.1/cert-manager.yaml",
-        }, { provider: chartArgs.clusterProvider });
+        }, { dependsOn: chartArgs.nodePoolDependency, provider: chartArgs.clusterProvider });
         // Deploy secret - certificate for cert-manager ca certificate(self signed)
         this.caSecret = new k8s.core.v1.Secret("certmanager-ca-secret", {
             metadata: {
