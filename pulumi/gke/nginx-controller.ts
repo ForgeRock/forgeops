@@ -20,7 +20,7 @@ function assignIp() {
         const staticIp = new gcp.compute.Address("cdm-ingress-ip", {
             addressType: "EXTERNAL",
         });
-        return staticIp.address;
+        return (staticIp.address).toString();
     }
 }
 
@@ -31,7 +31,7 @@ const nginxValues: ingressController.ChartArgs = {
     ip: lbIp,
     version: nginxVersion,
     clusterProvider: clusterProvider,
-    namespace: nsnginx.metadata.name
+    namespace: (nsnginx.metadata.name).toString()
 }
 
 // Deploy Nginx Ingress Controller Helm chart

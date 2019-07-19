@@ -4,7 +4,7 @@ import { Config } from "@pulumi/pulumi";
 const config = new Config();
 
 // ** PROJECT CONFIG **
-export const project = new pulumi.Config(pulumi.getProject())
+export const project = new pulumi.Config(pulumi.getProject());
 
 // ** NETWORK CONFIG **
 // Add 'gke-cdm:network: <network name>' if you already have a network configured. 
@@ -27,13 +27,13 @@ export const nodeCount = config.getNumber("initialNodeCount") || 2;
 export const cpuPlatform = config.get("cpuPlatform") || "Intel Skylake";
 export const nodeMachineType = config.get("nodeMachineType") || "n1-standard-2";
 export const diskSize = config.getNumber("diskSizeGb") || 80;
-export const diskType = config.getNumber("diskType") || "pd-ssd";
+export const diskType = config.get("diskType") || "pd-ssd";
 export let minNodes = config.getNumber("min") || 2;
 export let maxNodes = config.getNumber("max") || 4;
 
 // ** ADDITIONAL GCP RESOURCES **
 // Please add 'gke-cdm:bucketName <bucketName>' to stack file if you would like a bucket created for DS exports.
-export const bucketName= config.get("bucketName")
+export const bucketName= config.get("bucketName");
 
 
 

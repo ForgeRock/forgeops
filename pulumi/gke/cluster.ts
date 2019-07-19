@@ -16,8 +16,6 @@ import {
     maxNodes
 } from "./config";
 
-let username = `process.env.USER`;
-
 function assignVpc() {
     // Create new network if not provided
     if (network !== undefined) {
@@ -25,7 +23,7 @@ function assignVpc() {
         return vpcNetwork;
     } else {
         const vpcNetwork = new gcp.compute.Network("cdm-network", {});
-        return vpcNetwork;
+        return vpcNetwork.name;
     }
 }
 

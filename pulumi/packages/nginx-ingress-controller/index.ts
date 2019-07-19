@@ -65,6 +65,7 @@ export class NginxIngressController {
         const clusterProvider = chartArgs.clusterProvider;
         const ns = chartArgs.namespace;
 
+        // set namespace field in k8s manifest after Helm chart as been transformed.
         function metaNamespace(o: any) {
             if (o !== undefined) {
                 o.metadata.namespace = ns;

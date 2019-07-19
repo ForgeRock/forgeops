@@ -3,7 +3,7 @@ import * as gcp from "@pulumi/gcp";
 import { clusterProvider, k8sConfig } from "./cluster";
 import "./nginx-controller";
 import { lbIp } from "./nginx-controller";
-import "./cert-manager";
+// import "./cert-manager";
 //import "./prometheus";
 import {
     bucketName,
