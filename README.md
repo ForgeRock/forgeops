@@ -1,6 +1,6 @@
 # ForgeRock DevOps and Cloud Deployment
 
-Kubernetes DevOps artifacts for the ForgeRock platform.
+Kubernetes deployment for the ForgeRock platform.
 
 ** IMPORTANT: The current supported branch is release/6.5.2. The master branch is under development **
 
@@ -68,7 +68,7 @@ This preview branch enables the use of supported ForgeRock binaries in your
 ## Documentation 
 
 The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide-minikube/index.html#devops-implementation-env-about-the-env)
-tracks the master branch.
+tracks the master branch, including information on the newer Kustommize/ Skaffold workflow.
 
 The documentation for the current release can be found on
 [backstage](https://backstage.forgerock.com/docs/platform).
@@ -77,7 +77,6 @@ The documentation for the current release can be found on
 ## Setting a namespace
 
 If you do not want to use the 'default' namespace, set your namespace using:
-
 ```
 kubectl config set-context $(kubectl config current-context) --namespace=<insert-namespace-name-here>
 ```

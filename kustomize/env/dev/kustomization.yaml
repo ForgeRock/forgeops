@@ -9,7 +9,6 @@ bases:
   # - ../../amster
   - ../../idm
   - ../../end-user-ui
-  - ../../ig
   - ../../web
   - ../../ingress
 patchesStrategicMerge:

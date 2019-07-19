@@ -1,12 +1,13 @@
-# Kustomize POC
+# Kustomize 
 
-This is a POC to experiment with [Kustomize](https://kubectl.docs.kubernetes.io/pages/app_customization/introduction.html).
+This folder provides [Kustomize](https://kubectl.docs.kubernetes.io/pages/app_customization/introduction.html) artifacts
+for deploying the ForgeRock platform.
 
 [ship](https://www.replicated.com/ship/) was used to generate the kustomize from our exiting helm charts.
 
 The organization is experimental - feedback welcome.
 
-If you are not familiar with Kustomize I suggest reading the doc link above - the explanation below will make a lot more sense.
+If you are not familiar with Kustomize, please read the document link above - the explanation below will make a lot more sense.
 
 TL;DR; - Kustomize is based on patching (json patch and strategic merge patch) and overlays.
 You create base assets (K8S yaml files), and patch those. Those in turn can be used as a new base, and so on. You can nest these to any 
