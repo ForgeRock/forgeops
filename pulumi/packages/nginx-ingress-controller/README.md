@@ -19,7 +19,7 @@ Configure required arguments for Nginx Helm chart:
 ```
 const nginxValues: ingressController.ChartArgs = {
     ip: "35.10.10.200",                // static IP address
-    version: "0.24.1",                 // Ingress controller version  
+    version: "0.25.0",                 // Ingress controller version  
     clusterProvider: clusterProvider,  // Your cluster provider
     namespace: nsnginx.metadata.name   // namespace 
 }

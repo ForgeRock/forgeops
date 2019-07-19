@@ -38,6 +38,6 @@ helm upgrade -i nginx --namespace nginx \
   --set controller.stats.enabled=true \
   --set controller.service.externalTrafficPolicy=Local \
   --set controller.service.type=LoadBalancer \
-  --set controller.image.tag="0.21.0" \
+  --set controller.image.tag="0.25.0" \
    $IP_OPTS $IP_GROUP_OPTS stable/nginx-ingress
 
