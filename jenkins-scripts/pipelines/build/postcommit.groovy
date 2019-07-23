@@ -56,9 +56,11 @@ void buildImage(String directoryName) {
     String gitShaLabel = "${BASE_VERSION}-${SHORT_GIT_COMMIT}" // e.g. 7.0.0-a7267fbc
 
     sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
-    sh "docker push ${imageBaseName}:${gitShaLabel}"
-    sh "docker tag ${imageBaseName}:${gitShaLabel} ${imageBaseName}:latest"
-    sh "docker push ${imageBaseName}:latest"
+    if (env.BRANCH_NAME == 'master') {
+        sh "docker push ${imageBaseName}:${gitShaLabel}"
+        sh "docker tag ${imageBaseName}:${gitShaLabel} ${imageBaseName}:latest"
+        sh "docker push ${imageBaseName}:latest"
+    }
 }
 
 def postBuildTests() {
