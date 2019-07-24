@@ -7,6 +7,7 @@
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 import com.forgerock.pipeline.PullRequestBuild
+import com.forgerock.pipeline.reporting.PipelineRun
 
 def build() {
 
@@ -55,12 +56,12 @@ void buildImage(String directoryName) {
     sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
 }
 
-def postBuildTests() {
+def postBuildTests(PipelineRun pipelineRun) {
 
     try {
         // PIT #1 tests
         stageErrorMessage = "The PIT #1 functional tests failed, please have a look at the console output"
-        pit1TestStage.runStage("tests/smoke")
+        pit1TestStage.runStage(pipelineRun, "tests/smoke")
         currentBuild.result = 'SUCCESS'
         prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
     }

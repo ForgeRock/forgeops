@@ -1,6 +1,8 @@
 #!/usr/bin/env groovy
 
-@Library(value=['forgerock-pipeline-libs', 'QaCloudUtils']) _
+@Library(value=['forgerock-pipeline-libs', 'QaCloudUtils', 'java-pipeline-libs']) _
+
+import com.forgerock.pipeline.reporting.PipelineRun
 
 BASE_VERSION = '7.0.0'
 
@@ -12,6 +14,7 @@ buildDirectories = [
 ]
 
 def pipeline
+def pipelineRun
 
 timestamps {
     node ('build&&linux') {
@@ -25,6 +28,8 @@ timestamps {
             GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
             currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
             currentBuild.description = 'built:'
+
+            pipelineRun = new PipelineRun(env, steps, "forgeops", BRANCH_NAME, GIT_COMMIT)
 
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
             def modulesLocation = "${env.WORKSPACE}/jenkins-scripts/modules"
@@ -46,7 +51,7 @@ timestamps {
     }
 
     if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
-        pipeline.postBuildTests()
+        pipeline.postBuildTests(pipelineRun)
 
         if (isPR()) {
             prAutomation.mergeIfAutomatedProductVersionUpdate(GIT_COMMIT)
