@@ -16,7 +16,7 @@ data:
       <h3>Links</h3>
       <ul>
         <li>
-          <a href="https://login.{{ .Release.Namespace }}{{ .Values.domain}}/openam" target="_blank">AM</a>
+          <a href="https://login.{{ .Release.Namespace }}{{ .Values.domain}}/openam/XUI/?service=adminconsoleservice" target="_blank">AM</a>
         </li>
         <li>
           <a href="https://openidm.{{ .Release.Namespace }}{{ .Values.domain}}" target="_blank">IDM</a>
