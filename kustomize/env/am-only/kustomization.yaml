@@ -5,7 +5,8 @@ bases:
   - ../../ds/cts
   - ../../ds/idrepo
   - ../../am
-  - ../../config-util
+  - ../../amster
+#  - ../../config-util
   - ../../ingress
 patchesStrategicMerge:
   - platform-config.yaml

@@ -25,15 +25,16 @@ class AMConfig(object):
         self.config_dir = folder
         self.fqdn = fqdn
         self.entityMap = {
-            "RestApis": "global-config/services",
-            "PrometheusReporter": "global-config/services/monitoring/prometheus",
-            "KeyStoreSecretStore": "global-config/secrets/stores/KeyStoreSecretStore",
-            "FileSystemSecretStore": "global-config/secrets/stores/FileSystemSecretStore",
-            "CtsDataStoreProperties": "global-config/servers",
-            "DefaultCtsDataStoreProperties": "global-config/servers/server-default/properties/cts",
-            "Authentication": "global-config/authentication",
-            "DefaultAdvancedProperties": "global-config/servers/server-default/properties/advanced",
-            "neoLdapService": "realms/root/realm-config/authentication/modules/ldap/neoLdapService"      
+            "RestApis": ["global-config/services", "protocol=2.0,resource=1.0"],
+            "PrometheusReporter": ["global-config/services/monitoring/prometheus", "protocol=2.0,resource=1.0"],
+            "CorsService": ["global-config/services/CorsService", "protocol=2.0,resource=1.0"],
+            "KeyStoreSecretStore": ["global-config/secrets/stores/KeyStoreSecretStore", "protocol=2.0,resource=1.0"],
+            "FileSystemSecretStore": ["global-config/secrets/stores/FileSystemSecretStore", "protocol=2.0,resource=1.0"],
+            "CtsDataStoreProperties": ["global-config/servers", "protocol=2.0,resource=1.0"],
+            "DefaultCtsDataStoreProperties": ["global-config/servers/server-default/properties/cts", "protocol=1.0,resource=1.0"],
+            "Authentication": ["global-config/authentication", "protocol=1.0,resource=1.0"],
+            "DefaultAdvancedProperties": ["global-config/servers/server-default/properties/advanced", "protocol=1.0,resource=1.0"],
+            "neoLdapService": ["realms/root/realm-config/authentication/modules/ldap/neoLdapService", "protocol=2.0,resource=1.0"]
         }
 
     # UTILITY METHODS
@@ -58,16 +59,20 @@ class AMConfig(object):
             'X-OpenAM-Password': password,
             'accept-api-version': 'resource=1.0,protocol=2.0',
         }
-        login_request = post(f'{self.am_url}/json/authenticate', headers=headers, verify=False)
+        login_request = post(f'{self.am_url}/json/authenticate?authIndexType=service&authIndexValue=adminconsoleservice', headers=headers, verify=False)
         token = login_request.json()['tokenId']
         print(f'Have admin access token: {token}')
         return token
 
-    @property
-    def admin_headers(self):
+    def admin_headers(self, api_version):
         return {'iPlanetDirectoryPro': self.admin_token,
-                'accept-api-version': 'protocol=1.0,resource=1.0',
+                # Note: protocol=1.0 for legacy endpoints...
+                'accept-api-version':  api_version,
                 'Content-Type': 'application/json'}
+
+    @property
+    def admin_headers_crest1(self):
+        return self.admin_headers('protocol=1.0,resource=1.0')
 
     # This header is needed for CREST 2.0 PUT requests          
     # 'if-none-match' : '*',
@@ -96,16 +101,18 @@ class AMConfig(object):
         if r.status_code > 300:
             print(f'Error is {r.content} ')
 
-    # Calculates the json path from the payload. 
-    def type_to_url(self, payload):
+    # Calculates the json path and proto versions from the payload.
+    def map_rest(self, payload):
         # payload contains a _type struct
         type = payload['metadata']['entityType']
         # The _id is the object type
         id = payload['data']['_id']
-        u = self.entityMap[type]
+        u = self.entityMap[type][0]
+        api = self.entityMap[type][1]
+        url = f'{self.am_url}/json/{u}/{id}'
         if (id == None or id.startswith("null")):
-            return f'{self.am_url}/json/{u}'
-        return f'{self.am_url}/json/{u}/{id}'
+            url =  f'{self.am_url}/json/{u}'
+        return url,api
 
     # Import all config files for the root realm
     def import_realm_config(self):
@@ -118,9 +125,9 @@ class AMConfig(object):
             # /am/json/realm-config/services/id-repositories/LDAPv3ForForgeRockIAM/DS%20for%20ForgeRock%20IAM
             
             if id.startswith("LDAPv3"):
-                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data, self.admin_headers)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/services/id-repositories/{id}/{name}', data, self.admin_headers_crest1)
             elif name == "Core":
-                self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers)
+                self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers_crest1)
             else:
                 self.put(f'{self.am_url}/json/realms/root/realm-config/services/{id}', data, self.admin_headers_crest2)
             # TODO: More error checking here...
@@ -153,22 +160,23 @@ class AMConfig(object):
             _chainConfig = data['data']['authChainConfiguration']
             url = f'{self.am_url}/json/realms/root/realm-config/authentication'
             # Create chain
-            post(f'{url}/chains?_action=create', json={"_id" : _chainId}, headers=self.admin_headers)
+            post(f'{url}/chains?_action=create', json={"_id" : _chainId}, headers=self.admin_headers_crest1)
             # Update chain configuration
-            put(f'{url}/chains/{_chainId}', json={"authChainConfiguration": _chainConfig}, headers=self.admin_headers)
+            put(f'{url}/chains/{_chainId}', json={"authChainConfiguration": _chainConfig}, headers=self.admin_headers_crest1)
             # if filename == "Authentication.json":
-            #     self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers)
+            #     self.put(f'{self.am_url}/json/realms/root/realm-config/authentication', data, self.admin_headers_crest1)
             
 
     def import_global_configs(self):
         dir = f'{self.config_dir}/global'
         for filename in os.listdir(dir):
             data = self.read_json_full(f'{dir}/{filename}', self.fqdn)
-            url = self.type_to_url(data)
+            url,api = self.map_rest(data)
             payload = data['data']
             # Remove the id from the payload - not required for PUT
             payload.pop('_id')
-            self.put(url, payload, self.admin_headers)
+            print(f'Putting  {url} payload={payload}')
+            self.put(url, payload, self.admin_headers(api))
 
     def import_policies(self):
         dir = f'{self.config_dir}/policies'
@@ -200,7 +208,7 @@ if __name__ == '__main__':
     print(f'Doing minimal AM config using {am_cfg_folder} with url {am_url} external fqdn {am_fqdn}')
     cfg = AMConfig(am_url, am_fqdn, am_cfg_folder)
     cfg.import_global_configs()
-    #cfg.import_auth_chains()
+    cfg.import_auth_modules()
     cfg.import_realm_config()
     cfg.import_oauth2_configs()
     cfg.import_agent_configs()

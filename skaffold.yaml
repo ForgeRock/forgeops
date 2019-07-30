@@ -162,8 +162,8 @@ profiles:
     - image: config-util
       context: docker/config-util
     # Uncomment this if you want to use amster instead of config-util
-    # - image: amster
-    #   context: docker/amster
+    - image: amster
+      context: docker/amster
     - image: ds-cts
       context: docker/ds/cts
     - image: ds-idrepo
