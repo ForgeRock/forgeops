@@ -8,8 +8,8 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
-
+#source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
+S3_BUCKET_NAME=lee-test-cdm3
 # Set policy name
 IAM_POLICY_NAME="${S3_BUCKET_NAME}-Sync-Policy"
 
@@ -38,3 +38,6 @@ EOF
 POLICY_ARN=$(aws iam create-policy --policy-name ${IAM_POLICY_NAME} --policy-document "${S3_BUCKET_POLICY}" --query Policy.Arn)
 
 echo "IAM policy created with ARN: ${POLICY_ARN}. Please set this ARN value to the S3_POLICY_ARN attribute in your eks-env.cfg file."
+
+# Update bucket permissions to block public access
+aws s3api put-public-access-block --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true --bucket ${S3_BUCKET_NAME}
