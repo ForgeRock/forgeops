@@ -2,10 +2,12 @@
 
 The Pulumi scripts in this folder enables a user to setup and manage the cloud infrastructure
 required to successfully deploy ForgeRock CDM samples.
+<br />
 
 ## Prerequisites
 * Kubernetes client version 1.14+
 * Pulumi version 0.17.25+
+<br />
 
 ## Pulumi setup steps
 The samples in this folder are based on Pulumi's default language of Typescript with Node.js.
@@ -49,6 +51,7 @@ backup/ - full historical state backups.
 ```
 
 Note: You will occasionally see (warnings)[https://github.com/pulumi/pulumi/issues/2791] using the gcs backend, but it does work.
+<br />
 
 ## Pulumi project setup steps
 
@@ -59,42 +62,43 @@ Pulumi.<stackname>.yaml - contains configuration values for the stack we initial
 index.ts - the Pulumi program that defines our stack resources. Let’s examine it.
 ```
 
-#### Actions
-These actions need to be carried out inside the cloud providers directory in the pulumi folder.  The same actions need to be repeated for each cloud provider that you are using.
+#### Setup steps
+These steps need to be carried out inside the cloud providers directory in the pulumi folder.  The same actions need to be repeated for each cloud provider that you are using.
 
 ```IMPORTANT``` Create your own branch so you can configure your own Pulumi stacks. If you wish to access a stack that has already been deployed, you will need to be on the same  branch that deployed the resources originally and login to the same shared backend.
 
-CD into the cloud provider folder that you want to use:
-```
-cd <aws/azure/gcp>
-```
+1. CD into the cloud provider folder that you want to use:
+    ```
+    cd <aws/azure/gcp>
+    ```
 
-Install dependencies
+2. Install dependencies
 (this generates node_modules directory. This is ignored by git as is too large to commit):
-```
-npm install
-```
+    ```
+    npm install
+    ```
 
-Running Pulumi in local mode or logging into a GCP bucket requires a passphrase to protect your stack.  You can set the following ENV variable to save you retyping passphrase every time. Default = "password" :
-```
-export PULUMI_CONFIG_PASSPHRASE=password
-```
+3. Running Pulumi in local mode or logging into a GCP bucket requires a passphrase to protect your stack.  You can set the following ENV variable to save you retyping passphrase every time. Default = "password" :
+    ```
+    export PULUMI_CONFIG_PASSPHRASE=password
+    ```
 
-Setup your Pulumi stacks.  The stack name needs to match the second part of the *Pulumi.\<stack\>.yaml* files.
+4. Setup your Pulumi stacks.  The stack name needs to match the second part of the *Pulumi.\<stack\>.yaml* files.
 If you are storing state in a bucket or using local login, stacks need to have unique names across projects(Pulumi are looking into this https://github.com/pulumi/pulumi/issues/2522).
 Please use format, <projectname>-<deployment name> so in GKE project please use:
-```
-pulumi stack init gke-small
-pulumi stack init gke-medium
-pulumi stack init gke-large
-```
+    ```
+    pulumi stack init gke-small
+    pulumi stack init gke-medium
+    pulumi stack init gke-large
+    ```
 
-```NOTE``` If you change your passphrase or stack/project cofiguration, please don't commit back to forgeops unless it's an improvement.
+    ```NOTE``` If you change your passphrase or stack/project cofiguration, please don't commit back to forgeops unless it's an improvement.
 
-Set kubeconfig:
-```
-export KUBECONFIG=$PWD/kubeconfig
-```
+5. Set kubeconfig:
+    ```
+    export KUBECONFIG=$PWD/kubeconfig
+    ```
+<br />
 
 ## Configure and run your deployment
 
@@ -148,10 +152,12 @@ Remove the selected stack:
 pulumi destroy
 ```
 
-```NOTE``` Sometimes, you may find that one of the Helm chart components doesn't succeed.  This is often to do with the ordering of deployed resources within a Helm chart. If this happens, running Pulumi up a 2nd time usually resolves this.
+```NOTE``` Sometimes, you may find that one of the Helm chart components doesn't succeed.  This is often to do with the ordering of deployed resources within a Helm chart. If this happens, running Pulumi up a 2nd time usually resolves this.  
+<br />
 
-## Switching projects
+## Switching cloud projects
 
+To run a particular cloud stack you need to ensure you are inside the correct cloud folder inside the Pulumi folder.  
 As the kubeconfig file is set local to a project, remember to reset when switching:
 ```
 export KUBECONFIG=$PWD/kubeconfig
@@ -159,7 +165,8 @@ export KUBECONFIG=$PWD/kubeconfig
 or:
 ```
 . ../bin/set-kubeconfig.sh
-```
+```  
+<br />
 
 ## Useful commands
 
@@ -180,7 +187,7 @@ View config values used in stack:
 pulumi config
 ```
 
-View decryted secret values:
+View decrypted secret values:
 ```
 pulumi config --show-secrets
 ```
@@ -194,6 +201,7 @@ Delete stack without removing the Pulumi.\<stack\>.yaml. This clears all the sta
 ```
 pulumi stack rm <stack> --preserve-config
 ```
+<br />
 
 ## To Do
 * Update EKS project with cert-manager and nginx ingress controller packages.

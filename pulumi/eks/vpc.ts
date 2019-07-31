@@ -6,29 +6,29 @@ import {
     numOfAzs,
 } from "./config"
         
-const publicSubnetArgsA: awsx.ec2.VpcSubnetArgs = {
-    name: 'publicSubnetA',
+const publicSubnetArgs: awsx.ec2.VpcSubnetArgs = {
+    name: 'publicSubnet',
     cidrMask: 20,
     type: 'public',
 };
 
-const publicSubnetArgsB: awsx.ec2.VpcSubnetArgs = {
-    name: 'publicSubnetB',
-    cidrMask: 20,
-    type: 'public',
-};
+// const publicSubnetArgsB: awsx.ec2.VpcSubnetArgs = {
+//     name: 'publicSubnetB',
+//     cidrMask: 20,
+//     type: 'public',
+// };
 
-const privateSubnetArgsA: awsx.ec2.VpcSubnetArgs = {
-    name: 'privateSubnetA',
+const privateSubnetArgs: awsx.ec2.VpcSubnetArgs = {
+    name: 'privateSubnet',
     cidrMask: 20,
     type: 'private',
 };
 
-const privateSubnetArgsB: awsx.ec2.VpcSubnetArgs = {
-    name: 'privateSubnetB',
-    cidrMask: 20,
-    type: 'private',
-};
+// const privateSubnetArgsB: awsx.ec2.VpcSubnetArgs = {
+//     name: 'privateSubnetB',
+//     cidrMask: 20,
+//     type: 'private',
+// };
 
 /* VPC configuration */
 const vpcArguments: awsx.ec2.VpcArgs = {
@@ -40,7 +40,7 @@ const vpcArguments: awsx.ec2.VpcArgs = {
         Name: "eks-cdm", 
         CreatedBy: `process.env.USER`
     },
-    subnets: [ publicSubnetArgsA, publicSubnetArgsB, privateSubnetArgsA, privateSubnetArgsB  ],
+    subnets: [ publicSubnetArgs, privateSubnetArgs  ],
 };
 
 
