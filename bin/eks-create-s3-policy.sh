@@ -8,8 +8,8 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-#source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
-S3_BUCKET_NAME=lee-test-cdm3
+source "${BASH_SOURCE%/*}/../etc/eks-env.cfg"
+
 # Set policy name
 IAM_POLICY_NAME="${S3_BUCKET_NAME}-Sync-Policy"
 
