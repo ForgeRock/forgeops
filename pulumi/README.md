@@ -1,10 +1,14 @@
 # ForgeRock Cloud Infrastructure Setup using Pulumi
 
-The Pulumi scripts in this folder allows a user to setup and manage the cloud infrastructure
+The Pulumi scripts in this folder enables a user to setup and manage the cloud infrastructure
 required to successfully deploy ForgeRock CDM samples.
 
+## Prerequisites
+* Kubernetes client version 1.14+
+* Pulumi version 0.17.25+
+
 ## Pulumi setup steps
-The samples in this folder are based on Pulumi's default language of Typescrypt with Node.js.
+The samples in this folder are based on Pulumi's default language of Typescript with Node.js.
 Other languages are available but not documented here.
 
 * Configure your cloud CLI if necessary: https://www.pulumi.com/docs/quickstart/.
@@ -58,15 +62,15 @@ index.ts - the Pulumi program that defines our stack resources. Let’s examine 
 #### Actions
 These actions need to be carried out inside the cloud providers directory in the pulumi folder.  The same actions need to be repeated for each cloud provider that you are using.
 
-```IMPORTANT``` Create your own branch so you can configure your own Pulumi stacks. If you are accessing a shared stack, you will need to be on the same  branch that deployed the resources originally and login to the shared backend.
+```IMPORTANT``` Create your own branch so you can configure your own Pulumi stacks. If you wish to access a stack that has already been deployed, you will need to be on the same  branch that deployed the resources originally and login to the same shared backend.
 
-CD into the cloud provider folder that you want to use
+CD into the cloud provider folder that you want to use:
 ```
 cd <aws/azure/gcp>
 ```
 
-Install dependencies:
-(this generates node_modules directory. This is ignored by git as is too large to commit)
+Install dependencies
+(this generates node_modules directory. This is ignored by git as is too large to commit):
 ```
 npm install
 ```
@@ -87,7 +91,7 @@ pulumi stack init gke-large
 
 ```NOTE``` If you change your passphrase or stack/project cofiguration, please don't commit back to forgeops unless it's an improvement.
 
-Set kubeconfig
+Set kubeconfig:
 ```
 export KUBECONFIG=$PWD/kubeconfig
 ```
@@ -123,17 +127,17 @@ pulumi stack select <stack>
 pulumi up
 ```
 
-Grab kubeconfig output from stack and set context. 
+Grab kubeconfig output from stack and set context:
 ```
 pulumi stack output kubeconfig > kubeconfig
 export KUBECONFIG=$PWD/kubeconfig
 ```
-or run 
+or run: 
 ```
 . ../bin/set-kubeconfig.sh
 ```
 
-Verify
+Verify:
 ```
 kubectx
 kubens # check for cert-manager and nginx namespaces and that the services are running.
@@ -152,39 +156,49 @@ As the kubeconfig file is set local to a project, remember to reset when switchi
 ```
 export KUBECONFIG=$PWD/kubeconfig
 ```
-or 
+or:
 ```
 . ../bin/set-kubeconfig.sh
 ```
 
 ## Useful commands
 
-Preview stack
+Preview stack:
 ```
 pulumi preview
 ```
 
-View/edit state file.
+View/edit state file:
 ```
 pulumi stack export --file output
 # edit file, i.e. you can remove resources if they get removed outside of Pulumi, or remove pending operations if Pulumi gets interrupted
 pulumi stack import --file output
 ```
 
-View decryted secret values
+View config values used in stack:
+```
+pulumi config
+```
+
+View decryted secret values:
 ```
 pulumi config --show-secrets
 ```
 
-View stack logs
+View stack logs:
 ```
 pulumi stack logs
 ```
 
-Delete stack without removing the Pulumi.\<stack\>.yaml. This clears all the stack files from the backend.
+Delete stack without removing the Pulumi.\<stack\>.yaml. This clears all the stack files from the backend:
 ```
 pulumi stack rm <stack> --preserve-config
 ```
+
+## To Do
+* Update EKS project with cert-manager and nginx ingress controller packages.
+* Add AKS project.
+* Add capability to reduce cluster to 0 nodes.
 
 
 

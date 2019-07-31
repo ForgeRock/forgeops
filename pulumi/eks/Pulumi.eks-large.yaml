@@ -1,0 +1,10 @@
+encryptionsalt: v1:9WLvKt33gcE=:v1:SK/fmK1Qdv8jnNqi:8aoOuhqZl4a2N58WWwlxx26FyhLKzA==
+config:
+  aws:region: us-east-1
+  eks-cdm:ami: ami-0abcb9f9190e867ab
+  eks-cdm:clusterName: cdm-large
+  eks-cdm:k8sVersion: "1.13"
+  eks-cdm:machineType: c5.9xlarge
+  eks-cdm:nodeZones: '["us-east4-b"]'
+  eks-cdm:pubKey:
+    secure: v1:j9G9NCAyN6ozHCL1:GqMU3XiFNT1JQ28MliIqICnVD8uOFSuOZmk6kPDBFtrOJeWxH1xz/N2y61ekjsKMMbgE6/guvF52XMv1HupIi7HsF7g35dMS+sSFHq/YB1HQaRPjKz0j2ejEXwp01G+p//J0GV8xLiCws/lzn0tIe/IpDHX8ESnNBIc/yCvCv6Dmj+gzGi5W2qdKB+7Z2hYNDIjCmHe/a83MvTszVvca8wBd6ygaMkb8Vxc2Lc6+8zydJg5Tg+EJAK8yg9vp/mcLLRUW1JGTK5mNWUP/4C1PkPSNWeRRqu893lHIJvHCQ3W+FxmgFjSKs5TG45NWziSm6oIjmeggEYpAosiiNP89kccjJFDgTd5TlgD0oRn6wNiCfY+iIShErBwAMcb9J3iOoTezT9HqrArQ0zlCkmqYJax/AsnGev/UlFBoXmaEQvMPDSSVSNUachav7yPMO/3Yq68wmJRB7wFkcqHMQycIcVwDBLpD0lng1OwiSz5jQVxy8Ug58XE3dxg6tqVgjXJZRbdh5yAoxB/PHtUZRvG6Ax/QnJ5BrrTFazR2Bm0eB5MNVK2PXQ==
