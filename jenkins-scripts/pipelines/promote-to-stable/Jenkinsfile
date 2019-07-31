@@ -1,0 +1,92 @@
+/*
+ * Copyright 2019 ForgeRock AS. All Rights Reserved
+ *
+ * Use of this code requires a commercial software license with ForgeRock AS.
+ * or with one of its affiliates. All use shall be exclusively subject
+ * to such license between the licensee and ForgeRock AS.
+ */
+
+//==================================================
+// ForgeOps pipeline to promote 'master' to 'stable'
+//==================================================
+
+import java.net.URLDecoder
+
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+
+@Library(['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@b268029'])
+import com.forgerock.pipeline.Build
+
+properties([
+        buildDiscarder(logRotator(numToKeepStr: '10')),
+        pipelineTriggers([cron('@daily')])
+])
+
+timestamps {
+    manageNotifications {
+        node('build&&linux') {
+            stage('Setup') {
+                checkout scm
+
+                def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
+                def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
+
+                localGitUtils = load("${libsLocation}/git-utils.groovy")
+                commonModule = load("${libsLocation}/common.groovy")
+                commonModule.loadCurrentHelmChartValues()
+
+                // Test stages
+                pit1Tests = load("${stagesLocation}/pit1-tests.groovy")
+                perfTests = load("${stagesLocation}/perf-tests.groovy")
+                greenfieldTests = load("${stagesLocation}/pit-greenfield.groovy")
+                upgradeTests = load("${stagesLocation}/pit-upgrade.groovy")
+                pit2Tests = load("${stagesLocation}/pit2-tests.groovy") // combines PERF, Greenfield, Upgrade
+
+                promoteMasterToStable = load("${stagesLocation}/promote-master-to-stable.groovy")
+
+                currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
+
+                echo "Testing ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} " +
+                        "(${commonModule.FORGEOPS_GIT_COMMIT})"
+                echo "Using Lodestar commit ${commonModule.LODESTAR_GIT_COMMIT} for the tests"
+            }
+        }
+
+        pit1Tests.runStage('PIT1 Smoke', 'tests/smoke', 'smoke-deployment')
+        pit2Tests.runStage()
+
+        promoteMasterToStable.runStage()
+
+        currentBuild.result = 'SUCCESS'
+    }
+}
+
+/**
+ * Manage the build notifications.
+ * @param notificationsEnabled Quickly disable notifications by setting this value to @code{false}.
+ * @param body The build script.
+ */
+def manageNotifications(boolean notificationsEnabled = true, Closure body) {
+    def slackChannel = '#cloud-deploy-notify'
+    def promotionBuild = new Build(steps, env, currentBuild)
+    try {
+        body() // perform the build
+        if (notificationsEnabled) {
+            promotionBuild.sendSlackNotification(
+                    slackChannel,
+                    false,
+                    " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promoted commit " +
+                            "${commonModule.FORGEOPS_SHORT_GIT_COMMIT} from master to stable (<${env.BUILD_URL}|Open>)"
+            )
+        }
+    } catch (FlowInterruptedException ex) {
+        currentBuild.result = 'ABORTED'
+        throw ex
+    } catch (exception) {
+        currentBuild.result = 'FAILURE'
+        if (notificationsEnabled) {
+            promotionBuild.sendSlackNotification(slackChannel)
+        }
+        throw exception
+    }
+}
