@@ -7,14 +7,8 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-hash: sha1
     nginx.ingress.kubernetes.io/session-cookie-name: route
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-methods: "PUT,GET,POST,HEAD,PATCH,DELETE"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with,cache-control,content-type,x-openidm-nosession,x-openidm-password,x-openidm-username,if-match,if-none-match"
-    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
-    # Add your allowed origins here...
-    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:8888"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "Access-Control-Expose-Headers: WWW-Authenticate";
+    # CORS is now set in the AM and IDM configurations
+    nginx.ingress.kubernetes.io/enable-cors: "false"
     certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
     #certmanager.k8s.io/cluster-issuer: "ca-issuer"
   name: forgerock
