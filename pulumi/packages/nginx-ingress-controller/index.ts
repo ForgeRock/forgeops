@@ -1,15 +1,17 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
 
 /** 
  * Nginx Ingress Controller Helm chart
  */ 
-function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider: k8s.Provider, metaNs: any, nodePool: gcp.container.NodePool, ns: k8s.core.v1.Namespace) {
+function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider: k8s.Provider, metaNs: any, dependency: any, ns: k8s.core.v1.Namespace, annotations: any) {
     
     const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
-        repo: "stable",
-        version: version,
+        fetchOpts: {
+            repo: "https://kubernetes-charts.storage.googleapis.com",
+            version: version
+        },
+        version: "1.9.1",
         chart: "nginx-ingress",
         transformations: [metaNs],
         namespace: ns.metadata.name,
@@ -17,26 +19,54 @@ function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider:
             rbac: {create: true},
             controller: {
                 publishService: {enabled: true},
-                stats: {enabled: true},
+                stats: {
+                    enabled: true,
+                    service: { omitClusterIP: true } 
+                },
                 service: {
                     type: "LoadBalancer",
                     externalTrafficPolicy: "Local",
-                    loadBalancerIP: ip
+                    loadBalancerIP: ip,
+                    annotations: annotations,
+                    omitClusterIP: true
                 },
                 image: {tag: version}
+            },
+            defaultBackend: {
+                service: { omitClusterIP: true }
             }
         }
-    },{dependsOn: [nodePool, ns], provider:  clusterProvider});
+    },{dependsOn: [dependency, ns], provider:  clusterProvider});
 
     return nginx;
 }
+
+// function addRoute53Record(domain: string, nginx: k8s.helm.v2.Chart, url: pulumi.Output<string>) {
+
+//     // Get the hostname given to the ingress load balancer
+//     const hostname = nginx.getResource("v1/Service", "nginx-ingress-controller").status.apply(s => s.loadBalancer.ingress[0].hostname);
+
+//     // Get the hosted zone details from the provided domain
+//     const selected = pulumi.output(aws.route53.getZone({
+//         name: domain
+//     }));
+
+//     // Upsert new CNAME record into hosted domain
+//     new aws.route53.Record("www", {
+//         name: url,
+//         records: [hostname],
+//         ttl: 300,
+//         type: "CNAME",
+//         zoneId: selected.zoneId,
+//     });
+// }
 
 /**
  * Nginx Ingress Controller configuration values
  */
 export interface ChartArgs {
     // Static IP address
-    ip: pulumi.Output<string>;
+    ip?: pulumi.Output<string>;
 
     // Nginx version for Ingress Controller
     version: string;
@@ -44,10 +74,18 @@ export interface ChartArgs {
     // The cluster provider containing the kubeconfig
     clusterProvider: k8s.Provider;
 
-    nodePool: gcp.container.NodePool;
+    // Dependency to force wait for cluster build
+    dependency?: any;
 
     // Namespace
-    namespace: k8s.core.v1.Namespace;
+    //namespace: k8s.core.v1.Namespace;
+
+    // Any required annotation
+    annotations?: any;
+
+    // For creating route53 records
+    domain?: string; 
+    url?: pulumi.Output<string>;
 }
 
 /**
@@ -64,12 +102,23 @@ export class NginxIngressController {
 
     constructor(chartArgs: ChartArgs) {
         
-        const ip = chartArgs.ip;
+        let ip = chartArgs.ip;
         const version = chartArgs.version;
         const clusterProvider = chartArgs.clusterProvider;
-        const nodePool = chartArgs.nodePool;
-        const ns = chartArgs.namespace;
+        const dependency = chartArgs.dependency;
+        //const ns = chartArgs.namespace;
+        const annotations = chartArgs.annotations;
+        const domain = chartArgs.domain;
+        const url = chartArgs.url;
+        let staticIp: any;
 
+        // Create nginx namespace
+        const ns = new k8s.core.v1.Namespace("nginx", { 
+            metadata: { 
+                name: "nginx" 
+            }
+        }, { dependsOn: [ dependency ], provider: clusterProvider });
+        
         // set namespace field in k8s manifest after Helm chart as been transformed.
         function metaNamespace(o: any) {
             if (o !== undefined) {
@@ -77,8 +126,15 @@ export class NginxIngressController {
             }
         }
 
+        // Check if IP has been provided and convert from Output<string>
+        if ( ip !== undefined ) {
+            staticIp = ip.apply(i => i);
+        };
+
         // Deploy Ingress Controller Helm chart
-        const nginx = nginxChart(ip, version, clusterProvider, metaNamespace, nodePool, ns);
+        const nginx = nginxChart(staticIp, version, clusterProvider, metaNamespace, dependency, ns, annotations);
+
+        //addRoute53Record(domain, nginx, url);
 
         return nginx;
     }

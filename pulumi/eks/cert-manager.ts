@@ -1,6 +1,6 @@
 import { Config } from "@pulumi/pulumi";
 import { cluster } from "./cluster";
-import * as cm from "@forgerock/pulumi-cert-manager"
+import * as cm from "../packages/cert-manager";
 
 // Get access to stack configuration values
 const config = new Config();

@@ -4,14 +4,14 @@ import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
 import { ip, nginxVersion } from "./config";
 import { primaryPool } from "./cluster";
-import * as ingressController from "@forgerock/pulumi-nginx-ingress-controller";
+import * as ingressController from "../packages/nginx-ingress-controller";
 
 // Create nginx namespace
-export const nsnginx = new k8s.core.v1.Namespace("nginx", { 
-    metadata: { 
-        name: "nginx" 
-    }
-}, { dependsOn: [ primaryPool ], provider: clusterProvider });
+// export const nsnginx = new k8s.core.v1.Namespace("nginx", { 
+//     metadata: { 
+//         name: "nginx" 
+//     }
+// }, { dependsOn: [ primaryPool ], provider: clusterProvider });
 
 // Check to see if static IP address has been provided. If not, create 1
 function assignIp() {
@@ -34,8 +34,8 @@ const nginxValues: ingressController.ChartArgs = {
     ip: lbIp,
     version: nginxVersion,
     clusterProvider: clusterProvider,
-    namespace: nsnginx,
-    nodePool: primaryPool, // for dependency
+    dependency: primaryPool,
+    //namespace: nsnginx
 }
 
 // Deploy Nginx Ingress Controller Helm chart

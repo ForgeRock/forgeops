@@ -15,6 +15,7 @@
     "dependencies": {
         "@pulumi/kubernetes": "^0.24.0",
         "@pulumi/pulumi": "^0.17.17",
-        "@pulumi/gcp": "^0.18.7"
+        "@pulumi/gcp": "^0.18.7",
+        "@pulumi/aws": "0.18.16"
     }
 }

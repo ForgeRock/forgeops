@@ -17,7 +17,7 @@ export interface ChartArgs {
     // Cloud DNS Service Account
     cloudDnsSa: string;
 
-    nodePoolDependency: gcp.container.NodePool;
+    dependency: any;
 }
 
 /**
@@ -42,7 +42,12 @@ export class CertManager {
         // Deploy cert-manager
         this.certmanagerResources = new ConfigFile("cmResources", {
             file: "https://github.com/jetstack/cert-manager/releases/download/v0.8.1/cert-manager.yaml", 
-        },{ dependsOn: chartArgs.nodePoolDependency, provider: chartArgs.clusterProvider });
+            transformations: [
+                (o: any) => {
+                    o.metadata.namespace = "cert-manager"
+                }
+            ]
+        },{ dependsOn: chartArgs.dependency, provider: chartArgs.clusterProvider });
 
         // Deploy secret - certificate for cert-manager ca certificate(self signed)
         this.caSecret = new k8s.core.v1.Secret("certmanager-ca-secret",{

@@ -1,9 +1,9 @@
 import * as k8s from "@pulumi/kubernetes";
 import * as gcp from "@pulumi/gcp";
 import { clusterProvider, k8sConfig } from "./cluster";
+import "./cert-manager";
 import "./nginx-controller";
 import { lbIp } from "./nginx-controller";
-import "./cert-manager";
 //import "./prometheus";
 import { bucketName } from "./config";
 
