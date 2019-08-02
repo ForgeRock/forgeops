@@ -27,8 +27,7 @@ const nginxValues: ingressController.ChartArgs = {
     ip: lbIp,
     version: nginxVersion,
     clusterProvider: clusterProvider,
-    dependency: primaryPool,
-    //namespace: nsnginx
+    dependency: primaryPool
 }
 
 // Deploy Nginx Ingress Controller Helm chart

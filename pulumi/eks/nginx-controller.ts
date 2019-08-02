@@ -14,7 +14,6 @@ const nginxValues: ingressController.ChartArgs = {
     version: nginxVersion,
     clusterProvider: cluster.provider,
     dependency: cluster,
-    //namespace: nsnginx,
     annotations: awsNlb,
     domain: route53Domain,
     url: url
