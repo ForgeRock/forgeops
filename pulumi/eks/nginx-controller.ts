@@ -4,14 +4,6 @@ import * as pulumi from "@pulumi/pulumi";
 import { nginxVersion, route53Domain } from "./config";
 import * as ingressController from "../packages/nginx-ingress-controller";
 import { prodNs } from "./index";
-//import { route53 } from "@pulumi/aws";
-
-// Create nginx namespace
-// export const nsnginx = new k8s.core.v1.Namespace("nginx", { 
-//     metadata: { 
-//         name: "nginx" 
-//     }
-// }, { dependsOn: [ cluster ], provider: cluster.provider });
 
 const awsNlb = {"service\.beta\.kubernetes\.io/aws-load-balancer-type": "nlb"};
 

@@ -6,13 +6,6 @@ import { ip, nginxVersion } from "./config";
 import { primaryPool } from "./cluster";
 import * as ingressController from "../packages/nginx-ingress-controller";
 
-// Create nginx namespace
-// export const nsnginx = new k8s.core.v1.Namespace("nginx", { 
-//     metadata: { 
-//         name: "nginx" 
-//     }
-// }, { dependsOn: [ primaryPool ], provider: clusterProvider });
-
 // Check to see if static IP address has been provided. If not, create 1
 function assignIp() {
     if (ip !== undefined) {
