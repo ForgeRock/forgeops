@@ -62,6 +62,8 @@ class AMConfig(object):
             self.amadmin_pwd = 'password'
 
         self.am_realm = "/"
+        # Use the console auth module /json/authenticate?authIndexType=service&authIndexValue=adminconsoleservice
+        self.rest_authn_admin_url = self.am_url + '/json/authenticate?authIndexType=service&authIndexValue=adminconsoleservice'
         self.rest_authn_url = self.am_url + '/json/authenticate?realm=%s' % self.am_realm
         self.rest_oauth2_authz_url = self.am_url + '/oauth2/authorize'
         self.rest_oauth2_access_token_url = self.am_url + '/oauth2/access_token?realm=%s' % self.am_realm
@@ -72,7 +74,7 @@ class AMConfig(object):
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         logger.test_step('Admin login')
-        response = post(verify=self.ssl_verify, url=self.rest_authn_url, headers=headers)
+        response = post(verify=self.ssl_verify, url=self.rest_authn_admin_url, headers=headers)
         rest.check_http_status(http_result=response, expected_status=200)
 
         admin_token = response.json()["tokenId"]
@@ -93,7 +95,7 @@ class AMConfig(object):
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         logger.test_step('Admin login')
-        response = post(verify=self.ssl_verify, url=self.rest_authn_url, headers=headers)
+        response = post(verify=self.ssl_verify, url=self.rest_authn_admin_url, headers=headers)
         rest.check_http_status(http_result=response, expected_status=200)
 
         admin_token = response.json()["tokenId"]
@@ -208,7 +210,7 @@ class IDMConfig(object):
             'scope': self.admin_oauth_scopes,
         }
 
-        token = s.post(amcfg.rest_authn_url, headers=headers, verify=self.ssl_verify).json()['tokenId']
+        token = s.post(amcfg.rest_authn_admin_url, headers=headers, verify=self.ssl_verify).json()['tokenId']
         data = {"decision": "Allow", 'csrf': token}
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',

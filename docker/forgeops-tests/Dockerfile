@@ -1,4 +1,5 @@
 FROM gcr.io/engineering-devops/python-test:latest
+# The config below has been moved to a base image to speed development. The base image is in forgeops/cicd/python-test
 # FROM python:3-slim
 
 # WORKDIR /usr/src/app

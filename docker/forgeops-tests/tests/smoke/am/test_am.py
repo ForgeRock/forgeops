@@ -32,7 +32,7 @@ class TestAM(object):
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         logger.test_step('Admin authn REST')
-        response = post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_authn_url, headers=headers)
+        response = post(verify=self.amcfg.ssl_verify, url=self.amcfg.rest_authn_admin_url, headers=headers)
         rest.check_http_status(http_result=response, expected_status=200)
 
     def test_2_user_login(self):
