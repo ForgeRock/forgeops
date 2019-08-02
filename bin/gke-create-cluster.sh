@@ -55,6 +55,12 @@ if [ ! -z "${GKE_NODE_LOCATIONS}" ]; then
       GKE_EXTRA_ARGS="${GKE_EXTRA_ARGS} --node-locations=${GKE_NODE_LOCATIONS}"
 fi
 
+# Check if gcloud version is greater or equal to 256.0.0. If so, then we need to explicitly enable VPC based cluster.
+VERSION=$(gcloud version | grep SDK | awk '{split($0,a," "); print a[4]}' | cut -d "." -f1)
+if (( $VERSION >= 256 )); then
+    GKE_EXTRA_ARGS="${GKE_EXTRA_ARGS} --enable-ip-alias"
+fi
+
 
 # Create cluster with values parsed from cfg file
 # scopes are required for gcs storage backup and cloud sql
