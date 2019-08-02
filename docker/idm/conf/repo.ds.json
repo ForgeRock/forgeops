@@ -70,6 +70,9 @@
             "query-cluster-failed-instances": {
                 "_queryFilter": "/timestamp le ${timestamp} and (/state eq \"1\" or /state eq \"2\")"
             },
+            "query-cluster-running-instances": {
+                "_queryFilter": "/state eq 1"
+            },
             "query-cluster-instances": {
                 "_queryFilter": "true"
             },
