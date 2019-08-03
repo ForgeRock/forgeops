@@ -49,6 +49,9 @@ Run the following command in this directory:
 This will bring up AM, IDM and the idrepo (DS). Open https://default.iam.example.com/am in your browser. AM will
 protect IDM. You can access the IDM admin console at: https://default.iam.example.com/admin/
 
+Note: if using Chrome, you need to import the root CA. To do so:
+1. Open Chrome settings and search for "Manage Certificates"
+2. Select the "Trusted Root Certification Authorities" or "Authorities" tab and import forgeops/kustomize/env/example/secret/ca.crt 
 
 ## Quick Start - GKE using default.iam.forgeops.com
 

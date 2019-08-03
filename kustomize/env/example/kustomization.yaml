@@ -3,19 +3,15 @@
 namespace: default
 bases:
 - ../dev
+secretGenerator:
+- name: sslcert
+  files:
+    - secret/ca.crt
+    - secret/tls.crt
+    - secret/tls.key
+  type: "kubernetes.io/tls"
+generatorOptions:
+    disableNameSuffixHash: true
 patchesStrategicMerge:
   - platform-config.yaml
-# This patches the ingress object to use the ca-issuer instead of the letsencrypt-prod
-patchesJson6902:
-  - target:
-      group: extensions
-      version: v1beta1
-      kind: Ingress
-      name: forgerock
-    path: ingress_patch.json
-  - target:
-      group: extensions
-      version: v1beta1
-      kind: Ingress
-      name: end-user-ui
-    path: ingress_patch.json
+
