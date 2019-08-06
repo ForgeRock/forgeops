@@ -1,0 +1,9 @@
+encryptionsalt: v1:T9I5rCsZxWk=:v1:Uigny5fT0a+dJ+jW:/2IyTIeRegaV7kHbjOlP6WY2G4rDMg==
+config:
+  azure:environment: AzureCloud
+  aks-cdm:servicePrincipalSecret:
+    secure: v1:ZlNvIHfcCGyZFwFE:oMO8vBT9Ip8BQ4poywfee1GczCBEV/12
+  aks-cdm:sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCxik3badxowARW+DZKlRRE4UGdZrr1qQuayBX7MM3pasTkKsoS8FJ7TdyiADRs/pGhzP6FuMg6pvYymKN1uCBhEBkdJoKCGfw8GXaXZEpbdcVt+kA11bmf888Cy46nx0UobsqisdpwQdYE6LqrrN5SnAf/9TgxF857Q5agQRnIg3YqhHwxh6OqkvP4eaMzbUIrZtDU1xAc8LjOdiY5UTWwHc7+XbE0TzC6F4B8jq10zuT8VFKQis2bcx7H4P7ElhxBFGU5WJ+1YCvSJ1Oe11N788zBKTlC1vEFOQiCcY7ntj65lWwau6oX+TFilsTwD6fLy9gev+vsnmyGTY0j7WCX
+    lee.baines@LeeBainess-MacBook-Pro-4593.local
+  aks-cdm:clusterName: cdm-small
+  aks-cdm:clusterResourceGroupName: cdm-small-resource-group
