@@ -55,7 +55,7 @@
       ]
     },
     "core": {
-      "orgConfig": "neoLdapService",
+      "orgConfig": "ldapService",
       "adminAuthModule": "ldapService"
     },
     "trees": {
