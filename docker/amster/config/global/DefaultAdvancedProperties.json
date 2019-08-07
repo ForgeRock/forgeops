@@ -70,7 +70,6 @@
     "org.forgerock.openam.auth.transactionauth.returnErrorOnAuthFailure" : false,
     "org.forgerock.openam.authLevel.excludeRequiredOrRequisite" : false,
     "com.iplanet.am.buildVersion" : "ForgeRock Access Management &{version}",
-    "org.forgerock.openam.cdc.validLoginURIs" : "/UI/Login",
     "org.forgerock.openam.redirecturlvalidator.maxUrlLength" : "2000",
     "com.iplanet.am.installdir" : "%BASE_DIR%/%SERVER_URI%",
     "org.forgerock.openam.idm.attribute.names.lower.case" : false,
