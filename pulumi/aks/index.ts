@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as azure from "@pulumi/azure";
 import * as cluster from "./cluster";
 import * as config from "./config";
-//import "./nginx-controller";
+import "./nginx-controller";
 
 export let statIp: pulumi.Output<string>;
 export let ipGroup: any;

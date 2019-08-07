@@ -28,7 +28,7 @@ function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider:
                     externalTrafficPolicy: "Local",
                     loadBalancerIP: ip,
                     annotations: annotations,
-                    omitClusterIP: false
+                    omitClusterIP: true
                 },
                 image: {tag: version}
             },
