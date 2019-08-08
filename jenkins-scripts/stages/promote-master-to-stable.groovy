@@ -6,14 +6,22 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.stage.FailureOutcome
+import com.forgerock.pipeline.stage.Status
+
 /**
  * Perform the promotion to stable: promote docker images to root level and the relevant commit to 'stable'.
  */
-void runStage() {
-    node('build&&linux') {
-        stage('Promote to stable') {
-            promoteDockerImagesToRootLevel()
-            promoteForgeOpsCommitToStable()
+void runStage(PipelineRun pipelineRun) {
+    pipelineRun.pushStageOutcome('forgeops-stable-promotion', stageDisplayName: 'ForgeOps Stable Promotion') {
+        node('build&&linux') {
+            stage('Promote to stable') {
+                pipelineRun.updateStageStatusAsInProgress()
+                promoteDockerImagesToRootLevel()
+                promoteForgeOpsCommitToStable()
+                return Status.SUCCESS.asOutcome()
+            }
         }
     }
 }
@@ -21,10 +29,10 @@ void runStage() {
 private void promoteDockerImagesToRootLevel() {
     commonModule.HELM_CHARTS.each { product, helmChart ->
         echo "Promoting ${product} docker image ${helmChart.currentTag} to root level"
-//        dockerUtils.copyImage(
-//                "${helmChart.currentImageName}:${helmChart.currentTag}",
-//                "${helmChart.rootLevelImageName}:${helmChart.currentTag}"
-//        )
+        dockerUtils.copyImage(
+                "${helmChart.currentImageName}:${helmChart.currentTag}",
+                "${helmChart.rootLevelImageName}:${helmChart.currentTag}"
+        )
     }
 }
 
