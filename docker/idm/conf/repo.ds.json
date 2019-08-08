@@ -161,6 +161,9 @@
                     "condition": {
                         "type": "simple",
                         "ldapAttribute": "fr-idm-condition"
+                    },
+                    "privileges" : {
+                      "type": "json", "ldapAttribute": "fr-idm-privilege", "isMultiValued": true
                     }
                 }
             },
