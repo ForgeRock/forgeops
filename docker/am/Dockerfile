@@ -16,5 +16,5 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 
 # Override the entrypoint and just start tomcat
 #CMD ["catalina.sh", "run"]
-
+RUN chmod +x /home/forgerock/openam/boot.sh
 CMD ["/home/forgerock/openam/boot.sh"]
