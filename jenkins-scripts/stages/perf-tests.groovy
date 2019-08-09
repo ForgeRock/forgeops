@@ -7,12 +7,10 @@
  */
 
 import com.forgerock.pipeline.reporting.PipelineRun
-import com.forgerock.pipeline.stage.FailureOutcome
-import com.forgerock.pipeline.stage.Status
 
 void runStage(PipelineRun pipelineRun, String stageName, String testName, String yamlFile) {
 
-    pipelineRun.pushStageOutcome(stageName.toLowerCase().replace(' ', '-'), stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome(commonModule.normalizeStageName(stageName), stageDisplayName: stageName) {
         node('perf-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
@@ -28,21 +26,12 @@ void runStage(PipelineRun pipelineRun, String stageName, String testName, String
                         EXT_FORGEOPS_PATH    : forgeopsPath
                     ]
 
-                    determinePyrockOutcome() {
+                    commonModule.determinePyrockOutcome("${env.BUILD_URL}/Pyrock_20Report_20-_20${testName}") {
                         withGKEPyrockNoStages(cfg)
                     }
                 }
             }
         }
-    }
-}
-
-def determinePyrockOutcome(Closure process) {
-    try {
-        process()
-        return Status.SUCCESS.asOutcome()
-    } catch (Exception e) {
-        return new FailureOutcome(e)
     }
 }
 

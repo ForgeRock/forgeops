@@ -1,4 +1,10 @@
-#!/usr/bin/env groovy
+/*
+ * Copyright 2019 ForgeRock AS. All Rights Reserved
+ *
+ * Use of this code requires a commercial software license with ForgeRock AS.
+ * or with one of its affiliates. All use shall be exclusively subject
+ * to such license between the licensee and ForgeRock AS.
+ */
 
 @Library(value=['forgerock-pipeline-libs', 'QaCloudUtils', 'java-pipeline-libs']) _
 
@@ -29,21 +35,24 @@ timestamps {
             currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
             currentBuild.description = 'built:'
 
-            pipelineRun = new PipelineRun(env, steps, "forgeops", BRANCH_NAME, GIT_COMMIT)
+            pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, GIT_COMMIT)
 
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
-            def modulesLocation = "${env.WORKSPACE}/jenkins-scripts/modules"
+            def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
+            def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
+
+            commonModule = load("${libsLocation}/common.groovy")
 
             if (env.TAG_NAME) {
                 currentBuild.result = 'ABORTED'
                 error 'This pipeline does not currently support building from a tag'
             } else if (isPR()) {
                 pipeline = load("${jobLocation}/pr.groovy")
-                pit1TestStage = load("${modulesLocation}/functional-tests-pit1.groovy")
-                prAutomation = load("${modulesLocation}/prAutomation.groovy")
+                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
+                prAutomation = load("${libsLocation}/pr-automation.groovy")
             } else {
                 pipeline = load("${jobLocation}/postcommit.groovy")
-                pit1TestStage = load("${modulesLocation}/functional-tests-pit1.groovy")
+                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
             }
         }
 

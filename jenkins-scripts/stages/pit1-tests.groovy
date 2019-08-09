@@ -7,41 +7,31 @@
  */
 
 import com.forgerock.pipeline.reporting.PipelineRun
-import com.forgerock.pipeline.stage.FailureOutcome
-import com.forgerock.pipeline.stage.Status
 
-void runStage(PipelineRun pipelineRun, String stageName, String scope, String sampleName) {
+void runStage(PipelineRun pipelineRun, String scope) {
 
-    pipelineRun.pushStageOutcome(stageName.toLowerCase().replace(' ', '-'), stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome('pit1', stageDisplayName: 'Run PIT #1 FTs') {
         node('google-cloud') {
-            stage(stageName) {
-                pipelineRun.updateStageStatusAsInProgress()
-                def forgeopsPath = localGitUtils.checkoutForgeops()
+            dir('forgeops') {
+                unstash 'workspace'
+            }
 
+            stage('Run PIT1 FTs') {
+                pipelineRun.updateStageStatusAsInProgress()
                 dir('lodestar') {
                     def cfg = [
-                        TESTS_SCOPE          : scope,
-                        SAMPLE_NAME          : sampleName,
-                        STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
-                        SKIP_FORGEOPS        : 'True',
-                        EXT_FORGEOPS_PATH    : forgeopsPath
+                            TESTS_SCOPE      : scope,
+                            SAMPLE_NAME      : 'smoke-deployment',
+                            SKIP_FORGEOPS    : 'True',
+                            EXT_FORGEOPS_PATH: "${env.WORKSPACE}/forgeops"
                     ]
 
-                    determinePitOutcome() {
+                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT_5fno_2e1_5fFTs") {
                         withGKEPitNoStages(cfg)
                     }
                 }
             }
         }
-    }
-}
-
-def determinePitOutcome(Closure process) {
-    try {
-        process()
-        return Status.SUCCESS.asOutcome()
-    } catch (Exception e) {
-        return new FailureOutcome(e)
     }
 }
 

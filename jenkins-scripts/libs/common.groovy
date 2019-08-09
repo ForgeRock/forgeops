@@ -6,6 +6,10 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+import com.forgerock.pipeline.stage.FailureOutcome
+import com.forgerock.pipeline.stage.Outcome
+import com.forgerock.pipeline.stage.Status
+
 /*
  * Common configuration used by several stages of the ForgeOps pipeline.
  */
@@ -51,6 +55,28 @@ def loadCurrentHelmChartValues() {
         def helmChartYaml = readYaml file: helmChart.filePath
         helmChart.currentImageName = helmChartYaml.image.repository
         helmChart.currentTag = helmChartYaml.image.tag
+    }
+}
+
+def normalizeStageName(String stageName) {
+    return stageName.toLowerCase().replaceAll("\\s","-")
+}
+
+def determinePitOutcome(String reportUrl, Closure process) {
+    try {
+        process()
+        return new Outcome(Status.SUCCESS, reportUrl)
+    } catch (Exception e) {
+        return new FailureOutcome(e, reportUrl)
+    }
+}
+
+def determinePyrockOutcome(String reportUrl, Closure process) {
+    try {
+        process()
+        return new Outcome(Status.SUCCESS, reportUrl)
+    } catch (Exception e) {
+        return new FailureOutcome(e, reportUrl)
     }
 }
 
