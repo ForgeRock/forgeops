@@ -16,6 +16,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Library(['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@b268029', 'java-pipeline-libs@c9f5837'])
 import com.forgerock.pipeline.Build
+import com.forgerock.pipeline.reporting.PipelineRun
 
 properties([
         buildDiscarder(logRotator(numToKeepStr: '10')),
