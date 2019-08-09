@@ -22,7 +22,7 @@ def build() {
         pipelineTriggers([cron('@daily')])
     ])
 
-    def postcommitBuild = new Build(steps, env, currentBuild)
+    postcommitBuild = new Build(steps, env, currentBuild)
     def slackChannel = '#cloud-deploy-notify'
     def currentImage
 
