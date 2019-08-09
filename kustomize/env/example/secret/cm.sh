@@ -17,4 +17,4 @@ openssl genrsa -out tls.key 2048
 openssl req -new -sha256 -key tls.key -subj "/C=US/ST=WA/O=ForgeRock/CN=*.${SUBDOMAIN}.${DOMAIN}" -out tls.csr
 
 # Sign the csr and generate crt
-openssl x509 -req -in tls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out tls.crt -days 1825 -sha256
+openssl x509 -req -in tls.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out tls.crt -days 1825 -sha256 -extfile openssl-with-ca.cnf -extensions san_ext
