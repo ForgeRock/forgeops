@@ -138,7 +138,8 @@ data:
       # To disable the persisted configuration store set this property to false.
       # This will store the configurations only in memory.
       # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration
-      openidm.config.repo.enabled={{ not .Values.config.immutable }}
+      # This must be set to `false` for environments running in kubernetes.
+      openidm.config.repo.enabled=false
 
       # To stop writes to configuration files, set this property to false; suitable for read-only installations.
       felix.fileinstall.enableConfigSave={{ not .Values.config.immutable }}
