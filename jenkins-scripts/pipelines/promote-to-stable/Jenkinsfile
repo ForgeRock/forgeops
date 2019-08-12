@@ -19,8 +19,8 @@ import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
 
 properties([
-        buildDiscarder(logRotator(numToKeepStr: '10')),
-        pipelineTriggers([cron('@daily')])
+    buildDiscarder(logRotator(numToKeepStr: '20')),
+    pipelineTriggers([cron('H 0 * * *')])
 ])
 
 def pipelineRun

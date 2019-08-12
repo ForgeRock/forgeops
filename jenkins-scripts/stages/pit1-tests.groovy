@@ -10,7 +10,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun, String scope) {
 
-    pipelineRun.pushStageOutcome('pit1', stageDisplayName: 'Run PIT #1 FTs') {
+    pipelineRun.pushStageOutcome('pit1', stageDisplayName: 'Run PIT1 FTs') {
         node('google-cloud') {
             dir('forgeops') {
                 unstash 'workspace'
@@ -26,7 +26,7 @@ void runStage(PipelineRun pipelineRun, String scope) {
                             EXT_FORGEOPS_PATH: "${env.WORKSPACE}/forgeops"
                     ]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT_5fno_2e1_5fFTs") {
+                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT1_5fFTs/") {
                         withGKEPitNoStages(cfg)
                     }
                 }

@@ -18,8 +18,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 def build() {
 
     properties([
-        buildDiscarder(logRotator(numToKeepStr: '20')),
-        pipelineTriggers([cron('@daily')])
+        buildDiscarder(logRotator(numToKeepStr: '20'))
     ])
 
     postcommitBuild = new Build(steps, env, currentBuild)

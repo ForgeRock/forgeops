@@ -26,6 +26,7 @@ void runStage(PipelineRun pipelineRun, String stageName, String testName, String
                         EXT_FORGEOPS_PATH    : forgeopsPath
                     ]
 
+                    testName = testName.replace('_', '_5f')
                     commonModule.determinePyrockOutcome("${env.BUILD_URL}/Pyrock_20Report_20-_20${testName}") {
                         withGKEPyrockNoStages(cfg)
                     }
