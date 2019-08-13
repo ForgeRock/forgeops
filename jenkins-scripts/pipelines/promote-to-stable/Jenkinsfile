@@ -38,7 +38,8 @@ timestamps {
                 commonModule = load("${libsLocation}/common.groovy")
                 commonModule.loadCurrentHelmChartValues()
 
-                pipelineRun = new PipelineRun(env, steps, 'forgeops', 'master', commonModule.FORGEOPS_GIT_COMMIT)
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', 'master', commonModule.FORGEOPS_GIT_COMMIT,
+                        commits: commonModule.getCurrentProductCommitHashes())
 
                 // Test stages
                 perfTests = load("${stagesLocation}/perf-tests.groovy")

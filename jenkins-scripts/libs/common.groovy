@@ -55,11 +55,21 @@ def loadCurrentHelmChartValues() {
         def helmChartYaml = readYaml file: helmChart.filePath
         helmChart.currentImageName = helmChartYaml.image.repository
         helmChart.currentTag = helmChartYaml.image.tag
+        helmChart.productCommit = helmChart.currentTag.split('-').last()
     }
 }
 
 def normalizeStageName(String stageName) {
     return stageName.toLowerCase().replaceAll("\\s","-")
+}
+
+def getCurrentProductCommitHashes() {
+    return [
+            HELM_CHARTS.ds.productCommit,
+            HELM_CHARTS.ig.productCommit,
+            HELM_CHARTS.idm.productCommit,
+            HELM_CHARTS.am.productCommit,
+    ]
 }
 
 def determinePitOutcome(String reportUrl, Closure process) {
