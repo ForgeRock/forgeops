@@ -4,7 +4,7 @@ import * as pulumi from "@pulumi/pulumi";
 /** 
  * Nginx Ingress Controller Helm chart
  */ 
-function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider: k8s.Provider, metaNs: any, dependencies: any[], ns: k8s.core.v1.Namespace, annotations: any) {
+function nginxChart(ip: string, version: string, clusterProvider: k8s.Provider, metaNs: any, dependencies: any[], ns: k8s.core.v1.Namespace, annotations: any) {
     
     const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
         fetchOpts: {
@@ -75,7 +75,7 @@ export interface ChartArgs {
     clusterProvider: k8s.Provider;
 
     // Dependency to force wait for cluster build
-    dependency?: any;
+    dependencies: any[];
 
     // Namespace
     //namespace: k8s.core.v1.Namespace;
@@ -105,23 +105,23 @@ export class NginxIngressController {
         let ip = chartArgs.ip;
         const version = chartArgs.version;
         const clusterProvider = chartArgs.clusterProvider;
-        const dependency = chartArgs.dependency;
+        const dependencies = chartArgs.dependencies;
         //const ns = chartArgs.namespace;
         const annotations = chartArgs.annotations;
         const domain = chartArgs.domain;
         const url = chartArgs.url;
         let staticIp: any;
-        let dependencies: any = [ dependency ];
+        // let dependencies: any = [ dependency ];
 
-        // Create array of dependencies
-        dependencies.push(staticIp) 
+        // // Create array of dependencies
+        // dependencies.push(ip) 
 
         // Create nginx namespace
         const ns = new k8s.core.v1.Namespace("nginx", { 
             metadata: { 
                 name: "nginx" 
             }
-        }, { dependsOn: dependency, provider: clusterProvider });
+        }, { dependsOn: dependencies, provider: clusterProvider });
 
         // set namespace field in k8s manifest after Helm chart as been transformed.
         function metaNamespace(o: any) {
@@ -144,8 +144,6 @@ export class NginxIngressController {
         return nginx;
     }
 }
-
-
 
 
 

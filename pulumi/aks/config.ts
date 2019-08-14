@@ -6,10 +6,12 @@ const config = new pulumi.Config();
 // ** GENERAL CONFIG **
 export const location = config.get("location") || azure.Locations.EastUS;
 export const clusterResourceGroupName = config.get("clusterResourceGroupName") || "aks-cluster";
-// If you have a static IP you want to provide, please also provide the resource group name that contains the IP.
-export const staticIp = config.get("staticIp");
+// If you have a preconfigured static IP you want to provide, please provide IP name and also the resource group name that contains the IP.
+
+// ** STATIC IP **
+export const staticIpName = config.get("staticIpName"); // Name not address
 export let ipResourceGroupName: any;
-if ( staticIp !== undefined ) {
+if ( staticIpName !== undefined ) {
     ipResourceGroupName = config.require("ipResourceGroupName");
 }
 
