@@ -26,12 +26,13 @@ if [ $status -ne 0 ]; then
     rm /home/forgerock/openam/boot.json
 else
     echo "ds-idrepo configured - keeping boot.json"
-    echo "Making log path to avoid audit service startup error "
-    mkdir -p /home/forgerock/openam/am/log
+    mkdir -p /home/forgerock/openam/var/audit
+    SDIR=/home/forgerock/openam/security/secrets/default
+    mkdir -p $SDIR
     echo "Copying bootstrap files for legacy AMKeyProvider"
-    cp /var/run/secrets/am/boot/.storepass /home/forgerock/openam/am
-    cp /var/run/secrets/am/boot/.keypass /home/forgerock/openam/am
-    cp /var/run/secrets/am/boot/keystore.jceks /home/forgerock/openam/am
+    cp /var/run/secrets/am/boot/.storepass $SDIR
+    cp /var/run/secrets/am/boot/.keypass $SDIR
+    cp /var/run/secrets/am/boot/keystore.jceks $SDIR
 
 fi
 
