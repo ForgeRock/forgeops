@@ -28,11 +28,13 @@ else
     echo "ds-idrepo configured - keeping boot.json"
     mkdir -p /home/forgerock/openam/var/audit
     SDIR=/home/forgerock/openam/security/secrets/default
+    KDIR=/home/forgerock/openam/security/keystores
     mkdir -p $SDIR
+    mkdir -p $KDIR
     echo "Copying bootstrap files for legacy AMKeyProvider"
     cp /var/run/secrets/am/boot/.storepass $SDIR
     cp /var/run/secrets/am/boot/.keypass $SDIR
-    cp /var/run/secrets/am/boot/keystore.jceks $SDIR
+    cp /var/run/secrets/am/boot/keystore.jceks $KDIR
 
 fi
 
