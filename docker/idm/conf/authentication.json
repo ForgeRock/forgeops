@@ -9,6 +9,9 @@
             "authenticationId" : "_id",
             "userRoles" : "authzRoles"
         },
+        "cache" : {
+            "maxTimeout" : "300 seconds"
+        },
         "anonymousUserMapping" : {
             "localUser" : "internal/user/anonymous",
             "userRoles" : "authzRoles"
