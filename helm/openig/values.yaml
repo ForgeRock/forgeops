@@ -29,7 +29,7 @@ catalinaOpts: "-Xmx512m"
 
 image:
   repository: gcr.io/forgerock-io/ig/pit1
-  tag: 7.0.0-d3ca5ef2549293922fbbb0b99525701902188f65
+  tag: 7.0.0-021cbefe40b5174fdaf006eb4dc2ae9022bd8d4f
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
 
