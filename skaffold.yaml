@@ -174,3 +174,21 @@ profiles:
     kustomize:
       path: ./kustomize/env/am-only
 
+- name: lodestar
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: config-util
+      context: docker/config-util
+    - image: idm
+      context: docker/idm
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/lodestar
