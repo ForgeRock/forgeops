@@ -30,3 +30,5 @@ vars:
     name: platform-config
   fieldref:
     fieldpath: metadata.namespace
+configurations:
+- var.yaml
