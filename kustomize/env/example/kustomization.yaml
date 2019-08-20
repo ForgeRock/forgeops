@@ -1,7 +1,7 @@
 # This deploys to default.iam.example.com. It uses the ca-issuer 
 # for self signed SSL certs. It is suitable for local minikube development
 namespace: default
-bases:
+resources:
 - ../dev
 secretGenerator:
 - name: sslcert

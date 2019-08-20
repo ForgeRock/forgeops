@@ -1,35 +1,6 @@
-kind: ""
-apiversion: ""
 namespace: prod
-# namespace: alex
-bases:
-- ../../frconfig
-- ../../ds/idrepo-small
-- ../../ds/cts-small
-- ../../am
-- ../../config-util
-- ../../idm
-- ../../end-user-ui
-- ../../ingress
-# - ../../ig
+resources:
+- ../dev
 patchesStrategicMerge:
-- platform-config.yaml
 - am.yaml
 - idm.yaml
-# - ig.yaml
-# TODO: We should be able to factor this out to a common base
-vars:
-  - fieldref:
-      fieldPath: data.DOMAIN
-    name: DOMAIN
-    objref:
-      apiVersion: v1
-      kind: ConfigMap
-      name: platform-config
-  - fieldref:
-      fieldPath: data.SUBDOMAIN
-    name: SUBDOMAIN
-    objref:
-      apiVersion: v1
-      kind: ConfigMap
-      name: platform-config
