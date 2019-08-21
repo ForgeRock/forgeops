@@ -8,7 +8,7 @@ image:
   repository: gcr.io/forgerock-io/am/pit1
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
-  tag: 7.0.0-4eb16a442b
+  tag: 7.0.0-47dff5a4c1
 
 gitImage:
   repository: gcr.io/forgerock-io/git
@@ -62,7 +62,8 @@ rootSuffix:  "ou=am-config"
 am:
   home: /home/forgerock/openam
   context: am
-  bootstrapDir: /home/forgerock/openam/am
+  secretsDir: /home/forgerock/openam/security/secrets/default
+  keystoresDir: /home/forgerock/openam/security/keystores
   instance: http://openam:80/am
 
 
@@ -124,13 +125,13 @@ auditLogs: []
 
 # auditLogs:
 #   - name: access-logs
-#     path: "/home/forgerock/openam/openam/log/access.audit.json"
+#     path: "/home/forgerock/openam/var/audit/access.audit.json"
 #   - name: activity-logs
-#     path: "/home/forgerock/openam/openam/log/activity.audit.json"
+#     path: "/home/forgerock/openam/var/audit/activity.audit.json"
 #   - name: authentication-logs
-#     path: "/home/forgerock/openam/openam/log/authentication.audit.json"
+#     path: "/home/forgerock/openam/var/audit/authentication.audit.json"
 #   - name: config-logs
-#     path: "/home/forgerock/openam/openam/log/config.audit.json"
+#     path: "/home/forgerock/openam/var/audit/config.audit.json"
 
 
 istio:
