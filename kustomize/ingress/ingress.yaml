@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -47,7 +47,7 @@ spec:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -69,7 +69,7 @@ spec:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: web
