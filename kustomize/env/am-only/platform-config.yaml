@@ -6,6 +6,10 @@ data:
   FQDN: $(NAMESPACE).iam.example.com
   SUBDOMAIN: iam
   DOMAIN: example.com
+  AM_URL: https://$(NAMESPACE).iam.example.com/am
+  IDM_ADMIN_URL:  https://$(NAMESPACE).iam.example.com/admin
+  IDM_REST_URL:   https://$(NAMESPACE).iam.example.com/openidm
+  ENDUSER_UI_URL:   https://$(NAMESPACE).iam.example.com/enduser
 ---
 apiVersion: v1
 kind: Secret

@@ -17,16 +17,16 @@ data:
       <h3>Links</h3>
       <ul>
         <li>
-          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/am/XUI/#login" target="_blank">AM Console</a>
+          <a  href="/am/XUI/#login" target="_blank">AM Console</a>
         </li>
         <li>
-          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/admin" target="_blank">IDM Admin Console</a>
+          <a href="/admin" target="_blank">IDM Admin UI</a>
         </li>
         <li>
-          <a href="https://$(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)/enduser/#/dashboard" target="_blank">End-user-UI</a>
+          <a href="/enduser/#/dashboard" target="_blank">End User UI</a>
         </li>
         <li>
-          <a href="https://smoke.$(SUBDOMAIN).$(DOMAIN)/tests/latest.html" target="_blank">Smoke test report</a>
+          <a href="/tests/latest.html" target="_blank">Smoke Test Report</a>
         </li>
       </ul>
     </html>

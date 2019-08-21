@@ -12,7 +12,6 @@ resources:
   - ../../ingress
   - platform-config.yaml
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
-# The paths below lookup data in the config map
 vars:
 - name: DOMAIN
   fieldref:
