@@ -286,15 +286,6 @@
         </Arg>
     </Call>
 
-    <!-- Fallback error handler, that returns minimal information, for errors that cannot be handled by OpenIDM -->
-    <Call name="addBean">
-        <Arg>
-            <New class="org.forgerock.openidm.jetty.JettyErrorHandler">
-                <Set name="server"><Ref refid="Server" /></Set>
-            </New>
-        </Arg>
-    </Call>
-
     <Call name="insertHandler">
         <Arg>
             <!-- https://www.eclipse.org/jetty/documentation/9.4.x/gzip-filter.html -->
