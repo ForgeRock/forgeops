@@ -1,4 +1,6 @@
-apiVersion: networking.k8s.io/v1beta1
+# When K8S is upgraded to >= 1.14 - change the apiVersion to:
+#apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -47,7 +49,7 @@ spec:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -69,7 +71,7 @@ spec:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
     secretName: sslcert
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: web
