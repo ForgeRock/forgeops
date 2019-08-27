@@ -28,6 +28,10 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String sa
                         COMPONENTS_CONFIGSTORE_IMAGE_TAG: commonModule.UPGRADE_TEST_BASE_CONFIGSTORE_VERSION,
                         COMPONENTS_USERSTORE_IMAGE_TAG  : commonModule.UPGRADE_TEST_BASE_USERSTORE_VERSION,
                         COMPONENTS_AM_CATALINAOPTS      : '-server -Dorg.forgerock.donotupgrade=true -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off',
+                        // The image used for AM upgrade contains old layout
+                        COMPONENTS_AM_UTILIMAGE_TAG     : '7.0.0',
+                        COMPONENTS_AM_AM_SECRETSDIR     : '/home/forgerock/openam/am',
+                        COMPONENTS_AM_AM_KEYSTORESDIR   : '/home/forgerock/openam/am',
                         STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                         SKIP_FORGEOPS                   : 'True',
                         EXT_FORGEOPS_PATH               : forgeopsPath

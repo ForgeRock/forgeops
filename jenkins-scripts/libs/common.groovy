@@ -27,7 +27,7 @@ FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim(
 /**
  * Globally scoped git commit information for the Lodestar repo
  */
-LODESTAR_GIT_COMMIT = 'fcfda4ec5c0d94dc781de59db2430081689b9b10'
+LODESTAR_GIT_COMMIT = '082a9017284bd12ae12b52c05d286363d8d865ce'
 
 /**
  * Base versions for the PIT#2 upgrade test
