@@ -20,10 +20,11 @@ void runStage(PipelineRun pipelineRun, String scope) {
                 pipelineRun.updateStageStatusAsInProgress()
                 dir('lodestar') {
                     def cfg = [
-                            TESTS_SCOPE      : scope,
-                            SAMPLE_NAME      : 'smoke-deployment',
-                            SKIP_FORGEOPS    : 'True',
-                            EXT_FORGEOPS_PATH: "${env.WORKSPACE}/forgeops"
+                            STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
+                            TESTS_SCOPE             : scope,
+                            SAMPLE_NAME             : 'smoke-deployment',
+                            SKIP_FORGEOPS           : 'True',
+                            EXT_FORGEOPS_PATH       : "${env.WORKSPACE}/forgeops"
                     ]
 
                     commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT1_5fFTs/") {
