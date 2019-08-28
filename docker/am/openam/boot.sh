@@ -4,6 +4,8 @@
 
 TEST_DN="ou=sunIdentityRepositoryService,ou=services,ou=am-config"
 
+AM_HOME=/home/forgerock/openam
+
 # First we wait for ds-idrepo to be up
 
 echo "Waiting for ds-idrepo to be available. Trying ds-idrepo:8080/alive endpoint"
@@ -23,12 +25,12 @@ status=$?
 echo "Is configured exit status is $status"
 if [ $status -ne 0 ]; then 
     echo "Looks like ds-idrepo is not configured. I will remove boot.json"
-    rm /home/forgerock/openam/boot.json
+    rm $AM_HOME/config/boot.json
 else
     echo "ds-idrepo configured - keeping boot.json"
-    mkdir -p /home/forgerock/openam/var/audit
-    SDIR=/home/forgerock/openam/security/secrets/default
-    KDIR=/home/forgerock/openam/security/keystores
+    mkdir -p $AM_HOME/var/audit
+    SDIR=$AM_HOME/security/secrets/default
+    KDIR=$AM_HOME/security/keystores
     mkdir -p $SDIR
     mkdir -p $KDIR
     echo "Copying bootstrap files for legacy AMKeyProvider"
