@@ -37,6 +37,10 @@ else
     cp /var/run/secrets/am/boot/.storepass $SDIR
     cp /var/run/secrets/am/boot/.keypass $SDIR
     cp /var/run/secrets/am/boot/keystore.jceks $KDIR
+    # Copy the amster key
+    AMSTER_KEYS=$AM_HOME/security/keys/amster
+    mkdir -p $AMSTER_KEYS
+    cp /var/run/secrets/amster/authorized_keys $AMSTER_KEYS
 
 fi
 

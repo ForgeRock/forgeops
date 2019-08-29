@@ -2,7 +2,7 @@
   "metadata" : {
     "realm" : null,
     "amsterVersion" : "&{version}",
-    "entityType" : "CorsService",
+    "entityType" : "CORSService",
     "entityId" : "platformCorsFilter",
     "pathParams" : { }
   },

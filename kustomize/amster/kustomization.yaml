@@ -6,4 +6,8 @@ commonLabels:
 resources:
 - deployment.yaml
 - configmap.yaml
-- secret.yaml
+secretGenerator:
+- name: amster
+  files:
+  - secrets/id_rsa
+  - secrets/authorized_keys
