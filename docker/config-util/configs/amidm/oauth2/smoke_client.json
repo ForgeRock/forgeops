@@ -3,7 +3,7 @@
     "realm" : "/",
     "amsterVersion" : "7.0.0-SNAPSHOT",
     "entityType" : "OAuth2Clients",
-    "entityId" : "endUserUIClient",
+    "entityId" : "smokeclient",
     "pathParams" : { }
   },
   "data" : {

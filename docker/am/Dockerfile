@@ -18,4 +18,5 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 #CMD ["catalina.sh", "run"]
 
 #ENTRYPOINT ["/bin/sh"]
-CMD ["sh", "-c", "/home/forgerock/openam/boot.sh"]
+# Use sh - because windows has issues with +x on the script
+CMD ["bash", "-c", "/home/forgerock/openam/boot.sh"]

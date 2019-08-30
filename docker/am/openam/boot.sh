@@ -15,19 +15,7 @@ do
 done
 echo "ds-idrepo is responding"
 
-# Test the configstore to see if it contains a configuration. Return 0 if configured.
-# This is not currently foolproof - it the ds-idrepo is not started yet the ldap search will also fail. This
-# can result in util installer running again - which in most cases is fine - it will refresh the configuraition.
-
-SVC="ou=services,$BASE_DN"
-r=$(ldapsearch -w password  -D "uid=admin" -A -H "ldap://ds-idrepo:1389" -s base -l 20 -b "$TEST_DN"  > /dev/null 2>&1)
-status=$?
-echo "Is configured exit status is $status"
-if [ $status -ne 0 ]; then 
-    echo "Looks like ds-idrepo is not configured. I will remove boot.json"
-    rm $AM_HOME/config/boot.json
-else
-    echo "ds-idrepo configured - keeping boot.json"
+copy_secrets() {
     mkdir -p $AM_HOME/var/audit
     SDIR=$AM_HOME/security/secrets/default
     KDIR=$AM_HOME/security/keystores
@@ -41,7 +29,27 @@ else
     AMSTER_KEYS=$AM_HOME/security/keys/amster
     mkdir -p $AMSTER_KEYS
     cp /var/run/secrets/amster/authorized_keys $AMSTER_KEYS
+}
+
+
+copy_secrets
+
+
+# Test the configstore to see if it contains a configuration. Return 0 if configured.
+# This is not currently foolproof - it the ds-idrepo is not started yet the ldap search will also fail. This
+# can result in util installer running again - which in most cases is fine - it will refresh the configuraition.
+
+SVC="ou=services,$BASE_DN"
+r=$(ldapsearch -w password  -D "uid=admin" -A -H "ldap://ds-idrepo:1389" -s base -l 20 -b "$TEST_DN"  > /dev/null 2>&1)
+status=$?
+echo "Is configured exit status is $status"
+if [ $status -ne 0 ]; then 
+    echo "Looks like ds-idrepo is not configured. I will remove boot.json"
+    rm $AM_HOME/config/boot.json
+else
+    echo "ds-idrepo configured - keeping boot.json"
+
 
 fi
 
-exec catalina.sh run 
+exec catalina.sh run
