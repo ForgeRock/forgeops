@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: amster
-data:
-  # todo: get the cts password from the cts..
-  CTS_PASSWORD: password
-  CTS_STORES: cts-ds-0:1389
-  PROMETHEUS_PASSWORD: prometheus

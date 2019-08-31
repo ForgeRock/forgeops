@@ -1,8 +1,0 @@
-kind: ""
-apiversion: ""
-commonLabels:
-  app: config-util
-  vendor: forgerock
-  component: config-util
-resources:
-- config-util-deployment.yaml

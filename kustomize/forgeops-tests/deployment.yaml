@@ -1,0 +1,49 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: forgeops-tests
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      volumes:
+      - name: reports
+        emptyDir: {}
+      containers:
+      - name: forgeops-tests
+        image: forgeops-tests
+        imagePullPolicy: Always
+        command: ["bash", "entrypoint.sh"]
+        resources:
+          limits:
+            memory: 1Gi
+            cpu: 1
+          requests:
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /usr/src/app/reports
+          name: reports
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+          - containerPort: 8081
+      - name: forgeops-tests-reports
+        image: nginx
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: 250Mi
+          requests:
+            memory: 250Mi
+            cpu: 1
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - mountPath: /usr/share/nginx/html/tests
+            name: reports

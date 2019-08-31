@@ -1,0 +1,9 @@
+kind: ""
+apiversion: ""
+commonLabels:
+  app: web
+  component: web
+resources:
+- deployment.yaml
+- service.yaml
+- configmap.yaml

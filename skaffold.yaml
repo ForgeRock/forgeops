@@ -1,0 +1,194 @@
+apiVersion: skaffold/v1beta12
+kind: Config
+build:
+  artifacts:
+  - image: am
+    context: docker/am
+  - image: config-util
+    context: docker/config-util
+  # Uncomment this if you want to use amster instead of config-util
+  # - image: amster
+  #   context: docker/amster
+  - image: idm
+    context: docker/idm
+  - image: ds-cts
+    context: docker/ds/cts
+  - image: ds-idrepo
+    context: docker/ds/idrepo
+  tagPolicy:
+    sha256: {}
+deploy:
+  kustomize:
+    path: ./kustomize/env/example
+profiles:
+# Example.forgeops deployment to default.iam.forgeops.com - uses a LE cert.
+- name: gke
+  deploy:
+    kustomize:
+      path: ./kustomize/env/dev
+# AM with File Based Config
+- name: fbc
+  build:
+    artifacts:
+    - image: am
+      context: docker/am-fbc
+    - image: config-util
+      context: docker/config-util
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: idm
+      context: docker/idm
+  deploy:
+    kustomize:
+      path: ./kustomize/env/example
+- name: smoke
+  build:
+    artifacts:
+    - image: ig
+      context: docker/ig
+    - image: forgeops-tests
+      context: docker/forgeops-tests
+    - image: am
+      context: docker/am
+    - image: config-util
+      context: docker/config-util
+    - image: idm
+      context: docker/idm
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/smoke
+- name: fbc-smoke
+  build:
+    artifacts:
+    - image: ig
+      context: docker/ig
+    - image: forgeops-tests
+      context: docker/forgeops-tests
+    - image: am
+      context: docker/am-fbc
+    - image: config-util
+      context: docker/config-util
+    - image: idm
+      context: docker/idm
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/smoke
+- name: medium
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: idm
+      context: docker/idm
+    - image: config-util
+      context: docker/config-util
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/medium
+- name: small
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: idm
+      context: docker/idm
+    - image: config-util
+      context: docker/config-util
+    #- image: ig
+    #  context: docker/ig
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/small
+- name: large
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: idm
+      context: docker/idm
+    - image: config-util
+      context: docker/config-util
+    #- image: ig
+    #  context: docker/ig
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/large
+# Profiles to launch / test just a specific product
+- name: ig
+  build:
+    artifacts:
+    - image: ig
+      context: docker/ig
+  deploy:
+    kustomize:
+      path: ./kustomize/ig
+- name: am-only
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: config-util
+      context: docker/config-util
+    # Uncomment this if you want to use amster instead of config-util
+    - image: amster
+      context: docker/amster
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: config-util
+      context: docker/config-util
+  deploy:
+    kustomize:
+      path: ./kustomize/env/am-only
+
+- name: lodestar
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: config-util
+      context: docker/config-util
+    - image: idm
+      context: docker/idm
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/lodestar

@@ -1,0 +1,68 @@
+# Waits for the perf test to be completed, and then
+# merges and uploads results to GCS.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: merge-perf-test-results
+spec:
+  backoffLimit: 1
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      labels:
+        name: merge-perf-test-results
+    spec:
+      serviceAccountName: perf-test-sa
+      initContainers:
+      - name: poll
+        image: gcr.io/cloud-builders/kubectl:latest
+        command: ["/scripts/script.sh"]
+        volumeMounts:
+        - name: script
+          mountPath: /scripts
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      containers:
+      - image: gatling
+        name: merge-perf-test-results
+        args:
+        - gradle
+        - deleteLogs
+        resources:
+          limits:
+            memory: 1500Mi
+          requests:
+            cpu: 250m
+            memory: 1500Mi
+        envFrom:
+        - configMapRef:
+            name: perf-test-config
+        volumeMounts:
+        - name: gcs-key
+          mountPath: /var/run/secrets
+      volumes:
+      - name: script
+        configMap:
+          name: poll-script
+          defaultMode: 0744
+      - name: gcs-key
+        secret:
+          secretName: gcs-key
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: poll-script
+data:
+  script.sh: |
+    #!/bin/bash
+    until [[ $(kubectl get job perf-test -n $NAMESPACE -o=jsonpath='{.status.conditions[0].type}') = "Complete" ]];
+    do
+      echo .
+      sleep 30;
+    done

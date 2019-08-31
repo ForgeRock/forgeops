@@ -1,0 +1,29 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  app: am
+  component: am
+  vendor: forgerock
+# - ingress.yaml
+resources:
+- configmap.yaml
+- deployment.yaml
+- service.yaml
+secretGenerator:
+- name: am-boot-secrets
+  type: Opaque
+  files:
+  - secrets/.keypass
+  - secrets/.storepass
+  - secrets/keystore.jceks
+  # This is for amster. May not be required
+  - secrets/authorized_keys
+- name: am-runtime-keystore
+  type: Opaque
+  files:
+  - secrets/keystore-runtime.jceks
+- name: am-runtime-passwords
+  type: Opaque
+  files:
+  - secrets/keypassruntime
+  - secrets/storepassruntime

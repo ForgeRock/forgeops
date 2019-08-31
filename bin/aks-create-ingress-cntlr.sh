@@ -14,24 +14,30 @@
 # k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/ing.yaml
 # k apply -f https://raw.githubusercontent.com/kubernetes/kubernetes/master/test/e2e/testing-manifests/ingress/http/svc.yaml
 
+source "${BASH_SOURCE%/*}/../etc/aks-env.cfg"
 
-IP=$1
+echo "=> Read the following env variables from config file"
+echo -e "\tStatic IP Address = ${AKS_INGRESS_IP}"
+echo -e "\tStatic IP resource group = ${AKS_IP_RESOURCE_GROUP_NAME}"
 
-if [ -z $1 ]; then
+if [ -z $AKS_INGRESS_IP ]; then
  IP_OPTS=""
 else
- IP_OPTS="--set controller.service.loadBalancerIP=$1"
+ IP_OPTS="--set controller.service.loadBalancerIP=${AKS_INGRESS_IP}"
 fi
 
-helm install --namespace nginx --name nginx \
+if [ -z $AKS_IP_RESOURCE_GROUP_NAME ]; then
+ IP_GROUP_OPTS=""
+else
+ IP_GROUP_OPTS="--set controller.service.annotations.'service\.beta\.kubernetes\.io/azure-load-balancer-resource-group'=${AKS_IP_RESOURCE_GROUP_NAME}"
+fi
+
+helm upgrade -i nginx --namespace nginx \
   --set rbac.create=true \
   --set controller.publishService.enabled=true \
   --set controller.stats.enabled=true \
   --set controller.service.externalTrafficPolicy=Local \
   --set controller.service.type=LoadBalancer \
-  --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"=forgeopsIPs \
-  --set controller.image.tag="0.21.0" \
-   $IP_OPTS stable/nginx-ingress
+  --set controller.image.tag="0.25.0" \
+   $IP_OPTS $IP_GROUP_OPTS stable/nginx-ingress
 
-#--set controller.image.tag="0.17.1"
-#--set enable-dynamic-configuration=false \

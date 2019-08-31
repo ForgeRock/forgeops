@@ -8,8 +8,6 @@ target/
 *.DS_Store
 .idea/
 *.tgz
-/helm/git/secrets/ssh
-/helm/git/secrets/ssh.pub
 bazel-*
 brigade.yaml
 settings.xml
@@ -17,9 +15,14 @@ settings.xml
 etc/cert-manager.json
 *.pyc
 .vscode/
-/cicd/forgeops-tests/.pytest_cache/
-/cicd/forgeops-tests/reports/
-/cicd/forgeops-tests/res.txt
-/cicd/forgeops-tests/results.txt
+.pytest_cache/
+reports/
+res.txt
+results.txt
 /venv/
-/dev/skaffold-dev.yaml
+skaffold-dev.yaml
+ __pycache__/
+build/
+.gradle/
+key.json
+cue/

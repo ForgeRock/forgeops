@@ -1,0 +1,18 @@
+# Sample overlay that sets the "small" t-shirt size
+# We override the replicas and the resource limits
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: ig
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: ig
+        resources:
+          limits:
+            memory: 2Gi
+          requests:
+            cpu: 1000m
+            memory: 1Gi

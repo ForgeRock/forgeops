@@ -1,0 +1,4 @@
+namespace: smoke
+bases:
+- ../dev
+- ../../forgeops-tests

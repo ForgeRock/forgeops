@@ -23,7 +23,7 @@ AKS_LOCATION="eastus"
 #AKS_NODE_LOCATIONS="eastus,eastus2"
 
 # Kubernetes Version "az aks get-versions -l <zone>"
-AKS_KUBERNETES_VERSION="1.12.5"
+AKS_KUBERNETES_VERSION="1.12.7"
 
 # Nodes per zone in Cluster
 AKS_NODE_COUNT="1"

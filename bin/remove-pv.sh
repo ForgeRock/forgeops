@@ -10,6 +10,6 @@ pvlist=`kubectl get pv -o jsonpath='{.items[*].metadata.name}'`
 
 for pv in ${pvlist}
 do
-    echo "kubectl delete pvc $pv"
+    echo "kubectl delete pv $pv"
     kubectl delete pv ${pv}
 done

@@ -1,0 +1,76 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: idm
+spec:
+  replicas: 1
+  serviceName: idm
+  volumeClaimTemplates: []
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: idm
+        image: idm
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            # TODO: Verify headers are no longer needed.
+            # httpHeaders:
+            # - name: X-OpenIDM-Username
+            #   value: anonymous
+            # - name: X-OpenIDM-Password
+            #   value: anonymous
+            # - name: X-OpenIDM-NoSession
+            #   value: "true"
+            path: /openidm/info/ping
+            port: 8080
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 5
+        name: openidm
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: 800Mi
+          requests:
+            cpu: 250m
+            memory: 800Mi
+        volumeMounts:
+        - mountPath: /opt/openidm/secrets
+          name: idm-secrets
+        - mountPath: /opt/openidm/logs
+          name: logs
+        - mountPath: /opt/openidm/audit
+          name: audit-logs
+        - mountPath: /opt/openidm/resolver
+          name: idm-boot-properties
+        - mountPath: /var/run/openidm/logging
+          name: idm-logging-properties
+      volumes:
+      - name: idm-secrets
+        secret:
+          secretName: idm
+      - emptyDir: {}
+        name: logs
+      - emptyDir: {}
+        name: audit-logs
+      - name: idm-boot-properties
+        configMap:
+            name: idm-boot-properties
+      - name: idm-logging-properties
+        configMap:
+           name: idm-logging-properties
+  updateStrategy:
+    type: RollingUpdate

@@ -14,10 +14,10 @@ data:
      "dsameUser" : "cn=dsameuser,ou=DSAME Users,{{ .Values.rootSuffix }}",
      "keystores" : {
        "default" : {
-         "keyStorePasswordFile" : "{{ .Values.am.bootstrapDir }}/.storepass",
-         "keyPasswordFile" : "{{ .Values.am.bootstrapDir }}/.keypass",
+         "keyStorePasswordFile" : "{{ .Values.am.secretsDir }}/.storepass",
+         "keyPasswordFile" : "{{ .Values.am.secretsDir }}/.keypass",
          "keyStoreType" : "JCEKS",
-         "keyStoreFile" : "{{ .Values.am.bootstrapDir }}/keystore.jceks"
+         "keyStoreFile" : "{{ .Values.am.keystoresDir }}/keystore.jceks"
        }
      },
      "configStoreList" : [ {
@@ -36,7 +36,7 @@ metadata:
   name: am-configmap
 data:
   CATALINA_OPTS: "{{ .Values.catalinaOpts }}"
-  {{ if .Values.config.amCustomizationScriptPath -}}
-  CUSTOMIZE_AM: "{{ .Values.config.amCustomizationScriptPath }}"
+  {{ if .Values.amCustomizationScriptPath -}}
+  CUSTOMIZE_AM: "{{ .Values.amCustomizationScriptPath }}"
   {{- end }}
 

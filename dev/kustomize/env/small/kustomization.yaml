@@ -1,6 +1,0 @@
-namespace: small
-bases:
-- ../dev
-- ../../ig
-patchesStrategicMerge:
-- ig.yaml

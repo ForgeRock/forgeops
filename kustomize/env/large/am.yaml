@@ -1,0 +1,16 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: am
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: openam
+        resources:
+          limits:
+            memory: 26Gi
+          requests:
+            cpu: 10000m
+            memory: 20Gi

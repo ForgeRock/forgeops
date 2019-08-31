@@ -25,10 +25,25 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "8080"
         sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
+{{- with .Values.extraAnnotations }}
+{{ toYaml . | trim | indent 8 }}
+{{- end }}
     spec:
       {{- with .Values.serviceAccountName }}
       serviceAccountName: {{ . }}
       {{- end }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - {{ template "name" . }}
+                topologyKey: {{ .Values.topologyKey }}
       {{- with .Values.securityContext }}
       securityContext:
 {{ toYaml . | trim | indent 8 }}
@@ -120,8 +135,8 @@ spec:
               fieldPath: metadata.namespace
         args: [ "pause"]
       {{ end }}
-      # audit logging containers
       {{- range .Values.auditLogs }}
+      # audit logging containers
       - name: {{ .name }}
         image: busybox
         env:
@@ -132,6 +147,9 @@ spec:
         - name: audit-logs
           mountPath: /opt/openidm/audit
       {{- end }}
+{{- with .Values.extraContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       volumes:
       - name: openidm-secrets
         secret:

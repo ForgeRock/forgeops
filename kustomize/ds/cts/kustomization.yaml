@@ -1,0 +1,8 @@
+commonLabels:
+  app: ds-cts
+bases:
+- ../base
+nameSuffix: -cts
+images:
+- newName: ds-cts
+  name: ds

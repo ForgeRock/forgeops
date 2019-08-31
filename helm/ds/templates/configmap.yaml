@@ -8,7 +8,6 @@ data:
   DJ_INSTANCE: "{{ .Values.instance }}"
   DS_SET_SIZE: "{{ .Values.replicas }}"
   OPENDJ_JAVA_ARGS: "{{ .Values.opendjJavaArgs }}"
-  SLACK_URL: "{{ .Values.slackUrl }}"
   DS_ENABLE_CTS: "{{ .Values.cts.enabled }}"
   DS_ENABLE_USERSTORE: "{{ .Values.userstore.enabled }}"
   DS_ENABLE_CONFIGSTORE: "{{ .Values.configstore.enabled }}"

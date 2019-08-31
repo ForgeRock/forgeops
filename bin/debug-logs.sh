@@ -63,7 +63,7 @@ OBJECT_TOC=""
 objects="service ingress configmap secrets"
 for object in $objects; do
     echo "<h2><a id=\"$object\">$object</a></h2><br/><pre>" >> $OUT
-    kubectl describe $object  >> $OUT
+    kubectl get $object -o yaml >> $OUT
 
     OBJECT_TOC="$OBJECT_TOC <li><a href=\"#$object\">$object</a></li>"
 

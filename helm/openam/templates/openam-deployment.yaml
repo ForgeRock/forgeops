@@ -3,6 +3,8 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{ template "openam.fullname" . }}
+  labels:
+    app: {{ template "openam.name" . }}
 spec:
   replicas: {{default 1 .Values.openamReplicaCount }}
   template:
@@ -15,6 +17,9 @@ spec:
         heritage: {{ .Release.Service }}
       annotations:
         sidecar.istio.io/inject: "{{ .Values.istio.enabled }}"
+{{- with .Values.extraAnnotations }}
+{{ toYaml . | trim | indent 8 }}
+{{- end }}
     spec:
       {{- with .Values.serviceAccountName }}
       serviceAccountName: {{ . }}
@@ -108,7 +113,7 @@ spec:
           mountPath: /git
         {{ end }}
         {{ if .Values.useConfigMapWebxml }}
-        - mountPath: /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
+        - mountPath: /usr/local/tomcat/webapps/am/WEB-INF/web.xml
           name: webxml
           subPath: webxml
         {{ end }}
@@ -153,6 +158,9 @@ spec:
         - name: openam-root
           mountPath: /home/forgerock/openam
       {{- end }}
+{{- with .Values.extraContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       volumes:
       {{ if .Values.useConfigMapWebxml }}
       - configMap:
@@ -173,7 +181,7 @@ spec:
           name: boot-json
       - name: configstore-secret
         secret:
-          secretName: configstore
+          secretName: {{ default "configstore" .Values.configSecretName }}
           #defaultMode: 256
       {{ if eq .Values.config.strategy  "git" }}
       - name: git

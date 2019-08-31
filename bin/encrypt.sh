@@ -5,10 +5,9 @@
 file=$1
 key="${2:-cert-manager}"
 
-
 gcloud kms encrypt \
-    --plaintext-file="$outfile" \
-    --ciphertext-file="$file"  \
+    --plaintext-file="$file" \
+    --ciphertext-file="$file.enc"  \
     --keyring=forgeops-build   \
     --key=$key \
     --location=global

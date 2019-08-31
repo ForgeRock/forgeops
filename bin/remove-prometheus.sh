@@ -26,7 +26,25 @@ helm delete --purge ${NAMESPACE}-prometheus-operator
 helm delete --purge ${NAMESPACE}-kube-prometheus
 
 # These get left over after the helm delete --purge has completed.
-kubectl delete svc alertmanager-operated prometheus-operated --namespace=$NAMESPACE
+kubectl delete svc alertmanager-operated prometheus-operated --namespace=${NAMESPACE}
+
+echo ""
+echo "- remove pvc"
+pvc_list=`kubectl get pvc | grep ${NAMESPACE} | awk -F' ' '{print $1}'`
+for pvc in ${pvc_list}
+do
+    echo "kubectl delete pvc $pvc"
+    kubectl delete pvc ${pvc}
+done
+
+echo ""
+echo "- remove pv"
+pv_list=`kubectl get pv | grep ${NAMESPACE} | awk -F' ' '{print $1}'`
+for pv in ${pv_list}
+do
+    echo "kubectl delete pv $pv"
+    kubectl delete pv ${pv}
+done
 
 
 

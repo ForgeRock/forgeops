@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+# Note that the service name is still openam - not am. Need to change the config....
+metadata:
+  name: am
+spec:
+  ports:
+  - name: am
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: am
+  type: ClusterIP

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+    /*
+    This placeholder file handles the query string parameters provided by the AS
+    when returning from the authorization endpoint.
+    */
+    var queryString = window.location.search.substring(1); // removes the '?'
+    // appAuth expects the details to be provided via hash, so copy them there
+    window.location.hash = queryString;
+
+    if (parent === window) { // if not in a frame
+        // Will receive a message event when the fetch tokens script has finished
+        window.addEventListener("message", function (e) {
+            var spaLocation = document.createElement("a");
+            spaLocation.href = "."; // assumes SPA is the default document in the folder this file resides within
+
+            setTimeout(function() {
+                window.location.assign(spaLocation.href);
+            }, 0);
+        });
+    }
+
+  </script>
+  <script src="appAuthHelperFetchTokensBundle.js"></script>
+</head>
+</html>

@@ -1,0 +1,17 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: am
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: openam
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 10Gi
+          requests:
+            cpu: 11000m
+            memory: 10Gi

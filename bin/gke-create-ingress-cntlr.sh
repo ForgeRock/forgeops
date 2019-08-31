@@ -29,8 +29,5 @@ helm install --namespace nginx --name nginx \
   --set controller.stats.enabled=true \
   --set controller.service.externalTrafficPolicy=Local \
   --set controller.service.type=LoadBalancer \
-  --set controller.image.tag="0.24.1" \
+  --set controller.image.tag="0.25.0" \
    $IP_OPTS stable/nginx-ingress
-
-#--set controller.image.tag="0.17.1"
-#--set enable-dynamic-configuration=false \

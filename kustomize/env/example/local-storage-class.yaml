@@ -1,0 +1,9 @@
+# TODO: This needs to be discussed before integration. Need to document the performance and HA tradeoffs.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  # suggested option for DS persistent volumes for their databases and changelogs.
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain

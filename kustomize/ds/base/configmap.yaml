@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds
+data:
+  # -XX:+PrintFlagsFinal
+  OPENDJ_JAVA_ARGS: "-server -XX:MaxRAMPercentage=75"

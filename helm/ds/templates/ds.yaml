@@ -26,14 +26,21 @@ spec:
       resources:
         requests:
           storage: {{ default "5Gi"  .Values.storageSize }}
-      {{- if .Values.storageClass }}
-      storageClassName:  {{ .Values.storageClass }}
-      {{- end }}
+    {{- if .Values.storageClass }}
+    {{- if eq .Values.storageClass "-" }}
+      storageClassName: ""
+    {{- else }}
+      storageClassName: "{{ .Values.storageClass }}"
+    {{- end }}
+    {{- end }}
   {{- end }}
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+{{- with .Values.extraAnnotations }}
+{{ toYaml . | trim | indent 8 }}
+{{- end }}
       labels:
         instance: {{ .Values.instance }}
         app: {{ template "fullname" . }}
@@ -146,6 +153,9 @@ spec:
             port: metrics
           initialDelaySeconds: 60
           periodSeconds: 120
+{{- with .Values.extraContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       volumes:
       - name: dj-secrets
         secret:

@@ -1,0 +1,69 @@
+/*
+ * Copyright 2019 ForgeRock AS. All Rights Reserved
+ *
+ * Use of this code requires a commercial software license with ForgeRock AS.
+ * or with one of its affiliates. All use shall be exclusively subject
+ * to such license between the licensee and ForgeRock AS.
+ */
+
+@Library(value=['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@b8d18dd', 'java-pipeline-libs@c9f5837']) _
+
+import com.forgerock.pipeline.reporting.PipelineRun
+
+BASE_VERSION = '7.0.0'
+
+// Temporarily comment out directories to prevent that image being built
+buildDirectories = [
+    [ name: 'git',              forceBuild: false ],
+    [ name: 'java-11',          forceBuild: true ],
+    [ name: 'util',             forceBuild: false ],
+]
+
+def pipeline
+def pipelineRun
+
+timestamps {
+    node ('build&&linux') {
+
+        stage ('Clone repo') {
+            checkout scm
+            // Stash workspace to be able to reuse it in the tests
+            stash includes: '**', name: "workspace" // omit 'useDefaultExcludes: false' - no need to stash .git folder
+
+            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+            GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
+            currentBuild.description = 'built:'
+
+            pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, GIT_COMMIT)
+
+            def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
+            def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
+            def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
+
+            commonModule = load("${libsLocation}/common.groovy")
+
+            if (env.TAG_NAME) {
+                currentBuild.result = 'ABORTED'
+                error 'This pipeline does not currently support building from a tag'
+            } else if (isPR()) {
+                pipeline = load("${jobLocation}/pr.groovy")
+                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
+                prAutomation = load("${libsLocation}/pr-automation.groovy")
+            } else {
+                pipeline = load("${jobLocation}/postcommit.groovy")
+                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
+            }
+        }
+
+        pipeline.build()
+    }
+
+    if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+        pipeline.postBuildTests(pipelineRun)
+
+        if (isPR()) {
+            prAutomation.mergeIfAutomatedProductVersionUpdate(GIT_COMMIT)
+        }
+    }
+}

@@ -1,0 +1,8 @@
+kind: ""
+apiversion: ""
+commonLabels:
+  app: ig
+resources:
+- deployment.yaml
+- secret.yaml
+- service.yaml
