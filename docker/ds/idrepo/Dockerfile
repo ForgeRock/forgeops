@@ -1,7 +1,7 @@
 # The ds-empty image configures https/https, and monitoring
-#FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-latest-postcommit
+#FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-latest-postcommit
 # Pinned until https://bugster.forgerock.org/jira/browse/OPENDJ-6556 is fixed
-FROM gcr.io/forgerock-io/ds-empty/pit1@sha256:39bb0e938007a5855d35c0f800a3068bd41af164988e3d60431dbc5e33a4fd52
+FROM gcr.io/forgerock-io/ds-empty/docker-build@sha256:39bb0e938007a5855d35c0f800a3068bd41af164988e3d60431dbc5e33a4fd52
 
 USER forgerock 
 
