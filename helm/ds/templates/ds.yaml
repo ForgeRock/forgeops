@@ -174,3 +174,10 @@ spec:
       - name: db
         emptyDir: {}
       {{ end }}
+      {{ if eq .Values.taints.enabled true }}
+      tolerations:
+        - key: "type"
+          operator: "Equal"
+          value: {{ .Values.instance | quote }}
+          effect: "NoSchedule"
+        {{end}}
