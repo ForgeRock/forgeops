@@ -1,5 +1,5 @@
 # Note: M5 integration with AM currently not working
-FROM gcr.io/forgerock-io/idm/pit1:7.0.0-8088ea4a405f4f06e0bd87d44b844b60f8932d38
+FROM gcr.io/forgerock-io/idm/pit1:7.0.0-c2050d87a00fa65e195b84d9534d49f5a7e9021d
 
 # Removes any existing conf files that might conflict with our config. This includes the embedded ds repo.
 RUN rm -fr /opt/openidm/conf
