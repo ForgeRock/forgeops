@@ -147,6 +147,10 @@ data:
     com.iplanet.am.cookie.name=iPlanetDirectoryPro
     com.sun.identity.auth.cookieName=AMAuthCookie
 
+    # TODO: Move this to commons secrets
+    # The client secret for the idm/am integration
+    rs.client.secret=rsFilterClient
+
 ---
 apiVersion: v1
 kind: ConfigMap
