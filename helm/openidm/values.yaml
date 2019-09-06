@@ -34,7 +34,7 @@ component: openidm
 
 image:
   repository: gcr.io/forgerock-io/idm/pit1
-  tag: 7.0.0-2f1295a93dc120dcc02cca4af2c237d6d35891e8
+  tag: 7.0.0-89ca1e7e4330d4d0d026d51988da58f5dd392120
   pullPolicy: IfNotPresent
   # For development use Always
   # pullPolicy: Always
