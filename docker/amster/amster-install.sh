@@ -2,8 +2,14 @@
 #!/usr/bin/env bash
 # Full amster install.
 
+# Uncomment the lines below to generate a random password for amadmin. If commented out
+# the default value passed in via the configmap is used instead.
+#export AMADMIN_PASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+#echo "Password for amadmin: $AMADMIN_PASSWORD"
+
 
 DIR=`pwd`
+
 
 # Path to script location - this is *not* the path to the amster/*.json config files - it is the path
 # to  *.amster scripts.

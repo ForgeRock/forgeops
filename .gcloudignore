@@ -1,4 +1,7 @@
 .git
 tmp/
- __pycache__/
- *.pyc
+__pycache__/
+*.pyc
+helm/
+pulumi/
+tmp

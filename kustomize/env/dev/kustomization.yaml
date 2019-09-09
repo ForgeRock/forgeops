@@ -4,8 +4,8 @@ resources:
   - ../../ds/cts
   - ../../ds/idrepo
   - ../../am
-  - ../../config-util
-  # - ../../amster
+  #- ../../config-util
+  - ../../amster
   - ../../idm
   - ../../end-user-ui
   - ../../web

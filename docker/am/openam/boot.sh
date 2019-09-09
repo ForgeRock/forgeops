@@ -15,6 +15,26 @@ do
 done
 echo "ds-idrepo is responding"
 
+copy_secrets() {
+    mkdir -p $AM_HOME/var/audit
+    SDIR=$AM_HOME/security/secrets/default
+    KDIR=$AM_HOME/security/keystores
+    mkdir -p $SDIR
+    mkdir -p $KDIR
+    echo "Copying bootstrap files for legacy AMKeyProvider"
+    cp /var/run/secrets/am/boot/.storepass $SDIR
+    cp /var/run/secrets/am/boot/.keypass $SDIR
+    cp /var/run/secrets/am/boot/keystore.jceks $KDIR
+    # Copy the amster key
+    AMSTER_KEYS=$AM_HOME/security/keys/amster
+    mkdir -p $AMSTER_KEYS
+    cp /var/run/secrets/amster/authorized_keys $AMSTER_KEYS
+}
+
+
+copy_secrets
+
+
 # Test the configstore to see if it contains a configuration. Return 0 if configured.
 # This is not currently foolproof - it the ds-idrepo is not started yet the ldap search will also fail. This
 # can result in util installer running again - which in most cases is fine - it will refresh the configuraition.
@@ -28,16 +48,8 @@ if [ $status -ne 0 ]; then
     rm $AM_HOME/config/boot.json
 else
     echo "ds-idrepo configured - keeping boot.json"
-    mkdir -p $AM_HOME/var/audit
-    SDIR=$AM_HOME/security/secrets/default
-    KDIR=$AM_HOME/security/keystores
-    mkdir -p $SDIR
-    mkdir -p $KDIR
-    echo "Copying bootstrap files for legacy AMKeyProvider"
-    cp /var/run/secrets/am/boot/.storepass $SDIR
-    cp /var/run/secrets/am/boot/.keypass $SDIR
-    cp /var/run/secrets/am/boot/keystore.jceks $KDIR
+
 
 fi
 
-exec catalina.sh run 
+exec catalina.sh run

@@ -51,6 +51,8 @@ spec:
           mountPath: /var/run/secrets/am/password
         - name: am-runtime-keystore
           mountPath: /var/run/secrets/am/keystore
+        - name: amster-keys
+          mountPath: /var/run/secrets/amster
       terminationGracePeriodSeconds: 10
       volumes:
       - name: am-boot-secrets
@@ -62,6 +64,9 @@ spec:
       - name: am-runtime-passwords
         secret:
           secretName: am-runtime-passwords
+      - name: amster-keys
+        secret:
+          secretName: amster
       - configMap:
           name: boot-json
         name: openam-boot

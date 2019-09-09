@@ -4,11 +4,11 @@ build:
   artifacts:
   - image: am
     context: docker/am
-  - image: config-util
-    context: docker/config-util
-  # Uncomment this if you want to use amster instead of config-util
-  # - image: amster
-  #   context: docker/amster
+# An experimental python client for configuration. Currently not used.
+#  - image: config-util
+#    context: docker/config-util
+  - image: amster
+    context: docker/amster
   - image: idm
     context: docker/idm
   - image: ds-cts
@@ -21,7 +21,7 @@ deploy:
   kustomize:
     path: ./kustomize/env/example
 profiles:
-# Example.forgeops deployment to default.iam.forgeops.com - uses a LE cert.
+# Example.forgeops deployment to default.iam.forgeops.com - uses a Let's Encrypt cert.
 - name: gke
   deploy:
     kustomize:
@@ -32,8 +32,8 @@ profiles:
     artifacts:
     - image: am
       context: docker/am-fbc
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     - image: ds-cts
       context: docker/ds/cts
     - image: ds-idrepo
@@ -52,8 +52,8 @@ profiles:
       context: docker/forgeops-tests
     - image: am
       context: docker/am
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     - image: idm
       context: docker/idm
     - image: ds-cts
@@ -74,8 +74,8 @@ profiles:
       context: docker/forgeops-tests
     - image: am
       context: docker/am-fbc
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     - image: idm
       context: docker/idm
     - image: ds-cts
@@ -98,8 +98,8 @@ profiles:
       context: docker/ds/cts
     - image: idm
       context: docker/idm
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     tagPolicy:
       sha256: {}
   deploy:
@@ -116,8 +116,8 @@ profiles:
       context: docker/ds/cts
     - image: idm
       context: docker/idm
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     #- image: ig
     #  context: docker/ig
     tagPolicy:
@@ -136,8 +136,8 @@ profiles:
       context: docker/ds/cts
     - image: idm
       context: docker/idm
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     #- image: ig
     #  context: docker/ig
     tagPolicy:
@@ -145,7 +145,7 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/large
-# Profiles to launch / test just a specific product
+# Sample profiles to launch / test just a specific product
 - name: ig
   build:
     artifacts:
@@ -159,11 +159,9 @@ profiles:
     artifacts:
     - image: am
       context: docker/am
-    - image: config-util
-      context: docker/config-util
-    # Uncomment this if you want to use amster instead of config-util
     - image: amster
       context: docker/amster
+    # Uncomment this if you want to use amster instead of config-util
     - image: ds-cts
       context: docker/ds/cts
     - image: ds-idrepo
@@ -179,8 +177,8 @@ profiles:
     artifacts:
     - image: am
       context: docker/am
-    - image: config-util
-      context: docker/config-util
+    - image: amster
+      context: docker/amster
     - image: idm
       context: docker/idm
     - image: ds-cts
