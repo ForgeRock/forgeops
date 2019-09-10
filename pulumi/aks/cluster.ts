@@ -77,3 +77,26 @@ export const k8sCluster = new azure.containerservice.KubernetesCluster("aksClust
 export const k8sProvider = new k8s.Provider("aksK8s", {
     kubeconfig: k8sCluster.kubeConfigRaw,
 });
+
+// Create production namespace
+new k8s.core.v1.Namespace("prod", { metadata: { name: "prod" }}, { provider: k8sProvider });
+
+// Create Storage Classes
+new k8s.storage.v1.StorageClass("sc-standard", {
+    metadata: { name: 'standard' },
+    provisioner: 'kubernetes.io/azure-disk',
+    parameters: { 
+        storageaccounttype: 'Standard_LRS',
+        kind: 'Managed'       
+    }
+}, { provider: k8sProvider } );
+
+new k8s.storage.v1.StorageClass("sc-premium", {
+    metadata: { name: 'fast' },
+    provisioner: 'kubernetes.io/azure-disk',
+    parameters: { 
+        storageaccounttype: 'Premium_LRS',
+        kind: 'Managed'       
+    }
+}, { provider: k8sProvider } );
+

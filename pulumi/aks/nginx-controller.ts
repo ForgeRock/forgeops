@@ -12,7 +12,7 @@ if ( config.staticIpName !== undefined ) {
     // Get static IP from config.ts
     statIp = pulumi.output(azure.network.getPublicIP({
         name: config.staticIpName,
-        resourceGroupName: config.ipResourceGroupName
+        resourceGroupName: config.ipResourceGroupName,
     }));
 
     // Get IP resource group from config.ts
@@ -41,20 +41,22 @@ if ( config.staticIpName !== undefined ) {
     });
 };
 
+// Assign permission to cluster SP to access IP resource group
 export const roleAssignment = new azure.role.Assignment("ip-role", {
     principalId: cluster.adSp.objectId,
     roleDefinitionName: "Network Contributor",
     scope: ipGroup.id
 });
 
-const azLbType = {"service\.beta\.kubernetes\.io/azure-load-balancer-resource-group": "aks-small-ip-resource-group"};
+// Set nginx load balancer annotation
+const azLbType = {"service\.beta\.kubernetes\.io/azure-load-balancer-resource-group": ipGroup.name};
 
 // Set values for nginx Helm chart
 export const nginxValues: ingressController.ChartArgs = {
     ip: statIp.ipAddress,
     version: config.nginxVersion,
     clusterProvider: cluster.k8sProvider,
-    dependencies: [statIp,cluster.k8sProvider],
+    dependencies: [cluster.k8sProvider],
     annotations: azLbType
 };
 

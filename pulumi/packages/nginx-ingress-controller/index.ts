@@ -111,10 +111,6 @@ export class NginxIngressController {
         const domain = chartArgs.domain;
         const url = chartArgs.url;
         let staticIp: any;
-        // let dependencies: any = [ dependency ];
-
-        // // Create array of dependencies
-        // dependencies.push(ip) 
 
         // Create nginx namespace
         const ns = new k8s.core.v1.Namespace("nginx", { 

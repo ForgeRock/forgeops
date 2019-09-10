@@ -7,5 +7,5 @@ config:
     lee.baines@LeeBainess-MacBook-Pro-4593.local
   aks-cdm:clusterName: cdm-small
   aks-cdm:clusterResourceGroupName: cdm-small-resource-group
-  aks-cdm:ipResourceGroupName: static-ips
-  aks-cdm:staticIpName: test-ip
+  # aks-cdm:ipResourceGroupName: static-ips
+  # aks-cdm:staticIpName: test-ip
