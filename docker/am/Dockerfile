@@ -3,7 +3,7 @@ FROM gcr.io/forgerock-io/am/pit1:7.0.0-latest-postcommit
 # BEGIN - temporary work around for testing if the ds-idrepo is configured before AM starts. Remove when FBC is integrated
 # Installs ldap utils for querying the repo.
 USER root
-RUN apt-get update && apt-get install ldap-utils
+RUN apt-get update && apt-get install -y ldap-utils
 USER forgerock
 COPY --chown=forgerock:root openam /home/forgerock/openam
 # END

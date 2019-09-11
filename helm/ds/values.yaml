@@ -111,3 +111,7 @@ securityContext:
   runAsUser: 11111
   fsGroup: 11111
   supplementalGroups: [ 0 ]
+
+# if taints enabled, then pod will be deployed on node with tainting type=INSTANCE_NAME (eg type=userstore)
+taints:
+  enabled: false
