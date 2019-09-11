@@ -15,7 +15,7 @@ export interface ChartArgs {
     clusterProvider: k8s.Provider;
 
     // Cloud DNS Service Account
-    cloudDnsSa: string;
+    cloudDnsSa?: string;
 
     dependency: any;
 }
@@ -62,17 +62,20 @@ export class CertManager {
             }
         },{ dependsOn: [this.certmanagerResources], provider: chartArgs.clusterProvider});
 
+        // Create secret for CloudDNS service account if provided for GCP.
+        if ( chartArgs.cloudDnsSa !== undefined ) {
         // Deploy secret - service account for access to Cloud DNS
-        this.clouddns = new k8s.core.v1.Secret("clouddns",{
-            metadata: {
-                name: "clouddns",
-                namespace: "cert-manager"
-            },
-            type: "Opaque",
-            stringData: {
-                "cert-manager.json": chartArgs.cloudDnsSa
-            }
-        },{ dependsOn: [this.certmanagerResources], provider: chartArgs.clusterProvider });
+            this.clouddns = new k8s.core.v1.Secret("clouddns",{
+                metadata: {
+                    name: "clouddns",
+                    namespace: "cert-manager"
+                },
+                type: "Opaque",
+                stringData: {
+                    "cert-manager.json": chartArgs.cloudDnsSa
+                }
+            },{ dependsOn: [this.certmanagerResources], provider: chartArgs.clusterProvider });
+        }
 
          // Deploy cert-manager issuers
         this.cmIssuers = new ConfigGroup("certManager", {

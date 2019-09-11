@@ -10,7 +10,6 @@ const certManagerValues: cm.ChartArgs = {
     tlsKey: config.require("tls-key"),
     tlsCrt: config.require("tls-crt"),
     clusterProvider: cluster.k8sProvider,
-    cloudDnsSa: config.require("clouddns"),
     dependency: cluster.k8sProvider
 }
 
