@@ -1,25 +1,12 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import * as k8s from "@pulumi/kubernetes";
-import { 
-    nodeCount, 
-    nodeMachineType, 
-    clusterName, 
-    enablePreemptible, 
-    k8sVersion,
-    nodeZones,
-    network, 
-    cpuPlatform, 
-    diskSize,
-    diskType,
-    minNodes,
-    maxNodes
-} from "./config";
+import * as config from "./config";
 
 function assignVpc() {
     // Create new network if not provided
-    if (network !== undefined) {
-        const vpcNetwork = network;
+    if (config.network !== undefined) {
+        const vpcNetwork = config.network;
         return vpcNetwork;
     } else {
         const vpcNetwork = new gcp.compute.Network("cdm-network", {});
@@ -31,13 +18,13 @@ export const vpc = assignVpc()
 
 // Create a GKE cluster
 const cluster = new gcp.container.Cluster("cdm-cluster", {
-    name: clusterName,
+    name: config.clusterName,
     initialNodeCount: 1,
     //location: zone,
-    nodeLocations: nodeZones,
+    nodeLocations: config.nodeZones,
     network: vpc,
     subnetwork: vpc,
-    minMasterVersion: k8sVersion,
+    minMasterVersion: config.k8sVersion,
     addonsConfig: {
         horizontalPodAutoscaling: {
             disabled: false,
@@ -58,13 +45,13 @@ const cluster = new gcp.container.Cluster("cdm-cluster", {
 //Setup NodePools
 export const primaryPool = new gcp.container.NodePool("primary", {
     cluster: cluster.name,
-    initialNodeCount: nodeCount,
+    initialNodeCount: config.nodeCount,
     //location: zone,
     nodeConfig: {
-        machineType: nodeMachineType,
-        diskSizeGb: diskSize,
-        diskType: diskType, 
-        minCpuPlatform: cpuPlatform,
+        machineType: config.nodeMachineType,
+        diskSizeGb: config.diskSize,
+        diskType: config.diskType, 
+        minCpuPlatform: config.cpuPlatform,
         oauthScopes: [
             "https://www.googleapis.com/auth/compute",
             "https://www.googleapis.com/auth/devstorage.read_only",
@@ -76,11 +63,11 @@ export const primaryPool = new gcp.container.NodePool("primary", {
         labels: {
             deployedby: "Pulumi"
         },
-        preemptible: enablePreemptible
+        preemptible: config.enablePreemptible
     },
     autoscaling: {
-        maxNodeCount: maxNodes,
-        minNodeCount: minNodes
+        maxNodeCount: config.maxNodes,
+        minNodeCount: config.minNodes
     },
     management: {
         autoRepair: true

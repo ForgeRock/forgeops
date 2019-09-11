@@ -1,5 +1,5 @@
 import { Config } from "@pulumi/pulumi";
-import { clusterProvider, primaryPool } from "./cluster";
+import * as cluster from "./cluster";
 import * as cm from "../packages/cert-manager"
 
 // Get access to stack configuration values
@@ -9,9 +9,9 @@ const config = new Config();
 const certManagerValues: cm.ChartArgs = {
     tlsKey: config.require("tls-key"),
     tlsCrt: config.require("tls-crt"),
-    clusterProvider: clusterProvider,
+    clusterProvider: cluster.clusterProvider,
     cloudDnsSa: config.require("clouddns"),
-    dependency: primaryPool
+    dependency: cluster.primaryPool
 }
 
 // Deploy cert-manager
