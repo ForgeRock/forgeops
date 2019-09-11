@@ -44,35 +44,6 @@ export const k8sCluster = new azure.containerservice.KubernetesCluster("aksClust
     },
 });
 
-// export const loganalytics = new azure.operationalinsights.AnalyticsWorkspace("aksloganalytics", {
-//     resourceGroupName: resourceGroup.name,
-//     location: resourceGroup.location,
-//     sku: "PerGB2018",
-//     retentionInDays: 30,
-// })
-
-// // Enable the Monitoring Diagonostic control plane component logs and AllMetrics   
-// export const azMonitoringDiagnostic = new azure.monitoring.DiagnosticSetting("aks", {
-//     logAnalyticsWorkspaceId: loganalytics.id,
-//     targetResourceId: k8sCluster.id,
-//     logs:  [{
-//         category: "kube-apiserver",
-//         enabled : true,
-    
-//         retentionPolicy: {
-//         enabled: true,
-//         }
-//     },
-//     ],
-//     metrics: [{
-//         category: "AllMetrics",
-    
-//         retentionPolicy: {
-//         enabled: true,
-//         }
-//     }],
-// })
-
 // Expose a K8s provider instance using our custom cluster instance.
 export const k8sProvider = new k8s.Provider("aksK8s", {
     kubeconfig: k8sCluster.kubeConfigRaw,
