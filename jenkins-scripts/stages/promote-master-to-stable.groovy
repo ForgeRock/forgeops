@@ -26,8 +26,8 @@ void runStage(PipelineRun pipelineRun) {
 }
 
 private void promoteDockerImagesToRootLevel() {
-    commonModule.HELM_CHARTS.each { product, helmChart ->
-        echo "Promoting ${product} docker image ${helmChart.currentTag} to root level"
+    commonModule.getHelmCharts().each { helmChart ->
+        echo "Promoting '${helmChart.currentImageName}:${helmChart.currentTag}' to root level"
         dockerUtils.copyImage(
                 "${helmChart.currentImageName}:${helmChart.currentTag}",
                 "${helmChart.rootLevelImageName}:${helmChart.currentTag}"
@@ -38,15 +38,17 @@ private void promoteDockerImagesToRootLevel() {
 private void promoteForgeOpsCommitToStable() {
     echo "Promoting ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to 'stable'"
     def repoUrl = scmUtils.getRepoUrl()
-    def localDevBranch = 'use-root-level-image-names-in-stable-helm-charts'
+    def localDevBranch = "promote-forgeops-master-to-stable-${env.BUILD_NUMBER}"
 
     localGitUtils.deepCloneBranch(repoUrl, 'master')
     sh "git checkout -b ${localDevBranch} ${commonModule.FORGEOPS_GIT_COMMIT}"
     this.useRootLevelImageNamesInHelmCharts()
+    this.useRootLevelImageNamesInDockerfiles()
     gitUtils.setupDefaultUser()
-    sh 'git commit --all -m "Use root-level image names in stable helm charts"'
+    sh 'git commit --all --message="Promote stable root-level images to Helm charts and Dockerfiles"'
 
     localGitUtils.deepCloneBranch(repoUrl, 'stable')
+
     sh commands(
             "git merge -Xtheirs --no-ff ${localDevBranch} -m " +
                     "'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to stable'",
@@ -54,15 +56,19 @@ private void promoteForgeOpsCommitToStable() {
     )
 }
 
-/* Update the Helm charts to use the root-level product container names.
+/* Update Helm charts to use root-level product image names.
  * Master branch uses the '/pit1' image name appendix; this can be removed once the image is promoted to the root level.
  */
 private void useRootLevelImageNamesInHelmCharts() {
-    commonModule.HELM_CHARTS.each { product, helmChart ->
-        // make all image names sed-friendly
-        def currentImageName = helmChart.currentImageName.replace('/', '\\/')
-        def rootLevelImageName = helmChart.rootLevelImageName.replace('/', '\\/')
-        sh "sed -i 's/${currentImageName}/${rootLevelImageName}/g' ${helmChart.filePath}"
+    commonModule.getHelmCharts().each { helmChart ->
+        sh "sed -i 's@${helmChart.currentImageName}@${helmChart.rootLevelImageName}@g' ${helmChart.filePath}"
+    }
+}
+
+/* Update Skaffold Dockerfiles to use root-level product image names. */
+private void useRootLevelImageNamesInDockerfiles() {
+    commonModule.getDockerfiles().each { dockerfile ->
+        sh "sed -i 's@FROM gcr.io/forgerock-io.*@FROM ${dockerfile.fullImageName}@g' ${dockerfile.filePath}"
     }
 }
 
