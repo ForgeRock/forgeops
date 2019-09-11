@@ -8,7 +8,6 @@ spec:
     spec:
       containers:
         - name: ds
-          imagePullPolicy: Always
           resources:
             requests:
               memory: 8Gi

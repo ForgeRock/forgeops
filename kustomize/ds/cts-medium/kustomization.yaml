@@ -1,5 +1,4 @@
-# Sample showing how to create a kustomized cts
-bases:
+resources:
 - ../cts
 patchesStrategicMerge:
 - cts.yaml
