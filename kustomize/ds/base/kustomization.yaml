@@ -11,11 +11,3 @@ secretGenerator:
    files:
    - secrets/keystore.pin
    - secrets/keystore
-vars:
-- name: DS_INSTANCE
-  objref:
-    kind: StatefulSet
-    apiVersion: apps/v1
-    name: ds
-  fieldref:
-    fieldpath: metadata.name

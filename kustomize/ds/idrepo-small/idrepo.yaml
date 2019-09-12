@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: ds
 spec:
-  replicas: 2
+  replicas: 3
   template:
     spec:
       containers:
