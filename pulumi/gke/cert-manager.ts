@@ -15,4 +15,8 @@ const certManagerValues: cm.ChartArgs = {
 }
 
 // Deploy cert-manager
-export const certManager = new cm.CertManager(certManagerValues);
+// export const certManager = new cm.CertManager(certManagerValues);
+
+export function createCertManager() {
+    return new cm.CertManager(certManagerValues);
+}

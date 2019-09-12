@@ -17,16 +17,21 @@ function assignIp() {
     }
 }
 
-// Get static IP
-export const lbIp = assignIp();
+export let lbIp:pulumi.Output<string>;
+export let nginx:ingress.NginxIngressController;
 
-// Set values for nginx Helm chart
-const nginxValues: ingress.ChartArgs = {
-    ip: lbIp,
-    version: config.nginxVersion,
-    clusterProvider: cluster.clusterProvider,
-    dependency: cluster.primaryPool
+
+if( config.enableNginxIngress ) {
+    lbIp = assignIp();
+    //
+    // Set values for nginx Helm chart
+    const nginxValues: ingress.ChartArgs = {
+        ip: lbIp,
+        version: config.nginxVersion,
+        clusterProvider: cluster.clusterProvider,
+        dependencies: [cluster.primaryPool]
+    }
+
+    // Deploy Nginx Ingress Controller Helm chart
+    nginx = new ingress.NginxIngressController( nginxValues );
 }
-
-// Deploy Nginx Ingress Controller Helm chart
-export const nginxControllerChart = new ingress.NginxIngressController( nginxValues );
