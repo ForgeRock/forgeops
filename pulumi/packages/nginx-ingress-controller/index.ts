@@ -4,7 +4,7 @@ import * as pulumi from "@pulumi/pulumi";
 /** 
  * Nginx Ingress Controller Helm chart
  */ 
-function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider: k8s.Provider, metaNs: any, dependency: any, ns: k8s.core.v1.Namespace, annotations: any) {
+function nginxChart(ip: string, version: string, clusterProvider: k8s.Provider, metaNs: any, dependencies: any[], ns: k8s.core.v1.Namespace, annotations: any) {
     
     const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
         fetchOpts: {
@@ -36,7 +36,7 @@ function nginxChart(ip: pulumi.Output<string>, version: string, clusterProvider:
                 service: { omitClusterIP: true }
             }
         }
-    },{dependsOn: [dependency, ns], provider:  clusterProvider});
+    },{dependsOn: dependencies, provider:  clusterProvider});
 
     return nginx;
 }
@@ -75,7 +75,7 @@ export interface ChartArgs {
     clusterProvider: k8s.Provider;
 
     // Dependency to force wait for cluster build
-    dependency?: any;
+    dependencies: any[];
 
     // Namespace
     //namespace: k8s.core.v1.Namespace;
@@ -105,7 +105,7 @@ export class NginxIngressController {
         let ip = chartArgs.ip;
         const version = chartArgs.version;
         const clusterProvider = chartArgs.clusterProvider;
-        const dependency = chartArgs.dependency;
+        const dependencies = chartArgs.dependencies;
         //const ns = chartArgs.namespace;
         const annotations = chartArgs.annotations;
         const domain = chartArgs.domain;
@@ -117,8 +117,8 @@ export class NginxIngressController {
             metadata: { 
                 name: "nginx" 
             }
-        }, { dependsOn: [ dependency ], provider: clusterProvider });
-        
+        }, { dependsOn: dependencies, provider: clusterProvider });
+
         // set namespace field in k8s manifest after Helm chart as been transformed.
         function metaNamespace(o: any) {
             if (o !== undefined) {
@@ -131,16 +131,15 @@ export class NginxIngressController {
             staticIp = ip.apply(i => i);
         };
 
+        
         // Deploy Ingress Controller Helm chart
-        const nginx = nginxChart(staticIp, version, clusterProvider, metaNamespace, dependency, ns, annotations);
+        const nginx = nginxChart(staticIp, version, clusterProvider, metaNamespace, dependencies, ns, annotations);
 
         //addRoute53Record(domain, nginx, url);
 
         return nginx;
     }
 }
-
-
 
 
 
