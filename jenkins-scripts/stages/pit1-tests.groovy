@@ -10,13 +10,13 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun, String scope) {
 
-    pipelineRun.pushStageOutcome('pit1', stageDisplayName: 'Run PIT1 FTs') {
+    pipelineRun.pushStageOutcome('pit-smoke', stageDisplayName: 'PIT Smoke Tests') {
         node('google-cloud') {
             dir('forgeops') {
                 unstash 'workspace'
             }
 
-            stage('Run PIT1 FTs') {
+            stage('PIT Smoke Tests') {
                 pipelineRun.updateStageStatusAsInProgress()
                 dir('lodestar') {
                     def cfg = [

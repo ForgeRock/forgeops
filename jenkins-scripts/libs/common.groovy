@@ -17,7 +17,7 @@ import com.forgerock.pipeline.stage.Status
 /**
  * Globally scoped git commit information
  */
-FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnStdout: true).trim()
 
 /**
  * Globally scoped git commit information
