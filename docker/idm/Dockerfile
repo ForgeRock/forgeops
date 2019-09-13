@@ -1,5 +1,5 @@
 # Note: M5 integration with AM currently not working
-FROM gcr.io/forgerock-io/idm/pit1:7.0.0-0b3acc97c9cf862000d1d593625deb0ee2af40a2
+FROM gcr.io/forgerock-io/idm/pit1:7.0.0-0c03e083908184eee2ddd2b07d686304b94aa18b
 
 # Harden IDM by removing the Felix OSGI Console. Unless you are a ForgeRock developer, the
 # console is rarely required. Your configuration should NOT include conf/felix.webconsole.json
