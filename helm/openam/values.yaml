@@ -8,7 +8,7 @@ image:
   repository: gcr.io/forgerock-io/am
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
-  tag: 7.0.0-47dff5a4c1
+  tag: 7.0.0-c5797aa2193d25fb135755c98d556234888bfab6
 
 gitImage:
   repository: gcr.io/forgerock-io/git
@@ -28,7 +28,6 @@ config:
   strategy: git
 
 openamReplicaCount: 1
-
 
 configLdapPort:  1389
 configLdapHost: configstore-0.configstore
@@ -66,6 +65,10 @@ am:
   keystoresDir: /home/forgerock/openam/security/keystores
   instance: http://openam:80/am
 
+# Controls the config type and method for installation and configuring the AM image.
+# Once completion of the move to use FBC these values can be removed.
+fbcEnabled: false
+configMode: AMSTER
 
 
 # Valid logger types: fluent-bit, none

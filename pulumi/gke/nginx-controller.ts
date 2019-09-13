@@ -1,15 +1,13 @@
-import * as k8s from "@pulumi/kubernetes";
-import { clusterProvider } from "./cluster";
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
-import { ip, nginxVersion } from "./config";
-import { primaryPool } from "./cluster";
-import * as ingressController from "../packages/nginx-ingress-controller";
+import * as config from "./config";
+import * as cluster from "./cluster";
+import * as ingress from "../packages/nginx-ingress-controller";
 
 // Check to see if static IP address has been provided. If not, create 1
 function assignIp() {
-    if (ip !== undefined) {
-        let a: pulumi.Output<string> = pulumi.concat(ip);
+    if (config.ip !== undefined) {
+        let a: pulumi.Output<string> = pulumi.concat(config.ip);
         return (a);
     } else {
         const staticIp = new gcp.compute.Address("cdm-ingress-ip", {
@@ -23,12 +21,12 @@ function assignIp() {
 export const lbIp = assignIp();
 
 // Set values for nginx Helm chart
-const nginxValues: ingressController.ChartArgs = {
+const nginxValues: ingress.ChartArgs = {
     ip: lbIp,
-    version: nginxVersion,
-    clusterProvider: clusterProvider,
-    dependency: primaryPool
+    version: config.nginxVersion,
+    clusterProvider: cluster.clusterProvider,
+    dependency: cluster.primaryPool
 }
 
 // Deploy Nginx Ingress Controller Helm chart
-export const nginxControllerChart = new ingressController.NginxIngressController( nginxValues );
+export const nginxControllerChart = new ingress.NginxIngressController( nginxValues );
