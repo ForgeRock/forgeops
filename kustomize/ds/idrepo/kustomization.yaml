@@ -1,6 +1,4 @@
-commonLabels:
-  app: ds-idrepo
-bases:
+resources:
 - ../base
 nameSuffix: -idrepo
 images:

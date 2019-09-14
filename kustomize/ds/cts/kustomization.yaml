@@ -1,6 +1,4 @@
-commonLabels:
-  app: ds-cts
-bases:
+resources:
 - ../base
 nameSuffix: -cts
 images:

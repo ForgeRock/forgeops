@@ -3,6 +3,8 @@ import * as gcp from "@pulumi/gcp";
 import * as k8s from "@pulumi/kubernetes";
 import * as config from "./config";
 
+
+// todo: Consider moving to network.ts module?
 function assignVpc() {
     // Create new network if not provided
     if (config.network !== undefined) {
@@ -39,7 +41,9 @@ const cluster = new gcp.container.Cluster("cdm-cluster", {
     ipAllocationPolicy: {
         useIpAliases: true,
     },
-    removeDefaultNodePool: true
+    // Setting to true results in primary node pool creation errors where one one of the nodes can
+    // not be provisioned due "Network not available" in a secondar zone.
+    removeDefaultNodePool: false
 });
 
 //Setup NodePools
@@ -50,13 +54,16 @@ export const primaryPool = new gcp.container.NodePool("primary", {
     nodeConfig: {
         machineType: config.nodeMachineType,
         diskSizeGb: config.diskSize,
-        diskType: config.diskType, 
+        diskType: config.diskType,
         minCpuPlatform: config.cpuPlatform,
         oauthScopes: [
             "https://www.googleapis.com/auth/compute",
             "https://www.googleapis.com/auth/devstorage.read_only",
             "https://www.googleapis.com/auth/logging.write",
             "https://www.googleapis.com/auth/monitoring",
+            "https://www.googleapis.com/auth/servicecontrol",
+            "https://www.googleapis.com/auth/service.management.readonly",
+            "https://www.googleapis.com/auth/trace.append",
             //"https://www.googleapis.com/auth/cloud-platform"
         ],
         imageType: "COS",
@@ -71,7 +78,8 @@ export const primaryPool = new gcp.container.NodePool("primary", {
     },
     management: {
         autoRepair: true
-    }
+    },
+
 });
 
 // Export the Cluster name

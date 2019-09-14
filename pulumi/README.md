@@ -25,13 +25,13 @@ On a mac you can install Pulumi and its dependencies using:
 brew install pulumi
 ```
 
-Login using a shared gcs backend:
+Login using a shared gcs backend. For example, if you have a bucket named `forgerock-pulumi`:
 
 ```
-pulumi login gs://forgeops-pulumi/<namespace>
+pulumi login gs://forgerock-pulumi/<namespace>
 ```
 
-Include a namespace to work under. This is where all your stacks and state files will be stored. Either use name/username for a personal namespace , or deployment sample name(e.g. cdm) for shared namespace.  
+Include a namespace to work under. This is where all your stacks and state files will be stored. Either use name/username for a personal namespace , or deployment sample name(e.g. cdm) for shared namespace.
 
 The shared namespace is designed to enable users to have a shared view of the resources that are created. Allowing one user to create a resource and another to update or delete it.
 
@@ -103,7 +103,7 @@ Please use format, <projectname>-<deployment name> so in GKE project please use:
 ## Configure and run your deployment
 
 #### Configuring your stack
-All configuration values are defined and initialized in *./config.ts*. These values inherit from your *Pulumi.\<stackname\>.yaml*.  
+All configuration values are defined and initialized in *./config.ts*. These values inherit from your *Pulumi.\<stackname\>.yaml*.
 The environment you wish to deploy to is defined within the *Pulumi.\<stackname\>.yaml*. To configure your stack, you must set your values in your *Pulumi.\<stackname\>.yaml*. Do not edit *./config.ts*.
 
 The *Pulumi.\<stackname\>.yaml* contains 2 types of variables:
@@ -112,7 +112,7 @@ The *Pulumi.\<stackname\>.yaml* contains 2 types of variables:
 
 Also your stack file can contain encrypted variables using a unique stack key(encryption salt) string at the top of your stack file.  These values are decrypted by Pulumi at runtime.
 
-Values can be added directly to *Pulumi.\<stackname\>.yaml* file or add configuration values using cmdline: 
+Values can be added directly to *Pulumi.\<stackname\>.yaml* file or add configuration values using cmdline:
 
 ```
 pulumi config set <var> <value>
@@ -136,7 +136,7 @@ Grab kubeconfig output from stack and set context:
 pulumi stack output kubeconfig > kubeconfig
 export KUBECONFIG=$PWD/kubeconfig
 ```
-or run: 
+or run:
 ```
 . ../bin/set-kubeconfig.sh
 ```
@@ -152,12 +152,12 @@ Remove the selected stack:
 pulumi destroy
 ```
 
-```NOTE``` Sometimes, you may find that one of the Helm chart components doesn't succeed.  This is often to do with the ordering of deployed resources within a Helm chart. If this happens, running Pulumi up a 2nd time usually resolves this.  
+```NOTE``` Sometimes, you may find that one of the Helm chart components doesn't succeed.  This is often to do with the ordering of deployed resources within a Helm chart. If this happens, running Pulumi up a 2nd time usually resolves this.
 <br />
 
 ## Switching cloud projects
 
-To run a particular cloud stack you need to ensure you are inside the correct cloud folder inside the Pulumi folder.  
+To run a particular cloud stack you need to ensure you are inside the correct cloud folder inside the Pulumi folder.
 As the kubeconfig file is set local to a project, remember to reset when switching:
 ```
 export KUBECONFIG=$PWD/kubeconfig
@@ -165,7 +165,7 @@ export KUBECONFIG=$PWD/kubeconfig
 or:
 ```
 . ../bin/set-kubeconfig.sh
-```  
+```
 <br />
 
 ## Useful commands

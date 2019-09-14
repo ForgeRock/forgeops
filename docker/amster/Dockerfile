@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/amster/pit1:7.0.0-c5797aa2193d25fb135755c98d556234888bfab6
+FROM gcr.io/forgerock-io/amster/pit1:7.0.0-f0e19e1456c8aa08ef6b12907765ad3ace6c05bc
 
 ENV SERVER_URI /am
 

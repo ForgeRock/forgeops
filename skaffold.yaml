@@ -190,3 +190,14 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/lodestar
+# Sample ds development deployment
+- name: ds
+  build:
+    artifacts:
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: ds-cts
+      context: docker/ds/idrepo
+  deploy:
+    kustomize:
+      path: ./kustomize/ds/ds-dev
