@@ -1,0 +1,4 @@
+# A small deployment for development that deploys the idrepo and the cts
+resources:
+- ../idrepo
+- ../cts

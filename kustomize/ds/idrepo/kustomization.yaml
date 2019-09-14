@@ -1,3 +1,5 @@
+commonLabels:
+  app: ds-idrepo
 resources:
 - ../base
 nameSuffix: -idrepo

@@ -24,10 +24,10 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchExpressions:
-                - key: app
+                - key: affinity
                   operator: In
                   values:
-                  - ds
+                  - directory
               topologyKey: kubernetes.io/hostname
             weight: 100
       # Create a toleration that allows this pod to be scheduled on a node tainted with app:ds
@@ -64,8 +64,9 @@ spec:
         #- name: JAVA_TOOL_OPTIONS
         - name: OPENDJ_JAVA_ARGS
           value: "-server -XX:MaxGCPauseMillis=100 -XX:MaxRAMPercentage=75"
-        - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-          value: ds-0.ds.default.svc.cluster.local:8989
+        # Best to let DS calculate this rather than hard code here.
+        # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+        #   value: ds-0.ds.default.svc.cluster.local:8989
         livenessProbe:
           initialDelaySeconds: 60
           periodSeconds: 120

@@ -7,7 +7,7 @@ this.binding.variables << [
    cookieDomain: System.getenv("DOMAIN") ?: "example.com",
    amadminPassword: System.getenv("AMADMIN_PASSWORD") ?: "password",
    lbUrl:  "https://" + (System.getenv("FQDN") ?: "default.iam.example.com") + "/am",
-] 
+]
 
 //def lbUrl = "https://" + fqdn + "/am"
 
@@ -19,14 +19,14 @@ install-openam \
    --cookieDomain cookieDomain \
    --adminPwd amadminPassword \
    --cfgStore dirServer \
-   --cfgStoreHost ds-idrepo \
+   --cfgStoreHost ds-idrepo-0.ds-idrepo \
    --cfgStoreDirMgr uid=admin \
    --cfgStoreDirMgrPwd password \
    --cfgStorePort 1389 \
    --cfgStoreRootSuffix "ou=am-config" \
    --userStoreDirMgr "uid=admin" \
    --userStoreDirMgrPwd  "password" \
-   --userStoreHost "ds-idrepo" \
+   --userStoreHost "ds-idrepo-0.ds-idrepo" \
    --userStorePort 1389 \
    --userStoreRootSuffix "ou=identities" \
    --userStoreType "LDAPv3ForForgeRockIAM" \

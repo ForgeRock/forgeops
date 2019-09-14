@@ -19,7 +19,7 @@ metadata:
   name: idm-boot-properties
 data:
   boot.properties: |
-    openidm.repo.host=ds-idrepo
+    openidm.repo.host=ds-idrepo-0.ds-idrepo
     openidm.repo.port=1389
     openidm.repo.user=uid=admin
     # todo: When the idm profile switches to this user, use this instead:
