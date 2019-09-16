@@ -5,6 +5,8 @@
 #
 # NOTE: You need to be on kubectl version >= 1.14
 
+CERT_MANAGER_YAML="https://github.com/jetstack/cert-manager/releases/download/v0.10.0/cert-manager.yaml"
+
 cd "$(dirname "$0")"
 
 printf "\n\nPlease ensure you have the following kubernetes versions to allow for cert-manager to deploy successfully and kubectl to use kustomize integration: \n"
@@ -18,8 +20,16 @@ kubectl create namespace cert-manager
 # Disable resource validation on the cert-manager namespace
 kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
 
+sleep 10
+
+
 # Install the CustomResourceDefinitions and cert-manager itself
-kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v0.8.0/cert-manager.yaml
+kubectl apply -f $CERT_MANAGER_YAML
+
+sleep 10
+# Apply again  - since there appears to be timing issues where some resources do not get created while the
+# controller for the CRDs is being created.
+kubectl apply -f $CERT_MANAGER_YAML
 
 
 # Allow time for operator to be deployed so CRDs are recognized
