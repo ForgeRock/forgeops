@@ -68,7 +68,7 @@ am:
 # Controls the config type and method for installation and configuring the AM image.
 # Once completion of the move to use FBC these values can be removed.
 fbcEnabled: false
-configMode: AMSTER
+configMode: UNCONFIGURED
 
 
 # Valid logger types: fluent-bit, none
