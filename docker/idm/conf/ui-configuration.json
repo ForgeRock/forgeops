@@ -23,6 +23,12 @@
                 "iconPath" : "images/notifications/error.png"
             }
         },
-        "defaultNotificationType" : "info"
+        "defaultNotificationType" : "info",
+        "platformSettings" : {
+            "adminOauthClient" : "idmAdminClient",
+            "adminOauthClientScopes" : "openid fr:idm:.*",
+            "amUrl" : "/am",
+            "loginUrl" : ""
+        }
     }
 }
