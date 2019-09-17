@@ -15,7 +15,7 @@ spec:
     spec:
       affinity:
         # Pod anti-affinity will attempt to spread out (repel) DS instances on to different nodes
-        # Note that the anti affinity is based on the label app: ds, and impacts *all* ds instances
+        # Note that the anti affinity is based on the label in the match expression below, and impacts *all* ds instances
         # Example: You deploy 3 cts instances, and 3 idrepos. The expression below will attempt to schedule those
         # across 6 nodes.
         podAntiAffinity:
