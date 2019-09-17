@@ -79,9 +79,7 @@ boolean isAutomatedPullRequest() {
 String getProductCommitHash() {
     String commitHash = PR_DATA.title.split('-')[-1]
 
-    try {
-        Integer.parseInt(commitHash, 16)
-    } catch (NumberFormatException ex) {
+    if (!commitHash.matches('[0-9a-fA-F]+')) {
         error "Product commit hash cannot be extracted from PR title '${PR_DATA.title}'\n" +
                 'Only call getProductCommitHash() on automated Pull Requests created by ' +
                 GlobalConfig.FORGEOPS_AUTOMATED_PR_AUTHOR
