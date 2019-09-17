@@ -30,13 +30,13 @@ spec:
                   - directory
               topologyKey: kubernetes.io/hostname
             weight: 100
-      # Create a toleration that allows this pod to be scheduled on a node tainted with app:ds
+      # Create a toleration that allows this pod to be scheduled on a node tainted with affinity:directory
       # This is used to drive directory instances to dedicated nodes for performance.
       # If a node is not tainted, this has no impact.
       tolerations:
-      - key: "app"
+      - key: "affinity"
         operator: Equal
-        value: "ds"
+        value: "directory"
       initContainers:
       - name: initialize
         image: ds
@@ -55,7 +55,8 @@ spec:
       containers:
       - name: ds
         image: ds
-        imagePullPolicy: IfNotPresent
+        args:
+        - start-ds
         env:
         - name: NAMESPACE
           valueFrom:
