@@ -53,7 +53,7 @@ timestamps {
 
             if (isPR() && prAutomation.isAutomatedPullRequest()) {
                 pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT,
-                        commits: [prAutomation.getProductCommitHash()])
+                        commits: prAutomation.getPrProductCommitHashes())
             } else {
                 pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT)
             }

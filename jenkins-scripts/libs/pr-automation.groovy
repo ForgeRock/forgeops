@@ -72,20 +72,24 @@ boolean isAutomatedPullRequest() {
             PR_DATA.title.startsWith(GlobalConfig.FORGEOPS_AUTOMATED_PR_TITLE_PREFIX)
 }
 
-/**
- *  Get the product commit hash from the PR title, if the PR is a product increment opened automatically by Rockbot.
- *  e.g. AUTOMATED PRODUCT INCREMENT: AM 7.0.0-830a7a99713c5a8267d0fc18386a929a491d6ef1
- */
-String getProductCommitHash() {
-    String commitHash = PR_DATA.title.split('-')[-1]
+/** Get the related product commit hashes for a product increment PR opened automatically by Rockbot. */
+Collection<String> getPrProductCommitHashes() {
+    Set relatedCommits = [].toSet()
+    scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 
-    if (!commitHash.matches('[0-9a-fA-F]+')) {
-        error "Product commit hash cannot be extracted from PR title '${PR_DATA.title}'\n" +
-                'Only call getProductCommitHash() on automated Pull Requests created by ' +
-                GlobalConfig.FORGEOPS_AUTOMATED_PR_AUTHOR
+    // Check changes to products
+    commonModule.getHelmCharts().each { helmChart ->
+        if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, helmChart.filePath)) {
+            relatedCommits << helmChart.productCommit
+        }
     }
 
-    return commitHash
+    // Check changes to Lodestar
+    if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, commonModule.LODESTAR_GIT_COMMIT_FILE)) {
+        relatedCommits << LODESTAR_GIT_COMMIT
+    }
+
+    return relatedCommits
 }
 
 /*

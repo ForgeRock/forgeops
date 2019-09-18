@@ -24,10 +24,9 @@ FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnSt
  */
 FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
 
-/**
- * Globally scoped git commit information for the Lodestar repo
- */
-LODESTAR_GIT_COMMIT = '8e3b671a42ed932678353a70e36bf3c76bb87290'
+/** Globally scoped git commit information for the Lodestar repo */
+LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
+LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
 
 /** Base product versions for the PIT#2 upgrade test */
 UPGRADE_TEST_BASE_AMSTER_VERSION      = '7.0.0-a220039d37'
