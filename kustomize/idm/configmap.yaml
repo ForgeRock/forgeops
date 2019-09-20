@@ -57,8 +57,8 @@ data:
     openidm.truststore.type=JKS
     openidm.keystore.provider=SunJCE
     openidm.truststore.provider=SUN
-    openidm.keystore.location=security/keystore.jceks
-    openidm.truststore.location=security/truststore
+    openidm.keystore.location=/var/run/secrets/idm/keystore.jceks
+    openidm.truststore.location=/var/run/secrets/idm/truststore
 
     # Keystore password, adjust to match your keystore and protect this file
     openidm.keystore.password=changeit

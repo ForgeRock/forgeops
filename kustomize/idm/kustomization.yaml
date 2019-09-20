@@ -13,3 +13,5 @@ secretGenerator:
   - secrets/keystore.jceks
   - secrets/truststore
   - secrets/realm.properties
+  - secrets/storepass
+  - secrets/keystorepass
