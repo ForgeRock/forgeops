@@ -171,25 +171,6 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/am-only
-
-- name: lodestar
-  build:
-    artifacts:
-    - image: am
-      context: docker/am
-    - image: amster
-      context: docker/amster
-    - image: idm
-      context: docker/idm
-    - image: ds-cts
-      context: docker/ds/cts
-    - image: ds-idrepo
-      context: docker/ds/idrepo
-    tagPolicy:
-      gitCommit: {}
-  deploy:
-    kustomize:
-      path: ./kustomize/env/lodestar
 # Sample ds development deployment
 - name: ds
   build:
