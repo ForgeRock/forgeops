@@ -6,15 +6,10 @@ DUR="${2:-60}"
 HOST="${3:-ds-idrepo-0.ds-idrepo}"
 USERS="${4:-1000000}"
 BASE_DN="${BASE_DN:-ou=identities}"
-PW_FILE="${DIR_MANAGER_PW_FILE:-/var/tmp/.passwd}"
 
 export OPENDJ_JAVA_ARGS="-Xmx512m"
 
-if [ ! -r ${PW_FILE} ]
-then
-	#echo "No file found...creating one"
-    echo -n "password" > "/var/tmp/.passwd"
-fi
+ADMIN_PW=${ADMIN_PW:-password}
 
 
 srch() {
@@ -23,7 +18,7 @@ srch() {
     echo "Starting searchrate on ${BASE_DN} with a range of ${USERS} random users..."
     $DJ_HOME/bin/searchrate --hostname ${HOST} --port 1389 \
         --bindDn "uid=admin" \
-        --bindPasswordFile "${PW_FILE}" \
+        --bindPassword "${ADMIN_PW}" \
         --warmUpDuration 10 \
         --noRebind \
         --numConnections 64 \
@@ -31,7 +26,6 @@ srch() {
         --maxDuration ${DUR} \
         --baseDn ${BASE_DN} \
         --argument "rand(0,${USERS})" "(uid=user.{})"
-
 }
 
 
@@ -41,7 +35,7 @@ mod() {
     echo "Starting modrate on ${BASE_DN} with a range of ${USERS} random users..."
     $DJ_HOME/bin/modrate --hostname ${HOST} --port 1389 \
          --bindDn "uid=admin" \
-         --bindPasswordFile "${PW_FILE}" \
+         --bindPassword "${ADMIN_PW}" \
          --noRebind \
          --numConnections 8 \
          --maxDuration ${DUR} \
@@ -56,7 +50,7 @@ auth() {
     echo "Starting authrate on ${BASE_DN} with a range of ${USERS} random users..."
     $DJ_HOME/bin/authrate --hostname ${HOST} --port 1389 \
          --bindDn '{2}' \
-         --bindPasswordFile "${PW_FILE}" \
+         --bindPassword "${ADMIN_PW}" \
          --keepConnectionsOpen \
          --numConnections 20 \
          --maxDuration ${DUR} \
@@ -64,46 +58,6 @@ auth() {
          --searchScope sub \
          --argument "rand(0,${USERS})" "(uid=user.{})"
 
-}
-
-genusertemplate() {
-
-echo "Generating userstore template..."
-
-cat >/tmp/userstore.template  <<EOF
-define suffix=$BASE_DN
-define maildomain=example.com
-
-branch: [suffix]
-
-branch: ou=People,[suffix]
-subordinateTemplate: person
-
-template: person
-rdnAttr: uid
-objectClass: top
-objectClass: person
-objectClass: organizationalPerson
-objectClass: inetOrgPerson
-givenName: <first>
-sn: <last>
-cn: {givenName} {sn}
-initials: {givenName:1}<random:chars:ABCDEFGHIJKLMNOPQRSTUVWXYZ:1>{sn:1}
-employeeNumber: <sequential:0>
-uid: test.{employeeNumber}
-mail: {uid}@[maildomain]
-userPassword: password
-telephoneNumber: <random:telephone>
-homePhone: <random:telephone>
-pager: <random:telephone>
-mobile: <random:telephone>
-street: <random:numeric:5> <file:streets> Street
-l: <file:cities>
-st: <file:states>
-postalCode: <random:numeric:5>
-postalAddress: {cn}${street}${l}, {st}  {postalCode}
-description: This is the description for {cn}.
-EOF
 }
 
 
@@ -134,18 +88,12 @@ EOF
 
 
 add() {
+    TEMPLATE="config/MakeLDIF/addrate.template"
 
-    TEMPLATE="/tmp/userstore.template"
-
-    if [ -z "$1" ]; then
-        genusertemplate
-    elif [ "$1" == "cts" ]; then
+    if [ "$1" == "cts" ]; then
         genctstemplate
         TEMPLATE="/tmp/cts.template"
         BASE_DN="o=cts"
-    else
-        echo "Unknown Parameter!"
-        exit 1
     fi
 
 
@@ -155,7 +103,7 @@ add() {
     echo "Starting addrate on ${BASE_DN}..."
     $DJ_HOME/bin/addrate --hostname ${HOST} --port 1389 \
           --bindDN "uid=admin" \
-          --bindPasswordFile "${PW_FILE}"  \
+          --bindPassword "${ADMIN_PW}"  \
           --noRebind \
           --numConnections 8 \
           --numConcurrentRequests 1 \

@@ -6,4 +6,15 @@ build:
 deploy:
   kubectl:
     manifests:
-    - k8s.yaml
+    - k8s/deployment.yaml
+profiles:
+- name: create-users
+  deploy:
+    kubectl:
+      manifests:
+      - k8s/create-job.yaml
+- name: ds-bench
+  deploy:
+    kubectl:
+      manifests:
+      - k8s/bench-job.yaml

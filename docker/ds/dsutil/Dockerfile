@@ -1,6 +1,11 @@
 # Utility ds image for testing, etc.
 FROM gcr.io/forgerock-io/ds-empty/docker-build:latest
 
+USER root
+RUN apt-get update && apt-get install -y vim
+USER forgerock
+
+
 COPY --chown=forgerock:root bin/*  bin/
 
 
