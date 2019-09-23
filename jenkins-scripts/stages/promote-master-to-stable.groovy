@@ -6,8 +6,13 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+import groovy.transform.Field
+
 import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.stage.Status
+
+/** Local branch used for the promotion step. */
+@Field String LOCAL_DEV_BRANCH = "promote-forgeops-master-to-stable-${env.BUILD_NUMBER}"
 
 /**
  * Perform the promotion to stable: promote docker images to root level and the relevant commit to 'stable'.
@@ -17,6 +22,10 @@ void runStage(PipelineRun pipelineRun) {
         node('build&&linux') {
             stage('Promote to stable') {
                 pipelineRun.updateStageStatusAsInProgress()
+
+                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'master')
+                sh "git checkout -b ${LOCAL_DEV_BRANCH} ${commonModule.FORGEOPS_GIT_COMMIT}"
+
                 promoteDockerImagesToRootLevel()
                 promoteForgeOpsCommitToStable()
                 return Status.SUCCESS.asOutcome()
@@ -37,20 +46,16 @@ private void promoteDockerImagesToRootLevel() {
 
 private void promoteForgeOpsCommitToStable() {
     echo "Promoting ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to 'stable'"
-    def repoUrl = scmUtils.getRepoUrl()
-    def localDevBranch = "promote-forgeops-master-to-stable-${env.BUILD_NUMBER}"
 
-    localGitUtils.deepCloneBranch(repoUrl, 'master')
-    sh "git checkout -b ${localDevBranch} ${commonModule.FORGEOPS_GIT_COMMIT}"
     this.useRootLevelImageNamesInHelmCharts()
     this.useRootLevelImageNamesInDockerfiles()
     gitUtils.setupDefaultUser()
     sh 'git commit --all --message="Promote stable root-level images to Helm charts and Dockerfiles"'
 
-    localGitUtils.deepCloneBranch(repoUrl, 'stable')
+    localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'stable')
 
     sh commands(
-            "git merge -Xtheirs --no-ff ${localDevBranch} -m " +
+            "git merge -Xtheirs --no-ff ${LOCAL_DEV_BRANCH} -m " +
                     "'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to stable'",
             'git push'
     )
