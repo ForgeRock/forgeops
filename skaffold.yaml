@@ -197,7 +197,7 @@ profiles:
     - image: ds-idrepo
       context: docker/ds/idrepo
     - image: ds-cts
-      context: docker/ds/idrepo
+      context: docker/ds/cts
   deploy:
     kustomize:
       path: ./kustomize/ds/ds-dev

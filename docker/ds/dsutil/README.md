@@ -16,4 +16,3 @@ The `exec.sh` script does the same thing as above.
 The utilities included:
 
 * ds-bench.sh - a small DS micro benchmark suite. `ds-bench.sh all`  for example (see the help).
-* make-users.sh  - makes a number of sample users. `make-users.sh 1000` - makes 1000 sample users.

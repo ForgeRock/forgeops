@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: ds
 spec:
-  replicas: 3
+  replicas: 1
   template:
     spec:
       containers:
@@ -11,7 +11,7 @@ spec:
           resources:
             requests:
               memory: 8Gi
-              cpu: 2000m
+              cpu: 4000m
             limits:
               memory: 11Gi
   volumeClaimTemplates:
