@@ -131,17 +131,8 @@ data:
     # enables workflow
     openidm.workflow.enabled=true
 
-    # To disable the persisted configuration store set this property to false.
-    # This will store the configurations only in memory.
-    # See https://ea.forgerock.com/docs/idm/integrators-guide/index.html#chap-configuration
-    # For an immutable Kubernetes deployments this should be false
-    openidm.config.repo.enabled=false
-
     # To stop writes to configuration files, set this property to false; suitable for read-only installations.
     felix.fileinstall.enableConfigSave=true
-
-    # This needs to be true to boot from json files.
-    openidm.fileinstall.enabled=true
 
     # Filtered headers in audit.json that may be customized
     com.iplanet.am.cookie.name=iPlanetDirectoryPro
