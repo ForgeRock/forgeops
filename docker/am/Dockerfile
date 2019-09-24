@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am/pit1:7.0.0-21d8f7b0d1394064a3ca3e4b1a74ca982492cfce
+FROM gcr.io/forgerock-io/am/pit1:7.0.0-53e3202d3a8ca326b92283bb4be42d81ab600966
 
 # BEGIN - temporary work around for testing if the ds-idrepo is configured before AM starts. Remove when FBC is integrated
 # Installs ldap utils for querying the repo.
