@@ -35,7 +35,7 @@ idmRepo:
   enabled: true
 
 image:
-  repository: gcr.io/forgerock-io/ds/pit1
+  repository: gcr.io/forgerock-io/ds
   tag: 7.0.0-26845ee4e54462049fc15d2ee081248bd14ad09d
   pullPolicy: IfNotPresent
 

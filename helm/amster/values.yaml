@@ -40,7 +40,7 @@ config:
   strategy: git
 
 image:
-  repository: gcr.io/forgerock-io/amster/pit1
+  repository: gcr.io/forgerock-io/amster
   tag: 7.0.0-53e3202d3a8ca326b92283bb4be42d81ab600966
   pullPolicy: IfNotPresent
   #pullPolicy: Always
