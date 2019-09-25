@@ -1,7 +1,7 @@
 # The ds-empty image configures https/https, and monitoring
-#FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-26845ee4e54462049fc15d2ee081248bd14ad09d
+#FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-32d3e305277c101ff7349e117b5b527614e1bd69
 # Pinned until PIT1 passes
-FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-26845ee4e54462049fc15d2ee081248bd14ad09d
+FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-32d3e305277c101ff7349e117b5b527614e1bd69
 
 USER forgerock
 
