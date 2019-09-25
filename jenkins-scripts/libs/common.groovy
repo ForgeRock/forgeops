@@ -17,46 +17,131 @@ import com.forgerock.pipeline.stage.Status
 /**
  * Globally scoped git commit information
  */
-FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnStdout: true).trim()
 
 /**
  * Globally scoped git commit information
  */
 FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
 
-/**
- * Globally scoped git commit information for the Lodestar repo
- */
-LODESTAR_GIT_COMMIT = 'cddd44a915a556917d25c0799eddd172339c4c05'
+/** Globally scoped git commit information for the Lodestar repo */
+LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
+LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
 
-/**
- * Base versions for the PIT#2 upgrade test
- */
+/** Base product versions for the PIT#2 upgrade test */
 UPGRADE_TEST_BASE_AMSTER_VERSION      = '7.0.0-a220039d37'
 UPGRADE_TEST_BASE_AM_VERSION          = '7.0.0-a220039d37'
 UPGRADE_TEST_BASE_IDM_VERSION         = '7.0.0-67e54db'
 UPGRADE_TEST_BASE_CONFIGSTORE_VERSION = '7.0.0-bdc0ce8'
 UPGRADE_TEST_BASE_USERSTORE_VERSION   = '7.0.0-bdc0ce8'
 
-/**
- * Helm chart file path, and data relevant to the ForgeOps pipeline.
- */
-HELM_CHARTS = [
-        'am' : ['filePath': 'helm/openam/values.yaml',  'rootLevelImageName': 'gcr.io/forgerock-io/am'],
-        'amster': ['filePath': 'helm/amster/values.yaml', 'rootLevelImageName': 'gcr.io/forgerock-io/amster'],
-        'ds' : ['filePath': 'helm/ds/values.yaml',      'rootLevelImageName': 'gcr.io/forgerock-io/ds'],
-        'idm': ['filePath': 'helm/openidm/values.yaml', 'rootLevelImageName': 'gcr.io/forgerock-io/idm'],
-        'ig' : ['filePath': 'helm/openig/values.yaml',  'rootLevelImageName': 'gcr.io/forgerock-io/ig'],
+
+/** Root-level image names corresponding to product Helm charts and Dockerfiles in the ForgeOps repo. */
+ROOT_LEVEL_IMAGE_NAMES = [
+        'am'     : 'gcr.io/forgerock-io/am',
+        'am-fbc' : 'gcr.io/forgerock-io/am',
+        'amster' : 'gcr.io/forgerock-io/amster',
+        'ds'     : 'gcr.io/forgerock-io/ds',
+        'idm'    : 'gcr.io/forgerock-io/idm',
+        'ig'     : 'gcr.io/forgerock-io/ig',
 ]
 
-def loadCurrentHelmChartValues() {
-    assertUsingNode()
-    HELM_CHARTS.each { product, helmChart ->
-        def helmChartYaml = readYaml file: helmChart.filePath
-        helmChart.currentImageName = helmChartYaml.image.repository
-        helmChart.currentTag = helmChartYaml.image.tag
-        helmChart.productCommit = helmChart.currentTag.split('-').last()
+/** Helm chart file paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
+HELM_CHART_PATHS = [
+        'am'     : 'helm/openam/values.yaml',
+        'amster' : 'helm/amster/values.yaml',
+        'ds'     : 'helm/ds/values.yaml',
+        'idm'    : 'helm/openidm/values.yaml',
+        'ig'     : 'helm/openig/values.yaml',
+]
+
+/**
+ * Helm data relevant to the ForgeOps pipeline. Cached to prevent repeated reading from file.
+ * Should be treated as private, although it's not possible to enforce this in Groovy.
+ */
+helmChartCache = [:]
+
+/** Products which have associated Helm charts. */
+Collection<String> getHelmChartProductNames() {
+    return HELM_CHART_PATHS.keySet()
+}
+
+/** Helm Chart data for all ForgeRock products. */
+Collection<Map> getHelmCharts() {
+    return getHelmChartProductNames().collect { getHelmChart(it) }
+}
+
+/**
+ * Helm chart data for individual ForgeRock product.
+ *
+ * @param productName Product to retrieve Helm chart data for.
+ * @return Helm chart data relevant to the build pipelines.
+ */
+Map getHelmChart(String productName) {
+    if (!HELM_CHART_PATHS.containsKey(productName)) {
+        error "Unknown Helm chart for '${productName}'"
     }
+    if (!ROOT_LEVEL_IMAGE_NAMES.containsKey(productName)) {
+        error "Unknown root-level image name '${productName}'"
+    }
+
+    def helmChartFilePath = HELM_CHART_PATHS[productName]
+
+    if (!helmChartCache.containsKey(productName)) {
+        // cache Helm chart data for future use
+        def helmChartYaml = readYaml(file: helmChartFilePath)
+        helmChartCache[productName] = [
+            'filePath'           : helmChartFilePath,
+            'rootLevelImageName' : ROOT_LEVEL_IMAGE_NAMES[productName],
+            'currentImageName'   : helmChartYaml.image.repository,
+            'currentTag'         : helmChartYaml.image.tag,
+            'productCommit'      : helmChartYaml.image.tag.split('-').last(),
+        ]
+    }
+
+    return helmChartCache[productName]
+}
+
+/** Skaffold Dockerfile paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
+SKAFFOLD_DOCKERFILE_PATHS = [
+        'am':     'docker/am/Dockerfile',
+        'am-fbc': 'docker/am-fbc/Dockerfile',
+        'amster': 'docker/amster/Dockerfile',
+        // ds-empty does not get promoted, as we have no tests for it yet
+        'idm':    'docker/idm/Dockerfile',
+        'ig':     'docker/ig/Dockerfile',
+]
+
+/** Products which have associated Dockerfiles. */
+Collection<String> getDockerfileProductNames() {
+    return SKAFFOLD_DOCKERFILE_PATHS.keySet()
+}
+
+/** Skaffold Dockerfile data for all ForgeRock products. */
+Collection<Map> getDockerfiles() {
+    return getDockerfileProductNames().collect { getDockerfile(it) }
+}
+
+/**
+ * Skaffold Dockerfile data for individual ForgeRock product.
+ *
+ * @param productName Product to retrieve Dockerfile data for.
+ * @return Dockerfile data relevant to the build pipelines.
+ */
+Map getDockerfile(String productName) {
+    if (!SKAFFOLD_DOCKERFILE_PATHS.containsKey(productName)) {
+        error "Unknown Dockerfile for '${productName}'"
+    }
+    if (!ROOT_LEVEL_IMAGE_NAMES.containsKey(productName)) {
+        error "Unknown root-level image name '${productName}'"
+    }
+
+    String tag = productName == 'am-fbc' ? getHelmChart('am').currentTag : getHelmChart(productName).currentTag
+
+    return [
+            'filePath'     : SKAFFOLD_DOCKERFILE_PATHS[productName],
+            'fullImageName': "${ROOT_LEVEL_IMAGE_NAMES[productName]}:${tag}",
+    ]
 }
 
 def normalizeStageName(String stageName) {
@@ -65,10 +150,10 @@ def normalizeStageName(String stageName) {
 
 def getCurrentProductCommitHashes() {
     return [
-            HELM_CHARTS.ds.productCommit,
-            HELM_CHARTS.ig.productCommit,
-            HELM_CHARTS.idm.productCommit,
-            HELM_CHARTS.am.productCommit,
+            getHelmChart('ds').productCommit,
+            getHelmChart('ig').productCommit,
+            getHelmChart('idm').productCommit,
+            getHelmChart('am').productCommit,
     ]
 }
 

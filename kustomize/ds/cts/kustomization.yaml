@@ -1,3 +1,5 @@
+commonLabels:
+  app: ds-cts
 resources:
 - ../base
 nameSuffix: -cts

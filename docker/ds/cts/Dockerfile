@@ -1,7 +1,6 @@
-#FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-latest-postcommit
-# Pinned until https://bugster.forgerock.org/jira/browse/OPENDJ-6556 is fixed
-FROM gcr.io/forgerock-io/ds-empty/docker-build@sha256:e7b0bd12c92cc1d74872ad747d3faa50872fe61b436d918e10eb7599bff4ea3f
-USER forgerock 
+#FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-26845ee4e54462049fc15d2ee081248bd14ad09d
+# Pinned until PIT1 passes
+FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-26845ee4e54462049fc15d2ee081248bd14ad09d
 
 RUN setup-profile --profile am-cts \
                   --set am-cts/tokenExpirationPolicy:ds \

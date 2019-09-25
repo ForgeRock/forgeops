@@ -1,6 +1,6 @@
 # Sample overlay that sets the "small" t-shirt size
 # We override the replicas and the resource limits
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ig

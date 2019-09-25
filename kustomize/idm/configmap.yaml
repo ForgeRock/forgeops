@@ -19,7 +19,7 @@ metadata:
   name: idm-boot-properties
 data:
   boot.properties: |
-    openidm.repo.host=ds-idrepo
+    openidm.repo.host=ds-idrepo-0.ds-idrepo
     openidm.repo.port=1389
     openidm.repo.user=uid=admin
     # todo: When the idm profile switches to this user, use this instead:
@@ -57,8 +57,8 @@ data:
     openidm.truststore.type=JKS
     openidm.keystore.provider=SunJCE
     openidm.truststore.provider=SUN
-    openidm.keystore.location=security/keystore.jceks
-    openidm.truststore.location=security/truststore
+    openidm.keystore.location=/var/run/secrets/idm/keystore.jceks
+    openidm.truststore.location=/var/run/secrets/idm/truststore
 
     # Keystore password, adjust to match your keystore and protect this file
     openidm.keystore.password=changeit

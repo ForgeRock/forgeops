@@ -30,18 +30,14 @@ timestamps {
             // Stash workspace to be able to reuse it in the tests
             stash includes: '**', name: "workspace" // omit 'useDefaultExcludes: false' - no need to stash .git folder
 
-            SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
-            GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-            currentBuild.displayName = "#${BUILD_NUMBER} - ${SHORT_GIT_COMMIT}"
-            currentBuild.description = 'built:'
-
-            pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, GIT_COMMIT)
-
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
             def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
             def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
 
             commonModule = load("${libsLocation}/common.groovy")
+
+            currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
+            currentBuild.description = 'built:'
 
             if (env.TAG_NAME) {
                 currentBuild.result = 'ABORTED'
@@ -54,6 +50,13 @@ timestamps {
                 pipeline = load("${jobLocation}/postcommit.groovy")
                 pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
             }
+
+            if (isPR() && prAutomation.isAutomatedPullRequest()) {
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT,
+                        commits: prAutomation.getPrProductCommitHashes())
+            } else {
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT)
+            }
         }
 
         pipeline.build()
@@ -63,7 +66,7 @@ timestamps {
         pipeline.postBuildTests(pipelineRun)
 
         if (isPR()) {
-            prAutomation.mergeIfAutomatedProductVersionUpdate(GIT_COMMIT)
+            prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.FORGEOPS_GIT_COMMIT)
         }
     }
 }
