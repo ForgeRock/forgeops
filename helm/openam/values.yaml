@@ -8,7 +8,7 @@ image:
   repository: gcr.io/forgerock-io/am
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
-  tag: 7.0.0-53e3202d3a8ca326b92283bb4be42d81ab600966
+  tag: 7.0.0-cd642411a35f7d3347579050531ab07259f338f1
 
 gitImage:
   repository: gcr.io/forgerock-io/git
@@ -68,7 +68,7 @@ am:
 # Controls the config type and method for installation and configuring the AM image.
 # Once completion of the move to use FBC these values can be removed.
 fbcEnabled: false
-configMode: AMSTER
+configMode: UNCONFIGURED
 
 
 # Valid logger types: fluent-bit, none
