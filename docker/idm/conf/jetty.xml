@@ -46,7 +46,7 @@
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
                     <!-- Becayse we are behind an ingress that performs this - we comment this out -->
-                    <!-- <Set name="hostHeader">
+                    <!-- <Set name="forcedHost">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>
                         </Call>:<Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
@@ -73,7 +73,7 @@
             <Arg>
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
-                    <!-- <Set name="hostHeader">
+                    <!-- <Set name="forcedHost">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>
                         </Call>:<Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
@@ -100,7 +100,7 @@
             <Arg>
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
-                    <!-- <Set name="hostHeader">
+                    <!-- <Set name="forcedHost">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>
                         </Call>:<Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
@@ -112,30 +112,30 @@
         </Call>
     </New>
 
-    <Array id="excludedCipherSuites" type="java.lang.String">
-        <!-- EXP-RC4-MD5  -->
-        <!-- RC4-MD5 -->
-        <Item>.*RC4.*MD5</Item>
+    <Array id="includedCipherSuites" type="java.lang.String">
+        <!-- TLS 1.3 cipher suites -->
+        <Item>TLS_AES_128_GCM_SHA256</Item>
+        <Item>TLS_AES_256_GCM_SHA384</Item>
+        <Item>TLS_CHACHA20_POLY1305_SHA256</Item>
 
-        <!-- RC4-SHA  -->
-        <!--ECDHE-RSA-RC4-SHA -->
-        <Item>.*RC4.*SHA</Item>
-
-        <!-- EDE_CBC_SHA -->
-        <!--EDH-RSA-DES-CBC-SHA or DHE-RSA-DES-CBC-SHA -->
-        <!-- EXP-EDH-RSA-DES-CBC-SHA or EXP-DHE-RSA-DES-CBC-SHA  -->
-        <!-- EXP-DES-CBC-SHA -->
-        <!-- DES-CBC-SHA -->
-        <Item>.*DES.*</Item>
-
+        <!-- TLS 1.2 cipher suites -->
+        <Item>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</Item>
+        <Item>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</Item>
+        <Item>TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</Item>
+        <Item>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</Item>
+        <Item>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</Item>
+        <Item>TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</Item>
+        <Item>TLS_DHE_RSA_WITH_AES_256_GCM_SHA384</Item>
+        <Item>TLS_DHE_RSA_WITH_AES_128_GCM_SHA256</Item>
     </Array>
 
-    <Array  id= "excludedProtocols" type="java.lang.String">
-        <Item>SSLv3</Item>
-        <Item>TLSv1</Item>
+    <Array  id= "includedProtocols" type="java.lang.String">
+        <!-- Only support TLS v1.2 and v1.3 -->
+        <Item>TLSv1.2</Item>
+        <Item>TLSv1.3</Item>
     </Array>
 
-    <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+    <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory$Server">
         <Set name="keyStorePath"><Get class="org.forgerock.openidm.jetty.Param" name="keystoreLocation"/></Set>
         <Set name="keyStorePassword"><Get class="org.forgerock.openidm.jetty.Param" name="keystorePassword"/></Set>
         <Set name="keyStoreType"><Get class="org.forgerock.openidm.jetty.Param" name="keystoreType"/></Set>
@@ -145,15 +145,15 @@
         <Set name="trustStorePath"><Get class="org.forgerock.openidm.jetty.Param" name="truststoreLocation"/></Set>
         <Set name="trustStorePassword"><Get class="org.forgerock.openidm.jetty.Param" name="truststorePassword"/></Set>
         <Set name="certAlias"><Get class="org.forgerock.openidm.jetty.Param" name="certAlias"/></Set>
-        <Set name="ExcludeProtocols">
-            <Ref refid="excludedProtocols"/>
+        <Set name="IncludeProtocols">
+            <Ref refid="includedProtocols"/>
         </Set>
-        <Set name="ExcludeCipherSuites">
-            <Ref refid="excludedCipherSuites"/>
+        <Set name="IncludeCipherSuites">
+            <Ref refid="includedCipherSuites"/>
         </Set>
     </New>
 
-    <New id="sslContextFactoryMutualAuth" class="org.eclipse.jetty.util.ssl.SslContextFactory">
+    <New id="sslContextFactoryMutualAuth" class="org.eclipse.jetty.util.ssl.SslContextFactory$Server">
         <Set name="keyStorePath"><Get class="org.forgerock.openidm.jetty.Param" name="keystoreLocation"/></Set>
         <Set name="keyStorePassword"><Get class="org.forgerock.openidm.jetty.Param" name="keystorePassword"/></Set>
         <Set name="keyStoreType"><Get class="org.forgerock.openidm.jetty.Param" name="keystoreType"/></Set>
@@ -164,11 +164,11 @@
         <Set name="trustStorePassword"><Get class="org.forgerock.openidm.jetty.Param" name="truststorePassword"/></Set>
         <Set name="needClientAuth">true</Set>
         <Set name="certAlias"><Get class="org.forgerock.openidm.jetty.Param" name="certAlias"/></Set>
-        <Set name="ExcludeProtocols">
-            <Ref refid="excludedProtocols"/>
+        <Set name="IncludeProtocols">
+            <Ref refid="includedProtocols"/>
         </Set>
-        <Set name="ExcludeCipherSuites">
-            <Ref refid="excludedCipherSuites"/>
+        <Set name="IncludeCipherSuites">
+            <Ref refid="includedCipherSuites"/>
         </Set>
     </New>
 
@@ -276,12 +276,6 @@
                     <Arg>openidm.port.mutualauth</Arg>
                 </Call>
                 </Set>
-                <!--Call class="org.forgerock.openidm.jetty.DisableOpenIDMAuth"
-        name="add">
-                    <Arg>
-                        <Ref refid="MutualAuthPort"/>
-                    </Arg>
-                </Call-->
             </New>
         </Arg>
     </Call>
@@ -291,7 +285,6 @@
             <!-- https://www.eclipse.org/jetty/documentation/9.4.x/gzip-filter.html -->
             <New id="GzipHandler" class="org.eclipse.jetty.server.handler.gzip.GzipHandler">
                 <Set name="minGzipSize"><Property name="jetty.gzip.minGzipSize" default="2048"/></Set>
-                <Set name="checkGzExists"><Property name="jetty.gzip.checkGzExists" default="false"/></Set>
                 <Set name="compressionLevel"><Property name="jetty.gzip.compressionLevel" default="-1"/></Set>
                 <Set name="inflateBufferSize"><Property name="jetty.gzip.inflateBufferSize" default="0"/></Set>
                 <Set name="syncFlush"><Property name="jetty.gzip.syncFlush" default="false" /></Set>
