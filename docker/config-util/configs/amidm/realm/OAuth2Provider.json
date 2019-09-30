@@ -27,7 +27,7 @@
       "oidcClaimsScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5"
     },
     "advancedOAuth2Config" : {
-      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "am-introspect-all-tokens", "fr:idm:.*|All of IDM", "fr:idm:profile|Able to read your account in IDM", "fr:idm:notifications|Able to read your IDM notifications", "fr:idm:consent_read|Able to read what you have consented to in IDM", "fr:idm:profile_update|Able to update your profile in IDM", "profile|Your personal information", "write" ],
+      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "am-introspect-all-tokens", "fr:idm:*|All of IDM", "fr:idm:profile|Able to read your account in IDM", "fr:idm:notifications|Able to read your IDM notifications", "fr:idm:consent_read|Able to read what you have consented to in IDM", "fr:idm:profile_update|Able to update your profile in IDM", "profile|Your personal information", "write" ],
       "codeVerifierEnforced" : "false",
       "tokenSigningAlgorithm" : "HS256",
       "authenticationAttributes" : [ "uid" ],

@@ -139,7 +139,7 @@ class IDMConfig(object):
         self.rest_selfpwreset_url = self.idm_url + '/selfservice/reset'
         self.admin_oauth_client = 'idmAdminClient'
         self.admin_oauth_redirect_url = f'{base_url()}/admin/appAuthHelperRedirect.html'
-        self.admin_oauth_scopes = 'openid fr:idm:.*'
+        self.admin_oauth_scopes = 'openid'
         self.bearer_token = None
 
         self.ssl_verify = SSL_VERIFY
