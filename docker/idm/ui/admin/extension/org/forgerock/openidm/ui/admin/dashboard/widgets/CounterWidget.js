@@ -7,6 +7,12 @@
  * or with one of its affiliates. All use shall be exclusively subject
  * to such license between the licensee and ForgeRock AS.
  */
+
+ /*
+ * Overriding this file to remove anything to do with idm selfservice.
+ */
+
+
 define(["jquery", "lodash", "org/forgerock/openidm/ui/common/dashboard/widgets/AbstractWidget", "org/forgerock/openidm/ui/admin/delegates/ConnectorDelegate", "org/forgerock/openidm/ui/admin/delegates/ReportDelegate", "org/forgerock/openidm/ui/common/delegates/SocialDelegate"], function ($, _, AbstractWidget, ConnectorDelegate, ReportDelegate, SocialDelegate) {
     var widgetInstance = {},
         Widget = AbstractWidget.extend({

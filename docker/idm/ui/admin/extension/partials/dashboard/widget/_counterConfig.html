@@ -5,6 +5,9 @@ Use of this code requires a commercial software license with ForgeRock AS.
 or with one of its affiliates. All use shall be exclusively subject
 to such license between the licensee and ForgeRock AS.
 --}}
+
+<!-- Overriding this file to comment out options that relate to stand alone idm auth and selfservice registration -->
+
 <form id="widgetConfigForm" class="form-horizontal">
     <div class="form-group">
         <label class="col-sm-3 control-label" for="widgetSize">{{t "dashboard.generalConfig.widgetSize"}}</label>
@@ -26,8 +29,10 @@ to such license between the licensee and ForgeRock AS.
             <select id="defaultOption" class="form-control" name="selected">
                 {{#staticSelect selected}}
                     <option value="activeUsers">{{t "dashboard.counterWidget.activeUsers" }}</option>
+                    <!-- <option value="socialEnabled">{{t "dashboard.counterWidget.socialEnabled" }}</option> -->
                     <option value="rolesEnabled">{{t "dashboard.counterWidget.rolesEnabled" }}</option>
                     <option value="activeConnectors">{{t "dashboard.counterWidget.activeConnectors" }}</option>
+                    <!-- <option value="manualRegistrations">{{t "dashboard.counterWidget.manualRegistrations" }}</option> -->
                 {{/staticSelect}}
             </select>
         </div>

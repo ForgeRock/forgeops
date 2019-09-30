@@ -6,6 +6,11 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+ /*
+  * Overriding this file to comment out a check against stand alone authentication.json and the error message
+  * that is displayed when rsFilter auth type is used.
+  */
+
 define([
     "jquery",
     "underscore",

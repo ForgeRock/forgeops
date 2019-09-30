@@ -6,6 +6,10 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+/*
+ * Overriding this file to comment out all links to selfservice configs.
+ */
+
 define([
     "org/forgerock/openidm/ui/common/util/Constants"
 ], function(constants) {

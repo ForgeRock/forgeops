@@ -8,6 +8,10 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+ /*
+  * Overriding this file to comment out anything to do with idm selfservice functionality.
+  */
+
 define(["jquery", "underscore", "org/forgerock/openidm/ui/admin/util/AdminAbstractView", "org/forgerock/commons/ui/common/main/EventManager", "org/forgerock/commons/ui/common/util/Constants", "org/forgerock/commons/ui/common/main/Configuration", "org/forgerock/openidm/ui/common/delegates/ConfigDelegate", "org/forgerock/openidm/ui/common/dashboard/widgets/MemoryUsageWidget", "org/forgerock/openidm/ui/common/dashboard/widgets/CPUUsageWidget", "org/forgerock/openidm/ui/common/dashboard/widgets/FullHealthWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/MappingReconResultsWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/ResourceListWidget", "org/forgerock/openidm/ui/common/dashboard/widgets/QuickStartWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/FrameWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/RelationshipWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/ClusterStatusWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/AuditDataOverTimeWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/ManagedObjectsWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/SocialRegistrationOverTimeWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/SocialLoginCountWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/MetricsWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/GraphWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/CounterWidget", "org/forgerock/openidm/ui/admin/dashboard/widgets/HistoricReportWidget"], function ($, _, AdminAbstractView, eventManager, constants, conf, ConfigDelegate, MemoryUsageWidget, CPUUsageWidget, FullHealthWidget, MappingReconResultsWidget, ResourceListWidget, QuickStartWidget, FrameWidget, RelationshipWidget, ClusterStatusWidget, AuditDataOverTimeWidget, ManagedObjectsWidget, SocialRegistrationOverTimeWidget, SocialLoginCountWidget, MetricsWidget, GraphWidget, CounterWidget, HistoricReportWidget) {
 
     var dwlInstance = {},
