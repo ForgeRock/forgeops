@@ -3,17 +3,19 @@ kind: StatefulSet
 metadata:
   name: ds
 spec:
-  replicas: 3
+  replicas: 1
   template:
     spec:
       containers:
-        - name: ds
-          resources:
-            requests:
-              memory: 8Gi
-              cpu: 4000m
-            limits:
-              memory: 11Gi
+      - name: ds
+        resources:
+          requests:
+            memory: 8Gi
+            cpu: 2000m
+          limits:
+            memory: 11Gi
+        args:
+        - dev
   volumeClaimTemplates:
   - metadata:
       name: data
@@ -23,5 +25,6 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 512Gi
+#          storage: 512Gi
+          storage: 100Gi
       storageClassName: fast

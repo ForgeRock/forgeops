@@ -1,0 +1,17 @@
+# This is a "dev" instance for the idrepo service. It removes the health check so that the
+# container can be started in "dev" mode without DS running. You can use various tools (import-ldif. etc.)
+# and the container will not be killed by Kubernetes.
+resources:
+- ../idrepo
+patchesStrategicMerge:
+- idrepo.yaml
+# For dev  - remove the liveness probe so we dont terminate the pod
+patchesJson6902:
+- target:
+    version: v1
+    group: apps
+    kind: StatefulSet
+    name: ds
+  patch: |-
+    - op: remove
+      path: /spec/template/spec/containers/0/livenessProbe
