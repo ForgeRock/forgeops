@@ -25,7 +25,7 @@ S3_BUCKET_POLICY=$(cat <<-EOF
          "Effect": "Allow",
          "Action": "s3:*",
          "Resource": [
-            "arn:aws:s3:::{S3_BUCKET_NAME}",
+            "arn:aws:s3:::${S3_BUCKET_NAME}",
             "arn:aws:s3:::${S3_BUCKET_NAME}/*"
          ]
       }
