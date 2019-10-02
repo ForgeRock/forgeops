@@ -32,6 +32,9 @@ data:
     :exit
   01_import.amster: |
     connect http://openam/am -k /var/run/secrets/amster/id_rsa
+{{- range $name, $value := .Values.variables }}
+    {{ $name }} = {{ $value | quote }}
+{{- end}}
     import-config --path {{ .Values.config.importPath }}  --clean {{.Values.amsterClean }}
     :exit
 {{- range $name, $script := .Values.scripts }}
@@ -53,4 +56,3 @@ data:
   AMADMIN_PASSWORD_HASHED: "{{ .Values.amadminPasswordHashed }}"
   DOMAIN: {{ .Values.domain }}
   COOKIE_DOMAIN: {{ trimPrefix "." .Values.domain }}
-
