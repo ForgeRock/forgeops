@@ -37,6 +37,10 @@ spec:
       - key: "nodetype"
         operator: Equal
         value: "directory"
+      - key: "WorkerDedicatedDS"
+        operator: "Exists"
+#      nodeSelector: CLOUD-1630
+#        ds: "true"
       initContainers:
       - name: initialize
         image: ds

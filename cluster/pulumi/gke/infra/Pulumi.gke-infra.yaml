@@ -1,0 +1,8 @@
+encryptionsalt: v1:z4rBrBih+jc=:v1:vlgq1tV3bxrprqCU:KtARTbACpnZVWeQTqXzGVDVftEgejw==
+config:
+  gcp:project: engineering-devops
+  gcp:region: us-east4
+  gcp:zone: us-east4-a
+  bucket:name: new-test-bucket
+  bucket:enable: "true"
+  vpc:enable: "true"

@@ -1,0 +1,3 @@
+name: eks-cdm
+runtime: nodejs
+description: AWS TS Pulumi Program
