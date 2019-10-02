@@ -50,7 +50,7 @@ history/*.history - snapshot of the pulumi action taken and the configuration va
 backup/ - full historical state backups.
 ```
 
-Note: You will occasionally see (warnings)[https://github.com/pulumi/pulumi/issues/2791] using the gcs backend, but it does work.
+Note: If you're using the gcs backend, you will occasionally see (warnings)[https://github.com/pulumi/pulumi/issues/2791] using the gcs backend, but it does work.
 <br />
 
 ## Pulumi project setup steps
@@ -67,15 +67,17 @@ These steps need to be carried out inside the cloud providers directory in the p
 
 ```IMPORTANT``` Create your own branch so you can configure your own Pulumi stacks. If you wish to access a stack that has already been deployed, you will need to be on the same  branch that deployed the resources originally and login to the same shared backend.
 
-1. CD into the cloud provider folder that you want to use:
-    ```
-    cd <aws/azure/gcp>
-    ```
 
-2. Install dependencies
+1. Install dependencies
 (this generates node_modules directory. This is ignored by git as is too large to commit):
     ```
+    cd forgeops/cluster/pulumi/
     npm install
+    ```
+
+2. CD to the cloud provider folder that you want to use:
+    ```
+    cd [eks OR gke OR aks]
     ```
 
 3. Running Pulumi in local mode or logging into a GCP bucket requires a passphrase to protect your stack.  You can set the following ENV variable to save you retyping passphrase every time. Default = "password" :
@@ -83,53 +85,46 @@ These steps need to be carried out inside the cloud providers directory in the p
     export PULUMI_CONFIG_PASSPHRASE=password
     ```
 
-4. Setup your Pulumi stacks.  The stack name needs to match the second part of the *Pulumi.\<stack\>.yaml* files.
+4. Set up your Pulumi stacks.  The stack name needs to match the second part of the *Pulumi.\<stack\>.yaml* files.
 If you are storing state in a bucket or using local login, stacks need to have unique names across projects(Pulumi are looking into this https://github.com/pulumi/pulumi/issues/2522).
 Please use format, <projectname>-<deployment name> so in GKE project please use:
     ```
+    cd forgeops/cluster/pulumi/gke/infra
+    pulumi stack init gke-infra
+    cd forgeops/cluster/pulumi/gke/cluster
     pulumi stack init gke-small
-    pulumi stack init gke-medium
-    pulumi stack init gke-large
     ```
 
     ```NOTE``` If you change your passphrase or stack/project cofiguration, please don't commit back to forgeops unless it's an improvement.
 
-5. Set kubeconfig:
-    ```
-    export KUBECONFIG=$PWD/kubeconfig
-    ```
 <br />
 
 ## Configure and run your deployment
 
 #### Configuring your stack
-All configuration values are defined and initialized in *./config.ts*. These values inherit from your *Pulumi.\<stackname\>.yaml*.
-The environment you wish to deploy to is defined within the *Pulumi.\<stackname\>.yaml*. To configure your stack, you must set your values in your *Pulumi.\<stackname\>.yaml*. Do not edit *./config.ts*.
-
-The *Pulumi.\<stackname\>.yaml* contains 2 types of variables:
-* \<cloud-provider\>:\<varname\> which allow you to define specific cloud wide variables like region and project name.  These can be used in any .ts file.
-* \<stack-name\>:\<varname\> which are custom stack variables which are referenced in *./config.ts*
-
-Also your stack file can contain encrypted variables using a unique stack key(encryption salt) string at the top of your stack file.  These values are decrypted by Pulumi at runtime.
-
-Values can be added directly to *Pulumi.\<stackname\>.yaml* file or add configuration values using cmdline:
+The environment and configurations of your stack are defined in the *Pulumi.\<stackname\>.yaml* file. Values can be added directly to the *Pulumi.\<stackname\>.yaml* file or using the command line:
 
 ```
 pulumi config set <var> <value>
 ```
+```NOTE```: Do not edit *./config.ts*.
 
-Add an encrypted secret:
+Your stack file can contain encrypted variables using a unique stack key(encryption salt) string at the top of your stack file.  These values are decrypted by Pulumi at runtime.
+
+To add an encrypted secret:
 ```
 pulumi config set --secret <secretVar> <secret>
 ```
 ```NOTE```: Using cmdline reformats the stackfile into alphabetical order.
 
 #### Deploy your stack
-Once you have configure you're stack, select stack and deploy(or add the -s <stack> flag each time to the up command):
+Once you have configured your stacks, change your directory to the location of the stack, select stack and deploy (or add the -s <stack> flag each time to the up command):
 ```
-pulumi stack select <stack>
+cd forgeops/cluster/pulumi/gke/infra
+pulumi stack select gke-infra
 pulumi up
 ```
+NOTE: You need to do this for every stack. i.e.: deploy the gke-infra stack first and then gke-small
 
 Grab kubeconfig output from stack and set context:
 ```
