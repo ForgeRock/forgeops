@@ -129,7 +129,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-{{ toYaml .Values.environment | indent 10 }}
+{{ if .Values.environment }}
+{{ toYaml .Values.environment | indent 8 }}
+{{ end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.
