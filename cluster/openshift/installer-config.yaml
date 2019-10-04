@@ -5,7 +5,7 @@ compute:
   name: worker
   platform:
     aws:
-      type: m5.2xlarge
+      type: m5.4xlarge
   replicas: 5
 controlPlane:
   hyperthreading: Enabled
@@ -14,7 +14,7 @@ controlPlane:
   replicas: 3
 metadata:
   creationTimestamp: null
-  name: fr-openshift
+  name: fropenshift
 networking:
   clusterNetwork:
   - cidr: 10.128.0.0/14
@@ -29,4 +29,4 @@ platform:
       zone: sandbox
       usecase: forgerock-benchmarks
       team: cloud-deployment
-    region: us-west-2
+    region: us-east-1

@@ -1,0 +1,10 @@
+kind: StatefulSet
+metadata:
+  name: ds
+spec:
+  template:
+    spec:
+      serviceAccount: forgerock-services
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 11111
