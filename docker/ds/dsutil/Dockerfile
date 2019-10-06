@@ -1,5 +1,5 @@
 # Utility ds image for testing, benchmarking, etc.
-FROM gcr.io/forgerock-io/ds-empty/docker-build:latest
+FROM gcr.io/forgerock-io/ds-empty/pit1:latest
 
 USER root
 RUN apt-get update && apt-get install -y vim

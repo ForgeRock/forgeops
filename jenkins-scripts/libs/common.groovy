@@ -38,21 +38,23 @@ UPGRADE_TEST_BASE_USERSTORE_VERSION   = '7.0.0-bdc0ce8'
 
 /** Root-level image names corresponding to product Helm charts and Dockerfiles in the ForgeOps repo. */
 ROOT_LEVEL_IMAGE_NAMES = [
-        'am'     : 'gcr.io/forgerock-io/am',
-        'am-fbc' : 'gcr.io/forgerock-io/am',
-        'amster' : 'gcr.io/forgerock-io/amster',
-        'ds'     : 'gcr.io/forgerock-io/ds',
-        'idm'    : 'gcr.io/forgerock-io/idm',
-        'ig'     : 'gcr.io/forgerock-io/ig',
+        'am'        : 'gcr.io/forgerock-io/am',
+        'am-fbc'    : 'gcr.io/forgerock-io/am',
+        'amster'    : 'gcr.io/forgerock-io/amster',
+        'ds'        : 'gcr.io/forgerock-io/ds',
+        'ds-empty'  : 'gcr.io/forgerock-io/ds-empty',
+        'idm'       : 'gcr.io/forgerock-io/idm',
+        'ig'        : 'gcr.io/forgerock-io/ig',
 ]
 
 /** Helm chart file paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
 HELM_CHART_PATHS = [
-        'am'     : 'helm/openam/values.yaml',
-        'amster' : 'helm/amster/values.yaml',
-        'ds'     : 'helm/ds/values.yaml',
-        'idm'    : 'helm/openidm/values.yaml',
-        'ig'     : 'helm/openig/values.yaml',
+        'am'        : 'helm/openam/values.yaml',
+        'amster'    : 'helm/amster/values.yaml',
+        'ds'        : 'helm/ds/values.yaml',
+        'ds-empty'  : 'helm/ds-empty/values.yaml',
+        'idm'       : 'helm/openidm/values.yaml',
+        'ig'        : 'helm/openig/values.yaml',
 ]
 
 /**
@@ -104,12 +106,14 @@ Map getHelmChart(String productName) {
 
 /** Skaffold Dockerfile paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
 SKAFFOLD_DOCKERFILE_PATHS = [
-        'am':     'docker/am/Dockerfile',
-        'am-fbc': 'docker/am-fbc/Dockerfile',
-        'amster': 'docker/amster/Dockerfile',
-        // ds-empty does not get promoted, as we have no tests for it yet
-        'idm':    'docker/idm/Dockerfile',
-        'ig':     'docker/ig/Dockerfile',
+        'am'        : 'docker/am/Dockerfile',
+        'am-fbc'    : 'docker/am-fbc/Dockerfile',
+        'amster'    : 'docker/amster/Dockerfile',
+        'ds-cts'    : 'docker/ds/cts/Dockerfile',
+        'ds-util'   : 'docker/ds/dsutil/Dockerfile',
+        'ds-idrepo' : 'docker/ds/idrepo/Dockerfile',
+        'idm'       : 'docker/idm/Dockerfile',
+        'ig'        : 'docker/ig/Dockerfile',
 ]
 
 /** Products which have associated Dockerfiles. */
@@ -136,7 +140,15 @@ Map getDockerfile(String productName) {
         error "Unknown root-level image name '${productName}'"
     }
 
-    String tag = productName == 'am-fbc' ? getHelmChart('am').currentTag : getHelmChart(productName).currentTag
+    String baseImage
+    if (productName == 'am-fbc') {
+        baseImage = 'am'
+    } else if (productName in ['ds-cts', 'ds-util', 'ds-idrepo']) {
+        baseImage = 'ds-empty'
+    } else {
+        baseImage = productName
+    }
+    String tag = getHelmChart(baseImage).currentTag
 
     return [
             'filePath'     : SKAFFOLD_DOCKERFILE_PATHS[productName],

@@ -8,11 +8,12 @@
 
 void runStage(pipelineRun) {
     def parallelTestsMap = [
-        Greenfield: { greenfieldTests.runStage(pipelineRun, 'Greenfield') },
-        Upgrade: { upgradeTests.runStage(pipelineRun, 'Upgrade', 'tests/upgrade', 'ds-shared-repo') },
+        Greenfield: { greenfieldTests.runStage(pipelineRun, 'PIT Greenfield') },
+        UpgradeDS: { upgradeTests.runStage(pipelineRun, 'PIT Upgrade With ds Image', 'tests/upgrade', 'ds-shared-repo', 'ds') },
+        UpgradeDSEmpty: { upgradeTests.runStage(pipelineRun, 'PIT Upgrade With ds-empty Image', 'tests/upgrade', 'ds-shared-repo', 'ds-empty') },
         PerfStack: { perfTests.runStage(pipelineRun, 'Perf Stack', 'stack', 'jenkins.yaml') },
-        PerfAuthnSharedRepo: { perfTests.runStage(pipelineRun, 'AuthN with DS shared repo', 'authn_rest', 'jenkins-dssr.yaml') },
-        PerfDSCrudShared: { perfTests.runStage(pipelineRun, 'CRUD on simple managed users with DS shared repo', 'simple_managed_users_ds_shared_repo', 'jenkins.yaml') }
+        PerfAuthnSharedRepo: { perfTests.runStage(pipelineRun, 'Perf AuthN', 'authn_rest', 'jenkins-dssr.yaml') },
+        PerfDSCrudShared: { perfTests.runStage(pipelineRun, 'Perf CRUD on simple managed users', 'simple_managed_users_ds_shared_repo', 'jenkins.yaml') }
     ]
     
     parallel parallelTestsMap

@@ -19,6 +19,9 @@ def build() {
 
     properties([buildDiscarder(logRotator(daysToKeepStr: '14', numToKeepStr: '10'))])
 
+    // Abort any active builds relating to the current PR, as they are superseded by this build
+    abortMultibranchPrBuilds()
+
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
     bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
 
