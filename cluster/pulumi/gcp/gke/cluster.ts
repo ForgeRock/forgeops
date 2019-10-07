@@ -1,14 +1,10 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import * as k8s from "@pulumi/kubernetes";
-//import { zone } from "@pulumi/gcp/config";
 import * as config from "./config";
 import * as ingress from "../../packages/nginx-ingress-controller/index-gke";
 import { Provider } from "@pulumi/gcp";
-import { Config } from "@pulumi/pulumi";
 import * as cm from "../../packages/cert-manager";
-
-const enable = new Config("enable");
 
 // To be finished...
 // export function createNetworkLoadbalancer(vpc: gcp.compute.Network, ip: gcp.compute.Address, instanceGroups: pulumi.Output<string[]>){
@@ -110,6 +106,7 @@ function addNodePools() {
 // Create a GKE cluster
 export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
     return new gcp.container.Cluster(config.clusterName, {
+        name: config.clusterName,
         nodeLocations: config.nodeZones,
         network: network,
         subnetwork: subnetwork,
@@ -172,6 +169,7 @@ users:
 });
 };
 
+// exorting kubeconfig in JSON format to resolve cert-manager issue. Will be consildated with above.
 export function createKubeconfigJson(cluster: gcp.container.Cluster) {
     return pulumi.
     all([ cluster.name, cluster.endpoint, cluster.masterAuth ]).
@@ -293,10 +291,10 @@ export function deployCertManager(clusterProvider: Provider, kubeconfig: any, cl
         tlsCrt: cmConfig.require("tls-crt"),
         clusterProvider: clusterProvider,
         clusterKubeconfig: kubeconfig,
-        cloudDnsSa: cmConfig.require("clouddns"),
+        cloudDnsSa: cmConfig.get("clouddns") || "",
         dependsOn: [cluster],
         version: cmConfig.require("version"),
-        useSelfSignedCert: true,
+        useSelfSignedCert: cmConfig.requireBoolean("useselfsignedcert"),
     };
 
     // Deploy Cert Manager

@@ -3,6 +3,6 @@ config:
   gcp:project: engineering-devops
   gcp:region: us-east4
   gcp:zone: us-east4-a
-  bucket:name: new-test-bucket
-  bucket:enable: "true"
+  bucket:name: my-new-bucket
+  bucket:enable: "false"
   vpc:enable: "true"

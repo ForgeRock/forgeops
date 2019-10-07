@@ -1,14 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as gke from "./cluster"
-//import * as nginx from "./nginx-controller";
 import * as config from "./config";
 import { Config } from "@pulumi/pulumi";
-import * as fs from 'fs';
-import { getStack } from "@pulumi/pulumi/runtime";
-const { exec } = require('child_process');
-
-
-
 
 // Reference configuration values
 const stackConfig = new Config();
@@ -67,8 +60,6 @@ if (config.enableNginxIngress) {
 
 /************ CERTIFICATE MANAGER ************/
 
-// export let k = (kubeconfig.apply(kc => kc)).toString();
-// export let k2: object = JSON.parse(k);
 //Deploy cert-manager if enable = true
 if (config.enableCertManager){
     gke.deployCertManager(clusterProvider, kube, cluster);

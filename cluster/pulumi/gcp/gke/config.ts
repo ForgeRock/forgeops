@@ -5,17 +5,17 @@ const cluster = new Config("cluster");
 const nginx = new Config("nginx");
 const primaryPool = new Config("primary");
 const secondaryPool = new Config("secondary");
+const cm = new Config("certmanager");
 const dsPool = new Config("ds");
-const enable = new Config("enable");
 
 // ** PROJECT CONFIG **
 export const project = new pulumi.Config(pulumi.getProject());
 
 // ** ENABLE RESOURCES
-export const enableSecondaryPool = enable.requireBoolean("nodePoolSecondary");
-export const enableDSPool = enable.requireBoolean("nodePoolDS");
-export const enableNginxIngress = enable.requireBoolean("nginx");
-export const enableCertManager = enable.requireBoolean("certManager");
+export const enableSecondaryPool = secondaryPool.requireBoolean("enable");
+export const enableDSPool = dsPool.requireBoolean("enable");
+export const enableNginxIngress = nginx.requireBoolean("enable");
+export const enableCertManager = cm.requireBoolean("enable");
 
 // ** NETWORK CONFIG **
 export const stackRef = cluster.get("infraStackName") || "gke-infra"
@@ -26,9 +26,9 @@ export const ip = cluster.get<string>("staticIp") || undefined;
 export const clusterName = cluster.require("name");
 export const nodeZones = cluster.requireObject<string[]>("nodeZones");
 export const k8sVersion = cluster.get("k8sVersion") || "latest";
-export const nginxVersion = cluster.get("nginxVersion") || "0.25.0";
+export const nginxVersion = nginx.require("version");
 export const disableIstio = cluster.getBoolean("disableIstio") || true;
-export const disableHPA = cluster.getBoolean("disableHorizontalPodAutoscaling") || false;
+export const disableHPA = cluster.getBoolean("disableHorizontalPodAutoscaling") || true;
 export let namespaces: Array<string> = cluster.getObject("namespaces") || ["prod"];
 let user = process.env["USER"] || "unknown";
 user = user.toLowerCase();
@@ -73,15 +73,15 @@ export const stackname = pulumi.getStack();
 // PRIMARY NODE POOL VALUES
 export const primary:NodePool = {
     initialNodeCount: primaryPool.getNumber("initialNodeCount") || 1,
-    nodeCount: primaryPool.getNumber("nodeCount") || 1,
+    nodeCount: primaryPool.getNumber("nodeCount") || 0,
     cpuPlatform: primaryPool.get("cpuPlatform") || "Intel Skylake",
     nodeMachineType: primaryPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: primaryPool.getNumber("diskSizeGb") || 80,
     diskType: primaryPool.get("diskType") || "pd-ssd",
-    enableAutoScaling: primaryPool.getBoolean("enableAutoScaling") || true,
+    enableAutoScaling: primaryPool.requireBoolean("autoScaling"),
     minNodes: primaryPool.getNumber("minNodes") || 1,
     maxNodes: primaryPool.getNumber("maxNodes") || 4,
-    preemptible: primaryPool.getBoolean("preemptible") || true,
+    preemptible: primaryPool.requireBoolean("preemptible"),
     nodePoolName: primaryPool.get("name") || "primary",
     labels: backendLabels,
 };
@@ -94,10 +94,10 @@ export const secondary:NodePool = {
     nodeMachineType: secondaryPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: secondaryPool.getNumber("diskSizeGb") || 80,
     diskType: secondaryPool.get("diskType") || "pd-ssd",
-    enableAutoScaling: secondaryPool.getBoolean("enableAutoScaling") || true,
+    enableAutoScaling: secondaryPool.requireBoolean("autoScaling"),
     minNodes: secondaryPool.getNumber("minNodes") || 1,
     maxNodes: secondaryPool.getNumber("maxNodes") || 4,
-    preemptible: secondaryPool.getBoolean("preemptible") || false,
+    preemptible: secondaryPool.requireBoolean("preemptible"),
     nodePoolName: secondaryPool.get("name") || "secondary",
     labels: backendLabels,
 };
