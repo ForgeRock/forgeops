@@ -169,7 +169,7 @@ users:
 });
 };
 
-// exorting kubeconfig in JSON format to resolve cert-manager issue. Will be consildated with above.
+// exporting kubeconfig in JSON format to resolve cert-manager issue. Will be consolidated with above.
 export function createKubeconfigJson(cluster: gcp.container.Cluster) {
     return pulumi.
     all([ cluster.name, cluster.endpoint, cluster.masterAuth ]).
