@@ -15,6 +15,7 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 import scala.concurrent.duration._
 import frutil._
 
+// An IDM simulation - creates users via REST API
 class IDMSimulation extends Simulation {
 
     val config = new BenchConfig()
@@ -64,25 +65,33 @@ class IDMSimulation extends Simulation {
             }
         }
 
+    // The create test checks to ensure the id does not exist
+    // this is slower - but is more realistic
     val createExec =
         exec(amAuth.authenticate)
         .during(config.duration) {
             feed(userFeeder)
             .exec(amAuth.refreshAccessToken)
-            .exec(
-                http("Create managed user via POST")
-                .post(config.idmUrl + "/managed/user?_action=create")
-                .body(StringBody(getGeneratedUser("${id}"))).asJson
+          .exec(
+              http("check for existing user")
+                .get(config.idmUrl + "/managed/user")
+                .queryParam("_queryFilter", "/userName eq \"testuser${id}\"")
                 .header("Authorization", "Bearer ${accessToken}")
-            )
+                .check(jsonPath("$.result[0]._id").optional.saveAs("uid"))
+          ) // if the uid does not exist, then create it..
+              .doIf( "${uid.isUndefined()}") {
+                exec(http("Create managed user via POST")
+                      .post(config.idmUrl + "/managed/user?_action=create")
+                      .body(StringBody(getGeneratedUser("${id}"))).asJson
+                      .header("Authorization", "Bearer ${accessToken}")
+                )
+            }
         }
-
-    // run deletes followed by creates
-    //val chainedScenario = scenario("idm delete then create").exec(deleteExec).exec(createExec)
-    // just deletes..
-    //val chainedScenario = scenario("idm delete").exec(deleteExec)
-    // just creates.
-    val chainedScenario = scenario("idm create").exec(createExec)
+    // If DELETE_USERS is true, then run the delete simulation first
+    val chainedScenario = if (config.deleteUsers)
+            scenario("idm delete then create").exec(deleteExec).exec(createExec);
+        else
+            scenario("idm create").exec(createExec);
 
     setUp(chainedScenario.inject(atOnceUsers(config.concurrency))).protocols(httpProtocol)
 }

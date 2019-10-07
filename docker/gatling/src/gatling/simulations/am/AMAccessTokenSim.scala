@@ -14,6 +14,7 @@ import io.gatling.http.Predef._
 import io.gatling.http.protocol.HttpProtocolBuilder
 import frutil._
 
+// Get an access token using the auth code flow
 class AMAccessTokenSim extends Simulation {
 
     val config = new BenchConfig()

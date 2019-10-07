@@ -1,5 +1,5 @@
 plugins {
-  id "com.github.lkishalmi.gatling" version "3.0.2"
+  id "com.github.lkishalmi.gatling" version "3.2.9"
 }
 
 apply plugin: 'scala'
@@ -12,26 +12,19 @@ repositories {
 }
 
 dependencies {
-    //gatling 'com.typesafe.play:play-json_2.12:2.6.9'
-    //gatling 'com.github.javafaker:javafaker:0.13'
-    gatling 'com.google.cloud:google-cloud-storage:1.77.0'
-    gatling 'com.google.auth:google-auth-library-oauth2-http:0.16.1'
+    gatling 'com.google.cloud:google-cloud-storage:1.96.0'
     gatling 'org.zeroturnaround:zt-zip:1.13'
-    //gatling 'com.fasterxml.jackson.module:jackson-module-scala_2.12:2.9.6'
 }
+
 gatling {
     toolVersion = '3.1.2'
-    jvmArgs = [ '-server' ]
+    jvmArgs = [ '-server', '-Xmx1G' ]
 
     simulations = {
         "**/*.scala"
     }
 
-    // simulations = {
-    //     include "**/package1/*Simu.scala"    (1)
-    //     include "**/package2/*Simulation.scala"  (2)
-    // }
-
+    // logLevel = "WARN"
 }
 
 
@@ -56,6 +49,11 @@ task buildReport(type: JavaExec, dependsOn: downloadLogs) {
 
 task uploadReport(type: JavaExec, dependsOn: buildReport) {
     main = 'gsutil.ReportUploader'
+    classpath = sourceSets.gatling.runtimeClasspath
+}
+
+task uploadResults(type: JavaExec) {
+    main = 'gsutil.ResultsUploader'
     classpath = sourceSets.gatling.runtimeClasspath
 }
 

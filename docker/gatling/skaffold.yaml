@@ -1,0 +1,30 @@
+# Runs the gatling job against the smoke namespace
+# See docker/gatling-sk/README.md
+#
+apiVersion: skaffold/v1beta15
+kind: Config
+build:
+  artifacts:
+  - image: gatling
+    context: .
+  tagPolicy:
+      gitCommit: {}
+deploy:
+  kustomize:
+    path: ./k8s/
+profiles:
+- name: kaniko
+  build:
+    artifacts:
+    - image: gatling
+      kaniko:
+        dockerfile: ./Dockerfile
+        target: gatling
+        buildContext:
+          gcsBucket: forgeops-kaniko
+        cache: {}
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./k8s

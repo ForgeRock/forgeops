@@ -5,9 +5,6 @@ metadata:
   name: perf-test
 spec:
   backoffLimit: 1
-  # If we are going to spawn multiple parallel jobs we need to
-  # update the simulation to use non overlapping users for the test.
-  # We could use the pod name as a user prefix?
   parallelism: 1
   completions: 1
   template:
@@ -18,13 +15,9 @@ spec:
       containers:
       - image: gatling
         name: perf-test
-        args:
-        - gradle
-        - gatlingRun-idm.IDMSimulation
-        - uploadLogs
         resources:
           limits:
-            memory: 2500Mi
+            memory: 3000Mi
           requests:
             cpu: 500m
             memory: 2500Mi
@@ -39,14 +32,13 @@ spec:
       - name: gcs-key
         secret:
           secretName: gcs-key
-
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: perf-test-config
 data:
-  # Using defaults for now. Customize as required
-  # See the *simulations.scala for env vars that can be set.
-  KEY_PATH: /var/run/secrets/key.json
+  # Customize as required
+  GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/key.json"
   DURATION: "60"
+  TARGET_HOST: "smoke.iam.forgeops.com"

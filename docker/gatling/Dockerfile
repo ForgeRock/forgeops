@@ -1,12 +1,8 @@
-
-# Credit to the following article for the pattern:
-# https://medium.com/de-bijenkorf-techblog/https-medium-com-annashepeleva-distributed-load-testing-with-gatling-and-kubernetes-93ebce26edbe
-
+# Run the gatling benchmarks using gradle
 FROM gcr.io/forgerock-io/java-11:latest
 
-
 ENV GRADLE_HOME /opt/gradle
-ENV GRADLE_VERSION 5.4.1
+ENV GRADLE_VERSION 5.6.2
 
 ADD  "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" /tmp/gradle.zip
 
@@ -20,5 +16,8 @@ WORKDIR /gatling
 
 COPY src/ /gatling/src
 COPY build.gradle /gatling
+COPY *.sh /gatling
 
-RUN gradle --no-daemon gatlingClasses
+RUN gradle --no-daemon compileGatlingScala
+
+ENTRYPOINT ["/gatling/run-all.sh"]

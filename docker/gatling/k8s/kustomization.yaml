@@ -2,10 +2,8 @@ kind: ""
 apiversion: ""
 commonLabels:
     app: gatling
-namespace: smoke
+#namespace: smoke
 resources:
-- service-account.yaml
-- merge-results-job.yaml
 - perf-test-job.yaml
 secretGenerator:
 - name: gcs-key

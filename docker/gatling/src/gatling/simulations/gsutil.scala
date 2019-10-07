@@ -4,10 +4,12 @@ import java.io.{File, FileInputStream}
 import java.nio.file.Paths
 import java.text.SimpleDateFormat
 import java.util.Date
+
 import com.google.auth.oauth2.GoogleCredentials
 import com.google.cloud.storage.Storage.BlobListOption
 import com.google.cloud.storage.{Blob, BlobInfo, Storage, StorageOptions}
 import org.zeroturnaround.zip.ZipUtil
+
 import scala.util.Random
 import scala.util.Properties
 
@@ -25,7 +27,8 @@ trait GoogleStorageClient {
     jwtStream.close()
   }
 
-  val storageClient: Storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService
+  //val storageClient: Storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService
+  val storageClient: Storage = StorageOptions.getDefaultInstance.getService
 }
 
 trait fsUtils {
@@ -83,6 +86,30 @@ object ReportUploader extends GoogleStorageClient with fsUtils {
   def main(args: Array[String]): Unit = {
 
     val reportDir = new File(downloadPath)
+
+    val date: Date = new Date
+    val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH-mm-ss")
+    val filename: String = dateFormat.format(date)
+
+    val zipFile = new File(s"build/reports/$filename.zip")
+    ZipUtil.pack(reportDir, zipFile)
+
+    storageClient.create(
+      BlobInfo.newBuilder(bucket, "reports/" + zipFile.getName).build(),
+      new FileInputStream(zipFile)
+    )
+    println("Uploaded report " + zipFile.getName)
+  }
+
+}
+
+// Upload everything in the build/reports/gatling folder
+object ResultsUploader extends  GoogleStorageClient with fsUtils {
+
+  @throws[Exception]
+  def main(args: Array[String]): Unit = {
+
+    val reportDir = new File("build/reports/gatling")
 
     val date: Date = new Date
     val dateFormat: SimpleDateFormat = new SimpleDateFormat("yyyyMMdd-HH-mm-ss")
