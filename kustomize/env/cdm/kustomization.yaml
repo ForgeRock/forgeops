@@ -1,4 +1,4 @@
-# Deploys to default.iam.forgeops.com. Uses the Let's encrypt issuer for SSL.
+# Deploys to prod.iam.forgeops.com. Uses the Let's encrypt issuer for SSL.
 namespace: prod
 resources:
   - ../../am
