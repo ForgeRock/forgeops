@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
+# Copyright (c) 2016-2019 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
 
@@ -41,7 +41,7 @@ config:
 
 image:
   repository: gcr.io/forgerock-io/amster
-  tag: 7.0.0-cd642411a35f7d3347579050531ab07259f338f1
+  tag: 7.0.0-3f3b17866040429ce650985da893f6edc353d96f
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
@@ -116,5 +116,13 @@ istio:
 #     :load /git/config/scripts/do_stuff.amster
 
 scripts: {}
+
+# Amster variables
+#
+# If there are extra variables you need to pass to amster to be used as property expressions, you can add them here.
+# As with ForgeRock common expression syntax, values should be expressed in the form `myPropertyName` and will then
+# be available in Amster import files using the expression `&{my.property.name}`.
+
+variables: {}
 
 # serviceAccountName: my-amster-serviceaccount

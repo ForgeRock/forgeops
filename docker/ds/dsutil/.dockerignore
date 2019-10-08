@@ -1,2 +1,3 @@
-k8s.yaml
 skaffold.yaml
+k8s/
+exec.sh

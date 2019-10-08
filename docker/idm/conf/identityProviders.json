@@ -127,7 +127,7 @@
                 }
             ],
             "redirectUri" : "https://localhost:8443/",
-            "configClass" : "org.forgerock.oauth.clients.oidc.OpenIDConnectClientConfiguration",
+            "configClass" : "org.forgerock.oauth.clients.oauth2.OAuth2ClientConfiguration",
             "basicAuth" : false
         },
         {

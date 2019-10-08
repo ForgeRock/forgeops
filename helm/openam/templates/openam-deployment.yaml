@@ -1,4 +1,4 @@
-# Copyright (c) 2016-2018 ForgeRock AS. All rights reserved
+# Copyright (c) 2016-2019 ForgeRock AS. All rights reserved
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
@@ -129,6 +129,9 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+{{ if .Values.environment }}
+{{ toYaml .Values.environment | indent 8 }}
+{{ end }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
         # For slow environments like Minikube you need to give OpenAM time to come up.

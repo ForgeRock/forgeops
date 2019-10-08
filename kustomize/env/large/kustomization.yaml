@@ -1,9 +1,7 @@
-kind: ""
-apiversion: ""
 namespace: prod
 resources:
 - ../dev
 patchesStrategicMerge:
 - am.yaml
 - idm.yaml
-# - ig.yaml
+- platform-config.yaml

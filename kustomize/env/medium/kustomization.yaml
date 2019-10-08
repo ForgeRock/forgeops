@@ -4,3 +4,4 @@ resources:
 patchesStrategicMerge:
 - am.yaml
 - idm.yaml
+- platform-config.yaml

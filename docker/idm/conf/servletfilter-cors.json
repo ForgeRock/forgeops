@@ -6,7 +6,7 @@
     "initParams" : {
         "allowedOrigins" : "*",
         "allowedMethods" : "GET,POST,PUT,DELETE,PATCH",
-        "allowedHeaders" : "authorization,accept,content-type,origin,x-requested-with",
+        "allowedHeaders" : "authorization,accept,content-type,origin,x-requested-with,cache-control",
         "allowCredentials" : false,
         "exposedHeaders": "WWW-Authenticate",
         "chainPreflight" : false

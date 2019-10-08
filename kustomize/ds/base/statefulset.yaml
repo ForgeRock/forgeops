@@ -34,9 +34,13 @@ spec:
       # This is used to drive directory instances to dedicated nodes for performance.
       # If a node is not tainted, this has no impact.
       tolerations:
-      - key: "affinity"
+      - key: "nodetype"
         operator: Equal
         value: "directory"
+      - key: "WorkerDedicatedDS"
+        operator: "Exists"
+#      nodeSelector: CLOUD-1630
+#        ds: "true"
       initContainers:
       - name: initialize
         image: ds

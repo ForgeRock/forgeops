@@ -26,7 +26,7 @@
         "defaultNotificationType" : "info",
         "platformSettings" : {
             "adminOauthClient" : "idmAdminClient",
-            "adminOauthClientScopes" : "openid fr:idm:.*",
+            "adminOauthClientScopes" : "openid",
             "amUrl" : "/am",
             "loginUrl" : ""
         }

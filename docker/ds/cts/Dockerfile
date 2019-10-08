@@ -1,6 +1,4 @@
-#FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-32d3e305277c101ff7349e117b5b527614e1bd69
-# Pinned until PIT1 passes
-FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-32d3e305277c101ff7349e117b5b527614e1bd69
+FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-5e9e1c7a12dab93be3b81ccee374c44bac7317d8
 
 RUN setup-profile --profile am-cts \
                   --set am-cts/tokenExpirationPolicy:ds \
