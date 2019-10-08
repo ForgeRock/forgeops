@@ -6,13 +6,13 @@ metadata:
 # These global variables can be used to parameterize your deployments.
 # The FQDN and URLs here should match your ingress or istio gateway definitions
 data:
-  FQDN: $(NAMESPACE).iam.forgeops.com
+  FQDN: $(NAMESPACE).iam.example.com
   SUBDOMAIN: iam
-  DOMAIN: forgeops.com
-  AM_URL: https://$(NAMESPACE).iam.forgeops.com/am
-  IDM_ADMIN_URL:  https://$(NAMESPACE).iam.forgeops.com/admin
-  IDM_REST_URL:   https://$(NAMESPACE).iam.forgeops.com/openidm
-  ENDUSER_UI_URL:   https://$(NAMESPACE).iam.forgeops.com/enduser
+  DOMAIN: example.com
+  AM_URL: https://$(NAMESPACE).iam.example.com/am
+  IDM_ADMIN_URL:  https://$(NAMESPACE).iam.example.com/admin
+  IDM_REST_URL:   https://$(NAMESPACE).iam.example.com/openidm
+  ENDUSER_UI_URL:   https://$(NAMESPACE).iam.example.com/enduser
 ---
 apiVersion: v1
 kind: Secret
