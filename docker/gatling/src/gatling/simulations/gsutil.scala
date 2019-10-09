@@ -14,20 +14,11 @@ import scala.util.Random
 import scala.util.Properties
 
 trait GoogleStorageClient {
-  val jwtPath: String = Properties.envOrElse("KEY_PATH", "key.json")
   val bucket: String = Properties.envOrElse("PERF_TEST_RESULTS_BUCKET_NAME", "forgeops-gatling")
   val fileNameSuffix: String = Properties.envOrElse("HOSTNAME", Random.alphanumeric.take(10).mkString(""))
   val downloadPath: String = Properties.envOrElse("PERF_TEST_LOG_DOWNLOAD_PATH", "build/reports/downloadedLogs")
-
-  val jwtStream = new FileInputStream(new File(jwtPath))
-
-  val credentials: GoogleCredentials = try {
-    GoogleCredentials.fromStream(jwtStream)
-  } finally {
-    jwtStream.close()
-  }
-
-  //val storageClient: Storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService
+  // The library assumes the env variable GOOGLE_APPLICATION_CREDENTIALS points to a
+  // a service account json file.
   val storageClient: Storage = StorageOptions.getDefaultInstance.getService
 }
 
