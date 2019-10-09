@@ -21,7 +21,7 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String sa
                         TESTS_SCOPE                     : scope,
                         SAMPLE_NAME                     : sampleName,
                         DS_IMAGE_NAME                   : imageName,
-                        CLUSTER_NAMESPACE               : 'upgrade',
+                        CLUSTER_NAMESPACE               : "upgrade-${imageName}",
                         CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                         COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
                         COMPONENTS_AM_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
