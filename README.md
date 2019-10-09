@@ -6,12 +6,12 @@ Kubernetes deployment for the ForgeRock platform. Branches:
 * Technology preview: skaffold-6.5 branch.
 * Under development master branch
 
-Note: The charts in the helm/ directory are deprecated and will be removed in the future. The Helm charts 
+Note: The charts in the helm/ directory are deprecated and will be removed in the future. The Helm charts
 are being replaced with Kustomize.
 
-This GitHub repository is a read-only mirror of 
+This GitHub repository is a read-only mirror of
 ForgeRock's [Bitbucket Server repository](https://stash.forgerock.org/projects/CLOUD/repos/forgeops). Users
-with BackStage accounts can make pull requests on our Bitbucket Server repository. ForgeRock does not 
+with BackStage accounts can make pull requests on our Bitbucket Server repository. ForgeRock does not
 accept pull requests on GitHub.
 
 ## Disclaimer
@@ -28,12 +28,12 @@ consequential damages or costs of any type arising out of any action taken by yo
 to the samples.
 
 
-## Documentation 
+## Documentation
 
-The draft ForgeRock DevOps Developer's Guides 
+The draft ForgeRock DevOps Developer's Guides
 ( [minikube](https://ea.forgerock.com/docs/platform/devops-guide-minikube)|
 [shared cluster](https://ea.forgerock.com/docs/platform/devops-guide-cloud)]
-tracks the master branch, including information on the newer Kustommize/ Skaffold workflow. If you are 
+tracks the master branch, including information on the newer Kustommize/ Skaffold workflow. If you are
 just getting started this is the recommended path.
 
 The documentation for the current release can be found on
@@ -47,19 +47,19 @@ by bundling the product configuration into the docker image for deployment. This
 development and greatly simplifies the Kubernetes runtime manifests. It eliminates the need for Git init containers
 and the complexity around configuring different Git repositories and branches in the helm charts.
 
-The new workflow combines the previously 
+The new workflow combines the previously
 independent `forgeops` and `forgeops-init` repositories into a single Git repository that holds configuration and Kubernetes
 manifests.  Documentation for this workflow is in progress. Please
  see the [early access documentation](https://ea.forgerock.com/docs/platform/devops-guide-minikube/#devops-guide-minikube).
 
-This preview branch enables the use of supported ForgeRock binaries in your 
- deployment. 
- 
+This preview branch enables the use of supported ForgeRock binaries in your
+ deployment.
+
  **Adopting this workflow now is recommended as it will ease transition to the 7.x platform.**
 
 ## Configuration
 
-The provided configuration 
+The provided configuration
 is a basic installation that can be further extended by developers to meet their requirements. Developers should fork
 this repository in Git, and modify the various configuration files.
 
@@ -72,7 +72,7 @@ separate postgres SQL database is *NOT* required.
 * AM protects the IDM administration and end user UI pages.
 * AM is configured with a single root realm
 * A number of OIDC clients are configured for the AM/IDM integration and the smoke tests.
-** Note the `idm-provisioning`, `idmAdminClient` and the `endUserUI` client configurations are required for the 
+** Note the `idm-provisioning`, `idmAdminClient` and the `endUserUI` client configurations are required for the
   integration of IDM and AM.
 * Directory service instances are configured for:
  - The shared AM/IDM repo (ds-idrepo)
@@ -82,8 +82,8 @@ separate postgres SQL database is *NOT* required.
 * A Python test harness. This test harness (forgeops-test) exercises the basic deployment and
 can be modified to include additional tests.
 
-When deployed, the following URLs are available (The domain name below is the default 
-for minikube and can be modified for your environment) 
+When deployed, the following URLs are available (The domain name below is the default
+for minikube and can be modified for your environment)
 
 * https://default.iam.example.com/web - web landing page
 * https://default.iam.example.com/am  - Access manager admin  (admin/password)
@@ -91,7 +91,7 @@ for minikube and can be modified for your environment)
 * https://default.iam.example.com/enduser  - End User UI page
 * https://default.iam.example.com/ig  - Identity Gateway (Optional)
 
-The various configuration files are located in the `docker` and bundled with their respective 
+The various configuration files are located in the `docker` and bundled with their respective
 products (amster, idm, ig, am).
 
 ## Troubleshooting Tips
@@ -101,7 +101,7 @@ Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forg
 Troubleshooting suggestions:
 
 * The script `bin/debug-log.sh` will generate an HTML file with log output. Useful for troubleshooting.
-* Simplify. Deploy a single product at a time (for example, ds), and make sure it is working correctly before deploying the next product. 
+* Simplify. Deploy a single product at a time (for example, ds), and make sure it is working correctly before deploying the next product.
 * Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.
     2. Examine any init containers. Did each init container complete with a zero (success) exit code? If not, examine the logs from that failed init container using `kubectl logs pod-xxx -c init-container-name`
@@ -115,16 +115,16 @@ Troubleshooting suggestions:
     1. `kubectl describe node`
     2. `kubectl get events -w`
 * Most images provide the ability to exec into the pod using bash, and examine processes and logs.  Use `kubectl exec pod-name -it bash`.
-* If `skaffold dev` fails because it does not have permissions to push a docker image it may be trying 
-to push to the docker hub (the reported image name will be something like `docker.io/am`).  
+* If `skaffold dev` fails because it does not have permissions to push a docker image it may be trying
+to push to the docker hub (the reported image name will be something like `docker.io/am`).
   When running on minikube, Skaffold assume that a push is not required as it can `docker build` direct to
   the docker machine. If it is attempting to push the docker hub it is because Skaffold thinks
-  it is *not* running on minikube. Make sure your 
+  it is *not* running on minikube. Make sure your
    minikube context is named `minikube`. An alternate solution
-   is to modify the docker build in `skaffold.yaml` and set `local.push` to false. See the 
+   is to modify the docker build in `skaffold.yaml` and set `local.push` to false. See the
    [skaffold.dev](https://skaffold.dev) documentation.
-   
- 
+
+
 ## Kustomizing the deployment
 
 Create a copy of one of the environments. Example:
