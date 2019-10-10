@@ -8,7 +8,7 @@
 
 import com.forgerock.pipeline.reporting.PipelineRun
 
-void runStage(PipelineRun pipelineRun, String stageName, String scope, String sampleName, String imageName) {
+void runStage(PipelineRun pipelineRun, String stageName, String scope, String deploymentName, String imageName) {
 
     pipelineRun.pushStageOutcome(commonModule.normalizeStageName(stageName), stageDisplayName: stageName) {
         node('google-cloud') {
@@ -19,7 +19,7 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String sa
                 dir('lodestar') {
                     def cfg = [
                         TESTS_SCOPE                     : scope,
-                        SAMPLE_NAME                     : sampleName,
+                        DEPLOYMENT_NAME                 : deploymentName,
                         DS_IMAGE_NAME                   : imageName,
                         CLUSTER_NAMESPACE               : "upgrade-${imageName}",
                         CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
