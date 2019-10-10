@@ -4,7 +4,7 @@ import * as utils from "../utils/utils";
 
 
 const stackConfig = new pulumi.Config();
-const infraReference = new pulumi.StackReference("eks-infra"); 
+const infraReference = new pulumi.StackReference("aws-infra"); 
 
 export interface ingressConfiguration {
     enable: boolean;
@@ -22,13 +22,19 @@ export interface certManagerConfiguration{
     version: string;
 }
 
+export interface prometheusConfiguration {
+    enable: boolean;
+    k8sNamespace: string;
+    version: string;
+}
+
 export interface clusterConfiguration {
     k8sVersion: string;
     k8sDashboard: boolean;
 }
 
 export interface nodeGroupConfiguration {
-    enabled: boolean;
+    enable: boolean;
     ami: string;
     namespace: string;
     diskSizeGb: number;
@@ -80,12 +86,21 @@ function getCertManagerConfig(namespace : string): certManagerConfiguration{
 }
 export const cmConfig = getCertManagerConfig("certmanager");
 
+function getPrometheusConfig(namespace: string): prometheusConfiguration {
+    let promconfig = new pulumi.Config(namespace);
+    let val: prometheusConfiguration = {
+        enable: promconfig.requireBoolean("enable"),
+        version: promconfig.require("version"),
+        k8sNamespace: promconfig.require("k8sNamespace")
+    } 
+    return val;
+}
+export const prometheusConfig = getPrometheusConfig("prometheus");
 
 function getNodeGroupConfig(namespace : string): nodeGroupConfiguration{
     let tempconfig = new pulumi.Config(namespace);
-    // let iamRole = utils.createRole(`${namespace}Role`)
     let val: nodeGroupConfiguration = {
-        enabled: tempconfig.getBoolean("enable") == undefined ? true : tempconfig.requireBoolean("enable"),
+        enable: tempconfig.getBoolean("enable") == undefined ? true : tempconfig.requireBoolean("enable"),
         ami: tempconfig.require("ami"),
         namespace: namespace,
         diskSizeGb: tempconfig.requireNumber("diskSizeGb"),
@@ -95,8 +110,6 @@ function getNodeGroupConfig(namespace : string): nodeGroupConfiguration{
         nodeCount: tempconfig.requireNumber("nodeCount"),
         k8sVersion: stackConfig.require("k8sVersion"),
         publickey: stackConfig.require("pubKey"),
-        // iamRole: iamRole,
-        // instanceProfile: new aws.iam.InstanceProfile(`${namespace}Profile`, {role: iamRole}),
         config: tempconfig,
     };
     return val;

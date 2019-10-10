@@ -21,7 +21,7 @@ let backendLabels: {[key: string]: string} = {
 
 
 //IF DS NODEPOOL IS ENABLED, CREATE AND ASSIGN IAM POLICIES
-if (config.dsNodeGroupConfig.enabled){
+if (config.dsNodeGroupConfig.enable){
     dsNodesCredentials = utils.createNodeGroupCredentials(config.dsNodeGroupConfig.namespace)
     new aws.iam.RolePolicyAttachment("dsnodes-s3-policy", { 
         policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess, 
@@ -40,7 +40,7 @@ else { //DS DEDICATED NODES DISABLED
 
 
 //IF FRONTEND NODEPOOL IS ENABLED, CREATE AND ASSIGN IAM POLICIES
-if (config.frontendNodeGroupConfig.enabled){
+if (config.frontendNodeGroupConfig.enable){
     frontendNodesCredentials = utils.createNodeGroupCredentials(config.frontendNodeGroupConfig.namespace)
     tempinstanceRoles.push(frontendNodesCredentials.iamRole)  
 }
@@ -65,7 +65,7 @@ const workerNodeGroup = clusterLib.createNodeGroup(config.workerNodeGroupConfig,
                                                    workerNodesCredentials.instanceProfile, backendLabels);
                                                    
 //CREATE FRONTEND DEDICATED NODES
-if (config.frontendNodeGroupConfig.enabled){
+if (config.frontendNodeGroupConfig.enable){
     const frontendLabels = {
         "frontend": "true",
         "kubernetes.io/role": "frontend"
@@ -88,7 +88,19 @@ if (config.frontendNodeGroupConfig.enabled){
                                     frontendNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
     clusterLib.addSecurityGroupRule("traffic-from-frontend8080", 8080, 
-                                    workerNodeGroup.nodeSecurityGroup.id, undefined, frontendNodeGroup.nodeSecurityGroup.id)
+                                    workerNodeGroup.nodeSecurityGroup.id, undefined, frontendNodeGroup.nodeSecurityGroup.id);
+    
+    if (config.prometheusConfig.enable){
+        clusterLib.addSecurityGroupRule("prometheus-kubeproxy", 10249,
+                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
+
+        clusterLib.addSecurityGroupRule("prometheus-kubelet", 10250,
+                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
+    
+        clusterLib.addSecurityGroupRule("prometheus-nodeexp", 9100,
+                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
+    }
+
 
     //if dedicatedFrontend nodes are enabled, attach LB to frontend, else attach to workerNodes
     groupNeedingLBAttachment = frontendNodeGroup;
@@ -104,7 +116,7 @@ else { //IF NOT USING DEDICATED FRONTEND NODES
 }
 
 //CREATE DS DEDICATED NODES
-if (config.dsNodeGroupConfig.enabled){
+if (config.dsNodeGroupConfig.enable){
     const dsLabels = {
         "ds": "true",
         "kubernetes.io/role": "ds"
@@ -125,6 +137,14 @@ if (config.dsNodeGroupConfig.enabled){
     ingressPortMap["ldaps"] = 1636;
     ingressPortMap["http"] = 8080;
     ingressPortMap["https"] = 8443;
+    
+    if (config.prometheusConfig.enable){
+        ingressPortMap["prometheus-kubeproxy"] = 10249
+        ingressPortMap["prometheus-kubelet"] = 10250
+        ingressPortMap["prometheus-nodeexp"] = 9100
+    }
+
+
     for (let portName in ingressPortMap){
         clusterLib.addSecurityGroupRule(`DS-${portName}`, ingressPortMap[portName], dsNodeGroup.nodeSecurityGroup.id, 
                                         undefined, workerNodeGroup.nodeSecurityGroup.id);
@@ -152,4 +172,9 @@ if (config.ingressConfig.enable){
 // ********************** CERTIFICATE MANAGER ************** 
 if (config.cmConfig.enable){
     const certmng = clusterLib.createCertManager(cluster);
+}
+
+// ********************** PROMETHEUS ************** 
+if (config.prometheusConfig.enable){
+    const certmng = clusterLib.createPrometheus(cluster);
 }
