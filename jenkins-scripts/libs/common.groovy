@@ -43,6 +43,8 @@ ROOT_LEVEL_IMAGE_NAMES = [
         'amster'    : 'gcr.io/forgerock-io/amster',
         'ds'        : 'gcr.io/forgerock-io/ds',
         'ds-empty'  : 'gcr.io/forgerock-io/ds-empty',
+        'ds-cts'    : 'gcr.io/forgerock-io/ds-empty',
+        'ds-idrepo' : 'gcr.io/forgerock-io/ds-empty',
         'idm'       : 'gcr.io/forgerock-io/idm',
         'ig'        : 'gcr.io/forgerock-io/ig',
 ]
