@@ -48,7 +48,7 @@ function getK8sVersion() {
 // Create node pool configuration
 function createNP(nodeConfig: any): object { 
     return { 
-        initialNodeCount: nodeConfig.initialNodeCount,
+        initialNodeCount: nodeConfig.nodeCount ? undefined : nodeConfig.initialNodeCount,
         version: getK8sVersion().latestNodeVersion,
         name: nodeConfig.nodePoolName,
         nodeConfig: {
@@ -72,7 +72,7 @@ function createNP(nodeConfig: any): object {
             preemptible: nodeConfig.preemptible,
             //localSsdCount: 1
         },
-        nodeCount: nodeConfig.enableAutoScaling ?  undefined : nodeConfig.nodeCount,
+        nodeCount: nodeConfig.enableAutoScaling ?  nodeConfig.minNodes : nodeConfig.nodeCount,
         autoscaling: nodeConfig.enableAutoScaling ? {
             maxNodeCount: nodeConfig.maxNodes,
             minNodeCount: nodeConfig.minNodes

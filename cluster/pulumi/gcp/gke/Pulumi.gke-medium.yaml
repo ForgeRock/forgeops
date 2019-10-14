@@ -19,7 +19,7 @@ config:
   primary:autoScaling: "true"
   primary:maxNodes: "4"
   primary:minNodes: "1"
-  primary:nodeCount: "1"
+  primary:nodeCount: "0"
   primary:nodeMachineType: custom-16-65536
   primary:preemptible: "false"
   secondary:autoScaling: "false"

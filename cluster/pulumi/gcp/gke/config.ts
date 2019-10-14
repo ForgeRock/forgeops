@@ -24,7 +24,7 @@ export const ip = cluster.get<string>("staticIp") || undefined;
 
 // ** CLUSTER CONFIG **
 export const clusterName = cluster.require("name");
-export const nodeZones = cluster.requireObject<string[]>("nodeZones");
+export const nodeZones = cluster.getObject<string[]>("nodeZones") || undefined;
 export const k8sVersion = cluster.get("k8sVersion") || "latest";
 export const nginxVersion = nginx.require("version");
 export const disableIstio = cluster.getBoolean("disableIstio") || true;
@@ -79,7 +79,7 @@ export const primary:NodePool = {
     diskSize: primaryPool.getNumber("diskSizeGb") || 80,
     diskType: primaryPool.get("diskType") || "pd-ssd",
     enableAutoScaling: primaryPool.requireBoolean("autoScaling"),
-    minNodes: primaryPool.getNumber("minNodes") || 1,
+    minNodes: primaryPool.getNumber("minNodes") || 2,
     maxNodes: primaryPool.getNumber("maxNodes") || 4,
     preemptible: primaryPool.requireBoolean("preemptible"),
     nodePoolName: primaryPool.get("name") || "primary",
