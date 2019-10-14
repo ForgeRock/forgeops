@@ -8,7 +8,7 @@ config:
   certmanager:useselfsignedcert: "true"
   certmanager:version: v0.10.0
   cluster:k8sVersion: "1.14"
-  cluster:name: dev-shared-lee
+  cluster:name: dev-shared
   cluster:nodeZones: '["us-east4-b"]'
   ds:enable: "false"
   gcp:project: engineering-devops
