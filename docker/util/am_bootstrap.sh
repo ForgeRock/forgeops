@@ -4,6 +4,8 @@
 # TODO: Deprecate this when we get boot from json support
 set -x
 
+FBC_ENABLED="${FBC_ENABLED:-false}"
+
 BASE_DN="${BASE_DN:-ou=am-config}"
 
 # Configuration store LDAP. Defaults to the configuration store stateful set running in the same namespace.
@@ -14,10 +16,11 @@ DIR_MANAGER_PW_FILE=${DIR_MANAGER_PW_FILE:-/var/run/secrets/configstore/dirmanag
 
 OPENAM_HOME=${OPENAM_HOME:-/home/forgerock/openam}
 # Contexts
+CONFIG_CTX="${OPENAM_HOME}/config"
 SECURITY_CTX="${OPENAM_HOME}/security"
 SECRETS_CTX="${SECURITY_CTX}/secrets"
 KEYSTORES_CTX="${SECURITY_CTX}/keystores"
-KEYS_CTS="${SECURITY_CTX}/keys"
+KEYS_CTX="${SECURITY_CTX}/keys"
 
 # Test the configstore to see if it contains a configuration. Return 0 if configured.
 is_configured() {
@@ -39,22 +42,26 @@ copy_secrets() {
     cp  -L /var/run/secrets/openam/.storepass "${SECRETS_CTX}/default"
     mkdir -p "${KEYSTORES_CTX}"
     cp  -L /var/run/secrets/openam/keystore.jceks "${KEYSTORES_CTX}"
-    mkdir -p "${KEYS_CTS}/amster"
-    cp  -L /var/run/secrets/openam/authorized_keys "${KEYS_CTS}/amster"
+    mkdir -p "${KEYS_CTX}/amster"
+    cp  -L /var/run/secrets/openam/authorized_keys "${KEYS_CTX}/amster"
     cp  -L /var/run/secrets/openam/openam_mon_auth "${SECURITY_CTX}"
     # The new AM secrets API specifies a directory for password secrets. Each file is a key, and the contents are the secret value
     # You can NOT use a leading dot 
     # In your global -> Secret Stores -> default-password-store - configure /home/forgerock/openam/secrets as your Directory
     mkdir -p "${SECRETS_CTX}/encrypted"
-    cp -L /var/run/secrets/openam/.keypass "${SECRETS_CTX}/encrypted/entrypass"
-    cp -L /var/run/secrets/openam/.storepass "${SECRETS_CTX}/encrypted/storepass"
+    cp -L /var/run/secrets/openam/keypass "${SECRETS_CTX}/encrypted/entrypass"
+    cp -L /var/run/secrets/openam/storepass "${SECRETS_CTX}/encrypted/storepass"
 }
 
 bootstrap() {
-    if is_configured;
-    then
+    if [[ "${FBC_ENABLED}" == "true" ]]; then
+        echo "Skipping copying of boot.json as it should be provided with file-based config"
+        return
+    fi
+    if is_configured; then
         echo "Configstore is present. Copying bootstrap"
-        cp -L /var/run/openam/*.json "$OPENAM_HOME"
+        mkdir -p ${CONFIG_CTX}
+        cp -L /var/run/openam/boot.json "${CONFIG_CTX}"
     fi
 }
 

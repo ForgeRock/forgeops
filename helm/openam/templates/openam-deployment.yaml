@@ -82,9 +82,15 @@ spec:
           value: {{ .Values.rootSuffix }}
         - name: CONFIGURATION_LDAP
           value: {{ .Values.configLdapHost }}:{{ .Values.configLdapPort }}
+        - name: FBC_ENABLED
+          value: "{{ .Values.fbcEnabled }}"
         volumeMounts:
-        - name: openam-root
-          mountPath: /home/forgerock/openam
+        - name: openam-security
+          mountPath: /home/forgerock/openam/security
+        {{ if not .Values.fbcEnabled }}
+        - name: openam-config
+          mountPath: /home/forgerock/openam/config
+        {{ end }}
         - name: openam-keys
           mountPath: /var/run/secrets/openam
         - name: openam-boot
@@ -100,8 +106,12 @@ spec:
         - containerPort: 8080
           name: http
         volumeMounts:
-        - name: openam-root
-          mountPath: /home/forgerock/openam
+        {{ if not .Values.fbcEnabled }}
+        - name: openam-config
+          mountPath: /home/forgerock/openam/config
+        {{ end }}
+        - name: openam-security
+          mountPath: /home/forgerock/openam/security
         - name: configstore-secret
           mountPath: /var/run/secrets/configstore
         - name: openam-keys
@@ -149,18 +159,6 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: {{ .Values.livenessTimeout }}
           periodSeconds: {{ .Values.livenessPeriod }}
-      # audit logging containers
-      {{- range .Values.auditLogs }}
-      - name: {{ .name }}
-        image: busybox
-        env:
-        - name: LOGFILE
-          value: {{ .path }}
-        args: [bin/sh, -c, 'while true; do if [ -e $LOGFILE ]; then tail -n+1 -f $LOGFILE; fi; sleep 5; done' ]
-        volumeMounts:
-        - name: openam-root
-          mountPath: /home/forgerock/openam
-      {{- end }}
 {{- with .Values.extraContainers }}
 {{ tpl . $ | trim | indent 6 }}
 {{- end }}
@@ -171,8 +169,18 @@ spec:
           name: webxml
         name: webxml
       {{ end }}
-      - name: openam-root
+      # /home/forgerock/openam/security directory accessible by all containers within pod
+      # this shared directory exists so that the bootstrap init container can copy files provided
+      # as Kubernetes secrets to the location where the openam container will look for them
+      - name: openam-security
         emptyDir: {}
+      # /home/forgerock/openam/config directory accessible by all containers within pod
+      # this shared directory exists so that the bootstrap init container can copy the boot.json file
+      # from the boot-json Kubernetes ConfigMap to the location where the openam container will look for it
+      {{ if not .Values.fbcEnabled }}
+      - name: openam-config
+        emptyDir: {}
+      {{ end }}
       - name: openam-keys
         secret:
           secretName: {{ default "openam-keys" .Values.existingSecrets.openamKeys }}

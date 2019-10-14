@@ -122,21 +122,6 @@ ingress:
     # nginx.ingress.kubernetes.io/cors-allow-headers: "authorization,x-requested-with"
     # nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
 
-# Audit log details for log streaming sidecar containers.
-# AM can now stream audit logs to stdout. This option may be removed in the future.
-auditLogs: []
-
-# auditLogs:
-#   - name: access-logs
-#     path: "/home/forgerock/openam/var/audit/access.audit.json"
-#   - name: activity-logs
-#     path: "/home/forgerock/openam/var/audit/activity.audit.json"
-#   - name: authentication-logs
-#     path: "/home/forgerock/openam/var/audit/authentication.audit.json"
-#   - name: config-logs
-#     path: "/home/forgerock/openam/var/audit/config.audit.json"
-
-
 istio:
   enabled: false
 
