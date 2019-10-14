@@ -27,7 +27,7 @@ void runStage(PipelineRun pipelineRun, String scope) {
                             EXT_FORGEOPS_PATH       : "${env.WORKSPACE}/forgeops"
                     ]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT1_5fFTs/") {
+                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT_5fSmoke_5fTests/") {
                         withGKEPitNoStages(cfg)
                     }
                 }

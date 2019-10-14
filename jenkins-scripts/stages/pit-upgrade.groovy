@@ -8,7 +8,7 @@
 
 import com.forgerock.pipeline.reporting.PipelineRun
 
-void runStage(PipelineRun pipelineRun, String stageName, String scope, String sampleName) {
+void runStage(PipelineRun pipelineRun, String stageName, String scope, String sampleName, String imageName) {
 
     pipelineRun.pushStageOutcome(commonModule.normalizeStageName(stageName), stageDisplayName: stageName) {
         node('google-cloud') {
@@ -20,7 +20,8 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String sa
                     def cfg = [
                         TESTS_SCOPE                     : scope,
                         SAMPLE_NAME                     : sampleName,
-                        CLUSTER_NAMESPACE               : 'upgrade',
+                        DS_IMAGE_NAME                   : imageName,
+                        CLUSTER_NAMESPACE               : "upgrade-${imageName}",
                         CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                         COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
                         COMPONENTS_AM_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
@@ -37,7 +38,7 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String sa
                         EXT_FORGEOPS_PATH               : forgeopsPath
                     ]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Upgrade") {
+                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20PIT_5fUpgrade_5fWith_5f${imageName}_5fImage") {
                         withGKEPitNoStages(cfg)
                     }
                 }

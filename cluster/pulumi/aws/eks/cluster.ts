@@ -1,11 +1,10 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
-import * as awsx from "@pulumi/awsx";
 import * as eks from "@pulumi/eks";
 import * as k8s from "@pulumi/kubernetes";
-import * as utils from "../utils/utils";
 import * as cm from "../../packages/cert-manager";
 import * as ingress from "../../packages/nginx-ingress-controller";
+import * as prometheus from "../../packages/prometheus";
 import * as config from "./config"
 
 
@@ -31,6 +30,16 @@ export function createCertManager(cluster: eks.Cluster){
         dependsOn: [cluster],
     }
     return new cm.CertManager(cmArgs);
+}
+
+export function createPrometheus(cluster: eks.Cluster){
+    const prometheusArgs: prometheus.PkgArgs = {
+        version: config.prometheusConfig.version,
+        namespaceName: config.prometheusConfig.k8sNamespace,
+        cluster: cluster,
+        dependsOn: [cluster],
+    }
+    return new prometheus.Prometheus(prometheusArgs)
 }
 
 export function createStorageClasses(cluster: eks.Cluster){

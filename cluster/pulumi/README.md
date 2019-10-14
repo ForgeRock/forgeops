@@ -71,7 +71,7 @@ These steps need to be carried out inside the cloud providers directory in the p
 1. Install dependencies
 (this generates node_modules directory. This is ignored by git as is too large to commit):
     ```
-    cd forgeops/cluster/pulumi/
+    cd /path/to/forgeops/cluster/pulumi/
     npm install
     ```
 
@@ -89,9 +89,9 @@ These steps need to be carried out inside the cloud providers directory in the p
 If you are storing state in a bucket or using local login, stacks need to have unique names across projects(Pulumi are looking into this https://github.com/pulumi/pulumi/issues/2522).
 Please use format, <projectname>-<deployment name> so in GKE project please use:
     ```
-    cd forgeops/cluster/pulumi/gke/infra
+    cd /path/to/forgeops/cluster/pulumi/gcp/infra
     pulumi stack init gke-infra
-    cd forgeops/cluster/pulumi/gke/cluster
+    cd /path/to/forgeops/cluster/pulumi/gcp/gke
     pulumi stack init gke-small
     ```
 
@@ -120,7 +120,7 @@ pulumi config set --secret <secretVar> <secret>
 #### Deploy your stack
 Once you have configured your stacks, change your directory to the location of the stack, select stack and deploy (or add the -s <stack> flag each time to the up command):
 ```
-cd forgeops/cluster/pulumi/gke/infra
+cd /path/to/forgeops/cluster/pulumi/gke/infra
 pulumi stack select gke-infra
 pulumi up
 ```

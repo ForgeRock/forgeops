@@ -23,7 +23,8 @@ void runStage(PipelineRun pipelineRun, String stageName, String testName, String
                         NAMED_REPORT         : true,
                         STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
                         SKIP_FORGEOPS        : 'True',
-                        EXT_FORGEOPS_PATH    : forgeopsPath
+                        EXT_FORGEOPS_PATH    : forgeopsPath,
+                        PIPELINE_NAME        : "ForgeOps-PIT2-promotion"
                     ]
 
                     testName = testName.replace('_', '_5f')

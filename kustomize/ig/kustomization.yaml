@@ -2,6 +2,7 @@ kind: ""
 apiversion: ""
 commonLabels:
   app: ig
+  component: ig
 resources:
 - deployment.yaml
 - secret.yaml

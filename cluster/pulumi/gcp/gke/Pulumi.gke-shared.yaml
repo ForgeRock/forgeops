@@ -16,7 +16,7 @@ config:
   gcp:zone: us-east4-a
   nginx:enable: "true"
   nginx:version: 0.25.0
-  primary:autoScaling: "false"
+  primary:autoScaling: "true"
   primary:maxNodes: "4"
   primary:minNodes: "1"
   primary:nodeCount: "0"

@@ -21,8 +21,8 @@ instance: ds
 component: ds
 
 image:
-  repository: gcr.io/forgerock-io/ds-empty/docker-build
-  tag: 7.0.0-5a575284741d4de9a2663172570b0aa234d71a46
+  repository: gcr.io/forgerock-io/ds-empty
+  tag: 7.0.0-37857fd088e5717cc3b8c9675d9937a183ab80e8
   pullPolicy: IfNotPresent
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.

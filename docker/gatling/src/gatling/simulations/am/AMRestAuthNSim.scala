@@ -14,7 +14,7 @@ import io.gatling.http.Predef._
 import io.gatling.http.protocol.HttpProtocolBuilder
 import frutil._
 
-
+// Perform a simple authentication against the /json/authenticate endpoint
 class AMRestAuthNSim extends Simulation {
 
     val config = new BenchConfig()

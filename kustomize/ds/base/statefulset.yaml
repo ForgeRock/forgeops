@@ -30,6 +30,15 @@ spec:
                   - directory
               topologyKey: kubernetes.io/hostname
             weight: 100
+            
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: ds
+                operator: Exists
+
       # Create a toleration that allows this pod to be scheduled on a node tainted with affinity:directory
       # This is used to drive directory instances to dedicated nodes for performance.
       # If a node is not tainted, this has no impact.
@@ -39,8 +48,6 @@ spec:
         value: "directory"
       - key: "WorkerDedicatedDS"
         operator: "Exists"
-#      nodeSelector: CLOUD-1630
-#        ds: "true"
       initContainers:
       - name: initialize
         image: ds
