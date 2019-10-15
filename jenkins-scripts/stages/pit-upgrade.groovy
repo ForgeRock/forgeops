@@ -16,6 +16,11 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String de
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
+                String upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DS_VERSION
+                if (imageName == 'ds-empty') {
+                    upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DSEMTPY_VERSION
+                }
+
                 dir('lodestar') {
                     def cfg = [
                         TESTS_SCOPE                     : scope,
@@ -26,8 +31,12 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String de
                         COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
                         COMPONENTS_AM_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
                         COMPONENTS_IDM_IMAGE_TAG        : commonModule.UPGRADE_TEST_BASE_IDM_VERSION,
-                        COMPONENTS_CONFIGSTORE_IMAGE_TAG: commonModule.UPGRADE_TEST_BASE_CONFIGSTORE_VERSION,
-                        COMPONENTS_USERSTORE_IMAGE_TAG  : commonModule.UPGRADE_TEST_BASE_USERSTORE_VERSION,
+                        COMPONENTS_CTSSTORE_IMAGE_TAG   : upgradeDsVersion,
+                        COMPONENTS_CTSSTORE_IMAGE_REPOSITORY  : "gcr.io/forgerock-io/${imageName}/pit1",
+                        COMPONENTS_CTSSTORE_IMAGE_UPGRADE_REPOSITORY  : "gcr.io/forgerock-io/${imageName}/pit1",
+                        COMPONENTS_USERSTORE_IMAGE_TAG  : upgradeDsVersion,
+                        COMPONENTS_USERSTORE_IMAGE_REPOSITORY  : "gcr.io/forgerock-io/${imageName}/pit1",
+                        COMPONENTS_USERSTORE_IMAGE_UPGRADE_REPOSITORY  : "gcr.io/forgerock-io/${imageName}/pit1",
                         COMPONENTS_AM_CATALINAOPTS      : '-server -Dorg.forgerock.donotupgrade=true -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off',
                         // The image used for AM upgrade contains old layout
                         COMPONENTS_AM_UTILIMAGE_TAG     : '7.0.0',

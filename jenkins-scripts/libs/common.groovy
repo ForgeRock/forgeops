@@ -29,12 +29,11 @@ LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
 LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
 
 /** Base product versions for the PIT#2 upgrade test */
-UPGRADE_TEST_BASE_AMSTER_VERSION      = '7.0.0-a220039d37'
-UPGRADE_TEST_BASE_AM_VERSION          = '7.0.0-a220039d37'
-UPGRADE_TEST_BASE_IDM_VERSION         = '7.0.0-67e54db'
-UPGRADE_TEST_BASE_CONFIGSTORE_VERSION = '7.0.0-bdc0ce8'
-UPGRADE_TEST_BASE_USERSTORE_VERSION   = '7.0.0-bdc0ce8'
-
+UPGRADE_TEST_BASE_AMSTER_VERSION    = '7.0.0-a220039d37'
+UPGRADE_TEST_BASE_AM_VERSION        = '7.0.0-a220039d37'
+UPGRADE_TEST_BASE_IDM_VERSION       = '7.0.0-67e54db'
+UPGRADE_TEST_BASE_DS_VERSION        = '7.0.0-bdc0ce8'
+UPGRADE_TEST_BASE_DSEMPTY_VERSION   = '7.0.0-5e9e1c7a12dab93be3b81ccee374c44bac7317d8'
 
 /** Root-level image names corresponding to product Helm charts and Dockerfiles in the ForgeOps repo. */
 ROOT_LEVEL_IMAGE_NAMES = [
