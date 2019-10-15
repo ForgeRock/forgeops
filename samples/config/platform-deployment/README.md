@@ -1,1 +1,1 @@
-This config allows to use DS as a shared repository.
+This config allows to use platform deployment.
