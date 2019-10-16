@@ -36,7 +36,7 @@ idmRepo:
 
 image:
   repository: gcr.io/forgerock-io/ds/pit1
-  tag: 7.0.0-37857fd088e5717cc3b8c9675d9937a183ab80e8
+  tag: 7.0.0-e88c6fe9c4afe7126e2e13380d48a10d4c970c46
   pullPolicy: IfNotPresent
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.

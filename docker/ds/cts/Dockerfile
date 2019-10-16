@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-37857fd088e5717cc3b8c9675d9937a183ab80e8
+FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-e88c6fe9c4afe7126e2e13380d48a10d4c970c46
 
 RUN setup-profile --profile am-cts \
                   --set am-cts/tokenExpirationPolicy:ds \
