@@ -5,7 +5,6 @@ resources:
   - ../../ds/idrepo
   - ../../am
   - ../../amster
-#  - ../../config-util
   - ../../ingress
   - platform-config.yaml
 vars:

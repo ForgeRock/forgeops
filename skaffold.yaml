@@ -4,9 +4,6 @@ build:
   artifacts:
   - image: am
     context: docker/am
-# An experimental python client for configuration. Currently not used.
-#  - image: config-util
-#    context: docker/config-util
   - image: amster
     context: docker/amster
   - image: idm
@@ -161,13 +158,10 @@ profiles:
       context: docker/am
     - image: amster
       context: docker/amster
-    # Uncomment this if you want to use amster instead of config-util
     - image: ds-cts
       context: docker/ds/cts
     - image: ds-idrepo
       context: docker/ds/idrepo
-    - image: config-util
-      context: docker/config-util
   deploy:
     kustomize:
       path: ./kustomize/env/am-only
