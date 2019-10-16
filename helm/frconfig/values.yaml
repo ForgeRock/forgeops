@@ -19,7 +19,7 @@ secret:
 git:
   # git repo to clone. The value below is a public git repo that does not require authentication.
   repo: "https://github.com/ForgeRock/forgeops-init.git"
-  branch: 8583ce99f97dccd807da46eaddc701e82bd67987
+  branch: 6283070ffb9c37958d1d45d9fb40b0517df1979c
 
 # Cert manager defaults
 certmanager:
