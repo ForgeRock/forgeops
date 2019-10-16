@@ -18,7 +18,7 @@ void runStage(PipelineRun pipelineRun, String stageName, String scope, String de
 
                 String upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DS_VERSION
                 if (imageName == 'ds-empty') {
-                    upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DSEMTPY_VERSION
+                    upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION
                 }
 
                 dir('lodestar') {
