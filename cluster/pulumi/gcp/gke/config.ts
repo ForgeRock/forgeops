@@ -20,7 +20,7 @@ export const enableCertManager = cm.requireBoolean("enable");
 export const enablePrometheus = prom.requireBoolean("enable");
 
 // ** NETWORK CONFIG **
-export const stackRef = cluster.get("infraStackName") || "gke-infra"
+export const stackRef = cluster.get("infraStackName") || "gcp-infra"
 export const vpcName = cluster.get("vpcName");
 export const ip = cluster.get<string>("staticIp") || undefined;
 

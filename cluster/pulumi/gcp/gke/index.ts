@@ -14,7 +14,7 @@ const infra = {
 }
 
 /******************* VPC *******************/
-// Function to either grab VPC from gke-infra project or copy VPC name from user
+// Function to either grab VPC from gcp-infra project or copy VPC name from user
 function assignVpc() {
     // Create new network if not provided
     if (infra.vpcId === undefined) {  
