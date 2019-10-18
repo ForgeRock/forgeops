@@ -41,7 +41,7 @@ config:
 
 image:
   repository: gcr.io/forgerock-io/amster/pit1
-  tag: 7.0.0-365a5a021abfdf2ca94326d6b7650b7b155bbca7
+  tag: 7.0.0-ad7201f8227cc20363a01ae23ee00345adcf297a
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 
