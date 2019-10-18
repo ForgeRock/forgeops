@@ -25,7 +25,6 @@ export function createCertManager(cluster: eks.Cluster){
         tlsKey: config.cmConfig.tlsKey || "",
         tlsCrt: config.cmConfig.tlsCrt || "",
         cloudDnsSa: config.cmConfig.cloudDnsSa || "",
-        clusterKubeconfig: cluster.kubeconfig,
         clusterProvider: cluster.provider,
         dependsOn: [cluster],
     }
