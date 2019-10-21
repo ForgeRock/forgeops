@@ -5,6 +5,7 @@ import * as config from "./config";
 import * as ingress from "../../packages/nginx-ingress-controller/index-gke";
 import { Provider } from "@pulumi/gcp";
 import * as cm from "../../packages/cert-manager";
+import * as prometheus from "../../packages/prometheus";
 
 // To be finished...
 // export function createNetworkLoadbalancer(vpc: gcp.compute.Network, ip: gcp.compute.Address, instanceGroups: pulumi.Output<string[]>){
@@ -299,4 +300,16 @@ export function deployCertManager(clusterProvider: Provider, kubeconfig: any, cl
 
     // Deploy Cert Manager
     new cm.CertManager(cmArgs);
+}
+
+/************ PROMETHEUS OPERATOR ************/
+
+export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.Provider){
+    const prometheusArgs: prometheus.PkgArgs = {
+        version: config.prometheusConfig.version,
+        namespaceName: config.prometheusConfig.k8sNamespace,
+        provider: provider,
+        dependsOn: [cluster],
+    }
+    return new prometheus.Prometheus(prometheusArgs)
 }

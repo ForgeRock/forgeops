@@ -176,5 +176,5 @@ if (config.cmConfig.enable){
 
 // ********************** PROMETHEUS ************** 
 if (config.prometheusConfig.enable){
-    const certmng = clusterLib.createPrometheus(cluster);
+    const prom = clusterLib.createPrometheus(cluster);
 }

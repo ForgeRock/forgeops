@@ -22,6 +22,9 @@ config:
   primary:nodeCount: "0"
   primary:nodeMachineType: custom-4-16384
   primary:preemptible: "false"
+  prometheus:enable: "true"
+  prometheus:k8sNamespace: monitoring
+  prometheus:version: 6.4.2
   secondary:autoScaling: "false"
   secondary:enable: "false"
   secondary:nodeCount: "0"

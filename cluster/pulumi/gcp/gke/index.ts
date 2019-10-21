@@ -65,7 +65,9 @@ if (config.enableCertManager){
     gke.deployCertManager(clusterProvider, kube, cluster);
 }
 
-
-
+// ********************** PROMETHEUS ************** 
+if (config.enablePrometheus){
+    gke.createPrometheus(cluster, clusterProvider);
+}
 
 

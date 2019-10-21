@@ -6,6 +6,7 @@ const nginx = new Config("nginx");
 const primaryPool = new Config("primary");
 const secondaryPool = new Config("secondary");
 const cm = new Config("certmanager");
+const prom = new Config("prometheus");
 const dsPool = new Config("ds");
 
 // ** PROJECT CONFIG **
@@ -16,9 +17,10 @@ export const enableSecondaryPool = secondaryPool.requireBoolean("enable");
 export const enableDSPool = dsPool.requireBoolean("enable");
 export const enableNginxIngress = nginx.requireBoolean("enable");
 export const enableCertManager = cm.requireBoolean("enable");
+export const enablePrometheus = prom.requireBoolean("enable");
 
 // ** NETWORK CONFIG **
-export const stackRef = cluster.get("infraStackName") || "gke-infra"
+export const stackRef = cluster.get("infraStackName") || "gcp-infra"
 export const vpcName = cluster.get("vpcName");
 export const ip = cluster.get<string>("staticIp") || undefined;
 
@@ -123,6 +125,22 @@ export const ds:NodePool = {
     },
 };
 
+// PROMETHEUS VALUES
+export interface prometheusConfiguration {
+    enable: boolean;
+    k8sNamespace: string;
+    version: string;
+}
 
+function getPrometheusConfig(namespace: string): prometheusConfiguration {
+    let promconfig = new pulumi.Config(namespace);
+    let val: prometheusConfiguration = {
+        enable: promconfig.requireBoolean("enable"),
+        version: promconfig.require("version"),
+        k8sNamespace: promconfig.require("k8sNamespace")
+    } 
+    return val;
+}
+export const prometheusConfig = getPrometheusConfig("prometheus");
 
 
