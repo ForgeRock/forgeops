@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-9a0eed54650c1b25f871fac524f7eda30ad24ad0
+FROM gcr.io/forgerock-io/ds-empty/docker-build:7.0.0-7ef42d9a34b5b829d10ca251e6a17d6eff93d678
 
 USER forgerock
 COPY --chown=forgerock:root .  /opt/opendj/
