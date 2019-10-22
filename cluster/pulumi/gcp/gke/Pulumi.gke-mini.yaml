@@ -19,8 +19,8 @@ config:
   primary:initialNodeCount: "0"
   primary:nodeCount: "1"
   primary:nodeMachineType: n1-standard-2
-  primary:preemptible: "false"
-  prometheus:enable: "false"
+  primary:preemptible: "true"
+  prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.4.2
   secondary:autoScaling: "false"
