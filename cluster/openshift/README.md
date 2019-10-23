@@ -80,20 +80,19 @@ Resolving deltas: 100% (51936/51936), done.
 + grep -q libvirt
 + + go build -ldflags  -X github.com/openshift/installer/pkg/version.Raw=unreleased-master-1748-g596d9cf8592b9aedec683a90d75763beca06e5cd -X github.com/openshift/installer/pkg/version.Commit=596d9cf8592b9aedec683a90d75763beca06e5cd -s -w -tags  release -o bin/openshift-install ./cmd/openshift-install
 ```
-Create a config file for the installer that contains your SSH public key and your Red Hat pull secrets.
-
+Create file to contain your secrets:
 ```
 cp cluster/openshift/env/example-secrets.yaml cluster/openshift/env/local.yaml
 ```
 
-Now edit `local.yaml`
+Now edit `local.yaml`. Edit SSH public key value (`sshKey`) and Red Hat pull secrets `pullSecret`. `cluster/openshift/env/local.yaml` will be merged with `cluster/openshift/installer-config.yaml` before the installer is run (using `bin/openshift-install.sh`
 
 Now run an install. This will require nearly all privileges on your AWS account (see installer docs). You should have a default profile for the AWS CLI as well.
 
 ```
 # to follow progress `less +F forgerock-openshift/.openshift_install.log`
-bash bin/openshift-install.sh forgerock-openshift
 # last two lines will be kubeadmin and password
+bash bin/openshift-install.sh forgerock-openshift
 ```
 
 
@@ -102,7 +101,7 @@ bash bin/openshift-install.sh forgerock-openshift
 
 Running and deploying to OpenShift is slightly different than working with other clusters. Skaffold deploys containers using the label and the SHA of the image. The runtime for openshift (cri-o) doesn't know how to handle that tagging and will fail to pull images. There are open tickets on both Skaffold and the runtime OpenShift uses `cri-o` to fix compatability.
 
-deploys are two step:
+Deploying involves two steps:
 1. run skaffold build and push to a registry in AWS
 1. use kustomize and `oc` to deploy
 
@@ -169,8 +168,7 @@ The push refers to repository [048497731163.dkr.ecr.us-east-1.amazonaws.com/forg
 ```
 
 
-You will now need to configure Kustomize to change the docker image names to the ones in the registry we created.
-complete this step once.
+Configure Kustomize so that it changes the docker image names to the names you created in the registry.
 
 ```
 bin/openshift-configure-kustomize-images.sh
