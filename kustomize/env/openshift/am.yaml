@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: am
+spec:
+  template:
+    spec:
+      serviceAccount: forgerock-services
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 11111
+      containers:
+      - name: openam
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 10Gi
+          requests:
+            cpu: 11000m
+            memory: 10Gi

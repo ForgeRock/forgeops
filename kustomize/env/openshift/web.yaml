@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  template:
+    spec:
+      serviceAccount: forgerock-webserver
+      securityContext:
+        runAsUser: 0
+

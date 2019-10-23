@@ -1,0 +1,32 @@
+apiVersion: v1
+baseDomain: openshift.forgeops.com
+compute:
+- hyperthreading: Enabled
+  name: worker
+  platform:
+    aws:
+      type: m5.4xlarge
+  replicas: 5
+controlPlane:
+  hyperthreading: Enabled
+  name: master
+  platform: {}
+  replicas: 3
+metadata:
+  creationTimestamp: null
+  name: fropenshift
+networking:
+  clusterNetwork:
+  - cidr: 10.128.0.0/14
+    hostPrefix: 23
+  machineCIDR: 10.0.0.0/16
+  networkType: OpenShiftSDN
+  serviceNetwork:
+  - 172.30.0.0/16
+platform:
+  aws:
+    userTags:
+      zone: sandbox
+      usecase: forgerock-benchmarks
+      team: cloud-deployment
+    region: us-east-1

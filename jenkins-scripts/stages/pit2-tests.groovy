@@ -12,7 +12,7 @@ void runStage(pipelineRun) {
         UpgradeDS: { upgradeTests.runStage(pipelineRun, 'PIT Upgrade With ds Image', 'tests/upgrade', 'ds-shared-repo', 'ds') },
         UpgradeDSEmpty: { upgradeTests.runStage(pipelineRun, 'PIT Upgrade With ds-empty Image', 'tests/upgrade', 'ds-shared-repo', 'ds-empty') },
         PerfStack: { perfTests.runStage(pipelineRun, 'Perf Stack', 'stack', 'jenkins.yaml') },
-        PerfAuthnSharedRepo: { perfTests.runStage(pipelineRun, 'Perf AuthN', 'authn_rest', 'jenkins-dssr.yaml') },
+        PerfAuthnSharedRepo: { perfTests.runStage(pipelineRun, 'Perf AuthN', 'authn_rest', 'jenkins.yaml') },
         PerfDSCrudShared: { perfTests.runStage(pipelineRun, 'Perf CRUD on simple managed users', 'simple_managed_users_ds_shared_repo', 'jenkins.yaml') }
     ]
     

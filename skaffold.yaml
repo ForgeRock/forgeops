@@ -1,12 +1,11 @@
 apiVersion: skaffold/v1beta12
 kind: Config
+
+# Default profile
 build:
   artifacts:
   - image: am
     context: docker/am
-# An experimental python client for configuration. Currently not used.
-#  - image: config-util
-#    context: docker/config-util
   - image: amster
     context: docker/amster
   - image: idm
@@ -20,29 +19,11 @@ build:
 deploy:
   kustomize:
     path: ./kustomize/env/example
+
+# Additional profiles
 profiles:
-# Example.forgeops deployment to default.iam.forgeops.com - uses a Let's Encrypt cert.
-- name: gke
-  deploy:
-    kustomize:
-      path: ./kustomize/env/dev
-# AM with File Based Config
-- name: fbc
-  build:
-    artifacts:
-    - image: am
-      context: docker/am-fbc
-    - image: amster
-      context: docker/amster
-    - image: ds-cts
-      context: docker/ds/cts
-    - image: ds-idrepo
-      context: docker/ds/idrepo
-    - image: idm
-      context: docker/idm
-  deploy:
-    kustomize:
-      path: ./kustomize/env/example
+
+# Smoke tests
 - name: smoke
   build:
     artifacts:
@@ -65,46 +46,8 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/smoke
-- name: fbc-smoke
-  build:
-    artifacts:
-    - image: ig
-      context: docker/ig
-    - image: forgeops-tests
-      context: docker/forgeops-tests
-    - image: am
-      context: docker/am-fbc
-    - image: amster
-      context: docker/amster
-    - image: idm
-      context: docker/idm
-    - image: ds-cts
-      context: docker/ds/cts
-    - image: ds-idrepo
-      context: docker/ds/idrepo
-    tagPolicy:
-      gitCommit: {}
-  deploy:
-    kustomize:
-      path: ./kustomize/env/smoke
-- name: medium
-  build:
-    artifacts:
-    - image: am
-      context: docker/am
-    - image: ds-idrepo
-      context: docker/ds/idrepo
-    - image: ds-cts
-      context: docker/ds/cts
-    - image: idm
-      context: docker/idm
-    - image: amster
-      context: docker/amster
-    tagPolicy:
-      sha256: {}
-  deploy:
-    kustomize:
-      path: ./kustomize/env/medium
+
+# CDM s/m/l profiles. (For cdm-mini, use default profile.)
 - name: small
   build:
     artifacts:
@@ -125,6 +68,24 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/small
+- name: medium
+  build:
+    artifacts:
+    - image: am
+      context: docker/am
+    - image: ds-idrepo
+      context: docker/ds/idrepo
+    - image: ds-cts
+      context: docker/ds/cts
+    - image: idm
+      context: docker/idm
+    - image: amster
+      context: docker/amster
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/medium
 - name: large
   build:
     artifacts:
@@ -145,8 +106,9 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/env/large
+
 # Sample profiles to launch / test just a specific product
-- name: ig
+- name: ig-only
   build:
     artifacts:
     - image: ig
@@ -161,18 +123,14 @@ profiles:
       context: docker/am
     - image: amster
       context: docker/amster
-    # Uncomment this if you want to use amster instead of config-util
     - image: ds-cts
       context: docker/ds/cts
     - image: ds-idrepo
       context: docker/ds/idrepo
-    - image: config-util
-      context: docker/config-util
   deploy:
     kustomize:
       path: ./kustomize/env/am-only
-# Sample ds development deployment
-- name: ds
+- name: ds-only
   build:
     artifacts:
     - image: ds-idrepo

@@ -22,7 +22,7 @@ void runStage(PipelineRun pipelineRun, String scope) {
                     def cfg = [
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                             TESTS_SCOPE             : scope,
-                            SAMPLE_NAME             : 'smoke-deployment',
+                            DEPLOYMENT_NAME         : 'smoke-deployment',
                             SKIP_FORGEOPS           : 'True',
                             EXT_FORGEOPS_PATH       : "${env.WORKSPACE}/forgeops"
                     ]

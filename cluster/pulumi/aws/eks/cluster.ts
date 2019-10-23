@@ -36,7 +36,7 @@ export function createPrometheus(cluster: eks.Cluster){
     const prometheusArgs: prometheus.PkgArgs = {
         version: config.prometheusConfig.version,
         namespaceName: config.prometheusConfig.k8sNamespace,
-        cluster: cluster,
+        provider: cluster.provider,
         dependsOn: [cluster],
     }
     return new prometheus.Prometheus(prometheusArgs)

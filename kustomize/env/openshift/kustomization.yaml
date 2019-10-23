@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: default
+resources:
+- ../cdm
+- ../../ds/cts-medium
+- ../../ds/idrepo-medium
+- storage.yaml
+- sa.yaml
+- scc.yaml
+patchesStrategicMerge:
+- am.yaml
+- idm.yaml
+- web.yaml
+- platform-config.yaml
+# apply same patch to all ds statefullsets
+patches:
+- path: ds.yaml
+  target:
+    kind: StatefulSet
+    name: ds

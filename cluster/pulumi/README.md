@@ -90,7 +90,7 @@ If you are storing state in a bucket or using local login, stacks need to have u
 Please use format, <projectname>-<deployment name> so in GKE project please use:
     ```
     cd /path/to/forgeops/cluster/pulumi/gcp/infra
-    pulumi stack init gke-infra
+    pulumi stack init gcp-infra
     cd /path/to/forgeops/cluster/pulumi/gcp/gke
     pulumi stack init gke-small
     ```
@@ -121,10 +121,10 @@ pulumi config set --secret <secretVar> <secret>
 Once you have configured your stacks, change your directory to the location of the stack, select stack and deploy (or add the -s <stack> flag each time to the up command):
 ```
 cd /path/to/forgeops/cluster/pulumi/gke/infra
-pulumi stack select gke-infra
+pulumi stack select gcp-infra
 pulumi up
 ```
-NOTE: You need to do this for every stack. i.e.: deploy the gke-infra stack first and then gke-small
+NOTE: You need to do this for every stack. i.e.: deploy the gcp-infra stack first and then gke-small
 
 Grab kubeconfig output from stack and set context:
 ```

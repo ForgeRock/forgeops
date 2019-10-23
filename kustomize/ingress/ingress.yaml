@@ -5,6 +5,7 @@ kind: Ingress
 metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
+    haproxy.router.openshift.io/cookie_name: route
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/session-cookie-hash: sha1
     nginx.ingress.kubernetes.io/session-cookie-name: route

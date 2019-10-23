@@ -1,10 +1,9 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as eks from "@pulumi/eks";
 
 export interface PkgArgs {
     version: string;
     namespaceName: string;
-    cluster: eks.Cluster;
+    provider: k8s.Provider;
     dependsOn: any[];
 }
 
@@ -23,14 +22,15 @@ export class Prometheus {
 
     constructor(args: PkgArgs) {
         this.version = args.version;
-        this.provider = args.cluster.provider;
+        //this.provider = args.cluster.provider;
+        this.provider = args.provider;
         this.namespaceName = args.namespaceName;
 
         const namespace = new k8s.core.v1.Namespace("prometheusNamespace", {
             metadata: {
                 name: this.namespaceName
             }}, 
-            {provider: args.cluster.provider, dependsOn:args.dependsOn})
+            {provider: args.provider, dependsOn:args.dependsOn})
         this.namespace = namespace;
 
         function addNamespace (o: any): void{
@@ -112,7 +112,7 @@ export class Prometheus {
                     createCustomResource: false,
                 },
             },
-        }, {provider:  args.cluster.provider, dependsOn: [namespace].concat(args.dependsOn)});
+        }, {provider:  args.provider, dependsOn: [namespace].concat(args.dependsOn)});
 
         const forgerockMetrics = new k8s.helm.v2.Chart("forgerock-metrics", {
             path: "../../packages/prometheus/forgerock-metrics",
@@ -139,6 +139,6 @@ export class Prometheus {
                     enabled: false
                 }
             }
-        }, {provider:  args.cluster.provider, dependsOn: [namespace, prometheusOperator].concat(args.dependsOn)});
+        }, {provider:  args.provider, dependsOn: [namespace, prometheusOperator].concat(args.dependsOn)});
     }
 }
