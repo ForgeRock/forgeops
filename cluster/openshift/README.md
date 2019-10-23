@@ -1,17 +1,17 @@
-# Openshift Cluster
+# OpenShift Cluster
 
 
-## Create a redhat developer account
+## Create a Red Hat developer account
 
-[Create redhat account.](https://developers.redhat.com/)
-[Get the registry secrets.](https://cloud.redhat.com/openshift/install/aws/installer-provisioned) via the "Download pull secrets" and `Download command-line tools`
+[Create Red Hat account.](https://developers.redhat.com/)
+[Get the registry secrets.](https://cloud.Red Hat.com/openshift/install/aws/installer-provisioned) see the `Download pull secrets` and `Download command-line tools` buttons.
 
-you should have `openshift-installer` and `oc` in your path to proceed
+You should have `openshift-installer` and `oc` in your path to proceed.
 
 
 ## install the openshift installer from source
 
-we will use a recent version of the installer which uses okd 4.2 but use some private registries so a redhat developer account is required.
+We will use a recent version of the installer which uses okd 4.2 but use some private registries so a Red Hat developer account is required.
 
 The software `yq` and `jq` is needed.
 ```
@@ -80,7 +80,7 @@ Resolving deltas: 100% (51936/51936), done.
 + grep -q libvirt
 + + go build -ldflags  -X github.com/openshift/installer/pkg/version.Raw=unreleased-master-1748-g596d9cf8592b9aedec683a90d75763beca06e5cd -X github.com/openshift/installer/pkg/version.Commit=596d9cf8592b9aedec683a90d75763beca06e5cd -s -w -tags  release -o bin/openshift-install ./cmd/openshift-install
 ```
-Create a config file for the installer that contains your ssh public key and your redhat pull secrets
+Create a config file for the installer that contains your SSH public key and your Red Hat pull secrets.
 
 ```
 cp cluster/openshift/env/example-secrets.yaml cluster/openshift/env/local.yaml
@@ -88,7 +88,7 @@ cp cluster/openshift/env/example-secrets.yaml cluster/openshift/env/local.yaml
 
 Now edit `local.yaml`
 
-now run an install. This will require nearlly all privileges on your aws account (see installer docs). You should have a default profile for the aws cli as well.
+Now run an install. This will require nearly all privileges on your AWS account (see installer docs). You should have a default profile for the AWS CLI as well.
 
 ```
 # to follow progress `less +F forgerock-openshift/.openshift_install.log`
@@ -97,10 +97,10 @@ bash bin/openshift-install.sh forgerock-openshift
 ```
 
 
-## running forgeops
+## Running forgeops
 
 
-Running and deploying to Openshift is slightly different than working with other clusters. Skaffold deploys containers using the label and the sha of the image. The runtime for openshift (cri-o) doesn't know how to handle that tagging and will fail to pull images. There's open tickets on both skaffold and cri-o, cri-o follows OCI spec, and dockerd and skaffold do not.
+Running and deploying to OpenShift is slightly different than working with other clusters. Skaffold deploys containers using the label and the SHA of the image. The runtime for openshift (cri-o) doesn't know how to handle that tagging and will fail to pull images. There are open tickets on both Skaffold and the runtime OpenShift uses `cri-o` to fix compatability.
 
 deploys are two step:
 1. run skaffold build and push to a registry in AWS
@@ -169,7 +169,7 @@ The push refers to repository [048497731163.dkr.ecr.us-east-1.amazonaws.com/forg
 ```
 
 
-We will now need to configure kustomize to change the docker image names to the ones in the registry we created.
+You will now need to configure Kustomize to change the docker image names to the ones in the registry we created.
 complete this step once.
 
 ```
@@ -188,7 +188,7 @@ There seems to be an issue with continually re-deploying security profiles, so w
 
 Currently it doesn't look like the route objects are being created by the openshift ingress controller. We have to check back later with newer version to see if this is back or if we need to add a custom resource for it.
 
-Add work around route object, this doesn't configure TLS, which can be done too via self signed.
+Add work around route object. This doesn't configure TLS, which can be done self signed.
 ```
 cat << EOF > /tmp/route.yaml
 apiVersion: v1
