@@ -94,6 +94,92 @@ for minikube and can be modified for your environment)
 The various configuration files are located in the `docker` and bundled with their respective
 products (amster, idm, ig, am).
 
+## Managing Configurations (Experimental)
+
+The `bin/config.sh` utility is used to initialize a configuration and to syncronize files to and from a running instance.
+
+A number of configurations are under the [config](config/) folder. The CDK is the default configuration. To
+setup your environment for the cdk:
+
+```bash
+bin/config.sh init
+```
+
+Initialization copies the configuration from the git managed `config` directory to the product's  `docker` folder (for example, docker/idm).
+
+**Note that the configuration files under the `docker/` folder are not maintained in git.**.  They
+are considered temporary build time assets.
+
+You can select alternate configurations, or initialize specific products:
+
+```bash
+# Initializes the "test" configuration with the product idm
+bin/config.sh -p idm -c test init
+# Initialize the "demo" configuration with all products
+bin/config.sh -c test
+#
+```
+
+The `save` command copies the contents of the docker configuration *back* to the config/ folder where it can be versioned in git.
+
+```bash
+# Save the docker/ configuration for all products back to the config/ folder
+bin/config.sh save
+# Save just idm for the test config
+bin/config.sh -p idm -c test save
+```
+
+The `diff` command runs GNU `diff` to show the difference between the `docker/` product folder and the git configuration:
+
+```bash
+bin/config.sh -p idm -c cdk diff
+```
+
+The `export` command is used to export configuration from a running instance (e.g.IDM) back out to the `docker` folder. Note that not all
+products support export functionality (currently just idm).
+
+```bash
+# Export all configs for the cdk configuration
+bin/config.sh export
+# Export idm for the test configuration
+bin/config.sh -p idm -c test export
+```
+
+Finally, the `sync` command combines the `export` and `save` functions into a single command:
+
+```bash
+# Export from all running products to the docker folder, then save the results to the git folder:
+bin/config.sh sync
+# Export and save just idm for the test config
+bin/config.sh -p idm -c test sync
+```
+
+The `git status` command will show you any changes made to the `config` folder. You can decide whether to commit or discard those changes.
+
+To discard, you can run `git restore config`. As a convenience, the command `bin/config.sh restore`  runs this git command for you.
+
+A sample session using the CDK is as follows:
+
+```bash
+bin/config.sh init
+# run cdk configs
+skaffold dev
+# Make changes in the IDM UI. Then:
+bin/config.sh sync
+# See what changed using git
+git status
+# Commmit, or discard your changes
+bin/config.sh restore
+```
+
+To add a new configuration, copy the contents of an existing configuration to your new folder:
+
+```bash
+cd config
+cp -r cdk my_great_config
+git add my_great_config
+```
+
 ## Troubleshooting Tips
 
 Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forgerock.com/docs/platform/6/devops-guide/#chap-devops-troubleshoot).

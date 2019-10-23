@@ -26,3 +26,5 @@ build/
 .gradle/
 key.json
 cue/
+.project
+.settings/
