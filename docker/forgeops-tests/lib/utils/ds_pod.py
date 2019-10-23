@@ -10,9 +10,8 @@ import os
 import shutil
 import zipfile
 # Framework imports
-from utils import logger, kubectl
-from utils.pod import Pod
-
+from lib.utils import logger, kubectl
+from lib.utils.pod import Pod
 
 class DSPod(Pod):
     PRODUCT_TYPE = 'ds'
@@ -35,7 +34,7 @@ class DSPod(Pod):
         """
 
         logger.debug('Get version for {name}'.format(name=self.name))
-        stdout, ignored = kubectl.exec(
+        stdout, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'bin/start-ds', '-F'])
         logger.debug('{name} {product_type}: {version}'.format(
             name=self.name, product_type=self.product_type, version=stdout[0]))
@@ -84,7 +83,7 @@ class DSPod(Pod):
         """Report Java version on the pod."""
 
         logger.debug('Report Java version for {name}'.format(name=self.name))
-        metadata, ignored = kubectl.exec(
+        metadata, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'bin/start-ds', '-s'])
         attribute_of_interest = {'JAVA Version', 'JAVA Vendor', 'JVM Version'}
         os_metadata = Pod.get_metadata_of_interest('JAVA', self.name, metadata, attribute_of_interest)

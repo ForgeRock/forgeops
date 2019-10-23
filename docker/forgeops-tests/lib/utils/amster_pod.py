@@ -10,9 +10,8 @@ import os
 import shutil
 import zipfile
 # Framework imports
-from utils import kubectl, logger
-from utils.pod import Pod
-
+from lib.utils import logger, kubectl
+from lib.utils.pod import Pod
 
 class AmsterPod(Pod):
     PRODUCT_TYPE = 'amster'
@@ -35,7 +34,7 @@ class AmsterPod(Pod):
         """
 
         logger.test_step('Report Amster version for pod {name}'.format(name=self.name))
-        stdout, ignored = kubectl.exec(
+        stdout, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '--', './amster', '-c', self.product_type, '--version'])
         version_text = stdout[0].strip()
 
@@ -75,10 +74,10 @@ class AmsterPod(Pod):
         logger.debug('Check commons version for {name}:{commons_jar}'.
                      format(name=self.name, commons_jar=AmsterPod.REPRESENTATIVE_COMMONS_JAR))
         test_temp = os.path.join(AmsterPod.LOCAL_TEMP, self.name)
-        stdout, ignored = kubectl.exec(
+        stdout, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', AmsterPod.ROOT, '-name', 'amster-*.jar'])
         amster_filepath = stdout[0]
-        head, tail = os.path.split(amster_filepath)  # get versioned amster jar name
+        _head, tail = os.path.split(amster_filepath)  # get versioned amster jar name
         exploded_directory = os.path.join(test_temp, 'exploded')
         amster_jar_filepath = os.path.join(test_temp, tail)
         with zipfile.ZipFile(amster_jar_filepath) as commons_zip_file:

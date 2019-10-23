@@ -10,10 +10,9 @@ import os
 from requests import get
 
 # Framework imports
-from ProductConfig import IDMConfig
-from utils import logger, rest
-from utils.pod import Pod
-
+from config.ProductConfig import IDMConfig
+from lib.utils import logger, rest
+from lib.utils.pod import Pod
 
 class IDMPod(Pod):
     PRODUCT_TYPE = 'openidm'

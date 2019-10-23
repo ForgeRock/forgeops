@@ -16,7 +16,9 @@ spec:
       - name: forgeops-tests
         image: forgeops-tests
         imagePullPolicy: Always
-        command: ["bash", "entrypoint.sh"]
+        command: ["bash", "-c"]
+        #args: ["exec flask run --no-reload --no-debugger --host '0.0.0.0' --port '8080'"]
+        args: ["exec gunicorn tester:app  -b 0.0.0.0:8080 --timeout 180 --access-logfile -"]
         resources:
           limits:
             memory: 1Gi
@@ -24,26 +26,50 @@ spec:
           requests:
             memory: 1Gi
         volumeMounts:
-        - mountPath: /usr/src/app/reports
+        - mountPath: /usr/src/app/tester/reports
           name: reports
         env:
+        - name: SMOKETESTS_USER
+          valueFrom:
+            secretKeyRef:
+              name: forgeops-tester
+              key: SMOKETESTS_USER
+
+        - name: SMOKETESTS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: forgeops-tester
+              key: SMOKETESTS_PASSWORD
+
+        - name: FLASK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: forgeops-tester
+              key: FLASK_SECRET_KEY
+
+        - name: INGRESS_PATH_PREFIX
+          value: /tests
         - name: NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+
+        - name: TESTS_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+
+        - name: TESTS_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              key: DOMAIN
+              name: platform-config
+
+        - name: TESTS_SUBDOMAIN
+          valueFrom:
+            configMapKeyRef:
+              key: SUBDOMAIN
+              name: platform-config
+
         ports:
-          - containerPort: 8081
-      - name: forgeops-tests-reports
-        image: nginx
-        imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            memory: 250Mi
-          requests:
-            memory: 250Mi
-            cpu: 1
-        ports:
-          - containerPort: 80
-        volumeMounts:
-          - mountPath: /usr/share/nginx/html/tests
-            name: reports
+          - containerPort: 8080

@@ -13,6 +13,6 @@ pip3 install kubernetes
 pip3 install beautifulsoup4
 pip3 install pyyaml
 pip3 install prettytable
+pip3 install flask
 
-
-pytest allure-pytest pytest-html pytest-metadata requests kubernetes beautifulsoup4 pyyaml prettytable
+pytest allure-pytest pytest-html pytest-metadata requests kubernetes beautifulsoup4 pyyaml prettytable flask

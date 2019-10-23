@@ -6,9 +6,8 @@ import re
 from requests import get, post, delete
 
 # Framework imports
-from ProductConfig import AMConfig
-from utils import logger, rest
-
+from config.ProductConfig import AMConfig
+from lib.utils import logger, rest
 
 class TestAM(object):
     amcfg = AMConfig()

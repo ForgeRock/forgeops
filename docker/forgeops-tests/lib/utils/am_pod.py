@@ -10,10 +10,9 @@ import os
 from requests import get, post
 
 # Framework imports
-from ProductConfig import AMConfig
-from utils import logger, rest
-from utils.pod import Pod
-
+from lib.utils import logger, rest
+from lib.utils.pod import Pod
+from config.ProductConfig import AMConfig
 
 class AMPod(Pod):
     PRODUCT_TYPE = 'openam'

@@ -9,8 +9,7 @@ import os
 from prettytable import PrettyTable
 
 # Framework imports
-from utils import logger, kubectl
-
+from lib.utils import logger, kubectl
 
 class Pod(object):
 
@@ -97,7 +96,7 @@ class Pod(object):
         """
 
         file_of_interest = 'Forgerock_License.txt'
-        stdout, ignored = kubectl.exec(
+        stdout, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', '.', '-name', file_of_interest])
         file_path = stdout[0].strip()
         logger.debug('Found legal notice: {file}'.format(file=file_path))
@@ -111,7 +110,7 @@ class Pod(object):
         :param jar_name: Jar file to check.
         """
         logger.debug('Check commons version for {name}*.jar'.format(name=jar_name))
-        stdout, ignored = kubectl.exec(
+        stdout, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'find', lib_path, '-name', jar_name + '-*.jar'])
         config_filepath = stdout[0]  # first line of output
         start = config_filepath.find(jar_name)
@@ -130,7 +129,7 @@ class Pod(object):
         """
 
         logger.debug('Check Jaa version for {name}'.format(name=self.name))
-        ignored, metadata = kubectl.exec(
+        _ignored, metadata = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'java', '-version'])  # TODO: why stderr
         java_metadata = Pod.get_metadata_of_interest('Java', self.name, metadata, attributes_of_interest)
         Pod.print_table(java_metadata)
@@ -142,7 +141,7 @@ class Pod(object):
         """
 
         logger.debug('Check OS version for {name}'.format(name=self.name))
-        metadata, ignored = kubectl.exec(
+        metadata, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'cat', '/etc/os-release'])
         os_metadata = Pod.get_metadata_of_interest('OS', self.name, metadata, attributes_of_interest)
         Pod.print_table(os_metadata)
