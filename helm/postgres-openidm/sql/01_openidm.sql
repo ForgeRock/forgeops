@@ -109,9 +109,10 @@ CREATE TABLE openidm.relationships (
   CONSTRAINT fk_relationships_objecttypes FOREIGN KEY (objecttypes_id) REFERENCES openidm.objecttypes (id) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT idx_relationships_object UNIQUE (objecttypes_id, objectid)
 );
-CREATE INDEX idx_json_relationships ON openidm.relationships ( json_extract_path_text(fullobject, 'firstResourceCollection'), json_extract_path_text(fullobject, 'firstResourceId'), json_extract_path_text(fullobject, 'firstPropertyName'), json_extract_path_text(fullobject, 'secondResourceCollection'), json_extract_path_text(fullobject, 'secondResourceId'), json_extract_path_text(fullobject, 'secondPropertyName') );
-CREATE INDEX idx_json_relationships_first_object ON openidm.relationships ( firstresourcecollection, firstresourceid, firstpropertyname );
-CREATE INDEX idx_json_relationships_second_object ON openidm.relationships ( secondresourcecollection, secondresourceid, secondpropertyname );
+CREATE INDEX idx_relationships_first_object ON openidm.relationships ( firstresourcecollection, firstresourceid, firstpropertyname );
+CREATE INDEX idx_relationships_second_object ON openidm.relationships ( secondresourcecollection, secondresourceid, secondpropertyname );
+CREATE INDEX idx_relationships_originfirst ON openidm.relationships (firstresourceid , firstresourcecollection , firstpropertyname , secondresourceid , secondresourcecollection );
+CREATE INDEX idx_relationships_originsecond ON openidm.relationships (secondresourceid , secondresourcecollection , secondpropertyname , firstresourceid , firstresourcecollection );
 
 -- -----------------------------------------------------
 -- Table openidm.links
@@ -311,3 +312,48 @@ CREATE TABLE openidm.files (
   PRIMARY KEY (objectid)
 );
 
+-- -----------------------------------------------------
+-- Table openidm.relationshipresources
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS openidm.relationshipresources (
+  originresourcecollection VARCHAR(255) NOT NULL ,
+  originproperty VARCHAR(100) NOT NULL ,
+  refresourcecollection VARCHAR(255) NOT NULL ,
+  PRIMARY KEY ( originresourcecollection, originproperty,	refresourcecollection));
+
+create or replace
+function fn_relationshiprefs() returns trigger as
+'
+BEGIN
+    IF ( NEW.firstpropertyname IS NOT NULL ) THEN
+      INSERT INTO openidm.relationshipresources
+                  ( originresourcecollection,
+                   originproperty,
+                   refresourcecollection)
+      VALUES      ( NEW.firstresourcecollection,
+                   NEW.firstpropertyname,
+                   NEW.secondresourcecollection )
+      ON CONFLICT ( originresourcecollection,
+                   originproperty,
+                   refresourcecollection) DO NOTHING;
+    END IF;
+    IF ( NEW.secondpropertyname IS NOT NULL ) THEN
+      INSERT INTO openidm.relationshipresources
+                  ( originresourcecollection,
+                   originproperty,
+                   refresourcecollection)
+      VALUES      ( NEW.secondresourcecollection,
+                   NEW.secondpropertyname,
+                   NEW.firstresourcecollection )
+      ON CONFLICT ( originresourcecollection,
+                   originproperty,
+                   refresourcecollection) DO NOTHING;
+    END IF;
+
+    RETURN NEW;
+END;
+' LANGUAGE plpgsql VOLATILE;
+
+CREATE TRIGGER trig_relationshiprefs BEFORE INSERT
+ON openidm.relationships FOR EACH ROW
+EXECUTE PROCEDURE fn_relationshiprefs();
