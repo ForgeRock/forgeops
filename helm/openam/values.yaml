@@ -8,7 +8,7 @@ image:
   repository: gcr.io/forgerock-io/am/pit1
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
-  tag: 7.0.0-4ef544b22f4b618d3d5cd5118da4edff1ab7d72f
+  tag: 7.0.0-fa5ead61ef6b2b05a6e2deb9707ea5c97d2cc3e2
 
 gitImage:
   repository: gcr.io/forgerock-io/git
