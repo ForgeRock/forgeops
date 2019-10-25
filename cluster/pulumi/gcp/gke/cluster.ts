@@ -263,6 +263,7 @@ export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.P
     const prometheusArgs: prometheus.PkgArgs = {
         version: config.prometheusConfig.version,
         namespaceName: config.prometheusConfig.k8sNamespace,
+        k8sVersion: config.k8sVersion,
         provider: provider,
         dependsOn: [cluster],
     }
