@@ -31,7 +31,7 @@ config:
   nginxingress:version: 0.25.1
   prometheus:enable: "false"
   prometheus:k8sNamespace: monitoring
-  prometheus:version: 6.4.2
+  prometheus:version: 6.21.0
   workernodes:ami: ami-08198f90fe8bc57f0
   workernodes:diskSizeGb: "80"
   workernodes:instanceType: m5.xlarge

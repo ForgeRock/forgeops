@@ -24,7 +24,7 @@ config:
   primary:preemptible: "false"
   prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
-  prometheus:version: 6.4.2
+  prometheus:version: 6.21.0
   secondary:autoScaling: "false"
   secondary:enable: "false"
   secondary:nodeCount: "0"
