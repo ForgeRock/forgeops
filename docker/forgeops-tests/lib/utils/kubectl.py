@@ -9,8 +9,7 @@ Utility wrapping the kubectl command
 import subprocess
 
 # Framework imports
-from utils import logger
-
+from lib.utils import logger
 
 KUBECTL_COMMAND = 'kubectl'
 
@@ -56,7 +55,7 @@ def get_product_component_names(namespace, product_type):
 
     command = ' '.join([KUBECTL_COMMAND, '-n', namespace, 'get', 'pods',
                         '--selector=component={product_type}'.format(product_type=product_type)])
-    stdout, ignored = __run_cmd_process(command)
+    stdout, _ignored = __run_cmd_process(command)
     pod_names = []
     for line in stdout:
         logger.debug('Found component {component}'.format(component=line))

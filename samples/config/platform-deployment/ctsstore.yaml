@@ -5,3 +5,4 @@ userstore:
   enabled: false
 idmRepo:
   enabled: false
+replicas: 2

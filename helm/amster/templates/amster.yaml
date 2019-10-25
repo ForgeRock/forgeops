@@ -55,6 +55,8 @@ spec:
         - secretRef:
             name: {{ default "frconfig" .Values.config.name }}-platform
         env:
+        - name: OPENAM_INSTANCE
+          value: {{ .Values.serverBase }}
         - name: NAMESPACE
           valueFrom:
             fieldRef:

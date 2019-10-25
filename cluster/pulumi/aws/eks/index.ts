@@ -166,15 +166,15 @@ clusterLib.createStorageClasses(cluster);
 
 // ********************** INGRESS CONTROLLER **************
 if (config.ingressConfig.enable){
-    const ingressctl = clusterLib.createNginxIngress(cluster)
+    clusterLib.createNginxIngress(cluster)
 }
 
 // ********************** CERTIFICATE MANAGER ************** 
 if (config.cmConfig.enable){
-    const certmng = clusterLib.createCertManager(cluster);
+    clusterLib.createCertManager(cluster);
 }
 
 // ********************** PROMETHEUS ************** 
 if (config.prometheusConfig.enable){
-    const prom = clusterLib.createPrometheus(cluster);
+    clusterLib.createPrometheus(cluster);
 }

@@ -1,2 +1,7 @@
 configLdapHost: userstore-0.userstore
 configSecretName: userstore
+am:
+  instance: http://am:80/am
+service:
+  name: am
+openamReplicaCount: 1

@@ -1,4 +1,4 @@
 instance: userstore
 cts:
   enabled: false
-replicas: 1
+replicas: 2

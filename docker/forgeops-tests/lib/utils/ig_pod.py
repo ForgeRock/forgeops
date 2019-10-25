@@ -9,9 +9,8 @@ Metadata related to a kubernetes AM pod.
 import os
 
 # Framework imports
-from utils import logger, kubectl
-from utils.pod import Pod
-
+from lib.utils import logger, kubectl
+from lib.utils.pod import Pod
 
 class IGPod(Pod):
     PRODUCT_TYPE = 'openig'
@@ -36,7 +35,7 @@ class IGPod(Pod):
         test_jar_properties_path = os.path.join(IGPod.ROOT, 'webapps', 'ROOT', 'META-INF', 'maven', 'org.forgerock.openig', 'openig-war',
                                                 'pom.properties')
         attributes_of_interest = {'version', 'groupId', 'artifactId'}
-        metadata, ignored = kubectl.exec(
+        metadata, _ignored = kubectl.exec(
             Pod.NAMESPACE, [self.name, '-c', self.product_type, '--', 'cat', test_jar_properties_path])
         version_metadata = Pod.get_metadata_of_interest(self.product_type, self.name, metadata, attributes_of_interest)
         return version_metadata

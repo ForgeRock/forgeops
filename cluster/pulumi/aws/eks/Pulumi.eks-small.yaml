@@ -38,3 +38,4 @@ config:
   workernodes:maxNodes: "4"
   workernodes:minNodes: "0"
   workernodes:nodeCount: "2"
+

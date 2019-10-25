@@ -79,3 +79,4 @@ helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.i
 
 # Install/Upgrade forgerock-servicemonitors
 helm upgrade -i ${NAMESPACE}-forgerock-metrics ../helm/forgerock-metrics $CUSTOM_FILE --set=rbac.install=true --namespace=$NAMESPACE
+

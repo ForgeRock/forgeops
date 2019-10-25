@@ -3,10 +3,9 @@ Couple of basic integration tests between AM and IDM using shared id_repo
 """
 import json
 
-from ProductConfig import AMConfig, IDMConfig
-from utils import logger, rest
 from requests import get
-
+from config.ProductConfig import AMConfig, IDMConfig
+from lib.utils import logger, rest
 
 class TestIntegration(object):
     amcfg = AMConfig()

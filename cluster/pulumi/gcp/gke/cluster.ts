@@ -18,14 +18,14 @@ import * as prometheus from "../../packages/prometheus";
 //         unhealthyThreshold: 3,
 //         port: 30080
 //     });
-    
+
 //     const targetBackend = new gcp.compute.BackendService("targetBackend", {
 //         healthChecks: defaultHttpHealthCheck.selfLink,
 //         backends: [{
 //             group: instanceGroups[0],
-            
+
 //         }]
-        
+
 //     });
 
 //     const defaultForwardingRule = new gcp.compute.ForwardingRule("default", {
@@ -47,8 +47,8 @@ function getK8sVersion() {
 }
 
 // Create node pool configuration
-function createNP(nodeConfig: any): object { 
-    return { 
+function createNP(nodeConfig: any): object {
+    return {
         initialNodeCount: nodeConfig.nodeCount ? undefined : nodeConfig.initialNodeCount,
         version: getK8sVersion().latestNodeVersion,
         name: nodeConfig.nodePoolName,
@@ -100,7 +100,7 @@ function addNodePools() {
     } else {
         return [
             createNP(config.primary)
-        ]  
+        ]
     };
 }
 
@@ -136,7 +136,7 @@ export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
     });
 }
 
-// Create kube config 
+// Create kube config
 export function createKubeconfig(cluster: gcp.container.Cluster) {
     return pulumi.
     all([ cluster.name, cluster.endpoint, cluster.masterAuth ]).
@@ -170,52 +170,8 @@ users:
 });
 };
 
-// exporting kubeconfig in JSON format to resolve cert-manager issue. Will be consolidated with above.
-export function createKubeconfigJson(cluster: gcp.container.Cluster) {
-    return pulumi.
-    all([ cluster.name, cluster.endpoint, cluster.masterAuth ]).
-    apply(([ name, endpoint, masterAuth ]) => {
-        const context = `${gcp.config.project}_${gcp.config.zone}_${name}`;
-        return {
-            apiVersion: "v1",
-            clusters: [{
-                cluster: {
-                    "certificate-authority-data": masterAuth.clusterCaCertificate,
-                    server: "https://" + endpoint,
-                },
-                name: context
-            }],
-            contexts: [{
-                context: {
-                    cluster: context,
-                    user: context,
-                },
-                name: context,               
-            }],
-            "current-context": context,
-            kind: "Config",
-            preferences: {},
-            users: [{
-                name: context,
-                user: {
-                    "auth-provider": {
-                        config: {
-                            "cmd-args": "config config-helper --format=json",
-                            "cmd-path": "gcloud",
-                            "expiry-key": '{.credential.token_expiry}',
-                            "token-key": '{.credential.access_token}',                       
-                        },
-                        name: "gcp"
-                    },
-                },
-            }],   
-        };
-    });
-};
-
-
 // Create a Kubernetes provider instance that uses our cluster from above.
-export function createClusterProvider(k8sConfig: pulumi.Output<string>) { 
+export function createClusterProvider(k8sConfig: pulumi.Output<string>) {
 
     return new k8s.Provider("dev-cluster-provider", {
         kubeconfig: k8sConfig,
@@ -229,7 +185,7 @@ export function createStorageClasses(clusterProvider: k8s.Provider) {
         provisioner: 'kubernetes.io/gce-pd',
         parameters: { type: 'pd-ssd' },
     }, { provider: clusterProvider } );
-    
+
     new k8s.storage.v1.StorageClass("sc-local-nvme", {
         metadata: { name: 'local-nvme' },
         provisioner: 'kubernetes.io/no-provisioner',
@@ -268,7 +224,7 @@ export function assignIp() {
 // Call ngin-ingress-controller package to deploy Nginx Ingress Controller
 export function deployIngressController(ip: pulumi.Output<string>, clusterProvider: Provider, cluster: gcp.container.Cluster) {
     const nginxConfig = new pulumi.Config("nginx");
-        
+
     // Set values for nginx Helm chart
     const nginxValues: ingress.ChartArgs = {
         ip: ip,
@@ -284,14 +240,13 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
 /************ CERTIFICATE MANAGER ************/
 
 // Call cert-manager package to deploy cert-manager
-export function deployCertManager(clusterProvider: Provider, kubeconfig: any, cluster: gcp.container.Cluster) {
+export function deployCertManager(clusterProvider: Provider, cluster: gcp.container.Cluster) {
     const cmConfig = new pulumi.Config("certmanager");
 
     const cmArgs: cm.PkgArgs = {
         tlsKey: cmConfig.require("tls-key"),
         tlsCrt: cmConfig.require("tls-crt"),
         clusterProvider: clusterProvider,
-        clusterKubeconfig: kubeconfig,
         cloudDnsSa: cmConfig.get("clouddns") || "",
         dependsOn: [cluster],
         version: cmConfig.require("version"),

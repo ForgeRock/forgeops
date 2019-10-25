@@ -15,8 +15,7 @@ import requests
 from requests import post, get, delete
 
 # Framework imports
-from utils import logger, rest
-import utils.cmd
+from lib.utils import logger, rest, cmd
 
 # Global flag to enable/disable verification of certificates
 try:
@@ -30,26 +29,22 @@ def is_cluster_mode():
 
 
 def is_minikube_context():
-    out, err = utils.cmd.run_cmd('kubectl config current-context')
+    out, _err = cmd.run_cmd('kubectl config current-context')
     return out.decode("utf-8").strip() == 'minikube'
 
 
 def tests_namespace():
-    if 'TESTS_NAMESPACE' in os.environ:
-        return os.environ['TESTS_NAMESPACE']
-    else:
-        return 'smoke'
+    return os.environ.get('TESTS_NAMESPACE', 'smoke').lstrip('.')
 
+def tests_subdomain():
+    return os.environ.get('TESTS_SUBDOMAIN', 'iam').lstrip('.')
 
 def tests_domain():
-    if 'TESTS_DOMAIN' in os.environ:
-        return os.environ['TESTS_DOMAIN'].lstrip('.')
-    else:
-        return 'forgeops.com'
+    return os.environ.get('TESTS_DOMAIN', 'forgeops.com').lstrip('.')
 
 
 def base_url():
-    return 'https://%s.iam.%s' % (tests_namespace(), tests_domain())
+    return 'https://{}.{}.{}'.format(tests_namespace(), tests_subdomain(), tests_domain())
 
 
 class AMConfig(object):
@@ -279,6 +274,7 @@ class DSConfig(object):
         self.ctsstore0_rest_ping_url = self.ctsstore0_url + '/alive'
         self.configstore0_rest_ping_url = self.configstore0_url + '/alive'
         self.ssl_verify = SSL_VERIFY
+        self.reserved_ports = []
 
     def stop_ds_port_forward(self, instance_name='userstore', instance_nb=0):
         if not is_cluster_mode():
@@ -288,9 +284,9 @@ class DSConfig(object):
         if not is_cluster_mode():
             ds_pod_name = '%s-%s' % (instance_name, instance_nb)
             ds_local_port = eval('self.%s%s_local_port' % (instance_name, instance_nb))
-            cmd = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
+            command = self.helm_cmd + ' --namespace %s port-forward pod/%s %s:8080' % \
                   (tests_namespace(), ds_pod_name, ds_local_port)
-            ds_popen = utils.cmd.run_cmd_process(cmd)
+            ds_popen = cmd.run_cmd_process(command)
 
             duration = 60
             start_time = time.time()

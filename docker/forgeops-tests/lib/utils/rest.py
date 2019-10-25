@@ -2,7 +2,7 @@
 import pytest
 
 # Framework imports
-from utils import logger
+from lib.utils import logger
 
 
 def check_http_status(http_result, expected_status, known_issue=None):

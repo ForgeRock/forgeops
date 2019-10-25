@@ -6,3 +6,4 @@ openidm:
     port: 1389
     user: "uid=admin"
     password: password
+replicaCount: 2

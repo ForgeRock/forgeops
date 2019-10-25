@@ -99,6 +99,9 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         args: [ "initialize-only" ]
+{{- with .Values.extraInitContainers }}
+{{ tpl . $ | trim | indent 6 }}
+{{- end }}
       containers:
       - name: ds
         image:  {{ .Values.image.repository }}:{{ .Values.image.tag }}

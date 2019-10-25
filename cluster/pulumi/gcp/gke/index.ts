@@ -35,7 +35,6 @@ const cluster = gke.createCluster(network, infra.subnetId);
 
 // Expose kubeconfig
 export const kubeconfig = gke.createKubeconfig(cluster);
-const kube = gke.createKubeconfigJson(cluster);
 
 // Create cluster provider
 const clusterProvider = gke.createClusterProvider(kubeconfig);
@@ -62,7 +61,7 @@ if (config.enableNginxIngress) {
 
 //Deploy cert-manager if enable = true
 if (config.enableCertManager){
-    gke.deployCertManager(clusterProvider, kube, cluster);
+    gke.deployCertManager(clusterProvider, cluster);
 }
 
 // ********************** PROMETHEUS ************** 

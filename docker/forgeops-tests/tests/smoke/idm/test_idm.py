@@ -7,8 +7,8 @@ Test are sorted automatically so that's why it's needed to keep test_0[1,2,3]_ n
 from requests import get, post, put, delete, session, patch
 
 # Framework imports
-from ProductConfig import IDMConfig
-from utils import logger, rest
+from lib.utils import logger, rest
+from config.ProductConfig import IDMConfig
 
 class TestIDM(object):
     idmcfg = IDMConfig()

@@ -5,9 +5,8 @@
 # Lib imports
 import os
 from requests import get, post
-from utils import logger, rest
-from ProductConfig import IDMConfig, AMConfig, IGConfig, DSConfig
-
+from lib.utils import logger, rest
+from config.ProductConfig import AMConfig, IGConfig, DSConfig
 
 def pytest_configure(config):
     root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
@@ -94,7 +93,7 @@ def get_tests_properties():
 
     # Get properties that start with TESTS_ from environment.properties
     tests_properties = {}
-    for key, value in environment_properties.items():
+    for key, _value in environment_properties.items():
         if key.startswith("TESTS_"):
             tests_properties[key] = environment_properties[key]
     return tests_properties

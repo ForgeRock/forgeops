@@ -1,6 +1,7 @@
 config:
   claim: frconfig
   importPath: /git/config/platform/platform-deployment/amster
+serverBase: http://am:80
 configStore:
   host: userstore-0.userstore
 userStore:
