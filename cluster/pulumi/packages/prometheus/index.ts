@@ -3,6 +3,7 @@ import * as k8s from "@pulumi/kubernetes";
 export interface PkgArgs {
     version: string;
     namespaceName: string;
+    k8sVersion: string;
     provider: k8s.Provider;
     dependsOn: any[];
 }
@@ -59,6 +60,7 @@ export class Prometheus {
             chart: "prometheus-operator",
             transformations: [addNamespace],
             values: {
+                kubeTargetVersionOverride: args.k8sVersion,
                 alertmanager: {
                     enabled: true,
                 },
@@ -131,9 +133,6 @@ export class Prometheus {
                     port: "idm",
                     enabled: false,
                     labelSelectorComponent: "idm"
-                },
-                locust: {
-                    enabled: false,
                 },
                 ig: {
                     enabled: false
