@@ -96,53 +96,61 @@ products (amster, idm, ig, am).
 
 ## Managing Configurations (Experimental)
 
-The `bin/config.sh` utility is used to initialize a configuration and to syncronize files to and from a running instance.
+The `bin/config.sh` utility is used to initialize a configuration and to synchronize files to and from a running instance.
 
-A number of configurations are under the [config](config/) folder. The CDK is the default configuration. To
-setup your environment for the cdk:
+A number of configuration profiles are under the [config](config/) folder. The CDK is the default configuration profile. 
+You can set the configuration profile using the $CDK_PROFILE environment variable. The default value of $CDK_PROFILE is
+`cdk`. 
+
+The `bin/config.sh` utility takes two arguments:
+
+--profile: overrides the value of $CDK_PROFILE
+--component: specifies a single component of the ForgeRock Identity Platform  
+
+To setup your environment for the CDK, use the `init`command:
 
 ```bash
 bin/config.sh init
 ```
 
-Initialization copies the configuration from the git managed `config` directory to the product's  `docker` folder (for example, docker/idm).
+Initialization copies the configuration profile under the Git-managed `config` directory to one or more component's  `docker` folder (for example, docker/idm).
 
-**Note that the configuration files under the `docker/` folder are not maintained in git.**.  They
-are considered temporary build time assets.
+**Note that the configuration files under the `docker/` folder are not maintained in Git.**.  They
+are considered temporary build-time assets.
 
-You can select alternate configurations, or initialize specific products:
+You can select alternate configuration profiles, or initialize specific components:
 
 ```bash
-# Initializes the "test" configuration with the product idm
-bin/config.sh -p idm -c test init
-# Initialize the "demo" configuration with all products
-bin/config.sh -c test
+# Initializes the "test" configuration profile for IDM
+bin/config.sh --profile test --component idm init
+# Initialize the "test" configuration for all ForgeRock components
+bin/config.sh --profile test
 #
 ```
 
-The `save` command copies the contents of the docker configuration *back* to the config/ folder where it can be versioned in git.
+The `save` command copies the contents of the Docker configuration *back* to the config/ folder where it can be versioned in Git.
 
 ```bash
-# Save the docker/ configuration for all products back to the config/ folder
+# Save the docker/ configuration for all ForgeRock components back to the config/ folder
 bin/config.sh save
-# Save just idm for the test config
-bin/config.sh -p idm -c test save
+# Save just the IDM configuration to the test configuration profile
+bin/config.sh --component idm --profile test save
 ```
 
-The `diff` command runs GNU `diff` to show the difference between the `docker/` product folder and the git configuration:
+The `diff` command runs GNU `diff` to show the difference between the `docker/` component folder and the Git configuration:
 
 ```bash
-bin/config.sh -p idm -c cdk diff
+bin/config.sh --component idm --profile cdk diff
 ```
 
-The `export` command is used to export configuration from a running instance (e.g.IDM) back out to the `docker` folder. Note that not all
-products support export functionality (currently just idm).
+The `export` command is used to export configuration from a running instance (e.g., IDM) back to the `docker` folder. Note that not all
+components support export functionality (currently just IDM).
 
 ```bash
-# Export all configs for the cdk configuration
+# Export all configurations to the docker folder
 bin/config.sh export
-# Export idm for the test configuration
-bin/config.sh -p idm -c test export
+# Export the IDM configuration to the docker folder
+bin/config.sh --component idm export
 ```
 
 Finally, the `sync` command combines the `export` and `save` functions into a single command:
@@ -151,7 +159,7 @@ Finally, the `sync` command combines the `export` and `save` functions into a si
 # Export from all running products to the docker folder, then save the results to the git folder:
 bin/config.sh sync
 # Export and save just idm for the test config
-bin/config.sh -p idm -c test sync
+bin/config.sh --component idm --profile test sync
 ```
 
 The `git status` command will show you any changes made to the `config` folder. You can decide whether to commit or discard those changes.
@@ -166,7 +174,7 @@ bin/config.sh init
 skaffold dev
 # Make changes in the IDM UI. Then:
 bin/config.sh sync
-# See what changed using git
+# See what changed
 git status
 # Commmit, or discard your changes
 bin/config.sh restore
