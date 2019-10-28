@@ -129,7 +129,7 @@ spec:
         {{ end }}
         envFrom:
         - configMapRef:
-            name: am-configmap
+            name: {{ default "am-configmap" .Values.existingConfigMaps.amConfigMap }}
         {{ if eq .Values.config.strategy  "git" }}
         - configMapRef:
             name:  {{ default "frconfig" .Values.config.name  }}
@@ -189,7 +189,7 @@ spec:
           secretName: {{ default "openam-keystore-passwords" .Values.existingSecrets.openamKeystorePasswords }}
       - name: openam-boot
         configMap:
-          name: boot-json
+          name: {{ default "boot-json" .Values.existingConfigMaps.bootJson }}
       - name: configstore-secret
         secret:
           secretName: {{ default "configstore" .Values.configSecretName }}

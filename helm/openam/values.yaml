@@ -99,7 +99,14 @@ livenessTimeout: 15
 existingSecrets: {}
 # existingSecrets:
 #   openamKeys: openam-keys
-#   openamKeystorePasswords: openam-kesytore-passwords
+#   openamKeystorePasswords: openam-keystore-passwords
+
+# Set the names below to provide custom config maps. You must provide all config maps.
+# See templates/config-map.yaml for details
+existingConfigMaps: {}
+#existingConfigMaps:
+#  bootJson: boot-json
+#  amConfigMap: am-configmap
 
 service:
   name: openam
