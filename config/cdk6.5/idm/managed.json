@@ -1,0 +1,1050 @@
+{
+    "objects" : [
+        {
+            "name" : "user",
+            "onCreate" : {
+                "type" : "text/javascript",
+                "source" : "require('onCreateUser').setDefaultFields(object);require('onCreateUser').emailUser(object);"
+            },
+            "onUpdate" : {
+                "type" : "text/javascript",
+                "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);"
+            },
+            "postDelete" : {
+                "type" : "text/javascript",
+                "source" : "require('postDelete-idp-cleanup').removeConnectedIdpData(oldObject, resourceName, request);require('postDelete-notification-cleanup').removeConnectedNotificationData(oldObject, resourceName, request);"
+            },
+            "schema" : {
+                "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User",
+                "title" : "User",
+                "icon" : "fa-user",
+                "viewable" : true,
+                "$schema" : "http://json-schema.org/draft-03/schema",
+                "order" : [
+                    "_id",
+                    "userName",
+                    "password",
+                    "givenName",
+                    "sn",
+                    "mail",
+                    "description",
+                    "accountStatus",
+                    "telephoneNumber",
+                    "postalAddress",
+                    "address2",
+                    "city",
+                    "postalCode",
+                    "country",
+                    "stateProvince",
+                    "roles",
+                    "manager",
+                    "authzRoles",
+                    "reports",
+                    "effectiveRoles",
+                    "effectiveAssignments",
+                    "lastSync",
+                    "kbaInfo",
+                    "preferences",
+                    "consentedMappings"
+                ],
+                "properties" : {
+                    "_id" : {
+                        "description" : "User ID",
+                        "type" : "string",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "policies" : [
+                            {
+                                "policyId" : "cannot-contain-characters",
+                                "params" : {
+                                    "forbiddenChars" : [
+                                        "/"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "password" : {
+                        "title" : "Password",
+                        "description" : "Password",
+                        "type" : "string",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "minLength" : 8,
+                        "userEditable" : true,
+                        "encryption" : {
+                            "purpose": "idm.password.encryption"
+                        },
+                        "scope" : "private",
+                        "isProtected": true,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "policies" : [
+                            {
+                                "policyId" : "at-least-X-capitals",
+                                "params" : {
+                                    "numCaps" : 1
+                                }
+                            },
+                            {
+                                "policyId" : "at-least-X-numbers",
+                                "params" : {
+                                    "numNums" : 1
+                                }
+                            },
+                            {
+                                "policyId" : "cannot-contain-others",
+                                "params" : {
+                                    "disallowedFields" : [
+                                        "userName",
+                                        "givenName",
+                                        "sn"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "kbaInfo" : {
+                        "description" : "KBA Info",
+                        "type" : "array",
+                        "userEditable" : true,
+                        "viewable" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : true,
+                        "items" : {
+                            "type" : "object",
+                            "title" : "KBA Info Items",
+                            "properties" : {
+                                "answer" : {
+                                    "description" : "Answer",
+                                    "type" : "string"
+                                },
+                                "customQuestion" : {
+                                    "description" : "Custom question",
+                                    "type" : "string"
+                                },
+                                "questionId" : {
+                                    "description" : "Question ID",
+                                    "type" : "string"
+                                }
+                            },
+                            "order": [
+                                "answer",
+                                "customQuestion",
+                                "questionId"
+                            ],
+                            "required": []
+                        }
+                    },
+                    "preferences" : {
+                        "title" : "Preferences",
+                        "description" : "Preferences",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : true,
+                        "type" : "object",
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "properties" : {
+                            "updates" : {
+                                "description" : "Send me news and updates",
+                                "type" : "boolean"
+                            },
+                            "marketing": {
+                                "description" : "Send me special offers and services",
+                                "type" : "boolean"
+                            }
+                        },
+                        "order": [
+                            "updates",
+                            "marketing"
+                        ],
+                        "required": []
+                    },
+                    "mail" : {
+                        "title" : "Email Address",
+                        "description" : "Email Address",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : true,
+                        "policies" : [
+                            {
+                                "policyId" : "valid-email-address-format"
+                            }
+                        ]
+                    },
+                    "sn" : {
+                        "title" : "Last Name",
+                        "description" : "Last Name",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : true
+                    },
+                    "description" : {
+                        "title" : "Description",
+                        "description" : "Description",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false
+                    },
+                    "address2" : {
+                        "type" : "string",
+                        "title" : "Address 2",
+                        "description" : "Address 2",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : true
+                    },
+                    "givenName" : {
+                        "title" : "First Name",
+                        "description" : "First Name",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : true
+                    },
+                    "city" : {
+                        "type" : "string",
+                        "title" : "City",
+                        "description" : "City",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false
+                    },
+                    "country" : {
+                        "type" : "string",
+                        "title" : "Country",
+                        "description" : "Country",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false
+                    },
+                    "postalCode" : {
+                        "type" : "string",
+                        "title" : "Postal Code",
+                        "description" : "Postal Code",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false
+                    },
+                    "accountStatus" : {
+                        "title" : "Status",
+                        "description" : "Status",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false
+                    },
+                    "roles" : {
+                        "description" : "Provisioning Roles",
+                        "title" : "Provisioning Roles",
+                        "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User:roles",
+                        "viewable" : true,
+                        "userEditable" : false,
+                        "returnByDefault" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "type" : "array",
+                        "relationshipGrantTemporalConstraintsEnforced" : true,
+                        "items" : {
+                            "type" : "relationship",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User:roles:items",
+                            "title" : "Provisioning Roles Items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "members",
+                            "notifySelf" : true,
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "type" : "object",
+                                    "title" : "Provisioning Roles Items _refProperties",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        },
+                                        "_grantType" : {
+                                            "description" : "Grant Type",
+                                            "type" : "string",
+                                            "label" : "Grant Type"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "path" : "managed/role",
+                                    "label" : "Role",
+                                    "conditionalAssociationField" : "condition",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "authzRoles" : {
+                        "description" : "Authorization Roles",
+                        "title" : "Authorization Roles",
+                        "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User:authzRoles",
+                        "viewable" : true,
+                        "type" : "array",
+                        "userEditable" : false,
+                        "returnByDefault" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "items" : {
+                            "type" : "relationship",
+                            "title" : "Authorization Roles Items",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User:authzRoles:items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "authzMembers",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "type" : "object",
+                                    "title" : "Authorization Roles Items _refProperties",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "path" : "internal/role",
+                                    "label" : "Internal Role",
+                                    "conditionalAssociationField" : "condition",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "path" : "managed/role",
+                                    "label" : "Role",
+                                    "conditionalAssociationField" : "condition",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "reports" : {
+                        "description" : "Direct Reports",
+                        "title" : "Direct Reports",
+                        "viewable" : true,
+                        "userEditable" : false,
+                        "type" : "array",
+                        "returnByDefault" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "items" : {
+                            "type" : "relationship",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User:reports:items",
+                            "title" : "Direct Reports Items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "manager",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "type" : "object",
+                                    "title" : "Direct Reports Items _refProperties",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "path" : "managed/user",
+                                    "label" : "User",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "userName",
+                                            "givenName",
+                                            "sn"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "effectiveRoles" : {
+                        "type" : "array",
+                        "title" : "Effective Roles",
+                        "description" : "Effective Roles",
+                        "viewable" : false,
+                        "returnByDefault" : true,
+                        "isVirtual" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "onRetrieve" : {
+                            "type" : "text/javascript",
+                             "source" : "require('roles/effectiveRoles').calculateEffectiveRoles(object, 'roles');"
+                        },
+                        "items" : {
+                            "type" : "object",
+                            "title" : "Effective Roles Items"
+                        }
+                    },
+                    "effectiveAssignments" : {
+                        "type" : "array",
+                        "title" : "Effective Assignments",
+                        "description" : "Effective Assignments",
+                        "viewable" : false,
+                        "returnByDefault" : true,
+                        "isVirtual" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "onRetrieve" : {
+                            "type" : "text/javascript",
+                            "file" : "roles/effectiveAssignments.js",
+                            "effectiveRolesPropName" : "effectiveRoles"
+                        },
+                        "items" : {
+                            "type" : "object",
+                            "title" : "Effective Assignments Items"
+                        }
+                    },
+                    "telephoneNumber" : {
+                        "type" : "string",
+                        "title" : "Telephone Number",
+                        "description" : "Telephone Number",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "pattern" : "^\\+?([0-9\\- \\(\\)])*$",
+                        "usageDescription" : "",
+                        "isPersonal" : true
+                    },
+                    "stateProvince" : {
+                        "type" : "string",
+                        "title" : "State/Province",
+                        "description" : "State/Province",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false
+                    },
+                    "postalAddress" : {
+                        "type" : "string",
+                        "title" : "Address 1",
+                        "description" : "Address 1",
+                        "viewable" : true,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : true
+                    },
+                    "userName" : {
+                        "title" : "Username",
+                        "description" : "Username",
+                        "viewable" : true,
+                        "type" : "string",
+                        "searchable" : true,
+                        "userEditable" : true,
+                        "minLength" : 1,
+                        "usageDescription" : "",
+                        "isPersonal" : true,
+                        "policies" : [
+                            {
+                                "policyId" : "unique"
+                            },
+                            {
+                                "policyId" : "no-internal-user-conflict"
+                            },
+                            {
+                                "policyId" : "cannot-contain-characters",
+                                "params" : {
+                                    "forbiddenChars" : [
+                                        "/"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "manager" : {
+                        "type" : "relationship",
+                        "validate" : true,
+                        "reverseRelationship" : true,
+                        "reversePropertyName" : "reports",
+                        "description" : "Manager",
+                        "title" : "Manager",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "properties" : {
+                            "_ref" : {
+                                "description" : "References a relationship from a managed object",
+                                "type" : "string"
+                            },
+                            "_refProperties" : {
+                                "description" : "Supports metadata within the relationship",
+                                "type" : "object",
+                                "title" : "Manager _refProperties",
+                                "properties" : {
+                                    "_id" : {
+                                        "description" : "_refProperties object ID",
+                                        "type" : "string"
+                                    }
+                                }
+                            }
+                        },
+                        "resourceCollection" : [
+                            {
+                                "path" : "managed/user",
+                                "label" : "User",
+                                "query" : {
+                                    "queryFilter" : "true",
+                                    "fields" : [
+                                        "userName",
+                                        "givenName",
+                                        "sn"
+                                    ]
+                                }
+                            }
+                        ],
+                        "userEditable" : false
+                    },
+                    "lastSync" : {
+                        "description" : "Last Sync timestamp",
+                        "title" : "Last Sync timestamp",
+                        "type" : "object",
+                        "scope" : "private",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "properties" : {
+                            "effectiveAssignments" : {
+                                "description" : "Effective Assignments",
+                                "title" : "Effective Assignments",
+                                "type" : "array",
+                                "items" : {
+                                    "type" : "object",
+                                    "title" : "Effective Assignments Items"
+                                }
+                            },
+                            "timestamp" : {
+                                "description" : "Timestamp",
+                                "type" : "string"
+                            }
+                        },
+                        "order" : [
+                            "effectiveAssignments",
+                            "timestamp"
+                        ],
+                        "required": []
+                    },
+                    "consentedMappings" : {
+                        "title" : "Consented Mappings",
+                        "description" : "Consented Mappings",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : true,
+                        "usageDescription" : "",
+                        "isPersonal" : false,
+                        "items" : {
+                            "type" : "array",
+                            "title" : "Consented Mappings Items",
+                            "items" : {
+                                "type" : "object",
+                                "title" : "Consented Mappings Item",
+                                "properties" : {
+                                    "mapping" : {
+                                        "title" : "Mapping",
+                                        "description" : "Mapping",
+                                        "type" : "string",
+                                        "viewable" : true,
+                                        "searchable" : true,
+                                        "userEditable" : true
+                                    },
+                                    "consentDate" : {
+                                        "title" : "Consent Date",
+                                        "description" : "Consent Date",
+                                        "type" : "string",
+                                        "viewable" : true,
+                                        "searchable" : true,
+                                        "userEditable" : true
+                                    }
+                                },
+                                "order" : [
+                                    "mapping",
+                                    "consentDate"
+                                ],
+                                "required" : [
+                                    "mapping",
+                                    "consentDate"
+                                ]
+                            }
+                        },
+                        "returnByDefault" : false,
+                        "isVirtual" : false
+                    }
+                },
+                "type" : "object",
+                "required" : [
+                    "userName",
+                    "givenName",
+                    "sn",
+                    "mail"
+                ]
+            },
+            "meta" : {
+              "property" : "_meta",
+              "resourceCollection" : "internal/usermeta",
+              "trackedProperties" : [
+                  "createDate",
+                  "lastChanged"
+              ]
+            },
+            "notifications" : {
+            }
+        },
+        {
+            "name" : "role",
+            "onDelete" : {
+                "type" : "text/javascript",
+                "file" : "roles/onDelete-roles.js"
+            },
+            "postCreate" : {
+                "type" : "text/javascript",
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
+            },
+            "postUpdate" : {
+                "type" : "text/javascript",
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
+            },
+            "postDelete" : {
+                "type" : "text/javascript",
+                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
+            },
+            "schema" : {
+                "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role",
+                "$schema" : "http://forgerock.org/json-schema#",
+                "type" : "object",
+                "title" : "Role",
+                "icon" : "fa-check-square-o",
+                "description" : "",
+                "properties" : {
+                    "_id" : {
+                        "description" : "Role ID",
+                        "title" : "Name",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "type" : "string"
+                    },
+                    "name" : {
+                        "description" : "The role name, used for display purposes.",
+                        "title" : "Name",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "type" : "string"
+                    },
+                    "description" : {
+                        "description" : "The role description, used for display purposes.",
+                        "title" : "Description",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "type" : "string"
+                    },
+                    "members" : {
+                        "description" : "Role Members",
+                        "title" : "Role Members",
+                        "viewable" : true,
+                        "type" : "array",
+                        "returnByDefault" : false,
+                        "relationshipGrantTemporalConstraintsEnforced" : true,
+                        "items" : {
+                            "type" : "relationship",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role:members:items",
+                            "title" : "Role Members Items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "roles",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "type" : "object",
+                                    "title" : "Role Members Items _refProperties",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        },
+                                        "_grantType" : {
+                                            "description" : "Grant Type",
+                                            "type" : "string",
+                                            "label" : "Grant Type"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : true,
+                                    "conditionalAssociation" : true,
+                                    "path" : "managed/user",
+                                    "label" : "User",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "userName",
+                                            "givenName",
+                                            "sn"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "authzMembers" : {
+                        "description" : "Authorization Role Members",
+                        "title" : "Authorization Role Members",
+                        "viewable" : true,
+                        "type" : "array",
+                        "returnByDefault" : false,
+                        "items" : {
+                            "type" : "relationship",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role:authzMembers:items",
+                            "title" : "Authorization Role Members Items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "authzRoles",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "type" : "object",
+                                    "title" : "Authorization Role Members Items _refProperties",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "path" : "managed/user",
+                                    "conditionalAssociation" : true,
+                                    "label" : "User",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "userName",
+                                            "givenName",
+                                            "sn"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "assignments" : {
+                        "description" : "Managed Assignments",
+                        "title" : "Managed Assignments",
+                        "viewable" : true,
+                        "returnByDefault" : false,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role:assignments:items",
+                            "title" : "Managed Assignments Items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "roles",
+                            "notifySelf" : true,
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "title" : "Managed Assignments Items _refProperties",
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "path" : "managed/assignment",
+                                    "label" : "Assignment",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "notifyRelationships" : ["members"]
+                    },
+                    "condition" : {
+                        "description" : "A conditional filter for this role",
+                        "title" : "Condition",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "isConditional" : true,
+                        "type" : "string"
+                    },
+                    "temporalConstraints" : {
+                        "description" : "An array of temporal constraints for a role",
+                        "title" : "Temporal Constraints",
+                        "viewable" : false,
+                        "returnByDefault" : true,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "object",
+                            "title" : "Temporal Constraints Items",
+                            "properties" : {
+                                "duration" : {
+                                    "description" : "Duration",
+                                    "type" : "string"
+                                }
+                            },
+                            "required" : [
+                                "duration"
+                            ],
+                            "order" : [
+                                "duration"
+                            ]
+                        },
+                        "notifyRelationships" : ["members"]
+                    }
+                },
+                "required" : [
+                    "name"
+                ],
+                "order" : [
+                    "_id",
+                    "name",
+                    "description",
+                    "members",
+                    "authzMembers",
+                    "assignments",
+                    "condition",
+                    "temporalConstraints"
+                ]
+            }
+        },
+        {
+            "name" : "assignment",
+            "schema" : {
+                "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Assignment",
+                "$schema" : "http://forgerock.org/json-schema#",
+                "type" : "object",
+                "title" : "Assignment",
+                "icon" : "fa-key",
+                "description" : "A role assignment",
+                "properties" : {
+                    "_id" : {
+                        "description" : "The assignment ID",
+                        "title" : "Name",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "type" : "string"
+                    },
+                    "name" : {
+                        "description" : "The assignment name, used for display purposes.",
+                        "title" : "Name",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "type" : "string"
+                    },
+                    "description" : {
+                        "description" : "The assignment description, used for display purposes.",
+                        "title" : "Description",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "type" : "string"
+                    },
+                    "mapping" : {
+                        "description" : "The name of the mapping this assignment applies to",
+                        "title" : "Mapping",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "type" : "string",
+                        "policies" : [
+                            {
+                                "policyId" : "mapping-exists"
+                            }
+                        ]
+                    },
+                    "attributes" : {
+                        "description" : "The attributes operated on by this assignment.",
+                        "title" : "Assignment Attributes",
+                        "viewable" : true,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "object",
+                            "title" : "Assignment Attributes Items",
+                            "properties" : {
+                                "assignmentOperation" : {
+                                    "description" : "Assignment operation",
+                                    "type" : "string"
+                                },
+                                "unassignmentOperation" : {
+                                    "description" : "Unassignment operation",
+                                    "type" : "string"
+                                },
+                                "name" : {
+                                    "description" : "Name",
+                                    "type" : "string"
+                                },
+                                "value" : {
+                                    "description" : "Value",
+                                    "type" : "string"
+                                }
+                            },
+                            "order" : [
+                                "assignmentOperation",
+                                "unassignmentOperation",
+                                "name",
+                                "value"
+                            ],
+                            "required": []
+                        },
+                        "notifyRelationships" : ["roles"]
+                    },
+                    "linkQualifiers" : {
+                        "description" : "Conditional link qualifiers to restrict this assignment to.",
+                        "title" : "Link Qualifiers",
+                        "viewable" : true,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "string",
+                            "title" : "Link Qualifiers Items"
+                        }
+                    },
+                    "roles" : {
+                        "description" : "Managed Roles",
+                        "title" : "Managed Roles",
+                        "viewable" : true,
+                        "userEditable" : false,
+                        "type" : "array",
+                        "returnByDefault" : false,
+                        "items" : {
+                            "type" : "relationship",
+                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Assignment:roles:items",
+                            "title" : "Managed Roles Items",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "assignments",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "description" : "References a relationship from a managed object",
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "description" : "Supports metadata within the relationship",
+                                    "type" : "object",
+                                    "title" : "Managed Roles Items _refProperties",
+                                    "properties" : {
+                                        "_id" : {
+                                            "description" : "_refProperties object ID",
+                                            "type" : "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : true,
+                                    "path" : "managed/role",
+                                    "label" : "Role",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "required" : [
+                    "name",
+                    "description",
+                    "mapping"
+                ],
+                "order" : [
+                    "_id",
+                    "name",
+                    "description",
+                    "mapping",
+                    "attributes",
+                    "linkQualifiers",
+                    "roles"
+                ]
+            }
+        }
+    ]
+}

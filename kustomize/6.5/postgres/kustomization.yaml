@@ -1,0 +1,23 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  app: postgres-idm
+resources:
+- deployment.yaml
+- service.yaml
+- persistent-volume-claim.yaml
+configMapGenerator:
+- files:
+  - sql/01_openidm.sql
+  - sql/02_default_schema_optimization.sql
+  - sql/03_audit.sql
+  - sql/activiti.postgres.create.engine.sql
+  - sql/activiti.postgres.create.history.sql
+  - sql/activiti.postgres.create.identity.sql
+  - sql/sample-explicit-managed-user.sql
+  name: openidm-sql
+secretGenerator:
+- literals:
+  - postgres-password=openidm
+  name: postgres-secrets
+  type: Opaque

@@ -1,0 +1,28 @@
+# Place holder for skaffold 6.5 deployment
+# skaffold -f skaffold-6.5.yaml dev
+apiVersion: skaffold/v1beta12
+kind: Config
+build:
+  artifacts:
+  - image: idm
+    context: docker6.5/idm
+  tagPolicy:
+    sha256: {}
+deploy:
+  kustomize:
+    path: kustomize/env/example
+# Additional profiles
+profiles:
+- name: postgres
+  deploy:
+    kustomize:
+      path: kustomize/postgres
+- name: idm
+  build:
+    artifacts:
+    - image: idm
+      context: docker6.5/idm
+  deploy:
+    kustomize:
+        path: kustomize/6.5/env/dev
+
