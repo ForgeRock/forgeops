@@ -193,8 +193,14 @@ save_config()
 # Instead we chdir to the script root/..
 cd "$script_dir/.."
 PROFILE_ROOT="config/$_arg_profile"
-DOCKER_ROOT="docker"
 
+set -x
+# If the profile ends in 6.5, we use the docker6.5/ root folder
+if [[ "$_arg_profile"  == *6.5 ]]; then
+	DOCKER_ROOT="docker6.5"
+else
+	DOCKER_ROOT="docker"
+fi
 
 # TODO: Right now we only handle idm and ig configs
 if [ "$_arg_component" == "all" ]; then
