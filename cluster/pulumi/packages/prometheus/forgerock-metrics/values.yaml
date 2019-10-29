@@ -49,12 +49,6 @@ ig:
   secretUser: metric
   secretPassword: password
   
-locust:
-  component: locust
-  enabled: true
-  path: /metrics/prometheus
-  labelSelectorComponent: master
-
 additionalRulesLabels:
   prometheus: monitoring-kube-prometheus
   role: alert-rules

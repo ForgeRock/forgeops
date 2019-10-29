@@ -8,7 +8,7 @@ image:
   repository: gcr.io/forgerock-io/am
   # For development we set this to Always to get the most current image:
   pullPolicy: IfNotPresent
-  tag: 7.0.0-398abe9fc9b4fe572b5e47b48a3d14c8410983c4
+  tag: 7.0.0-e8b43fe1b9caa997635828843a776a287fe1dcb5
 
 gitImage:
   repository: gcr.io/forgerock-io/git
@@ -99,7 +99,14 @@ livenessTimeout: 15
 existingSecrets: {}
 # existingSecrets:
 #   openamKeys: openam-keys
-#   openamKeystorePasswords: openam-kesytore-passwords
+#   openamKeystorePasswords: openam-keystore-passwords
+
+# Set the names below to provide custom config maps. You must provide all config maps.
+# See templates/config-map.yaml for details
+existingConfigMaps: {}
+#existingConfigMaps:
+#  bootJson: boot-json
+#  amConfigMap: am-configmap
 
 service:
   name: openam
