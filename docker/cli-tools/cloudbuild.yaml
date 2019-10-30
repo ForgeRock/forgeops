@@ -1,0 +1,30 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - 'gcr.io/engineering-devops/pulumi-nodejs'
+    - '-f'
+    - 'docker/cli-tools/base/Dockerfile'
+    - 'docker/cli-tools/base/'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - 'gcr.io/engineering-devops/pulumi-nodejs:latest'
+- name: 'gcr.io/engineering-devops/pulumi-nodejs:latest'
+  args:
+    - 'ls'
+    - 'cluster/'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '-t'
+    - 'gcr.io/engineering-devops/forgeops-cli'
+    - '-f'
+    - 'docker/cli-tools/Dockerfile'
+    - '.'
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'push'
+    - 'gcr.io/engineering-devops/forgeops-cli:latest'
+
