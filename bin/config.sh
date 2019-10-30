@@ -119,7 +119,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 
 
 # Copy the product config $1 to the docker directory.
-copy_config()
+init_config()
 {
 	echo "cp -r ${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
     cp -r "${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
@@ -131,7 +131,7 @@ copy_config()
 diff_config()
 {
 	for p in "${COMPONENTS[@]}"; do
-		echo "diff ${PROFILE_ROOT}/$p $DOCKER_ROOT/$p"
+		echo "diff  -u --recursive ${PROFILE_ROOT}/$p $DOCKER_ROOT/$p"
 		diff -u --recursive -x ".*" -x "Dockerfile" -x "*.sh" "${PROFILE_ROOT}/$p" "$DOCKER_ROOT/$p" || true
 	done
 }
@@ -142,6 +142,8 @@ export_config(){
 	   # We dont support export for all products just yet - so need to case them
 	   case $p in
 		idm)
+			echo "Exporting IDM configuration"
+			rm -fr  "$DOCKER_ROOT/idm/conf"
 			kubectl cp idm-0:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
 			;;
 		amster)
@@ -149,6 +151,7 @@ export_config(){
 			pod=`kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}'`
 			echo "Executing amster export from $pod"
 			kubectl exec $pod -it /opt/amster/export.sh
+			rm -fr "$DOCKER_ROOT/amster/config"
 			kubectl cp "$pod":/var/tmp/amster "$DOCKER_ROOT/amster/config"
 			;;
 		am)
@@ -167,11 +170,14 @@ save_config()
 	   # We dont support export for all products just yet - so need to case them
 	   case $p in
 		idm)
+			# clean existing files
+			rm -fr  "$PROFILE_ROOT/idm/conf"
 			cp -R "$DOCKER_ROOT/idm/conf"  "$PROFILE_ROOT/idm"
 			;;
 		amster)
-			echo "Bulk save of amster export is not recommended. Selectively copy from: "
-			echo "     $DOCKER_ROOT/amster/config to $PROFILE_ROOT/amster"
+			# Clean any existing files
+			rm -fr "$PROFILE_ROOT/amster/config"
+			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster/config"
 			;;
 		*)
 			echo "Save not supported for $p"
@@ -201,7 +207,7 @@ fi
 case "$_arg_operation" in
 init)
 	for p in "${COMPONENTS[@]}"; do
-		copy_config $p
+		init_config "$p"
 	done
 	;;
 diff)
