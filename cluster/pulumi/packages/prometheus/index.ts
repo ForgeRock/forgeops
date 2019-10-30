@@ -131,7 +131,7 @@ export class Prometheus {
                 },
                 idm: {
                     port: "idm",
-                    enabled: false,
+                    enabled: true,
                     labelSelectorComponent: "idm"
                 },
                 ig: {
