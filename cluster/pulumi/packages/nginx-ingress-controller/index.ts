@@ -34,12 +34,9 @@ export class NginxIngressController {
         this.namespace = namespace;
             
         const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
-            fetchOpts: {
-                repo: "https://kubernetes-charts.storage.googleapis.com",
-                version: args.version,
-            },
             version: args.version,
             chart: "nginx-ingress",
+            repo: "stable",
             transformations: [(o: any) => { if (o !== undefined) { o.metadata.namespace = this.namespacename}}],
             namespace: this.namespacename,
             values: {
@@ -70,7 +67,6 @@ export class NginxIngressController {
                         type: "ClusterIP",
                         omitClusterIP: true,
                     },
-                    image: {tag: args.version},
                 },
                 defaultBackend: {
                     enabled: false,
