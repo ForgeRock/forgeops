@@ -5,7 +5,7 @@ kind: Config
 build:
   artifacts:
   - image: idm
-    context: docker6.5/idm
+    context: docker/6.5/idm
   tagPolicy:
     sha256: {}
 deploy:
@@ -21,7 +21,7 @@ profiles:
   build:
     artifacts:
     - image: idm
-      context: docker6.5/idm
+      context: docker/6.5/idm
   deploy:
     kustomize:
         path: kustomize/6.5/env/dev

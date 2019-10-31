@@ -1,1 +1,0 @@
-# Place holder - amster parent image.

@@ -105,14 +105,14 @@ Map getHelmChart(String productName) {
 
 /** Skaffold Dockerfile paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
 SKAFFOLD_DOCKERFILE_PATHS = [
-        'am'        : 'docker/am/Dockerfile',
-        'am-fbc'    : 'docker/am-fbc/Dockerfile',
-        'amster'    : 'docker/amster/Dockerfile',
-        'ds-cts'    : 'docker/ds/cts/Dockerfile',
-        'ds-util'   : 'docker/ds/dsutil/Dockerfile',
-        'ds-idrepo' : 'docker/ds/idrepo/Dockerfile',
-        'idm'       : 'docker/idm/Dockerfile',
-        'ig'        : 'docker/ig/Dockerfile',
+        'am'        : 'docker/7.0/am/Dockerfile',
+        'am-fbc'    : 'docker/7.0/am-fbc/Dockerfile',
+        'amster'    : 'docker/7.0/amster/Dockerfile',
+        'ds-cts'    : 'docker/7.0/ds/cts/Dockerfile',
+        'ds-util'   : 'docker/7.0/ds/dsutil/Dockerfile',
+        'ds-idrepo' : 'docker/7.0/ds/idrepo/Dockerfile',
+        'idm'       : 'docker/7.0/idm/Dockerfile',
+        'ig'        : 'docker/7.0/ig/Dockerfile',
 ]
 
 /** Products which have associated Dockerfiles. */
