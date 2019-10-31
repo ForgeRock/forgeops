@@ -148,9 +148,9 @@ export_config(){
 			;;
 		amster)
 			echo "Finding the amster pod"
-			pod=`kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}'`
+			pod=$(kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}')
 			echo "Executing amster export from $pod"
-			kubectl exec $pod -it /opt/amster/export.sh
+			kubectl exec "$pod" -it /opt/amster/export.sh
 			rm -fr "$DOCKER_ROOT/amster/config"
 			kubectl cp "$pod":/var/tmp/amster "$DOCKER_ROOT/amster/config"
 			;;
@@ -166,18 +166,23 @@ export_config(){
 # Save the configuration in the docker folder back to the git source
 save_config()
 {
-		for p in "${COMPONENTS[@]}"; do
-	   # We dont support export for all products just yet - so need to case them
-	   case $p in
+	# Create the profile dir if it does not exist
+	[[ -d "$PROFILE_ROOT" ]] || mkdir -p "$PROFILE_ROOT"
+
+	for p in "${COMPONENTS[@]}"; do
+		# We dont support export for all products just yet - so need to case them
+		case $p in
 		idm)
 			# clean existing files
 			rm -fr  "$PROFILE_ROOT/idm/conf"
+			mkdir -p "$PROFILE_ROOT/idm/conf"
 			cp -R "$DOCKER_ROOT/idm/conf"  "$PROFILE_ROOT/idm"
 			;;
 		amster)
 			# Clean any existing files
 			rm -fr "$PROFILE_ROOT/amster/config"
-			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster/config"
+			mkdir -p "$PROFILE_ROOT/amster/config"
+			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
 			;;
 		*)
 			echo "Save not supported for $p"
@@ -193,8 +198,14 @@ save_config()
 # Instead we chdir to the script root/..
 cd "$script_dir/.."
 PROFILE_ROOT="config/$_arg_profile"
-DOCKER_ROOT="docker"
 
+set -x
+# If the profile ends in 6.5, we use the docker6.5/ root folder
+if [[ "$_arg_profile"  == *6.5 ]]; then
+	DOCKER_ROOT="docker6.5"
+else
+	DOCKER_ROOT="docker"
+fi
 
 # TODO: Right now we only handle idm and ig configs
 if [ "$_arg_component" == "all" ]; then
