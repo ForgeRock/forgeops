@@ -7,7 +7,7 @@ import { Config } from "@pulumi/pulumi";
 const stackConfig = new Config();
 
 /************** INFRA IMPORTS **************/
-const infraReference = new pulumi.StackReference(config.stackRef); 
+const infraReference = new pulumi.StackReference(config.stackRef);
 const infra = {
     vpcId: infraReference.getOutput("vpcId"),
     subnetId: infraReference.getOutput("subnetId"),
@@ -17,9 +17,9 @@ const infra = {
 // Function to either grab VPC from gcp-infra project or copy VPC name from user
 function assignVpc() {
     // Create new network if not provided
-    if (infra.vpcId === undefined) {  
+    if (infra.vpcId === undefined) {
         if (config.vpcName === undefined) { return stackConfig.require("vpcName") }
-        else return config.vpcName; 
+        else return config.vpcName;
     }
     else { return infra.vpcId;}
 }
@@ -64,7 +64,7 @@ if (config.enableCertManager){
     gke.deployCertManager(clusterProvider, cluster);
 }
 
-// ********************** PROMETHEUS ************** 
+// ********************** PROMETHEUS **************
 if (config.enablePrometheus){
     gke.createPrometheus(cluster, clusterProvider);
 }

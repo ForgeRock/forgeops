@@ -1,77 +1,107 @@
 import * as k8s from "@pulumi/kubernetes";
-import * as eks from "@pulumi/eks";
+import * as pulumi from "@pulumi/pulumi";
 
+/**
+ * Nginx Ingress Controller configuration values
+ */
 export interface PkgArgs {
+    // Static IP address
+    ip?: pulumi.Output<string>;
+
+    // Nginx version for Ingress Controller
     version: string;
-    namespaceName: string;
-    cluster: eks.Cluster;
-    dependsOn: any[];
+
+    // The cluster provider containing the kubeconfig
+    clusterProvider: k8s.Provider;
+
+    // Dependency to force wait for cluster build
+    dependencies: any[];
+
+    // Namespace
+    //namespace: k8s.core.v1.Namespace;
+
+    // Any required annotation
+    annotations?: any;
+
+    // For creating route53 records
+    domain?: string;
+    url?: pulumi.Output<string>;
+
+    // A partial or complete values object for the helm chart
+    helmValues?: object;
+
 }
 
-export class NginxIngressController {
-
-    readonly version: string
-    readonly provider: k8s.Provider
-    private namespacename: string
-    readonly namespace: k8s.core.v1.Namespace
+/**
+ * Nginx Ingress Controller used for deploying ForgeRock CDM samples with Pulumi
+ */
+export class NginxIngressController extends k8s.helm.v2.Chart {
 
     /**
     * Deploy Nginx Ingress Controller to k8s cluster.
-    * @param PkgArgs  Args for NginxIngressController
+    * @param name  The _unique_ name of the resource.
+    * @param PkgArgs  The values to configure Nginx Controller Helm chart.
+    * @param opts  A bag of options that control this resource's behavior.
     */
 
-    constructor(args: PkgArgs) {
-
-        this.version = args.version;
-        this.provider = args.cluster.provider;
-        this.namespacename = args.namespaceName;
-
-        const namespace = new k8s.core.v1.Namespace("ingressNamespace", {
-            metadata: {
-                name: this.namespacename
-            }}, 
-            {provider: args.cluster.provider, dependsOn:args.dependsOn})
-        this.namespace = namespace;
-            
-        const nginx = new k8s.helm.v2.Chart("nginx-ingress", {
-            version: args.version,
-            chart: "nginx-ingress",
-            repo: "stable",
-            transformations: [(o: any) => { if (o !== undefined) { o.metadata.namespace = this.namespacename}}],
-            namespace: this.namespacename,
-            values: {
+    constructor(chartArgs: PkgArgs) {
+        let ip = chartArgs.ip;
+        let version = chartArgs.version;
+        let clusterProvider = chartArgs.clusterProvider;
+        let dependencies = chartArgs.dependencies;
+        //const ns = chartArgs.namespace;
+        let annotations = chartArgs.annotations;
+        let staticIp: any;
+        let buildHelmValues = (suppliedValues: object) => {
+            const defaultValues = {
                 rbac: {create: true},
                 controller: {
-                    kind: "DaemonSet",
-                    daemonset: {
-                        useHostPort: true,
-                        hostPorts: {
-                            http: 30080,
-                            https: 30443,
-                        }
-                    },
-                    tolerations: [{
-                        key: "WorkerAttachedToExtLoadBalancer",
-                        operator: "Exists",
-                        effect: "NoSchedule",
-                        }
-                    ],
-                    nodeSelector: {"frontend": "true"},
                     publishService: {enabled: true},
                     stats: {
                         enabled: true,
-                        service: { omitClusterIP: true } 
+                        service: { omitClusterIP: true }
                     },
                     service: {
-                        enabled: false,
-                        type: "ClusterIP",
-                        omitClusterIP: true,
+                        type: "LoadBalancer",
+                        externalTrafficPolicy: "Local",
+                        loadBalancerIP: ip,
+                        annotations: annotations,
+                        omitClusterIP: true
                     },
                 },
                 defaultBackend: {
-                    enabled: false,
+                  service: { omitClusterIP: true }
                 }
             }
-        },{provider:  args.cluster.provider, dependsOn: [namespace].concat(args.dependsOn)});
+            if (!suppliedValues) {
+                suppliedValues = {}
+            }
+            return {...defaultValues, ...suppliedValues}
+        }
+        // Create nginx namespace
+        const ns = new k8s.core.v1.Namespace("nginx", {
+            metadata: {
+                name: "nginx"
+            }
+        }, { dependsOn: dependencies, provider: clusterProvider });
+
+        // set namespace field in k8s manifest after Helm chart as been transformed.
+        function metaNamespace(o: any) {
+            if (o !== undefined) {
+                o.metadata.namespace = ns.metadata.name;
+            }
+        }
+        // Check if IP has been provided and convert from Output<string>
+        if ( ip !== undefined ) {
+            ip = ip.apply(i => i);
+        };
+        super("nginx-ingress", {
+           version: chartArgs.version, // TODO not sure what this version is for, the chart?
+           chart: "nginx-ingress",
+           repo: "stable",
+           transformations: [metaNamespace],
+           namespace: ns.metadata.name,
+           values: buildHelmValues(chartArgs.helmValues || {}),
+        },{dependsOn: dependencies, provider: clusterProvider})
     }
- }
+}

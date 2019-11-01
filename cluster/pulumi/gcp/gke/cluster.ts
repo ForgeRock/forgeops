@@ -2,7 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import * as k8s from "@pulumi/kubernetes";
 import * as config from "./config";
-import * as ingress from "../../packages/nginx-ingress-controller/index-gke";
+import * as ingress from "../../packages/nginx-ingress-controller";
 import { Provider } from "@pulumi/gcp";
 import * as cm from "../../packages/cert-manager";
 import * as prometheus from "../../packages/prometheus";
@@ -190,7 +190,7 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
     const nginxConfig = new pulumi.Config("nginx");
 
     // Set values for nginx Helm chart
-    const nginxValues: ingress.ChartArgs = {
+    const nginxValues: ingress.PkgArgs = {
         ip: ip,
         version: config.nginxVersion,
         clusterProvider: clusterProvider,
@@ -198,7 +198,7 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
     }
 
     // Deploy Nginx Ingress Controller Helm chart
-    new ingress.NginxIngressController( nginxValues );
+    new ingress.NginxIngressController(nginxValues);
 }
 
 /************ CERTIFICATE MANAGER ************/

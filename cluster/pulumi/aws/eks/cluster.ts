@@ -9,11 +9,42 @@ import * as config from "./config"
 
 
 export function createNginxIngress(cluster: eks.Cluster){
+    const eksHelmValues = {
+
+        controller: {
+                    kind: "DaemonSet",
+                    daemonset: {
+                        useHostPort: true,
+                        hostPorts: {
+                            http: 30080,
+                            https: 30443,
+                        }
+                    },
+                    tolerations: [{
+                        key: "WorkerAttachedToExtLoadBalancer",
+                        operator: "Exists",
+                        effect: "NoSchedule",
+                        }
+                    ],
+                    nodeSelector: {"frontend": "true"},
+                    publishService: {enabled: true},
+                    stats: {
+                        enabled: true,
+                        service: { omitClusterIP: true }
+                    },
+                    service: {
+                        enabled: false,
+                        type: "ClusterIP",
+                        omitClusterIP: true,
+                    },
+                    image: {tag: config.ingressConfig.version}
+                }
+    }
     const ingressArgs: ingress.PkgArgs = {
         version: config.ingressConfig.version,
-        namespaceName: config.ingressConfig.k8sNamespace,
-        cluster: cluster,
-        dependsOn: [cluster]
+        clusterProvider: cluster.provider,
+        dependencies: [cluster.provider],
+        helmValues: eksHelmValues
     }
     return new ingress.NginxIngressController(ingressArgs);
 }
@@ -52,7 +83,7 @@ export function createStorageClasses(cluster: eks.Cluster){
             type: "gp2"
         }
     }, {provider: cluster.provider});
-    
+
     new k8s.storage.v1.StorageClass("sc-fast", {
         metadata: {
             name: "fast",
@@ -62,7 +93,7 @@ export function createStorageClasses(cluster: eks.Cluster){
             type: "gp2"
         }
     }, {provider: cluster.provider});
-    
+
     new k8s.storage.v1.StorageClass("sc-fast10", {
         metadata: {
             name: "fast10",
@@ -74,7 +105,7 @@ export function createStorageClasses(cluster: eks.Cluster){
             iopsPerGB: "10"
         }
     }, {provider: cluster.provider});
-    
+
     new k8s.storage.v1.StorageClass("sc-nfs", {
         metadata: {
             name: "nfs",
@@ -97,7 +128,7 @@ export function createCluster(instanceRoles: aws.iam.Role[]): eks.Cluster{
             {
                 groups    : ["system:masters"],
                 roleArn   : config.infra.clusterAdminRole.arn,
-                username  : "pulumi:admin-usr",            
+                username  : "pulumi:admin-usr",
             }
         ],
         skipDefaultNodeGroup: true,
@@ -120,11 +151,11 @@ export function createCluster(instanceRoles: aws.iam.Role[]): eks.Cluster{
         metadata: {
         name: "cluster-admin-binding",
         },
-        subjects: [{ 
+        subjects: [{
         kind: "User",
         name: "pulumi:admin-usr",
         apiGroup: "rbac.authorization.k8s.io",
-        }], 
+        }],
         roleRef: {
         kind: "ClusterRole",
         name: "clusterAdminRole",
@@ -133,32 +164,32 @@ export function createCluster(instanceRoles: aws.iam.Role[]): eks.Cluster{
     }, {provider: cluster.provider});
 
     // if (cluster.core.instanceProfile !== undefined) {
-    //     new aws.iam.RolePolicyAttachment("s3-sync-policy", { 
-    //         policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess, 
+    //     new aws.iam.RolePolicyAttachment("s3-sync-policy", {
+    //         policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess,
     //         role: cluster.core.instanceProfile.role
     //     },
     // );
     // };
     // if (cluster.core.cluster.roleArn !== undefined) {
     //     let eksRole = cluster.core.cluster.roleArn.apply(role => role.split("/")[1]);
-    //     new aws.iam.RolePolicyAttachment("s3-sync-policy-eks", { 
+    //     new aws.iam.RolePolicyAttachment("s3-sync-policy-eks", {
     //         policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess,
     //         role: eksRole
     //     },
     // );
     // };
-    
-    
+
+
     new k8s.core.v1.Namespace("prodNamespace", {
         metadata: {
             name: "prod"
-        }}, 
+        }},
         {provider: cluster.provider, dependsOn:cluster})
 
     return cluster;
 }
 
-export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration, cluster: eks.Cluster, instanceProfile: aws.iam.InstanceProfile, 
+export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration, cluster: eks.Cluster, instanceProfile: aws.iam.InstanceProfile,
                                 labels:{[key: string]: string}, taints?: {[key: string]: any}){
     let ng = new eks.NodeGroup(`${nodeGroupConfig.namespace}Worker`, {
         amiId: nodeGroupConfig.ami,
