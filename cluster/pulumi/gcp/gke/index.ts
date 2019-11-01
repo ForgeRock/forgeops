@@ -69,4 +69,7 @@ if (config.enablePrometheus){
     gke.createPrometheus(cluster, clusterProvider);
 }
 
-
+// ********************** PROMETHEUS ************** 
+if (config.enableLocalSsdProvisioner){
+    gke.deployLocalSsdProvisioner(cluster, clusterProvider);
+}

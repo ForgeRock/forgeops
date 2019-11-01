@@ -16,16 +16,20 @@ config:
   nginx:enable: "true"
   nginx:version: "1.24.4"
   ds:enable: "false"
+  localssdprovisioner:enable: "false"
+  localssdprovisioner:namespace: local-storage
   primary:autoScaling: "true"
+  primary:localSsdCount: "1"
   primary:maxNodes: "4"
   primary:minNodes: "1"
   primary:nodeCount: "0"
   primary:nodeMachineType: custom-4-16384
   primary:preemptible: "false"
-  prometheus:enable: "true"
+  prometheus:enable: "false"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.21.0
   secondary:autoScaling: "false"
   secondary:enable: "false"
+  secondary:localSsdCount: "0"
   secondary:nodeCount: "0"
   secondary:preemptible: "false"

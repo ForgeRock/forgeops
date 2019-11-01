@@ -6,6 +6,7 @@ import * as ingress from "../../packages/nginx-ingress-controller/index-gke";
 import { Provider } from "@pulumi/gcp";
 import * as cm from "../../packages/cert-manager";
 import * as prometheus from "../../packages/prometheus";
+import * as localSsd from "../../packages/local-ssd-provisioner";
 
 // To be finished...
 // export function createNetworkLoadbalancer(vpc: gcp.compute.Network, ip: gcp.compute.Address, instanceGroups: pulumi.Output<string[]>){
@@ -71,7 +72,7 @@ function createNP(nodeConfig: any): object {
             labels: nodeConfig.labels,
             taints: nodeConfig.taints ? [nodeConfig.taints] : undefined,
             preemptible: nodeConfig.preemptible,
-            //localSsdCount: 1
+            localSsdCount: nodeConfig.localSsdCount
         },
         nodeCount: nodeConfig.nodeCount,
         autoscaling: nodeConfig.enableAutoScaling ? {
@@ -186,13 +187,7 @@ export function createStorageClasses(clusterProvider: k8s.Provider) {
         parameters: { type: 'pd-ssd' },
     }, { provider: clusterProvider } );
 
-    new k8s.storage.v1.StorageClass("sc-local-nvme", {
-        metadata: { name: 'local-nvme' },
-        provisioner: 'kubernetes.io/no-provisioner',
-        volumeBindingMode: 'WaitForFirstConsumer',
-    }, { provider: clusterProvider } );
-
-    new k8s.storage.v1.StorageClass("local-storage", {
+    new k8s.storage.v1.StorageClass("sc-local-storage", {
         metadata: { name: 'local-storage' },
         provisioner: 'kubernetes.io/no-provisioner',
         volumeBindingMode: 'WaitForFirstConsumer',
@@ -268,4 +263,16 @@ export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.P
         dependsOn: [cluster],
     }
     return new prometheus.Prometheus(prometheusArgs)
+}
+
+/************ LOCAL SSD PROVISIONER ************/
+
+export function deployLocalSsdProvisioner(cluster: gcp.container.Cluster, provider: k8s.Provider) {
+    const provisionerArgs: localSsd.PkgArgs = {
+        version: config.localSsdVersion,
+        namespaceName: config.localSsdNamespace,
+        provider: provider,
+        cluster: cluster
+    }
+    return new localSsd.LocalSsdProvisioner(provisionerArgs)
 }

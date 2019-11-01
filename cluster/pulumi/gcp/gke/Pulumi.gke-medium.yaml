@@ -14,6 +14,8 @@ config:
   gcp:project: engineering-devops
   gcp:region: us-east4
   gcp:zone: us-east4-a
+  localssdprovisioner:enable: "false"
+  localssdprovisioner:namespace: local-storage
   nginx:enable: "true"
   nginx:version: "1.24.4"
   primary:autoScaling: "true"
