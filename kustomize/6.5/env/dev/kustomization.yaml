@@ -1,0 +1,31 @@
+kind: ""
+apiversion: ""
+namespace: default
+resources:
+- ../../idm
+- ../../../ingress
+- platform-config.yaml
+vars:
+- name: DOMAIN
+  fieldref:
+    fieldPath: data.DOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: SUBDOMAIN
+  fieldref:
+    fieldPath: data.SUBDOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: NAMESPACE
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+  fieldref:
+    fieldpath: metadata.namespace
+configurations:
+- var.yaml

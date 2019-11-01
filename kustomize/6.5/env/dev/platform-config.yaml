@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+# The env vars below can be passed into a pod using the envFrom pod spec.
+# These global variables can be used to parameterize your deployments.
+# The FQDN and URLs here should match your ingress or istio gateway definitions
+data:
+  FQDN: $(NAMESPACE).iam.forgeops.com
+  SUBDOMAIN: iam
+  DOMAIN: forgeops.com
+  AM_URL: https://$(NAMESPACE).iam.forgeops.com/am
+  IDM_ADMIN_URL:  https://$(NAMESPACE).iam.forgeops.com/admin
+  IDM_REST_URL:   https://$(NAMESPACE).iam.forgeops.com/openidm
+  ENDUSER_UI_URL:   https://$(NAMESPACE).iam.forgeops.com/enduser
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: platform-secrets
+type: Opaque
+data:
+  # Password used at installation time. base64 encoded.
+  # Change after installation.
+  ADMIN_PASSWORD: cGFzc3dvcmQ=

@@ -32,7 +32,6 @@ LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FIL
 UPGRADE_TEST_BASE_AMSTER_VERSION    = 'fraas-production'
 UPGRADE_TEST_BASE_AM_VERSION        = 'fraas-production'
 UPGRADE_TEST_BASE_IDM_VERSION       = 'fraas-production'
-UPGRADE_TEST_BASE_DS_VERSION        = 'fraas-production'
 UPGRADE_TEST_BASE_DSEMPTY_VERSION   = '7.0.0-5e9e1c7a12dab93be3b81ccee374c44bac7317d8'
 
 /** Root-level image names corresponding to product Helm charts and Dockerfiles in the ForgeOps repo. */
@@ -40,7 +39,6 @@ ROOT_LEVEL_IMAGE_NAMES = [
         'am'        : 'gcr.io/forgerock-io/am',
         'am-fbc'    : 'gcr.io/forgerock-io/am',
         'amster'    : 'gcr.io/forgerock-io/amster',
-        'ds'        : 'gcr.io/forgerock-io/ds',
         'ds-empty'  : 'gcr.io/forgerock-io/ds-empty',
         'ds-cts'    : 'gcr.io/forgerock-io/ds-empty',
         'ds-idrepo' : 'gcr.io/forgerock-io/ds-empty',
@@ -53,7 +51,6 @@ ROOT_LEVEL_IMAGE_NAMES = [
 HELM_CHART_PATHS = [
         'am'        : 'helm/openam/values.yaml',
         'amster'    : 'helm/amster/values.yaml',
-        'ds'        : 'helm/ds/values.yaml',
         'ds-empty'  : 'helm/ds-empty/values.yaml',
         'idm'       : 'helm/openidm/values.yaml',
         'ig'        : 'helm/openig/values.yaml',
@@ -164,7 +161,7 @@ def normalizeStageName(String stageName) {
 
 def getCurrentProductCommitHashes() {
     return [
-            getHelmChart('ds').productCommit,
+            getHelmChart('ds-empty').productCommit,
             getHelmChart('ig').productCommit,
             getHelmChart('idm').productCommit,
             getHelmChart('am').productCommit,

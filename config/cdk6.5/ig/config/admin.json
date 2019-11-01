@@ -1,0 +1,33 @@
+{
+  "heap": [
+    {
+      "name": "ClientHandler",
+      "type": "ClientHandler"
+    },
+    {
+      "name": "ApiProtectionFilter",
+      "type": "ScriptableFilter",
+      "config": {
+        "type": "application/x-groovy",
+        "source": [
+          "return next.handle(context, request)"
+        ]
+      }
+    },
+    {
+      "name": "MetricsProtectionFilter",
+      "type": "ScriptableFilter",
+      "config": {
+        "type": "application/x-groovy",
+        "file": "BasicAuthResourceServerFilter.groovy",
+        "args": {
+          "realm": "/",
+          "username": "metric",
+          "password": "password"
+        }
+      }
+    }    
+  ],
+  "mode": "PRODUCTION",
+  "prefix": "openig"
+}

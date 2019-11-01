@@ -1,0 +1,36 @@
+{
+    "filters" : [
+        {
+            "condition" : {
+                "type" : "text/javascript",
+                "source" : "context.caller.external === true || context.current.name === 'selfservice'"
+            },
+            "onRequest" : {
+                "type" : "text/javascript",
+                "source" : "require('router-authz').testAccess()"
+            }
+        },
+        {
+            "pattern" : "^(managed|system|internal)($|(/.+))",
+            "onRequest" : {
+                "type" : "text/javascript",
+                "file" : "policyFilter.js"
+            },
+            "methods" : [
+                "create",
+                "update"
+            ]
+        },
+        {
+            "pattern" : "^(managed|internal)($|(/.+))",
+            "condition" : {
+                "type" : "text/javascript",
+                "source" : "context.caller.external === true || context.current.name === 'selfservice'"
+            },
+            "onResponse" : {
+                "type" : "text/javascript",
+                "source" : "require('relationshipFilter').filterResponse()"
+            }
+        }
+    ]
+}
