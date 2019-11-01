@@ -74,7 +74,7 @@ function createNP(nodeConfig: any): object {
             preemptible: nodeConfig.preemptible,
             localSsdCount: nodeConfig.localSsdCount
         },
-        nodeCount: nodeConfig.nodeCount,
+        nodeCount: nodeConfig.enableAutoScaling ? undefined : nodeConfig.nodeCount,
         autoscaling: nodeConfig.enableAutoScaling ? {
             maxNodeCount: nodeConfig.maxNodes,
             minNodeCount: nodeConfig.minNodes
