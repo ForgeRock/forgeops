@@ -1,2 +1,3 @@
 config:
-  path: /git/config/platform/platform-deployment/ig/
+  # git container does the checkout under /git/config so we have config twice
+  path: /git/config/config/7.0/platform-deployment/ig/

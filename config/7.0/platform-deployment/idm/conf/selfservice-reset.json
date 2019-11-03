@@ -1,0 +1,42 @@
+{
+    "stageConfigs" : [
+        {
+            "name" : "parameters",
+            "parameterNames" : [
+                "returnParams"
+            ]
+        },
+        {
+            "name" : "userQuery",
+            "validQueryFields" : [
+                "userName",
+                "mail",
+                "givenName",
+                "sn"
+            ],
+            "identityIdField" : "_id",
+            "identityEmailField" : "mail",
+            "identityUsernameField" : "userName",
+            "identityServiceUrl" : "managed/user"
+        },
+        {
+            "name" : "kbaSecurityAnswerVerificationStage",
+            "kbaPropertyName" : "kbaInfo",
+            "identityServiceUrl" : "managed/user",
+            "kbaConfig" : null
+        },
+        {
+            "name" : "resetStage",
+            "identityServiceUrl" : "managed/user",
+            "identityPasswordField" : "password"
+        }
+    ],
+    "snapshotToken" : {
+        "type" : "jwt",
+        "jweAlgorithm" : "RSAES_PKCS1_V1_5",
+        "encryptionMethod" : "A128CBC_HS256",
+        "jwsAlgorithm" : "HS256",
+        "tokenExpiry" : 300
+    },
+    "storage" : "stateless"
+}

@@ -107,7 +107,29 @@ profiles:
     kustomize:
       path: ./kustomize/env/large
 
-# Sample profiles to launch / test just a specific product
+# Platform deployment sample used for PIT and PERF tests
+- name: platform-deployment
+  build:
+    artifacts:
+      - image: am
+        context: docker/am
+      - image: amster
+        context: docker/amster
+      - image: idm
+        context: docker/idm
+      - image: ds-cts
+        context: docker/ds/cts
+      - image: ds-idrepo
+        context: docker/ds/idrepo
+      - image: ig
+        context: docker/ig
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/env/lodestar
+
+  # Sample profiles to launch / test just a specific product
 - name: ig-only
   build:
     artifacts:
