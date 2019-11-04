@@ -52,7 +52,7 @@ locust:
   labelSelectorComponent: master
 
 additionalRulesLabels:
-  prometheus: monitoring-kube-prometheus
+  prometheus: prometheus-operator
   role: alert-rules
 
   
