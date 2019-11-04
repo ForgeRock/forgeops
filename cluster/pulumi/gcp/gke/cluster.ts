@@ -8,37 +8,6 @@ import * as cm from "../../packages/cert-manager";
 import * as prometheus from "../../packages/prometheus";
 import * as localSsd from "../../packages/local-ssd-provisioner";
 
-// To be finished...
-// export function createNetworkLoadbalancer(vpc: gcp.compute.Network, ip: gcp.compute.Address, instanceGroups: pulumi.Output<string[]>){
-//     // firewall
-//     // health check
-//     const defaultHttpHealthCheck = new gcp.compute.HttpHealthCheck("default", {
-//         checkIntervalSec: 5,
-//         requestPath: "/healthz",
-//         timeoutSec: 1,
-//         unhealthyThreshold: 3,
-//         port: 30080
-//     });
-
-//     const targetBackend = new gcp.compute.BackendService("targetBackend", {
-//         healthChecks: defaultHttpHealthCheck.selfLink,
-//         backends: [{
-//             group: instanceGroups[0],
-
-//         }]
-
-//     });
-
-//     const defaultForwardingRule = new gcp.compute.ForwardingRule("default", {
-//         ports: ["80","443"],
-//         target: targetBackend.selfLink,
-//         loadBalancingScheme: "external",
-//         network: vpc.selfLink,
-//         region: gcp.config.region,
-//         ipAddress: ip.address
-//     });
-// }
-
 /** Method to return list of k8s full versions */
 function getK8sVersion() {
     return gcp.container.getEngineVersions({
