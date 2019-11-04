@@ -1,0 +1,18 @@
+apiVersion: skaffold/v1beta14
+kind: Config
+build:
+  artifacts:
+  - image: ds-idrepo
+    context: .
+deploy:
+  kustomize:
+    path: ../../../kustomize/ds/idrepo-dev
+profiles:
+- name: make-users
+  deploy:
+    kustomize:
+      path: ../../../kustomize/ds/idrepo-make-users
+- name: mini
+  deploy:
+    kustomize:
+      path: ../../../kustomize/ds/idrepo
