@@ -23,12 +23,9 @@ if read -t 15 -p "Removing Prometheus Operator and Grafana from '${NAMESPACE}' n
 # Remove Prometheus Operator
 helm delete --purge ${NAMESPACE}-forgerock-metrics
 helm delete --purge ${NAMESPACE}-prometheus-operator
-helm delete --purge ${NAMESPACE}-kube-prometheus
 
-# These get left over after the helm delete --purge has completed.
-kubectl delete svc alertmanager-operated prometheus-operated --namespace=$NAMESPACE
-
-
-
-
-
+kubectl delete crd prometheuses.monitoring.coreos.com
+kubectl delete crd prometheusrules.monitoring.coreos.com
+kubectl delete crd servicemonitors.monitoring.coreos.com
+kubectl delete crd podmonitors.monitoring.coreos.com
+kubectl delete crd alertmanagers.monitoring.coreos.com

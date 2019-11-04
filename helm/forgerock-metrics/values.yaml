@@ -16,7 +16,7 @@ namespaceSelectorStrategy: any
 am:
   component: am
   enabled: true
-  path: /json/metrics/prometheus
+  path: /am/json/metrics/prometheus
   labelSelectorComponent: openam
   secretUser: prometheus
   secretPassword: prometheus
@@ -45,8 +45,14 @@ ig:
   secretUser: metric
   secretPassword: password
   
+locust:
+  component: locust
+  enabled: true
+  path: /metrics/prometheus
+  labelSelectorComponent: master
+
 additionalRulesLabels:
-  prometheus: monitoring-kube-prometheus
+  prometheus: prometheus-operator
   role: alert-rules
 
   

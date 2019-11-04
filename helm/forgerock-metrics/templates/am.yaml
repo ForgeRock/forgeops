@@ -11,7 +11,7 @@ metadata:
     # This targets the instance that the helm chart coreos/kube-prometheus creates. 
     # Note that this ServiceMonitor needs to be in the same namespace as the operator
     # The monitored targets can be in different namespaces.
-    prometheus: {{ .Release.Namespace }}-kube-prometheus
+    prometheus: prometheus-operator
     app: {{ .Values.am.component }}
   name: {{ .Values.am.component }}
 spec:
