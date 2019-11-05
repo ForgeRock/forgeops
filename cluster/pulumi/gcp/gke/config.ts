@@ -7,7 +7,9 @@ const primaryPool = new Config("primary");
 const secondaryPool = new Config("secondary");
 const cm = new Config("certmanager");
 const prom = new Config("prometheus");
+const local = new Config("localssdprovisioner");
 const dsPool = new Config("ds");
+export let localSsdFlag: Boolean = false
 
 // ** PROJECT CONFIG **
 export const project = new pulumi.Config(pulumi.getProject());
@@ -18,6 +20,7 @@ export const enableDSPool = dsPool.requireBoolean("enable");
 export const enableNginxIngress = nginx.requireBoolean("enable");
 export const enableCertManager = cm.requireBoolean("enable");
 export const enablePrometheus = prom.requireBoolean("enable");
+export const enableLocalSsdProvisioner = local.requireBoolean("enable");
 
 // ** NETWORK CONFIG **
 export const stackRef = cluster.get("infraStackName") || "gcp-infra"
@@ -51,6 +54,7 @@ interface NodePool {
     nodePoolName: string;
     labels: object;
     taints?: object;
+    localSsdCount: number
 };
 
 let backendLabels: {[key: string]: string} = {
@@ -86,6 +90,7 @@ export const primary:NodePool = {
     preemptible: primaryPool.requireBoolean("preemptible"),
     nodePoolName: primaryPool.get("name") || "primary",
     labels: backendLabels,
+    localSsdCount: primaryPool.getNumber("localSsdCount") || 0
 };
 
 // SECONDARY NODE POOL VALUES
@@ -102,6 +107,7 @@ export const secondary:NodePool = {
     preemptible: secondaryPool.requireBoolean("preemptible"),
     nodePoolName: secondaryPool.get("name") || "secondary",
     labels: backendLabels,
+    localSsdCount: secondaryPool.getNumber("localSsdCount") || 0
 };
 
 // SECONDARY NODE POOL VALUES
@@ -123,9 +129,10 @@ export const ds:NodePool = {
         value: "true",
         effect: "NO_SCHEDULE"
     },
+    localSsdCount: dsPool.getNumber("localSsdCount") || 0
 };
 
-// PROMETHEUS VALUES
+//PROMETHEUS VALUES
 export interface prometheusConfiguration {
     enable: boolean;
     k8sNamespace: string;
@@ -142,5 +149,9 @@ function getPrometheusConfig(namespace: string): prometheusConfiguration {
     return val;
 }
 export const prometheusConfig = getPrometheusConfig("prometheus");
+
+//LOCAL SSD VALUES
+export const localSsdVersion = local.get("version") || "v2.2.1";
+export const localSsdNamespace = local.require("namespace");
 
 

@@ -125,6 +125,8 @@ spec:
       annotations:
         pv.beta.kubernetes.io/gid: "0"
     spec:
+      # Include below storageClass in overlay if wanting to use local SSD.
+      # storageClassName: "local-storage"
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:

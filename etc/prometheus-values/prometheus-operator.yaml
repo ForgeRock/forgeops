@@ -2,70 +2,71 @@
 # Possible values to override can be found here:
 # https://github.com/coreos/prometheus-operator/tree/master/helm/prometheus-operator
 
-global:
-  ## Hyperkube image to use when getting ThirdPartyResources & cleaning up
-  ##
-  hyperkube:
-    repository: quay.io/coreos/hyperkube
-    tag: v1.7.6_coreos.0
-    pullPolicy: IfNotPresent
-
 ## Prometheus-config-reloader image to use for config and rule reloading
 ##
-prometheusConfigReloader:
+prometheusConfigReloaderImage:
   repository: quay.io/coreos/prometheus-config-reloader
-  tag: v0.20.0
-
-## Configmap-reload image to use for reloading configmaps
-##
-configmapReload:
-  repository: quay.io/coreos/configmap-reload
-  tag: v0.0.1
+  tag: v0.32.0
   
 image:
   repository: quay.io/coreos/prometheus-operator
-  tag: v0.20.0
-  pullPolicy: IfNotPresent
+  tag: v0.32.0
 
-## If enabled, prometheus-operator will create a service for scraping kubelets
-##
-kubeletService:
-  enable: true
-  namespace: kube-system
-  name: kubelet
+alertmanagerSpec:
+  image:
+    repository: quay.io/prometheus/alertmanager
+    tag: v0.19.0
+
+  storageSpec:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: fast
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 50Gi
+
+grafana:
+  storageSpec:
+    class: fast
+    accessMode: "ReadWriteOnce"
+    resources:
+     requests:
+       storage: 20Gi  
+
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
   
-## Node labels for prometheus-operator pod assignment
-##
-nodeSelector: {}
+  adminPassword: password
 
-## Tolerations for use with node taints
-## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
-tolerations: {}
+prometheus:
+  image:
+    repository: quay.io/prometheus/prometheus
+    tag: v2.12.0
 
-## If true, create & use RBAC resources
-##
-rbacEnable: true
+prometheusSpec:
+  retention: 30d
 
-## If true, create Pod Security Policy resources
-pspEnable: true
+  ruleSelector: 
+    matchLabels:
+    role: alert-rules
+    #   prometheus: prometheus-operator
 
-# Reference to one or more secrets to be used when pulling images
-imagePullSecrets: []
-#  - name: "image-pull-secret"
+  serviceMonitorSelector:
+    matchLabels:
+      prometheus: prometheus-operator
 
-# Use logfmt (default) or json-formatted logging
-# logFormat: logfmt
-
-## Prometheus-operator resource limits & requests
-## Ref: https://kubernetes.io/docs/user-guide/compute-resources/
-##
-resources: {}
-  # limits:
-  #   cpu: 200m
-  #   memory: 100Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 50Mi
-
-jobLabel: prometheus-operator
+  storageSpec:
+    volumeClaimTemplate:
+      metadata:
+        name: prometheus-metrics
+        annotations:
+          "helm.sh/resource-policy": keep
+      spec:
+        storageClassName: fast
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi

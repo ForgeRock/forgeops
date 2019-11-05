@@ -2,41 +2,11 @@ import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import * as k8s from "@pulumi/kubernetes";
 import * as config from "./config";
-import * as ingress from "../../packages/nginx-ingress-controller/index-gke";
+import * as ingress from "../../packages/nginx-ingress-controller";
 import { Provider } from "@pulumi/gcp";
 import * as cm from "../../packages/cert-manager";
 import * as prometheus from "../../packages/prometheus";
-
-// To be finished...
-// export function createNetworkLoadbalancer(vpc: gcp.compute.Network, ip: gcp.compute.Address, instanceGroups: pulumi.Output<string[]>){
-//     // firewall
-//     // health check
-//     const defaultHttpHealthCheck = new gcp.compute.HttpHealthCheck("default", {
-//         checkIntervalSec: 5,
-//         requestPath: "/healthz",
-//         timeoutSec: 1,
-//         unhealthyThreshold: 3,
-//         port: 30080
-//     });
-
-//     const targetBackend = new gcp.compute.BackendService("targetBackend", {
-//         healthChecks: defaultHttpHealthCheck.selfLink,
-//         backends: [{
-//             group: instanceGroups[0],
-
-//         }]
-
-//     });
-
-//     const defaultForwardingRule = new gcp.compute.ForwardingRule("default", {
-//         ports: ["80","443"],
-//         target: targetBackend.selfLink,
-//         loadBalancingScheme: "external",
-//         network: vpc.selfLink,
-//         region: gcp.config.region,
-//         ipAddress: ip.address
-//     });
-// }
+import * as localSsd from "../../packages/local-ssd-provisioner";
 
 /** Method to return list of k8s full versions */
 function getK8sVersion() {
@@ -71,9 +41,9 @@ function createNP(nodeConfig: any): object {
             labels: nodeConfig.labels,
             taints: nodeConfig.taints ? [nodeConfig.taints] : undefined,
             preemptible: nodeConfig.preemptible,
-            //localSsdCount: 1
+            localSsdCount: nodeConfig.localSsdCount
         },
-        nodeCount: nodeConfig.nodeCount,
+        nodeCount: nodeConfig.enableAutoScaling ? undefined : nodeConfig.nodeCount,
         autoscaling: nodeConfig.enableAutoScaling ? {
             maxNodeCount: nodeConfig.maxNodes,
             minNodeCount: nodeConfig.minNodes
@@ -186,13 +156,7 @@ export function createStorageClasses(clusterProvider: k8s.Provider) {
         parameters: { type: 'pd-ssd' },
     }, { provider: clusterProvider } );
 
-    new k8s.storage.v1.StorageClass("sc-local-nvme", {
-        metadata: { name: 'local-nvme' },
-        provisioner: 'kubernetes.io/no-provisioner',
-        volumeBindingMode: 'WaitForFirstConsumer',
-    }, { provider: clusterProvider } );
-
-    new k8s.storage.v1.StorageClass("local-storage", {
+    new k8s.storage.v1.StorageClass("sc-local-storage", {
         metadata: { name: 'local-storage' },
         provisioner: 'kubernetes.io/no-provisioner',
         volumeBindingMode: 'WaitForFirstConsumer',
@@ -226,7 +190,7 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
     const nginxConfig = new pulumi.Config("nginx");
 
     // Set values for nginx Helm chart
-    const nginxValues: ingress.ChartArgs = {
+    const nginxValues: ingress.PkgArgs = {
         ip: ip,
         version: config.nginxVersion,
         clusterProvider: clusterProvider,
@@ -234,7 +198,7 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
     }
 
     // Deploy Nginx Ingress Controller Helm chart
-    new ingress.NginxIngressController( nginxValues );
+    new ingress.NginxIngressController(nginxValues);
 }
 
 /************ CERTIFICATE MANAGER ************/
@@ -268,4 +232,16 @@ export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.P
         dependsOn: [cluster],
     }
     return new prometheus.Prometheus(prometheusArgs)
+}
+
+/************ LOCAL SSD PROVISIONER ************/
+
+export function deployLocalSsdProvisioner(cluster: gcp.container.Cluster, provider: k8s.Provider) {
+    const provisionerArgs: localSsd.PkgArgs = {
+        version: config.localSsdVersion,
+        namespaceName: config.localSsdNamespace,
+        provider: provider,
+        cluster: cluster
+    }
+    return new localSsd.LocalSsdProvisioner(provisionerArgs)
 }

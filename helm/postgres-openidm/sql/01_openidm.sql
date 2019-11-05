@@ -316,10 +316,11 @@ CREATE TABLE openidm.files (
 -- Table openidm.relationshipresources
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS openidm.relationshipresources (
-  originresourcecollection VARCHAR(255) NOT NULL ,
-  originproperty VARCHAR(100) NOT NULL ,
-  refresourcecollection VARCHAR(255) NOT NULL ,
-  PRIMARY KEY ( originresourcecollection, originproperty,	refresourcecollection));
+  originresourcecollection VARCHAR(255) NOT NULL,
+  originproperty VARCHAR(100) NOT NULL,
+  refresourcecollection VARCHAR(255) NOT NULL,
+  originfirst BOOL NOT NULL,
+  PRIMARY KEY ( originresourcecollection, originproperty, refresourcecollection, originfirst ));
 
 create or replace
 function fn_relationshiprefs() returns trigger as
@@ -329,25 +330,31 @@ BEGIN
       INSERT INTO openidm.relationshipresources
                   ( originresourcecollection,
                    originproperty,
-                   refresourcecollection)
+                   refresourcecollection,
+                   originfirst)
       VALUES      ( NEW.firstresourcecollection,
                    NEW.firstpropertyname,
-                   NEW.secondresourcecollection )
+                   NEW.secondresourcecollection,
+                   true)
       ON CONFLICT ( originresourcecollection,
                    originproperty,
-                   refresourcecollection) DO NOTHING;
+                   refresourcecollection,
+                   originfirst) DO NOTHING;
     END IF;
     IF ( NEW.secondpropertyname IS NOT NULL ) THEN
       INSERT INTO openidm.relationshipresources
                   ( originresourcecollection,
                    originproperty,
-                   refresourcecollection)
+                   refresourcecollection,
+                   originfirst)
       VALUES      ( NEW.secondresourcecollection,
                    NEW.secondpropertyname,
-                   NEW.firstresourcecollection )
+                   NEW.firstresourcecollection,
+                   false)
       ON CONFLICT ( originresourcecollection,
                    originproperty,
-                   refresourcecollection) DO NOTHING;
+                   refresourcecollection,
+                   originfirst) DO NOTHING;
     END IF;
 
     RETURN NEW;

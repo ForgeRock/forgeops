@@ -13,16 +13,16 @@
 set -e
 
 MONPATH="../etc/prometheus-values"
-DEFAULT_VALUES="${MONPATH}/kube-prometheus.yaml"
+DEFAULT_VALUES="${MONPATH}/prometheus-operator.yaml"
 
-USAGE="Usage: $0 [-n <namespace>] [-f <values file>] [-k <kube-prometheus values file>] [-s <slack-webhook-url>]"
+USAGE="Usage: $0 [-n <namespace>] [-f <values file>] [-k <prometheus-operator values file>] [-s <slack-webhook-url>]"
 
 # Output help if no arguments or -h is included
 if [[ $1 == "-h" ]];then
     echo $USAGE
     echo "-n <namespace>    namespace"
     echo "-f <values file>  add custom values file for forgerocks-metrics. Default: custom.yaml"
-    echo "-k <values file>  add custom values file for kube-prometheus. Default: etc/kube-prometheus.yaml"
+    echo "-k <values file>  add custom values file for prometheus-operator. Default: etc/prometheus-operator.yaml"
     echo "-s <slack webhook url> add the url for a slack webhook url for custom values"
     exit
 fi
@@ -64,7 +64,7 @@ fi
 if read -t 10 -p "Installing Prometheus Operator and Grafana to '${NAMESPACE}' namespace in 10 seconds or when enter is pressed...";then echo;fi
 
 # Add coreos repo to helm
-helm repo add coreos https://s3-eu-west-1.amazonaws.com/coreos-charts/stable/
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 # Add frconfig chart to use cert-manager to provide TLS certificate for external access
 if [ $OVERRIDE_VALUES ]; then
@@ -72,11 +72,7 @@ if [ $OVERRIDE_VALUES ]; then
 fi
 
 # Install/Upgrade prometheus-operator
-helm upgrade -i ${NAMESPACE}-prometheus-operator coreos/prometheus-operator --set=rbac.install=true --values ${MONPATH}/prometheus-operator.yaml --namespace=$NAMESPACE
-
-# Install/Upgrade kube-prometheus
-helm upgrade -i ${NAMESPACE}-kube-prometheus coreos/kube-prometheus --set=rbac.install=true -f $DEFAULT_VALUES $OVERRIDE_VALUES $SLACK_VALUES --namespace=$NAMESPACE
+helm upgrade -i ${NAMESPACE}-prometheus-operator stable/prometheus-operator --set=rbac.install=true -f $DEFAULT_VALUES $OVERRIDE_VALUES $SLACK_VALUES --namespace=$NAMESPACE
 
 # Install/Upgrade forgerock-servicemonitors
 helm upgrade -i ${NAMESPACE}-forgerock-metrics ../helm/forgerock-metrics $CUSTOM_FILE --set=rbac.install=true --namespace=$NAMESPACE
-
