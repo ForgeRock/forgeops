@@ -22,7 +22,7 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                         DEPLOYMENT_NAME      : 'ds-shared-repo',
                         CLUSTER_DOMAIN       : 'pit-24-7.forgeops.com',
                         CLUSTER_NAMESPACE    : 'greenfield',
-                        REPEAT               : 23,
+                        REPEAT               : 10,
                         REPEAT_WAIT          : 3600,
                         TIMEOUT              : "24",
                         TIMEOUT_UNIT         : "HOURS",

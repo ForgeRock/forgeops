@@ -20,7 +20,6 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                     def cfg = [
                         TESTS_SCOPE                     : 'tests/upgrade',
                         DEPLOYMENT_NAME                 : 'ds-shared-repo',
-                        DS_IMAGE_NAME                   : imageName,
                         CLUSTER_NAMESPACE               : "upgrade",
                         CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                         COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
