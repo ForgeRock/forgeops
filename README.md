@@ -94,26 +94,18 @@ for minikube and can be modified for your environment)
 The various configuration files are located in the `docker` and bundled with their respective
 products (amster, idm, ig, am).
 
-## Managing Configurations
+## Managing Configurations (Experimental)
 
 The `bin/config.sh` utility is used to initialize a configuration and to synchronize files to and from a running instance.
 
-A number of configuration profiles and product versions are under the [config](config/) folder. The format
-of the folder structure is `config/$VERSION/$PROFILE` - where VERSION is the ForgeRock product version (6.5,7.0) and
-PROFILE is the configuration profile that makes up the deployment.
+A number of configuration profiles are under the [config](config/) folder. The CDK is the default configuration profile. 
+You can set the configuration profile using the $CDK_PROFILE environment variable. The default value of $CDK_PROFILE is
+`cdk`. 
 
-The `config/` directory is under version control. The target `docker/{product}/conf` directories are not versioned (via
-.gitignore). The workflow is that initial configuration is copied from the `config/` directory to the target `docker/`
-folder.  During development, configuration is exported back out of the running products to the `docker` folder, and
-then optionally copied back to the `config/` folder where it can be committed to version control.
+The `bin/config.sh` utility takes two arguments:
 
-
-The `bin/config.sh` utility takes the following arguments:
-
-* `--profile <profile>` : Specifies the profile. The default is the `cdk`. The environment variable $CDK_PROFILE can
-  override the default.
-* `--component <am|idm|amster|ig|all>`: specifies the component to configure. This defaults to `all` components.
-* `--version <6.5|7.0>`: The platform version (default 7.0). The environment variable `CDK_VERSION` can override this.
+--profile: overrides the value of $CDK_PROFILE
+--component: specifies a single component of the ForgeRock Identity Platform  
 
 To setup your environment for the CDK, use the `init`command:
 
@@ -121,30 +113,19 @@ To setup your environment for the CDK, use the `init`command:
 bin/config.sh init
 ```
 
-The above copies the configuration profile under the Git-managed `config/7.0/cdk` directory to the  `docker/7.0` folder
+Initialization copies the configuration profile under the Git-managed `config` directory to one or more component's  `docker` folder (for example, docker/idm).
 
-**Keep in mind that the configuration files under the `docker/$version/$product/$config` folder are not maintained in Git.**.  They
+**Note that the configuration files under the `docker/` folder are not maintained in Git.**.  They
 are considered temporary build-time assets.
 
 You can select alternate configuration profiles, or initialize specific components:
 
 ```bash
-# Initializes the "test" configuration profile for IDM 6.5
-bin/config.sh --profile test --component idm --version 6.5 init
-# Initialize the "test" configuration for all ForgeRock components for the default 7.0 version
+# Initializes the "test" configuration profile for IDM
+bin/config.sh --profile test --component idm init
+# Initialize the "test" configuration for all ForgeRock components
 bin/config.sh --profile test
 #
-```
-
-
-The `export` command is used to export configuration from a running instance (e.g., IDM) back to the `docker` folder. Note that not all
-components support export functionality (currently just IDM and amster).
-
-```bash
-# Export all configurations to the docker folder
-bin/config.sh export
-# Export the IDM configuration to the docker folder
-bin/config.sh --component idm export
 ```
 
 The `save` command copies the contents of the Docker configuration *back* to the config/ folder where it can be versioned in Git.
@@ -162,6 +143,15 @@ The `diff` command runs GNU `diff` to show the difference between the `docker/` 
 bin/config.sh --component idm --profile cdk diff
 ```
 
+The `export` command is used to export configuration from a running instance (e.g., IDM) back to the `docker` folder. Note that not all
+components support export functionality (currently just IDM).
+
+```bash
+# Export all configurations to the docker folder
+bin/config.sh export
+# Export the IDM configuration to the docker folder
+bin/config.sh --component idm export
+```
 
 Finally, the `sync` command combines the `export` and `save` functions into a single command:
 
@@ -193,7 +183,7 @@ bin/config.sh restore
 To add a new configuration, copy the contents of an existing configuration to your new folder:
 
 ```bash
-cd config/7.0
+cd config
 cp -r cdk my_great_config
 git add my_great_config
 ```

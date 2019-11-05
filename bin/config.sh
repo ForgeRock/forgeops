@@ -25,18 +25,16 @@ _positionals=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_component="all"
 
-# Profile defaults to cdk if not provided
 _arg_profile="${CDK_PROFILE:-cdk}"
-_arg_version="${CDK_VERSION:-7.0}"
+
 
 print_help()
 {
 	printf '%s\n' "manage ForgeRock platform configurations"
-	printf 'Usage: %s [-p|--profile <arg>] [-c|--component <arg>] [-v|--version <arg>] [-h|--help] <operation>\n' "$0"
+	printf 'Usage: %s [-p|--profile <arg>] [-c|--component <arg>] [-h|--help] <operation>\n' "$0"
 	printf '\t%s\n' "<operation>: operation is one of init - to copy initial configuration, diff - to run a diff command, export - export config from running instance, save - save to git, restore - restore git (abandon changes), sync - export and save"
 	printf '\t%s\n' "-c, --component: Select component - am, amster, idm, ig or all  (default: 'all')"
 	printf '\t%s\n' "-p, --profile: Select configuration source (default: 'cdk')"
-	printf '\t%s\n' "-v, --version: Select configuration version (default: '7.0')"
 	printf '\t%s\n' "-h, --help: Prints help"
 	printf '\n%s\n' "example to copy idm files: config.sh -c idm -p cdk init"
 }
@@ -55,10 +53,10 @@ parse_commandline()
 				shift
 				;;
 			--component=*)
-				_arg_component="${_key##--component=}"
+				_arg_component="${_key##--product=}"
 				;;
 			-c*)
-				_arg_component="${_key##-c}"
+				_arg_component="${_key##-p}"
 				;;
 			-p|--profile)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -66,21 +64,10 @@ parse_commandline()
 				shift
 				;;
 			--profile=*)
-				_arg_profile="${_key##--profile=}"
+				_arg_profile="${_key##--config=}"
 				;;
 			-p*)
-				_arg_profile="${_key##-p}"
-				;;
-			-v|--version=)
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-			    _arg_version="$2"
-				shift
-				;;
-			--version=*)
-				_arg_version="${_key##--version=}"
-				;;
-			-v*)
-				_arg_version="${_key##-v}"
+				_arg_profile="${_key##-c}"
 				;;
 			-h|--help)
 				print_help
@@ -203,16 +190,30 @@ save_config()
 	done
 }
 
-# chdir to the script root/..
-cd "$script_dir/.."
-PROFILE_ROOT="config/$_arg_version/$_arg_profile"
-DOCKER_ROOT="docker/$_arg_version"
+# The calculated roots below are more correct- but they lead to longer file names being displayed.
+# If the user runs this from the root directory the file names get easier.
+#PROFILE_ROOT="$script_dir/../config/$_arg_profile"
+#DOCKER_ROOT="$script_dir/../docker"
 
+# Instead we chdir to the script root/..
+cd "$script_dir/.."
+PROFILE_ROOT="config/$_arg_profile"
+
+set -x
+# If the profile ends in 6.5, we use the docker6.5/ root folder
+if [[ "$_arg_profile"  == *6.5 ]]; then
+	DOCKER_ROOT="docker6.5"
+else
+	DOCKER_ROOT="docker"
+fi
+
+# TODO: Right now we only handle idm and ig configs
 if [ "$_arg_component" == "all" ]; then
 	COMPONENTS=(idm ig amster)
 else
 COMPONENTS=( "$_arg_component" )
 fi
+
 
 case "$_arg_operation" in
 init)
