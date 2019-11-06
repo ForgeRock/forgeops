@@ -97,13 +97,13 @@ Please use format, <projectname>-<deployment name> so in GKE project please use:
 
     ```NOTE``` If you change your passphrase or stack/project cofiguration, please don't commit back to forgeops unless it's an improvement.
 
-5. GCP only.  Please configure Pulumi to use your GCP project id. This can either be done per stack by running the following command:
+5. GCP ONLY.  Please configure Pulumi to use your GCP project id. This can either be done per stack by running the following command:
     ```
     pulumi config set gcp:project my-project-id -s <stack name>
     ```
     or set environment variable(only available in current shell session):
     ```
-    export GOOGLE_PROJECT=<gpc project>
+    export GOOGLE_PROJECT=<gcp project>
     ```
 <br />
 
