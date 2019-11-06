@@ -10,7 +10,6 @@ config:
   cluster:k8sVersion: "1.14"
   cluster:name: dev-mini
   ds:enable: "false"
-  gcp:project: engineering-devops
   gcp:region: us-east4
   gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"
