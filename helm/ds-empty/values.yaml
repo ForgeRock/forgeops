@@ -21,7 +21,7 @@ instance: ds
 component: ds
 
 image:
-  repository: gcr.io/forgerock-io/ds-empty/pit1
+  repository: gcr.io/forgerock-io/ds-empty
   tag: 7.0.0-9c922d2256a731bbbf96a38dc9ba217e8eb53423
   pullPolicy: IfNotPresent
 
