@@ -1,5 +1,0 @@
-{
-    "context" : "endpoint/oauthproxy",
-    "type" : "text/javascript",
-    "file" : "oauthProxy.js"
-}

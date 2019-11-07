@@ -1,3 +1,0 @@
-{
-    "hostnameVerifier" : "&{openidm.external.rest.hostnameVerifier}"
-}
