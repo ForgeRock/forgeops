@@ -10,7 +10,6 @@ config:
   cluster:k8sVersion: "1.14"
   cluster:name: cdm-small
   cluster:nodeZones: '["us-east4-b"]'
-  gcp:project: engineering-devops
   gcp:region: us-east4
   gcp:zone: us-east4-a
   nginx:enable: "true"
@@ -25,7 +24,7 @@ config:
   primary:nodeCount: "0"
   primary:nodeMachineType: custom-4-16384
   primary:preemptible: "false"
-  prometheus:enable: "false"
+  prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.21.0
   secondary:autoScaling: "false"
