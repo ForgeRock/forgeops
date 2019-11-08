@@ -4,7 +4,7 @@ metadata:
   name: ig
 spec:
   ports:
-  - name: ig
+  - name: http
     port: 80
     protocol: TCP
     targetPort: 8080
