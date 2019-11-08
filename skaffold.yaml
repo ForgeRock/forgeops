@@ -30,7 +30,7 @@ profiles:
     - image: ig
       context: docker/7.0/ig
     - image: forgeops-tests
-      context: docker/7.0/forgeops-tests
+      context: docker/forgeops-tests
     - image: am
       context: docker/7.0/am
     - image: amster
