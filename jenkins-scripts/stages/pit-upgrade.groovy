@@ -18,7 +18,7 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 imageName = 'ds-empty'
                 dir('lodestar') {
                     def cfg = [
-                        TESTS_SCOPE                     : 'tests/platform-deployment',
+                        TESTS_SCOPE                     : 'tests/platform_deployment',
                         DEPLOYMENT_NAME                 : 'platform-deployment',
                         CLUSTER_NAMESPACE               : "upgrade",
                         CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
