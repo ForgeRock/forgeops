@@ -8,19 +8,19 @@
 
 import com.forgerock.pipeline.reporting.PipelineRun
 
-void runStage(PipelineRun pipelineRun) {
+void runStage(PipelineRun pipelineRun, String scope) {
 
-    pipelineRun.pushStageOutcome('pit1', stageDisplayName: 'PIT1 Tests') {
+    pipelineRun.pushStageOutcome('pit-smoke', stageDisplayName: 'PIT Smoke Tests') {
         node('google-cloud') {
             dir('forgeops') {
                 unstash 'workspace'
             }
 
-            stage('PIT1 Tests') {
+            stage('PIT Smoke Tests') {
                 pipelineRun.updateStageStatusAsInProgress()
                 dir('lodestar') {
                     def cfg = [
-                            TESTS_SCOPE                     : 'tests/platform_deployment',
+                            TESTS_SCOPE                     : 'tests/platform-deployment',
                             DEPLOYMENT_NAME                 : 'platform-deployment',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                             COMPONENTS_FRCONFIG_GIT_BRANCH  : commonModule.FORGEOPS_GIT_COMMIT,
@@ -28,7 +28,7 @@ void runStage(PipelineRun pipelineRun) {
                             EXT_FORGEOPS_PATH               : "${env.WORKSPACE}/forgeops"
                     ]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT1_5fTests/") {
+                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT_5fSmoke_5fTests/") {
                         withGKEPitNoStages(cfg)
                     }
                 }

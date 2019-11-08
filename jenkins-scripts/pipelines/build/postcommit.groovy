@@ -74,7 +74,7 @@ def postBuildTests(PipelineRun pipelineRun) {
     try {
         // PIT #1 tests
         stageErrorMessage = "The PIT #1 functional tests failed, please have a look at the console output"
-        pit1TestStage.runStage(pipelineRun)
+        pit1TestStage.runStage(pipelineRun, "tests/smoke")
     }
     catch (exception) {
         currentBuild.result = 'FAILURE'
