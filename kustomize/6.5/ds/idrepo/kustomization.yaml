@@ -1,0 +1,8 @@
+commonLabels:
+  app: ds-idrepo
+bases:
+- ../base
+nameSuffix: -idrepo
+images:
+- newName: ds-idrepo
+  name: ds

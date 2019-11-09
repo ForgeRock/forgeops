@@ -1,0 +1,6 @@
+kind: ""
+apiVersion: ""
+resources:
+- ../../am
+patchesStrategicMerge:
+- configmap.yaml

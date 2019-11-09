@@ -1,10 +1,17 @@
-kind: ""
-apiversion: ""
+# 
 namespace: default
 resources:
+- ../../ds/cts
+- ../../ds/idrepo
+- ../../am
+- ../../../amster
 - ../../idm
 - ../../../ingress
+- ../../postgres
 - platform-config.yaml
+#- ../../end-user-ui
+#- ../../web
+# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
 - name: DOMAIN
   fieldref:

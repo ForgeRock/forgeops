@@ -71,7 +71,7 @@ parse_commandline()
 			-p*)
 				_arg_profile="${_key##-p}"
 				;;
-			-v|--version=)
+			-v|--version)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 			    _arg_version="$2"
 				shift

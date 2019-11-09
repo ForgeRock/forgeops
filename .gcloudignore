@@ -3,5 +3,4 @@ tmp/
 __pycache__/
 *.pyc
 helm/
-pulumi/
 tmp
