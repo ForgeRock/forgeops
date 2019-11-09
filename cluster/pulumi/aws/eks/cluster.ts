@@ -37,7 +37,6 @@ export function createNginxIngress(cluster: eks.Cluster){
                         type: "ClusterIP",
                         omitClusterIP: true,
                     },
-                    image: {tag: config.ingressConfig.version}
                 }
     }
     const ingressArgs: ingress.PkgArgs = {
