@@ -23,16 +23,16 @@ let backendLabels: {[key: string]: string} = {
 //IF DS NODEPOOL IS ENABLED, CREATE AND ASSIGN IAM POLICIES
 if (config.dsNodeGroupConfig.enable){
     dsNodesCredentials = utils.createNodeGroupCredentials(config.dsNodeGroupConfig.namespace)
-    new aws.iam.RolePolicyAttachment("dsnodes-s3-policy", { 
-        policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess, 
+    new aws.iam.RolePolicyAttachment("dsnodes-s3-policy", {
+        policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess,
         role: dsNodesCredentials.iamRole.id
     }, {dependsOn: [dsNodesCredentials.instanceProfile]});
 
     tempinstanceRoles.push(dsNodesCredentials.iamRole)
 }
 else { //DS DEDICATED NODES DISABLED
-    new aws.iam.RolePolicyAttachment("backend-s3-policy", { 
-        policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess, 
+    new aws.iam.RolePolicyAttachment("backend-s3-policy", {
+        policyArn: aws.iam.ManagedPolicies.AmazonS3FullAccess,
         role: workerNodesCredentials.iamRole.id
     },{dependsOn: [workerNodesCredentials.instanceProfile]});
     backendLabels["ds"] = "true"; //if ds dedicated nodes are disabled, run DS pods in workers nodes
@@ -42,7 +42,7 @@ else { //DS DEDICATED NODES DISABLED
 //IF FRONTEND NODEPOOL IS ENABLED, CREATE AND ASSIGN IAM POLICIES
 if (config.frontendNodeGroupConfig.enable){
     frontendNodesCredentials = utils.createNodeGroupCredentials(config.frontendNodeGroupConfig.namespace)
-    tempinstanceRoles.push(frontendNodesCredentials.iamRole)  
+    tempinstanceRoles.push(frontendNodesCredentials.iamRole)
 }
 else { //FRONTEND DEDICATED NODES DISABLED
     backendLabels["frontend"] = "true"; //if frontend dedicated nodes are disabled, run frontend pods in workers nodes
@@ -61,9 +61,9 @@ export const kubeconfig = cluster.kubeconfig.apply(kc => {
 
 /************** EKS NODEGROUPS**************/
 //WORKER NODES
-const workerNodeGroup = clusterLib.createNodeGroup(config.workerNodeGroupConfig, cluster, 
+const workerNodeGroup = clusterLib.createNodeGroup(config.workerNodeGroupConfig, cluster,
                                                    workerNodesCredentials.instanceProfile, backendLabels);
-                                                   
+
 //CREATE FRONTEND DEDICATED NODES
 if (config.frontendNodeGroupConfig.enable){
     const frontendLabels = {
@@ -77,26 +77,26 @@ if (config.frontendNodeGroupConfig.enable){
             effect: "NoSchedule"
         }
     }
-    const frontendNodeGroup = clusterLib.createNodeGroup(config.frontendNodeGroupConfig, cluster, 
-                                                         frontendNodesCredentials.instanceProfile, 
+    const frontendNodeGroup = clusterLib.createNodeGroup(config.frontendNodeGroupConfig, cluster,
+                                                         frontendNodesCredentials.instanceProfile,
                                                          frontendLabels, frontendTaints)
-    
-    clusterLib.addSecurityGroupRule(`${config.frontendNodeGroupConfig.namespace}30080`, 30080, 
+
+    clusterLib.addSecurityGroupRule(`${config.frontendNodeGroupConfig.namespace}30080`, 30080,
                                     frontendNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
-    clusterLib.addSecurityGroupRule(`${config.frontendNodeGroupConfig.namespace}30443`, 30443, 
+    clusterLib.addSecurityGroupRule(`${config.frontendNodeGroupConfig.namespace}30443`, 30443,
                                     frontendNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
-    clusterLib.addSecurityGroupRule("traffic-from-frontend8080", 8080, 
+    clusterLib.addSecurityGroupRule("traffic-from-frontend8080", 8080,
                                     workerNodeGroup.nodeSecurityGroup.id, undefined, frontendNodeGroup.nodeSecurityGroup.id);
-    
+
     if (config.prometheusConfig.enable){
         clusterLib.addSecurityGroupRule("prometheus-kubeproxy", 10249,
                                         frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
 
         clusterLib.addSecurityGroupRule("prometheus-kubelet", 10250,
                                         frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
-    
+
         clusterLib.addSecurityGroupRule("prometheus-nodeexp", 9100,
                                         frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
     }
@@ -106,12 +106,12 @@ if (config.frontendNodeGroupConfig.enable){
     groupNeedingLBAttachment = frontendNodeGroup;
 }
 else { //IF NOT USING DEDICATED FRONTEND NODES
-    clusterLib.addSecurityGroupRule(`${config.workerNodeGroupConfig.namespace}30080`, 30080, 
+    clusterLib.addSecurityGroupRule(`${config.workerNodeGroupConfig.namespace}30080`, 30080,
                                     workerNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
-    clusterLib.addSecurityGroupRule(`${config.workerNodeGroupConfig.namespace}30443`, 30443, 
+    clusterLib.addSecurityGroupRule(`${config.workerNodeGroupConfig.namespace}30443`, 30443,
                                     workerNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
-    
+
     groupNeedingLBAttachment = workerNodeGroup;
 }
 
@@ -128,8 +128,8 @@ if (config.dsNodeGroupConfig.enable){
             effect: "NoSchedule"
         }
     }
-    const dsNodeGroup = clusterLib.createNodeGroup(config.dsNodeGroupConfig, cluster, 
-                                                   dsNodesCredentials.instanceProfile, 
+    const dsNodeGroup = clusterLib.createNodeGroup(config.dsNodeGroupConfig, cluster,
+                                                   dsNodesCredentials.instanceProfile,
                                                    dsLabels, dsTaints)
     let ingressPortMap: {[id: string]: number; } = { };
     ingressPortMap["admin"] = 4444;
@@ -137,7 +137,7 @@ if (config.dsNodeGroupConfig.enable){
     ingressPortMap["ldaps"] = 1636;
     ingressPortMap["http"] = 8080;
     ingressPortMap["https"] = 8443;
-    
+
     if (config.prometheusConfig.enable){
         ingressPortMap["prometheus-kubeproxy"] = 10249
         ingressPortMap["prometheus-kubelet"] = 10250
@@ -146,7 +146,7 @@ if (config.dsNodeGroupConfig.enable){
 
 
     for (let portName in ingressPortMap){
-        clusterLib.addSecurityGroupRule(`DS-${portName}`, ingressPortMap[portName], dsNodeGroup.nodeSecurityGroup.id, 
+        clusterLib.addSecurityGroupRule(`DS-${portName}`, ingressPortMap[portName], dsNodeGroup.nodeSecurityGroup.id,
                                         undefined, workerNodeGroup.nodeSecurityGroup.id);
     }
 }
@@ -169,12 +169,12 @@ if (config.ingressConfig.enable){
     clusterLib.createNginxIngress(cluster)
 }
 
-// ********************** CERTIFICATE MANAGER ************** 
+// ********************** CERTIFICATE MANAGER **************
 if (config.cmConfig.enable){
     clusterLib.createCertManager(cluster);
 }
 
-// ********************** PROMETHEUS ************** 
+// ********************** PROMETHEUS **************
 if (config.prometheusConfig.enable){
     clusterLib.createPrometheus(cluster);
 }
