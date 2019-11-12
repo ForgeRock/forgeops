@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: ds
+          env:
+            - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+              value: ds-idrepo-0.ds-idrepo.csovant.svc.cluster.local:8989,ds-idrepo-1.ds-idrepo.csovant.svc.cluster.local:8989

@@ -1,7 +1,9 @@
 config:
   claim: frconfig
-  importPath: /git/config/platform/platform-deployment/amster
+  # git container does the checkout under /git/config so we have config twice
+  importPath: /git/config/config/7.0/platform-deployment/amster
 serverBase: http://am:80
+amadminPassword: "password"
 configStore:
   host: userstore-0.userstore
 userStore:

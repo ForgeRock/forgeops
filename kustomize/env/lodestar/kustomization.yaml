@@ -1,0 +1,10 @@
+bases:
+- ../dev
+resources:
+- ../../ig
+patchesStrategicMerge:
+- ds-cts.yaml
+- ds-idrepo.yaml
+- idm.yaml
+configurations:
+- am.yaml

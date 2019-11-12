@@ -41,10 +41,11 @@ spec:
       #     serviceName: end-user-ui
       #     servicePort: 80
       #   path: /enduser-ui
-      - backend:
-          serviceName: ig
-          servicePort: 80
-        path: /ig
+      # IG currently has its own ingress. Needs to rewrite the url path...
+      # - backend:
+      #    serviceName: ig
+      #    servicePort: 80
+      #  path: /ig
   tls:
   - hosts:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
@@ -94,3 +95,7 @@ spec:
           serviceName: web
           servicePort: 80
         path: /web
+      - backend:
+          serviceName: ig
+          servicePort: 80
+        path: /ig
