@@ -67,15 +67,12 @@ export const primaryTaints: object = primaryPool.getObject("taints") || {};
 export const secondaryTaints: object = secondaryPool.getObject("taints") || {};
 export const dsTaints: object = dsPool.getObject("taints") || {};
 
-
 let backendLabels: {[key: string]: string} = {
     "deployedby": "Pulumi",
     "frontend": "true",
     "backend": "true",
     "kubernetes.io/role": "backend"
 };
-
-
 
 // If not deploying ds nodegroup, label backend cluster so ds pods run in backend nodes
 if (!enableDSPool){
