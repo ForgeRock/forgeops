@@ -39,7 +39,7 @@ function createNP(nodeConfig: any): object {
             ],
             imageType: "COS",
             labels: nodeConfig.labels,
-            taints: nodeConfig.taints ? [nodeConfig.taints] : undefined,
+            taints: nodeConfig.taints ? nodeConfig.taints : undefined,
             preemptible: nodeConfig.preemptible,
             localSsdCount: nodeConfig.localSsdCount
         },

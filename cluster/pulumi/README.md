@@ -125,6 +125,7 @@ pulumi config set --secret <secretVar> <secret>
 ```
 ```NOTE```: Using cmdline reformats the stackfile into alphabetical order.
 
+
 #### Deploy your stack
 Once you have configured your stacks, change your directory to the location of the stack, select stack and deploy (or add the -s <stack> flag each time to the up command):
 ```
@@ -204,12 +205,18 @@ Delete stack without removing the Pulumi.\<stack\>.yaml. This clears all the sta
 ```
 pulumi stack rm <stack> --preserve-config
 ```
-<br />
 
-## To Do
-* Update EKS project with cert-manager and nginx ingress controller packages.
-* Add AKS project.
-* Add capability to reduce cluster to 0 nodes.
+To add additional labels to a Node Pool, set an object e.g. to add 2 extra labels to the primary Node Pool:
+
+```
+pulumi config set primary:labels '{"myKey1": "myValue1", "myKey2": "myValue2"}'
+```
+
+To add additional taints to a Node Pool, set an array of objects e.g. to add 2 extra taints to the primary Node Pool:
+
+```
+pulumi config set primary:taints '[{"key": "myKey", "value": "myValue", "effect": "NO_SCHEDULE"},{"key": "myKey2", "value": "myValue2", "effect": "NO_SCHEDULE"}]'
+```
 
 
 
