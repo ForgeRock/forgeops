@@ -63,9 +63,9 @@ export const secondaryLabels: object = secondaryPool.getObject("labels") || {};
 export const dsLabels: object = dsPool.getObject("labels") || {};
 
 // Assign additional taints values if set
-export const primaryTaints: object = primaryPool.getObject("taints") || {};
-export const secondaryTaints: object = secondaryPool.getObject("taints") || {};
-export const dsTaints: object = dsPool.getObject("taints") || {};
+export const primaryTaints: object = primaryPool.getObject("taints") || [];
+export const secondaryTaints: object = secondaryPool.getObject("taints") || [];
+export const dsTaints: object = dsPool.getObject("taints") || [];
 
 let backendLabels: {[key: string]: string} = {
     "deployedby": "Pulumi",
