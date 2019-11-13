@@ -2,6 +2,7 @@ import * as azure from "@pulumi/azure";
 import * as azuread from "@pulumi/azuread";
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
+import * as cm from "../packages/cert-manager";
 import * as config from "./config";
 
 // Create an Azure Resource Group
@@ -30,6 +31,12 @@ export const k8sCluster = new azure.containerservice.KubernetesCluster("aksClust
         name: "aksagentpool",
         count: config.nodeCount,
         vmSize: config.nodeSize,
+        type: "VirtualMachineScaleSets",
+        availabilityZones: [
+            "1",
+            "2",
+            "3"
+        ]
     }],
     dnsPrefix: `${pulumi.getStack()}-kube`,
     linuxProfile: {
@@ -42,6 +49,10 @@ export const k8sCluster = new azure.containerservice.KubernetesCluster("aksClust
         clientId: adApp.applicationId,
         clientSecret: adSpPassword.value,
     },
+    networkProfile: {
+        networkPlugin: "azure",
+        loadBalancerSku: "standard"
+    }
 });
 
 // Expose a K8s provider instance using our custom cluster instance.
@@ -56,18 +67,32 @@ new k8s.core.v1.Namespace("prod", { metadata: { name: "prod" }}, { provider: k8s
 new k8s.storage.v1.StorageClass("sc-standard", {
     metadata: { name: 'standard' },
     provisioner: 'kubernetes.io/azure-disk',
-    parameters: { 
+    parameters: {
         storageaccounttype: 'Standard_LRS',
-        kind: 'Managed'       
+        kind: 'Managed'
     }
 }, { provider: k8sProvider } );
 
 new k8s.storage.v1.StorageClass("sc-premium", {
     metadata: { name: 'fast' },
     provisioner: 'kubernetes.io/azure-disk',
-    parameters: { 
+    parameters: {
         storageaccounttype: 'Premium_LRS',
-        kind: 'Managed'       
+        kind: 'Managed'
     }
 }, { provider: k8sProvider } );
 
+export function createCertManager(cluster: k8s.Provider){
+    const cmConfig = new pulumi.Config("certmanager");
+    console.log(cmConfig);
+    const cmArgs: cm.PkgArgs = {
+        version: cmConfig.require("version"),
+        useSelfSignedCert: cmConfig.getBoolean("useSelfSignedCert") || true,
+        tlsKey: cmConfig.get("tls-key") || "",
+        tlsCrt: cmConfig.get("tls-crt") || "",
+        cloudDnsSa: cmConfig.get("cloudDnsSa") || "",
+        clusterProvider: cluster,
+        dependsOn: [cluster],
+    }
+    return new cm.CertManager(cmArgs);
+}

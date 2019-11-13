@@ -1,0 +1,120 @@
+{
+    "auditServiceConfig" : {
+        "handlerForQueries" : "json",
+        "availableAuditEventHandlers" : [
+            "org.forgerock.audit.handlers.csv.CsvAuditEventHandler",
+            "org.forgerock.audit.handlers.elasticsearch.ElasticsearchAuditEventHandler",
+            "org.forgerock.audit.handlers.jms.JmsAuditEventHandler",
+            "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+            "org.forgerock.audit.handlers.json.stdout.JsonStdoutAuditEventHandler",
+            "org.forgerock.openidm.audit.impl.RepositoryAuditEventHandler",
+            "org.forgerock.openidm.audit.impl.RouterAuditEventHandler",
+            "org.forgerock.audit.handlers.splunk.SplunkAuditEventHandler",
+            "org.forgerock.audit.handlers.syslog.SyslogAuditEventHandler"
+        ],
+        "filterPolicies" : {
+            "value" : {
+                "excludeIf" : [
+                    "/access/http/request/cookies/&{com.iplanet.am.cookie.name}",
+                    "/access/http/request/cookies/session-jwt",
+                    "/access/http/request/headers/&{com.sun.identity.auth.cookieName}",
+                    "/access/http/request/headers/&{com.iplanet.am.cookie.name}",
+                    "/access/http/request/headers/accept-encoding",
+                    "/access/http/request/headers/accept-language",
+                    "/access/http/request/headers/Authorization",
+                    "/access/http/request/headers/cache-control",
+                    "/access/http/request/headers/connection",
+                    "/access/http/request/headers/content-length",
+                    "/access/http/request/headers/content-type",
+                    "/access/http/request/headers/proxy-authorization",
+                    "/access/http/request/headers/X-OpenAM-Password",
+                    "/access/http/request/headers/X-OpenIDM-Password",
+                    "/access/http/request/queryParameters/access_token",
+                    "/access/http/request/queryParameters/IDToken1",
+                    "/access/http/request/queryParameters/id_token_hint",
+                    "/access/http/request/queryParameters/Login.Token1",
+                    "/access/http/request/queryParameters/redirect_uri",
+                    "/access/http/request/queryParameters/requester",
+                    "/access/http/request/queryParameters/sessionUpgradeSSOTokenId",
+                    "/access/http/request/queryParameters/tokenId",
+                    "/access/http/response/headers/Authorization",
+                    "/access/http/response/headers/Set-Cookie",
+                    "/access/http/response/headers/X-OpenIDM-Password"
+                ],
+                "includeIf" : [ ]
+            }
+        },
+        "caseInsensitiveFields" : [
+            "/access/http/request/headers",
+            "/access/http/response/headers"
+        ]
+    },
+    "eventHandlers" : [
+        {
+            "class" : "org.forgerock.audit.handlers.json.JsonAuditEventHandler",
+            "config" : {
+                "name" : "json",
+                "logDirectory" : "&{idm.data.dir}/audit",
+                "buffering" : {
+                    "maxSize" : 100000,
+                    "writeInterval" : "100 millis"
+                },
+                "topics" : [
+                    "access",
+                    "activity",
+                    "recon",
+                    "sync",
+                    "authentication",
+                    "config"
+                ]
+            }
+        },
+        {
+            "class": "org.forgerock.openidm.audit.impl.RepositoryAuditEventHandler",
+            "config": {
+                "name": "repo",
+                "enabled": false,
+                "topics": [
+                    "access",
+                    "activity",
+                    "recon",
+                    "sync",
+                    "authentication",
+                    "config"
+                ]
+            }
+        }
+    ],
+    "eventTopics" : {
+        "config" : {
+            "filter" : {
+                "actions" : [
+                    "create",
+                    "update",
+                    "delete",
+                    "patch",
+                    "action"
+                ]
+            }
+        },
+        "activity" : {
+            "filter" : {
+                "actions" : [
+                    "create",
+                    "update",
+                    "delete",
+                    "patch",
+                    "action"
+                ]
+            },
+            "watchedFields" : [ ],
+            "passwordFields" : [
+                "password"
+            ]
+        }
+    },
+    "exceptionFormatter" : {
+        "type" : "text/javascript",
+        "file" : "bin/defaults/script/audit/stacktraceFormatter.js"
+    }
+}

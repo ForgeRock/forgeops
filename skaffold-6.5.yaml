@@ -8,7 +8,7 @@ build:
     context: docker/6.5/am
   - image: amster
     context: docker/6.5/amster
-  - image: idm 
+  - image: idm
     context: docker/6.5/idm
   - image: ds-cts
     context: docker/6.5/ds/cts
@@ -35,4 +35,11 @@ profiles:
   deploy:
     kustomize:
         path: kustomize/6.5/env/dev
+# Sample profile to demonstrate connecting to an external DS instance instead of ds-idrepo in the cluster
+# See the README.md in kustomize/6.5/env/external-ds/
+- name: external-ds
+  deploy:
+    kustomize:
+        path: kustomize/6.5/env/external-ds
+
 

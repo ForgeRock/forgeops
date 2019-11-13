@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: idm
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: openidm
+        imagePullPolicy: Always

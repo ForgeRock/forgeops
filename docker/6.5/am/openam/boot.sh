@@ -7,29 +7,25 @@ if [ "$#" -ne 1 ]; then
   exec $*
 fi
 
-
 TEST_DN="ou=sunIdentityRepositoryService,ou=services,ou=am-config"
 
 # First we wait for ds-idrepo to be up
-
-echo "Waiting for ds-idrepo to be available. Trying ds-idrepo:8080/alive endpoint"
-while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ds-idrepo:8080/alive)" != "200" ]]; 
-do 
-        sleep 5; 
+until ldapsearch -w password  -D "cn=Directory Manager" -A -H "ldap://ds-idrepo:1389" -s base -l 20 -b "ou=am-config" > /dev/null 2>&1
+do
+  echo "waiting for ds-idrepo"
+  sleep 10
 done
+
 echo "ds-idrepo is responding"
+#
+sleep 5
 
 # Test the configstore to see if it contains a configuration. Return 0 if configured.
-# This is not currently foolproof - it the ds-idrepo is not started yet the ldap search will also fail. This
+# This is not currently foolproof - if the ds-idrepo is not started yet the ldap search will also fail. This
 # can result in util installer running again - which in most cases is fine - it will refresh the configuraition.
-
-SVC="ou=services,$BASE_DN"
 r=$(ldapsearch -w password  -D "cn=Directory Manager" -A -H "ldap://ds-idrepo:1389" -s base -l 20 -b "$TEST_DN"  > /dev/null 2>&1)
 status=$?
 echo "Is configured exit status is $status"
-
-# Remove the config location - we generate as required
-rm -rf /home/forgerock/.openamcfg
 
 # Remove the config location - we generate as required
 rm -rf /home/forgerock/.openamcfg
@@ -53,4 +49,4 @@ else
 
 fi
 
-exec catalina.sh run 
+exec catalina.sh run
