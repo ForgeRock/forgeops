@@ -25,7 +25,8 @@ jdk.crypto.ec,jdk.crypto.cryptoki,jdk.jfr,jdk.jcmd,jdk.jdwp.agent \
 # This installs the GCP stack driver profiler. Adds approx 8MB
 RUN mkdir -p /opt/cprof && \
      wget -q -O- https://storage.googleapis.com/cloud-profiler/java/latest/profiler_java_agent.tar.gz \
-     | tar xzv -C /opt/cprof
+     | tar xzv -C /opt/cprof && \
+     chmod 0555 /opt/cprof/*.so
 
 # Installs the async-profiler - adds 280K
 RUN mkdir -p /opt/async-profiler && \
