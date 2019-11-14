@@ -176,8 +176,8 @@ export function assignIp() {
         let a: pulumi.Output<string> = pulumi.concat(config.ip);
         return (a);
     } else {
-        const staticIp = new gcp.compute.Address("ingress-ip", {
-            addressType: "EXTERNAL",
+        const staticIp = new gcp.compute.Address(config.clusterName + "-ip", {
+            addressType: "EXTERNAL"
         });
         return staticIp.address;
     }
