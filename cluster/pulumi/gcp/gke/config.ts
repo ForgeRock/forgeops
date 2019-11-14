@@ -53,9 +53,19 @@ interface NodePool {
     preemptible: boolean;
     nodePoolName: string;
     labels: object;
-    taints?: object;
+    taints: object;
     localSsdCount: number
 };
+
+// Assign additional labels values if set
+export const primaryLabels: object = primaryPool.getObject("labels") || {};
+export const secondaryLabels: object = secondaryPool.getObject("labels") || {};
+export const dsLabels: object = dsPool.getObject("labels") || {};
+
+// Assign additional taints values if set
+export const primaryTaints: object = primaryPool.getObject("taints") || [];
+export const secondaryTaints: object = secondaryPool.getObject("taints") || [];
+export const dsTaints: object = dsPool.getObject("taints") || [];
 
 let backendLabels: {[key: string]: string} = {
     "deployedby": "Pulumi",
@@ -89,7 +99,8 @@ export const primary:NodePool = {
     maxNodes: primaryPool.getNumber("maxNodes") || 4,
     preemptible: primaryPool.requireBoolean("preemptible"),
     nodePoolName: primaryPool.get("name") || "primary",
-    labels: backendLabels,
+    labels: Object.assign({}, backendLabels, primaryLabels),
+    taints: primaryTaints,
     localSsdCount: primaryPool.getNumber("localSsdCount") || 0
 };
 
@@ -106,8 +117,9 @@ export const secondary:NodePool = {
     maxNodes: secondaryPool.getNumber("maxNodes") || 4,
     preemptible: secondaryPool.requireBoolean("preemptible"),
     nodePoolName: secondaryPool.get("name") || "secondary",
-    labels: backendLabels,
-    localSsdCount: secondaryPool.getNumber("localSsdCount") || 0
+    labels: Object.assign({}, backendLabels, secondaryLabels),
+    taints: secondaryTaints,
+    localSsdCount: secondaryPool.getNumber("localSsdCount") || 0 
 };
 
 // SECONDARY NODE POOL VALUES
@@ -123,12 +135,12 @@ export const ds:NodePool = {
     maxNodes: dsPool.getNumber("maxNodes") || 4,
     preemptible: dsPool.getBoolean("preemptible") || false,
     nodePoolName: dsPool.get("name") || "secondary",
-    labels: backendLabels,
-    taints: {
+    labels: Object.assign({}, backendLabels, dsLabels),
+    taints: Object.assign({}, {
         key: "WorkerDedicatedDS",
         value: "true",
         effect: "NO_SCHEDULE"
-    },
+    }, dsTaints),
     localSsdCount: dsPool.getNumber("localSsdCount") || 0
 };
 
