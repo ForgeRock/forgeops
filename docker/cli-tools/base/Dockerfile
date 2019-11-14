@@ -27,7 +27,10 @@ FROM builder as pulumi
 ENV PULUMI_VERSION=v1.4.0
 RUN curl -o /opt/build/pulumi.tar.gz "https://get.pulumi.com/releases/sdk/pulumi-${PULUMI_VERSION}-linux-x64.tar.gz" \
         && tar -xvf /opt/build/pulumi.tar.gz -C /tmp \
-            && install /tmp/pulumi/{pulumi,pulumi-language-nodejs,pulumi-resource-pulumi-nodejs,pulumi-analyzer-policy} /opt/build/bin/
+            && install /tmp/pulumi/{pulumi,pulumi-language-nodejs,pulumi-resource-pulumi-nodejs,pulumi-analyzer-policy} /opt/build/bin/ \
+                && pulumi plugin install resource gcp ${PULUMI_VERSION} \
+                    && pulumi plugin install resource aws ${PULUMI_VERSION} \
+                        && pulumi plugin install resource azure ${PULUMI_VERSION}
 
 FROM builder as helm
 ENV HELM_VERSION=v2.15.1

@@ -18,8 +18,9 @@ else
     ARGS=(${entry_args[@]:3})
 fi
 # drop to the same uid/gid as host
-HOME=/opt/forgeops
-usermod --uid ${userid} --gid ${groupid} forgeops 2&> /dev/null
-find ${HOME} . -type d -name "usr" -prune -o -type f -print | xargs chown -R ${userid}:${groupid}
+export HOME=/opt/forgeops
+groupmod -g ${groupid} forgeops
+usermod --uid ${userid} --gid ${groupid} forgeops
+find ${HOME} . -type d -name ".*" | xargs chown ${userid}:${groupid}
 # add supplimental group to rx nodejs scripts
 exec setpriv --reuid=${userid} --regid=${groupid} --groups 360360 --inh-caps=-all ${ARGS[@]}
