@@ -1,13 +1,10 @@
-# 
+# Deploy everything except persistence
 namespace: default
 resources:
-- ../../ds/cts
-- ../../ds/idrepo
 - ../../am
 - ../../../amster
 - ../../idm
 - ../../../ingress
-- ../../postgres
 - platform-config.yaml
 #- ../../end-user-ui
 #- ../../web

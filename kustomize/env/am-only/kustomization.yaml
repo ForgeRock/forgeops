@@ -1,12 +1,10 @@
 # Deploys to default.iam.forgeops.com. Uses the LE issuer for SSL.
 namespace: default
 resources:
-  - ../../ds/cts
-  - ../../ds/idrepo
-  - ../../am
-  - ../../amster
-  - ../../ingress
-  - platform-config.yaml
+- ../../am
+- ../../amster
+- ../../ingress
+- platform-config.yaml
 vars:
 - name: DOMAIN
   fieldref:

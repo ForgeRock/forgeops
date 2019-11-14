@@ -1,7 +1,8 @@
-# Deploys everything except persistence. Use this to iterate on the stateless services.
+# This deploys to default.iam.example.com. It uses the ca-issuer
+# for self signed SSL certs. It is suitable for local minikube development
 namespace: default
 resources:
-#- ../persistence
+- ../persistence
 - ../../am
 - ../../amster
 - ../../idm
@@ -9,7 +10,17 @@ resources:
 - ../../web
 - ../../ingress
 - platform-config.yaml
-# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
+secretGenerator:
+- name: sslcert
+  files:
+    - secret/ca.crt
+    - secret/tls.crt
+    - secret/tls.key
+  type: "kubernetes.io/tls"
+generatorOptions:
+    disableNameSuffixHash: true
+patchesStrategicMerge:
+- platform-config.yaml
 vars:
 - name: DOMAIN
   fieldref:

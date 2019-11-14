@@ -1,8 +1,7 @@
-# This deploys to default.iam.example.com. It uses the ca-issuer 
-# for self signed SSL certs. It is suitable for local minikube development
+# Sample to deploy to forgeops.com domain
 namespace: default
 resources:
-- ../dev
+- ../all
 secretGenerator:
 - name: sslcert
   files:
@@ -13,5 +12,5 @@ secretGenerator:
 generatorOptions:
     disableNameSuffixHash: true
 patchesStrategicMerge:
-  - platform-config.yaml
+- platform-config.yaml
 

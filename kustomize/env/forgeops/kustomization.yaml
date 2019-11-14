@@ -1,7 +1,7 @@
-# Deploys everything except persistence. Use this to iterate on the stateless services.
+# Sample to deploy to forgeops.com domain
 namespace: default
 resources:
-#- ../persistence
+- ../persistence
 - ../../am
 - ../../amster
 - ../../idm
@@ -9,7 +9,14 @@ resources:
 - ../../web
 - ../../ingress
 - platform-config.yaml
-# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
+patchesJson6902:
+- target:
+    #group: networking.k8s.io
+    group: extensions
+    version: v1beta1
+    kind: Ingress
+    name: forgerock
+  path: ingress_patch.json
 vars:
 - name: DOMAIN
   fieldref:

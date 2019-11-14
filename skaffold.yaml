@@ -1,3 +1,10 @@
+# For creating your own custom skaffold profiles we recommend making a copy of this
+# file to skaffold-dev.yaml (which is in .gitignore).
+# You can "mix and match" diferent services together by creating skaffold profiles
+# and by creating a new kustomize profile in kustomize/env
+
+
+# The default below for skaffold dev is to deploy all services in one shot:
 apiVersion: skaffold/v1beta12
 kind: Config
 
@@ -18,7 +25,7 @@ build:
     sha256: {}
 deploy:
   kustomize:
-    path: ./kustomize/env/example
+    path: ./kustomize/env/all
 
 # Additional profiles
 profiles:
@@ -182,3 +189,19 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/ds/ds-dev
+
+
+# stateful persistence services if you do not want to destroy your state
+# Run these separately with: skaffold run -p state
+- name: state
+  deploy:
+    kustomize:
+        path: kustomize/env/persistence
+
+# Just the stateless components. Compliments the above. Iterate on the
+# stateless components using skaffold dev -p dev
+- name: dev
+  deploy:
+    kustomize:
+        path: kustomize/env/dev
+
