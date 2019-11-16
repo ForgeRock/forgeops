@@ -2,7 +2,7 @@
 env_vars=()
 volumes=()
 sdks=()
-
+mount_root=/opt/forgeops/mnt
 
 _add_volume() {
     volumes+=( "-v" "${1}" )
@@ -22,18 +22,18 @@ _config_gcloud() {
        echo "GOOGLE_CLOUD_PROJECT environment variable required"
        exit 1;
     fi
-    _add_volume "${HOME}/.config/gcloud:/opt/forgeops/.config/gcloud"
+    _add_volume "${HOME}/.config/gcloud/:${mount_root}/.config/gcloud/"
     _add_env "GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"
     _add_sdk "gcp"
 }
 
 _config_aws() {
-    _add_volume "${HOME}/.aws/:/opt/forgeops/.aws/"
+    _add_volume "${HOME}/.aws/:${mount_root}/.aws/"
     _add_sdk "aws"
 }
 
 _config_azure() {
-    _add_env "${HOME}/.azure/:/opt/forgeops/.azure/"
+    _add_volume "${HOME}/.azure/:${mount_root}/.azure/"
     _add_sdk "azure"
 }
 
@@ -41,16 +41,16 @@ _config_pulumi() {
     [[ ! -d "${HOME}/.pulumi" ]] \
         && echo "No pulumi home detected. Creating ~/.pulumi" \
             && mkdir -p ~/.pulumi \
-                && touch ~/.pulumi/credentials.json
+                && echo "{}" > ~/.pulumi/credentials.json
     [[ -z "${PULUMI_CONFIG_PASSPHRASE}" ]] \
         && echo "Please set the environment variable PULUMI_CONFIG_PASSPHRASE" \
             && exit 1
     _add_env "PULUMI_CONFIG_PASSPHRASE=${PULUMI_CONFIG_PASSPHRASE}"
-    _add_volume "${HOME}/.pulumi/backups:/opt/forgeops/.pulumi/backups"
-    _add_volume "${HOME}/.pulumi/history:/opt/forgeops/.pulumi/history"
-    _add_volume "${HOME}/.pulumi/stacks:/opt/forgeops/.pulumi/stacks"
-    _add_volume "${HOME}/.pulumi/credentials.json:/opt/forgeops/.pulumi/credentials.json"
-    _add_volume "${HOME}/.pulumi/workspaces:/opt/forgeops/.pulumi/workspaces"
+    _add_volume "${HOME}/.pulumi/backups/:${mount_root}/.pulumi/backups/"
+    _add_volume "${HOME}/.pulumi/history:${mount_root}/.pulumi/history"
+    _add_volume "${HOME}/.pulumi/stacks:${mount_root}/.pulumi/stacks"
+    _add_volume "${HOME}/.pulumi/credentials.json:${mount_root}/.pulumi/credentials.json"
+    _add_volume "${HOME}/.pulumi/workspaces:${mount_root}/.pulumi/workspaces"
 }
 
 _config_sdk() {
@@ -70,14 +70,13 @@ _pre_exec() {
     USERID=$(id -u)
     GROUPID=$(id -g)
     CLI_IMAGE="${CLI_IMAGE:-gcr.io/engineering-devops/forgeops-cli:latest}"
-    _add_volume "${LOCALDIR}:/opt/forgeops/local";
+    _add_volume "${LOCALDIR}:${mount_root}/ctx";
 }
 
 _config_pulumi
 _config_sdk
 _pre_exec
 
-# mount and run
 docker pull "${CLI_IMAGE}"
 exec docker run --rm  \
                 ${volumes[*]} \

@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-export PATH="$PATH:/usr/local/google-cloud-sdk/bin"
-export NODE_PATH="/opt/forgeops/usr/node_modules"
-echo "export PS1=forgeopscli▶ " >> /opt/forgeops/.bashrc
+umask 0002
 entry_args=("${@}")
 userid=${entry_args[0]}
 groupid=${entry_args[1]}
-# set the directory for the program we are to run e.g. gcp/infra || gcp/gke
+homedir=/opt/forgeops/mnt
+# Set the directory for the program we are to run e.g. gcp/infra || gcp/gke
 if [[ "${entry_args[3]}" == "pulumi" ]];
 then
     localhost_dir="${entry_args[2]}"
@@ -17,10 +16,10 @@ then
 else
     ARGS=(${entry_args[@]:3})
 fi
-# drop to the same uid/gid as host
-export HOME=/opt/forgeops
 groupmod -g ${groupid} forgeops
 usermod --uid ${userid} --gid ${groupid} forgeops
-find ${HOME} . -type d -name ".*" | xargs chown ${userid}:${groupid}
-# add supplimental group to rx nodejs scripts
+# These two paths aren't directly mounted, so they must have the ownership changed
+chown forgeops:forgeops /opt/forgeops/mnt/{.pulumi,.config}
+export HOME=${homedir}
+# Add supplemental group such that permissions are g=r-x files/exec
 exec setpriv --reuid=${userid} --regid=${groupid} --groups 360360 --inh-caps=-all ${ARGS[@]}
