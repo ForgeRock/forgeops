@@ -130,11 +130,33 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 # End of arg parsing
 
 
+# clear the product configs $1 from the docker directory.
+clean_config()
+{
+    ## remove previously copied configs
+    echo "removing $1 configs from $DOCKER_ROOT"
+
+    if [ "$1" == "amster" ]; then
+        rm -rf "$DOCKER_ROOT/$1/config"
+
+    elif [ "$1" == "idm" ]; then
+        rm -rf "$DOCKER_ROOT/$1/conf"
+	rm -rf "$DOCKER_ROOT/$1/script"
+	rm -rf "$DOCKER_ROOT/$1/ui"
+
+    elif [ "$1" == "ig" ]; then
+        rm -rf "$DOCKER_ROOT/$1/config"
+        rm -rf "$DOCKER_ROOT/$1/scripts"
+    fi
+}
 
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-	echo "cp -r ${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
+    ## remove previously copied configs
+    echo ""
+    clean_config "$1"
+    echo "cp -r ${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
     cp -r "${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
 }
 
@@ -218,6 +240,11 @@ case "$_arg_operation" in
 init)
 	for p in "${COMPONENTS[@]}"; do
 		init_config "$p"
+	done
+	;;
+clean)
+	for p in "${COMPONENTS[@]}"; do
+		clean_config "$p"
 	done
 	;;
 diff)

@@ -1,0 +1,7 @@
+# Deploy just the persistence services
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+- ../../postgres
+- ../../ds/cts
+- ../../ds/idrepo

@@ -1,14 +1,14 @@
-# Deploys everything except persistence. Use this to iterate on the stateless services.
+#
 namespace: default
 resources:
-#- ../persistence
+- ../persistence
 - ../../am
-- ../../amster
+- ../../../amster
 - ../../idm
-- ../../end-user-ui
-- ../../web
-- ../../ingress
+- ../../../ingress
 - platform-config.yaml
+#- ../../end-user-ui
+#- ../../web
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
 - name: DOMAIN

@@ -1,5 +1,11 @@
-# Place holder for skaffold 6.5 deployment
 # skaffold -f skaffold-6.5.yaml dev
+# For creating your own custom skaffold profiles we recommend making a copy of this
+# file to skaffold-dev.yaml (which is in .gitignore).
+# You can "mix and match" diferent services together by creating skaffold profiles
+# and by creating a new kustomize profile in kustomize/6.5/env
+
+
+# The default below for skaffold dev is to deploy all services in one shot:
 apiVersion: skaffold/v1beta12
 kind: Config
 build:
@@ -20,26 +26,23 @@ build:
     sha256: {}
 deploy:
   kustomize:
-    path: kustomize/6.5/env/example
+    path: kustomize/6.5/env/all
 # Additional profiles
 profiles:
-- name: postgres
-  deploy:
-    kustomize:
-      path: kustomize/postgres
-- name: idm
-  build:
-    artifacts:
-    - image: idm
-      context: docker/6.5/idm
-  deploy:
-    kustomize:
-        path: kustomize/6.5/env/dev
 # Sample profile to demonstrate connecting to an external DS instance instead of ds-idrepo in the cluster
 # See the README.md in kustomize/6.5/env/external-ds/
 - name: external-ds
   deploy:
     kustomize:
         path: kustomize/6.5/env/external-ds
-
+# Profile to deploy just the stateful persistence services. Deploy using skaffold run (not skaffold dev)
+- name: state
+  deploy:
+    kustomize:
+        path: kustomize/6.5/env/persistence
+# Deploy just the stateless services (AM, IDM, etc.)
+- name: dev
+  deploy:
+    kustomize:
+        path: kustomize/6.5/env/dev
 
