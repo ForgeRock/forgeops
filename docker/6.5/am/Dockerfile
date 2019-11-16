@@ -1,14 +1,15 @@
+# Use publicly available am image for evaluation
 FROM gcr.io/forgerock-io/openam:6.5.2
+
+# Use a custom am-base image. See forgeops/docker/6.5/am-base/README
+#FROM am-base:latest
 
 # BEGIN tools for testing if the ds-idrepo is configured before AM starts.
 # Installs ldap utils for querying the repo.
 USER root
 
-# For debian
-#RUN apt-get update && apt-get install ldap-utils
-# Alpine:
-
-RUN apk add openldap-clients
+# Attempt debian installs first. Attempt alpine installs as fallback
+RUN ( apt-get update && apt-get install -y ldap-utils && apt-get clean all ) || ( apk add openldap-clients )
 
 USER forgerock
 
