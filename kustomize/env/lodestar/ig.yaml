@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: am
+  name: ig
 spec:
   template:
     spec:
       containers:
-        - name: openam
+        - name: ig
           imagePullPolicy: Always

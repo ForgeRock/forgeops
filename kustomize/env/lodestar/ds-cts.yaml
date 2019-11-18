@@ -11,3 +11,6 @@ spec:
           env:
             - name: DS_BOOTSTRAP_REPLICATION_SERVERS
               value: ds-cts-0.ds-cts.$(NAMESPACE).svc.cluster.local:8989,ds-cts-1.ds-cts.$(NAMESPACE).svc.cluster.local:8989
+      initContainers:
+        - name: initialize
+          imagePullPolicy: Always

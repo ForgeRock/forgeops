@@ -72,13 +72,18 @@ void buildImage(String directoryName) {
 def postBuildTests(PipelineRun pipelineRun) {
 
     try {
-        // PIT #1 tests
-        stageErrorMessage = "The PIT #1 functional tests failed, please have a look at the console output"
-        pit1TestStage.runStage(pipelineRun, "tests/smoke")
+        // PIT1 helm tests
+        stageErrorMessage = "The PIT1 helm tests failed, please have a look at the console output"
+        pit1TestStage.runStage(pipelineRun, 'PIT1 Helm')
+
+        // PIT1 kustomize tests
+        stageErrorMessage = "The PIT1 kustomize tests failed, please have a look at the console output"
+        pit1TestStage.runStage(pipelineRun, 'PIT1 Kustomize', true)
+        currentBuild.result = 'SUCCESS'
     }
     catch (exception) {
         currentBuild.result = 'FAILURE'
-        postcommitBuild.sendSlackNotification("#cloud-deploy-notify")
+        postcommitBuild.sendSlackNotification('#cloud-deploy-notify', true, stageErrorMessage)
         throw exception
     }
 }
