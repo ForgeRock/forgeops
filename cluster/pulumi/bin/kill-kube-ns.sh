@@ -1,47 +1,67 @@
-#!/bin/bash
+#!/bin/sh
 
-###############################################################################
-# Copyright (c) 2018 Red Hat Inc
+# ----------------------------------------------------------------------------
 #
-# See the NOTICE file(s) distributed with this work for additional
-# information regarding copyright ownership.
+# knsk.sh
 #
-# This program and the accompanying materials are made available under the
-# terms of the Eclipse Public License 2.0 which is available at
-# http://www.eclipse.org/legal/epl-2.0
+# This script delete Kubernetes' namespaces that are stuck in Terminating status
 #
-# SPDX-License-Identifier: EPL-2.0
+#                                                          thyarles@gmail.com
 #
-# Run ./kill-kube-ns.sh <namespace>
-#
-###############################################################################
+# ----------------------------------------------------------------------------
 
-set -eo pipefail
+set -u
 
-die() { echo "$*" 1>&2 ; exit 1; }
+# Test if kubectl is configured 
+kubectl cluster-info > /dev/null 2>&1
+error=$?
 
-need() {
-	which "$1" &>/dev/null || die "Binary '$1' is missing but required"
-}
+if [ $error -gt 0 ]; then
+  echo "Error: can't execute kubectl on this machine."
+  exit 1
+fi
 
-# checking pre-reqs
+# Get stuck namespaces
+namespace=$(kubectl get ns 2>/dev/null | grep Terminating | cut -f1 -d ' ')
 
-need "jq"
-need "curl"
-need "kubectl"
+# If exist namespace in Terminating mode, get access token and start the kubectl proxy
+if [ "x$namespace" != "x" ]; then
 
-PROJECT="$1"
-shift
+  # Get access token 
+  t=$(kubectl -n default describe secret $(kubectl -n default get secrets | grep default | cut -f1 -d ' ') | grep -E '^token' | cut -f2 -d':' | tr -d '\t' | tr -d ' ')
+  error=$?
 
-test -n "$PROJECT" || die "Missing arguments: kill-ns <namespace>"
+  if [ $error -gt 0 ]; then
+    echo "Error: can't get the token."
+    exit 1
+  fi
 
-kubectl proxy &>/dev/null &
-PROXY_PID=$!
-killproxy () {
-	kill $PROXY_PID
-}
-trap killproxy EXIT
+  # start the kubeclt proxy
+  kubectl proxy > /dev/null 2>&1 &
+  error=$?
+  k_pid=$!
 
-sleep 1 # give the proxy a second
+  if [ $error -gt 0 ]; then
+    echo "Error: can't up the kubectl proxy."
+    exit 1
+  fi
 
-kubectl get namespace "$PROJECT" -o json | jq 'del(.spec.finalizers[] | select("kubernetes"))' | curl -s -k -H "Content-Type: application/json" -X PUT -o /dev/null --data-binary @- http://localhost:8001/api/v1/namespaces/$PROJECT/finalize && echo "Killed namespace: $PROJECT"
+else
+  echo "No namespace in Terminating status found."
+  exit 0
+fi
+
+# Remove stuck namespaces
+for n in $namespace
+do
+  echo -n "Deleting $n... "
+  j=/tmp/$n.json
+  kubectl get ns $n -o json > $j 
+  sed -i s/\"kubernetes\"//g $j 
+  curl -s -o $j.log -X PUT --data-binary @$j http://localhost:8001/api/v1/namespaces/$n/finalize -H "Content-Type: application/json" --header "Authorization: Bearer $t" --insecure
+  sleep 5
+  echo "done!"
+done
+
+# Kill kubectl proxy
+kill $k_pid 
