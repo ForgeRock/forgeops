@@ -18,8 +18,8 @@ void runStage(PipelineRun pipelineRun, String stageName) {
 
                 dir('lodestar') {
                     def cfg = [
-                        TESTS_SCOPE          : 'tests/integration',
-                        DEPLOYMENT_NAME      : 'ds-shared-repo',
+                        TESTS_SCOPE          : 'tests/platform_deployment',
+                        DEPLOYMENT_NAME      : 'platform-deployment',
                         CLUSTER_DOMAIN       : 'pit-24-7.forgeops.com',
                         CLUSTER_NAMESPACE    : 'greenfield',
                         REPEAT               : 10,

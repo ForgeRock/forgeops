@@ -19,7 +19,7 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 dir('lodestar') {
                     def cfg = [
                         TESTS_SCOPE                     : 'tests/upgrade',
-                        DEPLOYMENT_NAME                 : 'ds-shared-repo',
+                        DEPLOYMENT_NAME                 : 'platform-deployment',
                         CLUSTER_NAMESPACE               : "upgrade",
                         CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                         COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
@@ -39,9 +39,7 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                         COMPONENTS_AM_AM_KEYSTORESDIR   : '/home/forgerock/openam/am',
                         STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                         EXT_FORGEOPS_BRANCH             : 'fraas-production',
-                        EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT,
-                        EXT_FORGEOPSINIT_REPO           : 'https://github.com/ForgeRock/forgeops-init.git',
-                        EXT_FORGEOPSINIT_BRANCH         : 'fraas-production'
+                        EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT
                     ]
 
                     commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20PIT_5fUpgrade") {
