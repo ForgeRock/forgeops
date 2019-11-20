@@ -25,14 +25,13 @@ spec:
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
-            # TODO: Verify headers are no longer needed.
-            # httpHeaders:
-            # - name: X-OpenIDM-Username
-            #   value: anonymous
-            # - name: X-OpenIDM-Password
-            #   value: anonymous
-            # - name: X-OpenIDM-NoSession
-            #   value: "true"
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value: "true"
             path: /openidm/info/ping
             port: 8080
           initialDelaySeconds: 120
@@ -54,8 +53,6 @@ spec:
           name: logs
         - mountPath: /opt/openidm/audit
           name: audit-logs
-        - mountPath: /opt/openidm/resolver
-          name: idm-boot-properties
         - mountPath: /var/run/openidm/logging
           name: idm-logging-properties
       volumes:
@@ -66,9 +63,6 @@ spec:
         name: logs
       - emptyDir: {}
         name: audit-logs
-      - name: idm-boot-properties
-        configMap:
-            name: idm-boot-properties
       - name: idm-logging-properties
         configMap:
            name: idm-logging-properties

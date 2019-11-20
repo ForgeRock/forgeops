@@ -10,6 +10,7 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 
 COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
 
+ENV CATALINA_OPTS "-server -XX:MaxRAMPercentage=75 -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off -Xlog:gc*,gc+ref=debug,gc+heap=debug,gc+age=trace:file=/tmp/gc-%p-%t.log:tags,uptime,time,level:filecount=10,filesize=10m"
 
 # This copies in the boot.json and other files...
 COPY --chown=forgerock:root openam /home/forgerock/openam

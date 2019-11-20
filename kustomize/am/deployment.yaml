@@ -15,9 +15,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        envFrom:
-        - configMapRef:
-            name: am
         image: am
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -67,6 +64,3 @@ spec:
       - name: amster-keys
         secret:
           secretName: amster
-      - configMap:
-          name: boot-json
-        name: openam-boot

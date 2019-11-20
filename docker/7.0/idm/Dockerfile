@@ -8,4 +8,5 @@ RUN rm bundle/org.apache.felix.webconsole*.jar  && \
 
 # Removes any existing conf files that might conflict with our config. This includes the embedded ds repo.
 RUN rm -fr /opt/openidm/conf
+ENV JAVA_OPTS "-server -XX:MaxRAMPercentage=75"
 COPY --chown=forgerock:root . /opt/openidm
