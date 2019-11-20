@@ -9,7 +9,7 @@
   "data" : {
     "_id" : "0c091c49-f3af-48fb-ac6f-07fba0499dd6",
     "pageDescription" : {
-      "en" : "Signing up is fast and easy."
+      "en" : "Signing up is fast and easy.<br>Already have an account? <a href='#/service/Login'>Sign In</a>"
     },
     "nodes" : [ {
       "_id" : "7fcaf48e-a754-4959-858b-05b2933b825f",

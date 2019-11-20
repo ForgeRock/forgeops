@@ -3,7 +3,7 @@
     "realm" : "/",
     "amsterVersion" : "&{version}",
     "entityType" : "AuthTree",
-    "entityId" : "PlatformRegistration",
+    "entityId" : "Registration",
     "pathParams" : { }
   },
   "data" : {
