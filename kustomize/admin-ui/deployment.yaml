@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: end-user-ui
+  name: admin-ui
 spec:
   replicas: 1
   template:
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-enduser-ui/docker-build:7.0.0-postcommit-latest
+      - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.0.0-postcommit-latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -16,7 +16,7 @@ spec:
           httpGet:
             path: /
             port: http
-        name: end-user-ui
+        name: admin-ui
         resources:
           requests:
             memory: "100Mi"

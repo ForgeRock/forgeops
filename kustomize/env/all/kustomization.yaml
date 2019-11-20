@@ -7,6 +7,8 @@ resources:
 - ../../amster
 - ../../idm
 - ../../end-user-ui
+- ../../login-ui
+- ../../admin-ui
 - ../../web
 - ../../ingress
 - platform-config.yaml

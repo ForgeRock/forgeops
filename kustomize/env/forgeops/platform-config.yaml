@@ -7,5 +7,11 @@ data:
   SUBDOMAIN: iam
   DOMAIN: forgeops.com
   AM_URL: https://$(NAMESPACE).iam.forgeops.com/am
+  PLATFORM_ADMIN_URL: https://$(NAMESPACE).iam.example.com/platform
   IDM_ADMIN_URL:  https://$(NAMESPACE).iam.forgeops.com/admin
   IDM_REST_URL:   https://$(NAMESPACE).iam.forgeops.com/openidm
+  ENDUSER_UI_URL: https://$(NAMESPACE).iam.example.com/enduser
+  LOGIN_UI_URL:   https://$(NAMESPACE).iam.example.com/login/#/service/login
+  ENDUSER_CLIENT_ID: endUserUIClient
+  ADMIN_CLIENT_ID: idmAdminClient
+  THEME: default
