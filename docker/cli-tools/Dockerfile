@@ -1,7 +1,7 @@
 FROM gcr.io/engineering-devops/pulumi-nodejs:latest as base
 
 SHELL ["bash", "-c"]
-ENV PULUMI_SKIP_UPDATE=1
+ENV PULUMI_SKIP_UPDATE_CHECK=1
 
 RUN mkdir -p /opt/forgeops/ \
         && addgroup --gid 360360 cli \
@@ -10,7 +10,6 @@ RUN mkdir -p /opt/forgeops/ \
 COPY --chown=0:360360 cluster/pulumi /opt/forgeops/usr/
 RUN chmod 2775 /opt/forgeops \
         && cd /opt/forgeops/usr/ \
-        && umask 007 \
             && PULUMI_HOME=/tmp/pulumi npm --loglevel=error ci --production \
                 && install -g 360360 /tmp/pulumi/plugins/**/* /opt/forgeops/usr/bin \
                     && rm -rf /tmp/pulumi
@@ -20,7 +19,7 @@ RUN helm --home /opt/forgeops/usr/helm init --client-only \
 
 
 FROM gcr.io/engineering-devops/pulumi-nodejs:latest as finale
-ENV PULUMI_SKIP_UPDATE=1
+ENV PULUMI_SKIP_UPDATE_CHECK=1
 ENV NODE_PATH=/opt/forgeops/usr/node_modules
 ENV HELM_HOME=/opt/forgeops/usr/helm
 ENV PS1="forgeopscli▶ "
@@ -30,9 +29,10 @@ COPY --from=base /opt /opt
 COPY --chown=0:360360 docker/cli-tools/entrypoint.sh /opt/forgeops/usr/entrypoint.sh
 RUN  adduser --system --no-create-home --uid 501 --disabled-password --group forgeops \
         && addgroup --gid 360360 cli \
-            && usermod -a -G cli forgeops
-            #                && mkdir --mode 770 -p /opt/forgeops/mnt/{ctx,.pulumi} \
-            #                    && chown -R forgeops:forgeops /opt/forgeops/mnt
+            && usermod -a -G cli forgeops \
+                && usermod -d /opt/forgeops/mnt forgeops \
+                && mkdir --mode 770 -p /opt/forgeops/mnt/{ctx,.pulumi} \
+                    && chown -R forgeops:forgeops /opt/forgeops/mnt
 
 ENTRYPOINT ["/opt/forgeops/usr/entrypoint.sh"]
-WORKDIR /opt/forgeops/mnt/
+WORKDIR /opt/forgeops/mnt/ctx
