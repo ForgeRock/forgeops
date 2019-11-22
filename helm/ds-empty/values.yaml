@@ -22,7 +22,7 @@ component: ds
 
 image:
   repository: gcr.io/forgerock-io/ds-empty/pit1
-  tag: 7.0.0-c82ab9b02f0a142228a98a6428307962782e966b
+  tag: 7.0.0-038e4f769278e4cb98ec8edfca16b1154e869d32
   pullPolicy: IfNotPresent
 
 # The number of instances in the StatefulSet. Each instance is a combined DS/RS pair.
