@@ -133,6 +133,18 @@
             "dnTemplate": "ou=generic,dc=openidm,dc=forgerock,dc=io"
         },
         "explicitMapping": {
+            "internal/user": {
+                "dnTemplate": "ou=users,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [ "uidObject", "fr-idm-internal-user" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "uid", "isRequired": true, "writability": "createOnly"
+                    },
+                    "password": {
+                        "type": "json", "ldapAttribute": "fr-idm-password"
+                    }
+                }
+            },
             "internal/role": {
                 "dnTemplate": "ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
