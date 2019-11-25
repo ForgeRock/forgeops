@@ -16,30 +16,34 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
-                String upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DS_VERSION
-                if (imageName == 'ds-empty') {
-                    upgradeDsVersion = commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION
-                }
+                stagesCloud = [:]
+
+                def subStageName = stageName
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
+
+                def imageName = 'ds-empty'
+                def cfg = [
+                    TESTS_SCOPE                         : 'tests/upgrade',
+                    DEPLOYMENT_NAME                     : 'platform-deployment',
+                    CLUSTER_DOMAIN                      : 'pit-24-7.forgeops.com',
+                    CLUSTER_NAMESPACE                   : subStageName,
+                    COMPONENTS_AMSTER_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
+                    COMPONENTS_AM_IMAGE_TAG             : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
+                    COMPONENTS_IDM_IMAGE_TAG            : commonModule.UPGRADE_TEST_BASE_IDM_VERSION,
+                    COMPONENTS_DS_IMAGE_TAG             : commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION,
+                    STASH_LODESTAR_BRANCH               : commonModule.LODESTAR_GIT_COMMIT,
+                    EXT_FORGEOPS_BRANCH                 : 'fraas-production',
+                    EXT_FORGEOPS_UPGRADE_BRANCH         : commonModule.FORGEOPS_GIT_COMMIT
+                ]
 
                 dir('lodestar') {
-                    def cfg = [
-                        TESTS_SCOPE                     : 'tests/upgrade',
-                        DEPLOYMENT_NAME                 : 'platform-deployment',
-                        CLUSTER_NAMESPACE               : "upgrade",
-                        CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
-                        COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
-                        COMPONENTS_AM_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
-                        COMPONENTS_IDM_IMAGE_TAG        : commonModule.UPGRADE_TEST_BASE_IDM_VERSION,
-                        COMPONENTS_DS_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION,
-                        STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                        EXT_FORGEOPS_BRANCH             : 'fraas-production',
-                        EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT
-                    ]
-
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20PIT_5fUpgrade") {
+                    commonModule.determineUnitOutcome(stagesCloud[subStageName]) {
                         withGKEPitNoStages(cfg)
                     }
                 }
+
+                summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, stageName, "${stageName.toLowerCase()}.html")
+                return commonModule.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${stageName}/")
             }
         }
     }

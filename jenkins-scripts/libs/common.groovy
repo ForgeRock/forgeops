@@ -168,12 +168,42 @@ def getCurrentProductCommitHashes() {
     ]
 }
 
-def determinePitOutcome(String reportUrl, Closure process) {
+def addStageCloud(HashMap stagesCloud, String subStageName, String reportName) {
+    stagesCloud[subStageName] = [
+        'numFailedTests'    : 0,
+        'testsDuration'     : -1,
+        'reportUrl'         : "${env.BUILD_URL}/artifact/reports/${reportName}",
+        'exception'         : null
+    ]
+    return stagesCloud
+}
+
+def determineUnitOutcome(HashMap stageCloud, Closure process) {
+    // Determine outcome of single test run
     try {
         process()
-        return new Outcome(Status.SUCCESS, reportUrl)
     } catch (Exception e) {
-        return new FailureOutcome(e, reportUrl)
+        // TODO - Implement method to accuratedly read number of failed tests from Lodestar
+        stageCloud["numFailedTests"] = 1
+        stageCloud["exception"] = e
+    }
+}
+
+def determinePitOutcome(HashMap stagesCloud, String reportUrl) {
+    // Determine outcome of all tests
+    def failure = false
+    def innerStage = ""
+    stagesCloud.each { key, val ->
+        if(stagesCloud[key]['numFailedTests'] > 0) {
+            failure = true
+            innerStage = key
+        }
+    }
+
+    if(failure) {
+        return new FailureOutcome(stagesCloud[innerStage]["exception"], reportUrl)
+    } else {
+        return new Outcome(Status.SUCCESS, reportUrl)
     }
 }
 

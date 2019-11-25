@@ -16,25 +16,33 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
-                dir('lodestar') {
-                    def cfg = [
-                        TESTS_SCOPE          : 'tests/platform_deployment',
-                        DEPLOYMENT_NAME      : 'platform-deployment',
-                        CLUSTER_DOMAIN       : 'pit-24-7.forgeops.com',
-                        CLUSTER_NAMESPACE    : 'greenfield',
-                        REPEAT               : 10,
-                        REPEAT_WAIT          : 3600,
-                        TIMEOUT              : "24",
-                        TIMEOUT_UNIT         : "HOURS",
-                        STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
-                        SKIP_FORGEOPS        : 'True',
-                        EXT_FORGEOPS_PATH    : forgeopsPath
-                    ]
+                stagesCloud = [:]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20PIT_5fGreenfield") {
+                def subStageName = stageName
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
+
+                def cfg = [
+                    TESTS_SCOPE             : 'tests/platform_deployment',
+                    DEPLOYMENT_NAME         : 'platform-deployment',
+                    CLUSTER_DOMAIN          : 'pit-24-7.forgeops.com',
+                    CLUSTER_NAMESPACE       : subStageName,
+                    REPEAT                  : 10,
+                    REPEAT_WAIT             : 3600,
+                    TIMEOUT                 : "24",
+                    TIMEOUT_UNIT            : "HOURS",
+                    STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
+                    SKIP_FORGEOPS           : 'True',
+                    EXT_FORGEOPS_PATH       : forgeopsPath
+                ]
+
+                dir('lodestar') {
+                    commonModule.determineUnitOutcome(stagesCloud[subStageName]) {
                         withGKEPitNoStages(cfg)
                     }
                 }
+
+                summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, stageName, "${stageName.toLowerCase()}.html")
+                return commonModule.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${stageName}/")
             }
         }
     }

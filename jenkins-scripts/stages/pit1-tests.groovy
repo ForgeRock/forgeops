@@ -18,20 +18,29 @@ void runStage(PipelineRun pipelineRun, String stageName, boolean useSkaffold = f
 
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
-                dir('lodestar') {
-                    def cfg = [
-                        STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-                        TESTS_SCOPE             : 'tests/platform_deployment',
-                        DEPLOYMENT_NAME         : 'platform-deployment',
-                        SKIP_FORGEOPS           : 'True',
-                        EXT_FORGEOPS_PATH       : "${env.WORKSPACE}/forgeops",
-                        USE_SKAFFOLD            : useSkaffold
-                    ]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20Run_5fPIT_5fSmoke_5fTests/") {
+                stagesCloud = [:]
+
+                def subStageName = stageName
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
+
+                def cfg = [
+                    TESTS_SCOPE             : 'tests/platform_deployment',
+                    DEPLOYMENT_NAME         : 'platform-deployment',
+                    STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
+                    SKIP_FORGEOPS           : 'True',
+                    EXT_FORGEOPS_PATH       : "${env.WORKSPACE}/forgeops",
+                    USE_SKAFFOLD            : useSkaffold
+                ]
+
+                dir('lodestar') {
+                    commonModule.determineUnitOutcome(stagesCloud[subStageName]) {
                         withGKEPitNoStages(cfg)
                     }
                 }
+
+                summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, stageName, "${stageName.toLowerCase()}.html")
+                return commonModule.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${stageName}/")
             }
         }
     }
