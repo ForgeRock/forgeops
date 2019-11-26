@@ -2,6 +2,7 @@
 # for self signed SSL certs. It is suitable for local minikube development
 namespace: default
 resources:
+- ../../forgeops-secrets
 - ../persistence
 - ../../am
 - ../../amster

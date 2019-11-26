@@ -52,8 +52,8 @@ spec:
       - name: initialize
         image: ds
         imagePullPolicy: IfNotPresent
-        args:
-          - initialize-only
+        command:
+          - /opt/opendj/bin/ds-init.sh
         resources:
           requests:
             memory: 512Mi
@@ -63,6 +63,8 @@ spec:
         volumeMounts:
         - mountPath: /opt/opendj/data
           name: data
+        - mountPath: /var/run/secrets/opendj-passwords
+          name: passwords
       containers:
       - name: ds
         image: ds
@@ -109,6 +111,8 @@ spec:
           mountPath: /opt/opendj/data
         - name: secrets
           mountPath: /opt/opendj/secrets
+        - mountPath: /var/run/secrets/opendj
+          name: secrets
       securityContext:
         fsGroup: 0
         runAsUser: 11111
@@ -117,6 +121,9 @@ spec:
       - name: secrets
         secret:
           secretName: ds
+      - name: passwords
+        secret:
+          secretName: ds-passwords
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:

@@ -5,9 +5,15 @@
 this.binding.variables << [
    fqdn: System.getenv("FQDN") ?: "default.iam.example.com",
    cookieDomain: System.getenv("DOMAIN") ?: "example.com",
-   amadminPassword: System.getenv("AMADMIN_PASSWORD") ?: "password",
+   amadminPassword: System.getenv("AMADMIN_PASS") ?: "password",
+   cfgDirPassword: System.getenv("CFGDIR_PASS") ?: "password",
+   usrUsrPassword:  System.getenv("USRUSR_PASS") ?: "password",
+   usrDirPassword:  System.getenv("USRDIR_PASS") ?: "password",
+   cfgUsrPassword: System.getenv("CFGUSR_PASS") ?: "password",
+   polAgentPassword: System.getenv("AM_POLICY_AGENT_PASS") ?: "password",
+   amEncKey: System.getenv("AM_ENC_KEY") ?: "C00lBeans",
    lbUrl:  "https://" + (System.getenv("FQDN") ?: "default.iam.example.com") + "/am",
-]
+] 
 
 //def lbUrl = "https://" + fqdn + "/am"
 
@@ -20,18 +26,18 @@ install-openam \
    --adminPwd amadminPassword \
    --cfgStore dirServer \
    --cfgStoreHost ds-idrepo-0.ds-idrepo \
-   --cfgStoreDirMgr uid=admin \
-   --cfgStoreDirMgrPwd password \
+   --cfgStoreDirMgr "uid=admin"  \
+   --cfgStoreDirMgrPwd cfgDirPassword \
    --cfgStorePort 1389 \
    --cfgStoreRootSuffix "ou=am-config" \
    --userStoreDirMgr "uid=admin" \
-   --userStoreDirMgrPwd  "password" \
+   --userStoreDirMgrPwd  usrDirPassword \
    --userStoreHost "ds-idrepo-0.ds-idrepo" \
    --userStorePort 1389 \
    --userStoreRootSuffix "ou=identities" \
    --userStoreType "LDAPv3ForForgeRockIAM" \
-   --policyAgentPwd "Passw0rd" \
-   --pwdEncKey "C00lBeans" \
+   --policyAgentPwd polAgentPassword \
+   --pwdEncKey amEncKey \
    --acceptLicense \
    --lbSiteName site1 \
    --lbPrimaryUrl lbUrl \

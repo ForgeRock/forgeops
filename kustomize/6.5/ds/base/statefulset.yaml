@@ -93,6 +93,8 @@ spec:
             name: data
           - mountPath: /opt/opendj/secrets
             name: secrets
+          - mountPath: /var/run/secrets/opendj
+            name: secrets
       securityContext:
         fsGroup: 0
         runAsUser: 11111
