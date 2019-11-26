@@ -16,7 +16,7 @@ then
 else
     ARGS=(${entry_args[@]:3})
 fi
-groupmod -g ${groupid} forgeops
+getent group ${groupid} > /dev/null 2>&1 || groupmod -g ${groupid} forgeops
 usermod --uid ${userid} --gid ${groupid} forgeops
 # These two paths aren't directly mounted, so they must have the ownership changed
 chown forgeops:forgeops /opt/forgeops/mnt/{.pulumi,.config}
@@ -24,4 +24,4 @@ export HOME=${homedir}
 export PULUMI_HOME=/opt/forgeops/mnt/.pulumi
 export NODE_PATH=/opt/forgeops/usr/node_modules
 # Add supplemental group such that permissions are g=r-x files/exec
-exec setpriv --reuid=${userid} --regid=${groupid} --groups 360360 --inh-caps=-all ${ARGS[@]}
+exec setpriv --reuid=${userid} --regid=${groupid} --groups 360360,998 --inh-caps=-all ${ARGS[@]}
