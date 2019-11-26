@@ -9,7 +9,7 @@ config:
   certmanager:version: v0.10.0
   cluster:k8sVersion: "1.14"
   cluster:name: cdm-medium
-  cluster:nodeZones: '["us-east4-b"]'
+  cluster:nodeZones: '["us-east4-b","us-east4-c"]'
   ds:enable: "false"
   gcp:region: us-east4
   gcp:zone: us-east4-a

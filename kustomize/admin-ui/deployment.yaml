@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-ui
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.0.0-postcommit-latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: platform-config
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        name: admin-ui
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "10m"
+          limits:
+            memory: "100Mi"
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http

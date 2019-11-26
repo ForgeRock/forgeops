@@ -1,0 +1,7 @@
+kind: ""
+apiversion: ""
+commonLabels:
+  app: login-ui
+resources:
+- deployment.yaml
+- service.yaml

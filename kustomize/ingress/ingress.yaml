@@ -54,11 +54,12 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    certmanager.k8s.io/cluster-issuer: "default-issuer"
-    #certmanager.k8s.io/cluster-issuer: "ca-issuer"
   name: end-user-ui
+  annotations:
+    certmanager.k8s.io/cluster-issuer: "default-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/enduser)$ $1/ redirect;
 spec:
   rules:
   - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
@@ -68,6 +69,52 @@ spec:
           serviceName: end-user-ui
           servicePort: 80
         path: /enduser/?(.*)
+  tls:
+  - hosts:
+    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    secretName: sslcert
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: login-ui
+  annotations:
+    certmanager.k8s.io/cluster-issuer: "default-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/login)$ $1/ redirect;
+spec:
+  rules:
+  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    http:
+      paths:
+      - backend:
+          serviceName: login-ui
+          servicePort: 80
+        path: /login/?(.*)
+  tls:
+  - hosts:
+    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    secretName: sslcert
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: platform-ui
+  annotations:
+    certmanager.k8s.io/cluster-issuer: "default-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/platform)$ $1/ redirect;
+spec:
+  rules:
+  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    http:
+      paths:
+      - backend:
+          serviceName: admin-ui
+          servicePort: 80
+        path: /platform/?(.*)
   tls:
   - hosts:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)

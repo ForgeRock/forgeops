@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am:7.0.0-b33f5b14758a42cfc02c2e36b084955d5453bc74
+FROM gcr.io/forgerock-io/am:7.0.0-9e5d1b172bf96cdccd2b128082bce7e3d1c1970b
 
 # BEGIN - temporary work around for testing if the ds-idrepo is configured before AM starts. Remove when FBC is integrated
 # Installs ldap utils for querying the repo.
@@ -10,6 +10,7 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 
 COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
 
+ENV CATALINA_OPTS "-server -XX:MaxRAMPercentage=75 -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off -Xlog:gc*,gc+ref=debug,gc+heap=debug,gc+age=trace:file=/tmp/gc-%p-%t.log:tags,uptime,time,level:filecount=10,filesize=10m"
 
 # This copies in the boot.json and other files...
 COPY --chown=forgerock:root openam /home/forgerock/openam

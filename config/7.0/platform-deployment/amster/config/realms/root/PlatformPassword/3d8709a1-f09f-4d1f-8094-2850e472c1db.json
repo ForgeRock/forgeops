@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "PlatformPassword",
+    "entityId" : "3d8709a1-f09f-4d1f-8094-2850e472c1db",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "3d8709a1-f09f-4d1f-8094-2850e472c1db",
+    "passwordAttribute" : "password",
+    "validateInput" : true,
+    "objectType" : "user",
+    "_type" : {
+      "_id" : "ValidatedPasswordNode",
+      "name" : "Platform Password",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "outcome",
+      "displayName" : "Outcome"
+    } ]
+  }
+}

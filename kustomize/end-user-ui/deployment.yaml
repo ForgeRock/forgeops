@@ -7,8 +7,11 @@ spec:
   template:
     spec:
       containers:
-      - image: gcr.io/engineering-devops/end-user-ui:fraasEndUserClient
+      - image: gcr.io/forgerock-io/platform-enduser-ui/docker-build:7.0.0-postcommit-latest
         imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: platform-config
         livenessProbe:
           httpGet:
             path: /
@@ -17,11 +20,11 @@ spec:
         resources:
           requests:
             memory: "100Mi"
-            cpu: "50m"
+            cpu: "10m"
           limits:
             memory: "100Mi"
         ports:
-        - containerPort: 8080
+        - containerPort: 80
           name: http
           protocol: TCP
         readinessProbe:

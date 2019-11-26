@@ -1,9 +1,10 @@
-apiVersion: v1
-kind: Secret
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: platform-secrets
-type: Opaque
-data:
-  # Password used at installation time. base64 encoded.
-  # Change after installation.
-  ADMIN_PASSWORD: cGFzc3dvcmQ=
+  name: am
+spec:
+  template:
+    spec:
+      containers:
+        - name: openam
+          imagePullPolicy: Always

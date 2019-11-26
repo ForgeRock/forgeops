@@ -14,13 +14,13 @@ import java.net.URLDecoder
 
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
-@Library(['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@d06115e', 'java-pipeline-libs@c9f5837'])
+@Library(['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@af6046a', 'java-pipeline-libs@c9f5837'])
 import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
 
 properties([
     buildDiscarder(logRotator(numToKeepStr: '20')),
-    pipelineTriggers([cron('H 0 * * *')])
+    pipelineTriggers([cron('H 0,12 * * *')])
 ])
 
 def pipelineRun

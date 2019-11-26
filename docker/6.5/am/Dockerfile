@@ -17,6 +17,8 @@ USER forgerock
 RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/am
 
 
+ENV CATALINA_OPTS "-server -Xmx1g -Dcom.iplanet.services.stats.state=off -D"
+
 COPY --chown=forgerock:root openam /home/forgerock/openam
 
 # Note that the upstream AM image does not execute our custom script. We override here

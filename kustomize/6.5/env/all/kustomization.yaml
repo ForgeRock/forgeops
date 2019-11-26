@@ -2,9 +2,9 @@
 namespace: default
 resources:
 - ../persistence
-- ../../am
+- ../../../am
 - ../../../amster
-- ../../idm
+- ../../../idm
 - ../../../ingress
 - platform-config.yaml
 #- ../../end-user-ui

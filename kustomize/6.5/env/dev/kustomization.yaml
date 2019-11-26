@@ -1,9 +1,9 @@
 # Deploy everything except persistence
 namespace: default
 resources:
-- ../../am
+- ../../../am
 - ../../../amster
-- ../../idm
+- ../../../idm
 - ../../../ingress
 - platform-config.yaml
 #- ../../end-user-ui

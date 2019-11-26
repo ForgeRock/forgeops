@@ -15,6 +15,7 @@
       "provisioningSigningKeyAlias" : "openidm-selfservice-key",
       "idmObjectEndpoint" : "managed",
       "idmDeploymentPath" : "openidm",
+      "idmProvisioningClient" : "idm-provisioning",
       "jwtSigningCompatibilityMode" : false,
       "idmDeploymentUrl" : "http://idm",
       "enabled" : true,

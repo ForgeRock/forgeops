@@ -10,9 +10,14 @@ data:
   SUBDOMAIN: apps
   DOMAIN: fropenshift.openshift.forgeops.com
   AM_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/am
+  PLATFORM_ADMIN_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/platform
   IDM_ADMIN_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/admin
   IDM_REST_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/openidm
   ENDUSER_UI_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/enduser
+  LOGIN_UI_URL:   https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/login/#/service/login
+  ENDUSER_CLIENT_ID: endUserUIClient
+  ADMIN_CLIENT_ID: idmAdminClient
+  THEME: default
 ---
 apiVersion: v1
 kind: Secret

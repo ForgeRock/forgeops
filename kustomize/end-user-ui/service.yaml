@@ -7,7 +7,7 @@ spec:
   - name: http
     port: 80
     protocol: TCP
-    targetPort: 8080
+    targetPort: 80
   selector:
     app: end-user-ui
   type: ClusterIP

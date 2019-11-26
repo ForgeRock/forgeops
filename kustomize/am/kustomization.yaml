@@ -6,7 +6,6 @@ commonLabels:
   vendor: forgerock
 # - ingress.yaml
 resources:
-- configmap.yaml
 - deployment.yaml
 - service.yaml
 secretGenerator:

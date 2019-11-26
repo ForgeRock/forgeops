@@ -64,7 +64,7 @@
       "scopes" : [ "openid" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ "https://&{fqdn}/admin/appAuthHelperRedirect.html", "https://&{fqdn}/admin/sessionCheck.html","http://localhost:8082/appAuthHelperRedirect.html", "http://localhost:8082/sessionCheck.html" ],
+      "redirectionUris" : [ "https://&{fqdn}/platform/appAuthHelperRedirect.html", "https://&{fqdn}/platform/sessionCheck.html","https://&{fqdn}/admin/appAuthHelperRedirect.html", "https://&{fqdn}/admin/sessionCheck.html","http://localhost:8082/appAuthHelperRedirect.html", "http://localhost:8082/sessionCheck.html" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {
