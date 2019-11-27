@@ -22,17 +22,19 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
 
                 def cfg = [
-                    TESTS_SCOPE             : 'tests/platform_deployment',
-                    DEPLOYMENT_NAME         : 'platform-deployment',
-                    CLUSTER_DOMAIN          : 'pit-24-7.forgeops.com',
-                    CLUSTER_NAMESPACE       : subStageName,
-                    REPEAT                  : 10,
-                    REPEAT_WAIT             : 3600,
-                    TIMEOUT                 : "24",
-                    TIMEOUT_UNIT            : "HOURS",
-                    STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-                    SKIP_FORGEOPS           : 'True',
-                    EXT_FORGEOPS_PATH       : forgeopsPath
+                    TESTS_SCOPE                     : 'tests/platform_deployment',
+                    DEPLOYMENT_NAME                 : 'platform-deployment',
+                    CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
+                    CLUSTER_NAMESPACE               : subStageName,
+                    REPEAT                          : 10,
+                    REPEAT_WAIT                     : 3600,
+                    TIMEOUT                         : "24",
+                    TIMEOUT_UNIT                    : "HOURS",
+                    COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
+                    COMPONENTS_FRCONFIG_GIT_BRANCH  : commonModule.FORGEOPS_GIT_COMMIT,
+                    STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
+                    SKIP_FORGEOPS                   : 'True',
+                    EXT_FORGEOPS_PATH               : forgeopsPath
                 ]
 
                 dir('lodestar') {

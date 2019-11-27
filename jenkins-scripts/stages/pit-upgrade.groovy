@@ -23,17 +23,19 @@ void runStage(PipelineRun pipelineRun, String stageName) {
 
                 def imageName = 'ds-empty'
                 def cfg = [
-                    TESTS_SCOPE                         : 'tests/upgrade',
-                    DEPLOYMENT_NAME                     : 'platform-deployment',
-                    CLUSTER_DOMAIN                      : 'pit-24-7.forgeops.com',
-                    CLUSTER_NAMESPACE                   : subStageName,
-                    COMPONENTS_AMSTER_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
-                    COMPONENTS_AM_IMAGE_TAG             : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
-                    COMPONENTS_IDM_IMAGE_TAG            : commonModule.UPGRADE_TEST_BASE_IDM_VERSION,
-                    COMPONENTS_DS_IMAGE_TAG             : commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION,
-                    STASH_LODESTAR_BRANCH               : commonModule.LODESTAR_GIT_COMMIT,
-                    EXT_FORGEOPS_BRANCH                 : 'fraas-production',
-                    EXT_FORGEOPS_UPGRADE_BRANCH         : commonModule.FORGEOPS_GIT_COMMIT
+                    TESTS_SCOPE                     : 'tests/upgrade',
+                    DEPLOYMENT_NAME                 : 'platform-deployment',
+                    CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
+                    CLUSTER_NAMESPACE               : subStageName,
+                    COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
+                    COMPONENTS_FRCONFIG_GIT_BRANCH  : commonModule.FORGEOPS_GIT_COMMIT,
+                    COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
+                    COMPONENTS_AM_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
+                    COMPONENTS_IDM_IMAGE_TAG        : commonModule.UPGRADE_TEST_BASE_IDM_VERSION,
+                    COMPONENTS_DS_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION,
+                    STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
+                    EXT_FORGEOPS_BRANCH             : 'fraas-production',
+                    EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT
                 ]
 
                 dir('lodestar') {
