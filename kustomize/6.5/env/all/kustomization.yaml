@@ -1,7 +1,6 @@
 #
 namespace: default
 resources:
-- ../../../forgeops-secrets
 - ../persistence
 - ../../../am
 - ../../../amster

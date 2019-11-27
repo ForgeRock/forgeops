@@ -241,11 +241,6 @@ init)
 	for p in "${COMPONENTS[@]}"; do
 		init_config "$p"
 	done
-
-	mkdir -p docker/forgeops-secrets/forgeops-secrets-image/config
-	echo "cp ${PROFILE_ROOT}/secrets/config"/* "docker/forgeops-secrets/forgeops-secrets-image/config"
-    cp "${PROFILE_ROOT}/secrets/config"/* "docker/forgeops-secrets/forgeops-secrets-image/config"
-	
 	;;
 clean)
 	for p in "${COMPONENTS[@]}"; do

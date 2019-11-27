@@ -22,8 +22,6 @@ build:
     context: docker/6.5/ds/idrepo
   - image: ig
     context: docker/6.5/ig
-  - image: forgeops-secrets
-    context: docker/forgeops-secrets
   tagPolicy:
     sha256: {}
 deploy:

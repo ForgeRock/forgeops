@@ -1,7 +1,7 @@
 {
     "rsFilter": {
         "clientId": "rsFilterClient",
-        "clientSecret": "&{rs.client.secret}",
+        "clientSecret": "rsFilterClient",
         "tokenIntrospectUrl": "http://am:80/am/oauth2/introspect",
         "scopes": [],
         "cache": {

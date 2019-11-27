@@ -21,8 +21,6 @@ build:
     context: docker/7.0/ds/cts
   - image: ds-idrepo
     context: docker/7.0/ds/idrepo
-  - image: forgeops-secrets
-    context: docker/forgeops-secrets
   tagPolicy:
     sha256: {}
 deploy:
@@ -50,8 +48,6 @@ profiles:
       context: docker/7.0/ds/cts
     - image: ds-idrepo
       context: docker/7.0/ds/idrepo
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
     tagPolicy:
       gitCommit: {}
   deploy:
@@ -72,8 +68,6 @@ profiles:
       context: docker/7.0/idm
     - image: amster
       context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
     #- image: ig
     #  context: docker/7.0/ig
     tagPolicy:
@@ -94,8 +88,6 @@ profiles:
       context: docker/7.0/idm
     - image: amster
       context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
     tagPolicy:
       sha256: {}
   deploy:
@@ -114,8 +106,6 @@ profiles:
       context: docker/7.0/idm
     - image: amster
       context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
     #- image: ig
     #  context: docker/7.0/ig
     tagPolicy:
@@ -140,8 +130,6 @@ profiles:
         context: docker/7.0/ds/idrepo
       - image: ig
         context: docker/7.0/ig
-      - image: forgeops-secrets
-        context: docker/forgeops-secrets
     tagPolicy:
       gitCommit: {}
   deploy:
@@ -162,8 +150,6 @@ profiles:
         context: docker/7.0/ds/cts
       - image: ds-idrepo
         context: docker/7.0/ds/idrepo
-      - image: forgeops-secrets
-        context: docker/forgeops-secrets
     tagPolicy:
       gitCommit: {}
   deploy:

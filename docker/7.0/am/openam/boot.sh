@@ -39,7 +39,7 @@ copy_secrets
 # This is not currently foolproof - it the ds-idrepo is not started yet the ldap search will also fail. This
 # can result in util installer running again - which in most cases is fine - it will refresh the configuraition.
 
-ldapsearch -w ${CFGDIR_PASS}  -D "uid=admin" -A -H "ldap://ds-idrepo-0.ds-idrepo:1389" -l 20 -b "$TEST_DN"  > /dev/null 2>&1
+ldapsearch -w password  -D "uid=admin" -A -H "ldap://ds-idrepo-0.ds-idrepo:1389" -l 20 -b "$TEST_DN"  > /dev/null 2>&1
 status=$?
 echo "Is configured exit status is $status"
 if [ $status -ne 0 ]; then

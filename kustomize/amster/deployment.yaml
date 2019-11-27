@@ -20,8 +20,6 @@ spec:
             name: amster
         - configMapRef:
             name: platform-config
-        - secretRef:
-            name: amster-env-secrets
         image: amster
         imagePullPolicy: IfNotPresent
         name: amster

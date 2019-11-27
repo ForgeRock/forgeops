@@ -1,7 +1,6 @@
 # Deploy everything except persistence
 namespace: default
 resources:
-- ../../../forgeops-secrets
 - ../../../am
 - ../../../amster
 - ../../../idm

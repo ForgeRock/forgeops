@@ -21,8 +21,6 @@ spec:
         envFrom:
         - configMapRef:
             name: idm
-        - secretRef:
-            name: idm-env-secrets
         image: idm
         imagePullPolicy: IfNotPresent
         livenessProbe:

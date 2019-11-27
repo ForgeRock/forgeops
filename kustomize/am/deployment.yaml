@@ -15,9 +15,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        envFrom:
-        - secretRef:
-            name: am-env-secrets
         image: am
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -47,9 +44,6 @@ spec:
         volumeMounts:
         - name: am-boot-secrets
           mountPath: /var/run/secrets/am/boot
-        - name: truststore
-          mountPath: /opt/java/openjdk/lib/security/cacerts
-          subPath: cacerts
         - name: am-runtime-passwords
           mountPath: /var/run/secrets/am/password
         - name: am-runtime-keystore
@@ -70,6 +64,3 @@ spec:
       - name: amster-keys
         secret:
           secretName: amster
-      - name: truststore
-        secret:
-          secretName: truststore

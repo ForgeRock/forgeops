@@ -16,3 +16,8 @@ configMapGenerator:
   - sql/activiti.postgres.create.identity.sql
   - sql/sample-explicit-managed-user.sql
   name: openidm-sql
+secretGenerator:
+- literals:
+  - postgres-password=openidm
+  name: postgres-secrets
+  type: Opaque

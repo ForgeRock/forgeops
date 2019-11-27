@@ -7,3 +7,8 @@ commonLabels:
 resources:
 - service.yaml
 - statefulset.yaml
+secretGenerator:
+ - name: ds
+   files:
+   - secrets/keystore.pin
+   - secrets/keystore

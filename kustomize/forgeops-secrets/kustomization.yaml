@@ -1,9 +1,0 @@
-kind: ""
-apiversion: ""
-commonLabels:
-    app: forgeops-secrets
-resources:
-- role.yaml
-- roleBinding.yaml
-- serviceAccount.yaml
-- job.yaml
