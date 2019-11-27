@@ -14,7 +14,8 @@ component: end-user-ui
 image:
   repository: gcr.io/forgerock-io/end-user-ui
   tag: 6.5.0
-  pullPolicy: IfNotPresent
+  # Switch to IfNotPresent once we have milestone builds
+  pullPolicy: Always
 
 service:
   name: end-user-ui
