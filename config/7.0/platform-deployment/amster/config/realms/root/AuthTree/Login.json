@@ -1,0 +1,49 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "AuthTree",
+    "entityId" : "Login",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "Login",
+    "description" : "Platform Login Tree",
+    "nodes" : {
+      "a12bc72f-ad97-4f1e-a789-a1fa3dd566c8" : {
+        "displayName" : "Page Node",
+        "nodeType" : "PageNode",
+        "x" : 136,
+        "y" : 59,
+        "connections" : {
+          "outcome" : "2998c1c9-f4c8-4a00-b2c6-3426783ee49d"
+        }
+      },
+      "2998c1c9-f4c8-4a00-b2c6-3426783ee49d" : {
+        "displayName" : "Data Store Decision",
+        "nodeType" : "DataStoreDecisionNode",
+        "x" : 315,
+        "y" : 140,
+        "connections" : {
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a",
+          "true" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
+        }
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 25
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 492,
+        "y" : 82
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 494,
+        "y" : 221
+      }
+    },
+    "entryNodeId" : "a12bc72f-ad97-4f1e-a789-a1fa3dd566c8"
+  }
+}

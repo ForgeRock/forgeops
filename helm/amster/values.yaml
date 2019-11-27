@@ -41,7 +41,7 @@ config:
 
 image:
   repository: gcr.io/forgerock-io/amster
-  tag: 7.0.0-9e5d1b172bf96cdccd2b128082bce7e3d1c1970b
+  tag: 7.0.0-4b04f7b69602a5ac8b849bc31fd0e9dbbc2c51a1
   pullPolicy: IfNotPresent
   #pullPolicy: Always
 

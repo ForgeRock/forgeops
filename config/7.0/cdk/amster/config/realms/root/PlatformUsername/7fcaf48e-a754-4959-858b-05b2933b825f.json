@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "PlatformUsername",
+    "entityId" : "7fcaf48e-a754-4959-858b-05b2933b825f",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "7fcaf48e-a754-4959-858b-05b2933b825f",
+    "usernameAttribute" : "userName",
+    "validateInput" : true,
+    "objectType" : "user",
+    "_type" : {
+      "_id" : "ValidatedUsernameNode",
+      "name" : "Platform Username",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "outcome",
+      "displayName" : "Outcome"
+    } ]
+  }
+}
