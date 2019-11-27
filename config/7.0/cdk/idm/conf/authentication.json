@@ -1,7 +1,7 @@
 {
     "rsFilter" : {
         "clientId" : "rsFilterClient",
-        "clientSecret" : "&{rs.client.secret}",
+        "clientSecret" : "&{rs.client.secret|password}",
         "tokenIntrospectUrl" : "http://am/am/oauth2/introspect",
         "scopes" : [ ],
         "queryOnResource" : "managed/user",

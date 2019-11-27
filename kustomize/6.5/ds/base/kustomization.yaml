@@ -5,8 +5,3 @@ resources:
 - configmap.yaml
 - service.yaml
 - statefulset.yaml
-secretGenerator:
- - name: ds
-   files:
-   - secrets/keystore.pin
-   - secrets/keystore

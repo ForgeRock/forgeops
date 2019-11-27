@@ -13,6 +13,9 @@ AMSTER_SCRIPTS=${AMSTER_SCRIPTS:-"${DIR}/scripts"}
 # all amster scripts have run.
 POST_INSTALL_SCRIPTS=${POST_INSTALL_SCRIPTS:-"${AMSTER_SCRIPTS}"}
 
+# Default directory for optional pre install scripts. Anything in this directory will be executed before
+# all amster scripts have run.
+PRE_INSTALL_SCRIPTS=${PRE_INSTALL_SCRIPTS:-"${DIR}/pre-install-scripts"}
 
 # Use 'openam' as the internal cluster dns name.
 export SERVER_URL=${OPENAM_INSTANCE:-http://am:80}
@@ -72,6 +75,17 @@ wait_for_openam
 # to fail. The sleep is a low tech solution...
 sleep 30
 
+# Execute any shell scripts ending with *sh
+if [ -d ${PRE_INSTALL_SCRIPTS} ]; then
+    for script in ${PRE_INSTALL_SCRIPTS}/*.sh
+    do
+        if [ -x ${script} ]; then
+            echo "Executing $script"
+            ${script}
+        fi
+    done
+fi
+
 # Execute Amster if the configuration is found.
 if [ -d  ${AMSTER_SCRIPTS} ]; then
     if [ ! -r /var/run/secrets/amster/id_rsa ]; then
@@ -86,7 +100,8 @@ if [ -d  ${AMSTER_SCRIPTS} ]; then
     for file in ${AMSTER_SCRIPTS}/*.amster
     do
         echo "Executing Amster script $file"
-        sh ./amster ${file}
+        # -q flag on amster prevents groovy from disaplaying the contents of variables as they are set, such as passwords.
+        sh ./amster -q ${file}
     done
 fi
 

@@ -1,6 +1,7 @@
 # Deploys everything except persistence. Use this to iterate on the stateless services.
 namespace: default
 resources:
+- ../../forgeops-secrets
 #- ../persistence
 - ../../am
 - ../../amster

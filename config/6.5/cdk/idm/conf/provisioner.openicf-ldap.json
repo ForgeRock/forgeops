@@ -9,7 +9,6 @@
         "port" : 1389,
         "ssl" : false,
         "principal" : "cn=Directory Manager",
-        "credentials" : "password",
         "credentials" : "&{userstore.password}",
         "baseContexts" : [
             "ou=people,&{userstore.basecontext}"
