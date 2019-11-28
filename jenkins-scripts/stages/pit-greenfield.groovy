@@ -10,7 +10,9 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun, String stageName) {
 
-    pipelineRun.pushStageOutcome(commonModule.normalizeStageName(stageName), stageDisplayName: stageName) {
+    def normStageName = commonModule.normalizeStageName(stageName)
+
+    pipelineRun.pushStageOutcome(normStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
@@ -18,7 +20,7 @@ void runStage(PipelineRun pipelineRun, String stageName) {
 
                 stagesCloud = [:]
 
-                def subStageName = stageName
+                def subStageName = normStageName
                 def reportName = "latest-${subStageName}.html"
                 stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, reportName)
 
@@ -45,8 +47,8 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                     }
                 }
 
-                summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, stageName, "${stageName.toLowerCase()}.html")
-                return commonModule.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${stageName}/")
+                summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normStageName, "${normStageName}.html")
+                return commonModule.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${normStageName}/")
             }
         }
     }
