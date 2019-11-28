@@ -34,7 +34,7 @@ component: openidm
 
 image:
   repository: gcr.io/forgerock-io/idm/pit1
-  tag: 7.0.0-e1c0a0a43181c8c863c8fcb098a68bcdbf4a27aa
+  tag: 7.0.0-dd92f68fbb51eb5cdaab6eb1f5db804406208607
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
 
