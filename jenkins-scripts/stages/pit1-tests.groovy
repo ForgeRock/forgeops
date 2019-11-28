@@ -25,7 +25,8 @@ void runStage(PipelineRun pipelineRun, String stageName, boolean useSkaffold = f
                 stagesCloud = [:]
 
                 def subStageName = stageName
-                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
+                def reportName = "latest-${subStageName}.html"
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, reportName)
 
                 def cfg = [
                     TESTS_SCOPE                     : 'tests/platform_deployment',
@@ -39,7 +40,8 @@ void runStage(PipelineRun pipelineRun, String stageName, boolean useSkaffold = f
                     STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                     SKIP_FORGEOPS                   : 'True',
                     EXT_FORGEOPS_PATH               : "${env.WORKSPACE}/forgeops",
-                    USE_SKAFFOLD                    : useSkaffold
+                    USE_SKAFFOLD                    : useSkaffold,
+                    REPORT_NAME                     : reportName
                 ]
 
                 dir('lodestar') {

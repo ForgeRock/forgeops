@@ -19,7 +19,8 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 stagesCloud = [:]
 
                 def subStageName = stageName
-                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
+                def reportName = "latest-${subStageName}.html"
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, reportName)
 
                 def cfg = [
                     TESTS_SCOPE                     : 'tests/platform_deployment',
@@ -34,7 +35,8 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                     COMPONENTS_FRCONFIG_GIT_BRANCH  : commonModule.FORGEOPS_GIT_COMMIT,
                     STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                     SKIP_FORGEOPS                   : 'True',
-                    EXT_FORGEOPS_PATH               : forgeopsPath
+                    EXT_FORGEOPS_PATH               : forgeopsPath,
+                    REPORT_NAME                     : reportName
                 ]
 
                 dir('lodestar') {

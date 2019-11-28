@@ -19,7 +19,8 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                 stagesCloud = [:]
 
                 def subStageName = stageName
-                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, "latest-${subStageName}.html")
+                def reportName = "latest-${subStageName}.html"
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, reportName)
 
                 def imageName = 'ds-empty'
                 def cfg = [
@@ -35,7 +36,8 @@ void runStage(PipelineRun pipelineRun, String stageName) {
                     COMPONENTS_DS_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION,
                     STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                     EXT_FORGEOPS_BRANCH             : 'fraas-production',
-                    EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT
+                    EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT,
+                    REPORT_NAME                     : reportName
                 ]
 
                 dir('lodestar') {
