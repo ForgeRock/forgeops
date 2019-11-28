@@ -80,13 +80,13 @@ separate postgres SQL database is *NOT* required.
  - The Access Manager Core Token Service (ds-cts).
 * A very simple landing page (/web)
 * A Python test harness. This test harness (forgeops-test) exercises the basic deployment and
-can be modified to include additional tests.
+can be modified to include additional tests. 
 
 When deployed, the following URLs are available (The domain name below is the default
 for minikube and can be modified for your environment)
 
 * https://default.iam.example.com/web - web landing page
-* https://default.iam.example.com/am  - Access manager admin  (admin/password)
+* https://default.iam.example.com/am  - Access manager admin  (amadmin/password)
 * https://default.iam.example.com/admin - IDM admin (login with amadmin credentials)
 * https://default.iam.example.com/enduser  - End User UI page
 * https://default.iam.example.com/ig  - Identity Gateway (Optional)
@@ -197,6 +197,14 @@ cd config/7.0
 cp -r cdk my_great_config
 git add my_great_config
 ```
+
+## Secrets 
+
+CDK and CDM deployments use a default set of secrets. Instead of using the default secrets, you can
+randomly generate secrets for the ForgeRock Identity Platform using the forgeops-secrets tool. 
+For more information about randomly generating secrets, see the  
+[forgeops-secrets README](docker/forgeops-secrets/forgeops-secrets-image/README.md) 
+
 
 ## Troubleshooting Tips
 

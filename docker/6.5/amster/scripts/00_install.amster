@@ -5,9 +5,12 @@
 this.binding.variables << [
    fqdn: System.getenv("FQDN") ?: "default.iam.example.com",
    cookieDomain: System.getenv("DOMAIN") ?: "example.com",
-   amadminPassword: System.getenv("AMADMIN_PASSWORD") ?: "password",
+   amadminPassword: System.getenv("AMADMIN_PASS") ?: "password",
+   cfgDirPassword: System.getenv("CFGDIR_PASS") ?: "password",
+   polAgentPassword: System.getenv("AM_POLICY_AGENT_PASS") ?: "password",
+   amEncKey: System.getenv("AM_ENC_KEY") ?: "C00lBeans",
    lbUrl:  "https://" + (System.getenv("FQDN") ?: "default.iam.example.com") + "/am",
-]
+] 
 
 //def lbUrl = "https://" + fqdn + "/am"
 
@@ -19,19 +22,19 @@ install-openam \
    --cookieDomain cookieDomain \
    --adminPwd amadminPassword \
    --cfgStore dirServer \
-   --cfgStoreHost ds-idrepo \
-   --cfgStoreDirMgr "uid=am-config,ou=admins,ou=am-config"  \
-   --cfgStoreDirMgrPwd password \
+   --cfgStoreHost ds-idrepo-0.ds-idrepo \
+   --cfgStoreDirMgr "cn=Directory Manager"  \
+   --cfgStoreDirMgrPwd cfgDirPassword \
    --cfgStorePort 1389 \
    --cfgStoreRootSuffix "ou=am-config" \
-   --userStoreDirMgr "uid=am-identity-bind-account,ou=admins,ou=identities" \
-   --userStoreDirMgrPwd  "password" \
-   --userStoreHost "ds-idrepo" \
+   --userStoreDirMgr "cn=Directory Manager" \
+   --userStoreDirMgrPwd  cfgDirPassword \
+   --userStoreHost "ds-idrepo-0.ds-idrepo" \
    --userStorePort 1389 \
    --userStoreRootSuffix "ou=identities" \
    --userStoreType "LDAPv3ForOpenDS" \
-   --policyAgentPwd "Passw0rd" \
-   --pwdEncKey "C00lBeans" \
+   --policyAgentPwd polAgentPassword \
+   --pwdEncKey amEncKey \
    --acceptLicense \
    --lbSiteName site1 \
    --lbPrimaryUrl lbUrl \
