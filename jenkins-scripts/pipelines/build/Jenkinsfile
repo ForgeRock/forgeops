@@ -6,7 +6,7 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-@Library(value=['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@af6046a', 'java-pipeline-libs@c9f5837']) _
+@Library(value=['forgerock-pipeline-libs@cee3cc0', 'QaUtils@d69c7df', 'QaCloudUtils@de5a52c', 'java-pipeline-libs@c9f5837']) _
 
 import com.forgerock.pipeline.reporting.PipelineRun
 

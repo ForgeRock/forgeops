@@ -14,7 +14,7 @@ image:
 gitImage:
   repository: gcr.io/forgerock-io/git
   tag: 6.5.1
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 config:
   # Name of the configMap that holds the configuration repository URL and of

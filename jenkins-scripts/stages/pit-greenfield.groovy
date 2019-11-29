@@ -10,31 +10,45 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun, String stageName) {
 
-    pipelineRun.pushStageOutcome(commonModule.normalizeStageName(stageName), stageDisplayName: stageName) {
+    def normStageName = commonModule.normalizeStageName(stageName)
+
+    pipelineRun.pushStageOutcome(normStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
-                dir('lodestar') {
-                    def cfg = [
-                        TESTS_SCOPE          : 'tests/platform_deployment',
-                        DEPLOYMENT_NAME      : 'platform-deployment',
-                        CLUSTER_DOMAIN       : 'pit-24-7.forgeops.com',
-                        CLUSTER_NAMESPACE    : 'greenfield',
-                        REPEAT               : 10,
-                        REPEAT_WAIT          : 3600,
-                        TIMEOUT              : "24",
-                        TIMEOUT_UNIT         : "HOURS",
-                        STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
-                        SKIP_FORGEOPS        : 'True',
-                        EXT_FORGEOPS_PATH    : forgeopsPath
-                    ]
+                stagesCloud = [:]
 
-                    commonModule.determinePitOutcome("${env.BUILD_URL}/Allure_20Report_20PIT_5fGreenfield") {
+                def subStageName = normStageName
+                def reportName = "latest-${subStageName}.html"
+                stagesCloud = commonModule.addStageCloud(stagesCloud, subStageName, reportName)
+
+                def cfg = [
+                    TESTS_SCOPE                     : 'tests/platform_deployment',
+                    DEPLOYMENT_NAME                 : 'platform-deployment',
+                    CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
+                    CLUSTER_NAMESPACE               : subStageName,
+                    REPEAT                          : 10,
+                    REPEAT_WAIT                     : 3600,
+                    TIMEOUT                         : "24",
+                    TIMEOUT_UNIT                    : "HOURS",
+                    COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
+                    COMPONENTS_FRCONFIG_GIT_BRANCH  : commonModule.FORGEOPS_GIT_COMMIT,
+                    STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
+                    SKIP_FORGEOPS                   : 'True',
+                    EXT_FORGEOPS_PATH               : forgeopsPath,
+                    REPORT_NAME                     : reportName
+                ]
+
+                dir('lodestar') {
+                    commonModule.determineUnitOutcome(stagesCloud[subStageName]) {
                         withGKEPitNoStages(cfg)
                     }
                 }
+
+                summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normStageName, "${normStageName}.html")
+                return commonModule.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${normStageName}/")
             }
         }
     }

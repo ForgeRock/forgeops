@@ -14,7 +14,7 @@ import java.net.URLDecoder
 
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
-@Library(['forgerock-pipeline-libs@cee3cc0', 'QaCloudUtils@af6046a', 'java-pipeline-libs@c9f5837'])
+@Library(['forgerock-pipeline-libs@cee3cc0', 'QaUtils@d69c7df', 'QaCloudUtils@de5a52c', 'java-pipeline-libs@c9f5837'])
 import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
 

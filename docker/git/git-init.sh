@@ -16,6 +16,9 @@ if [ ! -z "${GIT_REPO}" ]; then
     if [ ! -d .git  ];
     then 
         git clone "${GIT_REPO}" "${GIT_ROOT}"
+        git remote set-url --push origin no-pushing
+        git config --add remote.origin.fetch '+refs/pull-requests/*/from:refs/remotes/origin/pr/*'
+        git fetch
         if [ "$?" -ne 0 ]; then
             echo "git clone failed. Will sleep for 5 minutes for debugging."
             sleep 300

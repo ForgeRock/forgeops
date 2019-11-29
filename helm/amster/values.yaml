@@ -41,14 +41,14 @@ config:
 
 image:
   repository: gcr.io/forgerock-io/amster
-  tag: 7.0.0-d3f42c91bcb69ba165dd7cd92d9aa3e04031145c
-  pullPolicy: IfNotPresent
-  #pullPolicy: Always
+  tag: 7.0.0-a6e287d9207e523887da8b258a89f7475c3eb856
+  # Switch to IfNotPresent once we have milestone builds
+  pullPolicy: Always
 
 gitImage:
   repository: gcr.io/forgerock-io/git
   tag: 6.5.1
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 configStore:
   # type can be dirServer or embedded. Only dirServer is supported
