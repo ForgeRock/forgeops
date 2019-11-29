@@ -23,7 +23,7 @@ to the samples.
 - For 7.0, the new DS `dskeymgr` tool is used to build a CA and also issue/sign certs for AM/IDM/DS.
 - A java trust store is built and mounted on amster, DS, AM, IDM, allowing the services to trust each other's certs.
 - In the `cloud-deployment` and `cdk` profiles of the `config.sh` script, the generated passwords are all set to `password` (in the case of openidm-admin, `openidm-admin`).
-To randomly generate the passwords, delete the OVERRIDE_ALL_PASSWORDS.txt file from the forgeops-secrets docker image after you run the config.sh script. 
+To randomly generate the passwords, delete the OVERRIDE_ALL_PASSWORDS.txt file from the config folder after you run the config.sh script. 
 
 ### Major additions/changes to CDK/CDM artefacts
 
@@ -51,7 +51,7 @@ These tools make an effort to randomly generate all secrets for a **default** AM
 1. Backup the generated secrets `kubectl get secret -lsecrettype=forgeops-generated -o yaml > secrets.yaml`
 
 ### setting all passwords to the same value (for dev, automated testing)
-To have all passwords set with the same value, create a single file called `OVERRIDE_ALL_PASSWORDS.txt` in the forgeops-secrets docker image at the same location as the `gen.sh` script.
+To have all passwords set with the same value, create a single file called `OVERRIDE_ALL_PASSWORDS.txt` to the config folder.
 
 Add a single password to this file on one line only, eg `echo -n mypassword > OVERRIDE_ALL_PASSWORDS.txt`.
 
