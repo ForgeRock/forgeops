@@ -36,7 +36,7 @@ fi
 
 # Check if both optional flags have been included
 if [[ $GRAFANA -eq 1 ]] && [[ $PROMETHEUS -eq 1 ]]; then
-    echo "Invalid choice: Must select EITHER option -g to connect to Grafana or -p to to connect to Prometheus"
+    echo "Invalid choice: Must select EITHER option -G to connect to Grafana or -P to to connect to Prometheus"
     echo $USAGE
     exit 1
 fi
@@ -48,17 +48,18 @@ if [[ $GRAFANA -eq 1 ]]; then
         PORT=3000
     fi
 
-    kubectl port-forward $(kubectl get  pods --selector=app=${NAMESPACE}-kube-prometheus-grafana --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:3000 --namespace=$NAMESPACE
+    kubectl port-forward $(kubectl get  pods --selector=app=grafana --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:3000 --namespace=$NAMESPACE
 fi
 
 # Port forward to Grafana
 if [[ $PROMETHEUS -eq 1 ]]; then
     # check to see if port arg was set
+
     if ! [[ $PORT ]]; then
         PORT=9090
     fi
 
-    kubectl port-forward  prometheus-${NAMESPACE}-kube-prometheus-0 $PORT:9090 --namespace=$NAMESPACE
+    kubectl port-forward $(kubectl get  pods --selector=app=prometheus --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:9090 --namespace=$NAMESPACE
 fi
 
 # Port forward to Alertmanager
@@ -68,7 +69,7 @@ if [[ $ALERTMANAGER -eq 1 ]]; then
         PORT=9093
     fi
 
-    kubectl port-forward  alertmanager-${NAMESPACE}-kube-prometheus-0 $PORT:9093 --namespace=$NAMESPACE
+    kubectl port-forward  $(kubectl get  pods --selector=app=alertmanager --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:9093 --namespace=$NAMESPACE
 fi
 
 echo "Incorrect usage: "
