@@ -14,7 +14,7 @@ data:
   IDM_ADMIN_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/admin
   IDM_REST_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/openidm
   ENDUSER_UI_URL: https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/enduser
-  LOGIN_UI_URL:   https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/login/#/service/login
+  LOGIN_UI_URL:   https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/login/#/service/Login
   ENDUSER_CLIENT_ID: endUserUIClient
   ADMIN_CLIENT_ID: idmAdminClient
   THEME: default
