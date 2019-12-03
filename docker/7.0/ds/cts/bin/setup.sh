@@ -2,7 +2,16 @@
 # Setup the directory server for the idrepo service.
 # Add in custom tuning, index creation, etc. to this file.
 
-setup-profile --profile am-cts \
+version=$1
+
+AM_CTS="am-cts"
+
+# Select DS profile version
+if [[ ! -z $version ]]; then 
+    AM_CTS="${AM_CTS}:${version}"
+fi
+
+setup-profile --profile ${AM_CTS} \
               --set am-cts/tokenExpirationPolicy:ds \
               --set am-cts/amCtsAdminPassword:password
 

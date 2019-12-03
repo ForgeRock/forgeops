@@ -2,13 +2,28 @@
 # Setup the directory server for the idrepo service.
 # Add in custom tuning, index creation, etc. to this file.
 
-setup-profile --profile am-config \
+version=$1
+
+CONFIG="am-config"
+AM_IDENTITY_STORE="am-identity-store"
+IDM_REPO="idm-repo"
+AM_CTS="am-cts"
+
+# Select DS profile version
+if [[ ! -z $profile ]]; then 
+    CONFIG="${CONFIG}:${version}"
+    AM_IDENTITY_STORE="${AM_IDENTITY_STORE}:${version}"
+    IDM_REPO="${IDM_REPO}:${version}"
+    AM_CTS="${AM_CTS}:${version}"
+fi
+
+setup-profile --profile ${CONFIG} \
                   --set am-config/amConfigAdminPassword:password \
- && setup-profile --profile am-identity-store \
+ && setup-profile --profile ${AM_IDENTITY_STORE} \
                   --set am-identity-store/amIdentityStoreAdminPassword:password \
- && setup-profile --profile idm-repo \
+ && setup-profile --profile ${IDM_REPO} \
                   --set idm-repo/domain:forgerock.io \
- && setup-profile --profile am-cts \
+ && setup-profile --profile ${AM_CTS} \
                   --set am-cts/tokenExpirationPolicy:ds \
                   --set am-cts/amCtsAdminPassword:password
 
