@@ -1,0 +1,69 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "AuthTree",
+    "entityId" : "ProgressiveProfile",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "ProgressiveProfile",
+    "description" : "Prompt for missing preferences on 3rd login",
+    "nodes" : {
+      "8afdaec3-275e-4301-bb53-34f03e6a4b29" : {
+        "displayName" : "Login Count Decision",
+        "nodeType" : "LoginCountDecisionNode",
+        "x" : 152,
+        "y" : 36,
+        "connections" : {
+          "false" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0",
+          "true" : "a1f45b44-5bf7-4c57-aa3f-75c619c7db8e"
+        }
+      },
+      "423a959a-a1b9-498a-b0f7-596b6b6e775a" : {
+        "displayName" : "Patch Object",
+        "nodeType" : "PatchObjectNode",
+        "x" : 766,
+        "y" : 36,
+        "connections" : {
+          "PATCHED" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0",
+          "FAILURE" : "e301438c-0bd0-429c-ab0c-66126501069a"
+        }
+      },
+      "a1f45b44-5bf7-4c57-aa3f-75c619c7db8e" : {
+        "displayName" : "Query Filter Decision",
+        "nodeType" : "QueryFilterDecisionNode",
+        "x" : 357,
+        "y" : 36,
+        "connections" : {
+          "true" : "a5aecad8-854a-4ed5-b719-ff6c90e858c0",
+          "false" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
+        }
+      },
+      "a5aecad8-854a-4ed5-b719-ff6c90e858c0" : {
+        "displayName" : "Page Node",
+        "nodeType" : "PageNode",
+        "x" : 555,
+        "y" : 20,
+        "connections" : {
+          "outcome" : "423a959a-a1b9-498a-b0f7-596b6b6e775a"
+        }
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 58.5
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 802,
+        "y" : 312
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 919,
+        "y" : 171
+      }
+    },
+    "entryNodeId" : "8afdaec3-275e-4301-bb53-34f03e6a4b29"
+  }
+}
