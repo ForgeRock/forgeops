@@ -2,23 +2,14 @@
 # Copyright (c) 2016-2019 ForgeRock AS.
 FROM krallin/ubuntu-tini:bionic as download_tini
 
-FROM tomcat:9-jdk8-adoptopenjdk-hotspot as unpack
+FROM adoptopenjdk/openjdk8:debian-slim as unpack
 RUN apt-get update && apt-get install -y unzip && apt-get clean all
 COPY openidm.zip /openidm.zip
 RUN mkdir -p /var/tmp/openidm && unzip -q /openidm.zip -d /var/tmp && rm -fr /var/tmp/openidm/samples
 
 
-FROM tomcat:9-jdk8-adoptopenjdk-hotspot
+FROM adoptopenjdk/openjdk8:debian-slim
 ENV FORGEROCK_HOME /opt/forgerock
-
-#RUN apk add --no-cache su-exec unzip curl bash bind-tools iputils sysstat tini \
-#    && apk del --no-cache bind \
-#    && mkdir -p "${FORGEROCK_HOME}" \
-#    && addgroup -g 11111 forgerock \
-#    && adduser -s /bin/bash -h  "${FORGEROCK_HOME}" -u 11111 -D -G root forgerock \
-#    && chown -R forgerock:root /opt \
-#    && chmod -R 0770 "${FORGEROCK_HOME}" \
-#    && find / -perm +6000 -type f -exec chmod a-s {} \; || true
 
 RUN apt-get update && apt-get install -y zip unzip curl bash wget dnsutils sysstat ldap-utils ttf-dejavu\
     && apt-get clean all \
@@ -47,30 +38,8 @@ RUN mkdir -p /opt/async-profiler && \
 COPY --from=unpack /var/tmp/openidm /opt/openidm
 RUN chown -R forgerock:root /opt/openidm 
 
-#WORKDIR /opt
-
 # Override these to change the JVM:
 ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
-
-
-# Use this for Java 8 u131 or later. This sets the size of the VM heap according to the container size.
-#ENV JAVA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
-
-# For a Debian base image use the RUN stanza below.
-#
-# RUN apt-get update && apt-get install -y ldap-utils  bash  && \
-#     unzip -q /var/tmp/openidm.zip && \
-#     rm -f /var/tmp/openidm.zip  && rm -fr /opt/openidm/samples && \
-#     git config --global user.email "auto-sync@forgerock.net" && \
-#     git config --global user.name "Git Auto-sync user"
-# ttf-dejavu  - needed for Activiti workflow.
-
-#RUN apk update && \
-#    apk upgrade && \
-#    apk add zip ttf-dejavu tini && \
-#    apk add --no-cache nss
-
-#RUN chown -R forgerock:forgerock /opt/openidm  && rm -fr /opt/openidm/samples
 
 COPY *.sh /opt/openidm/
 COPY logging.properties /opt/openidm/logging.properties
