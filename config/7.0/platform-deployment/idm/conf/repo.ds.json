@@ -396,7 +396,7 @@
                     },
                     "country": {
                         "type": "simple",
-                        "ldapAttribute": "c"
+                        "ldapAttribute": "co"
                     },
                     "address2": {
                         "type": "simple",
