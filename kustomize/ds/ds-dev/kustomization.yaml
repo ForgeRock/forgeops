@@ -1,4 +1,6 @@
 # A small deployment for development that deploys the idrepo and the cts
+namespace: default
 resources:
+- ../../forgeops-secrets
 - ../idrepo
 - ../cts
