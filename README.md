@@ -198,6 +198,27 @@ cp -r cdk my_great_config
 git add my_great_config
 ```
 
+## Changing DS profile
+
+To deploy the latest DS version with older setup-profile versions, add the following buildArgs to the DS image:
+
+```  
+build:
+  artifacts:
+  - image: ds-cts
+    context: docker/7.0/ds/cts
+    docker:
+      buildArgs:
+        profile_version: "6.5"
+  - image: ds-idrepo
+    context: docker/7.0/ds/idrepo
+    docker:
+      buildArgs:
+        profile_version: "6.5"
+```
+
+On default, the latest setup-profile version is always deployed.
+
 ## Secrets 
 
 CDK and CDM deployments use a default set of secrets. Instead of using the default secrets, you can

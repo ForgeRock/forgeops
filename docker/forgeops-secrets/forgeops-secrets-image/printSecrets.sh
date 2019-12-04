@@ -1,7 +1,7 @@
 #!/bin/bash
 
 getsec () {
-    kubectl get secret $1 -o jsonpath="{.data.$2}" | base64 -d
+    kubectl get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
 }
 
 case $1 in 
