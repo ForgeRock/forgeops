@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/amster/pit1:7.0.0-de737def48b0d35c462b69c9e88b28167fdc87c1
+FROM gcr.io/forgerock-io/amster/pit1:7.0.0-ffc966cd25c7954437d2b97d0c163c7aacd687ff
 
 USER root
 RUN apk add --update --no-cache openldap-clients jq
