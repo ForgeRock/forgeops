@@ -190,6 +190,8 @@ profiles:
       context: docker/7.0/ds/cts
     - image: ds-idrepo
       context: docker/7.0/ds/idrepo
+    - image: forgeops-secrets
+      context: docker/forgeops-secrets
   deploy:
     kustomize:
       path: ./kustomize/env/am-only
@@ -200,9 +202,11 @@ profiles:
       context: docker/7.0/ds/idrepo
     - image: ds-cts
       context: docker/7.0/ds/cts
+    - image: forgeops-secrets
+      context: docker/forgeops-secrets
   deploy:
     kustomize:
-      path: ./kustomize/ds/ds-dev
+      path: ./kustomize/env/persistence
 
 
 # stateful persistence services if you do not want to destroy your state
@@ -210,12 +214,12 @@ profiles:
 - name: state
   deploy:
     kustomize:
-        path: kustomize/env/persistence
+        path: ./kustomize/env/persistence
 
 # Just the stateless components. Compliments the above. Iterate on the
 # stateless components using skaffold dev -p dev
 - name: dev
   deploy:
     kustomize:
-        path: kustomize/env/dev
+        path: ./kustomize/env/dev
 

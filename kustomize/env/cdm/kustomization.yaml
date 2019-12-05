@@ -1,6 +1,7 @@
 # Deploys to prod.iam.forgeops.com. Uses the Let's encrypt issuer for SSL.
 namespace: prod
 resources:
+  - ../../forgeops-secrets
   - ../../am
   - ../../amster
   - ../../idm
