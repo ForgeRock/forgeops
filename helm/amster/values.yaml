@@ -41,7 +41,7 @@ config:
 
 image:
   repository: gcr.io/forgerock-io/amster/pit1
-  tag: 7.0.0-6d11b3617f5efd8b9fe584020f4d7faf6384dd6d
+  tag: 7.0.0-372834053484c48f979460c5972368a629de2c7b
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
 
