@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "IncrementLoginCount",
+    "entityId" : "97a15eb2-a015-4b6d-81a0-be78c3aa1a3b",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "97a15eb2-a015-4b6d-81a0-be78c3aa1a3b",
+    "objectType" : "user",
+    "identityAttribute" : "userName",
+    "_type" : {
+      "_id" : "IncrementLoginCountNode",
+      "name" : "Increment Login Count",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "outcome",
+      "displayName" : "Outcome"
+    } ]
+  }
+}
