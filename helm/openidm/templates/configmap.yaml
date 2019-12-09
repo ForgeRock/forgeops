@@ -69,11 +69,6 @@ data:
       openidm.staticUser.password={{ .Values.openidm.staticUser.password }}
       {{ end }}
 
-      # Prometheus endpoint authentication
-      openidm.prometheus.username={{ .Values.openidm.prometheus.username }}
-      openidm.prometheus.password={{ .Values.openidm.prometheus.password }}
-      openidm.prometheus.role=openidm-prometheus
-
       # Optionally use the crypto bundle to obfuscate the password and set one of these:
       #openidm.keystore.password=OBF:
       #openidm.keystore.password=CRYPT:

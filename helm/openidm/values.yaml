@@ -60,9 +60,6 @@ openidm:
   # Optional client secret for AM/IDM integration:
   idpconfig:
     clientsecret: password
-  prometheus:
-    username: prometheus
-    password: prometheus
 
 # Optional - if there is a DS userstore configured for synchornization or explict mapping when DS is used as repo
 userstore:
