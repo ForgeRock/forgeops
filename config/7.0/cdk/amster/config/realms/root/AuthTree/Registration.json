@@ -26,7 +26,16 @@
         "y" : 206,
         "connections" : {
           "FAILURE" : "e301438c-0bd0-429c-ab0c-66126501069a",
-          "CREATED" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
+          "CREATED" : "97a15eb2-a015-4b6d-81a0-be78c3aa1a3b"
+        }
+      },
+      "97a15eb2-a015-4b6d-81a0-be78c3aa1a3b": {
+        "displayName": "Increment Login Count",
+        "nodeType": "IncrementLoginCountNode",
+        "x": 681,
+        "y": 144,
+        "connections": {
+          "outcome": "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
         }
       }
     },
@@ -36,8 +45,8 @@
         "y" : 25
       },
       "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
-        "x" : 687,
-        "y" : 180
+        "x": 905,
+        "y": 171
       },
       "e301438c-0bd0-429c-ab0c-66126501069a" : {
         "x" : 741,

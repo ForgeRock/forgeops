@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "QueryFilterDecision",
+    "entityId" : "a1f45b44-5bf7-4c57-aa3f-75c619c7db8e",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "a1f45b44-5bf7-4c57-aa3f-75c619c7db8e",
+    "queryFilter" : "!(/preferences pr) or /preferences/marketing eq false or /preferences/updates eq false",
+    "identityAttribute" : "userName",
+    "objectType" : "user",
+    "_type" : {
+      "_id" : "QueryFilterDecisionNode",
+      "name" : "Query Filter Decision",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "true",
+      "displayName" : "True"
+    }, {
+      "id" : "false",
+      "displayName" : "False"
+    } ]
+  }
+}

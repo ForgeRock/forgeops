@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "PatchObject",
+    "entityId" : "423a959a-a1b9-498a-b0f7-596b6b6e775a",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "423a959a-a1b9-498a-b0f7-596b6b6e775a",
+    "objectType" : "user",
+    "identityAttribute" : "userName",
+    "_type" : {
+      "_id" : "PatchObjectNode",
+      "name" : "Patch Object",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "PATCHED",
+      "displayName" : "Patched"
+    }, {
+      "id" : "FAILURE",
+      "displayName" : "Failed"
+    } ]
+  }
+}
