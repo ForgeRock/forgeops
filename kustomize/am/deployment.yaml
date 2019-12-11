@@ -48,8 +48,7 @@ spec:
         - name: am-boot-secrets
           mountPath: /var/run/secrets/am/boot
         - name: truststore
-          mountPath: /opt/java/openjdk/lib/security/cacerts
-          subPath: cacerts
+          mountPath: /var/run/secrets/truststore
         - name: am-runtime-passwords
           mountPath: /var/run/secrets/am/password
         - name: am-runtime-keystore

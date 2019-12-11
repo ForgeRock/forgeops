@@ -17,7 +17,7 @@ USER forgerock
 RUN mv /usr/local/tomcat/webapps/ROOT /usr/local/tomcat/webapps/am
 
 
-ENV CATALINA_OPTS "-server -Xmx1g -Dcom.iplanet.services.stats.state=off -D"
+ENV CATALINA_OPTS "-server -Xmx1g -Dcom.iplanet.services.stats.state=off -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit -D"
 
 COPY --chown=forgerock:root openam /home/forgerock/openam
 
