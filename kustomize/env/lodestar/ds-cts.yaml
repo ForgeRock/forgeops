@@ -8,9 +8,27 @@ spec:
     spec:
       containers:
         - name: ds
+          resources:
+            requests:
+              memory: 3Gi
+              cpu: 2000m
+            limits:
+              memory: 5Gi
+              cpu: 3000
           env:
             - name: DS_BOOTSTRAP_REPLICATION_SERVERS
               value: ds-cts-0.ds-cts.$(NAMESPACE).svc.cluster.local:8989,ds-cts-1.ds-cts.$(NAMESPACE).svc.cluster.local:8989
       initContainers:
         - name: initialize
           imagePullPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: fast
