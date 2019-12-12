@@ -97,7 +97,7 @@ This certificate handles SSL for all namespaces: *.$subdomain.$domain.
 
 Note: The frconfig chart no longer defaults to enabling cert-manager - as it is not required by default.
 
-For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html#devops-implementation-env-https-access-secret).
+For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube/index.html#devops-implementation-env-https-access-secret).
 
 # Notes
 
