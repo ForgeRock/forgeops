@@ -1,8 +1,0 @@
-namespace: prod
-resources:
-- ../cdm
-- ../../ds/cts-large
-- ../../ds/idrepo-large
-patchesStrategicMerge:
-- am.yaml
-- idm.yaml

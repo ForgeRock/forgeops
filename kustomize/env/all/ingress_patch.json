@@ -1,5 +1,0 @@
-[
-  {"op": "replace", 
-  "path": "/metadata/annotations/certmanager.k8s.io~1cluster-issuer",
-  "value": "ca-issuer"}
-]

@@ -1,4 +1,0 @@
-resources:
-- ../cts
-patchesStrategicMerge:
-- cts.yaml

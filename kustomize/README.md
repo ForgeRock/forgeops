@@ -15,8 +15,8 @@ arbitrary depth.
 
 ## Organization
 
-The top level directory folders include the products (am, idm, ig, ds) and an "environments"  folder in `env/`.  Environments
-pull together ther products into a kustomize deployment. See env/dev for an example.
+The base directory folder includes the products (am, idm, ig, ds) and the "overlay" folder includes the environments. 
+Environments pull together the products into a kustomize deployment. See `./overlay/{version}/all` for an example.
 
 ## Viewing the Kustomize output
 
@@ -24,9 +24,9 @@ You can use `kubectl`  (version 1.14 or higher) or `kustomize`
 
 
 ```bash
-cd kustomize/env
+cd kustomize/overlay/{version}/all
 # This will show you what is sent to the cluster
-kubectl kustomize minikube
+kustomize build
 ```
 
 ## Images

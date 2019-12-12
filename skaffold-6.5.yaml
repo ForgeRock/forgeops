@@ -28,7 +28,7 @@ build:
     sha256: {}
 deploy:
   kustomize:
-    path: kustomize/6.5/env/all
+    path: ./kustomize/overlay/6.5/all
 # Additional profiles
 profiles:
 # Sample profile to demonstrate connecting to an external DS instance instead of ds-idrepo in the cluster
@@ -36,15 +36,6 @@ profiles:
 - name: external-ds
   deploy:
     kustomize:
-        path: kustomize/6.5/env/external-ds
-# Profile to deploy just the stateful persistence services. Deploy using skaffold run (not skaffold dev)
-- name: state
-  deploy:
-    kustomize:
-        path: kustomize/6.5/env/persistence
-# Deploy just the stateless services (AM, IDM, etc.)
-- name: dev
-  deploy:
-    kustomize:
-        path: kustomize/6.5/env/dev
+        path: ./kustomize/overlay/6.5/external-ds
+
 
