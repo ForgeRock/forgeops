@@ -54,10 +54,10 @@ fi
 # Remove stuck namespaces
 for n in $namespace
 do
-  echo -n "Deleting $n... "
+  echo "Deleting $n... "
   j=/tmp/$n.json
   kubectl get ns $n -o json > $j 
-  sed -i s/\"kubernetes\"//g $j 
+  sed -i '' s/\"kubernetes\"//g $j 
   curl -s -o $j.log -X PUT --data-binary @$j http://localhost:8001/api/v1/namespaces/$n/finalize -H "Content-Type: application/json" --header "Authorization: Bearer $t" --insecure
   sleep 5
   echo "done!"

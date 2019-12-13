@@ -39,6 +39,9 @@ export const kubeconfig = gke.createKubeconfig(cluster);
 // Create cluster provider
 const clusterProvider = gke.createClusterProvider(kubeconfig);
 
+// Add Node Pools
+const nodes = gke.addNodePools(cluster.name)
+
 // Create storage classes
 gke.createStorageClasses(clusterProvider);
 
@@ -54,19 +57,19 @@ export const loadbalancerIp = gke.assignIp();
 
 // Deploy nginx ingress controller if enable = true
 if (config.enableNginxIngress) {
-    gke.deployIngressController(loadbalancerIp, clusterProvider, cluster)
+    gke.deployIngressController(loadbalancerIp, clusterProvider, cluster, nodes)
 }
 
 /************ CERTIFICATE MANAGER ************/
 
 //Deploy cert-manager if enable = true
 if (config.enableCertManager){
-    gke.deployCertManager(clusterProvider, cluster);
+    gke.deployCertManager(clusterProvider, cluster, nodes);
 }
 
 // ********************** PROMETHEUS **************
 if (config.enablePrometheus){
-    gke.createPrometheus(cluster, clusterProvider);
+    gke.createPrometheus(cluster, clusterProvider, nodes);
 }
 
 // ********************** PROMETHEUS ************** 

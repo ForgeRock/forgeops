@@ -4,14 +4,14 @@
         "@types/node": "latest"
     },
     "dependencies": {
-        "@pulumi/aws": "^1.7.0",
-        "@pulumi/awsx": "^0.18.12",
-        "@pulumi/azure": "^1.2.0",
-        "@pulumi/azuread": "^1.0.0",
-        "@pulumi/eks": "^0.18.14",
-        "@pulumi/gcp": "^1.3.0",
-        "@pulumi/kubernetes": "^1.2.3",
-        "@pulumi/pulumi": "^1.3.2",
-        "kubernetes-client": "^8.3.4"
+        "@pulumi/aws": "^1.14.1",
+        "@pulumi/awsx": "^0.18.14",
+        "@pulumi/azure": "^1.7.0",
+        "@pulumi/azuread": "^1.3.0",
+        "@pulumi/eks": "^0.18.18",
+        "@pulumi/gcp": "^1.7.0",
+        "@pulumi/kubernetes": "^1.3.4",
+        "@pulumi/pulumi": "^1.6.1",
+        "kubernetes-client": "^8.3.6"
     }
 }
