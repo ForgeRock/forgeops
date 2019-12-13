@@ -69,12 +69,6 @@ export function addNodePools(clusterName: pulumi.Output<string>) {
         pools.push(createNP(config.frontend, clusterName))
     }
     return pools;
-    // let primary = createNP(config.primary, clusterName)
-    // if (config.enableSecondaryPool) {createNP(config.secondary, clusterName)}
-    // if (config.enableDSPool) {createNP(config.ds, clusterName)}
-    // if (config.enableFrontEndPool) {createNP(config.frontend, clusterName)}
-
-    // return primary
 }
 
 // Create a GKE cluster
