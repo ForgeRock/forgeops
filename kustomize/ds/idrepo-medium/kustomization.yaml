@@ -1,4 +1,0 @@
-resources:
-- ../idrepo
-patchesStrategicMerge:
-- idrepo.yaml

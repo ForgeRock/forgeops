@@ -31,9 +31,9 @@ to the samples.
 ## Documentation
 
 The draft ForgeRock DevOps Developer's Guides
-( [minikube](https://ea.forgerock.com/docs/platform/devops-guide-minikube)|
-[shared cluster](https://ea.forgerock.com/docs/platform/devops-guide-cloud)]
-tracks the master branch, including information on the newer Kustommize/ Skaffold workflow. If you are
+( [minikube](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube)|
+[shared cluster](https://ea.forgerock.com/docs/forgeops/devops-guide-cloud)]
+tracks the master branch, including information on the newer Kustomize/ Skaffold workflow. If you are
 just getting started this is the recommended path.
 
 The documentation for the current release can be found on
@@ -50,7 +50,7 @@ and the complexity around configuring different Git repositories and branches in
 The new workflow combines the previously
 independent `forgeops` and `forgeops-init` repositories into a single Git repository that holds configuration and Kubernetes
 manifests.  Documentation for this workflow is in progress. Please
- see the [early access documentation](https://ea.forgerock.com/docs/platform/devops-guide-minikube/#devops-guide-minikube).
+ see the [early access documentation](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube/#devops-guide-minikube).
 
 This preview branch enables the use of supported ForgeRock binaries in your
  deployment.
@@ -229,7 +229,7 @@ For more information about randomly generating secrets, see the
 
 ## Troubleshooting Tips
 
-Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forgerock.com/docs/platform/6/devops-guide/#chap-devops-troubleshoot).
+Refer to the troubleshooting chapter in the [DevOps Guide](https://ea.forgerock.com/docs/forgeops/devops-guide-cloud/#chap-devops-troubleshoot).
 
 Troubleshooting suggestions:
 

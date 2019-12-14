@@ -320,6 +320,7 @@ CREATE TABLE IF NOT EXISTS openidm.relationshipresources (
   originproperty VARCHAR(100) NOT NULL,
   refresourcecollection VARCHAR(255) NOT NULL,
   originfirst BOOL NOT NULL,
+  reverseproperty VARCHAR(100),
   PRIMARY KEY ( originresourcecollection, originproperty, refresourcecollection, originfirst ));
 
 create or replace
@@ -331,11 +332,13 @@ BEGIN
                   ( originresourcecollection,
                    originproperty,
                    refresourcecollection,
-                   originfirst)
+                   originfirst,
+                   reverseproperty)
       VALUES      ( NEW.firstresourcecollection,
                    NEW.firstpropertyname,
                    NEW.secondresourcecollection,
-                   true)
+                   true,
+                   NEW.secondpropertyname)
       ON CONFLICT ( originresourcecollection,
                    originproperty,
                    refresourcecollection,
@@ -346,11 +349,13 @@ BEGIN
                   ( originresourcecollection,
                    originproperty,
                    refresourcecollection,
-                   originfirst)
+                   originfirst,
+                   reverseproperty)
       VALUES      ( NEW.secondresourcecollection,
                    NEW.secondpropertyname,
                    NEW.firstresourcecollection,
-                   false)
+                   false,
+                   NEW.firstpropertyname)
       ON CONFLICT ( originresourcecollection,
                    originproperty,
                    refresourcecollection,

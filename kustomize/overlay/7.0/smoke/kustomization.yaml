@@ -1,0 +1,69 @@
+# This deploys to smoke.iam.forgeops.com.
+# for self signed SSL certs. It is suitable for local minikube development
+namespace: smoke
+resources:
+- ../../../base/kustomizeConfig
+- ../../../base/forgeops-secrets
+- ../../../base/ingress
+- ../../../base/7.0/ds/cts
+- ../../../base/7.0/ds/idrepo
+- ../../../base/am
+- ../../../base/amster
+- ../../../base/idm
+- ../../../base/end-user-ui
+- ../../../base/web
+- ../../../base/forgeops-tests
+
+configMapGenerator:
+- name: platform-config
+  # The env vars below can be passed into a pod using the envFrom pod spec.
+  # These global variables can be used to parameterize your deployments.
+  # The FQDN and URLs here should match your ingress or istio gateway definitions
+  literals:
+  - FQDN=$(NAMESPACE).iam.forgeops.com
+  - SUBDOMAIN=iam
+  - DOMAIN=forgeops.com
+  - AM_URL=https://$(NAMESPACE).iam.forgeops.com/am
+  - IDM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/admin
+  - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/platform
+  - IDM_REST_URL=https://$(NAMESPACE).iam.forgeops.com/openidm
+  - ENDUSER_UI_URL=https://$(NAMESPACE).iam.forgeops.com/enduser
+  - LOGIN_UI_URL=https://$(NAMESPACE).iam.forgeops.com/login/#/service/Login
+  - ENDUSER_CLIENT_ID=endUserUIClient
+  - ADMIN_CLIENT_ID=idmAdminClient
+  - THEME=default
+  
+patchesJson6902:
+- target:
+    group: extensions
+    version: v1beta1
+    kind: Ingress
+    name: forgerock
+  patch: |-
+    - op: replace
+      path: /metadata/annotations/certmanager.k8s.io~1cluster-issuer
+      value: letsencrypt-prod
+      # value: default-issuer  # Default
+  
+vars:
+- name: DOMAIN
+  fieldref:
+    fieldPath: data.DOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: SUBDOMAIN
+  fieldref:
+    fieldPath: data.SUBDOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: NAMESPACE
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+  fieldref:
+    fieldpath: metadata.namespace

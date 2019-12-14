@@ -27,7 +27,7 @@ build:
     sha256: {}
 deploy:
   kustomize:
-    path: ./kustomize/env/all
+    path: ./kustomize/overlay/7.0/all
 
 # Additional profiles
 profiles:
@@ -56,7 +56,7 @@ profiles:
       gitCommit: {}
   deploy:
     kustomize:
-      path: ./kustomize/env/smoke
+      path: ./kustomize/overlay/7.0/smoke
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
 - name: small
@@ -80,7 +80,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/env/small
+      path: ./kustomize/overlay/7.0/small
 - name: medium
   build:
     artifacts:
@@ -100,7 +100,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/env/medium
+      path: ./kustomize/overlay/7.0/medium
 - name: large
   build:
     artifacts:
@@ -122,7 +122,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/env/large
+      path: ./kustomize/overlay/7.0/large
 
 # Platform deployment sample used for PIT and PERF tests
 - name: platform-deployment
@@ -146,7 +146,7 @@ profiles:
       gitCommit: {}
   deploy:
     kustomize:
-      path: ./kustomize/env/lodestar
+      path: ./kustomize/overlay/7.0/lodestar
 
 # ds-shared-repo sample used for PIT and PERF tests
 - name: ds-shared-repo
@@ -168,7 +168,7 @@ profiles:
       gitCommit: {}
   deploy:
     kustomize:
-      path: ./kustomize/env/lodestar
+      path: ./kustomize/overlay/7.0/lodestar
 
   # Sample profiles to launch / test just a specific product
 - name: ig-only
@@ -178,7 +178,7 @@ profiles:
       context: docker/7.0/ig
   deploy:
     kustomize:
-      path: ./kustomize/ig
+      path: ./kustomize/base/7.0/ig
 - name: am-only
   build:
     artifacts:
@@ -194,32 +194,6 @@ profiles:
       context: docker/forgeops-secrets
   deploy:
     kustomize:
-      path: ./kustomize/env/am-only
-- name: ds-only
-  build:
-    artifacts:
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-  deploy:
-    kustomize:
-      path: ./kustomize/env/persistence
+      path: ./kustomize/overlay/7.0/am-only
 
-
-# stateful persistence services if you do not want to destroy your state
-# Run these separately with: skaffold run -p state
-- name: state
-  deploy:
-    kustomize:
-        path: ./kustomize/env/persistence
-
-# Just the stateless components. Compliments the above. Iterate on the
-# stateless components using skaffold dev -p dev
-- name: dev
-  deploy:
-    kustomize:
-        path: ./kustomize/env/dev
 
