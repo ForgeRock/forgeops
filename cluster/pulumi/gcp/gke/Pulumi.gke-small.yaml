@@ -14,7 +14,7 @@ config:
   dsdedicatednodes:diskSizeGb: "80"
   dsdedicatednodes:enable: "true"
   dsdedicatednodes:nodeCount: "1"
-  dsdedicatednodes:nodeMachineType: custom-4-16384
+  dsdedicatednodes:nodeMachineType: custom-8-16384
   dsdedicatednodes:preemptible: "false"
   frontenddedicatednodes:autoScaling: "false"
   frontenddedicatednodes:diskSizeGb: "10"

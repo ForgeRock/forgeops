@@ -13,8 +13,8 @@ config:
   dsdedicatednodes:autoScaling: "false"
   dsdedicatednodes:diskSizeGb: "80"
   dsdedicatednodes:enable: "true"
-  dsdedicatednodes:nodeCount: "1"
-  dsdedicatednodes:nodeMachineType: custom-32-73728
+  dsdedicatednodes:nodeCount: "2"
+  dsdedicatednodes:nodeMachineType: custom-24-36864
   dsdedicatednodes:preemptible: "false"
   frontenddedicatednodes:autoScaling: "false"
   frontenddedicatednodes:diskSizeGb: "10"
@@ -33,7 +33,7 @@ config:
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
   primarynodes:nodeCount: "0"
-  primarynodes:nodeMachineType: custom-32-73728
+  primarynodes:nodeMachineType: custom-24-49152
   primarynodes:preemptible: "false"
   prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
