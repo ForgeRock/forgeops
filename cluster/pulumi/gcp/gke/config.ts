@@ -2,32 +2,35 @@ import * as pulumi from "@pulumi/pulumi";
 import { Config } from "@pulumi/pulumi";
 
 const cluster = new Config("cluster");
-const nginx = new Config("nginx");
-const primaryPool = new Config("primary");
-const secondaryPool = new Config("secondary");
+const nginx = new Config("nginxingress");
+const primaryPool = new Config("primarynodes");
+const secondaryPool = new Config("secondarynodes");
+const dsPool = new Config("dsdedicatednodes");
+const frontEndPool = new Config("frontenddedicatednodes");
 const cm = new Config("certmanager");
 const prom = new Config("prometheus");
 const local = new Config("localssdprovisioner");
-const dsPool = new Config("ds");
+
 export let localSsdFlag: Boolean = false
 
-// ** PROJECT CONFIG **
+// **************** PROJECT CONFIG ****************
 export const project = new pulumi.Config(pulumi.getProject());
 
-// ** ENABLE RESOURCES
+// **************** ENABLE RESOURCES ****************
 export const enableSecondaryPool = secondaryPool.requireBoolean("enable");
 export const enableDSPool = dsPool.requireBoolean("enable");
+export const enableFrontEndPool = frontEndPool.requireBoolean("enable");
 export const enableNginxIngress = nginx.requireBoolean("enable");
 export const enableCertManager = cm.requireBoolean("enable");
 export const enablePrometheus = prom.requireBoolean("enable");
 export const enableLocalSsdProvisioner = local.requireBoolean("enable");
 
-// ** NETWORK CONFIG **
+// **************** NETWORK CONFIG ****************
 export const stackRef = cluster.get("infraStackName") || "gcp-infra"
 export const vpcName = cluster.get("vpcName");
 export const ip = cluster.get<string>("staticIp") || undefined;
 
-// ** CLUSTER CONFIG **
+// **************** CLUSTER CONFIG ****************
 export const clusterName = cluster.require("name");
 export const nodeZones = cluster.getObject<string[]>("nodeZones") || undefined;
 export const k8sVersion = cluster.get("k8sVersion") || "latest";
@@ -39,7 +42,60 @@ let user = process.env["USER"] || "unknown";
 user = user.toLowerCase();
 export const username = user.replace("." , "_");
 
-// NODE POOL
+// **************** LABELS ****************
+let backendLabels: {[key: string]: string} = {
+    "deployedby": "Pulumi",
+    "backend": "true",
+    "kubernetes.io/role": "backend"
+};
+
+let frontendLabels: {[key: string]: string} = {
+    "frontend": "true",
+    "kubernetes.io/role": "frontend"
+};
+
+let dsLabels: {[key: string]: string} = {
+    "ds": "true",
+    "kubernetes.io/role": "ds"
+};
+
+// Assign additional labels values if set
+export const primaryLabels: object = primaryPool.getObject("labels") || {};
+export const secondaryLabels: object = secondaryPool.getObject("labels") || {};
+
+// If not deploying ds nodegroup, label backend cluster so ds pods run in backend nodes
+if (!enableDSPool){
+    backendLabels["ds"] = "true";
+}
+
+// If not deploying frontend nodegroup, label backend cluster so ingress controller pods run in backend nodes
+if (!enableFrontEndPool){
+    backendLabels["frontend"] = "true";
+}
+
+// **************** TAINTS ****************
+let dsTaints = [
+    {
+        "key": "WorkerDedicatedDS",
+        "value": "true",
+        "effect": "NO_SCHEDULE"
+    }
+]
+
+let frontendTaints = [
+    {
+        "key": "WorkerDedicatedFrontend",
+        "value": "true",
+        "effect": "NO_SCHEDULE"
+    }
+]
+
+// Assign additional taints values if set
+export const primaryTaints: object = primaryPool.getObject("taints") || [];
+export const secondaryTaints: object = secondaryPool.getObject("taints") || [];
+
+
+// **************** NODE POOLS ****************
 interface NodePool {
     initialNodeCount: number;
     nodeCount: number;
@@ -57,36 +113,9 @@ interface NodePool {
     localSsdCount: number
 };
 
-// Assign additional labels values if set
-export const primaryLabels: object = primaryPool.getObject("labels") || {};
-export const secondaryLabels: object = secondaryPool.getObject("labels") || {};
-export const dsLabels: object = dsPool.getObject("labels") || {};
-
-// Assign additional taints values if set
-export const primaryTaints: object = primaryPool.getObject("taints") || [];
-export const secondaryTaints: object = secondaryPool.getObject("taints") || [];
-export const dsTaints: object = dsPool.getObject("taints") || [];
-
-let backendLabels: {[key: string]: string} = {
-    "deployedby": "Pulumi",
-    "frontend": "true",
-    "backend": "true",
-    "kubernetes.io/role": "backend"
-};
-
-// If not deploying ds nodegroup, label backend cluster so ds pods run in backend nodes
-if (!enableDSPool){
-    backendLabels["ds"] = "true";
-}
-
-// If not deploying frontend nodegroup, label backend cluster so ingress controller pods run in backend nodes
-// if (!enableFrontEndPool)){
-//     backendLabels["frontend"] = "true";
-// }
-
 export const stackname = pulumi.getStack();
 
-// PRIMARY NODE POOL VALUES
+// PRIMARY NODE POOL VALUES.
 export const primary:NodePool = {
     initialNodeCount: primaryPool.getNumber("initialNodeCount") || 1,
     nodeCount: primaryPool.getNumber("nodeCount") || 0,
@@ -112,17 +141,35 @@ export const secondary:NodePool = {
     nodeMachineType: secondaryPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: secondaryPool.getNumber("diskSizeGb") || 80,
     diskType: secondaryPool.get("diskType") || "pd-ssd",
-    enableAutoScaling: secondaryPool.requireBoolean("autoScaling"),
+    enableAutoScaling: secondaryPool.getBoolean("autoScaling") || false,
     minNodes: secondaryPool.getNumber("minNodes") || 1,
     maxNodes: secondaryPool.getNumber("maxNodes") || 4,
-    preemptible: secondaryPool.requireBoolean("preemptible"),
+    preemptible: secondaryPool.getBoolean("preemptible") || false,
     nodePoolName: secondaryPool.get("name") || "secondary",
     labels: Object.assign({}, backendLabels, secondaryLabels),
     taints: secondaryTaints,
     localSsdCount: secondaryPool.getNumber("localSsdCount") || 0 
 };
 
-// SECONDARY NODE POOL VALUES
+// FRONT END NODE POOL VALUES
+export const frontend:NodePool = {
+    initialNodeCount: frontEndPool.getNumber("initialNodeCount") || 1,
+    nodeCount: frontEndPool.getNumber("nodeCount") || 0,
+    cpuPlatform: frontEndPool.get("cpuPlatform") || "Intel Skylake",
+    nodeMachineType: frontEndPool.get("nodeMachineType") || "n1-standard-2",
+    diskSize: frontEndPool.getNumber("diskSizeGb") || 80,
+    diskType: frontEndPool.get("diskType") || "pd-ssd",
+    enableAutoScaling: frontEndPool.getBoolean("autoScaling") || false,
+    minNodes: frontEndPool.getNumber("minNodes") || 1,
+    maxNodes: frontEndPool.getNumber("maxNodes") || 4,
+    preemptible: frontEndPool.getBoolean("preemptible") || false,
+    nodePoolName: frontEndPool.get("name") || "frontend",
+    labels: Object.assign({}, frontendLabels),
+    taints: frontendTaints,
+    localSsdCount: dsPool.getNumber("localSsdCount") || 0
+};
+
+// DS NODE POOL VALUES
 export const ds:NodePool = {
     initialNodeCount: dsPool.getNumber("initialNodeCount") || 1,
     nodeCount: dsPool.getNumber("nodeCount") || 0,
@@ -130,21 +177,17 @@ export const ds:NodePool = {
     nodeMachineType: dsPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: dsPool.getNumber("diskSizeGb") || 80,
     diskType: dsPool.get("diskType") || "pd-ssd",
-    enableAutoScaling: dsPool.getBoolean("enableAutoScaling") || true,
+    enableAutoScaling: dsPool.getBoolean("autoScaling") || false,
     minNodes: dsPool.getNumber("minNodes") || 1,
     maxNodes: dsPool.getNumber("maxNodes") || 4,
     preemptible: dsPool.getBoolean("preemptible") || false,
-    nodePoolName: dsPool.get("name") || "secondary",
-    labels: Object.assign({}, backendLabels, dsLabels),
-    taints: Object.assign({}, {
-        key: "WorkerDedicatedDS",
-        value: "true",
-        effect: "NO_SCHEDULE"
-    }, dsTaints),
+    nodePoolName: dsPool.get("name") || "ds",
+    labels: Object.assign({}, dsLabels),
+    taints: dsTaints,
     localSsdCount: dsPool.getNumber("localSsdCount") || 0
 };
 
-//PROMETHEUS VALUES
+// **************** PROMETHEUS VALUES ****************
 export interface prometheusConfiguration {
     enable: boolean;
     k8sNamespace: string;
@@ -162,7 +205,7 @@ function getPrometheusConfig(namespace: string): prometheusConfiguration {
 }
 export const prometheusConfig = getPrometheusConfig("prometheus");
 
-//LOCAL SSD VALUES
+// **************** LOCAL SSD VALUES ****************
 export const localSsdVersion = local.get("version") || "v2.2.1";
 export const localSsdNamespace = local.require("namespace");
 

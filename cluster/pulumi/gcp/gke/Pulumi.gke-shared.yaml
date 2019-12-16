@@ -10,23 +10,24 @@ config:
   cluster:k8sVersion: "1.14"
   cluster:name: dev-shared
   cluster:nodeZones: '["us-east4-b"]'
-  ds:enable: "false"
+  dsdedicatednodes:enable: "false"
+  frontenddedicatednodes:enable: "false"
   gcp:region: us-east4
   gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
-  nginx:enable: "true"
-  nginx:version: 0.25.0
-  primary:autoScaling: "true"
-  primary:maxNodes: "4"
-  primary:minNodes: "1"
-  primary:nodeCount: "0"
-  primary:nodeMachineType: n1-highmem-4
-  primary:preemptible: "false"
+  nginxingress:enable: "true"
+  nginxingress:version: "1.24.4"
+  primarynodes:autoScaling: "true"
+  primarynodes:maxNodes: "4"
+  primarynodes:minNodes: "1"
+  primarynodes:nodeCount: "0"
+  primarynodes:nodeMachineType: n1-highmem-4
+  primarynodes:preemptible: "false"
   prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.4.2
-  secondary:autoScaling: "false"
-  secondary:enable: "false"
-  secondary:nodeCount: "0"
-  secondary:preemptible: "false"
+  secondarynodes:autoScaling: "false"
+  secondarynodes:enable: "false"
+  secondarynodes:nodeCount: "0"
+  secondarynodes:preemptible: "false"

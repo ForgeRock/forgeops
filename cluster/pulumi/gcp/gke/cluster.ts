@@ -17,8 +17,9 @@ function getK8sVersion() {
 }
 
 // Create node pool configuration
-function createNP(nodeConfig: any): object {
-    return {
+function createNP(nodeConfig: any, clusterName: pulumi.Output<string>) {
+    return new gcp.container.NodePool(nodeConfig.nodePoolName, {
+        cluster: clusterName,
         initialNodeCount: nodeConfig.nodeCount ? undefined : nodeConfig.initialNodeCount,
         version: getK8sVersion().latestNodeVersion,
         name: nodeConfig.nodePoolName,
@@ -51,33 +52,30 @@ function createNP(nodeConfig: any): object {
         management: {
             autoRepair: true
         }
-    };
+    })
 }
 
 // Select node pools to be configured in GKE cluster.
-function addNodePools() {
-    if (config.enableSecondaryPool && config.enableDSPool) {
-        return [
-            createNP(config.primary),
-            createNP(config.secondary),
-            createNP(config.ds)
-        ]
-    } else if (config.enableSecondaryPool && !config.enableDSPool) {
-        return [
-            createNP(config.primary),
-            createNP(config.secondary)
-        ]
-    } else {
-        return [
-            createNP(config.primary)
-        ]
-    };
+
+export function addNodePools(clusterName: pulumi.Output<string>) {
+    var pools = [  createNP(config.primary, clusterName) ]
+    if (config.enableSecondaryPool ) {
+        pools.push(createNP(config.secondary, clusterName))
+    }
+    if( config.enableDSPool) {
+        pools.push(createNP(config.ds, clusterName))
+    }
+    if( config.enableFrontEndPool) {
+        pools.push(createNP(config.frontend, clusterName))
+    }
+    return pools;
 }
 
 // Create a GKE cluster
 export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
     return new gcp.container.Cluster(config.clusterName, {
         name: config.clusterName,
+        initialNodeCount: 1,
         nodeLocations: config.nodeZones,
         network: network,
         subnetwork: subnetwork,
@@ -91,13 +89,9 @@ export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
                 auth: "AUTH_MUTUAL_TLS",
             }
         },
-        nodePools: addNodePools(),
         loggingService: "logging.googleapis.com/kubernetes",
         monitoringService: "monitoring.googleapis.com/kubernetes",
-        ipAllocationPolicy: {
-            useIpAliases: true,
-        },
-        removeDefaultNodePool: false,
+        removeDefaultNodePool: true,
         resourceLabels: {
             modifiedby: config.username,
             deployedby: "pulumi",
@@ -186,15 +180,40 @@ export function assignIp() {
 /************ NGINX INGRESS CONTROLLER ************/
 
 // Call ngin-ingress-controller package to deploy Nginx Ingress Controller
-export function deployIngressController(ip: pulumi.Output<string>, clusterProvider: Provider, cluster: gcp.container.Cluster) {
+export function deployIngressController(ip: pulumi.Output<string>, clusterProvider: Provider, cluster: gcp.container.Cluster, nodePools: gcp.container.NodePool[]) {
     const nginxConfig = new pulumi.Config("nginx");
+
+    const gkeHelmValues: any = {
+        controller: {
+            kind: "DaemonSet",
+            publishService: {enabled: true},
+            stats: {
+                enabled: true,
+                service: { omitClusterIP: true }
+            },
+            service: {
+                type: "LoadBalancer",
+                externalTrafficPolicy: "Local",
+                loadBalancerIP: ip,
+                omitClusterIP: true
+            },
+            tolerations: [{
+                key: "WorkerDedicatedFrontend",
+                operator: "Exists",
+                effect: "NoSchedule",
+                }
+            ],
+            nodeSelector: {"frontend": "true"},
+        },
+    }
 
     // Set values for nginx Helm chart
     const nginxValues: ingress.PkgArgs = {
         ip: ip,
         version: config.nginxVersion,
         clusterProvider: clusterProvider,
-        dependencies: [cluster]
+        dependencies: [cluster, nodePools],
+        helmValues: config.enableFrontEndPool ? gkeHelmValues : {}
     }
 
     // Deploy Nginx Ingress Controller Helm chart
@@ -204,7 +223,7 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
 /************ CERTIFICATE MANAGER ************/
 
 // Call cert-manager package to deploy cert-manager
-export function deployCertManager(clusterProvider: Provider, cluster: gcp.container.Cluster) {
+export function deployCertManager(clusterProvider: Provider, cluster: gcp.container.Cluster, nodePools: gcp.container.NodePool[]) {
     const cmConfig = new pulumi.Config("certmanager");
 
     const cmArgs: cm.PkgArgs = {
@@ -212,7 +231,7 @@ export function deployCertManager(clusterProvider: Provider, cluster: gcp.contai
         tlsCrt: cmConfig.require("tls-crt"),
         clusterProvider: clusterProvider,
         cloudDnsSa: cmConfig.get("clouddns") || "",
-        dependsOn: [cluster],
+        dependsOn: [cluster, nodePools],
         version: cmConfig.require("version"),
         useSelfSignedCert: cmConfig.requireBoolean("useselfsignedcert"),
     };
@@ -223,13 +242,13 @@ export function deployCertManager(clusterProvider: Provider, cluster: gcp.contai
 
 /************ PROMETHEUS OPERATOR ************/
 
-export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.Provider){
+export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.Provider, nodePools: gcp.container.NodePool[]){
     const prometheusArgs: prometheus.PkgArgs = {
         version: config.prometheusConfig.version,
         namespaceName: config.prometheusConfig.k8sNamespace,
         k8sVersion: config.k8sVersion,
         provider: provider,
-        dependsOn: [cluster],
+        dependsOn: [cluster, nodePools],
     }
     return new prometheus.Prometheus(prometheusArgs)
 }

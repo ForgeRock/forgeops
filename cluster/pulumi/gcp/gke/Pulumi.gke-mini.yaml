@@ -9,22 +9,24 @@ config:
   certmanager:version: v0.10.0
   cluster:k8sVersion: "1.14"
   cluster:name: dev-mini
-  ds:enable: "false"
+  dsdedicatednodes:enable: "false"
+  frontenddedicatednodes:enable: "false"
   gcp:region: us-east4
   gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
-  nginx:enable: "true"
-  nginx:version: 1.24.4
-  primary:autoScaling: "false"
-  primary:initialNodeCount: "0"
-  primary:nodeCount: "1"
-  primary:nodeMachineType: n1-standard-4
-  primary:preemptible: "true"
+  nginxingress:enable: "true"
+  nginxingress:version: "1.24.4"
+  primarynodes:autoScaling: "false"
+  primarynodes:initialNodeCount: "0"
+  primarynodes:nodeCount: "1"
+  primarynodes:nodeMachineType: n1-standard-4
+  primarynodes:preemptible: "true"
   prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.21.0
-  secondary:autoScaling: "false"
-  secondary:enable: "false"
-  secondary:nodeCount: "0"
-  secondary:preemptible: "false"
+  secondarynodes:autoScaling: "false"
+  secondarynodes:enable: "false"
+  secondarynodes:nodeCount: "0"
+  secondarynodes:nodeMachineType: n1-standard-2
+  secondarynodes:preemptible: "false"

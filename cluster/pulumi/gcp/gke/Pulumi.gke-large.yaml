@@ -10,23 +10,32 @@ config:
   cluster:k8sVersion: "1.14"
   cluster:name: cdm-large
   cluster:nodeZones: '["us-east4-b","us-east4-c"]'
+  dsdedicatednodes:autoScaling: "false"
+  dsdedicatednodes:diskSizeGb: "80"
+  dsdedicatednodes:enable: "true"
+  dsdedicatednodes:nodeCount: "2"
+  dsdedicatednodes:nodeMachineType: custom-24-36864
+  dsdedicatednodes:preemptible: "false"
+  frontenddedicatednodes:autoScaling: "false"
+  frontenddedicatednodes:diskSizeGb: "10"
+  frontenddedicatednodes:enable: "true"
+  frontenddedicatednodes:nodeCount: "1"
+  frontenddedicatednodes:nodeMachineType: n1-standard-2
+  frontenddedicatednodes:preemptible: "false"
   gcp:region: us-east4
   gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
-  nginx:enable: "true"
-  nginx:version: "1.24.4"
-  ds:enable: "false"
-  primary:autoScaling: "true"
-  primary:maxNodes: "4"
-  primary:minNodes: "1"
-  primary:nodeCount: "0"
-  primary:nodeMachineType: custom-32-73728
-  primary:preemptible: "false"
+  nginxingress:enable: "true"
+  nginxingress:version: "1.24.4"
+  primarynodes:autoScaling: "true"
+  primarynodes:diskSizeGb: "80"
+  primarynodes:maxNodes: "4"
+  primarynodes:minNodes: "1"
+  primarynodes:nodeCount: "0"
+  primarynodes:nodeMachineType: custom-24-49152
+  primarynodes:preemptible: "false"
   prometheus:enable: "true"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.21.0
-  secondary:autoScaling: "false"
-  secondary:enable: "false"
-  secondary:nodeCount: "0"
-  secondary:preemptible: "false"
+  secondarynodes:enable: "false"
