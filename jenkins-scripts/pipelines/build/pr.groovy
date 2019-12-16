@@ -68,11 +68,8 @@ void buildImage(String directoryName) {
 def postBuildTests(PipelineRun pipelineRun) {
 
     try {
-        // PIT1 helm tests
-        pit1TestStage.runStage(pipelineRun, 'PIT1 Helm')
-
-        // PIT1 kustomize tests
-        pit1TestStage.runStage(pipelineRun, 'PIT1 Kustomize', true)
+        // PIT1 tests
+        pit1TestStage.runStage(pipelineRun)
 
         currentBuild.result = 'SUCCESS'
         prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
