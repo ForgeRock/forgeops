@@ -79,7 +79,7 @@ you run the idrepo statefulset it will attach the existing pvcs.
 
 Note that the PVC volume size you select during the intialization must match the desired size 
 when you run the benchmark.  Set the PVC volume size in
-the [idrepo-make-users statefulset](../../../kustomize/ds/idrepo-make-users) 
+the [idrepo-make-users statefulset](../../../../kustomize/base/7.0/ds/idrepo-make-users) 
 
 ## Running the ds micro benchmark
 
