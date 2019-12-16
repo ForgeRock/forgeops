@@ -19,12 +19,15 @@ spec:
             - podAffinityTerm:
                 labelSelector:
                   matchExpressions:
-                    - key: instance
+                    - key: affinity
                       operator: In
                       values:
-                        - ds
+                      - directory
                 topologyKey: kubernetes.io/hostname
               weight: 100
+      tolerations:
+      - key: "WorkerDedicatedDS"
+        operator: "Exists"
       initContainers:
         - name: restore
           image: ds

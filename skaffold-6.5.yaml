@@ -56,7 +56,14 @@ profiles:
       context: docker/6.5/idm-base
     - image: ds-base
       context: docker/6.5/ds-base
-
+- name: medium
+  deploy:
+    kustomize:
+        path: ./kustomize/overlay/6.5/medium
+- name: small
+  deploy:
+    kustomize:
+        path: ./kustomize/overlay/6.5/small
 # Sample profile to demonstrate connecting to an external DS instance instead of ds-idrepo in the cluster
 # See the README.md in kustomize/6.5/env/external-ds/
 - name: external-ds
