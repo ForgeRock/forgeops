@@ -116,6 +116,7 @@ RUN apt-get update -y \
                                                       python-minimal \
                                                       python-pip \
                                                       python-setuptools \
+                                                      jq \
             && apt-get clean \
                 && apt-get autoremove --purge  \
                     && rm -rf /var/lib/apt/lists/*
