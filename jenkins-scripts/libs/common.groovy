@@ -164,4 +164,13 @@ def getCurrentProductCommitHashes() {
     ]
 }
 
+def determinePyrockOutcome(String reportUrl, Closure process) {
+    try {
+        process()
+        return new Outcome(Status.SUCCESS, reportUrl)
+    } catch (Exception e) {
+        return new FailureOutcome(e, reportUrl)
+    }
+}
+
 return this
