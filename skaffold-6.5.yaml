@@ -44,7 +44,7 @@ profiles:
   build:
     tagPolicy:
       envTemplate:
-        template: "{{.IMAGE_NAME}}6.5"
+        template: "{{.IMAGE_NAME}}:6.5"
     artifacts:
     - image: am-base
       context: docker/6.5/am-base

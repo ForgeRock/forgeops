@@ -5,7 +5,7 @@
 The base image folders (for example, am-base) are the "parent" docker images used by the derived child image (example, am). You
 must build your own base images as a pre-requistite to deploying the child images.
 
-The images do no contain ForgeRock binaries. You must download the appropriate war or zip file
+The images do not contain ForgeRock binaries. You must download the appropriate war or zip file
 artifact from [ForgeRock Backstage](https://backstage.forgerock.com/downloads) and copy
 the artifact to the appropriate -base folder. The artifact should be named according to the following table:
 
