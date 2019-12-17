@@ -1,15 +1,6 @@
-FROM krallin/ubuntu-tini:bionic as download_tini
-
-FROM tomcat:9-jdk8-adoptopenjdk-hotspot as unpack
-RUN rm -fr "$CATALINA_HOME"/webapps/* 
-COPY openam.war "$CATALINA_HOME"/webapps/ROOT/openam.war
-RUN cd "$CATALINA_HOME"/webapps/ROOT \
-    && jar xf openam.war \
-    && rm "$CATALINA_HOME"/webapps/ROOT/openam.war
-
-FROM tomcat:9-jdk8-adoptopenjdk-hotspot
-RUN rm -fr "$CATALINA_HOME"/webapps/* 
-COPY --from=unpack "$CATALINA_HOME"/webapps "$CATALINA_HOME"/webapps
+FROM tomcat:8-jdk8-adoptopenjdk-hotspot
+RUN rm -fr "$CATALINA_HOME"/webapps/*
+COPY openam.war "$CATALINA_HOME"/webapps/am.war
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for setting the AM home directory:
@@ -24,7 +15,7 @@ COPY --from=unpack "$CATALINA_HOME"/webapps "$CATALINA_HOME"/webapps
 
 # This option:
 #  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
-# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450 
+# is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
 # This may impact amster imports for some configurations (SAML entities)
 # If you need to renable this for amster, it should be disabled after the import is complete
 
@@ -49,9 +40,6 @@ RUN apt-get update && apt-get install -y unzip curl bash wget\
   && chown -R forgerock:root  "$FORGEROCK_HOME" \
   && chmod -R g+rwx "$CATALINA_HOME" \
   && apt-get clean all
-
-COPY --from=download_tini /usr/bin/tini /usr/bin/tini
-COPY --from=download_tini /usr/bin/tini-static /usr/bin/tini-static
 
 # This installs the GCP stack driver profiler. Adds approx 8MB
 RUN mkdir -p /opt/cprof && \
@@ -94,10 +82,3 @@ COPY server.xml "$CATALINA_HOME"/conf/server.xml
 
 # Settings for Tomcat cache.
 COPY context.xml "$CATALINA_HOME"/conf/context.xml
-
-
-COPY *.sh $FORGEROCK_HOME/
-
-ENTRYPOINT ["/home/forgerock/docker-entrypoint.sh"]
-
-CMD ["run"]

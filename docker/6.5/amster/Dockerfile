@@ -1,11 +1,12 @@
-FROM gcr.io/forgerock-io/amster:6.5.2
+FROM  gcr.io/engineering-devops/amster-base:6.5
 
 ENV SERVER_URI /am
 
 USER root
-RUN apk add --update --no-cache openldap-clients jq
+#RUN apk add --update --no-cache openldap-clients jq
+RUN apt-get install -y ldap-client jq
 # We replace some of the entry point scripts with others need for skaffold.
-COPY  --chown=forgerock . /opt/amster
+COPY  --chown=forgerock:0 . /opt/amster
 USER forgerock
 
 # Use ENTRYPOINT with -x to support Windows deployments
