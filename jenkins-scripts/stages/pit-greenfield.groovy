@@ -49,8 +49,8 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPitNoStages(cfg)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normStageName, "${normStageName}.html")
-                    return dashboard_utils.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${normStageName}/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }
