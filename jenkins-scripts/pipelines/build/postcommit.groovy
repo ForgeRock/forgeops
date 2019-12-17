@@ -72,13 +72,10 @@ void buildImage(String directoryName) {
 def postBuildTests(PipelineRun pipelineRun) {
 
     try {
-        // PIT1 helm tests
-        stageErrorMessage = "The PIT1 helm tests failed, please have a look at the console output"
-        pit1TestStage.runStage(pipelineRun, 'PIT1 Helm')
+        // PIT1 tests
+        stageErrorMessage = "The PIT1 tests failed, please have a look at the console output"
+        pit1TestStage.runStage(pipelineRun)
 
-        // PIT1 kustomize tests
-        stageErrorMessage = "The PIT1 kustomize tests failed, please have a look at the console output"
-        pit1TestStage.runStage(pipelineRun, 'PIT1 Kustomize', true)
         currentBuild.result = 'SUCCESS'
     }
     catch (exception) {
