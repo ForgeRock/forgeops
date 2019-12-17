@@ -4,7 +4,7 @@
             "name" : "user",
             "onCreate" : {
                 "type" : "text/javascript",
-                "source" : "require('onCreateUser').setDefaultFields(object);require('onCreateUser').emailUser(object);"
+                "source" : "require('onCreateUser').setDefaultFields(object);"
             },
             "onUpdate" : {
                 "type" : "text/javascript",
