@@ -10,7 +10,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun, String stageName, String testName, String yamlFile) {
 
-    pipelineRun.pushStageOutcome(commonModule.normalizeStageName(stageName), stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome(dashboard_utils.normalizedStageName(stageName), stageDisplayName: stageName) {
         node('perf-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
