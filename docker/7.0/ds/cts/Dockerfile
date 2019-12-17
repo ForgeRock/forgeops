@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-a6078d84e568f285f6d42513e04a4248e19ef77f
+FROM gcr.io/forgerock-io/ds-empty:7.0.0-a6078d84e568f285f6d42513e04a4248e19ef77f
 
 USER forgerock
 COPY --chown=forgerock:root .  /opt/opendj/
