@@ -1,12 +1,12 @@
 
-FROM forgerock/downloader 
+FROM forgerock/downloader
 
-ARG VERSION="6.5.1-RC3"
+ARG VERSION="6.5.2"
 RUN download -v $VERSION opendj
 
 # JDK 11 tracking - https://bugster.forgerock.org/jira/browse/OPENDJ-5207
-#FROM openjdk:11-jdk 
-FROM openjdk:8-jdk 
+#FROM openjdk:11-jdk
+FROM openjdk:8-jdk
 COPY --from=0 /opendj.zip /var/tmp/opendj.zip
 
 WORKDIR /var/tmp/bootstrap
@@ -30,8 +30,8 @@ COPY --from=1 /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
 
 RUN useradd -d /opt/opendj -G root -m -u 11111 forgerock \
     && apt-get update && apt-get install -y --no-install-recommends dumb-init vim fio
-   
-WORKDIR /opt/opendj 
+
+WORKDIR /opt/opendj
 
 
 # This is the default location where secrets should be mounted.
@@ -50,7 +50,7 @@ ENV OPENDJ_JAVA_ARGS "-Xmx1024m"
 
 COPY *.sh /opt/opendj/
 COPY bootstrap/secrets/* /var/run/secrets/opendj/
-COPY scripts/ /opt/opendj/scripts/ 
+COPY scripts/ /opt/opendj/scripts/
 
 RUN chown -R forgerock:root /opt/opendj
 

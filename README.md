@@ -1,15 +1,17 @@
-# ForgeRock DevOps and Cloud Deployment 
+# ForgeRock DevOps and Cloud Deployment
 
-Docker and Kubernetes DevOps artifacts for the ForgeRock platform. 
+Docker and Kubernetes DevOps artifacts for the ForgeRock platform.
 
-** IMPORTANT: The current supported branch is release/6.5.2. The master branch is under development **
+> **NOTE:** If you are starting out with ForgeOps, we recommend using the `master` branch and the docker/6.5 Dockerfiles
+> Refer to the EA documentation at https://ea.forgerock.com/docs/forgeops/index.html
+
 
 Please refer to the [Platform Documentation for 6.5](https://backstage.forgerock.com/docs/platform/6.5). In
 particular refer to the [What's New section of the release notes.](https://backstage.forgerock.com/docs/platform/6.5/release-notes/#chap-rnotes-whats-new)
 
-This GitHub repository is a read-only mirror of 
+This GitHub repository is a read-only mirror of
 ForgeRock's [https://stash.forgerock.org/projects/CLOUD/repos/forgeops] (Bitbucket Server repository). Users
-with BackStage accounts can make pull requests on our Bitbucket Server repository. ForgeRock does not 
+with BackStage accounts can make pull requests on our Bitbucket Server repository. ForgeRock does not
 accept pull requests on this GitHub mirror.
 
 ## Disclaimer
@@ -25,37 +27,23 @@ service or software related thereto. ForgeRock shall not be liable for any direc
 consequential damages or costs of any type arising out of any action taken by you or others related
 to the samples.
 
-## Branches
-
-The master branch targets
-features that are still in development and may not be stable. Please checkout the 
- branch that matches the targeted release.
-
-
-For example, if you have the source checked out from git:
-
-```bash
-git checkout release/x.y.0 
-```
-
-
-## Contents 
+## Contents
 
 * `docker/` -  contains the Dockerfiles for the various containers.
 * `helm/` - contains Kubernetes helm charts to deploy those containers. See the helm/README.md
 * `etc/` - contains various scripts and utilities
 * `bin/`  - Utility shell scripts to deploy the helm charts and create and manage clusters.
 
-## Docker images 
+## Docker images
 
 See the [docker/README.md](docker/README.md) for instructions on how to build your own docker images.
 
-## Documentation 
+## Documentation
 
 The [Draft ForgeRock DevOps Guide](https://ea.forgerock.com/docs/platform/devops-guide/index.html)
 tracks the master branch.
 
-The documentation for the current release can be found on 
+The documentation for the current release can be found on
 [backstage](https://backstage.forgerock.com/docs/platform).
 
 ## Sample Session
@@ -90,7 +78,7 @@ open https://login.default.example.com
 ## Helm values.yaml overrides.
 
 The individual charts all have parmeters which you can override to control the deployment. For example,
-setting the domain FQDN. 
+setting the domain FQDN.
 
 Please refer to the chart README.md files.
 
@@ -112,7 +100,7 @@ Refer to the toubleshooting chapter in the [DevOps Guide](https://backstage.forg
 Troubleshooting suggestions:
 
 * The script `bin/debug-log.sh` will generate an HTML file with log output. Useful for troubleshooting.
-* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script and the `helm/cmp-platform` composite charts are provided as a convenience, but can make it more difficult to narrow down an issue in a single chart. 
+* Simplify. Deploy a single helm chart at a time (for example, opendj), and make sure that chart is working correctly before deploying the next chart. The `bin/deploy.sh` script and the `helm/cmp-platform` composite charts are provided as a convenience, but can make it more difficult to narrow down an issue in a single chart.
 * Describe a failing pod using `kubectl get pods; kubectl describe pod pod-xxx`
     1. Look at the event log for failures. For example, the image can't be pulled.
     2. Examine all the init containers. Did each init container complete with a zero (success) exit code? If not, examine the logs from that failed init container using `kubectl logs pod-xxx -c init-container-name`
