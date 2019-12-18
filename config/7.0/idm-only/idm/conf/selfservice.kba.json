@@ -1,0 +1,10 @@
+{
+    "kbaPropertyName" : "kbaInfo",
+    "minimumAnswersToDefine": 1,
+    "minimumAnswersToVerify": 1,
+    "questions" : {
+        "1" : {
+            "en" : "What's your favorite color?"
+        }
+    }
+}

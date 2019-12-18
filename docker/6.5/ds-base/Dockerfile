@@ -1,5 +1,6 @@
 #
 # Copyright (c) 2016-2019 ForgeRock AS.
+
 FROM krallin/ubuntu-tini:bionic as download_tini
 
 
@@ -17,7 +18,7 @@ FROM adoptopenjdk/openjdk8:debian-slim
 RUN apt-get update && apt-get install -y curl wget fio dumb-init \
     && apt-get clean all \
     && addgroup --gid 11111 forgerock \
-    && adduser --shell /bin/bash --home /opt/opendj --uid 11111 --ingroup root  --disabled-password --gecos "" -q forgerock 
+    && adduser --shell /bin/bash --home /opt/opendj --uid 11111 --ingroup root  --disabled-password --gecos "" -q forgerock
 
 COPY --from=download_tini /usr/bin/tini /usr/bin/tini
 COPY --from=download_tini /usr/bin/tini-static /usr/bin/tini-static
@@ -33,7 +34,7 @@ RUN mkdir -p /opt/async-profiler && \
     | tar xzv -C /opt/async-profiler
 
 COPY --from=unpack /var/tmp/bootstrap/run/dsrs1 /opt/opendj/
-WORKDIR /opt/opendj 
+WORKDIR /opt/opendj
 
 # This is the default location where secrets should be mounted.
 ENV SECRET_PATH /var/run/secrets/opendj
@@ -51,7 +52,7 @@ ENV OPENDJ_JAVA_ARGS "-Xmx1024m"
 
 COPY *.sh /opt/opendj/
 COPY bootstrap/secrets/* /var/run/secrets/opendj/
-COPY scripts/ /opt/opendj/scripts/ 
+COPY scripts/ /opt/opendj/scripts/
 
 RUN chown -R forgerock:root /opt/opendj
 

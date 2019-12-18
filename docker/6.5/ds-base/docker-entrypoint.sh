@@ -9,6 +9,8 @@
 # Copyright (c) 2016-2018 ForgeRock AS. Use of this source code is subject to the
 # Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 
+#set -x
+
 cd /opt/opendj
 
 source /opt/opendj/env.sh
@@ -30,17 +32,17 @@ update_pw() {
 
     echo "Updating the password in $2"
     # Set the JVM args so we dont blow up the container memory.
-    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m" bin/encode-password  -s PBKDF2 -f $1 | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
+    pw=$(OPENDJ_JAVA_ARGS="-Xmx256m -Djava.security.egd=file:/dev/./urandom" bin/encode-password  -s PBKDF2 -f $1 | sed -e 's/Encoded Password:  "//' -e 's/"//g' 2>/dev/null)
     # $pw can contian / - so need to use alternate sed delimiter.
     sed -ibak "s#userPassword: .*#userPassword: $pw#" "$2"
 }
 
-relocate_data() 
+relocate_data()
 {
     # Does data/db contain directories?
     if [ "$(find data/db  -type d)" ]; then
         echo "Data volume contains existing data"
-	# If continer is restarted then original db directory reappears 
+	# If continer is restarted then original db directory reappears
 	# from the docker image hence move it out of the way otherwise
 	# symbolic linking below will not work
 	mv db db.tmp || true
@@ -97,6 +99,8 @@ echo "Command is $CMD"
 
 echo "Server id is $SERVER_ID"
 
+# This significantly speeds up hashing performance
+export OPENDJ_JAVA_ARGS="$OPENDJ_JAVA_ARGS -Djava.security.egd=file:/dev/./urandom"
 
 case "$CMD" in
 start)

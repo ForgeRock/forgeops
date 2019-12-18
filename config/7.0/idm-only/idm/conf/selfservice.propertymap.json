@@ -1,0 +1,50 @@
+{
+  "properties" : [
+    {
+      "source" : "givenName",
+      "target" : "givenName"
+    },
+    {
+      "source" : "familyName",
+      "target" : "sn"
+    },
+    {
+      "source" : "email",
+      "target" : "mail"
+    },
+    {
+      "source" : "postalAddress",
+      "target" : "postalAddress",
+      "condition" : "/object/postalAddress  pr"
+    },
+    {
+      "source" : "addressLocality",
+      "target" : "city",
+      "condition" : "/object/addressLocality  pr"
+    },
+    {
+      "source" : "addressRegion",
+      "target" : "stateProvince",
+      "condition" : "/object/addressRegion  pr"
+    },
+    {
+      "source" : "postalCode",
+      "target" : "postalCode",
+      "condition" : "/object/postalCode  pr"
+    },
+    {
+      "source" : "country",
+      "target" : "country",
+      "condition" : "/object/country  pr"
+    },
+    {
+      "source" : "phone",
+      "target" : "telephoneNumber",
+      "condition" : "/object/phone  pr"
+    },
+    {
+      "source" : "username",
+      "target" : "userName"
+    }
+  ]
+}

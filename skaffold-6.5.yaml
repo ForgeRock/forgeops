@@ -9,6 +9,9 @@
 apiVersion: skaffold/v1beta12
 kind: Config
 build:
+  # local:
+  #   push: false
+  #   useDockerCLI: false
   artifacts:
   - image: am
     context: docker/6.5/am
@@ -18,8 +21,12 @@ build:
     context: docker/6.5/idm
   - image: ds-cts
     context: docker/6.5/ds/cts
+    docker:
+      noCache: true
   - image: ds-idrepo
     context: docker/6.5/ds/idrepo
+    docker:
+      noCache: true
   - image: ig
     context: docker/6.5/ig
   - image: forgeops-secrets
@@ -31,6 +38,32 @@ deploy:
     path: ./kustomize/overlay/6.5/all
 # Additional profiles
 profiles:
+# build base images. Example:
+# skaffold -f skaffold-6.5.yaml --default-repo gcr.io/engineering-devops -p base build
+- name: base
+  build:
+    tagPolicy:
+      envTemplate:
+        template: "{{.IMAGE_NAME}}:6.5"
+    artifacts:
+    - image: am-base
+      context: docker/6.5/am-base
+    - image: amster-base
+      context: docker/6.5/amster-base
+    - image: ig-base
+      context: docker/6.5/ig-base
+    - image: idm-base
+      context: docker/6.5/idm-base
+    - image: ds-base
+      context: docker/6.5/ds-base
+- name: medium
+  deploy:
+    kustomize:
+        path: ./kustomize/overlay/6.5/medium
+- name: small
+  deploy:
+    kustomize:
+        path: ./kustomize/overlay/6.5/small
 # Sample profile to demonstrate connecting to an external DS instance instead of ds-idrepo in the cluster
 # See the README.md in kustomize/6.5/env/external-ds/
 - name: external-ds

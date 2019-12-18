@@ -1,10 +1,16 @@
 # ForgeRock DevOps and Cloud Deployment
 
-Kubernetes deployment for the ForgeRock platform. Branches:
+Kubernetes deployment for the ForgeRock platform.
 
-* Recommended for production: release/6.5.2 branch
-* Technology preview: skaffold-6.5 branch.
-* Under development master branch
+This repository provides Docker and Kustomize artifacts for deploying both 6.5 and 7.0 (under development) products
+to a Kubernetes cluster. If you are starting out, using the `master` branch is recommended.
+
+## Documentation
+
+The draft ForgeRock DevOps Developer's Guides
+( [minikube](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube)|
+[shared cluster](https://ea.forgerock.com/docs/forgeops/devops-guide-cloud)]
+tracks the master branch, including information on the newer Kustomize/Skaffold workflow. This is the recommended path.
 
 Note: The charts in the helm/ directory are deprecated and will be removed in the future. The Helm charts
 are being replaced with Kustomize.
@@ -28,35 +34,6 @@ consequential damages or costs of any type arising out of any action taken by yo
 to the samples.
 
 
-## Documentation
-
-The draft ForgeRock DevOps Developer's Guides
-( [minikube](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube)|
-[shared cluster](https://ea.forgerock.com/docs/forgeops/devops-guide-cloud)]
-tracks the master branch, including information on the newer Kustomize/ Skaffold workflow. If you are
-just getting started this is the recommended path.
-
-The documentation for the current release can be found on
-[backstage](https://backstage.forgerock.com/docs/platform).
-
-
-## Skaffold preview branch
-
-The branch `skaffold-6.5` is a preview of the upcoming 7.x workflow that simplifies deployment
-by bundling the product configuration into the docker image for deployment. This workflow speeds iterative
-development and greatly simplifies the Kubernetes runtime manifests. It eliminates the need for Git init containers
-and the complexity around configuring different Git repositories and branches in the helm charts.
-
-The new workflow combines the previously
-independent `forgeops` and `forgeops-init` repositories into a single Git repository that holds configuration and Kubernetes
-manifests.  Documentation for this workflow is in progress. Please
- see the [early access documentation](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube/#devops-guide-minikube).
-
-This preview branch enables the use of supported ForgeRock binaries in your
- deployment.
-
- **Adopting this workflow now is recommended as it will ease transition to the 7.x platform.**
-
 ## Configuration
 
 The provided configuration
@@ -66,10 +43,6 @@ this repository in Git, and modify the various configuration files.
 The configuration provides the following features:
 
 * Deployments for ForgeRock AM, IDM, DS and IG. IG is not deployed by default.
-* AM and IDM are integrated, and share a common repository for users. The directory server instance
-(ds-idrepo) is used as the user store for both products, and as the managed repository for IDM objects. A
-separate postgres SQL database is *NOT* required.
-* AM protects the IDM administration and end user UI pages.
 * AM is configured with a single root realm
 * A number of OIDC clients are configured for the AM/IDM integration and the smoke tests.
 ** Note the `idm-provisioning`, `idmAdminClient` and the `endUserUI` client configurations are required for the
@@ -80,7 +53,17 @@ separate postgres SQL database is *NOT* required.
  - The Access Manager Core Token Service (ds-cts).
 * A very simple landing page (/web)
 * A Python test harness. This test harness (forgeops-test) exercises the basic deployment and
-can be modified to include additional tests. 
+can be modified to include additional tests.
+
+The 7.0 deployment provide the following additional enhancements:
+
+* AM and IDM are integrated, and share a common repository for users. The directory server instance
+(ds-idrepo) is used as the user store for both products, and as the managed repository for IDM objects. A
+separate postgres SQL database is *NOT* required.
+* AM protects the IDM administration and end user UI pages.
+* The /openidm REST endpoint is protected using OAuth 2.0
+
+## Deployed URLs
 
 When deployed, the following URLs are available (The domain name below is the default
 for minikube and can be modified for your environment)
@@ -102,7 +85,7 @@ A number of configuration profiles and product versions are under the [config](c
 of the folder structure is `config/$VERSION/$PROFILE` - where VERSION is the ForgeRock product version (6.5,7.0) and
 PROFILE is the configuration profile that makes up the deployment.
 
-The `config/` directory is under version control. The target `docker/{product}/conf` directories are not versioned (via
+The `config/` directory is under version control. The target `docker/{version}/{product}/conf` directories are not versioned (via
 .gitignore). The workflow is that initial configuration is copied from the `config/` directory to the target `docker/`
 folder.  During development, configuration is exported back out of the running products to the `docker` folder, and
 then optionally copied back to the `config/` folder where it can be committed to version control.
@@ -198,11 +181,11 @@ cp -r cdk my_great_config
 git add my_great_config
 ```
 
-## Changing DS profile
+## Changing the DS profile to support older ForgeRock releases.
 
-To deploy the latest DS version with older setup-profile versions, add the following buildArgs to the DS image:
+To deploy the latest DS 7.0 directory server with profiles for previous (6.5) products , add the following buildArgs to the DS image:
 
-```  
+```
 build:
   artifacts:
   - image: ds-cts
@@ -217,14 +200,14 @@ build:
         profile_version: "6.5"
 ```
 
-On default, the latest setup-profile version is always deployed.
+By default, the latest setup-profile version is always deployed.
 
-## Secrets 
+## Secrets
 
 CDK and CDM deployments use a default set of secrets. Instead of using the default secrets, you can
-randomly generate secrets for the ForgeRock Identity Platform using the forgeops-secrets tool. 
-For more information about randomly generating secrets, see the  
-[forgeops-secrets README](docker/forgeops-secrets/forgeops-secrets-image/README.md) 
+randomly generate secrets for the ForgeRock Identity Platform using the forgeops-secrets tool.
+For more information about randomly generating secrets, see the
+[forgeops-secrets README](docker/forgeops-secrets/forgeops-secrets-image/README.md)
 
 
 ## Troubleshooting Tips
@@ -263,13 +246,13 @@ to push to the docker hub (the reported image name will be something like `docke
 Create a copy of one of the environments. Example:
 
 ```
-cd kustomize/env
-cp -r dev test-gke
+cd kustomize/overlays/6.5
+cp -r medium my-new-overlay
 ```
 
 * Using a text editor, or sed, change all the occurences of the FQDN to your desired target FQDN.
   Example, change `default.iam.forgeops.com` to `test.iam.forgeops.com`
-* Update the DOMAIN in platform-config.yaml to the proper cookie domain for AM.
+* Update the DOMAIN to the proper cookie domain for AM.
 * Update kustomization.yaml with your desired target namespace (example: `test`). The namespace must be the same as the FQDN prefix.
 * Copy skaffold.yaml to skaffold-dev.yaml. This file is in .gitignore so it does not get checked in or overlayed on a Git checkout.
 * In skaffold-dev.yaml, edit the `path` for kustomize to point to your new environment folder (example: `kustomize/env/test-gke`).

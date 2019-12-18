@@ -1,6 +1,7 @@
 commonLabels:
   vendor: forgerock
   app: ds
+  affinity: directory
 resources:
 - configmap.yaml
 - service.yaml

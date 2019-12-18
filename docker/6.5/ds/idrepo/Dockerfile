@@ -1,9 +1,7 @@
-# Use publicly available ds image for evaluation
-FROM gcr.io/forgerock-io/ds:6.5.2
+# Copyright ForgeRock 2019
+FROM gcr.io/engineering-devops/ds-base:6.5
 
-# Use a custom ds-base image. See forgeops/docker/6.5/am-base/README
-#FROM ds-base:latest
 
-USER forgerock 
+USER forgerock
 
 COPY --chown=forgerock:root .  /opt/opendj/

@@ -1,0 +1,5 @@
+{
+    "context" : "endpoint/linkedView/*",
+    "type" : "text/javascript",
+    "source" : "require('linkedView').fetch(request.resourcePath);"
+}
