@@ -152,11 +152,11 @@ if (config.dsNodeGroupConfig.enable){
 }
 
 /************** ATTACH CORRECT NODEGROUP TO LB TARGET GROUPS**************/
-groupNeedingLBAttachment.cfnStack.outputs.NodeGroup.apply(s => {
+groupNeedingLBAttachment.cfnStack.outputs.apply(s => {
     for (let tgIndex in config.infra.loadBalancerTargetGroups) {
         new aws.autoscaling.Attachment(`asgAttachment${tgIndex}`, {
             albTargetGroupArn: config.infra.loadBalancerTargetGroups[tgIndex],
-            autoscalingGroupName: `${s}`,
+            autoscalingGroupName: `${s.NodeGroup}`,
         }, {dependsOn: groupNeedingLBAttachment});
     };
 });
