@@ -10,18 +10,18 @@ config:
   cluster:k8sVersion: "1.15"
   cluster:name: cdm-medium
   cluster:nodeZones: '["us-east4-b","us-east4-c"]'
-  dsdedicatednodes:autoScaling: "false"
-  dsdedicatednodes:diskSizeGb: "80"
-  dsdedicatednodes:enable: "true"
-  dsdedicatednodes:nodeCount: "2"
-  dsdedicatednodes:nodeMachineType: custom-12-20480
-  dsdedicatednodes:preemptible: "false"
-  frontenddedicatednodes:autoScaling: "false"
-  frontenddedicatednodes:diskSizeGb: "10"
-  frontenddedicatednodes:enable: "true"
-  frontenddedicatednodes:nodeCount: "1"
-  frontenddedicatednodes:nodeMachineType: n1-standard-2
-  frontenddedicatednodes:preemptible: "false"
+  dsnodes:autoScaling: "false"
+  dsnodes:diskSizeGb: "80"
+  dsnodes:enable: "true"
+  dsnodes:nodeCount: "2"
+  dsnodes:nodeMachineType: custom-12-20480
+  dsnodes:preemptible: "false"
+  frontendnodes:autoScaling: "false"
+  frontendnodes:diskSizeGb: "10"
+  frontendnodes:enable: "true"
+  frontendnodes:nodeCount: "1"
+  frontendnodes:nodeMachineType: n1-standard-2
+  frontendnodes:preemptible: "false"
   gcp:region: us-east4
   gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"

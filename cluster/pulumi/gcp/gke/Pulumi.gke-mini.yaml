@@ -9,8 +9,8 @@ config:
   certmanager:version: v0.10.0
   cluster:k8sVersion: "1.14"
   cluster:name: dev-mini
-  dsdedicatednodes:enable: "false"
-  frontenddedicatednodes:enable: "false"
+  dsnodes:enable: "false"
+  frontendnodes:enable: "false"
   gcp:region: us-east4
   gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"
