@@ -12,9 +12,9 @@ config:
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:instanceType: m5.9xlarge
-  dsnodes:maxNodes: "4"
-  dsnodes:minNodes: "0"
-  dsnodes:nodeCount: "2"
+  dsnodes:maxNodes: "6"
+  dsnodes:minNodes: "6"
+  dsnodes:nodeCount: "6"
   eks:k8sDashboard: "false"
   eks:k8sVersion: "1.14"
   eks:pubKey:
@@ -23,9 +23,9 @@ config:
   frontendnodes:diskSizeGb: "10"
   frontendnodes:enable: "true"
   frontendnodes:instanceType: c5.xlarge
-  frontendnodes:maxNodes: "4"
-  frontendnodes:minNodes: "0"
-  frontendnodes:nodeCount: "2"
+  frontendnodes:maxNodes: "3"
+  frontendnodes:minNodes: "3"
+  frontendnodes:nodeCount: "3"
   nginxingress:enable: "true"
   nginxingress:k8sNamespace: ingress
   nginxingress:version: 1.24.4
