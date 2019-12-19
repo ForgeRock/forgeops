@@ -109,13 +109,10 @@ patchesStrategicMerge:
           - name: ds
             resources:
               requests:
-                memory: 2Gi
-                cpu: 2000m
-                # todo: restore these
-                # memory: 11Gi
-                # cpu: 8000m
-              # limits:
-              #   memory: 14Gi
+                memory: 8Gi
+                cpu: 4000m
+              limits:
+                memory: 11Gi
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -152,12 +149,10 @@ patchesStrategicMerge:
           - name: ds
             resources:
               requests:
-                # memory: 8Gi
-                memory: 2Gi
-                # 4000m
-                cpu: 2000m
-              # limits:
-              #   memory: 11Gi
+                memory: 8Gi
+                cpu: 4000m
+              limits:
+                memory: 11Gi
     volumeClaimTemplates:
     - metadata:
         name: data
