@@ -162,7 +162,7 @@ export const frontend:NodePool = {
     nodePoolName: frontEndPool.get("name") || "frontend",
     labels: Object.assign({}, frontendLabels),
     taints: frontendTaints,
-    localSsdCount: dsPool.getNumber("localSsdCount") || 0
+    localSsdCount: frontEndPool.getNumber("localSsdCount") || 0
 };
 
 // DS NODE POOL VALUES
