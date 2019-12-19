@@ -99,7 +99,6 @@ export const secondaryTaints: object = secondaryPool.getObject("taints") || [];
 interface NodePool {
     initialNodeCount: number;
     nodeCount: number;
-    cpuPlatform: string;
     nodeMachineType: string;
     diskSize: number;
     diskType: string;
@@ -119,7 +118,6 @@ export const stackname = pulumi.getStack();
 export const primary:NodePool = {
     initialNodeCount: primaryPool.getNumber("initialNodeCount") || 1,
     nodeCount: primaryPool.getNumber("nodeCount") || 0,
-    cpuPlatform: primaryPool.get("cpuPlatform") || "Intel Skylake",
     nodeMachineType: primaryPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: primaryPool.getNumber("diskSizeGb") || 80,
     diskType: primaryPool.get("diskType") || "pd-ssd",
@@ -137,7 +135,6 @@ export const primary:NodePool = {
 export const secondary:NodePool = {
     initialNodeCount: secondaryPool.getNumber("initialNodeCount") || 1,
     nodeCount: secondaryPool.getNumber("nodeCount") || 0,
-    cpuPlatform: secondaryPool.get("cpuPlatform") || "Intel Skylake",
     nodeMachineType: secondaryPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: secondaryPool.getNumber("diskSizeGb") || 80,
     diskType: secondaryPool.get("diskType") || "pd-ssd",
@@ -148,14 +145,13 @@ export const secondary:NodePool = {
     nodePoolName: secondaryPool.get("name") || "secondary",
     labels: Object.assign({}, backendLabels, secondaryLabels),
     taints: secondaryTaints,
-    localSsdCount: secondaryPool.getNumber("localSsdCount") || 0 
+    localSsdCount: secondaryPool.getNumber("localSsdCount") || 0
 };
 
 // FRONT END NODE POOL VALUES
 export const frontend:NodePool = {
     initialNodeCount: frontEndPool.getNumber("initialNodeCount") || 1,
     nodeCount: frontEndPool.getNumber("nodeCount") || 0,
-    cpuPlatform: frontEndPool.get("cpuPlatform") || "Intel Skylake",
     nodeMachineType: frontEndPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: frontEndPool.getNumber("diskSizeGb") || 80,
     diskType: frontEndPool.get("diskType") || "pd-ssd",
@@ -173,7 +169,6 @@ export const frontend:NodePool = {
 export const ds:NodePool = {
     initialNodeCount: dsPool.getNumber("initialNodeCount") || 1,
     nodeCount: dsPool.getNumber("nodeCount") || 0,
-    cpuPlatform: dsPool.get("cpuPlatform") || "Intel Skylake",
     nodeMachineType: dsPool.get("nodeMachineType") || "n1-standard-2",
     diskSize: dsPool.getNumber("diskSizeGb") || 80,
     diskType: dsPool.get("diskType") || "pd-ssd",
@@ -200,7 +195,7 @@ function getPrometheusConfig(namespace: string): prometheusConfiguration {
         enable: promconfig.requireBoolean("enable"),
         version: promconfig.require("version"),
         k8sNamespace: promconfig.require("k8sNamespace")
-    } 
+    }
     return val;
 }
 export const prometheusConfig = getPrometheusConfig("prometheus");

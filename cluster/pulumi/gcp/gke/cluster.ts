@@ -27,7 +27,6 @@ function createNP(nodeConfig: any, clusterName: pulumi.Output<string>) {
             machineType: nodeConfig.nodeMachineType,
             diskSizeGb: nodeConfig.diskSize,
             diskType: nodeConfig.diskType,
-            minCpuPlatform: nodeConfig.cpuPlatform,
             oauthScopes: [
                 "https://www.googleapis.com/auth/compute",
                 "https://www.googleapis.com/auth/devstorage.read_only",
