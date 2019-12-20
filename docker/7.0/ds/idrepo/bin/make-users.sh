@@ -5,7 +5,7 @@ cd /opt/opendj
 
 
 # Default users
-USERS=10000
+USERS=10000000
 BASE_DN="ou=identities"
 START=0
 BASE_DN="ou=identities"

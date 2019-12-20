@@ -5,7 +5,7 @@ cd /opt/opendj
 
 
 # Default users
-USERS=10000
+USERS=10000000
 BASE_DN="ou=identities"
 START=0
 BASE_DN="ou=identities"
@@ -83,8 +83,8 @@ echo "Making $USERS  users"
 # Note the memory allocated here can not exceed the pod memory limit -
 # which includes the command below AND the ds server itself.
 # You may have to tune this value.
-#export OPENDJ_JAVA_ARGS="-Xmx2048m"
-export OPENDJ_JAVA_ARGS="-Xmx300m"
+export OPENDJ_JAVA_ARGS="-Xmx2048m"
+#export OPENDJ_JAVA_ARGS="-Xmx300m"
 
 import-ldif --clearBackend --backendId $BACKEND --ldifFile data/var/import.ldif \
    --skipFile /tmp/skip  --rejectFile /tmp/rejects \
