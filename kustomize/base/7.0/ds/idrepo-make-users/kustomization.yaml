@@ -1,7 +1,0 @@
-# Creates benchmark users for the idrepo.  To change
-# the number of users see statefulset.yaml
-resources:
-- statefulset.yaml
-- service.yaml
-commonLabels:
-  app: ds-idrepo

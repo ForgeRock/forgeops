@@ -78,12 +78,14 @@ spec:
         # Best to let DS calculate this rather than hard code here.
         # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
         #   value: ds-0.ds.default.svc.cluster.local:8989
-        livenessProbe:
-          initialDelaySeconds: 60
-          periodSeconds: 120
-          httpGet:
-            path: /alive
-            port: http
+        # See https://bugster.forgerock.org/jira/browse/CLOUD-1877
+        # Live / Ready probes complicate DS operations. Pod restart rarely solves DB issues.
+        # livenessProbe:
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 120
+        #   httpGet:
+        #     path: /alive
+        #     port: http
         ports:
           - name: ldap
             containerPort: 1389
@@ -102,7 +104,7 @@ spec:
             memory: 512Mi
             cpu: 250m
           limits:
-            memory: 512Mi
+            memory: 700Mi
         volumeMounts:
         - name: data
           mountPath: /opt/opendj/data
