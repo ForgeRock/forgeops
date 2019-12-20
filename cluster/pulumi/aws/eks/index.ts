@@ -9,7 +9,7 @@ import * as clusterLib from "./cluster";
 /************** IAM **************/
 // Assign extra policies to worker groups roles
 
-let workerNodesCredentials = utils.createNodeGroupCredentials(config.workerNodeGroupConfig.namespace);
+let workerNodesCredentials = utils.createNodeGroupCredentials(config.primaryNodeGroupConfig.namespace);
 let dsNodesCredentials: utils.nodeGroupCredentials = workerNodesCredentials;
 let frontendNodesCredentials: utils.nodeGroupCredentials = workerNodesCredentials;
 let groupNeedingLBAttachment : eks.NodeGroup
@@ -61,7 +61,7 @@ export const kubeconfig = cluster.kubeconfig.apply(kc => {
 
 /************** EKS NODEGROUPS**************/
 //WORKER NODES
-const workerNodeGroup = clusterLib.createNodeGroup(config.workerNodeGroupConfig, cluster,
+const primaryNodeGroup = clusterLib.createNodeGroup(config.primaryNodeGroupConfig, cluster,
                                                    workerNodesCredentials.instanceProfile, backendLabels);
 
 //CREATE FRONTEND DEDICATED NODES
@@ -88,17 +88,17 @@ if (config.frontendNodeGroupConfig.enable){
                                     frontendNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
     clusterLib.addSecurityGroupRule("traffic-from-frontend8080", 8080,
-                                    workerNodeGroup.nodeSecurityGroup.id, undefined, frontendNodeGroup.nodeSecurityGroup.id);
+                                    primaryNodeGroup.nodeSecurityGroup.id, undefined, frontendNodeGroup.nodeSecurityGroup.id);
 
     if (config.prometheusConfig.enable){
         clusterLib.addSecurityGroupRule("prometheus-kubeproxy", 10249,
-                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
+                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, primaryNodeGroup.nodeSecurityGroup.id);
 
         clusterLib.addSecurityGroupRule("prometheus-kubelet", 10250,
-                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
+                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, primaryNodeGroup.nodeSecurityGroup.id);
 
         clusterLib.addSecurityGroupRule("prometheus-nodeexp", 9100,
-                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, workerNodeGroup.nodeSecurityGroup.id);
+                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, primaryNodeGroup.nodeSecurityGroup.id);
     }
 
 
@@ -106,13 +106,13 @@ if (config.frontendNodeGroupConfig.enable){
     groupNeedingLBAttachment = frontendNodeGroup;
 }
 else { //IF NOT USING DEDICATED FRONTEND NODES
-    clusterLib.addSecurityGroupRule(`${config.workerNodeGroupConfig.namespace}30080`, 30080,
-                                    workerNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
+    clusterLib.addSecurityGroupRule(`${config.primaryNodeGroupConfig.namespace}30080`, 30080,
+                                    primaryNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
-    clusterLib.addSecurityGroupRule(`${config.workerNodeGroupConfig.namespace}30443`, 30443,
-                                    workerNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
+    clusterLib.addSecurityGroupRule(`${config.primaryNodeGroupConfig.namespace}30443`, 30443,
+                                    primaryNodeGroup.nodeSecurityGroup.id, ["0.0.0.0/0"], undefined)
 
-    groupNeedingLBAttachment = workerNodeGroup;
+    groupNeedingLBAttachment = primaryNodeGroup;
 }
 
 //CREATE DS DEDICATED NODES
@@ -147,7 +147,7 @@ if (config.dsNodeGroupConfig.enable){
 
     for (let portName in ingressPortMap){
         clusterLib.addSecurityGroupRule(`DS-${portName}`, ingressPortMap[portName], dsNodeGroup.nodeSecurityGroup.id,
-                                        undefined, workerNodeGroup.nodeSecurityGroup.id);
+                                        undefined, primaryNodeGroup.nodeSecurityGroup.id);
     }
 }
 

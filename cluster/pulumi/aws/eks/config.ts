@@ -114,9 +114,9 @@ function getNodeGroupConfig(namespace : string): nodeGroupConfiguration{
     };
     return val;
 };
-export const workerNodeGroupConfig = getNodeGroupConfig("workernodes");
-export const frontendNodeGroupConfig = getNodeGroupConfig("frontenddedicatednodes");
-export const dsNodeGroupConfig = getNodeGroupConfig("dsdedicatednodes");
+export const primaryNodeGroupConfig = getNodeGroupConfig("primarynodes");
+export const frontendNodeGroupConfig = getNodeGroupConfig("frontendnodes");
+export const dsNodeGroupConfig = getNodeGroupConfig("dsnodes");
 
 export const clusterConfig : clusterConfiguration =  {
     k8sVersion: stackConfig.require("k8sVersion"),
