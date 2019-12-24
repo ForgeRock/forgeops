@@ -65,9 +65,10 @@ EOF
 
 # In order to preserve the backend, we need to export the existing entries
 # If you dont do this the backend will not start.
+mkdir -p data/var
 rm -f data/var/users.ldif
 echo "Saving existing data in $BACKEND"
-export-ldif --backendId $BACKEND  --bindDN "uid=admin" --bindPassword password  \
+export-ldif --backendId $BACKEND  --bindDN "cn=Directory Manager" --bindPassword password  \
  --port 4444 --trustAll \
  --noPropertiesFile --ldifFile data/var/users.ldif
 
@@ -83,7 +84,9 @@ echo "Making $USERS  users"
 # which includes the command below AND the ds server itself.
 # You may have to tune this value.
 export OPENDJ_JAVA_ARGS="-Xmx2048m"
+#export OPENDJ_JAVA_ARGS="-Xmx300m"
+
 import-ldif --clearBackend --backendId $BACKEND --ldifFile data/var/import.ldif \
    --skipFile /tmp/skip  --rejectFile /tmp/rejects \
    --noPropertiesFile --port 4444 --trustAll \
-   --bindDN "uid=admin" --bindPassword password --clearBackend --overwrite
+   --bindDN "cn=Directory Manager" --bindPassword password --clearBackend --overwrite
