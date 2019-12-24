@@ -248,6 +248,8 @@ export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.P
         k8sVersion: config.k8sVersion,
         provider: provider,
         dependsOn: [cluster, nodePools],
+        enableExternal: config.prometheusConfig.enableExternal,
+        hostname: config.prometheusConfig.hostname
     }
     return new prometheus.Prometheus(prometheusArgs)
 }

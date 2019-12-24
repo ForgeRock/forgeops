@@ -184,21 +184,22 @@ export const ds:NodePool = {
 
 // **************** PROMETHEUS VALUES ****************
 export interface prometheusConfiguration {
-    enable: boolean;
     k8sNamespace: string;
     version: string;
+    hostname: string;
+    enableExternal: boolean;
 }
 
-function getPrometheusConfig(namespace: string): prometheusConfiguration {
-    let promconfig = new pulumi.Config(namespace);
+function getPrometheusConfig(): prometheusConfiguration {
     let val: prometheusConfiguration = {
-        enable: promconfig.requireBoolean("enable"),
-        version: promconfig.require("version"),
-        k8sNamespace: promconfig.require("k8sNamespace")
-    }
+        k8sNamespace: prom.require("k8sNamespace"),
+        version: prom.require("version"),
+        enableExternal: prom.requireBoolean("extAccessEnable"),
+        hostname: prom.require("extAccessHostname")
+    } 
     return val;
 }
-export const prometheusConfig = getPrometheusConfig("prometheus");
+export const prometheusConfig = getPrometheusConfig();
 
 // **************** LOCAL SSD VALUES ****************
 export const localSsdVersion = local.get("version") || "v2.2.1";

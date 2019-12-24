@@ -36,6 +36,8 @@ config:
   primarynodes:nodeMachineType: custom-24-49152
   primarynodes:preemptible: "false"
   prometheus:enable: "true"
+  prometheus:extAccessEnable: "false"
+  prometheus:extAccessHostname: "monitoring.iam.example.com"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.21.0
   secondarynodes:enable: "false"
