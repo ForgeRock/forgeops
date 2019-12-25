@@ -25,6 +25,8 @@ config:
   primarynodes:nodeMachineType: n1-highmem-4
   primarynodes:preemptible: "false"
   prometheus:enable: "true"
+  prometheus:extAccessEnable: "true"
+  prometheus:extAccessHostname: "monitoring.iam.example.com"
   prometheus:k8sNamespace: monitoring
   prometheus:version: 6.4.2
   secondarynodes:autoScaling: "false"

@@ -6,6 +6,8 @@ export interface PkgArgs {
     k8sVersion: string;
     provider: k8s.Provider;
     dependsOn: any[];
+    enableExternal?: boolean;
+    hostname?: string;
 }
 
 
@@ -15,6 +17,8 @@ export class Prometheus {
     readonly provider: k8s.Provider
     private namespaceName: string
     readonly namespace: k8s.core.v1.Namespace
+    readonly hostname: string
+    readonly enableExternal: boolean
 
     /**
     * Deploy Prometheus to k8s cluster.
@@ -32,7 +36,42 @@ export class Prometheus {
                 name: this.namespaceName
             }}, 
             {provider: args.provider, dependsOn:args.dependsOn})
+
         this.namespace = namespace;
+        
+        // Set external hostname for ingress
+        if (args.hostname) {
+            this.hostname = args.hostname;
+        }
+
+        if (args.enableExternal) {
+            this.enableExternal = args.enableExternal;
+        }
+
+
+        // function to add ingress block for external access
+        function addExternalAccess(hostname: string, path: string) {
+
+            // set annotations for ingress
+            let annotations = {
+                "kubernetes.io/ingress.class" : "nginx",
+                "certmanager.k8s.io/cluster-issuer": "default-issuer",
+                "nginx.ingress.kubernetes.io/ssl-redirect": "true"
+            }
+
+            return {
+                    enabled: true,
+                    annotations: { annotations },
+                    hosts: [ hostname ],
+                    paths: [ path ],
+                    tls: [
+                        {
+                            secretName: "sslcert",
+                            hosts: [ hostname ]
+                        }
+                    ]
+            }       
+        }
 
         function addNamespace (o: any): void{
             if (o !== undefined) {
@@ -52,6 +91,7 @@ export class Prometheus {
                 o.spec.restartPolicy = "OnFailure"
             }
         }
+
         //Deploy the Prometheus Operator to the cluster
         const prometheusOperator = new k8s.helm.v2.Chart("promhelm", {
             repo: "stable",
@@ -63,10 +103,16 @@ export class Prometheus {
                 kubeTargetVersionOverride: args.k8sVersion,
                 alertmanager: {
                     enabled: true,
+                    // required if configuring ingress block
+                    alertmanagerSpec: this.enableExternal ? { routePrefix: "/alertmanager" } : {},
+                    // Add ingress block if external access requested
+                    ingress: this.enableExternal ? addExternalAccess(this.hostname, "/alertmanager") : {}
                 },
                 grafana: {
                     enabled: true,
-                    adminPassword: "password"
+                    adminPassword: "password",
+                    // Add ingress block if external access requested
+                    ingress: this.enableExternal ? addExternalAccess(this.hostname, "grafana") : {}, 
                 },
                 defaultRules: {
                     create: true,
@@ -108,7 +154,11 @@ export class Prometheus {
                         //match any rule and any serviceMonitor on any namespace
                         serviceMonitorSelectorNilUsesHelmValues: false,
                         ruleSelectorNilUsesHelmValues: false,
+                        // required if configuring ingress block
+                        routePrefix: this.enableExternal ? "/prometheus" : "",
                     },
+                    // Add ingress block if external access requested
+                    ingress: this.enableExternal ? addExternalAccess(this.hostname, "/prometheus") : {}, 
                 },
                 prometheusOperator: {
                     createCustomResource: false,
