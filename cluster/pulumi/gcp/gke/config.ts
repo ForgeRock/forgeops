@@ -32,7 +32,7 @@ export const ip = cluster.get<string>("staticIp") || undefined;
 
 // **************** CLUSTER CONFIG ****************
 export const clusterName = cluster.require("name");
-export const nodeZones = cluster.getObject<string[]>("nodeZones") || undefined;
+export const numOfZones = cluster.requireNumber("availabilityZoneCount");
 export const k8sVersion = cluster.get("k8sVersion") || "latest";
 export const nginxVersion = nginx.require("version");
 export const disableIstio = cluster.getBoolean("disableIstio") || true;

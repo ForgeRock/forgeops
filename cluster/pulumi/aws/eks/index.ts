@@ -5,7 +5,6 @@ import * as utils from "../utils/utils";
 import * as config from "./config";
 import * as clusterLib from "./cluster";
 
-
 /************** IAM **************/
 // Assign extra policies to worker groups roles
 

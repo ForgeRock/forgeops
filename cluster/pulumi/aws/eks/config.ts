@@ -55,9 +55,8 @@ export interface infrastructureConfig {
     vpcPublicSubnetIds: pulumi.Output<any>;
     vpcAllSubnets: pulumi.Output<any>;
     bastionSgId: pulumi.Output<any>;
-    clusterAdminRole: aws.iam.Role,
-    loadBalancerTargetGroups: pulumi.Output<any>[],
-
+    clusterAdminRole: aws.iam.Role;
+    loadBalancerTargetGroups: pulumi.Output<any>[];
 }
 
 function getIngressConfig(namespace : string): ingressConfiguration {
@@ -133,5 +132,4 @@ export const infra: infrastructureConfig = {
     bastionSgId: infraReference.requireOutput("bastionSgId"),
     clusterAdminRole: aws.iam.Role.get("clusterAdministratorRole", infraReference.requireOutput("clusterAdministratorRoleID")),
     loadBalancerTargetGroups: [infraReference.requireOutput("extIngresstg80arn"), infraReference.requireOutput("extIngresstg443arn")],
-
 };
