@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# This will do an online restore of a previous backup. 
+# This will do an online restore of a previous backup.
 
 
 cd /opt/opendj
 
-source env.sh 
+source env.sh
 
 usage()
-{ 
+{
     echo "$0 [-o] [-p path] [-n]"
     echo "-o  do an offline restore. DS must not be running."
     echo "-p path. Restore files starting at this path. If this option is not provided, the most recent backup at $BACKUP_DIRECTORY is restored"
@@ -15,10 +15,12 @@ usage()
     exit 1
 }
 
+BACKUP_DIRECTORY="${BACKUP_DIRECTORY:-/opt/opendj/bak}"
+
 RESTORE_PATH="$BACKUP_DIRECTORY"
 
 while getopts ":p:on" opt; do
-    case $opt in 
+    case $opt in
         o)  OFFLINE=true ;;
         p)  RESTORE_PATH="$OPTARG" ;;
         n)  DRY_RUN="--dry-run" ;;
@@ -32,7 +34,7 @@ else
     ARGS="--hostname localhost --port 4444 --bindDN \"cn=Directory\\ Manager\" -j ${DIR_MANAGER_PW_FILE} --trustAll"
 fi
 
-fail() 
+fail()
 {
   echo "Error : restore path is not valid. Current path $RESTORE_PATH"
   exit 1
@@ -40,12 +42,12 @@ fail()
 
 ERR=0
 
-restore() 
+restore()
 {
     echo "Restoring from backup at $RESTORE_PATH"
-    cd $RESTORE_PATH || fail 
+    cd "$RESTORE_PATH" || fail
 
-    for dir in `ls -1` 
+    for dir in *
     do
         d="${RESTORE_PATH}/${dir}"
         echo /opt/opendj/bin/restore $ARGS --backupDirectory "$d" $DRY_RUN
