@@ -8,12 +8,10 @@ config:
   certmanager:useselfsignedcert: "true"
   certmanager:version: v0.10.0
   cluster:k8sVersion: "1.14"
+  cluster:availabilityZoneCount: "1"
   cluster:name: dev-shared
-  cluster:nodeZones: '["us-east4-b"]'
   dsdedicatednodes:enable: "false"
   frontenddedicatednodes:enable: "false"
-  gcp:region: us-east4
-  gcp:zone: us-east4-a
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   nginxingress:enable: "true"

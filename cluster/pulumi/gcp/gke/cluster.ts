@@ -8,20 +8,35 @@ import * as cm from "../../packages/cert-manager";
 import * as prometheus from "../../packages/prometheus";
 import * as localSsd from "../../packages/local-ssd-provisioner";
 
-/** Method to return list of k8s full versions */
-function getK8sVersion() {
+let zones = new Array(config.numOfZones) //array of availabity zones
+
+// Method to return list of k8s full versions
+function getK8sVersion(region: string) {
     return gcp.container.getEngineVersions({
-        location: gcp.config.zone,
+        location: getAZs(1, region)[0],
         versionPrefix: config.k8sVersion,
     });
 }
 
+// Function to return list of Availability Zones
+export function getAZs(numZones: number, region: string) {
+    //Retrieve number of zones provide in stack file
+    for(let i=0; i<numZones; i++) {
+        zones[i] = gcp.compute.getZones({
+            region: region
+        }).names[i]
+    }
+
+    return zones
+}
+
 // Create node pool configuration
-function createNP(nodeConfig: any, clusterName: pulumi.Output<string>) {
+function createNP(nodeConfig: any, clusterName: pulumi.Output<string>, region: string) {
     return new gcp.container.NodePool(nodeConfig.nodePoolName, {
         cluster: clusterName,
         initialNodeCount: nodeConfig.nodeCount ? undefined : nodeConfig.initialNodeCount,
-        version: getK8sVersion().latestNodeVersion,
+        version: getK8sVersion(region).latestNodeVersion,
+        location: region,
         name: nodeConfig.nodePoolName,
         nodeConfig: {
             machineType: nodeConfig.nodeMachineType,
@@ -56,29 +71,30 @@ function createNP(nodeConfig: any, clusterName: pulumi.Output<string>) {
 
 // Select node pools to be configured in GKE cluster.
 
-export function addNodePools(clusterName: pulumi.Output<string>) {
-    var pools = [  createNP(config.primary, clusterName) ]
+export function addNodePools(clusterName: pulumi.Output<string>, region: string) {
+    var pools = [  createNP(config.primary, clusterName, region) ]
     if (config.enableSecondaryPool ) {
-        pools.push(createNP(config.secondary, clusterName))
+        pools.push(createNP(config.secondary, clusterName, region))
     }
     if( config.enableDSPool) {
-        pools.push(createNP(config.ds, clusterName))
+        pools.push(createNP(config.ds, clusterName, region))
     }
     if( config.enableFrontEndPool) {
-        pools.push(createNP(config.frontend, clusterName))
+        pools.push(createNP(config.frontend, clusterName, region))
     }
     return pools;
 }
 
 // Create a GKE cluster
-export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
+export function createCluster(network: any, subnetwork: pulumi.Output<any>, region: string) {
     return new gcp.container.Cluster(config.clusterName, {
         name: config.clusterName,
         initialNodeCount: 1,
-        nodeLocations: config.nodeZones,
+        location: region,
+        nodeLocations: getAZs(config.numOfZones, region),
         network: network,
         subnetwork: subnetwork,
-        minMasterVersion: getK8sVersion().latestMasterVersion,
+        minMasterVersion: getK8sVersion(region).latestMasterVersion,
         addonsConfig: {
             horizontalPodAutoscaling: {
                 disabled: config.disableHPA,
@@ -100,11 +116,11 @@ export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
 }
 
 // Create kube config
-export function createKubeconfig(cluster: gcp.container.Cluster) {
+export function createKubeconfig(cluster: gcp.container.Cluster, zone: string) {
     return pulumi.
     all([ cluster.name, cluster.endpoint, cluster.masterAuth ]).
     apply(([ name, endpoint, masterAuth ]) => {
-        const context = `${gcp.config.project}_${gcp.config.zone}_${name}`;
+        const context = `${gcp.config.project}_${zone}_${name}`;
         return `apiVersion: v1
 clusters:
 - cluster:
@@ -164,13 +180,14 @@ export function createNamespaces(clusterProvider: k8s.Provider) {
 }
 
 // Check to see if static IP address has been provided. If not, create 1
-export function assignIp() {
+export function assignIp(region: string) {
     if (config.ip !== undefined) {
         let a: pulumi.Output<string> = pulumi.concat(config.ip);
         return (a);
     } else {
         const staticIp = new gcp.compute.Address(config.clusterName + "-ip", {
-            addressType: "EXTERNAL"
+            addressType: "EXTERNAL",
+            region: region
         });
         return staticIp.address;
     }

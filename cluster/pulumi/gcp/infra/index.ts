@@ -1,7 +1,9 @@
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
 import { Config } from "@pulumi/pulumi";
-import * as v from "./vpc"
+import * as v from "./vpc";
+
+export const region = gcp.config.region;
 
 /************* VPC CONFIGURATION *************/
 
@@ -10,7 +12,8 @@ const vpcConfig = new Config('vpc');
 
 export let vpc: gcp.compute.Network;
 export let vpcId: pulumi.Output<string>;
-export let subnetId:pulumi.Output<string>;
+export let subnetId: pulumi.Output<string>;
+
 
 // Create new VPC if enabled
 if (vpcConfig.getBoolean("enable")) {
