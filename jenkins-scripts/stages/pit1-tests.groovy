@@ -29,7 +29,7 @@ void runStage(PipelineRun pipelineRun) {
                     def stagesCloud = [:]
 
                     def cfg_common = [
-                        TESTS_SCOPE                     : 'tests/platform_deployment',
+                        TESTS_SCOPE                     : 'tests/pit1',
                         DEPLOYMENT_NAME                 : 'platform-deployment',
                         COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
                         COMPONENTS_FRCONFIG_GIT_BRANCH  : gitBranch,
