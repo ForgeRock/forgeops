@@ -5,7 +5,10 @@ import * as clusterLib from "./cluster";
 import * as config from "./config";
 
 const cluster = clusterLib.createCluster();
-export const kubeconfig = cluster.kubeConfigRaw;
+export const kubeconfig = pulumi.all([cluster.kubeConfigRaw, cluster.name]).apply(([kc, name]) => {
+    return kc.split(": " + name).join(": aks"); //replace any randon aks*** name in the kubeconfig to just "aks" for easier integration
+})
+
 
 const k8sProvider = new k8s.Provider("aksK8s", {
     kubeconfig: cluster.kubeConfigRaw,
