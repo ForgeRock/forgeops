@@ -194,20 +194,20 @@
       "methods"    : "action,query",
       "actions"    : "*"
     },
+    // openidm-admin can request nearly anything
     {
       "pattern"   : "*",
       "roles"     : "internal/role/openidm-admin",
       "methods"   : "*",
       "actions"   : "*",
-      "customAuthz" : "disallowQueryExpression()",
-      "excludePatterns": "repo,repo/*"
+      "excludePatterns": "repo,repo/*,file/iwa/*"
     },
+    // additional rules for openidm-admin that selectively enable certain parts of system/
     {
       "pattern"   : "system/*",
       "roles"     : "internal/role/openidm-admin",
       "methods"   : "create,read,update,delete,patch,query",
-      "actions"   : "",
-      "customAuthz" : "disallowQueryExpression()"
+      "actions"   : ""
     },
     {
       "pattern"   : "system/*",

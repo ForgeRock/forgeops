@@ -113,6 +113,8 @@ patchesStrategicMerge:
                 cpu: 4000m
               limits:
                 memory: 11Gi
+        nodeSelector:
+          kubernetes.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -153,6 +155,8 @@ patchesStrategicMerge:
                 cpu: 4000m
               limits:
                 memory: 11Gi
+        nodeSelector:
+          kubernetes.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data

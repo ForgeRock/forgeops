@@ -55,7 +55,7 @@ auth() {
     echo ""
     echo "Starting authrate on ${BASE_DN} with a range of ${USERS} random users..."
     $DJ_HOME/bin/authrate --hostname ${HOST} --port 1389 \
-         --bindDn '{2}' \
+         --bindDn "cn=directory manager" \
          --bindPasswordFile "${DIR_MANAGER_PW_FILE}" \
          --keepConnectionsOpen \
          --numConnections 20 \
