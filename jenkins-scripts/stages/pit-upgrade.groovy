@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2020 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -50,7 +50,7 @@ void runStage(PipelineRun pipelineRun) {
                     }
 
                     summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determinePitOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }
