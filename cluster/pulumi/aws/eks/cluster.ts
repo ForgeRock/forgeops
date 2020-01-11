@@ -208,7 +208,11 @@ export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration, 
         version: config.clusterConfig.k8sVersion
     }, {dependsOn: [cluster]});
 
-    addSecurityGroupRule(`${nodeGroupConfig.namespace}SSH`, 22, ng.nodeSecurityGroup.id, undefined, config.infra.bastionSgId)
+    config.infra.bastionEnable.apply(enabled => {
+        if (enabled == true) {
+            addSecurityGroupRule(`${nodeGroupConfig.namespace}SSH`, 22, ng.nodeSecurityGroup.id, undefined, config.infra.bastionSgId)
+        }
+    });
     return ng;
 }
 

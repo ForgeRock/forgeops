@@ -7,8 +7,9 @@ const config = new pulumi.Config();
 const numOfAzs = parseInt(config.require("numOfAzs"));
 const accountId = aws.getCallerIdentity({}).accountId;
 const bucketName = config.get("bucketName");
-const bastionAmi = config.require("bastionAmi");
-const bastionInstanceType = config.require<aws.ec2.InstanceType>("bastionInstanceType");
+const bastionCreate = config.requireBoolean("bastionEnable");
+const bastionAmi = config.requireBoolean("bastionEnable") == false ? "undefined" : config.require("bastionAmi");
+const bastionInstanceType = config.requireBoolean("bastionEnable") == false ? "t2.micro" : config.require<aws.ec2.InstanceType>("bastionInstanceType");
 const pubKey = config.require("pubKey");
 export const vpcCIDR = config.require("vpcCIDR");
 export const highAvailability = config.getBoolean("highAvailability");
@@ -54,14 +55,6 @@ export const vpcPublicSubnetsIds = vpc.publicSubnetIds;
 export const vpcIsolatedSubnetsIds = vpc.isolatedSubnetIds;
 export const vpcAllSubnets = vpc.privateSubnetIds.concat(vpc.publicSubnetIds).concat(vpc.isolatedSubnetIds);
 
-const bastionSG = new aws.ec2.SecurityGroup("bastionSG", {
-    ingress: [{ protocol: "tcp", fromPort: 22, toPort: 22, cidrBlocks: ["71.36.119.84/32"] }],
-    egress: [{cidrBlocks: ["0.0.0.0/0"], fromPort: 0, toPort: 0, protocol: "-1"}],
-    tags: {Name: "BastionSG"},
-    vpcId: vpcid,
-});
-export const bastionSgId = bastionSG.id
-
 /************** IAM **************/
 // IAM clusterAdminRole with full access to all cluster resources
 const clusterAdministratorRole = utils.createRole("clusterAdministratorRole", "root")
@@ -93,20 +86,33 @@ if (bucketName !== undefined) {
 }
 
 /************** Bastion Server **************/
-const bastionKeyPair = new aws.ec2.KeyPair("bastionKeyPair", {
-    publicKey: pubKey,
-});
+let bastionSG : aws.ec2.SecurityGroup | {id: string} = {id: "undefined"}
+let bastion : aws.ec2.Instance | {publicIp: string} = {publicIp: "undefined"}
+if (bastionCreate) {
+    bastionSG = new aws.ec2.SecurityGroup("bastionSG", {
+        ingress: [{ protocol: "tcp", fromPort: 22, toPort: 22, cidrBlocks: ["71.36.119.84/32"] }],
+        egress: [{cidrBlocks: ["0.0.0.0/0"], fromPort: 0, toPort: 0, protocol: "-1"}],
+        tags: {Name: "BastionSG"},
+        vpcId: vpcid,
+    });
+    
+    const bastionKeyPair = new aws.ec2.KeyPair("bastionKeyPair", {
+        publicKey: pubKey,
+    });
+    
+    bastion = new aws.ec2.Instance("BastionServer", {
+        instanceType: bastionInstanceType,
+        securityGroups: [bastionSG.id],
+        ami: bastionAmi,
+        keyName: bastionKeyPair.keyName,
+        associatePublicIpAddress: true, 
+        subnetId: vpc.publicSubnetIds[0],
+        tags: {Name: "Bastion"},
+    });
+}
 
-
-const bastion = new aws.ec2.Instance("BastionServer", {
-    instanceType: bastionInstanceType,
-    securityGroups: [bastionSgId],
-    ami: bastionAmi,
-    keyName: bastionKeyPair.keyName,
-    associatePublicIpAddress: true, 
-    subnetId: vpc.publicSubnetIds[0],
-    tags: {Name: "Bastion"},
-});
+export const bastionEnable = bastionCreate;
+export const bastionSgId = bastionSG.id;
 export const bastionPublicIp = bastion.publicIp;
 
 

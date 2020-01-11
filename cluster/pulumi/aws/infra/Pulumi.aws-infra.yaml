@@ -1,6 +1,7 @@
 encryptionsalt: v1:OGMSatR2kak=:v1:wXpXDZgHmyHrdIR1:f8WLl5uQaTIyGmX9OVsR+LZMbrHyaA==
 config:
   aws:region: us-east-1
+  aws-infra:bastionEnable: "false"
   aws-infra:bastionAmi: ami-0e70db31f7e942241
   aws-infra:bastionInstanceType: t2.micro
   aws-infra:bucketName: eks-cdm

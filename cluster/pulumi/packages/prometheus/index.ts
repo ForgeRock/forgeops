@@ -6,8 +6,8 @@ export interface PkgArgs {
     k8sVersion: string;
     provider: k8s.Provider;
     dependsOn: any[];
-    enableExternal?: boolean;
     hostname?: string;
+    enableExternal?: boolean;
 }
 
 
@@ -17,8 +17,8 @@ export class Prometheus {
     readonly provider: k8s.Provider
     private namespaceName: string
     readonly namespace: k8s.core.v1.Namespace
-    readonly hostname: string
-    readonly enableExternal: boolean
+    private hostname: string
+    private enableExternal: boolean
 
     /**
     * Deploy Prometheus to k8s cluster.
@@ -40,13 +40,8 @@ export class Prometheus {
         this.namespace = namespace;
         
         // Set external hostname for ingress
-        if (args.hostname) {
-            this.hostname = args.hostname;
-        }
-
-        if (args.enableExternal) {
-            this.enableExternal = args.enableExternal;
-        }
+        this.hostname = args.hostname ? args.hostname : "undefined";
+        this.enableExternal = args.enableExternal ? args.enableExternal : false;
 
 
         // function to add ingress block for external access
