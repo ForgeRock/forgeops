@@ -8,3 +8,5 @@ openidm:
     user: "uid=admin"
     password: password
 replicaCount: 2
+service:
+  name: idm
