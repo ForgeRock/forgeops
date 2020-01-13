@@ -493,6 +493,12 @@
             "updates": {
                 "dnTemplate": "ou=updates,dc=openidm,dc=forgerock,dc=io"
             },
+            "import": {
+              "dnTemplate": "ou=import,dc=openidm,dc=forgerock,dc=io"
+            },
+            "import/*": {
+              "dnTemplate": "ou=import,dc=openidm,dc=forgerock,dc=io"
+            },
             "reconprogressstate": {
                 "dnTemplate": "ou=reconprogressstate,dc=openidm,dc=forgerock,dc=io"
             },

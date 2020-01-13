@@ -23,6 +23,8 @@ configMapGenerator:
   - DOMAIN=example.com
   - AM_URL=https://$(NAMESPACE).iam.example.com/am
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/admin
+  - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.example.com/upload
+  - IDM_EXPORT_URL=https://$(NAMESPACE).iam.example.com/export
   - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/platform
   - IDM_REST_URL=https://$(NAMESPACE).iam.example.com/openidm
   - ENDUSER_UI_URL=https://$(NAMESPACE).iam.example.com/enduser

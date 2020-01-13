@@ -37,6 +37,14 @@ spec:
           backend:
             serviceName: {{ .Values.service.name }}
             servicePort: {{ .Values.service.externalPort }}
+        - path: /upload
+          backend:
+            serviceName: {{ .Values.service.name }}
+            servicePort: {{ .Values.service.externalPort }}
+        - path: /export
+          backend:
+            serviceName: {{ .Values.service.name }}
+            servicePort: {{ .Values.service.externalPort }}
         - path: /oauthReturn
           backend:
             serviceName: {{ .Values.service.name }}

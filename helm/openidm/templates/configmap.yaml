@@ -80,7 +80,10 @@ data:
 
       # PKCS#11 configuration file
       #openidm.security.pkcs11.config=
+      
       openidm.servlet.alias=/openidm
+      openidm.servlet.upload.alias=/upload
+      openidm.servlet.export.alias=/export
 
       # key in keystore to handle config encryption
       openidm.config.crypto.alias=openidm-sym-default
