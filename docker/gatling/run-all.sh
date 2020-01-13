@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Delete the IDM users before running create users
-export DELETE_USERS="true"
+export DELETE_USERS="false"
 
 export TARGET_HOST="${TARGET_HOST:-smoke.iam.forgeops.com}"
 # User pool size. The benchmark needs at least this many sample users loaded in the user store.
