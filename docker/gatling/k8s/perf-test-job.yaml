@@ -41,4 +41,5 @@ data:
   # Customize as required
   GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/key.json"
   DURATION: "60"
+  CONCURRENCY: "50"
   TARGET_HOST: "smoke.iam.forgeops.com"

@@ -16,12 +16,14 @@ class BenchConfig {
     val scope: String =  Properties.envOrElse("SCOPE", "fr:idm:*")
     val client_id: String = Properties.envOrElse("CLIENT_ID", "idm-provisioning")
     val client_password: String = Properties.envOrElse("CLIENT_PASSWORD", "password")
+    val idmUser: String = Properties.envOrElse("IDM_USER", "openidm-admin")
+    val idmPassword: String = Properties.envOrElse("IDM_PASSWORD", "password")
     val duration:Integer =  Properties.envOrElse("DURATION", "60").toInt
-    val userPoolSize: Integer =Properties.envOrElse("USER_POOL", "1000").toInt
+    val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000").toInt
     // Run the IDM delete users before running the create user simulation
     val deleteUsers: Boolean = Properties.envOrElse("DELETE_USERS", "false").toBoolean
 
-    val concurrency: Integer = Integer.getInteger("concurrency", 10)
+    val concurrency: Integer = Properties.envOrElse("CONCURRENCY", "1").toInt
     val warmup: Integer = Integer.getInteger("warmup", 1)
 
     val idmUrl: String = protocol + "://" + host + ":" + port + "/openidm"
