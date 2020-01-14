@@ -27,6 +27,8 @@ configMapGenerator:
   - AM_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/am
   - PLATFORM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/platform
   - IDM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/admin
+  - IDM_UPLOAD_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/upload
+  - IDM_EXPORT_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/export
   - IDM_REST_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/openidm
   - ENDUSER_UI_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/enduser
   - LOGIN_UI_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/login/#/service/Login

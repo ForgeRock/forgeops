@@ -31,6 +31,14 @@ spec:
       - backend:
           serviceName: idm
           servicePort: 80
+        path: /upload
+      - backend:
+          serviceName: idm
+          servicePort: 80
+        path: /export
+      - backend:
+          serviceName: idm
+          servicePort: 80
         path: /admin
       - backend:
           serviceName: forgeops-tests

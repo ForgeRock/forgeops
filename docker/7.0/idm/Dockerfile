@@ -10,3 +10,7 @@ RUN rm bundle/org.apache.felix.webconsole*.jar  && \
 RUN rm -fr /opt/openidm/conf
 ENV JAVA_OPTS "-server -XX:MaxRAMPercentage=75"
 COPY --chown=forgerock:root . /opt/openidm
+# Workaround for Kaniko issue
+USER root
+RUN chown -R forgerock:root /opt/openidm
+USER forgerock

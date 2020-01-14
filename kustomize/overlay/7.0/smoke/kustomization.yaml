@@ -25,6 +25,8 @@ configMapGenerator:
   - DOMAIN=forgeops.com
   - AM_URL=https://$(NAMESPACE).iam.forgeops.com/am
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/admin
+  - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.forgeops.com/upload
+  - IDM_EXPORT_URL=https://$(NAMESPACE).iam.forgeops.com/export
   - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/platform
   - IDM_REST_URL=https://$(NAMESPACE).iam.forgeops.com/openidm
   - ENDUSER_UI_URL=https://$(NAMESPACE).iam.forgeops.com/enduser
