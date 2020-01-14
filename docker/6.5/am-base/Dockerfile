@@ -12,7 +12,6 @@ COPY openam.war "$CATALINA_HOME"/webapps/am.war
 # -Duser.home=/home/forgerock
 # See also https://forum.forgerock.com/topic/openamcfg-location/
 
-
 # This option:
 #  -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true \
 # is disabled to avoid http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2007-0450
