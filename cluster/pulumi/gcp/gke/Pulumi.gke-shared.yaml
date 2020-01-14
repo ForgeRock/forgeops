@@ -12,6 +12,7 @@ config:
   cluster:name: dev-shared
   dsdedicatednodes:enable: "false"
   frontenddedicatednodes:enable: "false"
+  gcp:region: us-east4
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   nginxingress:enable: "true"

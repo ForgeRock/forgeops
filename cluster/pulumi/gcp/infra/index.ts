@@ -3,8 +3,6 @@ import * as pulumi from "@pulumi/pulumi";
 import { Config } from "@pulumi/pulumi";
 import * as v from "./vpc";
 
-export const region = gcp.config.region;
-
 /************* VPC CONFIGURATION *************/
 
 // Fetch VPC config
