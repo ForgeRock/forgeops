@@ -173,6 +173,9 @@
                     "condition": {
                         "type": "simple",
                         "ldapAttribute": "fr-idm-condition"
+                    },
+                    "privileges" : {
+                        "type": "json", "ldapAttribute": "fr-idm-privilege", "isMultiValued": true
                     }
                 }
             },
@@ -311,9 +314,22 @@
                         "ldapAttribute": "fr-idm-recon-targetIds"
                     }
                 }
+            }
+        },
+        "genericMapping": {
+            "config": {
+                "dnTemplate": "ou=config,dc=openidm,dc=forgerock,dc=io"
+            },
+            "ui/*": {
+                "dnTemplate": "ou=ui,dc=openidm,dc=forgerock,dc=io"
+            },
+            "managed/*": {
+                "dnTemplate": "ou=managed,dc=openidm,dc=forgerock,dc=io"
             },
             "managed/user": {
                 "dnTemplate": "ou=people,ou=identities",
+                "jsonAttribute" : "fr-idm-managed-user-custom-attrs",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatch",
                 "namingStrategy": {
                     "type": "clientDnNaming",
                     "dnAttribute": "fr-idm-uuid"
@@ -336,7 +352,8 @@
                     "pushDeviceProfilesContainer",
                     "sunAMAuthAccountLockout",
                     "sunFMSAML2NameIdentifier",
-                    "webauthnDeviceProfilesContainer"
+                    "webauthnDeviceProfilesContainer",
+                    "fr-idm-managed-user-hybrid-obj"
                 ],
                 "properties": {
                     "_id": {
@@ -445,17 +462,6 @@
                         "ldapAttribute": "fr-idm-preferences"
                     }
                 }
-            }
-        },
-        "genericMapping": {
-            "config": {
-                "dnTemplate": "ou=config,dc=openidm,dc=forgerock,dc=io"
-            },
-            "ui/*": {
-                "dnTemplate": "ou=ui,dc=openidm,dc=forgerock,dc=io"
-            },
-            "managed/*": {
-                "dnTemplate": "ou=managed,dc=openidm,dc=forgerock,dc=io"
             },
             "managed/role": {
                 "dnTemplate": "ou=role,ou=managed,dc=openidm,dc=forgerock,dc=io",
