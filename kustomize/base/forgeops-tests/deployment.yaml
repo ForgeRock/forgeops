@@ -47,6 +47,15 @@ spec:
               name: forgeops-tester
               key: FLASK_SECRET_KEY
 
+        - name: SLACK_NOTIFICATION_ENABLE
+          value: enabled
+
+        - name: SLACK_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: slack-webhook
+              key: SLACK_WEBHOOK_URL
+
         - name: INGRESS_PATH_PREFIX
           value: /tests
         - name: NAMESPACE
