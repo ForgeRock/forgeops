@@ -8,13 +8,19 @@ export TARGET_HOST="${TARGET_HOST:-smoke.iam.forgeops.com}"
 export USER_POOL="${USER_POOL:-1000}"
 # Duration of each simulation in seconds
 export DURATION="${DURATION:-60}"
+# Number of concurrent users for each simulation
+export CONCURRENCY="${CONCURRENCY:-50}"
 
 # Gradle options
 G_OPTS="--no-daemon"
 # We compile the binary in the docker build - so the clean is not stricly needed here
 #gradle clean
 # The idm simulation creates test users. Subsequent tests need these users!
-gradle "$G_OPTS" gatlingRun-idm.IDMSimulation
+# The 2 simulations ending '65' are specifically for running against version 6.5.  The difference is that IDM doesn't authenticate with AM.
+
+#gradle "$G_OPTS" gatlingRun-idm.IDMReadCreateUsersSim65
+#gradle "$G_OPTS" gatlingRun-idm.IDMDeleteUsersSim65
+gradle "$G_OPTS" gatlingRun-idm.IDMSimulation70
 gradle "$G_OPTS" gatlingRun-am.AMRestAuthNSim
 gradle "$G_OPTS" gatlingRun-am.AMAccessTokenSim
 
