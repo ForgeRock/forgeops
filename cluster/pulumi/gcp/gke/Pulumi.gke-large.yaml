@@ -22,6 +22,7 @@ config:
   frontendnodes:nodeCount: "1"
   frontendnodes:nodeMachineType: n1-standard-2
   frontendnodes:preemptible: "false"
+  gcp:region: us-east4
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   nginxingress:enable: "true"

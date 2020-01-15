@@ -6,6 +6,7 @@ from time import strftime, gmtime
 import pytest
 import urllib3
 import logging
+import json
 from config.ProductConfig import AMConfig, base_url
 
 # Framework imports
@@ -68,7 +69,16 @@ def run(test_path = "tests/smoke", firstTimeExtraWait = False):
 
     custom_args = '--html=%s --self-contained-html --alluredir=%s' % (html_report_path, allure_report_path)
     args = [test_path] + custom_args.split()
-    pytest.main(args=args)
+    retcode = pytest.main(args=args)
+
+    if (retcode != 0) and (os.environ.get("SLACK_NOTIFICATION_ENABLE").lower() == "enabled"):
+        data = {"text": html_report_name.split('_report.html')[0] + " Was not successful. See: https://smoke.iam.forgeops.com/tests/"}
+        headers = {"Content-type": "application/json"}
+        url = os.environ.get("SLACK_WEBHOOK_URL")
+        post(verify=True, url=url, headers=headers, data=json.dumps(data),  timeout=3)
+    else:
+        logger.info("NO NOTIFICATION SENT")
+
 
     latest_link = os.path.join(report_path, 'latest.html')
     if os.path.lexists(latest_link):

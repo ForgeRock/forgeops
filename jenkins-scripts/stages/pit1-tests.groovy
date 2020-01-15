@@ -31,8 +31,6 @@ void runStage(PipelineRun pipelineRun) {
                     def cfg_common = [
                         TESTS_SCOPE                     : 'tests/pit1',
                         DEPLOYMENT_NAME                 : 'platform-deployment',
-                        COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
-                        COMPONENTS_FRCONFIG_GIT_BRANCH  : gitBranch,
                         COMPONENTS_AMSTER_GITIMAGE_TAG  : gitImageTag,
                         COMPONENTS_AM_GITIMAGE_TAG      : gitImageTag,
                         COMPONENTS_IDM_GITIMAGE_TAG     : gitImageTag,
@@ -50,8 +48,10 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = cfg_common.clone()
                         cfg += [
-                            USE_SKAFFOLD: false,
-                            REPORT_NAME : reportName
+                            COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
+                            COMPONENTS_FRCONFIG_GIT_BRANCH  : gitBranch,
+                            USE_SKAFFOLD                    : false,
+                            REPORT_NAME                     : reportName
                         ]
 
                         withGKEPitNoStages(cfg)

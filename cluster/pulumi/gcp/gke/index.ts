@@ -11,7 +11,6 @@ const infraReference = new pulumi.StackReference(config.stackRef);
 const infra = {
     vpcId: infraReference.getOutput("vpcId"),
     subnetId: infraReference.getOutput("subnetId"),
-    region: infraReference.getOutputSync("region")
 }
 
 /******************* VPC *******************/
@@ -32,16 +31,16 @@ export const network: any = assignVpc();
 /***************** GKE *****************/
 
 // Create GKE cluster
-const cluster = gke.createCluster(network, infra.subnetId, infra.region);
+const cluster = gke.createCluster(network, infra.subnetId);
 
 // Expose kubeconfig
-export const kubeconfig = gke.createKubeconfig(cluster, gke.getAZs(1, infra.region)[0]);
+export const kubeconfig = gke.createKubeconfig(cluster);
 
 // Create cluster provider
 const clusterProvider = gke.createClusterProvider(kubeconfig);
 
 // Add Node Pools
-const nodes = gke.addNodePools(cluster.name, infra.region)
+const nodes = gke.addNodePools(cluster.name)
 
 // Create storage classes
 gke.createStorageClasses(clusterProvider);
@@ -54,7 +53,7 @@ gke.createNamespaces(clusterProvider);
 /************ NGINX INGRESS CONTROLLER ************/
 
 // Export the nginx ingress IP.
-export const loadbalancerIp = gke.assignIp(infra.region);
+export const loadbalancerIp = gke.assignIp();
 
 // Deploy nginx ingress controller if enable = true
 if (config.enableNginxIngress) {
