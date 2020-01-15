@@ -39,7 +39,9 @@ COPY --from=unpack /var/tmp/openidm /opt/openidm
 RUN chown -R forgerock:root /opt/openidm 
 
 # Override these to change the JVM:
-ENV JAVA_OPTS -Xmx1024m -server -XX:+UseG1GC -XX:+IgnoreUnrecognizedVMOptions --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
+ENV JAVA_OPTS -XX:MaxRAMPercentage=75.0
+# This option below is only needed if you are running on JDK > 9
+#--add-opens=java.base/jdk.internal.loader=ALL-UNNAMED
 
 COPY *.sh /opt/openidm/
 COPY logging.properties /opt/openidm/logging.properties

@@ -48,7 +48,8 @@ ENV MONITOR_PW_FILE /var/run/secrets/opendj/monitor.pw
 ENV KEYSTORE_FILE /var/run/secrets/opendj/keystore.pkcs12
 ENV KEYSTORE_PIN_FILE /var/run/secrets/opendj/keystore.pin
 # Default Java arguments - may be overridden when deployed
-ENV OPENDJ_JAVA_ARGS "-Xmx1024m"
+# Scale to 75% of available memory
+ENV OPENDJ_JAVA_ARGS "-XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 
 COPY *.sh /opt/opendj/
 COPY bootstrap/secrets/* /var/run/secrets/opendj/

@@ -9,7 +9,7 @@ RUN ( apt-get update && apt-get install -y ldap-utils && apt-get clean all ) || 
 
 USER forgerock
 
-ENV CATALINA_OPTS "-server -Xmx1g -Dcom.iplanet.services.stats.state=off -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit -D"
+ENV CATALINA_OPTS "-XX:MaxRAMPercentage=75.0 -Dcom.iplanet.services.stats.state=off -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit -D"
 
 COPY --chown=forgerock:root openam /home/forgerock/openam
 

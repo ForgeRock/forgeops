@@ -115,6 +115,9 @@ patchesStrategicMerge:
                 cpu: 2000m
               limits:
                 memory: 5Gi
+            env:
+            - name: DS_SET_SIZE
+              value: 3
         nodeSelector:
           forgerock.io/role: ds
     volumeClaimTemplates:
@@ -157,6 +160,9 @@ patchesStrategicMerge:
                 cpu: 1500m
               limits:
                 memory: 6Gi
+            env:
+            - name: DS_SET_SIZE
+              value: 3
         nodeSelector:
           forgerock.io/role: ds
     volumeClaimTemplates:
