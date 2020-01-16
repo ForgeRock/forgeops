@@ -20,6 +20,8 @@ class BenchConfig {
     val idmPassword: String = Properties.envOrElse("IDM_PASSWORD", "password")
     val duration:Integer =  Properties.envOrElse("DURATION", "60").toInt
     val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000").toInt
+    // template for test users.
+    val userPrefix:String = Properties.envOrElse("USER_PREFIX", "user.");
     // Run the IDM delete users before running the create user simulation
     val deleteUsers: Boolean = Properties.envOrElse("DELETE_USERS", "false").toBoolean
 
