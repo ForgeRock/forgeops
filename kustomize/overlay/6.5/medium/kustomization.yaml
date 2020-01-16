@@ -115,7 +115,7 @@ patchesStrategicMerge:
               limits:
                 memory: 11Gi
         nodeSelector:
-          kubernetes.io/role: ds
+          forgerock.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -157,7 +157,7 @@ patchesStrategicMerge:
               limits:
                 memory: 11Gi
         nodeSelector:
-          kubernetes.io/role: ds
+          forgerock.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
