@@ -67,8 +67,7 @@ closeKeystore
 ## TRUST STORE ##
 
 echo "[TRUST STORE] Importing platform ca to trust store"
-mkdir -p ${GEN_PATH}/truststore
-cp $JAVA_HOME/lib/security/cacerts ${GEN_PATH}/truststore
+
 openKeystore "truststore/cacerts" \
     jks \
     changeit \
