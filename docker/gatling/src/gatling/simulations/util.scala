@@ -10,7 +10,7 @@ import scala.util._
 
 // Holds the benchmark config for hostname, etc.
 class BenchConfig {
-    val host: String   = Properties.envOrElse("TARGET_HOST", "default.iam.example.com")
+    val host: String   = Properties.envOrElse("TARGET_HOST", "prod.iam.example.com")
     val port: String =  Properties.envOrElse("PORT", "443")
     val protocol: String =  Properties.envOrElse("protocol", "https")
     val scope: String =  Properties.envOrElse("SCOPE", "fr:idm:*")
