@@ -21,8 +21,10 @@ class AMRestAuthNSim extends Simulation {
     val random = new util.Random
 
     val userFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(
-    """username""" -> ("""testuser""" + random.nextInt(config.userPoolSize).toString),
-    """password""" -> "Passw0rd")
+    """username""" -> (config.userPrefix + random.nextInt(config.userPoolSize).toString),
+    """password""" -> "password")
+        // TODO: Parameterize this
+        //        """password""" -> "Passw0rd")
     )
 
     def getXOpenAMHeaders(username: String, password: String): scala.collection.immutable.Map[String, String] = {

@@ -24,7 +24,6 @@ class AMAccessTokenSim extends Simulation {
     val oauth2RedirectUri: String = System.getProperty("oauth2_redirect_uri", "http://fake.com")
     val getTokenInfo: String = System.getProperty("get_token_info", "False")
     val scope: String = System.getProperty("am_oauth2_scope","profile")
-
     val realm: String = System.getProperty("realm", "/")
     val state = 1234
 
@@ -35,8 +34,10 @@ class AMAccessTokenSim extends Simulation {
     val random = new util.Random
 
     val userFeeder: Iterator[Map[String, String]] = Iterator.continually(Map(
-        """username""" -> ("""testuser""" + random.nextInt(config.userPoolSize).toString),
-        """password""" -> "Passw0rd")
+        """username""" -> (config.userPrefix + random.nextInt(config.userPoolSize).toString),
+        """password""" -> "password")
+        // TODO: Parameterize this
+//        """password""" -> "Passw0rd")
     )
 
     def getXOpenAMHeaders(username: String, password: String): scala.collection.immutable.Map[String, String] = {

@@ -2,8 +2,6 @@
 set -euo pipefail
 
 echo "ForgeOPS secrets generation job"
-mkdir -p /opt/gen/secrets
-rm -Rf /opt/gen/secrets/*
 echo "#### GETTING EXISTING SECRETS ####"
 ./getset.sh -g /opt/gen/secrets secrettype=forgeops-generated
 echo "#### GENERATING MISSING SECRETS ####"
