@@ -10,8 +10,12 @@ has been tested with OpenJDK 11 and Gradle 5.6.2.
 
 To run the simulations:
 ```
-# The idm simulation creates test users. Subsequent tests need these users!
-gradle gatlingRun-idm.IDMSimulation
+# The idm simulations create and delete test users. You can use this for evaluating the create and delete user 
+# benchmarks but for benchmarking AM, users should be generated using the DS make_users.sh in the idrepo container.
+gradle gatlingRun-idm.IDMReadCreateUsersSim65
+gradle gatlingRun-idm.IDMDeleteUsersSim65
+# TODO: 7.0 IDM benchmarks
+
 # A test of the basic AM REST /json/authenticate endpoint
 gradle gatlingRun-am.AMRestAuthNSim
 # A test to issue access tokens using the auth code flow.

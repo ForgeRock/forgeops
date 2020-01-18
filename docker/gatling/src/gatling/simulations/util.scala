@@ -10,7 +10,7 @@ import scala.util._
 
 // Holds the benchmark config for hostname, etc.
 class BenchConfig {
-    val host: String   = Properties.envOrElse("TARGET_HOST", "smoke.iam.forgeops.com")
+    val host: String   = Properties.envOrElse("TARGET_HOST", "prod.iam.example.com")
     val port: String =  Properties.envOrElse("PORT", "443")
     val protocol: String =  Properties.envOrElse("protocol", "https")
     val scope: String =  Properties.envOrElse("SCOPE", "fr:idm:*")
@@ -18,14 +18,15 @@ class BenchConfig {
     val client_password: String = Properties.envOrElse("CLIENT_PASSWORD", "password")
     val idmUser: String = Properties.envOrElse("IDM_USER", "openidm-admin")
     val idmPassword: String = Properties.envOrElse("IDM_PASSWORD", "password")
+    val userPassword: String = Properties.envOrElse("USER_PASSWORD", "password")
     val duration:Integer =  Properties.envOrElse("DURATION", "60").toInt
-    val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000").toInt
+    val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000000").toInt
     // template for test users.
     val userPrefix:String = Properties.envOrElse("USER_PREFIX", "user.");
     // Run the IDM delete users before running the create user simulation
     val deleteUsers: Boolean = Properties.envOrElse("DELETE_USERS", "false").toBoolean
 
-    val concurrency: Integer = Properties.envOrElse("CONCURRENCY", "1").toInt
+    val concurrency: Integer = Properties.envOrElse("CONCURRENCY", "30").toInt
     val warmup: Integer = Integer.getInteger("warmup", 1)
 
     val idmUrl: String = protocol + "://" + host + ":" + port + "/openidm"

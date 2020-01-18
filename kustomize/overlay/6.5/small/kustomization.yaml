@@ -29,6 +29,7 @@ configMapGenerator:
   - ENDUSER_CLIENT_ID=endUserUIClient
   - ADMIN_CLIENT_ID=idmAdminClient
   - THEME=default
+  - CTS_STORES=ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389
 
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
@@ -115,7 +116,7 @@ patchesStrategicMerge:
               limits:
                 memory: 5Gi
         nodeSelector:
-          kubernetes.io/role: ds
+          forgerock.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -157,7 +158,7 @@ patchesStrategicMerge:
               limits:
                 memory: 6Gi
         nodeSelector:
-          kubernetes.io/role: ds
+          forgerock.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
