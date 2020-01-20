@@ -13,7 +13,7 @@ import com.forgerock.pipeline.stage.Status
 
 void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String doRecordResult, String clusterNamespace) {
 
-    pipelineRun.pushStageOutcome(dashboard_utils.normalizedStageName(stageName), stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome(dashboard_utils.normalizeStageName(stageName), stageDisplayName: stageName) {
         node('perf-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
@@ -36,39 +36,42 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     def stagesCloud = [:]
 
                     // perf stack test
-                    stagesCloud = stageCloudPerf(stagesCloud, "stack", skaffold_report_loc, "stack")
-                    def cfg_stack = cfg_common.clone()
-                    cfg_stack += [
-                            USE_SKAFFOLD: false,
-                            TEST_NAME   : "stack",
-                    ]
+                    stagesCloud = stageCloudPerf(stagesCloud, "stack", helm_report_loc, "stack")
 
                     dashboard_utils.determineUnitOutcome(stagesCloud['stack']) {
-                        withGKEPyrockNoStages(cfg_stack)
+                        def cfg = cfg_common.clone()
+                        cfg += [
+                            USE_SKAFFOLD: false,
+                            TEST_NAME   : "stack",
+                        ]
+
+                        withGKEPyrockNoStages(cfg)
                     }
 
                     // perf authn rest test
-                    def cfg_authn = cfg_common.clone()
-                    stagesCloud = stageCloudPerf(stagesCloud, "am_authn", skaffold_report_loc, "authn_rest")
-                    cfg_authn += [
-                            USE_SKAFFOLD: false,
-                            TEST_NAME   : "authn_rest",
-                    ]
+                    stagesCloud = stageCloudPerf(stagesCloud, "am_authn", helm_report_loc, "authn_rest")
 
                     dashboard_utils.determineUnitOutcome(stagesCloud['am_authn']) {
-                        withGKEPyrockNoStages(cfg_authn)
+                        def cfg = cfg_common.clone()
+                        cfg += [
+                            USE_SKAFFOLD: false,
+                            TEST_NAME   : "authn_rest",
+                        ]
+
+                        withGKEPyrockNoStages(cfg)
                     }
 
                     // CRUD on simple managed users tests
-                    def cfg_idm_crud = cfg_common.clone()
                     stagesCloud = stageCloudPerf(stagesCloud, "idm_crud", helm_report_loc, "simple_managed_users")
-                    cfg_idm_crud += [
-                            USE_SKAFFOLD: false,
-                            TEST_NAME   : "simple_managed_users",
-                    ]
 
                     dashboard_utils.determineUnitOutcome(stagesCloud['idm_crud']) {
-                        withGKEPyrockNoStages(cfg_idm_crud)
+                        def cfg = cfg_common.clone()
+                        cfg += [
+                            USE_SKAFFOLD: false,
+                            TEST_NAME   : "simple_managed_users",
+                        ]
+
+                        withGKEPyrockNoStages(cfg)
                     }
 
                     // Summary and combined report generation

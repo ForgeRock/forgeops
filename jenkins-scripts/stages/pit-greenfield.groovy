@@ -11,7 +11,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 void runStage(PipelineRun pipelineRun) {
 
     def stageName = 'PIT Greenfield'
-    def normalizedStageName = dashboard_utils.normalizedStageName(stageName)
+    def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
