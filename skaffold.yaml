@@ -178,7 +178,7 @@ profiles:
       context: docker/7.0/ig
   deploy:
     kustomize:
-      path: ./kustomize/base/7.0/ig
+      path: ./kustomize/overlay/7.0/ig-only
 - name: am-only
   build:
     artifacts:
