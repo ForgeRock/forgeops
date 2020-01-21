@@ -184,3 +184,31 @@ patchesStrategicMerge:
         resources:
           requests:
             storage: 500Gi
+
+- |-
+  #Patch postgres
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: postgres-idm
+  spec:
+    replicas: 1
+    template:
+      spec:
+        containers:
+        - name: postgres
+          resources:
+            limits:
+              memory: 6Gi
+            requests:
+              cpu: 4000m
+              memory: 5Gi
+    volumeClaimTemplates:
+      - metadata:
+          name: postgres-idm
+        spec:
+          storageClassName: fast
+          accessModes: [ "ReadWriteOnce" ]
+          resources:
+            requests:
+              storage: 100Gi

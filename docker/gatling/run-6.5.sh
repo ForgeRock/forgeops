@@ -4,7 +4,7 @@
 # Delete the IDM users before running create users
 export DELETE_USERS="false"
 
-export TARGET_HOST="${TARGET_HOST:-smoke.iam.forgeops.com}"
+export TARGET_HOST="${TARGET_HOST:-prod.iam.example.com}"
 # User pool size for IDM benchmarks
 export USER_POOL="${USER_POOL:-1000000}"
 # Duration of each simulation in seconds
