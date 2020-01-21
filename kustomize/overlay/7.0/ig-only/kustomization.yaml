@@ -2,7 +2,6 @@
 namespace: default
 resources:
   - ../../../base/kustomizeConfig
-  - ../../../base/forgeops-secrets
   - ../../../base/ig
   - ../../../base/ingress
 
