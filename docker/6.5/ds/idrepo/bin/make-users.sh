@@ -63,6 +63,14 @@ description: This is the description for {cn}.
 
 EOF
 
+
+# Note the memory allocated here can not exceed the pod memory limit -
+# which includes the command below AND the ds server itself.
+# You may have to tune this value
+#export OPENDJ_JAVA_ARGS="${OPENDJ_JAVA_ARGS:--XX:MaxRAMPercentage=10.0}"
+export OPENDJ_JAVA_ARGS="-XX:MaxRAMPercentage=10.0"
+
+
 # In order to preserve the backend, we need to export the existing entries
 # If you dont do this the backend will not start.
 mkdir -p data/var
@@ -72,6 +80,7 @@ export-ldif --backendId $BACKEND  --bindDN "cn=Directory Manager" --bindPassword
  --port 4444 --trustAll \
  --noPropertiesFile --ldifFile data/var/users.ldif
 
+
 # Note: makeldif generates duplicate ou=People org entries, which causes import-ldif to abort.
 # The tail -n +10 drops those first duplicates. Yes this is a hack.
 echo "Making $USERS  users"
@@ -80,11 +89,6 @@ echo "Making $USERS  users"
    makeldif -c suffix=$BASE_DN -c numusers=$USERS /var/tmp/user.template \
    | tail -n +10  )  >data/var/import.ldif
 
-# Note the memory allocated here can not exceed the pod memory limit -
-# which includes the command below AND the ds server itself.
-# You may have to tune this value.
-export OPENDJ_JAVA_ARGS="-Xmx2048m"
-#export OPENDJ_JAVA_ARGS="-Xmx300m"
 
 import-ldif --clearBackend --backendId $BACKEND --ldifFile data/var/import.ldif \
    --skipFile /tmp/skip  --rejectFile /tmp/rejects \

@@ -5,7 +5,7 @@
 export DS_SET_SIZE="${DS_SET_SIZE:-1}"
 
 # This should already be set by k8s - but in case it isn't we default it.
-export DJ_INSTANCE="${DJ_INSTANCE:-userstore}"
+export DJ_INSTANCE="${DJ_INSTANCE:-ds-idrepo}"
 
 # Subsequent scripts may want to know our FQDN in the cluster. The convention below works in k8s using StatefulSets.
 export FQDN="${HOSTNAME}.${DJ_INSTANCE}"

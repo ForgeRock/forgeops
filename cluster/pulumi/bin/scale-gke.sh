@@ -4,7 +4,7 @@
 CLUSTER=$1
 
 if [ -z "$CLUSTER" ]; then
-  echo "Usage: $0 cluster-name  [number of nodes - default 0"
+  echo "Usage: $0 cluster-name  [number of nodes - default 0]"
   exit 1
 fi
 

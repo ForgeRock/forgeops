@@ -3,7 +3,4 @@ kind: ConfigMap
 metadata:
   name: ds
 data:
-  # -XX:+PrintFlagsFinal
-  OPENDJ_JAVA_ARGS: "-server -Xmx512m"
   DJ_INSTANCE: "ds-cts"
-  DS_SET_SIZE: "1"

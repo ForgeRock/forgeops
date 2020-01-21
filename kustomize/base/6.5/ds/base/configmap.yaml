@@ -3,7 +3,5 @@ kind: ConfigMap
 metadata:
   name: ds
 data:
-  # -XX:+PrintFlagsFinal
-  OPENDJ_JAVA_ARGS: "-server -Xmx512m"
+  # todo: Update the env.sh to just calculate this. We dont need it in the configmap
   DJ_INSTANCE: "ds-idrepo"
-  DS_SET_SIZE: "1"

@@ -83,7 +83,7 @@ patchesStrategicMerge:
   metadata:
     name: idm
   spec:
-    replicas: 1
+    replicas: 2
     template:
       spec:
         containers:
@@ -114,6 +114,9 @@ patchesStrategicMerge:
                 cpu: 4000m
               limits:
                 memory: 11Gi
+            env:
+            - name: DS_SET_SIZE
+              value: "3"
         nodeSelector:
           forgerock.io/role: ds
     volumeClaimTemplates:
@@ -149,13 +152,16 @@ patchesStrategicMerge:
     template:
       spec:
         containers:
-          - name: ds
-            resources:
-              requests:
-                memory: 8Gi
-                cpu: 4000m
-              limits:
-                memory: 11Gi
+        - name: ds
+          resources:
+            requests:
+              memory: 8Gi
+              cpu: 4000m
+            limits:
+              memory: 11Gi
+          env:
+          - name: DS_SET_SIZE
+            value: "3"
         nodeSelector:
           forgerock.io/role: ds
     volumeClaimTemplates:
