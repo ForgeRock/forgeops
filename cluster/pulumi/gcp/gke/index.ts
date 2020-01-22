@@ -76,7 +76,3 @@ if (config.enablePrometheus){
 if (config.enableLocalSsdProvisioner){
     gke.deployLocalSsdProvisioner(cluster, clusterProvider);
 }
-
-const cmConfig = new pulumi.Config("certmanager");
-export const key = cmConfig.require("tls-key")
-export const cert = cmConfig.require("tls-crt")
