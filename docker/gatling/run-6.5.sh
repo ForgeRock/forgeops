@@ -8,7 +8,7 @@ export TARGET_HOST="${TARGET_HOST:-prod.iam.example.com}"
 # User pool size for IDM benchmarks
 export USER_POOL="${USER_POOL:-1000000}"
 # Duration of each simulation in seconds
-export DURATION="${DURATION:-3600}"
+export DURATION="${DURATION:-300}"
 # Number of concurrent users for each simulation
 export CONCURRENCY="${CONCURRENCY:-50}"
 
@@ -21,8 +21,8 @@ gradle clean
 # IDM does not authenticate with AM in 6.5
 
 # Run the IDM 6.5 create/delete simulations.  These are independant of creating users for the AM simulations.
-gradle "$G_OPTS" gatlingRun-idm.IDMReadCreateUsersSim65
-gradle "$G_OPTS" gatlingRun-idm.IDMDeleteUsersSim65
+#gradle "$G_OPTS" gatlingRun-idm.IDMReadCreateUsersSim65
+#gradle "$G_OPTS" gatlingRun-idm.IDMDeleteUsersSim65
 
 # For the AM simulations, prefer users created by the DS make-users.sh script
 # The uid format of those is user.$id
@@ -32,7 +32,7 @@ export USER_PREFIX="user."
 # For the medium benchmark use 10M users for AM
 export USER_POOL=10000000
 gradle "$G_OPTS" gatlingRun-am.AMRestAuthNSim
-gradle "$G_OPTS" gatlingRun-am.AMAccessTokenSim
+#gradle "$G_OPTS" gatlingRun-am.AMAccessTokenSim
 
 # Optionally upload the benchmark results to GCS
 # Note the google storage library needs a service account to upload results

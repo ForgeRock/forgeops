@@ -1,6 +1,6 @@
 encryptionsalt: v1:VjheTQ4LR1U=:v1:bjn1LLyB+wgucUoA:O417tG1IjVlYCSUuixD2XQCdqtP4lg==
 config:
-  certmanager:enable: "true"
+  certmanager:enable: "false"
   certmanager:tls-crt:
     secure: v1:gse7uPMfqdvy7lmX:3bu2wYDqKkG7gJ06G+voyiQjsUP+okwyMNmqT2gXo6eb20FcbgPs93TKtovUDpaEyfE0lgsBXt2913p6bhpViVc5iy8/G1MT+D3oJg5WXJpy4r9sfG2cavMWgFenUtMpr3QYC3VG0qNKjcTWhXmnEsCZu0vrwRoVW0NWbYS44Y7HEz1NF8wbOvYP56iWn6dT/QOSp4dh2cgEf7WlKsIAIk1OdXk3G6k9gn1GaQ7YyZPzHVRWCMloTWcPENSq5++iJNpG49pUxQrCEY9BXeUi5s7ZbtGFTTVjT1uWd42dF7JRsOnUFpNrgQ+3+cpNvrXRZxDIZSRSdh5nUtUye2+hTcjWQlQ623mjSLB3SoS5/7uBkWi8ZhHEseBWNL/chpJv4qDx1PljhUqjCdZPEVUomzDlUmOgwULZMYQtUku+2J3tuMupylWUWBetjjIniKvKkNbxLZKXByNxzoDafAELxrrtOvpIrzyHWUTZyHkvykNVZDBkaq4v32dyQjz8C9GxcBiFCdRNKmb1uf0JXbXRUX2G8R6kQat3kgmAj4tK2kO1TBilnffHoaOnHFCY36wRxlNmBTZDx/yp5+vSBoPsCwTrBq2sC5D32Gh1T0fPwryc2H+LiLDFdLfiPkEc5Ie2ZnLqRsnegPoyct6K6QpbR/UK/JyEHHwa6GLrdRLbEbBY98Jxzar1s9I9X70frycytkmRBZDm187nIE+Aanhz+j13C4jrpkkZSJYFauTK+BHjlzgVdEGvqSvYXcsGyQcVEheKoPJq0Afm5VTHblM5VXiRH1li83uOiSARqzwC5eleZpmX1ycJJoi0nOugYpZvEU+1lz2VBE0Fek8NLbJdk7/VS/A2v4TjuDOq/9BI2GNscjOK2mexznvvy/cyuX7TX8s0dPX8/A4B62s5hYBGMmQoROitnzCtHBfLh2gjP0dVrwVeLtOeLC75KUttj6/uriZPqa/3iSUtOcv+iQJxcXw4NKehZAasuKbCULKgOHjQOumn2cixWyDybJgQLmVbwLqpjNkNJr0xZjNETJXvoZGL06DCLsrosx4ntRzpUkU9f5+qcqiACHSr3ybpwNLzbHBnOCiEEeq2Uy3V0AhgWB/Ny8tGf/GBGbOfDiZhzVhPg+o9Ga/KTn+q3bCVgmJbdIBFppppD3kAIaFoZzTpJ1npOS3ee30+zz7X2wBq5HNv5R2QY5fEk4VAw2EXNFHkH+JJsXjs3tSoaMoAyGP4gcV36VkcT3cdzgxfdZCbw/qUrBT1fKYitWCpyJrqeC/NRDtfG0R8ooW3/GpXwmW40PnsrEOwCRJRql9HLpZp3XigCU9P3FuEStuR/2jZKP+FKx0ldr/O4LgN5lBdQZGYJSzIfiILmnu1lxYbIepJ5icdxWF0LlcISyCWVjT8sly0Q6/veRDYlSEXemtcFA9F2DLi9rEP4WHmPTpUKaLKoWbDLYuYYqTj40yafkX3sDsawHL/K0dM2t01CQgpyiuPorD9fmmg2ElEiYien2O0c3RPszfE+BAV+WLEYLVd9dZ0oR7g0IBct+3PECUI8DYORLVUvTCBBXaJnr6+
   certmanager:tls-key:
@@ -14,25 +14,25 @@ config:
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:nodeCount: "2"
-  dsnodes:nodeMachineType: custom-12-20480
+  dsnodes:nodeMachineType: custom-16-20480
   dsnodes:preemptible: "false"
   frontendnodes:autoScaling: "false"
   frontendnodes:diskSizeGb: "10"
-  frontendnodes:enable: "true"
+  frontendnodes:enable: "false"
   frontendnodes:nodeCount: "1"
-  frontendnodes:nodeMachineType: n1-standard-2
+  frontendnodes:nodeMachineType: n1-standard-4
   frontendnodes:preemptible: "false"
   gcp:region: us-east4
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   nginxingress:enable: "true"
   nginxingress:version: "1.24.4"
-  primarynodes:autoScaling: "true"
+  primarynodes:autoScaling: "false"
   primarynodes:diskSizeGb: "80"
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
-  primarynodes:nodeCount: "0"
-  primarynodes:nodeMachineType: custom-16-24576
+  primarynodes:nodeCount: "2"
+  primarynodes:nodeMachineType: e2-highcpu-16
   primarynodes:preemptible: "false"
   prometheus:enable: "true"
   prometheus:extAccessEnable: "false"

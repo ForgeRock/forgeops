@@ -200,7 +200,7 @@ export function deployIngressController(ip: pulumi.Output<string>, clusterProvid
 
     const gkeHelmValues: any = {
         controller: {
-            kind: "DaemonSet",
+            // kind: "DaemonSet",
             publishService: {enabled: true},
             stats: {
                 enabled: true,
