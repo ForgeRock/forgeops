@@ -9,7 +9,7 @@ metadata:
     {{- if .Values.additionalRulesLabels }}
 {{ toYaml .Values.additionalRulesLabels | indent 4 }}
     {{- end }}
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-fr.rules
 spec:
 {{- if .Values.prometheusRules }}
   groups:

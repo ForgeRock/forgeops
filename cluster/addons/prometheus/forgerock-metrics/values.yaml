@@ -1,0 +1,59 @@
+# Default values for exporter-forgerock.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Select namespace strategy. 
+#   any = scrape all namespaces[default].
+#   selection = user defined array of namespaces to scrape.
+namespaceSelectorStrategy: any
+# if namespaceSelectorStrategy: selected, then replace the namespace array below
+# with the namespaces to be scraped by Prometheus.
+#namespaceSelector:
+#  - production
+#  - staging
+#  - test
+
+am:
+  component: am
+  enabled: true
+  path: /am/json/metrics/prometheus
+  port: am
+  labelSelectorComponent: am
+  secretUser: prometheus
+  secretPassword: prometheus
+
+ds:
+  component: ds
+  enabled: true
+  path: /metrics/prometheus
+  port: http
+  labelSelectorComponent: ds
+  secretUser: monitor
+  secretPassword: password
+
+idm:
+  component: idm
+  enabled: true
+  path: /openidm/metrics/prometheus
+  port: idm
+  labelSelectorComponent: idm
+  secretUser: prometheus
+  secretPassword: prometheus
+
+ig:
+  component: ig
+  enabled: true
+  path: /openig/metrics/prometheus
+  port: ig
+  labelSelectorComponent: ig
+  secretUser: metric
+  secretPassword: password
+
+additionalRulesLabels:
+  prometheus: prometheus-operator
+  role: alert-rules
+
+  
+
+
+
