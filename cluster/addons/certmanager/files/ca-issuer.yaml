@@ -1,0 +1,9 @@
+# Create a cluster wide issuer that uses cert managers built in CA issuer
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: default-issuer
+  namespace: cert-manager
+spec:
+  ca:
+    secretName: certmanager-ca-secret

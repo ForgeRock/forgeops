@@ -73,7 +73,7 @@ patchesStrategicMerge:
             limits:
               memory: 10Gi
             requests:
-              cpu: 11000m
+              cpu: 10000m
               memory: 10Gi
 
 - |-
@@ -110,10 +110,10 @@ patchesStrategicMerge:
           - name: ds
             resources:
               requests:
-                memory: 8Gi
-                cpu: 4000m
+                memory: 14Gi
+                cpu: 10000m
               limits:
-                memory: 11Gi
+                memory: 16Gi
             env:
             - name: DS_SET_SIZE
               value: "3"
@@ -155,10 +155,10 @@ patchesStrategicMerge:
         - name: ds
           resources:
             requests:
-              memory: 8Gi
-              cpu: 4000m
+              memory: 14Gi
+              cpu: 10000m
             limits:
-              memory: 11Gi
+              memory: 16Gi
           env:
           - name: DS_SET_SIZE
             value: "3"
