@@ -14,6 +14,11 @@ metadata:
     nginx.ingress.kubernetes.io/enable-cors: "false"
     certmanager.k8s.io/cluster-issuer: "default-issuer"
     #certmanager.k8s.io/cluster-issuer: "ca-issuer"
+    nginx.ingress.kubernetes.io/body-size: "64m"
+    nginx.ingress.kubernetes.io/send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
   name: forgerock
 spec:
   rules:

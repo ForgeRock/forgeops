@@ -106,7 +106,7 @@ spec:
             memory: 512Mi
             cpu: 250m
           limits:
-            memory: 700Mi
+            memory: 1024Mi
         volumeMounts:
         - name: data
           mountPath: /opt/opendj/data
