@@ -10,6 +10,7 @@ const frontEndPool = new Config("frontendnodes");
 const cm = new Config("certmanager");
 const prom = new Config("prometheus");
 const local = new Config("localssdprovisioner");
+const gcp = new Config("gcp");
 
 export let localSsdFlag: Boolean = false
 
@@ -34,6 +35,7 @@ export const ip = cluster.get<string>("staticIp") || undefined;
 export const clusterName = cluster.require("name");
 export const numOfZones = cluster.requireNumber("availabilityZoneCount");
 export const k8sVersion = cluster.get("k8sVersion") || "latest";
+export const region = gcp.get("region") || "us-east1";
 export const nginxVersion = nginx.require("version");
 export const disableIstio = cluster.getBoolean("disableIstio") || true;
 export const disableHPA = cluster.getBoolean("disableHorizontalPodAutoscaling") || true;
@@ -196,7 +198,7 @@ function getPrometheusConfig(): prometheusConfiguration {
         version: prom.require("version"),
         enableExternal: prom.requireBoolean("extAccessEnable"),
         hostname: prom.require("extAccessHostname")
-    } 
+    }
     return val;
 }
 export const prometheusConfig = getPrometheusConfig();

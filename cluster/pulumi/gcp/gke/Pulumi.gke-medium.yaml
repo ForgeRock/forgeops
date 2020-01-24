@@ -8,13 +8,13 @@ config:
   certmanager:useselfsignedcert: "true"
   certmanager:version: v0.10.0
   cluster:availabilityZoneCount: "3"
-  cluster:k8sVersion: "1.15"
+  cluster:k8sVersion: "1.15."
   cluster:name: cdm-medium
   dsnodes:autoScaling: "false"
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:nodeCount: "2"
-  dsnodes:nodeMachineType: custom-16-20480
+  dsnodes:nodeMachineType: c2-standard-16
   dsnodes:preemptible: "false"
   frontendnodes:autoScaling: "false"
   frontendnodes:diskSizeGb: "10"
@@ -22,7 +22,7 @@ config:
   frontendnodes:nodeCount: "1"
   frontendnodes:nodeMachineType: n1-standard-4
   frontendnodes:preemptible: "false"
-  gcp:region: us-east4
+  gcp:region: us-east1
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   nginxingress:enable: "true"
@@ -34,7 +34,7 @@ config:
   primarynodes:nodeCount: "2"
   primarynodes:nodeMachineType: e2-highcpu-16
   primarynodes:preemptible: "false"
-  prometheus:enable: "true"
+  prometheus:enable: "false"
   prometheus:extAccessEnable: "false"
   prometheus:extAccessHostname: "monitoring.iam.example.com"
   prometheus:k8sNamespace: monitoring
