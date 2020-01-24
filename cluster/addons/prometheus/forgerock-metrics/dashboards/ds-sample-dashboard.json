@@ -4,25 +4,25 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "5.0.3"
+      "version": "6.4.2"
     },
     {
       "type": "panel",
       "id": "graph",
       "name": "Graph",
-      "version": "5.0.0"
+      "version": ""
     },
     {
       "type": "datasource",
-      "id": "Prometheus",
+      "id": "prometheus",
       "name": "Prometheus",
-      "version": "5.0.0"
+      "version": "1.0.0"
     },
     {
       "type": "panel",
       "id": "singlestat",
       "name": "Singlestat",
-      "version": "5.0.0"
+      "version": ""
     }
   ],
   "annotations": {
@@ -39,14 +39,15 @@
     ]
   },
   "editable": true,
-  "gnetId": null,
+  "gnetId": 11596,
   "graphTooltip": 0,
   "id": null,
-  "iteration": 1523630247830,
+  "iteration": 1579629544757,
   "links": [],
   "panels": [
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -103,6 +104,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "20%",
       "prefix": "",
@@ -189,6 +191,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -274,6 +277,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "20%",
       "prefix": "",
@@ -360,6 +364,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -413,7 +418,7 @@
         "#d44a3a"
       ],
       "datasource": "Prometheus",
-      "description": "This value represents the highest replication latency across all replicas, at each instant.",
+      "description": "This value represents the highest latency in receiving messages across all replicas, at each instant.",
       "format": "s",
       "gauge": {
         "maxValue": 30,
@@ -445,6 +450,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -465,7 +471,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "max(ds_replication_replica_remote_replicas_current_delay_seconds)",
+          "expr": "max(ds_replication_replica_remote_replicas_receive_delay_seconds)",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -473,7 +479,7 @@
         }
       ],
       "thresholds": "1, 5",
-      "title": "Max Replication Latency",
+      "title": "Max Receive Latency",
       "transparent": true,
       "type": "singlestat",
       "valueFontSize": "50%",
@@ -497,13 +503,129 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Prometheus",
+      "description": "Numbers of DS, RS and proxies. Some instances may be combined DS/RS.",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
         "y": 7
       },
+      "hiddenSeries": false,
+      "id": 44,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "sum(up and ds_start_time_seconds)",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Total number of ForgeRock DS instances",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(sum by (job) (up) and sum by (job) (ds_backend_entry_count{type=\"db\"}))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Number of DSs",
+          "refId": "C"
+        },
+        {
+          "expr": "sum(sum by (job) (up) and sum by (job) (ds_backend_entry_count{base_dn=\"cn=changelog\"}))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Number of RSs",
+          "refId": "D"
+        },
+        {
+          "expr": "sum(sum by (job) (up) and sum by (job) (ds_backend_entry_count{type=\"proxy\"}))",
+          "format": "time_series",
+          "intervalFactor": 1,
+          "legendFormat": "Number of Proxies",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "ForgeRock DS instances",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": "0",
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 7
+      },
+      "hiddenSeries": false,
       "id": 16,
       "legend": {
         "alignAsTable": true,
@@ -520,6 +642,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -534,12 +659,13 @@
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{job}} - {{ldap_handler}} {{type}}",
+          "legendFormat": "{{job}} {{instance}} - {{ldap_handler}} {{type}}",
           "refId": "A"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Errors",
       "tooltip": {
@@ -573,10 +699,15 @@
           "min": null,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -598,6 +729,7 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 9,
@@ -605,6 +737,7 @@
         "x": 0,
         "y": 16
       },
+      "hiddenSeries": false,
       "id": 2,
       "legend": {
         "alignAsTable": true,
@@ -620,6 +753,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -630,24 +766,25 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (job, ldap_handler) (rate(ds_connection_handlers_ldap_requests_count{job=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[1m]))",
+          "expr": "sum by (job, instance, ldap_handler) (rate(ds_connection_handlers_ldap_requests_count{job=~\"$ds_job\",instance=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[1m]))",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} {{ldap_handler}} m1_rate",
+          "legendFormat": "{{job}} {{instance}} {{ldap_handler}} m1_rate",
           "refId": "A",
           "target": "*.ds.connection-handlers.ldap.requests.m1_rate"
         },
         {
-          "expr": "sum by (job, ldap_handler) (rate(ds_connection_handlers_ldap_requests_count{job=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[5m]))",
+          "expr": "sum by (job, instance, ldap_handler) (rate(ds_connection_handlers_ldap_requests_count{job=~\"$ds_job\",instance=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} {{ldap_handler}} m5_rate",
+          "legendFormat": "{{job}} {{instance}} {{ldap_handler}} m5_rate",
           "refId": "B",
           "target": "*.ds.connection-handlers.ldap.requests.m5_rate"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Load Averages",
       "tooltip": {
@@ -681,7 +818,11 @@
           "min": null,
           "show": false
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
@@ -690,12 +831,14 @@
       "dashes": false,
       "datasource": "Prometheus",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 9,
         "w": 12,
         "x": 12,
         "y": 16
       },
+      "hiddenSeries": false,
       "id": 23,
       "legend": {
         "avg": false,
@@ -710,6 +853,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -720,16 +866,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (job, ldap_handler, type) (irate(ds_connection_handlers_ldap_requests_seconds_total{job=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[1m])) / sum by (job, ldap_handler, type) (irate(ds_connection_handlers_ldap_requests_count{job=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[1m]))",
+          "expr": "sum by (job, instance, ldap_handler, type) (irate(ds_connection_handlers_ldap_requests_seconds_total{job=~\"$ds_job\",instance=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[1m])) / sum by (job, instance, ldap_handler, type) (irate(ds_connection_handlers_ldap_requests_count{job=~\"$ds_job\",instance=~\"$ds_instance\",ldap_handler=~\"$ldap_handler\"}[1m]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{job}} - {{ldap_handler}} - {{type}}",
+          "legendFormat": "{{job}} {{instance}} - {{ldap_handler}} - {{type}}",
           "refId": "C"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Current response time",
       "tooltip": {
@@ -763,10 +910,15 @@
           "min": null,
           "show": true
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -786,12 +938,198 @@
       "dashes": false,
       "datasource": "Prometheus",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 8,
         "w": 12,
         "x": 0,
         "y": 26
       },
+      "hiddenSeries": false,
+      "id": 7,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideZero": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "ds_replication_replica_remote_replicas_receive_delay_seconds",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "DS({{remote_server_id}}) → DS({{server_id}})",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Receive Delay",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 26
+      },
+      "hiddenSeries": false,
+      "id": 51,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideZero": true,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "expr": "ds_replication_replica_remote_replicas_replay_delay_seconds",
+          "format": "time_series",
+          "intervalFactor": 2,
+          "legendFormat": "DS({{remote_server_id}}) → DS({{server_id}})",
+          "refId": "A"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Replay Delay",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "Prometheus",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "hiddenSeries": false,
       "id": 6,
       "legend": {
         "alignAsTable": true,
@@ -809,6 +1147,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -819,22 +1160,23 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(ds_replication_replica_remote_replicas_replayed_updates_count{job=~\"$ds_instance\"}[30s])",
+          "expr": "irate(ds_replication_replica_remote_replicas_replayed_updates_count{job=~\"$ds_job\",instance=~\"$ds_instance\",domain_name=~\"$domain\"}[30s])",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} {{domain_name}} last 30s",
+          "legendFormat": "{{job}} {{instance}} {{domain_name}} last 30s",
           "refId": "A"
         },
         {
-          "expr": "rate(ds_replication_replica_remote_replicas_replayed_updates_count{job=~\"$ds_instance\"}[5m])",
+          "expr": "rate(ds_replication_replica_remote_replicas_replayed_updates_count{job=~\"$ds_job\",instance=~\"$ds_instance\",domain_name=~\"$domain\"}[5m])",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} {{domain_name}} last 5m",
+          "legendFormat": "{{job}} {{instance}} {{domain_name}} last 5m",
           "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Replayed updates",
       "tooltip": {
@@ -868,97 +1210,20 @@
           "min": null,
           "show": true
         }
-      ]
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "datasource": "Prometheus",
-      "fill": 1,
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 26
-      },
-      "id": 7,
-      "legend": {
-        "alignAsTable": true,
-        "avg": true,
-        "current": true,
-        "hideZero": true,
-        "max": true,
-        "min": true,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "nullPointMode": "null",
-      "percentage": false,
-      "pointradius": 5,
-      "points": false,
-      "renderer": "flot",
-      "seriesOverrides": [],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "ds_replication_replica_remote_replicas_current_delay_seconds",
-          "format": "time_series",
-          "intervalFactor": 2,
-          "legendFormat": "DS({{remote_server_id}}) → DS({{server_id}})",
-          "refId": "A"
-        }
       ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeShift": null,
-      "title": "Current delay",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "format": "s",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": true
-        }
-      ]
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 42
       },
       "id": 18,
       "panels": [],
@@ -986,9 +1251,9 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 8,
+        "w": 6,
         "x": 0,
-        "y": 35
+        "y": 43
       },
       "id": 20,
       "interval": null,
@@ -1005,9 +1270,9 @@
         }
       ],
       "maxDataPoints": 100,
-      "minSpan": null,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1030,7 +1295,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "ds_backend_entry_count{base_dn=~\"$public_basedn\", job=~\"$ds_instance\"}",
+          "expr": "ds_backend_entry_count{base_dn=~\"$public_basedn\", instance=~\"$ds_instance\"}",
           "format": "time_series",
           "instant": true,
           "intervalFactor": 1,
@@ -1052,11 +1317,12 @@
     },
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 46
       },
       "id": 33,
       "panels": [],
@@ -1084,9 +1350,9 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 8,
+        "w": 6,
         "x": 0,
-        "y": 39
+        "y": 47
       },
       "id": 36,
       "interval": null,
@@ -1105,6 +1371,7 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
+      "options": {},
       "postfix": "",
       "postfixFontSize": "50%",
       "prefix": "",
@@ -1121,7 +1388,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "ds_disk_free_space_bytes{job=~\"$ds_instance\", disk=~\"$disk\"}",
+          "expr": "ds_disk_free_space_bytes{instance=~\"$ds_instance\", disk=~\"$disk\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "",
@@ -1143,11 +1410,12 @@
     },
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 50
       },
       "id": 12,
       "panels": [],
@@ -1164,13 +1432,15 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 43
+        "y": 51
       },
+      "hiddenSeries": false,
       "id": 3,
       "legend": {
         "alignAsTable": true,
@@ -1186,6 +1456,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1196,16 +1469,17 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "ds_jvm_memory_used_bytes{job=~\"$ds_instance\"}",
+          "expr": "ds_jvm_memory_used_bytes{instance=~\"$ds_instance\"}",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} JVM Total Memory Usage",
+          "legendFormat": "{{job}} {{instance}} JVM Total Memory Usage",
           "refId": "A",
           "target": "*.ds.jvm-memory-usage.memory-usage.total.used"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Memory Usage",
       "tooltip": {
@@ -1239,7 +1513,11 @@
           "min": null,
           "show": false
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "aliasColors": {},
@@ -1250,13 +1528,15 @@
       "editable": true,
       "error": false,
       "fill": 1,
+      "fillGradient": 0,
       "grid": {},
       "gridPos": {
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 43
+        "y": 51
       },
+      "hiddenSeries": false,
       "id": 4,
       "legend": {
         "alignAsTable": true,
@@ -1272,6 +1552,9 @@
       "linewidth": 2,
       "links": [],
       "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1282,23 +1565,24 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "rate(ds_jvm_garbage_collector_ps_marksweep_count{job=~\"$ds_instance\"}[1m])",
+          "expr": "rate(ds_jvm_garbage_collector_ps_marksweep_count{instance=~\"$ds_instance\"}[1m])",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} GC PS MarkSweep m1_rate",
+          "legendFormat": "{{job}} {{instance}} GC PS MarkSweep m1_rate",
           "refId": "A",
           "target": "perSecond(*.ds.jvm-memory-usage.garbage-collector.*.count)"
         },
         {
-          "expr": "rate(ds_jvm_garbage_collector_ps_scavenge_count{job=~\"$ds_instance\"}[1m])",
+          "expr": "rate(ds_jvm_garbage_collector_ps_scavenge_count{instance=~\"$ds_instance\"}[1m])",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} GC PS Scavenge m1_rate",
+          "legendFormat": "{{job}} {{instance}} GC PS Scavenge m1_rate",
           "refId": "B"
         }
       ],
       "thresholds": [],
       "timeFrom": null,
+      "timeRegions": [],
       "timeShift": null,
       "title": "Garbage Collections",
       "tooltip": {
@@ -1332,15 +1616,20 @@
           "min": null,
           "show": false
         }
-      ]
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
     },
     {
       "collapsed": false,
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 50
+        "y": 58
       },
       "id": 14,
       "panels": [],
@@ -1392,7 +1681,7 @@
         "h": 7,
         "w": 24,
         "x": 0,
-        "y": 51
+        "y": 59
       },
       "id": 8,
       "legend": {
@@ -1410,6 +1699,7 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
+      "options": {},
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -1420,10 +1710,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "ds_certificates_certificate_expires_at_seconds",
+          "expr": "ds_certificates_certificate_expires_at_seconds - time()",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "{{job}} \"{{key_manager}}\", {{alias}}",
+          "legendFormat": "{{job}} {{instance}} \"{{key_manager}}\", {{alias}}",
           "refId": "A"
         }
       ],
@@ -1458,7 +1748,7 @@
           "format": "s",
           "label": "",
           "logBase": 2,
-          "max": null,
+          "max": "2592000",
           "min": "0",
           "show": true
         },
@@ -1474,7 +1764,7 @@
     }
   ],
   "refresh": "10s",
-  "schemaVersion": 16,
+  "schemaVersion": 20,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1483,6 +1773,7 @@
         "allValue": null,
         "current": {},
         "datasource": "Prometheus",
+        "definition": "",
         "hide": 0,
         "includeAll": true,
         "label": null,
@@ -1492,6 +1783,7 @@
         "query": "label_values(ldap_handler)",
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 0,
         "tagValuesQuery": "",
         "tags": [],
@@ -1503,6 +1795,7 @@
         "allValue": null,
         "current": {},
         "datasource": "Prometheus",
+        "definition": "",
         "hide": 0,
         "includeAll": true,
         "label": null,
@@ -1512,6 +1805,7 @@
         "query": "label_values(base_dn)",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
@@ -1523,6 +1817,7 @@
         "allValue": null,
         "current": {},
         "datasource": "Prometheus",
+        "definition": "",
         "hide": 0,
         "includeAll": true,
         "label": null,
@@ -1532,6 +1827,7 @@
         "query": "label_values(ds_backend_entry_count{type=\"db\"}, base_dn)",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
@@ -1543,15 +1839,39 @@
         "allValue": null,
         "current": {},
         "datasource": "Prometheus",
+        "definition": "",
+        "hide": 0,
+        "includeAll": true,
+        "label": null,
+        "multi": true,
+        "name": "ds_job",
+        "options": [],
+        "query": "label_values(ds_start_time_seconds, job)",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {},
+        "datasource": "Prometheus",
+        "definition": "",
         "hide": 0,
         "includeAll": true,
         "label": null,
         "multi": true,
         "name": "ds_instance",
         "options": [],
-        "query": "label_values(ds_start_time_seconds, job)",
+        "query": "label_values(ds_start_time_seconds, instance)",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
@@ -1563,6 +1883,7 @@
         "allValue": null,
         "current": {},
         "datasource": "Prometheus",
+        "definition": "",
         "hide": 0,
         "includeAll": true,
         "label": null,
@@ -1572,6 +1893,7 @@
         "query": "label_values(ds_disk_free_space_bytes, disk)",
         "refresh": 1,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
@@ -1583,6 +1905,7 @@
         "allValue": null,
         "current": {},
         "datasource": "Prometheus",
+        "definition": "",
         "hide": 0,
         "includeAll": true,
         "label": null,
@@ -1592,6 +1915,7 @@
         "query": "label_values(ds_replication_replica_remote_replicas_replayed_updates_count, domain_name)",
         "refresh": 2,
         "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
@@ -1631,7 +1955,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "Directory Services Dashboard",
-  "uid": "wqyXwDkik",
-  "version": 4
+  "title": "ForgeRock Directory Services",
+  "uid": "dsdash2",
+  "version": 2,
+  "description": "Metrics for ForgeRock Directory Services\n"
 }

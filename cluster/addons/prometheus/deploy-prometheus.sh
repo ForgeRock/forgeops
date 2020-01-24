@@ -31,11 +31,8 @@ deploy() {
     
     # Add stable repo to helm
     helm repo add stable https://kubernetes-charts.storage.googleapis.com
-    #helm repo add bitnami https://charts.bitnami.com/bitnami
 
     helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE # --version $VERSION
-
-    #helm upgrade -i grafana bitnami/grafana  -f $GRAFANA_VALUES --namespace=$NAMESPACE
 
     sleep 10
 
@@ -55,7 +52,6 @@ delete() {
     kubectl delete crd podmonitors.monitoring.coreos.com
     kubectl delete crd alertmanagers.monitoring.coreos.com
 
-    #helm delete grafana --namespace=$NAMESPACE
     # Delete forgerock-metrics Helm chart
     helm delete forgerock-metrics --namespace=$NAMESPACE
 
