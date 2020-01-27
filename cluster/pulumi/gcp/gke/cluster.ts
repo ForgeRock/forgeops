@@ -13,7 +13,9 @@ let zones = new Array(config.numOfZones) //array of availabity zones
 // Method to return list of k8s full versions
 function getK8sVersion() {
     return gcp.container.getEngineVersions({
-        location: getAZs(1)[0],
+        // use the region to determine k8s versions.
+        // Not all zones support the same k8s versions
+        location: config.region,
         versionPrefix: config.k8sVersion,
     });
 }
