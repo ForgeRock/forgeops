@@ -10,14 +10,12 @@
 // Pull request pipeline for ForgeOps Docker images
 //=================================================
 
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
-
 import com.forgerock.pipeline.PullRequestBuild
 import com.forgerock.pipeline.reporting.PipelineRun
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def build() {
-
-    properties([buildDiscarder(logRotator(daysToKeepStr: '14', numToKeepStr: '10'))])
+    properties([buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5'))])
 
     // Abort any active builds relating to the current PR, as they are superseded by this build
     abortMultibranchPrBuilds()
@@ -31,7 +29,7 @@ def build() {
 
         for (buildDirectory in buildDirectories) {
             if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
-                stage ("Build ${buildDirectory['name']} image") {
+                stage("Build ${buildDirectory['name']} image") {
                     echo "Building 'docker/${buildDirectory['name']}' ..."
                     buildImage(buildDirectory['name'])
                     currentBuild.description += " ${buildDirectory['name']}"
