@@ -9,7 +9,7 @@ config:
   certmanager:useselfsignedcert: "true"
   certmanager:version: v0.10.0
   dsnodes:ami: ami-0392bafc801b7520f
-  dsnodes:diskSizeGb: "10"
+  dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:instanceType: c5.4xlarge
   dsnodes:maxNodes: "6"
