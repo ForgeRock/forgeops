@@ -29,12 +29,12 @@ config:
   nginxingress:enable: "true"
   nginxingress:k8sNamespace: ingress
   nginxingress:version: 1.24.4
-  prometheus:enable: "true"
-  prometheus:k8sNamespace: monitoring
-  prometheus:version: 6.21.0
   primarynodes:ami: ami-0392bafc801b7520f
   primarynodes:diskSizeGb: "80"
   primarynodes:instanceType: m5.xlarge
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
   primarynodes:nodeCount: "3"
+  prometheus:enable: "true"
+  prometheus:k8sNamespace: monitoring
+  prometheus:version: 6.21.0
