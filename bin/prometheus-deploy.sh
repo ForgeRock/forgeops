@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Deploys prometheus-operator Helm Chart, kube-prometheus charts and Forgerock metrics which include custom
+# Deploys prometheus-operator Helm Chart and Forgerock Metrics which include custom
 # endpoints, alerting rules and Grafana dashboards.
-# ./deploy-prometheus.sh -n namespace - deploy to different namespace that monitoring.
-# ./deploy-prometheus.sh -v values-file - use different custom values file.
-# ./deploy-prometheus.sh -d - delete deployment.
+# ./prometheus-deploy.sh -n namespace - deploy to different namespace that monitoring.
+# ./prometheus-deploy.sh -v values file - use different custom values file.
+# ./prometheus-deploy.sh -d - delete deployment.
 
 # You can deploy your own custom values file by using the -f <values file> flag.
 set -oe pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-PROM_VALUES="${DIR}/prometheus-operator.yaml"
-GRAFANA_VALUES="${DIR}/grafana.yaml"
+ADDONS_DIR="/../cluster/addons/prometheus"
+PROM_VALUES="${DIR}${ADDONS_DIR}/prometheus-operator.yaml"
 VERSION="0.35.0"
 
 USAGE="Usage: $0 [-n <namespace>] [-v <values file>] [-d]"
@@ -37,7 +37,7 @@ deploy() {
     sleep 10
 
     # Install/Upgrade forgerock-servicemonitors
-    helm upgrade -i forgerock-metrics ${DIR}/forgerock-metrics --namespace=$NAMESPACE
+    helm upgrade -i forgerock-metrics ${DIR}${ADDONS_DIR}/forgerock-metrics --namespace=$NAMESPACE
 }
 
 # Delete all
@@ -86,7 +86,7 @@ done
 # Check if -n flag has been included
 [[ $1 != "-n" ]] && NAMESPACE=monitoring
 # set custom yaml file if not provided with the -f arg
-[ $VALUES ] && PROM_VALUES="${DIR}/${VALUES}"
+[ $VALUES ] && PROM_VALUES="${DIR}${ADDONS_DIR}/${VALUES}"
 # delete chart if -d select
 [[ ${1} =~ "-d" ]] && delete
 
