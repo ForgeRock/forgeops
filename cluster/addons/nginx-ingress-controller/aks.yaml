@@ -1,0 +1,16 @@
+controller:
+    kind: Deployment
+    service:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        omitClusterIP: true
+    publishService: 
+        enabled: true
+    stats:
+        enabled: true
+        service:
+            omitClusterIP: true
+    tolerations:
+      - key: "WorkerAttachedToExtLoadBalancer"
+        operator: "Exists"
+        effect: "NoSchedule"
