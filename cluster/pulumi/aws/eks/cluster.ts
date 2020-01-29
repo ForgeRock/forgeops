@@ -89,7 +89,9 @@ export function createStorageClasses(cluster: eks.Cluster){
         },
         provisioner: "kubernetes.io/aws-ebs",
         parameters: {
-            type: "gp2"
+            type: "io1",
+            fstype: "ext4",
+            iopsPerGB: "10"
         }
     }, {provider: cluster.provider});
 

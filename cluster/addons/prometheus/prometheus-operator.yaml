@@ -1,0 +1,69 @@
+alertmanager:
+    enabled: true
+    ingress:
+        # Enable to use external url for Alertmanager.
+        enabled: false
+        annotations: 
+            kubernetes.io/ingress.class : nginx
+            certmanager.k8s.io/cluster-issuer: default-issuer
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        hosts: 
+          - alertmanager.iam.example.com
+        tls:
+          - secretName: sslcert
+            hosts: 
+              - alertmanager.iam.example.com
+
+prometheus:
+    prometheusSpec:
+        serviceMonitorSelectorNilUsesHelmValues: false
+        ruleSelectorNilUsesHelmValues: false
+    ingress:
+        # Enable to use external url for Prometheus.
+        enabled: false
+        annotations: 
+            kubernetes.io/ingress.class: nginx
+            certmanager.k8s.io/cluster-issuer: default-issuer
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        hosts: 
+          - prometheus.iam.example.com
+        tls:
+          - secretName: sslcert
+            hosts: 
+              - prometheus.iam.example.com
+
+grafana:
+    enabled: true
+    adminPassword: password
+    # Enable to use external url for Grafana.
+    ingress:
+        enabled: false
+        annotations: 
+            kubernetes.io/ingress.class : nginx
+            certmanager.k8s.io/cluster-issuer: default-issuer
+            nginx.ingress.kubernetes.io/ssl-redirect: "true"
+        hosts: 
+          - grafana.iam.example.com
+        tls:
+          - secretName: sslcert
+            hosts: 
+              - grafana.iam.example.com
+
+defaultRules:
+    rules:
+        etcd: false
+        kubeApiserver: false
+        kubeScheduler: false
+        kubernetesSystem: false
+
+coreDns:
+    enabled: false
+kubeEtcd:
+    enabled: false
+kubeControllerManager:
+    enabled: false
+kubeProxy:
+    enabled: false
+kube-state-metrics:
+    podSecurityPolicy:
+        enabled: false

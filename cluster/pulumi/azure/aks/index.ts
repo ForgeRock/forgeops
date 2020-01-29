@@ -31,8 +31,11 @@ new k8s.core.v1.Namespace("prod", { metadata: { name: "prod" }}, { provider: k8s
 clusterLib.createStorageClasses(k8sProvider)
 
 
-export const ipGroup = clusterLib.createIpGroup(k8sProvider);
-export const staticIp = clusterLib.createStaticIp(k8sProvider, ipGroup);
+const ipGroup = clusterLib.createIpGroup(k8sProvider);
+const staticIp = clusterLib.createStaticIp(k8sProvider, ipGroup);
+export const ipResourceGroupName = ipGroup.name
+export const staticIpName = staticIp.ipAddress
+
 
 // Assign permission to cluster SP to access IP resource group
 const roleAssignment = new azure.role.Assignment("ip-role", {
