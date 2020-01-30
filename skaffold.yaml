@@ -18,6 +18,7 @@ build:
   - image: idm
     context: docker/7.0/idm
   - image: ds-cts
+
     context: docker/7.0/ds/cts
   - image: ds-idrepo
     context: docker/7.0/ds/idrepo
@@ -57,6 +58,29 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/smoke
+
+# skaffold dev will not work with this, due to a new kustomize api thats being used for patching all objects
+# ensure psp controller is enabled e.g. gcloud beta container clusters update cloud-1472 --enable-pod-security-policy --zone us-east4
+- name: security
+  build:
+    artifacts:
+    - image: am
+      context: docker/7.0/am
+    - image: ds-idrepo
+      context: docker/7.0/ds/idrepo
+    - image: ds-cts
+      context: docker/7.0/ds/cts
+    - image: idm
+      context: docker/7.0/idm
+    - image: amster
+      context: docker/7.0/amster
+    - image: forgeops-secrets
+      context: docker/forgeops-secrets
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/security
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
 - name: small

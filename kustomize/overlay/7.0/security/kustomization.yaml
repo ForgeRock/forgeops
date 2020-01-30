@@ -1,0 +1,101 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: demo
+resources:
+- ../../../base/kustomizeConfig
+- ../../../base/forgeops-secrets
+- ../../../base/am
+- ../../../base/amster
+- ../../../base/idm
+- ../../../base/end-user-ui
+- ../../../base/7.0/ds/cts
+- ../../../base/7.0/ds/idrepo
+- ../../../base/security
+
+configMapGenerator:
+- literals:
+  - FQDN=$(NAMESPACE).iam.example.com
+  - SUBDOMAIN=iam
+  - DOMAIN=example.com
+  name: platform-config
+# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
+vars:
+- fieldref:
+    fieldPath: data.DOMAIN
+  name: DOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- fieldref:
+    fieldPath: data.SUBDOMAIN
+  name: SUBDOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- fieldref:
+    fieldPath: metadata.namespace
+  name: NAMESPACE
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+
+images:
+- name: forgeops-secrets
+  newName: gcr.io/engineering-devops/forgeops-secrets
+  newTag: latest
+patches:
+- patch: &securityContextPatch |-
+    kind: doesnt-matter
+    metadata:
+      name: doesnt-matter
+    spec:
+      template:
+        spec:
+          securityContext:
+            runAsUser: 11111
+            fsGroup: 11111
+  target:
+    kind: Deployment
+    labelSelector: app notin (end-user-ui)
+- patch: *securityContextPatch
+  target:
+    kind: StatefulSet
+    labelSelector: app notin (end-user-ui)
+- patch: *securityContextPatch
+  target:
+    kind: Job
+    labelSelector: app notin (end-user-ui)
+# add default-policy to forgeops-secrets-role
+- patch: |-
+    - op: add
+      path: /rules/-
+      value:
+        apiGroups:
+        - extensions
+        resourceNames:
+        - forgerock-default-policy
+        resources:
+        - podsecuritypolicies
+        verbs:
+        - use
+  target:
+    name: forgeops-secrets-role
+# patch end-user-ui for webserver to run as root
+- patch: |-
+    kind: doesnt-matter
+    metadata:
+      name: doesnt-matter
+    spec:
+      template:
+        spec:
+          serviceAccount: forgerock-webserver
+          securityContext:
+            runAsUser: 0
+            fsGroup: 0
+  target:
+    kind: Deployment
+    labelSelector: app in (end-user-ui)
