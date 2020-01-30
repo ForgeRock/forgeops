@@ -9,7 +9,7 @@ ARG AWSCLI_VERSION=1.16.270
 ARG AWS_IAM_AUTH=1.14.6
 ARG AWS_IAM_DATE=2019-08-22
 ARG CLOUD_SDK_VERSION=278.0.0
-ARG AZURE_VERSION=4.0.0
+ARG AZURE_VERSION=2.0.80
 FROM debian:buster-slim as base
 RUN apt-get update -y \
         && apt-get install -y --no-install-recommends util-linux ca-certificates \
