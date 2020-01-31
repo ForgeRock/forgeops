@@ -76,7 +76,7 @@ spec:
               fieldPath: metadata.namespace
         #- name: JAVA_TOOL_OPTIONS
         - name: OPENDJ_JAVA_ARGS
-          value: "-server -XX:MaxGCPauseMillis=100 -XX:MaxRAMPercentage=75"
+          value: "-server -XX:MaxRAMPercentage=75"
         # Best to let DS calculate this rather than hard code here.
         # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
         #   value: ds-0.ds.default.svc.cluster.local:8989
