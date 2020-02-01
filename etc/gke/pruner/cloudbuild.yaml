@@ -1,0 +1,21 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/engineering-devops/gcr-pruner:latest', '.' ]
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', 'gcr.io/engineering-devops/gcr-pruner:latest']
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - 'beta'
+    - 'run'
+    - 'deploy'
+    - '--service-account=gcr-pruner@engineering-devops.iam.gserviceaccount.com'
+    - '--image=gcr.io/engineering-devops/gcr-pruner:latest'
+    - '--timeout=600'
+    - '--update-env-vars=GCR_PRUNE_DRY_RUN=1'
+    - '--platform=managed'
+    - '--region=us-east1'
+    - 'gcr-pruner'
+images:
+- 'gcr.io/engineering-devops/gcr-pruner:latest'
+
+
