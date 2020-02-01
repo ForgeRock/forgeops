@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Example of deploying an nginx ingress controller using Helm.
+# Script to deploy an nginx ingress controller using Helm3 to either EKS/GKE or AKS.
 set -oe pipefail
 
-# Helm chart values
+# Helm Chart values
 VERSION="0.27.0"
 AKS_OPTS=""
 IP_OPTS=""
@@ -22,17 +22,17 @@ delete() {
 # Output help if no arguments or -h is included
 if [[ $1 == "-h" ]];then
     printf "\nUsage: $0 -e|-g|-a [-i IP] [-r RESOURCE GROUP] [-d]\n"
-    echo "-e  EKS."
-    echo "-g  GKE."
-    echo "-a  AKS."
-    echo "-i  static IP address."
-    echo "-r  IP resource group."
-    echo "-d  delete nginx-ingress Helm chart."
+    echo "-e                        : Deploy to EKS."
+    echo "-g                        : Deploy to GKE."
+    echo "-a                        : Deploy to AKS."
+    echo "-i  <static IP address>   : Provide an existing static IP address(GKE/AKS only)"
+    echo "-r  <resource group name> : Existing IP resource group name."
+    echo "-d                        : delete nginx-ingress Helm chart."
     exit 1
 fi
 
 # Read arguments
-while getopts :aegi:r:d option; do
+while getopts :aegc:i:r:d option; do
     case "${option}" in
         e) PROVIDER="eks";;
         g) PROVIDER="gke";;
@@ -49,12 +49,12 @@ done
 
 #******** VALIDATING ARGUMENTS ********
 # Ensure -p has been provided.
-[ -z "${PROVIDER}" ] && printf "\n** -p flag required **\n\n" && usage
-# If -p is equal to 'gke or aks' then validate IP address format.
+[ -z "${PROVIDER}" ] && printf "\n** Please provide a provider flag (-g|-e|-a) **\n\n" && usage
+# If -g or -a selected with -i then validate IP address format.
 [[ "${PROVIDER}" =~ ^(gke|aks)$ ]] && [ "${IP}" ] && [[ ! "${IP}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && printf '\n** IP address is not valid **\n\n' && usage
-# If -p is equal to 'gke or aks' then validate IP address format.
+# If -g or -a selected with -i then set loadbalancer IP field.
 [[ "${PROVIDER}" =~ ^(gke|aks)$ ]] && [ "${IP}" ] && IP_OPTS="--set controller.service.loadBalancerIP=${IP}"
-# If -p is equal to 'gke', ensure -i is provided.
+# If -e is selected with -i, echo that IP address will be ignored
 [[ "${PROVIDER}" =~ ^(eks)$ ]] && [ "${IP}" ] && printf "\n** IP address not required for EKS so ignoring **\n\n" && usage
 # If -p is equal to 'aks', ensure -g is provided.
 [[ "${PROVIDER}" =~ ^(aks)$ ]] && [ "${IP}" ] && [ -z "${RESOURCE_GROUP}" ] && printf "\n** AKS IP resource group required **\n\n" && usage

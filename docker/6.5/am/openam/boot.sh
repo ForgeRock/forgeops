@@ -43,6 +43,9 @@ else
     cp /var/run/secrets/am/boot/.keypass /home/forgerock/openam/am
     cp /var/run/secrets/am/boot/keystore.jceks /home/forgerock/openam/am
 
+    echo "Copying amster transport key"
+    cp /var/run/secrets/amster/authorized_keys /home/forgerock/openam
+
     echo "Generating .openamcfg"
     mkdir -p  /home/forgerock/.openamcfg
     echo "/home/forgerock/openam"  > /home/forgerock/.openamcfg/AMConfig_usr_local_tomcat_webapps_am_

@@ -1,5 +1,6 @@
 controller:
     kind: Deployment
+    replicaCount: 2
     service:
         type: LoadBalancer
         externalTrafficPolicy: Local
