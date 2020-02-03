@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-f7a0346ae15eae49a154d5cf7f2ed0ed31f551c6
+FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-4ec9c91cacb5a2f1d7b17933948e6fe175dc030a
 
 COPY --chown=forgerock:root .  /opt/opendj/
 ARG profile_version
