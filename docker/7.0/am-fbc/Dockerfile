@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am/pit1:7.0.0-cd882247cf64d9c7c1a62074bfe57687b1e23a8b
+FROM gcr.io/forgerock-io/am/pit1:7.0.0-2c94d6b0f8fa79b87e808dd17def783093cbc05e
 
 # This is where you would copy in custom web.xml, add jar files, javascript, etc.
 # The AM war is expanded to /usr/local/tomcat/webapps/am
