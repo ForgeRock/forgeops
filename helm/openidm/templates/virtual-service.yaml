@@ -12,6 +12,8 @@ spec:
       { uri: { prefix: "/idm" }},
       { uri: { prefix: "/api" }},
       { uri: { prefix: "/openidm" }},
+      { uri: { prefix: "/upload" }},
+      { uri: { prefix: "/export" }},
       { uri: { prefix: "/oauthReturn" }},
       { uri: { prefix: "/admin" }}
     ],
