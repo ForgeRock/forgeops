@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script to deploy an nginx ingress controller using Helm3 to either EKS/GKE or AKS.
-set -oe pipefail
+#set -oe pipefail
 
 # Helm Chart values
 VERSION="0.27.0"
@@ -42,13 +42,13 @@ while getopts :aegc:i:r:d option; do
         d) delete;;
         h) usage ;;
         \?) echo "Error: Incorrect usage"
-            echo usage
+            usage
             exit 1;;
     esac
 done
 
 #******** VALIDATING ARGUMENTS ********
-# Ensure -p has been provided.
+# Ensure provider flag has been provided.
 [ -z "${PROVIDER}" ] && printf "\n** Please provide a provider flag (-g|-e|-a) **\n\n" && usage
 # If -g or -a selected with -i then validate IP address format.
 [[ "${PROVIDER}" =~ ^(gke|aks)$ ]] && [ "${IP}" ] && [[ ! "${IP}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && printf '\n** IP address is not valid **\n\n' && usage

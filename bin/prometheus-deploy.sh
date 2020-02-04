@@ -32,33 +32,39 @@ deploy() {
     # Add stable repo to helm
     helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
-    helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE # --version $VERSION
+    helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE 
 
-    sleep 10
-
+    kubectl -n $NAMESPACE wait --for condition=established --timeout=60s \
+        crd/prometheuses.monitoring.coreos.com \
+        crd/servicemonitors.monitoring.coreos.com \
+        crd/servicemonitors.monitoring.coreos.com \
+        crd/podmonitors.monitoring.coreos.com \
+        crd/alertmanagers.monitoring.coreos.com
+        
     # Install/Upgrade forgerock-servicemonitors
     helm upgrade -i forgerock-metrics ${DIR}${ADDONS_DIR}/forgerock-metrics --namespace=$NAMESPACE
 }
 
 # Delete all
 delete() {
-    # Delete Prometheus Operator Helm chart
-    helm delete prometheus-operator --namespace=$NAMESPACE
 
-    # Delete CRDs
-    kubectl delete crd prometheuses.monitoring.coreos.com
-    kubectl delete crd prometheusrules.monitoring.coreos.com
-    kubectl delete crd servicemonitors.monitoring.coreos.com
-    kubectl delete crd podmonitors.monitoring.coreos.com
-    kubectl delete crd alertmanagers.monitoring.coreos.com
+    set +e
+
+    # Delete Prometheus Operator Helm chart
+    helm uninstall prometheus-operator --namespace=$NAMESPACE
 
     # Delete forgerock-metrics Helm chart
     helm delete forgerock-metrics --namespace=$NAMESPACE
 
-    sleep 10
+    # Delete CRDs
+    kubectl delete --wait=true crd prometheuses.monitoring.coreos.com
+    kubectl delete --wait=true crd prometheusrules.monitoring.coreos.com
+    kubectl delete --wait=true crd servicemonitors.monitoring.coreos.com
+    kubectl delete --wait=true crd podmonitors.monitoring.coreos.com
+    kubectl delete --wait=true crd alertmanagers.monitoring.coreos.com
 
     # Delete monitoring namespace
-    kubectl delete ns monitoring
+    kubectl delete ns $NAMESPACE
     exit 1
 }
 
