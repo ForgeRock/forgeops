@@ -2,11 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import * as k8s from "@pulumi/kubernetes";
 import * as config from "./config";
-import * as ingress from "../../packages/nginx-ingress-controller";
-import { Provider } from "@pulumi/gcp";
-import * as cm from "../../packages/cert-manager";
-import * as prometheus from "../../packages/prometheus";
-import * as localSsd from "../../packages/local-ssd-provisioner";
+import * as localSsd from "./local-ssd-provisioner";
 
 let zones = new Array(config.numOfZones) //array of availabity zones
 
@@ -183,93 +179,10 @@ export function createNamespaces(clusterProvider: k8s.Provider) {
 
 // Check to see if static IP address has been provided. If not, create 1
 export function assignIp() {
-    if (config.ip !== undefined) {
-        let a: pulumi.Output<string> = pulumi.concat(config.ip);
-        return (a);
-    } else {
-        const staticIp = new gcp.compute.Address(config.clusterName + "-ip", {
-            addressType: "EXTERNAL"
-        });
-        return staticIp.address;
-    }
-}
-
-/************ NGINX INGRESS CONTROLLER ************/
-
-// Call ngin-ingress-controller package to deploy Nginx Ingress Controller
-export function deployIngressController(ip: pulumi.Output<string>, clusterProvider: Provider, cluster: gcp.container.Cluster, nodePools: gcp.container.NodePool[]) {
-    const nginxConfig = new pulumi.Config("nginx");
-
-    const gkeHelmValues: any = {
-        controller: {
-            // kind: "DaemonSet",
-            publishService: {enabled: true},
-            stats: {
-                enabled: true,
-                service: { omitClusterIP: true }
-            },
-            service: {
-                type: "LoadBalancer",
-                externalTrafficPolicy: "Local",
-                loadBalancerIP: ip,
-                omitClusterIP: true
-            },
-            tolerations: [{
-                key: "WorkerDedicatedFrontend",
-                operator: "Exists",
-                effect: "NoSchedule",
-                }
-            ],
-            nodeSelector: {"frontend": "true"},
-        },
-    }
-
-    // Set values for nginx Helm chart
-    const nginxValues: ingress.PkgArgs = {
-        ip: ip,
-        version: config.nginxVersion,
-        clusterProvider: clusterProvider,
-        dependencies: [cluster, nodePools],
-        helmValues: config.enableFrontEndPool ? gkeHelmValues : {}
-    }
-
-    // Deploy Nginx Ingress Controller Helm chart
-    new ingress.NginxIngressController(nginxValues);
-}
-
-/************ CERTIFICATE MANAGER ************/
-
-// Call cert-manager package to deploy cert-manager
-export function deployCertManager(clusterProvider: Provider, cluster: gcp.container.Cluster, nodePools: gcp.container.NodePool[]) {
-    const cmConfig = new pulumi.Config("certmanager");
-
-    const cmArgs: cm.PkgArgs = {
-        tlsKey: cmConfig.require("tls-key"),
-        tlsCrt: cmConfig.require("tls-crt"),
-        clusterProvider: clusterProvider,
-        cloudDnsSa: cmConfig.get("clouddns") || "",
-        dependsOn: [cluster, nodePools],
-        version: cmConfig.require("version"),
-        useSelfSignedCert: cmConfig.requireBoolean("useselfsignedcert"),
-    };
-
-    // Deploy Cert Manager
-    new cm.CertManager(cmArgs);
-}
-
-/************ PROMETHEUS OPERATOR ************/
-
-export function createPrometheus(cluster: gcp.container.Cluster, provider: k8s.Provider, nodePools: gcp.container.NodePool[]){
-    const prometheusArgs: prometheus.PkgArgs = {
-        version: config.prometheusConfig.version,
-        namespaceName: config.prometheusConfig.k8sNamespace,
-        k8sVersion: config.k8sVersion,
-        provider: provider,
-        dependsOn: [cluster, nodePools],
-        enableExternal: config.prometheusConfig.enableExternal,
-        hostname: config.prometheusConfig.hostname
-    }
-    return new prometheus.Prometheus(prometheusArgs)
+    const staticIp = new gcp.compute.Address(config.clusterName + "-ip", {
+        addressType: "EXTERNAL"
+    });
+    return staticIp.address;
 }
 
 /************ LOCAL SSD PROVISIONER ************/

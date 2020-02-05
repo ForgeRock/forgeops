@@ -2,17 +2,12 @@ import * as pulumi from "@pulumi/pulumi";
 import { Config } from "@pulumi/pulumi";
 
 const cluster = new Config("cluster");
-const nginx = new Config("nginxingress");
 const primaryPool = new Config("primarynodes");
 const secondaryPool = new Config("secondarynodes");
 const dsPool = new Config("dsnodes");
 const frontEndPool = new Config("frontendnodes");
-const cm = new Config("certmanager");
-const prom = new Config("prometheus");
 const local = new Config("localssdprovisioner");
 const gcp = new Config("gcp");
-
-export let localSsdFlag: Boolean = false
 
 // **************** PROJECT CONFIG ****************
 export const project = new pulumi.Config(pulumi.getProject());
@@ -21,22 +16,18 @@ export const project = new pulumi.Config(pulumi.getProject());
 export const enableSecondaryPool = secondaryPool.requireBoolean("enable");
 export const enableDSPool = dsPool.requireBoolean("enable");
 export const enableFrontEndPool = frontEndPool.requireBoolean("enable");
-export const enableNginxIngress = nginx.requireBoolean("enable");
-export const enableCertManager = cm.requireBoolean("enable");
-export const enablePrometheus = prom.requireBoolean("enable");
 export const enableLocalSsdProvisioner = local.requireBoolean("enable");
 
 // **************** NETWORK CONFIG ****************
 export const stackRef = cluster.get("infraStackName") || "gcp-infra"
 export const vpcName = cluster.get("vpcName");
-export const ip = cluster.get<string>("staticIp") || undefined;
+export const ip = cluster.requireBoolean("createStaticIp");
 
 // **************** CLUSTER CONFIG ****************
 export const clusterName = cluster.require("name");
 export const numOfZones = cluster.requireNumber("availabilityZoneCount");
 export const k8sVersion = cluster.get("k8sVersion") || "latest";
 export const region = gcp.get("region") || "us-east1";
-export const nginxVersion = nginx.require("version");
 export const disableIstio = cluster.getBoolean("disableIstio") || true;
 export const disableHPA = cluster.getBoolean("disableHorizontalPodAutoscaling") || true;
 export let namespaces: Array<string> = cluster.getObject("namespaces") || ["prod"];
@@ -186,25 +177,6 @@ export const ds:NodePool = {
     taints: dsTaints,
     localSsdCount: dsPool.getNumber("localSsdCount") || 0
 };
-
-// **************** PROMETHEUS VALUES ****************
-export interface prometheusConfiguration {
-    k8sNamespace: string;
-    version: string;
-    hostname: string;
-    enableExternal: boolean;
-}
-
-function getPrometheusConfig(): prometheusConfiguration {
-    let val: prometheusConfiguration = {
-        k8sNamespace: prom.require("k8sNamespace"),
-        version: prom.require("version"),
-        enableExternal: prom.requireBoolean("extAccessEnable"),
-        hostname: prom.require("extAccessHostname")
-    }
-    return val;
-}
-export const prometheusConfig = getPrometheusConfig();
 
 // **************** LOCAL SSD VALUES ****************
 export const localSsdVersion = local.get("version") || "v2.2.1";

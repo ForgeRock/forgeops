@@ -27,7 +27,7 @@ export class LocalSsdProvisioner {
         this.namespaceName = args.namespaceName;
         this.cluster = args.cluster;
 
-        let yamlFile: string = '../../packages/local-ssd-provisioner/files/local-ssd-provisioner.yaml';
+        let yamlFile: string = 'local-ssd-provisioner/files/local-ssd-provisioner.yaml';
 
         // Create namespace
         const namespace = new k8s.core.v1.Namespace("localSsdProvisionerNamespace", {

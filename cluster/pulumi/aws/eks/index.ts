@@ -1,6 +1,5 @@
 import * as aws from "@pulumi/aws";
 import * as eks from "@pulumi/eks";
-import * as k8s from "@pulumi/kubernetes";
 import * as utils from "../utils/utils";
 import * as config from "./config";
 import * as clusterLib from "./cluster";
@@ -91,17 +90,6 @@ if (config.frontendNodeGroupConfig.enable){
     clusterLib.addSecurityGroupRule("traffic-from-frontend8080", 8080,
                                     primaryNodeGroup.nodeSecurityGroup.id, undefined, frontendNodeGroup.nodeSecurityGroup.id);
 
-    if (config.prometheusConfig.enable){
-        clusterLib.addSecurityGroupRule("prometheus-kubeproxy", 10249,
-                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, primaryNodeGroup.nodeSecurityGroup.id);
-
-        clusterLib.addSecurityGroupRule("prometheus-kubelet", 10250,
-                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, primaryNodeGroup.nodeSecurityGroup.id);
-
-        clusterLib.addSecurityGroupRule("prometheus-nodeexp", 9100,
-                                        frontendNodeGroup.nodeSecurityGroup.id, undefined, primaryNodeGroup.nodeSecurityGroup.id);
-    }
-
 
     //if dedicatedFrontend nodes are enabled, attach LB to frontend, else attach to workerNodes
     groupNeedingLBAttachment = frontendNodeGroup;
@@ -140,12 +128,6 @@ if (config.dsNodeGroupConfig.enable){
     ingressPortMap["http"] = 8080;
     ingressPortMap["https"] = 8443;
 
-    if (config.prometheusConfig.enable){
-        ingressPortMap["prometheus-kubeproxy"] = 10249
-        ingressPortMap["prometheus-kubelet"] = 10250
-        ingressPortMap["prometheus-nodeexp"] = 9100
-    }
-
     new aws.ec2.SecurityGroupRule("DS-All-Traffic", {
         sourceSecurityGroupId: dsNodeGroup.nodeSecurityGroup.id,
         fromPort: 0, toPort: 65535, protocol: '-1',
@@ -170,18 +152,3 @@ groupNeedingLBAttachment.cfnStack.outputs.apply(s => {
 
 // ********************** STORAGE CLASSES **************
 clusterLib.createStorageClasses(cluster);
-
-// ********************** INGRESS CONTROLLER **************
-if (config.ingressConfig.enable){
-    clusterLib.createNginxIngress(cluster)
-}
-
-// ********************** CERTIFICATE MANAGER **************
-if (config.cmConfig.enable){
-    clusterLib.createCertManager(cluster);
-}
-
-// ********************** PROMETHEUS **************
-if (config.prometheusConfig.enable){
-    clusterLib.createPrometheus(cluster);
-}

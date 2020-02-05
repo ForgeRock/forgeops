@@ -1,32 +1,8 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
-import * as utils from "../utils/utils";
-
 
 const stackConfig = new pulumi.Config();
 const infraReference = new pulumi.StackReference("aws-infra"); 
-
-export interface ingressConfiguration {
-    enable: boolean;
-    k8sNamespace: string;
-    version: string;
-}
-
-export interface certManagerConfiguration{
-
-    enable: boolean;
-    useSelfSignedCert: boolean;
-    tlsCrt?: string;
-    tlsKey?: string;
-    cloudDnsSa: string;
-    version: string;
-}
-
-export interface prometheusConfiguration {
-    enable: boolean;
-    k8sNamespace: string;
-    version: string;
-}
 
 export interface clusterConfiguration {
     k8sVersion: string;
@@ -59,43 +35,6 @@ export interface infrastructureConfig {
     clusterAdminRole: aws.iam.Role;
     loadBalancerTargetGroups: pulumi.Output<any>[];
 }
-
-function getIngressConfig(namespace : string): ingressConfiguration {
-    let ingressConfig = new pulumi.Config(namespace);
-    let val: ingressConfiguration = {
-            enable: ingressConfig.requireBoolean("enable"),
-            version: ingressConfig.require("version"),
-            k8sNamespace: ingressConfig.require("k8sNamespace"),
-    };
-    return val;
-}
-export const ingressConfig = getIngressConfig("nginxingress");
-
-
-function getCertManagerConfig(namespace : string): certManagerConfiguration{
-    let cmConfig = new pulumi.Config(namespace);
-    let val: certManagerConfiguration = {
-        enable: cmConfig.requireBoolean("enable"),
-        useSelfSignedCert: cmConfig.requireBoolean("useselfsignedcert"),
-        version: cmConfig.require("version"),
-        tlsKey: cmConfig.get("tls-key") || "",
-        tlsCrt: cmConfig.get("tls-crt") || "",
-        cloudDnsSa: cmConfig.get("clouddns") || "",
-    }
-    return val;
-}
-export const cmConfig = getCertManagerConfig("certmanager");
-
-function getPrometheusConfig(namespace: string): prometheusConfiguration {
-    let promconfig = new pulumi.Config(namespace);
-    let val: prometheusConfiguration = {
-        enable: promconfig.requireBoolean("enable"),
-        version: promconfig.require("version"),
-        k8sNamespace: promconfig.require("k8sNamespace")
-    } 
-    return val;
-}
-export const prometheusConfig = getPrometheusConfig("prometheus");
 
 function getNodeGroupConfig(namespace : string): nodeGroupConfiguration{
     let tempconfig = new pulumi.Config(namespace);

@@ -2,75 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as eks from "@pulumi/eks";
 import * as k8s from "@pulumi/kubernetes";
-import * as cm from "../../packages/cert-manager";
-import * as ingress from "../../packages/nginx-ingress-controller";
-import * as prometheus from "../../packages/prometheus";
 import * as config from "./config"
-
-
-export function createNginxIngress(cluster: eks.Cluster){
-    const eksHelmValues = {
-
-        controller: {
-                    kind: "DaemonSet",
-                    daemonset: {
-                        useHostPort: true,
-                        hostPorts: {
-                            http: 30080,
-                            https: 30443,
-                        }
-                    },
-                    tolerations: [{
-                        key: "WorkerAttachedToExtLoadBalancer",
-                        operator: "Exists",
-                        effect: "NoSchedule",
-                        }
-                    ],
-                    nodeSelector: {"frontend": "true"},
-                    publishService: {enabled: true},
-                    stats: {
-                        enabled: true,
-                        service: { omitClusterIP: true }
-                    },
-                    service: {
-                        enabled: false,
-                        type: "ClusterIP",
-                        omitClusterIP: true,
-                    },
-                }
-    }
-    const ingressArgs: ingress.PkgArgs = {
-        version: config.ingressConfig.version,
-        clusterProvider: cluster.provider,
-        dependencies: [cluster.provider],
-        helmValues: eksHelmValues
-    }
-    return new ingress.NginxIngressController(ingressArgs);
-}
-
-export function createCertManager(cluster: eks.Cluster){
-    const cmArgs: cm.PkgArgs = {
-        version: config.cmConfig.version,
-        useSelfSignedCert: config.cmConfig.useSelfSignedCert,
-        tlsKey: config.cmConfig.tlsKey || "",
-        tlsCrt: config.cmConfig.tlsCrt || "",
-        cloudDnsSa: config.cmConfig.cloudDnsSa || "",
-        clusterProvider: cluster.provider,
-        dependsOn: [cluster],
-    }
-    return new cm.CertManager(cmArgs);
-}
-
-export function createPrometheus(cluster: eks.Cluster){
-    const prometheusArgs: prometheus.PkgArgs = {
-        version: config.prometheusConfig.version,
-        namespaceName: config.prometheusConfig.k8sNamespace,
-        k8sVersion: config.clusterConfig.k8sVersion,
-        provider: cluster.provider,
-        dependsOn: [cluster],
-    }
-    return new prometheus.Prometheus(prometheusArgs)
-}
 
 export function createStorageClasses(cluster: eks.Cluster){
     new k8s.storage.v1.StorageClass("sc-standard", {
