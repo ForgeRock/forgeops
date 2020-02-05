@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 helm/
 tmp
+node_modules
+.virt

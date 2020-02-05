@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/engineering-devops/gcr-pruner:latest', '.' ]
+  args: [ 'build', '-t', 'gcr.io/engineering-devops/gcr-pruner:latest', '-f', 'etc/gke/pruner/Dockerfile', 'etc/gke/pruner' ]
 - name: 'gcr.io/cloud-builders/docker'
   args: [ 'push', 'gcr.io/engineering-devops/gcr-pruner:latest']
 - name: 'gcr.io/cloud-builders/gcloud'
