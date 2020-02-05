@@ -22,7 +22,6 @@ configMapGenerator:
   - AM_URL=https://$(NAMESPACE).iam.example.com/am
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/admin
   - IDM_REST_URL=https://$(NAMESPACE).iam.example.com/openidm
-  - ENDUSER_UI_URL=https://$(NAMESPACE).iam.example.com/enduser
 
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
