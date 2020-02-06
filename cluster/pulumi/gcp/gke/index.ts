@@ -40,7 +40,7 @@ export const kubeconfig = gke.createKubeconfig(cluster);
 const clusterProvider = gke.createClusterProvider(kubeconfig);
 
 // Add Node Pools
-const nodes = gke.addNodePools(cluster.name)
+gke.addNodePools(cluster.name)
 
 // Create storage classes
 gke.createStorageClasses(clusterProvider);
@@ -48,31 +48,16 @@ gke.createStorageClasses(clusterProvider);
 // Create namespaces
 gke.createNamespaces(clusterProvider);
 
-//gke.createNetworkLoadbalancer(network, ip, cluster.instanceGroupUrls);
+let loadbalancerIp
 
-/************ NGINX INGRESS CONTROLLER ************/
-
-// Export the nginx ingress IP.
-export const loadbalancerIp = gke.assignIp();
-
-// Deploy nginx ingress controller if enable = true
-if (config.enableNginxIngress) {
-    gke.deployIngressController(loadbalancerIp, clusterProvider, cluster, nodes)
+// Create Static IP or Export the static ingress IP.
+if (config.ip){
+    loadbalancerIp = gke.assignIp();
 }
 
-/************ CERTIFICATE MANAGER ************/
+export const ip = loadbalancerIp
 
-//Deploy cert-manager if enable = true
-if (config.enableCertManager){
-    gke.deployCertManager(clusterProvider, cluster, nodes);
-}
-
-// ********************** PROMETHEUS **************
-if (config.enablePrometheus){
-    gke.createPrometheus(cluster, clusterProvider, nodes);
-}
-
-// ********************** PROMETHEUS ************** 
+// Deploy local ssd provisioner
 if (config.enableLocalSsdProvisioner){
     gke.deployLocalSsdProvisioner(cluster, clusterProvider);
 }

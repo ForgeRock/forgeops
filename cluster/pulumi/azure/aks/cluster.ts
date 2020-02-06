@@ -2,11 +2,6 @@ import * as azure from "@pulumi/azure";
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import * as config from "./config";
-import * as cm from "../../packages/cert-manager";
-import * as ingressController from "../../packages/nginx-ingress-controller"
-import * as prometheus from "../../packages/prometheus";
-
-
 
 export function createCluster(): azure.containerservice.KubernetesCluster {
 
@@ -83,20 +78,6 @@ export function createStorageClasses(provider: k8s.Provider){
     }, { provider: provider } );
 }
 
-
-export function createCertManager(provider: k8s.Provider){
-    const cmArgs: cm.PkgArgs = {
-        version: config.cmConfig.version,
-        useSelfSignedCert: config.cmConfig.useSelfSignedCert,
-        tlsKey: config.cmConfig.tlsKey || "",
-        tlsCrt: config.cmConfig.tlsCrt || "",
-        cloudDnsSa: config.cmConfig.cloudDnsSa || "",
-        clusterProvider: provider,
-        dependsOn: [provider],
-    }
-    return new cm.CertManager(cmArgs);
-}
-
 export function createIpGroup(provider: k8s.Provider): azure.core.ResourceGroup{
     let ipGroup : any
     if ( config.clusterConfig.staticIpName !== undefined ) {
@@ -140,45 +121,4 @@ export function createStaticIp(provider: k8s.Provider, ipGroup: azure.core.Resou
         });
     }
     return staticIp;
-}
-
-export function createNginxIngress(provider: k8s.Provider, ipGroup: azure.core.ResourceGroup, statIp: azure.network.PublicIp){
-
-    // Set nginx load balancer annotation
-    const azLbType = {"service\.beta\.kubernetes\.io/azure-load-balancer-resource-group": ipGroup.name};
-
-    const aksHelmValues = {
-        controller: {
-                    tolerations: [{
-                        key: "WorkerAttachedToExtLoadBalancer",
-                        operator: "Exists",
-                        effect: "NoSchedule",
-                        }
-                    ],
-                }
-    }
-
-    // Set values for nginx Helm chart
-    const nginxValues: ingressController.PkgArgs = {
-        ip: statIp.ipAddress,
-        version: config.ingressConfig.version,
-        clusterProvider: provider,
-        dependencies: [provider],
-        annotations: azLbType,
-        helmValues: aksHelmValues
-    };
-
-    // Deploy Nginx Ingress Controller Helm chart
-    return new ingressController.NginxIngressController(nginxValues);
-}
-
-export function createPrometheus(provider: k8s.Provider){
-    const prometheusArgs: prometheus.PkgArgs = {
-        version: config.prometheusConfig.version,
-        namespaceName: config.prometheusConfig.k8sNamespace,
-        k8sVersion: config.clusterConfig.k8sVersion,
-        provider: provider,
-        dependsOn: [provider],
-    }
-    return new prometheus.Prometheus(prometheusArgs)
 }

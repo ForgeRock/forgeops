@@ -53,20 +53,5 @@ if (config.clusterConfig.acrResourceGroupName) {
     });
 }
 
-// ********************** INGRESS CONTROLLER **************
-if (config.ingressConfig.enable) {
-    clusterLib.createNginxIngress(k8sProvider, ipGroup, staticIp)
-}
-
-// ********************** CERTIFICATE MANAGER **************
-if (config.cmConfig.enable){
-    clusterLib.createCertManager(k8sProvider)
-}
-
-// ********************** PROMETHEUS **************
-if (config.prometheusConfig.enable){
-    clusterLib.createPrometheus(k8sProvider);
-}
-
 
 
