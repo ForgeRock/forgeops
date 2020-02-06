@@ -50,14 +50,14 @@ generatorOptions:
 vars:
 - name: DOMAIN
   fieldref:
-    fieldPath: data.DOMAIN
+    fieldpath: data.DOMAIN
   objref:
     apiVersion: v1
     kind: ConfigMap
     name: platform-config
 - name: SUBDOMAIN
   fieldref:
-    fieldPath: data.SUBDOMAIN
+    fieldpath: data.SUBDOMAIN
   objref:
     apiVersion: v1
     kind: ConfigMap
