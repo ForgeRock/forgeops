@@ -36,16 +36,6 @@ configMapGenerator:
   - ADMIN_CLIENT_ID=idmAdminClient
   - THEME=default
 
-secretGenerator:
-- name: sslcert
-  files:
-    - secret/ca.crt
-    - secret/tls.crt
-    - secret/tls.key
-  type: "kubernetes.io/tls"
-generatorOptions:
-    disableNameSuffixHash: true
-
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
 - name: DOMAIN
