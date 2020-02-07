@@ -1,6 +1,7 @@
 encryptionsalt: v1:VjheTQ4LR1U=:v1:bjn1LLyB+wgucUoA:O417tG1IjVlYCSUuixD2XQCdqtP4lg==
 config:
   cluster:availabilityZoneCount: "3"
+  cluster:createStaticIp: "true"
   cluster:k8sVersion: "1.14"
   cluster:name: cdm-small
   dsnodes:autoScaling: "false"
