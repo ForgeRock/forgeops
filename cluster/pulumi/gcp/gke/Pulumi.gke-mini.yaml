@@ -6,7 +6,7 @@ config:
   cluster:name: dev-mini
   dsnodes:enable: "false"
   frontendnodes:enable: "false"
-  gcp:region: us-east4
+  gcp:region: us-east1
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   primarynodes:autoScaling: "false"

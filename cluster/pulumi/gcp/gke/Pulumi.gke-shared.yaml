@@ -5,7 +5,7 @@ config:
   cluster:name: dev-shared
   dsdedicatednodes:enable: "false"
   frontenddedicatednodes:enable: "false"
-  gcp:region: us-east4
+  gcp:region: us-east1
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   primarynodes:autoScaling: "true"
