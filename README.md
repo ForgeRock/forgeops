@@ -5,6 +5,18 @@ Kubernetes deployment for the ForgeRock platform.
 This repository provides Docker and Kustomize artifacts for deploying both 6.5 and 7.0 (under development) products
 to a Kubernetes cluster. If you are starting out, using the `master` branch is recommended.
 
+## Quick Start
+
+```bash
+# Initialize the configuration profile. Important!!!
+bin/config.sh -v 7.0 init
+# Add the ingress IP to your /etc/hosts. Create an entry for default.iam.example.com
+minikube ip
+# run skaffold in dev mode
+skaffold dev
+# Open https://default.iam.example.com/am  in your browser
+```
+
 ## Documentation
 
 The draft ForgeRock DevOps Developer's Guides
@@ -38,11 +50,11 @@ to the samples.
 
 The provided configuration
 is a basic installation that can be further extended by developers to meet their requirements. Developers should fork
-this repository in Git, and modify the various configuration files.
+this repository in Git, clone the fork, and modify the various configuration files.
 
 The configuration provides the following features:
 
-* Deployments for ForgeRock AM, IDM, DS and IG. IG is not deployed by default.
+* Deployments for ForgeRock AM, IDM, DS and IG. IG is available but not deployed by default.
 * AM is configured with a single root realm
 * A number of OIDC clients are configured for the AM/IDM integration and the smoke tests.
 ** Note the `idm-provisioning`, `idmAdminClient` and the `endUserUI` client configurations are required for the
@@ -68,14 +80,10 @@ separate postgres SQL database is *NOT* required.
 When deployed, the following URLs are available (The domain name below is the default
 for minikube and can be modified for your environment)
 
-* https://default.iam.example.com/web - web landing page
 * https://default.iam.example.com/am  - Access manager admin  (amadmin/password)
-* https://default.iam.example.com/admin - IDM admin (login with amadmin credentials)
-* https://default.iam.example.com/enduser  - End User UI page
+* https://default.iam.example.com/admin - IDM admin (login with amadmin credentials on 7.0)
+* https://default.iam.example.com/platform  - 7.0 Admin landing page (under development)
 * https://default.iam.example.com/ig  - Identity Gateway (Optional)
-
-The various configuration files are located in the `docker` and bundled with their respective
-products (amster, idm, ig, am).
 
 ## Managing Configurations
 
@@ -85,13 +93,16 @@ A number of configuration profiles and product versions are under the [config](c
 of the folder structure is `config/$VERSION/$PROFILE` - where VERSION is the ForgeRock product version (6.5,7.0) and
 PROFILE is the configuration profile that makes up the deployment.
 
-The `config/` directory is under version control. The target `docker/{version}/{product}/conf` directories are not versioned (via
-.gitignore). The workflow is that initial configuration is copied from the `config/` directory to the target `docker/`
-folder.  During development, configuration is exported back out of the running products to the `docker` folder, and
-then optionally copied back to the `config/` folder where it can be committed to version control.
+The `config/` directory is under version control. The target `docker/{version}/{product}/conf` directories are NOT versioned (via
+.gitignore). Configuration is copied from the git versioned `/conf` folder to the non versioned docker folder. Consider the
+configuration under docker/ to be a staging area.  During development, configuration can be exported out of the running
+product (e.g. AM or IDM) to the staging area, and if
+desired, copied back out to the git verioned `config/` folder where it can be committed to version control.
 
+The `bin/config.sh` script automates the copy / export process. The `init` command is used to initialize
+(copy from /conf/ to the staging area under docker).
 
-The `bin/config.sh` utility takes the following arguments:
+`config.sh` takes the following arguments:
 
 * `--profile <profile>` : Specifies the profile. The default is the `cdk`. The environment variable $CDK_PROFILE can
   override the default.
@@ -119,8 +130,7 @@ bin/config.sh --profile test
 #
 ```
 
-
-The `export` command is used to export configuration from a running instance (e.g., IDM) back to the `docker` folder. Note that not all
+The `export` command is used to export configuration from a running instance (e.g., IDM) back to the `docker` staging folder. Note that not all
 components support export functionality (currently just IDM and amster).
 
 ```bash
@@ -144,7 +154,6 @@ The `diff` command runs GNU `diff` to show the difference between the `docker/` 
 ```bash
 bin/config.sh --component idm --profile cdk diff
 ```
-
 
 Finally, the `sync` command combines the `export` and `save` functions into a single command:
 
@@ -200,7 +209,7 @@ build:
         profile_version: "6.5"
 ```
 
-By default, the latest setup-profile version is always deployed.
+By default, the latest setup-profile version (7.0) is deployed.
 
 ## Secrets
 
@@ -209,6 +218,18 @@ randomly generate secrets for the ForgeRock Identity Platform using the forgeops
 For more information about randomly generating secrets, see the
 [forgeops-secrets README](docker/forgeops-secrets/forgeops-secrets-image/README.md)
 
+
+## Development SSL Certificates
+
+If you are on minikube and would like to use a certificate that is accepted by your browser,  we suggest using
+the [mkcert](https://github.com/FiloSottile/mkcert) program.  Nginx will look for a TLS secret in the namespace
+called `sslcert` (this is defined by the ingress definition). Here is a sample of how to create and install
+a test certificate:
+
+```bash
+mkcert "*.iam.example.com"
+kubectl create secret tls sslcert --cert=_wildcard.iam.example.com.pem --key=_wildcard.iam.example.com-key.pem
+```
 
 ## Troubleshooting Tips
 
@@ -260,6 +281,9 @@ cp -r medium my-new-overlay
 * Warning: The AM install and config utility parameterizes the FQDN - but you may need to fix up other configurations in
 IDM, IG, end user UI, etc. This is a work in progress.
 
+The experimental script `bin/init-platform.sh` can be used to create a new Skaffold and Kustomize profile for a custom domain.
+Refer to the help for that script.
+
 ## Cleaning up
 
 `skaffold delete` or `skaffold delete -f skaffold-dev.yaml`
@@ -267,6 +291,8 @@ IDM, IG, end user UI, etc. This is a work in progress.
 If you want to delete the persistent volumes for the directory:
 
 `kubectl delete pvc --all`
+
+The script `bin/clean.sh` will perform the above as well as delete any generated secrets.
 
 ## Continuous Deployment
 
@@ -289,5 +315,3 @@ Once deployed, the following URLs are available:
 * [Smoke test report](https://smoke.iam.forgeops.com/tests/latest.html)
 * [Access Manager](https://smoke.iam.forgeops.com/am/XUI/#login/)
 * [IDM admin console](https://smoke.iam.forgeops.com/admin/#dashboard/0)
-* [End user UI](https://smoke.iam.forgeops.com/enduser/#/dashboard)
-
