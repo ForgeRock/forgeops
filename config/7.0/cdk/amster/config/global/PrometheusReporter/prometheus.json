@@ -8,7 +8,7 @@
   },
   "data" : {
     "_id" : "prometheus",
-    "password" : null,
+    "password" : "prometheus",
     "authenticationType" : "BASIC",
     "enabled" : true,
     "username" : "prometheus",
