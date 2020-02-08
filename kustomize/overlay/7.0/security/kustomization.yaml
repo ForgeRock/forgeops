@@ -22,21 +22,21 @@ configMapGenerator:
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
 - fieldref:
-    fieldPath: data.DOMAIN
+    fieldpath: data.DOMAIN
   name: DOMAIN
   objref:
     apiVersion: v1
     kind: ConfigMap
     name: platform-config
 - fieldref:
-    fieldPath: data.SUBDOMAIN
+    fieldpath: data.SUBDOMAIN
   name: SUBDOMAIN
   objref:
     apiVersion: v1
     kind: ConfigMap
     name: platform-config
 - fieldref:
-    fieldPath: metadata.namespace
+    fieldpath: metadata.namespace
   name: NAMESPACE
   objref:
     apiVersion: v1
