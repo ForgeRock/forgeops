@@ -1,7 +1,7 @@
 # GCP/GKE configuration
 
 ## Infra Configuration
-The 'infra' Pulumi program is a prequisite for deploying a GKE Pulumi program.  
+The 'infra' Pulumi program is a prerequisite for deploying a GKE Pulumi program.  
 
 **infra components**:
 * VPC creation
@@ -10,8 +10,9 @@ The 'infra' Pulumi program is a prequisite for deploying a GKE Pulumi program.
 **Stack configuration options**:
 * VPC config
     * ```vpc:enable: <true|false>```  
-    Create VPC but if you already have a VPC then you can provide that in the cluster program so set Currently you'll still need to deploy the infra stack.   
-    To disable set ```vpc:enable: "false"``` although please ```NOTE```, currently you'll still need to deploy the infra stack.   
+    Create VPC. But if you already have a VPC created outside of Pulumi then you can provide the VPC ID in the 'gke' program.    
+    To disable set ```vpc:enable: "false"```.  
+    ```NOTE```: currently you'll still need to deploy the infra stack even if you have a VPC already.   
 * Bucket config
     * ```bucket:enable: <true|false>```  
     Set to true to create a GCP bucket. Defaults to false.  
