@@ -14,6 +14,6 @@ controller:
     nodeSelector:
         "frontend": "true"
     tolerations:
-      - key: "WorkerAttachedToExtLoadBalancer"
+      - key: "WorkerDedicatedFrontend"
         operator: "Exists"
         effect: "NoSchedule"

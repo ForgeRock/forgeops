@@ -10,12 +10,7 @@ config:
   dsnodes:nodeCount: "2"
   dsnodes:nodeMachineType: custom-24-36864
   dsnodes:preemptible: "false"
-  frontendnodes:autoScaling: "false"
-  frontendnodes:diskSizeGb: "10"
-  frontendnodes:enable: "true"
-  frontendnodes:nodeCount: "1"
-  frontendnodes:nodeMachineType: n1-standard-2
-  frontendnodes:preemptible: "false"
+  frontendnodes:enable: "false"
   gcp:region: us-east1
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
