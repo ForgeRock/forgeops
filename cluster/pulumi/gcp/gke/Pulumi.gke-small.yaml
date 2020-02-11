@@ -1,7 +1,8 @@
 encryptionsalt: v1:VjheTQ4LR1U=:v1:bjn1LLyB+wgucUoA:O417tG1IjVlYCSUuixD2XQCdqtP4lg==
 config:
   cluster:availabilityZoneCount: "3"
-  cluster:k8sVersion: "1.14"
+  cluster:createStaticIp: "true"
+  cluster:k8sVersion: "1.15"
   cluster:name: cdm-small
   dsnodes:autoScaling: "false"
   dsnodes:diskSizeGb: "80"
@@ -15,7 +16,7 @@ config:
   frontendnodes:nodeCount: "1"
   frontendnodes:nodeMachineType: n1-standard-2
   frontendnodes:preemptible: "false"
-  gcp:region: us-east4
+  gcp:region: us-east1
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
   primarynodes:autoScaling: "true"
