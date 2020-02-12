@@ -1,7 +1,7 @@
 encryptionsalt: v1:T9I5rCsZxWk=:v1:Uigny5fT0a+dJ+jW:/2IyTIeRegaV7kHbjOlP6WY2G4rDMg==
 config:
   aks:acrResourceGroupName: ContainerRegistry
-  aks:clusterResourceGroupName: cdm-small-resource-group
+  aks:clusterResourceGroupName: cdm-medium-resource-group
   aks:k8sVersion: 1.15.5
   aks:location: eastus
   aks:numOfAzs: "3"
@@ -11,22 +11,22 @@ config:
     pulumiTest
   azure:environment: AzureCloud
   dsnodes:diskSizeGb: "80"
-  dsnodes:enable: "false"
+  dsnodes:enable: "true"
   dsnodes:enableAutoScaling: "false"
-  dsnodes:instanceType: Standard_DS3_v2
-  dsnodes:maxNodes: "0"
-  dsnodes:minNodes: "0"
-  dsnodes:nodeCount: "3"
+  dsnodes:instanceType: Standard_F16s_v2
+  dsnodes:maxNodes: "6"
+  dsnodes:minNodes: "1"
+  dsnodes:nodeCount: "6"
   frontendnodes:diskSizeGb: "30"
   frontendnodes:enable: "false"
   frontendnodes:enableAutoScaling: "false"
-  frontendnodes:instanceType: Standard_DS3_v2
+  frontendnodes:instanceType: Standard_F16s_v2
   frontendnodes:maxNodes: "0"
   frontendnodes:minNodes: "0"
   frontendnodes:nodeCount: "1"
   primarynodes:diskSizeGb: "80"
   primarynodes:enableAutoScaling: "false"
-  primarynodes:instanceType: Standard_DS3_v2
-  primarynodes:maxNodes: "0"
-  primarynodes:minNodes: "0"
+  primarynodes:instanceType: Standard_F16s_v2
+  primarynodes:maxNodes: "6"
+  primarynodes:minNodes: "1"
   primarynodes:nodeCount: "6"
