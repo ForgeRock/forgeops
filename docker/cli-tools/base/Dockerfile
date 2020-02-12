@@ -10,6 +10,7 @@ ARG AWS_IAM_AUTH=1.14.6
 ARG AWS_IAM_DATE=2019-08-22
 ARG CLOUD_SDK_VERSION=278.0.0
 ARG AZURE_VERSION=2.0.80
+ARG DOCKER_CREDENTIAL_GCR_VERSION=2.0.0
 FROM debian:buster-slim as base
 RUN apt-get update -y \
         && apt-get install -y --no-install-recommends util-linux ca-certificates \
@@ -100,12 +101,18 @@ RUN curl -sL https://codeload.github.com/ahmetb/kubectx/tar.gz/${KUBECTX_VERSION
             && tar -xvf /tmp/kubectx.tar.gz -C /tmp/kubectx --strip-components=1 \
                 && install /tmp/kubectx/kubens /opt/build/bin/kubens \
                     && install /tmp/kubectx/kubectx /opt/build/bin/kubectx
+FROM builder as docker-credential-gcr
+ARG DOCKER_CREDENTIAL_GCR_VERSION
+RUN curl -sL https://github.com/GoogleCloudPlatform/docker-credential-gcr/releases/download/v2.0.0/docker-credential-gcr_linux_amd64-${DOCKER_CREDENTIAL_GCR_VERSION}.tar.gz  -o /tmp/dcr.tar.gz \
+        && tar -xvf /tmp/dcr.tar.gz -C /tmp \
+            && install /tmp/docker-credential-gcr /opt/build/bin/docker-credential-gcloud
 
 FROM base as skaffold
 COPY --from=skaffold-base /usr/bin/skaffold /usr/local/bin/
 COPY --from=kustomize /opt/build/bin/* /usr/local/bin/
 COPY --from=kubectl /opt/build/bin/* /usr/local/bin/
 COPY --from=kubectx /opt/build/bin/* /usr/local/bin/
+COPY --from=docker-credential-gcr /opt/build/bin/* /usr/local/bin/
 
 FROM base as finale
 LABEL maintainer="cloud_eng_team@forgerock.com"
@@ -121,7 +128,7 @@ RUN apt-get update -y \
                 && apt-get autoremove --purge  \
                     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=nodejs /opt/build/nodejs /usr/local/
+COPY --from=nodejs /opt/build/nodejs /usr/local//
 COPY --from=helm /opt/build/bin/* /usr/local/bin/
 COPY --from=pulumi /opt/build/bin/* /usr/local/bin/
 COPY --from=kubectl /opt/build/bin/* /usr/local/bin/
