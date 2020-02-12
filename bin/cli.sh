@@ -19,19 +19,21 @@ The container has full access to credentials utilized by the tools.
 
 Usage:  cli.sh MODE [OPTIONS] COMMAND
 
-Options:
---build-env     docker daemon and registry to use for builds (only for cdk)
-                (default: minikube|localhost)
-
 Mode:
     cdm     Environment required to run Cloud Deployment Model
     cdk     Environment required to run Cloud Development Kit
 
+Options:
+--build-env     docker daemon and registry to use for builds (only for CDK)
+                (default: minikube|localhost)
+
 Examples:
     # list stack resources
-    cli.sh --cdk pulumi stack ls
+    cli.sh cdm pulumi stack ls
     # deploy to minikube
-    cli.sh --cdm skaffold dev
+    cli.sh cdk skaffold dev
+    # build using localhost dockerd, run on some remote cluster
+    cli.sh cdk --build-env localhost skaffold build && cli.sh cdk --build-env localhost skaffold run
 
 Environment Variables:
    CDM_IMAGE    CDM container to run
