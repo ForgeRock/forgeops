@@ -5,5 +5,4 @@ commonLabels:
   vendor: forgerock
 resources:
 - configmap.yaml
-- job.yaml
 - deployment.yaml

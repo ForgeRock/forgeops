@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
       - args:
-        - pause
+        - configure
         - sync
         env:
         - name: NAMESPACE
