@@ -19,19 +19,21 @@ The container has full access to credentials utilized by the tools.
 
 Usage:  cli.sh MODE [OPTIONS] COMMAND
 
-Options:
---build-env     docker daemon and registry to use for builds (only for cdk)
-                (default: minikube|localhost)
-
 Mode:
     cdm     Environment required to run Cloud Deployment Model
     cdk     Environment required to run Cloud Development Kit
 
+Options:
+--build-env     docker daemon and registry to use for builds (only for CDK)
+                (default: minikube|localhost)
+
 Examples:
     # list stack resources
-    cli.sh --cdk pulumi stack ls
+    cli.sh cdm pulumi stack ls
     # deploy to minikube
-    cli.sh --cdm skaffold dev
+    cli.sh cdk skaffold dev
+    # build using localhost dockerd, run on some remote cluster
+    cli.sh cdk --build-env localhost skaffold build && cli.sh cdk --build-env localhost skaffold run
 
 Environment Variables:
    CDM_IMAGE    CDM container to run
@@ -63,6 +65,14 @@ _config_gcloud() {
     _add_volume "${HOME}/.config/gcloud/:${mount_root}/.config/gcloud/"
     _add_env "GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}"
     _add_sdk "gcp"
+    if [[ "${CLI_MODE}" == "cdk" ]];
+    then
+        [[ ! -f "${HOME}/.config/gcloud/application_default_credentials.json" ]] \
+            && echo "using GCP and CDK requires application credentials to be set: gcloud auth application-default login" \
+                && exit 1
+        _add_env 'GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json'
+    fi
+
 }
 
 _config_aws() {
@@ -115,6 +125,8 @@ _set_minikube() {
 _set_localhost() {
     _add_volume "${HOME}/.docker:${mount_root}/.docker"
     _add_volume "/var/run/docker.sock:/var/run/docker.sock"
+    _config_cloud_sdk
+
 }
 
 _pre_exec() {
@@ -159,9 +171,9 @@ run_cdk() {
     [[ ! -d "${skaf_home}" ]] \
         && mkdir -p "${skaf_home}"
 
-    kubeconfig="${KUBECONFIG:-$HOME/.kube}"
+    kubeconfig="${KUBECONFIG:-$HOME/.kube/config}"
     _add_volume "${skaf_home}:${mount_root}/.skaffold"
-    _add_volume "${kubeconfig}:${mount_root}/.kube"
+    _add_volume "${kubeconfig}:${mount_root}/.kube/config"
     run ${cli_image} ${@}
 }
 
@@ -180,11 +192,13 @@ while (( "$#" )); do
     case "$1" in
         cdk)
             shift
+            CLI_MODE=cdk
             run_cdk ${@}
             exit
             ;;
         cdm)
             shift
+            CLI_MODE=cdm
             run_cdm ${@}
             exit
             ;;
