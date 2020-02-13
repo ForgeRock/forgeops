@@ -63,24 +63,38 @@ profiles:
 - name: nightly
   build:
     artifacts:
-    - image: ig
-      context: docker/7.0/ig
-    - image: forgeops-tests
-      context: docker/forgeops-tests
     - image: am
       context: docker/7.0/am
+      kaniko:
+        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+#       cache: {} DO NOT specify cache object. 
     - image: amster
       context: docker/7.0/amster
+      kaniko:
+        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
     - image: idm
       context: docker/7.0/idm
+      kaniko:
+        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
     - image: ds-cts
       context: docker/7.0/ds/cts
+      kaniko:
+        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
     - image: ds-idrepo
       context: docker/7.0/ds/idrepo
+      kaniko:
+        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
     - image: forgeops-secrets
       context: docker/forgeops-secrets
+      kaniko:
+        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+    cluster:
+      namespace: nightly
+      pullSecretName: kaniko-secret
+      #dockerConfig:
+        #path: ./config.json
     tagPolicy:
-      gitCommit: {}
+      sha256: {}
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/nightly

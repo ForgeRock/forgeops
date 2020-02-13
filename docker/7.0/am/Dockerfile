@@ -3,7 +3,9 @@ FROM gcr.io/forgerock-io/am/pit1:7.0.0-84d968ebb460387ae8bd62370a5bdecaa1db05c7
 # BEGIN - temporary work around for testing if the ds-idrepo is configured before AM starts. Remove when FBC is integrated
 # Installs ldap utils for querying the repo.
 USER root
-RUN apt-get update && apt-get install -y ldap-utils
+RUN apt-get update && apt-get install -y ldap-utils && apt-get clean all
+USER forgerock
+COPY --chown=forgerock:root openam /home/forgerock/openam
 # END
 
 COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
@@ -14,10 +16,6 @@ ENV CATALINA_OPTS "-server -Dcom.sun.identity.configuration.directory=/home/forg
 
 # This copies in the boot.json and other files...
 COPY --chown=forgerock:root openam /home/forgerock/openam
-# Kaniko workaround.
-RUN chown -R forgerock:root /home/forgerock/openam
-
-USER forgerock
 
 # Override the entrypoint and just start tomcat
 #CMD ["catalina.sh", "run"]

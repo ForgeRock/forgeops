@@ -1,0 +1,34 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: nightly-pipeline
+spec:
+  resources:
+    - name: forgeops
+      type: git
+  tasks:
+    - name: deploy-images-step
+      taskRef:
+        name: deploy-images
+      resources:
+        inputs:
+        - name: forgeops
+          resource: forgeops
+          
+    - name: create-users-step
+      runAfter:
+        - deploy-images-step
+      taskRef:
+        name: create-users
+      params:
+      - name: users
+        value: "10"
+        
+    - name: scale-am-deployment-step
+      runAfter:
+        - create-users-step
+      taskRef:
+        name: scale-am-deployment
+      params:
+      - name: replicas
+        value: "1"         

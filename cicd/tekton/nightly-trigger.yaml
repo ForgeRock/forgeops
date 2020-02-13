@@ -1,0 +1,67 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: nightly
+spec:
+  params:
+  - name: forgeops
+    value: forgeops-git
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: nightly
+spec:
+  params:
+  - name: forgeops
+    description: Name of the resourceRef
+    default: forgeops-git
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      generateName: nightly-run-
+    spec:
+      timeout: 45m
+      serviceAccountName: tekton-worker
+      pipelineRef:
+        name: nightly-pipeline
+      resources:
+      - name: forgeops
+        resourceRef:
+          name: $(params.forgeops)
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: nightly-listener
+spec:
+  serviceAccountName: tekton-worker
+  triggers:
+    - name: cron-trig
+      bindings:
+      - name: nightly
+      template:
+        name: nightly
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: nightly-cronjob
+spec:
+  schedule: "0 9 * * 1-5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: trigger
+            image: busybox
+            args:
+              - wget
+              - --spider
+              - el-nightly-listener:8080
+          restartPolicy: Never

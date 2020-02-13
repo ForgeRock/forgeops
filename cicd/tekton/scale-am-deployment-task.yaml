@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: scale-am-deployment
+  namespace: 
+spec:
+  inputs:
+    params:
+      - name: replicas
+        type: string
+        description: number of users to create
+  steps:
+    - name: scale-am-tozero
+      image: lachlanevenson/k8s-kubectl
+      command: ["ash", "-c"]
+      args: ["kubectl scale deployment am --replicas=0"]
+
+    - name: wait-10-seconds
+      image: lachlanevenson/k8s-kubectl
+      command: ["ash", "-c"]
+      args: ["sleep 10; echo 'done' "]
+      
+    - name: scale-am-todesired
+      image: lachlanevenson/k8s-kubectl
+      command: ["ash", "-c"]
+      args: ["kubectl scale deployment am --replicas=$(inputs.params.replicas)"]
+    

@@ -4,5 +4,6 @@ commonLabels:
   app: amster
   vendor: forgerock
 resources:
-- deployment.yaml
 - configmap.yaml
+- job.yaml
+- deployment.yaml

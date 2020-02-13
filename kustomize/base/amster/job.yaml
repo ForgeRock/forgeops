@@ -1,14 +1,16 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: amster
+  name: amster-configurator
 spec:
-  replicas: 1
+  backoffLimit: 2
+  activeDeadlineSeconds: 600
   template:
     spec:
+      restartPolicy: Never
       containers:
       - args:
-        - pause
+        - nowaitconfigure
         - sync
         env:
         - name: NAMESPACE

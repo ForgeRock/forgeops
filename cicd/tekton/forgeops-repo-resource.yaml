@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: forgeops-git
+spec:
+  type: git
+  params:
+    - name: revision
+      value: CLOUD-1935
+    - name: url
+      value: https://stash.forgerock.org/scm/~jhonattan.castillo/forgeops.git
