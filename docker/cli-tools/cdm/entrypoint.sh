@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+if [[ "${CDM_DEBUG}" == "true" ]];
+then
+    set -x;
+fi
 umask 0002
 entry_args=("${@}")
 userid=${entry_args[0]}

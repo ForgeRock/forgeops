@@ -1,0 +1,10 @@
+namePrefix: forgeops-cdk-
+namespace: default
+commonLabels:
+  app: toolbox
+  vendor: forgerock
+resources:
+  - pvc.yaml
+  - serviceaccount.yaml
+  - rolesandbindings.yaml
+  - deployment.yaml

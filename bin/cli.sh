@@ -130,6 +130,11 @@ _set_localhost() {
 }
 
 _pre_exec() {
+    if [[ "${CDM_DEBUG}" == "true" ]];
+    then
+        set -x
+        _add_env "CDM_DEBUG=true"
+    fi
     LOCALDIR=$(pwd)
     USERID=$(id -u)
     GROUPID=$(id -g)
