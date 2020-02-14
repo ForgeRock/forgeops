@@ -118,6 +118,7 @@ export const bastionPublicIp = bastion.publicIp;
 
 export let extIngresstg80arn : any = undefined
 export let extIngresstg443arn : any = undefined
+export let loadBalancerDnsName: any = undefined
 if (highAvailability) //If highAvailability is False, it is assumed that the user will use type loadbalancer. 
 {
     /************** Load Balancer **************/
@@ -127,7 +128,8 @@ if (highAvailability) //If highAvailability is False, it is assumed that the use
         vpc: vpc, 
         subnets: vpc.publicSubnetIds,         
         });
-
+    loadBalancerDnsName =  nlb1.loadBalancer.dnsName;
+    
     const extIngresstg80 = nlb1.createTargetGroup("ExtIngressLBTCP80", { port: 30080, targetType: "instance"});
     const listener1 = extIngresstg80.createListener("listener1", { port: 80});
     extIngresstg80arn = extIngresstg80.targetGroup.arn;

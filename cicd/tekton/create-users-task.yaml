@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: create-users
+  namespace: 
+spec:
+  inputs:
+    params:
+      - name: users
+        type: string
+        description: number of users to create
+  steps:
+    - name: wait-for-amster-configurator
+      image: lachlanevenson/k8s-kubectl
+      command: ["ash", "-c"]
+      args: ["kubectl wait --for=condition=complete --timeout=600s job/amster-configurator"]
+    
+#    - name: create-users
+#      image: lachlanevenson/k8s-kubectl
+#      command: ["ash", "-c"]
+#      args: ["kubectl exec ds-idrepo-0 make-users.sh $(inputs.params.users)"]
+    

@@ -1,5 +1,5 @@
 # Note: M5 integration with AM currently not working
-FROM gcr.io/forgerock-io/idm:7.0.0-3a6908bec5b8d5befb91067000f0d6a42f68bc39
+FROM gcr.io/forgerock-io/idm:7.0.0-dbfc71b852c0a4032e12c03ca7ca6fe77bab2073
 
 # Harden IDM by removing the Felix OSGI Console. Unless you are a ForgeRock developer, the
 # console is rarely required. Your configuration should NOT include conf/felix.webconsole.json
@@ -10,7 +10,3 @@ RUN rm bundle/org.apache.felix.webconsole*.jar  && \
 RUN rm -fr /opt/openidm/conf
 ENV JAVA_OPTS "-server -XX:MaxRAMPercentage=75"
 COPY --chown=forgerock:root . /opt/openidm
-# Workaround for Kaniko issue
-USER root
-RUN chown -R forgerock:root /opt/openidm
-USER forgerock

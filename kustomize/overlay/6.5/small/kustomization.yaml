@@ -115,7 +115,7 @@ patchesStrategicMerge:
                 memory: 5Gi
             env:
             - name: DS_SET_SIZE
-              value: 3
+              value: "3"
         nodeSelector:
           forgerock.io/role: ds
     volumeClaimTemplates:
@@ -160,7 +160,7 @@ patchesStrategicMerge:
                 memory: 6Gi
             env:
             - name: DS_SET_SIZE
-              value: 3
+              value: "3"
         nodeSelector:
           forgerock.io/role: ds
     volumeClaimTemplates:

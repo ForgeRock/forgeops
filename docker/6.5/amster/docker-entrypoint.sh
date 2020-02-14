@@ -21,7 +21,7 @@ trap exit_script SIGINT SIGTERM SIGUSR1 EXIT
 pause() {
     echo "Args are $# "
 
-    echo "Container will now pause. You can use kubectl exec to run export.sh"
+    echo "Container will now pause. You can exec into the container using kubectl exec to run export.sh"
     # Sleep forever, waiting for someone to exec into the container.
     while true
     do
@@ -48,6 +48,13 @@ configure)
     # Invoke amster install
     ./amster-install.sh
     pause
+    ;;
+nowaitconfigure)
+    # This option is useful if you want to run amster-install as a k8s job
+    # Without this chmod, Docker does not know the file is executable on Windows
+    chmod +x amster-install.sh
+    # Invoke amster install
+    ./amster-install.sh
     ;;
 export)
     ./export.sh
