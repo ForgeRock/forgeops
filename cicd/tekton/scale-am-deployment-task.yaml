@@ -11,17 +11,22 @@ spec:
         description: number of users to create
   steps:
     - name: scale-am-tozero
-      image: lachlanevenson/k8s-kubectl
-      command: ["ash", "-c"]
+      image: gcr.io/cloud-builders/kubectl
+      command: ["bash", "-c"]
       args: ["kubectl scale deployment am --replicas=0"]
 
     - name: wait-10-seconds
-      image: lachlanevenson/k8s-kubectl
-      command: ["ash", "-c"]
+      image: gcr.io/cloud-builders/kubectl
+      command: ["bash", "-c"]
       args: ["sleep 10; echo 'done' "]
       
     - name: scale-am-todesired
-      image: lachlanevenson/k8s-kubectl
-      command: ["ash", "-c"]
+      image: gcr.io/cloud-builders/kubectl
+      command: ["bash", "-c"]
       args: ["kubectl scale deployment am --replicas=$(inputs.params.replicas)"]
+
+    - name: wait-for-all-pods-ready
+      image: gcr.io/cloud-builders/kubectl
+      command: ["bash", "-c"]
+      args: ["sleep 15; kubectl wait --for=condition=ready --timeout=600s pod -l vendor=forgerock --all"]
     

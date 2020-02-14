@@ -20,8 +20,8 @@ spec:
       skaffold -f skaffold.yaml -p nightly delete
 
   - name: delete-pvcs
-    image: lachlanevenson/k8s-kubectl
-    command: ["ash", "-c"]
+    image: gcr.io/cloud-builders/kubectl
+    command: ["bash", "-c"]
     args: ["kubectl delete pvc --all"]
 
   - name: deploy-new-env

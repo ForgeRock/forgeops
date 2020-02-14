@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 if [ "$#" -ne 1 ]
 then
   echo "Need namespace name to install the pipelines in. ./install_tekton.sh nightly"
