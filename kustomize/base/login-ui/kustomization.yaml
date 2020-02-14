@@ -2,6 +2,7 @@ kind: ""
 apiversion: ""
 commonLabels:
   app: login-ui
+  vendor: forgerock
 resources:
 - deployment.yaml
 - service.yaml

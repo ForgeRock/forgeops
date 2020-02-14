@@ -15,8 +15,8 @@ spec:
       command: ["ash", "-c"]
       args: ["kubectl wait --for=condition=complete --timeout=600s job/amster-configurator"]
     
-#    - name: create-users
-#      image: lachlanevenson/k8s-kubectl
-#      command: ["ash", "-c"]
-#      args: ["kubectl exec ds-idrepo-0 make-users.sh $(inputs.params.users)"]
+    - name: create-users
+      image: lachlanevenson/k8s-kubectl
+      command: ["ash", "-c"]
+      args: ["kubectl exec ds-idrepo-0 make-users.sh $(inputs.params.users)"]
     
