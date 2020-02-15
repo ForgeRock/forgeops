@@ -108,7 +108,6 @@ patchesStrategicMerge:
           - name: ds
             resources:
               requests:
-                requests:
                 memory: 3Gi
                 cpu: 2000m
               limits:
@@ -153,7 +152,6 @@ patchesStrategicMerge:
           - name: ds
             resources:
               requests:
-                requests:
                 memory: 4Gi
                 cpu: 1500m
               limits:
