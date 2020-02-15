@@ -6,6 +6,6 @@ spec:
   type: git
   params:
     - name: revision
-      value: main
+      value: master
     - name: url
       value: https://stash.forgerock.org/scm/cloud/forgeops.git
