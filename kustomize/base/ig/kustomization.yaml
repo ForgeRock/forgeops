@@ -3,6 +3,7 @@ apiversion: ""
 commonLabels:
   app: ig
   component: ig
+  vendor: forgerock
 resources:
 - deployment.yaml
 - secret.yaml
