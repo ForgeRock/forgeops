@@ -29,7 +29,7 @@ LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
 // FIXME uncomment line below and remove hardcoded value when LODESTAR-200 is resolved
 //  and product pipelines correctly updated
 // LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
-LODESTAR_GIT_COMMIT = 'b0ed0df074a11ef44589020967e77d28bfd70275'
+LODESTAR_GIT_COMMIT = 'stable'
 
 /** Base product versions for the PIT#2 upgrade test */
 UPGRADE_TEST_BASE_AMSTER_VERSION    = 'fraas-production'
