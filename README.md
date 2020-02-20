@@ -19,13 +19,7 @@ skaffold dev
 
 ## Documentation
 
-The draft ForgeRock DevOps Developer's Guides
-( [minikube](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube)|
-[shared cluster](https://ea.forgerock.com/docs/forgeops/devops-guide-cloud)]
-tracks the master branch, including information on the newer Kustomize/Skaffold workflow. This is the recommended path.
-
-Note: The charts in the helm/ directory are deprecated and will be removed in the future. The Helm charts
-are being replaced with Kustomize.
+Please see the (DevOps)[https://backstage.forgerock.com/docs/forgeops/6.5] documentation.
 
 This GitHub repository is a read-only mirror of
 ForgeRock's [Bitbucket Server repository](https://stash.forgerock.org/projects/CLOUD/repos/forgeops). Users

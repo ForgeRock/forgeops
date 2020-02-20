@@ -1,6 +1,6 @@
 encryptionsalt: v1:VjheTQ4LR1U=:v1:bjn1LLyB+wgucUoA:O417tG1IjVlYCSUuixD2XQCdqtP4lg==
 config:
-  cluster:availabilityZoneCount: "3"
+  cluster:availabilityZoneCount: "2"
   cluster:createStaticIp: "true"
   cluster:k8sVersion: "1.15"
   cluster:name: cdm-small
@@ -8,7 +8,7 @@ config:
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:nodeCount: "1"
-  dsnodes:nodeMachineType: custom-8-16384
+  dsnodes:nodeMachineType: c2-standard-16
   dsnodes:preemptible: "false"
   frontendnodes:enable: "false"
   gcp:region: us-east1
@@ -19,6 +19,6 @@ config:
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
   primarynodes:nodeCount: "0"
-  primarynodes:nodeMachineType: custom-4-16384
+  primarynodes:nodeMachineType: e2-highcpu-16
   primarynodes:preemptible: "false"
   secondarynodes:enable: "false"
