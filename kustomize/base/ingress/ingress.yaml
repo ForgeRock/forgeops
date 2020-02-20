@@ -140,8 +140,9 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: "/"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
     certmanager.io/cluster-issuer: "default-issuer"
+
 spec:
   tls:
   - hosts:
@@ -158,4 +159,4 @@ spec:
       - backend:
           serviceName: ig
           servicePort: 80
-        path: /ig
+        path: /ig(/|$)(.*)
