@@ -19,7 +19,6 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                 pipelineRun.updateStageStatusAsInProgress()
 
                 dir('lodestar') {
-                    def helm_report_loc = "helm"
                     def skaffold_report_loc = "skaffold"
 
                     def cfg_common = [
@@ -36,12 +35,12 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     def stagesCloud = [:]
 
                     // perf stack test
-                    stagesCloud = stageCloudPerf(stagesCloud, "stack", helm_report_loc, "stack")
+                    stagesCloud = stageCloudPerf(stagesCloud, "stack", skaffold_report_loc, "stack")
 
                     dashboard_utils.determineUnitOutcome(stagesCloud['stack']) {
                         def cfg = cfg_common.clone()
                         cfg += [
-                            USE_SKAFFOLD: false,
+                            USE_SKAFFOLD: true,
                             TEST_NAME   : "stack",
                         ]
 
@@ -49,12 +48,12 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     }
 
                     // perf authn rest test
-                    stagesCloud = stageCloudPerf(stagesCloud, "am_authn", helm_report_loc, "authn_rest")
+                    stagesCloud = stageCloudPerf(stagesCloud, "am_authn", skaffold_report_loc, "authn_rest")
 
                     dashboard_utils.determineUnitOutcome(stagesCloud['am_authn']) {
                         def cfg = cfg_common.clone()
                         cfg += [
-                            USE_SKAFFOLD: false,
+                            USE_SKAFFOLD: true,
                             TEST_NAME   : "authn_rest",
                         ]
 
@@ -62,12 +61,12 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     }
 
                     // CRUD on simple managed users tests
-                    stagesCloud = stageCloudPerf(stagesCloud, "idm_crud", helm_report_loc, "simple_managed_users")
+                    stagesCloud = stageCloudPerf(stagesCloud, "idm_crud", skaffold_report_loc, "simple_managed_users")
 
                     dashboard_utils.determineUnitOutcome(stagesCloud['idm_crud']) {
                         def cfg = cfg_common.clone()
                         cfg += [
-                            USE_SKAFFOLD: false,
+                            USE_SKAFFOLD: true,
                             TEST_NAME   : "simple_managed_users",
                         ]
 
