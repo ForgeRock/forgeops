@@ -37,12 +37,6 @@
                     "name" : "password",
                     "policies" : [
                         {
-                            "policyId" : "required"
-                        },
-                        {
-                            "policyId" : "not-empty"
-                        },
-                        {
                             "policyId" : "minimum-length",
                             "params" : {
                                 "minLength" : 8
