@@ -59,7 +59,7 @@ openKeystore "am-boot-secrets/keystore.jceks" \
     $(useRandomPass am-boot-secrets/.storepass 24 print) \
     $(useRandomPass am-boot-secrets/.keypass 24 print)
 
-keytoolgen -importpass -alias dsameuserpwd $(useRandomPass amster-env-secrets/AMADMIN_PASS 24 print) 
+keytoolgen -importpass -alias dsameuserpwd $(useRandomPass amster-env-secrets/AMADMIN_PASS 24 print)
 keytoolgen -importpass -alias configstorepwd $(useRandomPass ds/dirmanager.pw 24 print)
 
 # DS password used in boot.sh to check to see if AM is configured
@@ -143,7 +143,7 @@ genRSA openidm-localhost 2048
 cpAttr truststore/cacerts idm/truststore
 closeKeystore
 
-useRandomPass idm-env-secrets/OPENIDM_ADMIN_PASSWORD 24
+useRandomPass idm-env-secrets/OPENIDM_ADMIN_PASSWORD 24 noprint openidm-admin
 cpAttr ds/dirmanager.pw idm-env-secrets/USERSTORE_PASSWORD
 
 useRandomPass postgres-secrets/postgres-password 24

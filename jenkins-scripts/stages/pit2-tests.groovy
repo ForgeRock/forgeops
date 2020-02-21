@@ -10,7 +10,7 @@ void runStage(pipelineRun) {
     def parallelTestsMap = [
         Greenfield: { greenfieldTests.runStage(pipelineRun) },
         //Upgrade: { upgradeTests.runStage(pipelineRun) },
-        PerfPit2: {perfTests.runStage(pipelineRun, 'PERF-PIT2', 'jenkins.yaml', doRecordResult="True", clusterNamespace="pyrock")}
+        PerfPit2: { perfTests.runStage(pipelineRun, 'PERF-PIT2', 'jenkins.yaml', "True", "pyrock") }
     ]
 
     parallel parallelTestsMap

@@ -59,7 +59,7 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : "&{idm.rs.client.secret|rsFilterClient}",
+      "userpassword" : "&{idm.rs.client.secret|password}",
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
       "defaultScopes" : [ ],

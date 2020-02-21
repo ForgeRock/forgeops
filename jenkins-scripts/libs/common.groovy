@@ -26,10 +26,7 @@ FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim(
 
 /** Globally scoped git commit information for the Lodestar repo */
 LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
-// FIXME uncomment line below and remove hardcoded value when LODESTAR-200 is resolved
-//  and product pipelines correctly updated
-// LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
-LODESTAR_GIT_COMMIT = 'stable'
+LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
 
 /** Base product versions for the PIT#2 upgrade test */
 UPGRADE_TEST_BASE_AMSTER_VERSION    = 'fraas-production'
