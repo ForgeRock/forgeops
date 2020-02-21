@@ -11,7 +11,6 @@ steps:
     - '--service-account=gcr-pruner@engineering-devops.iam.gserviceaccount.com'
     - '--image=gcr.io/engineering-devops/gcr-pruner:latest'
     - '--timeout=600'
-    - '--update-env-vars=GCR_PRUNE_DRY_RUN=1'
     - '--platform=managed'
     - '--region=us-east1'
     - 'gcr-pruner'
