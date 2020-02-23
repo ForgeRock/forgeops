@@ -32,13 +32,12 @@ timestamps {
 
         stage ('Clone repo') {
             checkout scm
-            // Stash workspace to be able to reuse it in the tests
-            stash includes: '**', name: "workspace" // omit 'useDefaultExcludes: false' - no need to stash .git folder
 
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
             def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
             def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
 
+            localGitUtils = load("${libsLocation}/git-utils.groovy")
             commonModule = load("${libsLocation}/common.groovy")
 
             currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
@@ -54,7 +53,7 @@ timestamps {
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
                 }
-                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
+                pit1TestStage = load("${stagesLocation}/pr-postcommit-pit1-tests.groovy")
                 perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
             }
 

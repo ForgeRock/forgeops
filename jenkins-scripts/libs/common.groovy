@@ -28,12 +28,6 @@ FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim(
 LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
 LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
 
-/** Base product versions for the PIT#2 upgrade test */
-UPGRADE_TEST_BASE_AMSTER_VERSION    = 'fraas-production'
-UPGRADE_TEST_BASE_AM_VERSION        = 'fraas-production'
-UPGRADE_TEST_BASE_IDM_VERSION       = 'fraas-production'
-UPGRADE_TEST_BASE_DSEMPTY_VERSION   = '7.0.0-5e9e1c7a12dab93be3b81ccee374c44bac7317d8'
-
 /** Root-level image names corresponding to product Helm charts and Dockerfiles in the ForgeOps repo. */
 ROOT_LEVEL_IMAGE_NAMES = [
         'am'        : 'gcr.io/forgerock-io/am',
@@ -162,15 +156,6 @@ def getCurrentProductCommitHashes() {
             getHelmChart('idm').productCommit,
             getHelmChart('am').productCommit,
     ]
-}
-
-def determinePyrockOutcome(String reportUrl, Closure process) {
-    try {
-        process()
-        return new Outcome(Status.SUCCESS, reportUrl)
-    } catch (Exception e) {
-        return new FailureOutcome(e, reportUrl)
-    }
 }
 
 return this

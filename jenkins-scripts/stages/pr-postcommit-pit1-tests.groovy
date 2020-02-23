@@ -18,9 +18,7 @@ void runStage(PipelineRun pipelineRun) {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
 
-                dir('forgeops') {
-                    unstash 'workspace'
-                }
+                def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 def gitBranch = isPR() ? "origin/pr/${env.CHANGE_ID}" : 'master'
                 def gitImageTag = isPR() ? '7.0.0' : '6.5.1'
@@ -37,7 +35,7 @@ void runStage(PipelineRun pipelineRun) {
                         COMPONENTS_IG_GITIMAGE_TAG      : gitImageTag,
                         STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                         SKIP_FORGEOPS                   : 'True',
-                        EXT_FORGEOPS_PATH               : "${env.WORKSPACE}/forgeops",
+                        EXT_FORGEOPS_PATH               : forgeopsPath,
                     ]
 
                     // Helm tests
@@ -72,7 +70,7 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPitNoStages(cfg)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normalizedStageName, "${normalizedStageName}.html")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }

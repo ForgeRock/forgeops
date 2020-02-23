@@ -131,7 +131,7 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/lodestar
 
-  # Sample profiles to launch / test just a specific product
+# Sample profiles to launch / test just a specific product
 - name: ig-only
   build:
     artifacts:

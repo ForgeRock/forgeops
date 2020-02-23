@@ -18,7 +18,7 @@ import com.forgerock.pipeline.stage.Status
  * Perform the promotion to stable: promote docker images to root level and the relevant commit to 'stable'.
  */
 void runStage(PipelineRun pipelineRun) {
-    pipelineRun.pushStageOutcome('promote-to-forgeops-stable', stageDisplayName: 'ForgeOps Stable Promotion') {
+    pipelineRun.pushStageOutcome('pit2-promote-to-forgeops-stable', stageDisplayName: 'ForgeOps Stable Promotion') {
         node('build&&linux') {
             stage('Promote to stable') {
                 pipelineRun.updateStageStatusAsInProgress()

@@ -9,45 +9,56 @@
 import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun) {
+
     def stageName = "PERF-PR-Postcommit"
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
+    def namespace = cloud_utils.transformNamespace("jenkins-${env.JOB_NAME}-${env.BUILD_NUMBER}")
+
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
 
-                dir('forgeops') {
-                    unstash 'workspace'
-                }
+                def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {
                     def stagesCloud = [:]
                     subStageName = 'skaffold'
-                    stagesCloud[subStageName] = dashboard_utils.stageCloud(normalizedStageName)
+                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'postcommit')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def namespace = cloud_utils.transformNamespace("jenkins-${env.JOB_NAME}-${env.BUILD_NUMBER}")
-                        withGKEPyrockNoStages([
+                        def cfg = [
                             STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
                             SKIP_FORGEOPS        : 'True',
-                            EXT_FORGEOPS_PATH    : "${env.WORKSPACE}/forgeops",
+                            EXT_FORGEOPS_PATH    : forgeopsPath,
                             TEST_NAME            : 'postcommit',
                             CLUSTER_DOMAIN       : "pit-cluster.forgeops.com",
+                            JENKINS_YAML         : 'lodestar-postcommit.yaml',
                             CLUSTER_NAMESPACE    : namespace + (new Random().nextInt(10**4)),
                             PIPELINE_NAME        : "FORGEOPS_POSTCOMMIT",
                             USE_SKAFFOLD         : true,
-                        ])
+                        ]
+
+                        withGKEPyrockNoStages(cfg)
                     }
 
                     // Summary and combined report generation
-                    summaryReportGen.createAndPublishSummaryReport(
-                        stagesCloud, stageName, 'build&&linux', false, stageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                                                                    "${env.BUILD_URL}/${normalizedStageName}/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }
     }
+}
+
+def stageCloudPerf(HashMap stagesCloud, String subStageName, String testName) {
+    stagesCloud[subStageName] = [
+        'numFailedTests': 0,
+        'testsDuration' : -1,
+        'reportUrl'     : "${env.BUILD_URL}/artifact/results/pyrock/${testName}-skaffold/global.html",
+        'exception'     : null
+    ]
+    return stagesCloud
 }
 
 return this

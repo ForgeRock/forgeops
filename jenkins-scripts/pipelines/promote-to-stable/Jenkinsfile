@@ -46,10 +46,10 @@ timestamps {
                         commits: commonModule.getCurrentProductCommitHashes())
 
                 // Test stages
+                greenfieldTests = load("${stagesLocation}/pit2-greenfield-tests.groovy")
+                upgradeTests = load("${stagesLocation}/pit2-upgrade-tests.groovy")
                 perfTests = load("${stagesLocation}/pit2-perf-tests.groovy")
-                greenfieldTests = load("${stagesLocation}/pit-greenfield.groovy")
-                upgradeTests = load("${stagesLocation}/pit-upgrade.groovy")
-                pit2Tests = load("${stagesLocation}/pit2-tests.groovy") // combines PERF, Greenfield, Upgrade
+                pit2Tests = load("${stagesLocation}/pit2-all-tests.groovy") // combines PERF, Greenfield, Upgrade
 
                 promoteMasterToStable = load("${stagesLocation}/promote-master-to-stable.groovy")
 
