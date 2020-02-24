@@ -4,10 +4,10 @@
     "requestAttributes" : { },
     "scriptExtensions" : { },
     "initParams" : {
-        "maxRequestSizeInMegabytes" : 50
+        "maxRequestSizeInMegabytes" : 5
     },
     "urlPatterns" : [
-        "/*"
+        "&{openidm.servlet.alias}/*"
     ],
     "filterClass" : "org.forgerock.openidm.jetty.LargePayloadServletFilter"
 }
