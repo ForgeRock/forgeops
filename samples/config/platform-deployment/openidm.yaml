@@ -1,6 +1,6 @@
 config:
   # git container does the checkout under /git/config so we have config twice
-  path: /git/config/config/7.0/platform-deployment/idm/
+  path: /git/config/config/7.0/cdk/idm/
 openidm:
   repo:
     host: userstore-0.userstore
