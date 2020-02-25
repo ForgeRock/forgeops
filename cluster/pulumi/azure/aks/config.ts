@@ -33,7 +33,7 @@ export interface nodeGroupConfiguration {
 export interface infrastructureConfig {
     adApp: azuread.Application;
     adSp: azuread.ServicePrincipal;
-    adSpPassword: azuread.ServicePrincipalPassword;
+    adSpPassword: pulumi.Output<string>;
     resourceGroup: azure.core.ResourceGroup;
 }
 
@@ -91,10 +91,17 @@ function createInfrastructure(): infrastructureConfig {
         endDate: "2099-01-01T00:00:00Z",
     }, {dependsOn: [adApp, adSp]});
 
+    let delayedAdSpPasswordValue = adSpPassword.value.apply(async (val) => {
+        // Wait for 30s
+        console.log("Waiting for 30s for AD Service Principal eventual consistency...");
+        await new Promise(resolve => setTimeout(resolve, 30000));
+        return val;
+    });
+    
     let val:infrastructureConfig = {
         adApp: adApp, 
         adSp: adSp,
-        adSpPassword: adSpPassword, 
+        adSpPassword: delayedAdSpPasswordValue, 
         resourceGroup: resourceGroup
     }
     return val;
