@@ -17,5 +17,3 @@ found in the respective product source code repository.
 ## Building Custom Images using skaffold 
 
 The remaining images in this folder are used to build your custom docker images for deployment.
-
-See the [EA Docs](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube/index.html#devops-implementation-env-about-the-env)

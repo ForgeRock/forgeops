@@ -50,7 +50,7 @@ class TestDS(object):
     def test_1_resource_replication(self, setup_teardown_test_resource_replication):
         """Creates a new resource via rest2ldap interface and
            verifies it is replicated to the second instance.
-           Ref:  https://ea.forgerock.com/docs/ds/rest-guide/create-rest.html#create-rest"""
+           Ref:  https://ea.forgerock.com/docs/ds/rest-guide/#create-rest"""
 
         headers = {'Content-Type': 'application/json',
                    'If-None-Match': '*'

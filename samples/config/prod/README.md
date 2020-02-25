@@ -63,7 +63,7 @@ Other requirements are:
 
 - The deployment will take anywhere from 3-10 minutes so be patient. For a successful deployment you will get a message saying "Deployment is now ready".
 
-- Check out the CDM Cookbook on http://backstage.forgerock.com for more details.
+- Check out the CDM Cookbooks at https://backstage.forgerock.com/docs/forgeops/6.5 for more details.
 
 ### Notes
 - It's normal to see these errors repeated 4 or 5 times in the beginning of the deployment
