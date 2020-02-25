@@ -42,7 +42,7 @@ patchesJson6902:
     name: forgerock
   patch: |-
     - op: replace
-      path: /metadata/annotations/certmanager.k8s.io~1cluster-issuer
+      path: /metadata/annotations/certmanager.io~1cluster-issuer
       value: letsencrypt-prod
       # value: default-issuer  # Default
   
