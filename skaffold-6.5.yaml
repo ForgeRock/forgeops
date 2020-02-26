@@ -56,6 +56,32 @@ profiles:
       context: docker/6.5/idm-base
     - image: ds-base
       context: docker/6.5/ds-base
+- name: large
+  build:
+    artifacts:
+    - image: am
+      context: docker/6.5/am
+    - image: amster
+      context: docker/6.5/amster
+    - image: idm
+      context: docker/6.5/idm
+    - image: ds-cts
+      context: docker/6.5/ds/cts
+      docker:
+        noCache: true
+    - image: ds-idrepo
+      context: docker/6.5/ds/idrepo
+      docker:
+        noCache: true
+    - image: ig
+      context: docker/6.5/ig
+    - image: forgeops-secrets
+      context: docker/forgeops-secrets
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+        path: ./kustomize/overlay/6.5/large
 - name: medium
   build:
     artifacts:
