@@ -40,7 +40,6 @@ void runStage(PipelineRun pipelineRun) {
                             TIMEOUT                         : "24",
                             TIMEOUT_UNIT                    : "HOURS",
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                            SKIP_FORGEOPS                   : 'True',
                             EXT_FORGEOPS_PATH               : forgeopsPath,
                             REPORT_NAME                     : reportName,
                         ]
