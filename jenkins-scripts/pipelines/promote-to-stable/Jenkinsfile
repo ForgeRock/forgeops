@@ -46,7 +46,7 @@ timestamps {
                         commits: commonModule.getCurrentProductCommitHashes())
 
                 // Test stages
-                perfTests = load("${stagesLocation}/perf-tests.groovy")
+                perfTests = load("${stagesLocation}/pit2-perf-tests.groovy")
                 greenfieldTests = load("${stagesLocation}/pit-greenfield.groovy")
                 upgradeTests = load("${stagesLocation}/pit-upgrade.groovy")
                 pit2Tests = load("${stagesLocation}/pit2-tests.groovy") // combines PERF, Greenfield, Upgrade

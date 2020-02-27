@@ -63,19 +63,21 @@ void buildImage(String directoryName) {
     sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
 }
 
+/**
+ * Uses the provided pipelineRun object to run PR tests.
+ *
+ * @param pipelineRun Used for running tests as part of the pipeline
+ */
 def postBuildTests(PipelineRun pipelineRun) {
-
     try {
-        // PIT1 tests
         pit1TestStage.runStage(pipelineRun)
-
+        perfTestStage.runStage(pipelineRun)
         currentBuild.result = 'SUCCESS'
-        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
-    }
-    catch (exception) {
+    } catch (exception) {
         currentBuild.result = 'FAILURE'
-        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
         throw exception
+    } finally {
+        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
     }
 }
 
