@@ -29,13 +29,13 @@ export function createCluster(): azure.containerservice.KubernetesCluster {
         },
         servicePrincipal: {
             clientId: config.infra.adApp.applicationId,
-            clientSecret: config.infra.adSpPassword.value,
+            clientSecret: config.infra.adSpPassword,
         },
         networkProfile: {
             networkPlugin: "azure",
             loadBalancerSku: "standard"
         }
-    }, {dependsOn: [config.infra.adApp, config.infra.adSp, config.infra.adSpPassword, config.infra.resourceGroup]});
+    }, {dependsOn: [config.infra.adApp, config.infra.adSp, config.infra.resourceGroup]});
 }
 
 export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration, 

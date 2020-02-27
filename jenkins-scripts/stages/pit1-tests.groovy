@@ -23,7 +23,7 @@ void runStage(PipelineRun pipelineRun) {
                 }
 
                 def gitBranch = isPR() ? "origin/pr/${env.CHANGE_ID}" : 'master'
-                def gitImageTag = isPR() ? '7.0.0-pr' : '6.5.1'
+                def gitImageTag = isPR() ? '7.0.0' : '6.5.1'
 
                 dir('lodestar') {
                     def stagesCloud = [:]
