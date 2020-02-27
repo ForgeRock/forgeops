@@ -4,11 +4,10 @@
 # You can "mix and match" diferent services together by creating skaffold profiles
 # and by creating a new kustomize profile in kustomize/6.5/env
 
-
 # The default below for skaffold dev is to deploy all services in one shot:
 apiVersion: skaffold/v1beta12
 kind: Config
-build:
+build: &default-build
   # local:
   #   push: false
   #   useDockerCLI: false
@@ -57,80 +56,17 @@ profiles:
     - image: ds-base
       context: docker/6.5/ds-base
 - name: large
-  build:
-    artifacts:
-    - image: am
-      context: docker/6.5/am
-    - image: amster
-      context: docker/6.5/amster
-    - image: idm
-      context: docker/6.5/idm
-    - image: ds-cts
-      context: docker/6.5/ds/cts
-      docker:
-        noCache: true
-    - image: ds-idrepo
-      context: docker/6.5/ds/idrepo
-      docker:
-        noCache: true
-    - image: ig
-      context: docker/6.5/ig
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
         path: ./kustomize/overlay/6.5/large
 - name: medium
-  build:
-    artifacts:
-    - image: am
-      context: docker/6.5/am
-    - image: amster
-      context: docker/6.5/amster
-    - image: idm
-      context: docker/6.5/idm
-    - image: ds-cts
-      context: docker/6.5/ds/cts
-      docker:
-        noCache: true
-    - image: ds-idrepo
-      context: docker/6.5/ds/idrepo
-      docker:
-        noCache: true
-    - image: ig
-      context: docker/6.5/ig
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
         path: ./kustomize/overlay/6.5/medium
 - name: small
-  build:
-    artifacts:
-    - image: am
-      context: docker/6.5/am
-    - image: amster
-      context: docker/6.5/amster
-    - image: idm
-      context: docker/6.5/idm
-    - image: ds-cts
-      context: docker/6.5/ds/cts
-      docker:
-        noCache: true
-    - image: ds-idrepo
-      context: docker/6.5/ds/idrepo
-      docker:
-        noCache: true
-    - image: ig
-      context: docker/6.5/ig
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
         path: ./kustomize/overlay/6.5/small
@@ -175,28 +111,7 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/6.5/nightly
 - name: oauth2
-  build:
-    artifacts:
-    - image: am
-      context: docker/6.5/am
-    - image: amster
-      context: docker/6.5/amster
-    - image: idm
-      context: docker/6.5/idm
-    - image: ds-cts
-      context: docker/6.5/ds/cts
-      docker:
-        noCache: true
-    - image: ds-idrepo
-      context: docker/6.5/ds/idrepo
-      docker:
-        noCache: true
-    - image: ig
-      context: docker/6.5/ig
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
         path: ./kustomize/overlay/6.5/oauth2
@@ -204,6 +119,7 @@ profiles:
 # Sample profile to demonstrate connecting to an external DS instance instead of ds-idrepo in the cluster
 # See the README.md in kustomize/6.5/env/external-ds/
 - name: external-ds
+  build: *default-build
   deploy:
     kustomize:
         path: ./kustomize/overlay/6.5/external-ds
