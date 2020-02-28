@@ -14,7 +14,7 @@ The entire build is done in the cluster itself. No external tooling is required.
 
 Run the shell script `./install.sh`
 
-This creates the Pipeline, Triggers, Tasks, Cronjoba, ServiceAccounts and all other required elements to create a functioning pipeline. 
+This creates the Pipeline, Triggers, Tasks, Cronjoba, ServiceAccounts and all other required elements to create a functioning pipeline.
 
 Note: This deployment will trigger automatically daily at 9:00 Mon-Fri ("* 9 * * 1-5"). If you want to change/remove this trigger, you can modify/remove nightly-trigger.yaml with the desired configuration.
 
@@ -27,3 +27,11 @@ kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097
 ```
 Or by using tkn cli tool
 
+## Manually Triggering the Task Run
+
+The task run is started using a Kubernetes Cronjob. You can manually re-run
+the task using the following command:
+
+```bash
+kubectl -n nightly create job --from=cronjob/nightly-cronjob manual-run
+```

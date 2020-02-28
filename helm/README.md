@@ -97,8 +97,6 @@ This certificate handles SSL for all namespaces: *.$subdomain.$domain.
 
 Note: The frconfig chart no longer defaults to enabling cert-manager - as it is not required by default.
 
-For further information on the above options, see the [DevOps developers guide](https://ea.forgerock.com/docs/forgeops/devops-guide-minikube/index.html#devops-implementation-env-https-access-secret).
-
 # Notes
 
 OpenIDM in "development" mode automatically writes out changes to configuration files as they are made in the GUI 

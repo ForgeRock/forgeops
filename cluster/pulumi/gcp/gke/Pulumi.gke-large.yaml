@@ -8,17 +8,17 @@ config:
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:nodeCount: "2"
-  dsnodes:nodeMachineType: custom-24-36864
+  dsnodes:nodeMachineType: c2-standard-16
   dsnodes:preemptible: "false"
   frontendnodes:enable: "false"
   gcp:region: us-east1
   localssdprovisioner:enable: "false"
   localssdprovisioner:namespace: local-storage
-  primarynodes:autoScaling: "true"
+  primarynodes:autoScaling: "false"
   primarynodes:diskSizeGb: "80"
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
-  primarynodes:nodeCount: "0"
-  primarynodes:nodeMachineType: custom-24-49152
+  primarynodes:nodeCount: "2"
+  primarynodes:nodeMachineType: e2-standard-16
   primarynodes:preemptible: "false"
   secondarynodes:enable: "false"

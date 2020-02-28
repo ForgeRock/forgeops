@@ -29,7 +29,7 @@
       secure="true" proxyPort="443"                 scheme="https"
   -->
 
-    <!-- See https://backstage.forgerock.com/docs/am/5.5/install-guide/#prepare-apache-tomcat
+    <!-- See https://backstage.forgerock.com/docs/am/6.5/install-guide/#prepare-apache-tomcat
 
      The URIEncoding should be set to UTF-8.
 

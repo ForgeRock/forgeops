@@ -34,7 +34,7 @@ clusterLib.createStorageClasses(k8sProvider)
 const ipGroup = clusterLib.createIpGroup(k8sProvider);
 const staticIp = clusterLib.createStaticIp(k8sProvider, ipGroup);
 export const ipResourceGroupName = ipGroup.name
-export const staticIpName = staticIp.ipAddress
+export const staticIpAddress = staticIp.ipAddress
 
 
 // Assign permission to cluster SP to access IP resource group
