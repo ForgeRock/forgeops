@@ -5,7 +5,6 @@ const stackConfig = new pulumi.Config();
 export interface clusterConfiguration {
     clusterResourceGroupName: string;
     sshPublicKey: string;
-    // acrResourceGroupName: string | undefined;
     k8sVersion: string;
     clusterName: string;
     numOfAzs: number;
@@ -46,7 +45,6 @@ export const dsNodeGroupConfig = getNodeGroupConfig("dsnodes");
 export const clusterConfig : clusterConfiguration =  {
     clusterResourceGroupName: stackConfig.require("clusterResourceGroupName"),
     sshPublicKey: stackConfig.require("sshPublicKey"),
-    // acrResourceGroupName: stackConfig.get("acrResourceGroupName") || undefined,
     k8sVersion: stackConfig.require("k8sVersion"),
     clusterName: pulumi.getStack(),
     numOfAzs: stackConfig.getNumber("numOfAzs"),
