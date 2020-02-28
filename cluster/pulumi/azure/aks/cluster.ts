@@ -3,10 +3,22 @@ import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
 import * as config from "./config";
 
-export function createCluster(infra: any): azure.containerservice.KubernetesCluster {
+export function createResourceGroup(location: pulumi.Output<any>, groupName: string) {
+    // Create an Azure Resource Group
+    return new azure.core.ResourceGroup("resourceGroup", {
+        location: location,
+        name: groupName,
+        tags: {
+            deploymentType: "cdm"
+        }
+    });
+}
+
+export function createCluster(infra: any, resourceGroup: azure.core.ResourceGroup): azure.containerservice.KubernetesCluster {
 
     return new azure.containerservice.KubernetesCluster("aksCluster", {
-        resourceGroupName: infra.resourceGroupName,
+        //name: config.clusterConfig.clusterName,
+        resourceGroupName: resourceGroup.name,
         location: infra.location,
         kubernetesVersion: config.clusterConfig.k8sVersion,
         defaultNodePool: {
@@ -35,7 +47,7 @@ export function createCluster(infra: any): azure.containerservice.KubernetesClus
             networkPlugin: "azure",
             loadBalancerSku: "standard"
         }
-    });
+    }, {dependsOn: resourceGroup});
 }
 
 export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration, 
@@ -78,47 +90,17 @@ export function createStorageClasses(provider: k8s.Provider){
     }, { provider: provider } );
 }
 
-export function createIpGroup(infra: any): azure.core.ResourceGroup{
-    let ipGroup : any
-    if ( config.clusterConfig.staticIpName !== undefined ) {
-        ipGroup = pulumi.output(azure.core.getResourceGroup({
-            name: config.clusterConfig.ipResourceGroupName
-        }))
-    }
-    else {
-        // Create an Azure Resource Group to hold static IP
-        ipGroup = new azure.core.ResourceGroup("ipResourceGroup", {
-            location: infra.location,
-            name: pulumi.getStack() + "-ip-resource-group",
-            tags: {
-                deploymentType: "cdm"
-            }
-        });
-    }
-    return ipGroup;
-}
-
-export function createStaticIp(provider: k8s.Provider, ipGroup: azure.core.ResourceGroup, infra: any): azure.network.PublicIp{
-    let staticIp : any
-    if ( config.clusterConfig.staticIpName !== undefined ) {
-        // Get static IP from config.ts
-        staticIp = pulumi.output(azure.network.getPublicIP({
-            name: config.clusterConfig.staticIpName,
-            resourceGroupName: config.clusterConfig.ipResourceGroupName,
-        }));
-    }
-    else {
-        // Create static IP
-        staticIp = new azure.network.PublicIp("static-ip", {
-            allocationMethod: "Static",
-            location: infra.location,
-            name: pulumi.getStack() + "-static-ip",
-            resourceGroupName: ipGroup.name,
-            sku: "Standard",
-            tags: {
-                deployment: pulumi.getStack(),
-            },
-        });
-    }
-    return staticIp;
+export function createStaticIp(ipResGroup: pulumi.Output<any>, loc: pulumi.Output<any>): azure.network.PublicIp{
+    
+    // Create static IP
+    return new azure.network.PublicIp("static-ip", {
+        allocationMethod: "Static",
+        location: loc,
+        name: pulumi.getStack() + "-static-ip",
+        resourceGroupName: ipResGroup,
+        sku: "Standard",
+        tags: {
+            deployment: pulumi.getStack(),
+        },
+    });
 }
