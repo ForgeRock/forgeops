@@ -1,4 +1,3 @@
-encryptionsalt: v1:T9I5rCsZxWk=:v1:Uigny5fT0a+dJ+jW:/2IyTIeRegaV7kHbjOlP6WY2G4rDMg==
 config:
   aks:acrResourceGroupName: ContainerRegistry
   aks:clusterResourceGroupName: cdm-medium-resource-group
