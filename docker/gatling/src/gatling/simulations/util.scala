@@ -17,7 +17,7 @@ class BenchConfig {
     val client_id: String = Properties.envOrElse("CLIENT_ID", "idm-provisioning")
     val client_password: String = Properties.envOrElse("CLIENT_PASSWORD", "password")
     val idmUser: String = Properties.envOrElse("IDM_USER", "openidm-admin")
-    val idmPassword: String = Properties.envOrElse("IDM_PASSWORD", "password")
+    val idmPassword: String = Properties.envOrElse("IDM_PASSWORD", "openidm-admin")
     val userPassword: String = Properties.envOrElse("USER_PASSWORD", "password")
     val duration:Integer =  Properties.envOrElse("DURATION", "60").toInt
     val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000000").toInt
