@@ -1,14 +1,26 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as k8s from "@pulumi/kubernetes";
-import * as azure from "@pulumi/azure";
 import * as clusterLib from "./cluster";
 import * as config from "./config";
 
-const cluster = clusterLib.createCluster();
+const infraReference = new pulumi.StackReference("azure-infra");
+
+const infra = {
+    adAppId: infraReference.getOutput("adAppId"),
+    adSpObjectId: infraReference.getOutputSync("adSpObjectId"),
+    adSpPassword: infraReference.requireOutput("adSpPassword"),
+    location: infraReference.requireOutput("location"),
+    ipResourceGroupName: infraReference.requireOutput("ipResourceGroupName")
+}
+
+// ********************** RESOURCE GROUP *******************
+const resourceGroup = clusterLib.createResourceGroup(infra.location, config.clusterConfig.clusterResourceGroupName);
+
+// ********************** AKS CLUSTER *******************
+const cluster = clusterLib.createCluster(infra, resourceGroup);
 export const kubeconfig = pulumi.all([cluster.kubeConfigRaw, cluster.name]).apply(([kc, name]) => {
     return kc.split(": " + name).join(": aks"); //replace any randon aks*** name in the kubeconfig to just "aks" for easier integration
 })
-
 
 const k8sProvider = new k8s.Provider("aksK8s", {
     kubeconfig: cluster.kubeConfigRaw,
@@ -30,28 +42,12 @@ new k8s.core.v1.Namespace("prod", { metadata: { name: "prod" }}, { provider: k8s
 // ********************** STORAGE CLASSES **************
 clusterLib.createStorageClasses(k8sProvider)
 
+// ********************** STATIC IP **************
+const staticIp = clusterLib.createStaticIp(infra.ipResourceGroupName, infra.location);
 
-const ipGroup = clusterLib.createIpGroup(k8sProvider);
-const staticIp = clusterLib.createStaticIp(k8sProvider, ipGroup);
-export const ipResourceGroupName = ipGroup.name
 export const staticIpAddress = staticIp.ipAddress
 
 
-// Assign permission to cluster SP to access IP resource group
-const roleAssignment = new azure.role.Assignment("ip-role", {
-    principalId: config.infra.adSp.objectId,
-    roleDefinitionName: "Network Contributor",
-    scope: ipGroup.id
-});
-
-if (config.clusterConfig.acrResourceGroupName) {
-    // Assign permission to cluster SP to pull images from ACR
-    new azure.role.Assignment("acr-role", {
-        principalId: config.infra.adSp.objectId,
-        roleDefinitionName: "AcrPull",
-        scope: pulumi.output(azure.core.getResourceGroup({name: config.clusterConfig.acrResourceGroupName})).id,
-    });
-}
 
 
 

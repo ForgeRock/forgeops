@@ -1,16 +1,15 @@
 # For creating your own custom skaffold profiles we recommend making a copy of this
 # file to skaffold-dev.yaml (which is in .gitignore).
 # You can "mix and match" diferent services together by creating skaffold profiles
-# and by creating a new kustomize profile in kustomize/env
-
-
+# and by creating a new kustomize profile in kustomize/overlay/
 # The default below for skaffold dev is to deploy all services in one shot:
+# Note: Upgrade to skaffold/v2alpha3 for skaffold 1.4
 apiVersion: skaffold/v1beta12
 kind: Config
 
 # Default profile
-build:
-  artifacts:
+build: &default-build
+  artifacts: &default-artifacts
   - image: am
     context: docker/7.0/am
   - image: amster
@@ -18,12 +17,13 @@ build:
   - image: idm
     context: docker/7.0/idm
   - image: ds-cts
-
     context: docker/7.0/ds/cts
   - image: ds-idrepo
     context: docker/7.0/ds/idrepo
   - image: forgeops-secrets
     context: docker/forgeops-secrets
+  - image: ig
+    context: docker/7.0/ig
   tagPolicy:
     sha256: {}
 deploy:
@@ -35,7 +35,7 @@ profiles:
 
 # Smoke tests
 - name: smoke
-  build:
+  build: &default-test-build
     artifacts:
     - image: ig
       context: docker/7.0/ig
@@ -58,7 +58,7 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/smoke
-      
+
 # 24/7 Demo environment
 - name: nightly
   build:
@@ -67,7 +67,7 @@ profiles:
       context: docker/7.0/am
       kaniko:
         image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
-#       cache: {} DO NOT specify cache object. 
+#       cache: {} DO NOT specify cache object.
     - image: amster
       context: docker/7.0/amster
       kaniko:
@@ -98,116 +98,35 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/nightly
-      
+
 # skaffold dev will not work with this, due to a new kustomize api thats being used for patching all objects
 # ensure psp controller is enabled e.g. gcloud beta container clusters update cloud-1472 --enable-pod-security-policy --zone us-east4
 - name: security
-  build:
-    artifacts:
-    - image: am
-      context: docker/7.0/am
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: idm
-      context: docker/7.0/idm
-    - image: amster
-      context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/security
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
 - name: small
-  build:
-    artifacts:
-    - image: am
-      context: docker/7.0/am
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: idm
-      context: docker/7.0/idm
-    - image: amster
-      context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    #- image: ig
-    #  context: docker/7.0/ig
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/small
 - name: medium
-  build:
-    artifacts:
-    - image: am
-      context: docker/7.0/am
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: idm
-      context: docker/7.0/idm
-    - image: amster
-      context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/medium
 - name: large
-  build:
-    artifacts:
-    - image: am
-      context: docker/7.0/am
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: idm
-      context: docker/7.0/idm
-    - image: amster
-      context: docker/7.0/amster
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    #- image: ig
-    #  context: docker/7.0/ig
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/large
 
 # Platform deployment sample used for PIT and PERF tests
 - name: platform-deployment
-  build:
-    artifacts:
-      - image: am
-        context: docker/7.0/am
-      - image: amster
-        context: docker/7.0/amster
-      - image: idm
-        context: docker/7.0/idm
-      - image: ds-cts
-        context: docker/7.0/ds/cts
-      - image: ds-idrepo
-        context: docker/7.0/ds/idrepo
-      - image: ig
-        context: docker/7.0/ig
-      - image: forgeops-secrets
-        context: docker/forgeops-secrets
-    tagPolicy:
-      sha256: {}
+  build: *default-build
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/lodestar
