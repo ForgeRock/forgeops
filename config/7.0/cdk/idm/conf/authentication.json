@@ -18,12 +18,12 @@
         },
         "staticUserMapping" : [
             {
-                "idpUser" : "amadmin",
+                "subject" : "amadmin",
                 "localUser" : "internal/user/openidm-admin",
                 "userRoles" : "authzRoles"
             },
             {
-                "idpUser": "idm-provisioning",
+                "subject": "idm-provisioning",
                 "localUser": "internal/user/openidm-admin",
                 "userRoles": "authzRoles"
             }
