@@ -47,13 +47,15 @@ timestamps {
             if (env.TAG_NAME) {
                 currentBuild.result = 'ABORTED'
                 error 'This pipeline does not currently support building from a tag'
-            } else if (isPR()) {
-                pipeline = load("${jobLocation}/pr.groovy")
-                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
-                prAutomation = load("${libsLocation}/pr-automation.groovy")
             } else {
-                pipeline = load("${jobLocation}/postcommit.groovy")
+                if (isPR()) {
+                    pipeline = load("${jobLocation}/pr.groovy")
+                    prAutomation = load("${libsLocation}/pr-automation.groovy")
+                } else {
+                    pipeline = load("${jobLocation}/postcommit.groovy")
+                }
                 pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
+                perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
             }
 
             if (isPR() && prAutomation.isAutomatedPullRequest()) {

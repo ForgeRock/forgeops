@@ -69,18 +69,19 @@ void buildImage(String directoryName) {
     }
 }
 
+/**
+ * Uses the provided pipelineRun object to run Postcommit tests.
+ *
+ * @param pipelineRun Used for running tests as part of the pipeline
+ */
 def postBuildTests(PipelineRun pipelineRun) {
-
     try {
-        // PIT1 tests
-        stageErrorMessage = "The PIT1 tests failed, please have a look at the console output"
         pit1TestStage.runStage(pipelineRun)
-
+        perfTestStage.runStage(pipelineRun)
         currentBuild.result = 'SUCCESS'
-    }
-    catch (exception) {
+    } catch (exception) {
         currentBuild.result = 'FAILURE'
-        postcommitBuild.sendSlackNotification('#cloud-deploy-notify', true, stageErrorMessage)
+        postcommitBuild.sendSlackNotification('#cloud-deploy-notify', true, "Failed while running postcommit tests")
         throw exception
     }
 }
