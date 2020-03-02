@@ -40,7 +40,7 @@ config:
   strategy: git
 
 image:
-  repository: gcr.io/forgerock-io/amster/pit1
+  repository: gcr.io/forgerock-io/amster
   tag: 7.0.0-98fae1caa4a90fadb8001e2753b290bce7b784e6
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
