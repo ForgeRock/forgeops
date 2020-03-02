@@ -3,25 +3,21 @@
     "realm" : "/",
     "amsterVersion" : "&{version}",
     "entityType" : "PageNode",
-    "entityId" : "a12bc72f-ad97-4f1e-a789-a1fa3dd566c8",
+    "entityId" : "e4c752f9-c625-48c9-9644-a58802fa9e9c",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "a12bc72f-ad97-4f1e-a789-a1fa3dd566c8",
+    "_id" : "e4c752f9-c625-48c9-9644-a58802fa9e9c",
     "pageDescription" : {
-      "en" : "New here? <a href=\"#/service/Registration\">Create an account</a><br><a href=\"#/service/ResetPassword\">Forgot Password?</a>"
+      "en" : "Change password"
     },
     "nodes" : [ {
-      "_id" : "7354982f-57b6-4b04-9ddc-f1dd1e1e07d0",
-      "nodeType" : "ValidatedUsernameNode",
-      "displayName" : "Platform Username"
-    }, {
-      "_id" : "0c80c39b-4813-4e67-b4fb-5a0bba85f994",
+      "_id" : "009c19c8-9572-47bb-adb2-1f092c559a43",
       "nodeType" : "ValidatedPasswordNode",
       "displayName" : "Platform Password"
     } ],
     "pageHeader" : {
-      "en" : "Sign In"
+      "en" : "Reset Password"
     },
     "_type" : {
       "_id" : "PageNode",

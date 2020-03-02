@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "IdentifyExistingUser",
+    "entityId" : "21b8ddf3-0203-4ae1-ab05-51cf3a3a707a",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "21b8ddf3-0203-4ae1-ab05-51cf3a3a707a",
+    "identifier" : "userName",
+    "objectType" : "user",
+    "identityAttribute" : "mail",
+    "_type" : {
+      "_id" : "IdentifyExistingUserNode",
+      "name" : "Identify Existing User",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "true",
+      "displayName" : "True"
+    }, {
+      "id" : "false",
+      "displayName" : "False"
+    } ]
+  }
+}
