@@ -32,6 +32,7 @@ void runStage(PipelineRun pipelineRun) {
                             SKIP_FORGEOPS        : 'True',
                             EXT_FORGEOPS_PATH    : "${env.WORKSPACE}/forgeops",
                             TEST_NAME            : 'postcommit',
+                            CLUSTER_DOMAIN       : "pit-cluster.forgeops.com",
                             CLUSTER_NAMESPACE    : namespace + (new Random().nextInt(10**4)),
                             PIPELINE_NAME        : "FORGEOPS_POSTCOMMIT",
                             USE_SKAFFOLD         : true,
