@@ -3,7 +3,7 @@ config:
   cluster:availabilityZoneCount: "1"
   cluster:createStaticIp: "true"
   cluster:k8sVersion: "1.15"
-  cluster:name: dev-mini2
+  cluster:name: dev-mini
   dsnodes:enable: "false"
   frontendnodes:enable: "false"
   gcp:region: us-east1
