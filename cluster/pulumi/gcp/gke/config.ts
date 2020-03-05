@@ -16,7 +16,7 @@ export const project = new pulumi.Config(pulumi.getProject());
 export const enableSecondaryPool = secondaryPool.requireBoolean("enable");
 export const enableDSPool = dsPool.requireBoolean("enable");
 export const enableFrontEndPool = frontEndPool.requireBoolean("enable");
-export const enableLocalSsdProvisioner = local.requireBoolean("enable");
+export const enableLocalSsdProvisioner = local.getBoolean("enable") || false;
 
 // **************** NETWORK CONFIG ****************
 export const stackRef = cluster.get("infraStackName") || "gcp-infra"
@@ -180,6 +180,6 @@ export const ds:NodePool = {
 
 // **************** LOCAL SSD VALUES ****************
 export const localSsdVersion = local.get("version") || "v2.2.1";
-export const localSsdNamespace = local.require("namespace");
+export const localSsdNamespace = local.get("namespace") || "local-storage";
 
 

@@ -12,8 +12,6 @@ config:
   dsnodes:preemptible: "false"
   frontendnodes:enable: "false"
   gcp:region: us-east1
-  localssdprovisioner:enable: "false"
-  localssdprovisioner:namespace: local-storage
   primarynodes:autoScaling: "true"
   primarynodes:diskSizeGb: "80"
   primarynodes:maxNodes: "4"
