@@ -37,7 +37,7 @@ objectClass: organizationalUnit
 subordinateTemplate: person:[numusers]
 
 template: person
-rdnAttr: uid
+rdnAttr: fr-idm-uuid
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
@@ -66,7 +66,7 @@ inetUserStatus: active
 fr-idm-preferences: \{"updates":false,"marketing":false\}
 fr-idm-uuid: <guid>
 mail: {uid}@[maildomain]
-userPassword: \{SSHA512\}YFIBSgo+6316zKQ1/FY2ij2Dgt3X7UHBMaeUVb6UDUOOm7HnT0gn/6s9vo44bdspuh6RE2k5a4D71+VX9xVgI1W3bfWbUrZi9rgkGOGRxiE=
+userPassword: \{PBKDF2-HMAC-SHA256\}10000:xKsMmlzVLRYdYzcgBuD3ZIAeSj8tNhjDHGFDqhth8Kcbw5qjL5UZxaiS2awL1HjO
 telephoneNumber: <random:telephone>
 homePhone: <random:telephone>
 pager: <random:telephone>
