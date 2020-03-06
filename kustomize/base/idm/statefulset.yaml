@@ -37,6 +37,20 @@ spec:
             path: /openidm/info/ping
             port: 8080
           initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value: "true"
+            path: /openidm/info/ping
+            port: 8080
+          initialDelaySeconds: 30
           periodSeconds: 30
           timeoutSeconds: 5
         name: openidm
