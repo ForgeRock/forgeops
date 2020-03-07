@@ -36,5 +36,6 @@ spec:
       ./config.sh init -v 7.0 -p cdk
       cd ..
       sleep 30
-      skaffold -f skaffold.yaml -p nightly --default-repo=gcr.io/engineering-devops/nightly run
-      
+      skaffold -f skaffold.yaml -p nightly --default-repo=gcr.io/engineering-devops/nightly render >render.yaml
+      kubectl apply -f render.yaml
+

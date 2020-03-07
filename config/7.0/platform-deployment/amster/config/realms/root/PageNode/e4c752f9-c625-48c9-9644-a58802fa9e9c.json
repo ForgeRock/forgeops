@@ -1,0 +1,32 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "PageNode",
+    "entityId" : "e4c752f9-c625-48c9-9644-a58802fa9e9c",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "e4c752f9-c625-48c9-9644-a58802fa9e9c",
+    "pageDescription" : {
+      "en" : "Change password"
+    },
+    "nodes" : [ {
+      "_id" : "009c19c8-9572-47bb-adb2-1f092c559a43",
+      "nodeType" : "ValidatedPasswordNode",
+      "displayName" : "Platform Password"
+    } ],
+    "pageHeader" : {
+      "en" : "Reset Password"
+    },
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "Page Node",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "outcome",
+      "displayName" : "Outcome"
+    } ]
+  }
+}

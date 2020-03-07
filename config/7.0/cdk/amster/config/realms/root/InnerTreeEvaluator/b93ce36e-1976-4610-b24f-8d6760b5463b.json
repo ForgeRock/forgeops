@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "InnerTreeEvaluator",
+    "entityId" : "b93ce36e-1976-4610-b24f-8d6760b5463b",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "b93ce36e-1976-4610-b24f-8d6760b5463b",
+    "tree" : "Login",
+    "_type" : {
+      "_id" : "InnerTreeEvaluatorNode",
+      "name" : "Inner Tree Evaluator",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "true",
+      "displayName" : "True"
+    }, {
+      "id" : "false",
+      "displayName" : "False"
+    } ]
+  }
+}

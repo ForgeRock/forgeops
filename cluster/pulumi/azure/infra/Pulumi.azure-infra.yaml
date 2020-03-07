@@ -1,6 +1,5 @@
 encryptionsalt: v1:OGMSatR2kak=:v1:wXpXDZgHmyHrdIR1:f8WLl5uQaTIyGmX9OVsR+LZMbrHyaA==
 config:
-  aws:region: us-east-1
   azure:environment: AzureCloud
   azure-infra:clusterResourceGroupName: aks-resource-group
   azure-infra:acrResourceGroupName: ContainerRegistry

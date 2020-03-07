@@ -9,7 +9,7 @@
 @Library([
     'forgerock-pipeline-libs@22983ac3de75284754110d027979640405966513',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
-    'QaCloudUtils@9b96fd9b00b91e77461d8e058682638840f6c200',
+    'QaCloudUtils@a2901bed4571dae23ea5b849678b52dd59b25289',
     'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ]) _
 
@@ -32,13 +32,12 @@ timestamps {
 
         stage ('Clone repo') {
             checkout scm
-            // Stash workspace to be able to reuse it in the tests
-            stash includes: '**', name: "workspace" // omit 'useDefaultExcludes: false' - no need to stash .git folder
 
             def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
             def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
             def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
 
+            localGitUtils = load("${libsLocation}/git-utils.groovy")
             commonModule = load("${libsLocation}/common.groovy")
 
             currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
@@ -54,7 +53,7 @@ timestamps {
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
                 }
-                pit1TestStage = load("${stagesLocation}/pit1-tests.groovy")
+                pit1TestStage = load("${stagesLocation}/pr-postcommit-pit1-tests.groovy")
                 perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
             }
 

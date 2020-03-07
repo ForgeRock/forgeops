@@ -17,7 +17,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 @Library([
     'forgerock-pipeline-libs@22983ac3de75284754110d027979640405966513',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
-    'QaCloudUtils@9b96fd9b00b91e77461d8e058682638840f6c200',
+    'QaCloudUtils@a2901bed4571dae23ea5b849678b52dd59b25289',
     'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ])
 import com.forgerock.pipeline.Build
@@ -46,10 +46,10 @@ timestamps {
                         commits: commonModule.getCurrentProductCommitHashes())
 
                 // Test stages
+                greenfieldTests = load("${stagesLocation}/pit2-greenfield-tests.groovy")
+                upgradeTests = load("${stagesLocation}/pit2-upgrade-tests.groovy")
                 perfTests = load("${stagesLocation}/pit2-perf-tests.groovy")
-                greenfieldTests = load("${stagesLocation}/pit-greenfield.groovy")
-                upgradeTests = load("${stagesLocation}/pit-upgrade.groovy")
-                pit2Tests = load("${stagesLocation}/pit2-tests.groovy") // combines PERF, Greenfield, Upgrade
+                pit2Tests = load("${stagesLocation}/pit2-all-tests.groovy") // combines PERF, Greenfield, Upgrade
 
                 promoteMasterToStable = load("${stagesLocation}/promote-master-to-stable.groovy")
 

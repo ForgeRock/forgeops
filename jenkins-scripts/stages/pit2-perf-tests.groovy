@@ -11,9 +11,15 @@ import com.forgerock.pipeline.stage.FailureOutcome
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.Status
 
-void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String doRecordResult, String clusterNamespace) {
+void runStage(PipelineRun pipelineRun) {
 
-    pipelineRun.pushStageOutcome(dashboard_utils.normalizeStageName(stageName), stageDisplayName: stageName) {
+    def stageName = 'PIT2 PERF'
+    def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
+    def yamlFile = 'jenkins.yaml'
+    def doRecordResult = 'True'
+    def clusterNamespace = 'pyrock'
+
+    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('perf-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
@@ -21,8 +27,6 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {
-                    def skaffold_report_loc = "skaffold"
-
                     def cfg_common = [
                         DO_RECORD_RESULT        : doRecordResult,
                         CLUSTER_NAMESPACE       : clusterNamespace,
@@ -30,16 +34,17 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                         JENKINS_YAML            : yamlFile,
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                         SKIP_FORGEOPS           : 'True',
-                        EXT_FORGEOPS_PATH       : "${env.WORKSPACE}/forgeops",
-                        PIPELINE_NAME           : "ForgeOps-PIT2-promotion"
+                        EXT_FORGEOPS_PATH       : forgeopsPath,
+                        PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
                     ]
 
                     def stagesCloud = [:]
 
                     // perf stack test
-                    stagesCloud = stageCloudPerf(stagesCloud, "stack", skaffold_report_loc, "stack")
+                    def subStageName = 'stack'
+                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'stack')
 
-                    dashboard_utils.determineUnitOutcome(stagesCloud['stack']) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = cfg_common.clone()
                         cfg += [
                             USE_SKAFFOLD    : true,
@@ -50,9 +55,10 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     }
 
                     // perf authn rest test
-                    stagesCloud = stageCloudPerf(stagesCloud, "am_authn", skaffold_report_loc, "authn_rest")
+                    subStageName = 'am_authn'
+                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'authn_rest')
 
-                    dashboard_utils.determineUnitOutcome(stagesCloud['am_authn']) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = cfg_common.clone()
                         cfg += [
                             USE_SKAFFOLD    : true,
@@ -63,9 +69,10 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     }
 
                     // CRUD on simple managed users tests
-                    stagesCloud = stageCloudPerf(stagesCloud, "idm_crud", skaffold_report_loc, "simple_managed_users")
+                    subStageName = 'idm_crud'
+                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'simple_managed_users')
 
-                    dashboard_utils.determineUnitOutcome(stagesCloud['idm_crud']) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = cfg_common.clone()
                         cfg += [
                             USE_SKAFFOLD    : true,
@@ -76,19 +83,19 @@ void runStage(PipelineRun pipelineRun, String stageName, String yamlFile, String
                     }
 
                     // Summary and combined report generation
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, "PERF-TESTS", "build && linux", false, "PERF", "perf.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/PERF/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }
     }
 }
 
-def stageCloudPerf(HashMap stagesCloud, String subStageName, String reportLoc, String testName) {
+def stageCloudPerf(HashMap stagesCloud, String subStageName, String testName) {
     stagesCloud[subStageName] = [
         'numFailedTests': 0,
         'testsDuration' : -1,
-        'reportUrl'     : "${env.BUILD_URL}/artifact/results/pyrock/${testName}-${reportLoc}/global.html",
+        'reportUrl'     : "${env.BUILD_URL}/artifact/results/pyrock/${testName}-skaffold/global.html",
         'exception'     : null
     ]
     return stagesCloud

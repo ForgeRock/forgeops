@@ -46,6 +46,7 @@ clusterLib.createStorageClasses(k8sProvider)
 const staticIp = clusterLib.createStaticIp(infra.ipResourceGroupName, infra.location);
 
 export const staticIpAddress = staticIp.ipAddress
+export const staticIpResourceGroup = infra.ipResourceGroupName
 
 
 

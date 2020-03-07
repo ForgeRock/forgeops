@@ -10,7 +10,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun) {
 
-    def stageName = 'PIT Upgrade'
+    def stageName = 'PIT2 Greenfield'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
@@ -24,32 +24,31 @@ void runStage(PipelineRun pipelineRun) {
                     def stagesCloud = [:]
 
                     // Upgrade tests
-                    def subStageName = 'upgrade'
+                    def subStageName = 'greenfield'
                     def reportName = "latest-${subStageName}.html"
                     stagesCloud[subStageName] = dashboard_utils.stageCloud(reportName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = [
-                            TESTS_SCOPE                     : 'tests/upgrade',
+                            USE_SKAFFOLD                    : true,
+                            TESTS_SCOPE                     : 'tests/pit1',
                             DEPLOYMENT_NAME                 : 'platform-deployment',
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE               : subStageName,
-                            COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
-                            COMPONENTS_FRCONFIG_GIT_BRANCH  : commonModule.FORGEOPS_GIT_COMMIT,
-                            COMPONENTS_AMSTER_IMAGE_TAG     : commonModule.UPGRADE_TEST_BASE_AMSTER_VERSION,
-                            COMPONENTS_AM_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_AM_VERSION,
-                            COMPONENTS_IDM_IMAGE_TAG        : commonModule.UPGRADE_TEST_BASE_IDM_VERSION,
-                            COMPONENTS_DS_IMAGE_TAG         : commonModule.UPGRADE_TEST_BASE_DSEMPTY_VERSION,
+                            REPEAT                          : 10,
+                            REPEAT_WAIT                     : 3600,
+                            TIMEOUT                         : "24",
+                            TIMEOUT_UNIT                    : "HOURS",
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_BRANCH             : 'fraas-production',
-                            EXT_FORGEOPS_UPGRADE_BRANCH     : commonModule.FORGEOPS_GIT_COMMIT,
-                            REPORT_NAME                     : reportName
+                            SKIP_FORGEOPS                   : 'True',
+                            EXT_FORGEOPS_PATH               : forgeopsPath,
+                            REPORT_NAME                     : reportName,
                         ]
 
                         withGKEPitNoStages(cfg)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, "build&&linux", false, normalizedStageName, "${normalizedStageName}.html")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }

@@ -7,8 +7,6 @@ config:
   dsdedicatednodes:enable: "false"
   frontenddedicatednodes:enable: "false"
   gcp:region: us-east1
-  localssdprovisioner:enable: "false"
-  localssdprovisioner:namespace: local-storage
   primarynodes:autoScaling: "true"
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
