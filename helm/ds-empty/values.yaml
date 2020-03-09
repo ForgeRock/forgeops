@@ -21,7 +21,7 @@ instance: ds
 component: ds
 
 image:
-  repository: gcr.io/forgerock-io/ds-empty/pit1
+  repository: gcr.io/forgerock-io/ds-empty
   tag: 7.0.0-c8023812572ea39b1ea02ec1bb22a18d6b076b77
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
