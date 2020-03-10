@@ -1,9 +1,11 @@
 <Context>
 
     <!-- Default set of monitored resources. If one of these changes, the    -->
-    <!-- web application will be reloaded.                                   -->
+    <!-- web application will be reloaded.
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+     -->
 
     <!-- Set the cache size. If this is not set, you will get a lot of warning messages on startup -->
     <Resources
