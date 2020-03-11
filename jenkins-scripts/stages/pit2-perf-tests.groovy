@@ -6,6 +6,7 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+
 import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.stage.FailureOutcome
 import com.forgerock.pipeline.stage.Outcome
@@ -54,7 +55,7 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPyrockNoStages(cfg)
                     }
 
-                    // perf authn rest test
+                    // perf am authn rest test
                     subStageName = 'am_authn'
                     stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'authn_rest')
 
@@ -68,7 +69,21 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPyrockNoStages(cfg)
                     }
 
-                    // CRUD on simple managed users tests
+                    // perf am access token test
+                    subStageName = 'am_access_token'
+                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'access_token')
+
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                        def cfg = cfg_common.clone()
+                        cfg += [
+                            USE_SKAFFOLD    : true,
+                            TEST_NAME       : "access_token",
+                        ]
+
+                        withGKEPyrockNoStages(cfg)
+                    }
+
+                    // IDM CRUD on simple managed users tests
                     subStageName = 'idm_crud'
                     stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'simple_managed_users')
 
