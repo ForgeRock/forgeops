@@ -17,7 +17,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 @Library([
     'forgerock-pipeline-libs@22983ac3de75284754110d027979640405966513',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
-    'QaCloudUtils@a2901bed4571dae23ea5b849678b52dd59b25289',
+    'QaCloudUtils@cfed6b9d2b3600e4c29684f86699be0203d5c854',
     'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ])
 import com.forgerock.pipeline.Build
