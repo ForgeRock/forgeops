@@ -39,19 +39,16 @@ export const username = user.replace("." , "_");
 let backendLabels: {[key: string]: string} = {
     "deployedby": "Pulumi",
     "backend": "true",
-    "kubernetes.io/role": "backend",
     "forgerock.io/role": "backend"
 };
 
 let frontendLabels: {[key: string]: string} = {
     "frontend": "true",
-    "kubernetes.io/role": "frontend",
     "forgerock.io/role": "frontend"
 };
 
 let dsLabels: {[key: string]: string} = {
     "ds": "true",
-    "kubernetes.io/role": "ds",
     "forgerock.io/role": "ds"
 };
 
