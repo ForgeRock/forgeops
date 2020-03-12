@@ -34,7 +34,6 @@ void runStage(PipelineRun pipelineRun) {
                         CLUSTER_DOMAIN          : "performance-jenkins.forgeops.com",
                         JENKINS_YAML            : yamlFile,
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-                        SKIP_FORGEOPS           : 'True',
                         EXT_FORGEOPS_PATH       : forgeopsPath,
                         PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
                     ]

@@ -34,7 +34,6 @@ void runStage(PipelineRun pipelineRun) {
                         COMPONENTS_IDM_GITIMAGE_TAG     : gitImageTag,
                         COMPONENTS_IG_GITIMAGE_TAG      : gitImageTag,
                         STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                        SKIP_FORGEOPS                   : 'True',
                         EXT_FORGEOPS_PATH               : forgeopsPath,
                     ]
 

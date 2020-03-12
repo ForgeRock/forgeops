@@ -18,8 +18,6 @@ void runStage(PipelineRun pipelineRun) {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
 
-                localGitUtils.checkoutForgeops()
-
                 dir('lodestar') {
                     def stagesCloud = [:]
 
@@ -40,7 +38,7 @@ void runStage(PipelineRun pipelineRun) {
                             COMPONENTS_IG_IMAGE_UPGRADE_TAG         : getHelmChart('ig').currentTag,
                             COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG   : getHelmChart('ds-empty').currentTag,
                             STASH_LODESTAR_BRANCH                   : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_BRANCH                     : 'fraas-production',
+                            STASH_FORGEOPS_BRANCH                   : 'fraas-production',
                             REPORT_NAME                             : reportName,
                         ]
 

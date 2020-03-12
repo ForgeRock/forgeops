@@ -29,7 +29,6 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = [
                             STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
-                            SKIP_FORGEOPS        : 'True',
                             EXT_FORGEOPS_PATH    : forgeopsPath,
                             TEST_NAME            : 'postcommit',
                             CLUSTER_DOMAIN       : "pit-cluster.forgeops.com",
