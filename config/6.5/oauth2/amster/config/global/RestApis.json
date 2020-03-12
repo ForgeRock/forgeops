@@ -1,7 +1,7 @@
 {
   "metadata" : {
     "realm" : null,
-    "amsterVersion" :  "&{version}",
+    "amsterVersion" : "&{version}",
     "entityType" : "RestApis",
     "entityId" : "RestApis",
     "pathParams" : { }
