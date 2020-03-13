@@ -9,7 +9,7 @@
 @Library([
     'forgerock-pipeline-libs@22983ac3de75284754110d027979640405966513',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
-    'QaCloudUtils@cfed6b9d2b3600e4c29684f86699be0203d5c854',
+    'QaCloudUtils@27731d56bad1b904090b6a485538fb646b95ad77',
     'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ]) _
 
