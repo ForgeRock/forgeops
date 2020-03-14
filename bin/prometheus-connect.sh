@@ -48,7 +48,7 @@ if [[ $GRAFANA -eq 1 ]]; then
         PORT=3000
     fi
 
-    kubectl port-forward $(kubectl get  pods --selector=app=grafana --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:3000 --namespace=$NAMESPACE
+    kubectl port-forward $(kubectl get  pods --selector="app.kubernetes.io/name=grafana" --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:3000 --namespace=$NAMESPACE
 fi
 
 # Port forward to Grafana
