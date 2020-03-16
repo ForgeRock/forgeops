@@ -7,17 +7,28 @@ spec:
     resources:
     - name: forgeops
       type: git
+  stepTemplate:
+    env:
+    - name: SLACK_FAILED_WEBHOOK_URL
+      valueFrom:
+        secretKeyRef:
+          name: slack-webhook
+          key: SLACK_FAILED_WEBHOOK_URL
   steps:
   # Executes skaffold with the kaniko builder to build in cluster
   - name: delete-current-env
     image: "gcr.io/k8s-skaffold/skaffold-in-cluster-builder:latest"
     script: |
       #!/usr/bin/env bash
-      #HACK NEED BETTER IMAGE WITH KUSTOMIZE INCLUDED. KUSTOMIZE == 11MB DOWNLOAD
-      curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-      cp kustomize /usr/local/bin
-      cd /workspace/forgeops
-      skaffold -f skaffold.yaml -p nightly delete
+      {
+        #HACK NEED BETTER IMAGE WITH KUSTOMIZE INCLUDED. KUSTOMIZE == 11MB DOWNLOAD
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        cp kustomize /usr/local/bin
+        cd /workspace/forgeops
+        skaffold -f skaffold.yaml -p nightly delete
+      } || { #If something fails
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to delete old environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+      }
 
   - name: delete-pvcs
     image: gcr.io/cloud-builders/kubectl
@@ -28,14 +39,17 @@ spec:
     image: "gcr.io/k8s-skaffold/skaffold-in-cluster-builder:latest"
     script: |
       #!/usr/bin/env bash
-      #HACK NEED BETTER IMAGE WITH KUSTOMIZE INCLUDED. KUSTOMIZE == 11MB DOWNLOAD
-      curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-      cp kustomize /usr/local/bin
-      cd /workspace/forgeops
-      cd bin
-      ./config.sh init -v 7.0 -p cdk
-      cd ..
-      sleep 30
-      skaffold -f skaffold.yaml -p nightly --default-repo=gcr.io/engineering-devops/nightly render >render.yaml
-      kubectl apply -f render.yaml
-
+      {
+        #HACK NEED BETTER IMAGE WITH KUSTOMIZE INCLUDED. KUSTOMIZE == 11MB DOWNLOAD
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        cp kustomize /usr/local/bin
+        cd /workspace/forgeops
+        cd bin
+        ./config.sh init -v 7.0 -p cdk
+        cd ..
+        sleep 30
+        skaffold -f skaffold.yaml -p nightly --default-repo=gcr.io/engineering-devops/nightly --status-check=false run
+      } || {
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+      }
+      

@@ -8,7 +8,9 @@ The entire build is done in the cluster itself. No external tooling is required.
 * Create a `kaniko-secret` in the default namespace. `kubectl create secret generic kaniko-secret --from-file=kaniko-secret`.
    The secret is the GCP service account json that has privileges to push/pull images to gcr.io
 * Optional: install the tkn cli tool. More information: https://github.com/tektoncd/cli
-
+  You can perform actions like:
+    tkn pipelinerun logs nightly-pipeline-run-lf7tn -f -n nightly #get pipeline logs
+    tkn -n nightly pipeline start nightly-pipeline -s tekton-worker #start a pipeline
 
 ## Run
 
