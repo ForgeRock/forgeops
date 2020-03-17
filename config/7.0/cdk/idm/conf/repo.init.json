@@ -30,6 +30,11 @@
         "id" : "openidm-prometheus",
         "name" : "openidm-prometheus",
         "description" : "Prometheus access"
+      },
+      {
+        "id" : "platform-provisioning",
+        "name" : "platform-provisioning",
+        "description" : "Platform provisioning access"
       }
     ],
     "internal/user": [
@@ -42,6 +47,14 @@
         "id" : "anonymous",
         "password" : "anonymous",
         "authzRoles" : [ { "_ref" : "internal/role/openidm-reg" } ]
+      },
+      {
+        "id" : "idm-provisioning",
+        "authzRoles" : [
+          {
+            "_ref" : "internal/role/platform-provisioning"
+          }
+        ]
       }
     ]
   },

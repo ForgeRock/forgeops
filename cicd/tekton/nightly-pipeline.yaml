@@ -32,3 +32,9 @@ spec:
       params:
       - name: replicas
         value: "1"         
+
+    - name: notify-step
+      runAfter:
+        - scale-am-deployment-step
+      taskRef:
+        name: notify

@@ -1,0 +1,60 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: notify
+spec:
+  steps:
+    - name: notify-send-passwords
+      image: gcr.io/cloud-builders/kubectl
+      env:
+      - name: SLACK_WEBHOOK_URL
+        valueFrom:
+          secretKeyRef:
+            name: slack-webhook
+            key: SLACK_WEBHOOK_URL
+      script: |
+        #!/usr/bin/env bash
+        getsec () {
+        kubectl get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
+        }
+        OUT=./temp.json
+        cat <<EOF >$OUT
+        {
+          "blocks": [{
+            "type": "section",
+            "text": {
+              "text": "Nightly pipeline Successful. Random Passwords generated for tonight's nightly environment. See <https://nightly.iam.forgeops.com/admin>",
+              "type": "mrkdwn"
+            },
+            "fields": [
+              {
+                "type": "mrkdwn",
+                "text": "*uid=admin*: \`$(getsec ds-passwords dirmanager\\.pw)\`"
+              },
+              {
+                "type": "mrkdwn",
+                "text": "*configStore profile*: \`$(getsec amster-env-secrets CFGUSR_PASS)\`"
+              },
+              {
+                "type": "mrkdwn",
+                "text": "*ctsStore profile*: \`$(getsec amster-env-secrets CTSUSR_PASS)\`"
+              },
+              {
+                "type": "mrkdwn",
+                "text": "*idrepo profile*: \`$(getsec amster-env-secrets USRUSR_PASS)\`"
+              },
+              {				
+                "type": "mrkdwn",
+                "text": "*amadmin*: \`$(getsec amster-env-secrets AMADMIN_PASS)\`"
+              },
+              {	
+                "type": "mrkdwn",
+                "text": "*openidm-admin*: \`$(getsec idm-env-secrets OPENIDM_ADMIN_PASSWORD)\`"
+              },
+            ]
+          }]
+        }
+        EOF
+        curl -X POST -H 'Content-type: application/json' --data @temp.json $SLACK_WEBHOOK_URL
+
+

@@ -24,7 +24,7 @@
             },
             {
                 "subject": "idm-provisioning",
-                "localUser": "internal/user/openidm-admin",
+                "localUser": "internal/user/idm-provisioning",
                 "userRoles": "authzRoles"
             }
         ]

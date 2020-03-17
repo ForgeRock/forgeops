@@ -241,6 +241,60 @@
       "customAuthz" : "request.additionalParameters.commandId === 'delete-mapping-links'"
     },
     {
+      "pattern"   : "managed/*",
+      "roles"     : "internal/role/platform-provisioning",
+      "methods"   : "create,read,query,patch"
+    },
+    {
+      "pattern"   : "internal/role/*",
+      "roles"     : "internal/role/platform-provisioning",
+      "methods"   : "read,query"
+    },
+    {
+      "pattern"   : "profile/*",
+      "roles"     : "internal/role/platform-provisioning",
+      "methods"   : "create,read,action,update",
+      "actions"   : "*"
+    },
+    {
+      "pattern"   : "policy/*",
+      "roles"     : "internal/role/platform-provisioning",
+      "methods"   : "read,action",
+      "actions"   : "*"
+    },
+    {
+      "pattern"    : "schema/*",
+      "roles"      : "internal/role/platform-provisioning",
+      "methods"    : "read"
+    },
+    {
+      "pattern"    : "consent",
+      "roles"      : "internal/role/platform-provisioning",
+      "methods"    : "action,query",
+      "actions"    : "*"
+    },
+    {
+      "pattern"    : "selfservice/kba",
+      "roles"      : "internal/role/platform-provisioning",
+      "methods"    : "read"
+    },
+    {
+      "pattern"    : "selfservice/terms",
+      "roles"      : "internal/role/platform-provisioning",
+      "methods"    : "read"
+    },
+    {
+      "pattern"    : "identityProviders",
+      "roles"      : "internal/role/platform-provisioning",
+      "methods"    : "read"
+    },
+    {
+      "pattern"   : "external/email",
+      "roles"     : "internal/role/platform-provisioning",
+      "methods"   : "action",
+      "actions"   : "sendTemplate"
+    },
+    {
       "pattern"   : "policy/*",
       "roles"     : "internal/role/openidm-authorized",
       "methods"   : "read,action",

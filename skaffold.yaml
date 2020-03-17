@@ -26,7 +26,7 @@ build: &default-build
     context: docker/7.0/ig
   tagPolicy:
     sha256: {}
-deploy:
+deploy: &default-deploy
   kustomize:
     path: ./kustomize/overlay/7.0/all
 
@@ -61,8 +61,8 @@ profiles:
 
 # 24/7 Demo environment
 - name: nightly
-  build:
-    artifacts:
+  build: &kaniko-build
+    artifacts: &kaniko-artifacts
     - image: am
       context: docker/7.0/am
       kaniko:
@@ -98,6 +98,11 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/nightly
+
+# Default with Kaniko
+- name: default-kaniko
+  build: *kaniko-build
+  deploy: *default-deploy
 
 # skaffold dev will not work with this, due to a new kustomize api thats being used for patching all objects
 # ensure psp controller is enabled e.g. gcloud beta container clusters update cloud-1472 --enable-pod-security-policy --zone us-east4
