@@ -10,6 +10,7 @@ BASE_DN="ou=identities"
 START=0
 BASE_DN="ou=identities"
 BACKEND=amIdentityStore
+PASSWORD="${ADMIN_PASSWORD:-password}"
 
 # TODO: Is there a need to start at non zero?
 [[ $# -eq 1 ]] && USERS=$1
@@ -84,7 +85,7 @@ EOF
 # If you dont do this the backend will not start.
 rm -f data/var/users.ldif
 echo "Saving existing data in $BACKEND"
-export-ldif --backendId $BACKEND  --bindDN "uid=admin" --bindPassword password  \
+export-ldif --backendId $BACKEND  --bindDN "uid=admin" --bindPassword $PASSWORD  \
  --port 4444 --trustAll \
  --noPropertiesFile --ldifFile data/var/users.ldif
 
@@ -103,4 +104,4 @@ export OPENDJ_JAVA_ARGS="-Xmx2048m"
 import-ldif --clearBackend --backendId $BACKEND --ldifFile data/var/import.ldif \
    --skipFile /tmp/skip  --rejectFile /tmp/rejects \
    --noPropertiesFile --port 4444 --trustAll \
-   --bindDN "uid=admin" --bindPassword password --clearBackend --overwrite
+   --bindDN "uid=admin" --bindPassword $PASSWORD --clearBackend --overwrite
