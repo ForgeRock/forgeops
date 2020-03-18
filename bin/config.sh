@@ -242,7 +242,7 @@ init)
 		init_config "$p"
 	done
 
-	rm -rf mkdir -p docker/forgeops-secrets/forgeops-secrets-image/config
+	rm -rf docker/forgeops-secrets/forgeops-secrets-image/config
 	mkdir -p docker/forgeops-secrets/forgeops-secrets-image/config
 
 	echo "Copying version to version.sh"
