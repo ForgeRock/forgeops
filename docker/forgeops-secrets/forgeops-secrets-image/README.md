@@ -22,12 +22,10 @@ to the samples.
 - For 6.5, a CA is created using keytool and https/ldaps certs are signed by this CA for AM/IDM/DS.
 - For 7.0, the new DS `dskeymgr` tool is used to build a CA and also issue/sign certs for AM/IDM/DS.
 - A java trust store is built and mounted on amster, DS, AM, IDM, allowing the services to trust each other's certs.
-- In the `cloud-deployment` and `cdk` profiles of the `config.sh` script, the generated passwords are all set to `password` (in the case of openidm-admin, `openidm-admin`).
-To randomly generate the passwords, delete the OVERRIDE_ALL_PASSWORDS.txt file from the config folder after you run the config.sh script. 
 
-### Major additions/changes to CDK/CDM artefacts
+### Major additions/changes to CDK/CDM artifacts
 
-- The amster pod has been modified to allow it to execute arbetrary scripts before amster scripts. An additional script is added here which configures the DS profile accounts with random passwords before amster executes.
+- The amster pod has been modified to allow it to execute arbitrary scripts before amster scripts. An additional script is added here which configures the DS profile accounts with random passwords before amster executes.
 - The DS init container has been modified to have a ds-init.sh script which configures the `uid=admin` password before DS starts.
 
 ## Usage WARNING
@@ -43,7 +41,7 @@ These tools make an effort to randomly generate all secrets for a **default** AM
 ## Detailed information
 
 
-### usage
+### Usage
 1. Configure as usual (`bin/config.sh init -v 6.5` or  `bin/config.sh init -v 7.0`)
 1. Deploy CDK/CDM as usual ( `skaffold dev` or `skaffold dev -f skaffold-6.5.yaml`)
 1. Wait for the forgeops-secrets job to complete.
@@ -52,10 +50,6 @@ These tools make an effort to randomly generate all secrets for a **default** AM
 
 ### setting all passwords to the same value (for dev, automated testing)
 To have all passwords set with the same value, create a single file called `OVERRIDE_ALL_PASSWORDS.txt` to the config folder.
-
-Add a single password to this file on one line only, eg `echo -n mypassword > OVERRIDE_ALL_PASSWORDS.txt`.
-
-This only affects passwords, not generated keys or certificates.
 
 ### Security considerations, things that could be improved
 

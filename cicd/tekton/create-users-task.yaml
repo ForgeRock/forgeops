@@ -23,9 +23,11 @@ spec:
         #!/usr/bin/env bash
         {
           sleep 15
+          kubectl wait --for=condition=complete --timeout=120s job -l app=forgeops-secrets --all
           kubectl wait --for=condition=ready --timeout=600s pod -l vendor=forgerock --all
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Some pods still unhealthy after 600s. Failed to create users"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
         }
 
     - name: wait-for-amster-config
@@ -37,15 +39,24 @@ spec:
           (kubectl logs $(kubectl get pod -l app=amster -o jsonpath="{.items[0].metadata.name}") -f &) | grep -qi "configuration script finished"
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Amster config failed"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
         }
       
     - name: create-users
       image: gcr.io/cloud-builders/kubectl
+      env:
+      - name: ADMIN_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: ds-passwords
+            key: dirmanager.pw      
       script: |
         #!/usr/bin/env bash
         {
-          kubectl exec ds-idrepo-0 make-users.sh $(inputs.params.users)
+          #set ADMIN_PASSWORD and run make-users.sh 
+          kubectl exec ds-idrepo-0 -- bash -c "export ADMIN_PASSWORD=$ADMIN_PASSWORD; make-users.sh $(inputs.params.users)"
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to create users. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
         }      
     

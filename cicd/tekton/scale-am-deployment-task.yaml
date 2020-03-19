@@ -25,6 +25,7 @@ spec:
           kubectl scale deployment am --replicas=0
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to scale AM to zero. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
         }
 
     - name: wait-10-seconds
@@ -40,6 +41,7 @@ spec:
           kubectl scale deployment am --replicas=$(inputs.params.replicas)
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to scale AM back to $(inputs.params.replicas). See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
         }
 
     - name: wait-for-all-pods-ready
@@ -51,5 +53,6 @@ spec:
           kubectl wait --for=condition=ready --timeout=600s pod -l vendor=forgerock --all
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Some pods are not healthy after AM restart. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
         }
     

@@ -28,13 +28,23 @@ spec:
         skaffold -f skaffold.yaml -p nightly delete
       } || { #If something fails
         curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to delete old environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        exit 1
       }
 
-  - name: delete-pvcs
+  - name: clean-pvcs-secrets
     image: gcr.io/cloud-builders/kubectl
-    command: ["bash", "-c"]
-    args: ["kubectl delete pvc --all"]
-
+    script: |
+      #!/usr/bin/env bash
+      {
+        kubectl delete secrets am-boot-secrets am-env-secrets am-https am-runtime-keystore am-runtime-passwords
+        kubectl delete secrets amster amster-env-secrets ds ds-deployment-key ds-passwords idm idm-env-secrets platform-ca truststore
+        kubectl delete pvc --all
+        
+      } || {
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
+        exit 1
+      }
+      
   - name: deploy-new-env
     image: "gcr.io/k8s-skaffold/skaffold-in-cluster-builder:latest"
     script: |
@@ -51,5 +61,6 @@ spec:
         skaffold -f skaffold.yaml -p nightly --default-repo=gcr.io/engineering-devops/nightly --status-check=false run
       } || {
         curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        exit 1
       }
       
