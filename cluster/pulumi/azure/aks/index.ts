@@ -7,7 +7,7 @@ const infraReference = new pulumi.StackReference("azure-infra");
 
 const infra = {
     adAppId: infraReference.getOutput("adAppId"),
-    adSpObjectId: infraReference.getOutputSync("adSpObjectId"),
+    adSpObjectId: infraReference.requireOutput("adSpObjectId"),
     adSpPassword: infraReference.requireOutput("adSpPassword"),
     location: infraReference.requireOutput("location"),
     ipResourceGroupName: infraReference.requireOutput("ipResourceGroupName")
