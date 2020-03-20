@@ -20,7 +20,7 @@ def wait_for_products():
     """
     ready = False
 
-    headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+    headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': os.environ['AM_ADMIN_PWD'],
                'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
     logger.info('Targetting cluster in {}'.format(base_url()))

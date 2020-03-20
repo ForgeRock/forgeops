@@ -4,7 +4,8 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   args: ['--default-repo', 'gcr.io/$PROJECT_ID', '-p', 'smoke', 'delete']
 - name: 'gcr.io/cloud-builders/kubectl'
-  args: ['-n=smoke','delete', 'pvc', '--all']
+  entrypoint: 'bash'
+  args: ['./bin/clean.sh', 'smoke']
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: 'bash'
   args: ['./bin/config.sh', 'init', '-p', 'cdk', '-v', '7.0']

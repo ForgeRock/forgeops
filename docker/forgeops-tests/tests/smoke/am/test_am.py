@@ -2,7 +2,7 @@
 Basic OpenAM smoke test suite.
 """
 # Lib imports
-import re
+import re, os
 from requests import get, post, delete
 
 # Framework imports
@@ -27,7 +27,7 @@ class TestAM(object):
     def test_1_admin_login(self):
         """Test AuthN as amadmin"""
 
-        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': os.environ['AM_ADMIN_PWD'],
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         logger.test_step('Admin authn REST')

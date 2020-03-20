@@ -1,10 +1,19 @@
 #!/usr/bin/env bash
 
+NAMESPACE=${1:-}
+NAMESPACE_CMD=
+if [ -z "$NAMESPACE" ]
+then 
+  NAMESPACE_CMD="" 
+else
+  echo "Targetting namespace: $NAMESPACE"
+  NAMESPACE_CMD="-n $NAMESPACE"
+fi
 # Delete PVCs
-kubectl delete pvc --all
+kubectl $NAMESPACE_CMD delete pvc --all
 
 # Clean up secrets
-kubectl get secrets | grep am | kubectl delete secrets $(awk '{ print $1 }')
-kubectl get secrets | grep idm | kubectl delete secrets $(awk '{ print $1 }')
-kubectl get secrets | grep ds | kubectl delete secrets $(awk '{ print $1 }')
-kubectl delete secret truststore platform-ca
+kubectl $NAMESPACE_CMD get secrets | grep am  | kubectl $NAMESPACE_CMD delete secrets $(awk '{ print $1 }')
+kubectl $NAMESPACE_CMD get secrets | grep idm | kubectl $NAMESPACE_CMD delete secrets $(awk '{ print $1 }')
+kubectl $NAMESPACE_CMD get secrets | grep ds  | kubectl $NAMESPACE_CMD delete secrets $(awk '{ print $1 }')
+kubectl $NAMESPACE_CMD delete secret truststore platform-ca

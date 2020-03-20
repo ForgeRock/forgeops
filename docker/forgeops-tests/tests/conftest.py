@@ -6,7 +6,7 @@
 import os
 from requests import get, post
 from lib.utils import logger, rest
-from config.ProductConfig import AMConfig, IGConfig, DSConfig
+from config.ProductConfig import AMConfig, IGConfig, DSConfig, IDMConfig
 
 def pytest_configure(config):
     root_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
@@ -65,7 +65,7 @@ def get_am_version_info():
     am_cfg = AMConfig()
 
     logger.info("Get software version of the OpenAM instance")
-    headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+    headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': os.environ['AM_ADMIN_PWD'],
                'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
     response = post(verify=am_cfg.ssl_verify, url=am_cfg.rest_authn_url, headers=headers)
