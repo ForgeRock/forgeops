@@ -33,7 +33,7 @@ class AMPod(Pod):
         amcfg = AMConfig()
 
         logger.debug('Get admin token')
-        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': os.environ['AM_ADMIN_PWD'],
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         response = post(verify=amcfg.ssl_verify, url=amcfg.rest_authn_url, headers=headers)

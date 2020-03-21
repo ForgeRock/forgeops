@@ -51,10 +51,7 @@ class AMConfig(object):
     def __init__(self):
         self.am_url = '%s/am' % base_url()
 
-        if 'AM_ADMIN_PWD' in os.environ:
-            self.amadmin_pwd = os.environ['AM_ADMIN_PWD']
-        else:
-            self.amadmin_pwd = 'password'
+        self.amadmin_pwd = os.environ['AM_ADMIN_PWD']
 
         self.am_realm = "/"
         # Use the console auth module /json/authenticate?authIndexType=service&authIndexValue=adminconsoleservice
@@ -65,7 +62,7 @@ class AMConfig(object):
         self.ssl_verify = SSL_VERIFY
 
     def create_user(self, username, password='password'):
-        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': self.amadmin_pwd,
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         logger.test_step('Admin login')
@@ -77,7 +74,7 @@ class AMConfig(object):
         headers = {'iPlanetDirectoryPro': admin_token, 'Content-Type': 'application/json',
                    'Accept-API-Version': 'resource=3.0, protocol=2.1'}
         user_data = {'username': username,
-                     'userpassword': 'password',
+                     'userpassword': password,
                      'mail': f'{username}@forgerock.com'}
 
         logger.test_step('Expecting test user to be created - HTTP-201')
@@ -86,7 +83,7 @@ class AMConfig(object):
         rest.check_http_status(http_result=response, expected_status=201)
 
     def delete_user(self, username):
-        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': 'password',
+        headers = {'X-OpenAM-Username': 'amadmin', 'X-OpenAM-Password': self.amadmin_pwd,
                    'Content-Type': 'application/json', 'Accept-API-Version': 'resource=2.0, protocol=1.0'}
 
         logger.test_step('Admin login')
@@ -118,15 +115,8 @@ class IDMConfig(object):
     def __init__(self):
         self.idm_url = '%s/openidm' % base_url()
 
-        if 'IDM_ADMIN_USERNAME' in os.environ:
-            self.idm_admin_username = os.environ['IDM_ADMIN_USERNAME']
-        else:
-            self.idm_admin_username = 'openidm-admin'
-
-        if 'IDM_ADMIN_PWD' in os.environ:
-            self.idm_admin_pwd = os.environ['IDM_ADMIN_PWD']
-        else:
-            self.idm_admin_pwd = 'openidm-admin'
+        self.idm_admin_username = os.environ.get('IDM_ADMIN_USERNAME', 'openidm-admin')
+        self.idm_admin_pwd = os.environ['IDM_ADMIN_PWD']
 
         self.rest_ping_url = self.idm_url + '/info/ping'
         self.rest_managed_user_url = self.idm_url + '/managed/user'

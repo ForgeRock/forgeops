@@ -7,6 +7,8 @@ config:
   dsnodes:enable: "false"
   frontendnodes:enable: "false"
   gcp:region: us-east1
+  localssdprovisioner:enable: "false"
+  localssdprovisioner:namespace: ""
   primarynodes:autoScaling: "false"
   primarynodes:initialNodeCount: "0"
   primarynodes:nodeCount: "1"

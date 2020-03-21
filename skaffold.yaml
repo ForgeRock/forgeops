@@ -32,7 +32,6 @@ deploy: &default-deploy
 
 # Additional profiles
 profiles:
-
 # Smoke tests
 - name: smoke
   build: &default-test-build

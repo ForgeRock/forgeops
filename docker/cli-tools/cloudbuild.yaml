@@ -1,51 +1,29 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
+  id: base
+  entrypoint: 'make'
   args:
-    - 'build'
-    - '-t'
-    - 'gcr.io/engineering-devops/yamkt'
     - '-f'
-    - 'docker/cli-tools/base/Dockerfile'
-    - 'docker/cli-tools/base/'
+    - 'docker/cli-tools/Makefile'
+    - 'yamkt'
 - name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'make'                   
+  waitFor: base
   args:
-    - 'push'
-    - 'gcr.io/engineering-devops/yamkt:latest'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    - 'build'
-    - '-t'
-    - 'gcr.io/engineering-devops/yamkt:skaffold'
-    - '--target'
-    - 'skaffold'
     - '-f'
-    - 'docker/cli-tools/base/Dockerfile'
-    - 'docker/cli-tools/base/'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    - 'push'
-    - 'gcr.io/engineering-devops/yamkt:skaffold'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    - 'build'
-    - '-t'
-    - 'gcr.io/engineering-devops/cdm-cli'
-    - '-f'
-    - 'docker/cli-tools/cdm/Dockerfile'
-    - '.'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    - 'push'
-    - 'gcr.io/engineering-devops/cdm-cli:latest'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    - 'build'
-    - '-t'
-    - 'gcr.io/engineering-devops/cdk-cli'
-    - '-f'
-    - 'docker/cli-tools/cdk/Dockerfile'
-    - '.'
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-    - 'push'
-    - 'gcr.io/engineering-devops/cdk-cli:latest'
+    - 'docker/cli-tools/Makefile'
+    - 'cdm'
+- name: 'gcr.io/cloud-builders/docker'  
+  entrypoint: 'make'                    
+  waitFor: base                         
+  args:                                 
+    - '-f'                              
+    - 'docker/cli-tools/Makefile'       
+    - 'cdk'                             
+- name: 'gcr.io/cloud-builders/docker'   
+  entrypoint: 'make'                     
+  waitFor: base                          
+  args:                                  
+    - '-f'                               
+    - 'docker/cli-tools/Makefile'        
+    - 'toolbox'                              

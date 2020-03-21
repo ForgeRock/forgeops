@@ -1,9 +1,9 @@
 kind: ""
 apiversion: ""
 commonLabels:
-  app: idm
-  component: idm
-  vendor: forgerock
+    app: idm
+    component: idm
+    vendor: forgerock
 resources:
 - configmap.yaml
 - statefulset.yaml

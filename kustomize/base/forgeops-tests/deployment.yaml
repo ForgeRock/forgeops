@@ -55,6 +55,18 @@ spec:
             secretKeyRef:
               name: slack-webhook
               key: SLACK_WEBHOOK_URL
+              
+        - name: AM_ADMIN_PWD
+          valueFrom:
+            secretKeyRef:
+              name: amster-env-secrets
+              key: AMADMIN_PASS
+ 
+        - name: IDM_ADMIN_PWD
+          valueFrom:
+            secretKeyRef:
+              name: idm-env-secrets
+              key: OPENIDM_ADMIN_PASSWORD
 
         - name: INGRESS_PATH_PREFIX
           value: /tests

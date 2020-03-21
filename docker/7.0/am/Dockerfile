@@ -4,7 +4,6 @@ FROM gcr.io/forgerock-io/am:7.0.0-184e4c2bda9aa7df1ed416b7dcbbe9371a33e8f3
 # Installs ldap utils for querying the repo.
 USER root
 RUN apt-get update && apt-get install -y ldap-utils && apt-get clean all
-USER forgerock
 COPY --chown=forgerock:root openam /home/forgerock/openam
 # END
 
@@ -20,6 +19,8 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 # Override the entrypoint and just start tomcat
 #CMD ["catalina.sh", "run"]
 
+RUN chown -R forgerock:root /home/forgerock
 #ENTRYPOINT ["/bin/sh"]
 # Use sh - because windows has issues with +x on the script
+USER forgerock
 CMD ["bash", "-c", "/home/forgerock/openam/boot.sh"]
