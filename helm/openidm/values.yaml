@@ -33,7 +33,7 @@ secret:
 component: openidm
 
 image:
-  repository: gcr.io/forgerock-io/idm/pit1
+  repository: gcr.io/forgerock-io/idm
   tag: 7.0.0-f60f0b2dabdf1d8acb513bc2b155a48e1cd39411
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
