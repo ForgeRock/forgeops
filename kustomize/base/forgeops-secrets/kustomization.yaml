@@ -2,7 +2,7 @@ kind: ""
 apiversion: ""
 commonLabels:
 #  vendor: forgerock - label removed
-    app: forgeops-secrets
+  app: forgeops-secrets
 resources:
 - role.yaml
 - roleBinding.yaml

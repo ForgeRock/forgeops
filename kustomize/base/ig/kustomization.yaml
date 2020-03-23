@@ -4,6 +4,7 @@ commonLabels:
   app: ig
   component: ig
   vendor: forgerock
+  tier: middle
 resources:
 - deployment.yaml
 - secret.yaml

@@ -1,0 +1,136 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ds-replication-policy
+  labels:
+    tier: data
+spec:
+  podSelector:
+    matchExpressions:
+    - key: tier
+      operator: In
+      values:
+      - data
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: tier
+          operator: In
+          values:
+          - data
+    ports:
+    - protocol: TCP
+      port: 8989
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ds-idrepo-ldap-policy
+  labels:
+    tier: data
+spec:
+  podSelector:
+    matchLabels:
+      app: ds-idrepo
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - am
+          - idm
+          - amster
+    ports:
+    - protocol: TCP
+      port: 1389
+    - protocol: TCP
+      port: 1636
+    - protocol: TCP
+      port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ds-cts-ldap-policy
+  labels:
+    tier: data
+spec:
+  podSelector:
+    matchLabels:
+      app: ds-cts
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - am
+          - amster
+    ports:
+    - protocol: TCP
+      port: 1389
+    - protocol: TCP
+      port: 1636
+    - protocol: TCP
+      port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-http-access
+  labels:
+    tier: middle
+spec:
+  podSelector:
+    matchExpressions:
+    - key: tier
+      operator: In
+      values:
+      - middle
+  policyTypes:
+  - Ingress
+  ingress:
+  - from: []
+    ports:
+      - protocol: TCP
+        port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: front-end-http-access
+  labels:
+    tier: ui
+spec:
+  podSelector:
+    matchExpressions:
+    - key: tier
+      operator: In
+      values:
+      - ui
+  policyTypes:
+  - Ingress
+  ingress:
+  - from: []
+    ports:
+      - protocol: TCP
+        port: 80

@@ -4,6 +4,7 @@ commonLabels:
   app: web
   component: web
   vendor: forgerock
+  tier: ui
 resources:
 - deployment.yaml
 - service.yaml

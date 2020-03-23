@@ -3,7 +3,7 @@ kind: StatefulSet
 metadata:
   name: ds
   labels:
-    component: ds
+    tier: ds
 spec:
   selector:
     matchLabels:
@@ -14,6 +14,8 @@ spec:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+      labels:
+        tier: ds
     spec:
       affinity:
         # Pod anti-affinity will attempt to spread out (repel) DS instances on to different nodes

@@ -4,6 +4,7 @@ commonLabels:
   app: am
   # Prometheus selector
   component: am
+  tier: middle
   vendor: forgerock
 # - ingress.yaml
 resources:
