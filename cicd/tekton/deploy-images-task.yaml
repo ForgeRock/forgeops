@@ -36,10 +36,8 @@ spec:
     script: |
       #!/usr/bin/env bash
       {
-        kubectl delete secrets am-boot-secrets am-env-secrets am-https am-runtime-keystore am-runtime-passwords
-        kubectl delete secrets amster amster-env-secrets ds ds-deployment-key ds-passwords idm idm-env-secrets platform-ca truststore
-        kubectl delete pvc --all
-        
+        cd /workspace/forgeops/bin
+        ./clean.sh nightly
       } || {
         curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
