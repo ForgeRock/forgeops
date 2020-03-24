@@ -4,6 +4,7 @@ commonLabels:
     app: idm
     component: idm
     vendor: forgerock
+    tier: middle
 resources:
 - configmap.yaml
 - statefulset.yaml

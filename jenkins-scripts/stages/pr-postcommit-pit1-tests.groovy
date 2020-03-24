@@ -51,7 +51,7 @@ void runStage(PipelineRun pipelineRun) {
                             REPORT_NAME                     : reportName
                         ]
 
-                        withGKEPitNoStages(cfg)
+                        withGKESpyglaasNoStages(cfg)
                     }
 
                     // Skaffold tests
@@ -66,7 +66,7 @@ void runStage(PipelineRun pipelineRun) {
                             REPORT_NAME : reportName
                         ]
 
-                        withGKEPitNoStages(cfg)
+                        withGKESpyglaasNoStages(cfg)
                     }
 
                     summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")

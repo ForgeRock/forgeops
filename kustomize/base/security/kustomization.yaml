@@ -5,3 +5,4 @@ resources:
   - psp.yaml
   - role.yaml
   - rolebinding.yaml
+  - netpolicies.yaml
