@@ -39,8 +39,7 @@ spec:
         cd /workspace/forgeops/bin
         ./clean.sh nightly
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
-        exit 1
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Warning: Skaffold failed to cleanup environment. Please verify the nightly deploy"}' $SLACK_FAILED_WEBHOOK_URL
       }
       
   - name: deploy-new-env
