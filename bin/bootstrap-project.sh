@@ -193,9 +193,9 @@ run_setup_workspace () {
 
 run_bootstrap() {
     echo "bootstrapping"
-    run_setup_fork \
-        && run_render_templates \
-            && run_keygen \
+    setup_workspace \
+        && run_setup_fork \
+            && run_render_templates \
                 && touch "${WORKSPACE}/.CONFIGURED"
     return $!
 }
