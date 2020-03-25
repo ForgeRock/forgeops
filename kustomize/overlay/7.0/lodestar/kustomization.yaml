@@ -14,7 +14,7 @@ resources:
 - ../../../base/login-ui
 - ../../../base/admin-ui
 - ../../../base/web
-- ../../../base/ingress
+- ../../../base/7.0/ingress
 
 configMapGenerator:
 - name: platform-config

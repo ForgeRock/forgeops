@@ -8,7 +8,7 @@ resources:
 - ../../../base/am
 - ../../../base/amster
 - ../../../base/idm
-- ../../../base/ingress
+- ../../../base/6.5/ingress
 
 configMapGenerator:
 - name: platform-config
