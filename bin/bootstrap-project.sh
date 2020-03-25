@@ -7,7 +7,7 @@ set -o pipefail
 [[ "${FR_DEBUG}" == true ]] && set -x
 
 NAMESPACE="${FR_NAMESPACE}"
-SUBDOMAIN="${FR_SUBDOMAIN}"
+SUBDOMAIN="${FR_SUBDOMAIN:-iam}"
 DOMAIN="${FR_DOMAIN}"
 WORKSPACE="${FR_WORKSPACE:-/opt/workspace/forgeops}"
 UPSTREAM="${FR_UPSTREAM:-https://github.com/ForgeRock/forgeops.git}"
@@ -152,7 +152,7 @@ cat >"$CDIR/run.sh" <<EOF
 #!/usr/bin/env bash
 # Generated script
 
-skaffold -f kaniko.yaml --default-repo=$DOCKER_REPO -p dev dev
+skaffold --default-repo=$DOCKER_REPO -p kdev dev
 
 EOF
 chmod +x $CDIR/run.sh

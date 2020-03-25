@@ -64,29 +64,26 @@ profiles:
     artifacts: &kaniko-artifacts
     - image: am
       context: docker/7.0/am
-      kaniko:
-        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
-#       cache: {} DO NOT specify cache object.
+      kaniko: &kaniko-opts
+        cache: {}
+        image: gcr.io/kaniko-project/executor:v0.19.0
+        flags:
+        - '--single-snapshot'
     - image: amster
       context: docker/7.0/amster
-      kaniko:
-        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+      kaniko: *kaniko-opts
     - image: idm
       context: docker/7.0/idm
-      kaniko:
-        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+      kaniko: *kaniko-opts
     - image: ds-cts
       context: docker/7.0/ds/cts
-      kaniko:
-        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+      kaniko: *kaniko-opts
     - image: ds-idrepo
       context: docker/7.0/ds/idrepo
-      kaniko:
-        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+      kaniko: *kaniko-opts
     - image: forgeops-secrets
       context: docker/forgeops-secrets
-      kaniko:
-        image: gcr.io/kaniko-project/executor:8d9e6b8ea54274f73517f11c113c13cd03d26349
+      kaniko: *kaniko-opts
     cluster:
       namespace: nightly
       pullSecretName: kaniko-secret
@@ -102,6 +99,13 @@ profiles:
 - name: default-kaniko
   build: *kaniko-build
   deploy: *default-deploy
+  
+# kdev - development build for the toolbox image, using the generated kustomize
+- name: kdev
+  build: *kaniko-build
+  deploy:
+    kustomize:
+        path: ./dev
 
 # skaffold dev will not work with this, due to a new kustomize api thats being used for patching all objects
 # ensure psp controller is enabled e.g. gcloud beta container clusters update cloud-1472 --enable-pod-security-policy --zone us-east4
