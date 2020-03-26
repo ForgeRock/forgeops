@@ -38,7 +38,7 @@ ROOT_LEVEL_IMAGE_NAMES = [
         'ds-idrepo' : 'gcr.io/forgerock-io/ds-empty',
         'ds-util'   : 'gcr.io/forgerock-io/ds-empty',
         'idm'       : 'gcr.io/forgerock-io/idm',
-        'ig'        : 'gcr.io/forgerock-io/ig',
+        'ig'        : 'gcr.io/forgerock-io/ig-standalone',
 ]
 
 /** Helm chart file paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
