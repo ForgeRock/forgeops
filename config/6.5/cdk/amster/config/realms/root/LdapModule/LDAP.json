@@ -9,11 +9,11 @@
   "data" : {
     "_id" : "LDAP",
     "authenticationLevel" : 0,
-    "userBindPassword" : null,
+    "userBindPassword" : "&{usrusr.pass|password}",
     "searchScope" : "SUBTREE",
     "returnUserDN" : true,
     "profileAttributeMappings" : [ ],
-    "userBindDN" : "cn=Directory Manager",
+    "userBindDN" : "uid=am-identity-bind-account,ou=admins,ou=identities",
     "userSearchAttributes" : [ "uid" ],
     "connectionHeartbeatTimeUnit" : "SECONDS",
     "beheraPasswordPolicySupportEnabled" : true,
