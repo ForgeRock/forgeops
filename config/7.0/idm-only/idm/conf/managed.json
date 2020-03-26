@@ -27,6 +27,7 @@
                     "password",
                     "givenName",
                     "sn",
+                    "cn",
                     "mail",
                     "description",
                     "accountStatus",
@@ -106,6 +107,7 @@
                         ]
                     },
                     "cn" : {
+                        "title" : "Common Name",
                         "description" : "Common Name",
                         "type" : "string",
                         "viewable" : false,
