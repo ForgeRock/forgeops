@@ -21,7 +21,7 @@ def build() {
     abortMultibranchPrBuilds()
 
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
-    bitbucketCommentId = prBuild.commentOnPullRequest(buildStatus: 'IN PROGRESS')
+    bitbucketCommentId = bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(buildStatus: 'IN PROGRESS')
 
     try {
         // in order to compare the PR with the target branch, we first need to fetch the target branch
@@ -40,11 +40,12 @@ def build() {
         }
     } catch (FlowInterruptedException ex) {
         currentBuild.result = 'ABORTED'
-        prBuild.commentOnPullRequest(buildStatus: 'ABORTED', originalCommentId: bitbucketCommentId)
+        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(buildStatus: 'ABORTED',
+                                                                      originalCommentId: bitbucketCommentId)
         throw ex
     } catch (exception) {
         currentBuild.result = 'FAILURE'
-        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
+        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(originalCommentId: bitbucketCommentId)
         throw exception
     }
 }
@@ -77,7 +78,7 @@ def postBuildTests(PipelineRun pipelineRun) {
         currentBuild.result = 'FAILURE'
         throw exception
     } finally {
-        prBuild.commentOnPullRequest(originalCommentId: bitbucketCommentId)
+        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(originalCommentId: bitbucketCommentId)
     }
 }
 
