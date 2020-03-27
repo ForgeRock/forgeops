@@ -20,11 +20,11 @@ spec:
           name: web
       containers:
         - name: web
-          image: nginx:latest
+          image: nginxinc/nginx-unprivileged:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:

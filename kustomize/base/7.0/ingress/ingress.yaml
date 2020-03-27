@@ -80,7 +80,7 @@ spec:
       paths:
       - backend:
           serviceName: end-user-ui
-          servicePort: 80
+          servicePort: 8080
         path: /enduser/?(.*)
   tls:
   - hosts:
@@ -103,7 +103,7 @@ spec:
       paths:
       - backend:
           serviceName: login-ui
-          servicePort: 80
+          servicePort: 8080
         path: /login/?(.*)
   tls:
   - hosts:
@@ -126,7 +126,7 @@ spec:
       paths:
       - backend:
           serviceName: admin-ui
-          servicePort: 80
+          servicePort: 8080
         path: /platform/?(.*)
   tls:
   - hosts:
@@ -154,9 +154,9 @@ spec:
       paths:
       - backend:
           serviceName: web
-          servicePort: 80
+          servicePort: 8080
         path: /web
       - backend:
           serviceName: ig
-          servicePort: 80
+          servicePort: 8080
         path: /ig(/|$)(.*)
