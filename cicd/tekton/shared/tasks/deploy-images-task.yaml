@@ -7,6 +7,15 @@ spec:
     resources:
     - name: forgeops
       type: git
+    params:
+    - name: profile
+      type: string
+      description: profile to deploy
+      
+    - name: docker-repo
+      type: string
+      description: Docker repository URL
+      
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
@@ -25,9 +34,9 @@ spec:
         curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
         cp kustomize /usr/local/bin
         cd /workspace/forgeops
-        skaffold -f skaffold.yaml -p nightly delete
+        skaffold -f skaffold.yaml -p $(inputs.params.profile) delete
       } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to delete old environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
 
@@ -37,9 +46,10 @@ spec:
       #!/usr/bin/env bash
       {
         cd /workspace/forgeops/bin
-        ./clean.sh nightly
+        ./clean.sh $(inputs.params.profile)
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Warning: Skaffold failed to cleanup environment. Please verify the nightly deploy"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Warning: clean.sh failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
+        exit 1
       }
       
   - name: deploy-new-env
@@ -55,7 +65,7 @@ spec:
         ./config.sh init -v 7.0 -p cdk
         cd ..
         sleep 30
-        skaffold -f skaffold.yaml -p nightly --default-repo=gcr.io/engineering-devops/nightly --status-check=false run
+        skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) --status-check=false run
       } || {
         curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1

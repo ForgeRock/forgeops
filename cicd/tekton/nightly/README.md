@@ -29,10 +29,15 @@ kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097
 ```
 Or by using tkn cli tool
 
-## Manually Triggering the Task Run
+## Manually Triggering the Pipeline
 
-The task run is started using a Kubernetes Cronjob. You can manually re-run
-the task using the following command:
+The pipeline is triggered by a Kubernetes Cronjob. You can manually re-run the pipeline using the following command:
+
+```bash
+tkn -n nightly pipeline start nightly-pipeline -s tekton-worker #start a pipeline
+```
+
+If you don't have `tkn` installed, you can also start the pipeline by manually triggering the cronjob
 
 ```bash
 kubectl -n nightly create job --from=cronjob/nightly-cronjob manual-run

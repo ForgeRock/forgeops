@@ -14,10 +14,15 @@ spec:
         inputs:
         - name: forgeops
           resource: forgeops
+      params:
+      - name: profile
+        value: nightly
+      - name: docker-repo
+        value: gcr.io/engineering-devops/nightly
           
     - name: create-users-step
       runAfter:
-        - deploy-images-step
+      - deploy-images-step
       taskRef:
         name: create-users
       params:
@@ -26,7 +31,7 @@ spec:
         
     - name: scale-am-deployment-step
       runAfter:
-        - create-users-step
+      - create-users-step
       taskRef:
         name: scale-am-deployment
       params:
@@ -35,6 +40,9 @@ spec:
 
     - name: notify-step
       runAfter:
-        - scale-am-deployment-step
+      - scale-am-deployment-step
       taskRef:
         name: notify
+      params:
+      - name: profile
+        value: nightly
