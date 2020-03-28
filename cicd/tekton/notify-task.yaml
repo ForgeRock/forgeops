@@ -31,18 +31,6 @@ spec:
                 "type": "mrkdwn",
                 "text": "*uid=admin*: \`$(getsec ds-passwords dirmanager\\.pw)\`"
               },
-              {
-                "type": "mrkdwn",
-                "text": "*configStore profile*: \`$(getsec amster-env-secrets CFGUSR_PASS)\`"
-              },
-              {
-                "type": "mrkdwn",
-                "text": "*ctsStore profile*: \`$(getsec amster-env-secrets CTSUSR_PASS)\`"
-              },
-              {
-                "type": "mrkdwn",
-                "text": "*idrepo profile*: \`$(getsec amster-env-secrets USRUSR_PASS)\`"
-              },
               {				
                 "type": "mrkdwn",
                 "text": "*amadmin*: \`$(getsec amster-env-secrets AMADMIN_PASS)\`"

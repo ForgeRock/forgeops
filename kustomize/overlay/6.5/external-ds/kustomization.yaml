@@ -7,7 +7,7 @@ resources:
 - ../../../base/6.5/ds/cts
 - ../../../base/am
 - ../../../base/amster
-- ../../../base/ingress
+- ../../../base/6.5/ingress
 - external-ds.yaml
 # In this example we use an external ds instance
 # - ../../../base/6.5/ds/idrepo

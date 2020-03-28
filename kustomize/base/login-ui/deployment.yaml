@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-login-ui/docker-build:7.0.0-3a8a91e0821e493085cfdd902d4fe0ffdb81e288
+      - image: gcr.io/forgerock-io/platform-login-ui/docker-build:7.0.0-09634b0ee90d5d8b7a4b8bbb1c7795a8b9218456
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -24,7 +24,7 @@ spec:
           limits:
             memory: "100Mi"
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           name: http
           protocol: TCP
         readinessProbe:

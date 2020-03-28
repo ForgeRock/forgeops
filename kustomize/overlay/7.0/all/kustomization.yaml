@@ -15,7 +15,7 @@ resources:
 - ../../../base/login-ui
 - ../../../base/admin-ui
 - ../../../base/web
-- ../../../base/ingress
+- ../../../base/7.0/ingress
 # By default we leave the Application out. You need an Application Controller to deploy this.
 #- application.yaml
 

@@ -45,11 +45,11 @@ These tools make an effort to randomly generate all secrets for a **default** AM
 1. Configure as usual (`bin/config.sh init -v 6.5` or  `bin/config.sh init -v 7.0`)
 1. Deploy CDK/CDM as usual ( `skaffold dev` or `skaffold dev -f skaffold-6.5.yaml`)
 1. Wait for the forgeops-secrets job to complete.
-1. View common passwords `printSecrets.sh 7.0` or `printSecrets.sh 6.5`)
+1. View common passwords `bin/print-secrets.sh 7.0` or `bin/print-secrets.sh 6.5`)
 1. Backup the generated secrets `kubectl get secret -lsecrettype=forgeops-generated -o yaml > secrets.yaml`
 
 ### setting all passwords to the same value (for dev, automated testing)
-To have all passwords set with the same value, create a single file called `OVERRIDE_ALL_PASSWORDS.txt` to the config folder.
+To have all passwords set with the same value, create a single file called `OVERRIDE_ALL_PASSWORDS.txt` to `forgeops-secrets-image/config` folder.
 
 ### Security considerations, things that could be improved
 
