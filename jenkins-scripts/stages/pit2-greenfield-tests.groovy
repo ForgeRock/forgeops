@@ -38,7 +38,7 @@ void runStage(PipelineRun pipelineRun) {
                             CLUSTER_CRASHER                 : 'True',
                             REPEAT                          : 10,
                             REPEAT_WAIT                     : 3600,
-                            TIMEOUT                         : '24',
+                            TIMEOUT                         : '12',
                             TIMEOUT_UNIT                    : 'HOURS',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH               : forgeopsPath,

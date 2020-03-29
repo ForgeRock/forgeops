@@ -12,7 +12,6 @@ void runStage(PipelineRun pipelineRun) {
 
     def stageName = "PERF-PR-Postcommit"
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def namespace = cloud_utils.transformNamespace("jenkins-${env.JOB_NAME}-${env.BUILD_NUMBER}")
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
@@ -33,7 +32,7 @@ void runStage(PipelineRun pipelineRun) {
                             TEST_NAME            : 'postcommit',
                             CLUSTER_DOMAIN       : "pit-cluster.forgeops.com",
                             JENKINS_YAML         : 'lodestar-postcommit.yaml',
-                            CLUSTER_NAMESPACE    : namespace + (new Random().nextInt(10**4)),
+                            CLUSTER_NAMESPACE    : cloud_config.cloudConfig()['CLUSTER_NAMESPACE'],
                             PIPELINE_NAME        : "FORGEOPS_POSTCOMMIT",
                             USE_SKAFFOLD         : true,
                         ]
