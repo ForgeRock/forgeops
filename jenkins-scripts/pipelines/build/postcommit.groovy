@@ -22,7 +22,6 @@ def build() {
     ])
 
     postcommitBuild = new Build(steps, env, currentBuild)
-    def slackChannel = '#cloud-deploy-notify'
     def currentImage
 
     try {
@@ -43,11 +42,7 @@ def build() {
         throw ex
     } catch (exception) {
         currentBuild.result = 'FAILURE'
-        postcommitBuild.sendSlackNotification(
-            slackChannel,
-            true, // prepend @here
-            "${JOB_NAME} #${BUILD_NUMBER} FAILED while building the `${currentImage}` image"
-        )
+        sendSlackNotification("Error occurred while building the `${currentImage}` image")
         throw exception
     }
 }
@@ -81,9 +76,13 @@ def postBuildTests(PipelineRun pipelineRun) {
         currentBuild.result = 'SUCCESS'
     } catch (exception) {
         currentBuild.result = 'FAILURE'
-        postcommitBuild.sendSlackNotification('#cloud-deploy-notify', true, "Failed while running postcommit tests")
+        sendSlackNotification("Error occurred while running postcommit tests")
         throw exception
     }
+}
+
+private void sendSlackNotification(String msgDetails) {
+    slackUtils.sendNoisyStatusMessage('#cloud-deploy-notify', currentBuild.result, msgDetails)
 }
 
 return this

@@ -16,9 +16,6 @@ void runStage(PipelineRun pipelineRun) {
 
     def stageName = 'PIT2 PERF'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def yamlFile = 'jenkins.yaml'
-    def doRecordResult = 'True'
-    def clusterNamespace = 'pyrock'
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('perf-cloud') {
@@ -29,10 +26,10 @@ void runStage(PipelineRun pipelineRun) {
 
                 dir('lodestar') {
                     def cfg_common = [
-                        DO_RECORD_RESULT        : doRecordResult,
-                        CLUSTER_NAMESPACE       : clusterNamespace,
+                        DO_RECORD_RESULT        : 'True',
+                        CLUSTER_NAMESPACE       : 'pyrock',
                         CLUSTER_DOMAIN          : "performance-jenkins.forgeops.com",
-                        JENKINS_YAML            : yamlFile,
+                        JENKINS_YAML            : 'jenkins.yaml',
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                         EXT_FORGEOPS_PATH       : forgeopsPath,
                         PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
