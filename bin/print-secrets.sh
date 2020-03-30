@@ -21,7 +21,7 @@ openidm_admin_password () {
 }
 
 7.0_directory_manager_password () {
-    echo "$(getsec ds dirmanager\\.pw) (uid=admin user)"
+    echo "$(getsec ds-passwords dirmanager\\.pw) (uid=admin user)"
 }
 
 setup_profile_service_account_passwords () {
