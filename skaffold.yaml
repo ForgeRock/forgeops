@@ -32,32 +32,6 @@ deploy: &default-deploy
 
 # Additional profiles
 profiles:
-# Smoke tests
-- name: smoke
-  build: &default-test-build
-    artifacts:
-    - image: ig
-      context: docker/7.0/ig
-    - image: forgeops-tests
-      context: docker/forgeops-tests
-    - image: am
-      context: docker/7.0/am
-    - image: amster
-      context: docker/7.0/amster
-    - image: idm
-      context: docker/7.0/idm
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-    tagPolicy:
-      gitCommit: {}
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/smoke
-
 # 24/7 Demo environment
 - name: nightly
   build: &kaniko-build
@@ -94,6 +68,40 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/nightly
+
+# Smoke tests
+- name: smoke
+  build: 
+    artifacts:     
+    - image: am
+      context: docker/7.0/am
+      kaniko: *kaniko-opts
+    - image: amster
+      context: docker/7.0/amster
+      kaniko: *kaniko-opts
+    - image: idm
+      context: docker/7.0/idm
+      kaniko: *kaniko-opts
+    - image: ds-cts
+      context: docker/7.0/ds/cts
+      kaniko: *kaniko-opts
+    - image: ds-idrepo
+      context: docker/7.0/ds/idrepo
+      kaniko: *kaniko-opts
+    - image: forgeops-secrets
+      context: docker/forgeops-secrets
+      kaniko: *kaniko-opts
+    - image: forgeops-tests
+      context: docker/forgeops-tests
+      kaniko: *kaniko-opts
+    cluster:
+      namespace: smoke
+      pullSecretName: kaniko-secret
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/smoke
 
 # Default with Kaniko
 - name: default-kaniko

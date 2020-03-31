@@ -1,0 +1,73 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: smoke
+spec:
+  params:
+  - name: gitrevision
+    value: $(body.head_commit.id)
+  - name: gitrepositoryurl
+    value: $(body.repository.url)
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: smoke
+spec:
+  params:
+  - name: gitrevision
+    description: The git revision
+    default: master
+  - name: gitrepositoryurl
+    description: The git repository url
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1alpha1
+    kind: PipelineRun
+    metadata:
+      generateName: smoke-run-
+    spec:
+      timeout: 30m
+      serviceAccountName: tekton-worker
+      pipelineRef:
+        name: smoke-pipeline
+      resources:
+      - name: forgeops
+        resourceSpec:
+          type: git
+          params:
+          - name: revision
+            value: $(params.gitrevision)
+          - name: url
+            value: $(params.gitrepositoryurl)
+
+---
+apiVersion: tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: smoke-listener
+spec:
+  serviceAccountName: tekton-worker
+  triggers:
+  - name: stash-trigger
+    interceptors:
+    - github:
+        secretRef:
+          secretName: git-webhook-secret
+          secretKey: secret
+#     eventTypes: #Only available when using github
+#     - push
+    - cel:
+        filter: "header.canonical('X-Event-Key') == 'repo:refs_changed'"
+    - cel:
+        filter: "body.changes[0].ref.type == 'BRANCH' && body.changes[0].type == 'UPDATE' && body.changes[0].ref.displayId == 'master'"
+        overlays:
+        - key: head_commit.id
+          expression: "body.changes[0].toHash" 
+        - key: repository.url
+          expression: "body.repository.links.clone[0].href" 
+
+    bindings:
+    - name: smoke
+    template:
+      name: smoke

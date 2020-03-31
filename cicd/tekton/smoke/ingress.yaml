@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: smoke-pipeline-trigger
+  annotations:
+    cert-manager.io/cluster-issuer: "default-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/triggerbuild)$ $1/ redirect;
+spec:
+  rules:
+  - host: smoke.iam.forgeops.com
+    http:
+      paths:
+      - backend:
+          serviceName: el-smoke-listener
+          servicePort: 8080
+        path: /triggerbuild/?(.*)
+  tls:
+  - hosts:
+    - smoke.iam.forgeops.com
+    secretName: sslcert
