@@ -12,8 +12,8 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # CORS is now set in the AM and IDM configurations
     nginx.ingress.kubernetes.io/enable-cors: "false"
-    certmanager.io/cluster-issuer: "default-issuer"
-    #certmanager.io/cluster-issuer: "ca-issuer"
+    cert-manager.io/cluster-issuer: "default-issuer"
+    #cert-manager.io/cluster-issuer: "ca-issuer"
     nginx.ingress.kubernetes.io/body-size: "64m"
     nginx.ingress.kubernetes.io/send-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-body-size: "64m"
@@ -69,7 +69,7 @@ kind: Ingress
 metadata:
   name: end-user-ui
   annotations:
-    certmanager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: "default-issuer"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/enduser)$ $1/ redirect;
@@ -92,7 +92,7 @@ kind: Ingress
 metadata:
   name: login-ui
   annotations:
-    certmanager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: "default-issuer"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/login)$ $1/ redirect;
@@ -115,7 +115,7 @@ kind: Ingress
 metadata:
   name: platform-ui
   annotations:
-    certmanager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: "default-issuer"
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/platform)$ $1/ redirect;
@@ -141,7 +141,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$2"
-    certmanager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: "default-issuer"
 
 spec:
   tls:

@@ -13,28 +13,6 @@ spec:
     # Name of a secret used to store the ACME account private key.
     privateKeySecretRef:
       name: letsencrypt-prod
-    # Enable the dns01 challenge provider.
-    # See: https://docs.cert-manager.io/en/release-0.8/tasks/upgrading/upgrading-0.7-0.8.html
-    # The HTTP01 and DNS01 fields are now **deprecated**.
-    # We leave them in place here so that any Certificates that still
-    # specify a ``certificate.spec.acme`` stanza will continue to operate
-    # correctly.
-    # cert-manager will decide which configuration to use based on whether
-    # the Certificate contains a ``certificate.spec.acme`` stanza.
-    dns01:
-      providers:
-      # The certificate object uses the below provider to challenge the certificate's requested domain in Google's CloudDNS.
-      # CloudDNS is used as provider for forgeops.com domain only.
-      # Additional providers can be configured.
-      - name: prod-dns
-        clouddns:
-          project: engineering-devops
-          # Service account needs to have Kubernetes Engine Developer and DNS Administrator IAM roles.
-          # After cert manager has been deployed to the cluster, service account json file must be encrypted using bin/encrypt.sh.
-          # The original unencrypted service account key must then be deleted afterwards.
-          serviceAccountSecretRef:
-            name: clouddns
-            key: cert-manager.json
     solvers:
     - dns01:
         clouddns:
