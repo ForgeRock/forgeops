@@ -1,6 +1,85 @@
 #!/usr/bin/env bash
 
+SCRIPT_NAME="$(basename "$0")"
+
+if ! command -v kustomize >/dev/null 2>&1;
+then
+    echo "kustomize binary required"
+fi
+
+if ! command -v kubectl >/dev/null 2>&1;
+then
+    echo "kubectl binary required"
+fi
+
+usage () {
+read -r -d '' help <<-EOF
+
+ForgeOps Toolbox CLI
+
+A wrapper script for deploying the ForgeOps toolkit inside a cluster.
+
+This script generates a kustomize profile, and then deploys the toolbox.
+
+Usage:  ${SCRIPT_NAME} [OPTIONS] COMMAND
+
+Command:
+    deploy     deploys forgeops-toolbox and makes sure kaniko secret is available
+    configure  generates a ./forgeops-toolbox/kustomization.yaml file
+    remove     *destructive* removes all objects (including PVC) related to the toobox
+    all        configures and deploys
+
+Options:
+    -n         namespace for deployment (default: active namespace)
+    -s         subdomain utilized by ForgeRock platform (default: iam)
+    -d         domain utilized by ForgeRock platform (default: example.com)
+    -f         git repository used as the fork of forgeops
+    -r         docker repository to push images from the kubernetes cluster (default: gcr.io/engineering-devops)
+    -h         help
+
+Examples:
+    # using defaults configure and deploy
+    ${SCRIPT_NAME} -f https://github.com/mygithuborg/forgeops.git all
+    # change defaults, configure kustomization.yaml
+    ${SCRIPT_NAME} -r dockerhub.com/mydockerhubaccount
+                   -s example-subdomain
+                   -d mydomain.com
+                   -n mynamespace
+                   -f https://github.com/mygithuborg/forgeops.git
+                   configure
+    # deploys kustomization
+    ${SCRIPT_NAME} deploy
+    # cleanup - careful this removes even volumes which could result in lost work
+    ${SCRIPT_NAME} remove
+EOF
+    printf "%-10s" "$help"
+}
+
+load_ns () {
+    ns=$(kubectl config view --minify --output 'jsonpath={..namespace}' | tr -d '\n')
+    if [[ "${ns}" == "" ]];
+    then
+        # return nothing validation will throw error
+        return 1
+    fi
+    echo "${ns}"
+}
+
 run_configure () {
+    missing_opts=0
+    for req in NAMESPACE SUBDOMAIN DOMAIN FORK DOCKER_REPO;
+    do
+        if [[ "${!req}" == "" ]];
+        then
+            echo "${req} is required";
+            missing_opts=1
+        fi
+    done
+    if (( "${missing_opts}" != 0 ));
+    then
+        usage;
+        return 1
+    fi
     mkdir -p forgeops-toolbox
     cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
 namespace: ${NAMESPACE}
@@ -43,7 +122,7 @@ KUSTOMIZATION
     fi
     if ! k8s config set-context --current --namespace=${NAMESPACE};
     then
-        echo "couldnt set context to ${NAMESPACE}";
+        echo "couldn't set context to ${NAMESPACE}";
     fi
     if ! k8s get secret kaniko-secret;
     then
@@ -56,8 +135,10 @@ KUSTOMIZATION
 
 # surpress kubectl output
 k8s () {
-    kubectl "${@}" > /dev/null 2>&1
-    return $?
+    if ! kubectl "${@}" > /dev/null 2>&1;
+    then
+        return 1
+    fi
 }
 
 run_deploy () {
@@ -82,18 +163,10 @@ run_delete () {
     return $?
 }
 
-
-# check for deps
-if ! which kubectl > /dev/null 2>&1;
-then
-    echo "kubectl not found in path"
-    exit 1;
-fi
-if ! which kustomize > /dev/null 2>&1;
-then
-    echo "kustomize not found in path"
-    exit 1;
-fi
+NAMESPACE=$(load_ns)
+SUBDOMAIN=iam
+DOMAIN=example.com
+DOCKER_REPO=gcr.io/engineering-devops
 
 # arg/opt parse
 while getopts n:s:d:f:r:h option
@@ -132,5 +205,11 @@ while (( "$#" )); do
             run_configure && run_deploy
             exit $?
             ;;
+        *)
+            usage
+            exit 1
+            ;;
     esac
 done
+usage
+exit 1
