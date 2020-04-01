@@ -1,5 +1,5 @@
 # Utility ds image for testing, benchmarking, etc.
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-811df5ce22a58995d94ad7f34e6552e9e8b4a8c0
+FROM gcr.io/forgerock-io/ds-empty/pit1:7.0.0-b27d6fea6b99bdd08bfe6f4ae37c75654d227d71
 
 USER root
 RUN apt-get update && apt-get install -y vim
