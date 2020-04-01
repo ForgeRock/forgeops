@@ -79,7 +79,7 @@ namespace: $NAMESPACE
 resources:
 - ../kustomize/base/kustomizeConfig
 - ../kustomize/base/forgeops-secrets
-- ../kustomize/base/ingress
+- ../kustomize/base/7.0/ingress
 - ../kustomize/base/7.0/ds/cts
 - ../kustomize/base/7.0/ds/idrepo
 - ../kustomize/base/am

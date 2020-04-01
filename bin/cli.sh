@@ -70,7 +70,7 @@ _config_gcloud() {
         [[ ! -f "${HOME}/.config/gcloud/application_default_credentials.json" ]] \
             && echo "using GCP and CDK requires application credentials to be set: gcloud auth application-default login" \
                 && exit 1
-        _add_env 'GOOGLE_APPLICATION_CREDENTIALS=$HOME/.config/gcloud/application_default_credentials.json'
+        _add_env 'GOOGLE_APPLICATION_CREDENTIALS=/opt/forgeops/mnt/.config/gcloud/application_default_credentials.json'
     fi
 
 }
@@ -145,7 +145,7 @@ run_cdm() {
     _config_pulumi
     _config_cloud_sdk
     local cli_image="${CDM_IMAGE:-gcr.io/engineering-devops/cdm-cli:latest}"
-    run ${cli_image} ${@}
+    run "${cli_image}" "${@}"
 }
 
 run_cdk() {
@@ -179,7 +179,7 @@ run_cdk() {
     kubeconfig="${KUBECONFIG:-$HOME/.kube/config}"
     _add_volume "${skaf_home}:${mount_root}/.skaffold"
     _add_volume "${kubeconfig}:${mount_root}/.kube/config"
-    run ${cli_image} ${@}
+    run "${cli_image}" "${@}"
 }
 
 run() {
@@ -187,9 +187,9 @@ run() {
     shift
     _pre_exec
     exec docker run --rm  \
-                    ${volumes[*]} \
-                    ${env_vars[*]} \
-                    -it "${cli_image}" ${USERID} ${GROUPID} ${LOCALDIR} ${@}
+                    "${volumes[*]}" \
+                    "${env_vars[*]}" \
+                    -it "${cli_image}" "${USERID}" "${GROUPID}" "${LOCALDIR}" "${@}"
 }
 
 

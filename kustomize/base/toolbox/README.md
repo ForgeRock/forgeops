@@ -13,54 +13,17 @@ Deployment creates a container that hosts an in-cluster development toolbox for 
 
 ## Installing
 
-By default we're expecting to work in the namespace of `default` (an easy change but not a one liner).
+We offer a simple installer script that can be used as a standlone with no dependencies on the ForgeOps repository. This will generate a kustomization file in the directory `forgeops-toolbox`, then it will deploy the toolbox
 
-Simple example w/ the default configuration:
-```
-kustomize build github.com/forgerock/forgeops//kustomize/base/toolbox/ | k apply -f -
-```
-
-Change the namespace deployment, and further kustomization of the workspace
+Example:
 
 ```
-❯ alias k=kubectl
-❯ cat <<KUSTOMIZATION >kustomization.yaml
-namespace: my-namespace
-resources:
-- github.com/ForgeRock/forgeops//kustomize/base/toolbox/
-patches:
-  - patch: |-
-      kind: Deployment
-      metadata:
-        name: toolbox
-      spec:
-        template:
-          spec:
-            containers:
-              - name: toolbox
-                env:
-                - name: FR_NAMESPACE
-                  value: my-namespace
-                - name: FR_SUBDOMAIN
-                  value: iam
-                - name: FR_DOMAIN
-                  value: example.com
-                - name: FR_FORK
-                  value: https://github/maxres-fr/forgeops.git
-                - name: FR_DOCKER_REPO
-                  value: gcr.io/engineering-devops
-    target:
-      kind: Deployment
-      name: toolbox
-KUSTOMIZATION
-
-❯ kustomize build . | k apply -f -
-serviceaccount/forgeops-cdk-account created
-clusterrole.rbac.authorization.k8s.io/forgeops-cdk-developer-role created
-clusterrolebinding.rbac.authorization.k8s.io/forgeops-cdk-binding created
-deployment.apps/forgeops-cdk-toolbox created
-persistentvolumeclaim/forgeops-cdk-storage-claim created
+curl -o forgeops-toolbox.sh -L https://raw.githubusercontent.com/ForgeRock/forgeops/master/bin/forgeops-toolbox.sh
+# using defaults configure, deploy, and set the remote for the forked copy of the ForgeOps repo
+bash forgeops-toolbox.sh -f https://github.com/mygithuborg/forgeops.git all
 ```
+
+You will probably want to change some of the default configuration, run `forgeops-toolbox.sh -h` to see the parameters available.
 
 ## Using the toolbox
 
