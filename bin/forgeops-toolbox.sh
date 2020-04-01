@@ -184,6 +184,12 @@ do
 done
 shift $((OPTIND - 1))
 
+if [[ "$#" != 1 ]];
+then
+    echo "one argument is expected"
+    exit 1
+fi
+
 while (( "$#" )); do
     case "$1" in
         configure)
