@@ -84,7 +84,7 @@ closeKeystore
 
 echo "[DS] Writing DS passwords"
 
-useRandomPass ds-passwords/monitor.pw 24
+useRandomPass ds-passwords/monitor.pw "" "" "" "password"
 useRandomPass ds-passwords/dirmanager.pw 24
 
 ### AM SECRETS ####

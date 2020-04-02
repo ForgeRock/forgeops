@@ -28,6 +28,12 @@ genRandomPass () {
 # Returns:
 #   random string if arg 3 is "print".
 #######################################
+
+# $1 Secret path
+# $2 Password length
+# $3 if "print", print the generated pw to console
+# $4 soft override. Use this value instead of the value found in OVERRIDE_ALL_PASSWORDS.txt . Ignored if OVERRIDE_ALL_PASSWORDS.txt is not found
+# $5 hard override. Use this value for the password regardless of any other condition.
 useRandomPass () {
     LEN=${2:-"24"}
 
@@ -35,9 +41,11 @@ useRandomPass () {
 
     if [ ! -f ${GEN_PATH}/${1} ]; then
         mkdir -p $(dirname ${GEN_PATH}/${1})
-        if [ -f config/OVERRIDE_ALL_PASSWORDS.txt ]; then
+        if [ -f config/OVERRIDE_ALL_PASSWORDS.txt ] || ([ $# -ge 5 ] && [ -n "$5" ]); then
             local overridePass=""
-            if [ ${4-"!"} == "!" ]; then
+            if [ $# -ge 5 ] && [ -n "$5" ]; then
+                overridePass=${5}            
+            elif [ ${4-"!"} == "!" ]; then
                 overridePass=$(< config/OVERRIDE_ALL_PASSWORDS.txt)
             else
                 overridePass=${4}

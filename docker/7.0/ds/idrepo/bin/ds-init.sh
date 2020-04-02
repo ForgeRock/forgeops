@@ -18,7 +18,7 @@ update_pw() {
 /opt/opendj/docker-entrypoint.sh initialize-only
 
 DIR_MANAGER_PW_FILE=${DIR_MANAGER_PW_FILE-"/var/run/secrets/opendj-passwords/dirmanager.pw"}
-MONITOR_PW_FILE=${MONITOR_PW_FILE-"/var/run/secrets/opendj-passwords/dirmanager.pw"}
+MONITOR_PW_FILE=${MONITOR_PW_FILE-"/var/run/secrets/opendj-passwords/monitor.pw"}
 ROOT_USER_LDIF=${ROOT_USER_LDIF-"/opt/opendj/data/db/rootUser/rootUser.ldif"}
 MONITOR_USER_LDIF=${MONITOR_USER_LDIF-"/opt/opendj/data/db/monitorUser/monitorUser.ldif"}
 
