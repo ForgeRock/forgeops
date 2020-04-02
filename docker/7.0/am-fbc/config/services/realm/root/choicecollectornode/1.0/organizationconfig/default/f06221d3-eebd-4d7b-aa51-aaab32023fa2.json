@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "ChoiceCollectorNode",
+    "entityId" : "default/f06221d3-eebd-4d7b-aa51-aaab32023fa2",
+    "serviceVersion" : null,
+    "uid" : "ou=f06221d3-eebd-4d7b-aa51-aaab32023fa2,ou=default,ou=OrganizationConfig,ou=1.0,ou=ChoiceCollectorNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "defaultChoice" : "Yes",
+    "_type" : {
+      "_id" : "ChoiceCollectorNode",
+      "name" : "ChoiceCollectorNode",
+      "collection" : false
+    },
+    "_id" : "default/f06221d3-eebd-4d7b-aa51-aaab32023fa2",
+    "choices" : [ "Yes", "No" ],
+    "prompt" : "DeviceRegistration"
+  }
+}

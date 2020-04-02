@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "realm": null,
+    "amsterVersion": "7.0.0-SNAPSHOT",
+    "entityType": "ScriptingService",
+    "entityId": "default/globalScripts/c64f9cfe-69f6-4568-a150-5546bdbe4c36",
+    "serviceVersion": "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
+    "uid": "ou=c64f9cfe-69f6-4568-a150-5546bdbe4c36,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID": "globalScript",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams": {},
+    "ou": null
+  },
+  "data": {
+    "lastModifiedDate": "1565386615495",
+    "createdBy": "null",
+    "lastModifiedBy": "null",
+    "_type": {
+      "_id": "ScriptingService",
+      "name": "ScriptingService",
+      "collection": false
+    },
+    "context": "OIDC_CLAIMS",
+    "name": "TEMPLATE - OIDC Claims Script.",
+    "description": "Template with tokens for custom scopes/claims: CUSTOM_CLAIM_RESOLVER_MAPPINGS, CUSTOM_SCOPE_TO_CLAIM_MAP",
+    "language": "GROOVY",
+    "_id": "default/globalScripts/c64f9cfe-69f6-4568-a150-5546bdbe4c36",
+    "creationDate": "0",
+    "script": {
+      "$base64:encode": {
+        "$inline": "TEMPLATE-OIDCClaimsScript.groovy"
+      }
+    }
+  }
+}

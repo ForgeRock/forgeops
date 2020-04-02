@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "WebAuthnAuthenticationNode",
+    "entityId" : "default/3546aa74-755b-426b-bf85-0f80cc927908",
+    "serviceVersion" : null,
+    "uid" : "ou=3546aa74-755b-426b-bf85-0f80cc927908,ou=default,ou=OrganizationConfig,ou=1.0,ou=WebAuthnAuthenticationNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "asScript" : false,
+    "_type" : {
+      "_id" : "WebAuthnAuthenticationNode",
+      "name" : "WebAuthnAuthenticationNode",
+      "collection" : false
+    },
+    "origins" : [ "https://local.forgeblocks.com:9001" ],
+    "_id" : "default/3546aa74-755b-426b-bf85-0f80cc927908",
+    "isRecoveryCodeAllowed" : false,
+    "userVerificationRequirement" : "PREFERRED",
+    "timeout" : 60
+  }
+}

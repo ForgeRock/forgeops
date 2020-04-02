@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "UsernameCollectorNode",
+    "entityId" : "default/7bddddba-b410-42f7-aae8-c3acc4d37c13",
+    "serviceVersion" : null,
+    "uid" : "ou=7bddddba-b410-42f7-aae8-c3acc4d37c13,ou=default,ou=OrganizationConfig,ou=1.0,ou=UsernameCollectorNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "UsernameCollectorNode",
+      "name" : "UsernameCollectorNode",
+      "collection" : false
+    },
+    "_id" : "default/7bddddba-b410-42f7-aae8-c3acc4d37c13"
+  }
+}

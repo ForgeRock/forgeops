@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "AuthenticatorWebAuthn",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : "8b76d4e3-214e-429d-984a-3d4c0f5cc9ad",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=AuthenticatorWebAuthn,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : [ "defaultconfig" ]
+  },
+  "data" : {
+    "authenticatorWebAuthnDeviceSettingsEncryptionKeystoreType" : "JCEKS",
+    "_type" : {
+      "_id" : "AuthenticatorWebAuthn",
+      "name" : "AuthenticatorWebAuthn",
+      "collection" : false
+    },
+    "webauthnAttrName" : "webauthnDeviceProfiles",
+    "authenticatorWebAuthnDeviceSettingsEncryptionScheme" : "NONE",
+    "_id" : "defaultconfig",
+    "authenticatorWebAuthnDeviceSettingsEncryptionKeystoreKeyPairAlias" : null,
+    "authenticatorWebAuthnDeviceSettingsEncryptionKeystorePassword" : "&{default.keystore.password}",
+    "authenticatorWebAuthnDeviceSettingsEncryptionKeystorePrivateKeyPassword": "&{default.keystore.entry.password}",
+    "authenticatorWebAuthnDeviceSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore.jceks"
+  }
+}

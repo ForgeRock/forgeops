@@ -1,0 +1,40 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "sunAMAuthADService",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : "98db7992-eec4-441e-84db-843c852fe57f",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=sunAMAuthADService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "returnUserDN" : true,
+    "primaryLdapServer" : [ "localhost:1389" ],
+    "operationTimeout" : 0,
+    "searchScope" : "SUBTREE",
+    "userSearchAttributes" : [ "uid" ],
+    "_type" : {
+      "_id" : "sunAMAuthADService",
+      "name" : "sunAMAuthADService",
+      "collection" : false
+    },
+    "connectionHeartbeatInterval" : 1,
+    "trustAllServerCertificates" : false,
+    "profileAttributeMappings" : [ ],
+    "connectionHeartbeatTimeUnit" : "MINUTES",
+    "userSearchFilter" : null,
+    "userBindDN" : "uid=admin",
+    "authenticationLevel" : 0,
+    "secondaryLdapServer" : [ ],
+    "userProfileRetrievalAttribute" : "uid",
+    "openam-auth-ldap-connection-mode" : "LDAP",
+    "userSearchStartDN" : [ "ou=identities" ],
+    "_id" : "defaultconfig",
+    "iplanet-am-auth-ldap-invalid-chars" : [ "*|(|)|&|!" ],
+    "userBindPassword" : null
+  }
+}

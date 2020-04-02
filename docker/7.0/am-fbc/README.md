@@ -1,45 +1,39 @@
 # File Based Configuration (FBC) Notes
 
-File Based Config (FBC) requires a config store to be present (this will be fixed for 7.x).
+This is a work in progress
 
-We are using the "ds-idrepo" instance as the all in one DS instance for the userstore, configstore, and CTS. For production deployments
-a separate ctsstore will also be configured.
+To run with FBC
 
-IMPORTANT: The file based configuration must match the AM war file version that created it. There
-is currently no upgrade capability. If you update the war file (to say a new nightly build), you must regenerate
-the configuration. For this reason the file configurations are not currently checked in to git (am-fbc/tmp is in .gitignore)
+```bash
+bin/clean.sh
+bin/config.sh -v 7.0 init
+# Deploy the directory server and secrets first
+skaffold -p fbc-ds run
+# Wait until ds-idrepo is up.
+# Deploy the AM FBC image
+skaffold -p fbs run --tail
+```
 
-## Preparing the ds-idrepo and initial FBC
+Deploys to https://fbc.iam.forgeops.com/am
 
-You must prepare the ds-idrepo instance with an amster install. You can not do this currently using file based configuration - the
-AM installer must run. Once you have your ds-idrepo prepared, you are advised to retain the PVC between development sessions
-so that you do not have to repeat this procedure.
+Get the amadmin and ldap passwords using `bin/print-secrets.sh 7.0`
 
-Steps:
+ForgeRock note: If you are on the eng-shared cluster, this can be
+deployed to the `fbc` namespace, and you will get a real dns and SSL cert.
 
-* Edit the `Dockerfile` in this directory and comment out the `COPY` instruction. This will cause the docker image to come up
-  in install mode - so you can create a new configuration.
-* In the dev/ folder, run `skaffold -p am-fbc dev`. This will bring up AM in FBC mode, and will also start amster to create an initial configuration.
-* Let amster finish, and then run the `dump-config.sh` script:  `cd am-fbc; ./dump-config.sh`
-* This script connects to the running AM instance and copies the file based configuration to the tmp/ directory on your local workstation.
-* Shut down skaffold (control-c, or run `skaffold delete -p fbc` if it does not clean up)
-* Important: Do NOT delete the ds-idrepo PVC. This has now been initialized with the structure that AM requires.
+```bash
+gcloud container clusters get-credentials eng-shared --zone us-east1-c --project engineering-devops
+kubens fbc # Or kubectl ns fbc - if you use the kubectl plugins
+```
+# Notes:
 
-## Running with File Based Configuration
-
-* Edit the `Dockerfile` again, and this time uncomment the `COPY` instruction. This will creates a docker image
-  that is now pre-configured for running AM. 
-* Deploy AM again:  `skaffold dev -p am-fbc`  
-* Amster may run again - but it will see that AM is configured and will exit. 
-* You can now log in to AM. If you update the configuration in the console, you can re-run the `./dump-config.sh` script to capture and save
- the updated files.
-
-### Updating the deployment FQDN in FBC
-
-Eventually this will be supported via commons expressions. For now, your choices are:
-
-* Using your ide, search and replace the FQDN. The site is config/services/realm/root/iplanetamplatformservice/1.0/globalconfig/default/com-sun-identity-sites/site1/accesspoint.json
-
-
-Use the script `./fix-fqdn.sh`
-
+* The forgeops-secrets job generates a number of secrets that are injected into 
+the pod.  
+* The [am-entrypoint.sh](am-entrypoint.sh) script sets more secret values as well as
+ldap server names. etc.  There is a env dump that is printed just before AM starts
+if you want to see the value
+* The am-crypto util is added to the container to encrypt the passwords to be injected
+into the config using commons expressions.
+* Search for `&{` in `config` to see all the expressions that have been set.
+* Edit logback.xml to set the debug level. At TRACE the pod logs quickly get truncated,
+so you need to send them off ASAP.  kubectl logs -lapp=am -f >my.log

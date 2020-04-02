@@ -1,0 +1,32 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "WebAuthnRegistrationNode",
+    "entityId" : "default/400619e6-69a3-4838-ba15-937bf534fec4",
+    "serviceVersion" : null,
+    "uid" : "ou=400619e6-69a3-4838-ba15-937bf534fec4,ou=default,ou=OrganizationConfig,ou=1.0,ou=WebAuthnRegistrationNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "relyingPartyName" : "ForgeRock",
+    "generateRecoveryCodes" : true,
+    "authenticatorAttachment" : "UNSPECIFIED",
+    "asScript" : false,
+    "acceptedSigningAlgorithms" : [ "ES256", "RS256" ],
+    "attestationPreference" : "NONE",
+    "_type" : {
+      "_id" : "WebAuthnRegistrationNode",
+      "name" : "WebAuthnRegistrationNode",
+      "collection" : false
+    },
+    "origins" : [ "https://local.forgeblocks.com:9001" ],
+    "_id" : "default/400619e6-69a3-4838-ba15-937bf534fec4",
+    "userVerificationRequirement" : "PREFERRED",
+    "timeout" : 60,
+    "excludeCredentials" : false
+  }
+}

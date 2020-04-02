@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PageNode",
+    "entityId" : "default/ed54e0ca-6f08-4cd0-bdc6-71609dcd6d3b",
+    "serviceVersion" : null,
+    "uid" : "ou=ed54e0ca-6f08-4cd0-bdc6-71609dcd6d3b,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "9af84914-d8af-4585-9209-3111a6b8146b:UsernameCollectorNode:Username Collector", "dd291659-f1fc-41ec-b4e6-55a8f9a00760:PasswordCollectorNode:Password Collector" ],
+    "stage" : "UsernamePassword",
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : { },
+    "_id" : "default/ed54e0ca-6f08-4cd0-bdc6-71609dcd6d3b",
+    "pageHeader" : { }
+  }
+}

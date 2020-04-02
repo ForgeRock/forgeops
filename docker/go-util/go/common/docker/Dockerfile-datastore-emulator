@@ -1,0 +1,7 @@
+FROM google/cloud-sdk:alpine
+
+ENV CLOUDSDK_CORE_PROJECT=fr-testproject 
+RUN apk --update --no-cache add openjdk8-jre
+RUN gcloud --quiet components install cloud-datastore-emulator beta
+
+CMD gcloud beta emulators datastore start --no-store-on-disk --consistency=1.0 --host-port 0.0.0.0:8081

@@ -1,0 +1,124 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "authenticationTreesService",
+    "entityId" : "default/SecondFactor",
+    "serviceVersion" : "81f1faa8-726c-4574-a47d-4f13a09764ad",
+    "uid" : "ou=SecondFactor,ou=default,ou=OrganizationConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config",
+    "sunServiceID" : "tree",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : {
+      "14bf4d09-130a-430b-aff9-4bee28640480" : {
+        "displayName" : "Data Store Decision",
+        "nodeType" : "DataStoreDecisionNode",
+        "connections" : {
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a",
+          "true" : "63f00174-2430-47c0-ab15-1dc9473bbe34"
+        },
+        "x" : 417.328125,
+        "y" : 112
+      },
+      "66f44b11-b08f-419d-ad0f-1776edf2fc36" : {
+        "displayName" : "HOTP Generator",
+        "nodeType" : "OneTimePasswordGeneratorNode",
+        "connections" : {
+          "outcome" : "92a1b90f-be56-4529-af41-5ba68b88ffbf"
+        },
+        "x" : 879.046875,
+        "y" : 101
+      },
+      "e27301eb-8258-4573-8b8f-e2c6c67de841" : {
+        "displayName" : "HOTP Generator",
+        "nodeType" : "OneTimePasswordGeneratorNode",
+        "connections" : {
+          "outcome" : "72c4fb7e-1ec1-4093-a75b-e6db426bfdae"
+        },
+        "x" : 879.046875,
+        "y" : 168
+      },
+      "ed54e0ca-6f08-4cd0-bdc6-71609dcd6d3b" : {
+        "displayName" : "UsernamePassword",
+        "nodeType" : "PageNode",
+        "connections" : {
+          "outcome" : "14bf4d09-130a-430b-aff9-4bee28640480"
+        },
+        "x" : 152,
+        "y" : 119
+      },
+      "72c4fb7e-1ec1-4093-a75b-e6db426bfdae" : {
+        "displayName" : "SMS with Twilio",
+        "nodeType" : "ScriptedDecisionNode",
+        "connections" : {
+          "outcome" : "cd7ea540-f61f-404a-97b3-f6843df0f3ff"
+        },
+        "x" : 1056,
+        "y" : 168
+      },
+      "92a1b90f-be56-4529-af41-5ba68b88ffbf" : {
+        "displayName" : "Email with org-api template",
+        "nodeType" : "ScriptedDecisionNode",
+        "connections" : {
+          "outcome" : "084e5b80-ba5c-4e63-b3ab-0dafaeb397c3"
+        },
+        "x" : 1056,
+        "y" : 101
+      },
+      "63f00174-2430-47c0-ab15-1dc9473bbe34" : {
+        "displayName" : "SecondFactorChoice",
+        "nodeType" : "PageNode",
+        "connections" : {
+          "SMS" : "e27301eb-8258-4573-8b8f-e2c6c67de841",
+          "Email" : "66f44b11-b08f-419d-ad0f-1776edf2fc36"
+        },
+        "x" : 614,
+        "y" : 119
+      },
+      "084e5b80-ba5c-4e63-b3ab-0dafaeb397c3" : {
+        "displayName" : "OneTimePassword Email",
+        "nodeType" : "PageNode",
+        "connections" : {
+          "true" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0",
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a"
+        },
+        "x" : 1238,
+        "y" : 25
+      },
+      "cd7ea540-f61f-404a-97b3-f6843df0f3ff" : {
+        "displayName" : "OneTimePassword SMS",
+        "nodeType" : "PageNode",
+        "connections" : {
+          "true" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0",
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a"
+        },
+        "x" : 1238,
+        "y" : 168
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 134.5
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 1503.5,
+        "y" : 168
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 1503.5,
+        "y" : 101
+      }
+    },
+    "entryNodeId" : "ed54e0ca-6f08-4cd0-bdc6-71609dcd6d3b",
+    "_type" : {
+      "_id" : "authenticationTreesService",
+      "name" : "authenticationTreesService",
+      "collection" : false
+    },
+    "_id" : "default/SecondFactor"
+  }
+}

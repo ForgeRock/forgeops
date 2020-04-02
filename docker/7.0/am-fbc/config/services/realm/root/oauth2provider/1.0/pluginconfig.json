@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "OAuth2Provider",
+    "entityId" : "PluginConfig",
+    "serviceVersion" : null,
+    "uid" : "ou=PluginConfig,ou=1.0,ou=OAuth2Provider,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "OAuth2Provider",
+      "name" : "OAuth2Provider",
+      "collection" : false
+    },
+    "_id" : "PluginConfig"
+  }
+}

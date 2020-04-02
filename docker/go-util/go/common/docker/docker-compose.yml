@@ -1,0 +1,36 @@
+version: '2'
+services:
+  datastore-emulator:
+    build:
+      context: .
+      dockerfile: Dockerfile-datastore-emulator
+    ports:
+      - '8081:8081'
+    image: forgecloud/datastore-emulator:local
+    environment:
+      CLOUDSDK_CORE_PROJECT: fr-testproject
+  pubsub-emulator:
+    build:
+      context: .
+      dockerfile: Dockerfile-pubsub-emulator
+    ports:
+      - '8085:8085'
+    image: forgecloud/pubsub-emulator:local
+    environment:
+      CLOUDSDK_CORE_PROJECT: fr-testproject
+  test:
+    build:
+      context: ../../
+      dockerfile: ../docker/Dockerfile-test
+    image: 'forgecloud/common-test:local'
+    environment:
+      DATASTORE_EMULATOR_HOST: datastore-emulator:8081
+      PUBSUB_EMULATOR_HOST: pubsub-emulator:8085
+      # DATASTORE_EMULATOR_ENABLED controls whether the test suite starts up the emulator in the background
+      # Since we're using an external dockerized version of the emulator, we set this to false.
+      DATASTORE_EMULATOR_ENABLED: "false"
+      PUBSUB_EMULATOR_ENABLED: "false"
+    command: sh -c "go test `go list ./... | grep -v /vendor/`"
+    depends_on:
+      - datastore-emulator
+      - pubsub-emulator

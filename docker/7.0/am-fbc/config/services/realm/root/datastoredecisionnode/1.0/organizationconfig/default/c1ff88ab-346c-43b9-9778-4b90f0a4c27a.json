@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "DataStoreDecisionNode",
+    "entityId" : "default/c1ff88ab-346c-43b9-9778-4b90f0a4c27a",
+    "serviceVersion" : null,
+    "uid" : "ou=c1ff88ab-346c-43b9-9778-4b90f0a4c27a,ou=default,ou=OrganizationConfig,ou=1.0,ou=DataStoreDecisionNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "DataStoreDecisionNode",
+      "name" : "DataStoreDecisionNode",
+      "collection" : false
+    },
+    "_id" : "default/c1ff88ab-346c-43b9-9778-4b90f0a4c27a"
+  }
+}

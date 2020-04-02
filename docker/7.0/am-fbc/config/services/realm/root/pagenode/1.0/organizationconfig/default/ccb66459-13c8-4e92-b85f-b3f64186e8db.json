@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PageNode",
+    "entityId" : "default/ccb66459-13c8-4e92-b85f-b3f64186e8db",
+    "serviceVersion" : null,
+    "uid" : "ou=ccb66459-13c8-4e92-b85f-b3f64186e8db,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "cd98e3b4-f3c9-44cd-9c2a-dfe40e185644:ChoiceCollectorNode:SecondFactorChoice" ],
+    "stage" : "SecondFactorChoice",
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : { },
+    "_id" : "default/ccb66459-13c8-4e92-b85f-b3f64186e8db",
+    "pageHeader" : { }
+  }
+}

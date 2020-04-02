@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "realm": null,
+    "amsterVersion": "7.0.0-SNAPSHOT",
+    "entityType": "ScriptingService",
+    "entityId": "default/globalScripts/157298c0-7d31-4059-a95b-eeb08473b7e5",
+    "serviceVersion": "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
+    "uid": "ou=157298c0-7d31-4059-a95b-eeb08473b7e5,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID": "globalScript",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams": {},
+    "ou": [
+      "157298c0-7d31-4059-a95b-eeb08473b7e5"
+    ]
+  },
+  "data": {
+    "lastModifiedDate": "0",
+    "createdBy": "null",
+    "lastModifiedBy": "null",
+    "_type": {
+      "_id": "ScriptingService",
+      "name": "ScriptingService",
+      "collection": false
+    },
+    "name": "Device Id (Match) - Client Side",
+    "context": "AUTHENTICATION_CLIENT_SIDE",
+    "description": "Default global script for client side Device Id (Match) Authentication Module",
+    "language": "JAVASCRIPT",
+    "_id": "default/globalScripts/157298c0-7d31-4059-a95b-eeb08473b7e5",
+    "creationDate": "0",
+    "script": {
+      "$base64:encode": {
+        "$inline": "DeviceId-ClientSide.javascript"
+      }
+    }
+  }
+}
