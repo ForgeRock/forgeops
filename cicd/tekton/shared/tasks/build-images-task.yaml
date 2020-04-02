@@ -1,0 +1,41 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: build-images
+spec:
+  inputs:
+    resources:
+    - name: forgeops
+      type: git
+    params:
+    - name: profile
+      type: string
+      description: profile to deploy
+      
+    - name: docker-repo
+      type: string
+      description: Docker repository URL
+      
+  stepTemplate:
+    env:
+    - name: SLACK_FAILED_WEBHOOK_URL
+      valueFrom:
+        secretKeyRef:
+          name: slack-webhook
+          key: SLACK_FAILED_WEBHOOK_URL
+  steps:
+  - name: build-images
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    script: |
+      #!/usr/bin/env bash
+      {
+        cd /workspace/forgeops
+        cd bin
+        ./config.sh init -v 7.0 -p cdk
+        cd ..
+        skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) build
+      } || {
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build images. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        exit 1
+      }
+      

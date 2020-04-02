@@ -5,22 +5,28 @@ VERSION=latest
 cdm-build:
 	docker build --cache-from $(REGISTRY_URL)/yamkt:$(VERSION) -t $(REGISTRY_URL)/cdm-cli:$(VERSION) -f docker/cli-tools/cdm/Dockerfile .
 
-cdm: yamkt cdm-build push/cdm-cli/$(VERSION) 
-	@echo "completed building cdk"       
+cdm: yamkt cdm-build push/cdm-cli/$(VERSION)
+	@echo "completed building cdk"
 
 cdk-build:
 	docker build --cache-from $(REGISTRY_URL)/yamkt:$(VERSION)-skaffold -t $(REGISTRY_URL)/cdk-cli:$(VERSION) -f docker/cli-tools/cdk/Dockerfile .
 
 cdk: yamkt cdk-build push/cdk-cli/$(VERSION)
 	@echo "completed building cdk"
-	
+
 toolbox-build:
-	docker build --cache-from $(REGISTRY_URL)/yamkt:$(VERSION)-skaffold -t $(REGISTRY_URL)/cdk-toolbox:$(VERSION) -f docker/cli-tools/toolbox/Dockerfile . 
+	docker build --cache-from $(REGISTRY_URL)/yamkt:$(VERSION)-skaffold -t $(REGISTRY_URL)/cdk-toolbox:$(VERSION) -f docker/cli-tools/toolbox/Dockerfile .
 
 toolbox: yamkt toolbox-build push/cdk-toolbox/$(VERSION)
 	@echo "completed building toolbox"
 
-cli-tools: cdm cdk toolbox
+debug-build:
+	docker build -t $(REGISTRY_URL)/debug-cli:$(VERSION) -f docker/cli-tools/debug/Dockerfile .
+
+debug: yamkt debug-build push/debug-cli/$(VERSION)
+	@echo "completed building cdk"
+
+cli-tools: cdm cdk toolbox debug
 	@echo "completed building cli tools"
 
 yamkt-build/%:

@@ -3,6 +3,11 @@ kind: Task
 metadata:
   name: notify
 spec:
+  inputs:
+    params:
+    - name: profile
+      type: string
+      description: profile deployed
   steps:
     - name: notify-send-passwords
       image: gcr.io/cloud-builders/kubectl
@@ -23,7 +28,7 @@ spec:
           "blocks": [{
             "type": "section",
             "text": {
-              "text": "Nightly pipeline Successful. Random Passwords generated for tonight's nightly environment. See <https://nightly.iam.forgeops.com/admin>",
+              "text": "$(inputs.params.profile) pipeline Successful. Random Passwords generated for $(inputs.params.profile)'s environment. See <https://$(inputs.params.profile).iam.forgeops.com/admin>",
               "type": "mrkdwn"
             },
             "fields": [

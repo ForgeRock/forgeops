@@ -1,6 +1,6 @@
-# Tekton demo / poc
+# Tekton pipelines
 
-This demonstrates the use of tekton to build and deploy our nightly builds in the cluster using the skaffold and kaniko builder.
+This demonstrates the use of tekton to build and deploy environments in a cluster using the skaffold and kaniko builder.
 The entire build is done in the cluster itself. No external tooling is required.
 
 ## Pre-reqs
@@ -14,26 +14,12 @@ The entire build is done in the cluster itself. No external tooling is required.
 
 ## Run
 
-Run the shell script `./install.sh`
+Run the shell script `forgeops/cicd/tekton/install-tekton.sh` to install tekton in your cluster. Then, run the `install-pipeline.sh` script for each desired pipeline.
 
-This creates the Pipeline, Triggers, Tasks, Cronjoba, ServiceAccounts and all other required elements to create a functioning pipeline.
+The Tekton dashboard is also included in this install. To map the dashboard, you can run:
 
-Note: This deployment will trigger automatically daily at 9:00 Mon-Fri ("* 9 * * 1-5"). If you want to change/remove this trigger, you can modify/remove nightly-trigger.yaml with the desired configuration.
-
-You can also see the log output from the dashboard:
-
-```
+```bash
 # Map the svc port
 kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097
 # open http://localhost:9097 in your browser
-```
-Or by using tkn cli tool
-
-## Manually Triggering the Task Run
-
-The task run is started using a Kubernetes Cronjob. You can manually re-run
-the task using the following command:
-
-```bash
-kubectl -n nightly create job --from=cronjob/nightly-cronjob manual-run
 ```

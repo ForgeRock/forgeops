@@ -4,8 +4,10 @@ metadata:
   name: nightly
 spec:
   params:
-  - name: forgeops
-    value: forgeops-git
+  - name: gitrevision
+    value: master
+  - name: gitrepositoryurl
+    value: https://stash.forgerock.org/scm/cloud/forgeops.git
 
 ---
 apiVersion: tekton.dev/v1alpha1
@@ -14,9 +16,11 @@ metadata:
   name: nightly
 spec:
   params:
-  - name: forgeops
-    description: Name of the resourceRef
-    default: forgeops-git
+  - name: gitrevision
+    description: The git revision
+    default: master
+  - name: gitrepositoryurl
+    description: The git repository url
   resourcetemplates:
   - apiVersion: tekton.dev/v1alpha1
     kind: PipelineRun
@@ -29,8 +33,13 @@ spec:
         name: nightly-pipeline
       resources:
       - name: forgeops
-        resourceRef:
-          name: $(params.forgeops)
+        resourceSpec:
+          type: git
+          params:
+          - name: revision
+            value: $(params.gitrevision)
+          - name: url
+            value: $(params.gitrepositoryurl)
 
 ---
 apiVersion: tekton.dev/v1alpha1
