@@ -29,12 +29,11 @@ try:
 except Exception as e:
     log.error(e)
     sys.stdout.flush()
-
+# iterable of regex strings to exclude
 _black_list_repos = [
    # all base images
-   r'^engineering-devops\/(?:\w*-base$)',
-   r'^engineering-devops\/lodestar-images/(?:-*)',
-   r'^engineering-devops\/(am|ds|(?:ds-\w*)|idm|amster)$',
+   # r'^engineering-devops\/(?:\w*-base$)',
+   # r'^engineering-devops\/(am|ds|(?:ds-\w*)|idm|amster)$',
    ]
 
 EXCLUDE = [ re.compile(i) for i in _black_list_repos ]
