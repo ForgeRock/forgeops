@@ -6,7 +6,7 @@ component: openam
 
 image:
   repository: gcr.io/forgerock-io/am/pit1
-  tag: 7.0.0-0976c0e80e9b8c5427c7db518979bba52908910a
+  tag: 7.0.0-cdb190346f7b42b92925f2e4b5409a6c614f7355
   # Switch to IfNotPresent once we have milestone builds
   pullPolicy: Always
 
