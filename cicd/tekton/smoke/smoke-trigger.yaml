@@ -65,7 +65,7 @@ spec:
         - key: head_commit.id
           expression: "body.changes[0].toHash" 
         - key: repository.url
-          expression: "body.repository.links.clone[0].href" 
+          expression: "body.repository.links.clone[0].name == 'http' ? body.repository.links.clone[0].href : body.repository.links.clone[1].href" 
 
     bindings:
     - name: smoke
