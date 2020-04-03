@@ -29,8 +29,7 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = [
                             USE_SKAFFOLD                            : true,
-                            TESTS_SCOPE                             : 'tests/pit2/upgrade',
-                            DEPLOYMENT_NAME                         : 'platform-deployment',
+                            TESTS_SCOPE                             : 'test/pit2/upgrade',
                             CLUSTER_DOMAIN                          : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE                       : subStageName,
                             COMPONENTS_AM_IMAGE_UPGRADE_TAG         : getHelmChart('am').currentTag,

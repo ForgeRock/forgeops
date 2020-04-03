@@ -27,8 +27,7 @@ void runStage(PipelineRun pipelineRun) {
                     def stagesCloud = [:]
 
                     def cfg_common = [
-                        TESTS_SCOPE                     : 'tests/pit1',
-                        DEPLOYMENT_NAME                 : 'platform-deployment',
+                        TESTS_SCOPE                     : 'test/pit1',
                         COMPONENTS_AMSTER_GITIMAGE_TAG  : gitImageTag,
                         COMPONENTS_AM_GITIMAGE_TAG      : gitImageTag,
                         COMPONENTS_IDM_GITIMAGE_TAG     : gitImageTag,
