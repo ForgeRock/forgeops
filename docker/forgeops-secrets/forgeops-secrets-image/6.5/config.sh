@@ -29,7 +29,7 @@ closeKeystore
 
 echo "[DS] Writing DS secrets"
 
-useRandomPass ds/monitor.pw 24
+useRandomPass ds/monitor.pw "" "" "" "password"
 useRandomPass ds/dirmanager.pw 24
 
 openKeystore "ds/ssl-keystore.p12" \

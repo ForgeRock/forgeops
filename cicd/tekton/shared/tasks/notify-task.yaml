@@ -28,7 +28,7 @@ spec:
           "blocks": [{
             "type": "section",
             "text": {
-              "text": "$(inputs.params.profile) pipeline Successful. Random Passwords generated for $(inputs.params.profile)'s environment. See <https://$(inputs.params.profile).iam.forgeops.com/admin>",
+              "text": "$(inputs.params.profile) pipeline Successful. Random Passwords generated for $(inputs.params.profile)'s environment. See:\n<https://$(inputs.params.profile).iam.forgeops.com/admin>\n<https://$(inputs.params.profile).iam.forgeops.com/am>\n<https://$(inputs.params.profile).iam.forgeops.com/enduser>",
               "type": "mrkdwn"
             },
             "fields": [
