@@ -1,0 +1,83 @@
+# vi:syntax=python
+# ref: https://raw.githubusercontent.com/vaab/gitchangelog/master/src/gitchangelog/gitchangelog.rc.reference
+import re
+
+JIRA_MD_FMT = '''
+[{ticket}](https://bugster.forgerock.org/jira/browse/{ticket})
+'''.strip().format
+
+# orig: ((?<!([A-Za-z]{1,10})-?)[A-Z]+-\d+) found a "semi offical jira ticket number" + starts with #
+JIRA_TICKET_REGEX = re.compile(r'(?:\s|^\#)([A-Z]+-[0-9]+)(?=\s|$)')
+# only add jira refs
+JIRA_REF_REGEX = re.compile(r'^(([jJ]ira)|([Rr]efs?))(?::\s| #)+')
+
+section_regexps = [
+    ('Features', [
+        r'^([Ff]eat)(\(.+\))?: (.+)'
+     ]),
+    ('Fixes', [
+        r'^([Ff]ix)(\(.+\))?: (.+)'
+     ]),
+    ('Docs', [
+        r'^([Dd]oc)(\(.+\))?: (.+)'
+     ])
+]
+
+_strip_type = [ re.compile(r) for _, regs in section_regexps for r in regs ]
+def strip_cc_type(txt):
+    for reg in _strip_type:
+        match = reg.search(txt)
+        if match:
+            # there's upto three groups in the subject: type(scope): value
+            return match.groups()[-1]
+
+
+def footer_jira_refs(txt):
+    parts = txt.split('\n\n')
+    parts_len = len(parts)
+    # assume no body or footers
+    body = ''
+    footers = ''
+    # body but no footer
+    if parts_len == 1:
+        # this could be a footer
+        footers = parts[0]
+    elif parts_len > 1:
+        # footer is the last part of the body and seperated by two new lines
+        footers = parts[-1]
+    # all jira ticket references must use `jira` or `ref` with the conventional commit
+    # seperators `: ` or ` #`
+    # unlike conventional commits spec they must be terminated by a newline.
+    # refs are one ticket per footer
+    # jira ref spec e.g.
+    # jira: CLOUD-1999
+    # jira #CLOUD-1999
+    # ref: CLOUD-1999
+    # ref #CLOUD-1999
+    tickets = []
+    # footer notes are seperated by one newline
+    for footer in footers.split('\n'):
+        ref = JIRA_REF_REGEX.search(footer)
+        ticket = JIRA_TICKET_REGEX.search(footer)
+        # references no ticket.
+        if not (ref and ticket):
+            continue
+        # import ipdb; ipdb.set_trace()
+        tickets.append(JIRA_MD_FMT(ticket=ticket.group().strip()))
+    # if there's no tickets we don't need the body
+    if not tickets:
+        return ''
+    # 
+    body = ','.join(tickets)
+    # breaking is supposed to be in the first line or footer... but \o/
+    # prefix the breaking change to the ticket list
+    breaking_change = 'BREAKING CHANGE: '
+    if breaking_change in txt:
+        body = f'{breaking_change}{body}'
+    return body
+
+
+unreleased_version_label = "ForgeOps Release Notes"
+subject_process = strip_cc_type
+body_process = footer_jira_refs
+output_engine = makotemplate('docker/cli-tools/repo/src/templates/changelog.tpl')
