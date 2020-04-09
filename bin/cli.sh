@@ -115,7 +115,8 @@ _config_cloud_sdk() {
 
 
 _set_minikube() {
-    local readonly docker_host=$(minikube ip)
+    local docker_host
+    docker_host=$(minikube ip)
     _add_env 'DOCKER_TLS_VERIFY="1"'
     _add_env "DOCKER_HOST=tcp://${docker_host}:2376"
     _add_env "DOCKER_CERT_PATH=${mount_root}/.certs"
@@ -172,7 +173,8 @@ run_cdk() {
         _set_minikube;
     fi
 
-    local readonly skaf_home=$HOME/.skaffold
+    local skaf_home
+    skaf_home=$HOME/.skaffold
     [[ ! -d "${skaf_home}" ]] \
         && mkdir -p "${skaf_home}"
 
@@ -186,9 +188,10 @@ run() {
     local cli_image=$1
     shift
     _pre_exec
+    # shellcheck disable=SC2086
     exec docker run --rm  \
-                    "${volumes[*]}" \
-                    "${env_vars[*]}" \
+                    ${volumes[*]} \
+                    ${env_vars[*]} \
                     -it "${cli_image}" "${USERID}" "${GROUPID}" "${LOCALDIR}" "${@}"
 }
 
@@ -198,12 +201,14 @@ while (( "$#" )); do
         cdk)
             shift
             CLI_MODE=cdk
+            # shellcheck disable=SC2068
             run_cdk ${@}
             exit
             ;;
         cdm)
             shift
             CLI_MODE=cdm
+            # shellcheck disable=SC2068
             run_cdm ${@}
             exit
             ;;

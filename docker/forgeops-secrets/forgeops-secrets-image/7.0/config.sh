@@ -87,6 +87,19 @@ echo "[DS] Writing DS passwords"
 useRandomPass ds-passwords/monitor.pw "" "" "" "password"
 useRandomPass ds-passwords/dirmanager.pw 24
 
+# Added for FBC. These are the setup profile service account passwords, not the directory admin password
+# A job updates these passwords in LDAP
+# This is the config user, not the admin
+useRandomPass ds-env-secrets/CONFIG_STORE_SVC_PASSWORD 24
+# The userstore service account password
+# Note that we use the same DS repo, so we just copy the above
+#useRandomPass ds-env-secrets/USER_STORE_PASSWORD 24
+cpAttr ds-env-secrets/CONFIG_STORE_SVC_PASSWORD ds-env-secrets/USER_STORE_SVC_PASSWORD
+
+# The CTS user service acccount password
+useRandomPass ds-env-secrets/CTS_USER_SVC_PASSWORD 24
+
+
 ### AM SECRETS ####
 
 echo "[AM] creating ssl keypair for https"
@@ -105,6 +118,22 @@ keytoolgen -importpass -alias configstorepwd $(useRandomPass ds-passwords/dirman
 
 # DS password used in boot.sh to check to see if AM is configured
 cpAttr ds-passwords/dirmanager.pw am-env-secrets/CFGDIR_PASS
+
+# Added By Warren for FBC
+useRandomPass am-env-secrets/AM_SUBJECT_IDENTIFIER_SALT 20
+useRandomPass am-env-secrets/AM_CONFIRMATION_ID_HMAC_KEY 32
+useRandomPass am-env-secrets/AM_AUTHENTICATION_SHARED_SECRET 32
+useRandomPass am-env-secrets/AM_SESSION_STATELESS_SIGNING_KEY_CLEAR 32
+useRandomPass am-env-secrets/AM_SESSION_STATELESS_ENCRYPTION_KEY_CLEAR 32
+useRandomPass am-env-secrets/AM_ENCRYPTION_PWD 32
+
+# Leave for now..
+cpAttr ds-passwords/dirmanager.pw am-env-secrets/CFGDIR_PASS
+cpAttr ds-passwords/dirmanager.pw am-env-secrets/USRDIR_PASS
+cpAttr ds-passwords/dirmanager.pw am-env-secrets/CTSDIR_PASS
+
+
+
 
 genRSA test 2048
 genRSA rsajwtsigningkey 2048
