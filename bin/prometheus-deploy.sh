@@ -11,7 +11,7 @@ set -oe pipefail
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ADDONS_DIR="/../cluster/addons/prometheus"
 PROM_VALUES="${DIR}${ADDONS_DIR}/prometheus-operator.yaml"
-VERSION="0.35.0"
+VERSION="0.38.0"
 
 USAGE="Usage: $0 [-n <namespace>] [-v <values file>] [-d]"
 
