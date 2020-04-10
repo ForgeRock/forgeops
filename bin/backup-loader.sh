@@ -41,8 +41,8 @@ do
     esac
 done
 
-if [ -z ${CTS_BACKUP_PATH+x}    ]; then echo "Missing -b argument"; usage; exit 1; fi
-if [ -z ${IDREPO_BACKUP_PATH+x} ]; then echo "Missing -u argument"; usage; exit 1; fi
+if [ -z ${CTS_BACKUP_PATH+x} ] && [ -z ${IDREPO_BACKUP_PATH+x} ]; then echo "Must specify at least one backup source path using -b or -u"; usage; exit 1; fi
+
 
 echo "NAMESPACE=$NAMESPACE"
 echo "REPLICAS=$REPLICAS"
@@ -98,44 +98,58 @@ EOF
 if $CREATE_PVCS;
 then
   echo "*** Creating placeholder statefulsets for ds-cts and ds-idrepo"
-  echo "$STATEFULSET" | sed "s/ds-name/ds-cts/;    s/replicas:.*/replicas: $REPLICAS/; s/storage:.*/storage: $CTS_DISK_SIZE/"    | kubectl --namespace=$NAMESPACE create -f -
-  echo "$STATEFULSET" | sed "s/ds-name/ds-idrepo/; s/replicas:.*/replicas: $REPLICAS/; s/storage:.*/storage: $IDREPO_DISK_SIZE/" | kubectl --namespace=$NAMESPACE create -f -
+  if [ "$CTS_BACKUP_PATH" ];
+  then
+    echo "$STATEFULSET" | sed "s/ds-name/ds-cts/;    s/replicas:.*/replicas: $REPLICAS/; s/storage:.*/storage: $CTS_DISK_SIZE/"    | kubectl --namespace=$NAMESPACE create -f -
+  fi
+  
+  if [ "$IDREPO_BACKUP_PATH" ];
+  then
+    echo "$STATEFULSET" | sed "s/ds-name/ds-idrepo/; s/replicas:.*/replicas: $REPLICAS/; s/storage:.*/storage: $IDREPO_DISK_SIZE/" | kubectl --namespace=$NAMESPACE create -f -
+  fi
+
   echo "Sleeping 15 secs before checking pod status..."
   sleep 15
-  kubectl --namespace=$NAMESPACE wait --for=condition=Ready pod -l app=ds-cts
-  kubectl --namespace=$NAMESPACE wait --for=condition=Ready pod -l app=ds-idrepo
+  if [ "$CTS_BACKUP_PATH"    ]; then kubectl --namespace=$NAMESPACE wait --for=condition=Ready pod -l app=ds-cts;    fi
+  if [ "$IDREPO_BACKUP_PATH" ]; then kubectl --namespace=$NAMESPACE wait --for=condition=Ready pod -l app=ds-idrepo; fi
 else
   echo "PVCs won't be created. Assuming you already have these created"
 fi
 
-echo ""
-echo "*** Starting kubectl cp for ds-cts"
-for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-cts -o json| jq -r '.items[].metadata.name') 
-do 
-  echo "copying backup files from $CTS_BACKUP_PATH to $podname"
-  for file in ${CTS_BACKUP_PATH}/*; do
-    kubectl --namespace=$NAMESPACE cp $file "${podname}":/bak/
+if [ "$CTS_BACKUP_PATH" ];
+then
+  echo ""
+  echo "*** Starting kubectl cp for ds-cts"
+  for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-cts -o json| jq -r '.items[].metadata.name') 
+  do 
+    echo "copying backup files from $CTS_BACKUP_PATH to $podname"
+    for file in ${CTS_BACKUP_PATH}/*; do
+      kubectl --namespace=$NAMESPACE cp $file "${podname}":/bak/
+    done
+      kubectl --namespace=$NAMESPACE exec -i "${podname}" -- chown -R 11111:root /bak/
   done
-    kubectl --namespace=$NAMESPACE exec -i "${podname}" -- chown -R 11111:root /bak/
-done
+fi
 
-echo ""
-echo "*** Starting kubectl cp for ds-idrepo"
-for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-idrepo -o json| jq -r '.items[].metadata.name') 
-do 
-  echo "copying backup files from $IDREPO_BACKUP_PATH to $podname"
-  for file in ${IDREPO_BACKUP_PATH}/*; do
-    kubectl --namespace=$NAMESPACE  cp $file "${podname}":/bak/
+if [ "$IDREPO_BACKUP_PATH" ];
+then
+  echo ""
+  echo "*** Starting kubectl cp for ds-idrepo"
+  for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-idrepo -o json| jq -r '.items[].metadata.name') 
+  do 
+    echo "copying backup files from $IDREPO_BACKUP_PATH to $podname"
+    for file in ${IDREPO_BACKUP_PATH}/*; do
+      kubectl --namespace=$NAMESPACE  cp $file "${podname}":/bak/
+    done
+      kubectl --namespace=$NAMESPACE exec -i "${podname}" -- chown -R 11111:root /bak/
   done
-    kubectl --namespace=$NAMESPACE exec -i "${podname}" -- chown -R 11111:root /bak/
-done
-
+fi
 
 if $CREATE_PVCS;
 then
   echo ""
   echo "*** Cleaning up statefulsets"
-  kubectl --namespace=$NAMESPACE delete statefulset ds-cts ds-idrepo
+  if [ "$CTS_BACKUP_PATH"    ]; then kubectl --namespace=$NAMESPACE delete statefulset ds-cts;    fi
+  if [ "$IDREPO_BACKUP_PATH" ]; then kubectl --namespace=$NAMESPACE delete statefulset ds-idrepo; fi
 fi
 
 echo ""
