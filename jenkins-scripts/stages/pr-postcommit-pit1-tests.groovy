@@ -26,43 +26,18 @@ void runStage(PipelineRun pipelineRun) {
                 dir('lodestar') {
                     def stagesCloud = [:]
 
-                    def cfg_common = [
-                        TESTS_SCOPE                     : 'test/pit1',
-                        COMPONENTS_AMSTER_GITIMAGE_TAG  : gitImageTag,
-                        COMPONENTS_AM_GITIMAGE_TAG      : gitImageTag,
-                        COMPONENTS_IDM_GITIMAGE_TAG     : gitImageTag,
-                        COMPONENTS_IG_GITIMAGE_TAG      : gitImageTag,
-                        STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                        EXT_FORGEOPS_PATH               : forgeopsPath,
-                    ]
-
-                    // Helm tests
-                    def subStageName = 'helm'
+                    // Skaffold tests
+                    def subStageName = 'skaffold'
                     def reportName = "latest-${subStageName}.html"
                     stagesCloud[subStageName] = dashboard_utils.stageCloud(reportName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = cfg_common.clone()
-                        cfg += [
-                            COMPONENTS_FRCONFIG_GIT_REPO    : "https://stash.forgerock.org/scm/cloud/forgeops.git",
-                            COMPONENTS_FRCONFIG_GIT_BRANCH  : gitBranch,
-                            USE_SKAFFOLD                    : false,
-                            REPORT_NAME                     : reportName
-                        ]
-
-                        withGKESpyglaasNoStages(cfg)
-                    }
-
-                    // Skaffold tests
-                    subStageName = 'skaffold'
-                    reportName = "latest-${subStageName}.html"
-                    stagesCloud[subStageName] = dashboard_utils.stageCloud(reportName)
-
-                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = cfg_common.clone()
-                        cfg += [
-                            USE_SKAFFOLD: true,
-                            REPORT_NAME : reportName
+                        def cfg = [
+                            USE_SKAFFOLD            : true,
+                            TESTS_SCOPE             : 'test/pit1',
+                            STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
+                            EXT_FORGEOPS_PATH       : forgeopsPath,
+                            REPORT_NAME             : reportName
                         ]
 
                         withGKESpyglaasNoStages(cfg)
