@@ -1,6 +1,10 @@
 FROM tomcat:8-jdk8-adoptopenjdk-hotspot
-RUN rm -fr "$CATALINA_HOME"/webapps/*
-COPY openam.war "$CATALINA_HOME"/webapps/am.war
+COPY openam.war /var/tmp/am.war
+# Expand the war file to the webapps/am directory. This will make AM available on the /am context.
+RUN rm -fr "$CATALINA_HOME"/webapps/* && \
+    mkdir "$CATALINA_HOME"/webapps/am && \
+    (cd "$CATALINA_HOME"/webapps/am; jar -xvf /var/tmp/am.war) && \
+    rm -f /var/tmp/am.war
 
 #ENV CATALINA_OPTS -server -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap
 # Option for setting the AM home directory:

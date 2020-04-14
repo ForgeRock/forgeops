@@ -5,7 +5,8 @@ If you have an existing configuration store, you can configure AM to use it by c
 an appropriate boot.json file with boot passwords stored in keystore.jceks.
 
 # Customizing the Web App 
-If you wish to customize the AM web app, you can inherit FROM this image, and overlay your changes on /usr/local/tomcat/webapps/openam/
+If you wish to customize the AM web app, you can inherit FROM this image, and 
+overlay your changes on /usr/local/tomcat/webapps/am/.
  
 # How to build am-base
 In order to build this image you must provide the openam war file.
