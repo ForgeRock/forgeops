@@ -53,7 +53,7 @@ def stageCloudPerf(HashMap stagesCloud, String subStageName, String testName) {
     stagesCloud[subStageName] = [
         'numFailedTests': 0,
         'testsDuration' : -1,
-        'reportUrl'     : "${env.BUILD_URL}/artifact/results/pyrock/${testName}-skaffold/global.html",
+        'reportUrl'     : "${env.BUILD_URL}/artifact/results/pyrock/${testName}/global.html",
         'exception'     : null
     ]
     return stagesCloud
