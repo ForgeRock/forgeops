@@ -1,13 +1,12 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: notify
 spec:
-  inputs:
-    params:
-    - name: profile
-      type: string
-      description: profile deployed
+  params:
+  - name: profile
+    type: string
+    description: profile deployed
   steps:
     - name: notify-send-passwords
       image: gcr.io/cloud-builders/kubectl

@@ -1,13 +1,12 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: create-users
 spec:
-  inputs:
-    params:
-      - name: users
-        type: string
-        description: number of users to create
+  params:
+  - name: users
+    type: string
+    description: number of users to create
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL

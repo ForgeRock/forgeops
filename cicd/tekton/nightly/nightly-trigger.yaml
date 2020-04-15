@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: nightly
@@ -10,7 +10,7 @@ spec:
     value: https://stash.forgerock.org/scm/cloud/forgeops.git
 
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: nightly
@@ -22,7 +22,7 @@ spec:
   - name: gitrepositoryurl
     description: The git repository url
   resourcetemplates:
-  - apiVersion: tekton.dev/v1alpha1
+  - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
       generateName: nightly-run-
@@ -42,12 +42,12 @@ spec:
             value: $(params.gitrepositoryurl)
 
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: nightly-listener
 spec:
-  serviceAccountName: tekton-worker
+  serviceAccountName: tekton-trigger
   triggers:
     - name: cron-trig
       bindings:
