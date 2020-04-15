@@ -1,0 +1,37 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: release-notes
+spec:
+  #  stepTemplate:
+  #    env:
+  #      - name: SLACK_FAILED_WEBHOOK_URL
+  #        valueFrom:
+  #          secretKeyRef:
+  #            name: slack-webhook
+  #            key: SLACK_FAILED_WEBHOOK_URL
+  params:
+    - name: gitrevision
+  resources:
+    inputs:
+      - name: git-repo
+        type: git
+  steps:
+    - name: release-notes
+      image: gcr.io/engineering-devops/repo
+      workingDir: /workspace/git-repo
+      env:
+        - name: GIT_TAG_NAME
+          value: $(params.gitrevision)
+        - name: GH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-bot
+              key: token
+      script: |
+        #!/usr/bin/env bash
+        # TODO remove these steps, and just use the command key when tekton will checkout a tag
+        git fetch --tags
+        git checkout "${GIT_TAG_NAME}"
+        make -f docker/cli-tools/repo/Makefile release

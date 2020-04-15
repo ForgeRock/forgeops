@@ -1,0 +1,47 @@
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: tag-release-template
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: tag-release-run-
+      spec:
+        timeout: 45m
+        serviceAccountName: tekton-worker
+        params:
+          - name: gitrevision
+            value: $(params.gitrevision)
+        pipelineRef:
+          name: tag-release
+        resources:
+          - name: git-repo
+            resourceSpec:
+              type: git
+              params:
+                - name: revision
+                  value: $(params.gitrevision)
+                - name: url
+                  value: $(params.gitrepositoryurl)
+                - name: depth
+                  value: "0"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: tag-release-binding
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.ref)
+    - name: gitrepositoryurl
+      value: $(body.repository.clone_url)

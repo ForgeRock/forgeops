@@ -9,7 +9,7 @@ import requests
 SPRINT_DATE_FMT = '%Y.%m.%d'
 GH_REPO = os.environ.get('GH_REPO', 'forgerock/forgeops')
 GH_API_URL = f'https://api.github.com/repos/{GH_REPO}/releases'
-print(GH_API_URL)
+
 def run(*args):
     result = subprocess.run(args, capture_output=True)
     if result.returncode != 0:
@@ -54,19 +54,23 @@ def find_last_tag(args):
             possible_tags.append(parsed)
     # sort by date, then patch
     possible_tags.sort(key=operator.itemgetter(0, 2), reverse=True)
-    last_tag = possible_tags[0]
+    try:
+        last_tag = possible_tags[0]
+    except Exception as e:
+        print(e)
+        sys.exit(0)
     if last_tag[2] != '0':
         out = '{}-{}.{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
                                 *last_tag[1:])
         print(out)
         sys.exit(0)
 
-    print('{}-{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
-                         last_tag[1]))
+    return '{}-{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
+                         last_tag[1])
 
 def create_release_notes(args):
     try:
-        token = os.environ['GH_TOKEN']
+        token = os.environ['GH_TOKEN'].strip()
     except KeyError:
         print('GH_TOKEN environment variable required')
     notes = ''.join(l for l in args.notes.readlines())
@@ -100,6 +104,14 @@ def active_tag():
 def current_tag(args):
     print(active_tag())
 
+def last_tag(args):
+    print(find_last_tag(args))
+
+def release_revlist(args):
+    last_release = find_last_tag(args)
+    print(f'{last_release}..{args.tag_name}')
+
+
 def main():
     parser = argparse.ArgumentParser(description='ForgeOps Repo Command Line')
     subparsers = parser.add_subparsers(help='sub-command help')
@@ -119,16 +131,25 @@ def main():
                                                help=('print the current tag'))
     current_tag_parser.set_defaults(func=current_tag)
 
-    # create release
-    release_parser = subparsers.add_parser('create-release',
+    # create release notes
+    release_notes_parser = subparsers.add_parser('create-release-notes',
                                            help=('create a draft release on '
                                                  'github with notes'))
-    release_parser.add_argument('-t', '--tag-name', default=active_tag(),
+    release_notes_parser.add_argument('-t', '--tag-name', default=active_tag(),
                                 help=('tag name of release. defaults to '
                                       'active tag'))
-    release_parser.add_argument('notes', type=argparse.FileType('r'),
+    release_notes_parser.add_argument('notes', type=argparse.FileType('r'),
                                 default=sys.stdin)
-    release_parser.set_defaults(func=create_release_notes)
+    release_notes_parser.set_defaults(func=create_release_notes)
+
+    # release revlist
+    release_revlist_parser = subparsers.add_parser('release-revlist',
+                                           help=('print a formated revlist for'
+                                                 ' a tag'))
+    release_revlist_parser.add_argument('-t', '--tag-name', default=active_tag(),
+                                help=('tag name of release. defaults to '
+                                      'active tag'))
+    release_revlist_parser.set_defaults(func=release_revlist)
 
     args = parser.parse_args()
     args.func(args)
