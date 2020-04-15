@@ -31,7 +31,7 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = [
                             USE_SKAFFOLD                    : true,
-                            TESTS_SCOPE                     : 'test/pit1',
+                            TESTS_SCOPE                     : 'tests/pit1',
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE               : subStageName,
                             CLUSTER_CRASHER                 : 'True',

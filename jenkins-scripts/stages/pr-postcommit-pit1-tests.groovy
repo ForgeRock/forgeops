@@ -34,7 +34,7 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def cfg = [
                             USE_SKAFFOLD            : true,
-                            TESTS_SCOPE             : 'test/pit1',
+                            TESTS_SCOPE             : 'tests/pit1',
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH       : forgeopsPath,
                             REPORT_NAME             : reportName
