@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: notify
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+  params:
+  - name: profile
+    type: string
+    description: profile deployed
+  steps:
+    - name: notify-send-passwords
+      image: gcr.io/cloud-builders/kubectl
+      env:
+      - name: SLACK_WEBHOOK_URL
+        valueFrom:
+          secretKeyRef:
+            name: slack-webhook
+            key: SLACK_WEBHOOK_URL
+      script: |
+        #!/usr/bin/env bash
+        OUT=./temp.json
+        cat <<EOF >$OUT
+        {
+          "blocks": [{
+            "type": "section",
+            "text": {
+              "text": "Hello World! I come in peace. I'm a tekton pipeline and I was triggered by a bitbucket PR. If you see this, I am working OK.",
+              "type": "mrkdwn"
+            },
+            "fields": [
+              {
+                "type": "mrkdwn",
+                "text": "AWESOME"
+              },
+              {				
+                "type": "mrkdwn",
+                "text": "SAUCE"
+              },
+            ]
+          }]
+        }
+        EOF
+        curl -X POST -H 'Content-type: application/json' --data @temp.json $SLACK_WEBHOOK_URL
+
+

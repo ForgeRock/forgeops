@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: utils-pipeline-trigger
+  annotations:
+    cert-manager.io/cluster-issuer: "default-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/triggerbuild)$ $1/ redirect;
+spec:
+  rules:
+  - host: utils.iam.forgeops.com
+    http:
+      paths:
+      - backend:
+          serviceName: el-utils-listener
+          servicePort: 8080
+        path: /triggerbuild/?(.*)
+  tls:
+  - hosts:
+    - utils.iam.forgeops.com
+    secretName: sslcert

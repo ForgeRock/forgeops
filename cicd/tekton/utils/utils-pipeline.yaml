@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: utils-pipeline
+spec:
+  resources:
+    - name: forgeops
+      type: git
+  tasks:
+    - name: notify-step
+      taskRef:
+        name: notify
+      resources:
+        inputs:
+        - name: forgeops
+          resource: forgeops
+      params:
+      - name: profile
+        value: utils
+        
