@@ -3,6 +3,10 @@ kind: Task
 metadata:
   name: notify
 spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
   params:
   - name: profile
     type: string
@@ -18,30 +22,23 @@ spec:
             key: SLACK_WEBHOOK_URL
       script: |
         #!/usr/bin/env bash
-        getsec () {
-        kubectl get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
-        }
         OUT=./temp.json
         cat <<EOF >$OUT
         {
           "blocks": [{
             "type": "section",
             "text": {
-              "text": "$(inputs.params.profile) pipeline Successful. Random Passwords generated for $(inputs.params.profile)'s environment. See:\n<https://$(inputs.params.profile).iam.forgeops.com/admin>\n<https://$(inputs.params.profile).iam.forgeops.com/am>\n<https://$(inputs.params.profile).iam.forgeops.com/enduser>",
+              "text": "Hello World! I come in peace. I'm a tekton pipeline and I was triggered by a bitbucket PR. If you see this, I am working OK.",
               "type": "mrkdwn"
             },
             "fields": [
               {
                 "type": "mrkdwn",
-                "text": "*uid=admin*: \`$(getsec ds-passwords dirmanager\\.pw)\`"
+                "text": "AWESOME"
               },
               {				
                 "type": "mrkdwn",
-                "text": "*amadmin*: \`$(getsec amster-env-secrets AMADMIN_PASS)\`"
-              },
-              {	
-                "type": "mrkdwn",
-                "text": "*openidm-admin*: \`$(getsec idm-env-secrets OPENIDM_ADMIN_PASSWORD)\`"
+                "text": "SAUCE"
               },
             ]
           }]

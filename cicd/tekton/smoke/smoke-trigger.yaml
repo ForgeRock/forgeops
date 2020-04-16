@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: smoke
@@ -10,7 +10,7 @@ spec:
     value: $(body.repository.url)
 
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: smoke
@@ -22,7 +22,7 @@ spec:
   - name: gitrepositoryurl
     description: The git repository url
   resourcetemplates:
-  - apiVersion: tekton.dev/v1alpha1
+  - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
       generateName: smoke-run-
@@ -42,12 +42,12 @@ spec:
             value: $(params.gitrepositoryurl)
 
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1alpha1
 kind: EventListener
 metadata:
   name: smoke-listener
 spec:
-  serviceAccountName: tekton-worker
+  serviceAccountName: tekton-trigger
   triggers:
   - name: stash-trigger
     interceptors:

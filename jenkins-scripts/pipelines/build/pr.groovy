@@ -74,6 +74,10 @@ def postBuildTests(PipelineRun pipelineRun) {
         pit1TestStage.runStage(pipelineRun)
         //perfTestStage.runStage(pipelineRun)
         currentBuild.result = 'SUCCESS'
+    } catch (FlowInterruptedException ex) {
+        echo "CAUGHT FlowInterruptedException"
+        currentBuild.result = 'ABORTED'
+        throw ex
     } catch (exception) {
         currentBuild.result = 'FAILURE'
         throw exception

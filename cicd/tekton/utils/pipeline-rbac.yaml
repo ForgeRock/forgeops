@@ -14,7 +14,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: tekton-worker
-  namespace: nightly
+  namespace: utils
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -50,4 +50,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: tekton-trigger
-  namespace: nightly
+  namespace: utils

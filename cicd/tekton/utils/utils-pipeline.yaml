@@ -1,22 +1,20 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: smoke-pipeline
+  name: utils-pipeline
 spec:
   resources:
     - name: forgeops
       type: git
   tasks:
-    - name: deploy-images-step
+    - name: notify-step
       taskRef:
-        name: deploy-images
+        name: notify
       resources:
         inputs:
         - name: forgeops
           resource: forgeops
       params:
       - name: profile
-        value: smoke
-      - name: docker-repo
-        value: gcr.io/engineering-devops/smoke
+        value: utils
         

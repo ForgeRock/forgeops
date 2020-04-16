@@ -7,12 +7,13 @@ The entire build happens in the cluster itself. No external tooling is required.
 
 * Create a `kaniko-secret` in the default namespace. `kubectl create secret generic kaniko-secret --from-file=kaniko-secret`.
    The secret is the GCP service account json that has privileges to push/pull images to gcr.io
-* Optional: install the tkn cli tool. More information: https://github.com/tektoncd/cli
-  You can perform actions like:
-    tkn -n smoke pipelinerun logs smoke-pipeline-run-lf7tn -f #get pipeline logs
-    tkn -n smoke pipeline start smoke-pipeline -s tekton-worker #start a pipeline
+* Optional: install the tkn cli tool. More information: https://github.com/tektoncd/cli  
+  You can perform actions like trigger pipeplines runs or obtain pipeline logs:  
+    tkn -n smoke pipelinerun logs smoke-pipeline-run-lf7tn -f #get pipeline logs  
+    tkn -n smoke pipeline start smoke-pipeline -s tekton-worker #start a pipeline  
+  For more information on `tkn`, take a look at https://github.com/tektoncd/cli/tree/master/docs
 
-## Run
+## Install the pipeline
 
 Run the shell script `forgeops/cicd/tekton/install-tekton.sh` to install tekton in your cluster. Then, run `./install-pipeline.sh smoke`. This will install the pipeline and all other required elements in the `smoke` namespace.
 
