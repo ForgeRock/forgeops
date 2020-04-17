@@ -165,6 +165,8 @@ profiles:
       context: docker/7.0/am
     - image: amster
       context: docker/7.0/amster
+    - image: ds-cts
+      context: docker/7.0/ds/cts
     - image: ds-idrepo
       context: docker/7.0/ds/idrepo
     - image: forgeops-secrets
