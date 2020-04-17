@@ -21,7 +21,7 @@ spec:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: slack-webhook
+          name: "slack-webhook-$(params.profile)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
   - name: build-images

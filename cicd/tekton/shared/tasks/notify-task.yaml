@@ -14,12 +14,12 @@ spec:
       - name: SLACK_WEBHOOK_URL
         valueFrom:
           secretKeyRef:
-            name: slack-webhook
+            name: "slack-webhook-$(params.profile)"
             key: SLACK_WEBHOOK_URL
       script: |
         #!/usr/bin/env bash
         getsec () {
-        kubectl get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
+        kubectl -n $(params.profile) get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
         }
         OUT=./temp.json
         cat <<EOF >$OUT
@@ -27,7 +27,7 @@ spec:
           "blocks": [{
             "type": "section",
             "text": {
-              "text": "$(inputs.params.profile) pipeline Successful. Random Passwords generated for $(inputs.params.profile)'s environment. See:\n<https://$(inputs.params.profile).iam.forgeops.com/admin>\n<https://$(inputs.params.profile).iam.forgeops.com/am>\n<https://$(inputs.params.profile).iam.forgeops.com/enduser>",
+              "text": "$(params.profile) pipeline Successful. Random Passwords generated for $(params.profile)'s environment. See:\n<https://$(params.profile).iam.forgeops.com/admin>\n<https://$(params.profile).iam.forgeops.com/am>\n<https://$(params.profile).iam.forgeops.com/enduser>",
               "type": "mrkdwn"
             },
             "fields": [

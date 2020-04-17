@@ -28,6 +28,8 @@ spec:
       params:
       - name: users
         value: "10"
+      - name: profile
+        value: nightly
         
     - name: scale-am-deployment-step
       runAfter:
@@ -36,7 +38,9 @@ spec:
         name: scale-am-deployment
       params:
       - name: replicas
-        value: "1"         
+        value: "1"
+      - name: profile
+        value: nightly
 
     - name: notify-step
       runAfter:
