@@ -10,7 +10,7 @@ void runStage(pipelineRun) {
     def parallelTestsMap = [
         Greenfield: { greenfieldTests.runStage(pipelineRun) },
         //Upgrade: { upgradeTests.runStage(pipelineRun) },
-        Perf: { perfTests.runStage(pipelineRun) }
+        Perf: { perfTests.runStage(pipelineRun) },
     ]
 
     parallel parallelTestsMap

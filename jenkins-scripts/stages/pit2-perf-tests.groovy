@@ -25,11 +25,7 @@ void runStage(PipelineRun pipelineRun) {
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {
-                    def cfg_common = [
-                        DO_RECORD_RESULT        : 'True',
-                        CLUSTER_NAMESPACE       : 'pyrock',
-                        CLUSTER_DOMAIN          : "performance-jenkins.forgeops.com",
-                        JENKINS_YAML            : 'jenkins.yaml',
+                    def config_common = [
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                         EXT_FORGEOPS_PATH       : forgeopsPath,
                         PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
@@ -39,77 +35,64 @@ void runStage(PipelineRun pipelineRun) {
 
                     // perf stack test
                     def subStageName = 'stack'
-                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'stack')
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('stack')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = cfg_common.clone()
-                        cfg += [
-                            USE_SKAFFOLD    : true,
+                        def config = config_common.clone()
+                        config += [
                             TEST_NAME       : "stack",
                         ]
 
-                        withGKEPyrockNoStages(cfg)
+                        withGKEPyrockNoStages(config)
                     }
 
                     // perf am authn rest test
                     subStageName = 'am_authn'
-                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'authn_rest')
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('authn_rest')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = cfg_common.clone()
-                        cfg += [
-                            USE_SKAFFOLD    : true,
+                        def config = config_common.clone()
+                        config += [
                             TEST_NAME       : "authn_rest",
                         ]
 
-                        withGKEPyrockNoStages(cfg)
+                        withGKEPyrockNoStages(config)
                     }
 
                     // perf am access token test
                     subStageName = 'am_access_token'
-                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'access_token')
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('access_token')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = cfg_common.clone()
-                        cfg += [
-                            USE_SKAFFOLD    : true,
+                        def config = config_common.clone()
+                        config += [
                             TEST_NAME       : "access_token",
                         ]
 
-                        withGKEPyrockNoStages(cfg)
+                        withGKEPyrockNoStages(config)
                     }
 
                     // IDM CRUD on simple managed users tests
                     subStageName = 'idm_crud'
-                    stagesCloud = stageCloudPerf(stagesCloud, subStageName, 'simple_managed_users')
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('simple_managed_users')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = cfg_common.clone()
-                        cfg += [
-                            USE_SKAFFOLD    : true,
+                        def config = config_common.clone()
+                        config += [
                             TEST_NAME       : "simple_managed_users",
                         ]
 
-                        withGKEPyrockNoStages(cfg)
+                        withGKEPyrockNoStages(config)
                     }
 
-                    // Summary and combined report generation
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false,
+                        normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
+                        "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }
     }
-}
-
-def stageCloudPerf(HashMap stagesCloud, String subStageName, String testName) {
-    stagesCloud[subStageName] = [
-        'numFailedTests': 0,
-        'testsDuration' : -1,
-        'reportUrl'     : "${env.BUILD_URL}/artifact/results/pyrock/${testName}/global.html",
-        'exception'     : null
-    ]
-    return stagesCloud
 }
 
 return this
