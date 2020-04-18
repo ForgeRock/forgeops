@@ -1,0 +1,133 @@
+dn: ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+objectclass: sunServiceComponent
+ou: services
+
+dn: ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: sunEntitlementService
+
+dn: ou=1.0,ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunService
+ou: 1.0
+
+dn: ou=GlobalConfig,ou=1.0,ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: GlobalConfig
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=PluginConfig,ou=1.0,ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: PluginConfig
+
+dn: ou=Instances,ou=1.0,ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: Instances
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: default
+
+dn: ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: sunEntitlementIndexes
+
+dn: ou=1.0,ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: sunService
+ou: 1.0
+
+dn: ou=GlobalConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: GlobalConfig
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=PluginConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: PluginConfig
+
+dn: ou=Instances,ou=1.0,ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: Instances
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: default
+
+dn: ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: AgentService
+
+dn: ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunService
+ou: 1.0
+
+dn: ou=GlobalConfig,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: GlobalConfig
+
+dn: ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=PluginConfig,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: PluginConfig
+
+dn: ou=Instances,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: organizationalunit
+ou: Instances
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: default
+
+dn: ou=agentgroup,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup
+
+dn: ou=agentgroup,ou=Instances,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectclass: top
+objectclass: sunServiceComponent
+objectclass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup

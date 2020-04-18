@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "iPlanetAMPolicyConfigService",
+    "entityId" : "default",
+    "serviceVersion" : "6d37f397-3c5e-4e9e-a6d0-249e91558583",
+    "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMPolicyConfigService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "bindDn" : "&{cfg.user.dn}",
+    "bindPassword" :"&{cfg.user.password.enc}",
+    "_type" : {
+      "_id" : "iPlanetAMPolicyConfigService",
+      "name" : "iPlanetAMPolicyConfigService",
+      "collection" : false
+    },
+    "_id" : "default"
+  }
+}

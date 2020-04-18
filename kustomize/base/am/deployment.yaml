@@ -18,6 +18,10 @@ spec:
         envFrom:
         - secretRef:
             name: am-env-secrets
+        - configMapRef:
+            name: platform-config
+        - secretRef:
+            name: amster-env-secrets
         image: am
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -72,3 +76,8 @@ spec:
       - name: truststore
         secret:
           secretName: truststore
+      - name: platform-configmap
+        configMap:
+          name: platform-config
+
+

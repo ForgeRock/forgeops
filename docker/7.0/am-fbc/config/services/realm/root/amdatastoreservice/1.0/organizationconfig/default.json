@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "amDataStoreService",
+    "entityId" : "default",
+    "serviceVersion" : "80eed16e-10ae-4ab6-bf72-0885f16641d8",
+    "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=amDataStoreService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "amDataStoreService",
+      "name" : "amDataStoreService",
+      "collection" : false
+    },
+    "applicationDataStoreId" : "configstore",
+    "_id" : "default",
+    "policyDataStoreId" : "configstore"
+  }
+}

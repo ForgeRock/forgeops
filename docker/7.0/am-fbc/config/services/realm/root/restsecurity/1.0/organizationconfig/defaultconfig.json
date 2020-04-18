@@ -1,0 +1,33 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "RestSecurity",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : "4784e889-5ec8-43d9-a601-d389cc5e4eed",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=RestSecurity,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "selfServiceEnabled" : false,
+    "selfRegistrationConfirmationUrl" : "http://localhost:8080/am/XUI/confirm.html",
+    "protectedUserAttributes" : [ ],
+    "userRegisteredDestination" : "default",
+    "_type" : {
+      "_id" : "RestSecurity",
+      "name" : "RestSecurity",
+      "collection" : false
+    },
+    "selfRegistrationTokenLifetime" : 900,
+    "forgotPasswordEnabled" : false,
+    "selfRegistrationEnabled" : false,
+    "confirmationIdHmacKey" : "&{am.confirmation.id.hmac.key}",
+    "_id" : "defaultconfig",
+    "SigningKeyValidator" : "org.forgerock.openam.authentication.modules.persistentcookie.validation.SigningKeyValidator",
+    "forgotPasswordConfirmationUrl" : "http://localhost:8080/am/XUI/confirm.html",
+    "forgotPasswordTokenLifetime" : 900
+  }
+}

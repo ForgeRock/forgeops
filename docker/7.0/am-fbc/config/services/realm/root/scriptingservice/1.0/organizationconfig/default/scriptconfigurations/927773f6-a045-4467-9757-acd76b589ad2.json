@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "realm": "/",
+    "amsterVersion": "7.0.0-SNAPSHOT",
+    "entityType": "ScriptingService",
+    "entityId": "default/scriptConfigurations/927773f6-a045-4467-9757-acd76b589ad2",
+    "serviceVersion": "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
+    "uid": "ou=927773f6-a045-4467-9757-acd76b589ad2,ou=scriptConfigurations,ou=default,ou=OrganizationConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID": "scriptConfiguration",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams": {},
+    "ou": null
+  },
+  "data": {
+    "lastModifiedDate": "0",
+    "createdBy": "null",
+    "lastModifiedBy": "null",
+    "_type": {
+      "_id": "ScriptingService",
+      "name": "ScriptingService",
+      "collection": false
+    },
+    "name": "SMS with Twilio",
+    "context": "AUTHENTICATION_TREE_DECISION_NODE",
+    "description": "Custom script to send a One Time Passcode using Twilio. Account SID, auth key, and from phone need to be populated, and OTP messaging can be changed using this approach",
+    "language": "JAVASCRIPT",
+    "_id": "default/scriptConfigurations/927773f6-a045-4467-9757-acd76b589ad2",
+    "creationDate": "0",
+    "script": {
+      "$base64:encode": {
+        "$inline": "SMSwithTwilio.javascript"
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "iPlanetAMAuthDeviceIdSaveService",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : "430b1a31-e389-4475-aba4-53ffd791c65e",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthDeviceIdSaveService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : [ "defaultconfig" ]
+  },
+  "data" : {
+    "authenticationLevel" : 0,
+    "maxProfilesAllowed" : 5,
+    "_type" : {
+      "_id" : "iPlanetAMAuthDeviceIdSaveService",
+      "name" : "iPlanetAMAuthDeviceIdSaveService",
+      "collection" : false
+    },
+    "_id" : "defaultconfig",
+    "autoStoreProfiles" : false
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "ChoiceCollectorNode",
+    "entityId" : "default/0013e051-d6e1-4685-8172-bb1af2541711",
+    "serviceVersion" : null,
+    "uid" : "ou=0013e051-d6e1-4685-8172-bb1af2541711,ou=default,ou=OrganizationConfig,ou=1.0,ou=ChoiceCollectorNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "defaultChoice" : "Device",
+    "_type" : {
+      "_id" : "ChoiceCollectorNode",
+      "name" : "ChoiceCollectorNode",
+      "collection" : false
+    },
+    "_id" : "default/0013e051-d6e1-4685-8172-bb1af2541711",
+    "choices" : [ "Device", "Email", "SMS" ],
+    "prompt" : "SecondFactorChoice"
+  }
+}

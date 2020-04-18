@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "realm": "/",
+    "amsterVersion": "7.0.0-SNAPSHOT",
+    "entityType": "ScriptingService",
+    "entityId": "default/scriptConfigurations/d25827fa-9eb9-4bbf-abe5-8d0b3c8f2b46",
+    "serviceVersion": "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
+    "uid": "ou=d25827fa-9eb9-4bbf-abe5-8d0b3c8f2b46,ou=scriptConfigurations,ou=default,ou=OrganizationConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID": "scriptConfiguration",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams": {},
+    "ou": null
+  },
+  "data": {
+    "lastModifiedDate": "0",
+    "createdBy": "null",
+    "lastModifiedBy": "null",
+    "_type": {
+      "_id": "ScriptingService",
+      "name": "ScriptingService",
+      "collection": false
+    },
+    "name": "Email with org-api template",
+    "context": "AUTHENTICATION_TREE_DECISION_NODE",
+    "description": "Custom script to send a One Time Passcode using org-api. Parameters for OpenIDM credentials, OpenIDM URL, and org-api URL need to be populated. OTP email template can be changed through org-ui.",
+    "language": "JAVASCRIPT",
+    "_id": "default/scriptConfigurations/d25827fa-9eb9-4bbf-abe5-8d0b3c8f2b46",
+    "creationDate": "0",
+    "script": {
+      "$base64:encode": {
+        "$inline": "Emailwithorg-apitemplate.javascript"
+      }
+    }
+  }
+}

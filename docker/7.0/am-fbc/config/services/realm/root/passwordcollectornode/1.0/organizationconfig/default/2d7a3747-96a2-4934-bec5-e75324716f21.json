@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PasswordCollectorNode",
+    "entityId" : "default/2d7a3747-96a2-4934-bec5-e75324716f21",
+    "serviceVersion" : null,
+    "uid" : "ou=2d7a3747-96a2-4934-bec5-e75324716f21,ou=default,ou=OrganizationConfig,ou=1.0,ou=PasswordCollectorNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "PasswordCollectorNode",
+      "name" : "PasswordCollectorNode",
+      "collection" : false
+    },
+    "_id" : "default/2d7a3747-96a2-4934-bec5-e75324716f21"
+  }
+}

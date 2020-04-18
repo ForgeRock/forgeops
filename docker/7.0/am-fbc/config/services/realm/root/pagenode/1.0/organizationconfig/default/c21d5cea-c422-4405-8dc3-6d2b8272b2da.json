@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PageNode",
+    "entityId" : "default/c21d5cea-c422-4405-8dc3-6d2b8272b2da",
+    "serviceVersion" : null,
+    "uid" : "ou=c21d5cea-c422-4405-8dc3-6d2b8272b2da,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "400619e6-69a3-4838-ba15-937bf534fec4:WebAuthnRegistrationNode:WebAuthn Registration Node" ],
+    "stage" : "DeviceRegistration",
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : { },
+    "_id" : "default/c21d5cea-c422-4405-8dc3-6d2b8272b2da",
+    "pageHeader" : { }
+  }
+}

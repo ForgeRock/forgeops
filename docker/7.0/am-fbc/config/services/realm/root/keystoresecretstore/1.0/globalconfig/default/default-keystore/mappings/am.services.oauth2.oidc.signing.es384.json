@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "KeyStoreSecretStore",
+    "entityId" : "default/default-keystore/mappings/am.services.oauth2.oidc.signing.ES384",
+    "serviceVersion" : null,
+    "uid" : "ou=am.services.oauth2.oidc.signing.ES384,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "aliases" : [ "es384test" ],
+    "_type" : {
+      "_id" : "KeyStoreSecretStore",
+      "name" : "KeyStoreSecretStore",
+      "collection" : false
+    },
+    "secretId" : "am.services.oauth2.oidc.signing.ES384",
+    "_id" : "default/default-keystore/mappings/am.services.oauth2.oidc.signing.ES384"
+  }
+}

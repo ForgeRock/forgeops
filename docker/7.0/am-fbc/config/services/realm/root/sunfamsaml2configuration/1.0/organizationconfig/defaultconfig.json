@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "sunFAMSAML2Configuration",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : "bde43f16-3a80-400d-a6d3-ced587341591",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=sunFAMSAML2Configuration,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "metadataSigningKeyPass-encrypted" : "AAAAA0FFUwIQ/qDG91O87UBCKgSXFQqaFQTp9rgbJr2ztVODh2TYNSeTbpnm/EcamLRT+PuS+z26Ue88+4YKJmjaisyhoLKr0Q==",
+    "metadataSigningKey" : "test",
+    "_type" : {
+      "_id" : "sunFAMSAML2Configuration",
+      "name" : "sunFAMSAML2Configuration",
+      "collection" : false
+    },
+    "metadataSigningKeyPass" : null,
+    "_id" : "defaultconfig"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "OneTimePasswordGeneratorNode",
+    "entityId" : "PluginConfig",
+    "serviceVersion" : null,
+    "uid" : "ou=PluginConfig,ou=1.0,ou=OneTimePasswordGeneratorNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "OneTimePasswordGeneratorNode",
+      "name" : "OneTimePasswordGeneratorNode",
+      "collection" : false
+    },
+    "_id" : "PluginConfig"
+  }
+}

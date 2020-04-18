@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "realm": null,
+    "amsterVersion": "7.0.0-SNAPSHOT",
+    "entityType": "ScriptingService",
+    "entityId": "default/globalScripts/7e3d7067-d50f-4674-8c76-a3e13a810c33",
+    "serviceVersion": "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
+    "uid": "ou=7e3d7067-d50f-4674-8c76-a3e13a810c33,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID": "globalScript",
+    "objectClass": [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams": {},
+    "ou": [
+      "7e3d7067-d50f-4674-8c76-a3e13a810c33"
+    ]
+  },
+  "data": {
+    "lastModifiedDate": "0",
+    "createdBy": "null",
+    "lastModifiedBy": "null",
+    "_type": {
+      "_id": "ScriptingService",
+      "name": "ScriptingService",
+      "collection": false
+    },
+    "name": "Scripted Module - Server Side",
+    "context": "AUTHENTICATION_SERVER_SIDE",
+    "description": "Default global script for server side Scripted Authentication Module",
+    "language": "JAVASCRIPT",
+    "_id": "default/globalScripts/7e3d7067-d50f-4674-8c76-a3e13a810c33",
+    "creationDate": "0",
+    "script": {
+      "$base64:encode": {
+        "$inline": "ScriptedModule-ServerSide.javascript"
+      }
+    }
+  }
+}

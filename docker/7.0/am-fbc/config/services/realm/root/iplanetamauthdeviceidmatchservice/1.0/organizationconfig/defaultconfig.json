@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "iPlanetAMAuthDeviceIdMatchService",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : "063d67bc-89d7-4900-991a-4245095b1dde",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMAuthDeviceIdMatchService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : [ "defaultconfig" ]
+  },
+  "data" : {
+    "serverScript" : "703dab1a-1921-4981-98dd-b8e5349d8548",
+    "authenticationLevel" : 0,
+    "_type" : {
+      "_id" : "iPlanetAMAuthDeviceIdMatchService",
+      "name" : "iPlanetAMAuthDeviceIdMatchService",
+      "collection" : false
+    },
+    "clientScript" : "157298c0-7d31-4059-a95b-eeb08473b7e5",
+    "_id" : "defaultconfig",
+    "clientScriptEnabled" : true
+  }
+}

@@ -1,0 +1,33 @@
+{
+    "title": "Job Status",
+    "type": "object",
+    "properties": {
+        "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 127,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "value": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 127,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+        },
+        "uuid": {
+            "type": "string"
+        },
+        "time": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "tenantID": {
+            "type": "integer",
+            "minimum": 0
+        }
+    },
+    "required": [
+        "type",
+        "value"
+    ]
+}
