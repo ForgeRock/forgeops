@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+
+function prep_helm() {
+    tiller &>> /dev/null &
+    export HELM_HOST=localhost:44134;
+}
+
+ARGS=(${entry_args[@]:3})
 if [[ "${CDM_DEBUG}" == "true" ]];
 then
     set -x;
@@ -30,6 +37,18 @@ then
         stack_file="/opt/forgeops/mnt/ctx/Pulumi.${stack_name}.yaml"
         ARGS=( ${ARGS[@]} "--config-file" "${stack_file}" );
     fi
+elif [[ "${entry_args[3]}" == "addons-deploy.sh" ]];
+then
+    prep_helm
+    ARGS=(${entry_args[@]:3})
+elif [[ "${entry_args[3]}" == "ingress-controller-deploy.sh" ]];
+then
+    prep_helm
+    ARGS=(${entry_args[@]:3})
+elif [[ "${entry_args[3]}" == "prometheus-deploy.sh" ]];
+then
+    prep_helm
+    ARGS=(${entry_args[@]:3})
 else
     ARGS=(${entry_args[@]:3})
 fi
