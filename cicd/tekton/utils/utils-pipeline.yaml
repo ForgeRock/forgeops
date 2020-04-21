@@ -7,9 +7,9 @@ spec:
     - name: forgeops
       type: git
   tasks:
-    - name: notify-step
+    - name: sample-pr-step
       taskRef:
-        name: notify
+        name: sample-pr-task
       resources:
         inputs:
         - name: forgeops

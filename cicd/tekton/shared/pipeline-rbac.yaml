@@ -3,8 +3,13 @@ kind: ServiceAccount
 metadata:
   name: tekton-worker
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tekton-trigger
+---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: ClusterRoleBinding
 metadata:
   name: tekton-worker
 roleRef:
@@ -14,12 +19,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: tekton-worker
-  namespace: utils
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: tekton-trigger
+  namespace: tekton-pipelines
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -50,4 +50,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: tekton-trigger
-  namespace: utils
+  namespace: tekton-pipelines

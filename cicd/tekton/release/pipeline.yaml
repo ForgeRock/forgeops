@@ -1,0 +1,22 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: tag-release
+spec:
+  params:
+    - name: gitrevision
+  resources:
+    - name: git-repo
+      type: git
+  tasks:
+    - name: release-notes
+      params:
+        - name: gitrevision
+          value: $(params.gitrevision)
+      taskRef:
+        name: release-notes
+      resources:
+        inputs:
+          - name: git-repo
+            resource: git-repo

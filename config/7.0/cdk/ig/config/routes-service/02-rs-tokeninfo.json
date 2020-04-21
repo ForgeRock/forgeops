@@ -12,7 +12,8 @@
           "type": "OAuth2ResourceServerFilter",
           "config": {
             "scopes": [
-              "mail"
+              "mail",
+              "employeenumber"
             ],
             "requireHttps": false,
             "realm": "OpenIG",

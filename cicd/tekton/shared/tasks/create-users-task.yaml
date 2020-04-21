@@ -7,12 +7,16 @@ spec:
   - name: users
     type: string
     description: number of users to create
+    
+  - name: profile
+    type: string
+    description: profile
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: slack-webhook
+          name: "slack-webhook-$(params.profile)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
     - name: wait-for-all-pods-ready
@@ -21,8 +25,8 @@ spec:
         #!/usr/bin/env bash
         {
           sleep 15
-          kubectl wait --for=condition=complete --timeout=120s job -l app=forgeops-secrets --all
-          kubectl wait --for=condition=ready --timeout=600s pod -l vendor=forgerock --all
+          kubectl -n $(params.profile) wait --for=condition=complete --timeout=120s job -l app=forgeops-secrets --all
+          kubectl -n $(params.profile) wait --for=condition=ready --timeout=600s pod -l vendor=forgerock --all
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Some pods still unhealthy after 600s. Failed to create users"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
@@ -34,7 +38,7 @@ spec:
         #!/usr/bin/env bash
         {
           # Obtain the amster pod name, tail the logs until the string is found      
-          (kubectl logs $(kubectl get pod -l app=amster -o jsonpath="{.items[0].metadata.name}") -f &) | grep -qi "configuration script finished"
+          (kubectl -n $(params.profile) logs $(kubectl -n $(params.profile) get pod -l app=amster -o jsonpath="{.items[0].metadata.name}") -f &) | grep -qi "configuration script finished"
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Amster config failed"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
@@ -42,17 +46,13 @@ spec:
       
     - name: create-users
       image: gcr.io/cloud-builders/kubectl
-      env:
-      - name: ADMIN_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: ds-passwords
-            key: dirmanager.pw      
       script: |
         #!/usr/bin/env bash
         {
           #set ADMIN_PASSWORD and run make-users.sh 
-          kubectl exec ds-idrepo-0 -- bash -c "export ADMIN_PASSWORD=$ADMIN_PASSWORD; make-users.sh $(inputs.params.users)"
+          
+          ADMIN_PASSWORD=$(kubectl -n $(params.profile) get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)
+          kubectl -n $(params.profile) exec ds-idrepo-0 -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD make-users.sh $(inputs.params.users)"
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to create users. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1

@@ -7,5 +7,6 @@ kubectl apply --filename https://github.com/tektoncd/triggers/releases/download/
 kubectl apply --filename https://github.com/tektoncd/dashboard/releases/download/v0.6.1/tekton-dashboard-release.yaml
 kubectl -n tekton-pipelines wait --for=condition=Ready pod --all
 
+kubectl -n tekton-pipelines apply --recursive -f shared/
 echo ""
 echo "Installation complete! You can now use tekton pipelines"

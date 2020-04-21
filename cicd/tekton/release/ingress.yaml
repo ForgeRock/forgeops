@@ -1,0 +1,24 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tag-release-pipeline-trigger
+  annotations:
+    cert-manager.io/cluster-issuer: "default-issuer"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(/release-tag)$ $1/ redirect;
+spec:
+  rules:
+    - host: tekton-pipelines.iam.forgeops.com
+      http:
+        paths:
+          - backend:
+              # TODO UODATE AND DEPLOY THIS VALUE
+              serviceName: el-github-tag-listener
+              servicePort: 8080
+            path: /release-tag/?(.*)
+  tls:
+    - hosts:
+        - cicd.iam.forgeops.com
+      secretName: sslcert

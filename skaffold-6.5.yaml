@@ -5,7 +5,7 @@
 # and by creating a new kustomize profile in kustomize/6.5/env
 
 # The default below for skaffold dev is to deploy all services in one shot:
-apiVersion: skaffold/v1beta12
+apiVersion: skaffold/v1
 kind: Config
 build: &default-build
   # local:
@@ -33,6 +33,7 @@ build: &default-build
   tagPolicy:
     sha256: {}
 deploy:
+  statusCheckDeadlineSeconds: 600
   kustomize:
     path: ./kustomize/overlay/6.5/all
 # Additional profiles

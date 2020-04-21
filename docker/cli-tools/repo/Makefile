@@ -1,17 +1,15 @@
+#!/usr/bin/env make
 SHELL := /bin/bash
-.SHELLFLAGS := -eu -o pipefail -c  
+.SHELLFLAGS := -eu -o pipefail -c
 
 # bins
 COMMITSTAR=/usr/local/bin/commitsar
 TSLINT=tslint
 
-LAST_TAG = $(shell forgeops prior-tag)      
-CURRENT_TAG = $(shell forgeops current-tag) 
-
 # TODO incorporate more from poc-pr branch
-#SHELL_SCRIPTS = $(wildcard **/*.sh)                                    
-#TS_SCRIPTS = $(shell find cluster/pulumi/{aws,azure,gcp} -name "*.ts") 
-#KUSTOMIZE_YAML = $(shell find kustomize -name "*.yaml")                
+#SHELL_SCRIPTS = $(wildcard **/*.sh)
+#TS_SCRIPTS = $(shell find cluster/pulumi/{aws,azure,gcp} -name "*.ts")
+#KUSTOMIZE_YAML = $(shell find kustomize -name "*.yaml")
 # .PHONY: $(SHELL_SCRIPTS) $(KUSTOMIZE_YAML) $(TS_SCRIPTS)
 #$(KUSTOMIZE_YAML):
 #	-yamllint -f parsable $@
@@ -39,12 +37,9 @@ CURRENT_TAG = $(shell forgeops current-tag)
 branch-notes:
 	@gitchangelog master..HEAD
 
-
-
 changelog.md:
-	@forgeops current-tag
-	@gitchangelog $(LAST_TAG)..$(CURRENT_TAG)
+	@gitchangelog $(forgeops release-revlist) > changelog.md
 
 release: changelog.md
-	forgeops create-release changelog.md
+	forgeops create-release-notes changelog.md
 

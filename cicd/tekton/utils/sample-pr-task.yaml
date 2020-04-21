@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: notify
+  name: sample-pr-task
 spec:
   resources:
     inputs:
@@ -12,13 +12,13 @@ spec:
     type: string
     description: profile deployed
   steps:
-    - name: notify-send-passwords
+    - name: notify-hello-world
       image: gcr.io/cloud-builders/kubectl
       env:
       - name: SLACK_WEBHOOK_URL
         valueFrom:
           secretKeyRef:
-            name: slack-webhook
+            name: "slack-webhook-$(params.profile)"
             key: SLACK_WEBHOOK_URL
       script: |
         #!/usr/bin/env bash

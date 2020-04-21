@@ -11,15 +11,16 @@
           "type": "OAuth2ResourceServerFilter",
           "config": {
             "scopes": [
-              "mail"
+              "mail",
+              "employeenumber"
             ],
             "requireHttps": false,
-            "realm": "/",
+            "realm": "OpenIG",
             "accessTokenResolver": {
               "name": "token-resolver-1",
               "type": "TokenIntrospectionAccessTokenResolver",
               "config": {
-                "endpoint": "http://am.&{namespace}.svc.cluster.local/am/oauth2/introspect",
+                "endpoint": "http://am:80/am/oauth2/introspect",
                 "providerHandler": {
                   "type": "Chain",
                   "config": {

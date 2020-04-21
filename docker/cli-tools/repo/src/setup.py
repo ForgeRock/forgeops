@@ -10,11 +10,11 @@ setup(name='forgeops',
       author_email='max.resnick@forgerock.com',
       url='http://stash.forgerock.org/scm/cloud/forgeops.git',
       license="CDDL",
-      py_modules=['forgeops'],
+      py_modules=['repo'],
       packages=[],
       install_requires=['gitchangelog', 'requests', 'mako'],
       entry_points = {
-          'console_scripts': ['forgeops=forgeops:main'],
+          'console_scripts': ['forgeops=repo:main'],
       },
       classifiers=[
           'Development Status :: 3 - Alpha',
