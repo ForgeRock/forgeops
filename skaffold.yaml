@@ -42,8 +42,8 @@ profiles:
       kaniko: &kaniko-opts
         cache: {}
         image: gcr.io/kaniko-project/executor:v0.19.0
-        flags:
-        - '--single-snapshot'
+        buildArgs:
+          single-snapshot: "true"
     - image: amster
       context: docker/7.0/amster
       kaniko: *kaniko-opts
