@@ -6,3 +6,5 @@ COPY --chown=forgerock:root .  /opt/opendj/
 ARG profile_version
 USER forgerock
 RUN bin/setup.sh "$profile_version"  && rm bin/setup.sh
+# CLOUD-1955
+#RUN find . -user root  && find . -name \*.wh
