@@ -51,4 +51,7 @@ else
 
 fi
 
+# Disable access logs and set the secure cookie
+export CATALINA_OPTS="$CATALINA_OPTS -DtomcatAccessLogDir=/dev -DtomcatAccessLogFile=null -DtomcatSecureLoadBalancer=true"
+
 exec catalina.sh run
