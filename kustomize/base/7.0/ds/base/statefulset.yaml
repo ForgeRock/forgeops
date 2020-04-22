@@ -64,6 +64,8 @@ spec:
         volumeMounts:
         - mountPath: /opt/opendj/data
           name: data
+        - mountPath: /opt/opendj/bak
+          name: backup
         - mountPath: /var/run/secrets/opendj-passwords
           name: passwords
       containers:
@@ -76,6 +78,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: FQDN_DS0
+          value: localhost
+        - name: BACKUP_DIRECTORY
+          value: /opt/opendj/bak
         # Best to let DS calculate this rather than hard code here.
         # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
         #   value: ds-0.ds.default.svc.cluster.local:8989
@@ -109,6 +115,8 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /opt/opendj/data
+        - name: backup
+          mountPath: /opt/opendj/bak
         - name: secrets
           mountPath: /opt/opendj/secrets
         - mountPath: /var/run/secrets/opendj
@@ -134,6 +142,15 @@ spec:
     spec:
       # Include below storageClass in overlay if wanting to use local SSD.
       # storageClassName: "local-storage"
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+  - metadata:
+      name: backup
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
