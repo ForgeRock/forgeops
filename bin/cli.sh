@@ -124,7 +124,7 @@ _set_minikube() {
 }
 
 _set_localhost() {
-    _add_volume "${HOME}/.docker:${mount_root}/.docker"
+    #_add_volume "${HOME}/.docker:${mount_root}/.docker"
     _add_volume "/var/run/docker.sock:/var/run/docker.sock"
     _config_cloud_sdk
 

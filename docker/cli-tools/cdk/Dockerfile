@@ -9,6 +9,9 @@ RUN adduser --system --no-create-home --uid 501 --disabled-password --group forg
                 && usermod -d /opt/forgeops/mnt forgeops \
                     && chown -R forgeops:forgeops /opt/forgeops/mnt \
                         && chmod 2775 /opt/forgeops
+USER 501
+RUN  docker-credential-gcloud config --token-source="env" && docker-credential-gcloud configure-docker
+USER root
 COPY docker/cli-tools/cdk/entrypoint.sh /opt/forgeops/usr/entrypoint.sh
 ENTRYPOINT ["/opt/forgeops/usr/entrypoint.sh"]
 WORKDIR /opt/forgeops/mnt/ctx
