@@ -76,8 +76,4 @@ spec:
       - name: truststore
         secret:
           secretName: truststore
-      - name: platform-configmap
-        configMap:
-          name: platform-config
-
 

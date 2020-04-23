@@ -31,8 +31,17 @@ deploy: &default-deploy
   kustomize:
     path: ./kustomize/overlay/7.0/all
 
+
 # Additional profiles
+
+# default.iam.forgeops.com
 profiles:
+- name: forgeops
+  build: *default-build
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/forgeops
+
 # 24/7 Demo environment
 - name: nightly
   build: &kaniko-build
