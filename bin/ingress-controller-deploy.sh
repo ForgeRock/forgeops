@@ -72,6 +72,9 @@ fi
 
 # Set script location
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ADDONS_BASE="${ADDONS_BASE:-/../cluster/addons}"
+ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
+
 
 # Add Helm repo
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/ > /dev/null
@@ -79,5 +82,5 @@ helm repo add stable https://kubernetes-charts.storage.googleapis.com/ > /dev/nu
 # Deploy ingress controller Helm chart
 helm upgrade -i nginx-ingress --namespace nginx stable/nginx-ingress \
   --set controller.image.tag=$VERSION \
-  $IP_OPTS $AKS_OPTS -f ${DIR}/../cluster/addons/nginx-ingress-controller/${PROVIDER}.yaml
-  
+  $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
+

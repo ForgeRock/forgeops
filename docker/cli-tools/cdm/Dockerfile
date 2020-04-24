@@ -1,4 +1,5 @@
 FROM gcr.io/engineering-devops/yamkt:latest as base
+ENV HELM_HOME=/opt/forgeops/usr/helm
 
 SHELL ["bash", "-c"]
 ENV PULUMI_SKIP_UPDATE_CHECK=1
@@ -15,8 +16,7 @@ RUN chmod 2775 /opt/forgeops \
                     && rm -rf /tmp/pulumi \
                         && chown -R root:cli /opt/forgeops/usr/node_modules
 
-RUN helm --home /opt/forgeops/usr/helm init --client-only \
-        && chown -R 0:360360 /opt/forgeops/usr/helm
+RUN helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 FROM gcr.io/engineering-devops/yamkt:latest as finale
 ENV NODE_PATH=/opt/forgeops/usr/node_modules
@@ -35,6 +35,9 @@ RUN  adduser --system --no-create-home --uid 501 --disabled-password --group for
                         && chown -R forgeops:forgeops /opt/forgeops/mnt
 
 COPY --chown=0:360360 docker/cli-tools/cdm/entrypoint.sh /opt/forgeops/usr/entrypoint.sh
+COPY --chown=0:360360 bin/ /opt/forgeops/usr/bin
+COPY --chown=0:360360 cluster/addons /opt/forgeops/usr/addons
+ENV ADDONS_BASE=/opt/forgeops/usr/addons
 
 ENTRYPOINT ["/opt/forgeops/usr/entrypoint.sh"]
 WORKDIR /opt/forgeops/mnt/ctx

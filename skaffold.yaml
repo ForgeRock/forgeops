@@ -31,8 +31,17 @@ deploy: &default-deploy
   kustomize:
     path: ./kustomize/overlay/7.0/all
 
+
 # Additional profiles
+
+# default.iam.forgeops.com
 profiles:
+- name: forgeops
+  build: *default-build
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/forgeops
+
 # 24/7 Demo environment
 - name: nightly
   build: &kaniko-build
@@ -40,10 +49,15 @@ profiles:
     - image: am
       context: docker/7.0/am
       kaniko: &kaniko-opts
-        cache: {}
+        #cache: {}
         image: gcr.io/kaniko-project/executor:v0.19.0
+        # The flags is deprecated - but without it we are seeing Kaniko bugs.
+        # CLOUD-1955
         flags:
-        - '--single-snapshot'
+          - '--single-snapshot'
+# This is the recommended way of passing the single-snapshot arg - but we see issues.
+#        buildArgs:
+#          single-snapshot: "true"
     - image: amster
       context: docker/7.0/amster
       kaniko: *kaniko-opts

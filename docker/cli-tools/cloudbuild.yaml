@@ -1,45 +1,43 @@
----
-timeout: 1200s
 steps:
- - name: 'gcr.io/cloud-builders/docker'
-   id: base
-   entrypoint: 'make'
-   args:
-     - '-f'
-     - 'docker/cli-tools/Makefile'
-     - 'yamkt'
- - name: 'gcr.io/cloud-builders/docker'
-   entrypoint: 'make'
-   waitFor: base
-   args:
-     - '-f'
-     - 'docker/cli-tools/Makefile'
-     - 'cdm'
- - name: 'gcr.io/cloud-builders/docker'
-   entrypoint: 'make'
-   waitFor: base
-   args:
-     - '-f'
-     - 'docker/cli-tools/Makefile'
-     - 'cdk'
- - name: 'gcr.io/cloud-builders/docker'
-   entrypoint: 'make'
-   waitFor: base
-   args:
-     - '-f'
-     - 'docker/cli-tools/Makefile'
-     - 'toolbox'
- - name: 'gcr.io/cloud-builders/docker'
-   entrypoint: 'make'
-   waitFor: base
-   args:
-     - '-f'
-     - 'docker/cli-tools/Makefile'
-     - 'debug'
- - name: 'gcr.io/cloud-builders/docker'
-   entrypoint: 'make'
-   waitFor: base
-   args:
-     - '-f'
-     - 'docker/cli-tools/Makefile'
-     - 'repo'
+- name: 'gcr.io/cloud-builders/docker'
+  id: base
+  entrypoint: 'make'
+  args:
+  - '-f'
+  - 'docker/cli-tools/Makefile'
+  - 'yamkt'
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'make'
+  waitFor: ["base"]
+  args:
+  - '-f'
+  - 'docker/cli-tools/Makefile'
+  - 'cdm'
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'make'
+  waitFor: ["base"]
+  args:
+  - '-f'
+  - 'docker/cli-tools/Makefile'
+  - 'cdk'
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'make'
+  waitFor: ["base"]
+  args:
+  - '-f'
+  - 'docker/cli-tools/Makefile'
+  - 'toolbox'
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'make'
+  waitFor: ["base"]
+  args:
+  - '-f'
+  - 'docker/cli-tools/Makefile'
+  - 'debug'
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'make'
+  waitFor: ["base"]
+  args:
+    - '-f'
+    - 'docker/cli-tools/Makefile'
+    - 'repo'

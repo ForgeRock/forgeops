@@ -26,25 +26,24 @@ void runStage(PipelineRun pipelineRun) {
                 dir('lodestar') {
                     def stagesCloud = [:]
 
-                    // Skaffold tests
-                    def subStageName = 'skaffold'
-                    def reportName = "latest-${subStageName}.html"
-                    stagesCloud[subStageName] = dashboard_utils.stageCloud(reportName)
+                    def subStageName = isPR() ? 'pr' : 'postcommit'
+                    stagesCloud[subStageName] = dashboard_utils.spyglaasStageCloud(subStageName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = [
-                            USE_SKAFFOLD            : true,
+                        def config = [
                             TESTS_SCOPE             : 'tests/pit1',
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH       : forgeopsPath,
-                            REPORT_NAME             : reportName
+                            REPORT_NAME             : subStageName,
                         ]
 
-                        withGKESpyglaasNoStages(cfg)
+                        withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false,
+                        normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
+                        "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }

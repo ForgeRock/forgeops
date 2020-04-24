@@ -9,8 +9,9 @@
 set -oe pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ADDONS_DIR="/../cluster/addons/prometheus"
-PROM_VALUES="${DIR}${ADDONS_DIR}/prometheus-operator.yaml"
+ADDONS_BASE="${ADDONS_BASE:-/../cluster/addons}"
+ADDONS_DIR="${ADDONS_BASE}/prometheus"
+PROM_VALUES="${ADDONS_DIR}/prometheus-operator.yaml"
 VERSION="0.38.0"
 
 USAGE="Usage: $0 [-n <namespace>] [-v <values file>] [-d]"
@@ -28,11 +29,11 @@ create_ns() {
 
 # deploy Prometheus Operator and forgerock metrics
 deploy() {
-    
+
     # Add stable repo to helm
     helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
-    helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE 
+    helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE
 
     kubectl -n $NAMESPACE wait --for condition=established --timeout=60s \
         crd/prometheuses.monitoring.coreos.com \
@@ -40,9 +41,9 @@ deploy() {
         crd/servicemonitors.monitoring.coreos.com \
         crd/podmonitors.monitoring.coreos.com \
         crd/alertmanagers.monitoring.coreos.com
-        
+
     # Install/Upgrade forgerock-servicemonitors
-    helm upgrade -i forgerock-metrics ${DIR}${ADDONS_DIR}/forgerock-metrics --namespace=$NAMESPACE
+    helm upgrade -i forgerock-metrics ${ADDONS_DIR}/forgerock-metrics --namespace=$NAMESPACE
 }
 
 # Delete all
@@ -92,7 +93,7 @@ done
 # Check if -n flag has been included
 [[ $1 != "-n" ]] && NAMESPACE=monitoring
 # set custom yaml file if not provided with the -f arg
-[ $VALUES ] && PROM_VALUES="${DIR}${ADDONS_DIR}/${VALUES}"
+[ $VALUES ] && PROM_VALUES="${ADDONS_DIR}/${VALUES}"
 # delete chart if -d select
 [[ ${1} =~ "-d" ]] && delete
 

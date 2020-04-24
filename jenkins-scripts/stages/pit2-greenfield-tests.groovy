@@ -25,12 +25,10 @@ void runStage(PipelineRun pipelineRun) {
 
                     // Upgrade tests
                     def subStageName = 'greenfield'
-                    def reportName = "latest-${subStageName}.html"
-                    stagesCloud[subStageName] = dashboard_utils.stageCloud(reportName)
+                    stagesCloud[subStageName] = dashboard_utils.spyglaasStageCloud(subStageName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = [
-                            USE_SKAFFOLD                    : true,
+                        def config = [
                             TESTS_SCOPE                     : 'tests/pit1',
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE               : subStageName,
@@ -41,14 +39,16 @@ void runStage(PipelineRun pipelineRun) {
                             TIMEOUT_UNIT                    : 'HOURS',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH               : forgeopsPath,
-                            REPORT_NAME                     : reportName,
+                            REPORT_NAME                     : subStageName,
                         ]
 
-                        withGKESpyglaasNoStages(cfg)
+                        withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false,
+                        normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
+                        "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }

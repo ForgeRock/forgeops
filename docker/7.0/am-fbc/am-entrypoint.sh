@@ -92,6 +92,11 @@ export CTS_PASSWORD_ENC=$(echo $CTS_PASSWORD | am-crypto encrypt des)
 export POLICY_PASSWORD_ENC=$(echo $POLICY_PASSWORD | am-crypto encrypt des)
 unset AM_ENC_KEY
 
+# TODO: Used by FRaaS for the email template: Emailwithorg-apitemplate.javascript
+export ORG_API_URL=$FQDN
+export IDM_USERNAME=openidm-admin
+export IDM_PASSWORD="NoWorky"
+
 # For debugging purposes
 echo "****** Environment *************: "
 env | sort

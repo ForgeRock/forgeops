@@ -1,4 +1,5 @@
-FROM gcr.io/forgerock-io/am:7.0.0-007878d135fb859c709c1c7c03ddccb582c9b2f5
+#FROM gcr.io/forgerock-io/am/pit1:7.0.0-28cd5f66d11a9c6b6fbfbf3421800615bbf753fd
+FROM gcr.io/forgerock-io/am/pit1@sha256:a914d0aabcb16962891d569c7115e3d245da9ee759f16e9498c0dee63c90c85a
 
 # BEGIN - temporary work around for testing if the ds-idrepo is configured before AM starts. Remove when FBC is integrated
 # Installs ldap utils for querying the repo.
@@ -8,10 +9,14 @@ COPY --chown=forgerock:root openam /home/forgerock/openam
 # END
 
 COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
+RUN chown -R forgerock:root /usr/local/tomcat
 
-# Reinstate once AM is back running on JDK11
+#  JDK11 with GC trace options
 # ENV CATALINA_OPTS "-server -XX:MaxRAMPercentage=75 -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off -Xlog:gc*,gc+ref=debug,gc+heap=debug,gc+age=trace:file=/tmp/gc-%p-%t.log:tags,uptime,time,level:filecount=10,filesize=10m -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
-ENV CATALINA_OPTS "-server -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
+# JDK 11
+ENV CATALINA_OPTS "-server -XX:MaxRAMPercentage=75 -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
+
+#ENV CATALINA_OPTS "-server -Dcom.sun.identity.configuration.directory=/home/forgerock/openam -Dcom.iplanet.services.stats.state=off -Djavax.net.ssl.trustStore=/var/run/secrets/truststore/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
 
 # This copies in the boot.json and other files...
 COPY --chown=forgerock:root openam /home/forgerock/openam

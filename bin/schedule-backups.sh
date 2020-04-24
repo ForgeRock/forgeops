@@ -16,10 +16,14 @@ if [[ -z "$NAMESPACE" ]] ; then
 fi
 
 pods=( $(kubectl get pods -n $NAMESPACE | grep ds | echo $(awk '{ print $1 }')) )
+#only set $ADMIN_PASSWORD if the secret is available. This information is only used in 7.0.
+if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}") ]] &>/dev/null; then
+  ADMIN_PASSWORD=$(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)
+fi
 for pod in "${pods[@]}"
 do
   echo ""
   echo "scheduling backup for pod: $pod"
-  kubectl -n $NAMESPACE exec -ti $pod ./scripts/schedule-backup.sh
+  kubectl -n $NAMESPACE exec $pod -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD ./scripts/schedule-backup.sh"
 done
 

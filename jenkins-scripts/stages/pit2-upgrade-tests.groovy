@@ -10,7 +10,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun) {
 
-    def stageName = 'PIT2 Upgrade'
+    def stageName = 'PIT2 Binary Upgrade'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
@@ -22,13 +22,11 @@ void runStage(PipelineRun pipelineRun) {
                     def stagesCloud = [:]
 
                     // Upgrade tests
-                    def subStageName = 'upgrade'
-                    def reportName = "latest-${subStageName}.html"
-                    stagesCloud[subStageName] = dashboard_utils.stageCloud(reportName)
+                    def subStageName = 'binary_upgrade'
+                    stagesCloud[subStageName] = dashboard_utils.spyglaasStageCloud(subStageName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def cfg = [
-                            USE_SKAFFOLD                            : true,
+                        def config = [
                             TESTS_SCOPE                             : 'tests/pit2/upgrade',
                             CLUSTER_DOMAIN                          : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE                       : subStageName,
@@ -38,14 +36,16 @@ void runStage(PipelineRun pipelineRun) {
                             COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG   : getHelmChart('ds-empty').currentTag,
                             STASH_LODESTAR_BRANCH                   : commonModule.LODESTAR_GIT_COMMIT,
                             STASH_FORGEOPS_BRANCH                   : 'fraas-production',
-                            REPORT_NAME                             : reportName,
+                            REPORT_NAME                             : subStageName,
                         ]
 
-                        withGKESpyglaasNoStages(cfg)
+                        withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false, normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud, "${env.BUILD_URL}/${normalizedStageName}/")
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false,
+                        normalizedStageName, "${normalizedStageName}.html")
+                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
+                        "${env.BUILD_URL}/${normalizedStageName}/")
                 }
             }
         }

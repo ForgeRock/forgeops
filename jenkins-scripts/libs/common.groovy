@@ -99,9 +99,10 @@ Map getHelmChart(String productName) {
 
 /** Skaffold Dockerfile paths. Should be treated as private, although it's not possible to enforce this in Groovy. */
 SKAFFOLD_DOCKERFILE_PATHS = [
-        'am'        : 'docker/7.0/am/Dockerfile',
+        // TODO remove CLOUD-2168
+        //'am'        : 'docker/7.0/am/Dockerfile',
         'am-fbc'    : 'docker/7.0/am-fbc/Dockerfile',
-        'amster'    : 'docker/7.0/amster/Dockerfile',
+        //'amster'    : 'docker/7.0/amster/Dockerfile',
         'ds-cts'    : 'docker/7.0/ds/cts/Dockerfile',
         'ds-util'   : 'docker/7.0/ds/dsutil/Dockerfile',
         'ds-idrepo' : 'docker/7.0/ds/idrepo/Dockerfile',
