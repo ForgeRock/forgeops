@@ -1,4 +1,3 @@
-import base64
 import os
 import sys
 import datetime
@@ -19,7 +18,8 @@ log.info('initializing gcr pruner')
 DRY_RUN = bool(int(os.environ.get('GCR_PRUNE_DRY_RUN', 0)))
 # export MAX_UPDATE_AGE=DAYS maximum age of a digest
 # (delete if currrent_time - last_update > MAX_UPDATE_AGE)
-MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
+ENGINEERING_DEVOPS_MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
+FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 90)))
 
 REGISTRY_BASE = 'https://gcr.io/v2'
 try:
@@ -37,6 +37,7 @@ _black_list_repos = [
    ]
 
 EXCLUDE = [ re.compile(i) for i in _black_list_repos ]
+GIT_SHA1_PATTERN = re.compile(r'^[0-9a-f]{7,40}$')
 
 def repo_tags(repo):
     url = f'{REGISTRY_BASE}/{repo}/tags/list'
@@ -44,16 +45,60 @@ def repo_tags(repo):
     response.raise_for_status()
     return response.json().get('manifest')
 
-def filter_digests(digests, max_recent_update_age):
+def image_is_stale(image_digest_id, image_digest_meta, max_recent_update_age):
+    last_update = datetime.datetime.utcfromtimestamp(
+        int(image_digest_meta['timeUploadedMs']) / 1000.0000)
+    log.debug(f'{image_digest_id} {last_update}')
+    return datetime.datetime.now() - last_update > max_recent_update_age
+
+def image_is_untagged(image_digest_meta):
+    return len(image_digest_meta['tag']) == 0
+
+def image_is_only_tagged_with_development_versions(image_digest_meta):
+    """Determine if image is only tagged with development versions, e.g. 7.0.0-37c45b4d11984014498cb35e3925d0a3e0c053ff
+    """
+    for tag in image_digest_meta['tag']:
+        if not is_development_tag(tag):
+            return False
+    return True
+
+def is_development_tag(tag):
+    """A development tag is one ending with a hyphen followed by a git SHA1
+    """
+    if '-' not in tag:
+        return False
+    tag_suffix = tag.split('-')[-1]
+    return GIT_SHA1_PATTERN.search(tag_suffix) is not None
+
+def filter_lookup(repo):
+    """Select which filtering algorithm to use, depending on the repo.
+    """
+    registry = repo.split('/')[0]
+    if registry == 'forgerock-io':
+        return filter_forgerock_io_digests
+    else:
+        return filter_engineering_devops_digests
+
+def filter_engineering_devops_digests(digests):
     filtered = []
     for digest_id, digest_meta in digests.items():
-        tagless = len(digest_meta['tag']) == 0
-        last_update = datetime.datetime.utcfromtimestamp(
-            int(digest_meta['timeUploadedMs']) / 1000.0000)
-        stale =  datetime.datetime.now() - last_update > MAX_AGE
-        log.debug(f'{digest_id} {last_update}')
+        tagless = image_is_untagged(digest_meta)
+        stale = image_is_stale(digest_id, digest_meta, ENGINEERING_DEVOPS_MAX_AGE)
         if tagless and stale:
             filtered.append(digest_id)
+    num_digests = len(filtered)
+    log.info(f'found {num_digests} to prune')
+    return filtered
+
+def filter_forgerock_io_digests(digests):
+    filtered = []
+    for digest_id, digest_meta in digests.items():
+        if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
+            tagless = image_is_untagged(digest_meta)
+            development_only = image_is_only_tagged_with_development_versions(digest_meta)
+            stale = image_is_stale(digest_id, digest_meta, FORGEROCK_IO_MAX_AGE)
+            if (tagless or development_only) and stale:
+                filtered.append(digest_id)
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
@@ -65,7 +110,6 @@ def registry_repos(exclude_images):
     for repo in repos:
         if not any(i.search(repo) for i in exclude_images):
             yield repo
-
 
 def prune_manifests(repo, digest_ids, dry_run=DRY_RUN):
     for digest_id in digest_ids:
@@ -84,7 +128,8 @@ def prune_registry(dry_run=DRY_RUN):
     log.info(f'is dry run {dry_run}')
     for repo in registry_repos(EXCLUDE):
         log.info(f'pruning {repo}')
-        digests_to_remove = filter_digests(repo_tags(repo), 14)
+        filter_digests = filter_lookup(repo)
+        digests_to_remove = filter_digests(repo_tags(repo))
         prune_manifests(repo, digests_to_remove, dry_run=dry_run)
 
 @app.route('/', methods=['POST'])
