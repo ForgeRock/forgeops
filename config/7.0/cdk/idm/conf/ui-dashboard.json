@@ -17,14 +17,9 @@
                     "size" : "large",
                     "cards" : [
                         {
-                            "name" : "Add Connector",
-                            "icon" : "fa-database",
-                            "href" : "#connectors/add/"
-                        },
-                        {
-                            "name" : "Create Mapping",
-                            "icon" : "fa-map-marker",
-                            "href" : "#mapping/add/"
+                            "name" : "Manage Users",
+                            "icon" : "fa-user",
+                            "href" : "#resource/managed/user/list/"
                         },
                         {
                             "name" : "Manage Roles",
@@ -35,21 +30,6 @@
                             "name" : "Add Device",
                             "icon" : "fa-tablet",
                             "href" : "#managed/add/"
-                        },
-                        {
-                            "name" : "Configure Registration",
-                            "icon" : "fa-gear",
-                            "href" : "#selfservice/userregistration/"
-                        },
-                        {
-                            "name" : "Configure Password Reset",
-                            "icon" : "fa-gear",
-                            "href" : "#selfservice/passwordreset/"
-                        },
-                        {
-                            "name" : "Manage Users",
-                            "icon" : "fa-user",
-                            "href" : "#resource/managed/user/list/"
                         },
                         {
                             "name" : "Configure System Preferences",
@@ -127,55 +107,6 @@
                 {
                     "type" : "resourceList",
                     "size" : "large"
-                }
-            ]
-        },
-        {
-            "name" : "Business Report",
-            "isDefault" : false,
-            "widgets" : [
-                {
-                    "type" : "signIns",
-                    "size" : "x-small",
-                    "widgetTitle" : "Sign-Ins",
-                    "providers" : [
-                        "Username/Password"
-                    ],
-                    "graphType" : "fa-pie-chart"
-                },
-                {
-                    "type" : "passwordResets",
-                    "size" : "x-small",
-                    "widgetTitle" : "Password Resets",
-                    "graphType" : "fa-bar-chart"
-                },
-                {
-                    "type" : "newRegistrations",
-                    "size" : "x-small",
-                    "widgetTitle" : "New Registrations",
-                    "providers" : [
-                        "Username/Password"
-                    ],
-                    "graphType" : "fa-line-chart"
-                },
-                {
-                    "type" : "socialLogin",
-                    "size" : "x-small",
-                    "timezone" : {
-                        "negative" : true,
-                        "hours" : "07",
-                        "minutes" : "00"
-                    }
-                },
-                {
-                    "type" : "counter",
-                    "size" : "x-small",
-                    "selected" : "socialEnabled"
-                },
-                {
-                    "type" : "counter",
-                    "size" : "x-small",
-                    "selected" : "manualRegistrations"
                 }
             ]
         }

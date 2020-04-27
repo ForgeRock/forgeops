@@ -874,6 +874,7 @@
                         "title" : "Temporal Constraints",
                         "viewable" : false,
                         "returnByDefault" : true,
+                        "isTemporalConstraint" : true,
                         "type" : "array",
                         "items" : {
                             "type" : "object",
