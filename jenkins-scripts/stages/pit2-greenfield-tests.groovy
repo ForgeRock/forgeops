@@ -33,7 +33,7 @@ void runStage(PipelineRun pipelineRun) {
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE               : subStageName,
                             CLUSTER_CRASHER                 : 'True',
-                            REPEAT                          : 10,
+                            REPEAT                          : GREENFIELD_REPEAT.toInteger(),
                             REPEAT_WAIT                     : 3600,
                             TIMEOUT                         : '12',
                             TIMEOUT_UNIT                    : 'HOURS',
@@ -45,7 +45,7 @@ void runStage(PipelineRun pipelineRun) {
                         withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false,
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
                         normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud,
                         "${env.BUILD_URL}/${normalizedStageName}/")

@@ -72,7 +72,7 @@ fi
 
 # Set script location
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ADDONS_BASE="${ADDONS_BASE:-/../cluster/addons}"
+ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
 ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
 
 

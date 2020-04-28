@@ -85,7 +85,7 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPyrockNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, 'build&&linux', false,
+                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
                         normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud,
                         "${env.BUILD_URL}/${normalizedStageName}/")
