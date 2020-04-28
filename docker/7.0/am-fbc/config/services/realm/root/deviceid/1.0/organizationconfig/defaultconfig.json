@@ -14,7 +14,7 @@
   "data" : {
     "deviceIdSettingsEncryptionKeystoreType" : "JCEKS",
     "deviceIdAttrName" : "devicePrintProfiles",
-    "deviceIdSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore.jceks",
+    "deviceIdSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore-runtime.jceks",
     "_type" : {
       "_id" : "DeviceId",
       "name" : "DeviceId",

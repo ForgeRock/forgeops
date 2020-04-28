@@ -7,9 +7,9 @@
     "serviceVersion" : null,
     "uid" : "ou=default,ou=GlobalConfig,ou=1.0,ou=CorsService,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
     "pathParams" : { },
-    "ou" : [ "default" ]
+    "ou" : null
   },
   "data" : {
     "_type" : {

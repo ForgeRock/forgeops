@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "ValidatedPasswordNode",
+    "entityId" : "default/923166b4-3108-447e-846e-da7673ffd5ec",
+    "serviceVersion" : null,
+    "uid" : "ou=923166b4-3108-447e-846e-da7673ffd5ec,ou=default,ou=OrganizationConfig,ou=1.0,ou=ValidatedPasswordNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "validateInput" : true,
+    "_type" : {
+      "_id" : "ValidatedPasswordNode",
+      "name" : "ValidatedPasswordNode",
+      "collection" : false
+    },
+    "passwordAttribute" : "password",
+    "_id" : "default/923166b4-3108-447e-846e-da7673ffd5ec",
+    "objectType" : "user"
+  }
+}

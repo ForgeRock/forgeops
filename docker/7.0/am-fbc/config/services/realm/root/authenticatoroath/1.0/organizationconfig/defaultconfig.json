@@ -13,7 +13,7 @@
   },
   "data" : {
     "authenticatorOATHSkippableName" : "oath2faEnabled",
-    "authenticatorOATHDeviceSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore.jceks",
+    "authenticatorOATHDeviceSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore-runtime.jceks",
     "authenticatorOATHDeviceSettingsEncryptionKeystorePrivateKeyPassword" : "&{default.keystore.entry.password}",
     "authenticatorOATHDeviceSettingsEncryptionKeystoreType" : "JCEKS",
     "_type" : {

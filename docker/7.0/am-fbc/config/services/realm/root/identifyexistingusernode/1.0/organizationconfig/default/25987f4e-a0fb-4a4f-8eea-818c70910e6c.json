@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "IdentifyExistingUserNode",
+    "entityId" : "default/25987f4e-a0fb-4a4f-8eea-818c70910e6c",
+    "serviceVersion" : null,
+    "uid" : "ou=25987f4e-a0fb-4a4f-8eea-818c70910e6c,ou=default,ou=OrganizationConfig,ou=1.0,ou=IdentifyExistingUserNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "identifier" : "userName",
+    "_type" : {
+      "_id" : "IdentifyExistingUserNode",
+      "name" : "IdentifyExistingUserNode",
+      "collection" : false
+    },
+    "_id" : "default/25987f4e-a0fb-4a4f-8eea-818c70910e6c",
+    "objectType" : "user",
+    "identityAttribute" : "mail"
+  }
+}

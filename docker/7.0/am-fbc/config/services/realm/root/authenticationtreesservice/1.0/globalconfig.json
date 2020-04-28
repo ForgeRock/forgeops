@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "authenticationTreesService",
+    "entityId" : "GlobalConfig",
+    "serviceVersion" : "81f1faa8-726c-4574-a47d-4f13a09764ad",
+    "uid" : "ou=GlobalConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "authenticationTreesService",
+      "name" : "authenticationTreesService",
+      "collection" : false
+    },
+    "_id" : "GlobalConfig"
+  }
+}

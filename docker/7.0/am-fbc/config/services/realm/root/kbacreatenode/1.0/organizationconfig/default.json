@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "KbaCreateNode",
+    "entityId" : "default",
+    "serviceVersion" : null,
+    "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=KbaCreateNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "KbaCreateNode",
+      "name" : "KbaCreateNode",
+      "collection" : false
+    },
+    "_id" : "default"
+  }
+}

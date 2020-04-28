@@ -105,7 +105,7 @@
       "com.iplanet.am.sdk.cache.maxSize=10000",
       "org.forgerock.openam.timerpool.shutdown.retry.interval=15000",
       "org.forgerock.services.umaaudit.store.password=",
-      "com.sun.identity.saml.xmlsig.keystore=%BASE_DIR%/security/keystores/keystore.jceks",
+      "com.sun.identity.saml.xmlsig.keystore=%BASE_DIR%/security/keystores/keystore-runtime.jceks",
       "org.forgerock.services.uma.labels.store.root.suffix=",
       "org.forgerock.services.uma.pendingrequests.store.max.connections=10",
       "com.sun.am.session.enableHostLookUp=false",
