@@ -23,8 +23,10 @@ import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
 
 properties([
+    disableConcurrentBuilds(),
     buildDiscarder(logRotator(numToKeepStr: '20')),
-    pipelineTriggers([cron('H 0,12 * * *')])
+    pipelineTriggers([cron('H 0,12 * * *')]),
+    parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
 ])
 
 def pipelineRun
