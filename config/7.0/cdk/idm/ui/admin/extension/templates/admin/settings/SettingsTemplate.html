@@ -20,9 +20,9 @@
                 <a data-toggle="tab" data-route="audit" href="#auditContainer">{{t "templates.audit.audit"}}</a>
                 </li>
 
-                <li class="{{#if maintenanceMode}}disabled{{/if}}{{#sw tabName "selfService"}}active{{/sw}}">
+                <!-- <li class="{{#if maintenanceMode}}disabled{{/if}}{{#sw tabName "selfService"}}active{{/sw}}">
                 <a data-toggle="tab" data-route="selfService" href="#selfServiceContainer">{{t "templates.selfService.title"}}</a>
-                </li>
+                </li> -->
 
                 <li class="{{#if maintenanceMode}}disabled{{/if}}{{#sw tabName "workflow"}}active{{/sw}}">
                 <a data-toggle="tab" data-route="workflow" href="#workflowContainer">{{t "templates.workflows.title"}}</a>
@@ -34,7 +34,7 @@
     <div class="container">
         <div class="tab-content" id="settings">
             <div id="auditContainer" data-settings="audit" class="tab-pane{{#sw tabName "audit"}} active{{/sw}}" role="tabpanel"></div>
-            <div id="selfServiceContainer" data-settings="selfService" class="tab-pane{{#sw tabName "selfService"}} active{{/sw}}" role="tabpanel"></div>
+            <!-- <div id="selfServiceContainer" data-settings="selfService" class="tab-pane{{#sw tabName "selfService"}} active{{/sw}}" role="tabpanel"></div> -->
             <div id="workflowContainer" data-settings="workflow" class="tab-pane{{#sw tabName "workflow"}} active{{/sw}}" role="tabpanel"></div>
         </div>
     </div>
