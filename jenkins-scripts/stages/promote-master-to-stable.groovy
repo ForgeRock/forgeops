@@ -36,15 +36,11 @@ void runStage(PipelineRun pipelineRun) {
 
 private void promoteDockerImagesToRootLevel() {
     commonModule.getHelmCharts().each { helmChart ->
-        if (helmChart.currentImageName in ['gcr.io/forgerock-io/am/pit1', 'gcr.io/forgerock-io/amster/pit1']) {
-            echo "Promotion of image '${helmChart.currentImageName}' temporarily disabled - see RELENG-631"
-        } else {
-            echo "Promoting '${helmChart.currentImageName}:${helmChart.currentTag}' to root level"
-            dockerUtils.copyImage(
-                    "${helmChart.currentImageName}:${helmChart.currentTag}",
-                    "${helmChart.rootLevelImageName}:${helmChart.currentTag}"
-            )
-        }
+        echo "Promoting '${helmChart.currentImageName}:${helmChart.currentTag}' to root level"
+        dockerUtils.copyImage(
+                "${helmChart.currentImageName}:${helmChart.currentTag}",
+                "${helmChart.rootLevelImageName}:${helmChart.currentTag}"
+        )
     }
 }
 

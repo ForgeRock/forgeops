@@ -39,13 +39,6 @@ except Exception as e:
 FORGEROCK_RELEASE_PATTERN = re.compile(r'^((0|[1-9]\d*)\.){2,3}(0|[1-9]\d*)(-(0|[1-9]\d{0,4}))?$')
 
 
-def repo_tags(repo):
-    url = f'{REGISTRY_BASE}/{repo}/tags/list'
-    response = authed_session.get(url)
-    response.raise_for_status()
-    return response.json().get('manifest')
-
-
 def is_production_tag(tag):
     if tag.startswith('IC'):
         tag = re.sub(r'^IC', '', tag)
@@ -69,22 +62,18 @@ def copy_image(tagged_image, source_registry, target_registry, dry_run=DRY_RUN):
         ]).check_returncode()
 
 
-def registry_repos(registry):
-    """Retrieve repos from the specified registry"""
-    response = authed_session.get(f'{REGISTRY_BASE}/_catalog')
+def production_images(repository):
+    """Retrieve production images from the specified repository"""
+    log.info(f'Searching for production images in {repository}...')
+    response = authed_session.get(f'{REGISTRY_BASE}/{repository}/tags/list')
     response.raise_for_status()
-    repos = response.json()['repositories']
-    for repo in repos:
-        if repo.split('/')[0].startswith(registry):
-            yield repo
-
-
-def production_images(source_registry):
-    for repo in registry_repos(source_registry):
-        for digest_id, digest_meta in repo_tags(repo).items():
-            for tag in digest_meta['tag']:
-                if is_production_tag(tag):
-                    yield f'{repo}:{tag}'
+    response_json = response.json()
+    for tag in response_json['tags']:
+        if is_production_tag(tag):
+            yield f'{repository}:{tag}'
+    # recurse through child repositories
+    for child_repository in response_json['child']:
+        yield from production_images(f'{repository}/{child_repository}')
 
 
 def backup_images(source_registry, target_registry, dry_run=DRY_RUN):
