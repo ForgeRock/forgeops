@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import datetime
 import logging
@@ -21,7 +22,8 @@ DRY_RUN = bool(int(os.environ.get('GCR_PRUNE_DRY_RUN', 0)))
 ENGINEERING_DEVOPS_MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
 FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 90)))
 
-REGISTRY_BASE = 'https://gcr.io/v2'
+REGISTRY_ROOT = 'gcr.io'
+REGISTRY_BASE = f'https://{REGISTRY_ROOT}/v2'
 try:
     credentials, project = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
     authed_session = AuthorizedSession(credentials)
@@ -114,19 +116,36 @@ def registry_repos(exclude_images):
 def prune_manifests(repo, digest_ids, dry_run=DRY_RUN):
     for digest_id in digest_ids:
         try:
-            url = f'{REGISTRY_BASE}/{repo}/manifests/{digest_id}'
+            image = f'{REGISTRY_ROOT}/{repo}@{digest_id}'
             if dry_run:
-                log.info(f'dry run: DELETE {url}')
+                log.info(f'dry run: DELETE {image}')
             else:
-                response = authed_session.delete(url, timeout=5)
-                response.raise_for_status()
-                log.info(f'DELETE {repo} {digest_id}')
+                subprocess.run(['gcloud', 'container', 'images', 'delete', image, '--force-delete-tags', '--quiet'])
+                log.info(f'DELETE {image} --force-delete-tags')
         except requests.exceptions.Timeout as e:
             log.error(f'error removing {repo} manifest {digest_id}')
+
+def activate_service_account():
+    """Activate Google SA if one is provided, else use the default account when launching gcloud commands."""
+    credentials_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    if credentials_file:
+        subprocess.run([
+            'gcloud',
+            'auth',
+            'activate-service-account',
+            credentials.service_account_email,
+            f'--key-file={credentials_file}'
+        ]).check_returncode()
+
+def print_account_warning():
+    print(f"\nCaution, you are logged into gcloud as {credentials.service_account_email}\n")
+    print('To view your gcloud accounts, run:\n\t$ gcloud auth list\n')
+    print('To set the active account, run:\n\t$ gcloud config set account `ACCOUNT`\n')
 
 def prune_registry(dry_run=DRY_RUN):
     log.info(f'is dry run {dry_run}')
     for repo in registry_repos(EXCLUDE):
+        activate_service_account()
         log.info(f'pruning {repo}')
         filter_digests = filter_lookup(repo)
         digests_to_remove = filter_digests(repo_tags(repo))
@@ -148,3 +167,4 @@ def index():
 
 if __name__ == '__main__':
     prune_registry()
+    print_account_warning()

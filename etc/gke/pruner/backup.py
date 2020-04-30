@@ -100,7 +100,7 @@ def activate_service_account():
 
 
 def print_account_warning():
-    print(f"\nCaution, you are still logged into gcloud as {credentials.service_account_email}\n")
+    print(f"\nCaution, you are logged into gcloud as {credentials.service_account_email}\n")
     print('To view your gcloud accounts, run:\n\t$ gcloud auth list\n')
     print('To set the active account, run:\n\t$ gcloud config set account `ACCOUNT`\n')
 
