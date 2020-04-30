@@ -11,17 +11,26 @@ spec:
   - name: profile
     type: string
     description: profile to deploy
+
+  - name: namespace
+    type: string
+    description: target namespace
       
   - name: docker-repo
     type: string
     description: Docker repository URL
+
+  - name: cleanEnvironment
+    type: string
+    default: "true"
+    description: if false, do not run clean.sh
       
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: "slack-webhook-$(params.profile)"
+          name: "slack-webhook-$(params.namespace)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
   # Executes skaffold with the kaniko builder to build in cluster
@@ -33,7 +42,7 @@ spec:
         cd /workspace/forgeops
         skaffold -f skaffold.yaml -p $(inputs.params.profile) delete
       } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old `$(inputs.params.profile)` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
 
@@ -42,10 +51,12 @@ spec:
     script: |
       #!/usr/bin/env bash
       {
-        cd /workspace/forgeops/bin
-        ./clean.sh $(inputs.params.profile)
+        if [ "$(params.cleanEnvironment)" == "true" ]; then
+          cd /workspace/forgeops/bin
+          ./clean.sh $(inputs.params.namespace)
+        fi
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Warning: clean.sh failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): clean.sh failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
       
@@ -59,9 +70,9 @@ spec:
         ./config.sh init -v 7.0 -p cdk
         cd ..
         sleep 30
-        skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) --status-check=false run
+        skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) run
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new `$(inputs.params.profile)` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
       

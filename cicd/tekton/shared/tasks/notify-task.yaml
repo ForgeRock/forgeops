@@ -4,9 +4,9 @@ metadata:
   name: notify
 spec:
   params:
-  - name: profile
+  - name: namespace
     type: string
-    description: profile deployed
+    description: target namespace
   steps:
     - name: notify-send-passwords
       image: gcr.io/cloud-builders/kubectl
@@ -14,12 +14,12 @@ spec:
       - name: SLACK_WEBHOOK_URL
         valueFrom:
           secretKeyRef:
-            name: "slack-webhook-$(params.profile)"
+            name: "slack-webhook-$(params.namespace)"
             key: SLACK_WEBHOOK_URL
       script: |
         #!/usr/bin/env bash
         getsec () {
-        kubectl -n $(params.profile) get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
+        kubectl -n $(params.namespace) get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
         }
         OUT=./temp.json
         cat <<EOF >$OUT
@@ -27,7 +27,7 @@ spec:
           "blocks": [{
             "type": "section",
             "text": {
-              "text": "$(params.profile) pipeline Successful. Random Passwords generated for $(params.profile)'s environment. See:\n<https://$(params.profile).iam.forgeops.com/admin>\n<https://$(params.profile).iam.forgeops.com/am>\n<https://$(params.profile).iam.forgeops.com/enduser>",
+              "text": "$(params.namespace) pipeline Successful. Random Passwords generated for $(params.namespace)'s environment. See:\n<https://$(params.namespace).iam.forgeops.com/admin>\n<https://$(params.namespace).iam.forgeops.com/am>\n<https://$(params.namespace).iam.forgeops.com/enduser>",
               "type": "mrkdwn"
             },
             "fields": [
@@ -47,6 +47,7 @@ spec:
           }]
         }
         EOF
+        cat $OUT
         curl -X POST -H 'Content-type: application/json' --data @temp.json $SLACK_WEBHOOK_URL
 
 

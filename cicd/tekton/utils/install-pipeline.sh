@@ -8,7 +8,7 @@ fi
 
 NAMESPACE="${1:-tekton-pipelines}"
 kubectl create namespace $NAMESPACE || true #create $NAMESPACE namespace. Ignore if this namespace is already present.
-kubectl -n tekton-pipelines wait --for=condition=Ready pod --all
+kubectl -n tekton-pipelines get pods --no-headers=true | awk '!/Completed/{print $1}' | xargs  kubectl wait -n tekton-pipelines pod --for=condition=Ready
 
 kubectl -n $NAMESPACE apply -f .
 echo ""

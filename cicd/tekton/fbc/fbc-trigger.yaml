@@ -1,0 +1,76 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: fbc
+spec:
+  params:
+  - name: gitrevision
+    value: master
+  - name: gitrepositoryurl
+    value: https://stash.forgerock.org/scm/cloud/forgeops.git
+
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: fbc
+spec:
+  params:
+  - name: gitrevision
+    description: The git revision
+    default: master
+  - name: gitrepositoryurl
+    description: The git repository url
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: fbc-run-
+    spec:
+      timeout: 45m
+      serviceAccountName: tekton-worker
+      pipelineRef:
+        name: fbc-pipeline
+      resources:
+      - name: forgeops
+        resourceSpec:
+          type: git
+          params:
+          - name: revision
+            value: $(params.gitrevision)
+          - name: url
+            value: $(params.gitrepositoryurl)
+
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: fbc-listener
+spec:
+  serviceAccountName: tekton-trigger
+  triggers:
+    - name: cron-trig
+      bindings:
+      - name: fbc
+      template:
+        name: fbc
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: fbc-cronjob
+spec:
+  schedule: "15 9 * * 1-5"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: trigger
+            image: busybox
+            args:
+              - wget
+              - --spider
+              - el-fbc-listener:8080
+          restartPolicy: Never

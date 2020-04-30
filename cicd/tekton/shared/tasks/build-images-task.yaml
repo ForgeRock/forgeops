@@ -11,6 +11,10 @@ spec:
   - name: profile
     type: string
     description: profile to deploy
+
+  - name: namespace
+    type: string
+    description: target namespace
       
   - name: docker-repo
     type: string
@@ -21,7 +25,7 @@ spec:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: "slack-webhook-$(params.profile)"
+          name: "slack-webhook-$(params.namespace)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
   - name: build-images
@@ -35,7 +39,7 @@ spec:
         cd ..
         skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) build
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build images. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build `$(inputs.params.profile)`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
       

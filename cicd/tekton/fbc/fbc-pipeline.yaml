@@ -1,13 +1,13 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: nightly-pipeline
+  name: fbc-pipeline
 spec:
   resources:
     - name: forgeops
       type: git
   tasks:
-    - name: deploy-images-step
+    - name: deploy-fbc-step
       taskRef:
         name: deploy-images
       resources:
@@ -16,22 +16,34 @@ spec:
           resource: forgeops
       params:
       - name: profile
-        value: nightly
+        value: fbc
       - name: namespace
-        value: nightly
+        value: fbc
       - name: docker-repo
         value: gcr.io/engineering-devops/nightly
-          
+
+#    - name: wait-before-am
+#      runAfter:
+#      - deploy-fbc-ds-step
+#      taskSpec:
+#        steps:
+#          - name: wait-1-minute
+#            image: gcr.io/cloud-builders/kubectl
+#            command: ["bash", "-c"]
+#            args: ["sleep 60; echo 'done' "]
+
     - name: create-users-step
       runAfter:
-      - deploy-images-step
+      - deploy-fbc-step
       taskRef:
         name: create-users
       params:
       - name: users
         value: "10"
       - name: namespace
-        value: nightly
+        value: fbc
+      - name: waitForAmster
+        value: "false"
         
     - name: scale-am-deployment-step
       runAfter:
@@ -42,7 +54,7 @@ spec:
       - name: replicas
         value: "1"
       - name: namespace
-        value: nightly
+        value: fbc
 
     - name: notify-step
       runAfter:
@@ -51,4 +63,4 @@ spec:
         name: notify
       params:
       - name: namespace
-        value: nightly
+        value: fbc
