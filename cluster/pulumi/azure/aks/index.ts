@@ -51,4 +51,3 @@ export const staticIpResourceGroup = infra.ipResourceGroupName
 
 
 
-
