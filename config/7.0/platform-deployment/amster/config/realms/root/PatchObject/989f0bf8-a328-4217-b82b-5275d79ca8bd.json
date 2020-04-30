@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "PatchObject",
+    "entityId" : "989f0bf8-a328-4217-b82b-5275d79ca8bd",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "989f0bf8-a328-4217-b82b-5275d79ca8bd",
+    "objectType" : "user",
+    "identityAttribute" : "mail",
+    "_type" : {
+      "_id" : "PatchObjectNode",
+      "name" : "Patch Object",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "PATCHED",
+      "displayName" : "Patched"
+    }, {
+      "id" : "FAILURE",
+      "displayName" : "Failed"
+    } ]
+  }
+}

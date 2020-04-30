@@ -35,8 +35,7 @@ configMapGenerator:
   - ENDUSER_CLIENT_ID=endUserUIClient
   - ADMIN_CLIENT_ID=idmAdminClient
   - THEME=default
-  - CTS_STORES="ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389"
-  - IDREPO_STORES="ds-idrepo-0.ds-idrepo:1389,ds-idrepo-1.ds-idrepo:1389,ds-idrepo-2.ds-idrepo:1389"
+  - CTS_STORES=ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389
 
 secretGenerator:
 - name: platform-secrets

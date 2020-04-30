@@ -36,8 +36,10 @@ configMapGenerator:
   - ENDUSER_CLIENT_ID=endUserUIClient
   - ADMIN_CLIENT_ID=idmAdminClient
   - THEME=default
-  - CTS_STORES="ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389"
-  - IDREPO_STORES="ds-idrepo-0.ds-idrepo:1389,ds-idrepo-1.ds-idrepo:1389"
+  - CTS_STORES=ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389
+
+generatorOptions:
+    disableNameSuffixHash: true
 
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
@@ -103,6 +105,9 @@ patchesStrategicMerge:
               limits:
                 memory: 5Gi
                 cpu: 3000
+            env:
+              - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+                value: ds-cts-0.ds-cts.$(NAMESPACE).svc.cluster.local:8989,ds-cts-1.ds-cts.$(NAMESPACE).svc.cluster.local:8989
         initContainers:
           - name: initialize
             imagePullPolicy: Always
@@ -137,6 +142,9 @@ patchesStrategicMerge:
               limits:
                 memory: 5Gi
                 cpu: 3000
+            env:
+              - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+                value: ds-idrepo-0.ds-idrepo.$(NAMESPACE).svc.cluster.local:8989,ds-idrepo-1.ds-idrepo.$(NAMESPACE).svc.cluster.local:8989
         initContainers:
           - name: initialize
             imagePullPolicy: Always

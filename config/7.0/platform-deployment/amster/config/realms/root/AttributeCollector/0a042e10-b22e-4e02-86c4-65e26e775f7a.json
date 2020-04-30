@@ -1,0 +1,26 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "AttributeCollector",
+    "entityId" : "0a042e10-b22e-4e02-86c4-65e26e775f7a",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "0a042e10-b22e-4e02-86c4-65e26e775f7a",
+    "validateInputs" : false,
+    "attributesToCollect" : [ "preferences/updates", "preferences/marketing" ],
+    "required" : false,
+    "identityAttribute" : "userName",
+    "objectType" : "user",
+    "_type" : {
+      "_id" : "AttributeCollectorNode",
+      "name" : "Attribute Collector",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "outcome",
+      "displayName" : "Outcome"
+    } ]
+  }
+}

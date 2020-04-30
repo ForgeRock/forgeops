@@ -1,0 +1,519 @@
+{
+    "embedded": false,
+    "maxConnectionAttempts" : 5,
+    "security": {
+        "keyManager": "jvm",
+        "trustManager": "jvm"
+    },
+    "ldapConnectionFactories": {
+        "bind": {
+            "connectionSecurity": "none",
+            "connectionPoolSize": 50,
+            "heartBeatIntervalSeconds": 60,
+            "heartBeatTimeoutMilliSeconds": 10000,
+            "primaryLdapServers": [
+                {
+                    "hostname": "&{openidm.repo.host}",
+                    "port": {
+                        "$int" : "&{openidm.repo.port}"
+                    }
+                }
+            ],
+            "secondaryLdapServers": [ ]
+        },
+        "root": {
+            "inheritFrom": "bind",
+            "authentication": {
+                "simple": {
+                    "bindDn": "&{openidm.repo.user}",
+                    "bindPassword": "&{openidm.repo.password}"
+                }
+            }
+        }
+    },
+    "queries": {
+        "generic": {
+            "query-all-ids": {
+                "_queryFilter": "true",
+                "_fields": "_id,_rev"
+            },
+            "credential-query": {
+                "_queryFilter": "/userName eq \"${username}\""
+            },
+            "credential-internaluser-query": {
+                "_queryFilter": "/_id eq \"${username}\""
+            },
+            "get-by-field-value": {
+                "_queryFilter": "/${field} eq \"${value}\""
+            },
+            "for-userName": {
+                "_queryFilter": "/userName eq \"${uid}\""
+            },
+            "query-all": {
+                "_queryFilter": "true"
+            },
+            "links-for-firstId": {
+                "_queryFilter": "/linkType eq \"${linkType}\" AND /firstId = \"${firstId}\""
+            },
+            "links-for-linkType": {
+                "_queryFilter": "/linkType eq \"${linkType}\""
+            },
+            "get-recons": {
+                "_queryFilter": "/entryType eq \"summary\"",
+                "_fields": "reconId,mapping,activitydate",
+                "_sortKeys": "-activitydate"
+            },
+            "get-notifications-for-user": {
+                "_queryFilter": "/receiverId eq \"${userId}\"",
+                "_sortKeys": "-createDate"
+            },
+            "query-cluster-failed-instances": {
+                "_queryFilter": "/timestamp le ${timestamp} and (/state eq \"1\" or /state eq \"2\")"
+            },
+            "query-cluster-running-instances": {
+                "_queryFilter": "/state eq 1"
+            },
+            "query-cluster-instances": {
+                "_queryFilter": "true"
+            },
+            "query-cluster-events": {
+                "_queryFilter": "/instanceId eq \"${instanceId}\""
+            },
+            "find-relationships-for-resource": {
+              "_queryFilter": "(/firstResourceCollection eq \"${resourceCollection}\" and /firstResourceId eq \"${resourceId}\" and /firstPropertyName eq \"${propertyName}\") or (/secondResourceCollection eq \"${resourceCollection}\" and /secondResourceId eq \"${resourceId}\" and /secondPropertyName eq \"${propertyName}\")"
+            },
+            "find-relationship-edges": {
+              "_queryFilter": "((/firstResourceCollection eq \"${firstResourceCollection}\" and /firstResourceId eq \"${firstResourceId}\" and /firstPropertyName eq \"${firstPropertyName}\") and (/secondResourceCollection eq \"${secondResourceCollection}\" and /secondResourceId eq \"${secondResourceId}\" and /secondPropertyName eq \"${secondPropertyName}\")) or ((/firstResourceCollection eq \"${secondResourceCollection}\" and /firstResourceId eq \"${secondResourceId}\" and /firstPropertyName eq \"${secondPropertyName}\") and (/secondResourceCollection eq \"${firstResourceCollection}\" and /secondResourceId eq \"${firstResourceId}\" and /secondPropertyName eq \"${firstPropertyName}\"))"
+            }
+        },
+        "explicit": {
+            "query-all-ids": {
+                "_queryFilter": "true",
+                "_fields": "_id,_rev"
+            },
+            "credential-query": {
+                "_queryFilter": "/userName eq \"${username}\""
+            },
+            "credential-internaluser-query": {
+                "_queryFilter": "/_id eq \"${username}\""
+            },
+            "links-for-firstId": {
+                "_queryFilter": "/linkType eq \"${linkType}\" AND /firstId = \"${firstId}\""
+            },
+            "links-for-linkType": {
+                "_queryFilter": "/linkType eq \"${linkType}\""
+            },
+            "for-userName": {
+                "_queryFilter": "/userName eq \"${uid}\""
+            },
+            "query-all": {
+                "_queryFilter": "true"
+            }
+        }
+    },
+    "commands": {
+        "delete-mapping-links": {
+            "_queryFilter": "/linkType eq \"${mapping}\"",
+            "operation": "DELETE"
+        },
+        "delete-target-ids-for-recon": {
+            "_queryFilter": "/reconId eq \"${reconId}\"",
+            "operation": "DELETE"
+        }
+    },
+    "rest2LdapOptions": {
+        "readOnUpdatePolicy": "controls",
+        "useSubtreeDelete": false,
+        "usePermissiveModify": true,
+        "useMvcc": true,
+        "mvccAttribute": "etag"
+    },
+    "resourceMapping": {
+        "defaultMapping": {
+            "dnTemplate": "ou=generic,dc=openidm,dc=forgerock,dc=io"
+        },
+        "explicitMapping": {
+            "internal/user": {
+                "dnTemplate": "ou=users,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [ "uidObject", "fr-idm-internal-user" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "uid", "isRequired": true, "writability": "createOnly"
+                    },
+                    "password": {
+                        "type": "json", "ldapAttribute": "fr-idm-password"
+                    }
+                }
+            },
+            "internal/role": {
+                "dnTemplate": "ou=roles,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "fr-idm-internal-role"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "cn",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "name": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-name"
+                    },
+                    "description": {
+                        "type": "simple",
+                        "ldapAttribute": "description"
+                    },
+                    "temporalConstraints": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-temporal-constraints",
+                        "isMultiValued": true
+                    },
+                    "condition": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-condition"
+                    }
+                }
+            },
+            "locks": {
+                "dnTemplate": "ou=locks,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-lock"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "uid",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "nodeId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-lock-nodeid"
+                    }
+                }
+            },
+            "sync/queue": {
+                "dnTemplate": "ou=queue,ou=sync,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-syncqueue"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "uid",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "syncAction": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-syncaction"
+                    },
+                    "resourceCollection": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-resourcecollection"
+                    },
+                    "resourceId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-resourceid"
+                    },
+                    "mapping": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-mapping"
+                    },
+                    "objectRev": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-objectRev"
+                    },
+                    "oldObject": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-syncqueue-oldobject"
+                    },
+                    "newObject": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-syncqueue-newobject"
+                    },
+                    "context": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-syncqueue-context"
+                    },
+                    "state": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-state"
+                    },
+                    "nodeId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-nodeid"
+                    },
+                    "remainingRetries": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-remainingretries"
+                    },
+                    "createDate": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-syncqueue-createdate"
+                    }
+                }
+            },
+            "link": {
+                "dnTemplate": "ou=links,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-link"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "uid",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "linkType": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-link-type"
+                    },
+                    "linkQualifier": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-link-qualifier"
+                    },
+                    "firstId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-link-firstId"
+                    },
+                    "secondId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-link-secondId"
+                    }
+                }
+            },
+            "clusteredrecontargetids": {
+                "dnTemplate": "ou=clusteredrecontargetids,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-recon-clusteredTargetIds"
+                ],
+                "properties": {
+                    "_id": {
+                        "type": "simple",
+                        "ldapAttribute": "uid",
+                        "isRequired": true,
+                        "writability": "createOnly"
+                    },
+                    "reconId": {
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-recon-id"
+                    },
+                    "targetIds": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-recon-targetIds"
+                    }
+                }
+            },
+            "managed/user": {
+                "dnTemplate": "ou=people,ou=identities",
+                "namingStrategy": {
+                    "type": "clientDnNaming",
+                    "dnAttribute": "fr-idm-uuid"
+                },
+                "nativeId" : false,
+                "objectClasses": [
+                    "person",
+                    "organizationalPerson",
+                    "inetOrgPerson",
+                    "iplanet-am-user-service",
+                    "devicePrintProfilesContainer",
+                    "kbaInfoContainer",
+                    "fr-idm-managed-user-explicit",
+                    "forgerock-am-dashboard-service",
+                    "inetuser",
+                    "iplanet-am-auth-configuration-service",
+                    "iplanet-am-managed-person",
+                    "iPlanetPreferences",
+                    "oathDeviceProfilesContainer",
+                    "pushDeviceProfilesContainer",
+                    "sunAMAuthAccountLockout",
+                    "sunFMSAML2NameIdentifier",
+                    "webauthnDeviceProfilesContainer"
+                ],
+                "properties": {
+                    "_id": {
+                        "primaryKey": true,
+                        "type": "simple",
+                        "ldapAttribute": "fr-idm-uuid"
+                    },
+                    "_rev": {
+                        "type": "simple",
+                        "ldapAttribute": "etag"
+                    },
+                    "userName": {
+                        "type": "simple",
+                        "ldapAttribute": "uid"
+                    },
+                    "cn": {
+                        "type": "simple",
+                        "ldapAttribute": "cn"
+                    },
+                    "password": {
+                        "type": "simple",
+                        "ldapAttribute": "userPassword"
+                    },
+                    "accountStatus": {
+                        "type": "simple",
+                        "ldapAttribute": "inetUserStatus"
+                    },
+                    "effectiveRoles": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-effectiveRole",
+                        "isMultiValued": true
+                    },
+                    "effectiveAssignments": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-effectiveAssignment",
+                        "isMultiValued": true
+                    },
+                    "postalCode": {
+                        "type": "simple",
+                        "ldapAttribute": "postalCode"
+                    },
+                    "stateProvince": {
+                        "type": "simple",
+                        "ldapAttribute": "st"
+                    },
+                    "postalAddress": {
+                        "type": "simple",
+                        "ldapAttribute": "postalAddress"
+                    },
+                    "displayName": {
+                        "type": "simple",
+                        "ldapAttribute": "displayName"
+                    },
+                    "description": {
+                        "type": "simple",
+                        "ldapAttribute": "description"
+                    },
+                    "country": {
+                        "type": "simple",
+                        "ldapAttribute": "co"
+                    },
+                    "address2": {
+                        "type": "simple",
+                        "ldapAttribute": "postalAddress"
+                    },
+                    "city": {
+                        "type": "simple",
+                        "ldapAttribute": "l"
+                    },
+                    "givenName": {
+                        "type": "simple",
+                        "ldapAttribute": "givenName"
+                    },
+                    "sn": {
+                        "type": "simple",
+                        "ldapAttribute": "sn"
+                    },
+                    "telephoneNumber": {
+                        "type": "simple",
+                        "ldapAttribute": "telephoneNumber"
+                    },
+                    "mail": {
+                        "type": "simple",
+                        "ldapAttribute": "mail"
+                    },
+                    "organizationName": {
+                        "type": "simple",
+                        "ldapAttribute": "organizationName"
+                    },
+                    "lastSync": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-lastSync"
+                    },
+                    "consentedMappings": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-consentedMapping",
+                        "isMultiValued": true
+                    },
+                    "kbaInfo": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-kbaInfo",
+                        "isMultiValued": true
+                    },
+                    "preferences": {
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-preferences"
+                    }
+                }
+            }
+        },
+        "genericMapping": {
+            "config": {
+                "dnTemplate": "ou=config,dc=openidm,dc=forgerock,dc=io"
+            },
+            "ui/*": {
+                "dnTemplate": "ou=ui,dc=openidm,dc=forgerock,dc=io"
+            },
+            "managed/*": {
+                "dnTemplate": "ou=managed,dc=openidm,dc=forgerock,dc=io"
+            },
+            "managed/role": {
+                "dnTemplate": "ou=role,ou=managed,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-managed-role"
+                ],
+                "jsonAttribute": "fr-idm-managed-role-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole"
+            },
+            "scheduler": {
+                "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=io"
+            },
+            "scheduler/*": {
+                "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=io"
+            },
+            "cluster/*": {
+                "dnTemplate": "ou=cluster,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-cluster-obj"
+                ],
+                "jsonAttribute": "fr-idm-cluster-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchClusterObject"
+            },
+            "relationships": {
+                "dnTemplate": "ou=relationships,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses": [
+                    "uidObject",
+                    "fr-idm-relationship"
+                ],
+                "jsonAttribute": "fr-idm-relationship-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchRelationship"
+            },
+            "updates": {
+                "dnTemplate": "ou=updates,dc=openidm,dc=forgerock,dc=io"
+            },
+            "import": {
+              "dnTemplate": "ou=import,dc=openidm,dc=forgerock,dc=io"
+            },
+            "import/*": {
+              "dnTemplate": "ou=import,dc=openidm,dc=forgerock,dc=io"
+            },
+            "reconprogressstate": {
+                "dnTemplate": "ou=reconprogressstate,dc=openidm,dc=forgerock,dc=io"
+            },
+            "jsonstorage": {
+                "dnTemplate": "ou=jsonstorage,dc=openidm,dc=forgerock,dc=io"
+            },
+            "internal/usermeta" : {
+                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=io"
+            },
+            "internal/notification" : {
+                "dnTemplate": "ou=notification,ou=internal,dc=openidm,dc=forgerock,dc=io"
+            },
+            "file" : {
+                "dnTemplate": "ou=file,dc=openidm,dc=forgerock,dc=io"
+            }
+        }
+    }
+}

@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "LoginCountDecision",
+    "entityId" : "8afdaec3-275e-4301-bb53-34f03e6a4b29",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "8afdaec3-275e-4301-bb53-34f03e6a4b29",
+    "amount" : 3,
+    "interval" : "AT",
+    "identityAttribute" : "userName",
+    "objectType" : "user",
+    "_type" : {
+      "_id" : "LoginCountDecisionNode",
+      "name" : "Login Count Decision",
+      "collection" : true
+    },
+    "_outcomes" : [ {
+      "id" : "true",
+      "displayName" : "True"
+    }, {
+      "id" : "false",
+      "displayName" : "False"
+    } ]
+  }
+}

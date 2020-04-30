@@ -1,0 +1,32 @@
+{
+    "rsFilter": {
+        "clientId": "rsFilterClient",
+        "clientSecret": "&{rs.client.secret|password}",
+        "tokenIntrospectUrl": "http://am:80/am/oauth2/introspect",
+        "scopes": [],
+        "cache": {
+            "maxTimeout": "300 seconds"
+        },
+        "queryOnResource": "managed/user",
+        "propertyMapping": {
+            "authenticationId": "userName",
+            "userRoles": "authzRoles"
+        },
+        "staticUserMapping": [
+            {
+                "subject": "amadmin",
+                "localUser": "internal/user/openidm-admin",
+                "userRoles": "authzRoles"
+            },
+            {
+                "subject": "idm-provisioning",
+                "localUser": "internal/user/idm-provisioning",
+                "userRoles": "authzRoles"
+            }
+        ],
+        "anonymousUserMapping": {
+            "localUser": "internal/user/anonymous",
+            "userRoles": "authzRoles"
+        }
+    }
+}
