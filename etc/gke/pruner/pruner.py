@@ -1,5 +1,4 @@
 import os
-import subprocess
 import sys
 import datetime
 import logging
@@ -22,8 +21,7 @@ DRY_RUN = bool(int(os.environ.get('GCR_PRUNE_DRY_RUN', 0)))
 ENGINEERING_DEVOPS_MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
 FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 90)))
 
-REGISTRY_ROOT = 'gcr.io'
-REGISTRY_BASE = f'https://{REGISTRY_ROOT}/v2'
+REGISTRY_BASE = 'https://gcr.io/v2'
 try:
     credentials, project = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
     authed_session = AuthorizedSession(credentials)
@@ -82,25 +80,29 @@ def filter_lookup(repo):
         return filter_engineering_devops_digests
 
 def filter_engineering_devops_digests(digests):
-    filtered = []
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    filtered = {}
     for digest_id, digest_meta in digests.items():
         tagless = image_is_untagged(digest_meta)
         stale = image_is_stale(digest_id, digest_meta, ENGINEERING_DEVOPS_MAX_AGE)
         if tagless and stale:
-            filtered.append(digest_id)
+            filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
 
 def filter_forgerock_io_digests(digests):
-    filtered = []
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    filtered = {}
     for digest_id, digest_meta in digests.items():
         if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
             tagless = image_is_untagged(digest_meta)
             development_only = image_is_only_tagged_with_development_versions(digest_meta)
             stale = image_is_stale(digest_id, digest_meta, FORGEROCK_IO_MAX_AGE)
             if (tagless or development_only) and stale:
-                filtered.append(digest_id)
+                filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
@@ -113,39 +115,30 @@ def registry_repos(exclude_images):
         if not any(i.search(repo) for i in exclude_images):
             yield repo
 
+def delete_manifest(repo, manifest, dry_run=DRY_RUN):
+    """Delete a single manifest; can be used to delete images and tags.
+    """
+    try:
+        url = f'{REGISTRY_BASE}/{repo}/manifests/{manifest}'
+        if dry_run:
+            log.info(f'dry run: DELETE {url}')
+        else:
+            response = authed_session.delete(url, timeout=5)
+            response.raise_for_status()
+            log.info(f'DELETE {repo} {manifest}')
+    except requests.exceptions.Timeout as e:
+        log.error(f'error removing {repo} manifest {manifest}')
+
 def prune_manifests(repo, digest_ids, dry_run=DRY_RUN):
-    for digest_id in digest_ids:
-        try:
-            image = f'{REGISTRY_ROOT}/{repo}@{digest_id}'
-            if dry_run:
-                log.info(f'dry run: DELETE {image}')
-            else:
-                subprocess.run(['gcloud', 'container', 'images', 'delete', image, '--force-delete-tags', '--quiet'])
-                log.info(f'DELETE {image} --force-delete-tags')
-        except requests.exceptions.Timeout as e:
-            log.error(f'error removing {repo} manifest {digest_id}')
-
-def activate_service_account():
-    """Activate Google SA if one is provided, else use the default account when launching gcloud commands."""
-    credentials_file = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    if credentials_file:
-        subprocess.run([
-            'gcloud',
-            'auth',
-            'activate-service-account',
-            credentials.service_account_email,
-            f'--key-file={credentials_file}'
-        ]).check_returncode()
-
-def print_account_warning():
-    print(f"\nCaution, you are logged into gcloud as {credentials.service_account_email}\n")
-    print('To view your gcloud accounts, run:\n\t$ gcloud auth list\n')
-    print('To set the active account, run:\n\t$ gcloud config set account `ACCOUNT`\n')
+    for digest_id, tags in digest_ids.items():
+        # in GCR, an image's tags must all be deleted before the image can be deleted
+        for tag in tags:
+            delete_manifest(repo, tag, dry_run)
+        delete_manifest(repo, digest_id, dry_run)
 
 def prune_registry(dry_run=DRY_RUN):
     log.info(f'is dry run {dry_run}')
     for repo in registry_repos(EXCLUDE):
-        activate_service_account()
         log.info(f'pruning {repo}')
         filter_digests = filter_lookup(repo)
         digests_to_remove = filter_digests(repo_tags(repo))
@@ -167,4 +160,3 @@ def index():
 
 if __name__ == '__main__':
     prune_registry()
-    print_account_warning()
