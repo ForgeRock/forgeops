@@ -1,0 +1,17 @@
+#
+# Copyright 2018 ForgeRock AS. All Rights Reserved
+#
+# Use of this code requires a commercial software license with ForgeRock AS.
+# or with one of its affiliates. All use shall be exclusively subject
+# to such license between the licensee and ForgeRock AS.
+#
+
+# Use this file to extend the properties defined in the JDK java.security file.
+
+# This is an example of how to add a PKCS11 (HSM) provider for JDK8. It is important to make sure the provider number is
+# not already taken.
+# security.provider.11=sun.security.pkcs11.SunPKCS11 /path/to/pkc11/config/pkcs11.conf
+
+# This is an example of how to add a PKCS11 (HSM) provider for JDK9+. It is important to make sure the provider number is
+# not already taken.
+# security.provider.14=SunPKCS11 /path/to/pkc11/config/pkcs11.conf

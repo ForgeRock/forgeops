@@ -2,6 +2,23 @@ import * as pulumi from "@pulumi/pulumi";
 
 const stackConfig = new pulumi.Config();
 
+// **************** LABELS ****************
+type nodeLabel = {[key: string]: string};
+let backendLabels: nodeLabel = {
+    "deployedby": "Pulumi",
+    "backend": "true",
+    "forgerock.io/role": "backend"
+};
+
+let frontendLabels: nodeLabel  = {
+    "frontend": "true",
+    "forgerock.io/role": "frontend"
+};
+let dsLabels: nodeLabel = {
+    "ds": "true",
+    "forgerock.io/role": "ds"
+};
+
 export interface clusterConfiguration {
     clusterResourceGroupName: string;
     sshPublicKey: string;
@@ -19,10 +36,21 @@ export interface nodeGroupConfiguration {
     maxNodes: number;
     minNodes: number;
     nodeCount: number;
+    nodeLabels: nodeLabel; 
     config: pulumi.Config;
 }
 
 function getNodeGroupConfig(namespace : string): nodeGroupConfiguration{
+    let nodeGroupLabel: nodeLabel;
+    if (namespace == "primarynodes") {
+        nodeGroupLabel = backendLabels;
+    }
+    else if (namespace == "frontendnodes") {
+        nodeGroupLabel = frontendLabels;
+    }
+    else if (namespace == "dsnodes") {
+        nodeGroupLabel = dsLabels;
+    }
     let tempconfig = new pulumi.Config(namespace);
     let val: nodeGroupConfiguration = {
         enable: tempconfig.getBoolean("enable") == undefined ? true : tempconfig.requireBoolean("enable"),
@@ -33,6 +61,7 @@ function getNodeGroupConfig(namespace : string): nodeGroupConfiguration{
         maxNodes: tempconfig.requireNumber("maxNodes"),
         minNodes: tempconfig.requireNumber("minNodes"),
         nodeCount: tempconfig.requireNumber("nodeCount"),
+       nodeLabels: nodeGroupLabel,
         config: tempconfig,
     };
     return val;

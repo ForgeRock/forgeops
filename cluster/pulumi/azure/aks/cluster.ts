@@ -50,9 +50,10 @@ export function createCluster(infra: any, resourceGroup: azure.core.ResourceGrou
     }, {dependsOn: resourceGroup});
 }
 
-export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration, 
-    cluster: azure.containerservice.KubernetesCluster, taints?: string[] | undefined) {
-        
+export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration,
+                                cluster: azure.containerservice.KubernetesCluster,
+                                taints?: string[] | undefined) {
+
         new azure.containerservice.KubernetesClusterNodePool(`${nodeGroupConfig.namespace}Worker`, {
             name: `${nodeGroupConfig.namespace}`.toLowerCase(),
             kubernetesClusterId: cluster.id,
@@ -61,6 +62,7 @@ export function createNodeGroup(nodeGroupConfig: config.nodeGroupConfiguration,
             nodeTaints: taints,
             vmSize: nodeGroupConfig.instanceType,
             osDiskSizeGb: nodeGroupConfig.diskSizeGb,
+            nodeLabels: nodeGroupConfig.nodeLabels,
             nodeCount: nodeGroupConfig.nodeCount,
             minCount: nodeGroupConfig.enableAutoScaling ? nodeGroupConfig.minNodes : undefined,
             maxCount: nodeGroupConfig.enableAutoScaling ? nodeGroupConfig.maxNodes : undefined,
@@ -91,7 +93,7 @@ export function createStorageClasses(provider: k8s.Provider){
 }
 
 export function createStaticIp(ipResGroup: pulumi.Output<any>, loc: pulumi.Output<any>): azure.network.PublicIp{
-    
+
     // Create static IP
     return new azure.network.PublicIp("static-ip", {
         allocationMethod: "Static",
@@ -104,3 +106,4 @@ export function createStaticIp(ipResGroup: pulumi.Output<any>, loc: pulumi.Outpu
         },
     });
 }
+

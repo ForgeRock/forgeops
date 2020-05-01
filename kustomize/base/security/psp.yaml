@@ -56,20 +56,20 @@ spec:
   runAsUser:
     rule: MustRunAs
     ranges:
-      - min: 0
-        max: 33
+      - min: 101
+        max: 101
   seLinux:
     rule: RunAsAny
   supplementalGroups:
     rule: MustRunAs
     ranges:
-      - min: 0
-        max: 33
+      - min: 101
+        max: 101
   fsGroup:
     rule: MustRunAs
     ranges:
-      - min: 0
-        max: 33
+      - min: 101
+        max: 101
   requiredDropCapabilities:
   - DAC_OVERRIDE
   - AUDIT_WRITE

@@ -1,0 +1,21 @@
+{
+  "host" : "smtp-service",
+  "port" : 1025,
+  "timeout" : 300000,
+  "writetimeout" : 300000,
+  "connectiontimeout" : 300000,
+  "auth" : {
+    "enable" : false,
+    "username" : ""
+  },
+  "starttls" : {
+    "enable" : false
+  },
+  "ssl" : {
+    "enable" : false
+  },
+  "from" : "info@example.com",
+  "debug" : false,
+  "smtpProperties" : [ ],
+  "threadPoolSize" : 20
+}
