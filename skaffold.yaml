@@ -218,41 +218,57 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/ds-only
 
-# AM FBC test
+# FBC test
 - name: fbc
   build:
     artifacts:
     - image: am
       context: docker/7.0/am-fbc
-#      kaniko: *kaniko-opts
-#        cache: {}
-#        image: gcr.io/kaniko-project/executor:v0.19.0
-#    cluster: *kaniko-cluster
+      kaniko: *kaniko-opts
+    - image: idm
+      context: docker/7.0/idm
+      kaniko: *kaniko-opts
+    - image: ds-cts
+      context: docker/7.0/ds/cts
+      kaniko: *kaniko-opts
+    - image: ds-idrepo
+      context: docker/7.0/ds/idrepo
+      kaniko: *kaniko-opts
+    - image: forgeops-secrets
+      context: docker/forgeops-secrets
+      kaniko: *kaniko-opts
+    - image: ldif-importer
+      context: docker/7.0/ldif-importer
+      kaniko: *kaniko-opts
+    cluster: *kaniko-cluster
     tagPolicy:
       gitCommit: {}
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/fbc
 
-# FBC ds and secrets. Deploy this first.
+
+# FBC ds and secrets.
 - name: fbc-ds
   build:
     artifacts:
     - image: ds-idrepo
       context: docker/7.0/ds/idrepo
-#      kaniko: *kaniko-opts
+      kaniko: *kaniko-opts
     - image: ds-cts
       context: docker/7.0/ds/cts
-#      kaniko: *kaniko-opts
+      kaniko: *kaniko-opts
     - image: forgeops-secrets
       context: docker/forgeops-secrets
-#      kaniko: *kaniko-opts
+      kaniko: *kaniko-opts
     - image: ldif-importer
       context: docker/7.0/ldif-importer
-#      kaniko: *kaniko-opts
-#    cluster: *kaniko-cluster
+      kaniko: *kaniko-opts
+    cluster: *kaniko-cluster
     tagPolicy:
       gitCommit: {}
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/fbc-ds
+      
+

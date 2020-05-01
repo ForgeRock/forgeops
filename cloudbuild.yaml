@@ -10,6 +10,6 @@ steps:
   entrypoint: 'bash'
   args: ['./bin/config.sh', 'init', '-p', 'cdk', '-v', '7.0']
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
-  args: ['--default-repo', 'gcr.io/$PROJECT_ID', '-p', 'smoke', '--status-check=false', 'run']
+  args: ['--default-repo', 'gcr.io/$PROJECT_ID/smoke', '-p', 'smoke', '--status-check=false', 'run']
 options:
   env: ['CLOUDSDK_COMPUTE_ZONE=us-east1-c', 'CLOUDSDK_CONTAINER_CLUSTER=eng-shared']

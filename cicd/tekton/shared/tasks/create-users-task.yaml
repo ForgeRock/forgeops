@@ -8,15 +8,20 @@ spec:
     type: string
     description: number of users to create
     
-  - name: profile
+  - name: namespace
     type: string
-    description: profile
+    description: target namespace
+
+  - name: waitForAmster
+    type: string
+    default: "true"
+    description: if false, do not wait for amster
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: "slack-webhook-$(params.profile)"
+          name: "slack-webhook-$(params.namespace)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
     - name: wait-for-all-pods-ready
@@ -25,10 +30,10 @@ spec:
         #!/usr/bin/env bash
         {
           sleep 15
-          kubectl -n $(params.profile) wait --for=condition=complete --timeout=120s job -l app=forgeops-secrets --all
-          kubectl -n $(params.profile) wait --for=condition=ready --timeout=600s pod -l vendor=forgerock --all
+          kubectl -n $(params.namespace) wait --for=condition=complete --timeout=120s job --all
+          kubectl -n $(params.namespace) get pods --no-headers=true | awk '!/Completed/{print $1}' | xargs  kubectl wait -n $(params.namespace) pod --for=condition=Ready
         } || {
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Some pods still unhealthy after 600s. Failed to create users"}' $SLACK_FAILED_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Some pods still unhealthy after 600s. Failed to create users"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
         }
 
@@ -37,10 +42,13 @@ spec:
       script: |
         #!/usr/bin/env bash
         {
-          # Obtain the amster pod name, tail the logs until the string is found      
-          (kubectl -n $(params.profile) logs $(kubectl -n $(params.profile) get pod -l app=amster -o jsonpath="{.items[0].metadata.name}") -f &) | grep -qi "configuration script finished"
+          if [ "$(params.waitForAmster)" == "true" ]; then
+            echo "Waiting for amster"
+            (kubectl -n $(params.namespace) logs $(kubectl -n $(params.namespace) get pod -l app=amster -o jsonpath="{.items[0].metadata.name}") -f &) | grep -qi "configuration script finished"
+            echo "Waited for amster"
+          fi
         } || {
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Amster config failed"}' $SLACK_FAILED_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Amster config failed"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
         }
       
@@ -51,10 +59,10 @@ spec:
         {
           #set ADMIN_PASSWORD and run make-users.sh 
           
-          ADMIN_PASSWORD=$(kubectl -n $(params.profile) get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)
-          kubectl -n $(params.profile) exec ds-idrepo-0 -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD make-users.sh $(inputs.params.users)"
+          ADMIN_PASSWORD=$(kubectl -n $(params.namespace) get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)
+          kubectl -n $(params.namespace) exec ds-idrepo-0 -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD make-users.sh $(inputs.params.users)"
         } || {
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"Failed to create users. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Failed to create users. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
         }      
     

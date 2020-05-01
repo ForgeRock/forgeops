@@ -2,12 +2,16 @@
 namespace: fbc
 resources:
   - ../../../base/kustomizeConfig
-#  - ../../../base/forgeops-secrets
+  - ../../../base/forgeops-secrets
+  - ../../../base/7.0/ds/cts
+  - ../../../base/7.0/ds/idrepo
+  - ../../../base/ldif-importer
   - ../../../base/am
-#  - ../../../base/7.0/ds/idrepo
-#  - ../../../base/7.0/ds/cts
+  - ../../../base/idm
+  - ../../../base/end-user-ui
+  - ../../../base/login-ui
+  - ../../../base/admin-ui
   - ../../../base/7.0/ingress
-#  - ../../../base/ldif-importer
 
 configMapGenerator:
 - name: platform-config

@@ -17,6 +17,8 @@ spec:
       params:
       - name: profile
         value: smoke
+      - name: namespace
+        value: smoke
       - name: docker-repo
         value: gcr.io/engineering-devops/smoke
         
