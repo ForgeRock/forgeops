@@ -1,0 +1,68 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "authenticationTreesService",
+    "entityId" : "default/Registration",
+    "serviceVersion" : "81f1faa8-726c-4574-a47d-4f13a09764ad",
+    "uid" : "ou=Registration,ou=default,ou=OrganizationConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config",
+    "sunServiceID" : "tree",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : [ "Registration" ]
+  },
+  "data" : {
+    "nodes" : {
+      "4fcf1224-8464-402d-a820-419e1dc74169" : {
+        "displayName" : "Page Node",
+        "nodeType" : "PageNode",
+        "x" : 217,
+        "y" : 153,
+        "connections" : {
+          "outcome" : "fe5b334e-35f8-484a-8e16-c1a2f423a590"
+        }
+      },
+      "fe5b334e-35f8-484a-8e16-c1a2f423a590" : {
+        "displayName" : "Create Object",
+        "nodeType" : "CreateObjectNode",
+        "x" : 491,
+        "y" : 213,
+        "connections" : {
+          "CREATED" : "fdaa21e7-5710-49bc-8b5f-f940a3f61aa3",
+          "FAILURE" : "e301438c-0bd0-429c-ab0c-66126501069a"
+        }
+      },
+      "fdaa21e7-5710-49bc-8b5f-f940a3f61aa3" : {
+        "displayName" : "Increment Login Count",
+        "nodeType" : "IncrementLoginCountNode",
+        "x" : 649,
+        "y" : 123,
+        "connections" : {
+          "outcome" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
+        }
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 25
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 881,
+        "y" : 160
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 703,
+        "y" : 298
+      }
+    },
+    "entryNodeId" : "4fcf1224-8464-402d-a820-419e1dc74169",
+    "_type" : {
+      "_id" : "authenticationTreesService",
+      "name" : "authenticationTreesService",
+      "collection" : false
+    },
+    "uiConfig" : { },
+    "_id" : "default/Registration"
+  }
+}

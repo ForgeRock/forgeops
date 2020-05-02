@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "ValidatedUsernameNode",
+    "entityId" : "default/2b9b7030-1312-45f9-a509-e2cb4932e559",
+    "serviceVersion" : null,
+    "uid" : "ou=2b9b7030-1312-45f9-a509-e2cb4932e559,ou=default,ou=OrganizationConfig,ou=1.0,ou=ValidatedUsernameNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : [ "2b9b7030-1312-45f9-a509-e2cb4932e559" ]
+  },
+  "data" : {
+    "validateInput" : false,
+    "_type" : {
+      "_id" : "ValidatedUsernameNode",
+      "name" : "ValidatedUsernameNode",
+      "collection" : false
+    },
+    "_id" : "default/2b9b7030-1312-45f9-a509-e2cb4932e559",
+    "usernameAttribute" : "userName",
+    "objectType" : "user"
+  }
+}

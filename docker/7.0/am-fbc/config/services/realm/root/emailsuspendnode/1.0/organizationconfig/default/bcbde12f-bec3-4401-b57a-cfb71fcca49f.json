@@ -1,0 +1,30 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "EmailSuspendNode",
+    "entityId" : "default/bcbde12f-bec3-4401-b57a-cfb71fcca49f",
+    "serviceVersion" : null,
+    "uid" : "ou=bcbde12f-bec3-4401-b57a-cfb71fcca49f,ou=default,ou=OrganizationConfig,ou=1.0,ou=EmailSuspendNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "EmailSuspendNode",
+      "name" : "EmailSuspendNode",
+      "collection" : false
+    },
+    "objectLookup" : true,
+    "_id" : "default/bcbde12f-bec3-4401-b57a-cfb71fcca49f",
+    "emailAttribute" : "mail",
+    "objectType" : "user",
+    "emailSuspendMessage" : {
+      "en" : "An email has been sent to the address you entered. Click the link in that email to proceed."
+    },
+    "emailTemplateName" : "forgottenUsername",
+    "identityAttribute" : "mail"
+  }
+}

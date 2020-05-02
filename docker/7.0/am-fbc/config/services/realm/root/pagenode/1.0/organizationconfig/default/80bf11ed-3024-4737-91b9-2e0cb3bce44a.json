@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PageNode",
+    "entityId" : "default/80bf11ed-3024-4737-91b9-2e0cb3bce44a",
+    "serviceVersion" : null,
+    "uid" : "ou=80bf11ed-3024-4737-91b9-2e0cb3bce44a,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "5b50db27-6728-4483-b67d-6cbc9208bb26:ValidatedPasswordNode:Platform Password" ],
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : {
+      "en" : "Change password"
+    },
+    "_id" : "default/80bf11ed-3024-4737-91b9-2e0cb3bce44a",
+    "pageHeader" : {
+      "en" : "Reset Password"
+    }
+  }
+}

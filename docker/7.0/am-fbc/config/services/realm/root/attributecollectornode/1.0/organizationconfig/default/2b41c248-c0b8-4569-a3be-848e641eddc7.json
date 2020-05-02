@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "AttributeCollectorNode",
+    "entityId" : "default/2b41c248-c0b8-4569-a3be-848e641eddc7",
+    "serviceVersion" : null,
+    "uid" : "ou=2b41c248-c0b8-4569-a3be-848e641eddc7,ou=default,ou=OrganizationConfig,ou=1.0,ou=AttributeCollectorNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "validateInputs" : true,
+    "attributesToCollect" : [ "givenName", "sn", "mail", "preferences/marketing", "preferences/updates" ],
+    "_type" : {
+      "_id" : "AttributeCollectorNode",
+      "name" : "AttributeCollectorNode",
+      "collection" : false
+    },
+    "_id" : "default/2b41c248-c0b8-4569-a3be-848e641eddc7",
+    "required" : true,
+    "identityAttribute" : "userName",
+    "objectType" : "user"
+  }
+}

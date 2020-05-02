@@ -1,0 +1,25 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PatchObjectNode",
+    "entityId" : "default/5240f16c-944b-4f83-bae9-bc50e3dc15a4",
+    "serviceVersion" : null,
+    "uid" : "ou=5240f16c-944b-4f83-bae9-bc50e3dc15a4,ou=default,ou=OrganizationConfig,ou=1.0,ou=PatchObjectNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "PatchObjectNode",
+      "name" : "PatchObjectNode",
+      "collection" : false
+    },
+    "_id" : "default/5240f16c-944b-4f83-bae9-bc50e3dc15a4",
+    "patchAsObject" : false,
+    "identityAttribute" : "userName",
+    "objectType" : "user"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "InnerTreeEvaluatorNode",
+    "entityId" : "GlobalConfig",
+    "serviceVersion" : null,
+    "uid" : "ou=GlobalConfig,ou=1.0,ou=InnerTreeEvaluatorNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "InnerTreeEvaluatorNode",
+      "name" : "InnerTreeEvaluatorNode",
+      "collection" : false
+    },
+    "_id" : "GlobalConfig"
+  }
+}

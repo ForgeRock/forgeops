@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "IncrementLoginCountNode",
+    "entityId" : "default",
+    "serviceVersion" : null,
+    "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=IncrementLoginCountNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "IncrementLoginCountNode",
+      "name" : "IncrementLoginCountNode",
+      "collection" : false
+    },
+    "_id" : "default"
+  }
+}

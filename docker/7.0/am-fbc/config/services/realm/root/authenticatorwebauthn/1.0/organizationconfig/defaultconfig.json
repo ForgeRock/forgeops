@@ -24,6 +24,6 @@
     "authenticatorWebAuthnDeviceSettingsEncryptionKeystoreKeyPairAlias" : null,
     "authenticatorWebAuthnDeviceSettingsEncryptionKeystorePassword" : "&{default.keystore.password}",
     "authenticatorWebAuthnDeviceSettingsEncryptionKeystorePrivateKeyPassword": "&{default.keystore.entry.password}",
-    "authenticatorWebAuthnDeviceSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore.jceks"
+    "authenticatorWebAuthnDeviceSettingsEncryptionKeystore" : "/var/run/secrets/openam/keystore/keystore-runtime.jceks"
   }
 }

@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "PageNode",
+    "entityId" : "default/4fcf1224-8464-402d-a820-419e1dc74169",
+    "serviceVersion" : null,
+    "uid" : "ou=4fcf1224-8464-402d-a820-419e1dc74169,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "53471560-8b70-4dd5-98ee-523564bb2e76:ValidatedUsernameNode:Platform Username", "2b41c248-c0b8-4569-a3be-848e641eddc7:AttributeCollectorNode:Attribute Collector", "4712001b-d3c3-4d83-8859-1f9512aa6c04:ValidatedPasswordNode:Platform Password", "2a10caf0-49db-475e-9ccb-fa72ec961808:KbaCreateNode:KBA Definition", "c1024cef-2192-4e37-9357-c8e30ffe11f3:AcceptTermsAndConditionsNode:Accept Terms and Conditions" ],
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : {
+      "en" : "Signing up is fast and easy.<br>Already have an account? <a href='#/service/Login'>Sign In</a>"
+    },
+    "_id" : "default/4fcf1224-8464-402d-a820-419e1dc74169",
+    "pageHeader" : {
+      "en" : "Sign Up"
+    }
+  }
+}

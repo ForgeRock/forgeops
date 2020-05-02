@@ -27,19 +27,17 @@
       "statelessTokensEnabled" : true
     },
     "advancedOAuth2Config" : {
-      "customLoginUrlTemplate" : "&{org.ui.url}/hosted/login?goto=${goto}<#if acrValues??>&acr_values=${acrValues}</#if><#if realm??>&realm=${realm}</#if><#if module??>&module=${module}</#if><#if service??>&service=${service}</#if><#if locale??>&locale=${locale}</#if>",
-      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "profile|Your personal information" ],
-      "codeVerifierEnforced" : "public",
-      "tokenSigningAlgorithm" : "RS256",
+      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "am-introspect-all-tokens", "fr:idm:*|All of IDM", "fr:idm:profile|Able to read your account in IDM", "fr:idm:notifications|Able to read your IDM notifications", "fr:idm:consent_read|Able to read what you have consented to in IDM", "fr:idm:profile_update|Able to update your profile in IDM", "profile|Your personal information", "write" ],
+      "codeVerifierEnforced" : "false",
+      "tokenSigningAlgorithm" : "HS256",
       "authenticationAttributes" : [ "uid" ],
       "defaultScopes" : [ "address", "phone", "openid", "profile", "email" ],
       "scopeImplementationClass" : "org.forgerock.openam.oauth2.OpenAMScopeValidator",
       "responseTypeClasses" : [ "code|org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler", "id_token|org.forgerock.openidconnect.IdTokenResponseTypeHandler", "device_code|org.forgerock.oauth2.core.TokenResponseTypeHandler", "token|org.forgerock.oauth2.core.TokenResponseTypeHandler" ],
       "tlsCertificateBoundAccessTokensEnabled" : true,
-      "hashSalt" : "&{am.subject.identifier.salt}",
       "moduleMessageEnabledInPasswordGrant" : false,
       "tokenEncryptionEnabled" : false,
-      "grantTypes" : [ "implicit", "urn:ietf:params:oauth:grant-type:saml2-bearer", "refresh_token", "password", "client_credentials", "urn:ietf:params:oauth:grant-type:device_code", "authorization_code", "urn:openid:params:grant-type:ciba", "urn:ietf:params:oauth:grant-type:uma-ticket", "urn:ietf:params:oauth:grant-type:jwt-bearer" ],
+      "grantTypes" : [ "implicit", "urn:ietf:params:oauth:grant-type:saml2-bearer", "refresh_token", "password", "client_credentials", "urn:ietf:params:oauth:grant-type:device_code", "authorization_code", "urn:ietf:params:oauth:grant-type:uma-ticket" ],
       "displayNameAttribute" : "cn",
       "supportedSubjectTypes" : [ "public" ]
     },

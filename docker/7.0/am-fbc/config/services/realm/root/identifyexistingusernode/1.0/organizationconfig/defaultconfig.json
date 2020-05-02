@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "IdentifyExistingUserNode",
+    "entityId" : "defaultconfig",
+    "serviceVersion" : null,
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=IdentifyExistingUserNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "IdentifyExistingUserNode",
+      "name" : "IdentifyExistingUserNode",
+      "collection" : false
+    },
+    "_id" : "defaultconfig"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "7.0.0-SNAPSHOT",
+    "entityType" : "IncrementLoginCountNode",
+    "entityId" : "default/fdaa21e7-5710-49bc-8b5f-f940a3f61aa3",
+    "serviceVersion" : null,
+    "uid" : "ou=fdaa21e7-5710-49bc-8b5f-f940a3f61aa3,ou=default,ou=OrganizationConfig,ou=1.0,ou=IncrementLoginCountNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "IncrementLoginCountNode",
+      "name" : "IncrementLoginCountNode",
+      "collection" : false
+    },
+    "_id" : "default/fdaa21e7-5710-49bc-8b5f-f940a3f61aa3",
+    "identityAttribute" : "userName",
+    "objectType" : "user"
+  }
+}
