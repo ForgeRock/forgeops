@@ -80,25 +80,29 @@ def filter_lookup(repo):
         return filter_engineering_devops_digests
 
 def filter_engineering_devops_digests(digests):
-    filtered = []
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    filtered = {}
     for digest_id, digest_meta in digests.items():
         tagless = image_is_untagged(digest_meta)
         stale = image_is_stale(digest_id, digest_meta, ENGINEERING_DEVOPS_MAX_AGE)
         if tagless and stale:
-            filtered.append(digest_id)
+            filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
 
 def filter_forgerock_io_digests(digests):
-    filtered = []
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    filtered = {}
     for digest_id, digest_meta in digests.items():
         if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
             tagless = image_is_untagged(digest_meta)
             development_only = image_is_only_tagged_with_development_versions(digest_meta)
             stale = image_is_stale(digest_id, digest_meta, FORGEROCK_IO_MAX_AGE)
             if (tagless or development_only) and stale:
-                filtered.append(digest_id)
+                filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
@@ -111,18 +115,26 @@ def registry_repos(exclude_images):
         if not any(i.search(repo) for i in exclude_images):
             yield repo
 
+def delete_manifest(repo, manifest, dry_run=DRY_RUN):
+    """Delete a single manifest; can be used to delete images and tags.
+    """
+    try:
+        url = f'{REGISTRY_BASE}/{repo}/manifests/{manifest}'
+        if dry_run:
+            log.info(f'dry run: DELETE {url}')
+        else:
+            response = authed_session.delete(url, timeout=5)
+            response.raise_for_status()
+            log.info(f'DELETE {repo} {manifest}')
+    except requests.exceptions.Timeout as e:
+        log.error(f'error removing {repo} manifest {manifest}')
+
 def prune_manifests(repo, digest_ids, dry_run=DRY_RUN):
-    for digest_id in digest_ids:
-        try:
-            url = f'{REGISTRY_BASE}/{repo}/manifests/{digest_id}'
-            if dry_run:
-                log.info(f'dry run: DELETE {url}')
-            else:
-                response = authed_session.delete(url, timeout=5)
-                response.raise_for_status()
-                log.info(f'DELETE {repo} {digest_id}')
-        except requests.exceptions.Timeout as e:
-            log.error(f'error removing {repo} manifest {digest_id}')
+    for digest_id, tags in digest_ids.items():
+        # in GCR, an image's tags must all be deleted before the image can be deleted
+        for tag in tags:
+            delete_manifest(repo, tag, dry_run)
+        delete_manifest(repo, digest_id, dry_run)
 
 def prune_registry(dry_run=DRY_RUN):
     log.info(f'is dry run {dry_run}')
