@@ -84,9 +84,8 @@ def filter_engineering_devops_digests(digests):
     """
     filtered = {}
     for digest_id, digest_meta in digests.items():
-        tagless = image_is_untagged(digest_meta)
         stale = image_is_stale(digest_id, digest_meta, ENGINEERING_DEVOPS_MAX_AGE)
-        if tagless and stale:
+        if stale:
             filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
