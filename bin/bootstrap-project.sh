@@ -163,7 +163,7 @@ chmod +x $CDIR/run.sh
 run_render_templates () {
     # check required variables
     missing_opts=0
-    for req in NAMESPACE SUBDOMAIN DOMAIN FORK WORKSPACE DOCKER_REPO;
+    for req in NAMESPACE SUBDOMAIN DOMAIN WORKSPACE DOCKER_REPO;
     do
         if [[ "${!req}" == "" ]];
         then
