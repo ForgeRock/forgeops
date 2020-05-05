@@ -50,7 +50,7 @@ profiles:
       context: docker/7.0/am
       kaniko: &kaniko-opts
         #cache: {}
-        image: gcr.io/kaniko-project/executor:v0.19.0
+        image: gcr.io/kaniko-project/executor:v0.20.0
         # The flags is deprecated - but without it we are seeing Kaniko bugs.
         # CLOUD-1955
         flags:
