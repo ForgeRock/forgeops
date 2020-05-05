@@ -1,4 +1,4 @@
-FROM gcr.io/engineering-devops/am-base:6.5
+FROM gcr.io/forgeops-public/am-base:6.5
 
 # BEGIN tools for testing if the ds-idrepo is configured before AM starts.
 # Installs ldap utils for querying the repo.

@@ -1,5 +1,5 @@
 # Use publicly available am image for evaluation
-FROM gcr.io/engineering-devops/idm-base:6.5
+FROM gcr.io/forgeops-public/idm-base:6.5
 
 # Use a custom am-base image. See forgeops/docker/6.5/am-base/README
 #FROM idm-base:latest
