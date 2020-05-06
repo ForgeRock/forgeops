@@ -1,0 +1,10 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: idm
+spec:
+  minAvailable: 50%
+  # maxUnavailable: 1 #Only one of minAvailable or maxUnavailable can be enabled.
+  selector:
+    matchLabels:
+      app: idm

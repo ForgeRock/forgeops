@@ -1,0 +1,8 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+# Include this kustomization to deploy PDBs for AM, IDM, IG, DS-IDREPO and DS-CTS
+resources:
+- pdb-am.yaml
+- pdb-idm.yaml
+- pdb-ds.yaml
+- pdb-ig.yaml
