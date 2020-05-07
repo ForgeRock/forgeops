@@ -9,11 +9,11 @@
         </encoder>
     </appender>
 
-    <logger name="org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2" level="TRACE">
+    <logger name="org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2" level="WARN">
         <appender-ref ref="JSON" />
     </logger>
 
-    <root level="TRACE">
+    <root level="WARN">
         <appender-ref ref="JSON" />
     </root>
 </configuration>

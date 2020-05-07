@@ -1,4 +1,4 @@
-FROM  gcr.io/engineering-devops/amster-base:6.5
+FROM  gcr.io/forgeops-public/amster-base:6.5
 
 ENV SERVER_URI /am
 
