@@ -11,6 +11,7 @@ resources:
   - ../../../base/end-user-ui
   - ../../../base/web
   - ../../../base/7.0/ingress
+  - ../../../base/pdb
 
 configMapGenerator:
 - name: platform-config

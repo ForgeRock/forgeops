@@ -2,6 +2,7 @@ commonLabels:
   app: ds-idrepo
 resources:
 - ../base
+#- loadbalancer.yaml #Uncomment if public load balancer is required in front of DS.
 nameSuffix: -idrepo
 images:
 - newName: ds-idrepo
