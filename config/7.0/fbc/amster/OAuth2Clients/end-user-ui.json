@@ -3,11 +3,11 @@
     "realm" : "/",
     "amsterVersion" : "&{version}",
     "entityType" : "OAuth2Clients",
-    "entityId" : "idmAdminClient",
+    "entityId" : "end-user-ui",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "idmAdminClient",
+    "_id" : "end-user-ui",
     "signEncOAuth2ClientConfig" : {
       "idTokenEncryptionMethod" : "A128CBC-HS256",
       "jwkSet" : null,
@@ -61,10 +61,10 @@
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Public",
-      "scopes" : [ "openid" ],
+      "scopes" : [ "openid", "fr:idm:profile", "fr:idm:profile_update", "fr:idm:consent_read", "fr:idm:notifications" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ "https://&{fqdn}/platform/appAuthHelperRedirect.html", "https://&{fqdn}/platform/sessionCheck.html","https://&{fqdn}/admin/appAuthHelperRedirect.html", "https://&{fqdn}/admin/sessionCheck.html","http://localhost:8082/appAuthHelperRedirect.html", "http://localhost:8082/sessionCheck.html" ],
+      "redirectionUris" : [ "https://&{fqdn}/enduser/appAuthHelperRedirect.html", "https://&{fqdn}/enduser/sessionCheck.html","http://localhost:8888/appAuthHelperRedirect.html", "http://localhost:8888/sessionCheck.html" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {

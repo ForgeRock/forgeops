@@ -17,8 +17,8 @@ configMapGenerator:
       - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/platform
       - ENDUSER_UI_URL=https://$(NAMESPACE).iam.example.com/enduser
       - LOGIN_UI_URL=https://$(NAMESPACE).iam.example.com/login/#/service/Login
-      - ENDUSER_CLIENT_ID=endUserUIClient
-      - ADMIN_CLIENT_ID=idmAdminClient
+      - ENDUSER_CLIENT_ID=end-user-ui
+      - ADMIN_CLIENT_ID=idm-admin-ui
       - THEME=default
 
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)

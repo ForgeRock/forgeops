@@ -56,7 +56,7 @@ The configuration provides the following features:
 * Deployments for ForgeRock AM, IDM, DS and IG. IG is available but not deployed by default.
 * AM is configured with a single root realm
 * A number of OIDC clients are configured for the AM/IDM integration and the smoke tests.
-** Note the `idm-provisioning`, `idmAdminClient` and the `endUserUI` client configurations are required for the
+** Note the `idm-provisioning`, `idm-admin-ui` and the `end-user-ui` client configurations are required for the
   integration of IDM and AM.
 * Directory service instances are configured for:
  - The shared AM/IDM repo (ds-idrepo)

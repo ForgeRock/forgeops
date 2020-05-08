@@ -122,7 +122,7 @@ class IDMConfig(object):
         self.rest_managed_user_url = self.idm_url + '/managed/user'
         self.rest_selfreg_url = self.idm_url + '/selfservice/registration'
         self.rest_selfpwreset_url = self.idm_url + '/selfservice/reset'
-        self.admin_oauth_client = 'idmAdminClient'
+        self.admin_oauth_client = 'idm-admin-ui'
         self.admin_oauth_redirect_url = f'{base_url()}/admin/appAuthHelperRedirect.html'
         self.admin_oauth_scopes = 'openid'
         self.bearer_token = None
@@ -171,7 +171,7 @@ class IDMConfig(object):
         When IDM is integrated with AM, we need bearer token for being able to do admin stuff.
         This do following:
             - login into AM as amadmin
-            - do OAuth2 flow with idmAdminClient oauth2 client
+            - do OAuth2 flow with idm-admin-ui oauth2 client
             - return bearer token
         :return: Admin bearer token
         """

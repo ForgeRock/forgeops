@@ -106,8 +106,8 @@ configMapGenerator:
   - IDM_REST_URL=https://$FQDN/openidm
   - ENDUSER_UI_URL=https://$FQDN/enduser
   - LOGIN_UI_URL=https://$FQDN/login/#/service/Login
-  - ENDUSER_CLIENT_ID=endUserUIClient
-  - ADMIN_CLIENT_ID=idmAdminClient
+  - ENDUSER_CLIENT_ID=end-user-ui
+  - ADMIN_CLIENT_ID=idm-admin-ui
   - THEME=default
 
 # Patches the ingress to use the Let's Encrypt issuer

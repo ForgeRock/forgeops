@@ -24,7 +24,6 @@ configMapGenerator:
   - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/platform
   - IDM_REST_URL=https://$(NAMESPACE).iam.forgeops.com/openidm
   - LOGIN_UI_URL=https://$(NAMESPACE).iam.forgeops.com/login/#/service/Login
-  - ADMIN_CLIENT_ID=idmAdminClient
   - THEME=default
   - CTS_STORES=ds-cts-0.ds-cts:1389
 
