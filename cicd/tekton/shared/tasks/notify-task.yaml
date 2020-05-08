@@ -27,7 +27,7 @@ spec:
           "blocks": [{
             "type": "section",
             "text": {
-              "text": "$(params.namespace) pipeline Successful. Random Passwords generated for $(params.namespace)'s environment. See:\n<https://$(params.namespace).iam.forgeops.com/admin>\n<https://$(params.namespace).iam.forgeops.com/am>\n<https://$(params.namespace).iam.forgeops.com/enduser>",
+              "text": " \`$(params.namespace) pipeline\` Successful. Random Passwords generated for *$(params.namespace)*'s environment. See:\n<https://$(params.namespace).iam.forgeops.com/admin>\n<https://$(params.namespace).iam.forgeops.com/am>\n<https://$(params.namespace).iam.forgeops.com/enduser>",
               "type": "mrkdwn"
             },
             "fields": [
