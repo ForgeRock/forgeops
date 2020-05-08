@@ -26,7 +26,11 @@ FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim(
 
 /** Globally scoped git commit information for the Lodestar repo */
 LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
-LODESTAR_GIT_COMMIT = readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
+
+String getLodestarCommit() {
+    return readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
+}
+LODESTAR_GIT_COMMIT = getLodestarCommit()
 
 /** Root-level image names corresponding to product Helm charts and Dockerfiles in the ForgeOps repo. */
 ROOT_LEVEL_IMAGE_NAMES = [
@@ -151,10 +155,11 @@ Map getDockerfile(String productName) {
 
 def getCurrentProductCommitHashes() {
     return [
-            getHelmChart('ds-empty').productCommit,
-            getHelmChart('ig').productCommit,
-            getHelmChart('idm').productCommit,
-            getHelmChart('am').productCommit,
+        getHelmChart('ds-empty').productCommit,
+        getHelmChart('ig').productCommit,
+        getHelmChart('idm').productCommit,
+        getHelmChart('am').productCommit,
+        getLodestarCommit(),
     ]
 }
 
