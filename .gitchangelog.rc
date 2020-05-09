@@ -1,6 +1,7 @@
 # vi:syntax=python
 # ref: https://raw.githubusercontent.com/vaab/gitchangelog/master/src/gitchangelog/gitchangelog.rc.reference
 import re
+import string
 
 JIRA_MD_FMT = '''
 [{ticket}](https://bugster.forgerock.org/jira/browse/{ticket})
@@ -27,9 +28,12 @@ _strip_type = [ re.compile(r) for _, regs in section_regexps for r in regs ]
 def strip_cc_type(txt):
     for reg in _strip_type:
         match = reg.search(txt)
-        if match:
-            # there's upto three groups in the subject: type(scope): value
-            return match.groups()[-1]
+        if not match:
+            continue
+        # there's upto three groups in the subject: type(scope): value
+        subject = match.groups()[-1].capitalize()
+        subject = subject[:-1] if subject[-1] in string.punctuation else subject
+        return subject
 
 
 def footer_jira_refs(txt):
