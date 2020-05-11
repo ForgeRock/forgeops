@@ -442,6 +442,11 @@
                     "preferences": {
                         "type": "json",
                         "ldapAttribute": "fr-idm-preferences"
+                    },
+                    "aliasList" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "iplanet-am-user-alias-list",
+                        "isMultiValued" : true
                     }
                 }
             }
