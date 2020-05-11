@@ -1,5 +1,0 @@
-domain: forgeops.com
-
-image:
-  tag: 6.5.1
-  pullPolicy: Always

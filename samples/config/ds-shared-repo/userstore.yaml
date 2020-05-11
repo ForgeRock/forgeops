@@ -1,4 +1,0 @@
-instance: userstore
-cts:
-  enabled: false
-replicas: 1

@@ -1,8 +1,0 @@
-config:
-  path: /git/config/platform/idm-am-common-user/idm/
-openidm:
-  repo:
-    host: userstore-0.userstore
-    port: 1389
-    user: "uid=admin"
-    password: password
