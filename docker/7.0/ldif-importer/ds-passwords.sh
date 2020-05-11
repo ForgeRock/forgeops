@@ -22,6 +22,7 @@ chgPass () {
 
         *)
             echo "ERROR: Error when searching for user, response $SEARCH_RESPONSE"
+            exit 1
         ;;
     esac
 }

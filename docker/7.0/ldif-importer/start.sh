@@ -13,6 +13,10 @@ echo "ds-idrepo-0 is responding"
 if [ -f "/opt/opendj/ds-passwords.sh" ]; then
     echo "Setting random DS passwords script..."
     /opt/opendj/ds-passwords.sh
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Pre install script failed"
+        exit 1
+    fi
 fi
 
 # Apply the new ldap config entries
