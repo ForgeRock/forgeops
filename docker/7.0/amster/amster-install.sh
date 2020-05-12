@@ -84,6 +84,10 @@ if [ -d ${PRE_INSTALL_SCRIPTS} ]; then
         if [ -x ${script} ]; then
             echo "Executing $script"
             ${script}
+            if [ $? -ne 0 ]; then
+                echo "ERROR: Pre install script failed"
+                exit 1
+            fi
         fi
     done
 fi
@@ -114,6 +118,10 @@ if [ -d ${POST_INSTALL_SCRIPTS} ]; then
         if [ -x ${script} ]; then
             echo "Executing $script"
             ${script}
+            if [ $? -ne 0 ]; then
+                echo "ERROR: Pre install script failed"
+                exit 1
+            fi
         fi
     done
 fi

@@ -1,0 +1,6 @@
+cron:
+- description: "weekly engineering devops image pruning"
+  url: /
+  schedule: every saturday 09:00
+  timezone: UTC
+

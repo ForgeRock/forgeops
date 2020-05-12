@@ -15,6 +15,13 @@ do
 done
 echo "ds-idrepo is responding"
 
+echo "Waiting for ds-cts to be available. Trying ds-cts:8080/alive endpoint"
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ds-cts:8080/alive)" != "200" ]];
+do
+        sleep 5;
+done
+echo "ds-cts is responding"
+
 copy_secrets() {
     mkdir -p $AM_HOME/var/audit
     SDIR=$AM_HOME/security/secrets/default
