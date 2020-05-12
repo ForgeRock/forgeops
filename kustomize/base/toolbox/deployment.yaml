@@ -20,6 +20,8 @@ spec:
       - name: toolbox
         image: gcr.io/engineering-devops/cdk-toolbox:latest
         imagePullPolicy: Always
+        ports:
+          - containerPort: 4222
         volumeMounts:
         - name: workspace
           mountPath: "/opt/workspace"

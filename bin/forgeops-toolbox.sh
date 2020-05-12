@@ -35,6 +35,7 @@ Options:
     -d         domain utilized by ForgeRock platform (default: example.com)
     -f         git repository used as the fork of forgeops
     -r         docker repository to push images from the kubernetes cluster (default: gcr.io/engineering-devops)
+    -i         ssh public key used for ssh connection with VS Code Remote Development
     -h         help
 
 Examples:
@@ -46,6 +47,7 @@ Examples:
                    -d mydomain.com
                    -n mynamespace
                    -f https://github.com/mygithuborg/forgeops.git
+                   -i ~/.ssh/id_rsa.pub
                    configure
     # deploys kustomization
     ${SCRIPT_NAME} deploy
@@ -67,7 +69,7 @@ load_ns () {
 
 run_configure () {
     missing_opts=0
-    for req in NAMESPACE SUBDOMAIN DOMAIN FORK DOCKER_REPO;
+    for req in NAMESPACE SUBDOMAIN DOMAIN FORK DOCKER_REPO SSH_PUBKEY;
     do
         if [[ "${!req}" == "" ]];
         then
@@ -80,6 +82,12 @@ run_configure () {
         usage;
         return 1
     fi
+    if [[ ! -f "${SSH_PUBKEY}" ]];
+    then
+        echo "a path to a public key is required"
+        return 1
+    fi
+    SSH_PUBKEY=$(cat $SSH_PUBKEY)
     mkdir -p forgeops-toolbox
     cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
 namespace: ${NAMESPACE}
@@ -106,6 +114,8 @@ patches:
                   value: ${FORK}
                 - name: FR_DOCKER_REPO
                   value: ${DOCKER_REPO}
+                - name: SSH_PUBKEY
+                  value: ${SSH_PUBKEY} 
     target:
       kind: Deployment
       name: toolbox
@@ -169,7 +179,7 @@ DOMAIN=example.com
 DOCKER_REPO=gcr.io/engineering-devops
 
 # arg/opt parse
-while getopts n:s:d:f:r:h option
+while getopts n:s:d:f:r:i:h option
 do
     case "${option}"
         in
@@ -178,6 +188,7 @@ do
         d) DOMAIN=${OPTARG};;
         f) FORK=${OPTARG};;
         r) DOCKER_REPO=${OPTARG};;
+        i) SSH_PUBKEY=${OPTARG};;
         h) usage; exit 0;;
         *) usage; exit 1;;
     esac
