@@ -17,7 +17,6 @@
                 "accountStatus",
                 "telephoneNumber",
                 "postalAddress",
-                "address2",
                 "city",
                 "postalCode",
                 "country",
