@@ -67,6 +67,8 @@ cpAttr ds/dirmanager.pw am-env-secrets/CFGDIR_PASS
 
 genRSA test 2048
 genRSA rsajwtsigningkey 2048
+genRSA selfserviceenctest 2048
+genKey selfservicesigntest HmacSHA256 256
 
 # import SMS transport key which is the key used to encrypt the config in the forgeops-init repo.
 echo "[AM Keystore] Importing SMS transport key"
@@ -85,8 +87,6 @@ openKeystore "am-runtime-keystore/keystore-runtime.jceks" \
     $(useRandomPass am-runtime-passwords/storepassruntime 24 print) \
     $(useRandomPass am-runtime-passwords/keypassruntime 24 print)
 genRSA rsajwtsigningkey 2048
-genRSA selfserviceenctest 2048
-genKey selfservicesigntest HmacSHA256 256
 genEC es256test 256
 genEC es384test 384
 # Yes, es512test 521 is correct, see: https://backstage.forgerock.com/docs/am/5.5/authentication-guide/#configure-ecdsa-client-based

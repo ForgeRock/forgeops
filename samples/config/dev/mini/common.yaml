@@ -1,5 +1,0 @@
-domain: example.com
-
-certmanager:
-  enabled: false
-  

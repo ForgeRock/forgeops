@@ -33,7 +33,6 @@
                     "accountStatus",
                     "telephoneNumber",
                     "postalAddress",
-                    "address2",
                     "city",
                     "postalCode",
                     "country",
@@ -212,15 +211,6 @@
                         "userEditable" : true,
                         "usageDescription" : "",
                         "isPersonal" : false
-                    },
-                    "address2" : {
-                        "type" : "string",
-                        "title" : "Address 2",
-                        "description" : "Address 2",
-                        "viewable" : true,
-                        "userEditable" : true,
-                        "usageDescription" : "",
-                        "isPersonal" : true
                     },
                     "givenName" : {
                         "title" : "First Name",

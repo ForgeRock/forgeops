@@ -1,6 +1,0 @@
-config:
-  path: /git/config/7.0/smoke-tests/idm/
-
-# image:
-#   pullPolicy: Always
-#   tag: latest

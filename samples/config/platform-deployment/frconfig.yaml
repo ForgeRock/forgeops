@@ -1,6 +1,0 @@
-domain: forgeops.com
-
-git:
-  # git repo to clone. The value below is a public git repo that does not require authentication.
-  repo: "https://stash.forgerock.org/scm/cloud/forgeops.git"
-  branch: master

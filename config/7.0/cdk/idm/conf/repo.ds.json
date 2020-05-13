@@ -401,10 +401,6 @@
                         "type": "simple",
                         "ldapAttribute": "co"
                     },
-                    "address2": {
-                        "type": "simple",
-                        "ldapAttribute": "postalAddress"
-                    },
                     "city": {
                         "type": "simple",
                         "ldapAttribute": "l"

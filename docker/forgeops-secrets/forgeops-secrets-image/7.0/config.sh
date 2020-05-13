@@ -113,7 +113,7 @@ openKeystore "am-boot-secrets/keystore.jceks" \
     $(useRandomPass am-boot-secrets/.storepass 24 print) \
     $(useRandomPass am-boot-secrets/.keypass 24 print)
 
-keytoolgen -importpass -alias dsameuserpwd $(useRandomPass amster-env-secrets/AMADMIN_PASS 24 print) 
+keytoolgen -importpass -alias dsameuserpwd $(useRandomPass amster-env-secrets/AMADMIN_PASS 24 print)
 keytoolgen -importpass -alias configstorepwd $(useRandomPass ds-passwords/dirmanager.pw 24 print)
 
 # DS password used in boot.sh to check to see if AM is configured
@@ -137,6 +137,8 @@ cpAttr ds-passwords/dirmanager.pw am-env-secrets/CTSDIR_PASS
 
 genRSA test 2048
 genRSA rsajwtsigningkey 2048
+genRSA selfserviceenctest 2048
+genKey selfservicesigntest HmacSHA256 256
 
 # import SMS transport key which is the key used to encrypt the config in the forgeops-init repo.
 echo "[AM Keystore] Importing SMS transport key"
@@ -155,8 +157,6 @@ openKeystore "am-runtime-keystore/keystore-runtime.jceks" \
     $(useRandomPass am-runtime-passwords/storepassruntime 24 print) \
     $(useRandomPass am-runtime-passwords/keypassruntime 24 print)
 genRSA rsajwtsigningkey 2048
-genRSA selfserviceenctest 2048
-genKey selfservicesigntest HmacSHA256 256
 genEC es256test 256
 genEC es384test 384
 # Yes, es512test 521 is correct, see: https://backstage.forgerock.com/docs/am/6.5/authentication-guide/#configure-ecdsa-client-basedd
