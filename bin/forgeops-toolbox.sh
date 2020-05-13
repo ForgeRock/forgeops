@@ -69,7 +69,7 @@ load_ns () {
 
 run_configure () {
     missing_opts=0
-    for req in NAMESPACE SUBDOMAIN DOMAIN FORK DOCKER_REPO SSH_PUBKEY;
+    for req in NAMESPACE SUBDOMAIN DOMAIN FORK DOCKER_REPO;
     do
         if [[ "${!req}" == "" ]];
         then
@@ -82,12 +82,14 @@ run_configure () {
         usage;
         return 1
     fi
-    if [[ ! -f "${SSH_PUBKEY}" ]];
+    if [ ! -z ${SSH_PUBKEY+x} ] && [[ ! -f "${SSH_PUBKEY}" ]];
     then
         echo "a path to a public key is required"
         return 1
+    elif [ ! -z ${SSH_PUBKEY+x} ];
+    then
+        SSH_PUBKEY=$(cat $SSH_PUBKEY)
     fi
-    SSH_PUBKEY=$(cat $SSH_PUBKEY)
     mkdir -p forgeops-toolbox
     cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
 namespace: ${NAMESPACE}
@@ -115,7 +117,7 @@ patches:
                 - name: FR_DOCKER_REPO
                   value: ${DOCKER_REPO}
                 - name: SSH_PUBKEY
-                  value: ${SSH_PUBKEY} 
+                  value: ${SSH_PUBKEY}
     target:
       kind: Deployment
       name: toolbox

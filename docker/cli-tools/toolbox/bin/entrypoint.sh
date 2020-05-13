@@ -9,4 +9,4 @@ fi
 echo "${SSH_PUBKEY}" >> ~/.ssh/authorized_keys
 printenv >> ~/.ssh/environment
 exec /usr/sbin/sshd -D -p "${SSH_PORT}" -f ~/etc/sshd_config
-# exec pause
+exec pause
