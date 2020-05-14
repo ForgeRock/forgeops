@@ -3,11 +3,11 @@
     "realm" : "/",
     "amsterVersion" : "&{version}",
     "entityType" : "OAuth2Clients",
-    "entityId" : "rsFilterClient",
+    "entityId" : "idm-resource-server",
     "pathParams" : { }
   },
   "data" : {
-    "_id" : "rsFilterClient",
+    "_id" : "idm-resource-server",
     "signEncOAuth2ClientConfig" : {
       "idTokenEncryptionMethod" : "A128CBC-HS256",
       "jwkSet" : null,
@@ -28,7 +28,7 @@
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
       "userinfoEncryptedResponseAlg" : null,
-      "jwksUri" : "http://am/am/oauth2/connect/jwk_uri",
+      "jwksUri" : "http://am:80/am/oauth2/connect/jwk_uri",
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
     },
@@ -41,7 +41,7 @@
       "logoUri" : [ ],
       "tokenEndpointAuthMethod" : "client_secret_basic",
       "sectorIdentifierUri" : null,
-      "isConsentImplied" : true,
+      "isConsentImplied" : false,
       "contacts" : [ ],
       "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
       "policyUri" : [ ],
@@ -59,16 +59,17 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : "&{idm.rs.client.secret|password}",
+      "userpassword" : null,
+      "userpassword-encrypted" : "AAAAA0FFUwIQjp8Mpw0gXghvSphDZAOSAD1eS76PiQpfrBWIs1NHgpWc/5PEMaFnKg==",
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
-      "defaultScopes" : [ ],
+      "defaultScopes" : [ "am-introspect-all-tokens" ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "am-introspect-all-tokens" ],
+      "scopes" : [ ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
-      "redirectionUris" : [ ],
+      "redirectionUris" : [ "http://fake.com" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {

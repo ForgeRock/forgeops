@@ -635,6 +635,20 @@
                         },
                         "returnByDefault" : false,
                         "isVirtual" : false
+                    },
+                    "aliasList" : {
+                        "title" : "User Alias Names List",
+                        "description" : "List of identity aliases used primarily to record social IdP subjects for this user",
+                        "type" : "array",
+                        "items" : {
+                            "type" : "string",
+                            "title" : "User Alias Names Items"
+                        },
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : true,
+                        "returnByDefault" : false,
+                        "isVirtual" : false
                     }
                 },
                 "type" : "object",

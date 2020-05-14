@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cat ~/.etc/BANNER.txt
 
-cd forgeops || exit 1
+cd ${WORKSPACE} || exit 1
 
 if [[ ! -f "${WORKSPACE}/.CONFIGURED" ]];
 then

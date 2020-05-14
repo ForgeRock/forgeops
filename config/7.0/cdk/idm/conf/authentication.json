@@ -1,6 +1,6 @@
 {
     "rsFilter" : {
-        "clientId" : "rsFilterClient",
+        "clientId" : "idm-resource-server",
         "clientSecret" : "&{rs.client.secret|password}",
         "tokenIntrospectUrl" : "http://am/am/oauth2/introspect",
         "scopes" : [ ],

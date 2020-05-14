@@ -24,8 +24,6 @@ configMapGenerator:
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/admin
   - IDM_REST_URL=https://$(NAMESPACE).iam.example.com/openidm
   - ENDUSER_UI_URL=https://$(NAMESPACE).iam.example.com/enduser
-  - ENDUSER_CLIENT_ID=endUserUIClient
-  - ADMIN_CLIENT_ID=idmAdminClient
   - THEME=default
   - CTS_STORES=ds-cts-0.ds-cts:1389
 
