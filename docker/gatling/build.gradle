@@ -14,6 +14,7 @@ repositories {
 dependencies {
     gatling 'com.google.cloud:google-cloud-storage:1.96.0'
     gatling 'org.zeroturnaround:zt-zip:1.13'
+    gatling 'com.lihaoyi:ujson_2.12:1.1.0'
 }
 
 gatling {
