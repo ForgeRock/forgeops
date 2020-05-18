@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.0.0-3c7fe77c6fd6b2745dcbfb399a12983e5f66dd95
+      - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.0.0-6a67cba823c643120279db768b972caa8615e401
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
