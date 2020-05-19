@@ -85,7 +85,6 @@ define([
                 moduleClass: "org/forgerock/commons/ui/common/main/ServiceInvoker",
                 configuration: {
                     defaultHeaders: {
-                        Authorization:  "Bearer " + sessionStorage.getItem("accessToken")
                     }
                 }
             },
