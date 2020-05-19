@@ -6,7 +6,7 @@
         "scopes" : [ ],
         "queryOnResource" : "managed/user",
         "propertyMapping" : {
-            "authenticationId" : "userName",
+            "authenticationId" : "_id",
             "userRoles" : "authzRoles"
         },
         "cache" : {
