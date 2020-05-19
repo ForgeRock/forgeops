@@ -96,6 +96,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/login)$ $1/ redirect;
+      rewrite ^(/am/XUI)$ $1/ redirect;
 spec:
   rules:
   - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
@@ -105,6 +106,10 @@ spec:
           serviceName: login-ui
           servicePort: 8080
         path: /login/?(.*)
+      - backend:
+          serviceName: login-ui
+          servicePort: 8080
+        path: /am/XUI/?(.*)
   tls:
   - hosts:
     - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
