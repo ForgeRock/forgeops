@@ -1,0 +1,53 @@
+# Task to wait for all the components to stabilize and become ready
+# TODO: This needs improvement. Should probe the products, log on as an anoymouse user, etc.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: wait-platform-up
+spec:
+  params:
+  - name: namespace
+    type: string
+    description: target namespace
+
+  - name: waitForAmster
+    type: string
+    default: "false"
+    description: if false, do not wait for amster
+  stepTemplate:
+    env:
+    - name: SLACK_FAILED_WEBHOOK_URL
+      valueFrom:
+        secretKeyRef:
+          name: "slack-webhook-$(params.namespace)"
+          key: SLACK_FAILED_WEBHOOK_URL
+  steps:
+    - name: wait-for-all-pods-ready
+      image: gcr.io/cloud-builders/kubectl
+      script: |
+        #!/usr/bin/env bash
+        {
+          sleep 15
+          echo "Waiting for jobs to complete"
+          kubectl -n $(params.namespace) wait --for=condition=complete --timeout=600s job --all
+          echo "Waiting on pods to be READY"
+          kubectl -n $(params.namespace) get pods --no-headers=true --show-labels| awk '!/job-name|Completed/{print $1}'  \
+                  | xargs kubectl -n $(params.namespace) wait pods --for=condition=Ready --timeout=600s
+        } || {
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Some pods still unhealthy after 600s. Failed to create users"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
+        }
+
+    - name: wait-for-amster-config
+      image: gcr.io/cloud-builders/kubectl
+      script: |
+        #!/usr/bin/env bash
+        {
+          if [ "$(params.waitForAmster)" == "true" ]; then
+            echo "Waiting for amster"
+            (kubectl -n $(params.namespace) logs $(kubectl -n $(params.namespace) get pod -l app=amster -o jsonpath="{.items[0].metadata.name}") -f &) | grep -qi "configuration script finished"
+          fi
+        } || {
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Amster config failed"}' $SLACK_FAILED_WEBHOOK_URL
+          exit 1
+        }
