@@ -1,7 +1,0 @@
-FROM google/cloud-sdk:243.0.0-alpine
-
-ENV CLOUDSDK_CORE_PROJECT=fr-testproject 
-RUN apk --update --no-cache add openjdk7-jre 
-RUN gcloud --quiet components install pubsub-emulator beta
-
-CMD gcloud beta emulators pubsub start --host-port 0.0.0.0:8085
