@@ -50,3 +50,41 @@ vars:
     name: platform-config
   fieldref:
     fieldpath: metadata.namespace
+
+patchesStrategicMerge:
+- |-
+  #Patch DS IDREPO
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: ds-idrepo
+  spec:
+    replicas: 2
+    template:
+      spec:
+        containers:
+          - name: ds
+            resources:
+              requests:
+                memory: 3Gi
+                cpu: 2000m
+              limits:
+                memory: 5Gi
+                cpu: 3000
+            env:
+              - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+                value: ds-idrepo-0.ds-idrepo.$(NAMESPACE).svc.cluster.local:8989,ds-idrepo-1.ds-idrepo.$(NAMESPACE).svc.cluster.local:8989
+        initContainers:
+          - name: initialize
+            imagePullPolicy: Always
+    volumeClaimTemplates:
+    - metadata:
+        name: data
+        annotations:
+          pv.beta.kubernetes.io/gid: "0"
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: fast

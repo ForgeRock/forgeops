@@ -19,7 +19,14 @@
                     }
                 }
             ],
-            "secondaryLdapServers": [ ]
+            "secondaryLdapServers": [
+                {
+                    "hostname": "&{openidm.repo.secondary.host|ds-idrepo-1.ds-idrepo}",
+                    "port": {
+                        "$int" : "&{openidm.repo.port}"
+                    }
+                }
+            ]
         },
         "root": {
             "inheritFrom": "bind",
