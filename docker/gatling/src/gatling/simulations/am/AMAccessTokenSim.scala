@@ -1,8 +1,7 @@
 /*
 * Forgeops OpenAM OAuth2 simulation.
 *
-* Copyright (c) 2019 ForgeRock AS. Use of this source code is subject to the
-* Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+* Copyright ForgeRock AS.
 */
 
 package am
@@ -19,9 +18,9 @@ class AMAccessTokenSim extends Simulation {
 
     val config = new BenchConfig()
 
-    val oauth2ClientId: String = System.getProperty("oauth2_client_id", "clientOIDC_0")
+    val oauth2ClientId: String = System.getProperty("oauth2_client_id", "oauth2")
     val oauth2ClientPassword: String = System.getProperty("oauth2_client_pw", "password")
-    val oauth2RedirectUri: String = System.getProperty("oauth2_redirect_uri", "http://fake.com")
+    val oauth2RedirectUri: String = System.getProperty("oauth2_redirect_uri", "https://fake.com")
     val getTokenInfo: String = System.getProperty("get_token_info", "False")
     val scope: String = System.getProperty("am_oauth2_scope","profile")
     val realm: String = System.getProperty("realm", "/")

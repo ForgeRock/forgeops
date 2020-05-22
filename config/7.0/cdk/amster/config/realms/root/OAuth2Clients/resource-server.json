@@ -45,7 +45,12 @@
       "contacts" : [ ],
       "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
       "policyUri" : [ ],
-      "descriptions" : [ ],
+      "descriptions" : {
+        "inherited": false,
+        "value": [
+            "Sample client Used for IG testing"
+        ]
+      },
       "subjectType" : "Public",
       "name" : [ ]
     },
@@ -59,8 +64,7 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : null,
-      "userpassword-encrypted" : "AAAAA0FFUwIQjp8Mpw0gXghvSphDZAOSAD1eS76PiQpfrBWIs1NHgpWc/5PEMaFnKg==",
+      "userpassword" : "password",
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
       "defaultScopes" : [ "am-introspect-all-tokens" ],

@@ -33,6 +33,12 @@
       "clientJwtPublicKey" : null
     },
     "advancedOAuth2ClientConfig" : {
+      "descriptions": {
+        "inherited": false,
+        "value": [
+            "Sample client Used for PIT testing"
+        ]
+    },
       "grantTypes" : [ "authorization_code", "password" ],
       "updateAccessToken" : null,
       "requestUris" : [ ],
@@ -45,7 +51,6 @@
       "contacts" : [ ],
       "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
       "policyUri" : [ ],
-      "descriptions" : [ ],
       "subjectType" : "Public",
       "name" : [ ]
     },
@@ -59,8 +64,7 @@
       "defaultMaxAgeEnabled" : false
     },
     "coreOAuth2ClientConfig" : {
-      "userpassword" : null,
-      "userpassword-encrypted" : "AAAAA0FFUwIQ1eeotqAUS02Wv2ZvofQdr45FujzPRXJjM45qOqaiKbY8D0lHCbwamg==",
+      "userpassword" : "password",
       "authorizationCodeLifetime" : 120,
       "accessTokenLifetime" : 3600,
       "defaultScopes" : [ "cn", "profile" ],
@@ -69,7 +73,7 @@
       "scopes" : [ "profile", "mail", "employeenumber", "name", "cn" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 604800,
-      "redirectionUris" : [ "http://fake.com" ],
+      "redirectionUris" : [ "http://fake.com", "https://fake.com" ],
       "status" : "Active"
     },
     "coreUmaClientConfig" : {
