@@ -21,4 +21,23 @@ spec:
         value: smoke
       - name: docker-repo
         value: gcr.io/engineering-devops/smoke
-        
+    - name: wait-platform-up
+      taskRef:
+        name: wait-platform-up
+      runAfter:
+      - deploy-images-step
+      params:
+      - name: namespace
+        value: smoke
+    - name: run-tests
+      taskRef:
+        name: smoke-test
+      runAfter:
+      - wait-platform-up
+      resources:
+        inputs:
+        - name: forgeops
+          resource: forgeops
+      params:
+      - name: namespace
+        value: smoke

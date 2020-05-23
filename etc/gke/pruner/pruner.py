@@ -34,6 +34,9 @@ _black_list_repos = [
    # all base images
    # r'^engineering-devops\/(?:\w*-base$)',
    # r'^engineering-devops\/(am|ds|(?:ds-\w*)|idm|amster)$',
+   r'^engineering-devops\/smoketest$',
+   r'^engineering-devops\/skaffold$'
+
    ]
 
 EXCLUDE = [ re.compile(i) for i in _black_list_repos ]

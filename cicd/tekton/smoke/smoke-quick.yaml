@@ -1,0 +1,29 @@
+# Runs just the smoke test
+# tkn -n tekton-pipelines pipeline start smoke-quick -s tekton-worker
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: smoke-quick
+spec:
+  resources:
+    - name: forgeops
+      type: git
+  tasks:
+  - name: wait-platform-up
+    taskRef:
+      name: wait-platform-up
+    params:
+    - name: namespace
+      value: smoke
+  - name: run-tests
+    taskRef:
+      name: smoke-test
+    runAfter:
+    - wait-platform-up
+    resources:
+      inputs:
+      - name: forgeops
+        resource: forgeops
+    params:
+    - name: namespace
+      value: smoke

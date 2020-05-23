@@ -2,7 +2,7 @@
 # for self signed SSL certs. It is suitable for local minikube development
 namespace: default
 commonLabels:
-  app.kubernetes.io/name: "forgerock-01"
+  app.kubernetes.io/name: "forgerock"
 resources:
 - ../../../base/kustomizeConfig
 - ../../../base/forgeops-secrets

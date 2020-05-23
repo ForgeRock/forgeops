@@ -1,6 +1,8 @@
 # This deploys to smoke.iam.forgeops.com.
 # for self signed SSL certs. It is suitable for local minikube development
 namespace: smoke
+commonLabels:
+  app.kubernetes.io/name: "forgerock"
 resources:
 - ../../../base/kustomizeConfig
 - ../../../base/forgeops-secrets
@@ -11,8 +13,8 @@ resources:
 - ../../../base/amster
 - ../../../base/idm
 - ../../../base/end-user-ui
-- ../../../base/web
-- ../../../base/forgeops-tests
+- ../../../base/login-ui
+- ../../../base/admin-ui
 
 configMapGenerator:
 - name: platform-config
@@ -34,7 +36,7 @@ configMapGenerator:
   - ENDUSER_CLIENT_ID=end-user-ui
   - ADMIN_CLIENT_ID=idm-admin-ui
   - THEME=default
-  
+
 patchesJson6902:
 - target:
     group: extensions
@@ -46,7 +48,7 @@ patchesJson6902:
       path: /metadata/annotations/certmanager.io~1cluster-issuer
       value: letsencrypt-prod
       # value: default-issuer  # Default
-  
+
 vars:
 - name: DOMAIN
   fieldref:

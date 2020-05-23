@@ -1,0 +1,42 @@
+# Runs the smoke test as a service
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: smoke-test
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+  params:
+  - name: namespace
+    type: string
+    description: target namespace
+
+  stepTemplate:
+    env:
+    - name: SLACK_FAILED_WEBHOOK_URL
+      valueFrom:
+        secretKeyRef:
+          name: "slack-webhook-$(params.namespace)"
+          key: SLACK_FAILED_WEBHOOK_URL
+  steps:
+  # Run the smoke test by POSTing to the smoke cloud run service
+  - name: run-smoke
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    script: |
+      #!/usr/bin/env bash
+      {
+        cd /workspace/forgeops
+
+        amadmin=$(kubectl get secret -n $(params.namespace) amster-env-secrets -o jsonpath="{.data.AMADMIN_PASS}"  | base64 --decode)
+        fqdn=$(params.namespace).iam.forgeops.com
+        echo "going to sleep for 60 seconds to give AM time to come up. TODO: add a wait for deploy step"
+        sleep 60
+        echo "Running smoke test against $fqdn"
+        curl -X POST 'https://smoketest-7escakmhgq-uk.a.run.app/test' \
+            --data "fqdn=$fqdn&amadminPassword=$amadmin"
+      } || { #If something fails
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Smoke test failed `$(inputs.params.profile)` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        exit 1
+      }
