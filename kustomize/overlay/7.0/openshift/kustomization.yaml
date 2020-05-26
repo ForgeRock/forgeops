@@ -25,6 +25,7 @@ configMapGenerator:
   - SUBDOMAIN=apps
   - DOMAIN=fropenshift.openshift.forgeops.com
   - AM_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/am
+  - AM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/am/ui-admin/
   - PLATFORM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/platform
   - IDM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/admin
   - IDM_UPLOAD_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/upload
