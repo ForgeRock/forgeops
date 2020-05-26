@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 SCRIPT_NAME="$(basename "$0")"
 
 if ! command -v kustomize >/dev/null 2>&1;
@@ -23,15 +24,34 @@ This script generates a kustomize profile, and then deploys the toolbox.
 Usage:  ${SCRIPT_NAME} [OPTIONS] COMMAND
 
 Command:
-    init    initialize the forgeops-toolbox and ensure a kaniko secret is available. This is a one time activity
-    start   start the toolbox pod on kubernetes
-    stop    stop (pause) the toolbox. The persistent volume claims will not be deleted
-    exec    Get a tmux shell inside the toolbox
-    nuke    Completely destroy the toolbox and the pvc. You can not recover any saved data
+    deploy     deploys forgeops-toolbox and makes sure kaniko secret is available
+    configure  generates a ./forgeops-toolbox/kustomization.yaml file
+    remove     *destructive* removes all objects (including PVC) related to the toobox
+    all        configures and deploys
 
 Options:
-
+    -n         namespace for deployment (default: active namespace)
+    -f         fully qualified domain utilized by ForgeRock platform (default: default.iam.example.com)
+    -g         git repository used as the fork of forgeops
+    -d         docker repository to push images from the kubernetes cluster (default: gcr.io/engineering-devops)
+    -i         ssh public key used for ssh connection with VS Code Remote Development
     -h         help
+
+Examples:
+    # using defaults configure and deploy
+    ${SCRIPT_NAME} -f https://github.com/mygithuborg/forgeops.git all
+    # change defaults, configure kustomization.yaml
+    ${SCRIPT_NAME} -r dockerhub.com/mydockerhubaccount
+                   -s example-subdomain
+                   -d mydomain.com
+                   -n mynamespace
+                   -f https://github.com/mygithuborg/forgeops.git
+                   -i ~/.ssh/id_rsa.pub
+                   configure
+    # deploys kustomization
+    ${SCRIPT_NAME} deploy
+    # cleanup - careful this removes even volumes which could result in lost work
+    ${SCRIPT_NAME} remove
 EOF
     printf "%-10s" "$help"
 }
@@ -46,11 +66,36 @@ load_ns () {
     echo "${ns}"
 }
 
-init () {
-    if [ -d forgeops-toolbox  ]; then
-        echo "It looks like forgeops-toolbox already exists. I won't overwrite it."
-        exit 1
+run_configure () {
+    missing_opts=0
+    for req in NAMESPACE FQDN DOCKER_REPO;
+    do
+        if [[ "${!req}" == "" ]];
+        then
+            echo "${req} is required";
+            missing_opts=1
+        fi
+    done
+    if (( "${missing_opts}" != 0 ));
+    then
+        usage;
+        return 1
     fi
+    if [ ! -z ${SSH_PUBKEY+x} ] && [[ ! -f "${SSH_PUBKEY}" ]];
+    then
+        echo "a path to a public key is required"
+        return 1
+    elif [ ! -z ${SSH_PUBKEY+x} ];
+    then
+        SSH_PUBKEY=$(cat $SSH_PUBKEY)
+    fi
+    mkdir -p forgeops-toolbox
+    cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
+namespace: ${NAMESPACE}
+resources:
+- github.com/ForgeRock/forgeops/kustomize/base/toolbox/
+KUSTOMIZATION
+
 
     if ! k8s get ns "${NAMESPACE}";
     then
@@ -72,61 +117,6 @@ init () {
         echo "hint: https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster"
         return 1
     fi
-
-    mkdir -p forgeops-toolbox
-    cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
-namespace: ${NAMESPACE}
-resources:
-# For local testing only
-#- ../kustomize/base/toolbox
-- github.com/ForgeRock/forgeops/kustomize/base/toolbox/
-- configmap.yaml
-secretGenerator:
-- name: toolbox-secrets
-  files:
-   - id_rsa
-  type: Opaque
-generatorOptions:
-   disableNameSuffixHash: true
-KUSTOMIZATION
-
-cat <<CONFIGMAP >forgeops-toolbox/configmap.yaml
-kind: ConfigMap
-apiVersion: v1
-metadata:
-    name: toolbox-config
-# Edit the following values to reflect your deployment
-data:
-  # The root domain. The fully qualified domain will be $namespace.$subdomain.$domain
-  # For example, using the values below, am will be deployed at default.iam.example.com/am (assuming the default namespace)
-  FR_DOMAIN: example.com
-  FR_SUBDOMAIN: iam
-  # Your fork of https://github.com/ForgeRock/forgeops. If you want to update / push changes
-  # this must be an ssh git url, and you must provide an ssh private key called id_rsa in this folder.
-  FR_FORK: "git@github.com:ForgeRock/forgeops.git"
-  # The docker registry where kaniko will build and push images to. Kaniko must
-  # have a service account with privileges to push images here. Ask your cluster administrator to create this for you.
-  FR_DOCKER_REPO: "gcr.io/engineering-devops"
-  # SSH public key. This is not currently used since VSCode can directly exec into the container
-  SSH_PUBKEY: "notused"
-
-CONFIGMAP
-
-cat <<README >forgeops-toolbox/README.md
-# Toolbox Instructions
-
-
-* Edit configmap.yaml and replace with your desired vaues.
-* Optional - add your git ssh private key to id_rsa. If you want to push changes to git, you need this
-* Deploy to your cluster. You can use "kubectl apply -f forgeops-toolbox/"  or run "toolbox start"
-* Start/stop the instance using:  toolbox [start|stop]
-
-README
-
-
-echo "forgeops-toolbox/ created. IMPORTANT: Read forgeops-toolbox/README.md"
-gen_sshkey
-
     return 0
 }
 
@@ -138,60 +128,42 @@ k8s () {
     fi
 }
 
-# Generate an ssh key that can read/write to the users forked forgeops repo
-gen_sshkey() {
-    if [ ! $(command -v ssh-keygen) ]; then
-        echo "I can't generate a git ssh key. Missing the ssh-keygen command"
-        echo "Generating a dummy key. FIXME: Create a proper git ssh key and place it in forgeops-toolbox/id_rsa"
-        echo "dummy-ssh-key" >forgeops-toolbox/id_rsa
-        exit 1
-    fi
-    echo ""
-    echo "Generating an ssh key for git"
-     ssh-keygen -b 4096 \
-        -C "ForgeOps toolbox deployment key" \
-        -t ed25519 -N "" -q \
-        -f forgeops-toolbox/id_rsa
-
-    echo ""
-    echo "Add the public key in forgeops-toolbox/id_rsa.pub to your forked forgeops git repo. It should have permissions to read/write"
-    echo "Here are the contents to paste into your github or stash repo:"
-    echo ""
-    cat forgeops-toolbox/id_rsa.pub
-}
-
-start() {
-    if ! kustomize build forgeops-toolbox | kubectl apply -f -;
+run_deploy () {
+    if ! kustomize build forgeops-toolbox | k8s -n "${NAMESPACE}" apply -f -;
     then
         echo "failed to deploy toolbox";
         return 1
     fi
-    echo ""
-    echo "Give the toolbox time to start up. When ready, run"
-    echo "toolbox exec"
-    echo "or use"
-    echo "kubectl exec -it forgeops-cdk-toolbox --- tmux"
+    if ! k8s wait --for=condition=available deployment/forgeops-cdk-toolbox --timeout=300s -n "${NAMESPACE}";
+    then
+        echo "toolbox never reached status of available"
+        return 1
+    fi
+    echo "deployed forgeops-toolbox"
+    echo "to get started run:"
+    echo "  kubectl exec -it deploy/forgeops-cdk-toolbox tmux"
     return 0
 }
 
-stop () {
-    echo "Stoping the pod. This will not delete the data on the pvc"
-    kubectl delete pod forgeops-cdk-toolbox
+run_delete () {
+    kustomize build forgeops-toolbox | k8s -n "${NAMESPACE}" delete -f -
     return $?
 }
 
-exec_pod() {
-    kubectl exec forgeops-cdk-toolbox -it -- tmux
-}
-
 NAMESPACE=$(load_ns)
+FQDN=default.iam.example.com
+DOCKER_REPO=gcr.io/engineering-devops
 
 # arg/opt parse
-while getopts n:s:d:f:r:i:h option
+while getopts n:f:g:d:i:h option
 do
     case "${option}"
         in
         n) NAMESPACE=${OPTARG};;
+        f) FQDN=${OPTARG};;
+        g) FORK=${OPTARG};;
+        d) DOCKER_REPO=${OPTARG};;
+        i) SSH_PUBKEY=${OPTARG};;
         h) usage; exit 0;;
         *) usage; exit 1;;
     esac
@@ -201,42 +173,35 @@ shift $((OPTIND - 1))
 if [[ "$#" != 1 ]];
 then
     echo "one argument is expected"
-    usage
     exit 1
 fi
 
-
-nuke() {
-    kustomize build forgeops-toolbox | kubectl delete -f -
-    rm -fr forgeops-toolbox
-}
-
 while (( "$#" )); do
     case "$1" in
-        init)
+        configure)
             shift
-            init
+            run_configure
             exit $?
             ;;
-        start)
+        deploy)
             shift
-            start
+            run_deploy
+            exit $?
             ;;
-        stop)
+        remove)
             shift
-            stop
+            run_delete
+            exit $?
             ;;
-        nuke)
-            shift
-            nuke
-            ;;
-        exec)
-            shift
-            exec_pod
+        all)
+            run_configure && run_deploy
+            exit $?
             ;;
         *)
             usage
+            exit 1
             ;;
     esac
 done
-
+usage
+exit 1

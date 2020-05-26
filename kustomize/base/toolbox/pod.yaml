@@ -14,24 +14,13 @@ spec:
     envFrom:
     - configMapRef:
         name: toolbox-config
-    env:
-    - name: FR_NAMESPACE
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.namespace
     ports:
     - containerPort: 4222
     volumeMounts:
     - name: workspace
       mountPath: "/opt/workspace"
-    - name: toolbox-secrets
-      mountPath: /var/run/secrets/toolbox
     resources: {}  # for now ignore resource limits
   volumes:
   - name: workspace
     persistentVolumeClaim:
       claimName: storage-claim
-  - name: toolbox-secrets
-    secret:
-      secretName: toolbox-secrets
-

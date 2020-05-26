@@ -169,6 +169,12 @@ profiles:
   deploy:
     kustomize:
         path: ./dev
+        
+- name: dev
+  build: *default-build
+  deploy:
+    kustomize:
+      path: ./dev
 
 # skaffold dev will not work with this, due to a new kustomize api thats being used for patching all objects
 # ensure psp controller is enabled e.g. gcloud beta container clusters update cloud-1472 --enable-pod-security-policy --zone us-east4
