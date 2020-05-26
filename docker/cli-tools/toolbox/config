@@ -1,0 +1,8 @@
+host github.com
+ HostName github.com
+ IdentityFile /var/run/secrets/toolbox/id_rsa
+ User git
+host stash.forgerock.org
+ HostName stash.forgerock.org
+ IdentityFile /var/run/secrets/toolbox/id_rsa
+ User git

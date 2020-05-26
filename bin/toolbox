@@ -1,0 +1,242 @@
+#!/usr/bin/env bash
+SCRIPT_NAME="$(basename "$0")"
+
+if ! command -v kustomize >/dev/null 2>&1;
+then
+    echo "kustomize binary required"
+fi
+
+if ! command -v kubectl >/dev/null 2>&1;
+then
+    echo "kubectl binary required"
+fi
+
+usage () {
+read -r -d '' help <<-EOF
+
+ForgeOps Toolbox CLI
+
+A wrapper script for deploying the ForgeOps toolkit inside a cluster.
+
+This script generates a kustomize profile, and then deploys the toolbox.
+
+Usage:  ${SCRIPT_NAME} [OPTIONS] COMMAND
+
+Command:
+    init    initialize the forgeops-toolbox and ensure a kaniko secret is available. This is a one time activity
+    start   start the toolbox pod on kubernetes
+    stop    stop (pause) the toolbox. The persistent volume claims will not be deleted
+    exec    Get a tmux shell inside the toolbox
+    nuke    Completely destroy the toolbox and the pvc. You can not recover any saved data
+
+Options:
+
+    -h         help
+EOF
+    printf "%-10s" "$help"
+}
+
+load_ns () {
+    ns=$(kubectl config view --minify --output 'jsonpath={..namespace}' | tr -d '\n')
+    if [[ "${ns}" == "" ]];
+    then
+        # return nothing validation will throw error
+        return 1
+    fi
+    echo "${ns}"
+}
+
+init () {
+    if [ -d forgeops-toolbox  ]; then
+        echo "It looks like forgeops-toolbox already exists. I won't overwrite it."
+        exit 1
+    fi
+
+    if ! k8s get ns "${NAMESPACE}";
+    then
+        echo "${NAMESPACE} not found, attempting to create"
+        if ! k8s create ns "${NAMESPACE}";
+        then
+            echo "Couldn't create ${NAMESPACE}, exiting"
+            return 1;
+        fi
+        echo "${NAMESPACE} created!";
+    fi
+    if ! k8s config set-context --current --namespace=${NAMESPACE};
+    then
+        echo "couldn't set context to ${NAMESPACE}";
+    fi
+    if ! k8s get secret kaniko-secret;
+    then
+        echo "kaniko secret doesn't exist please create it"
+        echo "hint: https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster"
+        return 1
+    fi
+
+    mkdir -p forgeops-toolbox
+    cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
+namespace: ${NAMESPACE}
+resources:
+# For local testing only
+#- ../kustomize/base/toolbox
+- github.com/ForgeRock/forgeops/kustomize/base/toolbox/
+- configmap.yaml
+secretGenerator:
+- name: toolbox-secrets
+  files:
+   - id_rsa
+  type: Opaque
+generatorOptions:
+   disableNameSuffixHash: true
+KUSTOMIZATION
+
+cat <<CONFIGMAP >forgeops-toolbox/configmap.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+    name: toolbox-config
+# Edit the following values to reflect your deployment
+data:
+  # The root domain. The fully qualified domain will be $namespace.$subdomain.$domain
+  # For example, using the values below, am will be deployed at default.iam.example.com/am (assuming the default namespace)
+  FR_DOMAIN: example.com
+  FR_SUBDOMAIN: iam
+  # Your fork of https://github.com/ForgeRock/forgeops. If you want to update / push changes
+  # this must be an ssh git url, and you must provide an ssh private key called id_rsa in this folder.
+  FR_FORK: "git@github.com:ForgeRock/forgeops.git"
+  # The docker registry where kaniko will build and push images to. Kaniko must
+  # have a service account with privileges to push images here. Ask your cluster administrator to create this for you.
+  FR_DOCKER_REPO: "gcr.io/engineering-devops"
+  # SSH public key. This is not currently used since VSCode can directly exec into the container
+  SSH_PUBKEY: "notused"
+
+CONFIGMAP
+
+cat <<README >forgeops-toolbox/README.md
+# Toolbox Instructions
+
+
+* Edit configmap.yaml and replace with your desired vaues.
+* Optional - add your git ssh private key to id_rsa. If you want to push changes to git, you need this
+* Deploy to your cluster. You can use "kubectl apply -f forgeops-toolbox/"  or run "toolbox start"
+* Start/stop the instance using:  toolbox [start|stop]
+
+README
+
+
+echo "forgeops-toolbox/ created. IMPORTANT: Read forgeops-toolbox/README.md"
+gen_sshkey
+
+    return 0
+}
+
+# surpress kubectl output
+k8s () {
+    if ! kubectl "${@}" > /dev/null 2>&1;
+    then
+        return 1
+    fi
+}
+
+# Generate an ssh key that can read/write to the users forked forgeops repo
+gen_sshkey() {
+    if [ ! $(command -v ssh-keygen) ]; then
+        echo "I can't generate a git ssh key. Missing the ssh-keygen command"
+        echo "Generating a dummy key. FIXME: Create a proper git ssh key and place it in forgeops-toolbox/id_rsa"
+        echo "dummy-ssh-key" >forgeops-toolbox/id_rsa
+        exit 1
+    fi
+    echo ""
+    echo "Generating an ssh key for git"
+     ssh-keygen -b 4096 \
+        -C "ForgeOps toolbox deployment key" \
+        -t ed25519 -N "" -q \
+        -f forgeops-toolbox/id_rsa
+
+    echo ""
+    echo "Add the public key in forgeops-toolbox/id_rsa.pub to your forked forgeops git repo. It should have permissions to read/write"
+    echo "Here are the contents to paste into your github or stash repo:"
+    echo ""
+    cat forgeops-toolbox/id_rsa.pub
+}
+
+start() {
+    if ! kustomize build forgeops-toolbox | kubectl apply -f -;
+    then
+        echo "failed to deploy toolbox";
+        return 1
+    fi
+    echo ""
+    echo "Give the toolbox time to start up. When ready, run"
+    echo "toolbox exec"
+    echo "or use"
+    echo "kubectl exec -it forgeops-cdk-toolbox --- tmux"
+    return 0
+}
+
+stop () {
+    echo "Stoping the pod. This will not delete the data on the pvc"
+    kubectl delete pod forgeops-cdk-toolbox
+    return $?
+}
+
+exec_pod() {
+    kubectl exec forgeops-cdk-toolbox -it -- tmux
+}
+
+NAMESPACE=$(load_ns)
+
+# arg/opt parse
+while getopts n:s:d:f:r:i:h option
+do
+    case "${option}"
+        in
+        n) NAMESPACE=${OPTARG};;
+        h) usage; exit 0;;
+        *) usage; exit 1;;
+    esac
+done
+shift $((OPTIND - 1))
+
+if [[ "$#" != 1 ]];
+then
+    echo "one argument is expected"
+    usage
+    exit 1
+fi
+
+
+nuke() {
+    kustomize build forgeops-toolbox | kubectl delete -f -
+    rm -fr forgeops-toolbox
+}
+
+while (( "$#" )); do
+    case "$1" in
+        init)
+            shift
+            init
+            exit $?
+            ;;
+        start)
+            shift
+            start
+            ;;
+        stop)
+            shift
+            stop
+            ;;
+        nuke)
+            shift
+            nuke
+            ;;
+        exec)
+            shift
+            exec_pod
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+

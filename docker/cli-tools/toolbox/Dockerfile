@@ -32,6 +32,9 @@ RUN mkdir -p /opt/build/.local/bin \
                                             && chmod -R 0700 /opt/build/.ssh
 
 COPY bin/ /opt/build/.local/bin
+
+COPY config /opt/build/.ssh/config
+
 RUN echo "PATH=~/.local/bin:$PATH" >> /opt/build/.bashrc \
         && echo "bash -c ~/.local/bin/start-shell.sh" >> /opt/build/.bashrc
 
