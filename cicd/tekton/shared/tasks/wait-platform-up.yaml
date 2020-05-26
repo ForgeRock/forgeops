@@ -38,6 +38,18 @@ spec:
           exit 1
         }
 
+    # TODO: Write some tests to probe AM/IDM for ready to service (not just ready pod state)
+    # IDM comes up faster than DS, and will restart at least once. The additional sleep gives IDM time
+    # to stabilize.
+    - name: wait-am-idm-ready
+      image: gcr.io/cloud-builders/kubectl
+      script: |
+        #!/usr/bin/env bash
+        {
+          echo "Waiting for 5 minutes for system to come up"
+          sleep 300
+        }
+
     - name: wait-for-amster-config
       image: gcr.io/cloud-builders/kubectl
       script: |
