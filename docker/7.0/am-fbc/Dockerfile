@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am/pit1:7.0.0-eb2ce48b2fa6f42f9928acdb5b2a22f7ff988865
+FROM gcr.io/forgerock-io/am:7.0.0-eb2ce48b2fa6f42f9928acdb5b2a22f7ff988865
 
 USER root
 # musl is needed because the go code compiles in alpine.TODO: fix the go code
