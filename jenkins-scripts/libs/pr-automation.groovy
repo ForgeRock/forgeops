@@ -78,9 +78,9 @@ Collection<String> getPrProductCommitHashes() {
     scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 
     // Check changes to products
-    commonModule.getHelmCharts().each { helmChart ->
-        if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, helmChart.filePath)) {
-            relatedCommits << helmChart.productCommit
+    commonModule.dockerImages.each { imageName, image ->
+        if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, image.dockerfilePath)) {
+            relatedCommits << image.productCommit
         }
     }
 

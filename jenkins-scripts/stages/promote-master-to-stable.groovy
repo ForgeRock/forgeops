@@ -35,11 +35,11 @@ void runStage(PipelineRun pipelineRun) {
 }
 
 private void promoteDockerImagesToRootLevel() {
-    commonModule.getHelmCharts().each { helmChart ->
-        echo "Promoting '${helmChart.currentImageName}:${helmChart.currentTag}' to root level"
+    commonModule.dockerImages.each { imageName, image ->
+        echo "Promoting '${image.baseImageName}:${image.tag}' to root level"
         dockerUtils.copyImage(
-                "${helmChart.currentImageName}:${helmChart.currentTag}",
-                "${helmChart.rootLevelImageName}:${helmChart.currentTag}"
+                "${image.baseImageName}:${image.tag}",
+                "${image.rootLevelBaseImageName}:${image.tag}"
         )
     }
 }
@@ -47,10 +47,8 @@ private void promoteDockerImagesToRootLevel() {
 private void promoteForgeOpsCommitToStable() {
     echo "Promoting ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to 'stable'"
 
-    this.useRootLevelImageNamesInHelmCharts()
     this.useRootLevelImageNamesInDockerfiles()
-    gitUtils.setupDefaultUser()
-    sh 'git commit --all --message="Promote stable root-level images to Helm charts and Dockerfiles"'
+    gitUtils.commitModifiedFiles('Use stable root-level images in Dockerfiles')
 
     localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'stable')
 
@@ -61,19 +59,11 @@ private void promoteForgeOpsCommitToStable() {
     )
 }
 
-/* Update Helm charts to use root-level product image names.
- * Master branch uses the '/pit1' image name appendix; this can be removed once the image is promoted to the root level.
- */
-private void useRootLevelImageNamesInHelmCharts() {
-    commonModule.getHelmCharts().each { helmChart ->
-        sh "sed -i 's@${helmChart.currentImageName}@${helmChart.rootLevelImageName}@g' ${helmChart.filePath}"
-    }
-}
-
 /* Update Skaffold Dockerfiles to use root-level product image names. */
 private void useRootLevelImageNamesInDockerfiles() {
-    commonModule.getDockerfiles().each { dockerfile ->
-        sh "sed -i 's@FROM gcr.io/forgerock-io.*@FROM ${dockerfile.fullImageName}@g' ${dockerfile.filePath}"
+    commonModule.dockerImages.each { imageName, image ->
+        String rootImage = "${image.rootLevelBaseImageName}:${image.tag}"
+        sh "sed -i 's@FROM gcr.io/forgerock-io.*@FROM ${rootImage}@g' ${image.dockerfilePath}"
     }
 }
 
