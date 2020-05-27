@@ -6,6 +6,15 @@ spec:
   resources:
     - name: forgeops
       type: git
+  params:
+    - name: namespace
+      type: string
+      description: Target namespace of this pipeline
+      default: nightly
+    - name: skaffold-profile
+      type: string
+      description: Skaffold profile to deploy
+      default: nightly
   tasks:
     - name: deploy-images-step
       taskRef:
@@ -16,9 +25,9 @@ spec:
           resource: forgeops
       params:
       - name: profile
-        value: nightly
+        value: "$(params.skaffold-profile)"
       - name: namespace
-        value: nightly
+        value: "$(params.namespace)"
       - name: docker-repo
         value: gcr.io/engineering-devops/nightly
 
@@ -29,7 +38,7 @@ spec:
       - deploy-images-step
       params:
       - name: namespace
-        value: smoke
+        value: "$(params.namespace)"
 
     - name: create-users-step
       runAfter:
@@ -40,7 +49,7 @@ spec:
       - name: users
         value: "10"
       - name: namespace
-        value: nightly
+        value: "$(params.namespace)"
 
     - name: scale-am-deployment-step
       runAfter:
@@ -51,7 +60,7 @@ spec:
       - name: replicas
         value: "1"
       - name: namespace
-        value: nightly
+        value: "$(params.namespace)"
 
     - name: notify-step
       runAfter:
@@ -60,4 +69,4 @@ spec:
         name: notify
       params:
       - name: namespace
-        value: nightly
+        value: "$(params.namespace)"
