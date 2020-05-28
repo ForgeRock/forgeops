@@ -46,6 +46,10 @@ spec:
           servicePort: 80
         path: /admin
       - backend:
+          serviceName: idm
+          servicePort: 80
+        path: /openicf
+      - backend:
           serviceName: forgeops-tests
           servicePort: 80
         path: /tests
