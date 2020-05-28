@@ -67,6 +67,10 @@ spec:
       - scale-am-deployment-step
       taskRef:
         name: notify
+      resources:
+        inputs:
+        - name: forgeops
+          resource: forgeops
       params:
       - name: namespace
         value: "$(params.namespace)"

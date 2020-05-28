@@ -42,7 +42,7 @@ spec:
         cd /workspace/forgeops
         skaffold -f skaffold.yaml -p $(inputs.params.profile) delete
       } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old `$(inputs.params.profile)` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old \`$(inputs.params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
 
@@ -72,7 +72,7 @@ spec:
         sleep 30
         skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) run
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new `$(inputs.params.profile)` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new \`$(inputs.params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
       

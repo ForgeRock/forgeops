@@ -39,7 +39,7 @@ spec:
         cd ..
         skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) build
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build `$(inputs.params.profile)`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build \`$(inputs.params.profile)\`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
       
