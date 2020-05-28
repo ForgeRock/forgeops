@@ -48,6 +48,3 @@ dsbackup create \
  --recurringTask "${INCREMENTAL_CRON}" \
  --trustAll \
  $EXTRA_PARAMS
- 
-
-
