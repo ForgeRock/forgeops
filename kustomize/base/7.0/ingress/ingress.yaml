@@ -49,10 +49,6 @@ spec:
           serviceName: idm
           servicePort: 80
         path: /openicf
-      - backend:
-          serviceName: forgeops-tests
-          servicePort: 80
-        path: /tests
       # end user UI currently has its own ingress. Needs to rewrite the url path...
       # - backend:
       #     serviceName: end-user-ui

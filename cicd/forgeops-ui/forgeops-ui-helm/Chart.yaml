@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: "1.0"
-description: Helm chart for forgeops ui application
-name: forgeops-ui-helm
-version: 0.1.0
