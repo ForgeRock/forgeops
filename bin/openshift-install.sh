@@ -11,7 +11,7 @@ yq -y -s '.[0] * .[1]' cluster/openshift/installer-config.yaml \
 OS_NAME=$(yq -r '.metadata.name' "${CLUSTER_DIR}/install-config.yaml")
 openshift-install create cluster --dir "${CLUSTER_DIR}"
 
-for i in am idm ds-cts amster ds-idrepo forgeops-tests ig;
+for i in am idm ds-cts amster ds-idrepo ig;
 do
     repo_name="forgeops/${i}"
     if [[ $(aws ecr describe-repositories --repository-names "${repo_name}" | jq '.[] | length') -ne 1 ]];

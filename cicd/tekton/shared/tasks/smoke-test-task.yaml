@@ -12,6 +12,10 @@ spec:
   - name: namespace
     type: string
     description: target namespace
+  - name: tester-url
+    type: string
+    description: URL of the testing endpoint
+    default: "https://smoketest-7escakmhgq-uk.a.run.app/test"
 
   stepTemplate:
     env:
@@ -29,14 +33,14 @@ spec:
       {
         cd /workspace/forgeops
 
-        amadmin=$(kubectl get secret -n $(params.namespace) amster-env-secrets -o jsonpath="{.data.AMADMIN_PASS}"  | base64 --decode)
-        fqdn=$(params.namespace).iam.forgeops.com
+        AMADMIN_PASS=$(kubectl get secret -n $(params.namespace) amster-env-secrets -o jsonpath="{.data.AMADMIN_PASS}"  | base64 --decode)
+        FQDN=$(params.namespace).iam.forgeops.com
         echo "going to sleep for 60 seconds to give AM time to come up. TODO: add a wait for deploy step"
         sleep 60
-        echo "Running smoke test against $fqdn"
-        curl -X POST 'https://smoketest-7escakmhgq-uk.a.run.app/test' \
-            --data "fqdn=$fqdn&amadminPassword=$amadmin"
+        echo "Running smoke test against $FQDN"
+        curl -X POST "$(params.tester-url)" \
+            --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS"
       } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Smoke test failed `$(inputs.params.profile)` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Smoke test failed \`$(inputs.params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }

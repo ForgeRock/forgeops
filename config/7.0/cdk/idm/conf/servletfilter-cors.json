@@ -4,10 +4,11 @@
     "requestAttributes" : { },
     "scriptExtensions" : { },
     "initParams" : {
-        "allowedOrigins" : "https://localhost:&{openidm.port.https}",
+        "allowedOrigins" : "*",
         "allowedMethods" : "GET,POST,PUT,DELETE,PATCH",
-        "allowedHeaders" : "accept,x-openidm-password,x-openidm-nosession,x-openidm-username,content-type,origin,x-requested-with",
-        "allowCredentials" : true,
+        "allowedHeaders" : "authorization,accept,content-type,origin,x-requested-with,cache-control,accept-api-version",
+        "allowCredentials" : false,
+        "exposedHeaders" : "WWW-Authenticate",
         "chainPreflight" : false
     },
     "urlPatterns" : [

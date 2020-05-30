@@ -25,6 +25,7 @@ configMapGenerator:
   - SUBDOMAIN=iam
   - DOMAIN=forgeops.com
   - AM_URL=https://$(NAMESPACE).iam.forgeops.com/am
+  - AM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/am/ui-admin/
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/admin
   - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.forgeops.com/upload
   - IDM_EXPORT_URL=https://$(NAMESPACE).iam.forgeops.com/export
@@ -47,6 +48,37 @@ patchesJson6902:
       path: /metadata/annotations/certmanager.io~1cluster-issuer
       value: letsencrypt-prod
       # value: default-issuer  # Default
+
+
+patchesStrategicMerge:
+- |-
+  #Patch DS CTS
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: ds-cts
+  spec:
+    template:
+      spec:
+        containers:
+          - name: ds
+            envFrom:
+            - secretRef:
+                name: cloud-credentials  
+- |-
+  #Patch DS idrepo
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: ds-idrepo
+  spec:
+    template:
+      spec:
+        containers:
+          - name: ds
+            envFrom:
+            - secretRef:
+                name: cloud-credentials 
   
 vars:
 - name: DOMAIN

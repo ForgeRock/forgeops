@@ -7,23 +7,119 @@
 apiVersion: skaffold/v1
 kind: Config
 
+## Common YAML anchors
+## The yaml anchors are used to make it easier to compose skaffold profiles.
+## You should not need to edit this section
+.YamlAnchors:
+  kaniko:
+    kaniko-ops: &kaniko-opts
+      # Disable build cache for now. This is causing intermittent problems
+      # cache: {} 
+      image: gcr.io/kaniko-project/executor:v0.20.0
+      # The flags is deprecated - but without it we are seeing Kaniko bugs.
+      # CLOUD-1955
+      flags:
+        - '--single-snapshot'
+      # This is the recommended way of passing the single-snapshot arg - but we see issues.
+      # buildArgs:
+        # single-snapshot: "true"
+    cluster: &kaniko-cluster
+      namespace: kaniko
+      pullSecretName: kaniko-secret
+
+  artifactDefinitions:
+    - &AM
+      image: am
+      context: docker/7.0/am
+    - &AM_KANIKO
+      <<: *AM
+      kaniko: *kaniko-opts
+    - &AM-FBC_KANIKO
+      image: am
+      context: docker/7.0/am-fbc
+      kaniko: *kaniko-opts
+  
+    - &AMSTER
+      image: amster
+      context: docker/7.0/amster
+    - &AMSTER_KANIKO
+      <<: *AMSTER
+      kaniko: *kaniko-opts
+    
+    - &IDM
+      image: idm
+      context: docker/7.0/idm
+    - &IDM_KANIKO
+      <<: *IDM
+      kaniko: *kaniko-opts
+    
+    - &DS-CTS_BASE
+      image: ds-cts
+      context: docker/7.0/ds
+    - &DS-CTS
+      <<: *DS-CTS_BASE
+      docker:
+        dockerfile: cts/Dockerfile
+    - &DS-CTS_KANIKO
+      <<: *DS-CTS_BASE
+      kaniko: 
+        <<: *kaniko-opts
+        dockerfile: cts/Dockerfile
+    
+    - &DS-IDREPO_BASE
+      image: ds-idrepo
+      context: docker/7.0/ds/
+    - &DS-IDREPO
+      <<: *DS-IDREPO_BASE
+      docker:
+        dockerfile: idrepo/Dockerfile 
+    - &DS-IDREPO_KANIKO
+      <<: *DS-IDREPO_BASE
+      kaniko: 
+        <<: *kaniko-opts
+        dockerfile: idrepo/Dockerfile 
+  
+    - &FORGEOPS-SECRETS
+      image: forgeops-secrets
+      context: docker/forgeops-secrets
+    - &FORGEOPS-SECRETS_KANIKO
+      <<: *FORGEOPS-SECRETS
+      kaniko: *kaniko-opts
+  
+    - &LDIF-IMPORTER_KANIKO
+      image: ldif-importer
+      context: docker/7.0/ldif-importer
+      kaniko: *kaniko-opts 
+  
+    - &IG
+      image: ig
+      context: docker/7.0/ig
+  
+  commonArtifactSets:
+    default-artifacts: &default-artifacts
+    - *AM
+    - *AMSTER
+    - *IDM
+    - *DS-CTS
+    - *DS-IDREPO
+    - *FORGEOPS-SECRETS
+    - *IG
+    kaniko-artifacts: &kaniko-artifacts
+    - *AM_KANIKO
+    - *AMSTER_KANIKO
+    - *IDM_KANIKO
+    - *DS-CTS_KANIKO
+    - *DS-IDREPO_KANIKO
+    - *FORGEOPS-SECRETS_KANIKO
+## End YAML Anchors
+
+#---------------------
+# Skaffold profiles
+#---------------------
+
 # Default profile
 build: &default-build
-  artifacts: &default-artifacts
-  - image: am
-    context: docker/7.0/am
-  - image: amster
-    context: docker/7.0/amster
-  - image: idm
-    context: docker/7.0/idm
-  - image: ds-cts
-    context: docker/7.0/ds/cts
-  - image: ds-idrepo
-    context: docker/7.0/ds/idrepo
-  - image: forgeops-secrets
-    context: docker/forgeops-secrets
-  - image: ig
-    context: docker/7.0/ig
+  artifacts: *default-artifacts
   tagPolicy:
     sha256: {}
 deploy: &default-deploy
@@ -31,8 +127,6 @@ deploy: &default-deploy
   kustomize:
     path: ./kustomize/overlay/7.0/all
 
-
-# Additional profiles
 
 # default.iam.forgeops.com
 profiles:
@@ -45,39 +139,8 @@ profiles:
 # 24/7 Demo environment
 - name: nightly
   build: &kaniko-build
-    artifacts: &kaniko-artifacts
-    - image: am
-      context: docker/7.0/am
-      kaniko: &kaniko-opts
-        cache: {}
-        image: gcr.io/kaniko-project/executor:v0.20.0
-        # The flags is deprecated - but without it we are seeing Kaniko bugs.
-        # CLOUD-1955
-        flags:
-          - '--single-snapshot'
-# This is the recommended way of passing the single-snapshot arg - but we see issues.
-#        buildArgs:
-#          single-snapshot: "true"
-    - image: amster
-      context: docker/7.0/amster
-      kaniko: *kaniko-opts
-    - image: idm
-      context: docker/7.0/idm
-      kaniko: *kaniko-opts
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-      kaniko: *kaniko-opts
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-      kaniko: *kaniko-opts
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-      kaniko: *kaniko-opts
-    cluster: &kaniko-cluster
-      namespace: kaniko
-      pullSecretName: kaniko-secret
-      #dockerConfig:
-        #path: ./config.json
+    artifacts: *kaniko-artifacts
+    cluster: *kaniko-cluster
     tagPolicy:
       sha256: {}
   deploy:
@@ -87,25 +150,7 @@ profiles:
 # Smoke tests
 - name: smoke
   build:
-    artifacts:
-    - image: am
-      context: docker/7.0/am
-      kaniko: *kaniko-opts
-    - image: amster
-      context: docker/7.0/amster
-      kaniko: *kaniko-opts
-    - image: idm
-      context: docker/7.0/idm
-      kaniko: *kaniko-opts
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-      kaniko: *kaniko-opts
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-      kaniko: *kaniko-opts
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-      kaniko: *kaniko-opts
+    artifacts: *kaniko-artifacts
     cluster: *kaniko-cluster
     tagPolicy:
       gitCommit: {}
@@ -161,8 +206,7 @@ profiles:
 - name: ig-only
   build:
     artifacts:
-    - image: ig
-      context: docker/7.0/ig
+    - *IG
     tagPolicy:
       sha256: {}
   deploy:
@@ -171,16 +215,11 @@ profiles:
 - name: am-only
   build:
     artifacts:
-    - image: am
-      context: docker/7.0/am
-    - image: amster
-      context: docker/7.0/amster
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
+    - *AM
+    - *AMSTER
+    - *DS-CTS
+    - *DS-IDREPO
+    - *FORGEOPS-SECRETS
     tagPolicy:
       gitCommit: {}
   deploy:
@@ -189,12 +228,9 @@ profiles:
 - name: idm-only
   build:
     artifacts:
-    - image: idm
-      context: docker/7.0/idm
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
+    - *IDM
+    - *DS-IDREPO
+    - *FORGEOPS-SECRETS
     tagPolicy:
       sha256: {}
   deploy:
@@ -203,12 +239,9 @@ profiles:
 - name: ds-only
   build:
     artifacts:
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
+    - *DS-CTS
+    - *DS-IDREPO
+    - *FORGEOPS-SECRETS
     tagPolicy:
       sha256: {}
   deploy:
@@ -219,24 +252,12 @@ profiles:
 - name: fbc
   build:
     artifacts:
-    - image: am
-      context: docker/7.0/am-fbc
-      kaniko: *kaniko-opts
-    - image: idm
-      context: docker/7.0/idm
-      kaniko: *kaniko-opts
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-      kaniko: *kaniko-opts
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-      kaniko: *kaniko-opts
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-      kaniko: *kaniko-opts
-    - image: ldif-importer
-      context: docker/7.0/ldif-importer
-      kaniko: *kaniko-opts
+    - *AM-FBC_KANIKO
+    - *IDM_KANIKO
+    - *DS-CTS_KANIKO
+    - *DS-IDREPO_KANIKO
+    - *FORGEOPS-SECRETS_KANIKO
+    - *LDIF-IMPORTER_KANIKO
     cluster: *kaniko-cluster
     tagPolicy:
       gitCommit: {}
@@ -244,28 +265,17 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/fbc
 
-
 # FBC ds and secrets.
 - name: fbc-ds
   build:
     artifacts:
-    - image: ds-idrepo
-      context: docker/7.0/ds/idrepo
-      kaniko: *kaniko-opts
-    - image: ds-cts
-      context: docker/7.0/ds/cts
-      kaniko: *kaniko-opts
-    - image: forgeops-secrets
-      context: docker/forgeops-secrets
-      kaniko: *kaniko-opts
-    - image: ldif-importer
-      context: docker/7.0/ldif-importer
-      kaniko: *kaniko-opts
+    - *DS-CTS_KANIKO
+    - *DS-IDREPO_KANIKO
+    - *FORGEOPS-SECRETS_KANIKO
+    - *LDIF-IMPORTER_KANIKO
     cluster: *kaniko-cluster
     tagPolicy:
       gitCommit: {}
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/fbc-ds
-
-

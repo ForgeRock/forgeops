@@ -6,6 +6,15 @@ spec:
   resources:
     - name: forgeops
       type: git
+  params:
+    - name: namespace
+      type: string
+      description: Target namespace of this pipeline
+      default: smoke
+    - name: skaffold-profile
+      type: string
+      description: Skaffold profile to deploy
+      default: smoke
   tasks:
     - name: deploy-images-step
       taskRef:
@@ -16,9 +25,9 @@ spec:
           resource: forgeops
       params:
       - name: profile
-        value: smoke
+        value: "$(params.skaffold-profile)"
       - name: namespace
-        value: smoke
+        value: "$(params.namespace)"
       - name: docker-repo
         value: gcr.io/engineering-devops/smoke
     - name: wait-platform-up
@@ -28,7 +37,7 @@ spec:
       - deploy-images-step
       params:
       - name: namespace
-        value: smoke
+        value: "$(params.namespace)"
     - name: run-tests
       taskRef:
         name: smoke-test
@@ -40,4 +49,4 @@ spec:
           resource: forgeops
       params:
       - name: namespace
-        value: smoke
+        value: "$(params.namespace)"

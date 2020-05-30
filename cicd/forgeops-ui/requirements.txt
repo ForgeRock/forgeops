@@ -1,9 +1,0 @@
-Flask
-Flask-Cors
-pytest
-allure-pytest
-pytest-html
-pytest-metadata
-requests
-pyyaml
-GitPython

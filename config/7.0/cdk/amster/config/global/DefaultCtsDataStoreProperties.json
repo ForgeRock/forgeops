@@ -21,7 +21,8 @@
       "org.forgerock.services.cts.store.loginid" : "uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens",
       "org.forgerock.services.cts.store.password" : "&{ctsusr.pass|password}",
       "org.forgerock.services.cts.store.heartbeat" : "10",
-      "org.forgerock.services.cts.store.affinity.enabled" : true
+      "org.forgerock.services.cts.store.affinity.enabled" : true,
+      "org.forgerock.services.cts.reaper.cache.size" : "5000000"
     }
   }
 }

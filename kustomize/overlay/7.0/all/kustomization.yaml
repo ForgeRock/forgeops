@@ -29,6 +29,7 @@ configMapGenerator:
   - SUBDOMAIN=iam
   - DOMAIN=example.com
   - AM_URL=https://$(NAMESPACE).iam.example.com/am
+  - AM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/am/ui-admin/
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/admin
   - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.example.com/upload
   - IDM_EXPORT_URL=https://$(NAMESPACE).iam.example.com/export

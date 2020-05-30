@@ -3,6 +3,10 @@ kind: Task
 metadata:
   name: notify
 spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
   params:
   - name: namespace
     type: string
@@ -18,6 +22,7 @@ spec:
             key: SLACK_WEBHOOK_URL
       script: |
         #!/usr/bin/env bash
+        cd /workspace/forgeops
         getsec () {
         kubectl -n $(params.namespace) get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
         }
@@ -43,6 +48,10 @@ spec:
                 "type": "mrkdwn",
                 "text": "*openidm-admin*: \`$(getsec idm-env-secrets OPENIDM_ADMIN_PASSWORD)\`"
               },
+              {	
+                "type": "mrkdwn",
+                "text": "*forgeops-gitcommit*: \`$(git rev-parse --short HEAD)\`"
+              }              
             ]
           }]
         }

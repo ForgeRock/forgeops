@@ -99,6 +99,7 @@ configMapGenerator:
   - SUBDOMAIN=$SUBDOMAIN
   - DOMAIN=$DOMAIN
   - AM_URL=https://$FQDN/am
+  - AM_ADMIN_URL=https://$FQDN/am/ui-admin/
   - IDM_ADMIN_URL=https://$FQDN/admin
   - IDM_UPLOAD_URL=https://$FQDN/upload
   - IDM_EXPORT_URL=https://$FQDN/export

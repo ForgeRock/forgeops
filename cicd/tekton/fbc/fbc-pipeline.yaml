@@ -6,6 +6,15 @@ spec:
   resources:
     - name: forgeops
       type: git
+  params:
+    - name: namespace
+      type: string
+      description: Target namespace of this pipeline
+      default: fbc
+    - name: skaffold-profile
+      type: string
+      description: Skaffold profile to deploy
+      default: fbc
   tasks:
     - name: deploy-fbc-step
       taskRef:
@@ -16,9 +25,9 @@ spec:
           resource: forgeops
       params:
       - name: profile
-        value: fbc
+        value: "$(params.skaffold-profile)"
       - name: namespace
-        value: fbc
+        value: "$(params.namespace)"
       - name: docker-repo
         value: gcr.io/engineering-devops/nightly
 
@@ -32,18 +41,25 @@ spec:
 #            command: ["bash", "-c"]
 #            args: ["sleep 60; echo 'done' "]
 
-    - name: create-users-step
+    - name: wait-platform-up-step
+      taskRef:
+        name: wait-platform-up
       runAfter:
       - deploy-fbc-step
+      params:
+      - name: namespace
+        value: "$(params.namespace)"
+
+    - name: create-users-step
+      runAfter:
+      - wait-platform-up-step
       taskRef:
         name: create-users
       params:
       - name: users
         value: "10"
       - name: namespace
-        value: fbc
-      - name: waitForAmster
-        value: "false"
+        value: "$(params.namespace)"
         
     - name: scale-am-deployment-step
       runAfter:
@@ -54,13 +70,17 @@ spec:
       - name: replicas
         value: "1"
       - name: namespace
-        value: fbc
+        value: "$(params.namespace)"
 
     - name: notify-step
       runAfter:
       - scale-am-deployment-step
       taskRef:
         name: notify
+      resources:
+        inputs:
+        - name: forgeops
+          resource: forgeops
       params:
       - name: namespace
-        value: fbc
+        value: "$(params.namespace)"

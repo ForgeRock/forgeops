@@ -12,7 +12,6 @@ It is important to understand that many of the Dockerfiles do not contain the re
 * `java-11`: The foundational Java 11 image used to build ForgeRock DS, IDM and IG.
 * `cli-tools`: Wraps up cluster provisiong tools in a container.
 * `forgeops-secrets`: Docker image that generates random secrets for the platform.
-* `forgeops-tests`: Basic smoke test for the platform deployment.
 * `gatling`: Gatling image used to benchmark and exercise the platform.
 
 
