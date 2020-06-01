@@ -79,7 +79,7 @@ timestamps {
  * @param body The build script.
  */
 def manageNotifications(boolean notificationsEnabled = true, Closure body) {
-    def slackChannel = '#cloud-deploy-notify'
+    def slackChannel = '#plat-intg-test'
     def promotionBuild = new Build(steps, env, currentBuild)
     try {
         body() // perform the build

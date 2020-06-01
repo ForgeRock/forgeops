@@ -36,7 +36,7 @@ void runStage(PipelineRun pipelineRun) {
                             COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG   : commonModule.getCurrentTag('ds-idrepo'),
                             STASH_LODESTAR_BRANCH                   : commonModule.LODESTAR_GIT_COMMIT,
                             STASH_FORGEOPS_BRANCH                   : 'fraas-production',
-                            REPORT_NAME                             : subStageName,
+                            REPORT_NAME_PREFIX                      : subStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)

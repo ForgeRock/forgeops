@@ -39,7 +39,7 @@ void runStage(PipelineRun pipelineRun) {
                             TIMEOUT_UNIT                    : 'HOURS',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH               : forgeopsPath,
-                            REPORT_NAME                     : subStageName,
+                            REPORT_NAME_PREFIX              : subStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)
