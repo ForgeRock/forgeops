@@ -20,7 +20,7 @@ configMapGenerator:
   - SUBDOMAIN=iam
   - DOMAIN=forgeops.com
   - AM_URL=https://$(NAMESPACE).iam.forgeops.com/am
-  - AM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/am/ui-admin/
+  - AM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/am/ui-admin/
   - IDM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/admin
   - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/platform
   - IDM_REST_URL=https://$(NAMESPACE).iam.forgeops.com/openidm
