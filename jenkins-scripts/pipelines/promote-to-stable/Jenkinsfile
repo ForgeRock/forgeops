@@ -15,7 +15,7 @@ import java.net.URLDecoder
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Library([
-    'forgerock-pipeline-libs@22983ac3de75284754110d027979640405966513',
+    'forgerock-pipeline-libs@771f328acbacbd2d3eda84d2abc866e083127aaa',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
     'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ])
