@@ -55,7 +55,7 @@ String getCurrentTag(String productName) {
 
 def getCurrentProductCommitHashes() {
     return [
-            getDockerImage('ds-empty').productCommit,
+            getDockerImage('ds-idrepo').productCommit,
             getDockerImage('ig').productCommit,
             getDockerImage('idm').productCommit,
             getDockerImage('am').productCommit,
