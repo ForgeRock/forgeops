@@ -60,10 +60,8 @@ def find_last_tag(args):
         print(e)
         sys.exit(0)
     if last_tag[2] != '0':
-        out = '{}-{}.{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
+        return '{}-{}.{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
                                 *last_tag[1:])
-        print(out)
-        sys.exit(0)
 
     return '{}-{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
                          last_tag[1])
@@ -99,7 +97,7 @@ def active_tag():
     if tag_name == 'undefined':
         print('not on a tag')
         sys.exit(1)
-    return tag_name
+    return tag_name.strip('^0')
 
 def current_tag(args):
     print(active_tag())
