@@ -50,7 +50,7 @@ spec:
               },
               {	
                 "type": "mrkdwn",
-                "text": "*forgeops-gitcommit*: \`$(git rev-parse --short HEAD)\`"
+                "text": "*forgeops-commit-id*: \`$(git rev-parse --short HEAD)\`"
               }              
             ]
           }]
