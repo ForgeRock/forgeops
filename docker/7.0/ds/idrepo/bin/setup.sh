@@ -34,4 +34,11 @@ setup-profile --profile ${CONFIG} \
 ##    set-password-storage-scheme-prop --scheme-name "Salted SHA-512" --set enabled:true
 ##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
 #EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:equality \
+          --type generic \
+          --index-name fr-idm-uuid
+EOF
 
