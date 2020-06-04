@@ -2,6 +2,8 @@
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
+RELEASE_REVS := $(shell forgeops release-revlist)
+
 # bins
 COMMITSTAR=/usr/local/bin/commitsar
 TSLINT=tslint
@@ -38,7 +40,7 @@ branch-notes:
 	@gitchangelog master..HEAD
 
 changelog.md:
-	@gitchangelog $(forgeops release-revlist) > changelog.md
+	gitchangelog  $(RELEASE_REVS) > changelog.md
 
 release: changelog.md
 	forgeops create-release-notes changelog.md
