@@ -52,6 +52,7 @@ private void promoteForgeOpsCommitToStable() {
 
     localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'stable')
 
+    gitUtils.setupDefaultUser()
     sh commands(
             "git merge -Xtheirs --no-ff ${LOCAL_DEV_BRANCH} -m " +
                     "'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to stable'",
