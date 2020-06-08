@@ -35,7 +35,8 @@ _black_list_repos = [
    # r'^engineering-devops\/(?:\w*-base$)',
    # r'^engineering-devops\/(am|ds|(?:ds-\w*)|idm|amster)$',
    r'^engineering-devops\/smoketest$',
-   r'^engineering-devops\/skaffold$'
+   r'^engineering-devops\/skaffold$',
+   r'^engineering-devops\/ci.*',
 
    ]
 
