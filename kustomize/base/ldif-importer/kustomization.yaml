@@ -1,7 +1,0 @@
-kind: ""
-apiversion: ""
-commonLabels:
-  app: ldif-importer
-  vendor: forgerock
-resources:
-- job.yaml

@@ -34,7 +34,7 @@ void runStage(PipelineRun pipelineRun) {
                             TESTS_SCOPE             : 'tests/pit1',
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH       : forgeopsPath,
-                            REPORT_NAME             : subStageName,
+                            REPORT_NAME_PREFIX      : subStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)

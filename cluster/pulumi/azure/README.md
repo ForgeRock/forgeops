@@ -10,7 +10,6 @@ Deploys the following:
 
 ### Options
 
-* clusterResourceGroupName: resource group for AKS
 * acrResourceGroupName: resource group that has the ACR registry
 * location: eastus
 * servicePrincipalSecret
@@ -24,7 +23,6 @@ Deploys the following:
 
 ### Options
 
-* aks:acrResourceGroupName: resource group for ACR _note: should be the same as the infra stack_
 * clusterResourceGroupName: resource group for AKS
 * k8sVersion: kubernetes version
 * numOfAzs: number of availability zones

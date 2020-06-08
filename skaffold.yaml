@@ -247,35 +247,3 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/ds-only
-
-# FBC test
-- name: fbc
-  build:
-    artifacts:
-    - *AM-FBC_KANIKO
-    - *IDM_KANIKO
-    - *DS-CTS_KANIKO
-    - *DS-IDREPO_KANIKO
-    - *FORGEOPS-SECRETS_KANIKO
-    - *LDIF-IMPORTER_KANIKO
-    cluster: *kaniko-cluster
-    tagPolicy:
-      gitCommit: {}
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/fbc
-
-# FBC ds and secrets.
-- name: fbc-ds
-  build:
-    artifacts:
-    - *DS-CTS_KANIKO
-    - *DS-IDREPO_KANIKO
-    - *FORGEOPS-SECRETS_KANIKO
-    - *LDIF-IMPORTER_KANIKO
-    cluster: *kaniko-cluster
-    tagPolicy:
-      gitCommit: {}
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/fbc-ds

@@ -25,7 +25,8 @@ if [[ -z "$NAMESPACE" ]] ; then
     exit -1
 fi
 
-pods=( $(kubectl get pods -n $NAMESPACE | grep ds | echo $(awk '{ print $1 }')) )
+pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts|ds-idrepo/{print $1}')))
+
 # only set $ADMIN_PASSWORD if the secret is available. This information is only used in 7.0.
 if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}") ]] &>/dev/null; then
   ADMIN_PASSWORD=$(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)

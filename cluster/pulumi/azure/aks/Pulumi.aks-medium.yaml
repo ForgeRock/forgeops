@@ -1,6 +1,5 @@
 encryptionsalt: v1:Xqb3Ixd/7MY=:v1:rQSjfIv89hnCr5Uw:j7JCenHD2XIAAhLnZkdjWDktkTGKIg==
 config:
-  aks:acrResourceGroupName: ContainerRegistry
   aks:clusterResourceGroupName: cdm-medium-resource-group
   aks:k8sVersion: 1.15.10
   aks:numOfAzs: "3"

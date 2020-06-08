@@ -35,11 +35,11 @@ void runStage(PipelineRun pipelineRun) {
                             CLUSTER_CRASHER                 : 'True',
                             REPEAT                          : GREENFIELD_REPEAT.toInteger(),
                             REPEAT_WAIT                     : 3600,
-                            TIMEOUT                         : '12',
+                            TIMEOUT                         : '14',
                             TIMEOUT_UNIT                    : 'HOURS',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH               : forgeopsPath,
-                            REPORT_NAME                     : subStageName,
+                            REPORT_NAME_PREFIX              : subStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)
