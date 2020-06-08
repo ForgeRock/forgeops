@@ -23,8 +23,7 @@ void runStage(PipelineRun pipelineRun) {
             stage('Promote to stable') {
                 pipelineRun.updateStageStatusAsInProgress()
 
-                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'master')
-                sh "git checkout -b ${LOCAL_DEV_BRANCH} ${commonModule.FORGEOPS_GIT_COMMIT}"
+                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), env.BRANCH_NAME)
 
                 promoteDockerImagesToRootLevel()
                 promoteForgeOpsCommitToStable()
@@ -35,6 +34,7 @@ void runStage(PipelineRun pipelineRun) {
 }
 
 private void promoteDockerImagesToRootLevel() {
+    sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
     commonModule.dockerImages.each { imageKey, image ->
         echo "Promoting '${image.baseImageName}:${image.tag}' to root level"
         dockerUtils.copyImage(
@@ -47,15 +47,21 @@ private void promoteDockerImagesToRootLevel() {
 private void promoteForgeOpsCommitToStable() {
     echo "Promoting ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to 'stable'"
 
+    sh "git checkout -b ${LOCAL_DEV_BRANCH} ${commonModule.FORGEOPS_GIT_COMMIT}"
     this.useRootLevelImageNamesInDockerfiles()
     gitUtils.commitModifiedFiles('Use stable root-level images in Dockerfiles')
 
+    // temporarily checkout the 'stable' branch, so it can be used for merges
     localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'stable')
+    sh "git checkout ${LOCAL_DEV_BRANCH}"
 
     gitUtils.setupDefaultUser()
     sh commands(
-            "git merge -Xtheirs --no-ff ${LOCAL_DEV_BRANCH} -m " +
-                    "'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to stable'",
+            "git merge --strategy=ours --no-ff stable " +
+                    "-m 'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to stable'",
+            'git checkout stable',
+            // merge the temporary branch to stable; it contains the master+stable merge commit
+            "git merge --ff-only ${LOCAL_DEV_BRANCH}",
             'git push'
     )
 }
