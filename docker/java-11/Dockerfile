@@ -47,3 +47,5 @@ ENV JAVA_HOME /opt/jdk
 
 ENV PATH $PATH:/opt/jdk/bin
 
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
