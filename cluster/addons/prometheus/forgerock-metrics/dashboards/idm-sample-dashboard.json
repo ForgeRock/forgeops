@@ -548,7 +548,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "rate(idm_selfservice_user_password_reset_count[1m])",
+            "expr": "sum(rate(idm_selfservice_user_password_reset_count[1m]))",
             "format": "time_series",
             "hide": false,
             "interval": "",
@@ -557,7 +557,7 @@
             "refId": "A"
           },
           {
-            "expr": "rate(idm_selfservice_user_password_reset_count[5m])",
+            "expr": "sum(rate(idm_selfservice_user_password_reset_count[5m]))",
             "format": "time_series",
             "hide": false,
             "interval": "",
@@ -566,7 +566,7 @@
             "refId": "B"
           },
           {
-            "expr": "rate(idm_selfservice_user_password_reset_count[15m])",
+            "expr": "sum(rate(idm_selfservice_user_password_reset_count[15m]))",
             "format": "time_series",
             "hide": false,
             "interval": "",
@@ -578,7 +578,7 @@
         "thresholds": [],
         "timeFrom": null,
         "timeShift": null,
-        "title": "User Password Rest Average",
+        "title": "User Password Reset Average",
         "tooltip": {
           "shared": true,
           "sort": 0,
@@ -827,7 +827,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "sum(rate(idm_managed_seconds{managed_object=\"user\"}[1m]))",
+            "expr": "sum(rate(idm_managed_count{managed_object=\"user\"}[1m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -835,7 +835,7 @@
             "refId": "A"
           },
           {
-            "expr": "sum(rate(idm_managed_seconds{managed_object=\"user\"}[15m]))",
+            "expr": "sum(rate(idm_managed_count{managed_object=\"user\"}[15m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -843,7 +843,7 @@
             "refId": "B"
           },
           {
-            "expr": "sum(rate(idm_managed_seconds{managed_object=\"role\"}[1m]))",
+            "expr": "sum(rate(idm_managed_count{managed_object=\"role\"}[1m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -851,7 +851,7 @@
             "refId": "C"
           },
           {
-            "expr": "sum(rate(idm_managed_seconds{managed_object=\"role\"}[15m]))",
+            "expr": "sum(rate(idm_managed_count{managed_object=\"role\"}[15m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1143,7 +1143,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "rate(idm_recon_seconds_total[1m])",
+            "expr": "sum(rate(idm_recon_count[1m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1151,7 +1151,7 @@
             "refId": "A"
           },
           {
-            "expr": "rate(idm_recon_seconds_total[5m])",
+            "expr": "sum(rate(idm_recon_count[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1159,7 +1159,7 @@
             "refId": "B"
           },
           {
-            "expr": "rate(idm_recon_seconds_total[15m])",
+            "expr": "sum(rate(idm_recon_count[15m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1385,7 +1385,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"create\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"create\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1393,7 +1393,7 @@
             "refId": "A"
           },
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"read\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"read\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1401,7 +1401,7 @@
             "refId": "B"
           },
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"update\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"update\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1409,7 +1409,7 @@
             "refId": "C"
           },
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"delete\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"delete\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1417,7 +1417,7 @@
             "refId": "D"
           },
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"patch\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"patch\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1425,7 +1425,7 @@
             "refId": "E"
           },
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"action\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"action\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1433,7 +1433,7 @@
             "refId": "F"
           },
           {
-            "expr": "sum(rate(idm_repo_seconds{quantile=\"0.5\", operation=\"query\"}[5m]))",
+            "expr": "sum(rate(idm_repo_count{operation=\"query\"}[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
@@ -1530,7 +1530,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "rate(idm_audit_count[5m])",
+            "expr": "sum(rate(idm_audit_count[5m]))",
             "format": "time_series",
             "hide": false,
             "intervalFactor": 2,
