@@ -164,36 +164,4 @@ patchesStrategicMerge:
           requests:
             storage: 100Gi
         storageClassName: fast
-
-- |-
-  #Patch PDB
-  apiVersion: policy/v1beta1
-  kind: PodDisruptionBudget
-  metadata:
-    name: am
-  spec:
-    minAvailable: 50%
-- |-
-  #Patch PDB
-  apiVersion: policy/v1beta1
-  kind: PodDisruptionBudget
-  metadata:
-    name: idm
-  spec:
-    minAvailable: 50%
-- |-
-  #Patch PDB
-  apiVersion: policy/v1beta1
-  kind: PodDisruptionBudget
-  metadata:
-    name: ds-idrepo
-  spec:
-    minAvailable: 50%
-- |-
-  #Patch PDB
-  apiVersion: policy/v1beta1
-  kind: PodDisruptionBudget
-  metadata:
-    name: ds-cts
-  spec:
-    minAvailable: 50%
+        
