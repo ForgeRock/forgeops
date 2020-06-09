@@ -2,7 +2,7 @@
 
 cd /opt/opendj
 FULL_CRON="0 0 * * *"
-INCREMENTAL_CRON="0 * * * *"
+INCREMENTAL_CRON=${BACKUP_SCHEDULE:-0 * * * *}
 
 # TODO This is a temporary workaround. taskIds are randmonly generated. see OPENDJ-7141. Need to obtain the name of the task, then cancel it.
 echo "Cancelling any previously scheduled backup tasks. Ignore errors if the task does not exist"

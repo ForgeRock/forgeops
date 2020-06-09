@@ -7,6 +7,7 @@
 # kubectl create secret generic cloud-credentials --from-file=GOOGLE_CREDENTIALS_JSON=file-from-gcp-2dada2b03f03.json #GCP
 # kubectl create secret generic cloud-credentials --from-literal=AZURE_ACCOUNT_NAME=storageAcctName --from-literal=AZURE_ACCOUNT_KEY="storageAcctKey"
 
+BACKUP_SCHEDULE="0 * * * *"
 kcontext=$(kubectl config current-context)
 NS=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}")
 if [ $# = '2' ]; then
@@ -40,5 +41,8 @@ do
   fi
   echo ""
   echo "scheduling backup for pod: $pod"
-  kubectl -n $NAMESPACE exec $pod -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD BACKUP_DIRECTORY=$BACKUP_LOCATION ./scripts/schedule-backup.sh"
+  kubectl -n $NAMESPACE exec $pod -- bash -c "ADMIN_PASSWORD=${ADMIN_PASSWORD} \
+                                              BACKUP_DIRECTORY=${BACKUP_LOCATION} \
+                                              BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
+                                              ./scripts/schedule-backup.sh"
 done
