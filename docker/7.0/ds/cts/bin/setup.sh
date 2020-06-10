@@ -12,7 +12,7 @@ if [[ ! -z $version ]]; then
 fi
 
 setup-profile --profile ${AM_CTS} \
-              --set am-cts/tokenExpirationPolicy:ds \
+              --set am-cts/tokenExpirationPolicy:am-sessions-only \
               --set am-cts/amCtsAdminPassword:password
 
 # The default in 7.x is to use PBKDF2 password hashing - which is many order of magnitude slower than
