@@ -34,7 +34,9 @@
                         "userCredential" : "password",
                         "userRoles" : "authzRoles"
                     },
-                    "defaultUserRoles" : [ ]
+                    "defaultRoles" : [
+                        "internal/role/openidm-authorized"
+                    ]
                 },
                 "enabled" : false
             },

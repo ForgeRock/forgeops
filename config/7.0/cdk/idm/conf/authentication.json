@@ -9,6 +9,9 @@
             "authenticationId" : "_id",
             "userRoles" : "authzRoles"
         },
+        "defaultRoles" : [
+            "internal/role/openidm-authorized"
+        ]
         "cache" : {
             "maxTimeout" : "300 seconds"
         },
