@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: forgerock-dashboards
-  labels: 
-      grafana_dashboard: "1"
-data:
-{{ (.Files.Glob "dashboards/*.json").AsConfig | indent 2 }}

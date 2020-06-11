@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: "7.0.0"
-description: A helm chart to manage configuration for the ForgeRock platform
-name: frconfig
-version: 7.0.0

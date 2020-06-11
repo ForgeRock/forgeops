@@ -1,4 +1,0 @@
-OpenIDM should be available soon at the ingress address of https://{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}/admin
-
-
-It can take a few minutes for the ingress to become ready.

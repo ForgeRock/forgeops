@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Preps a cloud SQL postgres DB for OpenIDM. Run once to prep the database.
-name: prepsql
-version: 0.1.0

@@ -1,6 +1,0 @@
-apiVersion: v1
-appVersion: "1.0"
-description: Simple Landing Page for ForgeOps
-name: web
-version: 7.0.0
-

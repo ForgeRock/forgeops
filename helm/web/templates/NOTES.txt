@@ -1,3 +1,0 @@
-
-
-Open https://{{ .Release.Namespace }}.{{.Values.subdomain }}.{{ .Values.domain }}/web

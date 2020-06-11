@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Forgeops benchmark Gatling helm chart
-name: gatling-benchmark
-version: 6.0.0

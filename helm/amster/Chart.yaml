@@ -1,4 +1,0 @@
-apiVersion: v1
-description: Installs / Configures OpenAM using Amster
-name: amster
-version: 7.0.0
