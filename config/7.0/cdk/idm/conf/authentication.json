@@ -11,7 +11,7 @@
         },
         "defaultRoles" : [
             "internal/role/openidm-authorized"
-        ]
+        ],
         "cache" : {
             "maxTimeout" : "300 seconds"
         },
