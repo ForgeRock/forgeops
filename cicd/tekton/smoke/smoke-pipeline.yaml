@@ -30,6 +30,7 @@ spec:
         value: "$(params.namespace)"
       - name: docker-repo
         value: gcr.io/engineering-devops/smoke
+
     - name: wait-platform-up
       taskRef:
         name: wait-platform-up
@@ -38,11 +39,23 @@ spec:
       params:
       - name: namespace
         value: "$(params.namespace)"
+
+    - name: scale-am-deployment-step
+      runAfter:
+      - wait-platform-up
+      taskRef:
+        name: scale-am-deployment
+      params:
+      - name: replicas
+        value: "1"
+      - name: namespace
+        value: "$(params.namespace)"
+
     - name: run-tests
       taskRef:
         name: smoke-test
       runAfter:
-      - wait-platform-up
+      - scale-am-deployment-step
       resources:
         inputs:
         - name: forgeops

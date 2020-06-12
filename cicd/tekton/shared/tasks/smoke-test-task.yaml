@@ -33,11 +33,13 @@ spec:
       {
         cd /workspace/forgeops
 
-        AMADMIN_PASS=$(kubectl get secret -n $(params.namespace) amster-env-secrets -o jsonpath="{.data.AMADMIN_PASS}"  | base64 --decode)
+        AMADMIN_PASS=$(kubectl get secret -n $(params.namespace) am-env-secrets -o jsonpath="{.data.AM_PASSWORDS_AMADMIN_CLEAR}"  | base64 --decode)
+        # todo: when this handles namespace replace:
+        #AMADMIN_PASS=$(./bin/print-secrets.sh amadmin)
         FQDN=$(params.namespace).iam.forgeops.com
-        echo "going to sleep for 60 seconds to give AM time to come up. TODO: add a wait for deploy step"
+        echo "Smoke test will start in 60 seconds"
         sleep 60
-        echo "Running smoke test against $FQDN"
+        echo "Running smoke test against $FQDN $AMADMIN_PASS"
         curl -X POST "$(params.tester-url)" \
             --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS"
       } || { #If something fails

@@ -9,17 +9,17 @@ spec:
     - name: forgeops
       type: git
   tasks:
-  - name: wait-platform-up
-    taskRef:
-      name: wait-platform-up
-    params:
-    - name: namespace
-      value: smoke
+  # - name: wait-platform-up
+  #   taskRef:
+  #     name: wait-platform-up
+  #   params:
+  #   - name: namespace
+  #     value: smoke
   - name: run-tests
     taskRef:
       name: smoke-test
-    runAfter:
-    - wait-platform-up
+    # runAfter:
+    # - wait-platform-up
     resources:
       inputs:
       - name: forgeops

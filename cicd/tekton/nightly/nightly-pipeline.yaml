@@ -40,20 +40,9 @@ spec:
       - name: namespace
         value: "$(params.namespace)"
 
-    - name: create-users-step
-      runAfter:
-      - wait-platform-up-step
-      taskRef:
-        name: create-users
-      params:
-      - name: users
-        value: "10"
-      - name: namespace
-        value: "$(params.namespace)"
-
     - name: scale-am-deployment-step
       runAfter:
-      - create-users-step
+      - wait-platform-up-step
       taskRef:
         name: scale-am-deployment
       params:
@@ -61,6 +50,21 @@ spec:
         value: "1"
       - name: namespace
         value: "$(params.namespace)"
+
+    # The smoke test creates 5 users as part of the test
+    - name: run-tests
+      taskRef:
+        name: smoke-test
+      runAfter:
+      - scale-am-deployment-step
+      resources:
+        inputs:
+        - name: forgeops
+          resource: forgeops
+      params:
+      - name: namespace
+        value: "$(params.namespace)"
+
 
     - name: notify-step
       runAfter:
