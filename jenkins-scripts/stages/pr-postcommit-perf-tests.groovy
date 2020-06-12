@@ -10,7 +10,7 @@ import com.forgerock.pipeline.reporting.PipelineRun
 
 void runStage(PipelineRun pipelineRun) {
 
-    def stageName = "PERF-PR-Postcommit"
+    def stageName = "PERF"
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testName = 'postcommit'
 

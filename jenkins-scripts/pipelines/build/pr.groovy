@@ -72,7 +72,7 @@ void buildImage(String directoryName) {
 def postBuildTests(PipelineRun pipelineRun) {
     try {
         pit1TestStage.runStage(pipelineRun)
-        //perfTestStage.runStage(pipelineRun)
+        perfTestStage.runStage(pipelineRun)
         currentBuild.result = 'SUCCESS'
     } catch (FlowInterruptedException ex) {
         echo "CAUGHT FlowInterruptedException"
