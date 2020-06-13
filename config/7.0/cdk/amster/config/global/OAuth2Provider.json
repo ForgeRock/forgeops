@@ -13,7 +13,7 @@
     "blacklistCacheSize" : 10000,
     "statelessGrantTokenUpgradeCompatibilityMode" : false,
     "blacklistPollInterval" : 60,
-    "storageScheme" : "CTS_GRANT_SET_MODEL",
+    "storageScheme" : "CTS_ONE_TO_ONE_MODEL",
     "jwtTokenLifetimeValidationEnabled" : true,
     "defaults" : {
       "coreOAuth2Config" : {
