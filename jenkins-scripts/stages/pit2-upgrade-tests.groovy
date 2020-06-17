@@ -27,17 +27,21 @@ void runStage(PipelineRun pipelineRun) {
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = [
-                            TESTS_SCOPE                             : 'tests/pit2/upgrade',
-                            CLUSTER_DOMAIN                          : 'pit-24-7.forgeops.com',
-                            CLUSTER_NAMESPACE                       : subStageName,
-                            COMPONENTS_AMSTER_IMAGE_TAG             : '7.0.0-1ba49f89bf13e3d0543c80fd5fa284e32b5fd9e4',
-                            COMPONENTS_AM_IMAGE_UPGRADE_TAG         : commonModule.getCurrentTag('am'),
-                            COMPONENTS_IDM_IMAGE_UPGRADE_TAG        : commonModule.getCurrentTag('idm'),
-                            COMPONENTS_IG_IMAGE_UPGRADE_TAG         : commonModule.getCurrentTag('ig'),
-                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG   : commonModule.getCurrentTag('ds-idrepo'),
-                            STASH_LODESTAR_BRANCH                   : commonModule.LODESTAR_GIT_COMMIT,
-                            STASH_FORGEOPS_BRANCH                   : 'fraas-production',
-                            REPORT_NAME_PREFIX                      : subStageName,
+                            TESTS_SCOPE                                     : 'tests/pit2/upgrade',
+                            CLUSTER_DOMAIN                                  : 'pit-24-7.forgeops.com',
+                            CLUSTER_NAMESPACE                               : subStageName,
+                            COMPONENTS_AMSTER_IMAGE_TAG                     : '7.0.0-1ba49f89bf13e3d0543c80fd5fa284e32b5fd9e4',
+                            COMPONENTS_AM_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('am'),
+                            COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/am/pit1',
+                            COMPONENTS_IDM_IMAGE_UPGRADE_TAG                : commonModule.getCurrentTag('idm'),
+                            COMPONENTS_IDM_IMAGE_UPGRADE_REPOSITORY         : 'gcr.io/forgerock-io/idm/pit1',
+                            COMPONENTS_IG_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('ig'),
+                            COMPONENTS_IG_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/ig/pit1',
+                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG           : commonModule.getCurrentTag('ds-idrepo'),
+                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_REPOSITORY    : 'gcr.io/forgerock-io/ds-empty/pit1',
+                            STASH_LODESTAR_BRANCH                           : commonModule.LODESTAR_GIT_COMMIT,
+                            STASH_FORGEOPS_BRANCH                           : 'fraas-production',
+                            REPORT_NAME_PREFIX                              : subStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)
