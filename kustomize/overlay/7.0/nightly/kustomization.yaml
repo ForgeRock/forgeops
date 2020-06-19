@@ -50,36 +50,6 @@ patchesJson6902:
       # value: default-issuer  # Default
 
 
-patchesStrategicMerge:
-- |-
-  #Patch DS CTS
-  apiVersion: apps/v1
-  kind: StatefulSet
-  metadata:
-    name: ds-cts
-  spec:
-    template:
-      spec:
-        containers:
-          - name: ds
-            envFrom:
-            - secretRef:
-                name: cloud-credentials  
-- |-
-  #Patch DS idrepo
-  apiVersion: apps/v1
-  kind: StatefulSet
-  metadata:
-    name: ds-idrepo
-  spec:
-    template:
-      spec:
-        containers:
-          - name: ds
-            envFrom:
-            - secretRef:
-                name: cloud-credentials 
-  
 vars:
 - name: DOMAIN
   fieldref:

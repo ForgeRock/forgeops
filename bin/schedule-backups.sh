@@ -2,22 +2,30 @@
 # Simple script to schedule DS backups
 
 # Note:
-# In order to enable cloud storage in 7.0, the user must create a secret as follows:
-# kubectl create secret generic cloud-credentials --from-literal=AWS_ACCESS_KEY_ID=foobarkey --from-literal=AWS_SECRET_ACCESS_KEY=foobarkeysecret #AWS
-# kubectl create secret generic cloud-credentials --from-file=GOOGLE_CREDENTIALS_JSON=file-from-gcp-2dada2b03f03.json #GCP
-# kubectl create secret generic cloud-credentials --from-literal=AZURE_ACCOUNT_NAME=storageAcctName --from-literal=AZURE_ACCOUNT_KEY="storageAcctKey"
+# In order to enable cloud storage in 7.0, the user must update the secret "cloud-storage-credentials" with the appropriate credentials.
+# There are 2 ways to achieve this:
+# 1) Modify the "cloud-storage-credentials" secret directly before deployment. See forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml
+# 
+# 2) Apply changes to "cloud-storage-credentials-cts" and "cloud-storage-credentials-idrepo" after deployment 
+# but before scheduling backup or restore operations :
+#   kubectl create secret generic cloud-storage-credentials-[idrepo|cts] --from-literal=AWS_ACCESS_KEY_ID=foobarkey --from-literal=AWS_SECRET_ACCESS_KEY=foobarkeysecret --dry-run -o yaml | kubectl apply -f - #AWS
+#   kubectl create secret generic cloud-storage-credentials-[idrepo|cts] --from-file=GOOGLE_CREDENTIALS_JSON=file-from-gcp-2dada2b03f03.json --dry-run -o yaml | kubectl apply -f -  #GCP
+#   kubectl create secret generic cloud-storage-credentials-[idrepo|cts] --from-literal=AZURE_ACCOUNT_NAME=storageAcctName --from-literal=AZURE_ACCOUNT_KEY="storageAcctKey" --dry-run -o yaml | kubectl apply -f - 
 
 BACKUP_SCHEDULE="0 * * * *"
 kcontext=$(kubectl config current-context)
 NS=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}")
-if [ $# = '2' ]; then
+if [ $# = '1' ]; then
     NAMESPACE=$1
-    BACKUP_DIRECTORY=$2
+    BACKUP_DIRECTORY_ENV=""
+elif [ $# = '2' ]; then
+    # BACKUP_DIRECTORY not required for 7.0. Set DSBACKUP_DIRECTORY in your Kustomize overlay instead.
+    NAMESPACE=$1
+    BACKUP_DIRECTORY_ENV="BACKUP_DIRECTORY=$2"
 else
-    echo "usage: $0 NAMESPACE [ local_path | s3://bucket/path | az://bucket/path | gs://bucket/path ]"
-    echo "example using local_path: $0 mynamespace /opt/opendj/bak"
-    echo "example using s3: $0 mynamespace s3://my_bucket_name/path"
-    echo "example using gs: $0 mynamespace gs://my_bucket_name/path"
+    echo "usage: $0 NAMESPACE [ /local/path ]"
+    echo "example for 6.5: $0 mynamespace /opt/opendj/bak"
+    echo "example for 7.0: $0 mynamespace"
     exit -1
 fi
 
@@ -34,15 +42,10 @@ if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirman
 fi
 for pod in "${pods[@]}"
 do
-  if [[ $BACKUP_DIRECTORY == s3://* || $BACKUP_DIRECTORY == az://* || $BACKUP_DIRECTORY == gs://* ]]; then
-    BACKUP_LOCATION="$BACKUP_DIRECTORY/$pod/"
-  else
-    BACKUP_LOCATION="$BACKUP_DIRECTORY"
-  fi
   echo ""
   echo "scheduling backup for pod: $pod"
   kubectl -n $NAMESPACE exec $pod -- bash -c "ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-                                              BACKUP_DIRECTORY=${BACKUP_LOCATION} \
+                                              ${BACKUP_DIRECTORY_ENV} \
                                               BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
                                               ./scripts/schedule-backup.sh"
 done
