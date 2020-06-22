@@ -73,7 +73,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+        - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
           value: "true"
         - name: DS_UID_MONITOR_PASSWORD_FILE
           value: "/var/run/secrets/opendj-passwords/monitor.pw"

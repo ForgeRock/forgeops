@@ -22,7 +22,7 @@ fi
 # /opt/opendj/docker-entrypoint.sh initialize-only
 ##
 
-# Remove this section once support for SET_UID_ADMIN_AND_MONITOR_PASSWORDS is added
+# Remove this section once support for DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS is added
 update_pw() {
      if [ ! -f "$1" ]; then
         echo "Can't find the password file $1. Won't change the password in $2"
