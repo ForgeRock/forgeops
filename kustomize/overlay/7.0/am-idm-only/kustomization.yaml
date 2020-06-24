@@ -1,0 +1,22 @@
+namespace: fbc
+resources:
+  - ../../../base/kustomizeConfig
+  - ../../../base/am
+  - ../../../base/idm
+  - ../../../base/7.0/ingress
+  - ../../../base/end-user-ui
+  - ../../../base/login-ui
+  - ../../../base/admin-ui
+  - ../../../base/amster
+
+# Sets our fqdn and cert issuer
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    DOMAIN: "forgeops.com"
+    FQDN: fbc.iam.forgeops.com
+    CERT_ISSUER: letsencrypt-prod

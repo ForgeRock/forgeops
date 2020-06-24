@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "LoginCountDecisionNode",
+    "entityId" : "default/8afdaec3-275e-4301-bb53-34f03e6a4b29",
+    "uid" : "ou=8afdaec3-275e-4301-bb53-34f03e6a4b29,ou=default,ou=OrganizationConfig,ou=1.0,ou=LoginCountDecisionNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "amount" : 3,
+    "_type" : {
+      "_id" : "LoginCountDecisionNode",
+      "name" : "LoginCountDecisionNode",
+      "collection" : false
+    },
+    "interval" : "AT",
+    "_id" : "default/8afdaec3-275e-4301-bb53-34f03e6a4b29",
+    "identityAttribute" : "userName",
+    "objectType" : "user"
+  }
+}

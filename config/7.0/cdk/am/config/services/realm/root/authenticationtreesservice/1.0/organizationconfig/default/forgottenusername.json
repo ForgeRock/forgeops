@@ -1,0 +1,76 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "authenticationTreesService",
+    "entityId" : "default/ForgottenUsername",
+    "uid" : "ou=ForgottenUsername,ou=default,ou=OrganizationConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config",
+    "sunServiceID" : "tree",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : {
+      "5e2a7c95-94af-4b23-8724-deb13853726a" : {
+        "displayName" : "Page Node",
+        "nodeType" : "PageNode",
+        "x" : 139,
+        "y" : 146,
+        "connections" : {
+          "outcome" : "bf9ea8d5-9802-4f26-9664-a21840faac23"
+        }
+      },
+      "bf9ea8d5-9802-4f26-9664-a21840faac23" : {
+        "displayName" : "Identify Existing User",
+        "nodeType" : "IdentifyExistingUserNode",
+        "x" : 324,
+        "y" : 152,
+        "connections" : {
+          "true" : "d9a79f01-2ce3-4be2-a28a-975f35c3c8ca",
+          "false" : "d9a79f01-2ce3-4be2-a28a-975f35c3c8ca"
+        }
+      },
+      "d9a79f01-2ce3-4be2-a28a-975f35c3c8ca" : {
+        "displayName" : "Email Suspend Node",
+        "nodeType" : "EmailSuspendNode",
+        "x" : 563,
+        "y" : 193,
+        "connections" : {
+          "outcome" : "b93ce36e-1976-4610-b24f-8d6760b5463b"
+        }
+      },
+      "b93ce36e-1976-4610-b24f-8d6760b5463b" : {
+        "displayName" : "Inner Tree Evaluator",
+        "nodeType" : "InnerTreeEvaluatorNode",
+        "x" : 767,
+        "y" : 188,
+        "connections" : {
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a",
+          "true" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
+        }
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 25
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 970,
+        "y" : 149
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 982,
+        "y" : 252
+      }
+    },
+    "entryNodeId" : "5e2a7c95-94af-4b23-8724-deb13853726a",
+    "_type" : {
+      "_id" : "authenticationTreesService",
+      "name" : "authenticationTreesService",
+      "collection" : false
+    },
+    "description" : "Forgotten Username Tree",
+    "_id" : "default/ForgottenUsername"
+  }
+}

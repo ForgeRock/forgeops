@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "PageNode",
+    "entityId" : "default/0c091c49-f3af-48fb-ac6f-07fba0499dd6",
+    "uid" : "ou=0c091c49-f3af-48fb-ac6f-07fba0499dd6,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "7fcaf48e-a754-4959-858b-05b2933b825f:ValidatedUsernameNode:Platform Username", "d3ce2036-1523-4ce8-b1a2-895a2a036667:AttributeCollectorNode:Attribute Collector", "3d8709a1-f09f-4d1f-8094-2850e472c1db:ValidatedPasswordNode:Platform Password", "120c69d3-90b4-4ad4-b7af-380e8b119340:KbaCreateNode:KBA Definition", "b4a0e915-c15d-4b83-9c9d-18347d645976:AcceptTermsAndConditionsNode:Accept Terms and Conditions" ],
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : {
+      "en" : "Signing up is fast and easy.<br>Already have an account? <a href='#/service/Login'>Sign In</a>"
+    },
+    "_id" : "default/0c091c49-f3af-48fb-ac6f-07fba0499dd6",
+    "pageHeader" : {
+      "en" : "Sign Up"
+    }
+  }
+}

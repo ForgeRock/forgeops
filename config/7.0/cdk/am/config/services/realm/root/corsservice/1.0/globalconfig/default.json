@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "CorsService",
+    "entityId" : "default",
+    "uid" : "ou=default,ou=GlobalConfig,ou=1.0,ou=CorsService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "CorsService",
+      "name" : "CorsService",
+      "collection" : false
+    },
+    "_id" : "default",
+    "enabled" : true
+  }
+}

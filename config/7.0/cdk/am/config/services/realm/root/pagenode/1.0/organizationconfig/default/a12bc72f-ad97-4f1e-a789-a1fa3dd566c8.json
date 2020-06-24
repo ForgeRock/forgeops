@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "PageNode",
+    "entityId" : "default/a12bc72f-ad97-4f1e-a789-a1fa3dd566c8",
+    "uid" : "ou=a12bc72f-ad97-4f1e-a789-a1fa3dd566c8,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "7354982f-57b6-4b04-9ddc-f1dd1e1e07d0:ValidatedUsernameNode:Platform Username", "0c80c39b-4813-4e67-b4fb-5a0bba85f994:ValidatedPasswordNode:Platform Password" ],
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : {
+      "en" : "New here? <a href=\"#/service/Registration\">Create an account</a><br><a href=\"#/service/ForgottenUsername\">Forgot username?</a><a href=\"#/service/ResetPassword\"> Forgot password?</a>"
+    },
+    "_id" : "default/a12bc72f-ad97-4f1e-a789-a1fa3dd566c8",
+    "pageHeader" : {
+      "en" : "Sign In"
+    }
+  }
+}

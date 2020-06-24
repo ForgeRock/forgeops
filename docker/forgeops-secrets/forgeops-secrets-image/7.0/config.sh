@@ -87,17 +87,18 @@ echo "[DS] Writing DS passwords"
 useRandomPass ds-passwords/monitor.pw "" "" "" "password"
 useRandomPass ds-passwords/dirmanager.pw 24
 
-# Added for FBC. These are the setup profile service account passwords, not the directory admin password
+# Service account passwords. These are not the directory admin password
 # A job updates these passwords in LDAP
-# This is the config user, not the admin
-useRandomPass ds-env-secrets/CONFIG_STORE_SVC_PASSWORD 24
-# The userstore service account password
-# Note that we use the same DS repo, so we just copy the above
-#useRandomPass ds-env-secrets/USER_STORE_PASSWORD 24
-cpAttr ds-env-secrets/CONFIG_STORE_SVC_PASSWORD ds-env-secrets/USER_STORE_SVC_PASSWORD
+
+useRandomPass ds-env-secrets/AM_STORES_USER_PASSWORD 24
+useRandomPass ds-env-secrets/AM_STORES_APPLICATION_PASSWORD 24
+useRandomPass ds-env-secrets/AM_STORES_CTS_PASSWORD 24
+
+## TODO: Update
 
 # The CTS user service acccount password
-useRandomPass ds-env-secrets/CTS_USER_SVC_PASSWORD 24
+# Remove
+#useRandomPass ds-env-secrets/CTS_USER_SVC_PASSWORD 24
 
 
 ### AM SECRETS ####
@@ -107,38 +108,49 @@ dskey_openKeyStore am-https/keystore.p12 $(useRandomPass am-https/keystore.pin 2
 dskey_wrapper create-tls-key-pair -a ssl-key-pair -h openam -s CN=am
 dskey_closeKeyStore
 
-# keystore for AM containing boot secrets
-openKeystore "am-boot-secrets/keystore.jceks" \
-    jceks \
-    $(useRandomPass am-boot-secrets/.storepass 24 print) \
-    $(useRandomPass am-boot-secrets/.keypass 24 print)
+# Secrets injected for FBC
+useRandomPass am-env-secrets/AM_OIDC_CLIENT_SUBJECT_IDENTIFIER_HASH_SALT 20
+useRandomPass am-env-secrets/AM_AUTHENTICATION_SHARED_SECRET 32
+useRandomPass am-env-secrets/AM_SESSION_STATELESS_SIGNING_KEY 32
+useRandomPass am-env-secrets/AM_SESSION_STATELESS_ENCRYPTION_KEY 32
+useRandomPass am-env-secrets/AM_ENCRYPTION_KEY 32
+useRandomPass am-env-secrets/AM_PASSWORDS_AMADMIN_CLEAR 24
 
-keytoolgen -importpass -alias dsameuserpwd $(useRandomPass amster-env-secrets/AMADMIN_PASS 24 print)
+# do we need to base64 encode this
+useRandomPass am-env-secrets/AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY 32
+
+# TODO: Do we need still need this?
+useRandomPass am-env-secrets/AM_CONFIRMATION_ID_HMAC_KEY 32
+
+
+# Legacy Keystore - includes boot passwords
+openKeystore "am-keystore/keystore.jceks" \
+    jceks \
+    $(useRandomPass am-passwords/.storepass 24 print) \
+    $(useRandomPass am-passwords/.keypass 24 print)
+
+# configstore password. should not be required for FBC but AM complains if it is not in the keystore
+# keytoolgen -importpass -alias configstorepwd $(useRandomPass ds-passwords/dirmanager.pw 24 print)
+# keytoolgen -importpass -alias dsameuserpwd $(useRandomPass ds-passwords/dirmanager.pw 24 print)
+
+# Note: dsameuser password doesnt really matter but it needs a place holder in the keystore.
+keytoolgen -importpass -alias dsameuserpwd $(useRandomPass am-env-secrets/AM_PASSWORDS_AMADMIN_CLEAR 24 print)
 keytoolgen -importpass -alias configstorepwd $(useRandomPass ds-passwords/dirmanager.pw 24 print)
 
-# DS password used in boot.sh to check to see if AM is configured
-cpAttr ds-passwords/dirmanager.pw am-env-secrets/CFGDIR_PASS
 
-# Added By Warren for FBC
-useRandomPass am-env-secrets/AM_SUBJECT_IDENTIFIER_SALT 20
-useRandomPass am-env-secrets/AM_CONFIRMATION_ID_HMAC_KEY 32
-useRandomPass am-env-secrets/AM_AUTHENTICATION_SHARED_SECRET 32
-useRandomPass am-env-secrets/AM_SESSION_STATELESS_SIGNING_KEY_CLEAR 32
-useRandomPass am-env-secrets/AM_SESSION_STATELESS_ENCRYPTION_KEY_CLEAR 32
-useRandomPass am-env-secrets/AM_ENCRYPTION_PWD 32
-
-# Leave for now..
-cpAttr ds-passwords/dirmanager.pw am-env-secrets/CFGDIR_PASS
-cpAttr ds-passwords/dirmanager.pw am-env-secrets/USRDIR_PASS
-cpAttr ds-passwords/dirmanager.pw am-env-secrets/CTSDIR_PASS
-
-
-
-
-genRSA test 2048
 genRSA rsajwtsigningkey 2048
 genRSA selfserviceenctest 2048
 genKey selfservicesigntest HmacSHA256 256
+genEC es256test 256
+genEC es384test 384
+# Yes, es512test 521 is correct, see: https://backstage.forgerock.com/docs/am/6.5/authentication-guide/#configure-ecdsa-client-basedd
+genEC es512test 521
+
+genKey hmacsigningtest HMacSHA512 512
+genKey directenctest aes 256
+
+genRSA test 2048
+
 
 # import SMS transport key which is the key used to encrypt the config in the forgeops-init repo.
 echo "[AM Keystore] Importing SMS transport key"
@@ -150,41 +162,14 @@ keytoolgen -importkeystore \
   -srckeypass:file "sms-transport-key/keypass" \
   -srcstorepass:file "sms-transport-key/storepass"
 
-closeKeystore
-
-openKeystore "am-runtime-keystore/keystore-runtime.jceks" \
-    jceks \
-    $(useRandomPass am-runtime-passwords/storepassruntime 24 print) \
-    $(useRandomPass am-runtime-passwords/keypassruntime 24 print)
-genRSA rsajwtsigningkey 2048
-genEC es256test 256
-genEC es384test 384
-# Yes, es512test 521 is correct, see: https://backstage.forgerock.com/docs/am/6.5/authentication-guide/#configure-ecdsa-client-basedd
-genEC es512test 521
-
-genKey hmacsigningtest HMacSHA512 512
-genKey directenctest aes 256
-
-genRSA test 2048
-genRSA rsajwtsigningkey 2048
-
 # genKey sms.transport.key aes 128
 closeKeystore
 
+
+
 ### AMSTER SECRETS ###
 
-cpAttr ds-passwords/dirmanager.pw amster-env-secrets/CFGDIR_PASS
-cpAttr ds-passwords/dirmanager.pw amster-env-secrets/USRDIR_PASS
-cpAttr ds-passwords/dirmanager.pw amster-env-secrets/CTSDIR_PASS
-
-useRandomPass amster-env-secrets/AMADMIN_PASS 24
-useRandomPass amster-env-secrets/AM_ENC_KEY 32
-useRandomPass amster-env-secrets/AM_POLICY_AGENT_PASS 24
-
-useRandomPass amster-env-secrets/CTSUSR_PASS 24
-useRandomPass amster-env-secrets/CFGUSR_PASS 24
-useRandomPass amster-env-secrets/USRUSR_PASS 24
-
+# Amster placeholders for OAuth clients
 useRandomPass amster-env-secrets/IDM_PROVISIONING_CLIENT_SECRET 24
 useRandomPass amster-env-secrets/IDM_RS_CLIENT_SECRET 24
 
@@ -197,8 +182,11 @@ fi
 genSshKey amster/id_rsa
 amsterKeyCheck amster/id_rsa
 cp ${GEN_PATH}/amster/id_rsa.pub ${GEN_PATH}/amster/authorized_keys
-cp ${GEN_PATH}/amster/id_rsa.pub ${GEN_PATH}/am-boot-secrets/authorized_keys
 
+# This was need by amster during install. No longer needed?
+#cp ${GEN_PATH}/amster/id_rsa.pub ${GEN_PATH}/am-boot-secrets/authorized_keys
+# amster public key needed by AM. Should this be in a file?
+cp ${GEN_PATH}/amster/id_rsa.pub ${GEN_PATH}/am-env-secrets/authorized_keys
 
 ### IDM Secrets ###
 openKeystore "idm/keystore.jceks" \

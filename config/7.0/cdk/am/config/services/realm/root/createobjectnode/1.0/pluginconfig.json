@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "CreateObjectNode",
+    "entityId" : "PluginConfig",
+    "uid" : "ou=PluginConfig,ou=1.0,ou=CreateObjectNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "CreateObjectNode",
+      "name" : "CreateObjectNode",
+      "collection" : false
+    },
+    "_id" : "PluginConfig"
+  }
+}

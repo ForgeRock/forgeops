@@ -3,50 +3,14 @@ kind: Kustomization
 
 namespace: default
 resources:
-- ../../../base/kustomizeConfig
-- ../../../base/forgeops-secrets
-- ../../../base/am
-- ../../../base/amster
-- ../../../base/idm
-- ../../../base/end-user-ui
-- ../../../base/7.0/ds/cts
-- ../../../base/7.0/ds/idrepo
+- ../all
 - ../../../base/security
-
-configMapGenerator:
-- literals:
-  - FQDN=$(NAMESPACE).iam.example.com
-  - SUBDOMAIN=iam
-  - DOMAIN=example.com
-  name: platform-config
-# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
-vars:
-- fieldref:
-    fieldpath: data.DOMAIN
-  name: DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- fieldref:
-    fieldpath: data.SUBDOMAIN
-  name: SUBDOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- fieldref:
-    fieldpath: metadata.namespace
-  name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
 
 images:
 - name: forgeops-secrets
   newName: gcr.io/engineering-devops/forgeops-secrets
   newTag: latest
+
 patches:
 - patch: &securityContextPatch |-
     kind: doesnt-matter

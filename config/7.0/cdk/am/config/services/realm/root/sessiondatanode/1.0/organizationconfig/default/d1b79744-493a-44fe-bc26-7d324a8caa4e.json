@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SessionDataNode",
+    "entityId" : "default/d1b79744-493a-44fe-bc26-7d324a8caa4e",
+    "uid" : "ou=d1b79744-493a-44fe-bc26-7d324a8caa4e,ou=default,ou=OrganizationConfig,ou=1.0,ou=SessionDataNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "sharedStateKey" : "userName",
+    "_type" : {
+      "_id" : "SessionDataNode",
+      "name" : "SessionDataNode",
+      "collection" : false
+    },
+    "sessionDataKey" : "UserToken",
+    "_id" : "default/d1b79744-493a-44fe-bc26-7d324a8caa4e"
+  }
+}

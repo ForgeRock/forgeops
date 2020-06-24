@@ -3,19 +3,10 @@
 # Copyright (c) 2016-2017 ForgeRock AS. All rights reserved.
 #
 
-set -x
+# If a command arg is not passed, default to import
+ACTION="${1:-import}"
 
-
-exit_script() {
-    echo "Got signal. Killing child processes"
-    trap - SIGINT SIGTERM # clear the trap
-    kill -- -$$ # Sends SIGTERM to child/sub processes
-    echo "Exiting"
-    exit 0
-}
-
-trap exit_script SIGINT SIGTERM SIGUSR1 EXIT
-
+echo "amster action is $ACTION"
 
 
 pause() {
@@ -37,27 +28,20 @@ VERSION=${BASH_REMATCH[1]}
 echo "Amster version is: '${VERSION}'"
 export VERSION
 
-
-case $1  in
+case $ACTION  in
 pause)
     pause
     ;;
-configure)
-    # Without this chmod, Docker does not know the file is executable on Windows
-    chmod +x amster-install.sh
-    # invoke amster install.
-    ./amster-install.sh
-    pause
-    ;;
-nowaitconfigure)
-    # This option is useful if you want to run amster-install as a k8s job
-    # Without this chmod, Docker does not know the file is executable on Windows
-    chmod +x amster-install.sh
-    # invoke amster install.
-    ./amster-install.sh
-    ;;
 export)
+    # TO DO - export dynamic config
     ./export.sh
+    sleep infinity
+    ;;
+import)
+    # Without this chmod, Docker does not know the file is executable on Windows
+    chmod +x import.sh
+    # invoke amster install.
+    ./import.sh
     ;;
 *)
    exec "$@"

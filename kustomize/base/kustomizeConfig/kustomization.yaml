@@ -4,3 +4,88 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 
 configurations:
 - kustomizeConfig.yaml
+
+
+configMapGenerator:
+- name: platform-config
+  # The env vars below can be passed into a pod using the envFrom pod spec.
+  # These global variables can be used to parameterize your deployments.
+  # The FQDN and URLs here should match your ingress or istio gateway definitions
+  literals:
+  - SUBDOMAIN=iam
+  - DOMAIN=example.com
+  - FQDN=default.iam.example.com
+  - AM_URL=https://$(FQDN)/am
+  - AM_ADMIN_URL=https://$(FQDN)/am/ui-admin/
+  - IDM_ADMIN_URL=https://$(FQDN)/admin
+  - IDM_UPLOAD_URL=https://$(FQDN)/upload
+  - IDM_EXPORT_URL=https://$(FQDN)/export
+  - PLATFORM_ADMIN_URL=https://$(FQDN)/platform
+  - IDM_REST_URL=https://$(FQDN)/openidm
+  - ENDUSER_UI_URL=https://$(FQDN)/enduser
+  - LOGIN_UI_URL=https://$(FQDN)/login/#/service/Login
+  - ENDUSER_CLIENT_ID=end-user-ui
+  - ADMIN_CLIENT_ID=idm-admin-ui
+  - THEME=default
+  - AM_STORES_CTS_SERVERS="ds-cts-0.ds-cts:1389"
+  - AM_STORES_USER_SERVERS="ds-idrepo-0.ds-idrepo:1389"
+  - AM_SERVER_FQDN="$(FQDN)"
+  - AUTORESTORE_FROM_DSBACKUP="false" # Set to "true" to enable DS auto recovery. See documentation 
+  - DSBACKUP_DIRECTORY="" # Ex. gs://bucket | s3://bucket | az://bucket
+  - CERT_ISSUER="default-issuer" # cert manager issuer. Patch with letsencrypt-prod for LE SSL certs.
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
+vars:
+- name: DOMAIN
+  fieldref:
+    fieldpath: data.DOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: FQDN
+  fieldref:
+    fieldpath: data.FQDN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: SUBDOMAIN
+  fieldref:
+    fieldpath: data.SUBDOMAIN
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: CERT_ISSUER
+  fieldref:
+    fieldpath: data.CERT_ISSUER
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+# TODO: Deprecate the use of $(NAMESPACE) in kustomize configurations
+- name: NAMESPACE
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+  fieldref:
+    fieldpath: metadata.namespace
+- name: AUTORESTORE_FROM_DSBACKUP
+  fieldref:
+    fieldpath: data.AUTORESTORE_FROM_DSBACKUP
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: DSBACKUP_DIRECTORY
+  fieldref:
+    fieldpath: data.DSBACKUP_DIRECTORY
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config

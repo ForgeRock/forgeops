@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "LoginCountDecisionNode",
+    "entityId" : "PluginConfig",
+    "uid" : "ou=PluginConfig,ou=1.0,ou=LoginCountDecisionNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "LoginCountDecisionNode",
+      "name" : "LoginCountDecisionNode",
+      "collection" : false
+    },
+    "_id" : "PluginConfig"
+  }
+}

@@ -21,7 +21,9 @@ spec:
         - configMapRef:
             name: platform-config
         - secretRef:
-            name: amster-env-secrets
+            name: amster-env-secrets # Needed for public amster key
+        - secretRef:
+            name: ds-env-secrets # passwords for cts, userstore, etc
         image: am
         imagePullPolicy: IfNotPresent
         livenessProbe:
@@ -49,31 +51,25 @@ spec:
             memory: 1000Mi
             cpu: 250m
         volumeMounts:
-        - name: am-boot-secrets
-          mountPath: /var/run/secrets/am/boot
         - name: truststore
           mountPath: /var/run/secrets/truststore
-        - name: am-runtime-passwords
-          mountPath: /var/run/secrets/am/password
-        - name: am-runtime-keystore
-          mountPath: /var/run/secrets/am/keystore
+        - name: am-secrets
+          mountPath: /var/run/secrets/am
         - name: amster-keys
           mountPath: /var/run/secrets/amster
       terminationGracePeriodSeconds: 10
       volumes:
-      - name: am-boot-secrets
-        secret:
-          secretName: am-boot-secrets
-      - name: am-runtime-keystore
-        secret:
-          secretName: am-runtime-keystore
-      - name: am-runtime-passwords
-        secret:
-          secretName: am-runtime-passwords
+      - name: am-secrets
+        projected:
+          sources:
+          - secret:
+             name: am-passwords
+          - secret:
+              name: am-keystore
+      - name: ds
       - name: amster-keys
         secret:
           secretName: amster
       - name: truststore
         secret:
           secretName: truststore
-

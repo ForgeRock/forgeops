@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: amster
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app: amster
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: platform-config
+        - secretRef:
+            name: amster-env-secrets
+        image: amster
+        imagePullPolicy: Always
+        name: amster
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+            cpu: "100m"
+        volumeMounts:
+        - mountPath: /var/run/secrets/amster
+          name: amster-secrets
+          readOnly: true
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 5
+      volumes:
+      - name: amster-secrets
+        secret:
+          secretName: amster
+      - name: platform-config
+        configMap:
+          name: platform-config

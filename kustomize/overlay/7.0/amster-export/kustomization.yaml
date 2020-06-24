@@ -1,0 +1,15 @@
+resources:
+  - ../../../base/amster
+
+patchesStrategicMerge:
+- |-
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: amster
+  spec:
+    template:
+      spec:
+        containers:
+        - name: amster
+          args: ["export"]

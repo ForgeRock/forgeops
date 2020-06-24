@@ -1,0 +1,24 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "KbaCreateNode",
+    "entityId" : "default/120c69d3-90b4-4ad4-b7af-380e8b119340",
+    "uid" : "ou=120c69d3-90b4-4ad4-b7af-380e8b119340,ou=default,ou=OrganizationConfig,ou=1.0,ou=KbaCreateNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "KbaCreateNode",
+      "name" : "KbaCreateNode",
+      "collection" : false
+    },
+    "_id" : "default/120c69d3-90b4-4ad4-b7af-380e8b119340",
+    "message" : {
+      "en" : "Select a security question"
+    },
+    "objectType" : "user"
+  }
+}

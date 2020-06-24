@@ -1,4 +1,3 @@
-# Deploys to default.iam.forgeops.com. Uses the Let's encrypt issuer for SSL.
 namespace: default
 resources:
   - ../../../base/kustomizeConfig
@@ -15,30 +14,6 @@ resources:
   - sa.yaml
   - scc.yaml
 
-configMapGenerator:
-- name: platform-config
-  # The env vars below can be passed into a pod using the envFrom pod spec.
-  # These global variables can be used to parameterize your deployments.
-  # The FQDN and URLs here should match your ingress or istio gateway definitions
-  literals:
-  - FQDN=$(NAMESPACE).apps.fropenshift.openshift.forgeops.com
-  - SUBDOMAIN=apps
-  - DOMAIN=fropenshift.openshift.forgeops.com
-  - AM_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/am
-  - AM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/am/ui-admin/
-  - PLATFORM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/platform
-  - IDM_ADMIN_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/admin
-  - IDM_UPLOAD_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/upload
-  - IDM_EXPORT_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/export
-  - IDM_REST_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/openidm
-  - ENDUSER_UI_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/enduser
-  - LOGIN_UI_URL=https://$(NAMESPACE).apps.fropenshift.openshift.forgeops.com/login/#/service/Login
-  - ENDUSER_CLIENT_ID=end-user-ui
-  - ADMIN_CLIENT_ID=idm-admin-ui
-  - THEME=default
-  - CTS_STORES="ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389"
-  - IDREPO_STORES="ds-idrepo-0.ds-idrepo:1389,ds-idrepo-1.ds-idrepo:1389,ds-idrepo-2.ds-idrepo:1389"
-
 secretGenerator:
 - name: platform-secrets
   literals:
@@ -46,34 +21,18 @@ secretGenerator:
   # Change after installation.
   - ADMIN_PASSWORD=password
 
-# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
-vars:
-- name: DOMAIN
-  fieldref:
-    fieldpath: data.DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: SUBDOMAIN
-  fieldref:
-    fieldpath: data.SUBDOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-  fieldref:
-    fieldpath: metadata.namespace
-
 patchesStrategicMerge:
 - am.yaml
 - idm.yaml
 - web.yaml
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    SUBDOMAIN: "apps"
+    DOMAIN: "fropenshift.openshift.forgeops.com"
 - |-
   #Patch DS CTS
   apiVersion: apps/v1

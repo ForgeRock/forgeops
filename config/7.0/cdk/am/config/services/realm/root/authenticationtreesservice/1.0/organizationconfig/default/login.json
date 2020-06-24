@@ -1,0 +1,76 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "authenticationTreesService",
+    "entityId" : "default/Login",
+    "uid" : "ou=Login,ou=default,ou=OrganizationConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config",
+    "sunServiceID" : "tree",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : {
+      "a12bc72f-ad97-4f1e-a789-a1fa3dd566c8" : {
+        "displayName" : "Page Node",
+        "nodeType" : "PageNode",
+        "x" : 136,
+        "y" : 59,
+        "connections" : {
+          "outcome" : "2998c1c9-f4c8-4a00-b2c6-3426783ee49d"
+        }
+      },
+      "2998c1c9-f4c8-4a00-b2c6-3426783ee49d" : {
+        "displayName" : "Data Store Decision",
+        "nodeType" : "DataStoreDecisionNode",
+        "x" : 315,
+        "y" : 140,
+        "connections" : {
+          "true" : "bba3e0d8-8525-4e82-bf48-ac17f7988917",
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a"
+        }
+      },
+      "bba3e0d8-8525-4e82-bf48-ac17f7988917" : {
+        "displayName" : "Increment Login Count",
+        "nodeType" : "IncrementLoginCountNode",
+        "x" : 564,
+        "y" : 132,
+        "connections" : {
+          "outcome" : "33b24514-3e50-4180-8f08-ab6f4e51b07e"
+        }
+      },
+      "33b24514-3e50-4180-8f08-ab6f4e51b07e" : {
+        "displayName" : "Inner Tree Evaluator",
+        "nodeType" : "InnerTreeEvaluatorNode",
+        "x" : 815,
+        "y" : 180,
+        "connections" : {
+          "true" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0",
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a"
+        }
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 25
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 1008,
+        "y" : 186
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 624,
+        "y" : 267
+      }
+    },
+    "entryNodeId" : "a12bc72f-ad97-4f1e-a789-a1fa3dd566c8",
+    "_type" : {
+      "_id" : "authenticationTreesService",
+      "name" : "authenticationTreesService",
+      "collection" : false
+    },
+    "description" : "Platform Login Tree",
+    "_id" : "default/Login"
+  }
+}

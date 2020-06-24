@@ -1,8 +1,7 @@
 kind: ""
-apiversion: ""
+apiVersion: ""
 commonLabels:
   app: amster
   vendor: forgerock
 resources:
-- configmap.yaml
-- deployment.yaml
+- job.yaml

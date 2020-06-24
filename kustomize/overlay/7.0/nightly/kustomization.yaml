@@ -1,74 +1,17 @@
-# This deploys to nightly.iam.forgeops.com.
-# for self signed SSL certs. It is suitable for local minikube development
 namespace: nightly
 resources:
-- ../../../base/kustomizeConfig
-- ../../../base/forgeops-secrets
-- ../../../base/7.0/ingress
-- ../../../base/7.0/ds/cts
-- ../../../base/7.0/ds/idrepo
-- ../../../base/am
-- ../../../base/amster
-- ../../../base/idm
-- ../../../base/end-user-ui
-- ../../../base/login-ui
-- ../../../base/admin-ui
-- ../../../base/web
+- ../all
 
-configMapGenerator:
-- name: platform-config
-  # The env vars below can be passed into a pod using the envFrom pod spec.
-  # These global variables can be used to parameterize your deployments.
-  # The FQDN and URLs here should match your ingress or istio gateway definitions
-  literals:
-  - FQDN=$(NAMESPACE).iam.forgeops.com
-  - SUBDOMAIN=iam
-  - DOMAIN=forgeops.com
-  - AM_URL=https://$(NAMESPACE).iam.forgeops.com/am
-  - AM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/am/ui-admin/
-  - IDM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/admin
-  - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.forgeops.com/upload
-  - IDM_EXPORT_URL=https://$(NAMESPACE).iam.forgeops.com/export
-  - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.forgeops.com/platform
-  - IDM_REST_URL=https://$(NAMESPACE).iam.forgeops.com/openidm
-  - ENDUSER_UI_URL=https://$(NAMESPACE).iam.forgeops.com/enduser
-  - LOGIN_UI_URL=https://$(NAMESPACE).iam.forgeops.com/login/#/service/Login
-  - ENDUSER_CLIENT_ID=end-user-ui
-  - ADMIN_CLIENT_ID=idm-admin-ui
-  - THEME=default
-  
-patchesJson6902:
-- target:
-    group: extensions
-    version: v1beta1
-    kind: Ingress
-    name: forgerock
-  patch: |-
-    - op: replace
-      path: /metadata/annotations/certmanager.io~1cluster-issuer
-      value: letsencrypt-prod
-      # value: default-issuer  # Default
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    DOMAIN: "forgeops.com"
+    FQDN: "nightly.iam.forgeops.com"
+    CERT_ISSUER: letsencrypt-prod
 
 
-vars:
-- name: DOMAIN
-  fieldref:
-    fieldpath: data.DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: SUBDOMAIN
-  fieldref:
-    fieldpath: data.SUBDOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-  fieldref:
-    fieldpath: metadata.namespace
+

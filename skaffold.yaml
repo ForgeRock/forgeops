@@ -14,7 +14,7 @@ kind: Config
   kaniko:
     kaniko-ops: &kaniko-opts
       # Disable build cache for now. This is causing intermittent problems
-      # cache: {} 
+      # cache: {}
       image: gcr.io/kaniko-project/executor:v0.20.0
       # The flags is deprecated - but without it we are seeing Kaniko bugs.
       # CLOUD-1955
@@ -34,25 +34,18 @@ kind: Config
     - &AM_KANIKO
       <<: *AM
       kaniko: *kaniko-opts
-    - &AM-FBC_KANIKO
-      image: am
-      context: docker/7.0/am-fbc
-      kaniko: *kaniko-opts
-  
     - &AMSTER
       image: amster
       context: docker/7.0/amster
     - &AMSTER_KANIKO
       <<: *AMSTER
       kaniko: *kaniko-opts
-    
     - &IDM
       image: idm
       context: docker/7.0/idm
     - &IDM_KANIKO
       <<: *IDM
       kaniko: *kaniko-opts
-    
     - &DS-CTS_BASE
       image: ds-cts
       context: docker/7.0/ds
@@ -62,39 +55,43 @@ kind: Config
         dockerfile: cts/Dockerfile
     - &DS-CTS_KANIKO
       <<: *DS-CTS_BASE
-      kaniko: 
+      kaniko:
         <<: *kaniko-opts
         dockerfile: cts/Dockerfile
-    
+
     - &DS-IDREPO_BASE
       image: ds-idrepo
       context: docker/7.0/ds/
     - &DS-IDREPO
       <<: *DS-IDREPO_BASE
       docker:
-        dockerfile: idrepo/Dockerfile 
+        dockerfile: idrepo/Dockerfile
     - &DS-IDREPO_KANIKO
       <<: *DS-IDREPO_BASE
-      kaniko: 
+      kaniko:
         <<: *kaniko-opts
-        dockerfile: idrepo/Dockerfile 
-  
+        dockerfile: idrepo/Dockerfile
+
     - &FORGEOPS-SECRETS
       image: forgeops-secrets
       context: docker/forgeops-secrets
     - &FORGEOPS-SECRETS_KANIKO
       <<: *FORGEOPS-SECRETS
       kaniko: *kaniko-opts
-  
+
+    - &LDIF-IMPORTER
+      image: ldif-importer
+      context: docker/7.0/ldif-importer
+
     - &LDIF-IMPORTER_KANIKO
       image: ldif-importer
       context: docker/7.0/ldif-importer
-      kaniko: *kaniko-opts 
-  
+      kaniko: *kaniko-opts
+
     - &IG
       image: ig
       context: docker/7.0/ig
-  
+
   commonArtifactSets:
     default-artifacts: &default-artifacts
     - *AM
@@ -104,6 +101,7 @@ kind: Config
     - *DS-IDREPO
     - *FORGEOPS-SECRETS
     - *IG
+    - *LDIF-IMPORTER
     kaniko-artifacts: &kaniko-artifacts
     - *AM_KANIKO
     - *AMSTER_KANIKO
@@ -111,6 +109,8 @@ kind: Config
     - *DS-CTS_KANIKO
     - *DS-IDREPO_KANIKO
     - *FORGEOPS-SECRETS_KANIKO
+    - *LDIF-IMPORTER_KANIKO
+
 ## End YAML Anchors
 
 #---------------------
@@ -212,6 +212,7 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/ig-only
+
 - name: am-only
   build:
     artifacts:
@@ -220,11 +221,13 @@ profiles:
     - *DS-CTS
     - *DS-IDREPO
     - *FORGEOPS-SECRETS
+    - *LDIF-IMPORTER
     tagPolicy:
       gitCommit: {}
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/am-only
+
 - name: idm-only
   build:
     artifacts:
@@ -236,6 +239,7 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/idm-only
+
 - name: ds-only
   build:
     artifacts:
@@ -247,3 +251,40 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/ds-only
+
+# Deploy only ds and secrets.
+- name: persistence
+  build:
+    artifacts:
+    - *DS-CTS
+    - *DS-IDREPO
+    - *FORGEOPS-SECRETS
+    - *LDIF-IMPORTER
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/persistence
+
+# deploy only AM/IDM - for iterative testing
+- name: am-idm-only
+  build:
+    artifacts:
+    - *AM
+    - *IDM
+    - *AMSTER
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/am-idm-only
+
+- name: amster-export
+  build:
+    artifacts:
+    - *AMSTER
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/amster-export

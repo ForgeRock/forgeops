@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "QueryFilterDecisionNode",
+    "entityId" : "default/a1f45b44-5bf7-4c57-aa3f-75c619c7db8e",
+    "uid" : "ou=a1f45b44-5bf7-4c57-aa3f-75c619c7db8e,ou=default,ou=OrganizationConfig,ou=1.0,ou=QueryFilterDecisionNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "QueryFilterDecisionNode",
+      "name" : "QueryFilterDecisionNode",
+      "collection" : false
+    },
+    "queryFilter" : "!(/preferences pr) or /preferences/marketing eq false or /preferences/updates eq false",
+    "_id" : "default/a1f45b44-5bf7-4c57-aa3f-75c619c7db8e",
+    "identityAttribute" : "userName",
+    "objectType" : "user"
+  }
+}

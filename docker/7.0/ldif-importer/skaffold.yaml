@@ -1,0 +1,14 @@
+# deploy as a job. This is used for testing only
+apiVersion: skaffold/v1
+kind: Config
+
+# Default profile
+build:
+  artifacts:
+  - image: ldif-importer
+    context: .
+  tagPolicy:
+    sha256: {}
+deploy:
+  kustomize:
+    path: ../../../kustomize/base/ldif-importer

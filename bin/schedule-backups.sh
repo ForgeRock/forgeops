@@ -15,7 +15,7 @@
 BACKUP_SCHEDULE="0 * * * *"
 kcontext=$(kubectl config current-context)
 NS=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}")
-if [ $# = '1' ]; then
+if [ $# = '2' ]; then
     NAMESPACE=$1
     BACKUP_DIRECTORY_ENV=""
 elif [ $# = '2' ]; then
@@ -48,6 +48,11 @@ if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirman
 fi
 for pod in "${pods[@]}"
 do
+  if [[ $BACKUP_DIRECTORY == s3://* || $BACKUP_DIRECTORY == az://* || $BACKUP_DIRECTORY == gs://* ]]; then
+    BACKUP_LOCATION="$BACKUP_DIRECTORY/$pod/"
+  else
+    BACKUP_LOCATION="$BACKUP_DIRECTORY"
+  fi
   echo ""
   echo "scheduling backup for pod: $pod"
   kubectl -n $NAMESPACE exec $pod -- bash -c "ADMIN_PASSWORD=${ADMIN_PASSWORD} \

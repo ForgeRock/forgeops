@@ -1,4 +1,3 @@
-# Deploys to prod.iam.forgeops.com. Uses the Let's encrypt issuer for SSL.
 namespace: default
 resources:
   - ../../../base/kustomizeConfig
@@ -6,50 +5,6 @@ resources:
   - ../../../base/idm
   - ../../../base/7.0/ds/idrepo
   - ../../../base/7.0/ingress
-
-configMapGenerator:
-- name: platform-config
-  # The env vars below can be passed into a pod using the envFrom pod spec.
-  # These global variables can be used to parameterize your deployments.
-  # The FQDN and URLs here should match your ingress or istio gateway definitions
-  literals:
-  - FQDN=$(NAMESPACE).iam.example.com
-  - SUBDOMAIN=iam
-  - DOMAIN=example.com
-  - IDM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/admin
-  - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.example.com/upload
-  - IDM_EXPORT_URL=https://$(NAMESPACE).iam.example.com/export
-  - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/platform
-  - IDM_REST_URL=https://$(NAMESPACE).iam.example.com/openidm
-  - ENDUSER_UI_URL=https://$(NAMESPACE).iam.example.com/enduser
-  - LOGIN_UI_URL=https://$(NAMESPACE).iam.example.com/login/#/service/Login
-  - ENDUSER_CLIENT_ID=end-user-ui
-  - ADMIN_CLIENT_ID=idm-admin-ui
-  - THEME=default
-
-# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
-vars:
-- name: DOMAIN
-  fieldref:
-    fieldpath: data.DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: SUBDOMAIN
-  fieldref:
-    fieldpath: data.SUBDOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-  fieldref:
-    fieldpath: metadata.namespace
 
 patchesStrategicMerge:
 - |-

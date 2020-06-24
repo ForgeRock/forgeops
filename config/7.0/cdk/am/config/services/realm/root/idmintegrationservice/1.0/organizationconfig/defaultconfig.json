@@ -1,0 +1,31 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "IdmIntegrationService",
+    "entityId" : "defaultconfig",
+    "uid" : "ou=defaultconfig,ou=OrganizationConfig,ou=1.0,ou=IdmIntegrationService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : [ "defaultconfig" ]
+  },
+  "data" : {
+    "provisioningSigningKeyAlias" : "openidm-selfservice-key",
+    "idmObjectEndpoint" : "managed",
+    "_type" : {
+      "_id" : "IdmIntegrationService",
+      "name" : "IdmIntegrationService",
+      "collection" : false
+    },
+    "jwtSigningCompatibilityMode" : false,
+    "enabled" : true,
+    "provisioningSigningAlgorithm" : "HS256",
+    "provisioningEncryptionKeyAlias" : "selfservice",
+    "provisioningEncryptionMethod" : "A128CBC_HS256",
+    "provisioningEncryptionAlgorithm" : "RSAES_PKCS1_V1_5",
+    "idmProvisioningClient" : "idm-provisioning",
+    "idmDeploymentPath" : "openidm",
+    "_id" : "defaultconfig",
+    "idmDeploymentUrl" : "http://idm"
+  }
+}

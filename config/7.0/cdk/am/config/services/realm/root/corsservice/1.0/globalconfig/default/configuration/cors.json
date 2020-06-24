@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "CorsService",
+    "entityId" : "default/configuration/cors",
+    "uid" : "ou=cors,ou=configuration,ou=default,ou=GlobalConfig,ou=1.0,ou=CorsService,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "maxAge" : 600,
+    "exposedHeaders" : [ "WWW-Authenticate" ],
+    "acceptedOrigins" : [ "http://localhost:8083", "http://localhost:8888", "http://localhost:8082" ],
+    "_type" : {
+      "_id" : "CorsService",
+      "name" : "CorsService",
+      "collection" : false
+    },
+    "acceptedMethods" : [ "HEAD", "DELETE", "POST", "GET", "PUT", "PATCH" ],
+    "_id" : "default/configuration/cors",
+    "acceptedHeaders" : [ "authorization", "x-openidm-username", "if-none-match", "x-openidm-nosession", "x-openidm-password", "accept-api-version", "x-requested-with", "content-type", "if-match", "cache-control" ],
+    "allowCredentials" : true,
+    "enabled" : true
+  }
+}

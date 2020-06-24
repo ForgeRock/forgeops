@@ -90,7 +90,7 @@ writeDecodedObject () {
             done
         fi
     done
-        
+
 }
 
 makeFromFiles () {
@@ -103,12 +103,12 @@ makeFromFiles () {
 
 createK8sObject () {
 
-    KUBECTL_OPTIONS="$KUBECTL_OPTIONS --save-config --dry-run -o yaml"
+    KUBECTL_OPTIONS="$KUBECTL_OPTIONS --save-config --dry-run=client -o yaml"
     KUBECTL_OUT="${TEMP_PATH}/createmanifests/$(basename ${2}).yaml"
 
 
     case "${1}" in
-        'generic') 
+        'generic')
             kubectl create secret generic $(basename ${2}) $(makeFromFiles ${2}) ${KUBECTL_OPTIONS} > ${KUBECTL_OUT}
         ;;
         'tls')
@@ -118,7 +118,7 @@ createK8sObject () {
             DOCKER_MAIL="$(jq -r '.auths | .. | .email? | select(type != "null")' ${2}/.dockerconfigjson)"
             DOCKER_USER="$(jq -r '.auths | .. | .username? | select(type != "null")' ${2}/.dockerconfigjson)"
             DOCKER_PASS="$(jq -r '.auths | .. | .password? | select(type != "null")' ${2}/.dockerconfigjson)"
-            DOCKER_REGI="$(jq -r '.auths | keys[]' ${2}/.dockerconfigjson)"   
+            DOCKER_REGI="$(jq -r '.auths | keys[]' ${2}/.dockerconfigjson)"
 
             [ -z "$DOCKER_MAIL" ] && DOCKER_MAIL="$(jq -r '.auths | .. | .Email? | select(type != "null")' ${2}/.dockerconfigjson)"
             [ -z "$DOCKER_USER" ] && DOCKER_USER="$(jq -r '.auths | .. | .Username? | select(type != "null")' ${2}/.dockerconfigjson)"
@@ -165,7 +165,7 @@ deleteAllExisting () {
 
     if [ "$delStringSecrets" != "" ]; then kubectl delete secret $delStringSecrets; fi
     if [ "$delStringConfigMaps" != "" ]; then kubectl delete configmap $delStringConfigMaps; fi
- 
+
 }
 
 getDefaultImagePullSecret () {
@@ -177,7 +177,7 @@ setDefaultImagePullSecret () {
     if [ "${secretName}" == "" ]; then
         echo "ERROR: Default image pull secret name in defaultsecret.txt is empty."
         exit 20
-    fi 
+    fi
     kubectl patch serviceaccount default -p "{\"imagePullSecrets\": [{\"name\": \"${secretName}\"}]}" || true
 }
 

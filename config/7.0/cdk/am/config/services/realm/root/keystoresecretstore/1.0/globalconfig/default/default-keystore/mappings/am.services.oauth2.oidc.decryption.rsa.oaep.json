@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "KeyStoreSecretStore",
+    "entityId" : "default/default-keystore/mappings/am.services.oauth2.oidc.decryption.RSA.OAEP",
+    "serviceVersion" : null,
+    "uid" : "ou=am.services.oauth2.oidc.decryption.RSA.OAEP,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "aliases" : [ "test" ],
+    "_type" : {
+      "_id" : "KeyStoreSecretStore",
+      "name" : "KeyStoreSecretStore",
+      "collection" : false
+    },
+    "secretId" : "am.services.oauth2.oidc.decryption.RSA.OAEP",
+    "_id" : "default/default-keystore/mappings/am.services.oauth2.oidc.decryption.RSA.OAEP"
+  }
+}

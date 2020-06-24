@@ -32,7 +32,7 @@ void runStage(PipelineRun pipelineRun) {
                             CLUSTER_NAMESPACE                               : subStageName,
                             COMPONENTS_AMSTER_IMAGE_TAG                     : '7.0.0-1ba49f89bf13e3d0543c80fd5fa284e32b5fd9e4',
                             COMPONENTS_AM_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('am'),
-                            COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/am/pit1',
+                            COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/am-base/docker-build',
                             COMPONENTS_IDM_IMAGE_UPGRADE_TAG                : commonModule.getCurrentTag('idm'),
                             COMPONENTS_IDM_IMAGE_UPGRADE_REPOSITORY         : 'gcr.io/forgerock-io/idm/pit1',
                             COMPONENTS_IG_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('ig'),

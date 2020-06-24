@@ -77,39 +77,17 @@ render_templates () {
 # for self signed SSL certs. It is suitable for local minikube development
 namespace: $NAMESPACE
 resources:
-- ../kustomize/base/kustomizeConfig
-- ../kustomize/base/forgeops-secrets
-- ../kustomize/base/7.0/ingress
-- ../kustomize/base/7.0/ds/cts
-- ../kustomize/base/7.0/ds/idrepo
-- ../kustomize/base/am
-- ../kustomize/base/amster
-- ../kustomize/base/idm
-- ../kustomize/base/login-ui
-- ../kustomize/base/admin-ui
-- ../kustomize/base/end-user-ui
+- ../kustomize/overlay/7.0/all
 
-configMapGenerator:
-- name: platform-config
-  # The env vars below can be passed into a pod using the envFrom pod spec.
-  # These global variables can be used to parameterize your deployments.
-  # The FQDN and URLs here should match your ingress or istio gateway definitions
-  literals:
-  - FQDN=$FQDN
-  - SUBDOMAIN=$SUBDOMAIN
-  - DOMAIN=$DOMAIN
-  - AM_URL=https://$FQDN/am
-  - AM_ADMIN_URL=https://$FQDN/am/ui-admin/
-  - IDM_ADMIN_URL=https://$FQDN/admin
-  - IDM_UPLOAD_URL=https://$FQDN/upload
-  - IDM_EXPORT_URL=https://$FQDN/export
-  - PLATFORM_ADMIN_URL=https://$FQDN/platform
-  - IDM_REST_URL=https://$FQDN/openidm
-  - ENDUSER_UI_URL=https://$FQDN/enduser
-  - LOGIN_UI_URL=https://$FQDN/login/#/service/Login
-  - ENDUSER_CLIENT_ID=end-user-ui
-  - ADMIN_CLIENT_ID=idm-admin-ui
-  - THEME=default
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    DOMAIN: $DOMAIN
+    SUBDOMAIN: $SUBDOMAIN
 
 # Patches the ingress to use the Let's Encrypt issuer
 patchesJson6902:
@@ -123,29 +101,6 @@ patchesJson6902:
       path: /metadata/annotations/certmanager.io~1cluster-issuer
       value: letsencrypt-prod
       # value: default-issuer  # Default
-
-vars:
-- name: DOMAIN
-  fieldref:
-    fieldPath: data.DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: SUBDOMAIN
-  fieldref:
-    fieldPath: data.SUBDOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-  fieldref:
-    fieldpath: metadata.namespace
 EOF
 
 echo "Creating $CDIR/run.sh script"

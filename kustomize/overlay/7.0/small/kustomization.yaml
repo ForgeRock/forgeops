@@ -1,67 +1,24 @@
-# Deploys to prod.iam.example.com. Uses the Let's encrypt issuer for SSL.
 namespace: prod
 resources:
-  - ../../../base/kustomizeConfig
-  - ../../../base/forgeops-secrets
-  - ../../../base/7.0/ds/cts
-  - ../../../base/7.0/ds/idrepo
-  - ../../../base/am
-  - ../../../base/amster
-  - ../../../base/idm
-  - ../../../base/end-user-ui
-  - ../../../base/web
-  - ../../../base/7.0/ingress
-  - ../../../base/pdb
-
-configMapGenerator:
-- name: platform-config
-  # The env vars below can be passed into a pod using the envFrom pod spec.
-  # These global variables can be used to parameterize your deployments.
-  # The FQDN and URLs here should match your ingress or istio gateway definitions
-  literals:
-  - FQDN=$(NAMESPACE).iam.example.com
-  - SUBDOMAIN=iam
-  - DOMAIN=example.com
-  - AM_URL=https://$(NAMESPACE).iam.example.com/am
-  - AM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/am/ui-admin/
-  - IDM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/admin
-  - IDM_UPLOAD_URL=https://$(NAMESPACE).iam.example.com/upload
-  - IDM_EXPORT_URL=https://$(NAMESPACE).iam.example.com/export
-  - PLATFORM_ADMIN_URL=https://$(NAMESPACE).iam.example.com/platform
-  - IDM_REST_URL=https://$(NAMESPACE).iam.example.com/openidm
-  - ENDUSER_UI_URL=https://$(NAMESPACE).iam.example.com/enduser
-  - LOGIN_UI_URL=https://$(NAMESPACE).iam.example.com/login/#/service/Login
-  - ENDUSER_CLIENT_ID=end-user-ui
-  - ADMIN_CLIENT_ID=idm-admin-ui
-  - THEME=default
-  - CTS_STORES="ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389"
-  - IDREPO_STORES="ds-idrepo-0.ds-idrepo:1389,ds-idrepo-1.ds-idrepo:1389,ds-idrepo-2.ds-idrepo:1389"
-
-# The variables defined below can be referenced in resources using the syntax $(VARIABLE)
-vars:
-- name: DOMAIN
-  fieldref:
-    fieldpath: data.DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: SUBDOMAIN
-  fieldref:
-    fieldpath: data.SUBDOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-  fieldref:
-    fieldpath: metadata.namespace
+- ../all
+- ../../../base/ig
+- ../../../base/pdb
 
 patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    # Some optional settings
+    # Set the FQDN - includes the namespace prefix!
+    # FQDN: prod.pit-test.forgeops.com
+    # If you are using cert-manager and Let's Encrypt in your cluster and want real certs - set this
+    # CERT_ISSUER: letsencrypt-prod
+    AM_STORES_CTS_SERVERS: "ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389"
+    AM_STORES_USER_SERVERS: "ds-idrepo-0.ds-idrepo:1389,ds-idrepo-1.ds-idrepo:1389,ds-idrepo-2.ds-idrepo:1389"
+
 - |-
   #Patch AM
   apiVersion: apps/v1

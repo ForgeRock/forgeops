@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "InnerTreeEvaluatorNode",
+    "entityId" : "default/b93ce36e-1976-4610-b24f-8d6760b5463b",
+    "uid" : "ou=b93ce36e-1976-4610-b24f-8d6760b5463b,ou=default,ou=OrganizationConfig,ou=1.0,ou=InnerTreeEvaluatorNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "InnerTreeEvaluatorNode",
+      "name" : "InnerTreeEvaluatorNode",
+      "collection" : false
+    },
+    "tree" : "Login",
+    "_id" : "default/b93ce36e-1976-4610-b24f-8d6760b5463b"
+  }
+}

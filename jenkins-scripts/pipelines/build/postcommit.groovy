@@ -82,7 +82,7 @@ def postBuildTests(PipelineRun pipelineRun) {
 }
 
 private void sendSlackNotification(String msgDetails) {
-    slackUtils.sendNoisyStatusMessage('#cloud-deploy-notify', currentBuild.result, msgDetails)
+    slackUtils.sendStatusMessage('#cloud-deploy-notify', currentBuild.result, msgDetails)
 }
 
 return this

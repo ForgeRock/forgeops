@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "EmailSuspendNode",
+    "entityId" : "default/06c97be5-7fdd-4739-aea1-ecc7fe082865",
+    "uid" : "ou=06c97be5-7fdd-4739-aea1-ecc7fe082865,ou=default,ou=OrganizationConfig,ou=1.0,ou=EmailSuspendNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "EmailSuspendNode",
+      "name" : "EmailSuspendNode",
+      "collection" : false
+    },
+    "objectLookup" : true,
+    "_id" : "default/06c97be5-7fdd-4739-aea1-ecc7fe082865",
+    "emailAttribute" : "mail",
+    "emailTemplateName" : "resetPassword",
+    "objectType" : "user",
+    "emailSuspendMessage" : {
+      "en" : "An email has been sent to the address you entered. Click the link in that email to proceed."
+    },
+    "identityAttribute" : "mail"
+  }
+}

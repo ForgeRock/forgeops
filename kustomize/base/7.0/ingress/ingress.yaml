@@ -12,8 +12,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # CORS is now set in the AM and IDM configurations
     nginx.ingress.kubernetes.io/enable-cors: "false"
-    cert-manager.io/cluster-issuer: "default-issuer"
-    #cert-manager.io/cluster-issuer: "ca-issuer"
+    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
     nginx.ingress.kubernetes.io/body-size: "64m"
     nginx.ingress.kubernetes.io/send-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-body-size: "64m"
@@ -22,7 +21,7 @@ metadata:
   name: forgerock
 spec:
   rules:
-  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+  - host: $(FQDN)
     http:
       paths:
       - backend:
@@ -61,7 +60,7 @@ spec:
       #  path: /ig
   tls:
   - hosts:
-    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    - $(FQDN)
     secretName: sslcert
 ---
 apiVersion: extensions/v1beta1
@@ -69,13 +68,13 @@ kind: Ingress
 metadata:
   name: end-user-ui
   annotations:
-    cert-manager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/enduser)$ $1/ redirect;
 spec:
   rules:
-  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+  - host: $(FQDN)
     http:
       paths:
       - backend:
@@ -84,7 +83,7 @@ spec:
         path: /enduser/?(.*)
   tls:
   - hosts:
-    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    - $(FQDN)
     secretName: sslcert
 ---
 apiVersion: extensions/v1beta1
@@ -92,14 +91,14 @@ kind: Ingress
 metadata:
   name: login-ui
   annotations:
-    cert-manager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/login)$ $1/ redirect;
       rewrite ^(/am/XUI)$ $1/ redirect;
 spec:
   rules:
-  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+  - host: $(FQDN)
     http:
       paths:
       - backend:
@@ -112,7 +111,7 @@ spec:
         path: /am/XUI/?(.*)
   tls:
   - hosts:
-    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    - $(FQDN)
     secretName: sslcert
 ---
 apiVersion: extensions/v1beta1
@@ -120,13 +119,13 @@ kind: Ingress
 metadata:
   name: platform-ui
   annotations:
-    cert-manager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/configuration-snippet: |
       rewrite ^(/platform)$ $1/ redirect;
 spec:
   rules:
-  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+  - host: $(FQDN)
     http:
       paths:
       - backend:
@@ -135,7 +134,7 @@ spec:
         path: /platform/?(.*)
   tls:
   - hosts:
-    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    - $(FQDN)
     secretName: sslcert
 ---
 apiVersion: extensions/v1beta1
@@ -146,15 +145,15 @@ metadata:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "/$2"
-    cert-manager.io/cluster-issuer: "default-issuer"
+    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
 
 spec:
   tls:
   - hosts:
-    - $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+    - $(FQDN)
     secretName: sslcert
   rules:
-  - host: $(NAMESPACE).$(SUBDOMAIN).$(DOMAIN)
+  - host: $(FQDN)
     http:
       paths:
       - backend:

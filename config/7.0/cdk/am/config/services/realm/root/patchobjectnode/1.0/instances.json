@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "PatchObjectNode",
+    "entityId" : "Instances",
+    "uid" : "ou=Instances,ou=1.0,ou=PatchObjectNode,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "PatchObjectNode",
+      "name" : "PatchObjectNode",
+      "collection" : false
+    },
+    "_id" : "Instances"
+  }
+}
