@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "selfServiceTrees",
+    "entityId" : "default",
+    "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=selfServiceTrees,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : [ "default" ]
+  },
+  "data" : {
+    "treeMapping" : {
+      "resetPassword" : "ResetPassword",
+      "updatePassword" : "UpdatePassword",
+      "forgottenUsername" : "ForgottenUsername",
+      "registration" : "Registration",
+      "login" : "Login"
+    },
+    "_type" : {
+      "_id" : "selfServiceTrees",
+      "name" : "selfServiceTrees",
+      "collection" : false
+    },
+    "_id" : "default"
+  }
+}
