@@ -34,7 +34,12 @@ if [[ -z "$NAMESPACE" ]] ; then
     exit -1
 fi
 
-pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts|ds-idrepo/{print $1}')))
+if [[ $BACKUP_DIRECTORY == s3://* || $BACKUP_DIRECTORY == az://* || $BACKUP_DIRECTORY == gs://* ]]; then
+    # If we're sending backups to the cloud, only back up the first pod. All pods can restore from the same backup
+    pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts-0|ds-idrepo-0/{print $1}')))
+else
+    pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts|ds-idrepo/{print $1}')))
+fi
 
 # only set $ADMIN_PASSWORD if the secret is available. This information is only used in 7.0.
 if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}") ]] &>/dev/null; then

@@ -74,22 +74,25 @@ GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.js
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
 
+# Always restore from first pod's backup. i.e. replace ds-cts-2 with ds-cts-0
+BACKUP_NAME="$(printf '%s' $POD_NAME | sed 's/[0-9]\+$//')0"
+
 case "$DSBACKUP_DIRECTORY" in 
   s3://* )
     echo "S3 Bucket detected. Restoring backups from AWS S3"
     EXTRA_PARAMS="${AWS_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${POD_NAME}"
+    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
     ;;
   az://* )
     echo "Azure Bucket detected. Restoring backups from Azure block storage"
     EXTRA_PARAMS="${AZ_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${POD_NAME}"
+    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
     ;;
   gs://* )
     echo "GCP Bucket detected. Restoring backups from GCP block storage"
     printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
     EXTRA_PARAMS="${GCP_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${POD_NAME}"
+    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
     ;;
   *)
     EXTRA_PARAMS=""
