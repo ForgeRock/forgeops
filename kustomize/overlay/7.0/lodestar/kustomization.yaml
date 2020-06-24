@@ -118,7 +118,7 @@ patchesStrategicMerge:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storageSize: 850Gi
+            storage: 850Gi
         storageClassName: fast
 
 - |-
@@ -153,7 +153,7 @@ patchesStrategicMerge:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storageSize: 850Gi
+            storage: 850Gi
         storageClassName: fast
 
 - |-
