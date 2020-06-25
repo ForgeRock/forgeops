@@ -19,7 +19,7 @@ if [ $# = '1' ]; then
     NAMESPACE=$1
     BACKUP_DIRECTORY_ENV=""
 elif [ $# = '2' ]; then
-    # BACKUP_DIRECTORY not required for 7.0. Set DSBACKUP_DIRECTORY in your Kustomize overlay instead.
+    echo "WARNING: BACKUP_DIRECTORY is ignored in DS 7.0. If targetting DS 7.0, set DSBACKUP_DIRECTORY in your Kustomize overlay instead"
     NAMESPACE=$1
     BACKUP_DIRECTORY_ENV="BACKUP_DIRECTORY=$2"
 else
@@ -34,10 +34,11 @@ if [[ -z "$NAMESPACE" ]] ; then
     exit -1
 fi
 
-if [[ $BACKUP_DIRECTORY == s3://* || $BACKUP_DIRECTORY == az://* || $BACKUP_DIRECTORY == gs://* ]]; then
-    # If we're sending backups to the cloud, only back up the first pod. All pods can restore from the same backup
+if [[ -z "$BACKUP_DIRECTORY_ENV" ]] ; then
+    # 7.0: Only back up the first pod. All pods can restore from the same backup
     pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts-0|ds-idrepo-0/{print $1}')))
 else
+    # 6.5: Back up all pods
     pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts|ds-idrepo/{print $1}')))
 fi
 
