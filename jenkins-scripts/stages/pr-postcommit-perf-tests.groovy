@@ -32,6 +32,7 @@ void runStage(PipelineRun pipelineRun) {
                             STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH    : forgeopsPath,
                             TEST_NAME            : testName,
+                            DEPLOYMENT_NAME      : 'small',
                             CLUSTER_DOMAIN       : 'pit-cluster.forgeops.com',
                             CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'],
                             PIPELINE_NAME        : 'FORGEOPS_POSTCOMMIT',
