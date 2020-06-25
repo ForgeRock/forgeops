@@ -76,11 +76,18 @@ esac
 
 echo "Attempting to restore backup from: ${BACKUP_LOCATION}"
 
-BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
-    grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
+if [ ${POD_NAME} = ${BACKUP_NAME} ]; then
+  # If this pod is the owner of the backup tasks, restore the tasks. Else, skip the "tasks" backend
+  BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
+      grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
+else
+  BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
+      grep -i "backend name" | grep -v "tasks" | awk '{printf "%s %s ","--backendName", $3}')
+fi
 
 if [ ! -z "${BACKEND_NAMES}" ]; then
     echo "Restore operation starting"
+    echo "Restoring ${BACKEND_NAMES}"
     dsbackup restore --offline --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} ${BACKEND_NAMES} 
     echo "Restore operation complete"
 else
