@@ -42,7 +42,7 @@ spec:
               },
               {				
                 "type": "mrkdwn",
-                "text": "*amadmin*: \`$(getsec amster-env-secrets AMADMIN_PASS)\`"
+                "text": "*amadmin*: \`$(getsec  am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR)\`"
               },
               {	
                 "type": "mrkdwn",

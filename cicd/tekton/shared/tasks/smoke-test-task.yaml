@@ -39,7 +39,7 @@ spec:
         FQDN=$(params.namespace).iam.forgeops.com
         echo "Smoke test will start in 60 seconds"
         sleep 60
-        echo "Running smoke test against $FQDN $AMADMIN_PASS"
+        echo "Running smoke test against $FQDN"
         curl -X POST "$(params.tester-url)" \
             --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS"
       } || { #If something fails
