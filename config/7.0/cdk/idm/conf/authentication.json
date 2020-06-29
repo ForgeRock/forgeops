@@ -15,20 +15,29 @@
         "cache" : {
             "maxTimeout" : "300 seconds"
         },
+        "subjectMapping" : [
+          {
+            "queryOnResource": "managed/user",
+            "propertyMapping": {
+              "sub": "_id"
+            },
+            "userRoles": "authzRoles/*"
+          }
+        ],
         "anonymousUserMapping" : {
             "localUser" : "internal/user/anonymous",
-            "userRoles" : "authzRoles"
+            "userRoles" : "authzRoles/*"
         },
         "staticUserMapping" : [
             {
                 "subject" : "amadmin",
                 "localUser" : "internal/user/openidm-admin",
-                "userRoles" : "authzRoles"
+                "userRoles" : "authzRoles/*"
             },
             {
                 "subject": "idm-provisioning",
                 "localUser": "internal/user/idm-provisioning",
-                "userRoles": "authzRoles"
+                "userRoles": "authzRoles/*"
             }
         ]
     }
