@@ -4,7 +4,13 @@ metadata:
   name: login-ui
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: login-ui
   template:
+    metadata:
+      labels:
+        app: login-ui
     spec:
       containers:
       - image: gcr.io/forgerock-io/platform-login-ui/docker-build:7.0.0-374ff66cf759b14c5123c251c83634495992837a

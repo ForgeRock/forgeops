@@ -4,10 +4,15 @@ metadata:
   name: am
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: am
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+      labels:
+        app: am
     spec:
       containers:
       - env:

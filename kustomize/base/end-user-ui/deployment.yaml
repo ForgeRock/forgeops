@@ -4,7 +4,13 @@ metadata:
   name: end-user-ui
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: end-user-ui
   template:
+    metadata:
+      labels:
+        app: end-user-ui
     spec:
       containers:
       - image: gcr.io/forgerock-io/platform-enduser-ui/docker-build:7.0.0-374ff66cf759b14c5123c251c83634495992837a

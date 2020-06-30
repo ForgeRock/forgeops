@@ -4,10 +4,15 @@ metadata:
   name: ig
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: ig
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "false"
+      labels:
+        app: ig
     spec:
       containers:
       - name: ig

@@ -4,7 +4,13 @@ metadata:
   name: admin-ui
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: admin-ui
   template:
+    metadata:
+      labels:
+        app: admin-ui
     spec:
       containers:
       - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.0.0-374ff66cf759b14c5123c251c83634495992837a
