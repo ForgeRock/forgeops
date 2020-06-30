@@ -202,6 +202,13 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/lodestar
 
+# Platform deployment without default UI projects. UI to be installed separately, for development
+- name: no-ui
+  build: *default-build
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/noui
+
 # Sample profiles to launch / test just a specific product
 - name: ig-only
   build:
