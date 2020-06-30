@@ -229,7 +229,8 @@ export_config(){
 			mkdir -p "$DOCKER_ROOT/am/config-exported"
 
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
-			kubectl exec $pod -- bash -c "cd openam && git diff HEAD --name-only config/services > exported"
+
+			kubectl exec $pod -- bash -c "cd openam && git add config/services && git diff HEAD --name-only config/services > exported"
 			kubectl cp $pod:"/home/forgerock/openam/exported" "$DOCKER_ROOT/am/config-exported/exported"
 
 			while read a; do
