@@ -140,7 +140,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: web
+  name: ig-web
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
@@ -156,10 +156,6 @@ spec:
   - host: $(FQDN)
     http:
       paths:
-      - backend:
-          serviceName: web
-          servicePort: 8080
-        path: /web
       - backend:
           serviceName: ig
           servicePort: 8080
