@@ -21,7 +21,7 @@ spec:
         - secretRef:
             name: amster-env-secrets
         image: amster
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: amster
         resources:
           limits:
