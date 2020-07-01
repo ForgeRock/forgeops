@@ -32,7 +32,7 @@
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
       "userinfoEncryptedResponseAlg" : null,
-      "jwksUri" : "http://am:80/am/oauth2/connect/jwk_uri",
+      "jwksUri" : null,
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
     },
