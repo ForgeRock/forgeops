@@ -23,4 +23,8 @@ RUN git config --global user.email "cloud-deployment@forgerock.com" && \
 
 WORKDIR /home/forgerock
 
+# If you want to debug AM uncomment these lines:
+#ENV JPDA_TRANSPORT=dt_socket
+#ENV JPDA_ADDRESS *:9009
+
 ENTRYPOINT ["/home/forgerock/custom-entrypoint.sh"]
