@@ -1,7 +1,6 @@
 namespace: prod
 resources:
 - ../all
-- ../../../base/ig
 - ../../../base/pdb
 
 patchesStrategicMerge:
