@@ -1,5 +1,5 @@
-FROM gcr.io/forgerock-io/am-base/docker-build:7.0.0-0f6085481caaac41ec8cf68caded1b3c8c07b72d
-#FROM gcr.io/forgerock-io/am-base/docker-build:7.0.0-747236dd647a99d98165aeb242df46517d852c2d
+FROM gcr.io/forgerock-io/am-base/pit1:7.0.0-2b1a765c97389516703db47ffccba8a07b70090b
+#FROM gcr.io/forgerock-io/am-base/pit1:7.0.0-2b1a765c97389516703db47ffccba8a07b70090b
 USER root
 
 RUN apt-get update && apt-get install -y git
