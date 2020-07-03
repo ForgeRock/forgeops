@@ -23,7 +23,7 @@ void runStage(PipelineRun pipelineRun) {
             stage('Promote to stable') {
                 pipelineRun.updateStageStatusAsInProgress()
 
-                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), env.BRANCH_NAME)
+                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'master')
 
                 promoteDockerImagesToRootLevel()
                 promoteForgeOpsCommitToStable()
