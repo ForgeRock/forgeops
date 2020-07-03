@@ -20,6 +20,7 @@ DRY_RUN = bool(int(os.environ.get('GCR_PRUNE_DRY_RUN', 0)))
 # (delete if currrent_time - last_update > MAX_UPDATE_AGE)
 ENGINEERING_DEVOPS_MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
 FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 90)))
+FORGEROCK_IO_PULL_REQUEST_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 30)))
 
 REGISTRY_BASE = 'https://gcr.io/v2'
 try:
@@ -74,6 +75,12 @@ def is_development_tag(tag):
     tag_suffix = tag.split('-')[-1]
     return GIT_SHA1_PATTERN.search(tag_suffix) is not None
 
+def is_pr_repo(repo):
+    """Images pushed from a PR can be deleted more frequently than other images.
+    """
+    image_promotion_level = repo.split('/')[-1]
+    return image_promotion_level == 'pull-requests'
+
 def filter_lookup(repo):
     """Select which filtering algorithm to use, depending on the repo.
     """
@@ -83,7 +90,7 @@ def filter_lookup(repo):
     else:
         return filter_engineering_devops_digests
 
-def filter_engineering_devops_digests(digests):
+def filter_engineering_devops_digests(repo, digests):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
     """
     filtered = {}
@@ -95,17 +102,23 @@ def filter_engineering_devops_digests(digests):
     log.info(f'found {num_digests} to prune')
     return filtered
 
-def filter_forgerock_io_digests(digests):
+def filter_forgerock_io_digests(repo, digests):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
     """
     filtered = {}
-    for digest_id, digest_meta in digests.items():
-        if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
-            tagless = image_is_untagged(digest_meta)
-            development_only = image_is_only_tagged_with_development_versions(digest_meta)
-            stale = image_is_stale(digest_id, digest_meta, FORGEROCK_IO_MAX_AGE)
-            if (tagless or development_only) and stale:
-                filtered[digest_id] = digest_meta['tag']
+    if is_pr_repo(repo):
+        for digest_id, digest_meta in digests.items():
+            if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
+                if image_is_stale(digest_id, digest_meta, FORGEROCK_IO_PULL_REQUEST_MAX_AGE):
+                    filtered[digest_id] = digest_meta['tag']
+    else:
+        for digest_id, digest_meta in digests.items():
+            if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
+                tagless = image_is_untagged(digest_meta)
+                development_only = image_is_only_tagged_with_development_versions(digest_meta)
+                stale = image_is_stale(digest_id, digest_meta, FORGEROCK_IO_MAX_AGE)
+                if (tagless or development_only) and stale:
+                    filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
@@ -144,7 +157,7 @@ def prune_registry(dry_run=DRY_RUN):
     for repo in registry_repos(EXCLUDE):
         log.info(f'pruning {repo}')
         filter_digests = filter_lookup(repo)
-        digests_to_remove = filter_digests(repo_tags(repo))
+        digests_to_remove = filter_digests(repo, repo_tags(repo))
         prune_manifests(repo, digests_to_remove, dry_run=dry_run)
 
 @app.route('/', methods=['POST'])
