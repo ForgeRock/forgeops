@@ -88,14 +88,7 @@ spec:
             memory: 512Mi
             cpu: 250m
           limits:
-            memory: 512Mi
-        volumeMounts:
-        - mountPath: /opt/opendj/data
-          name: data
-        - mountPath: /var/run/secrets/opendj-passwords
-          name: passwords
-        - mountPath: /opt/opendj/secrets
-          name: secrets
+            memory: 1024Mi
       containers:
       - name: ds
         image: ds
@@ -161,7 +154,7 @@ spec:
         runAsUser: 11111
       terminationGracePeriodSeconds: 30
       volumes:
-      - name: secrets  # keystore and pin
+      - name: secrets
         secret:
           secretName: ds
       - name: passwords
@@ -183,3 +176,13 @@ spec:
       resources:
         requests:
           storage: 10Gi
+
+#  - metadata:
+#      name: backup
+#      annotations:
+#        pv.beta.kubernetes.io/gid: "0"
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      resources:
+#        requests:
+#          storage: 10Gi
