@@ -33,14 +33,14 @@ void runStage(PipelineRun pipelineRun) {
 
                     def stagesCloud = [:]
 
-                    // perf stack test
-                    def subStageName = 'stack'
-                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('stack')
+                    // perf platform test
+                    def subStageName = 'platform'
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = config_common.clone()
                         config += [
-                            TEST_NAME       : "stack",
+                            TEST_NAME       : "platform",
                         ]
 
                         withGKEPyrockNoStages(config)
