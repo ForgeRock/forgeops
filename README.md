@@ -92,11 +92,14 @@ A number of configuration profiles and product versions are under the [config](c
 of the folder structure is `config/$VERSION/$PROFILE` - where VERSION is the ForgeRock product version (6.5,7.0) and
 PROFILE is the configuration profile that makes up the deployment.
 
-The `config/` directory is under version control. The target `docker/{version}/{product}/conf` directories are NOT versioned (via
+The `config/` folder is under version control. The target `docker/{version}/{product}/conf` folders are NOT versioned (via
 .gitignore). Configuration is copied from the git versioned `/conf` folder to the non versioned docker folder. Consider the
 configuration under docker/ to be a staging area.  During development, configuration can be exported out of the running
 product (e.g. AM or IDM) to the staging area, and if
-desired, copied back out to the git verioned `config/` folder where it can be committed to version control.
+desired, copied back out to the git versioned `config/` folder where it can be committed to version control.  
+
+**`NOTE`** This functionality doesn't apply to the Amster and AM exported files 
+due to the amount of changes required to fix up placeholders and secrets.
 
 The `bin/config.sh` script automates the copy / export process. The `init` command is used to initialize
 (copy from /conf/ to the staging area under docker).
@@ -108,7 +111,7 @@ The `bin/config.sh` script automates the copy / export process. The `init` comma
 * `--component <am|idm|amster|ig|all>`: specifies the component to configure. This defaults to `all` components.
 * `--version <6.5|7.0>`: The platform version (default 7.0). The environment variable `CDK_VERSION` can override this.
 
-To setup your environment for the CDK, use the `init`command:
+To setup your environment for the CDK, use the `init` command:
 
 ```bash
 bin/config.sh init
@@ -129,8 +132,20 @@ bin/config.sh --profile test
 #
 ```
 
-The `export` command is used to export configuration from a running instance (e.g., IDM) back to the `docker` staging folder. Note that not all
-components support export functionality (currently just IDM and amster).
+**EXPORT**  
+The `export` command is used to export configuration from a running instance (e.g. IDM) back to the `docker` staging folder. Note that currently IDM, AM, and Amster support export functionality.
+
+**IDM export**  
+Configuration is exported to `docker/$version/idm/conf` and is a full copy of the configuration including any changes.  
+
+**Amster export**  
+Amster only runs as a Kubernetes job so there is no running deployment.  The export command kicks of a new Amster job to export OAuth2Clients and ig-agent config from AM.  
+Configuration is exported to `docker/$version/amster/config`.
+Any files that contain secrets will be exported with a hashed version of the secret. This needs to be removed from the exported file and the secret value updated with the commons placeholder if required.
+
+**AM export**  
+AM configuration export works differently. Due to the large number of config files in file based configuration, we don't want to export all files. So the export identifies only the updated configuration and exports any updated files.  
+These updated files are exported to `docker/$version/am/config-exported`. This folder is also ignored by git.
 
 ```bash
 # Export all configurations to the docker folder
@@ -139,14 +154,19 @@ bin/config.sh export
 bin/config.sh --component idm export
 ```
 
-The `save` command copies the contents of the Docker configuration *back* to the config/ folder where it can be versioned in Git.
+**`NOTE`** All configuration except the commons placeholders are exported.  These will need to be restored where necessary. 
+
+**SAVE**  
+The `save` command copies the contents of the Docker configuration *back* to the `config/` folder where it can be versioned in Git.  
+
+**`NOTE`** Currently `save` doesn't work for Amster and AM due to the amount of manual changes currently required to fix up secrets and commons placeholders.
 
 ```bash
 # Save the docker/ configuration for all ForgeRock components back to the config/ folder
 bin/config.sh save
 # Save just the IDM configuration to the test configuration profile
 bin/config.sh --component idm --profile test save
-```
+``` 
 
 The `diff` command runs GNU `diff` to show the difference between the `docker/` component folder and the Git configuration:
 
