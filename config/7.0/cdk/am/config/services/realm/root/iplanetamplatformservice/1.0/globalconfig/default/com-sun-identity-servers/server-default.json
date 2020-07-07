@@ -17,7 +17,7 @@
   "data": {
     "serverconfig": [
       "com.iplanet.am.directory.ssl.enabled=false",
-      "org.forgerock.services.cts.store.affinity.enabled=false",
+      "org.forgerock.services.cts.store.affinity.enabled=true",
       "org.forgerock.services.default.store.max.connections=",
       "openam.auth.distAuthCookieName=AMDistAuthCookie",
       "com.sun.identity.server.fqdnMap[am]=am",
