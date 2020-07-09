@@ -57,63 +57,61 @@ EXTRA_PARAMS=""
 
 # Let's convert the comma separated value in $DSBACKUP_HOSTS to an array
 HOSTS=($(echo "${DSBACKUP_HOSTS}" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
-# If this host is present in the host list, target this host's backup. Else, target the first backup available.
-if [[ " ${HOSTS[@]} " =~ " ${HOSTNAME} " ]]; then
-    BACKUP_NAME="${HOSTNAME}"
-else
-    for host in "${HOSTS[@]}"; do
-        # Remove the pod idx and compare. ex. ds-idrepo-2 => ds-idrepo-
-        # if ds-idrepo- = ds-idrepo-, then use the $host backup
-        if [ "$(printf ${HOSTNAME} | sed 's/[0-9]\+$//')" = "$(printf ${host} | sed 's/[0-9]\+$//')" ]; then
-            BACKUP_NAME="${host}"
+
+
+case "$DSBACKUP_DIRECTORY" in 
+s3://* )
+    echo "S3 Bucket detected. Restoring backups from AWS S3"
+    EXTRA_PARAMS="${AWS_PARAMS}"
+    ;;
+az://* )
+    echo "Azure Bucket detected. Restoring backups from Azure block storage"
+    EXTRA_PARAMS="${AZ_PARAMS}"
+    ;;
+gs://* )
+    echo "GCP Bucket detected. Restoring backups from GCP block storage"
+    printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
+    EXTRA_PARAMS="${GCP_PARAMS}"
+    ;;
+*)
+    echo "Restoring backups from local storage"
+    EXTRA_PARAMS=""
+    ;;
+esac  
+# Recover from the first available backup that passes verification checks.
+for host in "${HOSTS[@]}"; do
+    # Remove the pod idx and compare. ex. ds-idrepo-2 => ds-idrepo-
+    # if ds-idrepo- = ds-idrepo-, then attemp to restore from that $host backup
+    if [ "$(printf ${HOSTNAME} | sed 's/[0-9]\+$//')" = "$(printf ${host} | sed 's/[0-9]\+$//')" ]; then
+        BACKUP_NAME="${host}"
+        BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
+
+        echo "Attempting to verify backup from: ${BACKUP_LOCATION}"
+        # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend
+        if [[ " ${HOSTS[@]} " =~ " ${HOSTNAME} " ]]; then
+        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
+            grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
+        else
+        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
+            grep -i "backend name" | grep -v "tasks" | awk '{printf "%s %s ","--backendName", $3}')
+        fi
+        if [ ! -z "${BACKEND_NAMES}" ]; then
+            # Verification complete, we will use $BACKUP_LOCATION for restore
             break
         fi
-    done
-fi
+    fi
+done
 
 if [ -z "${BACKUP_NAME}" ]; then
     echo "No suitable backup target was found for $HOSTNAME. Skipping restore"
-    exit -0
+    exit 0
 else
     echo "BACKUP_NAME is set to $BACKUP_NAME"
 fi
 
-case "$DSBACKUP_DIRECTORY" in 
-  s3://* )
-    echo "S3 Bucket detected. Restoring backups from AWS S3"
-    EXTRA_PARAMS="${AWS_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
-    ;;
-  az://* )
-    echo "Azure Bucket detected. Restoring backups from Azure block storage"
-    EXTRA_PARAMS="${AZ_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
-    ;;
-  gs://* )
-    echo "GCP Bucket detected. Restoring backups from GCP block storage"
-    printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
-    EXTRA_PARAMS="${GCP_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${BACKUP_NAME}"
-    ;;
-  *)
-    EXTRA_PARAMS=""
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}"
-    ;;
-esac  
-
-echo "Attempting to restore backup from: ${BACKUP_LOCATION}"
-
-if [ ${HOSTNAME} = ${BACKUP_NAME} ]; then
-  # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend
-  BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
-      grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
-else
-  BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
-      grep -i "backend name" | grep -v "tasks" | awk '{printf "%s %s ","--backendName", $3}')
-fi
-
 if [ ! -z "${BACKEND_NAMES}" ]; then
-    echo "Restore operation starting"
+    echo "Verification completed."
+    echo "Restoring backups from: ${BACKUP_LOCATION}"
     echo "Restoring ${BACKEND_NAMES}"
     dsbackup restore --offline --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} ${BACKEND_NAMES} 
     echo "Restore operation complete"

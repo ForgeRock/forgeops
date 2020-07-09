@@ -7,7 +7,8 @@
 # kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json --dry-run -o yaml > ./forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml #GCP
 # kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_ACCOUNT_NAME=CHANGEME_storageAcctName --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run -o yaml > ./forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml #Azure
 
-BACKUP_SCHEDULE="0 * * * *"
+BACKUP_SCHEDULE_IDREPO="0 * * * *"
+BACKUP_SCHEDULE_CTS="10 * * * *"
 kcontext=$(kubectl config current-context)
 NS=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}")
 
@@ -53,8 +54,13 @@ if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirman
 fi
 for pod in "${pods[@]}"
 do
+  if [[ "${pod}" = "ds-idrepo"* ]]; then
+    BACKUP_SCHEDULE="${BACKUP_SCHEDULE_IDREPO}"
+  else
+    BACKUP_SCHEDULE="${BACKUP_SCHEDULE_CTS}"
+  fi
   echo ""
-  echo "scheduling backup for pod: $pod"
+  echo "scheduling backup schedule $BACKUP_SCHEDULE for pod: $pod"
   kubectl -n $NAMESPACE exec $pod -- bash -c "ADMIN_PASSWORD=${ADMIN_PASSWORD} \
                                               ${BACKUP_DIRECTORY_ENV} \
                                               BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \

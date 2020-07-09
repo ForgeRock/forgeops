@@ -21,27 +21,24 @@ AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_ACCOUNT_NAME  --storag
 GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.json"
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
+BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${HOSTNAME}"
 
 case "$DSBACKUP_DIRECTORY" in 
   s3://* )
     echo "S3 Bucket detected. Setting up backups in AwS S3"
     EXTRA_PARAMS="${AWS_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${HOSTNAME}"
     ;;
   az://* )
     echo "Azure Bucket detected. Setting up backups in Azure block storage"
     EXTRA_PARAMS="${AZ_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${HOSTNAME}"
     ;;
   gs://* )
     echo "GCP Bucket detected. Setting up backups in GCP block storage"
     printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
     EXTRA_PARAMS="${GCP_PARAMS}"
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${HOSTNAME}"
     ;;
   *)
     EXTRA_PARAMS=""
-    BACKUP_LOCATION="${DSBACKUP_DIRECTORY}"
     ;;
 esac    
 

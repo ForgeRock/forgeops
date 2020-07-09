@@ -17,6 +17,7 @@ patchesStrategicMerge:
     # CERT_ISSUER: letsencrypt-prod
     AM_STORES_CTS_SERVERS: "ds-cts-0.ds-cts:1389,ds-cts-1.ds-cts:1389,ds-cts-2.ds-cts:1389"
     AM_STORES_USER_SERVERS: "ds-idrepo-0.ds-idrepo:1389,ds-idrepo-1.ds-idrepo:1389,ds-idrepo-2.ds-idrepo:1389"
+    DSBACKUP_HOSTS: "ds-cts-2,ds-idrepo-2"
 
 - |-
   #Patch AM
