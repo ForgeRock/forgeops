@@ -185,11 +185,15 @@ export_config(){
 	   # We dont support export for all products just yet - so need to case them
 	   case $p in
 		idm)
-			echo "Exporting IDM configuration"
+			printf "\nExporting IDM configuration...\n\n"
 			rm -fr  "$DOCKER_ROOT/idm/conf"
 			kubectl cp idm-0:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
 			;;
 		amster)
+			printf "\nExporting Amster configuration...\n\n"
+			printf "Skaffold is used to run the export job. Ensure your default-repo is set.\n\n"
+			sleep 3
+
 			rm -fr "$DOCKER_ROOT/amster/config"
 
 			echo "Removing any existing Amster jobs..."
@@ -225,6 +229,7 @@ export_config(){
 			del=$(skaffold delete -p amster-export)
 			;;
 		am)
+			printf "\nExporting AM configuration..\n\n"
 			rm -fr "$DOCKER_ROOT/am/config-exported"
 			mkdir -p "$DOCKER_ROOT/am/config-exported"
 
@@ -260,25 +265,46 @@ save_config()
 		# We dont support export for all products just yet - so need to case them
 		case $p in
 		idm)
+			printf "\nSaving IDM configuration..\n\n"
 			# clean existing files
 			rm -fr  "$PROFILE_ROOT/idm/conf"
 			mkdir -p "$PROFILE_ROOT/idm/conf"
 			cp -R "$DOCKER_ROOT/idm/conf"  "$PROFILE_ROOT/idm"
 			;;
 		amster)
-			# Clean any existing files
+			printf "\nSaving Amster configuration..\n\n"
+			#****** REMOVE EXISTING FILES ******#
 			rm -fr "$PROFILE_ROOT/amster/config"
 			mkdir -p "$PROFILE_ROOT/amster/config"
+
+			#****** FIX CONFIG RULES ******#
+
+			# Fix FQDN and amsterVersion fields with placeholders. Remove encrypted password field.
+			fqdn=$(kubectl get configmap platform-config -o yaml |grep AM_SERVER_FQDN | head -1 | awk '{print $2}')
+
+			printf "\n*** APPLYING FIXES ***\n"
+
+			echo "Adding back amsterVersion placeholder ..."
+			echo "Adding back FQDN placeholder ..."
+			echo "Removing 'userpassword-encrypted' fields ..."
+			find "$DOCKER_ROOT/amster/config" -name "*.json" \
+					\( -exec sed -i '' "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
+					\( -exec sed -i '' 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
+					-exec sed -i '' '/userpassword-encrypted/d' {} \; \
+
+			# Fix passwords in OAuth2Clients with placeholders or default values.
+			CLIENT_ROOT="$DOCKER_ROOT/amster/config/OAuth2Clients"
 			
-			# Add version parameter
-			find "$DOCKER_ROOT/amster/config" -name "*.json" -exec sed -i '' 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \;
+			echo "Add back password placeholder with defaults"
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{idm.provisioning.client.secret|openidm}"/g' ${CLIENT_ROOT}/idm-provisioning.json
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{idm.rs.client.secret|password}"/g' ${CLIENT_ROOT}/idm-resource-server.json		
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{ig.rs.client.secret|password}""/g' ${CLIENT_ROOT}/resource-server.json
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{pit.client.secret|password}""/g' ${CLIENT_ROOT}/oauth2.json
 
-			## TODO Need to fix up fqdns with ${fqdn}
-			# sed -i '' 's/https:\/\/.*\/enduser\/appAuthHelperRedirect.html/https:\/\/\&{fqdn}\/enduser\/appAuthHelperRedirect.html/g' "$PROFILE_ROOT/amster/config/OAuth2Clients/end-user-ui.json"
-
+			#****** COPY FIXED FILES ******#
 			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
 
-			printf "\n** Check your saved files and fix any commons placeholders or missing secrets. **"
+			printf "\n*** The above fixes have been made to the Amster files. If you have exported new files that should contain commons placeholders or passwords, please update the rules in this script.***\n\n"
 			;;
 		*)
 			echo "Save not supported for $p"

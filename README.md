@@ -98,8 +98,8 @@ configuration under docker/ to be a staging area.  During development, configura
 product (e.g. AM or IDM) to the staging area, and if
 desired, copied back out to the git versioned `config/` folder where it can be committed to version control.  
 
-**`NOTE`** This functionality doesn't apply to the Amster and AM exported files 
-due to the amount of changes required to fix up placeholders and secrets.
+**`NOTE`** This functionality doesn't apply to the AM exported files 
+due to the complexity merging in new and updated files.
 
 The `bin/config.sh` script automates the copy / export process. The `init` command is used to initialize
 (copy from /conf/ to the staging area under docker).
@@ -141,7 +141,6 @@ Configuration is exported to `docker/$version/idm/conf` and is a full copy of th
 **Amster export**  
 Amster only runs as a Kubernetes job so there is no running deployment.  The export command kicks of a new Amster job to export OAuth2Clients and ig-agent config from AM.  
 Configuration is exported to `docker/$version/amster/config`.
-Any files that contain secrets will be exported with a hashed version of the secret. This needs to be removed from the exported file and the secret value updated with the commons placeholder if required.
 
 **AM export**  
 AM configuration export works differently. Due to the large number of config files in file based configuration, we don't want to export all files. So the export identifies only the updated configuration and exports any updated files.  
@@ -159,7 +158,8 @@ bin/config.sh --component idm export
 **SAVE**  
 The `save` command copies the contents of the Docker configuration *back* to the `config/` folder where it can be versioned in Git.  
 
-**`NOTE`** Currently `save` doesn't work for Amster and AM due to the amount of manual changes currently required to fix up secrets and commons placeholders.
+**`NOTE`** This functionality doesn't apply to the AM exported files 
+due to the complexity merging in new and updated files.  This will need to be done manually.
 
 ```bash
 # Save the docker/ configuration for all ForgeRock components back to the config/ folder
