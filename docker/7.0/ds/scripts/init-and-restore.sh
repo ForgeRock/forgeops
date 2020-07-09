@@ -7,7 +7,6 @@
 # GOOGLE_CREDENTIALS_JSON: Contents of the service account JSON, if using GCP. The SA must have write privileges in the desired bucket
 # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Access key and secret for AWS, if using S3. 
 # AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY: Storage account name and key, if using Azure
-# POD_NAME: Name of the current pod
 
 set -e
 
@@ -35,6 +34,14 @@ else
     echo "DSBACKUP_DIRECTORY is set to $DSBACKUP_DIRECTORY"
 fi
 
+if [ -z "${DSBACKUP_HOSTS}" ]; then
+    echo "If AUTORESTORE_FROM_DSBACKUP is enabled, DSBACKUP_HOSTS must be specified. "
+    echo "DSBACKUP_HOSTS should contain the pod names. Example: 'ds-cts-0,ds-idrepo-0'"
+    exit -1
+else
+    echo "DSBACKUP_HOSTS is set to $DSBACKUP_HOSTS"
+fi
+
 if [ -n "${DATA_PRESENT_BEFORE_INIT}" ] && [ "${DATA_PRESENT_BEFORE_INIT}" != "false" ]; then
    echo "****"
    echo "There's data already present in /opt/opendj/data. Skipping restore operation." 
@@ -48,8 +55,28 @@ GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.js
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
 
-# Always restore from first pod's backup. i.e. replace ds-cts-2 with ds-cts-0
-BACKUP_NAME="$(printf '%s' $POD_NAME | sed 's/[0-9]\+$//')0"
+# Let's convert the comma separated value in $DSBACKUP_HOSTS to an array
+HOSTS=($(echo "${DSBACKUP_HOSTS}" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
+# If this host is present in the host list, target this host's backup. Else, target the first backup available.
+if [[ " ${HOSTS[@]} " =~ " ${HOSTNAME} " ]]; then
+    BACKUP_NAME="${HOSTNAME}"
+else
+    for host in "${HOSTS[@]}"; do
+        # Remove the pod idx and compare. ex. ds-idrepo-2 => ds-idrepo-
+        # if ds-idrepo- = ds-idrepo-, then use the $host backup
+        if [ "$(printf ${HOSTNAME} | sed 's/[0-9]\+$//')" = "$(printf ${host} | sed 's/[0-9]\+$//')" ]; then
+            BACKUP_NAME="${host}"
+            break
+        fi
+    done
+fi
+
+if [ -z "${BACKUP_NAME}" ]; then
+    echo "No suitable backup target was found for $HOSTNAME. Skipping restore"
+    exit -0
+else
+    echo "BACKUP_NAME is set to $BACKUP_NAME"
+fi
 
 case "$DSBACKUP_DIRECTORY" in 
   s3://* )
@@ -76,8 +103,8 @@ esac
 
 echo "Attempting to restore backup from: ${BACKUP_LOCATION}"
 
-if [ ${POD_NAME} = ${BACKUP_NAME} ]; then
-  # If this pod is the owner of the backup tasks, restore the tasks. Else, skip the "tasks" backend
+if [ ${HOSTNAME} = ${BACKUP_NAME} ]; then
+  # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend
   BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
       grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
 else

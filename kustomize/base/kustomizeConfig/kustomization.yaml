@@ -32,6 +32,7 @@ configMapGenerator:
   - AM_SERVER_FQDN="$(FQDN)"
   - AUTORESTORE_FROM_DSBACKUP="false" # Set to "true" to enable DS auto recovery. See documentation 
   - DSBACKUP_DIRECTORY="" # Ex. gs://bucket | s3://bucket | az://bucket
+  - DSBACKUP_HOSTS="ds-cts-0,ds-idrepo-0" # Name of the pods running the backup tasks. Ex: "ds-cts-0,ds-idrepo-0"
   - CERT_ISSUER="default-issuer" # cert manager issuer. Patch with letsencrypt-prod for LE SSL certs.
 
 generatorOptions:
@@ -85,6 +86,13 @@ vars:
 - name: DSBACKUP_DIRECTORY
   fieldref:
     fieldpath: data.DSBACKUP_DIRECTORY
+  objref:
+    apiVersion: v1
+    kind: ConfigMap
+    name: platform-config
+- name: DSBACKUP_HOSTS
+  fieldref:
+    fieldpath: data.DSBACKUP_HOSTS
   objref:
     apiVersion: v1
     kind: ConfigMap

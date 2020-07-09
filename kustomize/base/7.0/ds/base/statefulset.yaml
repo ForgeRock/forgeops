@@ -69,16 +69,14 @@ spec:
         - secretRef:
             name: cloud-storage-credentials
         env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
         - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
           value: "true"
         - name: DS_UID_MONITOR_PASSWORD_FILE
           value: "/var/run/secrets/opendj-passwords/monitor.pw"
         - name: DS_UID_ADMIN_PASSWORD_FILE
           value: "/var/run/secrets/opendj-passwords/dirmanager.pw"
+        - name: DSBACKUP_HOSTS
+          value: $(DSBACKUP_HOSTS)
         - name: DSBACKUP_DIRECTORY
           value: $(DSBACKUP_DIRECTORY)
         - name: AUTORESTORE_FROM_DSBACKUP
@@ -99,10 +97,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
+        - name: DSBACKUP_HOSTS
+          value: $(DSBACKUP_HOSTS)              
         - name: DSBACKUP_DIRECTORY
           value: $(DSBACKUP_DIRECTORY)
         # Best to let DS calculate this rather than hard code here.
