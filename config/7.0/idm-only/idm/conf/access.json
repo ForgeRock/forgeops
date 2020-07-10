@@ -74,6 +74,12 @@
       "actions"    : "*"
     },
     {
+      "pattern"    : "util/validateQueryFilter",
+      "roles"      : "internal/role/openidm-authorized",
+      "methods"    : "action",
+      "actions"    : "validate"
+    },
+    {
       "pattern"    : "selfservice/registration",
       "roles"      : "*",
       "methods"    : "read,action",
