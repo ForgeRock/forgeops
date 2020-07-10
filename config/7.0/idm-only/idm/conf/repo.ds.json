@@ -149,6 +149,24 @@
                     },
                     "password": {
                         "type": "json", "ldapAttribute": "fr-idm-password"
+                    },
+                    "authzRoles" : {
+                        "type" : "collection",
+                        "isMultiValued" : true,
+                        "items" : [
+                            {
+                                "type" : "reference",
+                                "ldapAttribute" : "fr-idm-internal-user-authzroles-managed-role",
+                                "primaryKey" : "uid",
+                                "resourcePath" : "managed/role"
+                            },
+                            {
+                                "type" : "reference",
+                                "ldapAttribute" : "fr-idm-internal-user-authzroles-internal-role",
+                                "primaryKey" : "cn",
+                                "resourcePath" : "internal/role"
+                            }
+                        ]
                     }
                 }
             },
@@ -180,6 +198,22 @@
                     "condition": {
                         "type": "simple",
                         "ldapAttribute": "fr-idm-condition"
+                    },
+                    "authzMembers" : {
+                        "type" : "collection",
+                        "isMultiValued" : true,
+                        "items" : [
+                            {
+                                "type" : "reverseReference",
+                                "resourcePath" : "managed/user",
+                                "propertyName" : "authzRoles"
+                            },
+                            {
+                                "type" : "reverseReference",
+                                "resourcePath" : "internal/user",
+                                "propertyName" : "authzRoles"
+                            }
+                        ]
                     }
                 }
             },
@@ -446,6 +480,58 @@
                     "preferences": {
                         "type": "json",
                         "ldapAttribute": "fr-idm-preferences"
+                    },
+                    "roles" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-user-roles",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "managed/role",
+                        "isMultiValued" : true
+                    },
+                    "reports" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "manager",
+                        "isMultiValued" : true
+                    },
+                    "manager" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-user-manager",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "managed/user",
+                        "isMultiValued" : false
+                    },
+                    "_meta" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-user-meta",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "internal/usermeta",
+                        "isMultiValued" : false
+                    },
+                    "_notifications" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-user-notifications",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "internal/notification",
+                        "isMultiValued" : true
+                    },
+                    "authzRoles" : {
+                        "type" : "collection",
+                        "isMultiValued" : true,
+                        "items" : [
+                            {
+                                "type" : "reference",
+                                "ldapAttribute" : "fr-idm-managed-user-authzroles-managed-role",
+                                "primaryKey" : "uid",
+                                "resourcePath" : "managed/role"
+                            },
+                            {
+                                "type" : "reference",
+                                "ldapAttribute" : "fr-idm-managed-user-authzroles-internal-role",
+                                "primaryKey" : "cn",
+                                "resourcePath" : "internal/role"
+                            }
+                        ]
                     }
                 }
             }
@@ -467,7 +553,31 @@
                     "fr-idm-managed-role"
                 ],
                 "jsonAttribute": "fr-idm-managed-role-json",
-                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole"
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatchManagedRole",
+                "properties" : {
+                    "members" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "roles",
+                        "isMultiValued" : true
+                    },
+                    "authzMembers" : {
+                        "type" : "collection",
+                        "isMultiValued" : true,
+                        "items" : [
+                            {
+                                "type" : "reverseReference",
+                                "resourcePath" : "managed/user",
+                                "propertyName" : "authzRoles"
+                            },
+                            {
+                                "type" : "reverseReference",
+                                "resourcePath" : "internal/user",
+                                "propertyName" : "authzRoles"
+                            }
+                        ]
+                    }
+                }
             },
             "scheduler": {
                 "dnTemplate": "ou=scheduler,dc=openidm,dc=forgerock,dc=io"
@@ -509,10 +619,30 @@
                 "dnTemplate": "ou=jsonstorage,dc=openidm,dc=forgerock,dc=io"
             },
             "internal/usermeta" : {
-                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=io"
+                "dnTemplate": "ou=usermeta,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses" : [ "uidObject", "fr-idm-generic-obj" ],
+                "jsonAttribute" : "fr-idm-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatch",
+                "properties": {
+                    "target" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "_meta"
+                    }
+                }
             },
             "internal/notification" : {
-                "dnTemplate": "ou=notification,ou=internal,dc=openidm,dc=forgerock,dc=io"
+                "dnTemplate": "ou=notification,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses" : [ "uidObject", "fr-idm-notification" ],
+                "jsonAttribute" : "fr-idm-notification-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatch",
+                "properties": {
+                    "target" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "_notifications"
+                    }
+                }
             },
             "file" : {
                 "dnTemplate": "ou=file,dc=openidm,dc=forgerock,dc=io"

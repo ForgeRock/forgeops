@@ -10,7 +10,7 @@ IDM_REPO="idm-repo"
 AM_CTS="am-cts"
 
 # Select DS profile version
-if [[ ! -z $profile ]]; then 
+if [[ ! -z $profile ]]; then
     CONFIG="${CONFIG}:${version}"
     AM_IDENTITY_STORE="${AM_IDENTITY_STORE}:${version}"
     IDM_REPO="${IDM_REPO}:${version}"
@@ -42,3 +42,51 @@ create-backend-index \
           --index-name fr-idm-uuid
 EOF
 
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-manager \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-meta \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-notifications \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-roles \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-authzroles-internal-role \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-authzroles-managed-role \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
