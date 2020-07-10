@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "OAuth2Provider",
+    "entityId" : "default",
+    "uid" : "ou=default,ou=GlobalConfig,ou=1.0,ou=OAuth2Provider,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : [ "default" ]
+  },
+  "data" : {
+    "jwtTokenUnreasonableLifetime" : 86400,
+    "blacklistPurgeDelay" : 1,
+    "_type" : {
+      "_id" : "OAuth2Provider",
+      "name" : "OAuth2Provider",
+      "collection" : false
+    },
+    "blacklistCacheSize" : 10000,
+    "statelessGrantTokenUpgradeCompatibilityMode" : false,
+    "blacklistingEnabled" : true,
+    "blacklistPollInterval" : 60,
+    "_id" : "default",
+    "storageScheme" : "CTS_GRANT_SET_MODEL",
+    "jwtTokenLifetimeValidationEnabled" : true
+  }
+}
