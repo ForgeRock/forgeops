@@ -71,7 +71,7 @@
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "fr:idm:*" ],
+      "scopes" : [ "openid" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ ],

@@ -71,7 +71,7 @@
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "am-introspect-all-tokens" ],
+      "scopes" : [ "am-introspect-all-tokens", "am-introspect-all-tokens-any-realm" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ ],

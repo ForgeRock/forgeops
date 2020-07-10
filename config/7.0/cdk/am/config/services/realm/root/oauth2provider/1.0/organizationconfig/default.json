@@ -26,7 +26,7 @@
       "statelessTokensEnabled" : false
     },
     "advancedOAuth2Config" : {
-      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "am-introspect-all-tokens", "fr:idm:*|All of IDM", "fr:idm:profile|Able to read your account in IDM", "fr:idm:notifications|Able to read your IDM notifications", "fr:idm:consent_read|Able to read what you have consented to in IDM", "fr:idm:profile_update|Able to update your profile in IDM", "profile|Your personal information", "write" ],
+      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "am-introspect-all-tokens", "am-introspect-all-tokens-any-realm", "profile|Your personal information", "write" ],
       "codeVerifierEnforced" : "false",
       "tokenSigningAlgorithm" : "HS256",
       "authenticationAttributes" : [ "uid" ],

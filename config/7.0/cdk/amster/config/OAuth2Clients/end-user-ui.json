@@ -66,11 +66,11 @@
     "coreOAuth2ClientConfig" : {
       "loopbackInterfaceRedirection" : false,
       "authorizationCodeLifetime" : 0,
-      "accessTokenLifetime" : 0,
+      "accessTokenLifetime" : 240,
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Public",
-      "scopes" : [ "openid", "fr:idm:profile", "fr:idm:profile_update", "fr:idm:consent_read", "fr:idm:notifications" ],
+      "scopes" : [ "openid" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ "https://&{fqdn}/enduser/appAuthHelperRedirect.html", "https://&{fqdn}/enduser/sessionCheck.html", "http://localhost:8888/appAuthHelperRedirect.html", "http://localhost:8888/sessionCheck.html" ],
