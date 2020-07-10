@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
 [[ "${FR_DEBUG}" == true ]] && set -x
-rsync -War /opt/build/ /opt/workspace
-if ! "${HOME}/.local/bin/bootstrap-project.sh" run-bootstrap;
+
+cd $WORKSPACE
+
+if [[ ! -f "${WORKSPACE}/.CONFIGURED" ]];
 then
-    echo "failed to bootstrap project";
-    exit 1
+  echo "Configuring workspace"
+  git clone --origin upstream --depth 1 https://github.com/ForgeRock/forgeops.git
+  (cd /opt/build; tar cf - .) | tar xvf -
+  touch "${WORKSPACE}/.CONFIGURED"
 fi
-echo "${SSH_PUBKEY}" >> ~/.ssh/authorized_keys
-printenv >> ~/.ssh/environment
-exec /usr/sbin/sshd -D -p "${SSH_PORT}" -f ~/etc/sshd_config
+
+# TODO: Needed still?
+#echo "${SSH_PUBKEY}" >> ~/.ssh/authorized_keys
+#printenv >> ~/.ssh/environment
+
+# Needed for VSCode remote support
+#exec /usr/sbin/sshd -D -p "${SSH_PORT}" -f ~/etc/sshd_config
+# Need for VSCode
+exec /usr/sbin/sshd -D -p "${SSH_PORT}"
+
 exec pause

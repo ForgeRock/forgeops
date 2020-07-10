@@ -1,7 +1,3 @@
-# Builds the parent python image
-# This takes a long time in skaffold - so we build the parent here and use it in a child image
-# To build this:  gcloud builds submit
-# Or locally:  docker build -t gcr.io/engineering-devops/python-test .
 steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/skaffold', '.' ]

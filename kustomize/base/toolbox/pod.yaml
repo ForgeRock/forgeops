@@ -11,9 +11,6 @@ spec:
   - name: toolbox
     image: gcr.io/engineering-devops/cdk-toolbox:latest
     imagePullPolicy: Always
-    envFrom:
-    - configMapRef:
-        name: toolbox-config
     ports:
     - containerPort: 4222
     volumeMounts:
@@ -24,3 +21,5 @@ spec:
   - name: workspace
     persistentVolumeClaim:
       claimName: storage-claim
+
+

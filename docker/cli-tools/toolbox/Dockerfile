@@ -5,17 +5,13 @@ ARG COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/microsoft/vscode-dev
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
-RUN adduser --disabled-password forgeops --no-create-home --home /opt/workspace \
+RUN adduser --disabled-password forgeops --no-create-home --home /opt/workspace --gid 0 \
         && mkdir -m 0770 -p /opt/{workspace,build} \
-        && chown root:forgeops /opt/{workspace,build}
+        && chown forgeops:root /opt/{workspace,build}
 COPY --from=pause /pause /usr/local/bin/pause
-RUN apt-get update && apt-get install --yes vim jq curl dnsutils tmux git rsync openssh-server
-
-
-
-USER forgeops
-COPY --chown=forgeops:forgeops docker/cli-tools/toolbox/etc /opt/build/.etc
-COPY --chown=forgeops:forgeops docker/cli-tools/toolbox/bin/  /opt/build/.local/bin/
+# VScode prereqs from https://code.visualstudio.com/docs/remote/linux#_remote-host-container-wsl-linux-prerequisites
+RUN apt-get update && apt-get install --yes vim jq curl dnsutils tmux git rsync openssh-server libc6 libstdc++6 \
+        python-minimal ca-certificates tar
 
 RUN mkdir -p /opt/build/.local/bin \
         && mkdir -p /opt/build/.vim/pack/plugins/start \
@@ -29,17 +25,20 @@ RUN mkdir -p /opt/build/.local/bin \
                                     && echo "AllowUsers forgeops" >> /opt/build/etc/sshd_config \
                                     && echo "PermitUserEnvironment yes" >> /opt/build/etc/sshd_config \
                                         && mkdir -p /opt/build/.ssh \
-                                            && chmod -R 0700 /opt/build/.ssh
+                                            && chmod -R 0700 /opt/build/.ssh \
+                                                && chown -R forgeops:root /opt/
 
-COPY bin/ /opt/build/.local/bin
+USER forgeops
 
-COPY config /opt/build/.ssh/config
+RUN echo "PATH=/opt/workspace/bin:$PATH" >> /opt/build/.bashrc \
+        && echo "bash -c /opt/build/bin/start-shell.sh" >> /opt/build/.bashrc
 
-RUN echo "PATH=~/.local/bin:$PATH" >> /opt/build/.bashrc \
-        && echo "bash -c ~/.local/bin/start-shell.sh" >> /opt/build/.bashrc
+COPY --chown=forgeops:root etc /opt/build/etc
+COPY --chown=forgeops:root bin/  /opt/build/bin
+COPY --chown=forgeops:root bin/git-set-fork.sh /usr/local/bin
 
 ENV SSH_PORT=4222
-ENV WORKSPACE=/opt/workspace/forgeops
+ENV WORKSPACE=/opt/workspace
 WORKDIR /opt/workspace
-ENTRYPOINT ["/opt/build/.local/bin/entrypoint.sh"]
+ENTRYPOINT ["/opt/build/bin/entrypoint.sh"]
 CMD ["/usr/local/bin/pause"]

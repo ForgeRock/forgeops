@@ -10,3 +10,4 @@ spec:
     requests:
       storage: 8Gi
   storageClassName: standard
+

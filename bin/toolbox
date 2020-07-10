@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
-
+# Deploys the toolbox in a pod. The Toolbox contains utilities such as skaffold and kustomize
+#
 SCRIPT_NAME="$(basename "$0")"
+
+# Remote:
+TOOLBOX_URL=https://github.com/ForgeRock/forgeops/blob/master/kustomize/base/toolbox
+# For local testing
+# TOOLBOX_URL=kustomize/base/toolbox
 
 if ! command -v kustomize >/dev/null 2>&1;
 then
@@ -24,34 +30,15 @@ This script generates a kustomize profile, and then deploys the toolbox.
 Usage:  ${SCRIPT_NAME} [OPTIONS] COMMAND
 
 Command:
-    deploy     deploys forgeops-toolbox and makes sure kaniko secret is available
-    configure  generates a ./forgeops-toolbox/kustomization.yaml file
-    remove     *destructive* removes all objects (including PVC) related to the toobox
-    all        configures and deploys
+    start   start the toolbox pod on kubernetes
+    stop    stop (pause) the toolbox. The persistent volume claims will not be deleted
+    exec    Get a tmux shell inside the toolbox
+    nuke    Completely destroy the toolbox and the pvc. You can not recover any saved data
+    backup  Copies the contents of your toolbox /opt/workspace to ./tmp/workspace
 
 Options:
-    -n         namespace for deployment (default: active namespace)
-    -f         fully qualified domain utilized by ForgeRock platform (default: default.iam.example.com)
-    -g         git repository used as the fork of forgeops
-    -d         docker repository to push images from the kubernetes cluster (default: gcr.io/engineering-devops)
-    -i         ssh public key used for ssh connection with VS Code Remote Development
-    -h         help
 
-Examples:
-    # using defaults configure and deploy
-    ${SCRIPT_NAME} -f https://github.com/mygithuborg/forgeops.git all
-    # change defaults, configure kustomization.yaml
-    ${SCRIPT_NAME} -r dockerhub.com/mydockerhubaccount
-                   -s example-subdomain
-                   -d mydomain.com
-                   -n mynamespace
-                   -f https://github.com/mygithuborg/forgeops.git
-                   -i ~/.ssh/id_rsa.pub
-                   configure
-    # deploys kustomization
-    ${SCRIPT_NAME} deploy
-    # cleanup - careful this removes even volumes which could result in lost work
-    ${SCRIPT_NAME} remove
+    -h         help
 EOF
     printf "%-10s" "$help"
 }
@@ -66,36 +53,7 @@ load_ns () {
     echo "${ns}"
 }
 
-run_configure () {
-    missing_opts=0
-    for req in NAMESPACE FQDN DOCKER_REPO;
-    do
-        if [[ "${!req}" == "" ]];
-        then
-            echo "${req} is required";
-            missing_opts=1
-        fi
-    done
-    if (( "${missing_opts}" != 0 ));
-    then
-        usage;
-        return 1
-    fi
-    if [ ! -z ${SSH_PUBKEY+x} ] && [[ ! -f "${SSH_PUBKEY}" ]];
-    then
-        echo "a path to a public key is required"
-        return 1
-    elif [ ! -z ${SSH_PUBKEY+x} ];
-    then
-        SSH_PUBKEY=$(cat $SSH_PUBKEY)
-    fi
-    mkdir -p forgeops-toolbox
-    cat <<KUSTOMIZATION >forgeops-toolbox/kustomization.yaml
-namespace: ${NAMESPACE}
-resources:
-- github.com/ForgeRock/forgeops/kustomize/base/toolbox/
-KUSTOMIZATION
-
+init () {
 
     if ! k8s get ns "${NAMESPACE}";
     then
@@ -113,9 +71,13 @@ KUSTOMIZATION
     fi
     if ! k8s get secret kaniko-secret;
     then
-        echo "kaniko secret doesn't exist please create it"
-        echo "hint: https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster"
-        return 1
+        if ! k8s --namespace kaniko get secret kaniko-secret;
+        then
+            echo "kaniko secret for building images doesn't exist please create it"
+            echo "see: https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster"
+            echo "I will continue to run the toolbox, but you may not be able to build images or run skaffold"
+            return 0
+        fi
     fi
     return 0
 }
@@ -128,42 +90,56 @@ k8s () {
     fi
 }
 
-run_deploy () {
-    if ! kustomize build forgeops-toolbox | k8s -n "${NAMESPACE}" apply -f -;
+# TODO: Replace this with kpt or some other mechanism..
+get_toolbox_manifest() {
+    kustomize build $TOOLBOX_URL | sed -e "s/namespace:\ default/namespace:\ $NAMESPACE/" >/tmp/toolbox.yaml
+}
+
+start() {
+    echo "Deploying toolbox to $NAMESPACE namespace"
+    get_toolbox_manifest
+
+    if ! kubectl apply -f /tmp/toolbox.yaml;
     then
         echo "failed to deploy toolbox";
         return 1
     fi
-    if ! k8s wait --for=condition=available deployment/forgeops-cdk-toolbox --timeout=300s -n "${NAMESPACE}";
-    then
-        echo "toolbox never reached status of available"
-        return 1
-    fi
-    echo "deployed forgeops-toolbox"
-    echo "to get started run:"
-    echo "  kubectl exec -it deploy/forgeops-cdk-toolbox tmux"
+    echo ""
+    echo "Give the toolbox time to start up. When ready, run"
+    echo "toolbox exec"
+    echo "or use"
+    echo "kubectl exec -it forgeops-cdk-toolbox -- tmux"
+    echo "You can also connect to the toolbox using VSCode remote"
     return 0
 }
 
-run_delete () {
-    kustomize build forgeops-toolbox | k8s -n "${NAMESPACE}" delete -f -
+stop () {
+    get_toolbox_manifest
+    echo "Stoping the pod. This will NOT delete the data on the pvc"
+    kubectl delete pod forgeops-cdk-toolbox
     return $?
 }
 
+exec_pod() {
+    echo "Getting a shell in the toolbox"
+    kubectl -n $NAMESPACE exec forgeops-cdk-toolbox -it -- tmux
+}
+
+backup() {
+  echo "Backing up the toolbox pod /opt/workspace to ./tmp/workspace"
+  echo "WARNING: If you added a github SSH key in the toolbox you may want to remove ./tmp/workspace/.ssh"
+  mkdir -p ./tmp
+  kubectl cp  forgeops-cdk-toolbox:/opt/workspace ./tmp/workspace
+}
+
 NAMESPACE=$(load_ns)
-FQDN=default.iam.example.com
-DOCKER_REPO=gcr.io/engineering-devops
 
 # arg/opt parse
-while getopts n:f:g:d:i:h option
+while getopts n:h option
 do
     case "${option}"
         in
         n) NAMESPACE=${OPTARG};;
-        f) FQDN=${OPTARG};;
-        g) FORK=${OPTARG};;
-        d) DOCKER_REPO=${OPTARG};;
-        i) SSH_PUBKEY=${OPTARG};;
         h) usage; exit 0;;
         *) usage; exit 1;;
     esac
@@ -173,35 +149,49 @@ shift $((OPTIND - 1))
 if [[ "$#" != 1 ]];
 then
     echo "one argument is expected"
+    usage
     exit 1
 fi
 
+
+nuke() {
+    echo "Deleting the toolbox. This is not recoverable"
+    read -p "Are you sure? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        get_toolbox_manifest
+        kubectl delete -f /tmp/toolbox.yaml
+    else
+        echo "not deleted"
+    fi
+}
+
 while (( "$#" )); do
     case "$1" in
-        configure)
+        start)
             shift
-            run_configure
-            exit $?
+            start
             ;;
-        deploy)
+        stop)
             shift
-            run_deploy
-            exit $?
+            stop
             ;;
-        remove)
+        nuke)
             shift
-            run_delete
-            exit $?
+            nuke
             ;;
-        all)
-            run_configure && run_deploy
-            exit $?
+        exec)
+            shift
+            exec_pod
+            ;;
+        backup)
+            shift
+            backup
             ;;
         *)
             usage
-            exit 1
             ;;
     esac
 done
-usage
-exit 1
+

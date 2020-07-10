@@ -1,0 +1,13 @@
+# Skaffold used to iterate on the the toolbox.
+apiVersion: skaffold/v2beta4
+kind: Config
+metadata:
+  name: toolbox
+build:
+  artifacts:
+  - image: gcr.io/engineering-devops/cdk-toolbox
+    context: .
+deploy:
+  kustomize:
+    paths:
+    - ../../../kustomize/base/toolbox
