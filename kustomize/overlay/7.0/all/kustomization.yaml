@@ -14,3 +14,12 @@ resources:
 - ../../../base/admin-ui
 - ../../../base/7.0/ingress
 - ../../../base/ldif-importer
+
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    FQDN: "default.iam.example.com"
