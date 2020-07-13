@@ -206,7 +206,7 @@
       "methods"   : "*",
       "actions"   : "*",
       "excludePatterns": "repo,repo/*,file/iwa/*"
-G   },
+    },
     {
       "pattern"   : "system/*",
       "roles"     : "internal/role/openidm-admin",
