@@ -71,7 +71,6 @@ spec:
              name: am-passwords
           - secret:
               name: am-keystore
-      - name: ds
       - name: amster-keys
         secret:
           secretName: amster
