@@ -21,23 +21,36 @@
             "propertyMapping": {
               "sub": "_id"
             },
-            "userRoles": "authzRoles/*"
+            "userRoles": "authzRoles/*",
+            "defaultRoles" : [
+                "internal/role/openidm-authorized"
+            ]
           }
         ],
         "anonymousUserMapping" : {
             "localUser" : "internal/user/anonymous",
-            "userRoles" : "authzRoles/*"
+            "userRoles" : "authzRoles/*",
+            "roles" : [
+                "internal/role/openidm-reg"
+            ]
         },
         "staticUserMapping" : [
             {
                 "subject" : "amadmin",
                 "localUser" : "internal/user/openidm-admin",
-                "userRoles" : "authzRoles/*"
+                "userRoles" : "authzRoles/*",
+                "roles" : [
+                    "internal/role/openidm-authorized",
+                    "internal/role/openidm-admin"
+                ]
             },
             {
                 "subject": "idm-provisioning",
                 "localUser": "internal/user/idm-provisioning",
-                "userRoles": "authzRoles/*"
+                "userRoles": "authzRoles/*",
+                "roles" : [
+                    "internal/role/platform-provisioning"
+                ]
             }
         ]
     }
