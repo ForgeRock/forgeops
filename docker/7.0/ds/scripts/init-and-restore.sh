@@ -28,7 +28,7 @@ fi
 
 if [ -z "${DSBACKUP_DIRECTORY}" ]; then
     echo "If AUTORESTORE_FROM_DSBACKUP is enabled, DSBACKUP_DIRECTORY must be specified. "
-    echo "DSBACKUP_DIRECTORY can be set to: /local/path | s3://bucket/path | az://bucket/path | gs://bucket/path "
+    echo "DSBACKUP_DIRECTORY can be set to: /local/path | s3://bucket/path | az://container/path | gs://bucket/path "
     exit -1
 else
     echo "DSBACKUP_DIRECTORY is set to $DSBACKUP_DIRECTORY"
