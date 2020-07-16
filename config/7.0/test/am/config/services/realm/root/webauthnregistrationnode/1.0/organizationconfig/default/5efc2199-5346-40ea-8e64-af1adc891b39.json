@@ -1,0 +1,35 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "WebAuthnRegistrationNode",
+    "entityId" : "default/5efc2199-5346-40ea-8e64-af1adc891b39",
+    "uid" : "ou=5efc2199-5346-40ea-8e64-af1adc891b39,ou=default,ou=OrganizationConfig,ou=1.0,ou=WebAuthnRegistrationNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "relyingPartyName" : "ForgeRock",
+    "generateRecoveryCodes" : true,
+    "authenticatorAttachment" : "UNSPECIFIED",
+    "enforceRevocationCheck" : true,
+    "attestationPreference" : "NONE",
+    "_type" : {
+      "_id" : "WebAuthnRegistrationNode",
+      "name" : "WebAuthnRegistrationNode",
+      "collection" : false
+    },
+    "timeout" : 60,
+    "excludeCredentials" : false,
+    "asScript" : true,
+    "requiresResidentKey" : false,
+    "acceptedSigningAlgorithms" : [ "ES256", "RS256" ],
+    "origins" : [ ],
+    "_id" : "default/5efc2199-5346-40ea-8e64-af1adc891b39",
+    "userVerificationRequirement" : "PREFERRED",
+    "trustStoreAlias" : "trustalias",
+    "postponeDeviceProfileStorage" : false,
+    "storeAttestationDataInTransientState" : false
+  }
+}

@@ -1,0 +1,34 @@
+{
+    "configuration" : {
+        "selfRegistration" : false,
+        "passwordReset" : false,
+        "forgotUsername" : false,
+        "lang" : "en",
+        "passwordResetLink" : "",
+        "roles" : {
+            "internal/role/openidm-authorized" : "ui-user",
+            "internal/role/openidm-admin" : "ui-admin"
+        },
+        "notificationTypes" : {
+            "info" : {
+                "name" : "common.notification.types.info",
+                "iconPath" : "images/notifications/info.png"
+            },
+            "warning" : {
+                "name" : "common.notification.types.warning",
+                "iconPath" : "images/notifications/warning.png"
+            },
+            "error" : {
+                "name" : "common.notification.types.error",
+                "iconPath" : "images/notifications/error.png"
+            }
+        },
+        "defaultNotificationType" : "info",
+        "platformSettings" : {
+            "adminOauthClient" : "idm-admin-ui",
+            "adminOauthClientScopes" : "openid",
+            "amUrl" : "/am",
+            "loginUrl" : ""
+        }
+    }
+}

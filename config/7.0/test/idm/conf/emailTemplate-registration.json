@@ -1,0 +1,14 @@
+{
+    "enabled" : true,
+    "from" : "",
+    "subject" : {
+      "en" :  "Register new account",
+      "fr" : "Créer un nouveau compte"
+    },
+    "message" : {
+      "en" : "<h3>This is your registration email.</h3><h4><a href=\"{{object.resumeURI}}\">Email verification link</a></h4>",
+      "fr" : "<h3>Ceci est votre mail d'inscription.</h3><h4><a href=\"{{object.resumeURI}}\">Lien de vérification email</a></h4>"
+    },
+    "defaultLocale" : "en",
+    "mimeType" : "text/html"
+}

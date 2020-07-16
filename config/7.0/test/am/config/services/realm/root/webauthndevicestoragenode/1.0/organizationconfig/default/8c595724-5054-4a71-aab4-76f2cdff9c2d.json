@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "WebAuthnDeviceStorageNode",
+    "entityId" : "default/8c595724-5054-4a71-aab4-76f2cdff9c2d",
+    "uid" : "ou=8c595724-5054-4a71-aab4-76f2cdff9c2d,ou=default,ou=OrganizationConfig,ou=1.0,ou=WebAuthnDeviceStorageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "generateRecoveryCodes" : true,
+    "_type" : {
+      "_id" : "WebAuthnDeviceStorageNode",
+      "name" : "WebAuthnDeviceStorageNode",
+      "collection" : false
+    },
+    "_id" : "default/8c595724-5054-4a71-aab4-76f2cdff9c2d"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "authenticationTreesService",
+    "entityId" : "default/SDK-TC001-DeviceRegistration",
+    "uid" : "ou=SDK-TC001-DeviceRegistration,ou=default,ou=OrganizationConfig,ou=1.0,ou=authenticationTreesService,ou=services,ou=am-config",
+    "sunServiceID" : "tree",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : [ "SDK-TC001-DeviceRegistration" ]
+  },
+  "data" : {
+    "nodes" : {
+      "520a8e9e-c408-4c22-b9f5-faf1283ae71a" : {
+        "displayName" : "Page Node",
+        "nodeType" : "PageNode",
+        "x" : 52,
+        "y" : 112,
+        "connections" : {
+          "outcome" : "0cf0a8e0-f6bc-4286-99dd-58edea34fbfd"
+        }
+      },
+      "0cf0a8e0-f6bc-4286-99dd-58edea34fbfd" : {
+        "displayName" : "Data Store Decision",
+        "nodeType" : "DataStoreDecisionNode",
+        "x" : 117,
+        "y" : 272,
+        "connections" : {
+          "false" : "e301438c-0bd0-429c-ab0c-66126501069a",
+          "true" : "70e691a5-1e33-4ac3-a356-e7b6d60d92e0"
+        }
+      }
+    },
+    "staticNodes" : {
+      "startNode" : {
+        "x" : 50,
+        "y" : 25
+      },
+      "70e691a5-1e33-4ac3-a356-e7b6d60d92e0" : {
+        "x" : 324,
+        "y" : 260
+      },
+      "e301438c-0bd0-429c-ab0c-66126501069a" : {
+        "x" : 386,
+        "y" : 323
+      }
+    },
+    "entryNodeId" : "520a8e9e-c408-4c22-b9f5-faf1283ae71a",
+    "_type" : {
+      "_id" : "authenticationTreesService",
+      "name" : "authenticationTreesService",
+      "collection" : false
+    },
+    "uiConfig" : { },
+    "_id" : "default/SDK-TC001-DeviceRegistration"
+  }
+}

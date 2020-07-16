@@ -1,0 +1,13 @@
+{
+    "classPathURLs" : [ ],
+    "systemProperties" : { },
+    "requestAttributes" : { },
+    "scriptExtensions" : { },
+    "initParams" : {
+        "maxRequestSizeInMegabytes" : 5
+    },
+    "urlPatterns" : [
+        "&{openidm.servlet.alias}/*"
+    ],
+    "filterClass" : "org.forgerock.openidm.jetty.LargePayloadServletFilter"
+}
