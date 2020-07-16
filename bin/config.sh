@@ -235,15 +235,7 @@ export_config(){
 
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 
-			kubectl exec $pod -- bash -c "cd openam && git add config/services && git diff HEAD --name-only config/services > exported"
-			kubectl cp $pod:"/home/forgerock/openam/exported" "$DOCKER_ROOT/am/config-exported/exported"
-
-			while read a; do
-				echo "exporting file: $a"
-				kubectl cp $pod:"/home/forgerock/openam/${a}" "$DOCKER_ROOT/am/config-exported/${a}"
-			done <$DOCKER_ROOT/am/config-exported/exported
-
-			rm -fr "$DOCKER_ROOT/am/config-exported/exported"
+			kubectl exec $pod -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am/config-exported; tar xvf - )
 
 			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config-exported."
 			echo "You now need to check the files and integrate those into config/7.0/am manually."

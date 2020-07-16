@@ -9,9 +9,9 @@ USER forgerock
 COPY  --chown=forgerock:root config/ /home/forgerock/openam/config/
 
 # Use a custom logback. Comment out if you want to use the default json logger.
-COPY logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
+COPY --chown=forgerock:root logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
 
-COPY custom-entrypoint.sh /home/forgerock
+COPY --chown=forgerock:root *.sh /home/forgerock/
 
 WORKDIR /home/forgerock/openam
 
