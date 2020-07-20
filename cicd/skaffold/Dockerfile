@@ -1,13 +1,13 @@
 #Download Skaffold
 FROM alpine as download-skaffold
-ARG SKAFFOLD_VERSION=v1.12.0
+ARG SKAFFOLD_VERSION=v1.12.1
 ENV SKAFFOLD_URL https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64
 RUN wget -O skaffold "${SKAFFOLD_URL}"
 RUN chmod +x skaffold
 
 # Download kustomize
 FROM alpine as download-kustomize
-ENV KUSTOMIZE_VERSION 3.8.0
+ENV KUSTOMIZE_VERSION 3.8.1
 ENV KUSTOMIZE_URL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
 RUN wget "${KUSTOMIZE_URL}"
 RUN tar -xzf kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz

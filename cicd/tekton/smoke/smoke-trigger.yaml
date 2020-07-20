@@ -68,6 +68,6 @@ spec:
           expression: "body.repository.links.clone[0].name == 'http' ? body.repository.links.clone[0].href : body.repository.links.clone[1].href" 
 
     bindings:
-    - name: smoke
+    - ref: smoke
     template:
       name: smoke

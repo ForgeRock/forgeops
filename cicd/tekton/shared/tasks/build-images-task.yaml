@@ -34,9 +34,7 @@ spec:
       #!/usr/bin/env bash
       {
         cd /workspace/forgeops
-        cd bin
-        ./config.sh init -v 7.0 -p cdk
-        cd ..
+       ./bin/config.sh init -v 7.0 -p cdk
         skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) build
       } || {
         curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build \`$(inputs.params.profile)\`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL

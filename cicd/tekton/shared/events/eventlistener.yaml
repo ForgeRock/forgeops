@@ -1,0 +1,25 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: tekton-events
+spec:
+  serviceAccountName: tekton-trigger
+  triggers:
+  - name: deploy-failed
+    interceptors:
+    - cel:
+        # In case the send to webhook task fails for some reason, we want to filter it out to avoid an infinite loop
+        filter: >-
+          header.match('ce-type', 'dev.tekton.event.taskrun.failed.v1') &&
+          body.taskRun.metadata.labels['tekton.dev/task'] != 'send-to-webhook-slack'
+    bindings:
+    - ref: configmap-deploy-details
+    - ref: taskrun-meta
+    template:
+      name: deploy-failed-slack
+
+
+# A sample of of some other expressions you can use to filter events
+#          header.match('ce-type', 'dev.tekton.event.taskrun.failed.v1') &&
+#          body.taskRun.metadata.labels['triggers.tekton.dev/eventlistener'] == 'tekton-cd' &&
+#          body.taskRun.metadata.labels['triggers.tekton.dev/trigger'] == 'configmaps'

@@ -51,7 +51,7 @@ spec:
   triggers:
     - name: cron-trig
       bindings:
-      - name: nightly
+      - ref: nightly
       template:
         name: nightly
 

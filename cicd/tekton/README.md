@@ -23,3 +23,13 @@ The Tekton dashboard is also included in this install. To map the dashboard, you
 kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097
 # open http://localhost:9097 in your browser
 ```
+
+## Purging completed pods
+
+Tekton leaves completed pods around to provide status updates and for log output. After several days
+you may wish to clean up completed pods. Use the following command:
+
+
+```
+kubectl -n tekton-pipelines delete pod --field-selector=status.phase==Succeeded
+```

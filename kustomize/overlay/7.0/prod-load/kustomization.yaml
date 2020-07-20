@@ -1,0 +1,16 @@
+namespace: prod
+resources:
+- ../../../base/kustomizeConfig
+- ../../../base/forgeops-secrets
+- ../../../base/amster
+- ../../../base/ldif-importer
+
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    FQDN: "prod.iam.forgeops.com"
+    CERT_ISSUER: letsencrypt-prod

@@ -147,6 +147,48 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/nightly
 
+# 24/7 demo that is continually upgraded (nightly is deployed fresh every night)
+# Just the directory services
+- name: prod-ds
+  build:
+    artifacts:
+    - *DS-CTS_KANIKO
+    - *DS-IDREPO_KANIKO
+    cluster: *kaniko-cluster
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/prod-ds
+# Just AM/IDM apps
+- name: prod-apps
+  build:
+    artifacts:
+    - *AM_KANIKO
+    - *IDM_KANIKO
+    cluster: *kaniko-cluster
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/prod-apps
+
+# Just initial load apps. These can be deleted after the initial deployment
+- name: prod-load
+  build:
+    artifacts:
+    - *LDIF-IMPORTER_KANIKO
+    - *AMSTER_KANIKO
+    - *FORGEOPS-SECRETS_KANIKO
+    cluster: *kaniko-cluster
+    tagPolicy:
+      gitCommit: {}
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/prod-load
+
+
+
 # Smoke tests
 - name: smoke
   build:

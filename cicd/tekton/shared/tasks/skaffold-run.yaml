@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: skaffold-run
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+  params:
+  - name: profile
+    type: string
+    description: profile to deploy
+      
+  - name: docker-repo
+    type: string
+    description: Docker repository URL
+  results:
+  - name: status
+    description: Deployment status
+
+  steps:
+  - name: deploy-new-env
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    script: |
+      #!/usr/bin/env bash
+      cd /workspace/forgeops
+      {
+        ./bin/config.sh init -v 7.0 -p cdk
+        skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) run
+      } || {
+        msg="Skaffold failed to deploy new $(inputs.params.profile) environment. See pipeline logs"
+        echo $msg | tee /tekton/results/status
+        exit 1
+      }

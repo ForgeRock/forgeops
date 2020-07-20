@@ -1,0 +1,32 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prod-pipeline
+spec:
+  resources:
+    - name: forgeops
+      type: git
+  params:
+  - name: namespace
+    type: string
+    description: Target namespace of this pipeline
+    default: prod
+  - name: skaffold-profile
+    type: string
+    description: Skaffold profile to deploy
+    default: prod-apps
+  tasks:
+  - name: skaffold-run
+    taskRef:
+      name: skaffold-run
+    resources:
+      inputs:
+      - name: forgeops
+        resource: forgeops
+    params:
+    - name: profile
+      value: "$(params.skaffold-profile)"
+    - name: docker-repo
+      value: gcr.io/engineering-devops/nightly
+
+  # TODO: add tasks for smoke test, creating users, etc.

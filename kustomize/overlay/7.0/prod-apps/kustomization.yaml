@@ -1,0 +1,22 @@
+namespace: prod
+resources:
+- ../../../base/kustomizeConfig
+- ../../../base/am
+- ../../../base/idm
+- ../../../base/end-user-ui
+- ../../../base/login-ui
+- ../../../base/admin-ui
+- ../../../base/7.0/ingress
+
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    FQDN: "prod.iam.forgeops.com"
+    CERT_ISSUER: letsencrypt-prod
+
+
+

@@ -12,6 +12,7 @@ The entire build happens in the cluster itself. No external tooling is required.
     tkn -n tekton-pipelines pipelinerun logs nightly-pipeline-run-lf7tn -f #get pipeline logs  
     tkn -n tekton-pipelines pipeline start nightly-pipeline -s tekton-worker #start a pipeline  
   For more information on `tkn`, take a look at https://github.com/tektoncd/cli/tree/master/docs
+* A secret is required for SLACK Integration
 
 ## Install the pipeline
 
