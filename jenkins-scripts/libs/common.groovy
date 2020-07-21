@@ -34,9 +34,9 @@ LODESTAR_GIT_COMMIT = getLodestarCommit()
 dockerImages = [
         'am'        : DockerImagePromotion.load('docker/7.0/am/Dockerfile', 'gcr.io/forgerock-io/am-base', steps),
         'amster'    : DockerImagePromotion.load('docker/7.0/amster/Dockerfile', 'gcr.io/forgerock-io/amster', steps),
-        'ds-cts'    : DockerImagePromotion.load('docker/7.0/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds-empty', steps),
-        'ds-util'   : DockerImagePromotion.load('docker/7.0/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds-empty', steps),
-        'ds-idrepo' : DockerImagePromotion.load('docker/7.0/ds/idrepo/Dockerfile', 'gcr.io/forgerock-io/ds-empty', steps),
+        'ds-cts'    : DockerImagePromotion.load('docker/7.0/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
+        'ds-util'   : DockerImagePromotion.load('docker/7.0/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
+        'ds-idrepo' : DockerImagePromotion.load('docker/7.0/ds/idrepo/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
         'idm'       : DockerImagePromotion.load('docker/7.0/idm/Dockerfile', 'gcr.io/forgerock-io/idm', steps),
         'ig'        : DockerImagePromotion.load('docker/7.0/ig/Dockerfile', 'gcr.io/forgerock-io/ig', steps),
 ]

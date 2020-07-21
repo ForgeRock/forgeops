@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/pit1:latest AS ds
+FROM gcr.io/forgerock-io/ds/pit1:latest AS ds
 FROM openjdk:11-jdk-slim
 
 ENV FORGEROCK_HOME /home/forgerock
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y jq openssh-client openssl curl vim && \
     curl -LO https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_RELEASE}/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl
-    
+
 ADD forgeops-secrets-image/ /opt/gen/
 RUN mkdir -p /opt/gen/secrets/generic/truststore && \
     cp $JAVA_HOME/lib/security/cacerts /opt/gen/secrets/generic/truststore && \

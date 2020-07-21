@@ -38,7 +38,7 @@ void runStage(PipelineRun pipelineRun) {
                             COMPONENTS_IG_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('ig'),
                             COMPONENTS_IG_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/ig/pit1',
                             COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG           : commonModule.getCurrentTag('ds-idrepo'),
-                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_REPOSITORY    : 'gcr.io/forgerock-io/ds-empty/pit1',
+                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_REPOSITORY    : 'gcr.io/forgerock-io/ds/pit1',
                             STASH_LODESTAR_BRANCH                           : commonModule.LODESTAR_GIT_COMMIT,
                             STASH_FORGEOPS_BRANCH                           : 'fraas-production',
                             REPORT_NAME_PREFIX                              : subStageName,
