@@ -25,7 +25,7 @@
             "pattern" : "^(managed|internal)($|(/.+))",
             "condition" : {
                 "type" : "text/javascript",
-                "source" : "context.caller.external === true || context.current.name === 'selfservice'"
+                "source" : "(context.caller.external === true || context.current.name === 'selfservice') && (typeof context.privilege === 'undefined' || Object.keys(context.privilege.matchingPrivileges).length === 0)"
             },
             "onResponse" : {
                 "type" : "text/javascript",
