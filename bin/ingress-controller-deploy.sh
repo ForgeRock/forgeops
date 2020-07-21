@@ -2,8 +2,9 @@
 # Script to deploy an nginx ingress controller using Helm3 to either EKS/GKE or AKS.
 #set -oe pipefail
 
-# Helm Chart values
-VERSION="0.27.0"
+# Version is currently not used. We default to installing the latest stable version in the helm repo.
+#VERSION="0.34.1"
+
 AKS_OPTS=""
 IP_OPTS=""
 
@@ -77,10 +78,8 @@ ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
 
 
 # Add Helm repo
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/ > /dev/null
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ > /dev/null
 
 # Deploy ingress controller Helm chart
-helm upgrade -i nginx-ingress --namespace nginx stable/nginx-ingress \
-  --set controller.image.tag=$VERSION \
+helm upgrade -i nginx-ingress --namespace nginx ingress-nginx/ingress-nginx \
   $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
-
