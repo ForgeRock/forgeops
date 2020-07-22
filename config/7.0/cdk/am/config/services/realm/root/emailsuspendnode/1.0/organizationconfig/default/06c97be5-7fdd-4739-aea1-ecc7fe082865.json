@@ -19,7 +19,6 @@
     "_id" : "default/06c97be5-7fdd-4739-aea1-ecc7fe082865",
     "emailAttribute" : "mail",
     "emailTemplateName" : "resetPassword",
-    "objectType" : "user",
     "emailSuspendMessage" : {
       "en" : "An email has been sent to the address you entered. Click the link in that email to proceed."
     },

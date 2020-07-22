@@ -19,7 +19,6 @@
     },
     "_id" : "default/9f1e8d94-4922-481b-9e14-212b66548900",
     "required" : true,
-    "objectType" : "user",
     "identityAttribute" : "mail"
   }
 }

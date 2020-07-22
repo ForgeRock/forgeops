@@ -18,7 +18,6 @@
     },
     "interval" : "AT",
     "_id" : "default/8afdaec3-275e-4301-bb53-34f03e6a4b29",
-    "identityAttribute" : "userName",
-    "objectType" : "user"
+    "identityAttribute" : "userName"
   }
 }

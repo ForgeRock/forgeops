@@ -18,6 +18,6 @@
     "_id" : "default/3990ce1f-cce6-435b-ae1c-f138e89411c1",
     "patchAsObject" : true,
     "identityAttribute" : "userName",
-    "objectType" : "user"
+    "identityResource" : "managed/user"
   }
 }

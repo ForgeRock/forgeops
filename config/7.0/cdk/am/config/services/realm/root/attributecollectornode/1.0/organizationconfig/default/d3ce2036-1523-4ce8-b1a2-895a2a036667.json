@@ -19,7 +19,6 @@
     },
     "_id" : "default/d3ce2036-1523-4ce8-b1a2-895a2a036667",
     "required" : true,
-    "identityAttribute" : "userName",
-    "objectType" : "user"
+    "identityAttribute" : "userName"
   }
 }

@@ -21,7 +21,6 @@
     "emailSuspendMessage" : {
       "en" : "An email has been sent to the address you entered. Click the link in that email to proceed."
     },
-    "objectType" : "user",
     "emailTemplateName" : "forgottenUsername",
     "identityAttribute" : "mail"
   }

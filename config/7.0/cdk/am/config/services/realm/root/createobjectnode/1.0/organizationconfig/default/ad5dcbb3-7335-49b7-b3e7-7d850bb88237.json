@@ -16,6 +16,6 @@
       "collection" : false
     },
     "_id" : "default/ad5dcbb3-7335-49b7-b3e7-7d850bb88237",
-    "objectType" : "user"
+    "identityResource" : "managed/user"
   }
 }

@@ -17,7 +17,6 @@
       "collection" : false
     },
     "_id" : "default/21b8ddf3-0203-4ae1-ab05-51cf3a3a707a",
-    "objectType" : "user",
     "identityAttribute" : "mail"
   }
 }

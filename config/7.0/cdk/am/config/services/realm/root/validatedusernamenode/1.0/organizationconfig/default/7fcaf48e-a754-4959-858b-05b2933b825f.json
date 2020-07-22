@@ -17,7 +17,6 @@
       "collection" : false
     },
     "_id" : "default/7fcaf48e-a754-4959-858b-05b2933b825f",
-    "usernameAttribute" : "userName",
-    "objectType" : "user"
+    "usernameAttribute" : "userName"
   }
 }
