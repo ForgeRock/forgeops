@@ -3,6 +3,9 @@
 
 cd /home/forgerock/openam
 
+# Adds any new file so it shows up with git diff
+git add -N config
+
 # Get a list of files that have changed. Prune boot.json as we can ignore.
 git diff --name-only | grep -v boot.json  >/var/tmp/export-list
 
