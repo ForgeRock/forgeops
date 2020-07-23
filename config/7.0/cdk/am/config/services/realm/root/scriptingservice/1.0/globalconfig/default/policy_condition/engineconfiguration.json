@@ -4,7 +4,7 @@
     "entityType" : "ScriptingService",
     "entityId" : "default/POLICY_CONDITION/EngineConfiguration",
     "serviceVersion" : "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
-    "uid" : "ou=EngineConfiguration,ou=POLICY_CONDITION,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "uid" : "ou=engineConfiguration,ou=POLICY_CONDITION,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
     "sunServiceID" : "engineConfiguration",
     "objectClass" : [ "top", "sunServiceComponent" ],
     "pathParams" : { },
