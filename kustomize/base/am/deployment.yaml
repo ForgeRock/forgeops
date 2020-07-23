@@ -51,9 +51,9 @@ spec:
           timeoutSeconds: 5
         resources:
           limits:
-            memory: 1000Mi
+            memory: 1400Mi
           requests:
-            memory: 1000Mi
+            memory: 1200Mi
             cpu: 250m
         volumeMounts:
         - name: truststore
