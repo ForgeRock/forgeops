@@ -29,7 +29,6 @@ export interface infrastructureConfig {
     vpcIsolatedSubnetIds: pulumi.Output<any>;
     vpcPrivateSubnetIds: pulumi.Output<any>;
     vpcPublicSubnetIds: pulumi.Output<any>;
-    vpcAllSubnets: pulumi.Output<any>;
     bastionEnable: pulumi.Output<any>;
     bastionSgId: pulumi.Output<any>;
     clusterAdminRole: aws.iam.Role;
@@ -68,7 +67,6 @@ export const infra: infrastructureConfig = {
     vpcIsolatedSubnetIds: infraReference.requireOutput("vpcIsolatedSubnetsIds"),
     vpcPrivateSubnetIds: infraReference.requireOutput("vpcPrivateSubnetsIds"),
     vpcPublicSubnetIds: infraReference.requireOutput("vpcPublicSubnetsIds"),
-    vpcAllSubnets: infraReference.requireOutput("vpcAllSubnets"),
     bastionEnable: infraReference.requireOutput("bastionEnable"),
     bastionSgId: infraReference.requireOutput("bastionSgId"),
     clusterAdminRole: aws.iam.Role.get("clusterAdministratorRole", infraReference.requireOutput("clusterAdministratorRoleID")),

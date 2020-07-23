@@ -1,6 +1,4 @@
 import * as aws from "@pulumi/aws";
-const accountId = aws.getCallerIdentity({}).accountId;
-
 
 const managedPolicyArns: string[] = [
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
@@ -13,15 +11,15 @@ export function createRole(name: string, trustEntity: string = "service") : aws.
     let principalObj:any  = {}
     if (trustEntity.toLowerCase() == "root")
     {
-        principalObj.AWS = `arn:aws:iam::${accountId}:root`
+        principalObj = aws.getCallerIdentity({}).then(id => aws.iam.assumeRolePolicyForPrincipal({"AWS": `arn:aws:iam::${id.accountId}:root`})) 
     }
     else
     {
-        principalObj.Service = "ec2.amazonaws.com"
+        principalObj = aws.getCallerIdentity({}).then(id => aws.iam.assumeRolePolicyForPrincipal({"Service": "ec2.amazonaws.com"}))
     }
 
     const role = new aws.iam.Role(name, {
-        assumeRolePolicy: aws.iam.assumeRolePolicyForPrincipal(principalObj),
+        assumeRolePolicy: principalObj,
     });
 
     if (trustEntity.toLowerCase() !== "root") //only run for service accounts

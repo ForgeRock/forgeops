@@ -5,11 +5,11 @@ import * as utils from "../utils/utils";
 
 const config = new pulumi.Config();
 const numOfAzs = parseInt(config.require("numOfAzs"));
-const accountId = aws.getCallerIdentity({}).accountId;
 const bucketName = config.get("bucketName");
 const bastionCreate = config.requireBoolean("bastionEnable");
 const bastionAmi = config.requireBoolean("bastionEnable") == false ? "undefined" : config.require("bastionAmi");
 const bastionInstanceType = config.requireBoolean("bastionEnable") == false ? "t2.micro" : config.require<aws.ec2.InstanceType>("bastionInstanceType");
+let bastionSubnetId;
 const pubKey = config.require("pubKey");
 export const vpcCIDR = config.require("vpcCIDR");
 export const highAvailability = config.getBoolean("highAvailability");
@@ -48,12 +48,17 @@ const vpcArguments: awsx.ec2.VpcArgs = {
     subnets: [ publicSubnetArgs, privateSubnetArgs, isolatedSubnetArgs ],
 };
 
-const vpc = new awsx.ec2.Vpc("eks-cdm", vpcArguments);
+export const vpc = new awsx.ec2.Vpc("eks-cdm", vpcArguments);
+// Grab a single subnet ID from the array of public subnets to use for bastion host.
+(async () => { 
+    const subnt = await vpc.getSubnetsIds("public")
+    bastionSubnetId = subnt.pop
+})()
+
 export const vpcid = vpc.id;
 export const vpcPrivateSubnetsIds = vpc.privateSubnetIds;
 export const vpcPublicSubnetsIds = vpc.publicSubnetIds;
 export const vpcIsolatedSubnetsIds = vpc.isolatedSubnetIds;
-export const vpcAllSubnets = vpc.privateSubnetIds.concat(vpc.publicSubnetIds).concat(vpc.isolatedSubnetIds);
 
 /************** IAM **************/
 // IAM clusterAdminRole with full access to all cluster resources
@@ -106,7 +111,7 @@ if (bastionCreate) {
         ami: bastionAmi,
         keyName: bastionKeyPair.keyName,
         associatePublicIpAddress: true, 
-        subnetId: vpc.publicSubnetIds[0],
+        subnetId: bastionSubnetId,
         tags: {Name: "Bastion"},
     });
 }

@@ -6,24 +6,20 @@ import * as localSsd from "./local-ssd-provisioner";
 
 let zones = new Array(config.numOfZones) //array of availabity zones
 
-// Method to return list of k8s full versions
-function getK8sVersion() {
-    return gcp.container.getEngineVersions({
-        // use the region to determine k8s versions.
-        // Not all zones support the same k8s versions
-        location: config.region,
-        versionPrefix: config.k8sVersion,
-    });
-}
+const engVersionProperties = {location: config.region, versionPrefix: config.k8sVersion};
+const latestMasterVersion = gcp.container.getEngineVersions(engVersionProperties).then(v => v.latestMasterVersion);
+const latestNodeVersion = gcp.container.getEngineVersions(engVersionProperties).then(v => v.latestNodeVersion);
 
 // Function to return list of Availability Zones
-export function getAZs(numZones: number) {
+async function getAZs(numZones: number) {
     //Retrieve number of zones provide in stack file
-    for(let i=0; i<numZones; i++) {
-        zones[i] = gcp.compute.getZones({
-            region: gcp.config.region
-        }).names[i]
-    }
+    const available = await gcp.compute.getZones({
+        region: gcp.config.region
+    });
+    
+    for (const range = {value: 0}; range.value < numZones; range.value++) {
+        zones[range.value] = available.names[range.value]
+    };
 
     return zones
 }
@@ -33,7 +29,7 @@ function createNP(nodeConfig: any, clusterName: pulumi.Output<string>) {
     return new gcp.container.NodePool(nodeConfig.nodePoolName, {
         cluster: clusterName,
         initialNodeCount: nodeConfig.nodeCount ? undefined : nodeConfig.initialNodeCount,
-        version: getK8sVersion().latestNodeVersion,
+        version: latestNodeVersion,
         location: gcp.config.region,
         name: nodeConfig.nodePoolName,
         nodeConfig: {
@@ -92,7 +88,7 @@ export function createCluster(network: any, subnetwork: pulumi.Output<any>) {
         nodeLocations: getAZs(config.numOfZones),
         network: network,
         subnetwork: subnetwork,
-        minMasterVersion: getK8sVersion().latestMasterVersion,
+        minMasterVersion: latestMasterVersion,
         addonsConfig: {
             horizontalPodAutoscaling: {
                 disabled: config.disableHPA,
@@ -118,7 +114,7 @@ export function createKubeconfig(cluster: gcp.container.Cluster) {
     return pulumi.
     all([ cluster.name, cluster.endpoint, cluster.masterAuth ]).
     apply(([ name, endpoint, masterAuth ]) => {
-        const context = `${gcp.config.project}_${getAZs(1)[0]}_${name}`;
+        const context = `${gcp.config.project}_${zones[0]}_${name}`;
         return `apiVersion: v1
 clusters:
 - cluster:

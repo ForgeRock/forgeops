@@ -1,17 +1,17 @@
 {
     "name": "typescript",
     "devDependencies": {
-        "@types/node": "^13.5.0"
+        "@types/node": "^14.0.24"
     },
     "dependencies": {
-        "@pulumi/aws": "^1.15.0",
-        "@pulumi/awsx": "^0.18.14",
-        "@pulumi/azure": "^2.3.0",
-        "@pulumi/azuread": "^1.4.0",
-        "@pulumi/eks": "^0.18.18",
-        "@pulumi/gcp": "^2.2.0",
-        "@pulumi/kubernetes": "^1.4.5",
-        "@pulumi/pulumi": "^1.9.0",
-        "kubernetes-client": "^8.3.6"
+        "@pulumi/aws": "^2.13.1",
+        "@pulumi/awsx": "^0.20.0",
+        "@pulumi/azure": "^3.12.1",
+        "@pulumi/azuread": "^2.4.0",
+        "@pulumi/eks": "^0.19.3",
+        "@pulumi/gcp": "^3.15.0",
+        "@pulumi/kubernetes": "^2.4.0",
+        "@pulumi/pulumi": "^2.7.1",
+        "kubernetes-client": "^9.0.0"
     }
 }

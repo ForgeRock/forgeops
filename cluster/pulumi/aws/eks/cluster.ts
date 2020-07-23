@@ -51,7 +51,8 @@ export function createStorageClasses(cluster: eks.Cluster){
 export function createCluster(instanceRoles: aws.iam.Role[]): eks.Cluster{
     let cluster = new eks.Cluster(pulumi.getStack(), {
         vpcId: config.infra.vpcid,
-        subnetIds: config.infra.vpcAllSubnets,
+        publicSubnetIds: config.infra.vpcPublicSubnetIds,
+        privateSubnetIds: config.infra.vpcPrivateSubnetIds,
         instanceRoles: instanceRoles,
         version: config.clusterConfig.k8sVersion,
         deployDashboard: config.clusterConfig.k8sDashboard,

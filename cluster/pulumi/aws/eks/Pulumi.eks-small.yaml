@@ -1,7 +1,7 @@
 encryptionsalt: v1:PWLD00bOvmk=:v1:4tP9xnTAarQD+80D:WPoPdEXN8PAFA7H9oeYArpzg7Vrw8g==
 config:
   aws:region: us-east-1
-  dsnodes:ami: ami-0392bafc801b7520f
+  dsnodes:ami: ami-04125ecea1c9b3b27
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
   dsnodes:instanceType: m5.xlarge
@@ -9,17 +9,17 @@ config:
   dsnodes:minNodes: "3"
   dsnodes:nodeCount: "3"
   eks:k8sDashboard: "false"
-  eks:k8sVersion: "1.14"
+  eks:k8sVersion: "1.17"
   eks:pubKey:
     secure: v1:QTq/P3VNxKACXE6U:mswf2U85JDs2PLLCB7ZzCeVu1HqNWtOD/2r31NaVVP48MNjkZ5S2k8YRFIg5RbKIfGKYrIWBAIFOyeJ+ASxfWvPRwM8d/vte/9PqNymerTmQmqEzPxFgb5DGRnEmsWc4vdHmxSfLGnD3uBHn8TVsHDUdtKXdCphiHGiTIZLrP+k+BxT83FQN2XF/gW5Wj3k9N6O2uetXaM2YWo489jwkOu2QhORt1N4mCcJfkotJ6mnSHnzT8+pYXhMS+TxkOrC4wMdJdBE0jIQ7voSjk48D4CFblsmlu0xQ+ABwxl/j2Twgxeu4V9k9do3Bwk8RA5rPY3fmqbvZf/qvB7MynETCRv8xjdWvM+phh/XwECCrijXlY7XkPCu2hv08/F/E0EpYlkDNsNNS0KaGPpPfC/uaACL7+Qwj6yECrl3Op92oxXcD3OVSLFedimPl9Hjwo+9RB3LbkqpvbxhTq+7JqQMlV56CfuL6tBFGoASV3HkaIC0PjcdTtEobjF+c1kaL27tIuBK0x8bNzMTDg+Hk35q1pzMFxf6sg8P1DAZ+nFzw93KWTyQ2siDz3aoYdK4+oATFG+F6IgVrA08GtpHSHGFomN+z74f7ozNIMjon+iXufx+cseY6kxVqzpVm4eEdYhBu/XNNfah1FoMKTJWOZtbY/UgRCIPcpSo7/xEO6v7LkJPOwjgFuF/nkq21jtPBfxlwia1p77VV2exmWQgEmWAn/qwNwAit+/zAoAZ4PIWKSHAWdfXVMt8uTOMGqEAw9ypdszQT3o5E1x/waoI4acdpINwuLVPD1/74fIPPRFTaR08edfUanluRl6hiWZs9G9mfXmc4qqgijQzaqg9OdqMD/mSBZP9HRpxMGD1e15j7yv5G0FfVBmlRBIuJnD6Qfm+oymGdeYx8HNQLhU6obrkR6x0qizO13kTot8QV5m4IR0kghbincmxWqLskZjHbM8XNaPandR71gx8d/D4VJ5eXKe0ukQHDFGh3LqzovbwxoQ==
-  frontendnodes:ami: ami-0392bafc801b7520f
+  frontendnodes:ami: ami-04125ecea1c9b3b27
   frontendnodes:diskSizeGb: "10"
   frontendnodes:enable: "false"
   frontendnodes:instanceType: c5.large
   frontendnodes:maxNodes: "3"
   frontendnodes:minNodes: "3"
   frontendnodes:nodeCount: "3"
-  primarynodes:ami: ami-0392bafc801b7520f
+  primarynodes:ami: ami-04125ecea1c9b3b27
   primarynodes:diskSizeGb: "80"
   primarynodes:instanceType: m5.xlarge
   primarynodes:maxNodes: "4"
