@@ -46,6 +46,10 @@ private void promoteDockerImagesToRootLevel() {
                     "gcr.io/forgerock-io/am/pit1:${image.tag}",
                     "gcr.io/forgerock-io/am:${image.tag}"
             )
+            dockerUtils.copyImage(
+                    "gcr.io/forgerock-io/am-config-upgrader/pit1:${image.tag}",
+                    "gcr.io/forgerock-io/am-config-upgrader:${image.tag}"
+            )
         }
     }
 }
