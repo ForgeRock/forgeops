@@ -8,10 +8,11 @@
   },
   "data" : {
     "_id" : "ig-agent",
-    "userpassword": "&{ig.agent.password|password}",
+    "igTokenIntrospection" : "None",
     "agentgroup" : null,
     "status" : "Active",
     "igCdssoRedirectUrls" : [ "http://am:80/am/cdcservlet" ],
+    "userpassword" : "&{ig.agent.password|password}",
     "_type" : {
       "_id" : "IdentityGatewayAgent",
       "name" : "Identity Gateway Agents",

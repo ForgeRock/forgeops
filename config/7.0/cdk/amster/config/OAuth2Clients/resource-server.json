@@ -1,88 +1,89 @@
 {
-    "metadata" : {
-      "realm" : "/",
-      "amsterVersion" : "&{version}",
-      "entityType" : "OAuth2Clients",
-      "entityId" : "resource-server",
-      "pathParams" : { }
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "OAuth2Clients",
+    "entityId" : "resource-server",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "resource-server",
+    "signEncOAuth2ClientConfig" : {
+      "idTokenEncryptionMethod" : "A128CBC-HS256",
+      "tokenIntrospectionSignedResponseAlg" : "RS256",
+      "jwkSet" : null,
+      "idTokenEncryptionAlgorithm" : "RSA-OAEP-256",
+      "userinfoResponseFormat" : "JSON",
+      "mTLSTrustedCert" : null,
+      "tokenIntrospectionResponseFormat" : "JSON",
+      "jwksCacheTimeout" : 3600000,
+      "userinfoSignedResponseAlg" : null,
+      "tokenIntrospectionEncryptedResponseAlg" : "RSA-OAEP-256",
+      "requestParameterEncryptedAlg" : null,
+      "tokenEndpointAuthSigningAlgorithm" : "RS256",
+      "mTLSSubjectDN" : null,
+      "idTokenEncryptionEnabled" : false,
+      "userinfoEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
+      "publicKeyLocation" : "jwks_uri",
+      "mTLSCertificateBoundAccessTokens" : false,
+      "tokenIntrospectionEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
+      "requestParameterEncryptedEncryptionAlgorithm" : "A128CBC-HS256",
+      "jwkStoreCacheMissCacheTime" : 60000,
+      "idTokenSignedResponseAlg" : "RS256",
+      "idTokenPublicEncryptionKey" : null,
+      "jwksUri" : null,
+      "userinfoEncryptedResponseAlg" : null,
+      "requestParameterSignedAlg" : null,
+      "clientJwtPublicKey" : null
     },
-    "data" : {
-      "_id" : "resource-server",
-      "signEncOAuth2ClientConfig" : {
-        "idTokenEncryptionMethod" : "A128CBC-HS256",
-        "jwkSet" : null,
-        "idTokenEncryptionAlgorithm" : "RSA-OAEP-256",
-        "userinfoResponseFormat" : "JSON",
-        "mTLSTrustedCert" : null,
-        "jwksCacheTimeout" : 3600000,
-        "userinfoSignedResponseAlg" : null,
-        "requestParameterEncryptedAlg" : null,
-        "tokenEndpointAuthSigningAlgorithm" : "RS256",
-        "mTLSSubjectDN" : null,
-        "idTokenEncryptionEnabled" : false,
-        "userinfoEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
-        "publicKeyLocation" : "jwks_uri",
-        "mTLSCertificateBoundAccessTokens" : false,
-        "requestParameterEncryptedEncryptionAlgorithm" : "A128CBC-HS256",
-        "jwkStoreCacheMissCacheTime" : 60000,
-        "idTokenSignedResponseAlg" : "RS256",
-        "idTokenPublicEncryptionKey" : null,
-        "userinfoEncryptedResponseAlg" : null,
-        "jwksUri" : null,
-        "requestParameterSignedAlg" : null,
-        "clientJwtPublicKey" : null
-      },
-      "advancedOAuth2ClientConfig" : {
-        "grantTypes" : [ "authorization_code" ],
-        "updateAccessToken" : null,
-        "requestUris" : [ ],
-        "clientUri" : [ ],
-        "mixUpMitigation" : false,
-        "logoUri" : [ ],
-        "tokenEndpointAuthMethod" : "client_secret_basic",
-        "sectorIdentifierUri" : null,
-        "isConsentImplied" : false,
-        "contacts" : [ ],
-        "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
-        "policyUri" : [ ],
-        "descriptions" : {
-          "inherited": false,
-          "value": [
-              "Sample client Used for IG testing"
-          ]
-        },
-        "subjectType" : "Public",
-        "name" : [ ]
-      },
-      "coreOpenIDClientConfig" : {
-        "jwtTokenLifetime" : 0,
-        "clientSessionUri" : null,
-        "postLogoutRedirectUri" : [ ],
-        "defaultMaxAge" : 600,
-        "claims" : [ ],
-        "defaultAcrValues" : [ ],
-        "defaultMaxAgeEnabled" : false
-      },
-      "coreOAuth2ClientConfig" : {
-        "userpassword" : "password",
-        "authorizationCodeLifetime" : 0,
-        "accessTokenLifetime" : 0,
-        "defaultScopes" : [ "am-introspect-all-tokens" ],
-        "clientName" : [ ],
-        "clientType" : "Confidential",
-        "scopes" : [ ],
-        "agentgroup" : null,
-        "refreshTokenLifetime" : 0,
-        "redirectionUris" : [ "http://fake.com" ],
-        "status" : "Active"
-      },
-      "coreUmaClientConfig" : {
-        "claimsRedirectionUris" : [ ]
-      },
-      "_type" : {
-        "_id" : "OAuth2Client",
-        "name" : "OAuth2 Clients",
-        "collection" : true
-      }
+    "advancedOAuth2ClientConfig" : {
+      "grantTypes" : [ "authorization_code" ],
+      "updateAccessToken" : null,
+      "requestUris" : [ ],
+      "clientUri" : [ ],
+      "mixUpMitigation" : false,
+      "logoUri" : [ ],
+      "javascriptOrigins" : [ ],
+      "tokenEndpointAuthMethod" : "client_secret_basic",
+      "sectorIdentifierUri" : null,
+      "isConsentImplied" : false,
+      "contacts" : [ ],
+      "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
+      "policyUri" : [ ],
+      "descriptions" : [ "Sample client Used for IG testing" ],
+      "subjectType" : "Public",
+      "name" : [ ]
+    },
+    "coreOpenIDClientConfig" : {
+      "jwtTokenLifetime" : 0,
+      "clientSessionUri" : null,
+      "postLogoutRedirectUri" : [ ],
+      "defaultMaxAge" : 600,
+      "claims" : [ ],
+      "defaultAcrValues" : [ ],
+      "defaultMaxAgeEnabled" : false
+    },
+    "coreOAuth2ClientConfig" : {
+      "loopbackInterfaceRedirection" : false,
+      "userpassword" : "&{ig.rs.client.secret|password}",
+      "authorizationCodeLifetime" : 0,
+      "accessTokenLifetime" : 0,
+      "defaultScopes" : [ "am-introspect-all-tokens" ],
+      "clientName" : [ ],
+      "clientType" : "Confidential",
+      "scopes" : [ ],
+      "agentgroup" : null,
+      "refreshTokenLifetime" : 0,
+      "redirectionUris" : [ "http://fake.com" ],
+      "status" : "Active"
+    },
+    "coreUmaClientConfig" : {
+      "claimsRedirectionUris" : [ ]
+    },
+    "_type" : {
+      "_id" : "OAuth2Client",
+      "name" : "OAuth2 Clients",
+      "collection" : true
     }
+  }
 }

@@ -286,12 +286,14 @@ save_config()
 
 			# Fix passwords in OAuth2Clients with placeholders or default values.
 			CLIENT_ROOT="$DOCKER_ROOT/amster/config/OAuth2Clients"
-			
+			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/IdentityGatewayAgents"
+
 			echo "Add back password placeholder with defaults"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{idm.provisioning.client.secret|openidm}"/g' ${CLIENT_ROOT}/idm-provisioning.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{idm.rs.client.secret|password}"/g' ${CLIENT_ROOT}/idm-resource-server.json		
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{ig.rs.client.secret|password}""/g' ${CLIENT_ROOT}/resource-server.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : "\&{pit.client.secret|password}""/g' ${CLIENT_ROOT}/oauth2.json
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json		
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
 
 			#****** COPY FIXED FILES ******#
 			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
