@@ -76,10 +76,18 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
 ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
 
-
 # Add Helm repo
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ > /dev/null
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/ > /dev/null
 
 # Deploy ingress controller Helm chart
-helm upgrade -i nginx-ingress --namespace nginx ingress-nginx/ingress-nginx \
+helm upgrade -i nginx-ingress --namespace nginx stable/nginx-ingress \
   $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
+
+# This other repo requires changes to the values in cluster/addons/nginx-ingress-controller
+# We're using `stable`, but need to explore if we should move to this other one. See CLOUD-2426
+# # Add Helm repo
+# helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx/ > /dev/null
+
+# # Deploy ingress controller Helm chart
+# helm upgrade -i nginx-ingress --namespace nginx ingress-nginx/ingress-nginx \
+#   $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml

@@ -8,7 +8,7 @@ controller:
     service:
         enabled: false
     publishService: 
-        enabled: true
+        enabled: false
     stats:
         enabled: true
         service:
