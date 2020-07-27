@@ -66,22 +66,39 @@
                     "sync",
                     "authentication",
                     "config"
-                ]
+                ],
+                "enabled" : false
             }
         },
         {
-            "class": "org.forgerock.openidm.audit.impl.RepositoryAuditEventHandler",
-            "config": {
-                "name": "repo",
-                "enabled": false,
-                "topics": [
+            "class" : "org.forgerock.openidm.audit.impl.RepositoryAuditEventHandler",
+            "config" : {
+                "name" : "repo",
+                "topics" : [
                     "access",
                     "activity",
                     "recon",
                     "sync",
                     "authentication",
                     "config"
-                ]
+                ],
+                "enabled" : false
+            }
+        },
+        {
+            "class" : "org.forgerock.audit.handlers.json.stdout.JsonStdoutAuditEventHandler",
+            "config" : {
+                "elasticsearchCompatible" : false,
+                "name" : "json-stdout",
+                "topics" : [
+                    "config",
+                    "activity",
+                    "authentication",
+                    "access",
+                    "recon",
+                    "sync"
+                ],
+                "enabled" : true
             }
         }
     ],
