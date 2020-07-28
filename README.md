@@ -144,7 +144,7 @@ Configuration is exported to `docker/$version/amster/config`.
 
 **AM export**  
 AM configuration export works differently. Due to the large number of config files in file based configuration, we don't want to export all files. So the export identifies only the updated configuration and exports any updated files.  
-These updated files are exported to `docker/$version/am/config-exported`. This folder is also ignored by git.
+These updated files are exported to `docker/$version/am/config`.
 
 ```bash
 # Export all configurations to the docker folder
@@ -157,9 +157,6 @@ bin/config.sh --component idm export
 
 **SAVE**  
 The `save` command copies the contents of the Docker configuration *back* to the `config/` folder where it can be versioned in Git.  
-
-**`NOTE`** This functionality doesn't apply to the AM exported files 
-due to the complexity merging in new and updated files.  This will need to be done manually.
 
 ```bash
 # Save the docker/ configuration for all ForgeRock components back to the config/ folder

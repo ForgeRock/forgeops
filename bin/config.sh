@@ -230,16 +230,13 @@ export_config(){
 			;;
 		am)
 			printf "\nExporting AM configuration..\n\n"
-			rm -fr "$DOCKER_ROOT/am/config-exported"
-			mkdir -p "$DOCKER_ROOT/am/config-exported"
 
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 
-			kubectl exec $pod -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am/config-exported; tar xvf - )
+			kubectl exec $pod -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xvf - )
 
-			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config-exported."
-			echo "You now need to check the files and integrate those into config/7.0/am manually."
-			echo "You will need to apply/fix any commons placeholders/secrets into your exported files."
+			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
+			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
 			;;
 		*)
 			echo "Export not supported for $p"
@@ -301,7 +298,13 @@ save_config()
 			printf "\n*** The above fixes have been made to the Amster files. If you have exported new files that should contain commons placeholders or passwords, please update the rules in this script.***\n\n"
 			;;
 		*)
-			echo "Save not supported for $p"
+			printf "\nSaving AM configuration..\n\n"
+			#****** REMOVE EXISTING FILES ******#
+			rm -fr "$PROFILE_ROOT/am/config"
+			mkdir -p "$PROFILE_ROOT/am/config"
+
+			#****** COPY FIXED FILES ******#
+			cp -R "$DOCKER_ROOT/am/config"  "$PROFILE_ROOT/am"
 		esac
 	done
 }
