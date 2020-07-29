@@ -21,6 +21,19 @@
                 "enabled" : true
             },
             {
+                "name" : "STATIC_USER",
+                "properties" : {
+                    "queryOnResource" : "internal/user",
+                    "username" : "openidm-admin",
+                    "password" : "&{openidm.admin.password}",
+                    "defaultUserRoles" : [
+                        "internal/role/openidm-authorized",
+                        "internal/role/openidm-admin"
+                    ]
+                },
+                "enabled" : true
+            },
+            {
                 "name" : "MANAGED_USER",
                 "properties" : {
                     "augmentSecurityContext": {
@@ -39,20 +52,6 @@
                     ]
                 },
                 "enabled" : false
-            },
-            {
-                "name" : "INTERNAL_USER",
-                "properties" : {
-                    "queryId" : "credential-internaluser-query",
-                    "queryOnResource" : "internal/user",
-                    "propertyMapping" : {
-                        "authenticationId" : "username",
-                        "userCredential" : "password",
-                        "userRoles" : "authzRoles"
-                    },
-                    "defaultUserRoles" : [ ]
-                },
-                "enabled" : true
             },
             {
                 "name" : "PASSTHROUGH",
@@ -87,18 +86,6 @@
                     "propertyMapping" : {
                         "userRoles" : "authzRoles"
                     }
-                },
-                "enabled" : true
-            },
-            {
-                "name" : "STATIC_USER",
-                "properties" : {
-                    "queryOnResource" : "internal/user",
-                    "username" : "&{openidm.prometheus.username}",
-                    "password" : "&{openidm.prometheus.password}",
-                    "defaultUserRoles" : [
-                        "internal/role/openidm-prometheus"
-                    ]
                 },
                 "enabled" : true
             }

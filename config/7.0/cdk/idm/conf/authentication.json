@@ -4,14 +4,6 @@
         "clientSecret" : "&{rs.client.secret|password}",
         "tokenIntrospectUrl" : "http://am/am/oauth2/introspect",
         "scopes" : [ ],
-        "queryOnResource" : "managed/user",
-        "propertyMapping" : {
-            "authenticationId" : "_id",
-            "userRoles" : "authzRoles"
-        },
-        "defaultRoles" : [
-            "internal/role/openidm-authorized"
-        ],
         "cache" : {
             "maxTimeout" : "300 seconds"
         },
@@ -29,7 +21,6 @@
         ],
         "anonymousUserMapping" : {
             "localUser" : "internal/user/anonymous",
-            "userRoles" : "authzRoles/*",
             "roles" : [
                 "internal/role/openidm-reg"
             ]
@@ -38,7 +29,6 @@
             {
                 "subject" : "amadmin",
                 "localUser" : "internal/user/openidm-admin",
-                "userRoles" : "authzRoles/*",
                 "roles" : [
                     "internal/role/openidm-authorized",
                     "internal/role/openidm-admin"
@@ -47,7 +37,6 @@
             {
                 "subject": "idm-provisioning",
                 "localUser": "internal/user/idm-provisioning",
-                "userRoles": "authzRoles/*",
                 "roles" : [
                     "internal/role/platform-provisioning"
                 ]
