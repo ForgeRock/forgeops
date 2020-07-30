@@ -21,8 +21,7 @@ cdk: yamkt cdk-build push/cdk-cli/$(VERSION)
 	@echo "completed building cdk"
 
 toolbox-build:
-	$(cd ./docker/cli-tools/toolbox && \
-	docker build --cache-from $(REGISTRY_URL)/yamkt:$(VERSION)-skaffold -t $(REGISTRY_URL)/cdk-toolbox:$(VERSION) )
+	docker build --cache-from $(REGISTRY_URL)/yamkt:$(VERSION)-skaffold -t $(REGISTRY_URL)/cdk-toolbox:$(VERSION) docker/cli-tools/toolbox
 
 toolbox: yamkt toolbox-build push/cdk-toolbox/$(VERSION)
 	@echo "completed building toolbox"

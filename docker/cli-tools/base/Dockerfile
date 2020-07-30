@@ -1,5 +1,5 @@
-ARG SKAFF_VERSION=v1.12.0
-ARG KUSTOMIZE_VERSION=v3.8.0
+ARG SKAFF_VERSION=v1.12.1
+ARG KUSTOMIZE_VERSION=v3.8.1
 ARG PULUMI_VERSION=v2.6.1
 ARG HELM_VERSION=v3.1.2
 ARG NODE_VERSION=v12.13.0
@@ -8,7 +8,7 @@ ARG KUBECTX_VERSION=v0.7.1
 ARG AWSCLI_VERSION=1.16.270
 ARG AWS_IAM_AUTH=1.14.6
 ARG AWS_IAM_DATE=2019-08-22
-ARG CLOUD_SDK_VERSION=300.0.0
+ARG CLOUD_SDK_VERSION=302.0.0
 ARG AZURE_VERSION=2.8.0
 ARG DOCKER_CREDENTIAL_GCR_VERSION=2.0.0
 FROM debian:buster-slim as base
@@ -128,7 +128,7 @@ RUN apt-get update -y \
                 && apt-get autoremove --purge  \
                     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=nodejs /opt/build/nodejs /usr/local//
+COPY --from=nodejs /opt/build/nodejs /usr/local/
 COPY --from=helm /opt/build/bin/* /usr/local/bin/
 COPY --from=pulumi /opt/build/bin/* /usr/local/bin/
 COPY --from=kubectl /opt/build/bin/* /usr/local/bin/
