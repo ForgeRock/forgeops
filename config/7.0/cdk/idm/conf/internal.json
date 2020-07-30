@@ -1,27 +1,6 @@
 {
   "objects" : [
     {
-      "name" : "user",
-      "properties" : {
-        "authzRoles" : {
-          "items" : {
-            "resourceCollection" : [
-              {
-                "path" : "managed/role",
-                "label" : "Role",
-                "query" : {
-                  "queryFilter" : "true",
-                  "fields" : [
-                    "name"
-                  ]
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
       "name" : "role",
       "properties" : {
         "authzMembers" : {

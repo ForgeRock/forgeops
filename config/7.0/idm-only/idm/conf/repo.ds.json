@@ -149,24 +149,6 @@
                     },
                     "password": {
                         "type": "json", "ldapAttribute": "fr-idm-password"
-                    },
-                    "authzRoles" : {
-                        "type" : "collection",
-                        "isMultiValued" : true,
-                        "items" : [
-                            {
-                                "type" : "reference",
-                                "ldapAttribute" : "fr-idm-internal-user-authzroles-managed-role",
-                                "primaryKey" : "uid",
-                                "resourcePath" : "managed/role"
-                            },
-                            {
-                                "type" : "reference",
-                                "ldapAttribute" : "fr-idm-internal-user-authzroles-internal-role",
-                                "primaryKey" : "cn",
-                                "resourcePath" : "internal/role"
-                            }
-                        ]
                     }
                 }
             },
@@ -200,20 +182,10 @@
                         "ldapAttribute": "fr-idm-condition"
                     },
                     "authzMembers" : {
-                        "type" : "collection",
                         "isMultiValued" : true,
-                        "items" : [
-                            {
-                                "type" : "reverseReference",
-                                "resourcePath" : "managed/user",
-                                "propertyName" : "authzRoles"
-                            },
-                            {
-                                "type" : "reverseReference",
-                                "resourcePath" : "internal/user",
-                                "propertyName" : "authzRoles"
-                            }
-                        ]
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "authzRoles"
                     }
                 }
             },
@@ -516,22 +488,11 @@
                         "isMultiValued" : true
                     },
                     "authzRoles" : {
-                        "type" : "collection",
                         "isMultiValued" : true,
-                        "items" : [
-                            {
-                                "type" : "reference",
-                                "ldapAttribute" : "fr-idm-managed-user-authzroles-managed-role",
-                                "primaryKey" : "uid",
-                                "resourcePath" : "managed/role"
-                            },
-                            {
-                                "type" : "reference",
-                                "ldapAttribute" : "fr-idm-managed-user-authzroles-internal-role",
-                                "primaryKey" : "cn",
-                                "resourcePath" : "internal/role"
-                            }
-                        ]
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-user-authzroles-internal-role",
+                        "primaryKey" : "cn",
+                        "resourcePath" : "internal/role"
                     }
                 }
             }
@@ -560,22 +521,6 @@
                         "resourcePath" : "managed/user",
                         "propertyName" : "roles",
                         "isMultiValued" : true
-                    },
-                    "authzMembers" : {
-                        "type" : "collection",
-                        "isMultiValued" : true,
-                        "items" : [
-                            {
-                                "type" : "reverseReference",
-                                "resourcePath" : "managed/user",
-                                "propertyName" : "authzRoles"
-                            },
-                            {
-                                "type" : "reverseReference",
-                                "resourcePath" : "internal/user",
-                                "propertyName" : "authzRoles"
-                            }
-                        ]
                     }
                 }
             },

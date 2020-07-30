@@ -360,17 +360,6 @@
                                             "name"
                                         ]
                                     }
-                                },
-                                {
-                                    "path" : "managed/role",
-                                    "label" : "Role",
-                                    "conditionalAssociationField" : "condition",
-                                    "query" : {
-                                        "queryFilter" : "true",
-                                        "fields" : [
-                                            "name"
-                                        ]
-                                    }
                                 }
                             ]
                         }
@@ -772,53 +761,6 @@
                             ]
                         }
                     },
-                    "authzMembers" : {
-                        "description" : "Authorization Role Members",
-                        "title" : "Authorization Role Members",
-                        "viewable" : true,
-                        "type" : "array",
-                        "returnByDefault" : false,
-                        "items" : {
-                            "type" : "relationship",
-                            "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role:authzMembers:items",
-                            "title" : "Authorization Role Members Items",
-                            "reverseRelationship" : true,
-                            "reversePropertyName" : "authzRoles",
-                            "validate" : true,
-                            "properties" : {
-                                "_ref" : {
-                                    "description" : "References a relationship from a managed object",
-                                    "type" : "string"
-                                },
-                                "_refProperties" : {
-                                    "description" : "Supports metadata within the relationship",
-                                    "type" : "object",
-                                    "title" : "Authorization Role Members Items _refProperties",
-                                    "properties" : {
-                                        "_id" : {
-                                            "description" : "_refProperties object ID",
-                                            "type" : "string"
-                                        }
-                                    }
-                                }
-                            },
-                            "resourceCollection" : [
-                                {
-                                    "path" : "managed/user",
-                                    "conditionalAssociation" : true,
-                                    "label" : "User",
-                                    "query" : {
-                                        "queryFilter" : "true",
-                                        "fields" : [
-                                            "userName",
-                                            "givenName",
-                                            "sn"
-                                        ]
-                                    }
-                                }
-                            ]
-                        }
-                    },
                     "assignments" : {
                         "description" : "Managed Assignments",
                         "title" : "Managed Assignments",
@@ -907,7 +849,6 @@
                     "name",
                     "description",
                     "members",
-                    "authzMembers",
                     "assignments",
                     "condition",
                     "temporalConstraints"
