@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "EmailSuspendNode",
+    "entityId" : "default/a3d97b53-e38a-4b24-aed0-a021050eb744",
+    "uid" : "ou=a3d97b53-e38a-4b24-aed0-a021050eb744,ou=default,ou=OrganizationConfig,ou=1.0,ou=EmailSuspendNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "EmailSuspendNode",
+      "name" : "EmailSuspendNode",
+      "collection" : false
+    },
+    "objectLookup" : true,
+    "_id" : "default/a3d97b53-e38a-4b24-aed0-a021050eb744",
+    "emailAttribute" : "mail",
+    "identityAttribute" : "userName",
+    "emailSuspendMessage" : {
+      "en" : "An email has been sent to your address, please verify your email address to update your password. Click the link in that email to proceed."
+    },
+    "emailTemplateName" : "updatePassword"
+  }
+}

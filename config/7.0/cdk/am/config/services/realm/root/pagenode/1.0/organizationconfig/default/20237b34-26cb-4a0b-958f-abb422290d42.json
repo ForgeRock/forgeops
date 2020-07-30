@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "PageNode",
+    "entityId" : "default/20237b34-26cb-4a0b-958f-abb422290d42",
+    "uid" : "ou=20237b34-26cb-4a0b-958f-abb422290d42,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "nodes" : [ "fe2962fc-4db3-4066-8624-553649afc438:ValidatedPasswordNode:Platform Password" ],
+    "_type" : {
+      "_id" : "PageNode",
+      "name" : "PageNode",
+      "collection" : false
+    },
+    "pageDescription" : {
+      "en" : "Enter current password"
+    },
+    "_id" : "default/20237b34-26cb-4a0b-958f-abb422290d42",
+    "pageHeader" : {
+      "en" : "Verify Existing Password"
+    }
+  }
+}
