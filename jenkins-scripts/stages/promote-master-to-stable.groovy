@@ -41,6 +41,7 @@ private void promoteDockerImagesToRootLevel() {
                 "${image.baseImageName}:${image.tag}",
                 "${image.rootLevelBaseImageName}:${image.tag}"
         )
+        // Promote 'am' image in addition to 'am-base'
         if (imageKey == 'am') {
             dockerUtils.copyImage(
                     "gcr.io/forgerock-io/am/pit1:${image.tag}",
@@ -49,6 +50,13 @@ private void promoteDockerImagesToRootLevel() {
             dockerUtils.copyImage(
                     "gcr.io/forgerock-io/am-config-upgrader/pit1:${image.tag}",
                     "gcr.io/forgerock-io/am-config-upgrader:${image.tag}"
+            )
+        }
+        // Promote 'ds-empty' image in addition to 'ds' one
+        if (imageKey == 'ds-idrepo') {
+            dockerUtils.copyImage(
+                    "gcr.io/forgerock-io/ds-emtpy/pit1:${image.tag}",
+                    "gcr.io/forgerock-io/ds-empty:${image.tag}"
             )
         }
     }
