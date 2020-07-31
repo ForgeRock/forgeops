@@ -13,24 +13,6 @@
       "actions"    : "login,logout"
     },
     {
-      "pattern"    : "identityProviders",
-      "roles"      : "*",
-      "methods"    : "action",
-      "actions"    : "getAuthRedirect,handlePostAuth,getLogoutUrl"
-    },
-    {
-      "pattern"    : "identityProviders",
-      "roles"      : "internal/role/openidm-authorized",
-      "methods"    : "action",
-      "actions"    : "normalizeProfile"
-    },
-    {
-      "pattern"    : "identityProviders",
-      "roles"      : "internal/role/openidm-authorized",
-      "methods"    : "read",
-      "actions"    : "*"
-    },
-    {
       "pattern"    : "config/ui/themeconfig",
       "roles"      : "*",
       "methods"    : "read",
@@ -282,7 +264,7 @@
       "roles"     : "internal/role/openidm-authorized",
       "methods"   : "read,query",
       "actions"   : "*",
-      "customAuthz" : "ownRelationshipCollection(['idps','_meta','_notifications'])"
+      "customAuthz" : "ownRelationshipCollection(['_meta','_notifications'])"
     },
     {
       "pattern"   : "notification",
