@@ -16,7 +16,6 @@ G_OPTS="--no-daemon"
 # We compile the binary in the docker build - so the clean is not stricly needed here
 #gradle clean
 # The idm simulation creates test users. Subsequent tests need these users!
-# The 2 simulations ending '65' are specifically for running against version 6.5.  The difference is that IDM doesn't authenticate with AM.
 
 #gradle "$G_OPTS" gatlingRun-idm.IDMReadCreateUsersSim65
 #gradle "$G_OPTS" gatlingRun-idm.IDMDeleteUsersSim65

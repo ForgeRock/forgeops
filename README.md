@@ -125,8 +125,8 @@ are considered temporary build-time assets.
 You can select alternate configuration profiles, or initialize specific components:
 
 ```bash
-# Initializes the "test" configuration profile for IDM 6.5
-bin/config.sh --profile test --component idm --version 6.5 init
+# Initializes the "test" configuration profile for IDM
+bin/config.sh --profile test --component idm init
 # Initialize the "test" configuration for all ForgeRock components for the default 7.0 version
 bin/config.sh --profile test
 #
@@ -283,7 +283,7 @@ to push to the docker hub (the reported image name will be something like `docke
 Create a copy of one of the environments. Example:
 
 ```
-cd kustomize/overlays/6.5
+cd kustomize/overlays/7.0
 cp -r medium my-new-overlay
 ```
 

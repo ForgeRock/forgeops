@@ -143,7 +143,6 @@ genRSA selfserviceenctest 2048
 genKey selfservicesigntest HmacSHA256 256
 genEC es256test 256
 genEC es384test 384
-# Yes, es512test 521 is correct, see: https://backstage.forgerock.com/docs/am/6.5/authentication-guide/#configure-ecdsa-client-basedd
 genEC es512test 521
 
 genKey hmacsigningtest HMacSHA512 512

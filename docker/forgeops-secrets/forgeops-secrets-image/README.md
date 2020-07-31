@@ -18,8 +18,7 @@ to the samples.
 - Attempts to randomly generate all secrets for ForgeRock AM, IDM and DS.
 - Runs as a Kubernetes job when products are deployed
 - The job attempts to be idempotent, only generating secrets if they do not already exist
-- Currently works for 6.5 and 7.x
-- For 6.5, a CA is created using keytool and https/ldaps certs are signed by this CA for AM/IDM/DS.
+- Currently works for 7.x
 - For 7.0, the new DS `dskeymgr` tool is used to build a CA and also issue/sign certs for AM/IDM/DS.
 - A java trust store is built and mounted on amster, DS, AM, IDM, allowing the services to trust each other's certs.
 
@@ -42,10 +41,10 @@ These tools make an effort to randomly generate all secrets for a **default** AM
 
 
 ### Usage
-1. Configure as usual (`bin/config.sh init -v 6.5` or  `bin/config.sh init -v 7.0`)
-1. Deploy CDK/CDM as usual ( `skaffold dev` or `skaffold dev -f skaffold-6.5.yaml`)
+1. Configure as usual (`bin/config.sh init -v 7.0`)
+1. Deploy CDK/CDM as usual ( `skaffold dev` or `skaffold dev -f skaffold-<version>.yaml`)
 1. Wait for the forgeops-secrets job to complete.
-1. View common passwords `bin/print-secrets.sh 7.0` or `bin/print-secrets.sh 6.5`)
+1. View common passwords `bin/print-secrets.sh`)
 1. Backup the generated secrets `kubectl get secret -lsecrettype=forgeops-generated -o yaml > secrets.yaml`
 
 ### setting all passwords to the same value (for dev, automated testing)
@@ -55,62 +54,8 @@ To have all passwords set with the same value, create a single file called `OVER
 
 - the AM runtime container requires the Directory Manager password as an environment variable to check whether AM has been configured. This is not ideal as it presently requires full root access to DS to complete the check from within the web facing container. 
 - the directory manager password is currently the same for all DS types
-- no DS replication admin password is configured in 6.5
 - the SMS transport key is not generated, a static value is used to ensure compatability with previous amster configs.
 - metrics/monitoring secrets are still at their defaults
-
-### 6.5 Secrets
-- am-boot-secrets 
-    - .keypass
-    - .storepass
-    - authorized_keys
-    - keystore.jceks
-- am-env-secrets 
-    - CFGDIR_PASS
-- am-https 
-    - keypass
-    - keystore.jceks
-    - storepass
-- am-runtime-keystore
-    - keystore-runtime.jceks
-- am-runtime-passwords
-    - keypassruntime
-    - storepassruntime
-- amster 
-    - authorized_keys
-    - id_rsa
-    - id_rsa.pub
-- amster-env-secrets 
-    - AMADMIN_PASS
-    - AM_ENC_KEY
-    - AM_POLICY_AGENT_PASS
-    - CFGDIR_PASS
-    - CFGUSR_PASS
-    - CTSDIR_PASS
-    - CTSUSR_PASS
-    - USRUSR_PASS
-- ds
-    - dirmanager.pw
-    - keystore.pin
-    - monitor.pw
-    - ssl-keystore.p12
-- idm
-    - keystore.jceks
-    - truststore
-- idm-env-secrets
-    - OPENIDM_ADMIN_PASSWORD
-    - OPENIDM_KEYSTORE_PASSWORD
-    - OPENIDM_REPO_PASSWORD
-    - USERSTORE_PASSWORD
-- platform-ca
-    - ca.jceks
-    - ca.pem
-    - keypass
-    - storepass
-- postgres-secrets
-    - postgres-password
-- truststore
-    - cacerts
 
 ### 7.0 Secrets
 - am-boot-secrets

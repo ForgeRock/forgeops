@@ -32,16 +32,11 @@ ds_version=$(kubectl -n $NAMESPACE exec ds-idrepo-0 -- /opt/opendj/bin/dsconfig 
 major_version=$(printf $ds_version| awk -F' ' '{print $1}'| cut -d'.' -f1)
 echo "DS server version: ${ds_version}"
 
-if [[ ${major_version} = "7" ]] ; then
-    # Only back up the pods in $DSBACKUP_HOSTS. All pods can restore from the same backup
-    hosts=$(kubectl -n $NAMESPACE get statefulset ds-idrepo -o jsonpath='{.spec.template.spec.initContainers[?(@.name=="initialize")].env[?(@.name=="DSBACKUP_HOSTS")].value}')
-    # Convert comma separated values to array
-    pods=($(echo "$hosts" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
-else
-    # 6.5: Back up all pods
-    pods=($(kubectl -n $NAMESPACE get pods --no-headers=true | echo $(awk '/ds-cts|ds-idrepo/{print $1}')))
-    BACKUP_DIRECTORY_ENV="BACKUP_DIRECTORY=/opt/opendj/bak"
-fi
+# Only back up the pods in $DSBACKUP_HOSTS. All pods can restore from the same backup
+hosts=$(kubectl -n $NAMESPACE get statefulset ds-idrepo -o jsonpath='{.spec.template.spec.initContainers[?(@.name=="initialize")].env[?(@.name=="DSBACKUP_HOSTS")].value}')
+# Convert comma separated values to array
+pods=($(echo "$hosts" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
+
 if [ -z "${pods}" ]; then
     echo "No DS pods available. No backups were scheduled."
     exit -1

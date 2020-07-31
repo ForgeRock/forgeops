@@ -3,7 +3,7 @@
 
 SRC="gcr.io/engineering-devops"
 DEST="gcr.io/forgerock-io"
-TAG="6.5.1"
+TAG="7.0.0"
 
 if [ -n "$1" ];
     then TAG=$1

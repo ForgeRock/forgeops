@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ds
-data:
-  # todo: Update the env.sh to just calculate this. We dont need it in the configmap
-  DJ_INSTANCE: "ds-idrepo"

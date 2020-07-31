@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: openidm-sql
-data:
-{{ (.Files.Glob "sql/*").AsConfig | indent 2 }}
