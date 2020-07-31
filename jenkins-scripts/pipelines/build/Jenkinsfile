@@ -18,9 +18,9 @@ BASE_VERSION = '7.0.0'
 
 // Temporarily comment out directories to prevent that image being built
 buildDirectories = [
-    [ name: 'git',              forceBuild: false ],
+    //[ name: 'git',              forceBuild: false ],
     [ name: 'java-11',          forceBuild: true ],
-    [ name: 'util',             forceBuild: false ],
+    // [ name: 'util',             forceBuild: false ],
 ]
 
 def pipeline
