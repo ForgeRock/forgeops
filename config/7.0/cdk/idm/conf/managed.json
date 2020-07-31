@@ -486,10 +486,7 @@
                         "isPersonal" : true,
                         "policies" : [
                             {
-                                "policyId" : "unique"
-                            },
-                            {
-                                "policyId" : "no-internal-user-conflict"
+                                "policyId" : "valid-username"
                             },
                             {
                                 "policyId" : "cannot-contain-characters",
@@ -497,6 +494,18 @@
                                     "forbiddenChars" : [
                                         "/"
                                     ]
+                                }
+                            },
+                            {
+                                "policyId" : "minimum-length",
+                                "params" : {
+                                    "minLength" : 1
+                                }
+                            },
+                            {
+                                "policyId" : "maximum-length",
+                                "params" : {
+                                    "maxLength" : 255
                                 }
                             }
                         ]

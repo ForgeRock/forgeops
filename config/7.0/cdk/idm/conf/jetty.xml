@@ -45,7 +45,7 @@
             <Arg>
                 <New class="org.eclipse.jetty.server.ForwardedRequestCustomizer">
                     <!-- Prevent host header changes that may occur from URL hijacking attempts -->
-                    <!-- Becayse we are behind an ingress that performs this - we comment this out -->
+                    <!-- Because we are behind an ingress that performs this - we comment this out -->
                     <!-- <Set name="forcedHost">
                         <Call class="org.forgerock.openidm.jetty.Param" name="getProperty">
                             <Arg>openidm.host</Arg>

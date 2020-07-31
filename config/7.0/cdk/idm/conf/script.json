@@ -1,15 +1,14 @@
 {
     "properties" : { },
     "ECMAScript" : {
-        "#javascript.debug" : "&{openidm.script.javascript.debug}",
+        "javascript.optimization.level" : 9,
         "javascript.recompile.minimumInterval" : 60000
     },
     "Groovy" : {
         "#groovy.warnings" : "likely errors #othere values [none,likely,possible,paranoia]",
-        "#groovy.source.encoding" : "utf-8 #default US-ASCII",
         "groovy.source.encoding" : "UTF-8",
-        "groovy.target.directory" : "&{idm.install.dir}/classes",
-        "#groovy.target.bytecode" : "1.5",
+        "#groovy.target.directory" : "&{idm.data.dir}/classes",
+        "#groovy.target.bytecode" : "1.8",
         "groovy.classpath" : "&{idm.install.dir}/lib",
         "#groovy.output.verbose" : false,
         "#groovy.output.debug" : false,
