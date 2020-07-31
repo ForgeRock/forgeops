@@ -10,10 +10,6 @@
                 "type" : "text/javascript",
                 "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);"
             },
-            "postDelete" : {
-                "type" : "text/javascript",
-                "source" : "require('postDelete-notification-cleanup').removeConnectedNotificationData(oldObject, resourceName, request);"
-            },
             "schema" : {
                 "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:User",
                 "title" : "User",
