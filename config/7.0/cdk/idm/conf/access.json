@@ -43,13 +43,6 @@
       "actions"    : "*"
     },
     {
-      "pattern"    : "config/selfservice/kbaConfig",
-      "roles"      : "*",
-      "methods"    : "read",
-      "actions"    : "*",
-      "customAuthz": "checkIfAnyFeatureEnabled(['registration', 'passwordReset'])"
-    },
-    {
       "pattern"    : "config/ui/dashboard",
       "roles"      : "internal/role/openidm-authorized",
       "methods"    : "read",
@@ -78,115 +71,6 @@
       "roles"      : "internal/role/openidm-authorized",
       "methods"    : "action",
       "actions"    : "validate"
-    },
-    {
-      "pattern"    : "selfservice/registration",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements",
-      "customAuthz" : "checkIfAnyFeatureEnabled('registration')"
-    },
-    {
-      "pattern"    : "selfservice/socialUserClaim",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements",
-      "customAuthz" : "checkIfAnyFeatureEnabled('registration')"
-    },
-    {
-      "pattern"    : "selfservice/reset",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements",
-      "customAuthz" : "checkIfAnyFeatureEnabled('passwordReset')"
-    },
-    {
-      "pattern"    : "selfservice/username",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements",
-      "customAuthz" : "checkIfAnyFeatureEnabled('retrieveUsername')"
-    },
-    {
-      "pattern"    : "selfservice/profile",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements"
-    },
-    {
-      "pattern"    : "selfservice/termsAndConditions",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements"
-    },
-    {
-      "pattern"    : "selfservice/kbaUpdate",
-      "roles"      : "*",
-      "methods"    : "read,action",
-      "actions"    : "submitRequirements"
-    },
-    {
-      "pattern"   : "policy/*",
-      "roles"     : "*",
-      "methods"   : "action",
-      "actions"   : "validateObject",
-      "customAuthz" : "context.current.name === 'selfservice'"
-    },
-    {
-      "pattern"   : "policy/selfservice/registration",
-      "roles"     : "*",
-      "methods"   : "action,read",
-      "actions"   : "validateObject",
-      "customAuthz" : "checkIfAnyFeatureEnabled('registration')"
-    },
-    {
-      "pattern"   : "policy/selfservice/reset",
-      "roles"     : "*",
-      "methods"   : "action,read",
-      "actions"   : "validateObject",
-      "customAuthz" : "checkIfAnyFeatureEnabled('passwordReset')"
-    },
-    {
-      "pattern"    : "selfservice/kba",
-      "roles"      : "internal/role/openidm-authorized",
-      "methods"    : "read",
-      "actions"    : "*",
-      "customAuthz" : "checkIfAnyFeatureEnabled('kba')"
-    },
-    {
-      "pattern"   : "managed/user",
-      "roles"     : "internal/role/openidm-reg",
-      "methods"   : "create",
-      "actions"   : "*",
-      "customAuthz" : "checkIfAnyFeatureEnabled('registration') && isSelfServiceRequest() && onlyEditableManagedObjectProperties('user', [])"
-    },
-    {
-      "pattern"   : "managed/user",
-      "roles"     : "*",
-      "methods"   : "query",
-      "actions"   : "*",
-      "customAuthz" : "checkIfAnyFeatureEnabled(['registration', 'retrieveUsername', 'passwordReset']) && isSelfServiceRequest()"
-    },
-    {
-      "pattern"   : "managed/user/*",
-      "roles"     : "*",
-      "methods"   : "read",
-      "actions"   : "*",
-      "customAuthz" : "checkIfAnyFeatureEnabled(['retrieveUsername', 'passwordReset']) && isSelfServiceRequest()"
-    },
-    {
-      "pattern"   : "managed/user/*",
-      "roles"     : "*",
-      "methods"   : "patch,action",
-      "actions"   : "patch",
-      "customAuthz" : "(checkIfAnyFeatureEnabled(['registration', 'passwordReset']) || checkIfProgressiveProfileIsEnabled()) && isSelfServiceRequest() && onlyEditableManagedObjectProperties('user', [])"
-    },
-    {
-      "pattern"   : "external/email",
-      "roles"     : "*",
-      "methods"   : "action",
-      "actions"   : "send",
-      "customAuthz" : "checkIfAnyFeatureEnabled(['registration', 'retrieveUsername', 'passwordReset']) && isSelfServiceRequest()"
     },
     {
       "pattern"    : "schema/*",
@@ -331,13 +215,6 @@
       "methods"   : "update,patch,action",
       "actions"   : "patch",
       "customAuthz" : "ownDataOnly() && onlyEditableManagedObjectProperties('user', []) && reauthIfProtectedAttributeChange()"
-    },
-    {
-      "pattern"   : "selfservice/user/*",
-      "roles"     : "internal/role/openidm-authorized",
-      "methods"   : "patch,action",
-      "actions"   : "patch",
-      "customAuthz" : "(request.resourcePath === 'selfservice/user/' + context.security.authorization.id) && onlyEditableManagedObjectProperties('user', [])"
     },
     {
       "pattern"   : "endpoint/getprocessesforuser",
