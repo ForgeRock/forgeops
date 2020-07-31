@@ -186,12 +186,6 @@
       "actions"   : "*"
     },
     {
-      "pattern"   : "authentication",
-      "roles"     : "internal/role/openidm-authorized",
-      "methods"   : "action",
-      "actions"   : "reauthenticate"
-    },
-    {
       "pattern"   : "*",
       "roles"     : "internal/role/openidm-authorized",
       "methods"   : "read,action,delete",
@@ -203,7 +197,7 @@
       "roles"     : "internal/role/openidm-authorized",
       "methods"   : "update,patch,action",
       "actions"   : "patch",
-      "customAuthz" : "ownDataOnly() && onlyEditableManagedObjectProperties('user', []) && reauthIfProtectedAttributeChange()"
+      "customAuthz" : "ownDataOnly() && onlyEditableManagedObjectProperties('user', [])"
     },
     {
       "pattern"   : "selfservice/user/*",
