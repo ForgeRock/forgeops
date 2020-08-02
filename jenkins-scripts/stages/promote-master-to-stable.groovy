@@ -55,7 +55,7 @@ private void promoteDockerImagesToRootLevel() {
         // Promote 'ds-empty' image in addition to 'ds' one
         if (imageKey == 'ds-idrepo') {
             dockerUtils.copyImage(
-                    "gcr.io/forgerock-io/ds-emtpy/pit1:${image.tag}",
+                    "gcr.io/forgerock-io/ds-empty/pit1:${image.tag}",
                     "gcr.io/forgerock-io/ds-empty:${image.tag}"
             )
         }
