@@ -35,11 +35,13 @@
     "internal/user": [
       {
         "id" : "openidm-admin",
-        "password" : "openidm-admin"
+        "password" : "openidm-admin",
+        "authzRoles" : [ { "_ref" : "internal/role/openidm-admin" }, { "_ref" : "internal/role/openidm-authorized" } ]
       },
       {
         "id" : "anonymous",
-        "password" : "anonymous"
+        "password" : "anonymous",
+        "authzRoles" : [ { "_ref" : "internal/role/openidm-reg" } ]
       }
     ]
   },
