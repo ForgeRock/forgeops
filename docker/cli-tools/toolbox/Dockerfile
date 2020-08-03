@@ -1,6 +1,7 @@
 FROM gcr.io/google-containers/pause:latest as pause
 
-FROM gcr.io/engineering-devops/yamkt:latest-skaffold as base
+ARG VERSION=lastest
+FROM gcr.io/engineering-devops/yamkt:${VERSION}-skaffold as base
 ARG COMMON_SCRIPT_SOURCE="https://raw.githubusercontent.com/microsoft/vscode-dev-containers/master/script-library/common-debian.sh"
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]

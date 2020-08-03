@@ -1,4 +1,5 @@
-FROM gcr.io/engineering-devops/yamkt:latest as base
+ARG VERSION=latest
+FROM gcr.io/engineering-devops/yamkt:$VERSION as base
 ENV HELM_HOME=/opt/forgeops/usr/helm
 
 SHELL ["bash", "-c"]
@@ -18,7 +19,8 @@ RUN chmod 2775 /opt/forgeops \
 
 RUN helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
-FROM gcr.io/engineering-devops/yamkt:latest as finale
+ARG VERSION=latest
+FROM gcr.io/engineering-devops/yamkt:$VERSION as finale
 ENV NODE_PATH=/opt/forgeops/usr/node_modules
 ENV PULUMI_SKIP_UPDATE_CHECK=1
 ENV HELM_HOME=/opt/forgeops/usr/helm

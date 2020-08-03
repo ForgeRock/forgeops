@@ -3,13 +3,17 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   id: base
   entrypoint: 'make'
+  env:                      
+  - "VERSION=$_VERSION"     
   args:
   - '-f'
   - 'docker/cli-tools/Makefile'
-  - 'yamkt'
+  - 'check'
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'make'
   waitFor: ["base"]
+  env:                    
+  - "VERSION=$_VERSION"    
   args:
   - '-f'
   - 'docker/cli-tools/Makefile'
@@ -17,6 +21,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'make'
   waitFor: ["base"]
+  env:                    
+  - "VERSION=$_VERSION"    
   args:
   - '-f'
   - 'docker/cli-tools/Makefile'
@@ -24,6 +30,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'make'
   waitFor: ["base"]
+  env:                    
+  - "VERSION=$_VERSION"    
   args:
   - '-f'
   - 'docker/cli-tools/Makefile'
@@ -31,6 +39,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'make'
   waitFor: ["base"]
+  env:                    
+  - "VERSION=$_VERSION"    
   args:
   - '-f'
   - 'docker/cli-tools/Makefile'
@@ -38,6 +48,8 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'make'
   waitFor: ["base"]
+  env:                    
+  - "VERSION=$_VERSION"    
   args:
     - '-f'
     - 'docker/cli-tools/Makefile'

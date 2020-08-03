@@ -1,5 +1,6 @@
+ARG VERSION=latest
 FROM gcr.io/google-containers/pause:latest
-FROM gcr.io/engineering-devops/yamkt:latest
+FROM gcr.io/engineering-devops/yamkt:$(VERSION)
 FROM debian:sid-slim
 ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=0 /pause /usr/local/bin/pause                   
