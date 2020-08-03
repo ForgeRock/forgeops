@@ -93,6 +93,10 @@ _config_pulumi() {
     [[ -z "${PULUMI_CONFIG_PASSPHRASE}" ]] \
         && echo "Please set the environment variable PULUMI_CONFIG_PASSPHRASE" \
             && exit 1
+    # use containers project file - which points to correct program
+    pulumi_project="$(pwd)/Pulumi.yaml"
+    [[ -f "${pulumi_project}" ]] \
+        && _add_volume "${pulumi_project}:/dev/null"
     _add_env "PULUMI_CONFIG_PASSPHRASE=${PULUMI_CONFIG_PASSPHRASE}"
     _add_volume "${HOME}/.pulumi/backups:${mount_root}/.pulumi/backups"
     _add_volume "${HOME}/.pulumi/history:${mount_root}/.pulumi/history"
@@ -140,6 +144,8 @@ _pre_exec() {
     USERID=$(id -u)
     GROUPID=$(id -g)
     _add_volume "${LOCALDIR}:${mount_root}/ctx"
+
+
 }
 
 run_cdm() {
