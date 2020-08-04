@@ -62,7 +62,6 @@
                 "topics" : [
                     "access",
                     "activity",
-                    "recon",
                     "sync",
                     "authentication",
                     "config"
@@ -77,7 +76,6 @@
                 "topics" : [
                     "access",
                     "activity",
-                    "recon",
                     "sync",
                     "authentication",
                     "config"
@@ -95,7 +93,6 @@
                     "activity",
                     "authentication",
                     "access",
-                    "recon",
                     "sync"
                 ],
                 "enabled" : true
