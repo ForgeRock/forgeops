@@ -4,7 +4,7 @@ config:
   dsnodes:ami: ami-0392bafc801b7520f
   dsnodes:diskSizeGb: "80"
   dsnodes:enable: "true"
-  dsnodes:instanceType: m5.9xlarge
+  dsnodes:instanceType: m5.8xlarge
   dsnodes:maxNodes: "6"
   dsnodes:minNodes: "6"
   dsnodes:nodeCount: "6"
@@ -21,7 +21,7 @@ config:
   frontendnodes:nodeCount: "3"
   primarynodes:ami: ami-0392bafc801b7520f
   primarynodes:diskSizeGb: "80"
-  primarynodes:instanceType: m5.9xlarge
+  primarynodes:instanceType: m5.8xlarge
   primarynodes:maxNodes: "4"
   primarynodes:minNodes: "1"
   primarynodes:nodeCount: "3"
