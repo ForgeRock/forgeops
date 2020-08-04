@@ -1,5 +1,5 @@
 #!/usr/bin/env make
-REGISTRY_URL=gcr.io/engineering-devops
+REGISTRY_URL?=gcr.io/engineering-devops
 VERSION?=latest
 _VERSION=$(subst master,lastest,$(VERSION))
 SHELL:=/bin/bash
