@@ -23,7 +23,7 @@ patchesStrategicMerge:
   metadata:
     name: am
   spec:
-    replicas: 1
+    replicas: 3
     template:
       spec:
         containers:
@@ -43,7 +43,7 @@ patchesStrategicMerge:
   metadata:
     name: idm
   spec:
-    replicas: 1
+    replicas: 2
     template:
       spec:
         containers:
