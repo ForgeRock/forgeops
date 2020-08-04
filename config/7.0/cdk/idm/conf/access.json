@@ -55,6 +55,13 @@
       "actions"    : "validate"
     },
     {
+      "pattern"    : "selfservice/kba",
+      "roles"      : "internal/role/openidm-authorized",
+      "methods"    : "read",
+      "actions"    : "*",
+      "customAuthz" : "checkIfAnyFeatureEnabled('kba')"
+    },
+    {
       "pattern"    : "schema/*",
       "roles"      : "internal/role/openidm-authorized",
       "methods"    : "read",
@@ -197,6 +204,13 @@
       "methods"   : "update,patch,action",
       "actions"   : "patch",
       "customAuthz" : "ownDataOnly() && onlyEditableManagedObjectProperties('user', []) && reauthIfProtectedAttributeChange()"
+    },
+    {
+      "pattern"   : "selfservice/user/*",
+      "roles"     : "internal/role/openidm-authorized",
+      "methods"   : "patch,action",
+      "actions"   : "patch",
+      "customAuthz" : "(request.resourcePath === 'selfservice/user/' + context.security.authorization.id) && onlyEditableManagedObjectProperties('user', [])"
     },
     {
       "pattern"   : "endpoint/getprocessesforuser",
