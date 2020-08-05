@@ -37,7 +37,7 @@ runtime: nodejs
 description: a project file for cdm container; DO NOT COMMIT
 main: ${pulumi_prgrm}
 EOF
-    echo ${project_file} > /opt/forgeops/mnt/ctx/Pulumi.yaml
+    printf "${project_file}" > /opt/forgeops/mnt/ctx/Pulumi.yaml
     if [[ "${entry_args[4]}" == "up" || "${entry_args[4]}" == "update" ]];
     then
         stack_name=$(setpriv --reuid=${userid} --regid=${groupid} --groups 360360,998 --inh-caps=-all  pulumi -C "${pulumi_prgrm}" stack ls --json | jq -r '.[] | select(.current == true) | .name')
