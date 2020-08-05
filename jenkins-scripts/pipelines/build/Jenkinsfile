@@ -54,6 +54,7 @@ timestamps {
                     prAutomation = load("${libsLocation}/pr-automation.groovy")
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
+                    tagReadyForDevPipelines = load("${stagesLocation}/tag-ready-for-dev-pipelines.groovy")
                 }
                 pit1TestStage = load("${stagesLocation}/pr-postcommit-pit1-tests.groovy")
                 perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
@@ -75,6 +76,8 @@ timestamps {
 
         if (isPR()) {
             prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.FORGEOPS_GIT_COMMIT)
+        } else {
+            tagReadyForDevPipelines.runStage(pipelineRun)
         }
     }
 }
