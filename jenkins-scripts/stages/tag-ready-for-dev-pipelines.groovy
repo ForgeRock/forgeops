@@ -31,3 +31,5 @@ void runStage(PipelineRun pipelineRun) {
         }
     }
 }
+
+return this
