@@ -13,7 +13,7 @@ COPY --chown=0:360360 cluster/pulumi /opt/forgeops/usr/
 RUN chmod 2775 /opt/forgeops \
         && cd /opt/forgeops/usr/ \
             && PULUMI_HOME=/tmp/pulumi npm --loglevel=error ci --production \
-                && install -g 360360 /tmp/pulumi/plugins/**/* /opt/forgeops/usr/bin \
+                && install --backup=numbered -g 360360 /tmp/pulumi/plugins/**/* /opt/forgeops/usr/bin \
                     && rm -rf /tmp/pulumi \
                         && chown -R root:cli /opt/forgeops/usr/node_modules
 
