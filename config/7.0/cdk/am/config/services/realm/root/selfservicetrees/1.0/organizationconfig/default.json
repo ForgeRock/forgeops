@@ -14,8 +14,7 @@
       "resetPassword" : "ResetPassword",
       "updatePassword" : "UpdatePassword",
       "forgottenUsername" : "ForgottenUsername",
-      "registration" : "Registration",
-      "login" : "Login"
+      "registration" : "Registration"
     },
     "_type" : {
       "_id" : "selfServiceTrees",
