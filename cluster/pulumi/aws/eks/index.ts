@@ -14,7 +14,6 @@ let groupNeedingLBAttachment : eks.NodeGroup
 let tempinstanceRoles = [workerNodesCredentials.iamRole];
 let backendLabels: {[key: string]: string} = {
     "backend": "true",
-    "kubernetes.io/role": "backend",
     "forgerock.io/role": "backend"
 }
 
@@ -67,7 +66,6 @@ const primaryNodeGroup = clusterLib.createNodeGroup(config.primaryNodeGroupConfi
 if (config.frontendNodeGroupConfig.enable){
     const frontendLabels = {
         "frontend": "true",
-        "kubernetes.io/role": "frontend",
         "forgerock.io/role": "frontend"
     };
 
@@ -108,7 +106,6 @@ else { //IF NOT USING DEDICATED FRONTEND NODES
 if (config.dsNodeGroupConfig.enable){
     const dsLabels = {
         "ds": "true",
-        "kubernetes.io/role": "ds",
         "forgerock.io/role": "ds"
     };
 

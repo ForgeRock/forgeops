@@ -6,12 +6,15 @@ const managedPolicyArns: string[] = [
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
 ];
 
+const managedPolicyArnsRoot: string[] = [
+    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+];
 export function createRole(name: string, trustEntity: string = "service") : aws.iam.Role {
 
     let principalObj:any  = {}
     if (trustEntity.toLowerCase() == "root")
     {
-        principalObj = aws.getCallerIdentity({}).then(id => aws.iam.assumeRolePolicyForPrincipal({"AWS": `arn:aws:iam::${id.accountId}:root`})) 
+        principalObj = aws.getCallerIdentity({}).then(id => aws.iam.assumeRolePolicyForPrincipal({"Service": "eks.amazonaws.com"}))
     }
     else
     {
@@ -31,6 +34,16 @@ export function createRole(name: string, trustEntity: string = "service") : aws.
                 { policyArn: policy, role: role },
             );
         }
+    }
+    else
+    {
+        let counter = 0;
+        for (const policy of managedPolicyArnsRoot) {
+            // Create RolePolicyAttachment without returning it.
+            const rpa = new aws.iam.RolePolicyAttachment(`${name}-policy-${counter++}`,
+                { policyArn: policy, role: role },
+            );
+        }       
     }
 
     return role;

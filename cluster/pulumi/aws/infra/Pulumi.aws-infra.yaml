@@ -4,7 +4,7 @@ config:
   aws-infra:bastionEnable: "false"
   aws-infra:bastionAmi: ami-0e70db31f7e942241
   aws-infra:bastionInstanceType: t2.micro
-  aws-infra:bucketName: eks-cdm
+  aws-infra:bucketName: ds-backup-unique-bucket-name
   aws-infra:highAvailability: "true"
   aws-infra:numOfAzs: "3"
   aws-infra:vpcCIDR: 192.168.0.0/16
