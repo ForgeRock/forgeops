@@ -89,8 +89,18 @@ def create_release_notes(args):
 
 def active_tag():
     try:
+        tag_name = ""
         commit_sha = run('git', 'rev-parse', 'HEAD')
-        tag_name = run('git', 'name-rev', '--tag', '--name-only', commit_sha)
+        tag_names = run('git', 'tag', '--points-at', commit_sha).split('\n')
+        for t in tag_names:
+            try:
+                parsed = parse_tag(t)
+                tag_name = t
+            except ValueError:
+                # move on from an invalid tag
+                continue
+        if tag_name == "":
+            raise Exception("current tag is incorrect format")
     except Exception as e:
         print(e)
         sys.exit(1)
