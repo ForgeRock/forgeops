@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:7.0.0-25acac1436304ec9a357fcd1a3ef5c8fb765415d
+FROM gcr.io/forgerock-io/ds:7.0.0-ldif-importer
 
 USER 0
 RUN apt-get update -y && apt-get install -y curl
