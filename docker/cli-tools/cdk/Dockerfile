@@ -1,5 +1,6 @@
 ARG VERSION=latest
-FROM gcr.io/engineering-devops/yamkt:${VERSION}-skaffold as base
+ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
+FROM ${FORGEOPS_REGISTRY}/yamkt:${VERSION}-skaffold as base
 SHELL ["bash", "-c"]
 RUN mkdir -p /opt/forgeops/{usr,mnt} \
         && mkdir 770 -p /opt/forgeops/mnt/{ctx,.pulumi} \

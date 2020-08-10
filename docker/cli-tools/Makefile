@@ -1,14 +1,10 @@
 #!/usr/bin/env make
 REGISTRY_URL?=gcr.io/engineering-devops
+# build master as latest
 VERSION?=latest
 _VERSION=$(subst master,lastest,$(VERSION))
 SHELL:=/bin/bash
-DOCKER_BUILD:=docker build --build-arg VERSION=$(_VERSION)
-
-check:
-	echo $(_VERSION)
-	echo $(TAG_NAME)
-	echo $(BRANCH_NAME)
+DOCKER_BUILD:=docker build --build-arg VERSION=$(_VERSION) --build-arg FORGEOPS_REGISTRY=$(REGISTRY_URL)
 
 repo-build:
 	docker build -t $(REGISTRY_URL)/repo:$(_VERSION) -f docker/cli-tools/repo/Dockerfile .
@@ -50,7 +46,7 @@ yamkt-build:
 	docker build -t $(REGISTRY_URL)/yamkt:$(_VERSION) -f docker/cli-tools/base/Dockerfile .
 
 yamkt: yamkt-build push/yamkt/$(_VERSION) yamkt-build/skaffold push/yamkt/$(_VERSION)-skaffold
-	@echo "completed building Yet Another Multicloud Kubernetes Toolkit"
+	@echo "completed build and push of Yet Another Multicloud Kubernetes Toolkit: $(_VERSION) to $(REGISRY_URL)"
 
 push/%:
 	docker push $(REGISTRY_URL)/$(*D):$(@F)

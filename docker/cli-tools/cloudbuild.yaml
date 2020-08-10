@@ -9,7 +9,7 @@ steps:
   args:
   - '-f'
   - 'docker/cli-tools/Makefile'
-  - 'check'
+  - 'yamkt'
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'make'
   waitFor: ["base"]

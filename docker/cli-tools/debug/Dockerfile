@@ -1,6 +1,7 @@
 ARG VERSION=latest
 FROM gcr.io/google-containers/pause:latest
-FROM gcr.io/engineering-devops/yamkt:$(VERSION)
+ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops    
+FROM ${FORGEOPS_REGISTRY}/yamkt:$VERSION as finale 
 FROM debian:sid-slim
 ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=0 /pause /usr/local/bin/pause                   
