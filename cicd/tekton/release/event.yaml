@@ -17,6 +17,6 @@ spec:
         - cel:
             filter: "body.ref_type == 'tag'"
       bindings:
-        - name: tag-release-binding
+        - ref: tag-release-binding
       template:
         name: tag-release-template
