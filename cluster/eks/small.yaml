@@ -1,0 +1,48 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: small
+  region: us-east-2
+  version: "1.17"
+
+vpc:
+  clusterEndpoints:
+    publicAccess:  true
+    privateAccess: true
+  #cidr: 192.168.0.0/16
+
+nodeGroups:
+  - name: primary
+    instanceType: m5.xlarge
+    minSize: 0
+    maxSize: 1
+    desiredCapacity: 1
+    availabilityZones: ["us-east-2a","us-east-2b","us-east-2c"]
+    volumeSize: 80
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+    labels: {
+      "ds": "true",
+      "frontend": "true",
+      "forgerock.io/role": "ds" }
+    ssh:
+      allow: true
+  - name: ds
+    instanceType: m5.xlarge
+    minSize: 1
+    maxSize: 1
+    desiredCapacity: 1
+    availabilityZones: ["us-east-2a","us-east-2b","us-east-2c"]
+    volumeSize: 80
+    labels: {
+      "ds": "true",
+      "forgerock.io/role": "ds"
+    }
+    taints: 
+      WorkerDedicatedDS: true:NoSchedule
+    ssh:
+      # publicKeyPath: 
+      allow: true

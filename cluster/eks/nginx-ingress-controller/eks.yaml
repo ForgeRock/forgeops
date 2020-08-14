@@ -1,0 +1,26 @@
+controller:
+    kind: DaemonSet
+    daemonset: 
+        useHostPort: true
+        hostPorts:
+            http: 30080
+            https: 30443
+    service:
+        enabled: true
+    publishService: 
+        enabled: false
+    stats:
+        enabled: true
+        service:
+            omitClusterIP: true
+    nodeSelector:
+        "frontend": "true"
+    tolerations:
+      - key: "WorkerAttachedToExtLoadBalancer"
+        operator: "Exists"
+        effect: "NoSchedule"
+defaultBackend:
+    service:
+        omitClusterIP: true
+        
+    

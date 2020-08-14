@@ -1,0 +1,55 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: medium
+  region: us-east-2
+  version: "1.17"
+
+# vpc:
+#   cidr: 192.168.0.0/16
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: s3-fullaccess
+      # if no namespace is set, "default" will be used;
+      # the namespace will be created if it doesn't exist already
+      namespace: prod
+    attachPolicyARNs:
+    - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+
+nodeGroups:
+  - name: primary
+    instanceType: m5.9xlarge
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 3
+    availabilityZones: ["us-east-2a","us-east-2b","us-east-2c"]
+    volumeSize: 80
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+    labels: {
+      "ds": "true",
+      "frontend": "true",
+      "forgerock.io/role": "ds" }
+    ssh:
+      allow: true
+  - name: ds
+    instanceType: m5.9xlarge
+    minSize: 6
+    maxSize: 6
+    desiredCapacity: 6
+    availabilityZones: ["us-east-2a","us-east-2b","us-east-2c"]
+    volumeSize: 80
+    labels: {
+      "ds": "true",
+      "forgerock.io/role": "ds"
+    }
+    taints: 
+      WorkerDedicatedDS: true:NoSchedule
+    ssh:
+      # publicKeyPath: 
+      allow: true
