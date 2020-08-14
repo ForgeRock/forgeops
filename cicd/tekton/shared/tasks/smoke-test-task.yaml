@@ -15,7 +15,7 @@ spec:
   - name: tester-url
     type: string
     description: URL of the testing endpoint
-    default: "https://smoketest-7escakmhgq-uk.a.run.app/test"
+    default: "https://smoketest.forgeops.com/test"
 
   stepTemplate:
     env:
