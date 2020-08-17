@@ -70,7 +70,7 @@
       "defaultScopes" : [ "cn", "mail" ],
       "clientName" : [ ],
       "clientType" : "Public",
-      "scopes" : [ "openid", "cn", "mail", "profile", "uid" ],
+      "scopes" : [ "openid", "cn", "mail", "profile", "uid", "fr:idm:*" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ "https://fake.com" ],

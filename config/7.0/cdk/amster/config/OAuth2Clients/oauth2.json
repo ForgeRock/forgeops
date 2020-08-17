@@ -71,7 +71,7 @@
       "defaultScopes" : [ "cn", "profile" ],
       "clientName" : [ ],
       "clientType" : "Confidential",
-      "scopes" : [ "profile", "mail", "employeenumber", "name", "cn" ],
+      "scopes" : [ "profile", "mail", "employeenumber", "name", "cn", "fr:idm:*" ],
       "refreshTokenLifetime" : 604800,
       "redirectionUris" : [ "http://fake.com", "https://fake.com" ],
       "status" : "Active"

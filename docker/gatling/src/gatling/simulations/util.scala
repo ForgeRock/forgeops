@@ -13,7 +13,7 @@ class BenchConfig {
     val host: String   = Properties.envOrElse("TARGET_HOST", "prod.iam.example.com")
     val port: String =  Properties.envOrElse("PORT", "443")
     val protocol: String =  Properties.envOrElse("protocol", "https")
-    val scope: String =  Properties.envOrElse("SCOPE", "openid")
+    val scope: String =  Properties.envOrElse("SCOPE", "fr:idm:*")
     val client_id: String = Properties.envOrElse("CLIENT_ID", "idm-provisioning")
     val client_password: String = Properties.envOrElse("CLIENT_PASSWORD", "password")
     val idmUser: String = Properties.envOrElse("IDM_USER", "openidm-admin")
@@ -40,7 +40,7 @@ class AMAuth (val config: BenchConfig) {
     val safetyMargin = 2 minutes
 
     // sample curl:
-    // curl -u idm-provisioning:password --data 'grant_type=client_credentials&scope=openid'
+    // curl -u idm-provisioning:password --data 'grant_type=client_credentials&scope=fr:idm:*'
     // -X POST https://smoke.iam.forgeops.com/am/oauth2/access_token
     // add this to a chain to get an access token.
     // tood: Do paramterize the client, grant, etc.

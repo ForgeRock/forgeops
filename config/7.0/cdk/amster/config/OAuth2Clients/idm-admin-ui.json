@@ -70,7 +70,7 @@
       "defaultScopes" : [ ],
       "clientName" : [ ],
       "clientType" : "Public",
-      "scopes" : [ "openid" ],
+      "scopes" : [ "openid", "fr:idm:*" ],
       "agentgroup" : null,
       "refreshTokenLifetime" : 0,
       "redirectionUris" : [ "https://&{fqdn}/platform/appAuthHelperRedirect.html", "https://&{fqdn}/platform/sessionCheck.html", "https://&{fqdn}/admin/appAuthHelperRedirect.html", "https://&{fqdn}/admin/sessionCheck.html", "http://localhost:8082/appAuthHelperRedirect.html", "http://localhost:8082/sessionCheck.html" ],
