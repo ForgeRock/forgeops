@@ -3,7 +3,7 @@
         "clientId" : "idm-resource-server",
         "clientSecret" : "&{rs.client.secret|password}",
         "tokenIntrospectUrl" : "http://am/am/oauth2/introspect",
-        "scopes" : [ ],
+        "scopes" : [ "fr:idm:*" ],
         "cache" : {
             "maxTimeout" : "300 seconds"
         },
