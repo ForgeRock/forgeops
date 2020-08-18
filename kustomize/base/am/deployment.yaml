@@ -55,25 +55,4 @@ spec:
           requests:
             memory: 1800Mi
             cpu: 250m
-        volumeMounts:
-        - name: truststore
-          mountPath: /var/run/secrets/truststore
-        - name: am-secrets
-          mountPath: /var/run/secrets/am
-        - name: amster-keys
-          mountPath: /var/run/secrets/amster
       terminationGracePeriodSeconds: 10
-      volumes:
-      - name: am-secrets
-        projected:
-          sources:
-          - secret:
-             name: am-passwords
-          - secret:
-              name: am-keystore
-      - name: amster-keys
-        secret:
-          secretName: amster
-      - name: truststore
-        secret:
-          secretName: truststore

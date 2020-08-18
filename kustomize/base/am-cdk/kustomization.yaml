@@ -1,0 +1,39 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+- ../am
+
+patchesStrategicMerge:
+- |-
+  #Patch AM
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: am
+  spec:
+    replicas: 1
+    template:
+      spec:
+        containers:
+        - name: openam
+          volumeMounts:
+           - name: truststore
+             mountPath: /var/run/secrets/truststore
+           - name: am-secrets
+             mountPath: /var/run/secrets/am
+           - name: amster-keys
+             mountPath: /var/run/secrets/amster
+        volumes:
+         - name: am-secrets
+           projected:
+             sources:
+             - secret:
+                name: am-passwords
+             - secret:
+                 name: am-keystore
+         - name: amster-keys
+           secret:
+             secretName: amster
+         - name: truststore
+           secret:
+             secretName: truststore

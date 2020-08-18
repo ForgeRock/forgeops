@@ -1,7 +1,7 @@
 namespace: prod
 resources:
 - ../../../base/kustomizeConfig
-- ../../../base/am
+- ../../../base/am-cdk
 - ../../../base/idm
 - ../../../base/end-user-ui
 - ../../../base/login-ui
