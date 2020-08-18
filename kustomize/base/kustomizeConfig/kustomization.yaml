@@ -24,6 +24,8 @@ configMapGenerator:
   - IDM_REST_URL=https://$(FQDN)/openidm
   - ENDUSER_UI_URL=https://$(FQDN)/enduser
   - LOGIN_UI_URL=https://$(FQDN)/login/#/service/Login
+  - PLATFORM_UI_IS_FRAAS="false" # FRaaS functionality is disabled in the platform
+  - FRAAS_LOGGING_URL="" # Location of FRaaS log api key service for the deployment
   - ENDUSER_CLIENT_ID=end-user-ui
   - ADMIN_CLIENT_ID=idm-admin-ui
   - THEME=default
