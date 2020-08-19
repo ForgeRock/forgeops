@@ -10,8 +10,6 @@ import com.sun.identity.idm.IdRepoException
 import org.forgerock.oauth2.core.exceptions.InvalidRequestException
 import org.forgerock.oauth2.core.UserInfoClaims
 import org.forgerock.openidconnect.Claim
-import groovy.json.JsonSlurper
-import org.apache.groovy.json.internal.LazyMap
 
 /*
 * Defined variables:
@@ -85,190 +83,34 @@ defaultClaimResolver = { claim ->
  *
  * If no match is found an exception is thrown.
  */
+userProfileClaimResolver = { attribute, claim, identity ->
+    if (identity != null) {
+        userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
+        if (userProfileValue != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(userProfileValue))) {
+            return [(claim.getName()): userProfileValue]
+        }
+    }
+    [:]
+}
 
-nameResolver = { attribute, claim, identity ->
-    userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
-    if (userProfileValue != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(userProfileValue))) {
-        def value = toJson(userProfileValue)
-        // @todo name including all name parts, possibly including titles and suffixes, ordered according to the End-User's locale and preferences.
-        if (value instanceof LazyMap) {
-          	if (value.givenName && value.familyName && value.middleName) {
-                return [
-                    "family_name": value.familyName,
-                    "given_name": value.givenName,
-                  	"middle_name": value.middleName,
-                    "name": "$value.givenName $value.middleName $value.familyName".trim(),
-                ]
-            } else if (value.givenName && value.familyName) {
-                return [
-                    "family_name": value.familyName,
-                    "given_name": value.givenName,
-                    "name": "$value.givenName $value.familyName".trim(),
-                ]
-            } else if (value.familyName) {
-                return [
-                    "family_name": value.familyName,
-                    "name": value.familyName,
-                ]
-            } else if (value.givenName) {
-                return [
-                    "given_name": value.givenName,
-                    "name": value.givenName,
-                ]
-            }
+/*
+ * Claim resolver which resolves the value of the claim of the user's address.
+ *
+ * This resolver will return a value for the claim if:
+ * # the value of the address is not null
+ *
+ */
+userAddressClaimResolver = { claim, identity ->
+    if (identity != null) {
+        addressFormattedValue = fromSet(claim.getName(), identity.getAttribute("postaladdress"))
+        if (addressFormattedValue != null) {
             return [
-                "name": value,
-            ]
-        } else {
-            return [
-                "name": value,
+                    "formatted" : addressFormattedValue
             ]
         }
     }
     [:]
 }
-
-addressResolver = { attribute, claim, identity ->
-  	def name = claim.getName()
-    logger.message("addressResolver: " + name)
-    
-  	def jsonValue = fromSet(name, identity.getAttribute(attribute))
-	if (jsonValue == null) {
-    	return [:]
-  	}
-  
-  	def address = toJson(jsonValue)
-
-  	// Create individual properties
-  	def map = [:]
-  	if (address.streetAddress) {
-    	map.put("street_address", address.streetAddress)
-  	}
-  	if (address.locality) {
-    	map.put("locality", address.locality)
-  	}
-  	if (address.region) {
-    	map.put("region", address.region)
-  	}
-  	if (address.postalCode) {
-    	map.put("postal_code", address.postalCode)
-  	}
-  	if (address.country) {
-    	map.put("country", address.country)
-  	}
-  
-  	// Create formatted address
-  	def formatted = []
-  	def localityRegionSep = ", "
-  	if (!address.locality || !address.region) {
-    	localityRegionSep = ""
-  	}
-  	if (address.streetAddress) {
-      	formatted << address.streetAddress
-  	}
-  	if (address.locality || address.region || address.postalCode) {
-    	formatted << (address.locality + localityRegionSep + address.region + " " + address.postalCode).trim()
-  	}
-  	if (address.country) {
-    	formatted << address.country
-  	}
-  	if (formatted.size() > 0) {
-    	map.put("formatted", formatted.join("\n"))
-  	}
-              
-   	return [address: map]
-}
-
-attributeResolver = { attribute, field, usePrimary, addVerified, claim, identity ->
-  	name = claim.getName()
-    logger.message("attributeResolver: " + name)
-  
-    value = fromSet(name, identity.getAttribute(attribute))
-
-  	if (value != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(value))) {
-        value = toJson(value)
-        if (usePrimary) {
-            value = getPrimaryOrFirst(value)
-        }
-      
-       	isMap = value != null && value instanceof LazyMap
-       	hasField = isMap && field instanceof String && value.containsKey(field)
-      	hasVerified = isMap && value.containsKey("verified")
-
-      	if (addVerified && hasVerified) {          	
-            return [
-                (name + "_verified"): hasVerified && value.verified == true,
-                (name): hasField ? value[field] : value,
-            ]
-        }
-      
-        return [
-            (name): hasField ? value[field] : value,
-        ]
-    }
-    [:]
-}
-
-basicResolver = { attribute, claim, identity ->
-    name = claim.getName()
-    logger.message("basicResolver: " + name)
-    userProfileValue = fromSet(name, identity.getAttribute(attribute))
-    if (userProfileValue != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(userProfileValue))) {
-        def value = toJson(userProfileValue)
-        value = getPrimaryOrFirst(value)
-        return [(name): value]
-    }
-    [:]
-}
-
-dateResolver = { attribute, claim, identity ->
-    name = claim.getName()
-    logger.message("dateResolver: " + name)
-    userProfileValue = fromSet(name, identity.getAttribute(attribute))
-    if (userProfileValue != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(userProfileValue))) {
-      	def value = toJson(userProfileValue)
-      	value = getPrimaryOrFirst(value)
-        def dateFormat = new java.text.SimpleDateFormat("yyyyMMddHHmmss")
-        def date = dateFormat.parse(value);
-		return [(name): date.time / 1000]
-    }
-    [:]
-}
-
-getPrimaryOrFirst = { value ->
-    if (value instanceof java.util.ArrayList) {
-        // look for primary
-        for (item in value) {
-          	obj = toJson(item)
-            if (obj.hasProperty("primary") && obj.primary == true) {
-                return obj
-            }
-        }
-        // return first
-        return toJson(value[0])
-    }
-    return value
-}
-
-toJson = { value ->
-    if (value instanceof java.util.HashSet) {
-        def jsonSet = []
-        value.each { i ->
-            try {
-                jsonSet.add(toJson(i))
-            } catch(e) {
-                jsonSet.add(i)
-            }
-        };
-        return jsonSet
-    }
-    try {
-        return new JsonSlurper().parseText(value)
-    } catch(e) {
-        return value
-    }
-}
-
 
 /*
  * Claim resolver which resolves the value of the claim by looking up the user's profile.
@@ -282,15 +124,16 @@ toJson = { value ->
  * If no match is found an exception is thrown.
  */
 essentialClaimResolver = { attribute, claim, identity ->
-    userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
-    if (claim.isEssential() && (userProfileValue == null || userProfileValue.isEmpty())) {
-        throw new InvalidRequestException("Could not provide value for essential claim $claim")
+    if (identity != null) {
+        userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
+        if (claim.isEssential() && (userProfileValue == null || userProfileValue.isEmpty())) {
+            throw new InvalidRequestException("Could not provide value for essential claim $claim")
+        }
+        if (userProfileValue != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(userProfileValue))) {
+            return [(claim.getName()): userProfileValue]
+        }
     }
-    if (userProfileValue != null && (claim.getValues() == null || claim.getValues().isEmpty() || claim.getValues().contains(userProfileValue))) {
-        return [(claim.getName()): userProfileValue]
-    } else {
-        return [:]
-    }
+    return [:]
 }
 
 /*
@@ -302,12 +145,14 @@ essentialClaimResolver = { attribute, claim, identity ->
  * If no match is found an exception is thrown.
  */
 claimLocalesClaimResolver = { attribute, claim, identity ->
-    userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
-    if (userProfileValue != null) {
-        localeValues = parseLocaleAwareString(userProfileValue)
-        locale = claimsLocales.find { locale -> localeValues.containsKey(locale) }
-        if (locale != null) {
-            return [(claim.getName()): localeValues.get(locale)]
+    if (identity != null) {
+        userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
+        if (userProfileValue != null) {
+            localeValues = parseLocaleAwareString(userProfileValue)
+            locale = claimsLocales.find { locale -> localeValues.containsKey(locale) }
+            if (locale != null) {
+                return [(claim.getName()): localeValues.get(locale)]
+            }
         }
     }
     return [:]
@@ -321,19 +166,21 @@ claimLocalesClaimResolver = { attribute, claim, identity ->
  * from the users' profile attribute. If no match is found an exception is thrown.
  */
 languageTagClaimResolver = { attribute, claim, identity ->
-    userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
-    if (userProfileValue != null) {
-        localeValues = parseLocaleAwareString(userProfileValue)
-        if (claim.getLocale() != null) {
-            if (localeValues.containsKey(claim.getLocale())) {
-                return [(claim.getName()): localeValues.get(claim.getLocale())]
+    if (identity != null) {
+        userProfileValue = fromSet(claim.getName(), identity.getAttribute(attribute))
+        if (userProfileValue != null) {
+            localeValues = parseLocaleAwareString(userProfileValue)
+            if (claim.getLocale() != null) {
+                if (localeValues.containsKey(claim.getLocale())) {
+                    return [(claim.getName()): localeValues.get(claim.getLocale())]
+                } else {
+                    entry = localeValues.entrySet().iterator().next()
+                    return [(claim.getName() + "#" + entry.getKey()): entry.getValue()]
+                }
             } else {
                 entry = localeValues.entrySet().iterator().next()
-                return [(claim.getName() + "#" + entry.getKey()): entry.getValue()]
+                return [(claim.getName()): entry.getValue()]
             }
-        } else {
-            entry = localeValues.entrySet().iterator().next()
-            return [(claim.getName()): entry.getValue()]
         }
     }
     return [:]
@@ -356,52 +203,29 @@ parseLocaleAwareString = { s ->
  */
 // [ {claim}: {attribute retriever}, ... ]
 claimAttributes = [
-        "address": addressResolver.curry("fr-idm-addresses"),
-        "birthdate": basicResolver.curry("fr-idm-birthdate"),
-        "email": attributeResolver.curry("fr-idm-emails", "value", true, true),
-        "gender": basicResolver.curry("fr-idm-gender"),
-        "locale": basicResolver.curry("fr-idm-locale"),
-        "name": nameResolver.curry("fr-idm-name-object"),
-        "nickname": basicResolver.curry("fr-idm-nick-name"),
-        "phone": attributeResolver.curry("fr-idm-phone-numbers", "value", true, false),
-        "picture": attributeResolver.curry("fr-idm-photos", "value", true, false),
-        "preferred_username": basicResolver.curry("userName"),
-        "profile": basicResolver.curry("fr-idm-profile-url"),
-        "title": basicResolver.curry("fr-idm-title"),
-        "updated_at": dateResolver.curry("modifyTimestamp"),
-        "username": basicResolver.curry("userName"),
-        "website": basicResolver.curry("fr-idm-website"),
-        "zoneinfo": basicResolver.curry("fr-idm-timezone"),
+        "email": userProfileClaimResolver.curry("mail"),
+        "address": { claim, identity -> [ "address" : userAddressClaimResolver(claim, identity) ] },
+        "phone_number": userProfileClaimResolver.curry("telephonenumber"),
+        "given_name": userProfileClaimResolver.curry("givenname"),
+        "zoneinfo": userProfileClaimResolver.curry("preferredtimezone"),
+        "family_name": userProfileClaimResolver.curry("sn"),
+        "locale": userProfileClaimResolver.curry("preferredlocale"),
+        "name": userProfileClaimResolver.curry("cn")
 ]
+
 
 // -------------- UPDATE THIS TO CHANGE SCOPE TO CLAIM MAPPINGS --------------
 /*
  * Map of scopes to claim objects.
  */
 // {scope}: [ {claim}, ... ]
-// https://trello.com/c/wHA3ebp1/1021-id-token-and-userinfo-endpoint-not-returning-all-user-data
 scopeClaimsMap = [
         "email": [ "email" ],
         "address": [ "address" ],
-        "phone": [ "phone" ],
-        "profile": [
-            "birthdate",
-            "family_name",
-            "gender",
-            "given_name",
-            "locale",
-            "name",
-            "nickname",
-            "picture",
-            "preferred_username",
-            "profile",
-            "title",
-            "updated_at",
-            "username",
-            "website",
-            "zoneinfo",
-        ]
+        "phone": [ "phone_number" ],
+        "profile": [ "given_name", "zoneinfo", "family_name", "locale", "name" ]
 ]
+
 
 // ---------------- UPDATE BELOW FOR ADVANCED USAGES -------------------
 if (logger.messageEnabled()) {
@@ -445,7 +269,7 @@ def claimsToResolve = convertScopeToClaims() + claimObjects + requestedTypedClai
 
 // Computes the claim return key and values for all requested claims
 computedClaims = claimsToResolve.collectEntries() { claim ->
-    computeClaim(claim)
+    result = computeClaim(claim)
 }
 
 // Computes composite scopes
