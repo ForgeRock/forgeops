@@ -14,8 +14,7 @@ usage() {
 }
 
 delete() {
-    helm uninstall nginx-ingress --namespace nginx || true
-    kubectl delete ns nginx
+    helm uninstall ingress-nginx --namespace nginx || true
     exit 1
 }
 
@@ -77,10 +76,10 @@ ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
 ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
 
 # Add Helm repo
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/ > /dev/null
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
 # Deploy ingress controller Helm chart
-helm upgrade -i nginx-ingress --namespace nginx stable/nginx-ingress \
+helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
   $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
 
 # This other repo requires changes to the values in cluster/addons/nginx-ingress-controller

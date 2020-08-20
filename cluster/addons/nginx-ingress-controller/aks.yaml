@@ -1,6 +1,8 @@
 controller:
     kind: Deployment
-    replicaCount: 2
+    # For testing and small installations one replica is sufficient. For larger tests
+    # you may want to increase the replicas
+    replicaCount: 1
     service:
         type: LoadBalancer
         externalTrafficPolicy: Local

@@ -1,6 +1,8 @@
 controller:
     kind: Deployment
-    replicaCount: 2
+    # For testing and small installations one replica is sufficient. For larger tests
+    # you may want to increase the replicas
+    replicaCount: 1
     service:
         type: LoadBalancer
         externalTrafficPolicy: Local
@@ -11,9 +13,10 @@ controller:
         enabled: true
         service:
             omitClusterIP: true
-    nodeSelector:
-        "frontend": "true"
-    tolerations:
-      - key: "WorkerDedicatedFrontend"
-        operator: "Exists"
-        effect: "NoSchedule"
+# Optional settings if you have dedicated front end nodes. Most implementations will not need this
+#    nodeSelector:
+#        "frontend": "true"
+#    tolerations:
+#      - key: "WorkerDedicatedFrontend"
+#        operator: "Exists"
+#        effect: "NoSchedule"
