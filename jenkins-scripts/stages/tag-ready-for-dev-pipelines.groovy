@@ -13,9 +13,10 @@ import com.forgerock.pipeline.stage.Status
  * Tag current commit as ready-for-dev-pipelines: the tag will be use in DEV pipelines for k8s/pit1.
  */
 void runStage(PipelineRun pipelineRun) {
-    def tagName = 'ready-for-dev-pipelines'
+    def tagBaseName = 'ready-for-dev-pipelines'
+    def tagName = "${env.BRANCH_NAME}-${tagBaseName}"
 
-    pipelineRun.pushStageOutcome(tagName, stageDisplayName: "Tag ${tagName}") {
+    pipelineRun.pushStageOutcome("create-tag-${tagName}", stageDisplayName: "Tag ${tagName}") {
         node('build&&linux') {
             stage("Tag ${tagName}") {
                 pipelineRun.updateStageStatusAsInProgress()
@@ -25,6 +26,12 @@ void runStage(PipelineRun pipelineRun) {
 
                 sh "git tag --force ${tagName}"
                 sh "git push --force origin ${tagName}"
+
+                // maintain this tag while the products are still using it
+                if (env.BRANCH_NAME == 'master') {
+                    sh "git tag --force ${tagBaseName}"
+                    sh "git push --force origin ${tagBaseName}"
+                }
 
                 return Status.SUCCESS.asOutcome()
             }
