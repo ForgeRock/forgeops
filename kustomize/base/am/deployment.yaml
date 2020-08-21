@@ -14,6 +14,31 @@ spec:
       labels:
         app: am
     spec:
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 0
+      initContainers:
+      # This init container copies in the "immutable" configuration from the Docker image
+      # to shared volume that is also mounted by the am container. Putting this on an emptyDir volume
+      # preserves configuration across pod restarts (for example, if AM crashes or suffers an OOM kill from k8s).
+      # This is most useful in development environments, so users do not lose their changes if the pod restarts.
+      - name: fbc-init
+        image: am
+        volumeMounts:
+        - mountPath: /fbc
+          name: fbc
+        command:
+        - /bin/bash
+        - -c
+        - |
+          if [ -d /fbc/.git ];
+          then
+            echo "Existing openam configuration found. Skipping copy"
+          else
+            echo "Copying docker image configuration files to the shared volume"
+            cd /home/forgerock/openam
+            cp -r .git .homeVersion * /fbc
+          fi
       containers:
       - env:
         - name: NAMESPACE
@@ -55,4 +80,11 @@ spec:
           requests:
             memory: 1800Mi
             cpu: 250m
+        volumeMounts:
+        - mountPath: /home/forgerock/openam
+          name: fbc
       terminationGracePeriodSeconds: 10
+      # Shared volume that holds the AM configuration.
+      volumes:
+      - name: fbc
+        emptyDir: {}
