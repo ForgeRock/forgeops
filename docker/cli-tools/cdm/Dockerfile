@@ -1,6 +1,6 @@
 ARG VERSION=latest
 ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
-FROM ${FORGEOPS_REGISTRY}/yamkt:$VERSION as base
+FROM $FORGEOPS_REGISTRY/yamkt:$VERSION as base
 ENV HELM_HOME=/opt/forgeops/usr/helm
 
 SHELL ["bash", "-c"]
