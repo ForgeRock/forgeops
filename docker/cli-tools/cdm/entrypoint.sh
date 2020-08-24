@@ -18,7 +18,7 @@ homedir=/opt/forgeops/mnt
 getent group ${groupid} > /dev/null 2>&1 || groupmod -g ${groupid} forgeops
 usermod --uid ${userid} --gid ${groupid} forgeops
 # These two paths aren't directly mounted, so they must have the ownership changed
-chown forgeops:forgeops /opt/forgeops/mnt/{.pulumi,.config}
+chown -f forgeops:forgeops /opt/forgeops/mnt/{.pulumi,.config}
 export HOME=${homedir}
 export PULUMI_HOME=/opt/forgeops/mnt/.pulumi
 export NODE_PATH=/opt/forgeops/usr/node_modules
