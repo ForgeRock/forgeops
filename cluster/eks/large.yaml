@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: medium
+  name: large
   region: us-east-2
   version: "1.17"
 
@@ -48,8 +48,8 @@ nodeGroups:
       "ds": "true",
       "forgerock.io/role": "ds"
     }
-    taints: 
+    taints:
       WorkerDedicatedDS: true:NoSchedule
     ssh:
-      # publicKeyPath: 
+      # publicKeyPath:
       allow: true

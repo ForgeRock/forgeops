@@ -7,7 +7,8 @@ set -o pipefail
 set -o nounset
 
 usage() {
-    printf "\nUsage: $0 <create|delete> <config file>\n\n"
+    printf "\nUsage: $0 <config file>\n\n"
+    exit 1
 }
 
 # Create cluster
@@ -54,41 +55,29 @@ EOF
     kubectl delete storageclass gp2
 }
 
-if [[ "$#" -eq 2 ]]; then
-    # Get values from yaml file
-    cluster_name=$(grep -A1 '^metadata:$' $2 | tail -n1 | awk '{ print $2 }')
-    region=$(grep -A2 'metadata:' $2 | tail -n1 | awk '{ print $2 }')
-
-    # Check if yaml file exists
-    if test -f "$2"; then
-        echo "$2 exists."
-        file=$2
-    else    
-        printf "\nProvided config file name doesn't exist\n\n"
-    fi
-    case $1 in 
-            "create")
-                echo "Creating EKS cluster..."
-                eksctl create cluster -f ${file}
-                #echo "Creating identity mappings..."
-                # createIAMMapping
-                echo "Creating storage classes..."
-                createStorageClasses
-                echo "Creating prod namespace..."
-                kubectl create ns prod
-            ;;
-
-            "delete")
-                echo "Deleting cluster ${cluster_name}..."
-                eksctl delete cluster --name $cluster_name --wait
-            ;;
-
-            *)
-                usage
-                exit 1;
-            ;;
-    esac
-else
+if [[ "$#" != 1 ]]; then
     usage
-    exit 1 
 fi
+
+file="$1"
+ # Check if yaml file exists
+if [ ! -f "$file" ]; then
+    printf "\nProvided config file name doesn't exist\n\n"
+    usage
+fi
+
+# Get values from yaml file
+cluster_name=$(grep -A1 '^metadata:$' $file | tail -n1 | awk '{ print $2 }')
+region=$(grep -A2 'metadata:' $file | tail -n1 | awk '{ print $2 }')
+
+
+
+
+echo "Creating EKS cluster..."
+eksctl create cluster -f ${file}
+#echo "Creating identity mappings..."
+# createIAMMapping
+echo "Creating storage classes..."
+createStorageClasses
+echo "Creating prod namespace..."
+kubectl create ns prod

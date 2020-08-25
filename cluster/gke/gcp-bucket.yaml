@@ -1,0 +1,12 @@
+# Creates a storage bucket using the ConfigConnector.
+# This is a sample only and is not supported by ForgeRock.
+# To see the available resources you can use:
+# kubectl describe crd storagebuckets.storage.cnrm.cloud.google.com
+# Docs for this resource:
+# See https://cloud.google.com/config-connector/docs/reference/resource-docs/storage/storagebucket
+kind:  StorageBucket
+apiVersion: storage.cnrm.cloud.google.com/v1beta1
+metadata:
+  namespace: prod
+  # The name below should be globally unique
+  name: cnrm-test-bucket

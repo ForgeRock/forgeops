@@ -19,7 +19,7 @@ for pool in $(gcloud container node-pools list --cluster $CLUSTER --zone $ZONE -
 do
   # Note - --async can not be used as you cant resize two node pools at the same time
   nodes="$NODES"
-  if [ "$pool" == "ds" ]; then
+  if [ "$pool" == "ds-pool" ]; then
       nodes="$DS_NODES"
   fi
   echo "Scaling $pool to $nodes"
