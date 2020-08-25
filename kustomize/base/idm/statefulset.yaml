@@ -22,6 +22,21 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: OPENIDM_REPO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ds-passwords
+              key: dirmanager.pw
+        - name: USERSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ds-passwords
+              key: dirmanager.pw
+        - name: RS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: amster-env-secrets
+              key: IDM_RS_CLIENT_SECRET
         envFrom:
         - configMapRef:
             name: idm

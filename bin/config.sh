@@ -327,12 +327,6 @@ init)
 		clean_config "$p"
 		init_config "$p"
 	done
-
-	rm -rf docker/forgeops-secrets/forgeops-secrets-image/config
-	mkdir -p docker/forgeops-secrets/forgeops-secrets-image/config
-
-	echo "Copying version to version.sh"
-	echo -n "CONFIG_VERSION=${_arg_version}" > docker/forgeops-secrets/forgeops-secrets-image/config/version.sh
 	;;
 add)
 	# Same as init - but do not delete existing files.

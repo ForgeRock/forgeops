@@ -73,13 +73,6 @@ kind: Config
         <<: *kaniko-opts
         dockerfile: idrepo/Dockerfile
 
-    - &FORGEOPS-SECRETS
-      image: forgeops-secrets
-      context: docker/forgeops-secrets
-    - &FORGEOPS-SECRETS_KANIKO
-      <<: *FORGEOPS-SECRETS
-      kaniko: *kaniko-opts
-
     - &LDIF-IMPORTER
       image: ldif-importer
       context: docker/7.0/ldif-importer
@@ -100,7 +93,6 @@ kind: Config
     - *IDM
     - *DS-CTS
     - *DS-IDREPO
-    - *FORGEOPS-SECRETS
     - *IG
     - *LDIF-IMPORTER
     kaniko-artifacts: &kaniko-artifacts
@@ -109,7 +101,6 @@ kind: Config
     - *IDM_KANIKO
     - *DS-CTS_KANIKO
     - *DS-IDREPO_KANIKO
-    - *FORGEOPS-SECRETS_KANIKO
     - *LDIF-IMPORTER_KANIKO
 
 ## End YAML Anchors
@@ -121,6 +112,8 @@ kind: Config
 # Default profile
 build: &default-build
   artifacts: *default-artifacts
+  local: 
+    push: true
   tagPolicy:
     sha256: {}
 deploy: &default-deploy
@@ -192,7 +185,6 @@ profiles:
     artifacts:
     - *LDIF-IMPORTER_KANIKO
     - *AMSTER_KANIKO
-    - *FORGEOPS-SECRETS_KANIKO
     cluster: *kaniko-cluster
     tagPolicy:
       gitCommit: {}
@@ -288,7 +280,6 @@ profiles:
     - *AMSTER
     - *DS-CTS
     - *DS-IDREPO
-    - *FORGEOPS-SECRETS
     - *LDIF-IMPORTER
     tagPolicy:
       gitCommit: {}
@@ -301,7 +292,6 @@ profiles:
     artifacts:
     - *IDM
     - *DS-IDREPO
-    - *FORGEOPS-SECRETS
     tagPolicy:
       sha256: {}
   deploy:
@@ -313,7 +303,6 @@ profiles:
     artifacts:
     - *DS-CTS
     - *DS-IDREPO
-    - *FORGEOPS-SECRETS
     tagPolicy:
       sha256: {}
   deploy:
@@ -326,7 +315,6 @@ profiles:
     artifacts:
     - *DS-CTS
     - *DS-IDREPO
-    - *FORGEOPS-SECRETS
     - *LDIF-IMPORTER
     tagPolicy:
       gitCommit: {}

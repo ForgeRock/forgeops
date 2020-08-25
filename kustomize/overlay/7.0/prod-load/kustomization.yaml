@@ -1,7 +1,7 @@
 namespace: prod
 resources:
 - ../../../base/kustomizeConfig
-- ../../../base/forgeops-secrets
+- ../../../base/secrets
 - ../../../base/amster
 - ../../../base/ldif-importer
 

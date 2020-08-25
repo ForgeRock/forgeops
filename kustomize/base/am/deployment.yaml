@@ -45,6 +45,14 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: AM_STORES_SSL_ENABLED
+          value: "false"
+        - name: TRUSTSTORE_PATH
+          value: /var/run/secrets/truststore/cacerts
+        - name: TRUSTSTORE_PASSWORD
+          value: changeit
+        - name: AM_STORES_USER_TYPE
+          value: LDAPv3ForForgeRockIAM
         envFrom:
         - secretRef:
             name: am-env-secrets
@@ -55,6 +63,9 @@ spec:
         - secretRef:
             name: ds-env-secrets # passwords for cts, userstore, etc
         image: am
+        command:
+          - bash
+          - /home/forgerock/docker-entrypoint.sh
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:

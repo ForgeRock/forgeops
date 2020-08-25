@@ -12,10 +12,6 @@ am-crypto() {
 # Additiomal place holder
 
 
-# TODO: These need to base64 encoded for now. When the secret gen is finished, remove these
-export AM_AUTHENTICATION_SHARED_SECRET=$(echo -n "$AM_AUTHENTICATION_SHARED_SECRET" | base64)
-export AM_SESSION_STATELESS_SIGNING_KEY=$(echo -n "$AM_SESSION_STATELESS_SIGNING_KEY" | base64)
-export AM_SESSION_STATELESS_ENCRYPTION_KEY=$(echo -n "$AM_SESSION_STATELESS_ENCRYPTION_KEY" | base64)
 export AM_STORES_SSL_ENABLED=false
 export TRUSTSTORE_PATH=/var/run/secrets/truststore/cacerts
 export TRUSTSTORE_PASSWORD=changeit

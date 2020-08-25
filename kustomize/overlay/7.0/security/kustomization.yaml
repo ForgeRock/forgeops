@@ -6,11 +6,6 @@ resources:
 - ../all
 - ../../../base/security
 
-images:
-- name: forgeops-secrets
-  newName: gcr.io/engineering-devops/forgeops-secrets
-  newTag: latest
-
 patches:
 - patch: &securityContextPatch |-
     kind: doesnt-matter
@@ -33,21 +28,6 @@ patches:
   target:
     kind: Job
     labelSelector: app notin (end-user-ui)
-# add default-policy to forgeops-secrets-role
-- patch: |-
-    - op: add
-      path: /rules/-
-      value:
-        apiGroups:
-        - extensions
-        resourceNames:
-        - forgerock-default-policy
-        resources:
-        - podsecuritypolicies
-        verbs:
-        - use
-  target:
-    name: forgeops-secrets-role
 # patch end-user-ui for webserver to run as root
 - patch: |-
     kind: doesnt-matter

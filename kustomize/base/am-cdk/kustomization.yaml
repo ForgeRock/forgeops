@@ -21,7 +21,7 @@ patchesStrategicMerge:
              mountPath: /var/run/secrets/truststore
            - name: am-secrets
              mountPath: /var/run/secrets/am
-           - name: amster-keys
+           - name: amster-key
              mountPath: /var/run/secrets/amster
         volumes:
          - name: am-secrets
@@ -34,6 +34,12 @@ patchesStrategicMerge:
          - name: amster-keys
            secret:
              secretName: amster
+         - name: amster-key
+           secret:
+             secretName: amster
+             items:
+             - key: id_rsa.pub
+               path: authorized_keys
          - name: truststore
            secret:
              secretName: truststore
