@@ -76,11 +76,20 @@ spec:
         - name: DS_UID_ADMIN_PASSWORD_FILE
           value: "/var/run/secrets/opendj-passwords/dirmanager.pw"
         - name: DSBACKUP_HOSTS
-          value: $(DSBACKUP_HOSTS)
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config 
+              key: DSBACKUP_HOSTS
         - name: DSBACKUP_DIRECTORY
-          value: $(DSBACKUP_DIRECTORY)
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config 
+              key: DSBACKUP_DIRECTORY
         - name: AUTORESTORE_FROM_DSBACKUP
-          value: $(AUTORESTORE_FROM_DSBACKUP)        
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config 
+              key: AUTORESTORE_FROM_DSBACKUP        
         resources:
           requests:
             memory: 512Mi
@@ -98,9 +107,15 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: DSBACKUP_HOSTS
-          value: $(DSBACKUP_HOSTS)              
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config 
+              key: DSBACKUP_HOSTS
         - name: DSBACKUP_DIRECTORY
-          value: $(DSBACKUP_DIRECTORY)
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config 
+              key: DSBACKUP_DIRECTORY
         # Best to let DS calculate this rather than hard code here.
         # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
         #   value: ds-0.ds.default.svc.cluster.local:8989
