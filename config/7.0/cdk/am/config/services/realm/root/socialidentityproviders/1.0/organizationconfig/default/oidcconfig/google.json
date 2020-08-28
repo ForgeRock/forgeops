@@ -1,0 +1,41 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/oidcConfig/google",
+    "uid" : "ou=google,ou=oidcConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/oidcConfig/google",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    },
+    "enabled" : false,
+    "authorizationEndpoint" : "https://accounts.google.com/o/oauth2/v2/auth",
+    "tokenEndpoint" : "https://www.googleapis.com/oauth2/v4/token",
+    "userInfoEndpoint" : "https://www.googleapis.com/oauth2/v3/userinfo",
+    "wellKnownEndpoint" : "https://accounts.google.com/.well-known/openid-configuration",
+    "uiConfig" : {
+      "buttonCustomStyleHover" : "color: #6d6d6d; background-color: #eee; border-color: #ccc;",
+      "buttonClass" : "",
+      "buttonImage" : "images/g-logo.png",
+      "buttonDisplayName" : "Google",
+      "iconBackground" : "#4184f3",
+      "iconFontColor" : "white",
+      "buttonCustomStyle" : "background-color: #fff; color: #757575; border-color: #ddd;",
+      "iconClass" : "fa-google"
+    },
+    "scopes" : [ "openid", "profile", "email" ],
+    "authenticationIdKey" : "sub",
+    "redirectURI" : "https://localhost:8443/openam",
+    "basicAuth" : false,
+    "scopeDelimiter" : " ",
+    "transform" : "58d29080-4563-480b-89bb-1e7719776a21"
+  }
+}

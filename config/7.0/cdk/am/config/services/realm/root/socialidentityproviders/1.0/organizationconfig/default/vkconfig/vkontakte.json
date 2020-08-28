@@ -1,0 +1,41 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/vkConfig/vkontakte",
+    "uid" : "ou=vkontakte,ou=vkConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/vkConfig/vkontakte",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    },
+    "enabled" : false,
+    "basicAuth" : false,
+    "authorizationEndpoint" : "https://oauth.vk.com/authorize",
+    "tokenEndpoint" : "https://oauth.vk.com/access_token",
+    "userInfoEndpoint" : "https://api.vk.com/method/users.get?fields=photo_50",
+    "redirectURI" : "https://localhost:8443/openam",
+    "apiVersion" : "5.73",
+    "scopes" : [ "email" ],
+    "uiConfig" : {
+      "buttonCustomStyleHover" : "background-color: #43658c; border-color: #43658c;color: white;",
+      "buttonClass" : "fa-vk",
+      "buttonDisplayName" : "VK",
+      "iconFontColor" : "white",
+      "iconClass" : "fa-vk",
+      "iconBackground" : "#4c75a3",
+      "buttonImage" : "",
+      "buttonCustomStyle" : "background-color: #4c75a3; border-color: #4c75a3;color: white;"
+    },
+    "authenticationIdKey" : "id",
+    "scopeDelimiter" : " ",
+    "transform" : "403cf226-6051-4368-8b72-9ba14f9a5140"
+  }
+}

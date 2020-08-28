@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/twitterConfig",
+    "uid" : "ou=twitterConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "twitterConfig",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/twitterConfig",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    }
+  }
+}

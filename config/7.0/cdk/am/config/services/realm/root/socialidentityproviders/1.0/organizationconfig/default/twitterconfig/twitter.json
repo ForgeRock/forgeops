@@ -1,0 +1,38 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/twitterConfig/twitter",
+    "uid" : "ou=twitter,ou=twitterConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/twitterConfig/twitter",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    },
+    "enabled" : false,
+    "requestTokenEndpoint" : "https://api.twitter.com/oauth/request_token",
+    "authorizationEndpoint" : "https://api.twitter.com/oauth/authenticate",
+    "tokenEndpoint" : "https://api.twitter.com/oauth/access_token",
+    "userInfoEndpoint" : "https://api.twitter.com/1.1/account/verify_credentials.json",
+    "uiConfig" : {
+      "buttonCustomStyleHover" : "background-color: #01abda; border-color: #01abda; color: #fff;",
+      "buttonDisplayName" : "Twitter",
+      "iconBackground" : "#00b6e9",
+      "buttonClass" : "fa-twitter",
+      "iconFontColor" : "white",
+      "buttonImage" : "",
+      "iconClass" : "fa-twitter",
+      "buttonCustomStyle" : "background-color: #00b6e9; border-color: #00b6e9; color: #fff;"
+    },
+    "authenticationIdKey" : "id_str",
+    "redirectURI" : "https://localhost:8443/openam",
+    "transform" : "8e298710-b55e-4085-a464-88a375a4004b"
+  }
+}

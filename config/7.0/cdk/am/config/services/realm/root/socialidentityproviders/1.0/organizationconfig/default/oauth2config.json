@@ -1,0 +1,20 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/oauth2Config",
+    "uid" : "ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "oauth2Config",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/oauth2Config",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    }
+  }
+}

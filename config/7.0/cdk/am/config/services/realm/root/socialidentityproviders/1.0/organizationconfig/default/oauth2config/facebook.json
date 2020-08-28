@@ -1,0 +1,40 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/oauth2Config/facebook",
+    "uid" : "ou=facebook,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/oauth2Config/facebook",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    },
+    "enabled" : false,
+    "authorizationEndpoint" : "https://www.facebook.com/dialog/oauth",
+    "tokenEndpoint" : "https://graph.facebook.com/v2.7/oauth/access_token",
+    "userInfoEndpoint" : "https://graph.facebook.com/me?fields=id,name,picture,email,first_name,last_name,locale",
+    "scopes" : [ "email", "user_birthday" ],
+    "uiConfig" : {
+      "buttonCustomStyle" : "background-color: #3b5998;border-color: #3b5998; color: white;",
+      "buttonCustomStyleHover" : "background-color: #334b7d;border-color: #334b7d; color: white;",
+      "iconBackground" : "#3b5998",
+      "iconClass" : "fa-facebook",
+      "iconFontColor" : "white",
+      "buttonDisplayName" : "Facebook",
+      "buttonImage" : "",
+      "buttonClass" : "fa-facebook-official"
+    },
+    "basicAuth" : false,
+    "authenticationIdKey" : "id",
+    "redirectURI" : "https://localhost:8443/openam",
+    "scopeDelimiter" : " ",
+    "transform" : "bae1d54a-e97d-4997-aa5d-c027f21af82c"
+  }
+}

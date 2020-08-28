@@ -1,0 +1,40 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/oauth2Config/salesforce",
+    "uid" : "ou=salesforce,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/oauth2Config/salesforce",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    },
+    "enabled" : false,
+    "authorizationEndpoint" : "https://login.salesforce.com/services/oauth2/authorize",
+    "tokenEndpoint" : "https://login.salesforce.com/services/oauth2/token",
+    "userInfoEndpoint" : "https://login.salesforce.com/services/oauth2/userinfo",
+    "scopes" : [ "id", "api", "web" ],
+    "uiConfig" : {
+      "iconClass" : "fa-cloud",
+      "buttonClass" : "fa-cloud",
+      "buttonDisplayName" : "Salesforce",
+      "iconBackground" : "#21a0df",
+      "buttonCustomStyleHover" : "background-color: #21a0df; border-color: #21a0df; color: white;",
+      "iconFontColor" : "white",
+      "buttonImage" : "",
+      "buttonCustomStyle" : "background-color: #21a0df; border-color: #21a0df; color: white;"
+    },
+    "authenticationIdKey" : "user_id",
+    "redirectURI" : "https://localhost:8443/openam",
+    "basicAuth" : false,
+    "scopeDelimiter" : " ",
+    "transform" : "312e951f-70c5-49d2-a9ae-93aef909d5df"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "entityType" : "SocialIdentityProviders",
+    "entityId" : "default/oauth2Config/instagram",
+    "uid" : "ou=instagram,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/oauth2Config/instagram",
+    "_type" : {
+      "_id" : "SocialIdentityProviders",
+      "name" : "SocialIdentityProviders",
+      "collection" : false
+    },
+    "enabled" : false,
+    "basicAuth" : false,
+    "authorizationEndpoint" : "https://api.instagram.com/oauth/authorize/",
+    "tokenEndpoint" : "https://api.instagram.com/oauth/access_token",
+    "userInfoEndpoint" : "https://graph.instagram.com/me?fields=id,username",
+    "redirectURI" : "https://localhost:8443/openam",
+    "scopes" : [ "user_profile" ],
+    "uiConfig" : {
+      "buttonCustomStyle" : "background-color: #3f729b; border-color: #3f729b;color: white;",
+      "buttonCustomStyleHover" : "background-color: #305777; border-color: #305777;color: white;",
+      "iconClass" : "fa-instagram",
+      "iconBackground" : "#3f729b",
+      "iconFontColor" : "white",
+      "buttonImage" : "",
+      "buttonClass" : "fa-instagram",
+      "buttonDisplayName" : "Instagram"
+    },
+    "authenticationIdKey" : "id",
+    "scopeDelimiter" : " ",
+    "transform" : "1244e639-4a31-401d-ab61-d75133d8dc9e"
+  }
+}
