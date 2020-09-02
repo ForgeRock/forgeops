@@ -32,12 +32,13 @@ DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 CREATE_DS_POOL="${CREATE_DS_POOL:-true}"
 
 # Labels to add to the default pool
-DEFAULT_POOL_LABELS=""
+# We need at least one node label to make the command happy
+DEFAULT_POOL_LABELS="frontend=true"
 
 if [ "$CREATE_DS_POOL" == "false" ]; then
-  # If there is no ds node pool we must label the primary nodes to allow
+  # If there is no ds node pool we must label the primary node pool to allow
   # ds pods to be scheduled there.
-  DEFAULT_POOL_LABELS="--node-labels forgerock.io/role=ds"
+  DEFAULT_POOL_LABELS="${DEFAULT_POOL_LABELS},forgerock.io/role=ds"
 fi
 
 
@@ -69,7 +70,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --metadata disable-legacy-endpoints=true \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
     "$PREEMPTIBLE" \
-    "$DEFAULT_POOL_LABELS" \
+    --node-labels "$DEFAULT_POOL_LABELS" \
     --enable-stackdriver-kubernetes \
     --enable-ip-alias \
     --num-nodes "1" \
