@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am-base/pit1:7.1.0-b308cddf4ace417ce012199460445581f5c5c285
+FROM gcr.io/forgerock-io/am-base/pit1:7.1.0-f0248b84a4ed9100c5b97a4bb78ccdaf6cb88558
 USER root
 
 RUN apt-get update && apt-get install -y git
