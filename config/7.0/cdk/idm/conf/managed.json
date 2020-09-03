@@ -418,9 +418,8 @@
                         "isVirtual" : true,
                         "usageDescription" : "",
                         "isPersonal" : false,
-                        "onRetrieve" : {
-                            "type" : "text/javascript",
-                             "source" : "require('roles/effectiveRoles').calculateEffectiveRoles(object, 'roles');"
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["roles"]
                         },
                         "items" : {
                             "type" : "object",
@@ -436,10 +435,9 @@
                         "isVirtual" : true,
                         "usageDescription" : "",
                         "isPersonal" : false,
-                        "onRetrieve" : {
-                            "type" : "text/javascript",
-                            "file" : "roles/effectiveAssignments.js",
-                            "effectiveRolesPropName" : "effectiveRoles"
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["roles", "assignments"],
+                            "referencedObjectFields" : ["*"]
                         },
                         "items" : {
                             "type" : "object",
