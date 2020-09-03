@@ -503,6 +503,228 @@
                         "resourcePath" : "internal/role"
                     }
                 }
+            },
+            "dsconfig/passwordPolicies" : {
+                "dnTemplate": "cn=Password Policies,cn=config",
+                "objectClasses": [ "ds-cfg-password-policy", "ds-cfg-authentication-policy" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "passwordAttribute" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-password-attribute", "isRequired": true
+                    },
+                    "defaultPasswordStorageScheme": {
+                        "type": "simple", "ldapAttribute": "ds-cfg-default-password-storage-scheme", "isMultiValued" : true , "isRequired": true
+                    },
+                    "validator" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-password-validator", "isMultiValued" : true
+                    },
+                    "passwordHistoryCount" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-password-history-count"
+                    },
+                    "maxPasswordAge" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-max-password-age"
+                    }
+                }
+            },
+            "dsconfig/lengthBased" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-length-based-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "minPasswordLength" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-min-password-length"
+                    },
+                    "maxPasswordLength" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-max-password-length"
+                    }
+                }
+            },
+            "dsconfig/attributeValue" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-attribute-value-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "testReversedPassword": {
+                        "type": "simple", "ldapAttribute": "ds-cfg-test-reversed-password", "isRequired": true
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "matchAttribute" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-match-attribute", "isMultiValued" : true
+                    },
+                    "checkSubstrings" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-check-substrings"
+                    },
+                    "minSubstringLength" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-min-substring-length"
+                    }
+                }
+            },
+            "dsconfig/characterSet" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-character-set-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "allowUnclassifiedCharacters" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-allow-unclassified-characters", "isRequired": true
+                    },
+                    "minCharacterSets" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-min-character-sets"
+                    },
+                    "characterSet" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-character-set", "isMultiValued" : true
+                    }
+                }
+            },
+            "dsconfig/dictionary" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-dictionary-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "dictionaryFile" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-dictionary-file", "isRequired": true
+                    },
+                    "caseSensitiveValidation" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-case-sensitive-validation", "isRequired": true
+                    },
+                    "testReversedPassword" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-test-reversed-password", "isRequired": true
+                    },
+                    "checkSubstrings" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-check-substrings"
+                    },
+                    "minSubstringLength" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-min-substring-length"
+                    }
+                }
+            },
+            "dsconfig/repeatedCharacters" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-repeated-characters-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "maxConsecutiveLength" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-max-consecutive-length", "isRequired": true
+                    },
+                    "caseSensitiveValidation" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-case-sensitive-validation", "isRequired": true
+                    }
+                }
+            },
+            "dsconfig/similarityBased" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-similarity-based-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "minPasswordDifference" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-min-password-difference", "isRequired": true
+                    }
+                }
+            },
+            "dsconfig/uniqueCharacters" : {
+                "dnTemplate": "cn=Password Validators,cn=config",
+                "objectClasses": [ "ds-cfg-password-validator", "ds-cfg-unique-characters-password-validator" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class"
+                    },
+                    "minUniqueCharacters" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-min-unique-characters", "isRequired": true
+                    },
+                    "caseSensitiveValidation" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-case-sensitive-validation", "isRequired": true
+                    }
+                }
+            },
+            "dsconfig/userDefinedVirtualAttribute" : {
+                "dnTemplate": "cn=Virtual Attributes,cn=config",
+                "objectClasses": [ "ds-cfg-user-defined-virtual-attribute", "ds-cfg-virtual-attribute" ],
+                "properties": {
+                    "_id": {
+                        "type": "simple", "ldapAttribute": "cn", "isRequired": true, "writability": "createOnly"
+                    },
+                    "javaClass" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-java-class", "isRequired": true
+                    },
+                    "enabled" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-enabled", "isRequired": true
+                    },
+                    "attributeType" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-attribute-type", "isRequired": true
+                    },
+                    "baseDn" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-base-dn", "isMultiValued" : true
+                    },
+                    "scope" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-scope"
+                    },
+                    "groupDn" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-group-dn"
+                    },
+                    "filter" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-filter", "isMultiValued" : true
+                    },
+                    "conflictBehavior" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-conflict-behavior"
+                    },
+                    "value" : {
+                        "type": "simple", "ldapAttribute": "ds-cfg-value", "isMultiValued" : true, "isRequired": true
+                    }
+                }
             }
         },
         "genericMapping": {
