@@ -115,3 +115,6 @@ ${DIR}/certmanager-deploy.sh $CERTMGR_ARGS
 
 printf "** Deploying Prometheus Operator **\n\n"
 ${DIR}/prometheus-deploy.sh $PROM_VALUES $PROM_NAMESPACE
+
+printf "** Deploying Secret Agent Operator **\n\n"
+${DIR}/secret-agent.sh install
