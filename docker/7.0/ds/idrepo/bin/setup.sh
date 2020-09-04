@@ -34,6 +34,9 @@ setup-profile --profile ${CONFIG} \
 ##    set-password-storage-scheme-prop --scheme-name "Salted SHA-512" --set enabled:true
 ##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
 #EOF
+
+
+# These indexes are required for the combined AM/IDM repo
 dsconfig --offline --no-prompt --batch <<EOF
 create-backend-index \
           --backend-name amIdentityStore \
@@ -90,3 +93,27 @@ create-backend-index \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
+
+# Example of creating additional indexes.
+# Uncomment these as per your needs:
+# dsconfig --offline --no-prompt --batch <<EOF
+# create-backend-index \
+#           --backend-name amIdentityStore \
+#           --set index-type:equality \
+#           --index-name fr-attr-i1
+# EOF
+
+# dsconfig --offline --no-prompt --batch <<EOF
+# create-backend-index \
+#           --backend-name amIdentityStore \
+#           --set index-type:equality \
+#           --index-name fr-attr-i2
+# EOF
+
+
+# dsconfig --offline --no-prompt --batch <<EOF
+# create-backend-index \
+#         --backend-name amIdentityStore \
+#         --index-name fr-attr-date1 \
+#         --set index-type:equality
+# EOF
