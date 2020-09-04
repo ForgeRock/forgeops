@@ -12,7 +12,10 @@ import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.stage.Status
 
 /** Local branch used for the promotion step. */
-@Field String LOCAL_DEV_BRANCH = "promote-forgeops-master-to-stable-${env.BUILD_NUMBER}"
+@Field String LOCAL_DEV_BRANCH = "promote-forgeops-${env.BRANCH_NAME}-to-stable-branch-${env.BUILD_NUMBER}"
+
+/** Corresponding Stable branch for this ForgeOps branch. */
+@Field String STABLE_BRANCH = env.BRANCH_NAME.equals('master') ? 'stable' : "${env.BRANCH_NAME}-stable"
 
 /**
  * Perform the promotion to stable: promote docker images to root level and the relevant commit to 'stable'.
@@ -20,10 +23,12 @@ import com.forgerock.pipeline.stage.Status
 void runStage(PipelineRun pipelineRun) {
     pipelineRun.pushStageOutcome('pit2-promote-to-forgeops-stable', stageDisplayName: 'ForgeOps Stable Promotion') {
         node('build&&linux') {
-            stage('Promote to stable') {
+            stage("Promote to ${STABLE_BRANCH}") {
                 pipelineRun.updateStageStatusAsInProgress()
 
-                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'master')
+                // always deep-clone the branch, in order to perform a git merge
+                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), env.BRANCH_NAME)
+                sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
 
                 promoteDockerImagesToRootLevel()
                 promoteForgeOpsCommitToStable()
@@ -34,7 +39,6 @@ void runStage(PipelineRun pipelineRun) {
 }
 
 private void promoteDockerImagesToRootLevel() {
-    sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
     commonModule.dockerImages.each { imageKey, image ->
         echo "Promoting '${image.baseImageName}:${image.tag}' to root level"
         dockerUtils.copyImage(
@@ -63,22 +67,21 @@ private void promoteDockerImagesToRootLevel() {
 }
 
 private void promoteForgeOpsCommitToStable() {
-    echo "Promoting ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to 'stable'"
+    echo "Promoting ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to ${STABLE_BRANCH}"
 
     sh "git checkout -b ${LOCAL_DEV_BRANCH} ${commonModule.FORGEOPS_GIT_COMMIT}"
     this.useRootLevelImageNamesInDockerfiles()
     gitUtils.commitModifiedFiles('Use stable root-level images in Dockerfiles')
 
-    // temporarily checkout the 'stable' branch, so it can be used for merges
-    localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), 'stable')
+    localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), STABLE_BRANCH)
     sh "git checkout ${LOCAL_DEV_BRANCH}"
 
     gitUtils.setupDefaultUser()
     sh commands(
-            "git merge --strategy=ours --no-ff stable " +
-                    "-m 'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to stable'",
-            'git checkout stable',
-            // merge the temporary branch to stable; it contains the master+stable merge commit
+            "git merge --strategy=ours --no-ff ${STABLE_BRANCH} " +
+                    "-m 'Promote commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} to ${STABLE_BRANCH}'",
+            "git checkout ${STABLE_BRANCH}",
+            // merge the temporary branch to stable; it contains the source+target branch merge commit
             "git merge --ff-only ${LOCAL_DEV_BRANCH}",
             'git push'
     )

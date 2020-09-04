@@ -6,9 +6,9 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-//==================================================
-// ForgeOps pipeline to promote 'master' to 'stable'
-//==================================================
+//================================================
+// ForgeOps pipeline to promote to a stable branch
+//================================================
 
 import java.net.URLDecoder
 
@@ -22,14 +22,29 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
 
-properties([
-    disableConcurrentBuilds(),
-    buildDiscarder(logRotator(numToKeepStr: '20')),
-    pipelineTriggers([cron('H 0 * * *')]),
-    parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
-])
-
 def pipelineRun
+
+if (env.TAG_NAME) {
+    currentBuild.result = 'ABORTED'
+    error 'This pipeline does not currently support building from a tag\nFor support, email releng@forgerock.com'
+} else if (isPR()) {
+    currentBuild.result = 'ABORTED'
+    error 'Please check your Multibranch Pipeline configuration for this job' +
+            '- it should not include settings that allow this build to be run from a PR.\n' +
+            'For support, email releng@forgerock.com'
+} else if (!env.BRANCH_NAME.equals('master')) {
+    // safety guard, to prevent non-master branches from building
+    currentBuild.result = 'ABORTED'
+    error 'Only master is currently allowed to run PIT#2 tests and promotion,\nFor support, email releng@forgerock.com'
+} else {
+    // only master has a scheduled build; jobs for other branches can be launched manually
+    properties([
+            disableConcurrentBuilds(),
+            buildDiscarder(logRotator(numToKeepStr: '20')),
+            pipelineTriggers([cron('H 0 * * *')]),
+            parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
+    ])
+}
 
 timestamps {
     manageNotifications {
@@ -46,7 +61,7 @@ timestamps {
                 // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
                 library "QaCloudUtils@${commonModule.LODESTAR_GIT_COMMIT}"
 
-                pipelineRun = new PipelineRun(env, steps, 'forgeops', 'master', commonModule.FORGEOPS_GIT_COMMIT,
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', env.BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT,
                         commits: commonModule.getCurrentProductCommitHashes())
 
                 // Test stages
@@ -55,7 +70,7 @@ timestamps {
                 perfTests = load("${stagesLocation}/pit2-perf-tests.groovy")
                 pit2Tests = load("${stagesLocation}/pit2-all-tests.groovy") // combines PERF, Greenfield, Upgrade
 
-                promoteMasterToStable = load("${stagesLocation}/promote-master-to-stable.groovy")
+                promoteToStableBranch = load("${stagesLocation}/promote-to-stable-branch.groovy")
 
                 currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
 
@@ -67,7 +82,7 @@ timestamps {
 
         pit2Tests.runStage(pipelineRun)
 
-        promoteMasterToStable.runStage(pipelineRun)
+        promoteToStableBranch.runStage(pipelineRun)
 
         currentBuild.result = 'SUCCESS'
     }
@@ -86,8 +101,9 @@ def manageNotifications(boolean notificationsEnabled = true, Closure body) {
         if (notificationsEnabled) {
             slackUtils.sendMessage(
                 slackChannel,
-                " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promoted commit " +
-                        "${commonModule.FORGEOPS_SHORT_GIT_COMMIT} from master to stable (<${env.BUILD_URL}|Open>)",
+                " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promoted " +
+                        "commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} " +
+                        "from ${env.BRANCH_NAME} to ${promoteToStableBranch.STABLE_BRANCH} (<${env.BUILD_URL}|Open>)",
                 slackUtils.colour('SUCCESS')
             )
         }
