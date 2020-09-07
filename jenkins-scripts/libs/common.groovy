@@ -52,6 +52,13 @@ String getCurrentTag(String productName) {
     return getDockerImage(productName).tag
 }
 
+/** Does the branch support PaaS releases */
+boolean branchSupportsPaasReleases() {
+    return 'master' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
+            || (!isPR() && "${env.BRANCH_NAME}".startsWith('paas-ga-')) \
+            || (isPR() && "${env.CHANGE_TARGET}".startsWith('paas-ga-'))
+}
+
 def getCurrentProductCommitHashes() {
     return [
             getDockerImage('ds-idrepo').productCommit,
