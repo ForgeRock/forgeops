@@ -32,11 +32,7 @@ if (env.TAG_NAME) {
     error 'Please check your Multibranch Pipeline configuration for this job' +
             '- it should not include settings that allow this build to be run from a PR.\n' +
             'For support, email releng@forgerock.com'
-} else if (!env.BRANCH_NAME.equals('master')) {
-    // safety guard, to prevent non-master branches from building
-    currentBuild.result = 'ABORTED'
-    error 'Only master is currently allowed to run PIT#2 tests and promotion,\nFor support, email releng@forgerock.com'
-} else {
+} else if (env.BRANCH_NAME.equals('master')) {
     // only master has a scheduled build; jobs for other branches can be launched manually
     properties([
             disableConcurrentBuilds(),
@@ -44,6 +40,18 @@ if (env.TAG_NAME) {
             pipelineTriggers([cron('H 0 * * *')]),
             parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
     ])
+} else if (env.BRANCH_NAME.startsWith('paas-ga-')) {
+    properties([
+            disableConcurrentBuilds(),
+            buildDiscarder(logRotator(numToKeepStr: '20')),
+            parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
+    ])
+} else {
+
+    // safety guard, to prevent non-master branches from building
+    currentBuild.result = 'ABORTED'
+    error 'Only master PaaS release branches are allowed to run PIT#2 tests and promotion.\n' +
+            'For support, email releng@forgerock.com'
 }
 
 timestamps {
