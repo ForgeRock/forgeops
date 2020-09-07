@@ -71,7 +71,7 @@ timestamps {
         pipeline.build()
     }
 
-    if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+    if (commonModule.branchSupportsPaasReleases()) {
         pipeline.postBuildTests(pipelineRun)
 
         if (isPR()) {
