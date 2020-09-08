@@ -5,9 +5,14 @@
     "entityId" : "default/0f0904e6-1da3-4cdb-9abf-0d2545016fab",
     "uid" : "ou=0f0904e6-1da3-4cdb-9abf-0d2545016fab,ou=default,ou=OrganizationConfig,ou=1.0,ou=AttributePresentDecisionNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
-    "ou" : [ "0f0904e6-1da3-4cdb-9abf-0d2545016fab" ]
+    "ou" : [
+      "0f0904e6-1da3-4cdb-9abf-0d2545016fab"
+    ]
   },
   "data" : {
     "_type" : {

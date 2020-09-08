@@ -1,37 +1,37 @@
 {
-  "metadata": {
-    "realm": null,
-    "entityType": "ScriptingService",
-    "entityId": "default/globalScripts/36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
-    "uid": "ou=36863ffb-40ec-48b9-94b1-9a99f71cc3b5,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
-    "sunServiceID": "globalScript",
-    "objectClass": [
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "ScriptingService",
+    "entityId" : "default/globalScripts/36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
+    "uid" : "ou=36863ffb-40ec-48b9-94b1-9a99f71cc3b5,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID" : "globalScript",
+    "objectClass" : [
       "top",
       "sunServiceComponent"
     ],
-    "pathParams": {},
-    "ou": [
+    "pathParams" : { },
+    "ou" : [
       "36863ffb-40ec-48b9-94b1-9a99f71cc3b5"
     ]
   },
-  "data": {
-    "lastModifiedDate": "0",
-    "createdBy": "null",
-    "lastModifiedBy": "null",
-    "_type": {
-      "_id": "ScriptingService",
-      "name": "ScriptingService",
-      "collection": false
+  "data" : {
+    "lastModifiedDate" : "0",
+    "createdBy" : "null",
+    "lastModifiedBy" : "null",
+    "_type" : {
+      "_id" : "ScriptingService",
+      "name" : "ScriptingService",
+      "collection" : false
     },
-    "name": "OIDC Claims Script",
-    "context": "OIDC_CLAIMS",
-    "description": "Default global script for OIDC claims",
-    "language": "GROOVY",
-    "_id": "default/globalScripts/36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
-    "creationDate": "0",
-    "script": {
-      "$base64:encode": {
-        "$inline": "OIDCClaimsScript.groovy"
+    "name" : "OIDC Claims Script",
+    "context" : "OIDC_CLAIMS",
+    "description" : "Default global script for OIDC claims",
+    "language" : "GROOVY",
+    "_id" : "default/globalScripts/36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
+    "creationDate" : "0",
+    "script" : {
+      "$base64:encode" : {
+        "$inline" : "OIDCClaimsScript.groovy"
       }
     }
   }

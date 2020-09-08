@@ -5,7 +5,10 @@
     "entityId" : "default/oauth2Config/wordpress",
     "uid" : "ou=wordpress,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -20,7 +23,9 @@
     "authorizationEndpoint" : "https://public-api.wordpress.com/oauth2/authorize",
     "tokenEndpoint" : "https://public-api.wordpress.com/oauth2/token",
     "userInfoEndpoint" : "https://public-api.wordpress.com/rest/v1.1/me/",
-    "scopes" : [ "auth" ],
+    "scopes" : [
+      "auth"
+    ],
     "authenticationIdKey" : "username",
     "basicAuth" : false,
     "uiConfig" : {

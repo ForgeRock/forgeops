@@ -5,7 +5,10 @@
     "entityId" : "PluginConfig",
     "uid" : "ou=PluginConfig,ou=1.0,ou=amRealmBaseURL,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },

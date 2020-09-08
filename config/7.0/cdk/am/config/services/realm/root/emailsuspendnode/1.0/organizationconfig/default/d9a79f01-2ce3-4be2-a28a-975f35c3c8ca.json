@@ -5,7 +5,10 @@
     "entityId" : "default/d9a79f01-2ce3-4be2-a28a-975f35c3c8ca",
     "uid" : "ou=d9a79f01-2ce3-4be2-a28a-975f35c3c8ca,ou=default,ou=OrganizationConfig,ou=1.0,ou=EmailSuspendNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },

@@ -5,16 +5,26 @@
     "entityId" : "default/StdOut",
     "uid" : "ou=StdOut,ou=default,ou=GlobalConfig,ou=1.0,ou=AuditService,ou=services,ou=am-config",
     "sunServiceID" : "JSONStdout",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
-    "ou" : [ "StdOut" ]
+    "ou" : [
+      "StdOut"
+    ]
   },
   "data" : {
     "jsonConfig" : {
       "elasticsearchCompatible" : true
     },
     "commonHandler" : {
-      "topics" : [ "access", "activity", "config", "authentication" ],
+      "topics" : [
+        "access",
+        "activity",
+        "config",
+        "authentication"
+      ],
       "enabled" : true
     },
     "_type" : {

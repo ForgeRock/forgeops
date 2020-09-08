@@ -5,7 +5,10 @@
     "entityId" : "Instances",
     "uid" : "ou=Instances,ou=1.0,ou=CreateObjectNode,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "top", "organizationalunit" ],
+    "objectClass" : [
+      "top",
+      "organizationalunit"
+    ],
     "pathParams" : { },
     "ou" : null
   },

@@ -5,7 +5,10 @@
     "entityId" : "default/oauth2Config/salesforce",
     "uid" : "ou=salesforce,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -20,7 +23,11 @@
     "authorizationEndpoint" : "https://login.salesforce.com/services/oauth2/authorize",
     "tokenEndpoint" : "https://login.salesforce.com/services/oauth2/token",
     "userInfoEndpoint" : "https://login.salesforce.com/services/oauth2/userinfo",
-    "scopes" : [ "id", "api", "web" ],
+    "scopes" : [
+      "id",
+      "api",
+      "web"
+    ],
     "uiConfig" : {
       "iconClass" : "fa-cloud",
       "buttonClass" : "fa-cloud",

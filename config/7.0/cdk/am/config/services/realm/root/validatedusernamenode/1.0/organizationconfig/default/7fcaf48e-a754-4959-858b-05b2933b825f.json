@@ -5,7 +5,10 @@
     "entityId" : "default/7fcaf48e-a754-4959-858b-05b2933b825f",
     "uid" : "ou=7fcaf48e-a754-4959-858b-05b2933b825f,ou=default,ou=OrganizationConfig,ou=1.0,ou=ValidatedUsernameNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },

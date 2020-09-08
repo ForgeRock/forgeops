@@ -1,37 +1,37 @@
 {
-  "metadata": {
-    "realm": null,
-    "entityType": "ScriptingService",
-    "entityId": "default/globalScripts/01e1a3c0-038b-4c16-956a-6c9d89328cff",
-    "uid": "ou=01e1a3c0-038b-4c16-956a-6c9d89328cff,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
-    "sunServiceID": "globalScript",
-    "objectClass": [
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "ScriptingService",
+    "entityId" : "default/globalScripts/01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "uid" : "ou=01e1a3c0-038b-4c16-956a-6c9d89328cff,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID" : "globalScript",
+    "objectClass" : [
       "top",
       "sunServiceComponent"
     ],
-    "pathParams": {},
-    "ou": [
+    "pathParams" : { },
+    "ou" : [
       "01e1a3c0-038b-4c16-956a-6c9d89328cff"
     ]
   },
-  "data": {
-    "lastModifiedDate": "0",
-    "createdBy": "null",
-    "lastModifiedBy": "null",
-    "_type": {
-      "_id": "ScriptingService",
-      "name": "ScriptingService",
-      "collection": false
+  "data" : {
+    "lastModifiedDate" : "0",
+    "createdBy" : "null",
+    "lastModifiedBy" : "null",
+    "_type" : {
+      "_id" : "ScriptingService",
+      "name" : "ScriptingService",
+      "collection" : false
     },
-    "context": "AUTHENTICATION_TREE_DECISION_NODE",
-    "name": "Authentication Tree Decision Node Script",
-    "description": "Default global script for a scripted decision node",
-    "language": "JAVASCRIPT",
-    "_id": "default/globalScripts/01e1a3c0-038b-4c16-956a-6c9d89328cff",
-    "creationDate": "0",
-    "script": {
-      "$base64:encode": {
-        "$inline": "AuthenticationTreeDecisionNodeScript.javascript"
+    "context" : "AUTHENTICATION_TREE_DECISION_NODE",
+    "name" : "Authentication Tree Decision Node Script",
+    "description" : "Default global script for a scripted decision node",
+    "language" : "JAVASCRIPT",
+    "_id" : "default/globalScripts/01e1a3c0-038b-4c16-956a-6c9d89328cff",
+    "creationDate" : "0",
+    "script" : {
+      "$base64:encode" : {
+        "$inline" : "AuthenticationTreeDecisionNodeScript.javascript"
       }
     }
   }

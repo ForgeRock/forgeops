@@ -5,9 +5,14 @@
     "entityId" : "default/OIDC_CLAIMS/engineConfiguration",
     "uid" : "ou=engineConfiguration,ou=OIDC_CLAIMS,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
     "sunServiceID" : "engineConfiguration",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
-    "ou" : [ "engineConfiguration" ]
+    "ou" : [
+      "engineConfiguration"
+    ]
   },
   "data" : {
     "queueSize" : -1,
@@ -18,7 +23,11 @@
       "name" : "ScriptingService",
       "collection" : false
     },
-    "blackList" : [ "java.lang.Class", "java.security.AccessController", "java.lang.reflect.*" ],
+    "blackList" : [
+      "java.lang.Class",
+      "java.security.AccessController",
+      "java.lang.reflect.*"
+    ],
     "coreThreads" : 10,
     "whiteList" : [
       "java.lang.Float",

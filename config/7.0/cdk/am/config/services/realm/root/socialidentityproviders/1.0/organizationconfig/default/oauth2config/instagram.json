@@ -5,7 +5,10 @@
     "entityId" : "default/oauth2Config/instagram",
     "uid" : "ou=instagram,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -22,7 +25,9 @@
     "tokenEndpoint" : "https://api.instagram.com/oauth/access_token",
     "userInfoEndpoint" : "https://graph.instagram.com/me?fields=id,username",
     "redirectURI" : "https://localhost:8443/openam",
-    "scopes" : [ "user_profile" ],
+    "scopes" : [
+      "user_profile"
+    ],
     "uiConfig" : {
       "buttonCustomStyle" : "background-color: #3f729b; border-color: #3f729b;color: white;",
       "buttonCustomStyleHover" : "background-color: #305777; border-color: #305777;color: white;",

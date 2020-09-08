@@ -5,7 +5,10 @@
     "entityId" : "default/oauth2Config/microsoft",
     "uid" : "ou=microsoft,ou=oauth2Config,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -20,7 +23,9 @@
     "authorizationEndpoint" : "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
     "tokenEndpoint" : "https://login.microsoftonline.com/common/oauth2/v2.0/token",
     "userInfoEndpoint" : "https://graph.microsoft.com/v1.0/me",
-    "scopes" : [ "User.Read" ],
+    "scopes" : [
+      "User.Read"
+    ],
     "authenticationIdKey" : "id",
     "basicAuth" : false,
     "uiConfig" : {

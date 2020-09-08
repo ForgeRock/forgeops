@@ -5,7 +5,10 @@
     "entityId" : "default/vkConfig/vkontakte",
     "uid" : "ou=vkontakte,ou=vkConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -23,7 +26,9 @@
     "userInfoEndpoint" : "https://api.vk.com/method/users.get?fields=photo_50",
     "redirectURI" : "https://localhost:8443/openam",
     "apiVersion" : "5.73",
-    "scopes" : [ "email" ],
+    "scopes" : [
+      "email"
+    ],
     "uiConfig" : {
       "buttonCustomStyleHover" : "background-color: #43658c; border-color: #43658c;color: white;",
       "buttonClass" : "fa-vk",
