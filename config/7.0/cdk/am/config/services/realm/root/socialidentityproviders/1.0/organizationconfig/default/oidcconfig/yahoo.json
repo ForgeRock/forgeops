@@ -5,7 +5,10 @@
     "entityId" : "default/oidcConfig/yahoo",
     "uid" : "ou=yahoo,ou=oidcConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -17,7 +20,10 @@
       "collection" : false
     },
     "enabled" : false,
-    "scopes" : [ "openid", "sdpp-w" ],
+    "scopes" : [
+      "openid",
+      "sdpp-w"
+    ],
     "uiConfig" : {
       "buttonCustomStyleHover" : "background-color: #7B0099; border-color: #7B0099; color:white;",
       "buttonCustomStyle" : "background-color: #7B0099; border-color: #7B0099; color:white;",

@@ -5,7 +5,10 @@
     "entityId" : "default/weChatConfig/wechat",
     "uid" : "ou=wechat,ou=weChatConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -23,7 +26,9 @@
     "refreshTokenEndpoint" : "https://api.wechat.com/sns/oauth2/refresh_token",
     "userInfoEndpoint" : "https://api.wechat.com/sns/userinfo",
     "redirectURI" : "https://localhost:8443/openam",
-    "scopes" : [ "snsapi_login" ],
+    "scopes" : [
+      "snsapi_login"
+    ],
     "uiConfig" : {
       "buttonClass" : "fa-weixin",
       "buttonCustomStyleHover" : "background-color: #09a007; border-color: #09a007;color: white;",

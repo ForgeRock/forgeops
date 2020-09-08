@@ -5,12 +5,17 @@
     "entityId" : "default/default-keystore/mappings/am.services.oauth2.remote.consent.response.decryption",
     "uid" : "ou=am.services.oauth2.remote.consent.response.decryption,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
   "data" : {
-    "aliases" : [ "test" ],
+    "aliases" : [
+      "test"
+    ],
     "_type" : {
       "_id" : "KeyStoreSecretStore",
       "name" : "KeyStoreSecretStore",

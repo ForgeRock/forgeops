@@ -5,7 +5,10 @@
     "entityId" : "default/linkedInConfig/linkedin",
     "uid" : "ou=linkedin,ou=linkedInConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -21,7 +24,10 @@
     "tokenEndpoint" : "https://www.linkedin.com/oauth/v2/accessToken",
     "userInfoEndpoint" : "https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,profilePicture)",
     "emailAddressEndpoint" : "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))",
-    "scopes" : [ "r_liteprofile", "r_emailaddress" ],
+    "scopes" : [
+      "r_liteprofile",
+      "r_emailaddress"
+    ],
     "authenticationIdKey" : "id",
     "basicAuth" : false,
     "uiConfig" : {

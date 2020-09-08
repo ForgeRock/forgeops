@@ -5,13 +5,22 @@
     "entityId" : "default/d3ce2036-1523-4ce8-b1a2-895a2a036667",
     "uid" : "ou=d3ce2036-1523-4ce8-b1a2-895a2a036667,ou=default,ou=OrganizationConfig,ou=1.0,ou=AttributeCollectorNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
   "data" : {
     "validateInputs" : true,
-    "attributesToCollect" : [ "givenName", "sn", "mail", "preferences/marketing", "preferences/updates" ],
+    "attributesToCollect" : [
+      "givenName",
+      "sn",
+      "mail",
+      "preferences/marketing",
+      "preferences/updates"
+    ],
     "_type" : {
       "_id" : "AttributeCollectorNode",
       "name" : "AttributeCollectorNode",

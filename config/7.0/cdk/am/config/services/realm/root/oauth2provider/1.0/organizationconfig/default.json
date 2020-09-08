@@ -5,7 +5,10 @@
     "entityId" : "default",
     "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=OAuth2Provider,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -25,57 +28,232 @@
       "statelessTokensEnabled" : false
     },
     "advancedOAuth2Config" : {
-      "supportedScopes" : [ "email|Your email address", "openid|", "address|Your postal address", "phone|Your telephone number(s)", "am-introspect-all-tokens", "am-introspect-all-tokens-any-realm", "profile|Your personal information", "write", "fr:idm:*|Full authority to operate with IDM on your behalf" ],
+      "supportedScopes" : [
+        "email|Your email address",
+        "openid|",
+        "address|Your postal address",
+        "phone|Your telephone number(s)",
+        "am-introspect-all-tokens",
+        "am-introspect-all-tokens-any-realm",
+        "profile|Your personal information",
+        "write",
+        "fr:idm:*|Full authority to operate with IDM on your behalf"
+      ],
       "codeVerifierEnforced" : "false",
       "tokenSigningAlgorithm" : "HS256",
-      "authenticationAttributes" : [ "uid" ],
-      "defaultScopes" : [ "address", "phone", "openid", "profile", "email" ],
+      "authenticationAttributes" : [
+        "uid"
+      ],
+      "defaultScopes" : [
+        "address",
+        "phone",
+        "openid",
+        "profile",
+        "email"
+      ],
       "scopeImplementationClass" : "org.forgerock.openam.oauth2.OpenAMScopeValidator",
-      "responseTypeClasses" : [ "code|org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler", "id_token|org.forgerock.openidconnect.IdTokenResponseTypeHandler", "device_code|org.forgerock.oauth2.core.TokenResponseTypeHandler", "token|org.forgerock.oauth2.core.TokenResponseTypeHandler" ],
+      "responseTypeClasses" : [
+        "code|org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler",
+        "id_token|org.forgerock.openidconnect.IdTokenResponseTypeHandler",
+        "device_code|org.forgerock.oauth2.core.TokenResponseTypeHandler",
+        "token|org.forgerock.oauth2.core.TokenResponseTypeHandler"
+      ],
       "tlsCertificateBoundAccessTokensEnabled" : true,
       "moduleMessageEnabledInPasswordGrant" : false,
       "tokenEncryptionEnabled" : false,
-      "grantTypes" : [ "implicit", "urn:ietf:params:oauth:grant-type:saml2-bearer", "refresh_token", "password", "client_credentials", "urn:ietf:params:oauth:grant-type:device_code", "authorization_code", "urn:ietf:params:oauth:grant-type:uma-ticket" ],
+      "grantTypes" : [
+        "implicit",
+        "urn:ietf:params:oauth:grant-type:saml2-bearer",
+        "refresh_token",
+        "password",
+        "client_credentials",
+        "urn:ietf:params:oauth:grant-type:device_code",
+        "authorization_code",
+        "urn:ietf:params:oauth:grant-type:uma-ticket"
+      ],
       "displayNameAttribute" : "cn",
-      "supportedSubjectTypes" : [ "public" ],
+      "supportedSubjectTypes" : [
+        "public"
+      ],
       "tlsCertificateRevocationCheckingEnabled" : false,
       "tlsOcspResponderUri" : null,
       "tlsOcspResponderCert" : null,
-      "allowedAudienceValues" : [ ]
+      "allowedAudienceValues" : [
+        
+      ]
     },
     "coreOIDCConfig" : {
-      "supportedIDTokenEncryptionMethods" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
+      "supportedIDTokenEncryptionMethods" : [
+        "A256GCM",
+        "A192GCM",
+        "A128GCM",
+        "A128CBC-HS256",
+        "A192CBC-HS384",
+        "A256CBC-HS512"
+      ],
       "jwtTokenLifetime" : 3600,
-      "supportedClaims" : [ "phone_number|Phone number", "family_name|Family name", "given_name|Given name", "locale|Locale", "email|Email address", "profile|Your personal information", "zoneinfo|Time zone", "address|Postal address", "name|Full name" ],
-      "supportedIDTokenEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "A256KW", "RSA1_5", "dir", "A192KW" ],
-      "supportedIDTokenSigningAlgorithms" : [ "PS384", "ES384", "RS384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
+      "supportedClaims" : [
+        "phone_number|Phone number",
+        "family_name|Family name",
+        "given_name|Given name",
+        "locale|Locale",
+        "email|Email address",
+        "profile|Your personal information",
+        "zoneinfo|Time zone",
+        "address|Postal address",
+        "name|Full name"
+      ],
+      "supportedIDTokenEncryptionAlgorithms" : [
+        "RSA-OAEP",
+        "RSA-OAEP-256",
+        "A128KW",
+        "A256KW",
+        "RSA1_5",
+        "dir",
+        "A192KW"
+      ],
+      "supportedIDTokenSigningAlgorithms" : [
+        "PS384",
+        "ES384",
+        "RS384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512",
+        "PS256",
+        "PS512",
+        "RS512"
+      ],
       "oidcClaimsScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5"
     },
     "advancedOIDCConfig" : {
       "storeOpsTokens" : true,
-      "defaultACR" : [ ],
-      "supportedRequestParameterEncryptionEnc" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
+      "defaultACR" : [
+        
+      ],
+      "supportedRequestParameterEncryptionEnc" : [
+        "A256GCM",
+        "A192GCM",
+        "A128GCM",
+        "A128CBC-HS256",
+        "A192CBC-HS384",
+        "A256CBC-HS512"
+      ],
       "claimsParameterSupported" : false,
       "amrMappings" : { },
-      "supportedUserInfoEncryptionEnc" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
-      "authorisedIdmDelegationClients" : [ "idm-provisioning" ],
+      "supportedUserInfoEncryptionEnc" : [
+        "A256GCM",
+        "A192GCM",
+        "A128GCM",
+        "A128CBC-HS256",
+        "A192CBC-HS384",
+        "A256CBC-HS512"
+      ],
+      "authorisedIdmDelegationClients" : [
+        "idm-provisioning"
+      ],
       "alwaysAddClaimsToToken" : false,
-      "supportedUserInfoSigningAlgorithms" : [ "ES384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512" ],
-      "supportedRequestParameterEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "A256KW", "RSA1_5", "dir", "A192KW" ],
-      "supportedTokenIntrospectionResponseEncryptionEnc" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
-      "supportedTokenIntrospectionResponseSigningAlgorithms" : [ "PS384", "RS384", "EdDSA", "ES384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
-      "authorisedOpenIdConnectSSOClients" : [ "openidm" ],
+      "supportedUserInfoSigningAlgorithms" : [
+        "ES384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512"
+      ],
+      "supportedRequestParameterEncryptionAlgorithms" : [
+        "RSA-OAEP",
+        "RSA-OAEP-256",
+        "A128KW",
+        "A256KW",
+        "RSA1_5",
+        "dir",
+        "A192KW"
+      ],
+      "supportedTokenIntrospectionResponseEncryptionEnc" : [
+        "A256GCM",
+        "A192GCM",
+        "A128GCM",
+        "A128CBC-HS256",
+        "A192CBC-HS384",
+        "A256CBC-HS512"
+      ],
+      "supportedTokenIntrospectionResponseSigningAlgorithms" : [
+        "PS384",
+        "RS384",
+        "EdDSA",
+        "ES384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512",
+        "PS256",
+        "PS512",
+        "RS512"
+      ],
+      "authorisedOpenIdConnectSSOClients" : [
+        "openidm"
+      ],
       "idTokenInfoClientAuthenticationEnabled" : true,
-      "supportedRequestParameterSigningAlgorithms" : [ "PS384", "ES384", "RS384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
-      "supportedUserInfoEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "A256KW", "RSA1_5", "dir", "A192KW" ],
-      "supportedTokenIntrospectionResponseEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "RSA1_5", "A256KW", "dir", "A192KW" ],
-      "supportedTokenEndpointAuthenticationSigningAlgorithms" : [ "PS384", "ES384", "RS384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
+      "supportedRequestParameterSigningAlgorithms" : [
+        "PS384",
+        "ES384",
+        "RS384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512",
+        "PS256",
+        "PS512",
+        "RS512"
+      ],
+      "supportedUserInfoEncryptionAlgorithms" : [
+        "RSA-OAEP",
+        "RSA-OAEP-256",
+        "A128KW",
+        "A256KW",
+        "RSA1_5",
+        "dir",
+        "A192KW"
+      ],
+      "supportedTokenIntrospectionResponseEncryptionAlgorithms" : [
+        "RSA-OAEP",
+        "RSA-OAEP-256",
+        "A128KW",
+        "RSA1_5",
+        "A256KW",
+        "dir",
+        "A192KW"
+      ],
+      "supportedTokenEndpointAuthenticationSigningAlgorithms" : [
+        "PS384",
+        "ES384",
+        "RS384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512",
+        "PS256",
+        "PS512",
+        "RS512"
+      ],
       "loaMapping" : { }
     },
     "clientDynamicRegistrationConfig" : {
       "dynamicClientRegistrationSoftwareStatementRequired" : false,
       "dynamicClientRegistrationScope" : "dynamic_client_registration",
-      "requiredSoftwareStatementAttestedAttributes" : [ "redirect_uris" ],
+      "requiredSoftwareStatementAttestedAttributes" : [
+        "redirect_uris"
+      ],
       "generateRegistrationAccessTokens" : true,
       "allowDynamicRegistration" : false
     },
@@ -86,19 +264,78 @@
     },
     "_id" : "default",
     "cibaConfig" : {
-      "supportedCibaSigningAlgorithms" : [ "ES256", "PS256" ],
+      "supportedCibaSigningAlgorithms" : [
+        "ES256",
+        "PS256"
+      ],
       "cibaAuthReqIdLifetime" : 600,
       "cibaMinimumPollingInterval" : 2
     },
     "consent" : {
       "enableRemoteConsent" : false,
-      "supportedRcsRequestSigningAlgorithms" : [ "PS384", "ES384", "RS384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
-      "supportedRcsResponseSigningAlgorithms" : [ "PS384", "ES384", "RS384", "HS256", "HS512", "ES256", "RS256", "HS384", "ES512", "PS256", "PS512", "RS512" ],
+      "supportedRcsRequestSigningAlgorithms" : [
+        "PS384",
+        "ES384",
+        "RS384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512",
+        "PS256",
+        "PS512",
+        "RS512"
+      ],
+      "supportedRcsResponseSigningAlgorithms" : [
+        "PS384",
+        "ES384",
+        "RS384",
+        "HS256",
+        "HS512",
+        "ES256",
+        "RS256",
+        "HS384",
+        "ES512",
+        "PS256",
+        "PS512",
+        "RS512"
+      ],
       "clientsCanSkipConsent" : true,
-      "supportedRcsRequestEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "RSA1_5", "A256KW", "dir", "A192KW" ],
-      "supportedRcsResponseEncryptionMethods" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
-      "supportedRcsRequestEncryptionMethods" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
-      "supportedRcsResponseEncryptionAlgorithms" : [ "RSA-OAEP", "RSA-OAEP-256", "A128KW", "A256KW", "RSA1_5", "dir", "A192KW" ]
+      "supportedRcsRequestEncryptionAlgorithms" : [
+        "RSA-OAEP",
+        "RSA-OAEP-256",
+        "A128KW",
+        "RSA1_5",
+        "A256KW",
+        "dir",
+        "A192KW"
+      ],
+      "supportedRcsResponseEncryptionMethods" : [
+        "A256GCM",
+        "A192GCM",
+        "A128GCM",
+        "A128CBC-HS256",
+        "A192CBC-HS384",
+        "A256CBC-HS512"
+      ],
+      "supportedRcsRequestEncryptionMethods" : [
+        "A256GCM",
+        "A192GCM",
+        "A128GCM",
+        "A128CBC-HS256",
+        "A192CBC-HS384",
+        "A256CBC-HS512"
+      ],
+      "supportedRcsResponseEncryptionAlgorithms" : [
+        "RSA-OAEP",
+        "RSA-OAEP-256",
+        "A128KW",
+        "A256KW",
+        "RSA1_5",
+        "dir",
+        "A192KW"
+      ]
     }
   }
 }

@@ -1,37 +1,37 @@
 {
-  "metadata": {
-    "realm": null,
-    "entityType": "ScriptingService",
-    "entityId": "default/globalScripts/c827d2b4-3608-4693-868e-bbcf86bd87c7",
-    "uid": "ou=c827d2b4-3608-4693-868e-bbcf86bd87c7,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
-    "sunServiceID": "globalScript",
-    "objectClass": [
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "ScriptingService",
+    "entityId" : "default/globalScripts/c827d2b4-3608-4693-868e-bbcf86bd87c7",
+    "uid" : "ou=c827d2b4-3608-4693-868e-bbcf86bd87c7,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID" : "globalScript",
+    "objectClass" : [
       "top",
       "sunServiceComponent"
     ],
-    "pathParams": {},
-    "ou": [
+    "pathParams" : { },
+    "ou" : [
       "c827d2b4-3608-4693-868e-bbcf86bd87c7"
     ]
   },
-  "data": {
-    "lastModifiedDate": "0",
-    "createdBy": "null",
-    "lastModifiedBy": "null",
-    "_type": {
-      "_id": "ScriptingService",
-      "name": "ScriptingService",
-      "collection": false
+  "data" : {
+    "lastModifiedDate" : "0",
+    "createdBy" : "null",
+    "lastModifiedBy" : "null",
+    "_type" : {
+      "_id" : "ScriptingService",
+      "name" : "ScriptingService",
+      "collection" : false
     },
-    "name": "Scripted Module - Client Side",
-    "context": "AUTHENTICATION_CLIENT_SIDE",
-    "description": "Default global script for client side Scripted Authentication Module",
-    "language": "JAVASCRIPT",
-    "_id": "default/globalScripts/c827d2b4-3608-4693-868e-bbcf86bd87c7",
-    "creationDate": "0",
-    "script": {
-      "$base64:encode": {
-        "$inline": "ScriptedModule-ClientSide.javascript"
+    "name" : "Scripted Module - Client Side",
+    "context" : "AUTHENTICATION_CLIENT_SIDE",
+    "description" : "Default global script for client side Scripted Authentication Module",
+    "language" : "JAVASCRIPT",
+    "_id" : "default/globalScripts/c827d2b4-3608-4693-868e-bbcf86bd87c7",
+    "creationDate" : "0",
+    "script" : {
+      "$base64:encode" : {
+        "$inline" : "ScriptedModule-ClientSide.javascript"
       }
     }
   }

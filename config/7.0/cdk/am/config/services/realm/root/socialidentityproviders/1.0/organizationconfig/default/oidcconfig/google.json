@@ -5,7 +5,10 @@
     "entityId" : "default/oidcConfig/google",
     "uid" : "ou=google,ou=oidcConfig,ou=default,ou=OrganizationConfig,ou=1.0,ou=SocialIdentityProviders,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -31,7 +34,11 @@
       "buttonCustomStyle" : "background-color: #fff; color: #757575; border-color: #ddd;",
       "iconClass" : "fa-google"
     },
-    "scopes" : [ "openid", "profile", "email" ],
+    "scopes" : [
+      "openid",
+      "profile",
+      "email"
+    ],
     "authenticationIdKey" : "sub",
     "redirectURI" : "https://localhost:8443/openam",
     "basicAuth" : false,

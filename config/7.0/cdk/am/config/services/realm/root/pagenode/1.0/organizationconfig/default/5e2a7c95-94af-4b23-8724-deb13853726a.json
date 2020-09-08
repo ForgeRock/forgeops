@@ -5,12 +5,17 @@
     "entityId" : "default/5e2a7c95-94af-4b23-8724-deb13853726a",
     "uid" : "ou=5e2a7c95-94af-4b23-8724-deb13853726a,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
   "data" : {
-    "nodes" : [ "9f1e8d94-4922-481b-9e14-212b66548900:AttributeCollectorNode:Attribute Collector" ],
+    "nodes" : [
+      "9f1e8d94-4922-481b-9e14-212b66548900:AttributeCollectorNode:Attribute Collector"
+    ],
     "_type" : {
       "_id" : "PageNode",
       "name" : "PageNode",

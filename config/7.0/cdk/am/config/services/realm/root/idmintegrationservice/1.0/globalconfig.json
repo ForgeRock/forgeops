@@ -5,7 +5,11 @@
     "entityId" : "GlobalConfig",
     "uid" : "ou=GlobalConfig,ou=1.0,ou=IdmIntegrationService,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "top", "organizationalunit", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "organizationalunit",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },

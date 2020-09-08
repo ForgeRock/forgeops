@@ -5,7 +5,11 @@
     "entityId" : "GlobalConfig",
     "uid" : "ou=GlobalConfig,ou=1.0,ou=CorsService,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "organizationalunit", "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "organizationalunit",
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },

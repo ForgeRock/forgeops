@@ -5,12 +5,17 @@
     "entityId" : "default/e4c752f9-c625-48c9-9644-a58802fa9e9c",
     "uid" : "ou=e4c752f9-c625-48c9-9644-a58802fa9e9c,ou=default,ou=OrganizationConfig,ou=1.0,ou=PageNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
   "data" : {
-    "nodes" : [ "009c19c8-9572-47bb-adb2-1f092c559a43:ValidatedPasswordNode:Platform Password" ],
+    "nodes" : [
+      "009c19c8-9572-47bb-adb2-1f092c559a43:ValidatedPasswordNode:Platform Password"
+    ],
     "_type" : {
       "_id" : "PageNode",
       "name" : "PageNode",

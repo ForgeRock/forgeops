@@ -1,21 +1,21 @@
 {
-  "metadata": {
-    "realm": null,
-    "entityType": "iPlanetAMPlatformService",
-    "entityId": "default/com-sun-identity-servers/server-default",
-    "uid": "ou=server-default,ou=com-sun-identity-servers,ou=default,ou=GlobalConfig,ou=1.0,ou=iPlanetAMPlatformService,ou=services,ou=am-config",
-    "sunServiceID": "server",
-    "objectClass": [
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "iPlanetAMPlatformService",
+    "entityId" : "default/com-sun-identity-servers/server-default",
+    "uid" : "ou=server-default,ou=com-sun-identity-servers,ou=default,ou=GlobalConfig,ou=1.0,ou=iPlanetAMPlatformService,ou=services,ou=am-config",
+    "sunServiceID" : "server",
+    "objectClass" : [
       "top",
       "sunServiceComponent"
     ],
-    "pathParams": {},
-    "ou": [
+    "pathParams" : { },
+    "ou" : [
       "server-default"
     ]
   },
-  "data": {
-    "serverconfig": [
+  "data" : {
+    "serverconfig" : [
       "com.iplanet.am.directory.ssl.enabled=false",
       "org.forgerock.services.cts.store.affinity.enabled=true",
       "org.forgerock.services.default.store.max.connections=",
@@ -235,14 +235,14 @@
       "org.forgerock.services.resourcesets.store.ssl.enabled=false",
       "openam.retained.http.headers=X-DSAMEVersion"
     ],
-    "_type": {
-      "_id": "iPlanetAMPlatformService",
-      "name": "iPlanetAMPlatformService",
-      "collection": false
+    "_type" : {
+      "_id" : "iPlanetAMPlatformService",
+      "name" : "iPlanetAMPlatformService",
+      "collection" : false
     },
-    "siteId": null,
-    "serverconfigxml": null,
-    "_id": "default/com-sun-identity-servers/server-default",
-    "id": "00"
+    "siteId" : null,
+    "serverconfigxml" : null,
+    "_id" : "default/com-sun-identity-servers/server-default",
+    "id" : "00"
   }
 }

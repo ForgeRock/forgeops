@@ -5,7 +5,10 @@
     "entityId" : "default/989f0bf8-a328-4217-b82b-5275d79ca8bd",
     "uid" : "ou=989f0bf8-a328-4217-b82b-5275d79ca8bd,ou=default,ou=OrganizationConfig,ou=1.0,ou=PatchObjectNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -18,6 +21,8 @@
     "_id" : "default/989f0bf8-a328-4217-b82b-5275d79ca8bd",
     "identityResource" : "managed/user",
     "identityAttribute" : "mail",
-    "ignoredFields" : [ ]
+    "ignoredFields" : [
+      
+    ]
   }
 }

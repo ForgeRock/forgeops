@@ -5,7 +5,10 @@
     "entityId" : "default/423a959a-a1b9-498a-b0f7-596b6b6e775a",
     "uid" : "ou=423a959a-a1b9-498a-b0f7-596b6b6e775a,ou=default,ou=OrganizationConfig,ou=1.0,ou=PatchObjectNode,ou=services,ou=am-config",
     "sunServiceID" : "instance",
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
     "ou" : null
   },
@@ -18,6 +21,8 @@
     "_id" : "default/423a959a-a1b9-498a-b0f7-596b6b6e775a",
     "identityAttribute" : "userName",
     "identityResource" : "managed/user",
-    "ignoredFields" : [ ]
+    "ignoredFields" : [
+      
+    ]
   }
 }
