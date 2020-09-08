@@ -17,6 +17,7 @@
     },
     "_id" : "default/423a959a-a1b9-498a-b0f7-596b6b6e775a",
     "identityAttribute" : "userName",
-    "identityResource" : "managed/user"
+    "identityResource" : "managed/user",
+    "ignoredFields" : [ ]
   }
 }

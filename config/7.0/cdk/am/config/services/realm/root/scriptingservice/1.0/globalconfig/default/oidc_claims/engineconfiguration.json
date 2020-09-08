@@ -3,7 +3,6 @@
     "realm" : null,
     "entityType" : "ScriptingService",
     "entityId" : "default/OIDC_CLAIMS/engineConfiguration",
-    "serviceVersion" : "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
     "uid" : "ou=engineConfiguration,ou=OIDC_CLAIMS,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
     "sunServiceID" : "engineConfiguration",
     "objectClass" : [ "top", "sunServiceComponent" ],
@@ -71,7 +70,9 @@
       "java.util.TreeMap",
       "java.util.Collections$EmptyList",
       "java.lang.Object",
-      "java.util.HashMap$Node"
+      "java.util.HashMap$Node",
+      "org.forgerock.openam.oauth2.token.macaroon.MacaroonAccessToken",
+      "org.forgerock.macaroons.Macaroon"
     ],
     "_id" : "default/OIDC_CLAIMS/engineConfiguration",
     "maxThreads" : 50,

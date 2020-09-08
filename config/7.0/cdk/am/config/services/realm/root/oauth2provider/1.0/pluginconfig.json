@@ -3,7 +3,6 @@
     "realm" : "/",
     "entityType" : "OAuth2Provider",
     "entityId" : "PluginConfig",
-    "serviceVersion" : null,
     "uid" : "ou=PluginConfig,ou=1.0,ou=OAuth2Provider,ou=services,ou=am-config",
     "sunServiceID" : null,
     "objectClass" : [ "top", "sunServiceComponent" ],

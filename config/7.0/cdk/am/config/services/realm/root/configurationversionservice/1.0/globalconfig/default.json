@@ -1,0 +1,21 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "ConfigurationVersionService",
+    "entityId" : "default",
+    "uid" : "ou=default,ou=GlobalConfig,ou=1.0,ou=ConfigurationVersionService,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [ "top", "sunServiceComponent", "organizationalunit" ],
+    "pathParams" : { },
+    "ou" : [ "default" ]
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "ConfigurationVersionService",
+      "name" : "ConfigurationVersionService",
+      "collection" : false
+    },
+    "_id" : "default",
+    "configurationVersion" : "2.0.0.0"
+  }
+}
