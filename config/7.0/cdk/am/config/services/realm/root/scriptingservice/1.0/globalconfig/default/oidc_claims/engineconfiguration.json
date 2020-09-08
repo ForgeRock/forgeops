@@ -2,7 +2,7 @@
   "metadata" : {
     "realm" : null,
     "entityType" : "ScriptingService",
-    "entityId" : "default/OIDC_CLAIMS/EngineConfiguration",
+    "entityId" : "default/OIDC_CLAIMS/engineConfiguration",
     "serviceVersion" : "24b09aa8-a51c-4ccf-a07c-9a9dd08eeefd",
     "uid" : "ou=engineConfiguration,ou=OIDC_CLAIMS,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
     "sunServiceID" : "engineConfiguration",
@@ -73,7 +73,7 @@
       "java.lang.Object",
       "java.util.HashMap$Node"
     ],
-    "_id" : "default/OIDC_CLAIMS/EngineConfiguration",
+    "_id" : "default/OIDC_CLAIMS/engineConfiguration",
     "maxThreads" : 50,
     "serverTimeout" : 0
   }
