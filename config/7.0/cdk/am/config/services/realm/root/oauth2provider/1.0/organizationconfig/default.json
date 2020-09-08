@@ -3,7 +3,6 @@
     "realm" : "/",
     "entityType" : "OAuth2Provider",
     "entityId" : "default",
-    "serviceVersion" : null,
     "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=OAuth2Provider,ou=services,ou=am-config",
     "sunServiceID" : null,
     "objectClass" : [ "top", "sunServiceComponent" ],
@@ -38,7 +37,11 @@
       "tokenEncryptionEnabled" : false,
       "grantTypes" : [ "implicit", "urn:ietf:params:oauth:grant-type:saml2-bearer", "refresh_token", "password", "client_credentials", "urn:ietf:params:oauth:grant-type:device_code", "authorization_code", "urn:ietf:params:oauth:grant-type:uma-ticket" ],
       "displayNameAttribute" : "cn",
-      "supportedSubjectTypes" : [ "public" ]
+      "supportedSubjectTypes" : [ "public" ],
+      "tlsCertificateRevocationCheckingEnabled" : false,
+      "tlsOcspResponderUri" : null,
+      "tlsOcspResponderCert" : null,
+      "allowedAudienceValues" : [ ]
     },
     "coreOIDCConfig" : {
       "supportedIDTokenEncryptionMethods" : [ "A256GCM", "A192GCM", "A128GCM", "A128CBC-HS256", "A192CBC-HS384", "A256CBC-HS512" ],
