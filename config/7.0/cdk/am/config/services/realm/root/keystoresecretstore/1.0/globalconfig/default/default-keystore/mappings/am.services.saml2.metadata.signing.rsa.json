@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "KeyStoreSecretStore",
+    "entityId" : "default/default-keystore/mappings/am.services.saml2.metadata.signing.RSA",
+    "uid" : "ou=am.services.saml2.metadata.signing.RSA,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/default-keystore/mappings/am.services.saml2.metadata.signing.RSA",
+    "_type" : {
+      "_id" : "KeyStoreSecretStore",
+      "name" : "KeyStoreSecretStore",
+      "collection" : false
+    },
+    "aliases" : [ "rsajwtsigningkey" ],
+    "secretId" : "am.services.saml2.metadata.signing.RSA"
+  }
+}

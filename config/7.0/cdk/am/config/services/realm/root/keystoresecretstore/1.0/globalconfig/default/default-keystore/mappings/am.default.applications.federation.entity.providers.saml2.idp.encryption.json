@@ -1,0 +1,22 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "KeyStoreSecretStore",
+    "entityId" : "default/default-keystore/mappings/am.default.applications.federation.entity.providers.saml2.idp.encryption",
+    "uid" : "ou=am.default.applications.federation.entity.providers.saml2.idp.encryption,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/default-keystore/mappings/am.default.applications.federation.entity.providers.saml2.idp.encryption",
+    "_type" : {
+      "_id" : "KeyStoreSecretStore",
+      "name" : "KeyStoreSecretStore",
+      "collection" : false
+    },
+    "aliases" : [ "test" ],
+    "secretId" : "am.default.applications.federation.entity.providers.saml2.idp.encryption"
+  }
+}
