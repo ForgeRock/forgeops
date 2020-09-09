@@ -28,7 +28,7 @@ ZONE=${ZONE:-"$REGION-a"}
 MACHINE=${MACHINE:-e2-standard-8}
 DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 
-# Set to "false" if you do not want to create a seperate pool for ds nodes
+# Set to "false" if you do not want to create a separate pool for ds nodes
 CREATE_DS_POOL="${CREATE_DS_POOL:-true}"
 
 # Labels to add to the default pool
@@ -119,3 +119,9 @@ EOF
 
 # Create prod namespace for sample CDM deployment
 kubectl create ns prod
+
+# create the cluster role binding to allow the current user to create new rbac rules.
+# Needed for installing addons, istio, etc.
+kubectl create clusterrolebinding cluster-admin-binding \
+    --clusterrole=cluster-admin \
+    --user=$(gcloud config get-value core/account)
