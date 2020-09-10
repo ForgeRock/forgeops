@@ -1,18 +1,17 @@
 # dsutil
 
-Deploys the ds tools and some sample scripts. Utility scripts are placed in /opt/opendj/bin, and will be
-in your path. Used for debugging, testing, etc. 
+Deploys the DS tools and sample scripts. Utility scripts are placed in /opt/opendj/bin.
 
-To run, cd to this folder and run:
+## Building
 
-`skaffold dev`
+gcloud builds submit .
 
-Then in another shell window:
+## Running
 
-`kubectl exec dsutil-xxxx -it bash `  where dsutil-xxx is the name of the pod.
+```
+kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash
+```
 
-The `exec.sh` script does the same thing as above.
+You can create a shell alias for the above the command:
 
-The utilities included:
-
-* ds-bench.sh - a small DS micro benchmark suite. `ds-bench.sh all`  for example (see the help).
+alias fdebug='kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash'

@@ -2,8 +2,8 @@
 
 Kubernetes deployment for the ForgeRock platform.
 
-This repository provides Docker and Kustomize artifacts for deploying both 6.5 and 7.0 (under development) products
-to a Kubernetes cluster. If you are starting out, using the `master` branch is recommended.
+This repository provides Docker and Kustomize artifacts for deploying the ForgeRock platform
+to a Kubernetes cluster. 
 
 ## Quick Start
 
@@ -17,9 +17,15 @@ skaffold dev
 # Open https://default.iam.example.com/am  in your browser
 ```
 
+The secrets for the platform are randomly generated. To retrieve the amadmin login:
+
+```
+bin/printSecrets.sh
+```
+
 ## Documentation
 
-Please see the (DevOps)[https://backstage.forgerock.com/docs/forgeops/6.5] documentation.
+Please see the (ForgeOps)[https://backstage.forgerock.com/docs/forgeops/7/start-here.html] documentation.
 
 This GitHub repository is a read-only mirror of
 ForgeRock's [Bitbucket Server repository](https://stash.forgerock.org/projects/CLOUD/repos/forgeops). Users
@@ -39,11 +45,6 @@ service or software related thereto. ForgeRock shall not be liable for any direc
 consequential damages or costs of any type arising out of any action taken by you or others related
 to the samples.
 
-## Quickstart
-
-If you have an existing cluster and it's configured to work with [kaniko](https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster) then the forgeops-toolbox allows building and deploy the ForgeRock Identity Platform from within kubernetes. This minimizes the a developers local environment dependencies to be h  `bash`, `kubectl`, and `kustomize`.
-
-Refer to `kustomize/base/toolbox/README.md` for more info on getting started using the `foregops-toolbox`.
 
 ## Configuration
 
@@ -54,7 +55,7 @@ this repository in Git, clone the fork, and modify the various configuration fil
 The configuration provides the following features:
 
 * Deployments for ForgeRock AM, IDM, DS and IG. IG is available but not deployed by default.
-* AM is configured with a single root realm
+* AM configured with a single root realm
 * A number of OIDC clients are configured for the AM/IDM integration and the smoke tests.
 ** Note the `idm-provisioning`, `idm-admin-ui` and the `end-user-ui` client configurations are required for the
   integration of IDM and AM.
@@ -79,9 +80,9 @@ separate postgres SQL database is *NOT* required.
 When deployed, the following URLs are available (The domain name below is the default
 for minikube and can be modified for your environment)
 
-* https://default.iam.example.com/am  - Access manager admin  (amadmin/password)
-* https://default.iam.example.com/admin - IDM admin (login with amadmin credentials on 7.0)
-* https://default.iam.example.com/platform  - 7.0 Admin landing page (under development)
+* https://default.iam.example.com/am  - Access manager admin  (amadmin)
+* https://default.iam.example.com/admin - IDM admin (login with amadmin credentials)
+* https://default.iam.example.com/platform  - 7.0 Admin landing page
 * https://default.iam.example.com/ig  - Identity Gateway (Optional)
 
 ## Managing Configurations
@@ -98,8 +99,6 @@ configuration under docker/ to be a staging area.  During development, configura
 product (e.g. AM or IDM) to the staging area, and if
 desired, copied back out to the git versioned `config/` folder where it can be committed to version control.  
 
-**`NOTE`** This functionality doesn't apply to the AM exported files 
-due to the complexity merging in new and updated files.
 
 The `bin/config.sh` script automates the copy / export process. The `init` command is used to initialize
 (copy from /conf/ to the staging area under docker).
@@ -277,6 +276,22 @@ to push to the docker hub (the reported image name will be something like `docke
    is to modify the docker build in `skaffold.yaml` and set `local.push` to false. See the
    [skaffold.dev](https://skaffold.dev) documentation.
 
+## Debug utility
+
+There is an debug utility pod that contains the DS cli tools (ldapsearch, etc.) in addition to curl, netcat and vim.
+Run this tool using:
+
+```
+kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash
+```
+
+Create a shell alias for the above the command:
+
+```
+alias fdebug='kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash'
+```
+
+When you are finished with the pod, delete it using `kubectl delete pod dsutil`
 
 ## Kustomizing the deployment
 
@@ -312,22 +327,5 @@ The script `bin/clean.sh` will perform the above as well as delete any generated
 
 ## Continuous Deployment
 
-The file `cloudbuild.yaml` is a sample [Google Cloud Builder](https://cloud.google.com/cloud-build/) project
-that performs a continuous deployment to a running GKE cluster. Until AM file based configuration supports upgrade,
-the deployment is done fresh each time.
+The  `cicd/tekton` folder provides a sample continuous deployment to a running GKE cluster. 
 
-The deployment is triggered from a `git commit` to [forgeops](https://github.com/ForgeRock/forgeops). See the
-documentation on [automated build triggers](https://cloud.google.com/cloud-build/docs/running-builds/automate-builds) for more information.  You can also manually submit a build using:
-
-```bash
-cd forgeops
-gcloud builds submit
-```
-
-Track the build progress in the [GCP console](https://console.cloud.google.com/cloud-build/builds).
-
-Once deployed, the following URLs are available:
-
-* [Smoke test report](https://smoke.iam.forgeops.com/tests/latest.html)
-* [Access Manager](https://smoke.iam.forgeops.com/am/XUI/#login/)
-* [IDM admin console](https://smoke.iam.forgeops.com/admin/#dashboard/0)
