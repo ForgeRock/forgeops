@@ -1,0 +1,48 @@
+define suffix=ou=identities
+define maildomain=example.com
+define numusers=1000
+
+branch: [suffix]
+objectClass: top
+objectClass: organizationalUnit
+objectClass: untypedObject
+
+branch: ou=People,[suffix]
+objectClass: top
+objectClass: organizationalUnit
+subordinateTemplate: person:[numusers]
+
+branch: ou=Groups,[suffix]
+objectClass: top
+objectClass: organizationalUnit
+
+template: person
+rdnAttr: fr-idm-uuid
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+objectClass: iplanet-am-user-service
+objectClass: devicePrintProfilesContainer
+objectClass: kbaInfoContainer
+objectClass: fr-idm-managed-user-explicit
+objectClass: forgerock-am-dashboard-service
+objectClass: inetuser
+objectClass: iplanet-am-auth-configuration-service
+objectClass: iplanet-am-managed-person
+objectClass: iPlanetPreferences
+objectClass: oathDeviceProfilesContainer
+objectClass: pushDeviceProfilesContainer
+objectClass: sunAMAuthAccountLockout
+objectClass: sunFMSAML2NameIdentifier
+objectClass: webauthnDeviceProfilesContainer
+fr-idm-uuid: <guid>
+givenName: <first>
+sn: <last>
+cn: {givenName} {sn}
+description: This is the description for {cn}.
+inetUserStatus: active
+uid: user.<sequential:0>
+mail: {uid}@[maildomain]
+telephoneNumber: <random:telephone>
+userPassword: T35tr0ck123
