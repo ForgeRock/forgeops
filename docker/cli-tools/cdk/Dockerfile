@@ -3,7 +3,7 @@ ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
 FROM ${FORGEOPS_REGISTRY}/yamkt:${VERSION}-skaffold as base
 SHELL ["bash", "-c"]
 RUN mkdir -p /opt/forgeops/{usr,mnt} \
-        && mkdir 770 -p /opt/forgeops/mnt/{ctx,.pulumi} \
+        && mkdir 770 -p /opt/forgeops/mnt/{ctx,.pulumi,.kube} \
             && addgroup --gid 360360 cli \
                 && chown -R root:cli /opt/forgeops/
 RUN adduser --system --no-create-home --uid 501 --disabled-password --group forgeops \
