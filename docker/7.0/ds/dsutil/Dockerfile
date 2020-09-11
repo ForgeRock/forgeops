@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y bash vim curl dnsutils procps netcat
 
 
 COPY --chown=forgerock:root bin/*  bin/
+COPY --chown=forgerock:root ds-idrepo.template config/MakeLDIF
 
 # reset entrypoint of ds container
 ENTRYPOINT []
