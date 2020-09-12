@@ -23,7 +23,7 @@ pause() {
 # Extract amster version for commons parameter to modify configs
 echo "Extracting amster version"
 VER=$(./amster --version)
-[[ "$VER" =~ ([0-9].[0-9].[0-9](\.[0-9]*)?-([a-zA-Z][0-9]+|SNAPSHOT|RC[0-9]+)|[0-9].[0-9].[0-9](\.[0-9]*)?) ]]
+[[ "$VER" =~ ([0-9].[0-9].[0-9](\.[0-9]*)?-([a-zA-Z][0-9]+|([-a-zA-Z]+)?SNAPSHOT|RC[0-9]+)|[0-9].[0-9].[0-9](\.[0-9]*)?) ]]
 VERSION=${BASH_REMATCH[1]}
 echo "Amster version is: '${VERSION}'"
 export VERSION
