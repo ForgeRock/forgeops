@@ -1,14 +1,16 @@
 controller:
-    kind: DaemonSet
-    daemonset: 
-        useHostPort: true
-        hostPorts:
-            http: 30080
-            https: 30443
+    kind: Deployment
+    # For testing and small installations one replica is sufficient. For larger tests
+    # you may want to increase the replicas
+    replicaCount: 1
     service:
-        enabled: true
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        omitClusterIP: true
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
     publishService: 
-        enabled: false
+        enabled: true
     stats:
         enabled: true
         service:
@@ -22,5 +24,3 @@ controller:
 defaultBackend:
     service:
         omitClusterIP: true
-        
-    
