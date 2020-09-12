@@ -27,4 +27,4 @@ else
 fi
 
 echo "Deleting cluster ${cluster_name}..."
-eksctl delete cluster --name $cluster_name --wait
+eksctl delete cluster --config-file $file --wait

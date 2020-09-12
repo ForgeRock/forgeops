@@ -2,11 +2,11 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: small
+  name: mini
   region: us-east-1
   version: "1.17"
   tags:
-    forgerock.io/cluster: "cdm-small"
+    forgerock.io/cluster: "cdm-mini"
 
 vpc:
   clusterEndpoints:
@@ -20,8 +20,8 @@ nodeGroups:
   - name: primary
     instanceType: m5.xlarge
     minSize: 1
-    maxSize: 3
-    desiredCapacity: 3
+    maxSize: 1
+    desiredCapacity: 1
     volumeSize: 80
     iam:
       withAddonPolicies:
@@ -29,31 +29,12 @@ nodeGroups:
         certManager: true
     labels: 
       frontend: "true"
-      forgerock.io/cluster: "cdm-small"
-      forgerock.io/role: "primary"
-    tags:
-      forgerock.io/cluster: "cdm-small"
-      forgerock.io/role: "primary"
-    privateNetworking: true
-    ssh:
-      # eksctl will use your default public key (e.a. $HOME/.ssh/id_rsa.pub) if no path is provided
-      # publicKeyPath: 
-      allow: true
-  - name: ds
-    instanceType: m5.xlarge
-    minSize: 3
-    maxSize: 3
-    desiredCapacity: 3
-    volumeSize: 80
-    labels: 
       ds: "true"
-      forgerock.io/cluster: "cdm-small"
-      forgerock.io/role: "ds"
+      forgerock.io/cluster: "cdm-mini"
+      forgerock.io/role: "primary"
     tags:
-      forgerock.io/cluster: "cdm-small"
-      forgerock.io/role: "ds"
-    taints: 
-      WorkerDedicatedDS: true:NoSchedule
+      forgerock.io/cluster: "cdm-mini"
+      forgerock.io/role: "primary"
     privateNetworking: true
     ssh:
       # eksctl will use your default public key (e.a. $HOME/.ssh/id_rsa.pub) if no path is provided
