@@ -13,7 +13,7 @@ spec:
         app: login-ui
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-login-ui/docker-build:7.1.0-1a9ccdcc0c916c5c4b7e13ba38b2e65778db066f
+      - image: gcr.io/forgerock-io/platform-login-ui/docker-build:7.1.0-54bf23ad81a5c8960766538e6036517cb525c807
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
