@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/amster/pit1:7.1.0-918396b708b0b3e912797151c67f8a2f1b47d4cc
+FROM gcr.io/forgerock-io/amster/pit1:7.1.0-abede2578c68f86bbc259dc293a1998076faf48e
 
 USER root
 RUN apt-get install -y openldap-utils jq
