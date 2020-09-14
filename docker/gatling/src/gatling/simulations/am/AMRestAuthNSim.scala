@@ -41,7 +41,7 @@ class AMRestAuthNSim extends Simulation {
         .during(config.duration) {
             feed(userFeeder)
             .exec(http("Rest login")
-                .post("/json/authenticate")
+                .post("/json/realms/root/authenticate")
                 .disableUrlEncoding
                 .headers(getXOpenAMHeaders("${username}", "${password}")))
         }
