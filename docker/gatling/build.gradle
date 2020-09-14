@@ -1,5 +1,5 @@
 plugins {
-  id "com.github.lkishalmi.gatling" version "3.2.9"
+    id "com.github.lkishalmi.gatling" version "3.3.4"
 }
 
 apply plugin: 'scala'
@@ -19,15 +19,16 @@ dependencies {
 
 gatling {
     toolVersion = '3.1.2'
-    jvmArgs = [ '-server', '-Xmx1G' ]
-
+    // These are lifted from the source code of gatling.sh
+    jvmArgs = [ '-server','-Xmx1G','-XX:+HeapDumpOnOutOfMemoryError','-XX:+UseG1GC',
+                '-XX:MaxGCPauseMillis=30','-XX:G1HeapRegionSize=16m','-XX:InitiatingHeapOccupancyPercent=75',
+                '-XX:+ParallelRefProcEnabled','-XX:+PerfDisableSharedMem','-XX:+OptimizeStringConcat',
+                '-Djava.net.preferIPv4Stack=true','-Djava.net.preferIPv6Addresses=false']
     simulations = {
         "**/*.scala"
     }
-
-    // logLevel = "WARN"
+    //logLevel = "DEBUG"
 }
-
 
 task uploadLogs(type: JavaExec, dependsOn: compileGatlingScala) {
     main = 'gsutil.LogUploader'
