@@ -45,12 +45,8 @@ private void promoteDockerImagesToRootLevel() {
                 "${image.baseImageName}:${image.tag}",
                 "${image.rootLevelBaseImageName}:${image.tag}"
         )
-        // Promote 'am' image in addition to 'am-base'
+        // Promote 'am-config-upgrader' image in addition to 'am-base'
         if (imageKey == 'am') {
-            dockerUtils.copyImage(
-                    "gcr.io/forgerock-io/am/pit1:${image.tag}",
-                    "gcr.io/forgerock-io/am:${image.tag}"
-            )
             dockerUtils.copyImage(
                     "gcr.io/forgerock-io/am-config-upgrader/pit1:${image.tag}",
                     "gcr.io/forgerock-io/am-config-upgrader:${image.tag}"

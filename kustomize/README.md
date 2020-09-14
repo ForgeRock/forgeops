@@ -28,7 +28,7 @@ kustomize build
 ## Images
 
 The images referenced in the kustomize files are generic (example: `am`, `ig`), and not
-specific to a registry ( `gcr.io/forgerock-io/am:7.0.1` ).
+specific to a registry ( `gcr.io/forgerock-io/am-base:7.0.1` ).
 
 We can not directly deploy these generic images, because we need a docker image
 that has the configuration "baked in". This is where skaffold comes in to the picture.
