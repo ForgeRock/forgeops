@@ -1,3 +1,10 @@
+/*
+* Forgeops Gatling Utilities
+*
+* Copyright (c) 2020 ForgeRock AS. Use of this source code is subject to the
+* Common Development and Distribution License (CDDL) that can be found in the LICENSE file
+*/
+
 package frutil
 
 import io.gatling.core.Predef._
@@ -18,7 +25,7 @@ class BenchConfig {
     val client_password: String = Properties.envOrElse("CLIENT_PASSWORD", "password")
     val idmUser: String = Properties.envOrElse("IDM_USER", "openidm-admin")
     val idmPassword: String = Properties.envOrElse("IDM_PASSWORD", "openidm-admin")
-    val userPassword: String = Properties.envOrElse("USER_PASSWORD", "password")
+    val userPassword: String = Properties.envOrElse("USER_PASSWORD", "T35tr0ck123")
     val duration:Integer =  Properties.envOrElse("DURATION", "60").toInt
     val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000000").toInt
     // template for test users.
@@ -29,9 +36,11 @@ class BenchConfig {
     val concurrency: Integer = Properties.envOrElse("CONCURRENCY", "30").toInt
     val warmup: Integer = Integer.getInteger("warmup", 1)
 
+    val loginCookie = Properties.envOrElse("SESSION_COOKIE", "iPlanetDirectoryPro")
     val idmUrl: String = protocol + "://" + host + ":" + port + "/openidm"
     val amUrl: String = protocol + "://" + host + ":" + port + "/am"
-    val authnUrl: String = Properties.envOrElse("AUTHN_URL", "/json/realms/root/authenticate?authIndexType=service&authIndexValue=UserNamePassword")
+    val authnUrl: String = Properties.envOrElse("AUTHN_URL", "/json/realms/root/authenticate?authIndexType=service&authIndexValue=Login")
+    //val authnUrl: String = Properties.envOrElse("AUTHN_URL", "/json/realms/root/authenticate")
 }
 
 // Utility for OIDC client auth, refreshing access tokens, etc.
@@ -61,7 +70,7 @@ class AMAuth (val config: BenchConfig) {
     val refreshAccessToken: ChainBuilder =
         doIf(session => { session("timeout").as[Deadline].timeLeft <= safetyMargin }) {
             exec(
-                http("get access token")
+                http("Get Access Token")
                 .post(config.amUrl + "/oauth2/access_token")
                 .formParam("grant_type","client_credentials")
                 .formParam("scope", config.scope)
