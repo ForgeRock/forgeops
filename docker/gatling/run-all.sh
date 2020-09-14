@@ -17,11 +17,11 @@ G_OPTS="--no-daemon"
 #gradle clean
 # The idm simulation creates test users. Subsequent tests need these users!
 
-#gradle "$G_OPTS" gatlingRun-idm.IDMReadCreateUsersSim65
-#gradle "$G_OPTS" gatlingRun-idm.IDMDeleteUsersSim65
-gradle "$G_OPTS" gatlingRun-idm.IDMSimulation70
+gradle "$G_OPTS" gatlingRun-idm.IDMSimulation
 gradle "$G_OPTS" gatlingRun-am.AMRestAuthNSim
 gradle "$G_OPTS" gatlingRun-am.AMAccessTokenSim
+gradle "$G_OPTS" gatlingRun-platform.Register
+gradle "$G_OPTS" gatlingRun-platform.Login
 
 
 # Note the google storage library needs a service account to upload results

@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 import frutil._
 
 // An IDM simulation - creates users via REST API
-class IDMSimulation70 extends Simulation {
+class IDMSimulation extends Simulation {
 
     val config = new BenchConfig()
     val amAuth = new AMAuth(config)
