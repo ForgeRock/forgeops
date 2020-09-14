@@ -40,7 +40,6 @@ class BenchConfig {
     val idmUrl: String = protocol + "://" + host + ":" + port + "/openidm"
     val amUrl: String = protocol + "://" + host + ":" + port + "/am"
     val authnUrl: String = Properties.envOrElse("AUTHN_URL", "/json/realms/root/authenticate?authIndexType=service&authIndexValue=Login")
-    //val authnUrl: String = Properties.envOrElse("AUTHN_URL", "/json/realms/root/authenticate")
 }
 
 // Utility for OIDC client auth, refreshing access tokens, etc.
