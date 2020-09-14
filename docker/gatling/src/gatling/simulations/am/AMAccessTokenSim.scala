@@ -54,7 +54,7 @@ class AMAccessTokenSim extends Simulation {
             .exec(flushCookieJar)
             .exec(
                 http("Rest login stage")
-                    .post("/json/authenticate")
+                    .post("/json/realms/root/authenticate")
                     .disableUrlEncoding
                     .header("Content-Type", "application/json")
                     .headers(getXOpenAMHeaders("${username}", "${password}"))
