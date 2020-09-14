@@ -34,6 +34,7 @@ configMapGenerator:
   - DSBACKUP_DIRECTORY="" # Ex. gs://bucket | s3://bucket | az://container
   - DSBACKUP_HOSTS="ds-cts-0,ds-idrepo-0" # Name of the pods running the backup tasks. Ex: "ds-cts-0,ds-idrepo-0"
   - CERT_ISSUER="default-issuer" # cert manager issuer. Patch with letsencrypt-prod for LE SSL certs.
+  - RCS_AGENT_ENABLED="false" # Set to "true" when RCS Agent is enabled for use
 
 generatorOptions:
   disableNameSuffixHash: true

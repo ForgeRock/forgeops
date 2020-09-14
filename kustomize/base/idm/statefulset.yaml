@@ -37,6 +37,22 @@ spec:
             secretKeyRef:
               name: amster-env-secrets
               key: IDM_RS_CLIENT_SECRET
+        # see additional RCS Agent related config in configmap.yaml
+        - name: RCS_AGENT_IDM_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: rcs-agent-env-secrets
+              key: AGENT_IDM_SECRET
+        - name: OPENIDM_ICF_RETRY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: RCS_AGENT_ENABLED
+        - name: OPENIDM_ICF_RETRY_UPDATES_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: RCS_AGENT_ENABLED
         envFrom:
         - configMapRef:
             name: idm

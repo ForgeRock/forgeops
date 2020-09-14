@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rcs-agent-logging-properties
+data:
+  logging.properties: |
+    handlers = java.util.logging.ConsoleHandler
+    org.forgerock.openicf.framework.agent.level = INFO
+    io.netty.level = INFO
+    java.util.logging.ConsoleHandler.level = INFO
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rcs-agent-config-properties
+data:
+  Agent.properties: |
+    agent.port=8080
+    agent.idm_route=/idm
+    agent.rcs_route=/rcs
+    agent.health_route=/health
+    agent.max_http_size=65536
+    agent.max_frame_bytes=655360
+    agent.handshake_timeout_millis=10000
+    agent.shutdown_timeout_millis=25000
+    agent.ssl_enabled=false
+    agent.idm_principal=idmPrincipal
+    agent.rcs_principal=rcsPrincipal
+    #agent.idm_secret=forgeopsInjectsThisViaEnvVar
+    #agent.rcs_secret=forgeopsInjectsThisViaEnvVar
+    #agent.keystore_file=/mounted/path/to/keystore/file
+    #agent.keystore_secret=keystoreSecret
+    #agent.truststore_file=/mounted/path/to/truststore/file
+    #agent.truststore_secret=truststoreSecret
+    #agent.token_introspect_uri=http://am:80/am/oauth2/introspect
+    #agent.token_client_id=rcsAgentClientId
+    #agent.token_client_secret=rcsAgentClientSecret
+    #agent.required_scopes=fr:idm:*

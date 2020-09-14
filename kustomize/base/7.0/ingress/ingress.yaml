@@ -18,6 +18,9 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: "64m"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    # RCS Agent websockets
+    nginx.org/websocket-services: "rcs-agent"
+    nginx.ingress.kubernetes.io/websocket-services: "rcs-agent"
   name: forgerock
 spec:
   rules:
@@ -48,6 +51,10 @@ spec:
           serviceName: idm
           servicePort: 80
         path: /openicf
+      - backend:
+          serviceName: rcs-agent
+          servicePort: 80
+        path: /rcs
       # end user UI currently has its own ingress. Needs to rewrite the url path...
       # - backend:
       #     serviceName: end-user-ui

@@ -81,6 +81,7 @@ waitforsecrets () {
     echo ""
     printf "waiting for secret: am-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret am-env-secrets &> /dev/null ; do sleep 1; printf "."; done ; echo "done"
     printf "waiting for secret: idm-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret idm-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
+    printf "waiting for secret: rcs-agent-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret rcs-agent-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
     printf "waiting for secret: ds-passwords ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret ds-passwords &> /dev/null ; do sleep 1; printf "."; done; echo "done"
     printf "waiting for secret: ds-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret ds-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
 }
@@ -112,6 +113,8 @@ printsecrets () {
     echo "Relevant passwords:"
     echo "$(getsec am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR) (amadmin user)"
     echo "$(getsec idm-env-secrets OPENIDM_ADMIN_PASSWORD) (openidm-admin user)"
+    echo "$(getsec rcs-agent-env-secrets AGENT_IDM_SECRET) (rcs-agent IDM secret)"
+    echo "$(getsec rcs-agent-env-secrets AGENT_RCS_SECRET) (rcs-agent RCS secret)"
     echo "$(getsec ds-passwords dirmanager\\.pw) (uid=admin user)"
     echo "$(getsec ds-env-secrets AM_STORES_APPLICATION_PASSWORD) (App str svc acct (uid=am-config,ou=admins,ou=am-config))"
     echo "$(getsec ds-env-secrets AM_STORES_CTS_PASSWORD) (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))"

@@ -3,6 +3,7 @@ resources:
   - ../../../base/kustomizeConfig
   - ../../../base/am-cdk
   - ../../../base/idm
+  - ../../../base/rcs-agent
   - ../../../base/7.0/ingress
   - ../../../base/end-user-ui
   - ../../../base/login-ui

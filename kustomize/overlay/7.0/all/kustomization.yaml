@@ -9,6 +9,7 @@ resources:
 - ../../../base/am-cdk
 - ../../../base/amster
 - ../../../base/idm
+- ../../../base/rcs-agent
 - ../../../base/end-user-ui
 - ../../../base/login-ui
 - ../../../base/admin-ui

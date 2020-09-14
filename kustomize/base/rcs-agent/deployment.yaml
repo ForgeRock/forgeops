@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rcs-agent
+spec:
+  # only 1 replica of an rcs-agent, because otherwise it would not be connected to all IDM/RCS instances
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rcs-agent
+  template:
+    metadata:
+      labels:
+        app: rcs-agent
+    spec:
+      containers:
+        - env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: LOGGING_PROPERTIES
+              value: /var/run/rcs-agent/logging/logging.properties
+            - name: ARGS
+              value: "-p /var/run/rcs-agent/config/Agent.properties"
+          envFrom:
+            - secretRef:
+                name: rcs-agent-env-secrets
+          image: gcr.io/forgerock-io/rcs-agent/pit1:1.5.19.5-cedf214d89878197a3bd1b97a42c7e7286a144d1
+          imagePullPolicy: IfNotPresent
+          name: rcs-agent
+          ports:
+            - name: rcs-agent-port
+              containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: rcs-agent-port
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: rcs-agent-port
+            initialDelaySeconds: 5
+            periodSeconds: 30
+            timeoutSeconds: 5
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /var/run/rcs-agent/config
+              name: rcs-agent-config-properties
+            - mountPath: /var/run/rcs-agent/logging
+              name: rcs-agent-logging-properties
+      # must be slightly higher (seconds) than agent.shutdown_timeout_millis in configmap.yaml
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: rcs-agent-config-properties
+          configMap:
+            name: rcs-agent-config-properties
+        - name: rcs-agent-logging-properties
+          configMap:
+            name: rcs-agent-logging-properties
