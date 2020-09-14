@@ -37,7 +37,7 @@ The following simulations are provided in the src/gatling/simulations folder:
 |----------|-----------
 |am.AMRestAuthNSim|A simulation of the basic AM REST /json/authenticate endpoint for authentication
 |am.AMAccessTokenSim|A simulation to issue OAuth 2.0 access_token using the auth code flow
-|idm.IDMSimulation70|This idm simulation creates and deletes test users
+|idm.IDMSimulation|This idm simulation creates and deletes test users
 |platform.Register|This simulation mimics an interactive user registration
 |platform.Login|This simlation mimics an interactive user login. The *platform.Register* simulation is a *pre-requisite* for this simuation. This simulation using an Authentication Tree called "Login" which in turn uses the "Progressive Profiling" tree.
 |*ig.\**|*These simulaitons are no longer maintained.  Use them at your own risk*
