@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 import frutil._
 
 // An IDM simulation - creates users via REST API
-class IDMSimulation extends Simulation {
+class IDMSimulation70 extends Simulation {
 
     val config = new BenchConfig()
     val amAuth = new AMAuth(config)
@@ -50,7 +50,7 @@ class IDMSimulation extends Simulation {
             feed(userFeeder)
             .exec(amAuth.refreshAccessToken)
             .exec(
-                http("query for existing user")
+                http("Query for existing user")
                 .get(config.idmUrl + "/managed/user")
                 .queryParam("_queryFilter", "/userName eq \"testuser${id}\"")
                 .header("Authorization", "Bearer ${accessToken}")
@@ -73,7 +73,7 @@ class IDMSimulation extends Simulation {
             feed(userFeeder)
             .exec(amAuth.refreshAccessToken)
           .exec(
-              http("check for existing user")
+              http("Query for existing user")
                 .get(config.idmUrl + "/managed/user")
                 .queryParam("_queryFilter", "/userName eq \"testuser${id}\"")
                 .header("Authorization", "Bearer ${accessToken}")
@@ -89,9 +89,9 @@ class IDMSimulation extends Simulation {
         }
     // If DELETE_USERS is true, then run the delete simulation first
     val chainedScenario = if (config.deleteUsers)
-            scenario("idm delete then create").exec(deleteExec).exec(createExec);
+            scenario("IDM Delete then Create").exec(deleteExec).exec(createExec);
         else
-            scenario("idm create").exec(createExec);
+            scenario("IDM Create").exec(createExec);
 
     setUp(chainedScenario.inject(atOnceUsers(config.concurrency))).protocols(httpProtocol)
 }
