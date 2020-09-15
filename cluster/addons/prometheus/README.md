@@ -203,7 +203,9 @@ Grafana comes with a set of predefined Grafana dashboards for viewing Kubernetes
 dashboards can be added to the deployment by adding the dasboard json files into the ```cluster/addons/prometheus/forgerock-metrics/dashboards``` folder. 
 
 ### Expose Prometheus and Grafana externally.
-I have included a commented out section in the ```prometheus-operator.yaml``` file which has a template kto expose each service externally. Please uncomment and edit as necessary.
+External access is enabled by default using host ```<prometheus|grafana|alertmanager>.iam.example.com```.  
+To change the hostname, just edit the <prometheus|grafana|alertmanager>.ingress.hosts value in ```prometheus-operator.yaml```.
+
 
 The labels are optional and the hostname and secret name align with the current deployment of forgeops with cert-manager.
 
