@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Script to create a CDM cluster on GKE. This will create a cluster with
 # a default nodepool for the apps, and a ds-pool for the DS nodes.
-# The values below can be overridden by sourcing an environment variable script.  For example `source mini.sh && ./cluster-up.sh`
+# The values below create a "small" cluster and
+# can be overridden by sourcing an environment variable script.  For example `source mini.sh && ./cluster-up.sh`
 #
 
 
@@ -17,7 +18,7 @@ PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 PROJECT=${PROJECT:-$PROJECT_ID}
 
 # Get the default region
-R=$(gcloud config list --format 'value(run.region)')
+R=$(gcloud config list --format 'value(compute.region)')
 REGION=${REGION:-$R}
 
 # Where nodes run. We use 3 zones
@@ -30,6 +31,11 @@ DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 
 # Set to "false" if you do not want to create a separate pool for ds nodes
 CREATE_DS_POOL="${CREATE_DS_POOL:-true}"
+
+
+# Get current user
+CREATOR="${USER:-unknown}"
+
 
 # Labels to add to the default pool
 # We need at least one node label to make the command happy
@@ -54,9 +60,8 @@ PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
 # And add this to the first gcloud command:
 #    --cluster-version "$KUBE_VERSION" \
 
-# Number of nodes in each zone
+# Number of nodes in each zone for DS
 DS_NUM_NODES=${DS_NUM_NODES:-"1"}
-
 
 gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --zone "$ZONE" \
@@ -79,8 +84,9 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --default-max-pods-per-node "110" \
     --enable-autoscaling --min-nodes "0" --max-nodes "3" \
     --no-enable-master-authorized-networks \
-    --addons HorizontalPodAutoscaling,HttpLoadBalancing,ConfigConnector \
+    --addons HorizontalPodAutoscaling,ConfigConnector \
     --workload-pool "$PROJECT.svc.id.goog" \
+    --labels "createdBy=$CREATOR" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0
 
 

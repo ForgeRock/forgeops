@@ -6,7 +6,7 @@ NAME=${NAME:-small}
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 PROJECT=${PROJECT:-$PROJECT_ID}
 
-R=$(gcloud config list --format 'value(run.region)')
+R=$(gcloud config list --format 'value(compute.region)')
 REGION=${REGION:-$R}
 
 ZONE=${ZONE:-"$REGION-a"}
