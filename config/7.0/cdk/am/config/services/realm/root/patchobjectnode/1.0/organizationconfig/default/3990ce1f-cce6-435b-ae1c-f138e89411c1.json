@@ -19,7 +19,7 @@
       "collection" : false
     },
     "_id" : "default/3990ce1f-cce6-435b-ae1c-f138e89411c1",
-    "patchAsObject" : true,
+    "patchAsObject" : false,
     "identityAttribute" : "userName",
     "identityResource" : "managed/user",
     "ignoredFields" : [
