@@ -64,10 +64,26 @@ done
 # Create namespace
 ns=$(kubectl get namespace | grep nginx | awk '{ print $1 }' || true)
 
+# Identify cluster size
+clustsize=$(kubectl get nodes --label-columns forgerock.io/cluster --no-headers  | head -n 1 | awk '{print $6}')
+
 if [ -z "${ns}" ]; then
   kubectl create namespace nginx
 else
   printf "*** nginx namespace already exists ***\n"
+fi
+if [ -n "$clustsize" ]; then
+    echo "Detected cluster of type: $clustsize"
+fi 
+if [[ -n "$clustsize" && ($clustsize == "cdm-medium" || $clustsize == "cdm-large") ]]; then 
+    echo "Setting ingress pod count to 3"
+    INGRESS_POD_COUNT=3
+elif [[ -n "$clustsize" && ($clustsize == "cdm-small") ]]; then 
+    echo "Setting ingress pod count to 2"
+    INGRESS_POD_COUNT=2
+else 
+    echo "Setting ingress pod count to 1"
+    INGRESS_POD_COUNT=1
 fi
 
 # Set script location
@@ -80,7 +96,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
 # Deploy ingress controller Helm chart
 helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
-  $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
+  $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}
 
 # This other repo requires changes to the values in cluster/addons/nginx-ingress-controller
 # We're using `stable`, but need to explore if we should move to this other one. See CLOUD-2426
