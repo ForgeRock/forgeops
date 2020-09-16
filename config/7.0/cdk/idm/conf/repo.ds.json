@@ -725,6 +725,137 @@
                         "type": "simple", "ldapAttribute": "ds-cfg-value", "isMultiValued" : true, "isRequired": true
                     }
                 }
+            },
+            "recon/assoc" : {
+                "dnTemplate" : "ou=assoc,ou=recon,dc=openidm,dc=forgerock,dc=com",
+                "namingStrategy" : {
+                    "dnAttribute" : "fr-idm-reconassoc-reconid",
+                    "type" : "clientDnNaming"
+                },
+                "objectClasses" : [
+                    "fr-idm-reconassoc"
+                ],
+                "properties" : {
+                    "_id" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-reconid",
+                        "isRequired" : true
+                    },
+                    "mapping" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-mapping"
+                    },
+                    "sourceResourceCollection" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-sourceresourcecollection"
+                    },
+                    "targetResourceCollection" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-targetresourcecollection"
+                    },
+                    "isAnalysis" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-isanalysis"
+                    },
+                    "finishTime" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-finishtime"
+                    }
+                },
+                "subResources" : {
+                    "entry" : {
+                        "type" : "collection",
+                        "resource" : "recon-assoc-entry",
+                        "namingStrategy" : {
+                            "dnAttribute" : "uid",
+                            "type" : "clientDnNaming"
+                        }
+                    }
+                }
+            },
+            "recon/assoc/entry" : {
+                "resourceName" : "recon-assoc-entry",
+                "objectClasses" : [
+                    "uidObject",
+                    "fr-idm-reconassocentry"
+                ],
+                "subResourceRouting" : [
+                    {
+                        "template" : "recon/assoc/{reconId}/entry",
+                        "prefix" : "entry"
+                    }
+                ],
+                "properties" : {
+                    "_id" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "uid",
+                        "isRequired" : true
+                    },
+                    "reconId" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-reconid"
+                    },
+                    "linkQualifier" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-linkqualifier"
+                    },
+                    "status" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-status"
+                    },
+                    "situation" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-situation"
+                    },
+                    "action" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-action"
+                    },
+                    "phase" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-phase"
+                    },
+                    "sourceObjectId" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-sourceObjectId"
+                    },
+                    "targetObjectId" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-targetObjectId"
+                    },
+                    "exception" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-exception"
+                    },
+                    "message" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-message"
+                    },
+                    "messageDetail" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-messagedetail"
+                    },
+                    "ambiguousTargetObjectIds" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassocentry-ambiguoustargetobjectids"
+                    },
+                    "mapping" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-mapping"
+                    },
+                    "sourceResourceCollection" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-sourceresourcecollection"
+                    },
+                    "targetResourceCollection" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-targetresourcecollection"
+                    },
+                    "isAnalysis" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-reconassoc-isanalysis"
+                    }
+                }
             }
         },
         "genericMapping": {
