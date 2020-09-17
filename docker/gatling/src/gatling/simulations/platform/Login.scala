@@ -34,7 +34,7 @@ class Login extends Simulation {
         .header("Accept-API-Version", "resource=2.0, protocol=1.0")
 
     val loginScenario: ScenarioBuilder =
-        scenario("Rest login")
+        scenario("Login")
         .during(config.duration) {
             exitBlockOnFail{
                 exec(flushCookieJar)
