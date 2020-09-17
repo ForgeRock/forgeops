@@ -11,7 +11,7 @@ G_OPTS="--no-daemon"
 
 usage() {
     echo ""
-    echo "Usage: run-all.sh [am|idm|platform]"
+    echo "Usage: run.sh [am|idm|platform]"
     echo ""
 }
 

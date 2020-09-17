@@ -8,7 +8,7 @@ This sample is provided for reference only and is not supported by ForgeRock. Us
 
 * Pre-existing passwords for setting into env variables can be printed using the forgeops/bin/print-secrets.sh script.  For the IDM simulations you can get the secrets via `$ kubectl exec -it am-6f95c6bd4-vlsgn -- env | grep IDM_PROVISIONING_CLIENT_SECRET`
 
-* The [run-all.sh](run-all.sh) script sets these variables if they are not already set elsewhere. When running in Kubernetes, the [ConfigMap in perf-test](k8s/perf-test-job.yaml)  sets these values.
+* The [run.sh](run.sh) script sets these variables if they are not already set elsewhere. When running in Kubernetes, the [ConfigMap in perf-test](k8s/perf-test-job.yaml)  sets these values.
 
 
 ## Simulations
