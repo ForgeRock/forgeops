@@ -1,6 +1,6 @@
 # Source these values for a mini cluster - useful for small tests
 
-
+export NAME="mini"
 # The machine types for primary and ds node pools
 export REGION=us-east4
 export MACHINE=e2-standard-2

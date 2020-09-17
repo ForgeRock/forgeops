@@ -36,6 +36,8 @@ CREATE_DS_POOL="${CREATE_DS_POOL:-true}"
 # Get current user
 CREATOR="${USER:-unknown}"
 
+# Labels can not contain dots that may be present in the user.name
+CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
 # Labels to add to the default pool
 # We need at least one node label to make the command happy
@@ -60,7 +62,9 @@ PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
 # And add this to the first gcloud command:
 #    --cluster-version "$KUBE_VERSION" \
 
-# Number of nodes in each zone for DS
+
+# Number of nodes in each zone
+NUM_NODES=${NUM_NODES:-"1"} # Primary Node Pool
 DS_NUM_NODES=${DS_NUM_NODES:-"1"}
 
 gcloud beta container --project "$PROJECT" clusters create "$NAME" \
@@ -78,7 +82,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --node-labels "$DEFAULT_POOL_LABELS" \
     --enable-stackdriver-kubernetes \
     --enable-ip-alias \
-    --num-nodes "1" \
+    --num-nodes "$NUM_NODES" \
     --network "$NETWORK" \
     --subnetwork "$SUB_NETWORK" \
     --default-max-pods-per-node "110" \
@@ -86,7 +90,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --no-enable-master-authorized-networks \
     --addons HorizontalPodAutoscaling,ConfigConnector \
     --workload-pool "$PROJECT.svc.id.goog" \
-    --labels "createdBy=$CREATOR" \
+    --labels "createdby=$CREATOR" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0
 
 

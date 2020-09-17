@@ -1,4 +1,3 @@
-
 # Source these values for a medium cluster
 
 export NAME="medium"
@@ -7,5 +6,7 @@ export REGION=us-east4
 export MACHINE=e2-highcpu-16
 export DS_MACHINE=c2-standard-16
 export PREEMPTIBLE=""
-# Two nodes per zone, total of 6 DS nodes
+# 2 nodes per zone, total of 6 Primary nodes
+export NUM_NODES="2"
+# 2 nodes per zone, total of 6 DS nodes
 export DS_NUM_NODES="2"
