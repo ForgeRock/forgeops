@@ -4,13 +4,6 @@ kind: Task
 metadata:
   name: release-notes
 spec:
-  #  stepTemplate:
-  #    env:
-  #      - name: SLACK_FAILED_WEBHOOK_URL
-  #        valueFrom:
-  #          secretKeyRef:
-  #            name: slack-webhook
-  #            key: SLACK_FAILED_WEBHOOK_URL
   params:
     - name: gitrevision
   resources:

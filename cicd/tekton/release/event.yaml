@@ -20,3 +20,30 @@ spec:
         - ref: tag-release-binding
       template:
         name: tag-release-template
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: github-branch-listener
+spec:
+  serviceAccountName: tekton-trigger
+  triggers:
+    - name: github-image-build-trigger
+      interceptors:
+        - github:
+            secretRef:
+              secretName: github-webhook-secret
+              secretKey: secret
+            eventTypes:
+              - push
+        - cel:
+            filter: "body.ref.split('/')[2] == 'master'"
+            # set branch name in a friendly way
+            overlays:
+              - key: extensions.branch_name
+                expression: "body.ref.split('/')[2]"
+
+      bindings:
+        - ref: image-build-binding
+      template:
+        name: image-build-template

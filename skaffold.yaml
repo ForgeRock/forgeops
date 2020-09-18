@@ -26,6 +26,7 @@ kind: Config
     cluster: &kaniko-cluster
       namespace: kaniko
       pullSecretName: kaniko-secret
+      pullSecretMountPath: /secrets/kaniko-secret
 
   artifactDefinitions:
     - &AM
@@ -147,6 +148,18 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/nightly
 
+# Images tagged as environment variable 
+- name: image-tag                       
+  build:                   
+    tagPolicy:                          
+      envTemplate:                      
+        template: "{{.IMAGE_TAG}}"      
+    artifacts: *kaniko-artifacts        
+    cluster: *kaniko-cluster            
+  deploy:                               
+    kustomize:                          
+      path: ./kustomize/overlay/7.0/all 
+
 # 24/7 demo that is continually upgraded (nightly is deployed fresh every night)
 # Just the directory services
 - name: prod-ds
@@ -211,7 +224,7 @@ profiles:
   deploy:
     kustomize:
         path: ./dev
-        
+
 - name: dev
   build: *default-build
   deploy:

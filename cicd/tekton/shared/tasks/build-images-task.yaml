@@ -15,29 +15,36 @@ spec:
   - name: namespace
     type: string
     description: target namespace
-      
+
   - name: docker-repo
     type: string
     description: Docker repository URL
-      
+  - name: tag_name
+    type: string
+    description: tag name environment variable used in some skaffold profiles
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: "slack-webhook-$(params.namespace)"
+          name: "slack-webhook-utils"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
   - name: build-images
+    env:
+      - name: TAG_NAME
+        value: $(params.tag_name)
     image: "gcr.io/engineering-devops/skaffold:latest"
     script: |
       #!/usr/bin/env bash
+      # if there's a tag name change master to latest
+      set -x
+      IMAGE_TAG=${TAG_NAME/master/latest}
       {
         cd /workspace/forgeops
-       ./bin/config.sh init -v 7.0 -p cdk
+       ./bin/config.sh init -p cdk
         skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) build
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build \`$(inputs.params.profile)\`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+      #curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build \`$(inputs.params.profile)\`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
-      

@@ -14,10 +14,13 @@ spec:
       http:
         paths:
           - backend:
-              # TODO UODATE AND DEPLOY THIS VALUE
               serviceName: el-github-tag-listener
               servicePort: 8080
             path: /release-tag/?(.*)
+          - backend:
+              serviceName: el-github-branch-listener
+              servicePort: 8080
+            path: /branch/?(.*)
   tls:
     - hosts:
         - cicd.iam.forgeops.com

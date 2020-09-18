@@ -45,3 +45,50 @@ spec:
       value: $(body.ref)
     - name: gitrepositoryurl
       value: $(body.repository.clone_url)
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: image-build-template
+spec:
+  params:
+    - name: gitrevision
+      description: The git revision
+      default: master
+    - name: gitrepositoryurl
+      description: The git repository url
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: image-build-run-
+      spec:
+        timeout: 45m
+        serviceAccountName: tekton-worker
+        params:
+          - name: gitrevision
+            value: $(params.gitrevision)
+        pipelineRef:
+          name: build-images-on-master-push
+        resources:
+          - name: git-repo
+            resourceSpec:
+              type: git
+              params:
+                - name: revision
+                  value: $(params.gitrevision)
+                - name: url
+                  value: $(params.gitrepositoryurl)
+                - name: depth
+                  value: "0"
+---
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: image-build-binding
+spec:
+  params:
+    - name: gitrevision
+      value: $(body.extensions.branch_name)
+    - name: gitrepositoryurl
+      value: $(body.repository.clone_url)
