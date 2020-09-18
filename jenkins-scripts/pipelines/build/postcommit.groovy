@@ -71,8 +71,13 @@ void buildImage(String directoryName) {
  */
 def postBuildTests(PipelineRun pipelineRun) {
     try {
-        pit1TestStage.runStage(pipelineRun)
-        perfTestStage.runStage(pipelineRun)
+        Random random = new Random()
+        def parallelTestsMap = [
+            Spyglaas: { pit1TestStage.runStage(pipelineRun, random) },
+            PyRock: { perfTestStage.runStage(pipelineRun, random) },
+        ]
+
+        parallel parallelTestsMap
         currentBuild.result = 'SUCCESS'
     } catch (exception) {
         currentBuild.result = 'FAILURE'

@@ -8,11 +8,12 @@
 
 import com.forgerock.pipeline.reporting.PipelineRun
 
-void runStage(PipelineRun pipelineRun) {
+void runStage(PipelineRun pipelineRun, Random random) {
 
     def stageName = "PERF"
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testName = 'postcommit'
+    def randomNumber = random.nextInt(999) + 1000 // 4 digit random number to compute to namespace
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
@@ -34,7 +35,7 @@ void runStage(PipelineRun pipelineRun) {
                             TEST_NAME            : testName,
                             DEPLOYMENT_NAME      : 'small',
                             CLUSTER_DOMAIN       : 'pit-cluster.forgeops.com',
-                            CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'],
+                            CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             PIPELINE_NAME        : 'FORGEOPS_POSTCOMMIT',
                         ]
 
