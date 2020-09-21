@@ -37,6 +37,12 @@
       "actions"    : "*"
     },
     {
+      "pattern"    : "config/ui/themelogin",
+      "roles"      : "*",
+      "methods"    : "read",
+      "actions"    : "*"
+    },
+    {
       "pattern"    : "info/uiconfig",
       "roles"      : "*",
       "methods"    : "read",
