@@ -2,8 +2,11 @@
 
 # Cluster values
 export NAME=medium
-export LOCATION=eastus
 export CLUSTER_LABELS="forgerock.io/cluster=cdm-medium"
+
+# cluster-up.sh retrieves the location from the user's az config.  Uncomment below to override:
+# export LOCATION=eastus
+
 # Uncomment to provide different Azure Container Registry name than the default(forgeops)
 # export ACR_NAME="" 
 
