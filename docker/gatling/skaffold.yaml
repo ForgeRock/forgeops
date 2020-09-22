@@ -8,7 +8,7 @@ build:
   - image: gatling
     context: .
   tagPolicy:
-      gitCommit: {}
+      sha256: {}
 deploy:
   kustomize:
     path: ./k8s/
@@ -24,7 +24,7 @@ profiles:
           gcsBucket: forgeops-kaniko
         cache: {}
     tagPolicy:
-      gitCommit: {}
+      sha256: {}
   deploy:
     kustomize:
       path: ./k8s
