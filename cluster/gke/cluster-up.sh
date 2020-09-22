@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Script to create a CDM cluster on GKE. This will create a cluster with
 # a default nodepool for the apps, and a ds-pool for the DS nodes.
-# The values below create a "small" cluster and
-# can be overridden by sourcing an environment variable script.  For example `source mini.sh && ./cluster-up.sh`
+# The values below can be overridden by copying and sourcing an environment variable script. For example:
+# - `cp mini.sh my-cluster.sh`
+# - `source my-cluster.sh && ./cluster-up.sh`
 #
 
 

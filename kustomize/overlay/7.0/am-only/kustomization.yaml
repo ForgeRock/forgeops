@@ -9,7 +9,4 @@ resources:
   - ../../../base/7.0/ds/idrepo
   - ../../../base/7.0/ingress
   - ../../../base/ldif-importer
-  - ../../../base/end-user-ui
-  - ../../../base/login-ui
-  - ../../../base/admin-ui
 
