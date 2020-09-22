@@ -40,6 +40,9 @@ metadata:
 data:
   # Customize as required
   GOOGLE_APPLICATION_CREDENTIALS: "/var/run/secrets/key.json"
-  DURATION: "60"
-  CONCURRENCY: "50"
-  TARGET_HOST: "smoke.iam.forgeops.com"
+  PERF_TEST_RESULTS_BUCKET_NAME: "performance-bucket-us-east1"
+  DURATION: "10"
+  CONCURRENCY: "1"
+  TARGET_HOST: "wajih.iam.perf-pit-team.forgeops.com"
+  CLIENT_PASSWORD: "vtt3qtncd1dabsvq7ikehm11expywabq"
+  IDM_PASSWORD: "pw3j9uzgkx187fphchdzzxid48dridqa"
