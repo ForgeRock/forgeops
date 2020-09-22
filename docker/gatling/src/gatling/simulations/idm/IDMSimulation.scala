@@ -29,7 +29,7 @@ class IDMSimulation extends Simulation {
                   "givenName": "givenname%s",
                   "sn": "tester%s",
                   "mail": "testuser%s@forgerock.com",
-                  "password": "Passw0rd"}
+                  "password": "T35tr0ck123"}
             """.format(userId, userId, userId, userId).stripMargin
         stringJson
     }
@@ -72,15 +72,16 @@ class IDMSimulation extends Simulation {
         .during(config.duration) {
             feed(userFeeder)
             .exec(amAuth.refreshAccessToken)
-          .exec(
+            .exec(
               http("Query for existing user")
                 .get(config.idmUrl + "/managed/user")
                 .queryParam("_queryFilter", "/userName eq \"testuser${id}\"")
                 .header("Authorization", "Bearer ${accessToken}")
                 .check(jsonPath("$.result[0]._id").optional.saveAs("uid"))
-          ) // if the uid does not exist, then create it..
-              .doIf( "${uid.isUndefined()}") {
-                exec(http("Create managed user via POST")
+            ) // if the uid does not exist, then create it..
+            .doIf( "${uid.isUndefined()}") {
+                exec(
+                    http("Create managed user via POST")
                       .post(config.idmUrl + "/managed/user?_action=create")
                       .body(StringBody(getGeneratedUser("${id}"))).asJson
                       .header("Authorization", "Bearer ${accessToken}")

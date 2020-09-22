@@ -73,7 +73,7 @@ class Register extends Simulation {
             data("callbacks")(0)("input")(0)("value") = session("username").as[String]
             data("callbacks")(1)("input")(0)("value") = session("username").as[String]
             data("callbacks")(2)("input")(0)("value") = session("username").as[String]
-            data("callbacks")(3)("input")(0)("value") = session("username").as[String]+"@fogerock.com"
+            data("callbacks")(3)("input")(0)("value") = session("username").as[String]+"@forgerock.com"
             data("callbacks")(4)("input")(0)("value") = false
             data("callbacks")(5)("input")(0)("value") = false
             data("callbacks")(6)("input")(0)("value") = session("password").as[String]
@@ -83,7 +83,6 @@ class Register extends Simulation {
             session.set("callbacks", ujson.write(data))
           })
           .exec(registrationCallback())
-
     }
 
     setUp(scn.inject(rampUsers(config.concurrency) during config.warmup)).protocols(httpProtocol)
