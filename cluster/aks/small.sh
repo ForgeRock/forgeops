@@ -8,8 +8,8 @@ export CLUSTER_LABELS="forgerock.io/cluster=cdm-small"
 # cluster-up.sh retrieves the location from the user's az config.  Uncomment below to override:
 # export LOCATION=eastus
 
-# Uncomment to provide different Azure Container Registry name than the default(forgeops)
-# export ACR_NAME="" 
+# Name of Azure Container Registry.  AKS needs to be given access to ACR. Please amend to your registry name.
+export ACR_NAME="forgeops" 
 
 # PRIMARY NODE POOL VALUES
 export VM_SIZE=Standard_DS3_v2

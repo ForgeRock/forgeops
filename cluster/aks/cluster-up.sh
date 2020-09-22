@@ -28,7 +28,7 @@ NAME=${NAME:-small}
 ADMIN_USERNAME=${ADMIN_USERNAME:-"forgerock"}
 
 # Name of container registry used by cluster
-ACR_NAME=${ACR_NAME:-"forgeops"}
+ACR_NAME=${ACR_NAME}
 
 # For AKS, use the default kubernetes version.
 # If you want a specific cluster version uncomment the line below

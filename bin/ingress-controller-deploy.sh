@@ -5,11 +5,10 @@
 # Version is currently not used. We default to installing the latest stable version in the helm repo.
 #VERSION="0.34.1"
 
-AKS_OPTS=""
 IP_OPTS=""
 
 usage() {
-  printf "Usage: $0 -e|-g|-a [-i IP] [-r RESOURCE GROUP] [-d] \n\n"
+  printf "Usage: $0 -e|-g|-a [-i IP] [-d] \n\n"
   exit 2
 }
 
@@ -21,24 +20,22 @@ delete() {
 
 # Output help if no arguments or -h is included
 if [[ $1 == "-h" ]];then
-    printf "\nUsage: $0 -e|-g|-a [-i IP] [-r RESOURCE GROUP] [-d]\n"
+    printf "\nUsage: $0 -e|-g|-a [-i IP] [-d]\n"
     echo "-e                        : Deploy to EKS."
     echo "-g                        : Deploy to GKE."
     echo "-a                        : Deploy to AKS."
-    echo "-i  <static IP address>   : Provide an existing static IP address(GKE/AKS only)"
-    echo "-r  <resource group name> : Existing IP resource group name."
+    echo "-i  <static IP address>   : Provide an existing static IP address(GKE only)"
     echo "-d                        : delete nginx-ingress Helm chart."
     exit 1
 fi
 
 # Read arguments
-while getopts :aegc:i:r:d option; do
+while getopts :aegc:i:d option; do
     case "${option}" in
         e) PROVIDER="eks";;
         g) PROVIDER="gke";;
         a) PROVIDER="aks";;
         i) IP=${OPTARG};;
-        r) RESOURCE_GROUP=${OPTARG};;
         d) delete;;
         h) usage ;;
         \?) echo "Error: Incorrect usage"
@@ -50,16 +47,12 @@ done
 #******** VALIDATING ARGUMENTS ********
 # Ensure provider flag has been provided.
 [ -z "${PROVIDER}" ] && printf "\n** Please provide a provider flag (-g|-e|-a) **\n\n" && usage
-# If -g or -a selected with -i then validate IP address format.
-[[ "${PROVIDER}" =~ ^(gke|aks)$ ]] && [ "${IP}" ] && [[ ! "${IP}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && printf '\n** IP address is not valid **\n\n' && usage
-# If -g or -a selected with -i then set loadbalancer IP field.
-[[ "${PROVIDER}" =~ ^(gke|aks)$ ]] && [ "${IP}" ] && IP_OPTS="--set controller.service.loadBalancerIP=${IP}"
-# If -e is selected with -i, echo that IP address will be ignored
-[[ "${PROVIDER}" =~ ^(eks)$ ]] && [ "${IP}" ] && printf "\n** IP address not required for EKS so ignoring **\n\n" && usage
-# If -p is equal to 'aks', ensure -g is provided.
-[[ "${PROVIDER}" =~ ^(aks)$ ]] && [ "${IP}" ] && [ -z "${RESOURCE_GROUP}" ] && printf "\n** AKS IP resource group required **\n\n" && usage
-# If -p is equal to 'aks' and -g is provided, set IP resource group.
-[[ "${PROVIDER}" =~ ^(aks)$ ]] && [ "${RESOURCE_GROUP}" ] && AKS_OPTS="--set controller.service.annotations.'service\.beta\.kubernetes\.io/azure-load-balancer-resource-group'=${RESOURCE_GROUP}"
+# If -g selected with -i then validate IP address format.
+[[ "${PROVIDER}" =~ ^(gke)$ ]] && [ "${IP}" ] && [[ ! "${IP}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && printf '\n** IP address is not valid **\n\n' && usage
+# If -g selected with -i then set loadbalancer IP field.
+[[ "${PROVIDER}" =~ ^(gke)$ ]] && [ "${IP}" ] && IP_OPTS="--set controller.service.loadBalancerIP=${IP}"
+# If -e or -a is selected with -i, echo that IP address will be ignored
+[[ "${PROVIDER}" =~ ^(eks|aks)$ ]] && [ "${IP}" ] && printf "\n** IP address not required so ignoring **\n\n" && usage
 
 # Create namespace
 ns=$(kubectl get namespace | grep nginx | awk '{ print $1 }' || true)
@@ -96,7 +89,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
 # Deploy ingress controller Helm chart
 helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
-  $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}
+  $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}
 
 # This other repo requires changes to the values in cluster/addons/nginx-ingress-controller
 # We're using `stable`, but need to explore if we should move to this other one. See CLOUD-2426
@@ -105,4 +98,4 @@ helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
 
 # # Deploy ingress controller Helm chart
 # helm upgrade -i nginx-ingress --namespace nginx ingress-nginx/ingress-nginx \
-#   $IP_OPTS $AKS_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
+#   $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml
