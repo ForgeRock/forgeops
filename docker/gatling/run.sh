@@ -11,51 +11,69 @@ G_OPTS="--no-daemon"
 
 usage() {
     echo ""
-    echo "Usage: run.sh [am|idm|platform]"
+    echo "Usage: run.sh [all|am|idm|platform]"
     echo ""
 }
+
+
+am() {
+	export USER_PREFIX=user.
+	export USER_PASSWORD=T35tr0ck123
+	export oauth2_client_id="clientOIDC_0"
+	export oauth2_redirect_uri="http://fake.com"
+	gradle "$G_OPTS" gatlingRun-am.AMRestAuthNSim
+	gradle "$G_OPTS" gatlingRun-am.AMAccessTokenSim
+}
+
+idm() {
+	export DELETE_USERS="false" # Delete the IDM users before running create users
+	export CLIENT_ID=idm-provisioning
+	export CLIENT_PASSWORD=vtt3qtncd1dabsvq7ikehm11expywabq
+	export IDM_USER=amadmin
+	export IDM_PASSWORD=pw3j9uzgkx187fphchdzzxid48dridqa
+	gradle "$G_OPTS" gatlingRun-idm.IDMSimulation # Note IDMSimulation has hard coded user prefix
+}
+
+platform() {
+	export CLIENT_ID=idm-provisioning
+	export CLIENT_PASSWORD=vtt3qtncd1dabsvq7ikehm11expywabq
+	export IDM_USER=amadmin
+	export IDM_PASSWORD=pw3j9uzgkx187fphchdzzxid48dridqa
+	export USER_PREFIX=platuser.
+	gradle "$G_OPTS" gatlingRun-platform.Register
+	gradle "$G_OPTS" gatlingRun-platform.Login
+}
+
 
 if [ $# -ne 1 ]; then 
 	usage
 	exit
 fi
 
+gradle clean
+
 case $1 in
 
-  am)
-    export USER_PREFIX=user.
-	export USER_PASSWORD=T35tr0ck123
-	export oauth2_client_id="clientOIDC_0"
-	export oauth2_redirect_uri="http://fake.com"
-	gradle clean
-	gradle "$G_OPTS" gatlingRun-am.AMRestAuthNSim
-	gradle "$G_OPTS" gatlingRun-am.AMAccessTokenSim
+	am)
+      am
     ;;
 
-  idm)
-    export DELETE_USERS="true" # Delete the IDM users before running create users
-	export CLIENT_ID=idm-provisioning
-	export CLIENT_PASSWORD=vtt3qtncd1dabsvq7ikehm11expywabq
-	export IDM_USER=amadmin
-	export IDM_PASSWORD=pw3j9uzgkx187fphchdzzxid48dridqa
-	export USER_PREFIX=idmuser.
-	gradle clean
-	gradle "$G_OPTS" gatlingRun-idm.IDMSimulation
+  	idm)
+      idm
     ;;
 
-  platform)
-    export CLIENT_ID=idm-provisioning
-	export CLIENT_PASSWORD=vtt3qtncd1dabsvq7ikehm11expywabq
-	export IDM_USER=amadmin
-	export IDM_PASSWORD=pw3j9uzgkx187fphchdzzxid48dridqa
-	export USER_PREFIX=platuser.
-	gradle clean
-	gradle "$G_OPTS" gatlingRun-platform.Register
-	gradle "$G_OPTS" gatlingRun-platform.Login
+	platform)
+	  platform
     ;;
 
-  *)
-    usage
+	all)
+	  am
+	  idm
+	  platform
+	;;
+
+	*)
+      usage
     ;;
 
 esac
@@ -67,12 +85,12 @@ esac
 # export GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account.json
 # The service account needs permission to write / update the cloud storage bucket.
 if [ -r "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
-  echo 'Uploading results'
-  # For reasons unknown, the google storage library does not want to read
-  # this file from a sym link (which is what a k8s secret is..)
-  # So we need to make a copy of the file, and update the env var to point to it.
-  cp  "$GOOGLE_APPLICATION_CREDENTIALS"  ./key.json
-  export GOOGLE_APPLICATION_CREDENTIALS=key.json
-  gradle "$G_OPTS" uploadResults
+	echo 'Uploading results'
+	# For reasons unknown, the google storage library does not want to read
+	# this file from a sym link (which is what a k8s secret is..)
+	# So we need to make a copy of the file, and update the env var to point to it.
+	cp  "$GOOGLE_APPLICATION_CREDENTIALS"  ./key.json
+	export GOOGLE_APPLICATION_CREDENTIALS=key.json
+	gradle "$G_OPTS" uploadResults
 fi
 
