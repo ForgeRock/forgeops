@@ -4,11 +4,11 @@ This sample is provided for reference only and is not supported by ForgeRock. Us
 
 ## Benchmark Configuration
 
-* The utility class [BenchConfig](src/gatling/simulations/util.scala) initializes the common parameters for the test (number of users, duration, etc.). These are derived from environment variables. To override the default values, set these env variables in your env or script before running the simulations.  
+* The utility class [BenchConfig](src/gatling/simulations/util.scala) initializes the common parameters for the test (number of users, duration, etc.). These are derived from environment variables. Override the default values and set these env variables in your shell env or script before running the simulations. <u>This is a critical step which missed will lead to all sorts of failures</u>.
 
 * Pre-existing passwords for setting into env variables can be printed using the `forgeops/bin/print-secrets.sh` script.  For the simulations that require provisioning into IDM you will also need the you can get the secrets for the "idm-provisioning" OAuth2 client via the following command. `$ kubectl exec -it am-6f95c6bd4-vlsgn -- env | grep IDM_PROVISIONING_CLIENT_SECRET`
 
-* The [run.sh](run.sh) script sets these variables if they are not already set elsewhere. When running in Kubernetes, the [ConfigMap in perf-test](k8s/perf-test-job.yaml) can also set these values.
+* The [run.sh](run.sh) script sets these variables if they are not already set elsewhere. So you can also edit the env vars in this script. When running in Kubernetes, the [ConfigMap in perf-test](k8s/perf-test-job.yaml) can also set these values. See the section below called [Running in the Cluster](##Running in the Cluster).
 
 
 ## Simulations
@@ -23,6 +23,8 @@ The following sample simulations are provided in the src/gatling/simulations fol
 |platform.Register|This simulation mimics an interactive user registration.  Since this simulation creates new users it is recommended to set a different USER_PREFIX so that they do not collide with existing users that are seeded in the Identity Repository.
 |platform.Login|This simulation mimics an interactive user login. This simulation using an Authentication Tree called "Login" which in turn uses the "Progressive Profiling" tree.
 |*ig.\**|*These simulaitons are no longer maintained or tested.  Use them at your own risk*.
+
+NOTE each of these simulation sets are independant of each other.  For example you can run the "idm" simulation without running the "am" simulations.  However the "platform" Login simulation depends on the Register simulation.  <u>You have to run the platform.Register simulation first so that the users created can be used by the Login simuation</u>.  Furthermore you have to ensure that you run the Register simulation long enough to provide the desired USER_POOL for the Login simulation otherwise you will start getting 401 errors.
 
 If you just want to compile the simulation code:
 
@@ -100,17 +102,24 @@ gatling {
 
 ## Troubleshooting
 
-If you see these errors during the simulations, make sure that the username and passwords are correct. For example check the values of `IDM_USER`, `IDM_PASSWORD` and `CLIENT_PASSWORD`.
+=> If you see these errors during the simulations, make sure that the username and passwords are correct. For example check the values of `IDM_USER`, `IDM_PASSWORD` and `CLIENT_PASSWORD`.
 
 - Request 'registationCallback' failed for user 1: jsonPath($.tokenId).find.exists, found nothing
 - Request 'Submit Credentials' failed for user 1: status.find.is(200), but actually found 401
 
 
-When deploying the "gatling" container to the cluster via skaffold, you will see this error if a k8s/key.json is not created 
+=> When deploying the "gatling" container to the cluster via skaffold, you will see this error if a k8s/key.json is not created 
 
 ``` 
 stderr: "Error: file sources: [key.json]: evalsymlink failure on '/Users/wajih.ahmed/work/forgeops/docker/gatling/k8s/key.json' : lstat /Users/wajih.ahmed/work/forgeops/docker/gatling/k8s/key.json: no such file or directory\n"
 ```
 And if key.json is invalid then you will see the following in the output of the Skaffold.
 
-`[perf-test] Exception in thread "main" com.google.cloud.storage.StorageException: 401 Unauthorized`
+```
+[perf-test] Exception in thread "main" com.google.cloud.storage.StorageException: 401 Unauthorized
+```
+=> While running a simulation if you see this error, it means you need to increase your feeder size by increasing the USER_POOL or reduce the DURATION of your simulation so that the feeder is not exhausted.
+
+```
+09:02:12.566 [ERROR] i.g.c.a.SingletonFeed - Feed failed: Feeder is now empty, stopping engine, please report.
+```

@@ -32,6 +32,8 @@ class Login extends Simulation {
         .inferHtmlResources()
         .contentTypeHeader("""application/json""")
         .header("Accept-API-Version", "resource=2.0, protocol=1.0")
+        //.proxy(Proxy("localhost", 8888).httpsPort(8888)) // Uncomment for debugging through a proxy
+
 
     val loginScenario: ScenarioBuilder =
         scenario("Login")
@@ -39,11 +41,10 @@ class Login extends Simulation {
             exitBlockOnFail{
                 exec(flushCookieJar)
                 .exec(
-                    http("Get AuthId and Callbacks")
+                    http("Get Callbacks")
                     .post(config.authnUrl)
                     .check(status.is(200))
-                    .check(jsonPath("$.authId").find.saveAs("authId"))
-                    .check(jsonPath("$").find.saveAs("callbacks"))
+                    .check(jsonPath("$").ofType[String].exists.saveAs("callbacks"))
                 )
                 .feed(userFeeder)
                 .exec(session => {
@@ -51,18 +52,37 @@ class Login extends Simulation {
                     data("callbacks")(0)("input")(0)("value") = session("username").as[String]
                     data("callbacks")(1)("input")(0)("value") = session("password").as[String]
                     session.set("callbacks", ujson.write(data))
-
                 })
-                .exec(http("Submit Credentials")
+                .exec(http("Submit Callback with Credentials")
                     .post(config.authnUrl)
                     .disableUrlEncoding
-                    .asJson
                     .header("Accept-API-Version", "resource=2.0, protocol=1.0")
-                    .body(StringBody("${callbacks}")
-                    )
+                    .asJson
+                    .body(StringBody("${callbacks}"))
                     .check(status.is(200))
-                    .check(jsonPath("$.tokenId").find.saveAs("ssoToken"))
+                    //.check(jsonPath("$.tokenId"))
+                    .check(jsonPath("$.tokenId").find.optional.saveAs("tokenId"))
+                    .check(jsonPath("$").find.optional.saveAs("callbacks"))
                 )
+                // If there is no tokenId found or the response is non 200 then enter into Progressive
+                // Profiling flow.
+                .doIf(session => !session.contains("tokenId")) {
+                    exec(session => {
+                        var data = ujson.read(session("callbacks").as[String])
+                        data("callbacks")(0)("input")(0)("value") = true
+                        data("callbacks")(1)("input")(0)("value") = true
+                        session.set("callbacks", ujson.write(data))
+                    })
+                    .exec(http("Progressive Profile Callback")
+                        .post(config.authnUrl)
+                        .disableUrlEncoding
+                        .header("Accept-API-Version", "protocol=2.1,resource=1.0")
+                        .asJson
+                        .body(StringBody("${callbacks}"))
+                        .check(status.is(200))
+                        .check(jsonPath("$.tokenId").find.saveAs("tokenId"))
+                    )
+                }
             }
         }
 
