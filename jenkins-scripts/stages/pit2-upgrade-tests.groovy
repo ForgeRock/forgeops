@@ -15,7 +15,7 @@ void runStage(PipelineRun pipelineRun) {
     def fraasTag = 'fraas-production'
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('google-cloud') {
+        node('pit2-upgrade') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
 
