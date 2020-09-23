@@ -14,7 +14,7 @@ void runStage(PipelineRun pipelineRun) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('google-cloud') {
+        node('pit2-greenfield') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
 
