@@ -54,6 +54,10 @@ fi
 NETWORK=${NETWORK:-"projects/$PROJECT/global/networks/default"}
 SUB_NETWORK=${SUB_NETWORK:-"projects/$PROJECT/regions/$REGION/subnetworks/default"}
 
+# Create a static IP
+CREATE_STATIC_IP="${CREATE_STATIC_IP:-false}"
+STATIC_IP_NAME="${STATIC_IP_NAME:-$NAME}"
+
 # Uncomment to use preemptible nodes, or export PREEMPTIBLE="" to override
 PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
 
@@ -136,3 +140,12 @@ kubectl create ns prod
 kubectl create clusterrolebinding cluster-admin-binding \
     --clusterrole=cluster-admin \
     --user=$(gcloud config get-value core/account)
+
+# Create static ip if $CREATE_STATIC_IP set to true
+if [ "$CREATE_STATIC_IP" == true ]; then
+  echo "Creating static IP ${STATIC_IP_NAME}..."
+  gcloud compute addresses create "$STATIC_IP_NAME" --project "$PROJECT" --region "$REGION"
+  ip=$(gcloud compute addresses describe "$STATIC_IP_NAME" --project "$PROJECT" --region "$REGION" | grep "address:"  | awk '{print $2}')
+  echo -e "\nStatic IP: $ip"
+  echo -e "\nDon't forget to delete the IP address in the GCP console or when running cluster_down.sh when finished otherwise you will be billed.\n"
+fi
