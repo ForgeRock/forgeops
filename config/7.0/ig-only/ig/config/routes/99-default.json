@@ -14,7 +14,7 @@
           "nosniff"
         ]
       },
-      "entity": "hello and Welcome to OpenIG. Your path is ${request.uri.path}. OpenIG is using the default handler for this route with fix-up header"
+      "entity": "Hello TEST and welcome to OpenIG. Your path is ${request.uri.path}. OpenIG is using the default handler for this route"
     },
     "monitor": {
       "enabled": true
