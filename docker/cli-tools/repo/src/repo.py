@@ -16,6 +16,7 @@ def run(*args):
         raise Exception(result.stderr.decode().strip())
     return result.stdout.decode().strip()
 
+# Parses tag for sprint_date, sprint_name, patch
 def parse_tag(tag):
     sprint_date_str, sprint_name = tag.split('-')
     sprint_date = datetime.datetime.strptime(sprint_date_str, SPRINT_DATE_FMT)
@@ -27,13 +28,14 @@ def parse_tag(tag):
     patch = '0'
     return sprint_date, sprint_name, patch
 
+# Determines the tag prior to the current tag
 def find_last_tag(args):
     if args.tag_name:
         tag_name = args.tag_name
     else:
         tag_name = active_tag()
     try:
-        sprint_date, sprint_name, patch = parse_tag(tag_name)
+        sprint_date, _sprint_name, _patch = parse_tag(tag_name)
     except ValueError as e:
         print("tag didn't meet proper format")
     except Exception as e:
@@ -66,6 +68,8 @@ def find_last_tag(args):
     return '{}-{}'.format(last_tag[0].strftime(SPRINT_DATE_FMT),
                          last_tag[1])
 
+# creates github release draft containing provided notes and tag
+# uploads provided assets to the draft release
 def create_release_notes(args):
     try:
         token = os.environ['GH_TOKEN'].strip()
@@ -85,8 +89,24 @@ def create_release_notes(args):
     except Exception as e:
         print(e)
         sys.exit(1)
-    print('release created')
-
+    print('Release {} created'.format(args.tag_name))
+    try: 
+        for p in args.asset:
+            with open(p, "rb") as asset:
+                _, name = os.path.split(p) #grab the file name
+                res = requests.post(res.json()["upload_url"].split("{")[0], 
+                                    data = asset,
+                                    params = {"name": name},
+                                    headers={'Authorization': f'token {token}',
+                                    "Content-Type": "text/plain"},
+                                    timeout=30)
+                res.raise_for_status()
+                print('{} uploaded'.format(name))
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+    
+# determines the current tag using git cli
 def active_tag():
     try:
         tag_name = ""
@@ -94,7 +114,6 @@ def active_tag():
         tag_names = run('git', 'tag', '--points-at', commit_sha).split('\n')
         for t in tag_names:
             try:
-                parsed = parse_tag(t)
                 tag_name = t
             except ValueError:
                 # move on from an invalid tag
@@ -146,6 +165,11 @@ def main():
     release_notes_parser.add_argument('-t', '--tag-name', default=active_tag(),
                                 help=('tag name of release. defaults to '
                                       'active tag'))
+    
+    release_notes_parser.add_argument('-a', '--asset', action="append", default=[],
+                                help=('path to a file to be used as a release asset '
+                                      'can be specified multiple times.'))
+
     release_notes_parser.add_argument('notes', type=argparse.FileType('r'),
                                 default=sys.stdin)
     release_notes_parser.set_defaults(func=create_release_notes)
@@ -161,3 +185,7 @@ def main():
 
     args = parser.parse_args()
     args.func(args)
+
+
+if __name__ == "__main__":
+    main()

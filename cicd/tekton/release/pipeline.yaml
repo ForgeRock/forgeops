@@ -10,19 +10,9 @@ spec:
     - name: git-repo
       type: git
   tasks:
-    - name: release-notes
-      params:
-        - name: gitrevision
-          value: $(params.gitrevision)
-      taskRef:
-        name: release-notes
-      resources:
-        inputs:
-          - name: git-repo
-            resource: git-repo
     - name: build-images
       params:
-        - name: tag_name
+        - name: gitrevision
           value: $(params.gitrevision)
         - name: profile
           value: image-tag
@@ -35,6 +25,20 @@ spec:
       resources:
         inputs:
           - name: forgeops
+            resource: git-repo
+    - name: release-notes
+      params:
+        - name: gitrevision
+          value: $(params.gitrevision)
+        - name: docker-repo
+          value: 'gcr.io/forgeops-public'
+      taskRef:
+        name: release-notes
+      runAfter:
+      - build-images
+      resources:
+        inputs:
+          - name: git-repo
             resource: git-repo
 
 ---
@@ -51,7 +55,7 @@ spec:
   tasks:
     - name: build-internal-images
       params:
-        - name: tag_name
+        - name: gitrevision
           value: $(params.gitrevision)
         - name: profile
           value: image-tag
@@ -65,3 +69,4 @@ spec:
         inputs:
           - name: forgeops
             resource: git-repo
+            

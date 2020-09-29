@@ -11,5 +11,6 @@ changelog.md:
 	gitchangelog  $(RELEASE_REVS) > changelog.md
 
 release: changelog.md
-	forgeops create-release-notes changelog.md
+	skaffold render --digest-source=remote -p image-tag --default-repo=${DOCKER_REPO} > quickstart.yaml
+	forgeops create-release-notes --asset=quickstart.yaml changelog.md
 
