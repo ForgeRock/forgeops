@@ -25,7 +25,7 @@ bin/printSecrets.sh
 
 ## Documentation
 
-Please see the (ForgeOps)[https://backstage.forgerock.com/docs/forgeops/7/start-here.html] documentation.
+Please see the [ForgeOps documentation](https://backstage.forgerock.com/docs/forgeops/7/start-here.html).
 
 This GitHub repository is a read-only mirror of
 ForgeRock's [Bitbucket Server repository](https://stash.forgerock.org/projects/CLOUD/repos/forgeops). Users
