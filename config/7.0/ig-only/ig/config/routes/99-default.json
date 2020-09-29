@@ -1,12 +1,23 @@
 {
   "handler": {
     "type": "StaticResponseHandler",
-    "config" : {
+    "config": {
       "status": 200,
-      "entity": "Hello TEST and Welcome to OpenIG. Your path is ${request.uri.path}. OpenIG is using the default handler for this route."
+      "headers": {
+        "Cache-Control": [
+          "none"
+        ],
+        "Content-Type": [
+          "text/plain"
+        ],
+        "X-Content-Type-Options": [
+          "nosniff"
+        ]
+      },
+      "entity": "hello and Welcome to OpenIG. Your path is ${request.uri.path}. OpenIG is using the default handler for this route with fix-up header"
     },
     "monitor": {
       "enabled": true
-    }   
+    }
   }
 }
