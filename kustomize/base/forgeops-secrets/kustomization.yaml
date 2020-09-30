@@ -1,0 +1,10 @@
+kind: ""
+apiversion: ""
+commonLabels:
+#  vendor: forgerock - label removed
+  app: forgeops-secrets
+resources:
+- role.yaml
+- roleBinding.yaml
+- serviceAccount.yaml
+- job.yaml
