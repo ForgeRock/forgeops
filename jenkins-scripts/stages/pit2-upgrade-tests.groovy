@@ -45,6 +45,8 @@ void runStage(PipelineRun pipelineRun) {
                         COMPONENTS_DSCTS_IMAGE_UPGRADE_REPOSITORY       : 'gcr.io/forgerock-io/ds/pit1',
                         STASH_LODESTAR_BRANCH                           : commonModule.LODESTAR_GIT_COMMIT,
                         STASH_FORGEOPS_BRANCH                           : 'fraas-production',
+                        TIMEOUT                                         : '2',
+                        TIMEOUT_UNIT                                    : 'HOURS'
                     ]
 
                     // Binary upgrade tests
