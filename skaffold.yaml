@@ -112,8 +112,6 @@ kind: Config
 # Default profile
 build: &default-build
   artifacts: *default-artifacts
-  local: 
-    push: true
   tagPolicy:
     sha256: {}
 deploy: &default-deploy
