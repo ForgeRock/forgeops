@@ -53,7 +53,7 @@ patchesStrategicMerge:
             limits:
               memory: 6Gi
             requests:
-              cpu: 2000m
+              cpu: 8000m
               memory: 6Gi
 
 - |-
