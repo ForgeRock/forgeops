@@ -5,9 +5,14 @@
     "entityId" : "default",
     "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=IdmIntegrationService,ou=services,ou=am-config",
     "sunServiceID" : null,
-    "objectClass" : [ "top", "sunServiceComponent" ],
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
     "pathParams" : { },
-    "ou" : [ "default" ]
+    "ou" : [
+      "default"
+    ]
   },
   "data" : {
     "provisioningSigningKeyAlias" : "openidm-selfservice-key",

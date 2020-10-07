@@ -22,7 +22,7 @@
       "collection" : false
     },
     "contextPath" : "/am",
-    "fixedValue" : "https://&{fqdn}",
+    "fixedValue" : "&{am.server.protocol|https}://&{am.server.fqdn}",
     "_id" : "default",
     "source" : "FIXED_VALUE"
   }

@@ -1,0 +1,7 @@
+kind: ""
+apiVersion: ""
+commonLabels:
+  app: am-config-upgrader
+  vendor: forgerock
+resources:
+- job.yaml

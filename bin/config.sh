@@ -138,6 +138,42 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 
 # End of arg parsing
 
+apply_placeholders(){
+
+	#****** APPLY PLACEHOLDERS ******#
+	printf "\nReplacing missing placeholders using AM config upgrader...\n\n"
+	printf "Skaffold is used to run the AM upgrader job. Ensure your default-repo is set.\n\n"
+	sleep 3
+
+	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+	
+	cp -R "$DOCKER_ROOT/am/config"  "$DOCKER_ROOT/am-config-upgrader/"
+	rm -fr "$DOCKER_ROOT/config"
+
+	echo "Removing any existing config upgrader jobs..."
+	kubectl delete job am-config-upgrader || true
+
+	# Deploy AM config upgrader job
+	echo "Deploying AM config upgrader job..."
+	exp=$(skaffold run -p config-upgrader)
+
+	# Check to see if AM config upgrader pod is running
+	echo "Waiting for AM config upgrader to come up."
+	while ! [[ "$(kubectl get pod -l app=am-config-upgrader --field-selector=status.phase=Running)" ]];
+	do
+			sleep 5;
+	done
+	printf "AM config upgrader is responding..\n\n"
+
+	pod=`kubectl get pod -l app=am-config-upgrader -o jsonpath='{.items[0].metadata.name}'`
+
+	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+
+	kubectl exec $pod -- /home/forgerock/export.sh - | tar -C $DOCKER_ROOT/am-config-upgrader -xvf  -
+	
+	cp -R "$DOCKER_ROOT/am-config-upgrader/config/"  "$DOCKER_ROOT/am/config"
+	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+}
 
 # clear the product configs $1 from the docker directory.
 clean_config()
@@ -229,6 +265,7 @@ export_config(){
 			del=$(skaffold delete -p amster-export)
 			;;
 		am)
+			# Export AM configuration
 			printf "\nExporting AM configuration..\n\n"
 
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
@@ -237,6 +274,9 @@ export_config(){
 
 			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
 			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
+
+			# Apply Placeholders
+			apply_placeholders
 			;;
 		*)
 			echo "Export not supported for $p"

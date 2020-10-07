@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: am-config-upgrader
+spec:
+  template:
+    metadata:
+      labels:
+        app: am-config-upgrader
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: am-config-upgrader
+        image: am-config-upgrader
+        imagePullPolicy: IfNotPresent
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+  backoffLimit: 1
+  activeDeadlineSeconds: 300

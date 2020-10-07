@@ -33,6 +33,7 @@ LODESTAR_GIT_COMMIT = getLodestarCommit()
 /** Docker image metadata for individual ForgeRock products. */
 dockerImages = [
         'am'        : DockerImagePromotion.load('docker/7.0/am/Dockerfile', 'gcr.io/forgerock-io/am-base', steps),
+        'am-config-upgrader' : DockerImagePromotion.load('docker/7.0/am-config-upgrader/Dockerfile', 'gcr.io/forgerock-io/am-config-upgrader', steps),
         'amster'    : DockerImagePromotion.load('docker/7.0/amster/Dockerfile', 'gcr.io/forgerock-io/amster', steps),
         'ds-cts'    : DockerImagePromotion.load('docker/7.0/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
         'ds-util'   : DockerImagePromotion.load('docker/7.0/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds', steps),

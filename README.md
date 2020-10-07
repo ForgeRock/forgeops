@@ -143,7 +143,9 @@ Configuration is exported to `docker/$version/amster/config`.
 
 **AM export**  
 AM configuration export works differently. Due to the large number of config files in file based configuration, we don't want to export all files. So the export identifies only the updated configuration and exports any updated files.  
-These updated files are exported to `docker/$version/am/config`.
+These updated files are exported to `docker/$version/am/config`.  
+
+Editing AM configuration in the AM UI will rewrite the configuration files in the AM pod.  Any placeholders(commons expressions) will be replaced with the actual value.  The export function triggers a job to reinstate all placeholders into the configuration files.
 
 ```bash
 # Export all configurations to the docker folder
@@ -151,8 +153,6 @@ bin/config.sh export
 # Export the IDM configuration to the docker folder
 bin/config.sh --component idm export
 ```
-
-**`NOTE`** All configuration except the commons placeholders are exported.  These will need to be restored where necessary. 
 
 **SAVE**  
 The `save` command copies the contents of the Docker configuration *back* to the `config/` folder where it can be versioned in Git.  

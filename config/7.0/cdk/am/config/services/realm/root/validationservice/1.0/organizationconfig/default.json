@@ -22,7 +22,7 @@
     },
     "_id" : "default",
     "validGotoDestinations" : [
-      "https://&{fqdn}/*?*"
+      "&{am.server.protocol|https}://&{fqdn}/*?*"
     ]
   }
 }
