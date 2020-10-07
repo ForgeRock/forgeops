@@ -40,6 +40,7 @@ class AMRestAuthNSim extends Simulation {
         scenario("Rest login")
         .during(config.duration) {
             feed(userFeeder)
+            .exec(flushCookieJar) // need this otherwise same user is used for each thread
             .exec(http("Rest login")
                 .post("/json/realms/root/authenticate")
                 .disableUrlEncoding
