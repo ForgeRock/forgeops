@@ -85,7 +85,7 @@ ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
 ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
 
 # Add Helm repo
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
 
 # Deploy ingress controller Helm chart
 helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
