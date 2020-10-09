@@ -19,7 +19,7 @@
       "actions"    : "*"
     },
     {
-      "pattern"    : "config/ui/themelogin",
+      "pattern"    : "config/ui/themerealm",
       "roles"      : "*",
       "methods"    : "read",
       "actions"    : "*"
