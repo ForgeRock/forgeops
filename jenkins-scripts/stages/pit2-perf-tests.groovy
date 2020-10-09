@@ -29,6 +29,8 @@ void runStage(PipelineRun pipelineRun) {
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                         EXT_FORGEOPS_PATH       : forgeopsPath,
                         PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
+                        CHECK_REGRESSION        : true,
+                        MAX_VARIATION           : '0.10',
                     ]
 
                     def stagesCloud = [:]
@@ -41,6 +43,7 @@ void runStage(PipelineRun pipelineRun) {
                         def config = config_common.clone()
                         config += [
                             TEST_NAME       : "platform",
+                            BASELINE_RPS    : '[1983,1722,1136,360]',
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -54,6 +57,7 @@ void runStage(PipelineRun pipelineRun) {
                         def config = config_common.clone()
                         config += [
                             TEST_NAME       : "authn_rest",
+                            BASELINE_RPS    : '2550',
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -67,6 +71,7 @@ void runStage(PipelineRun pipelineRun) {
                         def config = config_common.clone()
                         config += [
                             TEST_NAME       : "access_token",
+                            BASELINE_RPS    : '[3075,3115]',
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -80,6 +85,7 @@ void runStage(PipelineRun pipelineRun) {
                         def config = config_common.clone()
                         config += [
                             TEST_NAME       : "simple_managed_users",
+                            BASELINE_RPS    : '[5688,0,0,0,1803,3977,1274,955]',
                         ]
 
                         withGKEPyrockNoStages(config)
