@@ -5,8 +5,6 @@
 # - `cp mini.sh my-cluster.sh`
 # - `source my-cluster.sh && ./cluster-up.sh`
 #
-
-
 set -o errexit
 set -o pipefail
 
@@ -67,10 +65,12 @@ PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
 # And add this to the first gcloud command:
 #    --cluster-version "$KUBE_VERSION" \
 
-
 # Number of nodes in each zone
 NUM_NODES=${NUM_NODES:-"1"} # Primary Node Pool
 DS_NUM_NODES=${DS_NUM_NODES:-"1"}
+
+# BY default we disable autoscaling for CDM. If you wish to use autoscaling, uncomment the following:
+#AUTOSCALE="--enable-autoscaling --min-nodes 0 --max-nodes 3"
 
 gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --zone "$ZONE" \
@@ -83,7 +83,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --disk-type "pd-ssd" --disk-size "100" \
     --metadata disable-legacy-endpoints=true \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
-    "$PREEMPTIBLE" \
+    $PREEMPTIBLE \
     --node-labels "$DEFAULT_POOL_LABELS" \
     --enable-stackdriver-kubernetes \
     --enable-ip-alias \
@@ -91,12 +91,12 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --network "$NETWORK" \
     --subnetwork "$SUB_NETWORK" \
     --default-max-pods-per-node "110" \
-    --enable-autoscaling --min-nodes "0" --max-nodes "3" \
     --no-enable-master-authorized-networks \
     --addons HorizontalPodAutoscaling,ConfigConnector \
     --workload-pool "$PROJECT.svc.id.goog" \
     --labels "createdby=$CREATOR" \
-    --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0
+    --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
+    $AUTOSCALE  # Note: Do not quote this variable. It needs to expand
 
 
 # Create the DS pool. This pool does not autoscale.
