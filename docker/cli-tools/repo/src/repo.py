@@ -94,13 +94,13 @@ def create_release_notes(args):
         for p in args.asset:
             with open(p, "rb") as asset:
                 _, name = os.path.split(p) #grab the file name
-                res = requests.post(res.json()["upload_url"].split("{")[0], 
+                res_upload = requests.post(res.json()["upload_url"].split("{")[0], 
                                     data = asset,
                                     params = {"name": name},
                                     headers={'Authorization': f'token {token}',
                                     "Content-Type": "text/plain"},
                                     timeout=30)
-                res.raise_for_status()
+                res_upload.raise_for_status()
                 print('{} uploaded'.format(name))
     except Exception as e:
         print(e)
