@@ -3,10 +3,9 @@
 # Change cluster name to a unique name that can include alphanumeric characters and hyphens only.
 export NAME="medium"
 
-# cluster-up.sh retrieves the region from the user's gcloud config.  Uncomment below to override:
+# cluster-up.sh retrieves the region from the user's gcloud config.
+# NODE_LOCATIONS refers to the zones to be used by CDM in the region. If your region doesn't include zones a,b or c then uncomment and set the REGION, ZONE and NODE_LOCATIONS appropriately to override:
 # export REGION=us-east1
-
-# Available zones vary between regions. If your region doesn't include zones a,b and c then uncomment below to override:
 # export NODE_LOCATIONS="$REGION-b,$REGION-c,$REGION-d"
 # export ZONE="$REGION-b" # required for cluster master
 
