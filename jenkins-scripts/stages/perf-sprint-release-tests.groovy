@@ -7,12 +7,12 @@
  */
 
 
-import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.FailureOutcome
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.Status
 
-void runStage(PipelineRun pipelineRun) {
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
     def stageName = 'PERF Sprint Release'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
@@ -20,7 +20,6 @@ void runStage(PipelineRun pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
-                pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {

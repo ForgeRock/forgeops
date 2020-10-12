@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2020 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -11,7 +11,7 @@
 //=================================================
 
 import com.forgerock.pipeline.PullRequestBuild
-import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def build() {
@@ -69,7 +69,7 @@ void buildImage(String directoryName) {
  *
  * @param pipelineRun Used for running tests as part of the pipeline
  */
-def postBuildTests(PipelineRun pipelineRun) {
+def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
         Random random = new Random()
         def parallelTestsMap = [

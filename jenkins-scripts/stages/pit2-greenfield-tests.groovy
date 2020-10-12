@@ -6,9 +6,9 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-void runStage(PipelineRun pipelineRun) {
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
     def stageName = 'PIT2 Greenfield'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
@@ -16,8 +16,6 @@ void runStage(PipelineRun pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('pit2-greenfield') {
             stage(stageName) {
-                pipelineRun.updateStageStatusAsInProgress()
-
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {

@@ -16,11 +16,11 @@ import com.forgerock.pipeline.forgeops.DockerImage
  * Globally scoped git commit information
  */
 FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnStdout: true).trim()
-
-/**
- * Globally scoped git commit information
- */
 FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+FORGEOPS_GIT_COMMITTER = sh(returnStdout: true, script: 'git show -s --pretty=%cn').trim()
+FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
+FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
+FORGEOPS_GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
 /** Globally scoped git commit information for the Lodestar repo */
 LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'

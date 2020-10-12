@@ -6,21 +6,19 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 
 /**
  * Tag current commit as ready-for-dev-pipelines: the tag will be use in DEV pipelines for k8s/pit1.
  */
-void runStage(PipelineRun pipelineRun) {
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def tagBaseName = 'ready-for-dev-pipelines'
     def tagName = "${env.BRANCH_NAME}-${tagBaseName}"
 
     pipelineRun.pushStageOutcome("create-tag-${tagName}", stageDisplayName: "Tag ${tagName}") {
         node('build&&linux') {
             stage("Tag ${tagName}") {
-                pipelineRun.updateStageStatusAsInProgress()
-
                 checkout scm
                 sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
 
