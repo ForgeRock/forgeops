@@ -14,8 +14,6 @@ export ACR_NAME="forgeops"
 # PRIMARY NODE POOL VALUES
 export VM_SIZE=Standard_DS3_v2
 export NODE_COUNT=1
-export MIN=1
-export MAX=2
 
 # DS NODE POOL VALUES
 export CREATE_DS_POOL=false

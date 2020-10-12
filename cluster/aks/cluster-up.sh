@@ -44,10 +44,8 @@ VM_SIZE=${NODE_VM_SIZE:-"Standard_DS3_v2"}
 DS_VM_SIZE=${DS_NODE_VM_SIZE:-"Standard_DS3_v2"}
 NODE_OSDISK_SIZE=${NODE_OSDISK_SIZE:-80}
 
-# Primary node values
+# Primary node count
 NODE_COUNT=${NODE_COUNT:-3}
-MIN=${MIN:-1}
-MAX=${MAX:-4}
 
 # Labels to add to the default pool
 PRIMARY_POOL_LABELS="${CLUSTER_LABELS} frontend=true forgerock.io/role=primary"
@@ -66,6 +64,10 @@ if [ "$CREATE_DS_POOL" == "false" ]; then
   PRIMARY_POOL_LABELS="${PRIMARY_POOL_LABELS} ${DS_POOL_LABELS}"
 fi
 
+# By default we disable autoscaling for CDM. If you wish to use autoscaling, 
+# uncomment the following and adjust min/max-count as required:
+#AUTOSCALE="--enable-cluster-autoscaler --min-count 1 --max-count 3"
+
 # Check user is signed into Azure
 authn=$(az ad signed-in-user show | grep userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
 echo -e "\n\nYou are authenticated and logged into Azure as ${authn}.\n"
@@ -82,9 +84,6 @@ az aks create \
     --admin-username "$ADMIN_USERNAME" \
     --attach-acr "$ACR_NAME" \
     --location "$LOCATION" \
-    --enable-cluster-autoscaler \
-    --max-count $MAX \
-    --min-count $MIN \
     --node-vm-size "$VM_SIZE" \
     --node-osdisk-size 100 \
     --node-count "$NODE_COUNT" \
@@ -96,7 +95,8 @@ az aks create \
     --generate-ssh-keys \
     --network-plugin "azure" \
     --load-balancer-sku "standard" \
-    --zones 3
+    --zones 3 \
+    $AUTOSCALE  # Note: Do not quote this variable. It needs to expand
 
 # Create the DS pool. This pool does not autoscale.
 

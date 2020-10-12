@@ -14,8 +14,6 @@ export ACR_NAME="forgeops"
 # PRIMARY NODE POOL VALUES
 export VM_SIZE=Standard_F8s_v2 # vCPU*8, Mem GiB*16, Compute Intensive, Premium Storage(with caching)
 export NODE_COUNT=3
-export MIN=1
-export MAX=4
 
 # DS NODE POOL VALUES
 export CREATE_DS_POOL=true
