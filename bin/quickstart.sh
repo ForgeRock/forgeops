@@ -59,17 +59,20 @@ installdependencies () {
 
 ## Deploy the CDQ manifest
 deploycdq () {
+    echo ""
     echo "Installing Forgeops ${FORGEOPS_REPO}:${FORGEOPS_VERSION}"
     echo "Targeting namespace: ${FORGEOPS_NAMESPACE}"
     echo ""
     if [ "$FORGEOPS_VERSION" == "latest" ]; then
         # kubectl apply -f "https://github.com/${FORGEOPS_REPO}/releases/latest/download/quickstart.yaml"
         curl -sL "https://github.com/${FORGEOPS_REPO}/releases/latest/download/quickstart.yaml" 2>&1 | \
-        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | kubectl apply -f -
+        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
+        sed  "s/default.iam.example.com/${FORGEOPS_NAMESPACE}.iam.example.com/g" | kubectl apply -f -
     else
         # kubectl apply -f "https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/quickstart.yaml"
         curl -sL "https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/quickstart.yaml" 2>&1 | \
-        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | kubectl apply -f -
+        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
+        sed  "s/default.iam.example.com/${FORGEOPS_NAMESPACE}.iam.example.com/g" | kubectl apply -f -
     fi
 }
 
@@ -80,7 +83,6 @@ waitforsecrets () {
     printf "waiting for secret: idm-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret idm-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
     printf "waiting for secret: ds-passwords ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret ds-passwords &> /dev/null ; do sleep 1; printf "."; done; echo "done"
     printf "waiting for secret: ds-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret ds-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
-    echo ""
 }
 
 ## Uninstall the CDQ manifest
@@ -106,6 +108,7 @@ getsec () {
 
 ## Print secrets
 printsecrets () {
+    echo ""
     echo "Relevant passwords:"
     echo "$(getsec am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR) (amadmin user)"
     echo "$(getsec idm-env-secrets OPENIDM_ADMIN_PASSWORD) (openidm-admin user)"
@@ -115,6 +118,18 @@ printsecrets () {
     echo "$(getsec ds-env-secrets AM_STORES_USER_PASSWORD) (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))"
 
 }
+
+printurls () {
+    echo ""
+    echo "Relevant URLs:"
+    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/platform"
+    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/admin"
+    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/am"
+    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/enduser"
+
+    
+}
+
 ## OSX does not come with `timeout` pre-installed. 
 timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 
@@ -153,3 +168,7 @@ deploycdq
 ## Call waitforsecrets with a 2 minute timeout
 timeout 120s cat <( waitforsecrets )
 printsecrets
+printurls
+
+echo ""
+echo "Enjoy Forgeops!"
