@@ -719,7 +719,7 @@
                 }
             },
             "recon/assoc" : {
-                "dnTemplate" : "ou=assoc,ou=recon,dc=openidm,dc=forgerock,dc=com",
+                "dnTemplate" : "ou=assoc,ou=recon,dc=openidm,dc=forgerock,dc=io",
                 "namingStrategy" : {
                     "dnAttribute" : "fr-idm-reconassoc-reconid",
                     "type" : "clientDnNaming"
