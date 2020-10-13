@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
-SECRET_AGENT_VERSION=master
+SECRET_AGENT_VERSION=${SECRET_AGENT_VERSION:-latest}
 
 USAGE="Usage: $0 install|remove"
 
 install() {
-    kustomize build \
-        "github.com/ForgeRock/secret-agent//config/default/?ref=${SECRET_AGENT_VERSION}" | kubectl apply -f -
+    kubectl apply -f https://github.com/ForgeRock/secret-agent/releases/${SECRET_AGENT_VERSION}/download/secret-agent.yaml
 }
 
 remove() {
     echo "Warning this is very destructive and will remove all managed secrets"
     echo "Waiting 5 seconds before removing."
     sleep 5
-    kustomize build \
-        "github.com/ForgeRock/secret-agent//config/default" | kubectl delete -f -
+    kubectl delete -f https://github.com/ForgeRock/secret-agent/releases/${SECRET_AGENT_VERSION}/download/secret-agent.yaml
+
 }
 
 cmd=${1}

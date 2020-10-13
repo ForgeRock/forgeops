@@ -228,10 +228,8 @@ By default, the latest setup-profile version (7.0) is deployed.
 
 ## Secrets
 
-CDK and CDM deployments use a default set of secrets. Instead of using the default secrets, you can
-randomly generate secrets for the ForgeRock Identity Platform using the forgeops-secrets tool.
-For more information about randomly generating secrets, see the
-[forgeops-secrets README](docker/forgeops-secrets/forgeops-secrets-image/README.md)
+CDK and CDM deployments use secrets generated and managed by the secret-agent operator. For more information
+about the secret agent operator, see [secret-agent README](https://github.com/ForgeRock/secret-agent/blob/master/README.md)
 
 
 ## Development SSL Certificates
