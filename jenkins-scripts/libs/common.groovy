@@ -54,10 +54,10 @@ String getCurrentTag(String productName) {
 }
 
 /** Does the branch support PaaS releases */
-boolean branchSupportsPaasReleases() {
+boolean branchSupportsIDCloudReleases() {
     return 'master' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
-            || (!isPR() && "${env.BRANCH_NAME}".startsWith('paas-ga-')) \
-            || (isPR() && "${env.CHANGE_TARGET}".startsWith('paas-ga-'))
+            || (!isPR() && "${env.BRANCH_NAME}".startsWith('idcloud-')) \
+            || (isPR() && "${env.CHANGE_TARGET}".startsWith('idcloud-'))
 }
 
 def getCurrentProductCommitHashes() {
