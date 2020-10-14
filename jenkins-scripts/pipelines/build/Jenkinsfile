@@ -71,7 +71,7 @@ timestamps {
         pipeline.build()
     }
 
-    if (commonModule.branchSupportsPaasReleases()) {
+    if (commonModule.branchSupportsIDCloudReleases()) {
         pipeline.postBuildTests(pipelineRun)
 
         if (isPR()) {

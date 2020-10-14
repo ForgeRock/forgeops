@@ -40,7 +40,7 @@ if (env.TAG_NAME) {
             pipelineTriggers([cron('H 0 * * *')]),
             parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
     ])
-} else if (env.BRANCH_NAME.startsWith('paas-ga-')) {
+} else if (env.BRANCH_NAME.startsWith('idcloud-')) {
     properties([
             disableConcurrentBuilds(),
             buildDiscarder(logRotator(numToKeepStr: '20')),
