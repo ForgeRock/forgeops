@@ -13,7 +13,7 @@ spec:
         app: admin-ui
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.1.0-3627a9f62a3a692552d0412339d1be184232c5d6
+      - image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.1.0-4239d8f379002e7094edbbe43a55285e9071577c
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
