@@ -19,6 +19,8 @@ DRY_RUN = bool(int(os.environ.get('GCR_PRUNE_DRY_RUN', 0)))
 # export MAX_UPDATE_AGE=DAYS maximum age of a digest
 # (delete if currrent_time - last_update > MAX_UPDATE_AGE)
 ENGINEERING_DEVOPS_MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
+ENGINEERING_PIT_MAX_AGE = datetime.timedelta(int(os.environ.get('ENGINEERINGPIT_MAX_UPDATE_AGE', 30)))
+FORGEOPS_PUBLIC_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEOPS_PUBLIC_AGE', 365)))
 FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 90)))
 FORGEROCK_IO_PULL_REQUEST_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 30)))
 
@@ -41,8 +43,10 @@ _black_list_repos = [
 
    ]
 
-EXCLUDE = [ re.compile(i) for i in _black_list_repos ]
+EXCLUDE = tuple( re.compile(i) for i in _black_list_repos )
 GIT_SHA1_PATTERN = re.compile(r'^[0-9a-f]{7,40}$')
+
+# helpers
 
 def repo_tags(repo):
     url = f'{REGISTRY_BASE}/{repo}/tags/list'
@@ -81,26 +85,41 @@ def is_pr_repo(repo):
     image_promotion_level = repo.split('/')[-1]
     return image_promotion_level == 'pull-requests'
 
+# Digest Filtering
+
 def filter_lookup(repo):
     """Select which filtering algorithm to use, depending on the repo.
     """
-    registry = repo.split('/')[0]
-    if registry == 'forgerock-io':
-        return filter_forgerock_io_digests
-    else:
-        return filter_engineering_devops_digests
+    for route, filter_func in FILTER_ROUTES:
+        if route.match(repo):
+            return filter_func
 
-def filter_engineering_devops_digests(repo, digests):
+def filter_forgeops_public_digests(repo, digests):
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    return filter_digests_by_age(repo, digests, FORGEOPS_PUBLIC_MAX_AGE)
+
+def filter_engineeringpit_digests(repo, digests):
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    return filter_digests_by_age(repo, digests, ENGINEERING_PIT_MAX_AGE)
+
+def filter_digests_by_age(repo, digests, age):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
     """
     filtered = {}
     for digest_id, digest_meta in digests.items():
-        stale = image_is_stale(digest_id, digest_meta, ENGINEERING_DEVOPS_MAX_AGE)
+        stale = image_is_stale(digest_id, digest_meta, age)
         if stale:
             filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
+
+def filter_engineering_devops_digests(repo, digests):
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    return filter_digests_by_age(repo, digests, ENGINEERING_DEVOPS_MAX_AGE)
 
 def filter_forgerock_io_digests(repo, digests):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
@@ -122,6 +141,16 @@ def filter_forgerock_io_digests(repo, digests):
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
+
+filter_route = (
+    (r'^engineering-devops/*', filter_engineering_devops_digests,),
+    (r'^forgerock-io/*', filter_forgerock_io_digests, ),
+    (r'^forgeops-public/*', filter_forgeops_public_digests, ),
+    (r'^engineeringpit/lodestar-images/*', filter_forgeops_public_digests, )
+)
+FILTER_ROUTES = [ (re.compile(i[0]), i[1]) for i in filter_route]
+
+
 
 def registry_repos(exclude_images):
     response = authed_session.get(f'{REGISTRY_BASE}/_catalog')
@@ -157,8 +186,11 @@ def prune_registry(dry_run=DRY_RUN):
     for repo in registry_repos(EXCLUDE):
         log.info(f'pruning {repo}')
         filter_digests = filter_lookup(repo)
-        digests_to_remove = filter_digests(repo, repo_tags(repo))
-        prune_manifests(repo, digests_to_remove, dry_run=dry_run)
+        if filter_digests:
+            digests_to_remove = filter_digests(repo, repo_tags(repo))
+            prune_manifests(repo, digests_to_remove, dry_run=dry_run)
+        else:
+            log.info(f'no images in repo: {repo}')
 
 @app.route('/', methods=['POST'])
 def index():
