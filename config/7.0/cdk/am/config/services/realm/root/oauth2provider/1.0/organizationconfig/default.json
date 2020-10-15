@@ -79,7 +79,7 @@
       "tlsOcspResponderUri" : null,
       "tlsOcspResponderCert" : null,
       "allowedAudienceValues" : [
-        
+
       ]
     },
     "coreOIDCConfig" : {
@@ -131,7 +131,7 @@
     "advancedOIDCConfig" : {
       "storeOpsTokens" : true,
       "defaultACR" : [
-        
+
       ],
       "supportedRequestParameterEncryptionEnc" : [
         "A256GCM",
@@ -151,9 +151,7 @@
         "A192CBC-HS384",
         "A256CBC-HS512"
       ],
-      "authorisedIdmDelegationClients" : [
-        "idm-provisioning"
-      ],
+      "authorisedIdmDelegationClients" : [ ],
       "alwaysAddClaimsToToken" : false,
       "supportedUserInfoSigningAlgorithms" : [
         "ES384",

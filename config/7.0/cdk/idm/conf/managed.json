@@ -71,7 +71,7 @@
                         "viewable" : false,
                         "searchable" : false,
                         "minLength" : 8,
-                        "userEditable" : true,
+                        "userEditable" : false,
                         "scope" : "private",
                         "isProtected": true,
                         "usageDescription" : "",
