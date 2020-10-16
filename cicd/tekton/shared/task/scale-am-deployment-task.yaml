@@ -20,22 +20,7 @@ spec:
           name: "slack-webhook-$(params.namespace)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
-    - name: scale-am-tozero
-      image: gcr.io/cloud-builders/kubectl
-      script: |
-        #!/usr/bin/env bash
-        {
-          kubectl -n $(params.namespace) scale deployment am --replicas=0
-        } || {
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Failed to scale AM to zero. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
-          exit 1
-        }
-
-    - name: wait-10-seconds
-      image: gcr.io/cloud-builders/kubectl
-      command: ["bash", "-c"]
-      args: ["sleep 10; echo 'done' "]
-      
+     
     - name: scale-am-todesired
       image: gcr.io/cloud-builders/kubectl
       script: |
@@ -53,7 +38,7 @@ spec:
         #!/usr/bin/env bash
         {
           sleep 15
-          kubectl -n $(params.namespace) get pods --no-headers=true | awk '!/Completed/{print $1}' | xargs  kubectl wait -n $(params.namespace) pod --for=condition=Ready
+          kubectl -n $(params.namespace) get pods --no-headers=true | awk '!/Completed/{print $1}' | xargs  kubectl wait -n $(params.namespace) pod --for=condition=Ready --timeout=60s
         } || {
           curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Some pods are not healthy after AM restart. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
