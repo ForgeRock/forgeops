@@ -47,25 +47,6 @@
                         "userCredential" : "password",
                         "userRoles" : "authzRoles"
                     },
-                    "defaultRoles" : [
-                        "internal/role/openidm-authorized"
-                    ]
-                },
-                "enabled" : false
-            },
-            {
-                "name" : "PASSTHROUGH",
-                "properties" : {
-                    "augmentSecurityContext": {
-                        "type" : "text/javascript",
-                        "file" : "auth/populateAsManagedUser.js"
-                    },
-                    "queryOnResource" : "system/ldap/account",
-                    "propertyMapping" : {
-                        "authenticationId" : "uid",
-                        "userRoles" : "authzRoles"
-                    },
-                    "managedUserLink" : "systemLdapAccounts_managedUser",
                     "defaultUserRoles" : [
                         "internal/role/openidm-authorized"
                     ]
