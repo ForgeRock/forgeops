@@ -249,13 +249,11 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/large
-
-# Platform deployment sample used for PIT and PERF tests
-- name: platform-deployment
+- name: dev
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/lodestar
+      path: ./kustomize/overlay/7.0/dev
 
 # Platform deployment without default UI projects. UI to be installed separately, for development
 - name: no-ui
