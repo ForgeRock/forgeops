@@ -44,9 +44,9 @@ echo "Waiting for AM server at ${ALIVE} "
 
 wait_for_openam
 
-echo "Giving AM some extra time... TODO: Remove"
+echo "Giving AM some extra time..."
 
-sleep 100
+sleep 200
 
 # Execute Amster if the configuration is found.
 if [  ${IMPORT_SCRIPT} ]; then
