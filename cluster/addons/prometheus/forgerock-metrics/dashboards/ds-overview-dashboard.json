@@ -2007,7 +2007,7 @@
       "pluginVersion": "7.0.3",
       "targets": [
         {
-          "expr": "max(\n  max_over_time(ds_replication_replica_updates_inbound_queue{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
+          "expr": "max(\n  max_over_time(ds_replication_replica_updates_outbound_queue{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
