@@ -9,10 +9,13 @@ export NAME="small"
 # export NODE_LOCATIONS="$REGION-b,$REGION-c,$REGION-d"
 # export ZONE="$REGION-b" # required for cluster master
 
-# The machine types for primary and ds node pools
+# PRIMARY NODE POOL VALUES
 export MACHINE=e2-standard-8
-export DS_MACHINE=n2-standard-8
 export PREEMPTIBLE=""
+
+# DS NODE POOL VALUES
+export CREATE_DS_POOL=false
+export DS_MACHINE=n2-standard-8
 
 # Values for creating a static IP
 export CREATE_STATIC_IP=false # set to true to create a static IP.

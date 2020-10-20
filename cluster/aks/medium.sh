@@ -12,10 +12,10 @@ export CLUSTER_LABELS="forgerock.io/cluster=cdm-medium"
 export ACR_NAME="forgeops" 
 
 # PRIMARY NODE POOL VALUES
-export VM_SIZE=Standard_F16s_v2 # vCPU*16, Mem GiB*32, Compute Intensive, Premium Storage(with caching)
-export NODE_COUNT=6
+export VM_SIZE=Standard_DS5_v2 # vCPU*16, Mem GiB*56, Premium Storage(with caching)
+export NODE_COUNT=12
 
 # DS NODE POOL VALUES
-export CREATE_DS_POOL=true
-export DS_VM_SIZE=Standard_DS5_v2 # vCPU*16, Mem GiB*56, Premium Storage(with caching)
-export DS_NODE_COUNT=6
+export CREATE_DS_POOL=false
+# export DS_VM_SIZE=Standard_DS5_v2 # vCPU*16, Mem GiB*56, Premium Storage(with caching)
+# export DS_NODE_COUNT=6
