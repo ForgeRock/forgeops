@@ -28,7 +28,6 @@ REGISTRY_BASE = 'https://gcr.io/v2'
 try:
     credentials, project = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
     authed_session = AuthorizedSession(credentials)
-    app = Flask(__name__)
 except Exception as e:
     log.error(e)
     sys.stdout.flush()
@@ -191,20 +190,6 @@ def prune_registry(dry_run=DRY_RUN):
             prune_manifests(repo, digests_to_remove, dry_run=dry_run)
         else:
             log.info(f'no images in repo: {repo}')
-
-@app.route('/', methods=['POST'])
-def index():
-    try:
-        prune_registry()
-    except requests.HTTPError as e:
-        log.error(e)
-        return e.response.reason, e.response.status_code
-    except Exception as e:
-        log.error(e)
-        return f'Bad Request: {e}', 400
-    # Flush the stdout to avoid log buffering.
-    sys.stdout.flush()
-    return ('', 204)
 
 if __name__ == '__main__':
     prune_registry()

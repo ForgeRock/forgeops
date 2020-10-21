@@ -1,20 +1,18 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/engineering-devops/gcr-pruner:latest', '-f', 'etc/gke/pruner/Dockerfile', 'etc/gke/pruner' ]
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/gcp-pruner:latest', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'push', 'gcr.io/engineering-devops/gcr-pruner:latest']
+  args: [ 'push', 'gcr.io/$PROJECT_ID/gcp-pruner:latest']
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
     - 'beta'
     - 'run'
     - 'deploy'
-    - '--service-account=gcr-pruner@engineering-devops.iam.gserviceaccount.com'
-    - '--image=gcr.io/engineering-devops/gcr-pruner:latest'
+    - '--service-account=gcp-pruner@$PROJECT_ID.iam.gserviceaccount.com'
+    - '--image=gcr.io/$PROJECT_ID/gcp-pruner:latest'
     - '--timeout=600'
     - '--platform=managed'
-    - '--region=us-east1'
-    - 'gcr-pruner'
+    - '--region=us-east4'
+    - 'gcp-pruner'
 images:
-- 'gcr.io/engineering-devops/gcr-pruner:latest'
-
-
+- 'gcr.io/$PROJECT_ID/gcp-pruner:latest'

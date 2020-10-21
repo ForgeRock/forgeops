@@ -105,6 +105,12 @@ def print_account_warning():
     print('To set the active account, run:\n\t$ gcloud config set account `ACCOUNT`\n')
 
 
+def run_backup(source_registry, target_registry):
+        activate_service_account()
+        backup_images(source_registry, target_registry)
+        print_account_warning()
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print(usage_str)
