@@ -255,7 +255,7 @@ export_config(){
 
 			# Copy files locally
 			echo "Copying the export to the ./tmp directory"
-			kubectl cp $pod:/var/tmp/amster/realms/root/ "$DOCKER_ROOT/amster/config"
+			kubectl cp $pod:/var/tmp/amster/realms/ "$DOCKER_ROOT/amster/config"
 
 			printf "Dynamic config exported\n\n"
 
