@@ -28,8 +28,8 @@ ZONE=${ZONE:-"$REGION-a"}
 MACHINE=${MACHINE:-e2-standard-8}
 DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 
-# Set to "false" if you do not want to create a separate pool for ds nodes
-CREATE_DS_POOL="${CREATE_DS_POOL:-true}"
+# Create a separate node pool for ds
+CREATE_DS_POOL="${CREATE_DS_POOL:-false}"
 
 
 # Get current user

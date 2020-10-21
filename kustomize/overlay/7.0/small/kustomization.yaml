@@ -116,4 +116,3 @@ patchesStrategicMerge:
           requests:
             storage: 100Gi
         storageClassName: fast
-        

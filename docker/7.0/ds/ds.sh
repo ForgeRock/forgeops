@@ -20,8 +20,6 @@ if [ ! -z "$2" ]; then
   HOST="$2"
 fi
 
-k="kubectl exec ds-0 -it --"
-
 # All the backends we know about..
 backends="ou=identities ou=tokens ou=am-config dc=openidm,dc=forgerock,dc=io"
 dr_args=""
@@ -71,7 +69,7 @@ kcmd dsbackup purge --noPropertiesFile --offline \
     --olderThan '12h'
     ;;
 *)
-  kubectl exec ds-0 -it -- $* $pwd_args \
+  kubectl exec $HOST -it -- $* $pwd_args \
 ;;
 esac
 

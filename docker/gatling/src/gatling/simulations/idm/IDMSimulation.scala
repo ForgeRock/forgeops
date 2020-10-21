@@ -25,10 +25,10 @@ class IDMSimulation extends Simulation {
 
     def getGeneratedUser(userId: String) : String = {
         val stringJson: String =
-            """  {"userName": "testuser%s",
+            """  {"userName": "user.%s",
                   "givenName": "givenname%s",
                   "sn": "tester%s",
-                  "mail": "testuser%s@forgerock.com",
+                  "mail": "user.%s@forgerock.com",
                   "password": "T35tr0ck123"}
             """.format(userId, userId, userId, userId).stripMargin
         stringJson
@@ -49,48 +49,36 @@ class IDMSimulation extends Simulation {
         .during(config.duration) {
             feed(userFeeder)
             .exec(amAuth.refreshAccessToken)
-            .exec(
-                http("Query for existing user")
-                .get(config.idmUrl + "/managed/user")
-                .queryParam("_queryFilter", "/userName eq \"testuser${id}\"")
+            .exec(http("Deleting existing user")
+                .delete(config.idmUrl + "/managed/user/${uid}")
                 .header("Authorization", "Bearer ${accessToken}")
-                .check(jsonPath("$.result[0]._id").optional.saveAs("uid"))
+                .header("if-match", "*")
             )
-            .doIf( "${uid.exists()}") {
-                exec(http("Deleting existing user")
-                    .delete(config.idmUrl + "/managed/user/${uid}")
-                    .header("Authorization", "Bearer ${accessToken}")
-                    .header("if-match", "*")
-                )
-            }
+            // .doIf( "${uid.exists()}") {
+            //     exec(http("Deleting existing user")
+            //         .delete(config.idmUrl + "/managed/user/${uid}")
+            //         .header("Authorization", "Bearer ${accessToken}")
+            //         .header("if-match", "*")
+            //     )
+            // }
         }
 
-    // The create test checks to ensure the id does not exist
-    // this is slower - but is more realistic
     val createExec =
         exec(amAuth.authenticate)
         .during(config.duration) {
             feed(userFeeder)
             .exec(amAuth.refreshAccessToken)
             .exec(
-              http("Query for existing user")
-                .get(config.idmUrl + "/managed/user")
-                .queryParam("_queryFilter", "/userName eq \"testuser${id}\"")
-                .header("Authorization", "Bearer ${accessToken}")
-                .check(jsonPath("$.result[0]._id").optional.saveAs("uid"))
-            ) // if the uid does not exist, then create it..
-            .doIf( "${uid.isUndefined()}") {
-                exec(
-                    http("Create managed user via POST")
-                      .post(config.idmUrl + "/managed/user?_action=create")
-                      .body(StringBody(getGeneratedUser("${id}"))).asJson
-                      .header("Authorization", "Bearer ${accessToken}")
-                )
-            }
+                http("Create managed user via POST")
+                    .post(config.idmUrl + "/managed/user?_action=create")
+                    .body(StringBody(getGeneratedUser("${id}"))).asJson
+                    .header("Authorization", "Bearer ${accessToken}")
+            )
         }
+
     // If DELETE_USERS is true, then run the delete simulation first
     val chainedScenario = if (config.deleteUsers)
-            scenario("IDM Delete then Create").exec(deleteExec).exec(createExec);
+            scenario("IDM Delete").exec(deleteExec);
         else
             scenario("IDM Create").exec(createExec);
 

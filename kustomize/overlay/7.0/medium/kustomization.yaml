@@ -83,7 +83,7 @@ patchesStrategicMerge:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 850Gi
+            storage: 500Gi
         storageClassName: fast
 
 - |-
@@ -93,17 +93,17 @@ patchesStrategicMerge:
   metadata:
     name: ds-idrepo
   spec:
-    replicas: 3
+    replicas: 2
     template:
       spec:
         containers:
           - name: ds
             resources:
               requests:
-                memory: 8Gi
-                cpu: 4000m
-              limits:
                 memory: 11Gi
+                cpu: 8000m
+              limits:
+                memory: 14Gi
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -113,5 +113,5 @@ patchesStrategicMerge:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 512Gi
+            storage: 1000Gi
         storageClassName: fast
