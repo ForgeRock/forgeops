@@ -164,7 +164,8 @@ profiles:
     - *DS-IDREPO_KANIKO
     cluster: *kaniko-cluster
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/prod-ds
@@ -176,7 +177,8 @@ profiles:
     - *IDM_KANIKO
     cluster: *kaniko-cluster
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/prod-apps
@@ -189,12 +191,11 @@ profiles:
     - *AMSTER_KANIKO
     cluster: *kaniko-cluster
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/prod-load
-
-
 
 # Smoke tests
 - name: smoke
@@ -202,7 +203,8 @@ profiles:
     artifacts: *kaniko-artifacts
     cluster: *kaniko-cluster
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/smoke
@@ -282,7 +284,8 @@ profiles:
     - *DS-IDREPO
     - *LDIF-IMPORTER
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/am-only
@@ -317,7 +320,8 @@ profiles:
     - *DS-IDREPO
     - *LDIF-IMPORTER
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/persistence
@@ -330,7 +334,8 @@ profiles:
     - *IDM
     - *AMSTER
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/am-idm-only
@@ -340,7 +345,8 @@ profiles:
     artifacts:
     - *AMSTER
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/amster-export
@@ -350,7 +356,8 @@ profiles:
     artifacts:
       - *AM_CONFIG_UPGRADER
     tagPolicy:
-      gitCommit: {}
+      gitCommit:
+        variant: AbbrevCommitSha
   deploy:
     kustomize:
       path: ./kustomize/base/am-config-upgrader
