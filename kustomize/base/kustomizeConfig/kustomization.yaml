@@ -12,8 +12,6 @@ configMapGenerator:
   # These global variables can be used to parameterize your deployments.
   # The FQDN and URLs here should match your ingress or istio gateway definitions
   literals:
-  - SUBDOMAIN=iam
-  - DOMAIN=example.com
   - FQDN=default.iam.example.com
   - AM_URL=https://$(FQDN)/am
   - AM_ADMIN_URL=https://$(FQDN)/am/ui-admin/
@@ -42,23 +40,9 @@ generatorOptions:
 
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
-- name: DOMAIN
-  fieldref:
-    fieldpath: data.DOMAIN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
 - name: FQDN
   fieldref:
     fieldpath: data.FQDN
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: SUBDOMAIN
-  fieldref:
-    fieldpath: data.SUBDOMAIN
   objref:
     apiVersion: v1
     kind: ConfigMap
