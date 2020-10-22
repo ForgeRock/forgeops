@@ -7,10 +7,6 @@ spec:
     - name: forgeops
       type: git
   params:
-  - name: namespace
-    type: string
-    description: Target namespace of this pipeline
-    default: prod
   - name: skaffold-profile
     type: string
     description: Skaffold profile to deploy
