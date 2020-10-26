@@ -11,6 +11,9 @@ COPY --chown=forgerock:root common  /opt/opendj/
 COPY --chown=forgerock:root idrepo  /opt/opendj/
 COPY --chown=forgerock:root scripts /opt/opendj/scripts
 
+# To experiment with a modified entrypoint, uncomment:
+# COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
+
 ARG profile_version
 RUN bin/setup.sh "$profile_version" && \
     bin/relax-security-settings.sh  && \
