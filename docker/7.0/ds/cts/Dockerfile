@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:7.1.0-32119329eb700eaeac2e1a16cee1a2c9caaa2f6b
+FROM gcr.io/forgerock-io/ds:7.1.0-32119329eb700eaeac2e1a16cee1a2c9caaa2f6b
 USER root
 RUN chown -R forgerock:root /opt/opendj
 USER forgerock
