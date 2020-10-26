@@ -29,7 +29,7 @@ DESCRIPTION
             am, ds, idm, ig, must match a product in docker/7.0
 
         IMAGE
-            gcr.io/forgerock-io/am/mypr:v8.7 must be valid image to base prudct image off of
+            gcr.io/forgerock-io/am/mypr:v8.7 base product image
 
     Optional arguments
         SOURCE
