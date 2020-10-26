@@ -28,25 +28,65 @@ wait_for_openam()
       echo "Got Response code ${response}"
       if [ ${response} = "200" ];
       then
-         echo "AM web app is up and dynamic config can be imported"
+         echo "AM web app is up"
          break
       fi
 
       echo "Will continue to wait..."
       sleep 5
    done
-
-	# Sleep additional time in case DS is not quite up yet.
-	echo "About to begin import"
 }
 
-echo "Waiting for AM server at ${ALIVE} "
+checkPass () {
+   while true
+   do
+      local HOST=$1
+      local USER_DN=$2
+      local USER_UID=$3
+      local USER_PASS=$4
+      echo "checking password for ${USER_UID},${USER_DN} "
+      ldapsearch -h $HOST -p 1389 -D "${USER_UID},${USER_DN}" -w $USER_PASS -b $USER_DN "objectclass=*"  > /dev/null
+      SEARCH_RESPONSE=$?
+      case "${SEARCH_RESPONSE}" in
+         "0")
+            echo "Password for ${USER_DN} correct"
+            break
+         ;;
+         "32")
+            echo "User ${USER_UID},${USER_DN} not found, skipping..."
+         ;;
+         "49")
+            echo "Password for ${USER_DN} not correct, skipping..."
+         ;;
+         *)
+            echo "ERROR: Error when searching for user, response $SEARCH_RESPONSE"
+            exit 1
+         ;;
+      esac
+      sleep 5
+   done
+}
+
+wait_for_ds_password_change () {
+   checkPass ds-idrepo-0.ds-idrepo ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
+   checkPass ds-idrepo-0.ds-idrepo ou=admins,ou=identities "uid=am-identity-bind-account" ${AM_STORES_USER_PASSWORD}
+   checkPass ds-idrepo-0.ds-idrepo ou=admins,ou=am-config "uid=am-config" ${AM_STORES_APPLICATION_PASSWORD}
+   checkPass ds-cts-0.ds-cts ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
+}
+
+echo "Waiting for AM server at ${ALIVE}..."
 
 wait_for_openam
 
+echo "Waiting for DS passwords to be updated..."
+
+wait_for_ds_password_change
+
 echo "Giving AM some extra time..."
 
-sleep 200
+sleep 100
+
+echo "About to begin dynamic data import"
 
 # Execute Amster if the configuration is found.
 if [  ${IMPORT_SCRIPT} ]; then

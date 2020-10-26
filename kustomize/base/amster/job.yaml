@@ -20,6 +20,8 @@ spec:
             name: platform-config
         - secretRef:
             name: amster-env-secrets
+        - secretRef:
+            name: ds-env-secrets
         image: amster
         imagePullPolicy: IfNotPresent
         name: amster
