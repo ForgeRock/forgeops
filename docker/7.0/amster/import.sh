@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Import dynamic config.
 
+set -x pipefail
+
 DIR=`pwd`
 
 IMPORT_SCRIPT=${IMPORT_SCRIPT:-"${DIR}/amster-scripts/import.amster"}
@@ -44,19 +46,20 @@ checkPass () {
       local USER_DN=$2
       local USER_UID=$3
       local USER_PASS=$4
-      echo "checking password for ${USER_UID},${USER_DN} "
-      ldapsearch -h $HOST -p 1389 -D "${USER_UID},${USER_DN}" -w $USER_PASS -b $USER_DN "objectclass=*"  > /dev/null
+      local FULL_USER_DN="${USER_UID},${USER_DN}"
+      echo "Checking password for ${FULL_USER_DN} on ${HOST}"
+      ldapsearch -h $HOST -p 1389 -D "${FULL_USER_DN}" -w $USER_PASS -b $USER_DN "objectclass=*"  > /dev/null
       SEARCH_RESPONSE=$?
       case "${SEARCH_RESPONSE}" in
          "0")
-            echo "Password for ${USER_DN} correct"
+            echo "Password for ${FULL_USER_DN} correct"
             break
          ;;
          "32")
-            echo "User ${USER_UID},${USER_DN} not found, skipping..."
+            echo "${FULL_USER_DN} not found, skipping..."
          ;;
          "49")
-            echo "Password for ${USER_DN} not correct, skipping..."
+            echo "Password for ${FULL_USER_DN} not correct, skipping..."
          ;;
          *)
             echo "ERROR: Error when searching for user, response $SEARCH_RESPONSE"
@@ -113,6 +116,5 @@ if [  ${IMPORT_SCRIPT} ]; then
          exit 1
    fi
 fi
-
 
 echo  "done"
