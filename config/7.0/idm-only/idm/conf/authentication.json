@@ -25,7 +25,7 @@
                 "properties" : {
                     "queryOnResource" : "internal/user",
                     "username" : "openidm-admin",
-                    "password" : "openidm-admin",
+                    "password" : "&{openidm.admin.password|openidm-admin}",
                     "defaultUserRoles" : [
                         "internal/role/openidm-authorized",
                         "internal/role/openidm-admin"

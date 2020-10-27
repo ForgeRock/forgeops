@@ -40,7 +40,7 @@
     "internal/user": [
       {
         "id" : "openidm-admin",
-        "password" : "&{openidm-admin-password|openidm-admin}"
+        "password" : "&{openidm.admin.password|openidm-admin}"
       },
       {
         "id" : "anonymous",
