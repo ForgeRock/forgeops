@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "KeyStoreSecretStore",
+    "entityId" : "default/default-keystore/mappings/am.services.oauth2.remote.consent.request.encryption",
+    "uid" : "ou=am.services.oauth2.remote.consent.request.encryption,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/default-keystore/mappings/am.services.oauth2.remote.consent.request.encryption",
+    "_type" : {
+      "_id" : "KeyStoreSecretStore",
+      "name" : "KeyStoreSecretStore",
+      "collection" : false
+    },
+    "aliases" : [
+      "selfserviceenctest"
+    ],
+    "secretId" : "am.services.oauth2.remote.consent.request.encryption"
+  }
+}
