@@ -22,7 +22,7 @@ void runStage(PipelineRun pipelineRun) {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
-
+                cloud_utils.authenticate_gcloud()
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 2)
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
