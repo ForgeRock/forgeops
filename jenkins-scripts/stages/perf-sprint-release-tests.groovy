@@ -22,10 +22,10 @@ void runStage(PipelineRun pipelineRun) {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
-                
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 2)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
+
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 2)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
                 dir('lodestar') {
                     def config_common = [
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
@@ -86,9 +86,9 @@ void runStage(PipelineRun pipelineRun) {
                         "${env.BUILD_URL}/${normalizedStageName}/")
                 }
 
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 1)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 1)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 1)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 1)
             }
         }
     }
