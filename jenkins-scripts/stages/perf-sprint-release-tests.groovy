@@ -22,18 +22,20 @@ void runStage(PipelineRun pipelineRun) {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
-                
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 2)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
+
+                cloud_utils.authenticate_gcloud()
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 2)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 8)
+
                 dir('lodestar') {
                     def config_common = [
-                        STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-                        EXT_FORGEOPS_PATH       : forgeopsPath,
-                        PIPELINE_NAME           : 'ForgeOps - Perf-Sprint-Release',
-                        CHECK_REGRESSION        : true,
-                        MAX_VARIATION           : '0.10',
-                        CLUSTER_DOMAIN          : 'perf-sprint-release.forgeops.com',
+                        STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
+                        EXT_FORGEOPS_PATH    : forgeopsPath,
+                        PIPELINE_NAME        : 'ForgeOps - Perf-Sprint-Release',
+                        CHECK_REGRESSION     : true,
+                        MAX_VARIATION        : '0.10',
+                        CLUSTER_DOMAIN       : 'perf-sprint-release.forgeops.com',
                     ]
 
                     def stagesCloud = [:]
@@ -45,8 +47,8 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = config_common.clone()
                         config += [
-                            TEST_NAME       : "platform_long",
-                            BASELINE_RPS    : '[1983,1722,1136,360]',
+                            TEST_NAME   : "platform_long",
+                            BASELINE_RPS: '[1983,1722,1136,360]',
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -59,8 +61,8 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = config_common.clone()
                         config += [
-                            TEST_NAME       : "authn_rest_long",
-                            BASELINE_RPS    : '2550',
+                            TEST_NAME   : "authn_rest_long",
+                            BASELINE_RPS: '2550',
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -73,22 +75,22 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = config_common.clone()
                         config += [
-                            TEST_NAME       : "access_token_long",
-                            BASELINE_RPS    : '[3075,3115]',
+                            TEST_NAME   : "access_token_long",
+                            BASELINE_RPS: '[3075,3115]',
                         ]
 
                         withGKEPyrockNoStages(config)
                     }
 
                     summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
-                        normalizedStageName, "${normalizedStageName}.html")
+                            normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                        "${env.BUILD_URL}/${normalizedStageName}/")
+                            "${env.BUILD_URL}/${normalizedStageName}/")
                 }
 
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 1)
-                scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 1)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 1)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 1)
             }
         }
     }
