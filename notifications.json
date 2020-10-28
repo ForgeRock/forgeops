@@ -2,6 +2,7 @@
   "rules":[{
     "inverted":false,
     "match": "/**/*",
+    "events": ["Push", "BranchCreate"],
     "notifications":[{
       "address":"cloud-deployment@forgerock.com",
       "prefix":"",
