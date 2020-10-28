@@ -20,6 +20,7 @@ chgPass () {
         ;;
         "32")
             echo "${FULL_USER_DN} not found, skipping..."
+            exit 1
         ;;
         *)
             echo "ERROR: Error when searching for user, response $SEARCH_RESPONSE"
