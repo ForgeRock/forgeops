@@ -370,8 +370,8 @@
                         "ldapAttribute": "cn"
                     },
                     "password": {
-                        "type": "simple",
-                        "ldapAttribute": "userPassword"
+                        "type": "json",
+                        "ldapAttribute": "fr-idm-password"
                     },
                     "accountStatus": {
                         "type": "simple",
