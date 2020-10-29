@@ -55,11 +55,15 @@ checkPass () {
             echo "Password for ${FULL_USER_DN} correct"
             break
          ;;
-         "32")
-            echo "${FULL_USER_DN} not found, skipping..."
-         ;;
          "49")
             echo "Password for ${FULL_USER_DN} not correct, skipping..."
+            # TODO: To remove later
+            # Dump whole user entry for debug
+            ldapsearch -h $HOST -p 1389 -D "${FULL_USER_DN}" -w $USER_PASS -b $USER_DN "objectclass=*"
+         ;;
+         "32")
+            echo "${FULL_USER_DN} not found, skipping..."
+            exit 1
          ;;
          *)
             echo "ERROR: Error when searching for user, response $SEARCH_RESPONSE"
