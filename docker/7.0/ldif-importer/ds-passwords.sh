@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PS4='+ $(date "+%H:%M:%S")\011 '
 set -eox pipefail
 
 chgPass () {

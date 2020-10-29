@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Import dynamic config.
 
+PS4='+ $(date "+%H:%M:%S")\011 '
 set -x pipefail
 
 DIR=`pwd`
