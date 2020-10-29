@@ -9,6 +9,9 @@
 # The argument passed to this script should be the path to restore from. For example, gs://my-ds/my-backup/
 # If no path is passed on the command line, a normal start is assumed and no recovery will be attempted.
 
+set -x
+env
+
 BACKUP_PATH="$1"
 # If no restore path provided just perform init and exit
 if [ -z "$BACKUP_PATH" ]; then
