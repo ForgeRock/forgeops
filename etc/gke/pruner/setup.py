@@ -1,6 +1,6 @@
 """setup - setuptools based setup"""
 
-from setuptools import setup
+from setuptools import setup, find_packages
 __version__ = '1.0.0'
 
 setup(name='pruner',
@@ -11,7 +11,7 @@ setup(name='pruner',
       url='http://stash.forgerock.org/scm/cloud/forgeops.git',
       license="CDDL",
       py_modules=['pruner'],
-      packages=[],
+      packages=find_packages(),
       install_requires=['pruner', 'requests', 'gunicorn', 'flask', 'google-auth', 'google-api-python-client'],
       entry_points={
           'console_scripts': ['pruner=pruner:main']
