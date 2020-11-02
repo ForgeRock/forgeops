@@ -34,33 +34,22 @@ void runStage(PipelineRun pipelineRun) {
                         CHECK_REGRESSION        : true,
                         MAX_VARIATION           : '0.10',
                         CLUSTER_DOMAIN          : 'perf-sprint-release.forgeops.com',
+                        TIMEOUT                 : '12',
+                        TIMEOUT_UNIT            : 'HOURS',
                     ]
 
                     def stagesCloud = [:]
 
-                    // perf platform test
-                    def subStageName = 'platform_long'
-                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
-
-                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def config = config_common.clone()
-                        config += [
-                            TEST_NAME       : "platform_long",
-                            BASELINE_RPS    : '[1983,1722,1136,360]',
-                        ]
-
-                        withGKEPyrockNoStages(config)
-                    }
-
                     // perf am authn rest test
-                    subStageName = 'am_authn_long'
+                    def subStageName = 'am_authn_long'
                     stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('authn_rest')
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = config_common.clone()
                         config += [
-                            TEST_NAME       : "authn_rest_long",
+                            TEST_NAME       : "authn_rest",
                             BASELINE_RPS    : '2550',
+                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries: 10000000",
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -73,8 +62,24 @@ void runStage(PipelineRun pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
                         def config = config_common.clone()
                         config += [
-                            TEST_NAME       : "access_token_long",
+                            TEST_NAME       : "access_token",
                             BASELINE_RPS    : '[3075,3115]',
+                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries: 10000000",
+                        ]
+
+                        withGKEPyrockNoStages(config)
+                    }
+
+                    // perf platform test
+                    subStageName = 'platform_long'
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
+
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                        def config = config_common.clone()
+                        config += [
+                            TEST_NAME       : "platform",
+                            BASELINE_RPS    : '[1983,1722,1136,360]',
+                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h",
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -87,7 +92,7 @@ void runStage(PipelineRun pipelineRun) {
                 }
 
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 1)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 0)
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 1)
             }
         }
