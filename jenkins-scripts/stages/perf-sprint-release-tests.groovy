@@ -49,7 +49,7 @@ void runStage(PipelineRun pipelineRun) {
                         config += [
                             TEST_NAME       : "authn_rest",
                             BASELINE_RPS    : '2550',
-                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries: 10000000",
+                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries=10000000",
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -64,7 +64,7 @@ void runStage(PipelineRun pipelineRun) {
                         config += [
                             TEST_NAME       : "access_token",
                             BASELINE_RPS    : '[3075,3115]',
-                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries: 10000000",
+                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries=10000000",
                         ]
 
                         withGKEPyrockNoStages(config)
