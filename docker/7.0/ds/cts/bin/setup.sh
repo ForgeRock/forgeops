@@ -15,6 +15,13 @@ setup-profile --profile ${AM_CTS} \
               --set am-cts/tokenExpirationPolicy:am-sessions-only \
               --set am-cts/amCtsAdminPassword:password
 
+# Reduce changelog purge interval to 12 hours
+dsconfig set-synchronization-provider-prop \
+          --provider-name Multimaster\ Synchronization \
+          --set replication-purge-delay:43200\ s \
+          --no-prompt \
+          --offline
+
 # The default in 7.x is to use PBKDF2 password hashing - which is many order of magnitude slower than
 # SHA-512. We recommend leaving PBKDF2 as the default as it more secure.
 # If you wish to revert to the less secure SHA-512, Uncomment these lines:

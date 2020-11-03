@@ -10,6 +10,10 @@ build:
     context: .
     docker:
       dockerfile: idrepo/Dockerfile
+  - image: ds-cts
+    context: .
+    docker:
+      dockerfile: cts/Dockerfile
   tagPolicy:
     gitCommit:
       variant: AbbrevCommitSha
