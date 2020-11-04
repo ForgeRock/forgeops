@@ -138,9 +138,9 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 
 # End of arg parsing
 
-apply_placeholders(){
+#****** UPGRADE CONFIG AND REAPPLY PLACEHOLDERS ******#
+upgrade_config(){
 
-	#****** APPLY PLACEHOLDERS ******#
 	printf "\nReplacing missing placeholders using AM config upgrader...\n\n"
 	printf "Skaffold is used to run the AM upgrader job. Ensure your default-repo is set.\n\n"
 	sleep 3
@@ -275,8 +275,8 @@ export_config(){
 			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
 			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
 
-			# Apply Placeholders
-			apply_placeholders
+			# Upgrade config and reapply placeholders
+			upgrade_config
 			;;
 		*)
 			echo "Export not supported for $p"
@@ -391,6 +391,9 @@ save)
 sync)
 	export_config
 	save_config
+	;;
+upgrade)
+	upgrade_config
 	;;
 restore)
 	git restore "$PROFILE_ROOT"
