@@ -286,13 +286,6 @@
       "methods"   : "action",
       "actions"   : "deleteNotificationsForTarget",
       "customAuthz" : "request.additionalParameters.target === (context.security.authorization.component + '/' + context.security.authorization.id)"
-    },
-    {
-      "pattern"   : "managed/*",
-      "roles"     : "internal/role/openidm-authorized",
-      "methods"   : "read",
-      "actions"   : "*",
-      "customAuthz" : "ownIDP()"
     }
   ]
 }
