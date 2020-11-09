@@ -151,7 +151,7 @@
         "A192CBC-HS384",
         "A256CBC-HS512"
       ],
-      "authorisedIdmDelegationClients" : [ ],
+      "authorisedIdmDelegationClients" : ["idm-provisioning"],
       "alwaysAddClaimsToToken" : false,
       "supportedUserInfoSigningAlgorithms" : [
         "ES384",

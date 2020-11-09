@@ -37,7 +37,7 @@
       "clientJwtPublicKey" : null
     },
     "advancedOAuth2ClientConfig" : {
-      "grantTypes" : [ "client_credentials", "idm_delegation" ],
+      "grantTypes" : [ "client_credentials" ],
       "updateAccessToken" : null,
       "requestUris" : [ ],
       "clientUri" : [ ],
