@@ -171,7 +171,7 @@
       "com.sun.identity.monitoring=off",
       "org.forgerock.openidconnect.ssoprovider.maxcachesize=5000",
       "openam.session.case.sensitive.uuid=false",
-      "com.sun.identity.cookie.samesite=NONE",
+      "com.sun.identity.cookie.samesite=off",
       "org.forgerock.openam.xui.user.session.validation.enabled=true",
       "com.sun.identity.authentication.multiple.tabs.used=false",
       "org.forgerock.services.cts.store.ttlsupport.enabled=true",
