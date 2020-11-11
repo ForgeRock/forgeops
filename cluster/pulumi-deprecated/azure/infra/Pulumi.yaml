@@ -1,3 +1,0 @@
-name: azure-infra
-runtime: nodejs
-description: Azure TS Pulumi Program

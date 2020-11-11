@@ -1,7 +1,0 @@
-encryptionsalt: v1:z4rBrBih+jc=:v1:vlgq1tV3bxrprqCU:KtARTbACpnZVWeQTqXzGVDVftEgejw==
-config:
-  gcp:region: us-east1
-  gcp:zone: us-east1-b
-  bucket:name: my-new-bucket
-  bucket:enable: "false"
-  vpc:enable: "true"

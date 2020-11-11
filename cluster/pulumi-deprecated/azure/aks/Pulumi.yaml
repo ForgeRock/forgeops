@@ -1,3 +1,0 @@
-name: aks
-runtime: nodejs
-description: Deploy CDM in AKS

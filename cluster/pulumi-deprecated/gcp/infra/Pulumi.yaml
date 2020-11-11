@@ -1,3 +1,0 @@
-name: gcp-infra
-runtime: nodejs
-description: Deploy infra to support GKE deployments

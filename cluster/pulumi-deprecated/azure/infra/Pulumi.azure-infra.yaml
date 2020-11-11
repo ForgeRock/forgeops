@@ -1,8 +1,0 @@
-encryptionsalt: v1:OGMSatR2kak=:v1:wXpXDZgHmyHrdIR1:f8WLl5uQaTIyGmX9OVsR+LZMbrHyaA==
-config:
-  azure:environment: AzureCloud
-  azure-infra:acrResourceGroupName: ContainerRegistry
-  azure-infra:location: eastus
-  azure-infra:servicePrincipalSecret:
-    secure: v1:NKBFcXBQI8qc8u59:R28qMAblGLg1+YlNTuSmDu7+6xNFm6GE
-

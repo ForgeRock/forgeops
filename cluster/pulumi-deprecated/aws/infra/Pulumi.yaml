@@ -1,3 +1,0 @@
-name: aws-infra
-runtime: nodejs
-description: AWS TS Pulumi Program
