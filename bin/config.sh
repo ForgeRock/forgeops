@@ -148,7 +148,7 @@ upgrade_config(){
 	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
 	
 	cp -R "$DOCKER_ROOT/am/config"  "$DOCKER_ROOT/am-config-upgrader/"
-	rm -fr "$DOCKER_ROOT/config"
+	rm -fr "$DOCKER_ROOT/am/config"
 
 	echo "Removing any existing config upgrader jobs..."
 	kubectl delete job am-config-upgrader || true
