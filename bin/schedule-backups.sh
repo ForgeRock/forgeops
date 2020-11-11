@@ -33,12 +33,13 @@ major_version=$(printf $ds_version| awk -F' ' '{print $1}'| cut -d'.' -f1)
 echo "DS server version: ${ds_version}"
 
 # Only back up the pods in $DSBACKUP_HOSTS. All pods can restore from the same backup
-hosts=$(kubectl -n $NAMESPACE get statefulset ds-idrepo -o jsonpath='{.spec.template.spec.initContainers[?(@.name=="initialize")].env[?(@.name=="DSBACKUP_HOSTS")].value}')
+# hosts=$(kubectl -n $NAMESPACE get statefulset ds-idrepo -o jsonpath='{.spec.template.spec.initContainers[?(@.name=="initialize")].env[?(@.name=="DSBACKUP_HOSTS")].value}')
+hosts=$(kubectl -n $NAMESPACE get configmap platform-config -o jsonpath='{.data.DSBACKUP_HOSTS}')
 # Convert comma separated values to array
 pods=($(echo "$hosts" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
 
 if [ -z "${pods}" ]; then
-    echo "No DS pods available. No backups were scheduled."
+    echo "No DS hosts provided. No backups were scheduled."
     exit -1
 fi
 echo "Targeting pods: ${pods[@]}"

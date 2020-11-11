@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: mini
   region: us-east-1
-  version: "1.17"
+  version: "1.18"
   tags:
     forgerock.io/cluster: "cdm-mini"
 
