@@ -74,8 +74,6 @@ patchesStrategicMerge:
                 cpu: 8000m
               limits:
                 memory: 14Gi
-        nodeSelector:
-          forgerock.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
@@ -106,8 +104,6 @@ patchesStrategicMerge:
                 cpu: 4000m
               limits:
                 memory: 11Gi
-        nodeSelector:
-          forgerock.io/role: ds
     volumeClaimTemplates:
     - metadata:
         name: data
