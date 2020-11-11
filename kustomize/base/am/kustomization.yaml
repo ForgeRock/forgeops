@@ -10,3 +10,5 @@ commonLabels:
 resources:
 - deployment.yaml
 - service.yaml
+# Need k8s 1.18+ to enable HPA
+# - hpa.yaml
