@@ -18,7 +18,7 @@ RUN chmod 2775 /opt/forgeops \
                     && rm -rf /tmp/pulumi \
                         && chown -R root:cli /opt/forgeops/usr/node_modules
 
-RUN helm repo add stable https://kubernetes-charts.storage.googleapis.com
+RUN helm repo add "stable" "https://charts.helm.sh/stable" --force-update
 
 ARG VERSION=latest
 ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops  

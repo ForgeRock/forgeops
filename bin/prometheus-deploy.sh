@@ -31,7 +31,7 @@ create_ns() {
 deploy() {
 
     # Add stable repo to helm
-    helm repo add stable https://kubernetes-charts.storage.googleapis.com --force-update
+    helm repo add "stable" "https://charts.helm.sh/stable" --force-update
 
     helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE
 
