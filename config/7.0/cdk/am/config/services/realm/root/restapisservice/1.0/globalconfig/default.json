@@ -17,7 +17,7 @@
   },
   "data" : {
     "defaultProtocolVersion" : "Latest",
-    "descriptionsState" : "STATIC",
+    "descriptionsState" : "DISABLED",
     "warningHeader" : false,
     "_type" : {
       "_id" : "RestApisService",
