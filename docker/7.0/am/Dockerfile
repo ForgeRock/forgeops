@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am-base/pit1:7.1.0-IDCLOUD-9dbceaad6e6676f446f339dbd021f97c17a0444f
+FROM gcr.io/forgerock-io/am-base/pit1:7.1.0-IDCLOUD-d136098c4a0693ff03b34472eed0552ed8e1f57e
 USER root
 
 RUN apt-get update && apt-get install -y git
