@@ -22,10 +22,12 @@ void runStage(PipelineRun pipelineRun) {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
+
                 cloud_utils.authenticate_gcloud()
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 8)
+                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 6)
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 2)
                 cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 8)
+
                 dir('lodestar') {
                     def config_common = [
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
@@ -70,30 +72,30 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPyrockNoStages(config)
                     }
 
-                    // perf platform test
-                    subStageName = 'platform_long'
-                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
+                    //// perf platform test
+                    //subStageName = 'platform_long'
+                    //stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
+//
+                    //dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                    //    def config = config_common.clone()
+                    //    config += [
+                    //        TEST_NAME       : "platform",
+                    //        BASELINE_RPS    : '[1983,1722,1136,360]',
+                    //        SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h",
+                    //    ]
+//
+                    //    withGKEPyrockNoStages(config)
+                    //}
 
-                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                        def config = config_common.clone()
-                        config += [
-                            TEST_NAME       : "platform",
-                            BASELINE_RPS    : '[1983,1722,1136,360]',
-                            SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h",
-                        ]
-
-                        withGKEPyrockNoStages(config)
-                    }
+                    cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
+                    cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 0)
+                    cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 0)
 
                     summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
                         normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud,
                         "${env.BUILD_URL}/${normalizedStageName}/")
                 }
-
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 0)
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 1)
             }
         }
     }
