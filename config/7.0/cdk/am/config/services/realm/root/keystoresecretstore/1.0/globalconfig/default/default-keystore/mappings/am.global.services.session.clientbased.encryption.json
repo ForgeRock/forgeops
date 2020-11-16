@@ -1,0 +1,27 @@
+{
+    "metadata": {
+        "realm": null,
+        "entityType": "KeyStoreSecretStore",
+        "entityId": "default/default-keystore/mappings/am.global.services.session.clientbased.encryption",
+        "uid": "ou=am.global.services.session.clientbased.encryption,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,dc=openam,dc=forgerock,dc=org",
+        "sunServiceID": "instance",
+        "objectClass": [
+            "top",
+            "sunServiceComponent"
+        ],
+        "pathParams": {},
+        "ou": null
+    },
+    "data": {
+        "_type": {
+            "_id": "KeyStoreSecretStore",
+            "name": "KeyStoreSecretStore",
+            "collection": false
+        },
+        "_id": "default/default-keystore/mappings/am.global.services.session.clientbased.encryption",
+        "secretId": "am.global.services.session.clientbased.encryption",
+        "aliases": [
+            "test"
+        ]
+    }
+}
