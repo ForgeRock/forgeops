@@ -3,7 +3,7 @@
         "realm": null,
         "entityType": "KeyStoreSecretStore",
         "entityId": "default/default-keystore/mappings/am.global.services.session.clientbased.encryption",
-        "uid": "ou=am.global.services.session.clientbased.encryption,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,dc=openam,dc=forgerock,dc=org",
+        "uid": "ou=am.global.services.session.clientbased.encryption,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
         "sunServiceID": "instance",
         "objectClass": [
             "top",
