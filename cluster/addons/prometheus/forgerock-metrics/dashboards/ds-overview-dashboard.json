@@ -16,8 +16,8 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 31,
-  "iteration": 1602927249086,
+  "id": 29,
+  "iteration": 1605691196328,
   "links": [],
   "panels": [
     {
@@ -49,6 +49,25 @@
       "id": 15,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -61,7 +80,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(ds_health_status_alive{service=~\"$service\",pod=~\"$pod\"})\n",
@@ -104,6 +123,25 @@
       "id": 16,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -116,7 +154,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(ds_health_status_healthy{service=~\"$service\",pod=~\"$pod\"})",
@@ -159,6 +197,25 @@
       "id": 17,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -171,7 +228,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(ds_backend_degraded_index_count{service=~\"$service\",pod=~\"$pod\"})",
@@ -214,6 +271,25 @@
       "id": 18,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -226,7 +302,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(ds_connection_handlers_ldap_active_persistent_searches{service=~\"$service\",pod=~\"$pod\"})\n",
@@ -283,6 +359,25 @@
       "id": 8,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -295,7 +390,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(increase(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))",
@@ -338,6 +433,25 @@
       "id": 9,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -350,7 +464,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(ds_current_connections{service=~\"$service\",pod=~\"$pod\"})\n",
@@ -393,6 +507,25 @@
       "id": 11,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -405,7 +538,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(ds_work_queue_requests_in_queue{service=~\"$service\",pod=~\"$pod\"})",
@@ -448,6 +581,25 @@
       "id": 13,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -460,7 +612,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "(\n  sum(increase(ds_connection_handlers_ldap_requests_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_ldap_requests_failure_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_failure_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n) / (\n  sum(increase(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n)",
@@ -1329,6 +1481,25 @@
       "id": 27,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -1341,7 +1512,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "max(\n  max_over_time(\n    ds_replication_replica_remote_replicas_receive_delay_seconds{service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
@@ -1384,6 +1555,25 @@
       "id": 29,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -1396,7 +1586,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "max(\n  max_over_time(\n    ds_replication_replica_remote_replicas_replay_delay_seconds{service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
@@ -1439,6 +1629,25 @@
       "id": 30,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -1451,7 +1660,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "max(\n  max_over_time(\n    ds_replication_replica_entries_awaiting_updates_count{service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
@@ -1494,6 +1703,25 @@
       "id": 33,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -1506,7 +1734,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(increase(ds_replication_replica_replayed_updates_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))",
@@ -1937,6 +2165,25 @@
       "id": 35,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -1949,7 +2196,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "max(\n  max_over_time(ds_replication_replica_updates_inbound_queue{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
@@ -1992,6 +2239,25 @@
       "id": 36,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -2004,7 +2270,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "max(\n  max_over_time(ds_replication_replica_updates_outbound_queue{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
@@ -2047,6 +2313,25 @@
       "id": 37,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -2059,7 +2344,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(\n  increase(ds_replication_replica_replayed_updates_conflicts_unresolved{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
@@ -2102,6 +2387,25 @@
       "id": 38,
       "options": {
         "colorMode": "value",
+        "fieldOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                }
+              ]
+            }
+          },
+          "overrides": [],
+          "values": false
+        },
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
@@ -2114,7 +2418,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "7.0.3",
+      "pluginVersion": "6.6.2",
       "targets": [
         {
           "expr": "sum(\n  increase(ds_replication_replica_replayed_updates_conflicts_resolved{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
@@ -2345,7 +2649,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 25,
+  "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -2405,8 +2709,8 @@
     ]
   },
   "time": {
-    "from": "2020-10-14T21:37:29.560Z",
-    "to": "2020-10-15T09:53:21.102Z"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -2424,5 +2728,5 @@
   "timezone": "",
   "title": "DS Overview",
   "uid": "gDnFuzcGk",
-  "version": 13
+  "version": 2
 }
