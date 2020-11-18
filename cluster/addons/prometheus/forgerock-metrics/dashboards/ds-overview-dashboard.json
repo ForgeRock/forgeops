@@ -17,7 +17,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 29,
-  "iteration": 1605691196328,
+  "iteration": 1605692162987,
   "links": [],
   "panels": [
     {
@@ -83,7 +83,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(ds_health_status_alive{service=~\"$service\",pod=~\"$pod\"})\n",
+          "expr": "sum(ds_health_status_alive{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"})\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -157,7 +157,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(ds_health_status_healthy{service=~\"$service\",pod=~\"$pod\"})",
+          "expr": "sum(ds_health_status_healthy{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -231,7 +231,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(ds_backend_degraded_index_count{service=~\"$service\",pod=~\"$pod\"})",
+          "expr": "sum(ds_backend_degraded_index_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -305,7 +305,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(ds_connection_handlers_ldap_active_persistent_searches{service=~\"$service\",pod=~\"$pod\"})\n",
+          "expr": "sum(ds_connection_handlers_ldap_active_persistent_searches{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"})\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -393,7 +393,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(increase(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))",
+          "expr": "sum(increase(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))\n+\nsum(increase(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -467,7 +467,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(ds_current_connections{service=~\"$service\",pod=~\"$pod\"})\n",
+          "expr": "sum(ds_current_connections{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"})\n",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -541,7 +541,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(ds_work_queue_requests_in_queue{service=~\"$service\",pod=~\"$pod\"})",
+          "expr": "sum(ds_work_queue_requests_in_queue{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -615,7 +615,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "(\n  sum(increase(ds_connection_handlers_ldap_requests_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_ldap_requests_failure_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_failure_seconds_total{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n) / (\n  sum(increase(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))\n)",
+          "expr": "(\n  sum(increase(ds_connection_handlers_ldap_requests_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_ldap_requests_failure_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_failure_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))\n) / (\n  sum(increase(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])) +\n  sum(increase(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -676,7 +676,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (pod) (\n  irate(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
+          "expr": "sum by (pod) (\n  irate(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -773,7 +773,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (pod) (\n  ds_connection_handlers_http_active_connections_count{service=~\"$service\",pod=~\"$pod\"}\n) +\nsum by (pod) (\n  ds_connection_handlers_ldap_active_connections_count{service=~\"$service\",pod=~\"$pod\"}\n)\n",
+          "expr": "sum by (pod) (\n  ds_connection_handlers_http_active_connections_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}\n) +\nsum by (pod) (\n  ds_connection_handlers_ldap_active_connections_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}\n)\n",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -870,7 +870,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (pod) (\n  ds_work_queue_requests_in_queue{service=~\"$service\",pod=~\"$pod\"}\n)\n",
+          "expr": "sum by (pod) (\n  ds_work_queue_requests_in_queue{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}\n)\n",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -967,13 +967,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "(\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_seconds_total{service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_seconds_total{service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n) / (\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n)",
+          "expr": "(\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n) / (\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n)",
           "interval": "",
           "legendFormat": "{{pod}} success",
           "refId": "A"
         },
         {
-          "expr": "(\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_failure_seconds_total{service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_failure_seconds_total{service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n) / (\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n)",
+          "expr": "(\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_failure_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_failure_seconds_total{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n) / (\n  sum by (pod) (\n    irate(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  ) +\n  sum by (pod) (\n    irate(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n  )\n)",
           "interval": "",
           "legendFormat": "{{pod}} failure",
           "refId": "B"
@@ -1084,7 +1084,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (pod) (\n  irate(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
+          "expr": "sum by (pod) (\n  irate(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (pod) (\n  irate(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -1182,13 +1182,13 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (service) (\n  irate(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
+          "expr": "sum by (service) (\n  irate(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "{{service}} LDAP",
           "refId": "A"
         },
         {
-          "expr": "sum by (service) (\n  irate(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
+          "expr": "sum by (service) (\n  irate(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "hide": false,
           "interval": "",
           "legendFormat": "{{service}} HTTP",
@@ -1287,7 +1287,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (sevice,type) (\n  irate(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service,type) (\n  irate(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service,type) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service,type) (\n  irate(ds_connection_handlers_http_requests_failure_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
+          "expr": "sum by (sevice,type) (\n  irate(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service,type) (\n  irate(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service,type) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service,type) (\n  irate(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "{{service}} {{type}}",
           "refId": "A"
@@ -1384,15 +1384,15 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (service) (\n  irate(ds_connection_handlers_ldap_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_http_requests_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
+          "expr": "sum by (service) (\n  irate(ds_connection_handlers_ldap_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_http_requests_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "interval": "",
           "legendFormat": "{{service}} success",
           "refId": "A"
         },
         {
-          "expr": "sum by (cluster) (\n  (\n    sum by (cluster,container_id) (\n      irate(ds_connection_handlers_ldap_requests_failure_count{cluster=\"$kubernetesCluster\"}[$__interval])\n    ) or\n    sum by (cluster,container_id) (\n      irate(ds_connection_handlers_http_requests_failure_count{cluster=\"$kubernetesCluster\"}[$__interval])\n    )\n  )\n  * on (container_id) group_left(pod) kube_pod_container_info{cluster=\"$kubernetesCluster\"}\n  * on (pod) group_left kube_pod_owner{cluster=\"$kubernetesCluster\",owner_kind=\"StatefulSet\",owner_name=~\"$statefulSet\"}\n)\n",
+          "expr": "sum by (service) (\n  irate(ds_connection_handlers_ldap_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n) or\nsum by (service) (\n  irate(ds_connection_handlers_http_requests_failure_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n)\n",
           "interval": "",
-          "legendFormat": "{{cluster}} failure",
+          "legendFormat": "{{service}} failure",
           "refId": "B"
         }
       ],
@@ -1515,7 +1515,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "max(\n  max_over_time(\n    ds_replication_replica_remote_replicas_receive_delay_seconds{service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
+          "expr": "max(\n  max_over_time(\n    ds_replication_replica_remote_replicas_receive_delay_seconds{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1589,7 +1589,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "max(\n  max_over_time(\n    ds_replication_replica_remote_replicas_replay_delay_seconds{service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
+          "expr": "max(\n  max_over_time(\n    ds_replication_replica_remote_replicas_replay_delay_seconds{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1663,7 +1663,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "max(\n  max_over_time(\n    ds_replication_replica_entries_awaiting_updates_count{service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
+          "expr": "max(\n  max_over_time(\n    ds_replication_replica_entries_awaiting_updates_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]\n  )\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1737,7 +1737,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(increase(ds_replication_replica_replayed_updates_count{service=~\"$service\",pod=~\"$pod\"}[$__range]))",
+          "expr": "sum(increase(ds_replication_replica_replayed_updates_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range]))",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1798,7 +1798,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "max_over_time(\n    ds_replication_replica_remote_replicas_receive_delay_seconds{service=~\"$service\",pod=~\"$pod\"}[1m]\n)\n",
+          "expr": "max_over_time(\n    ds_replication_replica_remote_replicas_receive_delay_seconds{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m]\n)\n",
           "interval": "",
           "legendFormat": "{{domain_name}} DS({{remote_server_id}}) → DS({{server_id}})",
           "refId": "A"
@@ -1895,7 +1895,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "max_over_time(\n    ds_replication_replica_remote_replicas_replay_delay_seconds{service=~\"$service\",pod=~\"$pod\"}[1m]\n)\n",
+          "expr": "max_over_time(\n    ds_replication_replica_remote_replicas_replay_delay_seconds{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m]\n)\n",
           "interval": "",
           "legendFormat": "{{domain_name}} DS({{remote_server_id}}) → DS({{server_id}})",
           "refId": "A"
@@ -1992,7 +1992,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum by (pod) (\n  ds_work_queue_requests_in_queue{service=~\"$service\",pod=~\"$pod\"}\n)\n",
+          "expr": "sum by (pod) (\n  ds_work_queue_requests_in_queue{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}\n)\n",
           "interval": "",
           "legendFormat": "{{pod}}",
           "refId": "A"
@@ -2089,7 +2089,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "irate(ds_replication_replica_replayed_updates_count{service=~\"$service\",pod=~\"$pod\"}[1m])\n",
+          "expr": "irate(ds_replication_replica_replayed_updates_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])\n",
           "interval": "",
           "legendFormat": "{{pod}} {{domain_name}}",
           "refId": "A"
@@ -2199,7 +2199,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "max(\n  max_over_time(ds_replication_replica_updates_inbound_queue{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
+          "expr": "max(\n  max_over_time(ds_replication_replica_updates_inbound_queue{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2273,7 +2273,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "max(\n  max_over_time(ds_replication_replica_updates_outbound_queue{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
+          "expr": "max(\n  max_over_time(ds_replication_replica_updates_outbound_queue{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2347,7 +2347,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(\n  increase(ds_replication_replica_replayed_updates_conflicts_unresolved{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
+          "expr": "sum(\n  increase(ds_replication_replica_replayed_updates_conflicts_unresolved{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2421,7 +2421,7 @@
       "pluginVersion": "6.6.2",
       "targets": [
         {
-          "expr": "sum(\n  increase(ds_replication_replica_replayed_updates_conflicts_resolved{service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
+          "expr": "sum(\n  increase(ds_replication_replica_replayed_updates_conflicts_resolved{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[$__range])\n)",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -2498,7 +2498,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "ds_backend_entry_count{service=~\"$service\",pod=~\"$pod\"}",
+          "expr": "ds_backend_entry_count{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}",
           "interval": "",
           "legendFormat": "{{pod}} {{backend}} {{base_dn}}",
           "refId": "A"
@@ -2599,7 +2599,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "max_over_time(ds_disk_free_space_bytes{service=~\"$service\",pod=~\"$pod\"}[1m])",
+          "expr": "max_over_time(ds_disk_free_space_bytes{namespace=~\"$namespace\",service=~\"$service\",pod=~\"$pod\"}[1m])",
           "interval": "",
           "legendFormat": " {{pod}} {{disk}}",
           "refId": "A"
@@ -2657,7 +2657,33 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": "Prometheus",
+        "definition": "label_values(ds_health_status_alive, namespace)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Namespace",
+        "multi": false,
+        "name": "namespace",
+        "options": [],
+        "query": "label_values(ds_health_status_alive, namespace)",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": null,
+        "current": {
+          "selected": true,
           "text": "All",
           "value": "$__all"
         },
@@ -2683,7 +2709,7 @@
       {
         "allValue": null,
         "current": {
-          "selected": false,
+          "selected": true,
           "text": "All",
           "value": "$__all"
         },
@@ -2728,5 +2754,5 @@
   "timezone": "",
   "title": "DS Overview",
   "uid": "gDnFuzcGk",
-  "version": 2
+  "version": 6
 }
