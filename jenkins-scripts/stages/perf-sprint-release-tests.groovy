@@ -23,11 +23,6 @@ void runStage(PipelineRun pipelineRun) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
-                cloud_utils.authenticate_gcloud()
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 6)
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 2)
-                cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 8)
-
                 dir('lodestar') {
                     def config_common = [
                         STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
@@ -86,10 +81,6 @@ void runStage(PipelineRun pipelineRun) {
 //
                     //    withGKEPyrockNoStages(config)
                     //}
-
-                    cloud_utils.scaleClusterNodePool('perf-sprint-release', 'ds', 'us-east4', 0)
-                    cloud_utils.scaleClusterNodePool('perf-sprint-release', 'frontend', 'us-east4', 0)
-                    cloud_utils.scaleClusterNodePool('perf-sprint-release', 'default-pool', 'us-east4', 0)
 
                     summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
                         normalizedStageName, "${normalizedStageName}.html")
