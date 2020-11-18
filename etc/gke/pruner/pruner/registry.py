@@ -79,11 +79,6 @@ def filter_forgeops_public_digests(repo, digests):
     """
     return filter_digests_by_age(repo, digests, FORGEOPS_PUBLIC_MAX_AGE)
 
-def filter_engineeringpit_digests(repo, digests):
-    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
-    """
-    return filter_digests_by_age(repo, digests, ENGINEERING_PIT_MAX_AGE)
-
 def filter_digests_by_age(repo, digests, age):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
     """
@@ -111,15 +106,28 @@ def filter_forgerock_io_digests(repo, digests):
                 if image_is_stale(digest_id, digest_meta, FORGEROCK_IO_PULL_REQUEST_MAX_AGE):
                     filtered[digest_id] = digest_meta['tag']
     else:
-        for digest_id, digest_meta in digests.items():
-            if 'fraas-production' not in digest_meta['tag']:  # NEVER delete anything tagged with 'fraas-production'
-                tagless = image_is_untagged(digest_meta)
-                development_only = image_is_only_tagged_with_development_versions(digest_meta)
-                stale = image_is_stale(digest_id, digest_meta, FORGEROCK_IO_MAX_AGE)
-                if (tagless or development_only) and stale:
-                    filtered[digest_id] = digest_meta['tag']
+        filtered = filter_digests_by_tags_age(digests, 'fraas-production', FORGEROCK_IO_MAX_AGE)
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
+    return filtered
+
+def filter_engineeringpit_digests(repo, digests):
+    """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
+    """
+    filtered = filter_digests_by_tags_age(digests, '-stable', ENGINEERING_PIT_MAX_AGE)
+    num_digests = len(filtered)
+    log.info(f'found {num_digests} to prune')
+    return filtered
+
+def filter_digests_by_tags_age(digests, exclude_tags_start_with, max_age):
+    filtered = {}
+    for digest_id, digest_meta in digests.items():
+        if exclude_tags_start_with not in digest_meta['tag']:  # NEVER delete anything tagged with exclude_tags_start_with
+            tagless = image_is_untagged(digest_meta)
+            development_only = image_is_only_tagged_with_development_versions(digest_meta)
+            stale = image_is_stale(digest_id, digest_meta, max_age)
+            if (tagless or development_only) and stale:
+                filtered[digest_id] = digest_meta['tag']
     return filtered
 
 filter_route = (
