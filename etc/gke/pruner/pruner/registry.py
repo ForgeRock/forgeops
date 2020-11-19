@@ -25,24 +25,14 @@ FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_U
 FORGEROCK_IO_PULL_REQUEST_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 30)))
 
 REGISTRY_BASE = 'https://gcr.io/v2'
+
 try:
     credentials, project = google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
     authed_session = AuthorizedSession(credentials)
 except Exception as e:
     log.error(e)
     sys.stdout.flush()
-# iterable of regex strings to exclude
-_black_list_repos = [
-   # all base images
-   # r'^engineering-devops\/(?:\w*-base$)',
-   # r'^engineering-devops\/(am|ds|(?:ds-\w*)|idm|amster)$',
-   r'^engineering-devops\/smoketest$',
-   r'^engineering-devops\/skaffold$',
-   r'^engineering-devops\/ci.*',
 
-   ]
-
-EXCLUDE = tuple( re.compile(i) for i in _black_list_repos )
 GIT_SHA1_PATTERN = re.compile(r'^[0-9a-f]{7,40}$')
 
 # helpers
@@ -83,15 +73,6 @@ def is_pr_repo(repo):
     """
     image_promotion_level = repo.split('/')[-1]
     return image_promotion_level == 'pull-requests'
-
-# Digest Filtering
-
-def filter_lookup(repo):
-    """Select which filtering algorithm to use, depending on the repo.
-    """
-    for route, filter_func in FILTER_ROUTES:
-        if route.match(repo):
-            return filter_func
 
 def filter_forgeops_public_digests(repo, digests):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
@@ -142,22 +123,34 @@ def filter_forgerock_io_digests(repo, digests):
     return filtered
 
 filter_route = (
+    # specific rules first 
+    (r'^engineering-devops\/smoketest$', None),
+    (r'^engineering-devops\/skaffold$', None),
+    (r'^engineering-devops\/ci.*', None),
+    (r'^engineeringpit/lodestar-images/*', filter_engineeringpit_digests, ),
+
+    # top level inclusions
     (r'^engineering-devops/*', filter_engineering_devops_digests,),
     (r'^forgerock-io/*', filter_forgerock_io_digests, ),
     (r'^forgeops-public/*', filter_forgeops_public_digests, ),
-    (r'^engineeringpit/lodestar-images/*', filter_forgeops_public_digests, )
 )
 FILTER_ROUTES = [ (re.compile(i[0]), i[1]) for i in filter_route]
 
-
-
 def registry_repos(exclude_images):
+    """search registry for repo routes for first match yielding the route and filter function
+    """
     response = authed_session.get(f'{REGISTRY_BASE}/_catalog')
     response.raise_for_status()
     repos = response.json()['repositories']
     for repo in repos:
-        if not any(i.search(repo) for i in exclude_images):
-            yield repo
+        for regex, filter_method in exclude_images:
+            match = regex.search(repo)
+            if not match:
+                continue
+            elif filter_method:
+                yield repo, filter_method
+            # if we got any kind of match, move on to the next repo
+            break
 
 def delete_manifest(repo, manifest, dry_run=DRY_RUN):
     """Delete a single manifest; can be used to delete images and tags.
@@ -182,14 +175,11 @@ def prune_manifests(repo, digest_ids, dry_run=DRY_RUN):
 
 def prune_registry(dry_run=DRY_RUN):
     log.info(f'is dry run {dry_run}')
-    for repo in registry_repos(EXCLUDE):
+    for repo , filter_digests in registry_repos(FILTER_ROUTES):
         log.info(f'pruning {repo}')
-        filter_digests = filter_lookup(repo)
-        if filter_digests:
-            digests_to_remove = filter_digests(repo, repo_tags(repo))
-            prune_manifests(repo, digests_to_remove, dry_run=dry_run)
-        else:
-            log.info(f'no images in repo: {repo}')
+        digests_to_remove = filter_digests(repo, repo_tags(repo))
+        prune_manifests(repo, digests_to_remove, dry_run=dry_run)
+        log.info(f'pruned repo: {repo}')
 
 if __name__ == '__main__':
     prune_registry()
