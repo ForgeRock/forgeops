@@ -32,7 +32,7 @@ class Register extends Simulation {
         })
 
     val registrationUrl = config.amUrl + 
-        "/json/realms/root/authenticate?service=Registration&authIndexType=service&authIndexValue=Registration"
+        "/json/realms/root/authenticate?authIndexType=service&authIndexValue=Registration"
 
     val httpProtocol: HttpProtocolBuilder = http
         .baseUrls(config.idmUrl)
@@ -59,8 +59,8 @@ class Register extends Simulation {
         .asJson
         .body(StringBody("${callbacks}"))
         .check(status.is(200))
-        .check(jsonPath("$.tokenId")) // Presence of the tokenId in the body indicates success
-    )}
+        .check(jsonPath("$.tokenId").find.saveAs("tokenId"))) // Presence of the tokenId in the body indicates success
+    }
 
     val scn: ScenarioBuilder = scenario("Managed User Registration")
       .during (config.duration) {
@@ -69,16 +69,17 @@ class Register extends Simulation {
           .exec(registrationTreeInitiate())
           .exec(session => {
             var data = ujson.read(session("callbacks").as[String])
-            data("authId") = session("authId").as[String]
             data("callbacks")(0)("input")(0)("value") = session("username").as[String]
             data("callbacks")(1)("input")(0)("value") = session("username").as[String]
             data("callbacks")(2)("input")(0)("value") = session("username").as[String]
-            data("callbacks")(3)("input")(0)("value") = session("username").as[String]+"@forgerock.com"
+            data("callbacks")(3)("input")(0)("value") = session("username").as[String] + "@forgerock.com"
             data("callbacks")(4)("input")(0)("value") = false
             data("callbacks")(5)("input")(0)("value") = false
             data("callbacks")(6)("input")(0)("value") = session("password").as[String]
-            data("callbacks")(7)("input")(0)("value") = "red"
-            data("callbacks")(8)("input")(0)("value") = "forgerock"
+            data("callbacks")(7)("input")(0)("value") = "What's your favorite color?"
+            data("callbacks")(7)("input")(1)("value") = "red"
+            data("callbacks")(8)("input")(0)("value") = "Who was your first employer?"
+            data("callbacks")(8)("input")(1)("value") = "forgerock"
             data("callbacks")(9)("input")(0)("value") = true
             session.set("callbacks", ujson.write(data))
           })
