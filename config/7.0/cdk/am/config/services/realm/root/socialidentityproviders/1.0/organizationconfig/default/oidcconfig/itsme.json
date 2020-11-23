@@ -24,12 +24,16 @@
     "uiConfig": {
       "buttonCustomStyle": "background-color: #ff4612; border-color: #2d3131; color: white",
       "buttonCustomStyleHover": "background-color: white; border-color: #2d3131; color: #2d3131",
-      "buttonDisplayName": "itsme"
+      "buttonDisplayName": "itsme",
+      "buttonImage": "images/itsme_logo_white.png"
     },
     "scopes": [
       "openid",
       "service:TEST_code"
     ],
+    "acrValues": ["tag:sixdots.be,2016-06:acr_advanced", "tag:sixdots.be,2016-06:acr_basic"],
+    "requestObjectSigningAlg" : "RS256",
+    "requestObjectEncryptionAlg" : "RSA-OAEP",
     "authenticationIdKey" : "sub",
     "redirectURI" : "https://localhost:8443/openam",
     "basicAuth" : false,
