@@ -6,8 +6,5 @@ USER 11111
 
 COPY --chown=forgerock:root start.sh /opt/opendj
 COPY --chown=forgerock:root ds-passwords.sh /opt/opendj
-COPY --chown=forgerock:root external-am-datastore.ldif /opt/opendj
 
 ENTRYPOINT /opt/opendj/start.sh
-
-#CMD /opt/opendj/start.sh

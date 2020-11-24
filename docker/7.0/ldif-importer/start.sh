@@ -27,11 +27,3 @@ if [ -f "/opt/opendj/ds-passwords.sh" ]; then
     fi
 fi
 
-# Apply the new ldap config entries
-# Remove this once the ds profile has been updated to include FBC
-/opt/opendj/bin/ldapmodify -c \
-    -D uid=admin \
-    -j /var/run/secrets/opendj-passwords/dirmanager.pw \
-    -h ds-idrepo-0.ds-idrepo \
-    -p 1389 \
-    /opt/opendj/external-am-datastore.ldif
