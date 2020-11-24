@@ -16,6 +16,9 @@ spec:
               - create
         - cel:
             filter: "body.ref_type == 'tag'"
+        - cel:
+            filter: >
+              body.ref.matches(r'^(v)(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-(.)*$')
       bindings:
         - ref: tag-release-binding
       template:
