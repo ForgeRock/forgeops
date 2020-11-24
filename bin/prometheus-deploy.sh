@@ -4,6 +4,8 @@
 # ./prometheus-deploy.sh -n namespace - deploy to different namespace that monitoring.
 # ./prometheus-deploy.sh -v values file - use different custom values file.
 # ./prometheus-deploy.sh -d - delete deployment.
+#
+# Prerequisite: Helm version 3.04 or higher.
 
 # You can deploy your own custom values file by using the -f <values file> flag.
 set -oe pipefail
@@ -12,7 +14,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
 ADDONS_DIR="${ADDONS_BASE}/prometheus"
 PROM_VALUES="${ADDONS_DIR}/prometheus-operator.yaml"
-VERSION="0.38.0"
 
 USAGE="Usage: $0 [-n <namespace>] [-v <values file>] [-d]"
 
@@ -88,6 +89,8 @@ while getopts :n:v:d option; do
             exit 1;;
     esac
 done
+
+echo -e "\n**This script requires Helm version 3.04 or later due to changes in the behaviour of 'helm repo add' command.**\n"
 
 ## Validate arguments
 # Check if -n flag has been included
