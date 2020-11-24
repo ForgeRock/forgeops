@@ -20,6 +20,13 @@ PROJECT=${PROJECT:-$PROJECT_ID}
 R=$(gcloud config list --format 'value(compute.region)')
 REGION=${REGION:-$R}
 
+echo "Deploying to region: $REGION"
+
+if [ -z $REGION ]; then 
+  echo "Please set region in your gcloud config 'gcloud config set compute/region <region>' or in <my-cluster>.sh"; 
+  exit 1
+fi
+
 # Where nodes run. We use 3 zones
 NODE_LOCATIONS=${NODE_LOCATIONS:-"$REGION-a,$REGION-b,$REGION-c"}
 ZONE=${ZONE:-"$REGION-a"}
