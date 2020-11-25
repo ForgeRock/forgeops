@@ -350,6 +350,17 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/amster-export
+    
+- name: amster-import
+  build:
+    artifacts:
+    - *AMSTER
+    tagPolicy:
+      gitCommit:
+        variant: AbbrevCommitSha
+  deploy:
+    kustomize:
+      path: ./kustomize/base/amster
 
 - name: config-upgrader
   build:

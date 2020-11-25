@@ -284,6 +284,33 @@ export_config(){
 	done
 }
 
+# Import config into running Amster instance from docker folder.
+import_amster_config(){
+	printf "\nImporting Amster configuration...\n\n"
+	printf "Skaffold is used to run the import job. Ensure your default-repo is set.\n\n"
+	sleep 3
+
+	echo "Removing any existing Amster jobs..."
+	kubectl delete job amster || true
+
+	# Deploy Amster job
+	echo "Deploying Amster import job..."
+	exp=$(skaffold run -p amster-import)
+
+	# Check to see if Amster pod is running
+	echo "Waiting for Amster import to complete."
+	while ! [[ "$(kubectl get pod -l app=amster --field-selector=status.phase=Succeeded)" ]];
+	do
+			sleep 5;
+	done
+	printf "Amster import is complete..\n\n"
+
+	# Shut down Amster job
+	printf "Shutting down Amster job...\n"
+
+	del=$(skaffold delete -p amster-import)
+}
+
 # Save the configuration in the docker folder back to the git source
 save_config()
 {
@@ -384,6 +411,9 @@ diff)
 	;;
 export)
 	export_config
+	;;
+import)
+	import_amster_config
 	;;
 save)
 	save_config

@@ -96,7 +96,7 @@ The `export` command is used to export configuration from a running instance (e.
 Configuration is exported to `docker/$version/idm/conf` and is a full copy of the configuration including any changes.  
 
 **Amster export**  
-Amster only runs as a Kubernetes job so there is no running deployment.  The export command kicks of a new Amster job to export OAuth2Clients and ig-agent config from AM.  
+Amster only runs as a Kubernetes job so there is no running deployment.  The export command kicks of a new Amster job to export dynamic data(application and policy data) from AM.  
 Configuration is exported to `docker/$version/amster/config`.
 
 **AM export**  
@@ -111,6 +111,9 @@ bin/config.sh export
 # Export the IDM configuration to the docker folder
 bin/config.sh --component idm export
 ```
+
+**IMPORT (AMSTER ONLY)**  
+The `import` command is used to run ad hoc dynamic data(application and policy data) imports from the `docker` staging folder to AM by running an Amster job. Note that the import command is for Amster only, so requires no further arguments: `config.sh import`.
 
 **SAVE**  
 The `save` command copies the contents of the Docker configuration *back* to the `config/` folder where it can be versioned in Git.  
