@@ -1,6 +1,6 @@
 # Utility ds image for testing, benchmarking, etc.
 # Also useful as a general purpose debugging tool
-FROM gcr.io/forgerock-io/ds/pit1:7.1.0-a43092d663ee57608381b3eda1146d5bba522e3a
+FROM gcr.io/forgerock-io/ds/pit1:7.1.0-fb320ed52308ad317e4964abbcb000bf6394cfc2
 
 USER root
 RUN apt-get update && apt-get install -y bash vim curl dnsutils procps netcat
