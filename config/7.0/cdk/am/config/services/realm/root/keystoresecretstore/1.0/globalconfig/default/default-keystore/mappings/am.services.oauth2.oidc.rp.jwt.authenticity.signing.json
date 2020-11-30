@@ -1,0 +1,27 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "KeyStoreSecretStore",
+    "entityId" : "default/default-keystore/mappings/am.services.oauth2.oidc.rp.jwt.authenticity.signing",
+    "uid" : "ou=am.services.oauth2.oidc.rp.jwt.authenticity.signing,ou=mappings,ou=default-keystore,ou=default,ou=GlobalConfig,ou=1.0,ou=KeyStoreSecretStore,ou=services,ou=am-config",
+    "sunServiceID" : "instance",
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "aliases" : [
+      "rsajwtsigningkey"
+    ],
+    "_type" : {
+      "_id" : "KeyStoreSecretStore",
+      "name" : "KeyStoreSecretStore",
+      "collection" : false
+    },
+    "secretId" : "am.services.oauth2.oidc.rp.jwt.authenticity.signing",
+    "_id" : "default/default-keystore/mappings/am.services.oauth2.oidc.rp.jwt.authenticity.signing"
+  }
+}
