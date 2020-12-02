@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am-config-upgrader/docker-build@sha256:e98feb8a98a099d4dd3cef2e0b7c991cdfaa07821e42c9a1099c9db0d0ffcb5c
+FROM gcr.io/forgerock-io/am-config-upgrader/pit1:7.1.0-ae945e16eef05ef3a4efde56c8c42ff239a1007b
 
 USER root
 
