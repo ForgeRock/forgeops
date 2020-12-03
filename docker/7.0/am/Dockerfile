@@ -1,7 +1,12 @@
 FROM gcr.io/forgerock-io/am-base/pit1:7.1.0-69b22d62d9b796b2faa0c83692c5b32c34f662ba
 USER root
 
-RUN apt-get update && apt-get install -y git
+ENV DEBIAN_FRONTEND=noninteractive                          
+ENV APT_OPTS="--no-install-recommends --yes"                
+RUN apt-get update \                                        
+        && apt-get install -y git \           
+        && apt-get clean \                                  
+        && rm -r /var/lib/apt/lists /var/cache/apt/archives 
 
 USER forgerock
 
