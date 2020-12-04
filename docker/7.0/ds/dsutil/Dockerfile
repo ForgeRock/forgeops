@@ -3,7 +3,12 @@
 FROM gcr.io/forgerock-io/ds/pit1:7.1.0-IDCLOUD-323bfc699bab857ddf319b690068e06c8721c996
 
 USER root
-RUN apt-get update && apt-get install -y bash vim curl dnsutils procps netcat
+ENV DEBIAN_FRONTEND=noninteractive                           
+ENV APT_OPTS="--no-install-recommends --yes"                 
+RUN apt-get update \                                         
+        && apt-get install -y bash vim curl dnsutils procps netcat  \                          
+        && apt-get clean \                                   
+        && rm -r /var/lib/apt/lists /var/cache/apt/archives  
 
 
 COPY --chown=forgerock:root bin/*  bin/
