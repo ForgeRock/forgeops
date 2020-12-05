@@ -4,7 +4,7 @@ kind: DirectoryService
 metadata:
   name: ds-cts
 spec:
-  image: gcr.io/forgeops-public/ds-cts:2c7403c6-dirty
+  image:  gcr.io/forgeops-public/ds-cts:2a0e6bfc
   # The number of DS servers in the topology
   replicas: 1
   # The resources assigned to each DS pod
@@ -38,7 +38,7 @@ spec:
       #create: true
 
     # Set the service account passwords
-    "ou=admins,ou=famrecords,ou=openam-session,ou=tokens,uid=openam_cts":
+    uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens:
       secretName: ds-env-secrets
       key: AM_STORES_CTS_PASSWORD
 

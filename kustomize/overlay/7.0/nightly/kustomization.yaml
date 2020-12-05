@@ -1,6 +1,15 @@
-namespace: nightly
+namespace: warren
+commonLabels:
+  app.kubernetes.io/name: "forgerock"
 resources:
-- ../all
+- ../../../base/kustomizeConfig
+- ../../../base/am-cdk
+- ../../../base/amster
+- ../../../base/idm
+- ../../../base/end-user-ui
+- ../../../base/login-ui
+- ../../../base/admin-ui
+- ../../../base/7.0/ingress
 
 patchesStrategicMerge:
 - |-
@@ -10,7 +19,7 @@ patchesStrategicMerge:
     name: platform-config
   data:
     DOMAIN: "forgeops.com"
-    FQDN: "nightly.iam.forgeops.com"
+    FQDN: "warren.iam.forgeops.com"
     CERT_ISSUER: letsencrypt-prod
 
 

@@ -4,7 +4,7 @@ kind: DirectoryService
 metadata:
   name: ds-idrepo
 spec:
-  image: gcr.io/forgeops-public/ds-idrepo:dab61faf
+  image:  gcr.io/forgeops-public/ds-idrepo:2a0e6bfc
   # The number of DS servers in the topology
   replicas: 1
   # The resources assigned to each DS pod
@@ -39,13 +39,13 @@ spec:
 
     # Set the service account passwords
     # We also set the CTS account - in case the user wants to use a single ds instance
-    "ou=admins,ou=famrecords,ou=openam-session,ou=tokens,uid=openam_cts":
+    uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens:
       secretName: ds-env-secrets
       key: AM_STORES_CTS_PASSWORD
-    "ou=admins,ou=identities,uid=am-identity-bind-account":
+    uid=am-identity-bind-account,ou=admins,ou=identities:
       secretName: ds-env-secrets
       key: AM_STORES_USER_PASSWORD
-    "ou=admins,ou=am-config,uid=am-config":
+    uid=am-config,ou=admins,ou=am-config:
       secretName: ds-env-secrets
       key: AM_STORES_APPLICATION_PASSWORD
 
