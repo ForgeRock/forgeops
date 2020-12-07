@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Script to create a CDM cluster on AKS. This will create a cluster with
-# a default nodepool for the apps, and a ds-pool for the DS nodes.
+# Script to create an AKS cluster. 
 # The values below can be overridden by copying and sourcing an environment variable script. For example:
 # - `cp mini.sh my-cluster.sh`
 # - `source my-cluster.sh && ./cluster-up.sh`
@@ -28,6 +27,11 @@ NAME=${NAME:-small}
 ADMIN_USERNAME=${ADMIN_USERNAME:-"forgerock"}
 
 # Name of container registry used by cluster
+if [[ -z $ACR_NAME ]]; then 
+  echo "Please set ACR_NAME variable in the <env>.sh file so the cluster can be configured with permission to access the container registry"
+  exit 1 
+fi
+
 ACR_NAME=${ACR_NAME}
 
 # For AKS, use the default kubernetes version.
@@ -40,8 +44,8 @@ ACR_NAME=${ACR_NAME}
 RES_GROUP_NAME=${RES_GROUP_NAME:-"${NAME}-res-group"}
 
 ######### NODE GROUP VARS ########
-VM_SIZE=${NODE_VM_SIZE:-"Standard_DS3_v2"}
-DS_VM_SIZE=${DS_NODE_VM_SIZE:-"Standard_DS3_v2"}
+VM_SIZE=${VM_SIZE:-"Standard_DS3_v2"}
+DS_VM_SIZE=${DS_VM_SIZE:-"Standard_DS3_v2"}
 NODE_OSDISK_SIZE=${NODE_OSDISK_SIZE:-80}
 
 # Primary node count
