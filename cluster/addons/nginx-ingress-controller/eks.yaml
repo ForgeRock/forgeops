@@ -5,7 +5,7 @@ controller:
     replicaCount: 1
     service:
         type: LoadBalancer
-        externalTrafficPolicy: Local
+        # externalTrafficPolicy: Local
         omitClusterIP: true
         annotations:
           service.beta.kubernetes.io/aws-load-balancer-type: "nlb"

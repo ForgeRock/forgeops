@@ -18,10 +18,11 @@ availabilityZones: ["us-east-1a","us-east-1b","us-east-1c"]
 
 nodeGroups:
   - name: primary
-    instanceType: c5.4xlarge
+    instanceType: c5.9xlarge
+    ebsOptimized: true
     minSize: 1
-    maxSize: 12
-    desiredCapacity: 12
+    maxSize: 6
+    desiredCapacity: 6
     volumeSize: 80
     iam:
       withAddonPolicies:
