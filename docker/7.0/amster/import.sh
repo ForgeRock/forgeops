@@ -14,7 +14,7 @@ export URI=${SERVER_URI:-/am}
 export INSTANCE="${SERVER_URL}${URI}"
 
 # Alive check
-ALIVE="${INSTANCE}/isAlive.jsp"
+ALIVE="${INSTANCE}/json/health/ready"
 
 wait_for_openam()
 {
@@ -88,10 +88,6 @@ wait_for_openam
 echo "Waiting for DS passwords to be updated..."
 
 wait_for_ds_password_change
-
-echo "Giving AM some extra time..."
-
-sleep 100
 
 echo "About to begin dynamic data import"
 
