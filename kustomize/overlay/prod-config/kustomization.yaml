@@ -1,12 +1,8 @@
-namespace: prod
 commonLabels:
   app.kubernetes.io/name: "forgerock"
 resources:
-- ../../../base/kustomizeConfig
-- ../../../base/secrets
-- ../../../base/amster
-- ../../../base/ldif-importer
-- ../../../base/7.0/ingress
+- ../../base/kustomizeConfig
+- ../../base/7.0/ingress
 
 patchesStrategicMerge:
 - |-

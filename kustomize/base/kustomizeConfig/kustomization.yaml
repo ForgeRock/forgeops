@@ -30,7 +30,7 @@ configMapGenerator:
   - AM_STORES_CTS_SERVERS="ds-cts-0.ds-cts:1389"
   - AM_STORES_USER_SERVERS="ds-idrepo-0.ds-idrepo:1389"
   - AM_SERVER_FQDN="$(FQDN)"
-  - AUTORESTORE_FROM_DSBACKUP="false" # Set to "true" to enable DS auto recovery. See documentation 
+  - AUTORESTORE_FROM_DSBACKUP="false" # Set to "true" to enable DS auto recovery. See documentation
   - DSBACKUP_DIRECTORY="" # Ex. gs://bucket | s3://bucket | az://container
   - DSBACKUP_HOSTS="ds-cts-0,ds-idrepo-0" # Name of the pods running the backup tasks. Ex: "ds-cts-0,ds-idrepo-0"
   - CERT_ISSUER="default-issuer" # cert manager issuer. Patch with letsencrypt-prod for LE SSL certs.
@@ -54,14 +54,7 @@ vars:
     apiVersion: v1
     kind: ConfigMap
     name: platform-config
-# TODO: Deprecate the use of $(NAMESPACE) in kustomize configurations
-- name: NAMESPACE
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-  fieldref:
-    fieldpath: metadata.namespace
+
 - name: AUTORESTORE_FROM_DSBACKUP
   fieldref:
     fieldpath: data.AUTORESTORE_FROM_DSBACKUP

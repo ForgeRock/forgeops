@@ -1,88 +1,71 @@
-# For creating your own custom skaffold profiles we recommend making a copy of this
-# file to skaffold-dev.yaml (which is in .gitignore).
-# You can "mix and match" diferent services together by creating skaffold profiles
-# and by creating a new kustomize profile in kustomize/overlay/
-# The default below for skaffold dev is to deploy all services in one shot:
-# Note: Upgrade to skaffold/v2alpha3 for skaffold 1.4
+# Skaffold build for the nightly and prod deployments
 apiVersion: skaffold/v2beta10
 kind: Config
 
 ## Common YAML anchors
 ## The yaml anchors are used to make it easier to compose skaffold profiles.
 ## You should not need to edit this section
-.YamlAnchors:
-  kaniko:
-    kaniko-ops: &kaniko-opts
-      # Disable build cache for now. This is causing intermittent problems
-      # cache: {}
-      image: gcr.io/kaniko-project/executor:v1.3.0
-      # The flags is deprecated - but without it we are seeing Kaniko bugs.
-      # CLOUD-1955
-      # flags:
-      #   - '--single-snapshot'
-      # This is the recommended way of passing the single-snapshot arg - but we see issues.
-      # buildArgs:
-        # single-snapshot: "true"
-    cluster: &kaniko-cluster
-      namespace: kaniko
-      pullSecretName: kaniko-secret
-      pullSecretMountPath: /secrets/kaniko-secret
 
-  artifactDefinitions:
-    - &AM
-      image: am
-      context: docker/7.0/am
-    - &AM_KANIKO
-      <<: *AM
-      kaniko: *kaniko-opts
-    - &AMSTER
-      image: amster
-      context: docker/7.0/amster
-    - &AMSTER_KANIKO
-      <<: *AMSTER
-      kaniko: *kaniko-opts
-    - &IDM
-      image: idm
-      context: docker/7.0/idm
-    - &IDM_KANIKO
-      <<: *IDM
-      kaniko: *kaniko-opts
+build:
+  artifacts:
+  - image: am
+    context: docker/7.0/am
+    kaniko: {}
+  - image: amster
+    context: docker/7.0/amster
+    kaniko: {}
+  - image: idm
+    context: docker/7.0/idm
+    kaniko: {}
+  cluster:
+    namespace: kaniko
+    pullSecretName: kaniko-secret
+    pullSecretMountPath: /secrets/kaniko-secret
+  tagPolicy:
+    sha256: {}
 
-  commonArtifactSets:
-    default-artifacts: &default-artifacts
-    - *AM
-    - *AMSTER
-    - *IDM
-    kaniko-artifacts: &kaniko-artifacts
-    - *AM_KANIKO
-    - *AMSTER_KANIKO
-    - *IDM_KANIKO
-
-## End YAML Anchors
-
-#---------------------
-# Skaffold profiles
-#---------------------
 
 profiles:
-# 24/7 Demo environment
-- name: nightly
-  build: &kaniko-build
-    artifacts: *kaniko-artifacts
-    cluster: *kaniko-cluster
-    tagPolicy:
-      sha256: {}
+# Note that profiles below should be deployed to the desired namespace
+# By passing --namespace to skaffold or kubectl. If this is not done
+# the will deploy to the current namespace - often default
+
+# 24/7 nightly and prod Demo environments
+# The profiles below should be deployed in order, and you should provide
+# --namespace to skaffold to target the proper namespace.
+
+# Configuration specific to the prod.iam.foregeops.com deploy
+# Deploy this OR the prod-nightly, but not both
+# skaffold -n prod -f nightly.yaml -p prod-config run
+- name: prod-config
   deploy:
     kustomize:
       paths:
-      - kustomize/overlay/7.0/nightly
+      - kustomize/overlay/prod-config
 
+
+# Configuration specific to the nightly.iam.foregeops.com deploy
+# skaffold -n nightly -f nightly.yaml -p nightly-config run
+- name: prod-nightly
+  deploy:
+    kustomize:
+      paths:
+      - kustomize/overlay/prod-config
+
+### The profiles below can be used for either the nightly or prod. Just change the
+### the -n argument to the proper namespace
+
+# secrets
+# skaffold -n prod -f nightly.yaml -p secrets run
 - name: secrets
   deploy:
     kustomize:
+      defaultNamespace: prod
       paths:
       - kustomize/base/secrets
 
+# Deploy the directory using the ds-operator. This depends on the secrets being deployed first
+# skaffold -n prod -f nightly.yaml -p ds run
 - name: ds
   deploy:
     kustomize:
@@ -90,6 +73,23 @@ profiles:
       - kustomize/base/ds-idrepo
       - kustomize/base/ds-cts
 
+# Deploy the apps (AM, IDM, etc.). Depends on the secrets and ds
+# Before deploying ensure that ds is up and the service account passwords have been changed:
+# kubectl get directoryservice/ds-idrepo -o yaml | grep  serviceAccountPasswordsUpdatedTime
+# skaffold -n prod -f nightly.yaml -p apps run
+- name: apps
+  deploy:
+    kustomize:
+      paths:
+      - kustomize/overlay/apps
 
+# Run amster to import configuration
+# This can be re-run at anaytime to import new dynamic configuration
+# skaffold -n prod -f nightly.yaml -p amster run
+- name: amster
+  deploy:
+    kustomize:
+      paths:
+      - kustomize/base/amster
 
 
