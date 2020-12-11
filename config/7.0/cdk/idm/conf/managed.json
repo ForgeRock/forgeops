@@ -2,10 +2,6 @@
     "objects" : [
         {
             "name" : "user",
-            "onCreate" : {
-                "type" : "text/javascript",
-                "source" : "require('onCreateUser').setDefaultFields(object);"
-            },
             "onUpdate" : {
                 "type" : "text/javascript",
                 "source" : "require('onUpdateUser').preserveLastSync(object, oldObject, request);"
@@ -247,6 +243,7 @@
                     },
                     "accountStatus" : {
                         "title" : "Status",
+                        "default" : "active",
                         "description" : "Status",
                         "viewable" : true,
                         "type" : "string",
