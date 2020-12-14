@@ -6,23 +6,13 @@ spec:
   resources:
     - name: forgeops
       type: git
-  params:
-  - name: skaffold-profile
-    type: string
-    description: Skaffold profile to deploy
-    default: prod-apps
   tasks:
-  - name: skaffold-run
+  - name: skaffold-prod-deploy
     taskRef:
-      name: skaffold-run
+      name: skaffold-prod-deploy
     resources:
       inputs:
       - name: forgeops
         resource: forgeops
-    params:
-    - name: profile
-      value: "$(params.skaffold-profile)"
-    - name: docker-repo
-      value: gcr.io/engineering-devops/nightly
 
   # TODO: add tasks for smoke test, creating users, etc.

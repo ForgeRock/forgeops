@@ -6,25 +6,6 @@ kind: Config
 ## The yaml anchors are used to make it easier to compose skaffold profiles.
 ## You should not need to edit this section
 
-build:
-  artifacts:
-  - image: am
-    context: docker/7.0/am
-    kaniko: {}
-  - image: amster
-    context: docker/7.0/amster
-    kaniko: {}
-  - image: idm
-    context: docker/7.0/idm
-    kaniko: {}
-  cluster:
-    namespace: kaniko
-    pullSecretName: kaniko-secret
-    pullSecretMountPath: /secrets/kaniko-secret
-  tagPolicy:
-    sha256: {}
-
-
 profiles:
 # Note that profiles below should be deployed to the desired namespace
 # By passing --namespace to skaffold or kubectl. If this is not done
@@ -60,7 +41,6 @@ profiles:
 - name: secrets
   deploy:
     kustomize:
-      defaultNamespace: prod
       paths:
       - kustomize/base/secrets
 
@@ -78,6 +58,20 @@ profiles:
 # kubectl get directoryservice/ds-idrepo -o yaml | grep  serviceAccountPasswordsUpdatedTime
 # skaffold -n prod -f nightly.yaml -p apps run
 - name: apps
+  build:
+    artifacts:
+    - image: am
+      context: docker/7.0/am
+      kaniko: {}
+    - image: idm
+      context: docker/7.0/idm
+      kaniko: {}
+    cluster: &cluster
+      namespace: kaniko
+      pullSecretName: kaniko-secret
+      pullSecretMountPath: /secrets/kaniko-secret
+    tagPolicy:
+      sha256: {}
   deploy:
     kustomize:
       paths:
@@ -87,9 +81,15 @@ profiles:
 # This can be re-run at anaytime to import new dynamic configuration
 # skaffold -n prod -f nightly.yaml -p amster run
 - name: amster
+  build:
+    artifacts:
+    - image: amster
+      context: docker/7.0/amster
+      kaniko: {}
+    cluster: *cluster
+    tagPolicy:
+      sha256: {}
   deploy:
     kustomize:
       paths:
       - kustomize/base/amster
-
-
