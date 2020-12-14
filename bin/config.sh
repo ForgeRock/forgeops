@@ -349,8 +349,8 @@ save_config()
 					-exec sed -i '' '/userpassword-encrypted/d' {} \; \
 
 			# Fix passwords in OAuth2Clients with placeholders or default values.
-			CLIENT_ROOT="$DOCKER_ROOT/amster/config/root/OAuth2Clients"
-			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/root/IdentityGatewayAgents"
+			CLIENT_ROOT="$DOCKER_ROOT/amster/config/OAuth2Clients"
+			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/IdentityGatewayAgents"
 
 			echo "Add back password placeholder with defaults"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json

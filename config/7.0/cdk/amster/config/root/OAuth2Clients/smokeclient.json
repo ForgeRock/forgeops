@@ -19,8 +19,8 @@
       "jwksCacheTimeout" : 3600000,
       "userinfoSignedResponseAlg" : null,
       "tokenIntrospectionEncryptedResponseAlg" : "RSA-OAEP-256",
-      "tokenEndpointAuthSigningAlgorithm" : "RS256",
       "requestParameterEncryptedAlg" : null,
+      "tokenEndpointAuthSigningAlgorithm" : "RS256",
       "mTLSSubjectDN" : null,
       "idTokenEncryptionEnabled" : false,
       "userinfoEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
@@ -31,19 +31,19 @@
       "jwkStoreCacheMissCacheTime" : 60000,
       "idTokenSignedResponseAlg" : "RS256",
       "idTokenPublicEncryptionKey" : null,
-      "userinfoEncryptedResponseAlg" : null,
       "jwksUri" : null,
+      "userinfoEncryptedResponseAlg" : null,
       "requestParameterSignedAlg" : null,
       "clientJwtPublicKey" : null
     },
     "advancedOAuth2ClientConfig" : {
       "grantTypes" : [ "authorization_code", "implicit" ],
       "updateAccessToken" : null,
-      "tokenExchangeAuthLevel" : 0,
       "requestUris" : [ ],
       "clientUri" : [ ],
       "mixUpMitigation" : false,
       "logoUri" : [ ],
+      "javascriptOrigins" : [ ],
       "tokenEndpointAuthMethod" : "client_secret_post",
       "sectorIdentifierUri" : null,
       "isConsentImplied" : true,
@@ -52,9 +52,7 @@
       "policyUri" : [ ],
       "descriptions" : [ ],
       "subjectType" : "Public",
-      "name" : [ ],
-      "customProperties" : [ ],
-      "javascriptOrigins" : [ ]
+      "name" : [ ]
     },
     "coreOpenIDClientConfig" : {
       "jwtTokenLifetime" : 0,
