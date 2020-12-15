@@ -1,0 +1,40 @@
+# Deploys the base (platform-configmap), secrets and the DS persistence tier
+# FOr the prod namespace this is a one time activity. The nightly will deploy this fresh every night.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: skaffold-deploy-base-ds
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+
+  params:
+  - name: namespace
+    type: string
+    description: namespace to deploy in. Also selects the base config
+
+  results:
+  - name: status
+    description: Deployment status
+
+  steps:
+  - name: deploy-new-env
+    image: gcr.io/engineering-devops/skaffold:latest
+    script: |
+      #!/usr/bin/env bash
+      cd /workspace/forgeops
+      {
+        PCONFIG='kustomize/overlay/$(params.namespace)-config'
+        set -x
+        kustomize build $PCONFIG | kubectl apply -n '$(params.namespace)' -f -
+        kubectl apply -n '$(params.namespace)' -f kustomize/base/secrets/secret_agent_config.yaml
+        sleep 30
+        kubectl apply -n '$(params.namespace)' -f kustomize/base/ds-cts/ds-cts.yaml
+        kubectl apply -n '$(params.namespace)' -f kustomize/base/ds-idrepo/ds-idrepo.yaml
+      } || {
+        msg='Failed to deploy the base environment and directory to the $(params.namespace) namespace. See pipeline logs'
+        echo $msg | tee /tekton/results/status
+        exit 1
+      }

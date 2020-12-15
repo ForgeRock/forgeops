@@ -15,7 +15,7 @@ spec:
   - name: namespace
     type: string
     description: target namespace
-      
+
   - name: docker-repo
     type: string
     description: Docker repository URL
@@ -24,7 +24,7 @@ spec:
     type: string
     default: "true"
     description: if false, do not run clean.sh
-      
+
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
@@ -40,9 +40,9 @@ spec:
       #!/usr/bin/env bash
       {
         cd /workspace/forgeops
-        skaffold -f skaffold.yaml -p $(inputs.params.profile) delete
+        skaffold -f skaffold.yaml -p $(params.profile) delete
       } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old \`$(inputs.params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to delete old \`$(params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
 
@@ -53,13 +53,13 @@ spec:
       {
         if [ "$(params.cleanEnvironment)" == "true" ]; then
           cd /workspace/forgeops/bin
-          ./clean.sh $(inputs.params.namespace)
+          ./clean.sh $(params.namespace)
         fi
       } || {
         curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): clean.sh failed to cleanup environment"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
-      
+
   - name: deploy-new-env
     image: "gcr.io/engineering-devops/skaffold:latest"
     script: |
@@ -70,9 +70,9 @@ spec:
         ./config.sh init -v 7.0 -p cdk
         cd ..
         sleep 30
-        skaffold -f skaffold.yaml -p $(inputs.params.profile) --default-repo=$(inputs.params.docker-repo) run
+        skaffold -f skaffold.yaml -p $(params.profile) --default-repo=$(params.docker-repo) run
       } || {
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new \`$(inputs.params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to deploy new \`$(params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
-      
+

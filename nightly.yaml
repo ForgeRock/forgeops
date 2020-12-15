@@ -7,52 +7,6 @@ kind: Config
 ## You should not need to edit this section
 
 profiles:
-# Note that profiles below should be deployed to the desired namespace
-# By passing --namespace to skaffold or kubectl. If this is not done
-# the will deploy to the current namespace - often default
-
-# 24/7 nightly and prod Demo environments
-# The profiles below should be deployed in order, and you should provide
-# --namespace to skaffold to target the proper namespace.
-
-# Configuration specific to the prod.iam.foregeops.com deploy
-# Deploy this OR the prod-nightly, but not both
-# skaffold -n prod -f nightly.yaml -p prod-config run
-- name: prod-config
-  deploy:
-    kustomize:
-      paths:
-      - kustomize/overlay/prod-config
-
-
-# Configuration specific to the nightly.iam.foregeops.com deploy
-# skaffold -n nightly -f nightly.yaml -p nightly-config run
-- name: prod-nightly
-  deploy:
-    kustomize:
-      paths:
-      - kustomize/overlay/prod-config
-
-### The profiles below can be used for either the nightly or prod. Just change the
-### the -n argument to the proper namespace
-
-# secrets
-# skaffold -n prod -f nightly.yaml -p secrets run
-- name: secrets
-  deploy:
-    kustomize:
-      paths:
-      - kustomize/base/secrets
-
-# Deploy the directory using the ds-operator. This depends on the secrets being deployed first
-# skaffold -n prod -f nightly.yaml -p ds run
-- name: ds
-  deploy:
-    kustomize:
-      paths:
-      - kustomize/base/ds-idrepo
-      - kustomize/base/ds-cts
-
 # Deploy the apps (AM, IDM, etc.). Depends on the secrets and ds
 # Before deploying ensure that ds is up and the service account passwords have been changed:
 # kubectl get directoryservice/ds-idrepo -o yaml | grep  serviceAccountPasswordsUpdatedTime

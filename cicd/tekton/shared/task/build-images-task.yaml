@@ -46,8 +46,8 @@ spec:
         git fetch --tags
         git checkout "${GIT_TAG_NAME}"
        ./bin/config.sh init -p cdk
-        skaffold -f skaffold.yaml -p $(params.profile) --default-repo=$(inputs.params.docker-repo) build
+        skaffold -f skaffold.yaml -p $(params.profile) --default-repo=$(params.docker-repo) build
       } || {
-      #curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build \`$(inputs.params.profile)\`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+      #curl -X POST -H 'Content-type: application/json' --data '{"text":"Skaffold failed to build \`$(params.profile)\`. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }

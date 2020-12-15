@@ -1,0 +1,20 @@
+# Deploys the base configmap, secrets and DS to the prod namespace. This is a one shot deal
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: prod-base-pipeline
+spec:
+  resources:
+    - name: forgeops
+      type: git
+  tasks:
+  - name: skaffold-deploy-base-ds
+    taskRef:
+      name: skaffold-deploy-base-ds
+    resources:
+      inputs:
+      - name: forgeops
+        resource: forgeops
+    params:
+    - name: namespace
+      value: "prod"

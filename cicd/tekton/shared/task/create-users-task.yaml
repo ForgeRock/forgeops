@@ -28,7 +28,7 @@ spec:
         #set ADMIN_PASSWORD and run make-users.sh
 
         ADMIN_PASSWORD=$(kubectl -n $(params.namespace) get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)
-        kubectl -n $(params.namespace) exec ds-idrepo-0 -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD make-users.sh $(inputs.params.users)"
+        kubectl -n $(params.namespace) exec ds-idrepo-0 -- bash -c "ADMIN_PASSWORD=$ADMIN_PASSWORD make-users.sh $(params.users)"
       } || {
         curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Failed to create users. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1

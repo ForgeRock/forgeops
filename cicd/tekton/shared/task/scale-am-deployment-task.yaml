@@ -11,7 +11,7 @@ spec:
   - name: namespace
     type: string
     description: target namespace
-    
+
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
@@ -20,15 +20,15 @@ spec:
           name: "slack-webhook-$(params.namespace)"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
-     
+
     - name: scale-am-todesired
       image: gcr.io/cloud-builders/kubectl
       script: |
         #!/usr/bin/env bash
         {
-          kubectl -n $(params.namespace) scale deployment am --replicas=$(inputs.params.replicas)
+          kubectl -n $(params.namespace) scale deployment am --replicas=$(params.replicas)
         } || {
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Failed to scale AM back to $(inputs.params.replicas). See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Failed to scale AM back to $(params.replicas). See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
         }
 
@@ -43,4 +43,4 @@ spec:
           curl -X POST -H 'Content-type: application/json' --data '{"text":"$(params.namespace): Some pods are not healthy after AM restart. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
           exit 1
         }
-    
+

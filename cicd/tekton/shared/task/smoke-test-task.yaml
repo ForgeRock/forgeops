@@ -22,7 +22,7 @@ spec:
     - name: SLACK_FAILED_WEBHOOK_URL
       valueFrom:
         secretKeyRef:
-          name: "slack-webhook-$(params.namespace)"
+          name: "slack-webhook-smoke"
           key: SLACK_FAILED_WEBHOOK_URL
   steps:
   # Run the smoke test by POSTing to the smoke cloud run service
@@ -43,6 +43,6 @@ spec:
         curl -X POST "$(params.tester-url)" \
             --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS"
       } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Smoke test failed \`$(inputs.params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
+        curl -X POST -H 'Content-type: application/json' --data '{"text":"Smoke test failed \`$(params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
         exit 1
       }
