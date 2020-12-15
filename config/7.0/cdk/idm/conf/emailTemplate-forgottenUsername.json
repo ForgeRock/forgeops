@@ -6,9 +6,10 @@
         "fr" : "Informations sur le compte - nom d'utilisateur"
     },
     "message" : {
-        "en" : "<html><body>{{#if object.userName}}<p>Your username is '{{object.userName}}'.</p>{{else}}If you received this email in error, please disregard.{{/if}}<h4><a href=\"{{object.resumeURI}}\">Click here to login</a></h4></body></html>",
-        "fr" : "<html><body>{{#if object.userName}}<p>Votre nom d'utilisateur est '{{object.userName}}'.</p>{{else}}Si vous avez reçu cet e-mail par erreur, veuillez ne pas en tenir compte.{{/if}}<h4><a href=\"{{object.resumeURI}}\">Cliquez ici pour vous connecter</a></h4></body></html>"
+        "en" : "<html><body>{{#if object.userName}}<p>Your username is '{{object.userName}}'.</p>{{else}}If you received this email in error, please disregard.{{/if}}<p><a href=\"{{object.resumeURI}}\">Click here to login</a></p></body></html>",
+        "fr" : "<html><body>{{#if object.userName}}<p>Votre nom d'utilisateur est '{{object.userName}}'.</p>{{else}}Si vous avez reçu cet e-mail par erreur, veuillez ne pas en tenir compte.{{/if}}<p><a href=\"{{object.resumeURI}}\">Cliquez ici pour vous connecter</a></p></body></html>"
     },
+    "styles": "body{background-color:#324054;color:#5e6d82;padding:60px;text-align:center}a{text-decoration:none;color:#109cf1}.content{background-color:#fff;border-radius:4px;margin:0 auto;padding:48px;width:235px}",
     "defaultLocale" : "en",
     "mimeType" : "text/html"
 }

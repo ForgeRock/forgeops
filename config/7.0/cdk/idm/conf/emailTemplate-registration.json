@@ -6,9 +6,10 @@
       "fr" : "Créer un nouveau compte"
     },
     "message" : {
-      "en" : "<h3>This is your registration email.</h3><h4><a href=\"{{object.resumeURI}}\">Email verification link</a></h4>",
-      "fr" : "<h3>Ceci est votre mail d'inscription.</h3><h4><a href=\"{{object.resumeURI}}\">Lien de vérification email</a></h4>"
+      "en" : "<h3>This is your registration email.</h3><p><a href=\"{{object.resumeURI}}\">Email verification link</a></p>",
+      "fr" : "<h3>Ceci est votre mail d'inscription.</h3><p><a href=\"{{object.resumeURI}}\">Lien de vérification email</a></p>"
     },
+    "styles": "body{background-color:#324054;color:#5e6d82;padding:60px;text-align:center}a{text-decoration:none;color:#109cf1}.content{background-color:#fff;border-radius:4px;margin:0 auto;padding:48px;width:235px}",
     "defaultLocale" : "en",
     "mimeType" : "text/html"
 }
