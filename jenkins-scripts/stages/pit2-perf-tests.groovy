@@ -7,12 +7,12 @@
  */
 
 
-import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
+import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.stage.FailureOutcome
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.Status
 
-void runStage(PipelineRunLegacyAdapter pipelineRun) {
+void runStage(PipelineRun pipelineRun) {
 
     def stageName = 'PIT2 PERF'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
@@ -20,6 +20,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('perf-cloud') {
             stage(stageName) {
+                pipelineRun.updateStageStatusAsInProgress()
+
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {

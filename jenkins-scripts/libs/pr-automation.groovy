@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 ForgeRock AS. All Rights Reserved
+ * Copyright 2019 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -7,7 +7,7 @@
  */
 
 import com.forgerock.pipeline.GlobalConfig
-import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
+import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.stage.Status
 
 /**
@@ -18,7 +18,7 @@ import com.forgerock.pipeline.stage.Status
  *
  * @param currentBuildCommit Git commit used in this build.
  */
-void mergeIfAutomatedProductVersionUpdate(PipelineRunLegacyAdapter pipelineRun, String currentBuildCommit) {
+void mergeIfAutomatedProductVersionUpdate(PipelineRun pipelineRun, String currentBuildCommit) {
     String project = scmUtils.getProjectName()
     String repo = scmUtils.getRepoName()
     String creds = credsId()

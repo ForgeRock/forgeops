@@ -6,9 +6,9 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
+import com.forgerock.pipeline.reporting.PipelineRun
 
-void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
+void runStage(PipelineRun pipelineRun, Random random) {
 
     def stageName = 'PIT1'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
@@ -17,6 +17,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
+                pipelineRun.updateStageStatusAsInProgress()
+
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 def gitBranch = isPR() ? "origin/pr/${env.CHANGE_ID}" : 'master'

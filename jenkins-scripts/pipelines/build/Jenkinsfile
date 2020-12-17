@@ -7,13 +7,12 @@
  */
 
 @Library([
-    'forgerock-pipeline-libs@a4f6060382c4edd70bedfd33adfa87120772fb53',
+    'forgerock-pipeline-libs@45b7fefa52bb82702c2ebd62d9c538fa7f218679',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
-    'java-pipeline-libs@2030cffcf3a3a246137c6299854fbaee96baca51'
+    'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ]) _
 
 import com.forgerock.pipeline.reporting.PipelineRun
-import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 BASE_VERSION = '7.0.0'
 
@@ -61,22 +60,12 @@ timestamps {
                 perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
             }
 
-            builder = PipelineRun.builder(env, steps)
-                    .pipelineName("forgeops")
-                    .branch(commonModule.FORGEOPS_GIT_BRANCH)
-                    .commit(commonModule.FORGEOPS_GIT_COMMIT)
-                    .committer(commonModule.FORGEOPS_GIT_COMMITTER)
-                    .commitMessage(commonModule.FORGEOPS_GIT_MESSAGE)
-                    .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.FORGEOPS_GIT_COMMITTER_DATE))
-                    .repo("forgeops")
-
-
             if (isPR() && prAutomation.isAutomatedPullRequest()) {
-                builder.commits(["forgeops": commonModule.FORGEOPS_GIT_COMMIT, "commits": prAutomation.getPrProductCommitHashes()])
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT,
+                        commits: prAutomation.getPrProductCommitHashes())
             } else {
-                builder.commits(["forgeops": commonModule.FORGEOPS_GIT_COMMIT])
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT)
             }
-            pipelineRun  = new PipelineRunLegacyAdapter(builder.build())
         }
 
         pipeline.build()

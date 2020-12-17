@@ -15,13 +15,12 @@ import java.net.URLDecoder
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Library([
-    'forgerock-pipeline-libs@a4f6060382c4edd70bedfd33adfa87120772fb53',
+    'forgerock-pipeline-libs@45b7fefa52bb82702c2ebd62d9c538fa7f218679',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
-    'java-pipeline-libs@2030cffcf3a3a246137c6299854fbaee96baca51'
+    'java-pipeline-libs@0e109e8bb0bb067d8505aff78709623f81100177'
 ])
 import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
-import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 def pipelineRun
 
@@ -70,15 +69,8 @@ timestamps {
                 // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
                 library "QaCloudUtils@${commonModule.LODESTAR_GIT_COMMIT}"
 
-                pipelineRun = new PipelineRunLegacyAdapter(PipelineRun.builder(env, steps)
-                        .pipelineName("forgeops")
-                        .branch(commonModule.FORGEOPS_GIT_BRANCH)
-                        .commit(commonModule.FORGEOPS_GIT_COMMIT)
-                        .commits(["forgeops": commonModule.FORGEOPS_GIT_COMMIT, "commits": commonModule.getCurrentProductCommitHashes()])
-                        .committer(commonModule.FORGEOPS_GIT_COMMITTER)
-                        .commitMessage(commonModule.FORGEOPS_GIT_MESSAGE)
-                        .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.FORGEOPS_GIT_COMMITTER_DATE))
-                        .repo("forgeops"))
+                pipelineRun = new PipelineRun(env, steps, 'forgeops', env.BRANCH_NAME, commonModule.FORGEOPS_GIT_COMMIT,
+                        commits: commonModule.getCurrentProductCommitHashes())
 
                 // Test stages
                 greenfieldTests = load("${stagesLocation}/pit2-greenfield-tests.groovy")

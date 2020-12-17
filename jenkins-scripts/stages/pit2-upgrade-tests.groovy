@@ -6,9 +6,9 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
+import com.forgerock.pipeline.reporting.PipelineRun
 
-void runStage(PipelineRunLegacyAdapter pipelineRun) {
+void runStage(PipelineRun pipelineRun) {
 
     def stageName = 'PIT2 Binary Upgrade'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
@@ -17,6 +17,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('pit2-upgrade') {
             stage(stageName) {
+                pipelineRun.updateStageStatusAsInProgress()
+
                 dir('lodestar') {
                     def stagesCloud = [:]
 
