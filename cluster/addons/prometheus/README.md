@@ -1,144 +1,190 @@
 # Prometheus and Grafana deployment
 
-The deployment uses the [Prometheus Operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator). 
+The CDM uses the 
+[Prometheus operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator)
+for monitoring and alerts. Before you attempt to customize the default 
+implementation, make sure you are familiar with Prometheus, Grafana, and 
+Alertmanager concepts in the following documentation:
 
-Alertmanager overview: [here](https://prometheus.io/docs/alerting/overview/).
+* [Alertmanager overview](https://prometheus.io/docs/alerting/overview/)
 
-Alertmanager configuration: [here](https://prometheus.io/docs/alerting/configuration/).
+* [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/)
 
-Grafana docs: [here](https://grafana.com/docs/grafana/latest/)
+* [Grafana](https://grafana.com/docs/grafana/latest/)
 
-**Note**: Any scripts and folder locations mentioned below are relative to top level folder of forgeops. 
+The following sections list the forgeops repository artifacts that are used to 
+deploy Prometheus, Grafana, and Alertmanager in the CDM.  
 
-**Prometheus solution comprises of the following artifacts:**  
+### Helm charts
 
-Helm charts:
-* **prometheus-operator** deploys the Prometheus, Grafana and Alertmanager products along with the relevant metrics exporters. 
-Creates custom resources which make the Prometheus deployment native to Kubernetes and configuration.
-* **forgerock-metrics**  provides configurable ServiceMonitors, alerting rules and some custom ForgeRock dashboards.  ServiceMonitors define the ForgeRock Identity Platform  
-component endpoints that are monitored by Prometheus.
-
-Scripts:
-* ```bin/prometheus-deploy.sh```: deploys the Helm charts mentioned above:
-* ```bin/prometheus-connect.sh```: wrapper script for port-forwarding to Prometheus and Grafana endpoints.
+* The ``prometheus-operator`` chart deploys Prometheus, Grafana, and 
+Alertmanager software. It also deploys the relevant metrics exporters. The 
+deployment creates custom resources to make Prometheus native to Kubernetes.
   
-Files:  
+* The ``forgerock-metrics`` chart provides configurable service monitors, 
+alerting rules and custom ForgeRock dashboards. Service monitors define the 
+ForgeRock Identity Platform component endpoints that Prometheus monitors.
 
-The ```bin/prometheus-deploy.sh``` uses files in cluster/addons/prometheus.
-* ```prometheus-operator.yaml```: override values for Promethes Operator, Prometheus, Grafana and Alertmanager. The default values  
-can be viewed [here](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml).  Either update prometheus-operator.yaml  
-or add your own override file with the -v flag 
-    ```
+### Scripts
+
+* The ```bin/prometheus-deploy.sh``` script deploys the Helm charts mentioned 
+above.
+  
+* The ```bin/prometheus-connect.sh``` wrapper script port forwards the 
+Prometheus, Grafana, and Alertmanager endpoints.
+  
+Note: All path locations mentioned in this README are relative to the forgeops
+repository's top-level directory. 
+  
+### Files in the ``cluster/addons/prometheus`` directory  
+
+* ``prometheus-operator.yaml``: Overrides values for the Prometheus operator, 
+Prometheus, Grafana, and Alertmanager. See   
+[the ``prometheus-operator`` Helm chart](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml)
+for default values. To modify default values, override the 
+``prometheus-operator.yaml`` file, or specify your own values file when you 
+deploy Prometheus. For example: 
+  
+```
     bin/deploy-prometheus.yaml -v <custom-values>.yaml
-    ```
-* ```forgerock-metrics```: Helm chart that includes ForgeRock service monitors, alerting rules and dashboards.
+```
+
+* ``forgerock-metrics``: a Helm chart that contains ForgeRock service 
+monitors, alerting rules, and dashboards.
 
 <br />
 
-# How Prometheus Operator works
+# How the Prometheus operator works
 
-Prometheus Operator creates, configures, and manages Prometheus monitoring instances. The Prometheus Operator  
-works by watching for ServiceMonitor CRDs (CRDs are Kubernetes Custom Resource Definitions). These are first  
-class Kubernetes types that you can manage with kubectl (kubectl create/delete/patch, etc.).  The ServiceMonitor  
-CRDs define the target to be scraped. 
+The Prometheus operator creates, configures, and manages Prometheus monitoring
+instances. The operator works by watching for service monitor CRDs. These CRDs
+are first-class Kubernetes types that you can manage with the ``kubectl``
+command.  The service monitor CRDs define targets to be scraped. 
 
-Prometheus Operator also defines alerting rules CRDs which allow for easy deployment of alerting rule files.  
+The operator also defines alerting rules CRDs that allow for easy deployment of
+alerting rule files.  
 
 <br />
 
 # How Prometheus works
 
-The Prometheus scrape configuration is generated and updated automatically by the Prometheus Operater as described above.  
-Prometheus uses its own config watcher to look for updated configurations.
+The Prometheus scrape configuration is generated and updated automatically by 
+the Prometheus operator, as described above. Prometheus uses its own 
+configuration watcher to look for updated configurations.
 
 <br />
 
 # How Grafana works
 
-The Grafana Helm chart is deployed as part of the prometheus-operator Helm chart.  Grafana automatically connects  
-to Prometheus and syncs all the metrics which are visible through graphs.  
+The Grafana Helm chart is deployed as part of the ``prometheus-operator`` Helm 
+chart.  Grafana automatically connects to Prometheus and syncs all the metrics.
+The metrics are visible through graphs.  
 
-Dashboards for ForgeRock products are added to the cluster/addons/prometheus/forgerock-metrics/dashboards folder.  The dashboards are automatically added  
-to a configmap and imported into Grafana.  For more info, see 'Import Custom Grafana Dashboards' in the 'How Tos'  
-section below.
+Dashboards for ForgeRock products are added to the Grafana deployment from the
+``cluster/addons/prometheus/forgerock-metrics/dashboards`` directory.  The 
+dashboards are automatically added to a configmap, and then imported into 
+Grafana. For more information, see the **Import Custom Grafana Dashboards**  
+how-to below.
 
 <br />
 
 # How Alertmanager works
-Alertmanager is used to redirect specific alerts from Prometheus to configured receivers.  
-To configure Alertmanager, there is an Alertmanager configuration section in ```cluster/addons/prometheus/prometheus-operator.yaml```.  
-Details about how to configure Alertmanager can be found in the link at the top of the page.  
-In summary:
-* global section defines attributes that apply to all alerts.
-* route section defines a tree topology of alert filters to direct particular alerts to a specific receiver.  
-Currently we're sending all alerts to a Slack receiver.
-* receivers section defines named configurations of notification integrations.
 
-Prometheus alerts are configured, by product, in the ```cluster/addons/prometheus/forgerock-metrics/fr-alerts.yaml``` file.  
-A PrometheusRules CRD has been included in the Helm chart which includes the fr-alerts.yaml file and syncs the  
-rules with Prometheus using labels.
+Alertmanager is used to redirect specific alerts from Prometheus to configured 
+receivers. Use the Alertmanager configuration section in 
+the ```cluster/addons/prometheus/prometheus-operator.yaml``` directory to 
+configure Alertmanager.  
+
+Alertmanager configuration details:
+
+* The ``global`` section defines attributes that apply to all alerts.
+  
+* The ``route`` section defines a tree topology of alert filters to direct 
+particular alerts to a specific receiver. The example deployment sends all 
+alerts to a Slack receiver.
+  
+* The ``receivers`` section defines named configurations of notification 
+integrations.
+
+Prometheus alerts are configured by product, in the 
+```cluster/addons/prometheus/forgerock-metrics/fr-alerts.yaml``` file.  
+The Helm chart that includes the ``fr-alerts.yaml`` file also contains
+a Prometheus rules CRD. The CRD syncs the rules with Prometheus using labels.
 
 # Deployment instructions
-### Pre-requisites
-* Deployed ForgeRock applications in Cloud Environment.
-* Authenticated to cluster.
 
-### Prepare for deployment
-* cd to the bin folder in your forgeops repo clone.
+### Prerequisites
 
-* Running the deployment without any overrides will use the default values file which deploys to 'monitoring'  
-namespace and scrapes metrics from all ForgeRock product endpoints, across all namespaces, based on configured labels.  
+* The ForgeRock applications are deployed in a cloud environment.
+* You have authenticated to a Kubernetes cluster.
 
-* To provide custom Prometheus, Alertmanager or Grafana configuration, see the  
-**Overriding Prometheus and Alertmanager configuration values** 'How To' below.
+### To Deploy
 
-### Deploy
+* ``cd`` to the ``bin`` folder in your forgeops repository clone.
 
-Run the deploy script ```bin/prometheus-deploy.sh``` with the OPTIONAL flags:
-* -n *namespace* \[optional\] : to deploy Prometheus into.  Default = monitoring.
-* -v *custom values file* \[optional\] : absolute path to yaml file to override ```/path/to/<custom-values>.yaml```.
-* -h view help
+* Run the ``prometheus-deploy.sh`` script:
 
-### View Prometheus/Grafana/Alertmanager
+  * Running the deployment without any overrides uses the default values file,
+which deploys to the ``monitoring`` namespace, and scrapes metrics from all 
+ForgeRock product endpoints, across all namespaces, based on configured labels.  
 
-The following script uses kubectl port forwarding to access the Prometheus, Grafana and Alertmanager UIs.  
-Run ```bin/prometheus-connect.sh``` with the following flags:  
-* -G (Grafana), -P (Prometheus) or -A (Alertmanager).
-* -n *namespace* \[optional\] : where Grafana/Prometheus/Alertmanager is deployed.  Default = monitoring.
-* -p *port* \[optional\] : Grafana uses local port 3000, Prometheus 9090 and Alertmanager 9093. If you want to use different  
-ports, or need to access multiple instance of Grafana/Prometheus/Alertmanager, use the -p flag.
-* -h view help
+  * If you want to provide custom Prometheus, Alertmanager or Grafana 
+configuration values, see the  
+**Override Prometheus and Alertmanager configuration values** how-to below.
 
-View Prometheus:
-* In browser: localhost:9090 (unless altered in the above script).
-* Status/targets: to view whether targets are up or down and last scrape time.
-* Status/configuration: to view the Prometheus scrape configs made up of all the configuration
-provided by the Service Monitors
+### Start the Prometheus, Grafana, and Alertmanager UIs
 
-View Grafana:
-* In browser: localhost:3000 (unless altered in the above script).
-* Login for Grafana: admin/admin.
-* View dashboards clicking top left icon then select dashboards.
+Before attempting to access the Prometheus, Grafana, and Alertmanager UIs, 
+forward ports using the ```bin/prometheus-connect.sh``` script: 
 
-View Alertmanager:
-* In browser: localhost:9093 (unless altered in the above script).
-* Status: view Alertmanager configuration.
-* Alerts: current alerts.
+* For Grafana, run ```bin/prometheus-connect.sh -G```
 
+* For Prometheus, run ```bin/prometheus-connect.sh -P```
+
+* For Alertmanager, run ```bin/prometheus-connect.sh -A```
+
+By default, Grafana uses local port 3000, Prometheus, port 9090 and 
+Alertmanager, 9093. You can specify alternate ports using the ``-p`` option
+when you run the ``prometheus-connect.sh`` script.
+
+To access the UIs on the default ports:
+
+* For Grafana, go to localhost:3000. User admin/admin to log in. To view 
+dashboards, select the top left icon, then select Dashboards.
+  
+* For Prometheus, go to localhost:9090. Select Status > Targets to see whether 
+targets are up or down and the last scrape time. Select Status > Configuration 
+to see the Prometheus scrape configurations provided by the service monitors.
+  
+* For Alertmanager, go to localhost:9093. Select Status to see the Alertmanager
+configuration. Select Alerts to see current Alerts.
+  
 <br />
 
-# How Tos.
+# How-tos
 
-### Configure new endpoints to be scraped by Prometheus.
+### Configure new endpoints to be scraped by Prometheus
 
-If you want Prometheus to scrape metrics from a different product, you need to create a new ServiceMonitor in the  
-exporter-forgerock Helm chart.  Please follow these steps:
-* Copy the am.yaml ServiceMonitor file and rename file to \<product-name\>.yaml.
+If you want Prometheus to scrape metrics from a different product, you need to 
+create a new service monitor in the ``exporter-forgerock`` Helm chart.  Follow
+these steps:
+
+* Copy the ``am.yaml`` service monitor file and rename the new file to 
+``\<product-name\>.yaml``.
+  
 * Change the following fields:
-    * change 'port: am' to either port: \<port name\> or targetPort: \<port number\>
-    * find and replace 'am' with 'product-name'.
-    * If you don't require authentication to scrape the endpoint, then remove the basicAuth section.
-* In values.yaml, copy the below am section and create a new section as described by the comments:
+  
+  * Change ``port: am`` to either ``port: \<port name\>`` or 
+``targetPort: \<port number\>``.
+
+  * Find and replace ``am`` with ``product-name``.
+
+  * If you don't require authentication to scrape the endpoint, then remove the 
+``basicAuth`` section.
+
+  * In the ``values.yaml`` file, create a new section based on the ``am`` section.
+Change the values in the new section as described by the comments:
+
     ```
     <product name>:
         component: am   # product name to define the ServiceMonitor
@@ -148,11 +194,17 @@ exporter-forgerock Helm chart.  Please follow these steps:
         secretUser: cHJvbWV0aGV1cw==        # username in base64 encode if required
         secretPassword: cHJvbWV0aGV1cw==        # password in base64 encode if required
     ```
-* The default scope for Prometheus is to scrape all namespaces configured in values.yaml like this:
+  
+  * The default scope for Prometheus is to scrape all namespaces configured in 
+the ``values.yaml`` file, like this:
+
     ```
     namespaceSelectorStrategy: any
     ```
-  If you want to limit this scope, you can define a list of namespace, for example:
+    
+  * If you want to limit this scope, you can define a list of namespaces. For 
+example:
+
     ```
     namespaceSelectorStrategy: selection
     namespaceSelector:
@@ -160,61 +212,73 @@ exporter-forgerock Helm chart.  Please follow these steps:
       - staging
       - test
     ```
-* Update Prometheus with new ServiceMonitor
+
+  * Update Prometheus with the new service monitor:
+
     ```
     bin/prometheus-deploy.sh [-n <namespace>]
     ```
 
-### Overriding Prometheus, Alertmanager and Grafana configuration values.
-The default deployment uses configuration values in ```cluster/addons/prometheus/prometheus-operator.yaml```. This file is just  
-an override of the prometheus-operator Helm chart default values file.  This file contains configuration values for Prometheus,  
-Alertmanager and Grafana.
+### Override Prometheus, Alertmanager and Grafana configuration values
 
-You can provide your own custom configuration by customizing a copy of ```prometheus-operator.yaml``` and deploying as follows:
+The entire configuration for Prometheus, Alertmanager, and Grafana can be found
+in the [Prometheus operator Helm chart values 
+file](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml).
+Configuration overrides for the CDM are contained in the
+``cluster/addons/prometheus/prometheus-operator.yaml`` file. If you want to 
+specify additional customized configuration values, do one of the following: 
+
+* Extend the ``cluster/addons/prometheus/prometheus-operator.yaml`` file, adding
+your custom configuration values to the file.
+
+* Provide your own custom configuration by copying the 
+``prometheus-operator.yaml`` file and modifying it with your custom 
+configuration values. Then, specify the customized configuration file when you 
+deploy the Prometheus operator:
+
 ```
-    bin/prometheus-deploy.sh -v <path/to/custom-prometheus-operator.yaml>
+    bin/prometheus-deploy.sh -v /path/to/custom-prometheus-operator.yaml
 ```
 
-The main uses of this custom file will be to:
-* customize the Alertmanager configuration which determines whether to send alert notifications to a particular receiver  
-(Slack for example).
-* customize the Prometheus configuration to include new endpoints to monitor as described in the  
-**Configure new endpoints to be scraped by Prometheus** 'How To' (e.g. an additional service that's running alongside  
-FR products). 
-* customize the Grafana configuration.  
+### Configure alerting rules
 
-All values can be found in the Prometheus Operator Helm chart values file [here](https://github.com/helm/charts/blob/master/stable/prometheus-operator/values.yaml).
- 
+To add new alerting rules, add rules to the ``fr-alerts.yaml`` file. This file 
+is split into groups, with a group for each product, and a separate group for 
+cluster rules.  
 
-### Configure alerting rules.
-To add new alerting rules, add additional rules to ```fr-alerts.yaml```. fr-alerts.yaml is split into groups with a  
-group for each product and a separate group for cluster rules.  
+See [Prometheus Alerting](https://prometheus.io/docs/practices/alerting/) for 
+details on configuring alerts.   
 
-See [Prometheus alerting](https://prometheus.io/docs/practices/alerting/) for details on configuring alerts.   
+### Configure alert notifications
 
-### Configure alert notifications.
-The default Alertmanager configuration in ```cluster/addons/prometheus/prometheus-operator.yaml``` is not configured to send any alert  
-notifications. See the alertmanager.config section in the Prometheus Operator Helm  chart values file.
+The default Alertmanager configuration in the 
+``cluster/addons/prometheus/prometheus-operator.yaml`` file is not configured to
+send any alert notifications. Use the the ``alertmanager.config`` section in the 
+Prometheus operator Helm chart values file to configure alert notifications.
 
-See [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/) and [Alertmanger notifications](https://prometheus.io/docs/alerting/notifications/) for more details.
+For more information, see
+[Alertmanager Configuration](https://prometheus.io/docs/alerting/configuration/) 
+and 
+[Alertmanger Notifications](https://prometheus.io/docs/alerting/notifications/).
 
-### Import Custom Grafana Dashboards.
-Grafana comes with a set of predefined Grafana dashboards for viewing Kubernetes and cluster metrics.  Further custom  
-dashboards can be added to the deployment by adding the dasboard json files into the ```cluster/addons/prometheus/forgerock-metrics/dashboards``` folder. 
+### Import custom Grafana dashboards
 
-### Expose Prometheus and Grafana externally.
-External access is enabled by default using host ```<prometheus|grafana|alertmanager>.iam.example.com```.  
-To change the hostname, just edit the <prometheus|grafana|alertmanager>.ingress.hosts value in ```prometheus-operator.yaml```.
+Grafana includes a set of predefined dashboards for viewing Kubernetes and 
+cluster metrics.  You can add custom dashboards to your deployment by adding 
+dashboard JSON files to the 
+``cluster/addons/prometheus/forgerock-metrics/dashboards`` directory. 
 
+### Expose Prometheus and Grafana externally
 
-The labels are optional and the hostname and secret name align with the current deployment of forgeops with cert-manager.
+External access is enabled by default using the FQDNs, 
+``<prometheus|grafana|alertmanager>.iam.example.com``.
 
+If you want to change the hostname, edit the 
+``<prometheus|grafana|alertmanager>.ingress.hosts`` value in the  
+``prometheus-operator.yaml`` file.
 
-
-
-
-
-
+The labels are optional, and the hostname and secret name align with the current
+deployment of the CDM with cert-manager.
 
 
 
