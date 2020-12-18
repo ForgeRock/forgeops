@@ -173,6 +173,11 @@ upgrade_config(){
 	
 	cp -R "$DOCKER_ROOT/am-config-upgrader/config/"  "$DOCKER_ROOT/am/config"
 	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+
+	# Shut down config upgrader job
+	printf "Shutting down config upgrader job...\n"
+
+	del=$(skaffold delete -p config-upgrader)
 }
 
 # clear the product configs $1 from the docker directory.
