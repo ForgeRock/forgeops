@@ -46,8 +46,8 @@ spec:
       script: |
         #!/usr/bin/env bash
         {
-          echo "Waiting for 5 minutes for system to come up"
-          sleep 300
+          echo "Waiting for 1 minute for system to come up"
+          sleep 60
         }
 
     - name: wait-for-amster-config

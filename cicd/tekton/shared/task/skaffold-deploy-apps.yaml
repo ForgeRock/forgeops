@@ -1,4 +1,4 @@
-# Deploys the apps only to the prod namespace
+# Deploys the apps only
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:

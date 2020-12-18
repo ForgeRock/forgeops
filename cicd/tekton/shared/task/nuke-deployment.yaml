@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: nuke-deployment
+spec:
+  params:
+  - name: namespace
+    type: string
+    description: target namespace
+  steps:
+  # Nuke everything in the namespace
+  - name: delete-deployment
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    script: |
+      #!/usr/bin/env bash
+      set -x
+      kubectl -n '$(params.namespace)' delete sts,service,deployment,job,cronjob,ingress --all
+      kubectl -n '$(params.namespace)' delete  secretagentconfiguration,directoryservice --all
+      kubectl  -n '$(params.namespace)' delete pvc --all

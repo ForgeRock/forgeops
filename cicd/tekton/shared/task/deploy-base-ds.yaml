@@ -3,7 +3,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: skaffold-deploy-base-ds
+  name: deploy-base-ds
 spec:
   resources:
     inputs:
@@ -33,6 +33,8 @@ spec:
         sleep 30
         kubectl apply -n '$(params.namespace)' -f kustomize/base/ds-cts/ds-cts.yaml
         kubectl apply -n '$(params.namespace)' -f kustomize/base/ds-idrepo/ds-idrepo.yaml
+        echo "sleeping a bit to give the directory time to come up"
+        sleep 30
       } || {
         msg='Failed to deploy the base environment and directory to the $(params.namespace) namespace. See pipeline logs'
         echo $msg | tee /tekton/results/status

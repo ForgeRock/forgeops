@@ -1,0 +1,43 @@
+# Run amster
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: amster-load
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+  results:
+  - name: status
+    description: Deployment status
+
+  params:
+  - name: namespace
+    type: string
+    description: namespace to deploy in.
+
+  - name: skaffold-file
+    type: string
+    description: Filename of skaffold.yaml
+    default: nightly.yaml
+
+  - name: docker-repo
+    type: string
+    default: gcr.io/engineering-devops/nightly
+
+  steps:
+  - name: deploy-new-env
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    script: |
+      #!/usr/bin/env bash
+      set -x
+      cd /workspace/forgeops
+      ./bin/config.sh init
+      skaffold -n '$(params.namespace)' -f '$(params.skaffold-file)'  -p amster --default-repo='$(params.docker-repo)' delete
+      sleep 10
+      set -e -o pipefail
+
+      skaffold -n '$(params.namespace)' -f '$(params.skaffold-file)'  -p amster --default-repo='$(params.docker-repo)' run
+
+      kubectl -n '$(params.namespace)' wait --timeout=600s job/amster --for=condition=complete
