@@ -132,70 +132,19 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/forgeops
 
-# 24/7 Demo environment
-- name: nightly
-  build: &kaniko-build
+
+# Images tagged as environment variable
+- name: image-tag
+  build:
+    tagPolicy:
+      envTemplate:
+        template: "{{.IMAGE_TAG}}"
     artifacts: *kaniko-artifacts
     cluster: *kaniko-cluster
-    tagPolicy:
-      sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/nightly
+      path: ./kustomize/overlay/7.0/all
 
-# Images tagged as environment variable 
-- name: image-tag                       
-  build:                   
-    tagPolicy:                          
-      envTemplate:                      
-        template: "{{.IMAGE_TAG}}"      
-    artifacts: *kaniko-artifacts        
-    cluster: *kaniko-cluster            
-  deploy:                               
-    kustomize:                          
-      path: ./kustomize/overlay/7.0/all 
-
-# 24/7 demo that is continually upgraded (nightly is deployed fresh every night)
-# Just the directory services
-- name: prod-ds
-  build:
-    artifacts:
-    - *DS-CTS_KANIKO
-    - *DS-IDREPO_KANIKO
-    cluster: *kaniko-cluster
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/prod-ds
-# Just AM/IDM apps
-- name: prod-apps
-  build:
-    artifacts:
-    - *AM_KANIKO
-    - *IDM_KANIKO
-    cluster: *kaniko-cluster
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/prod-apps
-
-# Just initial load apps. These can be deleted after the initial deployment
-- name: prod-load
-  build:
-    artifacts:
-    - *LDIF-IMPORTER_KANIKO
-    - *AMSTER_KANIKO
-    cluster: *kaniko-cluster
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/prod-load
 
 # Smoke tests
 - name: smoke
@@ -209,17 +158,22 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/smoke
 
+
+# kdev - development build for the toolbox image, using the generated kustomize
+- name: kdev
+  build: &kaniko-build
+    artifacts: *kaniko-artifacts
+    cluster: *kaniko-cluster
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+        path: ./dev
+
 # Default with Kaniko
 - name: default-kaniko
   build: *kaniko-build
   deploy: *default-deploy
-
-# kdev - development build for the toolbox image, using the generated kustomize
-- name: kdev
-  build: *kaniko-build
-  deploy:
-    kustomize:
-        path: ./dev
 
 - name: dev
   build: *default-build
@@ -350,7 +304,7 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/amster-export
-    
+
 - name: amster-import
   build:
     artifacts:
