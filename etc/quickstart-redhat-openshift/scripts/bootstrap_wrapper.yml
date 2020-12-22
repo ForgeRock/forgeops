@@ -1,8 +1,0 @@
----
-- name: "Wait for instances to become reachable"
-  hosts: all
-  gather_facts: no
-  strategy: debug
-  tasks:
-    - name: Wait for SSH on all hosts.
-      wait_for_connection:

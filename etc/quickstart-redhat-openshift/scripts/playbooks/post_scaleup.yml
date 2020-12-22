@@ -1,8 +1,0 @@
-# Note: No variables are passed to this playbook. 
-# The expectation is that any tasks will use the Ansible Inventory.
-# Please raise a github issue if this does not fit your use case.
----
-- hosts: all
-  tasks:
-  - debug:
-      msg: running post-scaleup for all
