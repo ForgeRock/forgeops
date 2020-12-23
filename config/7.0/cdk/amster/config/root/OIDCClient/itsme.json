@@ -29,7 +29,6 @@
     "scopeDelimiter" : " ",
     "transform" : "3d97c436-42c0-4dd0-a571-ea6f34f752b3",
     "pkceMethod" : "S256",
-    "requestObjectOptions" : "none",
     "_type" : {
       "_id" : "oidcConfig",
       "name" : "Client configuration for providers that implement the OpenID Connect specification.",

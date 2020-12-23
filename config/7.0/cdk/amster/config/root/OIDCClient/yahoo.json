@@ -30,7 +30,6 @@
     "transform" : "424da748-82cc-4b54-be6f-82bd64d82a74",
     "acrValues" : [ ],
     "pkceMethod" : "S256",
-    "requestObjectOptions" : "none",
     "_type" : {
       "_id" : "oidcConfig",
       "name" : "Client configuration for providers that implement the OpenID Connect specification.",
