@@ -33,16 +33,20 @@ deploy() {
 
     # Add stable repo to helm
     helm repo add "stable" "https://charts.helm.sh/stable" --force-update
+    helm repo add "prometheus-community" "https://prometheus-community.github.io/helm-charts" --force-update
 
-    helm upgrade -i prometheus-operator stable/prometheus-operator  -f $PROM_VALUES --namespace=$NAMESPACE
+    helm upgrade -i prometheus-operator prometheus-community/kube-prometheus-stack  -f $PROM_VALUES --namespace=$NAMESPACE
 
     kubectl -n $NAMESPACE wait --for condition=established --timeout=60s \
         crd/prometheuses.monitoring.coreos.com \
         crd/servicemonitors.monitoring.coreos.com \
         crd/servicemonitors.monitoring.coreos.com \
         crd/podmonitors.monitoring.coreos.com \
-        crd/alertmanagers.monitoring.coreos.com
+        crd/alertmanagers.monitoring.coreos.com \
+        crd/alertmanagerconfigs.monitoring.coreos.com \
+        crd/probes.monitoring.coreos.com 
 
+    kubectl -n $NAMESPACE wait --for condition=Ready --timeout=60s pod --all
     # Install/Upgrade forgerock-servicemonitors
     helm upgrade -i forgerock-metrics ${ADDONS_DIR}/forgerock-metrics --namespace=$NAMESPACE
 }
@@ -64,6 +68,9 @@ delete() {
     kubectl delete --wait=true crd servicemonitors.monitoring.coreos.com
     kubectl delete --wait=true crd podmonitors.monitoring.coreos.com
     kubectl delete --wait=true crd alertmanagers.monitoring.coreos.com
+    kubectl delete --wait=true crd alertmanagerconfigs.monitoring.coreos.com
+    kubectl delete --wait=true crd probes.monitoring.coreos.com
+    kubectl delete --wait=true crd thanosrulers.monitoring.coreos.com
 
     # Delete monitoring namespace
     kubectl delete ns $NAMESPACE
