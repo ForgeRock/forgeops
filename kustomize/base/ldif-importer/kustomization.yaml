@@ -1,7 +1,10 @@
 kind: ""
 apiversion: ""
 commonLabels:
+  app.kubernetes.io/name: ldif-importer
+  app.kubernetes.io/instance: ldif-importer
+  app.kubernetes.io/component: directory
+  app.kubernetes.io/part-of: forgerock
   app: ldif-importer
-  vendor: forgerock
 resources:
 - job.yaml

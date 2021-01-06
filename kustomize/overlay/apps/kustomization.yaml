@@ -1,6 +1,6 @@
 # Deploy the platform apps
 commonLabels:
-  app.kubernetes.io/name: "forgerock"
+  app.kubernetes.io/part-of: "forgerock"
 resources:
 - ../../base/am-cdk
 - ../../base/idm

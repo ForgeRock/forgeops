@@ -1,7 +1,9 @@
 kind: ""
 apiVersion: ""
 commonLabels:
-  app: am-config-upgrader
-  vendor: forgerock
+  app.kubernetes.io/name: am-config-upgrader
+  app.kubernetes.io/instance: am-config-upgrader
+  app.kubernetes.io/component: am-config-upgrader
+  app.kubernetes.io/part-of: forgerock
 resources:
 - job.yaml

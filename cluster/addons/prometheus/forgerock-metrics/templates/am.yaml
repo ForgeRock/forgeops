@@ -30,7 +30,7 @@ spec:
   # This targets the service using a label.
   selector:
     matchLabels:
-      component: {{ .Values.am.labelSelectorComponent }}
+      app.kubernetes.io/component: {{ .Values.am.labelSelectorComponent }}
   namespaceSelector:
     {{ if eq .Values.namespaceSelectorStrategy "any" }}
     any: true

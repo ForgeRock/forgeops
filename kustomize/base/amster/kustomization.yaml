@@ -1,7 +1,10 @@
 kind: ""
 apiVersion: ""
 commonLabels:
+  app.kubernetes.io/name: amster
+  app.kubernetes.io/instance: amster
+  app.kubernetes.io/component: am
+  app.kubernetes.io/part-of: forgerock
   app: amster
-  vendor: forgerock
 resources:
 - job.yaml

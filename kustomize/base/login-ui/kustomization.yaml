@@ -1,8 +1,10 @@
 kind: ""
 apiversion: ""
 commonLabels:
-  app: login-ui
-  vendor: forgerock
+  app.kubernetes.io/name: login-ui
+  app.kubernetes.io/instance: login-ui
+  app.kubernetes.io/component: ui
+  app.kubernetes.io/part-of: forgerock
   tier: ui
 resources:
 - deployment.yaml

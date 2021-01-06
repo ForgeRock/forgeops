@@ -5,11 +5,11 @@ kind: Application
 metadata:
   name: "forgerock-01"
   labels:
-    app.kubernetes.io/name: "forgerock"
+    app.kubernetes.io/part-of: "forgerock"
 spec:
   selector:
     matchLabels:
-     app.kubernetes.io/name: "forgerock"
+     app.kubernetes.io/part-of: "forgerock"
   componentKinds:
     - group: v1
       kind: Service

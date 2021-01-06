@@ -1,7 +1,7 @@
 # for self signed SSL certs. It is suitable for local minikube development
 namespace: smoke
 commonLabels:
-  app.kubernetes.io/name: "forgerock"
+  app.kubernetes.io/part-of: "forgerock"
 resources:
 - ../forgeops
 

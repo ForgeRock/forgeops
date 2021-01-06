@@ -1,8 +1,10 @@
 kind: ""
 apiversion: ""
 commonLabels:
-  app: admin-ui
-  vendor: forgerock
+  app.kubernetes.io/name: admin-ui
+  app.kubernetes.io/instance: admin-ui
+  app.kubernetes.io/component: ui
+  app.kubernetes.io/part-of: forgerock
   tier: ui
 resources:
 - deployment.yaml

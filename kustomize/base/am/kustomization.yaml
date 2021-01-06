@@ -1,11 +1,12 @@
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 commonLabels:
-  app: am
-  # Prometheus selector
-  component: am
+  app.kubernetes.io/name: am
+  app.kubernetes.io/instance: am
+  app.kubernetes.io/component: am
+  app.kubernetes.io/part-of: forgerock
   tier: middle
-  vendor: forgerock
+  app: am
 # - ingress.yaml
 resources:
 - deployment.yaml
