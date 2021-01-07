@@ -27,7 +27,8 @@ void runStage(PipelineRun pipelineRun) {
                     def config_common = [
                         CLUSTER_DOMAIN                                  : 'pit-24-7.forgeops.com',
                         CLUSTER_NAMESPACE                               : initialSubStageName,
-                        COMPONENTS_AMSTER_IMAGE_TAG                     : fraasTag,
+                        // Workaround as we can't build Amster with fraas-production tag
+                        COMPONENTS_AMSTER_IMAGE_TAG                     : '7.1.0-IDCLOUD-da79b63be2ac9319c7716dbdb06d387bd2ee1dc3',
                         COMPONENTS_AM_IMAGE_TAG                         : fraasTag,
                         COMPONENTS_AM_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('am'),
                         COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/am-base/pit1',
