@@ -56,6 +56,8 @@ defaultRules:
         kubeScheduler: false
         kubernetesSystem: false
 
+kubeScheduler:
+  enabled: false
 coreDns:
     enabled: false
 kubeEtcd:
