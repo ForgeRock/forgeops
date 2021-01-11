@@ -1,36 +1,45 @@
-# OpenShift Cluster
+# Deploy the ForgeRock Identity Platform in an OpenShift Cluster
 
-**NOTICE** This README was written when OpenShift 4 and the installer were in pre-beta development. Most of this is likely to be out of date since they were mostly work arounds and you should understand most of the tools to utilize this README.
+## Important
 
-The important changes to run on OpenShift are located in `kustomize/env/openshift`
+This README was written when OpenShift 4 and its installer were in pre-beta 
+development. Most of the information in this README is likely to be out of date,
+since it's primarily a compilation of workarounds. But if you understand 
+OpenShift, you should be able to utilize this README. This deployment has been 
+tested only on AWS, but the os-install works for multiple providers.
 
-Known Issues with OpenShift
-* Ingress/Route controller for OpenShift uses HA Proxy and might need a custom configuration deployed to support proper load balancing and re directs
-* The PSP currently in the repo for the UI containers isn't required anymore
-* Secret Agent controller hasn't been tested on OpenShift 
+## File Locations
 
-_Tested on AWS only but the os-install works for multiple providers_
+The artifacts required to run the ForgeRock Identity Platform on OpenShift are 
+located in the `kustomize/overlay/7.0/openshift` directory.
 
 ## Create a Red Hat developer account
 
-[Create Red Hat account.](https://developers.redhat.com/)
-[Get the registry secrets.](https://cloud.Red Hat.com/openshift/install/aws/installer-provisioned) see the `Download pull secrets` and `Download command-line tools` buttons.
+Before starting, make sure you have a Red Hat developer account, and have 
+obtained registry secrets.
 
-You should have `openshift-installer` and `oc` in your path to proceed.
+[Create a Red Hat account.](https://developers.redhat.com/)
 
+[Get the registry secrets](https://cloud.redhat.com/openshift/install/aws/installer-provisioned) -
+use the `Download pull secrets` and `Download command-line tools` buttons.
 
-##  Quick script
+##  Run the Installer Script
 
-You should have `yq` and `aws` in your path to proceed with the script.
+Make sure the `openshift-installer`, `oc`, `yq` and `aws` commands are in your 
+path.
 
-Create file to contain your secrets:
+Create a file to contain your secrets:
 ```
 cp cluster/openshift/env/example-secrets.yaml cluster/openshift/env/local.yaml
 ```
 
-Now edit `local.yaml`. Edit SSH public key value (`sshKey`) and Red Hat pull secrets `pullSecret`. `cluster/openshift/env/local.yaml` will be merged with `cluster/openshift/installer-config.yaml` before the installer is run using `bin/openshift-install.sh`
+Edit the `local.yaml` file. Set the SSH public key value (`sshKey`) and Red 
+Hat pull secrets (`pullSecret`). The `cluster/openshift/env/local.yaml` will be 
+merged with the `cluster/openshift/installer-config.yaml` file when you run 
+the installer script in the next step. 
 
-Run script:
+Run the installer script. Note that running the scriopt requires nearly all 
+privileges on your AWS account; see the OpenShift installer documentation: 
 
 ```                                                                                                                                                          
 # to follow progress `less +F forgerock-openshift/.openshift_install.log`                                                                                    
@@ -38,18 +47,22 @@ Run script:
 bash bin/openshift-install.sh forgerock-openshift                                                                                                            
 ```                                                                                                                                                          
 
-Note: This will require nearly all privileges on your AWS account (see openshift installer docs).
+## Deploy and Run the ForgeRock Identity Platform
 
-## Running forgeops
+Running and deploying to OpenShift is slightly different than working with other
+cloud providers. Skaffold deploys containers using the label and the SHA of the 
+image. The runtime for OpenShift (cri-o) doesn't know how to handle that 
+tagging, and will fail to pull images. There are open tickets to fix this 
+incompatibility on both Skaffold and `cri-o`.
 
-_update: this section about cri-o issues might be resolved, but a new skaffold profile will need to be setup to use the openshift kustomize `kustomize/env/openshift`_
-Running and deploying to OpenShift is slightly different than working with other clusters. Skaffold deploys containers using the label and the SHA of the image. The runtime for openshift (cri-o) doesn't know how to handle that tagging and will fail to pull images. There are open tickets on both Skaffold and the runtime OpenShift uses `cri-o` to fix compatability.
+_update: this section about cri-o issues might be resolved, but a new Skaffold 
+profile will need to be setup to use the openshift kustomize `kustomize/env/openshift`_
 
-Deploying involves two steps:
-1. run skaffold build and push to a registry in AWS
-1. use kustomize and `oc` to deploy
+To deploy the platform on OpenShift:
 
-Build images _note: ideal to do a network with good upload speed_
+1. First, run `skaffold build`, and then push to an AWS registry. It's ideal to 
+   do this on a network with good upload speed.
+1. Then, use `kustomize` and `oc` to deploy.
 
 ```
 ~/projects/forgeops2 on  CLOUD-1632-scripts-for-openshift ● ●
@@ -111,14 +124,14 @@ The push refers to repository [ACCT_ID.dkr.ecr.us-east-1.amazonaws.com/forgeops/
 ...etc...
 ```
 
-
-Configure Kustomize so that it changes the docker image names to the names you created in the registry.
+Configure Kustomize so that it changes the Docker image names to the names you 
+created in the registry:
 
 ```
 bin/openshift-configure-kustomize-images.sh
 ```
 
-Now deploy
+Now deploy:
 
 ```
 oc login # user/pass should have been in the last two lines of the install output (see last line of shell script)
@@ -126,14 +139,25 @@ kustomize build kustomize/env/openshift | oc apply -f -
 oc get po,sts
 ```
 
-There seems to be an issue with continually re-deploying security profiles, so when updating it will show errors for those files but that doesn't have any side effect except ugly shell output.
+## Known Issues
 
-```
+There's an issue with continually re-deploying security profiles, so when 
+updating, it will show errors for those files but that doesn't have any side 
+effect except ugly shell output.
 
-Tickets have full details:
+The following Jira issues have full details:
 
 * CLOUD-1565 	Investigate OpenShift deployment
-* CLOUD-1585 	bootstrap AWS account for openshift installer
-* CLOUD-1586 	install openshift on AWS
-* CLOUD-1587 	deploy directory service to openshift
-* CLOUD-1588 	deploy rest of services to openshift
+* CLOUD-1585 	Bootstrap AWS account for OpenShift installer
+* CLOUD-1586 	install OpenShift on AWS
+* CLOUD-1587 	Deploy directory service to OpenShift
+* CLOUD-1588 	Deploy rest of services to OpenShift
+
+The following are known issues with ForgeRock Identity Platform deployments on 
+OpenShift:
+
+* The OpenShift ingress/route controller uses HA Proxy and might need a custom 
+  configuration deployed to support proper load balancing and redirects.
+* The PSP currently in the repo for the UI containers isn't required anymore.
+* The Secret Agent controller hasn't been tested on OpenShift.
+  
