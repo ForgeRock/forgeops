@@ -63,7 +63,7 @@ integration of IDM and AM.
    * The Access Manager Core Token Service (ds-cts).
 * A Gatling test harness, which exercises the basic deployment and can be modified to include additional tests.
 
-The 7.0 deployment provide the following additional enhancements:
+The 7.0 deployment provides the following additional enhancements:
 
 * AM and IDM are integrated, and share a common repository for users. The directory server instance
 (ds-idrepo) is used as the user store for both products, and as the managed repository for IDM objects. A
@@ -73,8 +73,14 @@ separate postgres SQL database is *NOT* required.
 
 ## Getting Started
 
-You'll need to install some third-party software, set up a Kubernetes cluster, and
-install the ForgeRock Identity Platform. 
+If you just want to observe the ForgeRock Identity Platform in action on a 
+Kubernetes cluster, you can try out our [CDQ (Cloud Deployment 
+Quickstart)](https://ea.forgerock.com/docs/forgeops/quickstart.html).
+You can get the CDQ up and running quickly, but its capabilities are _very_ 
+limited.   
+
+For a full CDK deployment, you'll need to install some third-party software, set
+up a Kubernetes cluster, and install the ForgeRock Identity Platform. 
 
 See the [CDK documentation](https://backstage.forgerock.com/docs/forgeops/7/index-cdk.html) 
 for detailed information about all these tasks.
