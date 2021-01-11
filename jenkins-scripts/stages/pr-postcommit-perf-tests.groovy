@@ -36,6 +36,7 @@ void runStage(PipelineRun pipelineRun, Random random) {
                             DEPLOYMENT_NAME      : 'small',
                             CLUSTER_DOMAIN       : 'pit-cluster.forgeops.com',
                             CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
+                            DO_RECORD_RESULT     : false,
                             PIPELINE_NAME        : 'FORGEOPS_POSTCOMMIT',
                         ]
 
