@@ -1,0 +1,13 @@
+kind: Kustomization
+
+# To change the image or repo, use this:
+# images:
+# - name: gcr.io/forgeops-public/am-eval
+#   newName: gcr.io/forgeops-public/am-eval
+#   newTag: 7.1-dev
+
+resources:
+- am.yaml
+
+# patches:
+# - am-sidecar.yaml

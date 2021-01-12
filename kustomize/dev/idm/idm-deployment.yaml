@@ -1,0 +1,181 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: idm
+    app.kubernetes.io/component: idm
+  name: idm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: idm
+      app.kubernetes.io/component: idm
+  template:
+    metadata:
+     labels:
+        app.kubernetes.io/component: idm
+        app.kubernetes.io/instance: idm
+    spec:
+      initContainers:
+      ### The first init container copies the prototype config embedded in the image
+      - name: config
+        image: gcr.io/forgeops-public/idm-eval:7.1-dev
+        volumeMounts:
+        - mountPath: /fbc
+          name: fbc
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Copying idm configuration to emptyDir"
+          mkdir -p /fbc/conf
+          cp -r /opt/openidm/conf/* /fbc/conf
+
+      ### The next init container pulls the config from git-server - if it exists
+      ### If not - the prototype config in the image is used.
+      - name: git-init
+        imagePullPolicy: IfNotPresent
+        image: bitnami/git:latest
+        command: ["/scripts/git-clone.sh"]
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+            cpu: 100m
+        env:
+        - name: CONFIG_DIR
+          value: "conf"
+        - name: BRANCH
+          value: "idm"
+        volumeMounts:
+        - name: util
+          mountPath: /scripts
+        - name: git
+          mountPath: /git
+        - name: fbc
+          mountPath: /fbc
+
+
+      containers:
+      - name: openidm
+        env:
+        - name: BRANCH
+          value: "idm"
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OPENIDM_REPO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: dirmanager.pw
+              name: ds-passwords
+        - name: USERSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: dirmanager.pw
+              name: ds-passwords
+        - name: RS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: IDM_RS_CLIENT_SECRET
+              name: amster-env-secrets
+        envFrom:
+        - configMapRef:
+            name: idm
+        - secretRef:
+            name: idm-env-secrets
+        image: gcr.io/forgeops-public/idm-eval:7.1-dev
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value: "true"
+            path: /openidm/info/ping
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value: "true"
+            path: /openidm/info/ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 1280Mi
+            cpu: 1
+          requests:
+            cpu: 250m
+            memory: 768Mi
+        volumeMounts:
+        - mountPath: /var/run/secrets/idm
+          name: idm-secrets
+        - mountPath: /opt/openidm/logs
+          name: logs
+        - mountPath: /opt/openidm/audit
+          name: audit-logs
+        - mountPath: /var/run/openidm/logging
+          name: idm-logging-properties
+        - mountPath: /opt/openidm/conf
+          name: git
+          subPath: fr-config/conf
+      ### Git sync side car periodically sync any changes to the git-server
+      - name: git-sync
+        image:  bitnami/git:latest
+        resources:
+          limits:
+            memory: 100Mi
+            cpu: 200m
+          requests:
+            cpu: 100m
+        volumeMounts:
+        - name: util
+          mountPath: /scripts
+        - name: git
+          mountPath: /git
+        command: ["/scripts/git-sync.sh"]
+
+      ## Run as the forgerock user, root group
+      securityContext:
+          runAsGroup: 0
+          runAsUser: 11111
+          fsGroup: 0
+      volumes:
+      - name: idm-secrets
+        secret:
+          secretName: idm
+      - emptyDir: {}
+        name: logs
+      - emptyDir: {}
+        name: audit-logs
+      - configMap:
+          name: idm-logging-properties
+        name: idm-logging-properties
+      - name: fbc
+        emptyDir: {}
+      - name: git
+        emptyDir: {}
+      # Mounts utility scripts
+      - name: util
+        configMap:
+          name: util
+          defaultMode: 0777

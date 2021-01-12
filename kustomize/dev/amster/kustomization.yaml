@@ -1,0 +1,7 @@
+images:
+- name: amster
+  newName: gcr.io/forgeops-public/amster
+  newTag: 7.1-dev
+
+resources:
+- ../../base/amster

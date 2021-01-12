@@ -28,7 +28,7 @@ key.json
 cue/
 .project
 .settings/
-dev/
+./dev/
 .CONFIGURED
 forgeops-toolbox/
 legacy-docs/7.0/site/

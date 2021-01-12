@@ -55,5 +55,4 @@ spec:
     # keystore is a pkcs12 Java keystore.
     # Currently the operator can not generate this. Use Secret Agent.
     keyStoreSecretName: ds
-    # Truststore - Do we need it?
-    # trustStoreSecretName: foo
+

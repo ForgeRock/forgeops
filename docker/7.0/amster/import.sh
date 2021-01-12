@@ -39,55 +39,10 @@ wait_for_openam()
    done
 }
 
-checkPass () {
-   while true
-   do
-      local HOST=$1
-      local USER_DN=$2
-      local USER_UID=$3
-      local USER_PASS=$4
-      local FULL_USER_DN="${USER_UID},${USER_DN}"
-      echo "Checking password for ${FULL_USER_DN} on ${HOST}"
-      ldapsearch -h $HOST -p 1389 -D "${FULL_USER_DN}" -w $USER_PASS -b $USER_DN "objectclass=*"  > /dev/null
-      SEARCH_RESPONSE=$?
-      case "${SEARCH_RESPONSE}" in
-         "0")
-            echo "Password for ${FULL_USER_DN} correct"
-            break
-         ;;
-         "49")
-            echo "Password for ${FULL_USER_DN} not correct, skipping..."
-            # TODO: To remove later
-            # Dump whole user entry for debug
-            ldapsearch -h $HOST -p 1389 -D "${FULL_USER_DN}" -w $USER_PASS -b $USER_DN "objectclass=*"
-         ;;
-         "32")
-            echo "${FULL_USER_DN} not found, skipping..."
-            exit 1
-         ;;
-         *)
-            echo "ERROR: Error when searching for user, response $SEARCH_RESPONSE"
-            exit 1
-         ;;
-      esac
-      sleep 5
-   done
-}
-
-wait_for_ds_password_change () {
-   checkPass ds-idrepo-0.ds-idrepo ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
-   checkPass ds-idrepo-0.ds-idrepo ou=admins,ou=identities "uid=am-identity-bind-account" ${AM_STORES_USER_PASSWORD}
-   checkPass ds-idrepo-0.ds-idrepo ou=admins,ou=am-config "uid=am-config" ${AM_STORES_APPLICATION_PASSWORD}
-   checkPass ds-cts-0.ds-cts ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
-}
 
 echo "Waiting for AM server at ${ALIVE}..."
 
 wait_for_openam
-
-echo "Waiting for DS passwords to be updated..."
-
-wait_for_ds_password_change
 
 echo "About to begin dynamic data import"
 

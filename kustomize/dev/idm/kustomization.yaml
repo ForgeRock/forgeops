@@ -1,0 +1,10 @@
+kind: Kustomization
+
+# images:
+# - name: idm
+#   newName: gcr.io/forgeops-public/idm-eval
+#   newTag: 7.1-dev
+
+resources:
+- idm.yaml
+- idm-deployment.yaml

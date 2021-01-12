@@ -15,13 +15,31 @@ then
     echo "git:${encrypted}" > /srv/run/.htpasswd
 fi
 
+
 # See if the pvc has git initialized. If not - do so now
 if [[ ! -d  $GIT_DIR ]];
 then
     echo "$GIT_DIR is empty. Initializing a bare git repo"
-    git init --bare --shared $GIT_DIR
 
-    # TODO: Figure out how to prime this from the contents of forgeops/config/7.0/cdk
+
+    mkdir -p /tmp/git
+    cd /tmp/git
+    DEST="$GIT_DIR"
+    # Run in subshell and unset GIT_DIR!
+    # This procedure initializes the bare repo with a master branch
+    (
+        unset GIT_DIR
+        git init
+        git config user.email "init@forgerock.com"
+        git config user.name "Forgerock User"
+        echo "Baseline Branch" >  README.md
+        git add README.md
+        git commit -a -m 'init'
+        mkdir -p /srv/git
+        mv .git $DEST
+        cd $DEST
+        git config --bool core.bare true
+    )
 fi
 
 
