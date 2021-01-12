@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Unsupported - this is a sample procedure for a GKE cluster to enable
-# in-cluster Docker builds using Kaniko.
 #
-# This is run by a cluster administrator as a one time process.
+# This is run by a cluster administrator as a *one time process*. It
+# creates a GCP service account with privileges to push/pull images
+# from a private registry. A Kubernetes secret is created for
+# Kaniko with the credentials for this service account.
 
 PROJECT=${GOOGLE_CLOUD_PROJECT:-engineering-devops}
 

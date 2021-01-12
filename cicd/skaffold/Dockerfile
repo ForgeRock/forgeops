@@ -1,4 +1,9 @@
-#Download Skaffold
+
+# Dockerfile that packages up Skaffold, Kustomize and kubectl to run under a CI/CD pipeline.
+# Publish this to your registry and update your CI/CD pipelines to point at this image.
+# See the tekton/ folder for an example of a CI/CD pipeline that deploys the ForgeRock Identity Platform.
+
+# Download Skaffold
 FROM alpine as download-skaffold
 ARG SKAFFOLD_VERSION=v1.17.2
 ENV SKAFFOLD_URL https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64

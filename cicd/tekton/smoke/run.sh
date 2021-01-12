@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Utility to run the smoke test
+# Utility to run the smoke test. Used during developement to iterate on the pipeline.
+
 kubectl -n tekton-pipelines apply -f shared/task/wait-platform-up.yaml
 kubectl -n tekton-pipelines apply -f shared/task/smoke-test-task.yaml
 kubectl -n tekton-pipelines  apply -f smoke/smoke-pipeline.yaml
