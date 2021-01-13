@@ -1,7 +1,9 @@
 FROM gcr.io/forgerock-io/amster:7.0.0
 
 USER root
-RUN apt-get install -y openldap-utils jq
+RUN apt-get update && apt-get install -y openldap-utils jq  && apt-get clean \
+        && rm -r /var/lib/apt/lists /var/cache/apt/archives
+
 USER forgerock
 
 ENV SERVER_URI /am
