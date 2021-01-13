@@ -20,10 +20,35 @@ PROJECT=${PROJECT:-$PROJECT_ID}
 R=$(gcloud config list --format 'value(compute.region)')
 REGION=${REGION:-$R}
 
+GCLOUD_ACCT_EMAIL=$(gcloud config list account --format 'value(core.account)')
+SLUG_NAME=$(echo $GCLOUD_ACCT_EMAIL | awk -F "@" '{print $1 }' | sed 's/\./_/g')
+ES_USEREMAIL=${ES_USEREMAIL:-$SLUG_NAME}
+ES_ZONE=${ES_ZONE:-"empherical"}
+
+IS_FORGEROCK=$([[ "$GCLOUD_ACCT_EMAIL" =~ forgerock.com ]])
+
+ES_BUSINESSUNIT=${ES_BUSINESSUNIT:-"engineering"}
+BILLING_ENTITY=${BILLING_ENTITY:-"us"}
+
 echo "Deploying to region: $REGION"
 
-if [ -z $REGION ]; then 
-  echo "Please set region in your gcloud config 'gcloud config set compute/region <region>' or in <my-cluster>.sh"; 
+if [ -v $I_AM_CDM ];
+then
+    ES_OWNEDBY=${ES_OWNEDBY:-"cdm"}
+    ES_MANAGEDBY=${ES_MANAGEDBY:-"cdm"}
+fi
+
+if [ ! -v $ES_OWNEDBY ] && $IS_FORGEROCK; then
+    echo "please set ES_OWNEDBY for Enterprise Security Tag Rules"
+    exit 1
+fi
+if [ ! -v $ES_MANAGEDBY ] && $IS_FORGEROCK; then
+    echo "Please set ES_MANAGEDBY for Enterprise Security Tag Rules" 
+    exit 1
+fi
+
+if [ -z $REGION ]; then
+  echo "Please set region in your gcloud config 'gcloud config set compute/region <region>' or in <my-cluster>.sh";
   exit 1
 fi
 
@@ -37,7 +62,15 @@ DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 
 # Create a separate node pool for ds
 CREATE_DS_POOL="${CREATE_DS_POOL:-false}"
+ADDITIONAL_OPTS=""
 
+# myname-<firstname>-<lastname>.  For example “openam-john-doe” or “benchmark-cluster-john-doe”
+
+if $IS_FORGEROCK;
+then
+    ASSET_LABELS="--labels es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
+    ADDITIONAL_OPTS+="${ASSET_LABELS} "
+fi
 
 # Get current user
 CREATOR="${USER:-unknown}"
@@ -79,6 +112,7 @@ DS_NUM_NODES=${DS_NUM_NODES:-"1"}
 # BY default we disable autoscaling for CDM. If you wish to use autoscaling, uncomment the following:
 #AUTOSCALE="--enable-autoscaling --min-nodes 0 --max-nodes 3"
 
+# shellcheck disable=SC2086
 gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --zone "$ZONE" \
     --node-locations "$NODE_LOCATIONS" \
@@ -101,10 +135,8 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --no-enable-master-authorized-networks \
     --addons HorizontalPodAutoscaling,ConfigConnector \
     --workload-pool "$PROJECT.svc.id.goog" \
-    --labels "createdby=$CREATOR" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
-    $AUTOSCALE  # Note: Do not quote this variable. It needs to expand
-
+    $ADDITIONAL_OPTS  # Note: Do not quote this variable. It needs to expand
 
 # Create the DS pool. This pool does not autoscale.
 
