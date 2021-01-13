@@ -1,62 +1,47 @@
 timeout: 1200s
 steps:
 - name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker/cli-tools'
   id: base
   entrypoint: 'make'
   env:                      
   - "VERSION=$_VERSION"     
   - "REGISTRY_URL=gcr.io/$PROJECT_ID"
   args:
-  - '-f'
-  - 'docker/cli-tools/Makefile'
-  - 'yamkt'
+  - 'base'
 - name: 'gcr.io/cloud-builders/docker'
-  entrypoint: 'make'
-  waitFor: ["base"]
-  env:                    
-  - "VERSION=$_VERSION"    
-  - "REGISTRY_URL=gcr.io/$PROJECT_ID"
-  args:
-  - '-f'
-  - 'docker/cli-tools/Makefile'
-  - 'cdm'
-- name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker/cli-tools'
   entrypoint: 'make'
   waitFor: ["base"]
   env:                    
   - "REGISTRY_URL=gcr.io/$PROJECT_ID"
   - "VERSION=$_VERSION"    
   args:
-  - '-f'
-  - 'docker/cli-tools/Makefile'
-  - 'cdk'
+  - 'git-server'
 - name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker/cli-tools'
   entrypoint: 'make'
   waitFor: ["base"]
   env:                    
   - "REGISTRY_URL=gcr.io/$PROJECT_ID"
   - "VERSION=$_VERSION"    
   args:
-  - '-f'
-  - 'docker/cli-tools/Makefile'
   - 'toolbox'
 - name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker/cli-tools'
   entrypoint: 'make'
   waitFor: ["base"]
   env:                    
   - "REGISTRY_URL=gcr.io/$PROJECT_ID"
   - "VERSION=$_VERSION"    
   args:
-  - '-f'
-  - 'docker/cli-tools/Makefile'
   - 'debug'
 - name: 'gcr.io/cloud-builders/docker'
+  dir: 'docker/cli-tools'
   entrypoint: 'make'
   waitFor: ["base"]
   env:                    
   - "REGISTRY_URL=gcr.io/$PROJECT_ID"
   - "VERSION=$_VERSION"    
   args:
-    - '-f'
-    - 'docker/cli-tools/Makefile'
     - 'repo'

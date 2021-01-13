@@ -1,6 +1,6 @@
 ARG VERSION=latest
 ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
-FROM ${FORGEOPS_REGISTRY}/yamkt:${VERSION}-skaffold as tools
+FROM ${FORGEOPS_REGISTRY}/cli-tools/base:${VERSION} as tools
 FROM debian:sid-slim
 SHELL ["bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
@@ -12,8 +12,9 @@ RUN apt-get update -y \
                            python3-pip \
                            python3-setuptools
 
-COPY docker/cli-tools/repo/src /opt/workspace
-COPY --from=tools ["/usr/local/bin/skaffold","/usr/local/bin/kustomize","/usr/local/bin/docker-credential-gcloud", "/usr/local/bin/kubectl", "/usr/local/bin/"]
+COPY src /opt/workspace
+# source, source, ... destination
+COPY --from=tools ["/usr/local/bin/skaffold","/usr/local/bin/kustomize","/usr/local/bin/kubectl", "/usr/local/bin/"]
 
-RUN cd /opt/workspace && pip3 install . && docker-credential-gcloud config
+RUN cd /opt/workspace && pip3 install .
 WORKDIR /opt/workspace

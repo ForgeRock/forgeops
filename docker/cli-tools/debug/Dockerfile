@@ -4,7 +4,7 @@ FROM gcr.io/google-containers/pause:latest
 
 ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
 ARG VERSION=latest
-FROM $FORGEOPS_REGISTRY/yamkt:$VERSION
+FROM $FORGEOPS_REGISTRY/base:$VERSION
 
 FROM debian:sid-slim
 ENV DEBIAN_FRONTEND=noninteractive
@@ -19,7 +19,8 @@ RUN apt-get update -y \
                               ldap-utils \
                               strace \
                               nmap \
-                              netcat
+                              ncat \
+                              hping3
 
 
 CMD ["/usr/local/bin/pause"]
