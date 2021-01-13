@@ -1,12 +1,20 @@
-# Tekton smoke Test
+# Tekton Smoke Test
 
-Runs a smoke test deployment every time a commit is made to the forgeops repo.
+This sample pipeline runs a smoke test deployment every time a commit is made to
+the `forgeops` repo.
 
-## Pipeline overview
+## Pipeline Overview
 
-The `./install-pipeline.sh` script installs the pipeline and all other required elements in the `tekton-pipelines` namespace.
+The `./install-pipeline.sh` script installs the pipeline and all other required 
+elements in the `tekton-pipelines` namespace.
 
-Note: The smoke pipeline is configured to trigger automatically when there's a push event in the master branch of our repo https://stash.forgerock.org/scm/cloud/forgeops.git. You must provide the webhook secret as a k8s generic secret named `git-webhook-secret` using `secret` as the key for the entry. You must use the same secret when creating the webhook. In addition to the secret, update `ingress.yaml` with the FQDN of your trigger endpoint.
+The smoke test pipeline is configured to trigger automatically when there's a 
+push event in the master branch of our repo, 
+https://stash.forgerock.org/scm/cloud/forgeops.git. You must provide the webhook
+secret as a Kubernetes generic secret named `git-webhook-secret`, using `secret` 
+as the key for the entry. You must use the same secret when creating the 
+webhook. In addition to creating the secret, you must update the `ingress.yaml` 
+file with the FQDN of your trigger endpoint.
 
 You can use the following command to create the secret:
 
@@ -14,14 +22,18 @@ You can use the following command to create the secret:
 kubectl -n $NAMESPACE create secret generic git-webhook-secret --from-literal=secret=$WEBHOOK_SECRET
 ```
 
-Tekton provides a github trigger interceptor that we have repurposed to work with bitbucket by using their CEL interceptors to change contents of the webhook POST request.
+Tekton provides a GitHub trigger interceptor. We've repurposed this trigger to 
+work with Bitbucket by using their CEL interceptors to change the contents of 
+the webhook's POST request.
 
 Recommended documentation:
-1. Github webhook events: https://developer.github.com/v3/activity/events/types/#pushevent
-2. Bitbutcket webhook events: https://confluence.atlassian.com/bitbucketserver0516/event-payload-966061436.html
-3. Tekton triggers: https://github.com/tektoncd/triggers/blob/master/docs/eventlisteners.md#GitHub-Interceptors
 
-The Tekton dashboard is included in this install. To map the dashboard, you can run:
+* [GitHub webhook events](https://developer.github.com/v3/activity/events/types/#pushevent)
+* [Bitbutcket webhook events](https://confluence.atlassian.com/bitbucketserver0516/event-payload-966061436.html)
+* [Tekton triggers](https://github.com/tektoncd/triggers/blob/master/docs/eventlisteners.md#GitHub-Interceptors)
+
+The Tekton dashboard is included in this installation. To map the dashboard, 
+run:
 
 ```
 # Map the svc port
@@ -31,10 +43,12 @@ kubectl --namespace tekton-pipelines port-forward svc/tekton-dashboard 9097:9097
 
 ## Manually Triggering the Pipeline
 
-Because the eventlistener validates the request signatures, the easiest way to trigger the pipeline manually is to bypass the tekton trigger. You can manually re-run the pipeline using the following command:
+Because the event listener validates the request signatures, the easiest way to 
+trigger the pipeline manually is to bypass the Tekton trigger. You can manually
+rerun the pipeline using the following command:
 
 ```bash
 tkn -n tekton-pipelines pipeline start smoke-pipeline -s tekton-worker #start a pipeline
 ```
-Note: You'll need to provide information about your repo like url and branch/commit id.
+You'll need to provide the repository URL, branch, and commit ID.
 
