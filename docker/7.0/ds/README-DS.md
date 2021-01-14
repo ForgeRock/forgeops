@@ -1,30 +1,32 @@
-# Customizing DS Docker images
+# DS Customization and Utilities
+
+## Customized DS Docker Images
 
 There are a number of ways to customize the DS Docker images in order to
 contain additional indexes, log configuration, extensions or schema.
 
-1. Add dsconfig RUN commands in the Dockerfile: this is perhaps the
-   simplest approach. Figure out which configuration changes you'd like
-   to make and add them to the Dockerfile's RUN command sequence.
-   Remember to use the --offline flag.
+1. **Add dsconfig RUN commands in the Dockerfile**. This is the simplest 
+   approach. Figure out which configuration changes you'd like to make, and then 
+   add them to the Dockerfile's RUN command sequence. Remember to use the 
+   `--offline` flag.
 
-2. Add schema files or extensions into the Dockerfile. Schema files
-   should go in docker/ds/(cts|idrepo)/config/schema.
+2. **Add schema files or extensions into the Dockerfile**. Place schema files  
+   in the `docker/ds/(cts|idrepo)/config/schema` directory.
 
-3. Gitops: first mount the Docker source locations into your locally
-   running Minikube:
+3. **Gitops**. First, mount the Docker source locations into your 
+   locally-running Minikube VM:
+   
    ```
-   $ minikube mount docker/ds/cts:/tmp/docker-ds-cts &
-   $ minikube mount docker/ds/idrepo:/tmp/docker-ds-idrepo &
+   minikube mount docker/ds/cts:/tmp/docker-ds-cts &
+   minikube mount docker/ds/idrepo:/tmp/docker-ds-idrepo &
    ```
-   Then deploy forgeops to Minikube:
+
+   Next, deploy the platform.
+   
+   Then, configure a running DS instance using the `dsconfig` command:
+   
    ```
-   # Or use 'skaffold run -p dev' if you want to perform multiple changes
-   $ skaffold dev -p dev
-   ```
-   Then configure a running DS instance like this:
-   ```
-   $ kubectl exec ds-cts-0 -it dsconfig
+   kubectl exec ds-cts-0 -it dsconfig
 
     >>>> Specify OpenDJ LDAP connection parameters
 
@@ -39,10 +41,13 @@ contain additional indexes, log configuration, extensions or schema.
         3)   Account Status Notification Handler  24)  Log Retention Policy
     ..
    ```
-   Once customizations are complete, quit dsconfig and review changes in
-   your local workspace:
+   
+   After you've made all your customizations, quit the `dsconfig` session. 
+   
+   Review changes in your local workspace:
+   
    ```
-   $ git status
+   git status
    On branch master
    Your branch is up to date with 'origin/master'.
 
@@ -54,40 +59,42 @@ contain additional indexes, log configuration, extensions or schema.
 
    no changes added to commit (use "git add" and/or "git commit -a")
    ```
-   Commit your changes and submit pull-request!
+   
+   Commit your changes and submit a pull request!
 
-## Creating sample users for the idrepo
+## Sample Users
 
-The script [idrepo/bin/make-users.sh](idrepo/bin/make-users.sh) creates sample users for benchmarking.
+The [make-users.sh](idrepo/bin/make-users.sh) script lets you create sample 
+users for benchmarking or other purposes.
 
-Exec into each ds-idrepo pod, and run the script with the desired number of users. For example:
+Exec into each `ds-idrepo` pod and run the script with the desired number of 
+users. For example:
 
 ```bash
 kubectl exec ds-idrepo-0 -it make-users.sh 1000000
 kubectl exec ds-idrepo-1 -it make-users.sh 1000000
 kubectl exec ds-idrepo-2 -it make-users.sh 1000000
-
 ```
 
-## Running the ds micro benchmark
+## Utility image (`dsutil`)
 
-```bash
-cd dsutil
-# Edit k8s/bench-job.yaml paramters with the number of users, benchmark time, etc.
-skaffold dev  --default-repo gcr.io/engineering-devops -p ds-bench
+The `dsutil` image provides a bash shell into a pod that has all the DS tools 
+installed. Utility scripts are located in the `/opt/opendj/bin` directory.
+
+To build the `dsutil` image:
 
 ```
+gcloud builds submit .
+```
 
-## Running the utility image
+To run the `dsutil` image:
 
-The dsutil image gives you a bash shell into a pod that has all the ds tools installed.
+```
+kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash
+```
 
-To run:
+To create a shell alias for the above command:
 
-```bash
-cd dsutil
-skaffold dev  --default-repo gcr.io/engineering-devops
-# You can now exec into the dsutil pod
-kubectl exec dsutil-xxxx -it bash
-# Run ldap util commands...
+```
+alias fdebug='kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash'
 ```

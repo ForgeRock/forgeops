@@ -1,94 +1,111 @@
-# Gatling Benchmarks for the ForgeRock platform
+# Gatling Benchmarks for the ForgeRock Identity Platform
 
-This sample is provided for reference only and is not supported by ForgeRock. Use this at your own risk.
+This sample is provided for reference only, and is not supported by ForgeRock. 
+Use this at your own risk.
 
 ## Benchmark Configuration
 
-* The utility class [BenchConfig](src/gatling/simulations/util.scala) initializes the common parameters for the test (number of users, duration, etc.). These are derived from environment variables. Override the default values and set these env variables in your shell env or script before running the simulations. <u>This is a critical step which missed will lead to all sorts of failures</u>.
+* The [BenchConfig](src/gatling/simulations/util.scala) utility class 
+  initializes common parameters for simulation tests - number of users, 
+  duration, etc.). These parameters are derived from environment variables. 
+  Override the default values and set these environment variables in your shell 
+  or script before running the simulations. <u>This is a critical step which, if 
+  missed, will lead to failures</u>.
 
-* Pre-existing passwords for setting into env variables can be printed using the `forgeops/bin/print-secrets.sh` script.  For the simulations that require provisioning into IDM you will also need the you can get the secrets for the "idm-provisioning" OAuth2 client via the following command. `$ kubectl exec -it am-6f95c6bd4-vlsgn -- env | grep IDM_PROVISIONING_CLIENT_SECRET`
+* Get administrative passwords by running the 
+  [print-secrets](../../bin/print-secrets.sh) script.  
+  
+* The simulations that require provisioning to IDM also need the secrets for the
+  `idm-provisioning` OAuth2 client. Obtain them by running:
+  ```
+  kubectl exec -it am-6f95c6bd4-vlsgn -- env | grep IDM_PROVISIONING_CLIENT_SECRET`
+  ```
 
-* The [run.sh](run.sh) script sets these variables if they are not already set elsewhere. So you can also edit the env vars in this script. When running in Kubernetes, the [ConfigMap in perf-test](k8s/perf-test-job.yaml) can also set these values. See the section below called [Running in the Cluster](##Running in the Cluster).
-
-
+* The [`run.sh`](run.sh) script sets these variables if they are not already set 
+  elsewhere. You can also edit the script to set the enviroment variables. When
+  running in Kubernetes, you can also set these values in the config map in the
+  [perf-test-job.yaml](k8s/perf-test-job.yaml) file. 
+  
 ## Simulations
 
-The following sample simulations are provided in the src/gatling/simulations folder:
+The following sample simulations are provided in the `src/gatling/simulations` 
+directory:
 
 |Simulation|Description
 |----------|-----------
-|am.AMRestAuthNSim|A simulation of the basic AM REST /json/authenticate endpoint for authentication.
-|am.AMAccessTokenSim|A simulation to issue OAuth 2.0 access_token using the auth code flow.
-|idm.IDMSimulation|This idm simulation creates and optionally deletes test users.  The deletion is triggered by env variable DELETE_USERS=true which is set to false by default.
-|platform.Register|This simulation mimics an interactive user registration.  Since this simulation creates new users it is recommended to set a different USER_PREFIX so that they do not collide with existing users that are seeded in the Identity Repository.
-|platform.Login|This simulation mimics an interactive user login. This simulation using an Authentication Tree called "Login" which in turn uses the "Progressive Profiling" tree.
-|*ig.\**|*These simulaitons are no longer maintained or tested.  Use them at your own risk*.
+|`am/AMRestAuthNSim`|Calls the `/json/authenticate` endpoint for authentication.
+|`am/AMAccessTokenSim`|Issues OAuth 2.0 access tokens using the auth code flow.
+|`idm/IDMSimulation`|Creates and optionally deletes IDM test users. Deletion is triggered by setting the `DELETE_USERS` environment variable to `true`. (By default, it's set to `false`.)
+|`platform/Register`|Mimics an interactive user registration. Since this simulation creates new users, it is recommended to set the `USER_PREFIX` environment variable, so that the new user IDs don't collide with existing user Ds seeded in the identity repository.
+|`platform/Login`|Mimics an interactive user login using an authentication tree named `Login`. This tree uses the `Progressive Profiling` tree. You must run the `platform.Register` simulation before attempting to run this simulation, because this simulation requires users created by the `platform.Register` simulation.
+|`ig/*`|IG simulations. These simulations are no longer maintained or tested. 
 
-NOTE each of these simulation sets are independant of each other.  For example you can run the "idm" simulation without running the "am" simulations.  However the "platform" Login simulation depends on the Register simulation.  <u>You have to run the platform.Register simulation first so that the users created can be used by the Login simuation</u>.  Furthermore you have to ensure that you run the Register simulation long enough to provide the desired USER_POOL for the Login simulation otherwise you will start getting 401 errors.
+Except as noted, each of these simulation sets are independent from one another. 
+For example, you can run `IDMSimulation` without running either of the AM 
+simulations.  
 
-If you just want to compile the simulation code:
+To compile the simulation code:
 
 ```
-$ gradle gatlingClasses
+gradle gatlingClasses
 ```
-
 
 ## Running Locally
 
-You can run the gatling benchmarks from your laptop/desktop if you have both Gradle and Docker installed. This has been tested with OpenJDK 11 and Gradle 6.5.1. 
+You can run the Gatling benchmarks locally if you have both Gradle and Docker 
+installed. See 
+[the documentation](https://ea.forgerock.com/docs/forgeops/deployment/benchmark/authrate.html)
+for examples.
 
-=> Don't forget to set the Benchmark Configuration via env variables first as described in the previous section.
+## Running in a Cluster
 
-To run simulations proivde as argument the type of simuation. Currently supported types are "all", "am", "idm" and "platform". For example:
+You can run these benchmarks in a Kubernetes cluster. It does not need to be
+the same cluster as your test target - the benchmark uses an external FQDN. 
+Before you attempt to run the benchmarks in a cluster, make sure that your GCS  
+Service Account key is copied locally. See 
+[GCS Service Account Configuration](#gcs-service-account-configuration) for 
+configuration details. In addition, ensure that the `TARGET_HOST`, `USER_POOL`, 
+`DURATION`, `CONCURRRENCY`, `CLIENT_PASSWORD`, `IDM_PASSWORD` and 
+`PERF_TEST_RESULTS_BUCKET_NAME` keys are set correctly in the 
+`k8s/perf-test-job.yaml` file.
 
-```
-$ ./run.sh am
-```
-
-To run simulations directly using gradle
-
-```
-$ gradle clean && gradle gatlingRun-am.AMAccessTokenSim
-```
-
-
-
-## Running in the Cluster
-You can deploy these benchmarks in a Kubernetes cluster. It does not need to be
-the same cluster as your test target as the benchmark uses the external 
-FQDN. A pre-requisite to this step is ensuring that your GCS Service Account key copied locally. See the next section on configuration details. In addition ensure that the `TARGET_HOST`, `USER_POOL`, `DURATION`, `CONCURRRENCY`, `CLIENT_PASSWORD`, `IDM_PASSWORD` and `PERF_TEST_RESULTS_BUCKET_NAME` are set correctly in `k8s/perf-test-job.yaml`.
-
-Deploy using:
+To run the benchmarks in a cluster:
 
 ```
-$ skaffold --default-repo gcr.io/engineering-devops run
+skaffold --default-repo gcr.io/engineering-devops run
 ```
 
-or use `dev` instead of `run` to see the output.
+Alternatively, you can use `skaffold dev` to see the output.
 
-At the conclusion of the benchmark jobs, the results will be uploaded to the storage bucket specefied in `gsutil.scala`.
+At the conclusion of the benchmark jobs, the results are uploaded to the storage
+bucket specefied in `gsutil.scala`.
 
 See the [k8s deployment](k8s/) folder to modify the deployment. 
 
 ## GCS Service Account Configuration
 
-The gradle task `gradle uploadResults` will zip up the benchmark results and upload them to the gcs bucket. This task is run at the conclusion of the Kubernetes perf-test job.
+Run `gradle uploadResults` to zip the benchmark results files and upload them to
+the GCS bucket at the conclusion of the Kubernetes `perf-test` job.
 
-The task needs a service account to upload Gatling results to a GCS bucket. If you are running locally using gradle, you do NOT need the service account unless you want to test the GCS upload process.
+The task needs a service account to upload Gatling results to a GCS bucket. If 
+you're running locally, you don't need the service account, unless you want to 
+test the GCS upload process.
 
-The service account file `key.json` is NOT checked in to git.  Create and download a key from https://console.cloud.google.com/iam-admin/serviceaccounts (or see Warren to get a copy of the key.json)
-
-Place the key.json in: `k8s/key.json`. The environment variable
-`GOOGLE_APPPLICATION_CREDENTIALS` must point to this file (see `run.sh`).
+Do not check your service account file, `key.json`, into your Git repository. 
+Instead, create and download a key from 
+[Google Cloud Console](https://console.cloud.google.com/iam-admin/serviceaccounts).
+Place the `key.json` file in: `gatling/k8s/key.json`. The environment variable
+`GOOGLE_APPPLICATION_CREDENTIALS` must point to this file. See the `run.sh` 
+script for details.
 
 ## Enabling debug output 
 
-See the [logback.xml](src/gatling/resources/logback.xml) file to enable tracing of 
-the http calls. Tracing is *very* verbose and should only be turned on 
-when debugging. 
+See the [logback.xml](src/gatling/resources/logback.xml) file to enable tracing
+the HTTP calls. Tracing is very verbose, and should only be turned on when 
+debugging. 
 
-To enable results output in gatling
-edit [gatling.conf](src/gatlinge/resources/gatling.conf) and add `console` to the
+To enable results output in Gatling, edit the 
+[gatling.conf](src/gatling/resources/gatling.conf) file. Add `console` to the
 writers list:
 
 ```json
@@ -99,27 +116,31 @@ gatling {
 }
 ```
 
-
 ## Troubleshooting
 
-=> If you see these errors during the simulations, make sure that the username and passwords are correct. For example check the values of `IDM_USER`, `IDM_PASSWORD` and `CLIENT_PASSWORD`.
+* These errors appear when running the simulations if the username and passwords
+are incorrect. Check the values of `IDM_USER`, `IDM_PASSWORD` and 
+`CLIENT_PASSWORD` if you see these messages:
+    ```  
+    Request 'registationCallback' failed for user 1: jsonPath($.tokenId).find.exists, found nothing
+    Request 'Submit Credentials' failed for user 1: status.find.is(200), but actually found 401
+    ```
 
-- Request 'registationCallback' failed for user 1: jsonPath($.tokenId).find.exists, found nothing
-- Request 'Submit Credentials' failed for user 1: status.find.is(200), but actually found 401
+* When deploying the `gatling` container to the cluster using Skaffold, this 
+error indicates that the `gatling/k8s/key.json` is not present: 
+    ```
+    stderr: "Error: file sources: [key.json]: evalsymlink failure on '/Users/some.user/work/forgeops/docker/gatling/k8s/key.json' : lstat /Users/some.user/work/forgeops/docker/gatling/k8s/key.json: no such file or directory\n"
+    ```
 
+* If the `key.json` file is invalid, this error will appear in the Skaffold 
+output:
+    ```
+    [perf-test] Exception in thread "main" com.google.cloud.storage.StorageException: 401 Unauthorized
+    ```
 
-=> When deploying the "gatling" container to the cluster via skaffold, you will see this error if a k8s/key.json is not created 
-
-``` 
-stderr: "Error: file sources: [key.json]: evalsymlink failure on '/Users/wajih.ahmed/work/forgeops/docker/gatling/k8s/key.json' : lstat /Users/wajih.ahmed/work/forgeops/docker/gatling/k8s/key.json: no such file or directory\n"
-```
-And if key.json is invalid then you will see the following in the output of the Skaffold.
-
-```
-[perf-test] Exception in thread "main" com.google.cloud.storage.StorageException: 401 Unauthorized
-```
-=> While running a simulation if you see this error, it means you need to increase your feeder size by increasing the USER_POOL or reduce the DURATION of your simulation so that the feeder is not exhausted.
-
-```
-09:02:12.566 [ERROR] i.g.c.a.SingletonFeed - Feed failed: Feeder is now empty, stopping engine, please report.
-```
+* If the feeder is exhausted when you run a simulation, this error will appear. 
+To fix it, increase your feeder size by increasing the `USER_POOL` value, or 
+reduce the `DURATION` of your simulation:
+    ```
+    09:02:12.566 [ERROR] i.g.c.a.SingletonFeed - Feed failed: Feeder is now empty, stopping engine, please report.
+    ```
