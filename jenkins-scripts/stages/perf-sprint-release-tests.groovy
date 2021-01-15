@@ -18,7 +18,7 @@ void runStage(PipelineRun pipelineRun) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('google-cloud') {
+        node('perf-long-cloud') {
             stage(stageName) {
                 pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
