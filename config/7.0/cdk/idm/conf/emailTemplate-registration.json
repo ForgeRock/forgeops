@@ -1,15 +1,20 @@
 {
-    "enabled" : true,
-    "from" : "",
-    "subject" : {
-      "en" :  "Register new account",
-      "fr" : "Créer un nouveau compte"
-    },
-    "message" : {
-      "en" : "<h3>This is your registration email.</h3><p><a href=\"{{object.resumeURI}}\">Email verification link</a></p>",
-      "fr" : "<h3>Ceci est votre mail d'inscription.</h3><p><a href=\"{{object.resumeURI}}\">Lien de vérification email</a></p>"
-    },
-    "styles": "body{background-color:#324054;color:#5e6d82;padding:60px;text-align:center}a{text-decoration:none;color:#109cf1}.content{background-color:#fff;border-radius:4px;margin:0 auto;padding:48px;width:235px}",
-    "defaultLocale" : "en",
-    "mimeType" : "text/html"
+  "enabled": true,
+  "from": "",
+  "subject": {
+    "en": "Register new account",
+    "fr": "Créer un nouveau compte"
+  },
+  "message": {
+    "en": "<html><head></head><body style=\"background-color: #324054; color: #5e6d82; padding: 60px; text-align: center;\"><div class=\"content\" style=\"background-color: #fff; border-radius: 4px; margin: 0 auto; padding: 48px; width: 235px;\"><h3>Click to reset your password</h3><p><a href=\"{{object.resumeURI}}\" style=\"text-decoration: none; color: #109cf1;\">Password reset link</a></p></div></body></html>",
+    "fr": "<html><head></head><body style=\"background-color: #324054; color: #5e6d82; padding: 60px; text-align: center;\"><div class=\"content\" style=\"background-color: #fff; border-radius: 4px; margin: 0 auto; padding: 48px; width: 235px;\"><h3>Cliquez pour réinitialiser votre mot de passe</h3><p><a href=\"{{object.resumeURI}}\" style=\"text-decoration: none; color: #109cf1;\">Mot de passe lien de réinitialisation</a></p></div></body></html>"
+  },
+  "html": {
+    "en": "<html><body><h3>This is your registration email.</h3><p><a href=\"{{object.resumeURI}}\">Email verification link</a></p></body></html>",
+    "fr": "<html><body><h3>Ceci est votre mail d'inscription.</h3><p><a href=\"{{object.resumeURI}}\">Lien de vérification email</a></p></body></html>"
+  },
+  "styles": "body{background-color:#324054;color:#5e6d82;padding:60px;text-align:center}a{text-decoration:none;color:#109cf1}.content{background-color:#fff;border-radius:4px;margin:0 auto;padding:48px;width:235px}",
+  "defaultLocale": "en",
+  "mimeType": "text/html"
 }
+
