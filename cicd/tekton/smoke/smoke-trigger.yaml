@@ -30,7 +30,12 @@ spec:
       timeout: 30m
       serviceAccountName: tekton-worker
       pipelineRef:
-        name: smoke-pipeline
+        name: nightly-pipeline
+      params:
+      - name: "notify"
+        value: "false"
+      - name: "namespace"
+        value: "smoke"
       resources:
       - name: forgeops
         resourceSpec:
@@ -63,9 +68,9 @@ spec:
         filter: "body.changes[0].ref.type == 'BRANCH' && body.changes[0].type == 'UPDATE' && body.changes[0].ref.displayId == 'master'"
         overlays:
         - key: head_commit.id
-          expression: "body.changes[0].toHash" 
+          expression: "body.changes[0].toHash"
         - key: repository.url
-          expression: "body.repository.links.clone[0].name == 'http' ? body.repository.links.clone[0].href : body.repository.links.clone[1].href" 
+          expression: "body.repository.links.clone[0].name == 'http' ? body.repository.links.clone[0].href : body.repository.links.clone[1].href"
 
     bindings:
     - ref: smoke

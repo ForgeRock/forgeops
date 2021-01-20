@@ -20,6 +20,9 @@ spec:
     type: string
     description: Use the value nuke if we should delete the existing deployment, any other value keeps the directory
     default: "nuke"
+  - name: notify
+    description: Set to true (default) to send notification to slack with the generated passwords
+    default: "true"
 
   tasks:
     - name: nuke-deployment
@@ -104,3 +107,7 @@ spec:
       params:
       - name: namespace
         value: "$(params.namespace)"
+      when:
+      - input: "$(params.notify)"
+        operator: in
+        values: ["true"]
