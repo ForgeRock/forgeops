@@ -1,36 +1,50 @@
 # Forgeops CDK Toolbox
 
-Deployment creates a container that hosts an in-cluster development toolbox for building and deploying the ForgeRock platform on Kubernetes.
+This deployment creates a container that hosts an in-cluster development toolbox
+you can use to build and deploy the ForgeRock Identity Platform on Kubernetes.
+The toolbox contains tools for working with Skaffold and Kustomize. It also 
+contains the Vim editor and some debugging tools.
 
 
 ## Requirements
 
-* A cluster that supports [in cluster builds via kaniko](https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster) _hint: `bin/gke-cluster-admin.sh` will configure a GCP project for kaniko builds_
-* a kaniko secret (for registry pushes)
-* an cluster-admin account to deploy and work with the toolbox
-* kubectl
+* A cluster that supports 
+  [in-cluster builds using Kaniko](https://github.com/GoogleContainerTools/kaniko#running-kaniko-in-a-kubernetes-cluster) _hint: `bin/gke-cluster-admin.sh` will configure a GCP project for kaniko builds_
+* A Kaniko secret (for registry pushes)
+* A cluster administrative account that lets you deploy the toolbox and work 
+  with it
+* The `kubectl` command
 
 
 ## Installing
 
-We offer a simple installer script that can be used as a standlone with no dependencies on the ForgeOps repository. This will generate a kustomization file in the directory `forgeops-toolbox`, then it will deploy the toolbox
+We provide a simple installer script that you can run standalone, with no 
+dependencies on the forgeops repository. The script generates a Kustomize 
+file in the `forgeops-toolbox` directory, then deploys the toolbox.
 
-Example:
+For example:
 
 ```
-curl -o forgeops-toolbox.sh -L https://raw.githubusercontent.com/ForgeRock/forgeops/master/bin/forgeops-toolbox.sh
+curl -o toolbox -L https://raw.githubusercontent.com/ForgeRock/forgeops/master/bin/toolbox
 # using defaults configure, deploy, and set the remote for the forked copy of the ForgeOps repo
-bash forgeops-toolbox.sh -f https://github.com/mygithuborg/forgeops.git all
+bash toolbox -f https://github.com/mygithuborg/forgeops.git all
 ```
 
-You will probably want to change some of the default configuration, run `forgeops-toolbox.sh -h` to see the parameters available.
+If you want to change the default configuration. run the 
+`toolbox -h` command to explore available options.
 
-## Using the toolbox
+## Using the Toolbox
 
-Once the toolbox is deployed, utilizing the toolbox requires an exec into the pod and:
-1. Run the bootstrap script to set up the workspace (set up git fork, docker registry and ssh key for pushing to your repo)
-2. Add ssh key to to your repo
-3. Run the dev build and deploy script
+To use the toolbox after it's been deployed:
+
+1. Run the `kubectl exec` command to access the toolbox pod.
+1. In the toolbox pod, run the `bootstrap-project.sh` script to set up a 
+   workspace. This script creates a Git fork and identifies the Docker registry
+   you want to push images to. You'll need to provide your SSH key when you
+   run this script.
+1. Run the dev build and deploy script.
+
+For example:
 ```
 ❯ k exec -it deployment.apps/forgeops-cdk-toolbox tmux
              .
@@ -64,10 +78,16 @@ forgeops@forgeops-cdk-toolbox-7b86f78b77-tchrv:/opt/workspace$ bootstrap-project
 # note at somepoint you will be prompted for a password for your SSH key.
 ```
 
-The toolbox contains tools for working with Skaffold and Kustomize. It also contains vim as well as some debugging tools.
-
 # Security Notes
 
-* The toolbox requires privileges to deploy within a cluster. These privileges are similar to those of a cluster administrator.
-* Please be aware that the toolbox runs with escalated Kubernetes API privileges (for deploying)
-* If you add the generated ssh key from the toolbox to a repo keep in mind that anyone with cluster access could get a hold of that key. Its safer to not to add it, and copy the repo to your localhost then push from there. e.g. `kubectl cp toolboxpod:/opt/workspace/forgeops /tmp/myforgeopscopy; cd /tmp/myforgeopscopy; git push origin master;`
+* The toolbox requires privileges, similar to a cluster adminsitrator's 
+  privileges, to deploy within a cluster.
+* The toolbox runs with escalated Kubernetes API privileges (for deploying).
+* If you add the generated SSH key from the toolbox to a Git repository, keep in 
+  mind that anyone with cluster access could get the key. It's safer to not to 
+  add it to the repository. Instead, copy the repository to your local 
+  environment, and then copy the repository into the toolbox from there. For 
+  example:
+```  
+`kubectl cp toolboxpod:/opt/workspace/forgeops /tmp/myforgeopscopy; cd /tmp/myforgeopscopy; git push origin master;`
+```

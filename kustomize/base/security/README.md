@@ -1,39 +1,58 @@
 # ForgeOps Security Profile
 
-The security profile offers a starting point for utilizing pod security policies and network policies with the ForgeRock Identity Platform.
+The security profile offers a starting point for utilizing pod security policies
+and network policies with the ForgeRock Identity Platform.
 
-The objects may be added to any cluster, but won't be enforced until the controllers are enabled.
+The policies may be added to any cluster, but aren't enforced until the 
+controllers are enabled.
 
 For example, for a GKE cluster:
 ```
 gcloud beta container clusters update mycluster --enable-pod-security-policy
-
 gcloud container clusters update mycluster --enable-network-policy
 ```
 
 ## Pod Security Policies
 
-Enabling the pod security policy controller will require use of the `kustomize/base/security` as well as `kustomize/overlay/security`. The former creates policies, and the latter patches workloads to meet those policies.
+Enabling the pod security policy controller requires using the 
+`kustomize/base/security` base and the `kustomize/overlay/security` overlay. 
+The base creates policies, and the overlay patches workloads to meet those 
+policies.
 
-The policies are set up such that workloads using the default service account are allowed to run if they operate as the ForgeRock uid `11111` and the `fsGroup` of `11111`, and all workloads have no privilege escalation (or attempt to obtain esclation).
+The policies are set up so that workloads using the default service account 
+can run if:
 
-The ForgeRock UI applications use a webserver (NGINX), which requires the use of root. The policy has a limited scope that NGINX can operate with root permissions. The `seccomp` profile limits the system calls that can be completed inside the container. 
+* They operate as the ForgeRock uid `11111` and the `fsGroup` of `11111`
+* All workloads have no privilege escalation (or attempt to obtain escalation).
 
+The ForgeRock UI applications use the NGINX web server, which requires using
+the `root` account. The policy has a limited scope that NGINX can operate with 
+root permissions. The `seccomp` profile limits the system calls that can be 
+completed inside the container. 
 
-## network policies
+Note that pod security policies are scheduled to be 
+[deprecated in version 1.21 of Kubernetes, and will be removed from Kubernetes in version 1.25](https://github.com/kubernetes/kubernetes/pull/97171). 
 
-The supplied network policies are a starting point to use the ForgeRock Identity Platform. They are provided  in the kustomize/base/security profile and don't require the security overlay.
+## Network Policies
 
-The policies limit only ingress network traffic in the namespace. The provide a "tiered" architecture:
+The supplied network policies are a starting point to use with the ForgeRock 
+Identity Platform. They are provided in the `kustomize/base/security` profile,
+and don't require the `security` overlay.
 
-1. UIs are available for public ingress but have no DS access.
-2. AM/IDM are available for public ingress and for the UI application.
-3. DS ingress can be from another DS (replication), from AM/IDM for the ds-idrepo, and CTS can only be accessed by AM.
+These policies limit only ingress network traffic in the namespace. They provide
+a "tiered" architecture:
 
-We don't limit egress from any of the tiers. Ultimately, the egress configuration depends on:
+1. UIs are available for public ingress, but do not have DS access.
+1. AM and IDM are available for public ingress, and for the UI application.
+1. DS ingress can be from another DS (replication), from AM and IDM (the 
+   `ds-idrepo` directory), and by AM only (the `ds-cts` directory)
+
+There's no limit on egress from any of the tiers. Ultimately, the egress 
+configuration depends on:
 
 * The application's configuration.
 * Egress rules for social logins.
 * External integrations.
-* Additionally, access to DS backup storage will be highly variable.
+
+Additionally, access to DS backup storage will be highly variable.
 

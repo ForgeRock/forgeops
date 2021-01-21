@@ -1,43 +1,50 @@
 # Kustomize
 
-This folder provides [Kustomize](https://kubectl.docs.kubernetes.io/pages/app_customization/introduction.html) artifacts
-for deploying the ForgeRock platform.
+This folder provides Kustomize artifacts for deploying the ForgeRock Identity 
+Platform.
 
-If you are not familiar with Kustomize, please read the document link above - the explanation below will make a lot more sense.
+If you are not familiar with Kustomize, please read the documents and study the 
+tutorials [here](https://kustomize.io/) before you try to work with ForgeRock's 
+Kustomize artifacts.
 
-TL;DR; - Kustomize is based on patching (json patch and strategic merge patch) and overlays.
-You create base assets (K8S yaml files), and patch those. Those in turn can be used as a new base, and so on. You can nest these to any
-arbitrary depth.
+**TL;DR;** With Kustomize, you create base assets (Kubernetes YAML files), and 
+then patch them or overlay them. The modified assets can then be used as new 
+bases. You can nest these to any arbitrary depth.
 
 ## Organization
 
-The base directory folder includes the products (am, idm, ig, ds) and the "overlay" folder includes the environments.
-Environments pull together the products into a kustomize deployment. See `./overlay/{version}/all` for an example.
+The `kustomize/base` directory includes bases for the components of the 
+ForgeRock Identity Platform - AM, IDM, DS, and IG. The `overlay` folder includes
+the environments. Environments pull together the components into a Kustomize 
+deployment. See the `kustomize/overlay/7.0/all` directory for an example.
 
-## Viewing the Kustomize output
+## Reviewing Kustomize Output
 
-You can use `kubectl`  (version 1.14 or higher) or `kustomize`
-
-
+Use the `kustomize build` command to see the ouput that Kustomize generates. For
+example:
 ```bash
-cd kustomize/overlay/{version}/all
+cd kustomize/overlay/7.0/all
 # This will show you what is sent to the cluster
 kustomize build
 ```
 
-## Images
+## Docker Images
 
-The images referenced in the kustomize files are generic (example: `am`, `ig`), and not
-specific to a registry ( `gcr.io/forgerock-io/am-base:7.0.1` ).
+The Docker images referenced in the Kustomize files are generic (for example, 
+`am` or `ig`), and are not specific to a Docker registry (such as 
+`gcr.io/forgerock-io/am-base:7.1.0`).
 
-We can not directly deploy these generic images, because we need a docker image
-that has the configuration "baked in". This is where skaffold comes in to the picture.
-Skaffold will build new docker images that include configuration, and will
-"fix up" the docker image tags in kustomize, replacing the generic names (`am`) with
-a specific image name, tagged with a sha hash (dev mode) or a git hash (prod).
+We can not directly deploy the generic images, because we need a Docker image
+that has the configuration "baked in". This is where Skaffold comes in to the 
+picture. Skaffold builds new Docker images that include configuration, and 
+"fix up" the Docker image tags in Kustomize, replacing the generic names (`am`) 
+with specific image names tagged with an SHA hash (for pre-release builds) or a 
+Git hash (for release builds).
 
-See the skaffold [../README.md](../README.md).
+For more information, see the forgeops repository's [top-level README](../README.md).
 
 ## Further Discussion
 
- * This demonstrates a directory based organization. You can also use git branching. See [this discussion](https://kubectl.docs.kubernetes.io/pages/app_composition_and_deployment/diffing_local_and_remote_resources.html)
+The `kustomize` directory demonstrates a directory-based organization. You could
+also use Git branching. For more information, see 
+[this discussion](https://kubectl.docs.kubernetes.io/pages/app_composition_and_deployment/diffing_local_and_remote_resources.html).
