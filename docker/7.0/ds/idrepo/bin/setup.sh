@@ -8,6 +8,7 @@ CONFIG="am-config"
 AM_IDENTITY_STORE="am-identity-store"
 IDM_REPO="idm-repo"
 AM_CTS="am-cts"
+DS_PROXIED_SERVER="ds-proxied-server"
 
 # Select DS profile version
 if [[ ! -z $profile ]]; then
@@ -25,7 +26,10 @@ setup-profile --profile ${CONFIG} \
                   --set idm-repo/domain:forgerock.io \
  && setup-profile --profile ${AM_CTS} \
                   --set am-cts/tokenExpirationPolicy:ds \
-                  --set am-cts/amCtsAdminPassword:password
+                  --set am-cts/amCtsAdminPassword:password \
+ && setup-profile --profile ${DS_PROXIED_SERVER} \
+                  --set ds-proxied-server/proxyUserDn:uid=proxy \
+                  --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com
 
 # The default in 7.x is to use PBKDF2 password hashing - which is many order of magnitude slower than
 # SHA-512. We recommend leaving PBKDF2 as the default as it more secure.

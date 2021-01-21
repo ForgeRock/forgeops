@@ -11,15 +11,25 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: docker/7.0/ds
   args: [ 'build',
-    '-t', 'gcr.io/forgeops-public/cts:latest',
-    '-t', 'gcr.io/forgeops-public/cts:7.1-dev',
-    '-t', 'gcr.io/forgeops-public/cts:7-dev',
-    '-f', 'idrepo/Dockerfile', '.' ]
+    '-t', 'gcr.io/forgeops-public/ds-cts:latest',
+    '-t', 'gcr.io/forgeops-public/ds-cts:7.1-dev',
+    '-t', 'gcr.io/forgeops-public/ds-cts:7-dev',
+    '-f', 'cts/Dockerfile', '.' ]
+- name: 'gcr.io/cloud-builders/docker'
+  dir: docker/7.0/ds
+  args: [ 'build',
+    '-t', 'gcr.io/forgeops-public/ds-proxy:latest',
+    '-t', 'gcr.io/forgeops-public/ds-proxy:7.1-dev',
+    '-t', 'gcr.io/forgeops-public/ds-proxy:7-dev',
+    '-f', 'proxy/Dockerfile', '.' ]
 images: [
     'gcr.io/forgeops-public/ds-idrepo:latest',
     'gcr.io/forgeops-public/ds-idrepo:7.1-dev',
     'gcr.io/forgeops-public/ds-idrepo:7-dev',
-    'gcr.io/forgeops-public/cts:latest',
-    'gcr.io/forgeops-public/cts:7.1-dev',
-    'gcr.io/forgeops-public/cts:7-dev'
+    'gcr.io/forgeops-public/ds-cts:latest',
+    'gcr.io/forgeops-public/ds-cts:7.1-dev',
+    'gcr.io/forgeops-public/ds-cts:7-dev',
+    'gcr.io/forgeops-public/ds-proxy:latest',
+    'gcr.io/forgeops-public/ds-proxy:7.1-dev',
+    'gcr.io/forgeops-public/ds-proxy:7-dev'
    ]

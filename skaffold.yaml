@@ -73,6 +73,19 @@ kind: Config
         <<: *kaniko-opts
         dockerfile: idrepo/Dockerfile
 
+    - &DS-PROXY_BASE
+      image: ds-proxy
+      context: docker/7.0/ds
+    - &DS-PROXY
+      <<: *DS-PROXY_BASE
+      docker:
+        dockerfile: proxy/Dockerfile
+    - &DS-PROXY_KANIKO
+      <<: *DS-PROXY_BASE
+      kaniko:
+        <<: *kaniko-opts
+        dockerfile: proxy/Dockerfile
+
     - &LDIF-IMPORTER
       image: ldif-importer
       context: docker/7.0/ldif-importer
@@ -97,6 +110,7 @@ kind: Config
     - *IDM
     - *DS-CTS
     - *DS-IDREPO
+    - *DS-PROXY
     - *IG
     - *LDIF-IMPORTER
     kaniko-artifacts: &kaniko-artifacts
@@ -105,6 +119,7 @@ kind: Config
     - *IDM_KANIKO
     - *DS-CTS_KANIKO
     - *DS-IDREPO_KANIKO
+    - *DS-PROXY_KANIKO
     - *LDIF-IMPORTER_KANIKO
 
 ## End YAML Anchors

@@ -1,0 +1,59 @@
+# This is a sample of how to extend the schema for ds-idrepo
+# This adds some generic attributes which can contain string values
+# To use this add the objectclass fr-ext-attrs to the user entry
+# See setup.sh for an example of how to index these attributes
+dn: cn=schema
+objectClass: top
+objectClass: ldapSubentry
+objectClass: subschema
+cn: schema
+# Sample additional attributes
+# Indexed attributes have -i- in the name
+attributeTypes: (  fr-attr-i1
+  NAME 'fr-attr-i1'
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  EQUALITY caseIgnoreMatch
+  ORDERING caseIgnoreOrderingMatch
+  SINGLE-VALUE
+  X-STABILITY 'Internal' )
+attributeTypes: (  fr-attr-i2
+  NAME 'fr-attr-i2'
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  EQUALITY caseIgnoreMatch
+  ORDERING caseIgnoreOrderingMatch
+  SINGLE-VALUE
+  X-STABILITY 'Internal' )
+# Unidexed - have no -i-
+attributeTypes: (  fr-attr-1
+  NAME 'fr-attr-1'
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  EQUALITY caseIgnoreMatch
+  ORDERING caseIgnoreOrderingMatch
+  SINGLE-VALUE
+  X-STABILITY 'Internal' )
+attributeTypes: (  fr-attr-2
+  NAME 'fr-attr-2'
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  EQUALITY caseIgnoreMatch
+  ORDERING caseIgnoreOrderingMatch
+  SINGLE-VALUE
+  X-STABILITY 'Internal' )
+# A time attribute
+attributeTypes: (  fr-attr-date1
+  NAME 'fr-attr-date1'
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+  EQUALITY generalizedTimeMatch
+  ORDERING generalizedTimeOrderingMatch
+  SINGLE-VALUE
+  X-STABILITY 'Internal' )
+# Additional objectclass to add to your user to get these attributes
+objectClasses: (  fr-ext-attrs
+  NAME 'fr-ext-attrs'
+  SUP top
+  AUXILIARY
+  MAY ( fr-attr-1 $
+        fr-attr-2 $
+        fr-attr-i1 $
+        fr-attr-i2 $
+        fr-attr-date1
+        )  )

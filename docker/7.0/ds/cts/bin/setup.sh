@@ -5,6 +5,7 @@
 version=$1
 
 AM_CTS="am-cts"
+DS_PROXIED_SERVER="ds-proxied-server"
 
 # Select DS profile version
 if [[ ! -z $version ]]; then 
@@ -13,7 +14,10 @@ fi
 
 setup-profile --profile ${AM_CTS} \
               --set am-cts/tokenExpirationPolicy:am-sessions-only \
-              --set am-cts/amCtsAdminPassword:password
+              --set am-cts/amCtsAdminPassword:password \
+&& setup-profile --profile ${DS_PROXIED_SERVER} \
+                  --set ds-proxied-server/proxyUserDn:uid=proxy \
+                  --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com
 
 # Reduce changelog purge interval to 12 hours
 dsconfig set-synchronization-provider-prop \
