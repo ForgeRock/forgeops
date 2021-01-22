@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: git-server
+spec:
+  selector:
+    matchLabels:
+      app: git-server
+  template:
+    metadata:
+      labels:
+        app: git-server
+    spec:
+      securityContext:
+        runAsGroup: 0
+        runAsUser: 101
+        fsGroup: 0
+      containers:
+      - name: git-server
+        image: gcr.io/forgeops-public/git-server
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: /srv/git
+          name: git
+      volumes:
+      - name: git
+        persistentVolumeClaim:
+          claimName: git
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: git
+  annotations:
+    pv.beta.kubernetes.io/gid: "0"
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

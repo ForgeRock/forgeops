@@ -1,47 +1,13 @@
+# This is executed when any changes under docker/cli-tools are commited
 timeout: 1200s
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker/cli-tools'
-  id: base
-  entrypoint: 'make'
-  env:                      
-  - "VERSION=$_VERSION"     
-  - "REGISTRY_URL=gcr.io/$PROJECT_ID"
-  args:
-  - 'base'
+  args: ['build', '-t', 'gcr.io/forgeops-public/toolbox', 'toolbox']
 - name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker/cli-tools'
-  entrypoint: 'make'
-  waitFor: ["base"]
-  env:                    
-  - "REGISTRY_URL=gcr.io/$PROJECT_ID"
-  - "VERSION=$_VERSION"    
-  args:
-  - 'git-server'
+  args: ['build', '-t', 'gcr.io/forgeops-public/git-server', 'git-server']
 - name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker/cli-tools'
-  entrypoint: 'make'
-  waitFor: ["base"]
-  env:                    
-  - "REGISTRY_URL=gcr.io/$PROJECT_ID"
-  - "VERSION=$_VERSION"    
-  args:
-  - 'toolbox'
-- name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker/cli-tools'
-  entrypoint: 'make'
-  waitFor: ["base"]
-  env:                    
-  - "REGISTRY_URL=gcr.io/$PROJECT_ID"
-  - "VERSION=$_VERSION"    
-  args:
-  - 'debug'
-- name: 'gcr.io/cloud-builders/docker'
-  dir: 'docker/cli-tools'
-  entrypoint: 'make'
-  waitFor: ["base"]
-  env:                    
-  - "REGISTRY_URL=gcr.io/$PROJECT_ID"
-  - "VERSION=$_VERSION"    
-  args:
-    - 'repo'
+  args: ['build', '-t', 'gcr.io/engineering-devops/repo', 'repo']
+images:
+- gcr.io/forgeops-public/toolbox
+- gcr.io/forgeops-public/git-server
+- gcr.io/engineering-devops/repo

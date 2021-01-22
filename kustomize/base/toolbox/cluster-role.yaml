@@ -1,3 +1,7 @@
+# These Cluster wide RBAC roles are highly privileged in order to
+# give the toolbox the ability to deploy operators in the cluster.
+# This is NOT deployed by default. For shared clusters it is better to use the role.yaml
+# which is scoped to a namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -282,4 +286,4 @@ roleRef:
   name: developer-role
 subjects:
 - kind: ServiceAccount
-  name: account
+  name: toolbox

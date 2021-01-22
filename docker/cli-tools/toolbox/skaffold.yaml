@@ -5,9 +5,18 @@ metadata:
   name: toolbox
 build:
   artifacts:
-  - image: gcr.io/engineering-devops/cdk-toolbox
-    context: .
+  - image: cdk-toolbox
+    context: toolbox
 deploy:
   kustomize:
     paths:
-    - ../../../kustomize/base/toolbox
+    - ../../kustomize/base/toolbox
+profiles:
+- name: git
+  build:
+    artifacts:
+    - image: git-server
+      context: git-server
+  deploy:
+    kustomize:
+      paths: [ "../../kustomize/base/git-server"]

@@ -1,41 +1,57 @@
-ARG VERSION=latest
-ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
-FROM gcr.io/google-containers/pause:latest as pause
+FROM debian:buster as builder
 
-ARG VERSION=latest
-ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
-FROM $FORGEOPS_REGISTRY/cli-tools/base:$VERSION
+RUN apt-get update \
+        && apt-get install -y curl ca-certificates bash --no-install-recommends
+
+ARG KUSTOMIZE_VERSION=latest
+ARG KUBECTL_VERSION=latest
+
+RUN mkdir -p /opt/bin \
+        && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+        && cp kubectl /opt/bin  \
+        && curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash \
+        && cp kustomize /opt/bin \
+        && chmod a+rx /opt/bin/*
+
+# Skaffold
+RUN curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 \
+        && chmod +x skaffold && mv skaffold /opt/bin
+
+# TODO: Pull the forgeops cli
+#  RUN curl -LO https://github.com/ForgeRock/forgeops-cli/releases/latest/download/todo \
+#         && tar xvfz
+
+FROM debian:buster
 ARG VSCODE_CONTAINERS="https://raw.githubusercontent.com/microsoft/vscode-dev-containers/master/script-library/common-debian.sh"
 ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
-RUN useradd forgeops --home /opt/workspace --gid 0 \
+RUN useradd forgerock --home /opt/workspace --gid 0 \
         && apt-get update \
-        && apt-get install -y curl ca-certificates --no-install-recommends \
+        && apt-get install -y curl ca-certificates vim bash procps git netcat dnsutils tmux ldap-utils  \
         && mkdir -m 0770 -p /opt/{workspace,build} \
-        && chown forgeops:root /opt/{workspace,build} \
-        && curl -Lso common.sh ${VSCODE_CONTAINERS} \
-        && bash common.sh false none automatic automatic false false
+        && chown forgerock:root /opt/{workspace,build}
 
-COPY --from=pause /pause /usr/local/bin/pause
+# Uncomment for vscode support
+# RUN curl -Lso common.sh ${VSCODE_CONTAINERS} \
+#         && bash common.sh false none automatic automatic false false
 
-RUN mkdir -p /opt/build/.local/bin \
-        && mkdir -p /opt/build/.vim/pack/plugins/start \
-        && git clone --depth 1 https://github.com/dense-analysis/ale.git /opt/build/.vim/pack/plugins/start/ale \
-        && git clone --depth 1 https://github.com/preservim/nerdtree.git /opt/build/.vim/pack/plugins/start/nerdtree \
-        && chown -R forgeops:root /opt/
-
-USER forgeops
+USER forgerock
 
 RUN echo "PATH=/opt/workspace/bin:$PATH" >> /opt/build/.bashrc \
         && echo "bash -c /opt/build/bin/start-shell.sh" >> /opt/build/.bashrc
 
-COPY --chown=forgeops:root etc /opt/build/etc
-COPY --chown=forgeops:root bin/  /opt/build/bin
-COPY --chown=forgeops:root bin/git-set-fork.sh /usr/local/bin
+COPY --from=gcr.io/google-containers/pause:latest /pause /usr/local/bin/pause
+COPY --from=builder /opt/bin/* /usr/local/bin/
+COPY --chown=forgerock:root etc /opt/build/etc
+COPY --chown=forgerock:root bin/  /opt/build/bin
+COPY --chown=forgerock:root bin/git-set-fork.sh /usr/local/bin
 
 ENV SSH_PORT=4222
 ENV WORKSPACE=/opt/workspace
+
+ENV PATH=/opt/build/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/workspace/forgeops/bin
+
 WORKDIR /opt/workspace
 ENTRYPOINT ["/opt/build/bin/entrypoint.sh"]
 CMD ["/usr/local/bin/pause"]

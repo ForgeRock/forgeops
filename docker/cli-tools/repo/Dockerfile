@@ -1,7 +1,5 @@
-ARG VERSION=latest
-ARG FORGEOPS_REGISTRY=gcr.io/engineering-devops
-FROM ${FORGEOPS_REGISTRY}/cli-tools/base:${VERSION} as tools
-FROM debian:sid-slim
+FROM gcr.io/forgeops-public/toolbox as tools
+FROM debian:buster-slim
 SHELL ["bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
@@ -14,7 +12,7 @@ RUN apt-get update -y \
 
 COPY src /opt/workspace
 # source, source, ... destination
-COPY --from=tools ["/usr/local/bin/skaffold","/usr/local/bin/kustomize","/usr/local/bin/kubectl", "/usr/local/bin/"]
+COPY --from=tools /usr/local/bin /usr/local/bin
 
 RUN cd /opt/workspace && pip3 install .
 WORKDIR /opt/workspace

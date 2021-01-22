@@ -6,11 +6,12 @@ spec:
   securityContext:
     runAsUser: 1000
     fsGroup: 1000
-  serviceAccountName: account
+  serviceAccountName: toolbox
   containers:
   - name: toolbox
-    image: gcr.io/engineering-devops/cdk-toolbox:latest
+    image: gcr.io/forgeops-public/toolbox:latest
     imagePullPolicy: Always
+    args: ["pause"]
     ports:
     - containerPort: 4222
     volumeMounts:

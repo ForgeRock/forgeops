@@ -1,0 +1,22 @@
+# Skaffold used to iterate on the the toolbox.
+apiVersion: skaffold/v2beta4
+kind: Config
+metadata:
+  name: toolbox
+profiles:
+- name: git
+  build:
+    artifacts:
+    - image: gcr.io/engineering-devops/git-server
+      context: git-server
+  deploy:
+    kustomize:
+      paths: [ "../../kustomize/base/git-server"]
+- name: toolbox
+  build:
+    artifacts:
+    - image: gcr.io/forgeops-public/toolbox
+      context: toolbox
+  deploy:
+    kustomize:
+      paths: ["../../kustomize/base/toolbox"]

@@ -1,10 +1,9 @@
-namePrefix: forgeops-cdk-
-namespace: default
+namePrefix: cdk-
 commonLabels:
   app: toolbox
   vendor: forgerock
 resources:
-  - pvc.yaml
-  - serviceaccount.yaml
-  - rolesandbindings.yaml
-  - pod.yaml
+- pvc.yaml
+- serviceaccount.yaml
+- role.yaml
+- pod.yaml

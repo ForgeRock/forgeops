@@ -1,0 +1,23 @@
+# Namespace based role
+# This allows the user to do pretty much anything in their namespace.
+# This should only be used in development environments
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: toolbox
+rules:
+ - apiGroups: ["*"]
+   resources: ["*"]
+   verbs: ["*"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: toolbox
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: toolbox
+subjects:
+- kind: ServiceAccount
+  name: toolbox

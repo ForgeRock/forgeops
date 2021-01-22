@@ -4,9 +4,9 @@
 SCRIPT_NAME="$(basename "$0")"
 
 # Remote:
-TOOLBOX_URL=https://github.com/ForgeRock/forgeops/blob/master/kustomize/base/toolbox
+# TOOLBOX_URL=https://github.com/ForgeRock/forgeops/blob/master/kustomize/base/toolbox
 # For local testing
-# TOOLBOX_URL=kustomize/base/toolbox
+TOOLBOX_URL=kustomize/base/toolbox
 
 if ! command -v kustomize >/dev/null 2>&1;
 then
