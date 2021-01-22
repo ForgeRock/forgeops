@@ -71,7 +71,7 @@ void runStage(PipelineRun pipelineRun) {
                         def config = config_common.clone()
                         config += [
                             TEST_NAME       : "access_token",
-                            BASELINE_RPS    : '[3075,3115]',
+                            BASELINE_RPS    : '[2733,2453]',
                         ]
 
                         withGKEPyrockNoStages(config)

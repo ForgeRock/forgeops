@@ -47,7 +47,8 @@ void runStage(PipelineRun pipelineRun) {
                             TEST_NAME                  : "authn_rest",
                             DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/nemanja/3ds-10M-bis',
                             DEPLOYMENT_MAKEBACKUP      : false,
-                            SET_OPTIONS                : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries=10000000",
+                            CONFIGFILE_NAME            : 'conf-stability.yaml',
+                            BASELINE_RPS               : '2550',
                         ]
 
                         withGKEPyrockNoStages(config)
@@ -63,7 +64,8 @@ void runStage(PipelineRun pipelineRun) {
                             TEST_NAME                  : "access_token",
                             DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/nemanja/3ds-10M-bis',
                             DEPLOYMENT_MAKEBACKUP      : false,
-                            SET_OPTIONS                : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h --set components.servers['ds-idrepo'].num-entries=10000000",
+                            BASELINE_RPS               : '[2733,2453]',
+                            CONFIGFILE_NAME            : 'conf-stability.yaml',
                         ]
 
                         withGKEPyrockNoStages(config)
