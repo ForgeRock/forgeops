@@ -4,7 +4,7 @@ kind: DirectoryService
 metadata:
   name: ds-cts
 spec:
-  image:  gcr.io/forgeops-public/ds-cts:2a0e6bfc
+  image:  gcr.io/forgeops-public/ds-cts:7.1-dev
   # The number of DS servers in the topology
   replicas: 1
   # The resources assigned to each DS pod
