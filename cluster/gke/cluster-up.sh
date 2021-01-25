@@ -25,29 +25,33 @@ SLUG_NAME=$(echo $GCLOUD_ACCT_EMAIL | awk -F "@" '{print $1 }' | sed 's/\./_/g')
 ES_USEREMAIL=${ES_USEREMAIL:-$SLUG_NAME}
 ES_ZONE=${ES_ZONE:-"empherical"}
 
-IS_FORGEROCK=$([[ "$GCLOUD_ACCT_EMAIL" =~ forgerock.com ]])
+IS_FORGEROCK=$([[ "$GCLOUD_ACCT_EMAIL" =~ forgerock.com ]] || true)
 
 ES_BUSINESSUNIT=${ES_BUSINESSUNIT:-"engineering"}
 BILLING_ENTITY=${BILLING_ENTITY:-"us"}
 
 echo "Deploying to region: $REGION"
 
-if [ -v $I_AM_CDM ];
+I_AM_CDM=${I_AM_CDM:-0}
+ES_OWNEDBY=${ES_OWNEDBY:="unset"}
+ES_MANAGEDBY=${ES_MANAGEDBY:="unset"}
+
+if [ "$I_AM_CDM" == "1" ];
 then
-    ES_OWNEDBY=${ES_OWNEDBY:-"cdm"}
-    ES_MANAGEDBY=${ES_MANAGEDBY:-"cdm"}
+    ES_OWNEDBY="cdm"
+    ES_MANAGEDBY="cdm"
 fi
 
-if [ ! -v $ES_OWNEDBY ] && $IS_FORGEROCK; then
+if [ "$ES_OWNEDBY" == "unset" ] && "$IS_FORGEROCK"; then
     echo "please set ES_OWNEDBY for Enterprise Security Tag Rules"
     exit 1
 fi
-if [ ! -v $ES_MANAGEDBY ] && $IS_FORGEROCK; then
+if [ "$ES_MANAGEDBY" == "unset" ] && "$IS_FORGEROCK"; then
     echo "Please set ES_MANAGEDBY for Enterprise Security Tag Rules" 
     exit 1
 fi
 
-if [ -z $REGION ]; then
+if [ -z "$REGION" ]; then
   echo "Please set region in your gcloud config 'gcloud config set compute/region <region>' or in <my-cluster>.sh";
   exit 1
 fi
