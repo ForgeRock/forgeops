@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -16,11 +16,11 @@ import com.forgerock.pipeline.forgeops.DockerImage
  * Globally scoped git commit information
  */
 FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnStdout: true).trim()
-
-/**
- * Globally scoped git commit information
- */
 FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+FORGEOPS_GIT_COMMITTER = sh(returnStdout: true, script: 'git show -s --pretty=%cn').trim()
+FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
+FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
+FORGEOPS_GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
 /** Globally scoped git commit information for the Lodestar repo */
 LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
@@ -40,6 +40,17 @@ dockerImages = [
         'ds-idrepo' : DockerImagePromotion.load('docker/7.0/ds/idrepo/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
         'idm'       : DockerImagePromotion.load('docker/7.0/idm/Dockerfile', 'gcr.io/forgerock-io/idm', steps),
         'ig'        : DockerImagePromotion.load('docker/7.0/ig/Dockerfile', 'gcr.io/forgerock-io/ig', steps),
+]
+
+productToRepo = [
+        'am' : 'openam',
+        'am-config-upgrader' : 'openam',
+        'amster' : 'openam',
+        'ds-cts' : 'opendj',
+        'ds-util' : 'opendj',
+        'ds-idrepo' : 'opendj',
+        'idm' : 'openidm',
+        'ig' : 'openig',
 ]
 
 DockerImagePromotion getDockerImage(String productName) {
@@ -62,11 +73,12 @@ boolean branchSupportsIDCloudReleases() {
 
 def getCurrentProductCommitHashes() {
     return [
-            getDockerImage('ds-idrepo').productCommit,
-            getDockerImage('ig').productCommit,
-            getDockerImage('idm').productCommit,
-            getDockerImage('am').productCommit,
-            getLodestarCommit(),
+            'forgeops' : commonModule.FORGEOPS_GIT_COMMIT,
+            'opendj' : getDockerImage('ds-idrepo').productCommit,
+            'openig' : getDockerImage('ig').productCommit,
+            'openidm' : getDockerImage('idm').productCommit,
+            'openam' : getDockerImage('am').productCommit,
+            'lodestar' : getLodestarCommit()
     ]
 }
 

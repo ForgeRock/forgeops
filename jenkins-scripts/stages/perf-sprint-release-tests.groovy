@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 ForgeRock AS. All Rights Reserved
+ * Copyright 2020-2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -7,12 +7,12 @@
  */
 
 
-import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.FailureOutcome
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.Status
 
-void runStage(PipelineRun pipelineRun) {
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
     def stageName = 'PERF Sprint Release'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
@@ -20,7 +20,6 @@ void runStage(PipelineRun pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('perf-long-cloud') {
             stage(stageName) {
-                pipelineRun.updateStageStatusAsInProgress()
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
                 dir('lodestar') {

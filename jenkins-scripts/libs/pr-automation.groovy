@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -7,7 +7,7 @@
  */
 
 import com.forgerock.pipeline.GlobalConfig
-import com.forgerock.pipeline.reporting.PipelineRun
+import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 
 /**
@@ -18,7 +18,7 @@ import com.forgerock.pipeline.stage.Status
  *
  * @param currentBuildCommit Git commit used in this build.
  */
-void mergeIfAutomatedProductVersionUpdate(PipelineRun pipelineRun, String currentBuildCommit) {
+void mergeIfAutomatedProductVersionUpdate(PipelineRunLegacyAdapter pipelineRun, String currentBuildCommit) {
     String project = scmUtils.getProjectName()
     String repo = scmUtils.getRepoName()
     String creds = credsId()
@@ -74,19 +74,20 @@ boolean isAutomatedPullRequest() {
 
 /** Get the related product commit hashes for a product increment PR opened automatically by Rockbot. */
 Collection<String> getPrProductCommitHashes() {
-    Set relatedCommits = [].toSet()
+    Map<String, String> relatedCommits = [:]
     scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 
     // Check changes to products
     commonModule.dockerImages.each { imageKey, image ->
         if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, image.dockerfilePath)) {
-            relatedCommits << image.productCommit
+            String repo = commonModule.productToRepo[imageKey]
+            relatedCommits[repo] = image.productCommit
         }
     }
 
     // Check changes to Lodestar
     if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, commonModule.LODESTAR_GIT_COMMIT_FILE)) {
-        relatedCommits << LODESTAR_GIT_COMMIT
+        relatedCommits['lodestar'] = LODESTAR_GIT_COMMIT
     }
 
     return relatedCommits
