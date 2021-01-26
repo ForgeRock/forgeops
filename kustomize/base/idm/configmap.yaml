@@ -4,8 +4,6 @@ metadata:
   name: idm
 data:
   IDM_ENVCONFIG_DIRS: /opt/openidm/resolver
-  # Add -XX:+PrintFlagsFinal to see the final JVM settings
-  # Set in Dockerfile JAVA_OPTS -server -XX:MaxRAMPercentage=75
   LOGGING_PROPERTIES: /var/run/openidm/logging/logging.properties
   OPENIDM_ANONYMOUS_PASSWORD: anonymous
   OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
