@@ -18,6 +18,7 @@ prometheus:
     prometheusSpec:
         serviceMonitorSelectorNilUsesHelmValues: false
         ruleSelectorNilUsesHelmValues: false
+        enableAdminAPI: false
     ingress:
         # Enable to use external url for Prometheus.
         enabled: true

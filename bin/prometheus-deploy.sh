@@ -56,11 +56,11 @@ delete() {
 
     set +e
 
-    # Delete Prometheus Operator Helm chart
-    helm uninstall prometheus-operator --namespace=$NAMESPACE
-
     # Delete forgerock-metrics Helm chart
     helm delete forgerock-metrics --namespace=$NAMESPACE
+
+    # Delete Prometheus Operator Helm chart
+    helm uninstall prometheus-operator --namespace=$NAMESPACE
 
     # Delete CRDs
     kubectl delete --wait=true crd prometheuses.monitoring.coreos.com
