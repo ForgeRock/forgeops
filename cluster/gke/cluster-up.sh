@@ -89,7 +89,7 @@ DEFAULT_POOL_LABELS="frontend=true"
 if [ "$CREATE_DS_POOL" == "false" ]; then
   # If there is no ds node pool we must label the primary node pool to allow
   # ds pods to be scheduled there.
-  DEFAULT_POOL_LABELS="${DEFAULT_POOL_LABELS},forgerock.io/role=ds"
+  DEFAULT_POOL_LABELS="${DEFAULT_POOL_LABELS},forgerock.io/role=ds,forgerock.io/cluster=${NAME}"
 fi
 
 
@@ -154,7 +154,7 @@ if [ "$CREATE_DS_POOL" == "true" ]; then
     --disk-type "pd-ssd" \
     --disk-size "100" \
     --metadata disable-legacy-endpoints=true \
-    --node-labels forgerock.io/role=ds \
+    --node-labels forgerock.io/role=ds,forgerock.io/cluster=${NAME} \
     --node-taints WorkerDedicatedDS=true:NoSchedule \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
     "$PREEMPTIBLE" \

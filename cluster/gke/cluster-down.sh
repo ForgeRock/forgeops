@@ -16,30 +16,41 @@ REGION=${REGION:-$R}
 ZONE=${ZONE:-"$REGION-a"}
 
 
-echo "About to delete the cluster $NAME in zone $ZONE, and ALL data. Press any key to continue, or control-c to quit"
+echo "The \"${NAME}\" cluster will be deleted. This action cannot be undone."
+echo "Press any key to continue, or CTRL+C to quit"
 read;
-
-
 
 echo "Getting the cluster credentials for $NAME in Zone $ZONE"
 gcloud container clusters get-credentials "$NAME" --zone "$ZONE" || exit 1
 
-echo "About to delete the cluster in 10 seconds. YOU WILL LOSE ALL DATA! Control-c now to stop this"
 
-sleep 10
+read -r -p "Do you want to delete all PVCs allocated by this cluster (recommended for dev clusters)? [Y/N] " response
+case "$response" in
+    [nN][oO]|[nN]) 
+        echo
+        echo "***The following PVCs will not be removed. You're responsible to remove them later***"
+        kubectl get pvc --all-namespaces --no-headers
+        ;;
+    [yY][eE][sS]|[yY]) 
+        echo
+        echo "***Draining all nodes***"
+        kubectl cordon -l forgerock.io/cluster
+        kubectl delete pod --all-namespaces --all --grace-period=0
+        echo
+        echo "***Deleting all PVCs***"
+        kubectl delete pvc --all-namespaces --all
+        ;;
+    *)
+        echo "Invalid option. Please try again."
+        exit 1
+        ;;
+esac
 
-# Try to release any L4 service load balancers
-echo "Cleaning up the ngnix load balancer. Ignore any errors below"
-kubectl -n nginx delete deployment --all
-kubectl -n nginx delete svc --all
-kubectl delete ns nginx
+# Attempt to release any L4 service load balancers
+echo 
+echo "***Cleaning all services and load balancers if any***"
+kubectl delete svc --all --all-namespaces
 
-
-echo "Deleting all PVC disks in 5 seconds... YOU WILL LOSE ALL DATA. Control-c now to stop this"
-sleep 5
-kubectl delete pvc --all-namespaces --all
-
-sleep 10
 # Delete the cluster. Defaults to the current project.
 gcloud container clusters delete "$NAME" --zone "$ZONE"
 
