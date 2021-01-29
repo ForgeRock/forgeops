@@ -10,9 +10,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: ds-replication-policy
+  name: ds-replication
   labels:
-    tier: data
+    tier: ds
 spec:
   podSelector:
     matchExpressions:
@@ -37,9 +37,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: ds-idrepo-ldap-policy
+  name: ds-idrepo-ldap
   labels:
-    tier: data
+    tier: ds
 spec:
   podSelector:
     matchLabels:
@@ -67,9 +67,9 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: ds-cts-ldap-policy
+  name: ds-cts-ldap
   labels:
-    tier: data
+    tier: ds
 spec:
   podSelector:
     matchLabels:
