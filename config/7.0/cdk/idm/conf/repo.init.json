@@ -48,6 +48,9 @@
       },
       {
         "id" : "idm-provisioning"
+      },
+      {
+        "id" : "connector-server-client"
       }
     ]
   },
