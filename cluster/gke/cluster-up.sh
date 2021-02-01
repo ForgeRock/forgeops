@@ -25,7 +25,7 @@ SLUG_NAME=$(echo $GCLOUD_ACCT_EMAIL | awk -F "@" '{print $1 }' | sed 's/\./_/g')
 ES_USEREMAIL=${ES_USEREMAIL:-$SLUG_NAME}
 ES_ZONE=${ES_ZONE:-"empherical"}
 
-IS_FORGEROCK=$([[ "$GCLOUD_ACCT_EMAIL" =~ forgerock.com ]] || true)
+IS_FORGEROCK=$([[ "$GCLOUD_ACCT_EMAIL" =~ forgerock.com ]] && echo "yes" || echo "no")
 
 ES_BUSINESSUNIT=${ES_BUSINESSUNIT:-"engineering"}
 BILLING_ENTITY=${BILLING_ENTITY:-"us"}
@@ -42,11 +42,11 @@ then
     ES_MANAGEDBY="cdm"
 fi
 
-if [ "$ES_OWNEDBY" == "unset" ] && "$IS_FORGEROCK"; then
+if [ "$ES_OWNEDBY" == "unset" ] && [ "$IS_FORGEROCK" == "yes" ]; then
     echo "please set ES_OWNEDBY for Enterprise Security Tag Rules"
     exit 1
 fi
-if [ "$ES_MANAGEDBY" == "unset" ] && "$IS_FORGEROCK"; then
+if [ "$ES_MANAGEDBY" == "unset" ] && [ "$IS_FORGEROCK" == "yes" ]; then
     echo "Please set ES_MANAGEDBY for Enterprise Security Tag Rules" 
     exit 1
 fi
@@ -70,7 +70,7 @@ ADDITIONAL_OPTS=""
 
 # myname-<firstname>-<lastname>.  For example “openam-john-doe” or “benchmark-cluster-john-doe”
 
-if $IS_FORGEROCK;
+if [ "$IS_FORGEROCK" == "yes" ];
 then
     ASSET_LABELS="--labels es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
     ADDITIONAL_OPTS+="${ASSET_LABELS} "

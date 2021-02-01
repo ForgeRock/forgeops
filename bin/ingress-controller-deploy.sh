@@ -41,15 +41,15 @@ if [[ $# > 0 ]]; then
                 IP_OPTS="--set controller.service.loadBalancerIP=${2}"
             fi
             echo -e "Deploying Ingress Controller to GKE...\n"
-            PROVIDER="GKE"
+            PROVIDER="gke"
         ;;
         -e|--eks)
             echo -e "Deploying Ingress Controller to EKS...\n"
-            PROVIDER="EKS"
+            PROVIDER="eks"
         ;;
         -a|--aks)
             echo -e "Deploying Ingress Controller to AKS...\n"
-            PROVIDER="AKS"
+            PROVIDER="aks"
         ;;
         -h|--help)
             usage
