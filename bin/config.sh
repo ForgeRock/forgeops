@@ -141,14 +141,16 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 #****** UPGRADE CONFIG AND REAPPLY PLACEHOLDERS ******#
 upgrade_config(){
 
+	UPGRADER_DIR="$DOCKER_ROOT/am-config-upgrader"
+	AM_DIR="$DOCKER_ROOT/am"
 	printf "\nReplacing missing placeholders using AM config upgrader...\n\n"
 	printf "Skaffold is used to run the AM upgrader job. Ensure your default-repo is set.\n\n"
 	sleep 3
 
-	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+	rm -fr "$UPGRADER_DIR/config"
 	
-	cp -R "$DOCKER_ROOT/am/config"  "$DOCKER_ROOT/am-config-upgrader/"
-	rm -fr "$DOCKER_ROOT/am/config"
+	cp -R "$DOCKER_ROOT/am/config"  "$UPGRADER_DIR/"
+	rm -fr "$AM_DIR/config"
 
 	echo "Removing any existing config upgrader jobs..."
 	kubectl delete job am-config-upgrader || true
@@ -167,12 +169,16 @@ upgrade_config(){
 
 	pod=`kubectl get pod -l app=am-config-upgrader -o jsonpath='{.items[0].metadata.name}'`
 
-	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+	rm -fr "$UPGRADER_DIR/config"
 
-	kubectl exec $pod -- /home/forgerock/export.sh - | tar -C $DOCKER_ROOT/am-config-upgrader -xvf  -
+	kubectl exec $pod -- /home/forgerock/tar-config.sh 
+	kubectl cp $pod:/am-config/config/placeholdered-config.tar "$UPGRADER_DIR/placeholdered-config.tar"
 	
-	cp -R "$DOCKER_ROOT/am-config-upgrader/config/"  "$DOCKER_ROOT/am/config"
-	rm -fr "$DOCKER_ROOT/am-config-upgrader/config"
+	tar -xvf $UPGRADER_DIR/placeholdered-config.tar -C $UPGRADER_DIR
+
+	cp -R "$UPGRADER_DIR/config"  "$AM_DIR"
+	rm -fr "$UPGRADER_DIR/config"
+	rm "$UPGRADER_DIR/placeholdered-config.tar"
 
 	# Shut down config upgrader job
 	printf "Shutting down config upgrader job...\n"
