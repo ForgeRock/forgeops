@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am-config-upgrader/pit1:7.1.0-307b388690eb8911c3820be295ec7e86dca55ba1
+FROM gcr.io/forgerock-io/am-config-upgrader/pit1:7.1.0-ac220424cb41d83f2b91ad4aa5e4cbb00c07bfc1
 
 USER root
 
