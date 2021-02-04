@@ -70,20 +70,38 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         withGKEPyrockNoStages(config)
                     }
 
-                    //// perf platform test
-                    //subStageName = 'platform_long'
-                    //stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
-//
-                    //dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
-                    //    def config = config_common.clone()
-                    //    config += [
-                    //        TEST_NAME       : "platform",
-                    //        BASELINE_RPS    : '[1983,1722,1136,360]',
-                    //        SET_OPTIONS     : "--set phases['scenario'].duration=6 --set phases['scenario'].duration-unit=h",
-                    //    ]
-//
-                    //    withGKEPyrockNoStages(config)
-                    //}
+                    // perf platform test
+                    subStageName = 'platform_long'
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('platform')
+
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                        def config = config_common.clone()
+                        config += [
+                            TEST_NAME                  : "platform",
+                            DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/nemanja/platform-backup',
+                            DEPLOYMENT_MAKEBACKUP      : false,
+                            BASELINE_RPS               : '[1983,1722,1136,360]',
+                            CONFIGFILE_NAME            : 'conf-restore-1m-stability.yaml'
+                        ]
+
+                        withGKEPyrockNoStages(config)
+                    }
+
+                    // perf IDM Crud test
+                    subStageName = 'idm_crud_long'
+                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud('simple_managed_users')
+
+                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                        def config = config_common.clone()
+                        config += [
+                                TEST_NAME                  : "simple_managed_users",
+                                CONFIGFILE_NAME            : 'conf-restore-backup-1m-stability.yaml',
+                                DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/tinghua/1m',
+                                DEPLOYMENT_MAKEBACKUP      : false,
+                        ]
+
+                        withGKEPyrockNoStages(config)
+                    }
 
                     summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
                         normalizedStageName, "${normalizedStageName}.html")
