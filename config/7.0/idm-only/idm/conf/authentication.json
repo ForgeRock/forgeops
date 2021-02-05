@@ -38,14 +38,15 @@
                 "properties" : {
                     "augmentSecurityContext": {
                         "type" : "text/javascript",
-                        "source" : "require('auth/customAuthz').setProtectedAttributes(security)"
+                        "source" : "require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'orgPrivileges');require('auth/customAuthz').setProtectedAttributes(security);"
                     },
                     "queryId" : "credential-query",
                     "queryOnResource" : "managed/user",
                     "propertyMapping" : {
                         "authenticationId" : "username",
                         "userCredential" : "password",
-                        "userRoles" : "authzRoles"
+                        "userRoles" : "authzRoles",
+                        "additionalUserFields": ["adminOfOrg", "ownerOfOrg"]
                     },
                     "defaultUserRoles" : [
                         "internal/role/openidm-authorized"

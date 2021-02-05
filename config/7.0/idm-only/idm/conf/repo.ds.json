@@ -493,6 +493,32 @@
                         "ldapAttribute" : "fr-idm-managed-user-authzroles-internal-role",
                         "primaryKey" : "cn",
                         "resourcePath" : "internal/role"
+                    },
+                    "ownerOfOrg" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-organization-owner",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "managed/organization",
+                        "isMultiValued" : true
+                    },
+                    "adminOfOrg" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-organization-admin",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "managed/organization",
+                        "isMultiValued" : true
+                    },
+                    "memberOfOrg" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-organization-member",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "managed/organization",
+                        "isMultiValued" : true
+                    },
+                    "memberOfOrgIDs" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-managed-user-memberoforgid",
+                        "isMultiValued" : true
                     }
                 }
             },
@@ -873,6 +899,53 @@
                         "type" : "reverseReference",
                         "resourcePath" : "managed/user",
                         "propertyName" : "roles",
+                        "isMultiValued" : true
+                    }
+                }
+            },
+            "managed/organization" : {
+                "dnTemplate" : "ou=organization,ou=managed,dc=openidm,dc=forgerock,dc=io",
+                "objectClasses" : [
+                    "uidObject",
+                    "fr-idm-managed-organization"
+                ],
+                "jsonAttribute" : "fr-idm-managed-organization-json",
+                "jsonQueryEqualityMatchingRule" : "caseIgnoreJsonQueryMatch",
+                "properties" : {
+                    "_id" : {
+                        "type": "simple", "ldapAttribute": "uid"
+                    },
+                    "name" : {
+                        "type": "simple", "ldapAttribute": "fr-idm-managed-organization-name"
+                    },
+                    "parent" : {
+                        "type" : "reference",
+                        "ldapAttribute" : "fr-idm-managed-organization-parent",
+                        "primaryKey" : "uid",
+                        "resourcePath" : "managed/organization"
+                    },
+                    "children" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/organization",
+                        "propertyName" : "parent",
+                        "isMultiValued" : true
+                    },
+                    "owners" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "ownerOfOrg",
+                        "isMultiValued" : true
+                    },
+                    "admins" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "adminOfOrg",
+                        "isMultiValued" : true
+                    },
+                    "members" : {
+                        "type" : "reverseReference",
+                        "resourcePath" : "managed/user",
+                        "propertyName" : "memberOfOrg",
                         "isMultiValued" : true
                     }
                 }
