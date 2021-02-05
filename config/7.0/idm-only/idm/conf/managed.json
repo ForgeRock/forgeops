@@ -42,7 +42,11 @@
                     "lastSync",
                     "kbaInfo",
                     "preferences",
-                    "consentedMappings"
+                    "consentedMappings",
+                    "ownerOfOrg",
+                    "adminOfOrg",
+                    "memberOfOrg",
+                    "memberOfOrgIDs"
                 ],
                 "properties" : {
                     "_id" : {
@@ -622,6 +626,169 @@
                         },
                         "returnByDefault" : false,
                         "isVirtual" : false
+                    },
+                    "ownerOfOrg" : {
+                        "description" : null,
+                        "title" : "Organizations I Own",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "policies" : [ ],
+                        "returnByDefault" : false,
+                        "minLength" : null,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "notifySelf" : false,
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "owners",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : true,
+                                    "path" : "managed/organization",
+                                    "label" : "Organization",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "adminOfOrg" : {
+                        "description" : null,
+                        "title" : "Organizations I Administer",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "policies" : [ ],
+                        "returnByDefault" : false,
+                        "minLength" : null,
+                        "pattern" : null,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "notifySelf" : false,
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "admins",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : true,
+                                    "path" : "managed/organization",
+                                    "label" : "Organization",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "memberOfOrg" : {
+                        "description" : null,
+                        "title" : "Organizations to which I Belong",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "policies" : [ ],
+                        "returnByDefault" : false,
+                        "minLength" : null,
+                        "pattern" : null,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "notifySelf" : true,
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "members",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : false,
+                                    "path" : "managed/organization",
+                                    "label" : "Organization",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "memberOfOrgIDs" : {
+                        "title" : "MemberOfOrgIDs",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "description" : null,
+                        "minLength" : null,
+                        "isVirtual" : true,
+                        "returnByDefault" : true,
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["memberOfOrg"],
+                            "referencedObjectFields" : ["_id", "parentIDs"],
+                            "flattenProperties" : true
+                        },
+                        "items" : {
+                            "type" : "string",
+                            "title" : "org identifiers"
+                        }
                     }
                 },
                 "type" : "object",
@@ -989,6 +1156,385 @@
                     "attributes",
                     "linkQualifiers",
                     "roles"
+                ]
+            }
+        },
+        {
+            "name" : "organization",
+            "schema" : {
+                "$schema" : "http://forgerock.org/json-schema#",
+                "type" : "object",
+                "title" : "Organization",
+                "description" : "An organization or tenant, whose resources are managed by organizational admins.",
+                "icon" : "fa-building",
+                "properties" : {
+                    "name" : {
+                        "title" : "Name",
+                        "type" : "string",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "userEditable" : true
+                    },
+                    "description" : {
+                        "title" : "Description",
+                        "type" : "string",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "userEditable" : true
+                    },
+                    "owners" : {
+                        "title" : "Owner",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "returnByDefault" : false,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "notifySelf" : true,
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "ownerOfOrg",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : false,
+                                    "path" : "managed/user",
+                                    "label" : "User",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "userName",
+                                            "givenName",
+                                            "sn"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        },
+                        "description" : null,
+                        "notifyRelationships" : ["children"]
+                    },
+                    "admins" : {
+                        "title" : "Administrators",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "returnByDefault" : false,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "notifySelf" : true,
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "adminOfOrg",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : false,
+                                    "path" : "managed/user",
+                                    "label" : "User",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "userName",
+                                            "givenName",
+                                            "sn"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        },
+                        "description" : null,
+                        "notifyRelationships" : ["children"]
+                    },
+                    "members" : {
+                        "title" : "Members",
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "returnByDefault" : false,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "notifySelf" : false,
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "memberOfOrg",
+                            "validate" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "notify" : true,
+                                    "path" : "managed/user",
+                                    "label" : "User",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "userName",
+                                            "givenName",
+                                            "sn"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        },
+                        "description" : null
+                    },
+                    "parent" : {
+                        "title" : "Parent Organization",
+                        "description" : "Parent Organization",
+                        "type" : "relationship",
+                        "notifySelf" : true,
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "returnByDefault" : false,
+                        "reverseRelationship" : true,
+                        "reversePropertyName" : "children",
+                        "validate" : true,
+                        "properties" : {
+                            "_ref" : {
+                                "type" : "string"
+                            },
+                            "_refProperties" : {
+                                "type" : "object",
+                                "properties" : {
+                                    "_id" : {
+                                        "type" : "string",
+                                        "required" : false,
+                                        "propName" : "_id"
+                                    }
+                                }
+                            }
+                        },
+                        "resourceCollection" : [
+                            {
+                                "path" : "managed/organization",
+                                "notify" : true,
+                                "label" : "Organization",
+                                "query" : {
+                                    "queryFilter" : "true",
+                                    "fields" : [
+                                        "name",
+                                        "description"
+                                    ],
+                                    "sortKeys" : [ ]
+                                }
+                            }
+                        ],
+                        "notifyRelationships" : ["children", "members"]
+                    },
+                    "children" : {
+                        "description" : "Child Organizations",
+                        "title" : "Child Organizations",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "policies" : [ ],
+                        "returnByDefault" : false,
+                        "minLength" : null,
+                        "pattern" : null,
+                        "type" : "array",
+                        "items" : {
+                            "type" : "relationship",
+                            "reverseRelationship" : true,
+                            "reversePropertyName" : "parent",
+                            "validate" : true,
+                            "notifySelf" : true,
+                            "properties" : {
+                                "_ref" : {
+                                    "type" : "string"
+                                },
+                                "_refProperties" : {
+                                    "type" : "object",
+                                    "properties" : {
+                                        "_id" : {
+                                            "type" : "string",
+                                            "required" : false,
+                                            "propName" : "_id"
+                                        }
+                                    }
+                                }
+                            },
+                            "resourceCollection" : [
+                                {
+                                    "path" : "managed/organization",
+                                    "notify" : true,
+                                    "label" : "Organization",
+                                    "query" : {
+                                        "queryFilter" : "true",
+                                        "fields" : [
+                                            "name",
+                                            "description"
+                                        ],
+                                        "sortKeys" : [ ]
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "adminIDs" : {
+                        "title" : "Admin user ids",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "description" : null,
+                        "minLength" : null,
+                        "isVirtual" : true,
+                        "returnByDefault" : true,
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["admins"],
+                            "referencedObjectFields" : ["_id"],
+                            "flattenProperties" : true
+                        },
+                        "items" : {
+                            "type" : "string",
+                            "title" : "admin ids"
+                        }
+                    },
+                    "ownerIDs" : {
+                        "title" : "Owner user ids",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "description" : null,
+                        "minLength" : null,
+                        "isVirtual" : true,
+                        "returnByDefault" : true,
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["owners"],
+                            "referencedObjectFields" : ["_id"],
+                            "flattenProperties" : true
+                        },
+                        "items" : {
+                            "type" : "string",
+                            "title" : "owner ids"
+                        }
+                    },
+                    "parentAdminIDs" : {
+                        "title" : "user ids of parent admins",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "description" : null,
+                        "minLength" : null,
+                        "isVirtual" : true,
+                        "returnByDefault" : true,
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["parent"],
+                            "referencedObjectFields" : ["adminIDs", "parentAdminIDs"],
+                            "flattenProperties" : true
+                        },
+                        "items" : {
+                            "type" : "string",
+                            "title" : "user ids of parent admins"
+                        }
+                    },
+                    "parentOwnerIDs" : {
+                        "title" : "user ids of parent owners",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "description" : null,
+                        "minLength" : null,
+                        "isVirtual" : true,
+                        "returnByDefault" : true,
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["parent"],
+                            "referencedObjectFields" : ["ownerIDs", "parentOwnerIDs"],
+                            "flattenProperties" : true
+                        },
+                        "items" : {
+                            "type" : "string",
+                            "title" : "user ids of parent owners"
+                        }
+                    },
+                    "parentIDs" : {
+                        "title" : "parent org ids",
+                        "type" : "array",
+                        "viewable" : false,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "description" : null,
+                        "minLength" : null,
+                        "isVirtual" : true,
+                        "returnByDefault" : true,
+                        "queryConfig" : {
+                            "referencedRelationshipFields" : ["parent"],
+                            "referencedObjectFields" : ["_id", "parentIDs"],
+                            "flattenProperties" : true
+                        },
+                        "items" : {
+                            "type" : "string",
+                            "title" : "parent org ids"
+                        }
+                    }
+                },
+                "order" : [
+                    "name",
+                    "description",
+                    "owners",
+                    "admins",
+                    "members",
+                    "parent",
+                    "children",
+                    "adminIDs",
+                    "ownerIDs",
+                    "parentAdminIDs",
+                    "parentOwnerIDs",
+                    "parentIDs"
+                ],
+                "required" : [
+                    "name"
                 ]
             }
         }
