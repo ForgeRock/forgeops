@@ -3,10 +3,14 @@ timeout: 1200s
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/forgeops-public/toolbox', 'toolbox']
+  dir: docker/cli-tools
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/forgeops-public/git-server', 'git-server']
+  dir: docker/cli-tools
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/engineering-devops/repo', 'repo']
+  dir: docker/cli-tools
+
 images:
 - gcr.io/forgeops-public/toolbox
 - gcr.io/forgeops-public/git-server
