@@ -35,10 +35,6 @@ echo
 echo "***Cleaning all services and load balancers if any***"
 kubectl delete svc --all --all-namespaces
 
-echo
-echo "***Deleting cluster \"${NAME}\" in 5 seconds. CTRL+C now to stop***"
-sleep 5
-
 # Delete the cluster
 echo "Deleting AKS cluster ${NAME}..."
 az aks delete --resource-group $RES_GROUP_NAME --name $NAME --yes

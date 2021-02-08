@@ -58,6 +58,5 @@ echo "***Cleaning all services and load balancers if any***"
 kubectl delete svc --all --all-namespaces
 
 echo
-echo "***Deleting cluster \"${cluster_name}\" in 5 seconds. CTRL+C now to stop***"
-sleep 5
+echo "***Deleting cluster \"${cluster_name}\"***"
 eksctl delete cluster --config-file $file --wait

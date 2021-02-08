@@ -52,12 +52,12 @@ echo "***Cleaning all services and load balancers if any***"
 kubectl delete svc --all --all-namespaces
 
 # Delete the cluster. Defaults to the current project.
-gcloud container clusters delete "$NAME" --zone "$ZONE"
+gcloud container clusters delete --quiet "$NAME" --zone "$ZONE"
 
 # Delete static ip if $DELETE_STATIC_IP set to true
 if [ "$DELETE_STATIC_IP" == true ]; then
   echo "Deleting static IP ${STATIC_IP_NAME}..."
-  gcloud compute addresses delete "$STATIC_IP_NAME" --project "$PROJECT" --region "$REGION"
+  gcloud compute addresses delete --quiet "$STATIC_IP_NAME" --project "$PROJECT" --region "$REGION"
 fi
 
 echo "Check your GCP console for any orphaned project resources such as disks!"
