@@ -2,22 +2,17 @@
 # Setup the directory server for the idrepo service.
 # Add in custom tuning, index creation, etc. to this file.
 
-version=$1
+# Profile and versions. If the schema for a profile has not been
+# changed - it may use an older version. For example, AM 7.1 still uses the 6.5 schema for configuration
+CONFIG="am-config:6.5"
+AM_IDENTITY_STORE="am-identity-store:7.0"
+IDM_REPO="idm-repo:7.1"
+AM_CTS="am-cts:6.5"
+DS_PROXIED_SERVER="ds-proxied-server:7.0"
 
-CONFIG="am-config"
-AM_IDENTITY_STORE="am-identity-store"
-IDM_REPO="idm-repo"
-AM_CTS="am-cts"
-DS_PROXIED_SERVER="ds-proxied-server"
 
-# Select DS profile version
-if [[ ! -z $profile ]]; then
-    CONFIG="${CONFIG}:${version}"
-    AM_IDENTITY_STORE="${AM_IDENTITY_STORE}:${version}"
-    IDM_REPO="${IDM_REPO}:${version}"
-    AM_CTS="${AM_CTS}:${version}"
-fi
-
+# We also create the CTS backend for small deployments or development
+# environments where a separate CTS is not warranted.
 setup-profile --profile ${CONFIG} \
                   --set am-config/amConfigAdminPassword:password \
  && setup-profile --profile ${AM_IDENTITY_STORE} \

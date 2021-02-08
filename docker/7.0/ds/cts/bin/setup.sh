@@ -2,15 +2,10 @@
 # Setup the directory server for the idrepo service.
 # Add in custom tuning, index creation, etc. to this file.
 
-version=$1
+# The CTS and proxy schemas have not changed for 7.x
+AM_CTS="am-cts:6.5"
+DS_PROXIED_SERVER="ds-proxied-server:7.0"
 
-AM_CTS="am-cts"
-DS_PROXIED_SERVER="ds-proxied-server"
-
-# Select DS profile version
-if [[ ! -z $version ]]; then 
-    AM_CTS="${AM_CTS}:${version}"
-fi
 
 setup-profile --profile ${AM_CTS} \
               --set am-cts/tokenExpirationPolicy:am-sessions-only \

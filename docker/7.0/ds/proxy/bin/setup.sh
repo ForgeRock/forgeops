@@ -2,7 +2,6 @@
 # Setup the directory server for the idrepo service.
 # Add in custom tuning, index creation, etc. to this file.
 
-version=$1
 DS_PROXY_SERVER="ds-proxy-server"
 DS_PROXY_SERVER_SCHEMA="ds-proxy-server-schema"
 
@@ -13,10 +12,10 @@ setup-profile --profile ${DS_PROXY_SERVER} \
                   --set ds-proxy-server/keyManagerProvider:PKCS12 \
                   --set ds-proxy-server/trustManagerProvider:PKCS12 \
                   --set ds-proxy-server/certNickname:ssl-key-pair \
-                  --set ds-proxy-server/primaryGroupId:"&{dsproxy.primary.group.id|default}" 
+                  --set ds-proxy-server/primaryGroupId:"&{dsproxy.primary.group.id|default}"
                 #   --set ds-proxy-server/baseDn:dc=openidm,dc=forgerock,dc=io
 
-setup-profile --profile ${DS_PROXY_SERVER_SCHEMA} 
+setup-profile --profile ${DS_PROXY_SERVER_SCHEMA}
 
 dsconfig --offline --no-prompt \
 create-global-access-control-policy \

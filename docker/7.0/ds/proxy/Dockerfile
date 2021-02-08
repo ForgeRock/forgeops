@@ -18,7 +18,6 @@ COPY --chown=forgerock:root scripts /opt/opendj/scripts
 # This can be removed once AM can create these itself. See AME-19010
 RUN chmod +w  template/setup-profiles/AM/config/6.5/base-entries.ldif && cat scripts/external-am-datastore.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif
 
-ARG profile_version
-RUN bin/setup.sh "$profile_version" && \
+RUN bin/setup.sh && \
     bin/relax-security-settings.sh  && \
     rm bin/setup.sh bin/relax-security-settings.sh
