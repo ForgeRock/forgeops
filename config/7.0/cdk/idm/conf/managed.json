@@ -29,6 +29,7 @@
                     "postalCode",
                     "country",
                     "stateProvince",
+                    "assignedDashboard",
                     "roles",
                     "manager",
                     "authzRoles",
@@ -463,6 +464,19 @@
                         "userEditable" : true,
                         "usageDescription" : "",
                         "isPersonal" : false
+                    },
+                    "assignedDashboard" : {
+                        "title" : "Assigned Dashboard",
+                        "description" : "List of items to click on for this user",
+                        "type" : "array",
+                        "items" : {
+                            "type" : "string",
+                            "title" : "Assigned Dashboard Items"
+                        },
+                        "viewable" : true,
+                        "searchable" : false,
+                        "userEditable" : false,
+                        "isVirtual" : false
                     },
                     "postalAddress" : {
                         "type" : "string",

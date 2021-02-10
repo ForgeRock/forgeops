@@ -461,6 +461,11 @@
                         "ldapAttribute" : "iplanet-am-user-alias-list",
                         "isMultiValued" : true
                     },
+                    "assignedDashboard" :  {
+                        "type" : "simple",
+                        "ldapAttribute" : "assignedDashboard",
+                        "isMultiValued" : true
+                    },
                     "roles" : {
                         "type" : "reference",
                         "ldapAttribute" : "fr-idm-managed-user-roles",
