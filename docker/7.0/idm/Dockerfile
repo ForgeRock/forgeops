@@ -3,8 +3,8 @@ FROM gcr.io/forgerock-io/idm/pit1:7.1.0-9a1db020736164114e89c4b772e6bad6cd479ca3
 
 # Harden IDM by removing the Felix OSGI Console. Unless you are a ForgeRock developer, the
 # console is rarely required. Your configuration should NOT include conf/felix.webconsole.json
-RUN rm bundle/org.apache.felix.webconsole*.jar  && \
-    rm bundle/openidm-felix-webconsole-*.jar
+RUN rm -f bundle/org.apache.felix.webconsole*.jar  && \
+    rm -f bundle/openidm-felix-webconsole-*.jar
 
 # Removes any existing conf files that might conflict with our config. This includes the embedded ds repo.
 RUN rm -fr /opt/openidm/conf
