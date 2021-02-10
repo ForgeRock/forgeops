@@ -16,7 +16,7 @@ spec:
         resource: forgeops
     params:
     - name: namespace
-      value: prod
+      value: xn--59g
 
    # The smoke test creates 5 users as part of the test
   - name: run-tests
@@ -30,6 +30,6 @@ spec:
         resource: forgeops
     params:
     - name: namespace
-      value: prod
+      value: xn--59g 
 
   # TODO: add tasks for smoke test, creating users, etc.

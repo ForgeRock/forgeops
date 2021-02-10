@@ -17,4 +17,5 @@ spec:
         resource: forgeops
     params:
     - name: namespace
-      value: "prod"
+      # ∞
+      value: "xn--59g"
