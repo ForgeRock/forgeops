@@ -47,6 +47,7 @@
       "com.iplanet.services.debug.directory=%BASE_DIR%/var/debug",
       "openam.retained.http.request.headers=X-DSAMEVersion",
       "com.sun.identity.url.readTimeout=30000",
+      "org.forgerock.http.TrustTransactionHeader=&{platform.trust.transactionheader|false}",
       "org.forgerock.services.resourcesets.store.location=external",
       "com.iplanet.am.buildDate=2020-October-06 07:11",
       "org.forgerock.services.uma.pendingrequests.store.starttls.enabled=",

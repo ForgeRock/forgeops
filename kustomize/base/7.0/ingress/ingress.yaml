@@ -21,6 +21,9 @@ metadata:
     # RCS Agent websockets
     nginx.org/websocket-services: "rcs-agent"
     nginx.ingress.kubernetes.io/websocket-services: "rcs-agent"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      add_header X-ForgeRock-TransactionId $req_id;
+      proxy_set_header X-ForgeRock-TransactionId $req_id;
   name: forgerock
 spec:
   rules:

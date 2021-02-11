@@ -24,3 +24,74 @@ patchesStrategicMerge:
     name: platform-config
   data:
     FQDN: default.iam.example.com
+
+# Transaction Id Tacing
+patches:
+# ###############################################
+#                     WARNING
+# ###############################################
+# Uncomment to enable trust transaction headers
+# Clients could abuse X-ForgeRock-TransactionId and is
+# considered a security risk. As such the ingress should always reset
+# field and create uid
+# ###############################################
+# - target:
+#     labelSelector: "app in (ds-cts,ds-idrepo,am,idm)"
+#     kind: "StatefulSet|Deployment|Job"
+#   patch: |-
+#     - op: "add"
+#       path: "/spec/template/spec/containers/0/env/-"
+#       value:
+#         name: "PLATFORM_TRUST_TRANSACTIONHEADER"
+#         value: "true"
+# ###############################################
+#                     WARNING
+# ###############################################
+# Uncomment to enable trust transaction headers
+# Clients could abuse X-ForgeRock-TransactionId and is
+# considered a security risk. As such the ingress should always reset
+# field and create uid
+# ###############################################
+# - target:
+#     labelSelector: "app in (ig)"
+#     kind: "Deployment"
+#   patch: |-
+#     - op: "add"
+#       path: "/spec/template/spec/containers/0/env/-"
+#       value:
+#         name: "JAVA_OPTS"
+#         value: "-Dorg.forgerock.http.TrustTransactionHeader=true"
+# ###############################################
+#                     WARNING
+# ###############################################
+# Uncomment to disable all filtering on DS images
+# Disabling filtering can result:
+# * degraded reliablity due to potential logging backpressure
+# * potenitally signaficant performance hits
+# * increased logging storage costs
+# ###############################################
+# - target:
+#     labelSelector: "app in (ds-cts,ds-idrepo)"
+#     kind: "StatefulSet"
+#   patch: |-
+#     - op: "add"
+#       path: "/spec/template/spec/containers/0/env/-"
+#       value:
+#         name: "DS_LOG_FILTERING_POLICY"
+#         value: "no-filtering"
+# ###############################################
+#                     WARNING
+# ###############################################
+# Enable ingress access logging
+# Enabling filtering can result:
+# * degraded reliablity due to potential logging backpressure
+# * potenitally signaficant performance hits
+# * increased logging storage costs
+# ###############################################
+# - target:
+#     name: forgerock
+#     kind: "Ingress"
+#   patch: |-
+#     - op: "add"
+#       path: "/metadata/annotations/nginx.ingress.kubernetes.io~1enable-access-log"
+#       value: "true"
