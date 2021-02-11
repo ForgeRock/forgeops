@@ -1,0 +1,67 @@
+# For testing Istio.  Apply this to the namespace to set the mTLS policy.
+# https://istio.io/latest/docs/tasks/security/authentication/authn-policy/#enable-mutual-tls-per-workload
+#
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+ name: default
+spec:
+  mtls:
+    mode: PERMISSIVE
+---
+# This disables mTLS for the replication and other ports.
+# Per doc: The port value in the peer authentication policy is the container’s port. The value the destination rule is the service’s port.
+apiVersion: "security.istio.io/v1beta1"
+kind: "PeerAuthentication"
+metadata:
+  name: "ds"
+spec:
+  selector:
+    matchLabels:
+       app.kubernetes.io/name: ds-idrepo
+  mtls:
+    mode: STRICT
+  portLevelMtls:
+    8989:
+      mode: DISABLE
+    1389:
+      mode: DISABLE
+    1636:
+      mode: DISABLE
+    4444:
+      mode: DISABLE
+    8080:
+      mode: DISABLE
+---
+# https://istio.io/latest/docs/reference/config/networking/destination-rule/
+# According to docs: You can only use portLevelMtls if the port is bound to a service. Istio ignores it otherwise.
+apiVersion: "networking.istio.io/v1beta1"
+kind: "DestinationRule"
+metadata:
+  name: "ds"
+spec:
+  host: ds-idrepo
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    portLevelSettings:
+    - port:
+        number: 8989
+      tls:
+        mode: DISABLE
+    - port:
+        number: 1389
+      tls:
+        mode: DISABLE
+    - port:
+        number: 4444
+      tls:
+        mode: DISABLE
+    - port:
+        number: 1636
+      tls:
+        mode: DISABLE
+    - port:
+        number: 8080
+      tls:
+        mode: DISABLE
