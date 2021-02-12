@@ -21,7 +21,7 @@ gcloud iam service-accounts create "$SA_NAME" \
     --display-name "$SA_NAME"
 
 # Role binding to enable the Kaniko service account to push/pull images to the GCR
-gcloud projects add-iam-policy-binding "${PROJECT}" --memberw=serviceAccount:"${SA_ACCOUNT}" --role roles/storage.admin
+gcloud projects add-iam-policy-binding "${PROJECT}" --member=serviceAccount:"${SA_ACCOUNT}" --role roles/storage.admin
 gcloud projects add-iam-policy-binding "${PROJECT}" --member=serviceAccount:"${SA_ACCOUNT}" --role roles/storage.objectAdmin
 gcloud projects add-iam-policy-binding "${PROJECT}" --member=serviceAccount:"${SA_ACCOUNT}" --role roles/storage.objectCreator
 
