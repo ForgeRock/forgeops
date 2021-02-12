@@ -12,11 +12,6 @@ spec:
   - name: namespace
     type: string
     description: target namespace
-  - name: tester-url
-    type: string
-    description: URL of the testing endpoint
-    default: "https://smoketest.forgeops.com/test"
-
   stepTemplate:
     env:
     - name: SLACK_FAILED_WEBHOOK_URL
@@ -24,25 +19,18 @@ spec:
         secretKeyRef:
           name: "slack-webhook-smoke"
           key: SLACK_FAILED_WEBHOOK_URL
+    - name: NAMESPACE
+      value: $(params.namespace)
+  volumes:
+  - name: scripts
+    configMap:
+      name: tekton-scripts
+      defaultMode: 0755
   steps:
   # Run the smoke test by POSTing to the smoke cloud run service
   - name: run-smoke
     image: "gcr.io/engineering-devops/skaffold:latest"
-    script: |
-      #!/usr/bin/env bash
-      {
-        cd /workspace/forgeops
-
-        AMADMIN_PASS=$(kubectl get secret -n $(params.namespace) am-env-secrets -o jsonpath="{.data.AM_PASSWORDS_AMADMIN_CLEAR}"  | base64 --decode)
-        # todo: when this handles namespace replace:
-        #AMADMIN_PASS=$(./bin/print-secrets.sh amadmin)
-        FQDN=$(params.namespace).iam.forgeops.com
-        echo "Smoke test will start in 30 seconds"
-        sleep 30
-        echo "Running smoke test against $FQDN"
-        curl -X POST "$(params.tester-url)" \
-            --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS"
-      } || { #If something fails
-        curl -X POST -H 'Content-type: application/json' --data '{"text":"Smoke test failed \`$(params.profile)\` environment. See pipeline logs"}' $SLACK_FAILED_WEBHOOK_URL
-        exit 1
-      }
+    volumeMounts:
+    - name: scripts
+      mountPath: /mnt/scripts
+    command: [ "/mnt/scripts/run-smoke-test.sh"]

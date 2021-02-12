@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs Tekton into a cluster. 
+# Installs Tekton into a cluster.
 # Consult the tekton documentation at https://tekton.dev/ to verify the install procedure for your environment.
 set -e
 
@@ -13,7 +13,9 @@ kubectl apply --filename https://storage.googleapis.com/tekton-releases/dashboar
 
 kubectl -n tekton-pipelines get pods --no-headers=true | awk '!/Completed/{print $1}' | xargs  kubectl wait -n tekton-pipelines pod --for=condition=Ready
 
-kubectl -n tekton-pipelines apply --recursive -f shared/
+kubectl -n tekton-pipelines apply --recursive -f shared/events
+
+kustomize build shared/task | kubectl apply -f -
 
 echo "Reading Kaniko and slack secrets from GCP"
 # Secret was created using:
