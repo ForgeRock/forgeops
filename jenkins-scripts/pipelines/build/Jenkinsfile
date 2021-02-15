@@ -61,8 +61,13 @@ timestamps {
                 perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
             }
 
+            pipelineName = 'forgeops'
+            if (isPR() && prAutomation.isAutomatedPullRequest()) {
+                pipelineName = 'forgeops-automated-pr'
+            }
+
             builder = PipelineRun.builder(env, steps)
-                    .pipelineName('forgeops')
+                    .pipelineName(pipelineName)
                     .branch(commonModule.FORGEOPS_GIT_BRANCH)
                     .commit(commonModule.FORGEOPS_GIT_COMMIT)
                     .committer(commonModule.FORGEOPS_GIT_COMMITTER)

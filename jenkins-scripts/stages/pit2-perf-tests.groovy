@@ -14,7 +14,7 @@ import com.forgerock.pipeline.stage.Status
 
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
-    def stageName = 'PIT2 PERF'
+    def stageName = 'PIT2 Perf'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
@@ -89,10 +89,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         withGKEPyrockNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
-                        normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                        "${env.BUILD_URL}/${normalizedStageName}/")
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
             }
         }

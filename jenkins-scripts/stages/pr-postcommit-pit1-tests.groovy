@@ -19,30 +19,23 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
             stage(stageName) {
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 
-                def gitBranch = isPR() ? "origin/pr/${env.CHANGE_ID}" : 'master'
-
                 dir('lodestar') {
                     def stagesCloud = [:]
+                    stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
-                    def subStageName = isPR() ? 'pr' : 'postcommit'
-                    stagesCloud[subStageName] = dashboard_utils.spyglaasStageCloud(subStageName)
-
-                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
                             TESTS_SCOPE             : 'tests/pit1',
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH       : forgeopsPath,
                             CLUSTER_NAMESPACE       : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
-                            REPORT_NAME_PREFIX      : subStageName,
+                            REPORT_NAME_PREFIX      : normalizedStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
-                        normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                        "${env.BUILD_URL}/${normalizedStageName}/")
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
             }
         }

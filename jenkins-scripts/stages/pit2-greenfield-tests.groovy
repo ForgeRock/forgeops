@@ -20,12 +20,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
                 dir('lodestar') {
                     def stagesCloud = [:]
+                    stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
-                    // Upgrade tests
-                    def subStageName = 'greenfield'
-                    stagesCloud[subStageName] = dashboard_utils.spyglaasStageCloud(subStageName)
-
-                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
                             TESTS_SCOPE                     : 'tests/pit1',
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
@@ -37,16 +34,13 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             TIMEOUT_UNIT                    : 'HOURS',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH               : forgeopsPath,
-                            REPORT_NAME_PREFIX              : subStageName,
+                            REPORT_NAME_PREFIX              : normalizedStageName,
                         ]
 
                         withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
-                        normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                        "${env.BUILD_URL}/${normalizedStageName}/")
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
             }
         }

@@ -73,8 +73,8 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
         Random random = new Random()
         def parallelTestsMap = [
-            Spyglaas: { pit1TestStage.runStage(pipelineRun, random) },
-            PyRock: { perfTestStage.runStage(pipelineRun, random) },
+                'PIT1': { pit1TestStage.runStage(pipelineRun, random) },
+                'Basic Perf': { perfTestStage.runStage(pipelineRun, random) },
         ]
 
         parallel parallelTestsMap

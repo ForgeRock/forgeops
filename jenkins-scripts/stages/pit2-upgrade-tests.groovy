@@ -76,10 +76,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         withGKESpyglaasNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
-                        normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                        "${env.BUILD_URL}/${normalizedStageName}/")
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
             }
         }

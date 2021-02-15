@@ -10,7 +10,7 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
 
-    def stageName = "PERF"
+    def stageName = 'Basic Perf'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testName = 'postcommit'
     def randomNumber = random.nextInt(999) + 1000 // 4 digit random number to compute to namespace
@@ -22,11 +22,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
 
                 dir('lodestar') {
                     def stagesCloud = [:]
+                    stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(testName)
 
-                    def subStageName = isPR() ? 'pr' : 'postcommit'
-                    stagesCloud[subStageName] = dashboard_utils.pyrockStageCloud(testName)
-
-                    dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
                             STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH    : forgeopsPath,
@@ -41,10 +39,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                         withGKEPyrockNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
-                        normalizedStageName, "${normalizedStageName}.html")
-                    return dashboard_utils.determineLodestarOutcome(stagesCloud,
-                        "${env.BUILD_URL}/${normalizedStageName}/")
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
             }
         }
