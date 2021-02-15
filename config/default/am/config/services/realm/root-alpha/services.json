@@ -1,0 +1,23 @@
+{
+  "metadata" : {
+    "realm" : "/alpha",
+    "entityType" : "",
+    "entityId" : "services",
+    "uid" : "ou=services,o=alpha,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [
+      "top",
+      "organizationalunit"
+    ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_type" : {
+      "_id" : "",
+      "name" : "",
+      "collection" : false
+    },
+    "_id" : "services"
+  }
+}

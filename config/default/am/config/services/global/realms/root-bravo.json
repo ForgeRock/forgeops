@@ -1,0 +1,31 @@
+{
+  "metadata" : {
+    "realm" : "/bravo",
+    "entityType" : "",
+    "entityId" : "L2JyYXZv",
+    "uid" : "o=bravo,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [
+      "sunRealmService",
+      "top"
+    ],
+    "pathParams" : { },
+    "ou" : [
+      
+    ]
+  },
+  "data" : {
+    "_id" : "root-bravo",
+    "_type" : {
+      "_id" : "",
+      "name" : "",
+      "collection" : false
+    },
+    "parentPath" : "/",
+    "active" : true,
+    "name" : "bravo",
+    "aliases" : [
+      ""
+    ]
+  }
+}

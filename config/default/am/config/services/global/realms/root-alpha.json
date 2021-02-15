@@ -1,0 +1,31 @@
+{
+  "metadata" : {
+    "realm" : "/alpha",
+    "entityType" : "",
+    "entityId" : "L2FscGhh",
+    "uid" : "o=alpha,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [
+      "sunRealmService",
+      "top"
+    ],
+    "pathParams" : { },
+    "ou" : [
+      
+    ]
+  },
+  "data" : {
+    "_id" : "root-alpha",
+    "_type" : {
+      "_id" : "",
+      "name" : "",
+      "collection" : false
+    },
+    "parentPath" : "/",
+    "active" : true,
+    "name" : "alpha",
+    "aliases" : [
+      ""
+    ]
+  }
+}

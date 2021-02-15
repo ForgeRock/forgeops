@@ -1,0 +1,91 @@
+#
+# Copyright 2020 ForgeRock AS. All Rights Reserved
+#
+# Use of this code requires a commercial software license with ForgeRock AS.
+# or with one of its affiliates. All use shall be exclusively subject
+# to such license between the licensee and ForgeRock AS.
+#
+
+# These base entries are set up to theoretically allow any hierachy of realms with any name; each realm
+# having it's own idRepo under anotther OU in this DIT.
+# Each realm will have a people OU, a groups OU, and a realms Organization (o=<realm>).
+
+dn: o=root,ou=identities
+objectClass: top
+objectClass: organization
+o: root
+
+dn: ou=groups,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: ou=people,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=teammembermeta,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: teammembermeta
+
+dn: o=alpha,o=root,ou=identities
+objectClass: top
+objectClass: organization
+o: alpha
+
+dn: ou=groups,o=alpha,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: ou=user,o=alpha,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: user
+
+dn: ou=role,o=alpha,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: role
+
+dn: ou=assignment,o=alpha,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: assignment
+
+dn: ou=usermeta,o=alpha,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: alpha
+
+dn: o=bravo,o=root,ou=identities
+objectClass: top
+objectClass: organization
+o: bravo
+
+dn: ou=groups,o=bravo,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: groups
+
+dn: ou=user,o=bravo,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: user
+
+dn: ou=role,o=bravo,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: role
+
+dn: ou=assignment,o=bravo,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: assignment
+
+dn: ou=usermeta,o=bravo,o=root,ou=identities
+objectClass: top
+objectClass: organizationalUnit
+ou: usermeta

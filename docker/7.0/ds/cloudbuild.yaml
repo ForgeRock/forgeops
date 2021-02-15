@@ -1,5 +1,6 @@
-# Builds the docker images used by the ds-opertor (and may also be used for vanilla forgeops)
-# This is run by a trigger
+# Builds the docker images used by the ds-operator (and may also be used for vanilla forgeops)
+# This is run by a trigger. To run manually, from the forgeops root directory:
+# gcloud builds submit --config docker/7.0/ds/cloudbuild.yaml
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: docker/7.0/ds

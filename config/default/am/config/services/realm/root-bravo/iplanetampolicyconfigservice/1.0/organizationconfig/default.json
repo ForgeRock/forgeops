@@ -1,0 +1,28 @@
+{
+  "metadata" : {
+    "realm" : "/bravo",
+    "entityType" : "iPlanetAMPolicyConfigService",
+    "entityId" : "default",
+    "uid" : "ou=default,ou=OrganizationConfig,ou=1.0,ou=iPlanetAMPolicyConfigService,ou=services,o=bravo,ou=services,ou=am-config",
+    "sunServiceID" : null,
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "bindDn" : "&{am.stores.user.username}",
+    "bindPassword" : "&{am.stores.user.password}",
+    "sslEnabled" : {
+      "$bool" : "&{am.stores.ssl.enabled}"
+    },
+    "_type" : {
+      "_id" : "iPlanetAMPolicyConfigService",
+      "name" : "iPlanetAMPolicyConfigService",
+      "collection" : false
+    },
+    "_id" : "default"
+  }
+}

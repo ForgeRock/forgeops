@@ -1,0 +1,423 @@
+
+# alpha Realm entries - add to base ldif. See https://bugster.forgerock.org/jira/browse/AME-19010
+
+dn: o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunRealmService
+o: alpha
+
+dn: ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: services
+
+dn: ou=sunEntitlementService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: sunEntitlementService
+
+dn: ou=1.0,ou=sunEntitlementService,ou=services,o=alpha,ou=services,ou=am-con
+ fig
+objectClass: top
+objectClass: sunService
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=alpha
+ ,ou=services,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=serv
+ ices,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: default
+
+dn: ou=sunEntitlementIndexes,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: sunEntitlementIndexes
+
+dn: ou=1.0,ou=sunEntitlementIndexes,ou=services,o=alpha,ou=services,ou=am-con
+ fig
+objectClass: top
+objectClass: sunService
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=alpha
+ ,ou=services,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=serv
+ ices,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: default
+
+dn: ou=AgentService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: AgentService
+
+dn: ou=1.0,ou=AgentService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,o=alpha,ou=servi
+ ces,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: default
+
+dn: ou=Instances,ou=1.0,ou=AgentService,ou=services,o=alpha,ou=services,ou=am
+ -config
+objectClass: top
+objectClass: organizationalunit
+ou: Instances
+
+dn: ou=agentgroup,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,o
+ =alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup
+
+dn: ou=agentgroup,ou=Instances,ou=1.0,ou=AgentService,ou=services,o=alpha,ou=
+ services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup
+
+dn: ou=registeredResourceTypes,ou=default,ou=OrganizationConfig,ou=1.0,ou=su
+ nEntitlementService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: registeredResourceTypes
+sunserviceID: resourceTypes
+sunsmspriority: 0
+
+dn: ou=76656a38-5f8e-401b-83aa-4ccb74ce88d2,ou=registeredResourceTypes,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: 76656a38-5f8e-401b-83aa-4ccb74ce88d2
+sunKeyValue: lastModifiedBy=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: description=The built-in URL Resource Type available to OpenAMP
+ olicies.
+sunKeyValue: creationDate=1595479030487
+sunKeyValue: lastModifiedDate=1595479030487
+sunserviceID: resourceType
+sunxmlKeyValue: actions=PUT=true
+sunxmlKeyValue: actions=HEAD=true
+sunxmlKeyValue: actions=POST=true
+sunxmlKeyValue: patterns=*://*:*/*?*
+sunxmlKeyValue: actions=OPTIONS=true
+sunxmlKeyValue: name=URL
+sunxmlKeyValue: patterns=*://*:*/*
+sunxmlKeyValue: createdBy=id=dsameuser,ou=user,ou=am-config
+sunxmlKeyValue: actions=PATCH=true
+sunxmlKeyValue: actions=GET=true
+sunxmlKeyValue: actions=DELETE=true
+
+dn: ou=d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b,ou=registeredResourceTypes,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b
+sunKeyValue: description=The built-in OAuth2 Scope Resource Type for OAuth2p
+ olicy-provided scope.
+sunKeyValue: lastModifiedBy=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: creationDate=1595479030586
+sunKeyValue: lastModifiedDate=1595479030586
+sunserviceID: resourceType
+sunxmlKeyValue: patterns=*://*:*/*?*
+sunxmlKeyValue: actions=GRANT=true
+sunxmlKeyValue: name=OAuth2 Scope
+sunxmlKeyValue: patterns=*://*:*/*
+sunxmlKeyValue: createdBy=id=dsameuser,ou=user,ou=am-config
+sunxmlKeyValue: patterns=*
+
+dn: ou=registeredApplications,ou=default,ou=OrganizationConfig,ou=1.0,ou=sun
+ EntitlementService,ou=services,o=alpha,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: registeredApplications
+sunserviceID: applications
+sunsmspriority: 0
+
+dn: ou=oauth2Scopes,ou=registeredApplications,ou=default,ou=OrganizationConf
+ ig,ou=1.0,ou=sunEntitlementService,ou=services,o=alpha,ou=services,ou=am-con
+ fig
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: oauth2Scopes
+sunKeyValue: entitlementCombiner=com.sun.identity.entitlement.DenyOverride
+sunKeyValue: conditions=Script
+sunKeyValue: conditions=AMIdentityMembership
+sunKeyValue: conditions=IPv6
+sunKeyValue: conditions=SimpleTime
+sunKeyValue: conditions=IPv4
+sunKeyValue: subjects=AuthenticatedUsers
+sunKeyValue: subjectAttributeNames=
+sunKeyValue: subjects=NOT
+sunKeyValue: subjects=Identity
+sunKeyValue: conditions=LEAuthLevel
+sunKeyValue: conditions=LDAPFilter
+sunKeyValue: conditions=AuthScheme
+sunKeyValue: meta=createdby=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: displayName=Default OAuth2 Scopes Policy Set
+sunKeyValue: conditions=Session
+sunKeyValue: subjects=OR
+sunKeyValue: conditions=AND
+sunKeyValue: subjects=AND
+sunKeyValue: subjects=NONE
+sunKeyValue: meta=creationdate=1578580064992
+sunKeyValue: applicationType=iPlanetAMWebAgentService
+sunKeyValue: conditions=AuthenticateToRealm
+sunKeyValue: conditions=ResourceEnvIP
+sunKeyValue: conditions=SessionProperty
+sunKeyValue: conditions=OAuth2Scope
+sunKeyValue: meta=lastmodifieddate=1595479030629
+sunKeyValue: conditions=OR
+sunKeyValue: description=The built-in Application used by the OAuth2 scope a
+ uthorization process.
+sunKeyValue: conditions=Transaction
+sunKeyValue: conditions=NOT
+sunKeyValue: conditions=AuthLevel
+sunKeyValue: subjects=JwtClaim
+sunKeyValue: meta=lastmodifiedby=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: conditions=AuthenticateToService
+sunserviceID: application
+sunxmlKeyValue: resourceTypeUuids=d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b
+
+# bravo Realm entries
+
+dn: o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunRealmService
+o: bravo
+
+dn: ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: services
+
+dn: ou=sunEntitlementService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: sunEntitlementService
+
+dn: ou=1.0,ou=sunEntitlementService,ou=services,o=bravo,ou=services,ou=am-con
+ fig
+objectClass: top
+objectClass: sunService
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=bravo
+ ,ou=services,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=serv
+ ices,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: default
+
+dn: ou=sunEntitlementIndexes,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: sunEntitlementIndexes
+
+dn: ou=1.0,ou=sunEntitlementIndexes,ou=services,o=bravo,ou=services,ou=am-con
+ fig
+objectClass: top
+objectClass: sunService
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=bravo
+ ,ou=services,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=serv
+ ices,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: default
+
+dn: ou=AgentService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: AgentService
+
+dn: ou=1.0,ou=AgentService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunService
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,o=bravo,ou=servi
+ ces,ou=am-config
+objectClass: top
+objectClass: organizationalunit
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: default
+
+dn: ou=Instances,ou=1.0,ou=AgentService,ou=services,o=bravo,ou=services,ou=am
+ -config
+objectClass: top
+objectClass: organizationalunit
+ou: Instances
+
+dn: ou=agentgroup,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,o
+ =bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup
+
+dn: ou=agentgroup,ou=Instances,ou=1.0,ou=AgentService,ou=services,o=bravo,ou=
+ services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup
+
+dn: ou=registeredResourceTypes,ou=default,ou=OrganizationConfig,ou=1.0,ou=su
+ nEntitlementService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: registeredResourceTypes
+sunserviceID: resourceTypes
+sunsmspriority: 0
+
+dn: ou=76656a38-5f8e-401b-83aa-4ccb74ce88d2,ou=registeredResourceTypes,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: 76656a38-5f8e-401b-83aa-4ccb74ce88d2
+sunKeyValue: lastModifiedBy=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: description=The built-in URL Resource Type available to OpenAMP
+ olicies.
+sunKeyValue: creationDate=1595479030487
+sunKeyValue: lastModifiedDate=1595479030487
+sunserviceID: resourceType
+sunxmlKeyValue: actions=PUT=true
+sunxmlKeyValue: actions=HEAD=true
+sunxmlKeyValue: actions=POST=true
+sunxmlKeyValue: patterns=*://*:*/*?*
+sunxmlKeyValue: actions=OPTIONS=true
+sunxmlKeyValue: name=URL
+sunxmlKeyValue: patterns=*://*:*/*
+sunxmlKeyValue: createdBy=id=dsameuser,ou=user,ou=am-config
+sunxmlKeyValue: actions=PATCH=true
+sunxmlKeyValue: actions=GET=true
+sunxmlKeyValue: actions=DELETE=true
+
+dn: ou=d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b,ou=registeredResourceTypes,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b
+sunKeyValue: description=The built-in OAuth2 Scope Resource Type for OAuth2p
+ olicy-provided scope.
+sunKeyValue: lastModifiedBy=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: creationDate=1595479030586
+sunKeyValue: lastModifiedDate=1595479030586
+sunserviceID: resourceType
+sunxmlKeyValue: patterns=*://*:*/*?*
+sunxmlKeyValue: actions=GRANT=true
+sunxmlKeyValue: name=OAuth2 Scope
+sunxmlKeyValue: patterns=*://*:*/*
+sunxmlKeyValue: createdBy=id=dsameuser,ou=user,ou=am-config
+sunxmlKeyValue: patterns=*
+
+dn: ou=registeredApplications,ou=default,ou=OrganizationConfig,ou=1.0,ou=sun
+ EntitlementService,ou=services,o=bravo,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: registeredApplications
+sunserviceID: applications
+sunsmspriority: 0
+
+dn: ou=oauth2Scopes,ou=registeredApplications,ou=default,ou=OrganizationConf
+ ig,ou=1.0,ou=sunEntitlementService,ou=services,o=bravo,ou=services,ou=am-con
+ fig
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: oauth2Scopes
+sunKeyValue: entitlementCombiner=com.sun.identity.entitlement.DenyOverride
+sunKeyValue: conditions=Script
+sunKeyValue: conditions=AMIdentityMembership
+sunKeyValue: conditions=IPv6
+sunKeyValue: conditions=SimpleTime
+sunKeyValue: conditions=IPv4
+sunKeyValue: subjects=AuthenticatedUsers
+sunKeyValue: subjectAttributeNames=
+sunKeyValue: subjects=NOT
+sunKeyValue: subjects=Identity
+sunKeyValue: conditions=LEAuthLevel
+sunKeyValue: conditions=LDAPFilter
+sunKeyValue: conditions=AuthScheme
+sunKeyValue: meta=createdby=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: displayName=Default OAuth2 Scopes Policy Set
+sunKeyValue: conditions=Session
+sunKeyValue: subjects=OR
+sunKeyValue: conditions=AND
+sunKeyValue: subjects=AND
+sunKeyValue: subjects=NONE
+sunKeyValue: meta=creationdate=1578580064992
+sunKeyValue: applicationType=iPlanetAMWebAgentService
+sunKeyValue: conditions=AuthenticateToRealm
+sunKeyValue: conditions=ResourceEnvIP
+sunKeyValue: conditions=SessionProperty
+sunKeyValue: conditions=OAuth2Scope
+sunKeyValue: meta=lastmodifieddate=1595479030629
+sunKeyValue: conditions=OR
+sunKeyValue: description=The built-in Application used by the OAuth2 scope a
+ uthorization process.
+sunKeyValue: conditions=Transaction
+sunKeyValue: conditions=NOT
+sunKeyValue: conditions=AuthLevel
+sunKeyValue: subjects=JwtClaim
+sunKeyValue: meta=lastmodifiedby=id=dsameuser,ou=user,ou=am-config
+sunKeyValue: conditions=AuthenticateToService
+sunserviceID: application
+sunxmlKeyValue: resourceTypeUuids=d60b7a71-1dc6-44a5-8e48-e4b9d92dee8b
+
