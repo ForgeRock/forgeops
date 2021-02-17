@@ -30,20 +30,29 @@ void mergeIfAutomatedProductVersionUpdate(PipelineRunLegacyAdapter pipelineRun, 
         String latestPrVersion = PR_DATA.version.toString()
         String latestCommitOnPrBranch = PR_DATA.fromRef.latestCommit
 
-        /*
-         * The commit used in this build could be out of date with the PR if someone pushed while the build was running.
-         * If PR is up to date and commit on target branch is the parent of this commit, merge the PR, else rebase.
-         */
-        if (currentBuildCommit == latestCommitOnPrBranch &&
-                canDoFastForwardMerge(currentBuildCommit, PR_DATA.toRef.latestCommit)) {
-            pipelineRun.pushStageOutcome(
-                    "promote-to-forgeops-${env.CHANGE_TARGET}",
-                    stageDisplayName: "Promote to ForgeOps") {
-                bitbucketUtils.mergePullRequest(creds, project, repo, env.CHANGE_ID, latestPrVersion)
-                return Status.SUCCESS.asOutcome()
+        // https://jira.atlassian.com/browse/BSERV-11511
+        retry (5) {
+            /*
+             * The commit used in this build could be out of date with the PR if someone pushed while the build was running.
+             * If PR is up to date and commit on target branch is the parent of this commit, merge the PR, else rebase.
+             */
+            if (currentBuildCommit == latestCommitOnPrBranch &&
+                    canDoFastForwardMerge(currentBuildCommit, PR_DATA.toRef.latestCommit)) {
+                try {
+                    pipelineRun.pushStageOutcome("promote-to-forgeops-${env.CHANGE_TARGET}",
+                            stageDisplayName: "Promote to ForgeOps") {
+                        bitbucketUtils.mergePullRequest(creds, project, repo, env.CHANGE_ID, latestPrVersion)
+                        return Status.SUCCESS.asOutcome()
+                    }
+                } catch (exception) {
+                    echo "ERROR: Failed to merge PR, possibly due to BSERV-11511 - pausing, then retrying the merge"
+                    echo "Error message from Bitbucket: ${exception.message}"
+                    sleep (10)
+                    throw exception
+                }
+            } else {
+                bitbucketUtils.rebasePullRequest(creds, project, repo, env.CHANGE_ID, latestPrVersion)
             }
-        } else {
-            bitbucketUtils.rebasePullRequest(creds, project, repo, env.CHANGE_ID, latestPrVersion)
         }
     }
 }
