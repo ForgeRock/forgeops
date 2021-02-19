@@ -26,7 +26,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         def config = [
                             TESTS_SCOPE                     : 'tests/pit1',
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
-                            CLUSTER_NAMESPACE               : subStageName,
+                            CLUSTER_NAMESPACE               : 'greenfield',
                             CLUSTER_CRASHER                 : 'True',
                             REPEAT                          : GREENFIELD_REPEAT.toInteger(),
                             REPEAT_WAIT                     : 3600,
