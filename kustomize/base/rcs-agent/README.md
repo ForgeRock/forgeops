@@ -4,7 +4,7 @@ The RCS Agent is a _smart_ websocket proxy between any number of IDM and Remote 
 Server (RCS) instances.
 
 Primary goals and features are to:
-- Require a single websocket connection from an RCS instance, which eases configuration
+- Require a single connection URL from an RCS instance, which eases configuration
 - Allow IDM and RCS instances to connect in any order
 - Inform clients of network connection loss and graceful shutdown
 - Restart quickly for minimum downtime
@@ -68,7 +68,7 @@ the following, which relies on some environment variables provided by ForgeOps:
 
 ## IDM Environment Variables
 
-IDM acts as a websocket client that connect to the RCS Agent, and requires client configuration.
+IDM acts as a websocket client that connects to the RCS Agent, and requires client configuration.
 The IDM environment variables, set by ForgeOps, which are related to the RCS Agent are:
 
 - `RCS_AGENT_HOST`
@@ -115,7 +115,7 @@ connectorserver.trustStoreFile=/path/to/openicf/security/truststore.pkcs12
 connectorserver.trustStoreType=PKCS12
 connectorserver.trustStorePass=changeit
 
-# URL for RCS Agent public ingress
+# URL for RCS Agent public ingress (there MUST be only one URL on this line)
 connectorserver.url=wss://default.iam.example.com/rcs
 
 # IMPORTANT: each RCS instance needs a unique Host ID
@@ -124,15 +124,15 @@ connectorserver.hostId=RCS_01
 # must match "name" in IDM conf/provisioner.openicf.connectorinfoprovider.json
 connectorserver.connectorServerName=connectorserver
 
-# not necessary to send ping-pong protobuf messages, except for diagnostic reasons (0 turns this off)
+# ping-pong interval in seconds, used for diagnostic reasons and keep-alive (0 turns this off)
 connectorserver.pingPongInterval=0
 
-# number of websocket connections between RCS and RCS Agent (start with 1, but 3 may be reasonable)
-connectorserver.webSocketConnections=1
-connectorserver.maxWebSocketConnections=1
+# number of websocket connections between RCS and RCS Agent (use more than 1 when connectionTtl enabled)
+connectorserver.webSocketConnections=3
+connectorserver.maxWebSocketConnections=4
 
-# closes websockets on an interval (0 turns this off)
-connectorserver.connectionTtl=0
+# number of seconds before closing and rotating websockets (0 turns this off)
+connectorserver.connectionTtl=300
 
 # number of seconds between network connection checks
 connectorserver.housekeepingInterval=5
