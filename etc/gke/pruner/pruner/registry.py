@@ -20,7 +20,8 @@ DRY_RUN = bool(int(os.environ.get('GCR_PRUNE_DRY_RUN', 0)))
 # (delete if currrent_time - last_update > MAX_UPDATE_AGE)
 ENGINEERING_DEVOPS_MAX_AGE = datetime.timedelta(int(os.environ.get('MAX_UPDATE_AGE', 30)))
 ENGINEERING_PIT_MAX_AGE = datetime.timedelta(int(os.environ.get('ENGINEERINGPIT_MAX_UPDATE_AGE', 30)))
-FORGEOPS_PUBLIC_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEOPS_PUBLIC_AGE', 365)))
+FORGEOPS_PUBLIC_TAGGED_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEOPS_PUBLIC_TAGGED_AGE', 365)))
+FORGEOPS_PUBLIC_UNTAGGED_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEOPS_PUBLIC_TAGGED_AGE', 30)))
 FORGEROCK_IO_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 90)))
 FORGEROCK_IO_PULL_REQUEST_MAX_AGE = datetime.timedelta(int(os.environ.get('FORGEROCK_IO_MAX_UPDATE_AGE', 30)))
 
@@ -77,7 +78,14 @@ def is_pr_repo(repo):
 def filter_forgeops_public_digests(repo, digests):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
     """
-    return filter_digests_by_age(repo, digests, FORGEOPS_PUBLIC_MAX_AGE)
+    # images that have tags are retained for FORGEOPS_PUBLIC_MAX_AGE
+    digests_to_remove = filter_digests_by_age(repo, digests, FORGEOPS_PUBLIC_TAGGED_MAX_AGE)
+    for digest_id, digest_meta in digests.items():
+        tagless = image_is_untagged(digest_meta)
+        stale = image_is_stale(digest_id, digest_meta, FORGEOPS_PUBLIC_UNTAGGED_MAX_AGE)
+        if tagless and stale:
+            digests_to_remove[digest_id] = digest_meta['tag']
+    return digests_to_remove
 
 def filter_digests_by_age(repo, digests, age):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
