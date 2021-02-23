@@ -1183,6 +1183,7 @@
                 "title" : "Organization",
                 "description" : "An organization or tenant, whose resources are managed by organizational admins.",
                 "icon" : "fa-building",
+                "mat-icon" : "domain",
                 "properties" : {
                     "name" : {
                         "title" : "Name",
