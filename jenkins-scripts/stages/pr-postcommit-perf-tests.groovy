@@ -36,6 +36,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                             CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             DO_RECORD_RESULT     : false,
                             PIPELINE_NAME        : 'FORGEOPS_POSTCOMMIT',
+                            RUN_INSIDE_CLUSTER   : true,
                         ]
 
                         withGKEPyrockNoStages(config)
