@@ -4,21 +4,19 @@
 # The script tries its best to always put a basic config in place
 # On completion, the contents of /git/fr-config (an emptyDir) will contain the config
 
+# debug
+# set -x
 GIT_USER=git
 GIT_PASSWORD="${GIT_PASSWORD:-forgerock}"
 WORKSPACE="${WORKSPACE:-/git}"
 REPO="fr-config"
-REPO_PATH="$WORKSPACE/$REPO"
-# The name of the config folder - this config for AM, and conf for IDM
-CONFIG_DIR="${CONFIG_DIR:-config}"
 GIT_URL="http://$GIT_USER:$GIT_PASSWORD@git-server/$REPO.git"
 BRANCH="${BRANCH:-am}"
-
-
-cd "$WORKSPACE" || {
-    echo "Can not change to $WORKSPACE directory"
-    exit 1
-}
+GIT_CONTINUE_ON_ERROR="${GIT_CONTINUE_ON_ERROR:-true}"
+REPO_SUBDIR="${REPO_SUBDIR:-$BRANCH}"
+REPO_PATH="$WORKSPACE/$REPO/$REPO_SUBDIR"
+# The name of the config folder - this config for AM, and conf for IDM
+CONFIG_DIR="${CONFIG_DIR:-config}"
 
 # Copies in the base config if none is found in git. This config comes from /fbc
 # Which is assumed to be the AM or IDM config image that was copied to /fbc in a previous init container
@@ -36,17 +34,17 @@ copy_base_config() {
     fi
 }
 
-# debug
-# set -x
+cd "$WORKSPACE" || {
+    echo "Can not change to $WORKSPACE directory"
+    exit 1
+}
 
 if [[ -d  "${REPO_PATH}" ]];
 then
     echo "It looks like the git $REPO is already cloned"
     # This is not considered an error
-
     exit 0
 fi
-
 
 # Try the git server - if we can't find it, exit fast
 # The curl trick avoids a very long timeout (~5 min) using the git command
@@ -56,8 +54,6 @@ curl --connect-timeout 30 --retry 2 --retry-max-time 30 "$GIT_URL" || {
     exit 0
 }
 
-
-GIT_CONTINUE_ON_ERROR="true"
 # Attempt to clone the directory. In cases where the user might not have a git repo setup
 # we can carry on. If possible, exit with a zero code so startup continues
 git clone "$GIT_URL" || {
@@ -71,18 +67,17 @@ git clone "$GIT_URL" || {
     echo "Error can not continue"
     exit 1
 }
+mkdir -p "$REPO_PATH"
 
 # Try to switch to the branch and pull
-
  cd "$REPO_PATH" || {
-        echo "Can cd to $REPO_PATH"
+        echo "Can't cd to $REPO_PATH"
         exit 1
-    }
-
+}
 
 git config pull.rebase true
-git config user.email "git@forgeops.com"
-git config user.name "$GIT_USER"
+git config user.email "git-clone@forgerock.com"
+git config user.name "FR git-clone"
 
 # If the repo is fresh, these may fail - but ignore
 git checkout "$BRANCH"
@@ -108,7 +103,7 @@ var
 .homeVersion
 EOF
     git add .gitignore
-    git commit -a -m 'first commit'
+    git commit -a -m "$BRANCH first commit"
     git push  --set-upstream origin "$BRANCH"
 fi
 

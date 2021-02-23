@@ -1,3 +1,9 @@
+commonLabels:
+  app.kubernetes.io/name: git-server
+  app.kubernetes.io/instance: git-server
+  app.kubernetes.io/component: git-server
+  app.kubernetes.io/part-of: forgerock
+
 resources:
 - deployment.yaml
 - service.yaml

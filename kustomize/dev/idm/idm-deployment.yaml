@@ -56,9 +56,22 @@ spec:
           mountPath: /git
         - name: fbc
           mountPath: /fbc
-
-
       containers:
+      ### Git sync side car periodically sync any changes to the git-server
+      - name: git-sync
+        image:  bitnami/git:latest
+        resources:
+          limits:
+            memory: 100Mi
+            cpu: 200m
+          requests:
+            cpu: 100m
+        volumeMounts:
+        - name: util
+          mountPath: /scripts
+        - name: git
+          mountPath: /git
+        command: ["/scripts/git-sync.sh"]
       - name: openidm
         env:
         - name: BRANCH
@@ -137,23 +150,7 @@ spec:
           name: idm-logging-properties
         - mountPath: /opt/openidm/conf
           name: git
-          subPath: fr-config/conf
-      ### Git sync side car periodically sync any changes to the git-server
-      - name: git-sync
-        image:  bitnami/git:latest
-        resources:
-          limits:
-            memory: 100Mi
-            cpu: 200m
-          requests:
-            cpu: 100m
-        volumeMounts:
-        - name: util
-          mountPath: /scripts
-        - name: git
-          mountPath: /git
-        command: ["/scripts/git-sync.sh"]
-
+          subPath: fr-config/idm/conf
       ## Run as the forgerock user, root group
       securityContext:
           runAsGroup: 0

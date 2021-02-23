@@ -1,0 +1,9 @@
+kind: ""
+apiVersion: ""
+commonLabels:
+  app.kubernetes.io/name: fr-config-exporter
+  app.kubernetes.io/instance: fr-config-exporter
+  app.kubernetes.io/component: fr-config-exporter
+  app.kubernetes.io/part-of: forgerock
+resources:
+- job.yaml

@@ -66,6 +66,11 @@ spec:
           requests:
             memory: 100Mi
             cpu: 100m
+        env:
+        - name: BRANCH
+          value: "am"
+        - name: CONFIG_DIR
+          value: "config"
         securityContext:
           runAsGroup: 0
         volumeMounts:
@@ -155,7 +160,7 @@ spec:
           name: util
         - name: git
           mountPath: /home/forgerock/openam
-          subPath: fr-config
+          subPath: fr-config/am
         # - mountPath: /git
         #   name: git
       securityContext:

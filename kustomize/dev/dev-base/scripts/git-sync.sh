@@ -9,6 +9,8 @@ cd  "$RPATH" || {
     echo "Can not cd to $RPATH !"
     exit 1
 }
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REPO_SUBDIR="${REPO_SUBDIR:-$BRANCH}"
 
 if [[ ! -d .git ]];
 then
@@ -20,14 +22,20 @@ then
 
 fi
 
-git config user.email "git@forgeops"
-git config user.name "Forgeops Sync"
+git config user.email "git-sync@forgerock.com"
+git config user.name "FR git-sync"
+
+# Try to switch to the branch and pull
+ cd "$REPO_SUBDIR" || {
+        echo "Can cd to $REPO_SUBDIR"
+        exit 1
+}
 
 while true; do
     sleep 30
     # Add any new files
     git add .
     # commit and push changes
-    git commit -a -m "sync save"
+    git commit -a -m "$BRANCH sync save"
     git push
 done

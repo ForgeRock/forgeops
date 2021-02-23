@@ -44,6 +44,9 @@ configMapGenerator:
   - scripts/logback.xml
   - scripts/git-sync.sh
   - scripts/git-clone.sh
+  - scripts/git-merge-all.sh
+  - scripts/config-upgrader.sh
+  - scripts/tar-config.sh 
 
 generatorOptions:
   disableNameSuffixHash: true

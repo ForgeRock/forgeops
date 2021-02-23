@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fr-config-exporter
+spec:
+  template:
+    metadata:
+      labels:
+        app: fr-config-exporter
+    spec:
+      initContainers:
+      - name: git-merge
+        imagePullPolicy: IfNotPresent
+        image: bitnami/git:latest
+        command: ["/scripts/git-merge-all.sh"]
+        resources:
+          limits:
+            memory: 100Mi
+          requests:
+            memory: 100Mi
+            cpu: 100m
+        env:
+        - name: BRANCH
+          value: "export"
+        securityContext:
+          runAsGroup: 0
+        volumeMounts:
+        - name: util
+          mountPath: /scripts
+        - name: git
+          mountPath: /git
+      - name: am-config-upgrader
+        image: am-config-upgrader
+        imagePullPolicy: IfNotPresent
+        command: ["/scripts/config-upgrader.sh"]
+        volumeMounts:
+        - name: util
+          mountPath: /scripts
+        - name: git
+          mountPath: /git
+      restartPolicy: Never
+      containers:
+      - name: wait-for-copy
+        image: am-config-upgrader
+        imagePullPolicy: IfNotPresent
+        command: ["sleep", "30"]
+        volumeMounts:
+        - name: util
+          mountPath: /scripts
+        - name: git
+          mountPath: /git
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      volumes:
+      - name: git
+        emptyDir: {}
+      # Mounts utility scripts
+      - name: util
+        configMap:
+          name: util
+          defaultMode: 0777
+  backoffLimit: 1
+  activeDeadlineSeconds: 300

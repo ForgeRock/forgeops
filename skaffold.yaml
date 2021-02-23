@@ -341,3 +341,14 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/base/am-config-upgrader
+
+- name: fr-config-exporter
+  build:
+    artifacts:
+      - *AM_CONFIG_UPGRADER
+    tagPolicy:
+      gitCommit:
+        variant: AbbrevCommitSha
+  deploy:
+    kustomize:
+      path: ./kustomize/dev/fr-config-exporter

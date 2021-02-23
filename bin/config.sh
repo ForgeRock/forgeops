@@ -295,6 +295,80 @@ export_config(){
 	done
 }
 
+# Export config from the fr-config git-server to local environment
+# AM configs are processed using the config-upgrader before exporting
+export_config_dev(){
+
+	UPGRADER_DIR="$DOCKER_ROOT/am-config-upgrader"
+    echo "Exporting configs"
+	echo "Replacing missing placeholders using AM config upgrader"
+	printf "Skaffold is used to run the AM upgrader job. Ensure your default-repo is set.\n\n"
+	sleep 3
+
+	rm -fr "$UPGRADER_DIR/fr-config"
+    rm -fr "$UPGRADER_DIR/config"
+	mkdir -p "$UPGRADER_DIR/fr-config"
+    mkdir -p "$UPGRADER_DIR/config"
+    touch "$UPGRADER_DIR/config/placeholder"
+
+	echo "Removing any existing config upgrader jobs..."
+	kubectl delete job fr-config-exporter --ignore-not-found --wait=true --timeout=30s
+
+	# Deploy AM config upgrader job
+	echo "Deploying AM config upgrader job..."
+	exp=$(skaffold run -p fr-config-exporter)
+
+	# Check to see if AM config upgrader pod is running
+	printf "Waiting for the fr-config-exporter job to initialize: "
+    while ! [[ "$(kubectl get pod -l app.kubernetes.io/name=fr-config-exporter --field-selector=status.phase=Running 2> /dev/null)" ]];
+	do
+        printf "."  
+        sleep 5;
+	done
+    echo "done"
+	pod=$(kubectl get pod -l app.kubernetes.io/name=fr-config-exporter -o jsonpath='{.items[0].metadata.name}')
+    echo "Targeting $pod"
+	kubectl exec $pod -c wait-for-copy -- /scripts/tar-config.sh
+    echo "Copying configs from $pod into local environment" 
+	kubectl cp $pod:/git/placeholdered-config.tar.gz "$UPGRADER_DIR/placeholdered-config.tar.gz"
+	tar -xzf $UPGRADER_DIR/placeholdered-config.tar.gz -C $UPGRADER_DIR
+
+    # Copy exported configs to docker folder
+    for p in "${COMPONENTS[@]}"; do
+        # We dont support export for all products just yet - so need to case them
+        case $p in
+		am)
+            if [[ -d  "$UPGRADER_DIR/fr-config/am" ]];
+            then
+                DOCKER_EXPORT_DIR="$DOCKER_ROOT/am"
+                rm -fr "$DOCKER_EXPORT_DIR/config"
+                cp -R "$UPGRADER_DIR/fr-config/am/config"  "$DOCKER_EXPORT_DIR"
+            fi
+			;;
+        idm)
+            if [[ -d  "$UPGRADER_DIR/fr-config/idm" ]];
+            then
+                DOCKER_EXPORT_DIR="$DOCKER_ROOT/idm"
+                rm -fr "$DOCKER_EXPORT_DIR/conf"
+                cp -R "$UPGRADER_DIR/fr-config/idm/conf" "$DOCKER_EXPORT_DIR"
+            fi
+            ;;
+		*)
+        	echo "Git export not supported for $p"
+            ;;
+		esac
+	done
+	
+    echo "Deleting temporary files"
+	rm -fr "$UPGRADER_DIR/fr-config"
+    rm "$UPGRADER_DIR/placeholdered-config.tar.gz"
+    rm -fr "$UPGRADER_DIR/config"
+
+	# Shut down config upgrader job
+	echo "Shutting down config upgrader job..."
+	del=$(skaffold delete -p fr-config-exporter)
+}
+
 # Import config into running Amster instance from docker folder.
 import_amster_config(){
 	printf "\nImporting Amster configuration...\n\n"
@@ -435,6 +509,9 @@ sync)
 	;;
 upgrade)
 	upgrade_config
+	;;
+export-dev)
+	export_config_dev
 	;;
 restore)
 	git restore "$PROFILE_ROOT"
