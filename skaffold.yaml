@@ -148,7 +148,7 @@ profiles:
       path: ./kustomize/overlay/7.0/forgeops
 
 
-# Images tagged as environment variable
+# Images tagged as environment variable using kaniko
 - name: image-tag
   build:
     tagPolicy:
@@ -156,6 +156,17 @@ profiles:
         template: "{{.IMAGE_TAG}}"
     artifacts: *kaniko-artifacts
     cluster: *kaniko-cluster
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/all
+
+# Images tagged as environment variable in a dockerd or dockerd like environment
+- name: docker-image-tag
+  build:
+    tagPolicy:
+      envTemplate:
+        template: "{{.IMAGE_TAG}}"
+    artifacts: *default-artifacts
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/all

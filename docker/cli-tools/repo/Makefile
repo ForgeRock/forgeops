@@ -13,6 +13,6 @@ changelog.md:
 
 release: changelog.md
 	sed -i "0,/FORGEOPS_VERSION/s/FORGEOPS_VERSION=.*/FORGEOPS_VERSION=\"${ACTIVE_TAG}\"/" bin/quickstart.sh
-	skaffold render --digest-source=remote -p image-tag --default-repo=${DOCKER_REPO} --output=quickstart.yaml
+	skaffold render --digest-source=remote -p docker-image-tag --default-repo=${DOCKER_REPO} --output=quickstart.yaml
 	forgeops create-release-notes --asset=quickstart.yaml --asset=bin/quickstart.sh changelog.md
 

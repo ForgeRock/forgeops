@@ -1,0 +1,60 @@
+timeout: 1500s
+steps:
+# clone all the things
+- name: gcr.io/cloud-builders/git
+  args: ['fetch', '--all']
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  env:
+    - IMAGE_TAG=$TAG_NAME
+  args:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      for i in $(grep -h image: kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml | awk -F "- image: " '{ print $2 }');
+      do
+          tag=$(echo $i | awk -F ":" '{ print $2 }')
+          case $i in
+              *end-user-ui*)
+                  new_name="gcr.io/forgeops-public/end-user-ui:${tag}"
+                  ;;
+              *admin-ui*)
+                  new_name="gcr.io/forgeops-public/admin-ui:${tag}"
+                  ;;
+              *login-ui*)
+                  new_name="gcr.io/forgeops-public/login-ui:${tag}"
+                  ;;
+              *rcs-agent*)
+                  new_name="gcr.io/forgeops-public/rcs-agent:${tag}"
+                  ;;
+          esac
+          docker pull "${i}"
+          docker tag "${i}" "${new_name}"
+          docker push "${new_name}"
+      done
+
+- name: 'gcr.io/$PROJECT_ID/skaffold'
+  entrypoint: bash
+  env:
+    - IMAGE_TAG=$TAG_NAME
+  args: 
+    - '-c'
+    - |-
+      ./bin/config.sh init -p cdk \
+      && skaffold -f skaffold.yaml -p docker-image-tag --default-repo gcr.io/forgeops-public build
+- name: 'gcr.io/engineering-devops/repo'
+  entrypoint: bash
+  secretEnv:
+    - 'GH_TOKEN'
+  env:
+    - DOCKER_REPO=gcr.io/forgeops-public
+    - IMAGE_TAG=$TAG_NAME
+  args:
+    - '-c'
+    - |-
+      make -f docker/cli-tools/repo/Makefile release
+availableSecrets:
+  secretManager:
+    - versionName: projects/1067706085367/secrets/GH_API_CLOUDBUILD/versions/1
+      env: 'GH_TOKEN'
