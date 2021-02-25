@@ -13,7 +13,7 @@ spec:
         app: end-user-ui
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-enduser-ui/docker-build:7.1.0-c4bb8f18b5cf95aa37445d6f331d35c0576c2031
+      - image: gcr.io/forgerock-io/platform-enduser-ui/docker-build:7.1.0-c340ce0bef2f8fe669a707320cddd5940c47de34
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
