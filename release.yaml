@@ -12,12 +12,12 @@ steps:
     - 'pipefail'
     - '-c'
     - |-
-      for i in $(grep -h image: kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml | awk -F "- image: " '{ print $2 }');
+      for i in $(grep -h image: kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml | awk -F " image: " '{ print $2 }');
       do
           tag=$(echo $i | awk -F ":" '{ print $2 }')
           case $i in
-              *end-user-ui*)
-                  new_name="gcr.io/forgeops-public/end-user-ui:${tag}"
+              *enduser-ui*)
+                  new_name="gcr.io/forgeops-public/enduser-ui:${tag}"
                   ;;
               *admin-ui*)
                   new_name="gcr.io/forgeops-public/admin-ui:${tag}"
@@ -28,6 +28,10 @@ steps:
               *rcs-agent*)
                   new_name="gcr.io/forgeops-public/rcs-agent:${tag}"
                   ;;
+              *)
+                  echo "No name replacement rule found for: ${i}"
+                  continue
+                  ;;                  
           esac
           docker pull "${i}"
           docker tag "${i}" "${new_name}"
