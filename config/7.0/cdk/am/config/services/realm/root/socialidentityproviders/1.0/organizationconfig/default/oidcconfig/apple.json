@@ -33,13 +33,25 @@
       "iconClass" : "fa-apple"
     },
     "scopes" : [
-        "name",
-        "email"
+      "name",
+      "email"
     ],
     "authenticationIdKey" : "sub",
     "redirectURI" : "https://localhost:8443/openam",
-    "basicAuth" : false,
     "scopeDelimiter" : " ",
-    "transform" : "484e6246-dbc6-4288-97e6-54e55431402e"
+    "transform" : "484e6246-dbc6-4288-97e6-54e55431402e",
+    "jwtRequestParameterOption" : "NONE",
+    "requestObjectSigningAlg" : "",
+    "requestObjectEncryptionAlg" : "",
+    "acrValues" : [
+      
+    ],
+    "encryptedIdTokens" : false,
+    "issuer" : "null",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

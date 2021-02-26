@@ -41,8 +41,20 @@
     ],
     "authenticationIdKey" : "sub",
     "redirectURI" : "https://localhost:8443/openam",
-    "basicAuth" : false,
     "scopeDelimiter" : " ",
-    "transform" : "58d29080-4563-480b-89bb-1e7719776a21"
+    "transform" : "58d29080-4563-480b-89bb-1e7719776a21",
+    "jwtRequestParameterOption" : "NONE",
+    "requestObjectSigningAlg" : "",
+    "requestObjectEncryptionAlg" : "",
+    "acrValues" : [
+      
+    ],
+    "encryptedIdTokens" : false,
+    "issuer" : "https://accounts.google.com",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

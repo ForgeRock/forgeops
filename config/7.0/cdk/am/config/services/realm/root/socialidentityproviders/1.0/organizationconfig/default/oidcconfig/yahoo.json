@@ -39,8 +39,20 @@
     "wellKnownEndpoint" : "https://login.yahoo.com/.well-known/openid-configuration",
     "authenticationIdKey" : "sub",
     "redirectURI" : "https://localhost:8443/openam",
-    "basicAuth" : false,
     "scopeDelimiter" : " ",
-    "transform" : "424da748-82cc-4b54-be6f-82bd64d82a74"
+    "transform" : "424da748-82cc-4b54-be6f-82bd64d82a74",
+    "jwtRequestParameterOption" : "NONE",
+    "requestObjectSigningAlg" : "",
+    "requestObjectEncryptionAlg" : "",
+    "acrValues" : [
+      
+    ],
+    "encryptedIdTokens" : false,
+    "issuer" : "https://api.login.yahoo.com",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

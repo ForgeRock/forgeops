@@ -40,8 +40,12 @@
     },
     "authenticationIdKey" : "user_id",
     "redirectURI" : "https://localhost:8443/openam",
-    "basicAuth" : false,
     "scopeDelimiter" : " ",
-    "transform" : "312e951f-70c5-49d2-a9ae-93aef909d5df"
+    "transform" : "312e951f-70c5-49d2-a9ae-93aef909d5df",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

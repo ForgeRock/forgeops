@@ -20,7 +20,6 @@
       "collection" : false
     },
     "enabled" : false,
-    "basicAuth" : false,
     "authorizationEndpoint" : "https://api.instagram.com/oauth/authorize/",
     "tokenEndpoint" : "https://api.instagram.com/oauth/access_token",
     "userInfoEndpoint" : "https://graph.instagram.com/me?fields=id,username",
@@ -40,6 +39,11 @@
     },
     "authenticationIdKey" : "id",
     "scopeDelimiter" : " ",
-    "transform" : "1244e639-4a31-401d-ab61-d75133d8dc9e"
+    "transform" : "1244e639-4a31-401d-ab61-d75133d8dc9e",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

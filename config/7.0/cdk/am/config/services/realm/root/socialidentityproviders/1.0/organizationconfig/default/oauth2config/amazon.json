@@ -27,7 +27,6 @@
       "profile"
     ],
     "authenticationIdKey" : "user_id",
-    "basicAuth" : false,
     "uiConfig" : {
       "buttonClass" : "fa-amazon",
       "iconBackground" : "#f0c14b",
@@ -40,6 +39,11 @@
     },
     "redirectURI" : "https://localhost:8443/openam",
     "scopeDelimiter" : " ",
-    "transform" : "6b3cfd48-62d3-48ff-a96f-fe8f3a22ab30"
+    "transform" : "6b3cfd48-62d3-48ff-a96f-fe8f3a22ab30",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

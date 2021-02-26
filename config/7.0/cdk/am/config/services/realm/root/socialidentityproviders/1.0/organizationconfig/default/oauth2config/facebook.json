@@ -37,10 +37,14 @@
       "buttonImage" : "",
       "buttonClass" : "fa-facebook-official"
     },
-    "basicAuth" : false,
     "authenticationIdKey" : "id",
     "redirectURI" : "https://localhost:8443/openam",
     "scopeDelimiter" : " ",
-    "transform" : "bae1d54a-e97d-4997-aa5d-c027f21af82c"
+    "transform" : "bae1d54a-e97d-4997-aa5d-c027f21af82c",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

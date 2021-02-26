@@ -20,7 +20,6 @@
       "collection" : false
     },
     "enabled" : false,
-    "basicAuth" : false,
     "authorizationEndpoint" : "https://oauth.vk.com/authorize",
     "tokenEndpoint" : "https://oauth.vk.com/access_token",
     "userInfoEndpoint" : "https://api.vk.com/method/users.get?fields=photo_50",
@@ -41,6 +40,11 @@
     },
     "authenticationIdKey" : "id",
     "scopeDelimiter" : " ",
-    "transform" : "403cf226-6051-4368-8b72-9ba14f9a5140"
+    "transform" : "403cf226-6051-4368-8b72-9ba14f9a5140",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

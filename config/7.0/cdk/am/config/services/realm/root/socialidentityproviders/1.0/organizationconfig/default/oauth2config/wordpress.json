@@ -27,7 +27,6 @@
       "auth"
     ],
     "authenticationIdKey" : "username",
-    "basicAuth" : false,
     "uiConfig" : {
       "buttonCustomStyleHover" : "background-color: #0095cc; border-color: #0095cc; color:white;",
       "iconBackground" : "#0095cc",
@@ -40,6 +39,11 @@
     },
     "redirectURI" : "https://localhost:8443/openam",
     "scopeDelimiter" : " ",
-    "transform" : "91d197de-5916-4dca-83b5-9a4df26e7159"
+    "transform" : "91d197de-5916-4dca-83b5-9a4df26e7159",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }

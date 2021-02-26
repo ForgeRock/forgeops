@@ -27,7 +27,6 @@
       "User.Read"
     ],
     "authenticationIdKey" : "id",
-    "basicAuth" : false,
     "uiConfig" : {
       "buttonClass" : "",
       "buttonDisplayName" : "Microsoft",
@@ -40,6 +39,11 @@
     },
     "redirectURI" : "https://localhost:8443/openam",
     "scopeDelimiter" : " ",
-    "transform" : "73cecbfc-dad0-4395-be6a-6858ee3a80e5"
+    "transform" : "73cecbfc-dad0-4395-be6a-6858ee3a80e5",
+    "privateKeyJwtExpTime" : 3600,
+    "jwksUriEndpoint" : "",
+    "oauth2ProviderJwksCacheTimeout" : 3600,
+    "oauth2ProviderJwksCacheMissTime" : 60,
+    "clientAuthenticationMethod" : "CLIENT_SECRET_POST"
   }
 }
