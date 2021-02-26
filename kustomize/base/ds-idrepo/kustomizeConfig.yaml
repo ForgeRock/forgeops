@@ -1,0 +1,4 @@
+# This enables kustomize to replace variables in ConfigMap (data is the path spec for replacement)
+images:
+- path: spec/image
+  kind: DirectoryService

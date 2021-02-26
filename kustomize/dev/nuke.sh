@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-
-for c in amster am idm dev-base
-do
-    kustomize build "$c" | kubectl delete -f -
-done
-
+kubectl delete -f dist/quickstart.yaml --ignore-not-found=true
 kubectl delete pvc --all
 

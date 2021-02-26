@@ -17,7 +17,7 @@ spec:
         fsGroup: 0
       containers:
       - name: git-server
-        image: gcr.io/forgeops-public/git-server
+        image: git-server
         imagePullPolicy: IfNotPresent
         resources:
           limits:

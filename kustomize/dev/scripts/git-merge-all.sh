@@ -2,8 +2,6 @@
 # Script runs using the bitnami:git image. Performs a clone of the repo from the cluster local repo
 # The script then merges all branches using an octupus merge into the "export" branch
 
-# debug
-# set -x
 GIT_USER=git
 GIT_PASSWORD="${GIT_PASSWORD:-forgerock}"
 WORKSPACE="${WORKSPACE:-/git}"
@@ -21,7 +19,7 @@ if [[ -d  "${REPO_PATH}" ]];
 then
     echo "It looks like the git $REPO is already cloned"
     # This is not considered an error
-else 
+else
     # The repo is not present. We need to clone
     # Try the git server - if we can't find it, exit fast
     # The curl trick avoids a very long timeout (~5 min) using the git command
@@ -39,7 +37,7 @@ else
 fi
 
 # Try to switch to the branch and pull
- cd "$REPO_PATH" || {
+cd "$REPO_PATH" || {
         echo "Can't cd to $REPO_PATH"
         exit 1
 }

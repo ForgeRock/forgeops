@@ -91,8 +91,7 @@ kind: Config
       context: docker/7.0/ldif-importer
 
     - &LDIF-IMPORTER_KANIKO
-      image: ldif-importer
-      context: docker/7.0/ldif-importer
+      <<: *LDIF-IMPORTER
       kaniko: *kaniko-opts
 
     - &IG
@@ -102,6 +101,9 @@ kind: Config
     - &AM_CONFIG_UPGRADER
       image: am-config-upgrader
       context: docker/7.0/am-config-upgrader
+    - &AM_CONFIG_UPGRADER_KANIKO
+      <<: *AM_CONFIG_UPGRADER
+      kaniko: *kaniko-opts
 
   commonArtifactSets:
     default-artifacts: &default-artifacts
@@ -121,6 +123,7 @@ kind: Config
     - *DS-IDREPO_KANIKO
     - *DS-PROXY_KANIKO
     - *LDIF-IMPORTER_KANIKO
+    - *AM_CONFIG_UPGRADER_KANIKO
 
 ## End YAML Anchors
 

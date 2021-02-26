@@ -306,7 +306,6 @@ export_config_dev(){
 	sleep 3
 
 	rm -fr "$UPGRADER_DIR/fr-config"
-    rm -fr "$UPGRADER_DIR/config"
 	mkdir -p "$UPGRADER_DIR/fr-config"
     mkdir -p "$UPGRADER_DIR/config"
     touch "$UPGRADER_DIR/config/placeholder"
@@ -362,7 +361,6 @@ export_config_dev(){
     echo "Deleting temporary files"
 	rm -fr "$UPGRADER_DIR/fr-config"
     rm "$UPGRADER_DIR/placeholdered-config.tar.gz"
-    rm -fr "$UPGRADER_DIR/config"
 
 	# Shut down config upgrader job
 	echo "Shutting down config upgrader job..."

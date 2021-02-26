@@ -55,25 +55,4 @@ vars:
     apiVersion: v1
     kind: ConfigMap
     name: platform-config
-
-- name: AUTORESTORE_FROM_DSBACKUP
-  fieldref:
-    fieldpath: data.AUTORESTORE_FROM_DSBACKUP
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: DSBACKUP_DIRECTORY
-  fieldref:
-    fieldpath: data.DSBACKUP_DIRECTORY
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
-- name: DSBACKUP_HOSTS
-  fieldref:
-    fieldpath: data.DSBACKUP_HOSTS
-  objref:
-    apiVersion: v1
-    kind: ConfigMap
-    name: platform-config
+    

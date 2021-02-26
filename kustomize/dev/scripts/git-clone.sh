@@ -70,7 +70,7 @@ git clone "$GIT_URL" || {
 mkdir -p "$REPO_PATH"
 
 # Try to switch to the branch and pull
- cd "$REPO_PATH" || {
+cd "$REPO_PATH" || {
         echo "Can't cd to $REPO_PATH"
         exit 1
 }

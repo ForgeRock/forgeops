@@ -1,0 +1,4 @@
+# This file is just a placeholder to maintain backward compatibility with the older process
+# The current config-upgrader process copies the source configs from the local environment during the docker build.
+# The proposed config-upgrader process injects the source configs using k8s volumes at runtime. 
+# This file serves a placeholder to allow the container build process to succeed. 

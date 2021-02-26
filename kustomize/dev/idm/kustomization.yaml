@@ -1,10 +1,78 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# images:
-# - name: idm
-#   newName: gcr.io/forgeops-public/idm-eval
-#   newTag: 7.1-dev
-
 resources:
-- idm.yaml
-- idm-deployment.yaml
+- ../../base/idm
+
+patchesStrategicMerge:
+- |-
+  #Patch IDM
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: idm
+  spec:
+    replicas: 1
+    template:
+      spec:
+        initContainers:
+        - name: fbc-init
+          image: idm
+          volumeMounts:
+          - mountPath: /fbc
+            name: fbc
+          command: ["/bin/bash", "-c"]
+          args: 
+          - |
+            echo "Copying idm configuration to the shared volume"
+            mkdir -p /fbc/conf
+            cp -r /opt/openidm/conf/* /fbc/conf
+        - name: git-init
+          imagePullPolicy: IfNotPresent
+          image: bitnami/git:latest
+          command: ["/scripts/git-clone.sh"]
+          env:
+          - name: CONFIG_DIR
+            value: "conf"
+          - name: BRANCH
+            value: "idm"
+          volumeMounts:
+          - name: dev-utils
+            mountPath: /scripts
+          - name: git
+            mountPath: /git
+          - name: fbc
+            mountPath: /fbc
+        containers:
+        - name: git-sync
+          image: bitnami/git:latest
+          resources:
+            limits:
+              memory: 100Mi
+              cpu: 200m
+            requests:
+              cpu: 100m
+          volumeMounts:
+          - name: dev-utils
+            mountPath: /scripts
+          - name: git
+            mountPath: /git
+          command: ["/scripts/git-sync.sh"]
+        - name: openidm
+          volumeMounts:
+          - mountPath: /opt/openidm/conf
+            name: git
+            subPath: fr-config/idm/conf
+        securityContext:
+          runAsGroup: 0
+          runAsUser: 11111
+          fsGroup: 0
+        volumes:
+        - name: fbc
+          emptyDir: {}
+        - name: git
+          emptyDir: {}
+        - name: dev-utils
+          configMap:
+            name: dev-utils
+            defaultMode: 0777

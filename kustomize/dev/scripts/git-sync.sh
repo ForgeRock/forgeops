@@ -26,7 +26,7 @@ git config user.email "git-sync@forgerock.com"
 git config user.name "FR git-sync"
 
 # Try to switch to the branch and pull
- cd "$REPO_SUBDIR" || {
+cd "$REPO_SUBDIR" || {
         echo "Can cd to $REPO_SUBDIR"
         exit 1
 }
