@@ -30,7 +30,7 @@ $(BASE_COMPONENTS):
 	$(eval $@_DIR := dist/kustomize/base)
 	@mkdir -p $($@_DIR)
 	@(cd $($@_DIR) && kustomize init --labels app.kubernetes.io/part-of:forgerock) 2> /dev/null || true
-	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/base/kustomizeConfig) 2> /dev/null
+	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/dev/kustomizeConfig) 2> /dev/null
 	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/base/$@) 
 	@if [[ "$@" == "git-server" ]]; then \
 		(cd $($@_DIR) && kustomize edit set image $@=${DOCKER_REPO}/$@); \
@@ -47,6 +47,7 @@ $(DS_COMPONENTS):
 	@(cd $($@_DIR) && kustomize init --labels app.kubernetes.io/part-of:forgerock) 2> /dev/null || true
 	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/base/$@)
 	@(cd $($@_DIR) && kustomize edit set image .*$@.*=${DOCKER_REPO}/$@:${IMAGE_TAG})
+	@if [ "$@" = "ds-cts" ]; then (cd $($@_DIR) && kustomize edit set replicas ds-cts=0) 2> /dev/null || true; fi
 	@(cd $($@_DIR_INDV) && kustomize init --labels app.kubernetes.io/part-of:forgerock) 2> /dev/null
 	@(cd $($@_DIR_INDV) && kustomize edit add resource ../../../kustomize/base/$@)
 	@(cd $($@_DIR_INDV) && kustomize edit set image .*$@.*=${DOCKER_REPO}/$@:${IMAGE_TAG})

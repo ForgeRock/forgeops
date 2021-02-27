@@ -2,3 +2,6 @@
 images:
 - path: spec/image
   kind: DirectoryService
+replicas:
+- path: spec/replicas
+  kind: DirectoryService
