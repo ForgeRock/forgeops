@@ -1,28 +1,34 @@
 #!/usr/bin/env bash
 
-## This script deploys the Cloud Deployment Quickstart (CDQ). 
+## This script deploys the ForgeRock components to your target Kubernetes cluster. 
 set -e 
 set -o pipefail
 
 FORGEOPS_REPO="ForgeRock/forgeops"
 FORGEOPS_VERSION="latest"
-FORGEOPS_NAMESPACE="default"
+FORGEOPS_NAMESPACE=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+FORGEOPS_NAMESPACE="${FORGEOPS_NAMESPACE:-default}"
+FORGEOPS_COMPONENT="quickstart"
+FORGEOPS_FQDN="default.iam.example.com"
+FORGEOPS_URL=""
 SECRETAGENT_REPO="ForgeRock/secret-agent"
-SECRETAGENT_VERSION="latest"
+DSOPERATOR_REPO="ForgeRock/ds-operator"
 
 usage() {
 cat <<EOF
-ForgeOps Quickstart
+Forgeops Quickstart
 
-A wrapper script that deploys Forgeops Cloud Deployment Quickstart (CDQ) in your target cluster.
+A wrapper script that deploys ForgeRock Identity Platform components in your target Kubernetes cluster.
 
 Usage:  quickstart.sh [OPTIONS]
 
 Options:
--n      Target namespace for the forgeops deployment. (default: "&{FORGEOPS_NAMESPACE}")
--f      Forgeops version to deploy. (default: "${FORGEOPS_VERSION}")
--s      secret-agent version to deploy. (default: "${SECRETAGENT_VERSION}")
--u      Removes Forgeops CDQ from your cluster
+-n      Target namespace for the deployment. (default: "${FORGEOPS_NAMESPACE}")
+-a      FQDN used in the deployment (default: "${FORGEOPS_FQDN}")
+-c      Component to install/uninstall. Options: ["base", "ds", "apps", "ui", "am", "idm", "amster", etc] (default: "quickstart")
+-f      Forgeops tag/version to install/uninstall (default: "${FORGEOPS_VERSION}")
+-u      Uninstalls components
+-p      Prints relevant secrets/passwords and relevant urls
 -h      Prints this message
 
 Examples:
@@ -34,45 +40,93 @@ Examples:
     ${0} -n cdqtest -u
 
 EOF
-
 }
 
 ## Check and install dependencies
 installdependencies () {
     printf "Checking secret-agent operator and related CRDs: "
     if ! $(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io &> /dev/null); then
-        printf "secret-agent not found. Installing secret-agent version: '${SECRETAGENT_VERSION}'\n"
-        if [ "$SECRETAGENT_VERSION" == "latest" ]; then
-            kubectl apply -f "https://github.com/${SECRETAGENT_REPO}/releases/latest/download/secret-agent.yaml"
-        else
-            kubectl apply -f "https://github.com/${SECRETAGENT_REPO}/releases/download/${SECRETAGENT_VERSION}/secret-agent.yaml"
-        fi
+        printf "secret-agent CRD not found. Installing secret-agent\n"
+        kubectl -n secret-agent-system apply -f "https://github.com/${SECRETAGENT_REPO}/releases/latest/download/secret-agent.yaml"
         echo "Waiting for secret agent operator..."
         sleep 5
         kubectl wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s
-        kubectl -n secret-agent-system wait --for=condition=available deployment  --all --timeout=60s 
-        kubectl -n secret-agent-system wait --for=condition=ready pod --all --timeout=60s
+        kubectl -n secret-agent-system wait --for=condition=available deployment  --all --timeout=120s 
+        kubectl -n secret-agent-system wait --for=condition=ready pod --all --timeout=120s
+        echo
     else
         printf "secret-agent CRD found in cluster.\n"
     fi
+    printf "Checking ds-operator and related CRDs: "
+    if ! $(kubectl get crd directoryservices.directory.forgerock.io &> /dev/null); then
+        printf "ds-operator CRD not found. Installing ds-operator\n"
+        kubectl -n fr-system apply -f "https://github.com/${DSOPERATOR_REPO}/releases/latest/download/ds-operator.yaml"
+        echo "Waiting for ds-operator..."
+        sleep 5
+        kubectl wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s
+        kubectl -n fr-system wait --for=condition=available deployment  --all --timeout=120s 
+        kubectl -n fr-system wait --for=condition=ready pod --all --timeout=120s
+        echo
+    else
+        printf "ds-operator CRD found in cluster.\n"
+    fi
+
 }
 
-## Deploy the CDQ manifest
-deploycdq () {
-    echo ""
-    echo "Installing Forgeops ${FORGEOPS_REPO}:${FORGEOPS_VERSION}"
-    echo "Targeting namespace: ${FORGEOPS_NAMESPACE}"
-    echo ""
+# Deploy the quickstart
+deployquickstart () {
+    echo "******Deploying base.yaml. This is a one time activity******"
+    deploycomponent "base"
+    echo
+    echo "******Deploying ds.yaml. This is includes all directory resources******"
+    deploycomponent "ds"
+    echo 
+    echo "******Waiting for git-server and DS pods to come up. This can take several minutes******"
+    kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s
+    kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-cts --timeout=600s
+    kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-idrepo --timeout=300s
+    echo
+    echo "******Deploying AM and IDM******"
+    deploycomponent "apps"
+    echo 
+    echo "******Waiting for AM deployment to become available. This can take several minutes******"
+    kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s
+    echo
+    echo "******Waiting for amster job to complete. This can take several minutes******"
+    kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=complete job/amster --timeout=600s
+    echo
+    echo "Removing \"amster\" deployment."
+    uninstallcomponent "amster"
+    echo
+    echo "******Deploying UI******"
+    deploycomponent "ui"
+}
+
+# Calculates the targe URL of the desired component
+getcomponentURL () {
     if [ "$FORGEOPS_VERSION" == "latest" ]; then
-        # kubectl apply -f "https://github.com/${FORGEOPS_REPO}/releases/latest/download/quickstart.yaml"
-        curl -sL "https://github.com/${FORGEOPS_REPO}/releases/latest/download/quickstart.yaml" 2>&1 | \
-        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
-        sed  "s/default.iam.example.com/${FORGEOPS_NAMESPACE}.iam.example.com/g" | kubectl apply -f -
+        FORGEOPS_URL="https://github.com/${FORGEOPS_REPO}/releases/latest/download/${1}.yaml"
     else
-        # kubectl apply -f "https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/quickstart.yaml"
-        curl -sL "https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/quickstart.yaml" 2>&1 | \
-        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
-        sed  "s/default.iam.example.com/${FORGEOPS_NAMESPACE}.iam.example.com/g" | kubectl apply -f -
+        FORGEOPS_URL="https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/${1}.yaml"
+    fi
+    echo ${FORGEOPS_URL}
+}
+
+## Deploy the Component manifest
+deploycomponent () {
+    FORGEOPS_URL=$(getcomponentURL ${1})
+    curl -sL ${FORGEOPS_URL} 2>&1 | \
+    sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
+    sed  "s/default.iam.example.com/${FORGEOPS_FQDN}/g" | kubectl -n ${FORGEOPS_NAMESPACE} apply -f -
+}
+
+## Uninstall a manifest
+uninstallcomponent () {
+    FORGEOPS_URL=$(getcomponentURL ${1})
+    curl -sL ${FORGEOPS_URL} 2>&1 | \
+    sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | kubectl -n ${FORGEOPS_NAMESPACE} delete --ignore-not-found=true -f -
+    if [[ "$1" == "quickstart" ]]; then
+        kubectl -n ${FORGEOPS_NAMESPACE} delete pvc --all --ignore-not-found=true || true
     fi
 }
 
@@ -84,23 +138,6 @@ waitforsecrets () {
     printf "waiting for secret: rcs-agent-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret rcs-agent-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
     printf "waiting for secret: ds-passwords ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret ds-passwords &> /dev/null ; do sleep 1; printf "."; done; echo "done"
     printf "waiting for secret: ds-env-secrets ."; until kubectl -n ${FORGEOPS_NAMESPACE} get secret ds-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
-}
-
-## Uninstall the CDQ manifest
-uninstallcdq () {
-    echo "Uninstalling the CDQ"
-    echo "Targeting namespace: ${FORGEOPS_NAMESPACE}"
-    echo ""
-    if [ "$FORGEOPS_VERSION" == "latest" ]; then
-        # kubectl apply -f "https://github.com/${FORGEOPS_REPO}/releases/latest/download/quickstart.yaml"
-        curl -sL "https://github.com/${FORGEOPS_REPO}/releases/latest/download/quickstart.yaml" 2>&1 | \
-        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | kubectl delete -f -
-    else
-        # kubectl apply -f "https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/quickstart.yaml"
-        curl -sL "https://github.com/${FORGEOPS_REPO}/releases/download/${FORGEOPS_VERSION}/quickstart.yaml" 2>&1 | \
-        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | kubectl delete -f -
-    fi
-    kubectl -n ${FORGEOPS_NAMESPACE} delete pvc --all || true
 }
 
 getsec () {
@@ -119,33 +156,37 @@ printsecrets () {
     echo "$(getsec ds-env-secrets AM_STORES_APPLICATION_PASSWORD) (App str svc acct (uid=am-config,ou=admins,ou=am-config))"
     echo "$(getsec ds-env-secrets AM_STORES_CTS_PASSWORD) (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))"
     echo "$(getsec ds-env-secrets AM_STORES_USER_PASSWORD) (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))"
-
 }
 
 printurls () {
     echo ""
     echo "Relevant URLs:"
-    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/platform"
-    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/admin"
-    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/am"
-    echo "https://${FORGEOPS_NAMESPACE}.iam.example.com/enduser"
-
-    
+    fqdn=$(kubectl -n ${FORGEOPS_NAMESPACE} get ingress forgerock -o jsonpath="{.spec.rules[0].host}")
+    echo "https://${fqdn}/platform"
+    echo "https://${fqdn}/admin"
+    echo "https://${fqdn}/am"
+    echo "https://${fqdn}/enduser"
 }
 
 ## OSX does not come with `timeout` pre-installed. 
 timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 
-UNINSTALL_CDQ=false
+########################################################################################
+################################### MAIN STARTS HERE ###################################
+########################################################################################
+UNINSTALL_COMPONENT=false
+PRINT_SECRETS=false
 # list of arguments expected in the input
-optstring=":hun:f:s:"
+optstring=":hupn:f:a:c:"
 while getopts ${optstring} arg; do
   case ${arg} in
     h) echo "Usage:"; usage; exit 0;;
     n) FORGEOPS_NAMESPACE=${OPTARG};;
+    a) FORGEOPS_FQDN=${OPTARG};;
+    c) FORGEOPS_COMPONENT=${OPTARG};;
     f) FORGEOPS_VERSION=${OPTARG};;
-    s) SECRETAGENT_VERSION=${OPTARG};;
-    u) UNINSTALL_CDQ=true;;
+    u) UNINSTALL_COMPONENT=true;;
+    p) PRINT_SECRETS=true;;
     :)
       echo "$0: Must supply an argument to -$OPTARG." >&2
       usage
@@ -159,19 +200,38 @@ while getopts ${optstring} arg; do
   esac
 done
 
-echo ""
-if [ ${UNINSTALL_CDQ} = true ]; then
-    uninstallcdq
+if [ ${UNINSTALL_COMPONENT} = true ]; then
+    echo
+    echo "Using forgeops repo:tag \"${FORGEOPS_REPO}:${FORGEOPS_VERSION}\""
+    echo "Targeting namespace: \"${FORGEOPS_NAMESPACE}\""
+    echo
+    echo "Unistalling component: \"${FORGEOPS_COMPONENT}\""
+    uninstallcomponent ${FORGEOPS_COMPONENT}
     exit 0
 fi
-echo "Installing the CDQ"
+if [ ${PRINT_SECRETS} = true ]; then
+    printsecrets
+    printurls
+    exit 0
+fi
 installdependencies
-sleep 10
-deploycdq
-## Call waitforsecrets with a 2 minute timeout
-timeout 120s cat <( waitforsecrets )
-printsecrets
-printurls
+echo
+echo "Using forgeops repo:tag \"${FORGEOPS_REPO}:${FORGEOPS_VERSION}\""
+echo "Targeting namespace: \"${FORGEOPS_NAMESPACE}\""
+echo
+echo "Installing component: \"${FORGEOPS_COMPONENT}\""
+if [[ "$FORGEOPS_COMPONENT" == "quickstart" ]]; then
+    deployquickstart
+else
+    deploycomponent ${FORGEOPS_COMPONENT}
+fi
+# Only print secrets and urls if deploying the quickstart or base
+if [[ "$FORGEOPS_COMPONENT" == "quickstart" || "$FORGEOPS_COMPONENT" == "base" ]]; then
+    ## Call waitforsecrets with a 2 minute timeout
+    timeout 120s cat <( waitforsecrets )
+    printsecrets
+    printurls
+fi
 
 echo ""
-echo "Enjoy Forgeops!"
+echo "Enjoy your \"${FORGEOPS_COMPONENT}\" deployment!"

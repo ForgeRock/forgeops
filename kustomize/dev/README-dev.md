@@ -11,83 +11,169 @@ The developer profile provides:
   IDM and AM configurations are saved to an "emptyDir" volume, and then pushed
   to a Git server pod running in the developer's namespace. Any changes the
   developer makes in the AM and IDM UIs are be saved to Git.
-* **Phased deployment.** The ForgeRock Identity Platform is deployed in phases
+* **Phased deployment.** The developer profile is deployed in phases
   rather than by using a one-step _skaffold run_ deployment. The phased
   deployment lets you iterate on development without needing to reload users or
   recreate secrets.
 
 ## Deployment Steps
 
-1. Before deploying the platform, you must install the Secret Agent operator and
-the ds-operator, a one time activity.
+The `quickstart.sh` script verifies that the necessary prerequisites are installed.
+If they are not present in your cluster, it will install them for you.
+(ForgeRock staff using the `eng-shared` cluster: these have already been installed.)
 
-    To install the operators:
-
-    ```
-    bin/secret-agent.sh install
-    bin/ds-operator.sh install
-    ```
-
-    (ForgeRock staff using the `eng-shared` cluster: these have already been
-    installed.)
-
-
-2. Modify the `kustomize/dev/dev-base/kustomization.yaml` file for your
-   environment. Make sure that the FQDN and the CERT_ISSUER are set correctly.
-
-3. Change your context to your namespace.
-
-4. Run the `dev/start.sh` script.
+1. Run the `./bin/quickstart.sh` script.
+   You can specify things like _namespace_ and _FQDN_ for your deployment.
+   See `./bin/quickstart.sh -h` for more information about all the available parameters.
 
 ## Passwords
 
-Run the `bin/print-secrets.sh` script to obtain passwords for logging in to the
-AM and IDM UIs.
+Run the `./bin/quickstart.sh -p` script to obtain passwords for the AM and IDM UIs.
 
-## Running without an External UI
+## Customizing the Deployment Profile Components
 
-Modify the `kustomize/dev/dev-base/kustomization.yaml`  and comment out the `ui`
-NGINX containers.
+The default profile in `./bin/quickstart.sh` deploys the complete ForgeRock Identity
+Platform. If you wish to deploy a subset of apps, iterate over a specific app, or set
+of apps, you can do so by deploying the platform components individually.
 
-## Pulling Files From the Git Server
+To deploy an individual component, specify the component name using the `-c` arg.
+The example below demonstrates how to deploy the ForgeRock Identity Platform one component at a time.
 
-The Git server runs as a pod, and contains updates that you have made to the
-AM and IDM configurations.
-
-To pull these locally:
-
-```
-kubectl port-forward deployment/git-server 8080:8080
-
-# In another shell
-git clone http://git:forgerock@localhost:8080/fr-config.git
-```
-
-The AM updates are in the `am` branch, and the IDM updates are in the `idm`
-branch.
-
-## Iteration
-
-To redeploy a single component use the `kubectl apply` command. For example, to
-redeploy AM:
-
-```
-kustomize build am | kubectl apply -f -
+```bash
+./bin/quickstart.sh -c base
+./bin/quickstart.sh -c ds-cts
+./bin/quickstart.sh -c ds-idrepo
+./bin/quickstart.sh -c am
+./bin/quickstart.sh -c amster
+./bin/quickstart.sh -c idm
+./bin/quickstart.sh -c admin-ui
+./bin/quickstart.sh -c end-user-ui
+./bin/quickstart.sh -c login-ui
+./bin/quickstart.sh -c rcs-agent
 ```
 
-## Deleting the Deployment
+**Note**: `base` must always be deployed first as it contains the platform dependencies.
+`ds-cts` and `ds-idrepo` are also required by other components. In general, it is recommended to deploy the platform
+components in the order shown above.
 
-Run the `dev/nuke.sh` command to delete the deployment. Note that all
-PVCs (including the git and ds persistence) are also removed.
+This functionality gives the users total control of which apps, and when, they want to
+deploy in their target cluster. This is especially useful during debug sessions where
+the user wants to quickly test different configurations for a single app without having to redeploy
+the entire platform. For example:
+
+```bash
+# Install the full ForgeRock Identity Platform
+./bin/quickstart.sh -a demo.iam.customer.com
+# Clean up amster job after the platform is healthy and ready
+./bin/quickstart.sh -c amster -u
+# Delete only the IDM related resources
+./bin/quickstart.sh -c idm -u
+# Patch the platform-config configmap with a different setting
+kubectl patch cm platform-config --type=json -p='[{"op":"replace", "path": "/data/RCS_AGENT_ENABLED", "value": "true"}]'
+# Deploy IDM once again
+./bin/quickstart.sh -c idm
+# When done, uninstall the developer profile
+./bin/quickstart.sh -u
+```
+
+Let's say users want to iterate over several docker images as they test different settings for the admin-ui pod:
+
+```bash
+# Install the full ForgeRock Identity Platform
+./bin/quickstart.sh -a demo.iam.customer.com
+# Clean up amster job after the platform is healthy and ready
+./bin/quickstart.sh -c amster -u
+# Update the docker image of the admin-ui deployment
+kubectl set image deployment admin-ui admin-ui=gcr.io/forgeops-public/admin-ui:my-custom-tag1
+# After some testing, the user decides to test another image with some other changes
+kubectl set image deployment admin-ui admin-ui=gcr.io/forgeops-public/admin-ui:my-custom-tag2
+# When done, uninstall the developer profile
+./bin/quickstart.sh -u
+```
+
+### Component Bundles
+
+As we mentioned above, the `./bin/quickstart.sh` script provides complete control of the components the user wants to deploy.
+Users can achieve complete control by deploying individual components. However, it is understandable
+users may want a simpler deployment while still maintaining certain level of customization.
+
+We provide 4 main _bundles_ of components:
+| Bundle | Included Components |
+|-|-|
+| `base`| platform-config, dev-utils<br>git-sever<br>secrets<br>ingress |
+| `ds`  | ds-cts, ds-idrepo |
+| `apps`| am, amster, idm, rcs-agent|
+| `ui`  | admin-ui end-user-ui login-ui |
+
+Users can chose to install components as part of a bundle, individually or a combination of both.
+To deploy a bundle, specify the name of the bundle by using the `-c` argument.
+
+For example, let's say the user wants to deploy AM, IDM, idrepo and CTS. In order to save resources and deployment time,
+the developer profile provides a single DS instance for the CTS and idrepo. Users can easily change this configuration:
+
+```bash
+# Deploy the base bundle. This bundle is always required. 
+# Note: The default FQDN is set to default.iam.example.com. You can use "-a $FQDN" to change it while deploying "base"
+./bin/quickstart.sh -c base -a myownfqdn.mydomain.com
+# Change the configmap directing AM to use ds-cts as CTS server
+kubectl patch cm platform-config --type=json -p='[{"op":"replace", "path": "/data/AM_STORES_CTS_SERVERS", "value": "ds-cts-0.ds-cts:1389"}]'
+# Deploy ds
+./bin/quickstart.sh -c ds
+# Scale the ds-cts statefulset. By default, the developer profile has replicas=0 for ds-cts
+kubectl scale statefulset ds-cts --replicas=1
+# Deploy the apps bundle
+./bin/quickstart.sh -c apps
+# When done, uninstall the developer profile
+./bin/quickstart.sh -u
+```
+
+## Pulling Files From The Git Server
+
+The _git-server_ pod contains the updates that you have made to the AM and IDM configurations.
+This Git server is deployed by default as part of the developer profile. It is also present in the "base" bundle.
+
+There are two ways to extract the configs from the git server:
+
+1. Clone the repo:
+
+    ```bash
+    kubectl port-forward deployment/git-server 8080:8080
+
+    # In a different shell
+    git clone http://git:forgerock@localhost:8080/fr-config.git
+    ```
+
+    The AM updates are in the `am` branch, and the IDM updates are in the `idm` branch.
+    It is worth noting that the `am` configs are stored "raw" in the repo.
+    The user is expected to run the `am-config-upgrader` to replace the necessary placeholders.
+1. Export the config using `./bin/config.sh`
+
+    This is the most streamlined approach available to export configs. The script copies the data and runs
+    the `am-config-upgrader`. It then copies the configs to your local environment.
+
+    ```bash
+    # Extract the configurations from the git-server and copy them to your local "./docker" folder
+    ./config.sh export-dev
+    # Copy the configs from ./docker/ into ./config
+    ./config.sh save
+    ```
+
+## Deleting the ForgeRock Identity Platform Deployment
+
+You can run `./bin/quickstart.sh -u` to delete the deployment. This command will delete all components
+of the developer profile regardless of the bundles or component.
+Note that all PVCs (including git and ds persistence) are also removed.
 
 If you just wish to scale down the pods, you can do
 
-```
-kubectl scale --replicas=0 deployment --all
+```bash
+kubectl scale deployment --all --replicas=0
+kubectl scale statefulset --all --replicas=0
 ```
 
-And to resume
+And to resume:
 
-```
-kubectl scale --replicas=1 deployment --all
+```bash
+kubectl scale deployment --all --replicas=1
+kubectl scale statefulset --all --replicas=1
 ```
