@@ -38,7 +38,7 @@
                 "properties" : {
                     "augmentSecurityContext": {
                         "type" : "text/javascript",
-                        "source" : "require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'orgPrivileges');require('auth/customAuthz').setProtectedAttributes(security);"
+                        "source" : "var augmentYield = require('auth/customAuthz').setProtectedAttributes(security);require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'privileges', 'privilegeAssignments', augmentYield);"
                     },
                     "queryId" : "credential-query",
                     "queryOnResource" : "managed/user",

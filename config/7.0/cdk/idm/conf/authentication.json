@@ -9,7 +9,7 @@
         },
         "augmentSecurityContext" : {
           "type": "text/javascript",
-          "source": "require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'orgPrivileges');"
+          "source": "require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'privileges', 'privilegeAssignments');"
         },
         "subjectMapping" : [
           {
