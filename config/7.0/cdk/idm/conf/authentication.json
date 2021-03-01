@@ -7,6 +7,10 @@
         "cache" : {
             "maxTimeout" : "300 seconds"
         },
+        "augmentSecurityContext" : {
+          "type": "text/javascript",
+          "source": "require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'privileges', 'privilegeAssignments');"
+        },
         "subjectMapping" : [
           {
             "queryOnResource": "managed/user",
@@ -14,6 +18,7 @@
               "sub": "_id"
             },
             "userRoles": "authzRoles/*",
+            "additionalUserFields": ["adminOfOrg", "ownerOfOrg"],
             "defaultRoles" : [
                 "internal/role/openidm-authorized"
             ]
