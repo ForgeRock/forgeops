@@ -31,8 +31,8 @@ spec:
         kustomize build $PCONFIG | kubectl apply -n '$(params.namespace)' -f -
         kubectl apply -n '$(params.namespace)' -f kustomize/base/secrets/secret_agent_config.yaml
         sleep 30
-        kubectl apply -n '$(params.namespace)' -f kustomize/base/ds-cts/ds-cts.yaml
-        kubectl apply -n '$(params.namespace)' -f kustomize/base/ds-idrepo/ds-idrepo.yaml
+        kustomize build kustomize/base/ds-cts | kubectl apply -n '$(params.namespace)' -f -
+        kustomize build kustomize/base/ds-idrepo | kubectl apply -n '$(params.namespace)' -f -
         echo "sleeping a bit to give the directory time to come up"
         sleep 30
       } || {
