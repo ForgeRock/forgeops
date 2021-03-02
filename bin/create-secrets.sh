@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+cd "$(dirname "$0")"
 
 SCRIPT_NAME="$(basename "$0")"
 
@@ -28,7 +29,7 @@ i=0
 
 while [ $i -le  30 ];
 do
-    if kubectl --namespace "${ns}" apply --filename=kustomize/base/secrets/secret_agent_config.yaml > /dev/null 2>&1;
+    if kubectl --namespace "${ns}" apply --filename=../kustomize/base/secrets/secret_agent_config.yaml > /dev/null 2>&1;
     then
         break
     fi
