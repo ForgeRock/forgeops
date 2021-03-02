@@ -1,7 +1,6 @@
 namespace: default
 resources:
   - ../../../base/kustomizeConfig
-  - ../../../base/secrets
   - ../../../base/idm
   - ../../../base/7.0/ds/idrepo
   - ../../../base/7.0/ingress

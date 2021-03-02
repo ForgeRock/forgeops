@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#pipeline-ready
 cd "$(dirname "$0")"
 
 SCRIPT_NAME="$(basename "$0")"
@@ -31,7 +32,9 @@ while [ $i -le  30 ];
 do
     if kubectl --namespace "${ns}" apply --filename=../kustomize/base/secrets/secret_agent_config.yaml > /dev/null 2>&1;
     then
-        break
+        kubectl get --namespace "${ns}" secrets
+        echo "deploying secret agent configuration completed"
+        exit 0
     fi
     echo "deploying secret agent configuration failed, trying again"
     sleepTime=$(( $i * 2 ))
@@ -39,3 +42,4 @@ do
 
     i=$(( $i + 1 ))
 done
+exit 1
