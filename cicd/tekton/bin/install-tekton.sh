@@ -23,6 +23,13 @@ echo "Reading Kaniko and slack secrets from GCP"
 # gcloud secrets versions add tekton-secrets-all --data-file="tekton-secrets-all.yaml"
 gcloud secrets versions access latest --secret="tekton-secrets-all" |  kubectl -n tekton-pipelines apply -f -
 
+# Kaniko secrets created using
+# gcloud secrets create kaniko
+# gcloud secrets versions add kaniko --data-file=kaniko.yaml
+# The kaniko secret is a gcp json service account that has permissions to push/pull from the gcr registry
+# See gke-kaniko.sh for an example of how to create the secret
+gcloud secrets versions access latest --secret=kaniko |  kubectl -n kaniko apply -f -
+
 # Install additional notification hooks
 kubectl -n tekton-pipelines apply -f https://raw.githubusercontent.com/tektoncd/catalog/master/task/send-to-webhook-slack/0.1/send-to-webhook-slack.yaml
 
