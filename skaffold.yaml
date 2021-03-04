@@ -11,42 +11,17 @@ kind: Config
 ## The yaml anchors are used to make it easier to compose skaffold profiles.
 ## You should not need to edit this section
 .YamlAnchors:
-  kaniko:
-    kaniko-ops: &kaniko-opts
-      # Disable build cache for now. This is causing intermittent problems
-      # cache: {}
-      image: gcr.io/kaniko-project/executor:v0.20.0
-      # The flags is deprecated - but without it we are seeing Kaniko bugs.
-      # CLOUD-1955
-      flags:
-        - '--single-snapshot'
-      # This is the recommended way of passing the single-snapshot arg - but we see issues.
-      # buildArgs:
-        # single-snapshot: "true"
-    cluster: &kaniko-cluster
-      namespace: kaniko
-      pullSecretName: kaniko-secret
-      pullSecretMountPath: /secrets/kaniko-secret
 
   artifactDefinitions:
     - &AM
       image: am
       context: docker/7.0/am
-    - &AM_KANIKO
-      <<: *AM
-      kaniko: *kaniko-opts
     - &AMSTER
       image: amster
       context: docker/7.0/amster
-    - &AMSTER_KANIKO
-      <<: *AMSTER
-      kaniko: *kaniko-opts
     - &IDM
       image: idm
       context: docker/7.0/idm
-    - &IDM_KANIKO
-      <<: *IDM
-      kaniko: *kaniko-opts
     - &DS-CTS_BASE
       image: ds-cts
       context: docker/7.0/ds
@@ -54,12 +29,6 @@ kind: Config
       <<: *DS-CTS_BASE
       docker:
         dockerfile: cts/Dockerfile
-    - &DS-CTS_KANIKO
-      <<: *DS-CTS_BASE
-      kaniko:
-        <<: *kaniko-opts
-        dockerfile: cts/Dockerfile
-
     - &DS-IDREPO_BASE
       image: ds-idrepo
       context: docker/7.0/ds/
@@ -67,12 +36,6 @@ kind: Config
       <<: *DS-IDREPO_BASE
       docker:
         dockerfile: idrepo/Dockerfile
-    - &DS-IDREPO_KANIKO
-      <<: *DS-IDREPO_BASE
-      kaniko:
-        <<: *kaniko-opts
-        dockerfile: idrepo/Dockerfile
-
     - &DS-PROXY_BASE
       image: ds-proxy
       context: docker/7.0/ds
@@ -80,30 +43,15 @@ kind: Config
       <<: *DS-PROXY_BASE
       docker:
         dockerfile: proxy/Dockerfile
-    - &DS-PROXY_KANIKO
-      <<: *DS-PROXY_BASE
-      kaniko:
-        <<: *kaniko-opts
-        dockerfile: proxy/Dockerfile
-
     - &LDIF-IMPORTER
       image: ldif-importer
       context: docker/7.0/ldif-importer
-
-    - &LDIF-IMPORTER_KANIKO
-      <<: *LDIF-IMPORTER
-      kaniko: *kaniko-opts
-
     - &IG
       image: ig
       context: docker/7.0/ig
-
     - &AM_CONFIG_UPGRADER
       image: am-config-upgrader
       context: docker/7.0/am-config-upgrader
-    - &AM_CONFIG_UPGRADER_KANIKO
-      <<: *AM_CONFIG_UPGRADER
-      kaniko: *kaniko-opts
 
   commonArtifactSets:
     default-artifacts: &default-artifacts
@@ -115,15 +63,6 @@ kind: Config
     - *DS-PROXY
     - *IG
     - *LDIF-IMPORTER
-    kaniko-artifacts: &kaniko-artifacts
-    - *AM_KANIKO
-    - *AMSTER_KANIKO
-    - *IDM_KANIKO
-    - *DS-CTS_KANIKO
-    - *DS-IDREPO_KANIKO
-    - *DS-PROXY_KANIKO
-    - *LDIF-IMPORTER_KANIKO
-    - *AM_CONFIG_UPGRADER_KANIKO
 
 ## End YAML Anchors
 
@@ -150,19 +89,6 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/forgeops
 
-
-# Images tagged as environment variable using kaniko
-- name: image-tag
-  build:
-    tagPolicy:
-      envTemplate:
-        template: "{{.IMAGE_TAG}}"
-    artifacts: *kaniko-artifacts
-    cluster: *kaniko-cluster
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/all
-
 # Images tagged as environment variable in a dockerd or dockerd like environment
 - name: docker-image-tag
   build:
@@ -174,49 +100,6 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/7.0/all
 
-
-# Smoke tests
-- name: smoke
-  build:
-    artifacts: *kaniko-artifacts
-    cluster: *kaniko-cluster
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/smoke
-
-
-# kdev - development build for the toolbox image, using the generated kustomize
-- name: kdev
-  build: &kaniko-build
-    artifacts: *kaniko-artifacts
-    cluster: *kaniko-cluster
-    tagPolicy:
-      sha256: {}
-  deploy:
-    kustomize:
-        path: ./dev
-
-# Default with Kaniko
-- name: default-kaniko
-  build: *kaniko-build
-  deploy: *default-deploy
-
-- name: dev
-  build: *default-build
-  deploy:
-    kustomize:
-      path: ./dev
-
-# skaffold dev will not work with this, due to a new kustomize api thats being used for patching all objects
-# ensure psp controller is enabled e.g. gcloud beta container clusters update cloud-1472 --enable-pod-security-policy --zone us-east4
-- name: security
-  build: *default-build
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/security
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
 - name: small
