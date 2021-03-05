@@ -1,3 +1,7 @@
+# The smoke test triggger runs the `nightly` pipeline anytime a commit is made to the `forgeops` stash repo.
+# Unlike the `nightly` pipeline, this is deployed to the `smoke` namespace, and
+# slack notifications are not generated.
+
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
@@ -75,4 +79,4 @@ spec:
     bindings:
     - ref: smoke
     template:
-      name: smoke
+      ref: smoke

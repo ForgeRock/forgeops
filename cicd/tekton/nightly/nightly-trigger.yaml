@@ -49,19 +49,17 @@ metadata:
 spec:
   serviceAccountName: tekton-trigger
   triggers:
-    - name: cron-trig
-      bindings:
-      - ref: nightly
-      template:
-        name: nightly
-
+  - bindings:
+    - ref: nightly
+    template:
+      ref: nightly
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: nightly-cronjob
 spec:
-  schedule: "0 9 * * 1-5"
+  schedule: "0 9 * * *"
   jobTemplate:
     spec:
       template:

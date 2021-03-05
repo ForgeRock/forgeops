@@ -3,12 +3,10 @@ namespace: tekton-pipelines
 resources:
 - amster-load.yaml
 - build-images-task.yaml
-- create-users-task.yaml
 - deploy-base-ds.yaml
 - deploy-images-task.yaml
 - notify-task.yaml
 - nuke-deployment.yaml
-- scale-am-deployment-task.yaml
 - skaffold-deploy-apps.yaml
 - skaffold-run.yaml
 - slack-notify.yaml
