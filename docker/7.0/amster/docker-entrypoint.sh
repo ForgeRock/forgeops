@@ -20,6 +20,10 @@ pause() {
     done
 }
 
+# Without this chmod, Docker does not know the file is executable on Windows
+chmod +x import.sh
+
+
 # Extract amster version for commons parameter to modify configs
 echo "Extracting amster version"
 VER=$(./amster --version)
@@ -39,10 +43,12 @@ export)
     sleep infinity
     ;;
 import)
-    # Without this chmod, Docker does not know the file is executable on Windows
-    chmod +x import.sh
     # invoke amster install.
     ./import.sh
+    ;;
+upload)
+    # Like import - but waits for files to be uploaded to config/upload
+    ./import.sh upload
     ;;
 *)
    exec "$@"

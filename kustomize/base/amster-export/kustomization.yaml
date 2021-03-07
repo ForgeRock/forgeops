@@ -1,0 +1,20 @@
+resources:
+  - ../amster
+
+images:
+- name: amster
+  newName: gcr.io/forgeops-public/amster
+  newTag: 7.1-dev
+
+patchesStrategicMerge:
+- |-
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: amster
+  spec:
+    template:
+      spec:
+        containers:
+        - name: amster
+          args: ["export"]

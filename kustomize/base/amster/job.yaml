@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: amster
 spec:
-  backoffLimit: 2
+  backoffLimit: 0
   template:
     metadata:
       labels:

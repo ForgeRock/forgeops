@@ -148,7 +148,7 @@ upgrade_config(){
 	sleep 3
 
 	rm -fr "$UPGRADER_DIR/config"
-	
+
 	cp -R "$DOCKER_ROOT/am/config"  "$UPGRADER_DIR/"
 	rm -fr "$AM_DIR/config"
 
@@ -171,9 +171,9 @@ upgrade_config(){
 
 	rm -fr "$UPGRADER_DIR/config"
 
-	kubectl exec $pod -- /home/forgerock/tar-config.sh 
+	kubectl exec $pod -- /home/forgerock/tar-config.sh
 	kubectl cp $pod:/am-config/config/placeholdered-config.tar "$UPGRADER_DIR/placeholdered-config.tar"
-	
+
 	tar -xvf $UPGRADER_DIR/placeholdered-config.tar -C $UPGRADER_DIR
 
 	cp -R "$UPGRADER_DIR/config"  "$AM_DIR"
@@ -237,43 +237,9 @@ export_config(){
 			kubectl cp idm-0:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
 			;;
 		amster)
-			printf "\nExporting Amster configuration...\n\n"
-			printf "Skaffold is used to run the export job. Ensure your default-repo is set.\n\n"
-			sleep 3
-
 			rm -fr "$DOCKER_ROOT/amster/config"
-
-			echo "Removing any existing Amster jobs..."
-			kubectl delete job amster || true
-
-			# Deploy Amster job
-			echo "Deploying Amster job..."
-			exp=$(skaffold run -p amster-export)
-
-			# Check to see if Amster pod is running
-			echo "Waiting for Amster pod to come up."
-			while ! [[ "$(kubectl get pod -l app=amster --field-selector=status.phase=Running)" ]];
-			do
-					sleep 5;
-			done
-			printf "Amster job is responding..\n\n"
-
-			pod=`kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}'`
-			
-			# Export OAuth2Clients and IG Agents
-			echo "Executing Amster export within the amster pod"
-			kubectl exec $pod -it /opt/amster/export.sh
-
-			# Copy files locally
-			echo "Copying the export to the ./tmp directory"
-			kubectl cp $pod:/var/tmp/amster/realms/ "$DOCKER_ROOT/amster/config"
-
-			printf "Dynamic config exported\n\n"
-
-			# Shut down Amster job
-			printf "Shutting down Amster job...\n"
-
-			del=$(skaffold delete -p amster-export)
+			mkdir -p "$DOCKER_ROOT/amster/config"
+			"$script_dir/amster" export "$DOCKER_ROOT/amster/config"
 			;;
 		am)
 			# Export AM configuration
@@ -321,14 +287,14 @@ export_config_dev(){
 	printf "Waiting for the fr-config-exporter job to initialize: "
     while ! [[ "$(kubectl get pod -l app.kubernetes.io/name=fr-config-exporter --field-selector=status.phase=Running 2> /dev/null)" ]];
 	do
-        printf "."  
+        printf "."
         sleep 5;
 	done
     echo "done"
 	pod=$(kubectl get pod -l app.kubernetes.io/name=fr-config-exporter -o jsonpath='{.items[0].metadata.name}')
     echo "Targeting $pod"
 	kubectl exec $pod -c wait-for-copy -- /scripts/tar-config.sh
-    echo "Copying configs from $pod into local environment" 
+    echo "Copying configs from $pod into local environment"
 	kubectl cp $pod:/git/placeholdered-config.tar.gz "$UPGRADER_DIR/placeholdered-config.tar.gz"
 	tar -xzf $UPGRADER_DIR/placeholdered-config.tar.gz -C $UPGRADER_DIR
 
@@ -357,7 +323,7 @@ export_config_dev(){
             ;;
 		esac
 	done
-	
+
     echo "Deleting temporary files"
 	rm -fr "$UPGRADER_DIR/fr-config"
     rm "$UPGRADER_DIR/placeholdered-config.tar.gz"
@@ -365,33 +331,6 @@ export_config_dev(){
 	# Shut down config upgrader job
 	echo "Shutting down config upgrader job..."
 	del=$(skaffold delete -p fr-config-exporter)
-}
-
-# Import config into running Amster instance from docker folder.
-import_amster_config(){
-	printf "\nImporting Amster configuration...\n\n"
-	printf "Skaffold is used to run the import job. Ensure your default-repo is set.\n\n"
-	sleep 3
-
-	echo "Removing any existing Amster jobs..."
-	kubectl delete job amster || true
-
-	# Deploy Amster job
-	echo "Deploying Amster import job..."
-	exp=$(skaffold run -p amster-import)
-
-	# Check to see if Amster pod is running
-	echo "Waiting for Amster import to complete."
-	while ! [[ "$(kubectl get pod -l app=amster --field-selector=status.phase=Succeeded)" ]];
-	do
-			sleep 5;
-	done
-	printf "Amster import is complete..\n\n"
-
-	# Shut down Amster job
-	printf "Shutting down Amster job...\n"
-
-	del=$(skaffold delete -p amster-import)
 }
 
 # Save the configuration in the docker folder back to the git source
@@ -437,7 +376,7 @@ save_config()
 
 			echo "Add back password placeholder with defaults"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json		
+			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
@@ -496,7 +435,7 @@ export)
 	export_config
 	;;
 import)
-	import_amster_config
+	$script_dir/amster import $PROFILE_ROOT/amster
 	;;
 save)
 	save_config

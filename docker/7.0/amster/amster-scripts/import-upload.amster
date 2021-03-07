@@ -1,0 +1,4 @@
+amUrl = System.getProperty("AM_HOST")
+connect amUrl -k /var/run/secrets/amster/id_rsa
+import-config --path /opt/amster/config/upload  --clean false
+:exit

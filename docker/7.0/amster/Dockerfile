@@ -5,7 +5,7 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_OPTS="--no-install-recommends --yes"
 RUN apt-get update \
-        && apt-get install -y openldap-utils jq \
+        && apt-get install -y openldap-utils jq inotify-tools \
         && apt-get clean \
         && rm -r /var/lib/apt/lists /var/cache/apt/archives
 
