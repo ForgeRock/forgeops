@@ -5,7 +5,7 @@
 
 # Download Skaffold
 FROM alpine as download-skaffold
-ARG SKAFFOLD_VERSION=v1.17.2
+ARG SKAFFOLD_VERSION=v1.20.0
 ENV SKAFFOLD_URL https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64
 RUN wget -O skaffold "${SKAFFOLD_URL}"
 RUN chmod +x skaffold
@@ -24,7 +24,7 @@ ENV DOCKER_CONFIG=/builder/home/.docker
 RUN mkdir -p /builder/bin && \
     apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
-    git python unzip && \
+    git python unzip curl wget && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean all
 

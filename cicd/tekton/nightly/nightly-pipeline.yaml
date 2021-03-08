@@ -16,6 +16,8 @@ spec:
     type: string
     description: Target namespace of this pipeline
     default: nightly
+    # When https://github.com/tektoncd/pipeline/pull/3176 is integrated
+    # rename this to something more sensible.
   - name: nuke
     type: string
     description: Use the value nuke if we should delete the existing deployment, any other value keeps the directory

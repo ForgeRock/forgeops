@@ -3,12 +3,12 @@
 FROM gcr.io/forgerock-io/ds/pit1:7.1.0-471453ff8394f5ebd6470f56284077b1f003fb62
 
 USER root
-ENV DEBIAN_FRONTEND=noninteractive                           
-ENV APT_OPTS="--no-install-recommends --yes"                 
-RUN apt-get update \                                         
-        && apt-get install -y bash vim curl dnsutils procps netcat  \                          
-        && apt-get clean \                                   
-        && rm -r /var/lib/apt/lists /var/cache/apt/archives  
+ENV DEBIAN_FRONTEND=noninteractive
+ENV APT_OPTS="--no-install-recommends --yes"
+RUN apt-get update \
+        && apt-get install -y bash vim curl dnsutils procps netcat wget \
+        && apt-get clean \
+        && rm -r /var/lib/apt/lists /var/cache/apt/archives
 
 
 COPY --chown=forgerock:root bin/*  bin/

@@ -7,8 +7,7 @@ spec:
   - name: gitrevision
     value: master
   - name: gitrepositoryurl
-    value: https://stash.forgerock.org/scm/cloud/forgeops.git
-
+    value: https://stash.forgerock.org/scm/cloud/forgeops
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
@@ -21,6 +20,7 @@ spec:
     default: master
   - name: gitrepositoryurl
     description: The git repository url
+    default: https://stash.forgerock.org/scm/cloud/forgeops.git
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -37,9 +37,9 @@ spec:
           type: git
           params:
           - name: revision
-            value: $(params.gitrevision)
+            value: $(tt.params.gitrevision)
           - name: url
-            value: $(params.gitrepositoryurl)
+            value: $(tt.params.gitrepositoryurl)
 
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -66,9 +66,6 @@ spec:
         spec:
           containers:
           - name: trigger
-            image: busybox
-            args:
-              - wget
-              - --spider
-              - el-nightly-listener:8080
+            image: curlimages/curl
+            args: ["curl", "-X", "POST" , "--data" ,"{}", "el-nightly-listener:8080" ]
           restartPolicy: Never

@@ -1,3 +1,11 @@
+# This sample deploys the ForgeRock Identity Platform to the `xn--59g` (∞) namespace.
+# aka the psuedo "prod" instance that is upgraded instead of being redeployed.
+# This sample uses the nightly deployment pipeline,
+# except that the persistence tier (`cts` and `idrepo` stores) are not created
+# from scratch every night.
+#
+# If you ever need to recreate the directory services, run teh "nightly" pipeline and s
+
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
@@ -21,6 +29,7 @@ spec:
     default: master
   - name: gitrepositoryurl
     description: The git repository url
+    default: https://stash.forgerock.org/scm/cloud/forgeops.git
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -30,16 +39,24 @@ spec:
       timeout: 45m
       serviceAccountName: tekton-worker
       pipelineRef:
-        name: prod-pipeline
+        name: nightly-pipeline
+      params:
+      - name: "notify"
+        value: "false"
+      - name: "namespace"
+        value: "xn--59g"
+      # This does not work right now https://github.com/tektoncd/pipeline/pull/3176
+      # - name: "nuke"
+      #   value: "false"
       resources:
       - name: forgeops
         resourceSpec:
           type: git
           params:
           - name: revision
-            value: $(params.gitrevision)
+            value: $(tt.params.gitrevision)
           - name: url
-            value: $(params.gitrepositoryurl)
+            value: $(tt.params.gitrepositoryurl)
 
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -53,7 +70,7 @@ spec:
       bindings:
       - ref: prod
       template:
-        name: prod
+        ref: prod
 
 ---
 apiVersion: batch/v1beta1
@@ -61,16 +78,13 @@ kind: CronJob
 metadata:
   name: prod-cronjob
 spec:
-  schedule: "10 9 * * 1-5"
+  schedule: "10 9 * * *"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
           - name: trigger
-            image: busybox
-            args:
-              - wget
-              - --spider
-              - el-prod-listener:8080
+            image: curlimages/curl
+            args: ["curl", "-X", "POST" , "--data" ,"{}", "el-prod-listener:8080" ]
           restartPolicy: Never
