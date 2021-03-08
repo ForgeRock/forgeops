@@ -7,7 +7,7 @@ spec:
   - name: gitrevision
     value: master
   - name: gitrepositoryurl
-    value: https://stash.forgerock.org/scm/cloud/forgeops
+    value: https://stash.forgerock.org/scm/cloud/forgeops.git
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
