@@ -14,19 +14,18 @@ steps:
     - |-
       for i in $(grep -h image: kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml | awk -F " image: " '{ print $2 }');
       do
-          tag=$(echo $i | awk -F ":" '{ print $2 }')
           case $i in
               *enduser-ui*)
-                  new_name="gcr.io/forgeops-public/enduser-ui:${tag}"
+                  new_name="gcr.io/forgeops-public/enduser-ui:${IMAGE_TAG}"
                   ;;
               *admin-ui*)
-                  new_name="gcr.io/forgeops-public/admin-ui:${tag}"
+                  new_name="gcr.io/forgeops-public/admin-ui:${IMAGE_TAG}"
                   ;;
               *login-ui*)
-                  new_name="gcr.io/forgeops-public/login-ui:${tag}"
+                  new_name="gcr.io/forgeops-public/login-ui:${IMAGE_TAG}"
                   ;;
               *rcs-agent*)
-                  new_name="gcr.io/forgeops-public/rcs-agent:${tag}"
+                  new_name="gcr.io/forgeops-public/rcs-agent:${IMAGE_TAG}"
                   ;;
               *)
                   echo "No name replacement rule found for: ${i}"

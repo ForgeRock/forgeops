@@ -16,6 +16,8 @@ branch-notes:
 
 changelog.md:
 	gitchangelog  $(RELEASE_REVS) > changelog.md
+	# debug TODO remove later
+	cat changelog.md
 
 
 clean_artifacts:
