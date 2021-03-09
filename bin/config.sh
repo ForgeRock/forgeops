@@ -139,8 +139,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 # End of arg parsing
 
 
-docker build -q -t apply-patch:latest docker/cli-tools/apply-patch/
-
 #****** UPGRADE CONFIG AND REAPPLY PLACEHOLDERS ******#
 upgrade_config(){
 
@@ -192,46 +190,96 @@ upgrade_config(){
 # clear the product configs $1 from the docker directory.
 clean_config()
 {
-    ## remove previously copied configs
-    echo "removing $1 configs from $DOCKER_ROOT"
+    for c in "${@}";
+    do
+        ## remove previously copied configs
+        echo "removing $c configs from $DOCKER_ROOT"
 
-    if [ "$1" == "amster" ]; then
-        rm -rf "$DOCKER_ROOT/$1/config"
+        if [ "$c" == "amster" ]; then
+            rm -rf "$DOCKER_ROOT/$c/config"
 
-	elif [ "$1" == "am" ]; then
-		rm -rf "$DOCKER_ROOT/$1/config"
+	    elif [ "$c" == "am" ]; then
+	    	rm -rf "$DOCKER_ROOT/$c/config"
 
-    elif [ "$1" == "idm" ]; then
-        rm -rf "$DOCKER_ROOT/$1/conf"
-		rm -rf "$DOCKER_ROOT/$1/script"
-		rm -rf "$DOCKER_ROOT/$1/ui"
-    elif [ "$1" == "ig" ]; then
-        rm -rf "$DOCKER_ROOT/$1/config"
-        rm -rf "$DOCKER_ROOT/$1/scripts"
-    fi
+        elif [ "$c" == "idm" ]; then
+            rm -rf "$DOCKER_ROOT/$c/conf"
+	    	rm -rf "$DOCKER_ROOT/$c/script"
+	    	rm -rf "$DOCKER_ROOT/$c/ui"
+        elif [ "$c" == "ig" ]; then
+            rm -rf "$DOCKER_ROOT/$c/config"
+            rm -rf "$DOCKER_ROOT/$c/scripts"
+        fi
+    done
+}
+
+patch_container() {
+   cd $(dirname "${BASH_SOURCE[0]}")
+   BASE_PATH=..
+   TARGET_PATH=${BASE_PATH}/config/7.0/$1
+   OVERLAY_PATH=${BASE_PATH}/config/$2
+   if [[ ! -d "${OVERLAY_PATH}" ]];
+   then
+       echo "${OVERLAY_PATH} profile found"
+       exit 0
+   fi
+
+   if ! docker pull -q gcr.io/forgeops-public/patcher:7.1-dev > /dev/null 2>&1;
+   then
+       echo "couldn't pull patch config tools, attempting to build"
+       if ! docker build -q -t gcr.io/forgeops-public/patcher:7.1-dev ${BASE_PATH}/docker/cli-tools/patcher;
+       then
+           echo "cloudn't build or pull patch config tools, aborting"
+           exit 1
+       fi
+   fi
+
+   # build baseline from target
+   OUTPUT_PATH=${BASE_PATH}/docker/7.0
+   cp -R $TARGET_PATH/* "$OUTPUT_PATH/"
+   shopt -s globstar
+   # overwrite baseline with patches
+   for patch in $OVERLAY_PATH/**/*.json;
+   do
+       patch_filename=$(basename ${patch})
+       output_base_path=$(dirname ${patch/$OVERLAY_PATH/$OUTPUT_PATH})
+       mkdir -p $output_base_path
+       # a file with a patch has a patch applied
+       if [[ "$patch_filename" == *"patch.json" ]];
+       then
+           # this is the file we want to run a patch against
+           target_name=${patch_filename/.patch/}
+           # dirname of targetted file
+           target_base_path=$(dirname ${patch/${OVERLAY_PATH}/$TARGET_PATH})
+           # fully qualified path to target
+           target_path="${target_base_path}/${target_name}"
+           # fully qualified path to output
+           output="${output_base_path}/${target_name}"
+           cat $target_path <(echo "=====") $patch | docker run -i gcr.io/forgeops-public/patcher:7.1-dev > $output
+           continue
+       fi
+       # copy files if they don't have patch in the name
+       cp "${patch}" "${output_base_path}/${patch_filename}"
+   done
+   exit 0
 }
 
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-    echo cp -r "${PROFILE_ROOT}/../cdk/$1" "$DOCKER_ROOT"
-    cp -r "${PROFILE_ROOT}/../cdk/$1" "$DOCKER_ROOT"
-
+    echo $@
     if [[ -d "${PROFILE_ROOT}/$1" ]]
     then
-        PATCH_LIST=$(cd ${PROFILE_ROOT}/$1 && find -name "*.patch.json")
-        NON_PATCH_LIST=$(cd ${PROFILE_ROOT}/$1 && find -type f -not -name "*.patch.json")
-
-        for file in ${NON_PATCH_LIST}; do
-            cp ${PROFILE_ROOT}/$1/${file} $DOCKER_ROOT/$1/${file}
+	    for p in "${@}"; do
+            echo "cp -r ${PROFILE_ROOT}/$p" "$DOCKER_ROOT"
+            cp -r "${PROFILE_ROOT}/$p" "$DOCKER_ROOT"
         done
-
-        for patchFile in ${PATCH_LIST}; do
-          ORIGINAL_FILE=$(echo ${patchFile} | sed  's/\.patch\.json/.json/' -)
-          echo `cat $DOCKER_ROOT/$1/${ORIGINAL_FILE}` `echo =====` `cat ${PROFILE_ROOT}/$1/${patchFile}` | docker run -i apply-patch:latest > $DOCKER_ROOT/$1/${ORIGINAL_FILE}.tmp
-          mv $DOCKER_ROOT/$1/${ORIGINAL_FILE}.tmp  $DOCKER_ROOT/$1/${ORIGINAL_FILE}
-        done
+        return
     fi
+    # get patch profile name
+    patch_profile=$(basename "${PROFILE_ROOT}")
+
+    echo "patch profile found, this doesn't support component selection"
+    patch_container cdk "$patch_profile"
 }
 
 # Show the differences between the source configuration and the current Docker configuration
@@ -462,21 +510,15 @@ fi
 
 case "$_arg_operation" in
 init)
-	for p in "${COMPONENTS[@]}"; do
-		clean_config "$p"
-		init_config "$p"
-	done
+	clean_config "${COMPONENTS[@]}"
+	init_config "${COMPONENTS[@]}"
 	;;
 add)
 	# Same as init - but do not delete existing files.
-	for p in "${COMPONENTS[@]}"; do
-		init_config "$p"
-	done
+	init_config "${COMPONENTS[@]}"
 	;;
 clean)
-	for p in "${COMPONENTS[@]}"; do
-		clean_config "$p"
-	done
+	clean_config "${COMPONENTS[@]}"
 	;;
 diff)
 	diff_config

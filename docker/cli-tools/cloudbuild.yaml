@@ -2,16 +2,25 @@
 timeout: 1200s
 steps:
 - name: 'gcr.io/cloud-builders/docker'
+  id: toolbox
   args: ['build', '-t', 'gcr.io/forgeops-public/toolbox', 'toolbox']
   dir: docker/cli-tools
+- name: 'gcr.io/cloud-builders/docker'                            
+  args: ['build', '-t', 'gcr.io/engineering-devops/repo', 'repo'] 
+  dir: docker/cli-tools                                           
+  waitFor:
+    - toolbox
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/forgeops-public/git-server', 'git-server']
   dir: docker/cli-tools
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/engineering-devops/repo', 'repo']
-  dir: docker/cli-tools
+  waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'                            
+  args: ['build', '-t', 'gcr.io/forgeops-public/patcher:7.1-dev', 'patcher'] 
+  dir: docker/cli-tools                                           
+  waitFor: ['-']
 
 images:
 - gcr.io/forgeops-public/toolbox
-- gcr.io/forgeops-public/git-server
 - gcr.io/engineering-devops/repo
+- gcr.io/forgeops-public/git-server
+- gcr.io/forgeops-public/patcher:7.1-dev
