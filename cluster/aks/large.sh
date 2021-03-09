@@ -9,7 +9,7 @@ export CLUSTER_LABELS="forgerock.io/cluster=cdm-large"
 # export LOCATION=eastus
 
 # Name of Azure Container Registry.  AKS needs to be given access to ACR. Please amend to your registry name.
-export ACR_NAME="" 
+# export ACR_NAME="" 
 
 # PRIMARY NODE POOL VALUES
 export VM_SIZE=Standard_F16s_v2 # vCPU*16, Mem GiB*32, Compute Intensive, Premium Storage(with caching)

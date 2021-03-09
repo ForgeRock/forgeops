@@ -28,7 +28,8 @@ ADMIN_USERNAME=${ADMIN_USERNAME:-"forgerock"}
 
 # Name of container registry used by cluster
 if [[ -z $ACR_NAME ]]; then 
-  echo "Please set ACR_NAME variable in the <env>.sh file so the cluster can be configured with permission to access the container registry"
+  echo "Set the value of the ACR_NAME environment variable to the name of your ACS container registry."
+  echo "$ export ACR_NAME=my-container-registry"
   exit 1 
 fi
 
