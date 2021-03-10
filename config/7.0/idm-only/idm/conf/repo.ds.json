@@ -419,6 +419,10 @@
                         "type": "simple",
                         "ldapAttribute": "givenName"
                     },
+                    "profileImage": {
+                        "type": "simple",
+                        "ldapAttribute": "labeledURI"
+                    },
                     "sn": {
                         "type": "simple",
                         "ldapAttribute": "sn"
