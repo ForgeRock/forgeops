@@ -1,0 +1,31 @@
+[
+    {
+        "operation": "add",
+        "field": "/objects/-",
+        "value": {
+            "name" : "test",
+            "schema" : {
+                "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Group",
+                "title" : "TEST OBJ",
+                "icon" : "fa-group",
+                "mat-icon" : "group",
+                "viewable" : true,
+                "$schema" : "http://json-schema.org/draft-03/schema",
+                "type" : "object",
+                "order" : [
+                    "name"
+                ],
+                "properties" : {
+                    "name" : {
+                        "title": "Name",
+                        "description" : "Name",
+                        "type" : "string",
+                        "viewable" : true,
+                        "searchable" : true,
+                        "userEditable" : false
+                    }
+                }
+            }
+        }
+    }
+]

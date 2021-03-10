@@ -138,6 +138,9 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 
 # End of arg parsing
 
+
+docker build -q -t apply-patch:latest docker/cli-tools/apply-patch/
+
 #****** UPGRADE CONFIG AND REAPPLY PLACEHOLDERS ******#
 upgrade_config(){
 
@@ -211,8 +214,24 @@ clean_config()
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-    echo "cp -r ${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
-    cp -r "${PROFILE_ROOT}/$1" "$DOCKER_ROOT"
+    echo cp -r "${PROFILE_ROOT}/../cdk/$1" "$DOCKER_ROOT"
+    cp -r "${PROFILE_ROOT}/../cdk/$1" "$DOCKER_ROOT"
+
+    if [[ -d "${PROFILE_ROOT}/$1" ]]
+    then
+        PATCH_LIST=$(cd ${PROFILE_ROOT}/$1 && find -name "*.patch.json")
+        NON_PATCH_LIST=$(cd ${PROFILE_ROOT}/$1 && find -type f -not -name "*.patch.json")
+
+        for file in ${NON_PATCH_LIST}; do
+            cp ${PROFILE_ROOT}/$1/${file} $DOCKER_ROOT/$1/${file}
+        done
+
+        for patchFile in ${PATCH_LIST}; do
+          ORIGINAL_FILE=$(echo ${patchFile} | sed  's/\.patch\.json/.json/' -)
+          echo `cat $DOCKER_ROOT/$1/${ORIGINAL_FILE}` `echo =====` `cat ${PROFILE_ROOT}/$1/${patchFile}` | docker run -i apply-patch:latest > $DOCKER_ROOT/$1/${ORIGINAL_FILE}.tmp
+          mv $DOCKER_ROOT/$1/${ORIGINAL_FILE}.tmp  $DOCKER_ROOT/$1/${ORIGINAL_FILE}
+        done
+    fi
 }
 
 # Show the differences between the source configuration and the current Docker configuration
@@ -240,6 +259,37 @@ export_config(){
 			rm -fr "$DOCKER_ROOT/amster/config"
 			mkdir -p "$DOCKER_ROOT/amster/config"
 			"$script_dir/amster" export "$DOCKER_ROOT/amster/config"
+			echo "Removing any existing Amster jobs..."
+			kubectl delete job amster || true
+
+			# Deploy Amster job
+			echo "Deploying Amster job..."
+			exp=$(skaffold run -p amster-export)
+
+			# Check to see if Amster pod is running
+			echo "Waiting for Amster pod to come up."
+			while ! [[ "$(kubectl get pod -l app=amster --field-selector=status.phase=Running)" ]];
+			do
+					sleep 5;
+			done
+			printf "Amster job is responding..\n\n"
+
+			pod=`kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}'`
+
+			# Export OAuth2Clients and IG Agents
+			echo "Executing Amster export within the amster pod"
+			kubectl exec $pod -it /opt/amster/export.sh
+
+			# Copy files locally
+			echo "Copying the export to the ./tmp directory"
+			kubectl cp $pod:/var/tmp/amster/realms/ "$DOCKER_ROOT/amster/config"
+
+			printf "Dynamic config exported\n\n"
+
+			# Shut down Amster job
+			printf "Shutting down Amster job...\n"
+
+			del=$(skaffold delete -p amster-export)
 			;;
 		am)
 			# Export AM configuration

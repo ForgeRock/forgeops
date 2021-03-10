@@ -1,0 +1,65 @@
+[
+    {
+        "operation": "add",
+        "field": "/a",
+        "value": "boo"
+    },
+    {
+        "operation": "replace",
+        "field": "/a",
+        "value": "b"
+    },
+    {
+        "operation": "remove",
+        "field": "/test"
+    },
+    {
+        "operation": "add",
+        "field": "/foo/bar/baz",
+        "value": "boo"
+    },
+    {
+        "operation": "add",
+        "field": "/foo/bar/biz/-",
+        "value": "boo"
+    },
+    {
+        "operation": "add",
+        "field": "/foo/bar/biz/-",
+        "value": { "hi": "there" }
+    },
+    {
+        "operation": "add",
+        "field": "/foo/bar/biz/-",
+        "value": "another value"
+    },
+    {
+        "operation": "add",
+        "field": "/foo/num",
+        "value": 10
+    },
+    {
+        "operation": "remove",
+        "field": "/foo/bar/biz/0"
+    },
+    {
+        "operation": "remove",
+        "field": "/foo/bar/biz",
+        "value": { "hi": "there" }
+    },
+    {
+        "operation": "copy",
+        "from": "/foo",
+        "field": "what"
+    },
+    {
+        "operation": "increment",
+        "field": "/foo/num",
+        "value": 20
+    },
+    {
+        "operation": "move",
+        "from": "foo",
+        "field": "to"
+    }
+]
