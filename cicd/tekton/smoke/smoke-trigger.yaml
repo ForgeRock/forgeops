@@ -8,11 +8,18 @@ metadata:
   name: smoke
 spec:
   params:
-  - name: gitrevision
-    value: $(body.head_commit.id)
+  # This expression does not appear to exist in the stash payload. Suspect it is defaulting to "", which
+  # is subsquently getting set to the param.default value of "master"
+  # - name: gitrevision
+  #   value: $(body.head_commit.id)
   - name: gitrepositoryurl
-    value: $(body.repository.url)
-
+    value: "https://stash.forgerock.org/scm/cloud/forgeops.git"
+  # From the tekton bitbucket sample.
+  - name: gitrevision
+    value: $(body.changes[0].ref.displayId)
+  # - name: gitrepositoryurl
+  #   value: $(body.repository.links.clone[0].href)
+  # See https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html for on prem stash sample
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
@@ -60,22 +67,20 @@ spec:
   triggers:
   - name: stash-trigger
     interceptors:
-    - github:
+    - bitbucket:
         secretRef:
           secretName: git-webhook-secret
           secretKey: secret
-#     eventTypes: #Only available when using github
-#     - push
-    - cel:
-        filter: "header.canonical('X-Event-Key') == 'repo:refs_changed'"
-    - cel:
-        filter: "body.changes[0].ref.type == 'BRANCH' && body.changes[0].type == 'UPDATE' && body.changes[0].ref.displayId == 'master'"
-        overlays:
-        - key: head_commit.id
-          expression: "body.changes[0].toHash"
-        - key: repository.url
-          expression: "body.repository.links.clone[0].name == 'http' ? body.repository.links.clone[0].href : body.repository.links.clone[1].href"
-
+        eventTypes:
+        # todo: What are the allowable event types?
+        # See https://support.atlassian.com/bitbucket-cloud/docs/event-payloads/ for hosted bitbucket
+        # https://confluence.atlassian.com/bitbucketserver/event-payload-938025882.html - for stash
+        # Note they are not exactly the same!
+        # Other event types in stash:
+        # pr:opened
+        # pr:from_ref_updated - source branch updated
+        # pr:modified -
+        - repo:refs_changed
     bindings:
     - ref: smoke
     template:

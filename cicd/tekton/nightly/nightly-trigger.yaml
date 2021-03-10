@@ -67,5 +67,5 @@ spec:
           containers:
           - name: trigger
             image: curlimages/curl
-            args: ["curl", "-X", "POST" , "--data" ,"{}", "el-nightly-listener:8080" ]
+            args: ["curl", "-X", "POST", "--data", "{}", "el-nightly-listener:8080"]
           restartPolicy: Never
