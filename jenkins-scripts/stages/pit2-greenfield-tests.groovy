@@ -28,7 +28,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE               : 'greenfield',
                             CLUSTER_CRASHER                 : 'True',
-                            REPEAT                          : GREENFIELD_REPEAT.toInteger(),
+                            REPEAT                          : params.PIT2_Greenfield.toInteger(),
                             REPEAT_WAIT                     : 3600,
                             TIMEOUT                         : '14',
                             TIMEOUT_UNIT                    : 'HOURS',
