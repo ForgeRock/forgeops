@@ -6,6 +6,8 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+// pit2-upgrade-tests.groovy
+
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun) {

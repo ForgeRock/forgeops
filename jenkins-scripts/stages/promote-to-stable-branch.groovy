@@ -6,6 +6,8 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+// promote-to-stable-branch.groovy
+
 import groovy.transform.Field
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
