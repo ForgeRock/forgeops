@@ -28,7 +28,7 @@ If they are not present in your cluster, it will install them for you.
 
 ## Passwords
 
-Run the `./bin/quickstart.sh -p` script to obtain passwords for the AM and IDM UIs.
+Run `./bin/quickstart.sh -p` to obtain passwords for the AM and IDM UIs.
 
 ## Customizing the Deployment Profile Components
 
@@ -41,7 +41,6 @@ The example below demonstrates how to deploy the ForgeRock Identity Platform one
 
 ```bash
 ./bin/quickstart.sh -c base
-./bin/quickstart.sh -c ds-cts
 ./bin/quickstart.sh -c ds-idrepo
 ./bin/quickstart.sh -c am
 ./bin/quickstart.sh -c amster
@@ -53,7 +52,7 @@ The example below demonstrates how to deploy the ForgeRock Identity Platform one
 ```
 
 **Note**: `base` must always be deployed first as it contains the platform dependencies.
-`ds-cts` and `ds-idrepo` are also required by other components. In general, it is recommended to deploy the platform
+`ds-idrepo` is also required by other components. In general, it is recommended to deploy the platform
 components in the order shown above.
 
 This functionality gives the users total control of which apps, and when, they want to
@@ -64,8 +63,6 @@ the entire platform. For example:
 ```bash
 # Install the full ForgeRock Identity Platform
 ./bin/quickstart.sh -a demo.iam.customer.com
-# Clean up amster job after the platform is healthy and ready
-./bin/quickstart.sh -c amster -u
 # Delete only the IDM related resources
 ./bin/quickstart.sh -c idm -u
 # Patch the platform-config configmap with a different setting
@@ -81,8 +78,6 @@ Let's say users want to iterate over several docker images as they test differen
 ```bash
 # Install the full ForgeRock Identity Platform
 ./bin/quickstart.sh -a demo.iam.customer.com
-# Clean up amster job after the platform is healthy and ready
-./bin/quickstart.sh -c amster -u
 # Update the docker image of the admin-ui deployment
 kubectl set image deployment admin-ui admin-ui=gcr.io/forgeops-public/admin-ui:my-custom-tag1
 # After some testing, the user decides to test another image with some other changes
@@ -123,6 +118,27 @@ kubectl patch cm platform-config --type=json -p='[{"op":"replace", "path": "/dat
 kubectl scale statefulset ds-cts --replicas=1
 # Deploy the apps bundle
 ./bin/quickstart.sh -c apps
+# When done, uninstall the developer profile
+./bin/quickstart.sh -u
+```
+
+### Local mode (Development mode)
+
+This mode allows the user to deploy platform components using local manifests. In this mode, the script gathers
+the manifest of the specified component or bundle from your local _kustomize_ folder rather
+than using the latest public release. In addition, the docker images are set to the latest _nightly_ image of each component.
+To run the script in this mode, run `./quickstart.bin -l [flags]`.
+
+For example, let's assume the user wants to run the platform using the latest stable release. However, the user wants
+nightly images for all UI components and a special image tag for the admin-ui pod:
+
+```bash
+# Install the full ForgeRock Identity Platform
+./bin/quickstart.sh -a demo.iam.customer.com
+# Install the ui bundle using local manifests and latest nightly image
+./quickstart.sh -c ui -l
+# Update the docker image of the admin-ui deployment only
+kubectl set image deployment admin-ui admin-ui=gcr.io/forgeops-public/admin-ui:my-custom-tag1
 # When done, uninstall the developer profile
 ./bin/quickstart.sh -u
 ```

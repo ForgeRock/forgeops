@@ -13,6 +13,7 @@ FORGEOPS_FQDN="default.iam.example.com"
 FORGEOPS_URL=""
 SECRETAGENT_REPO="ForgeRock/secret-agent"
 DSOPERATOR_REPO="ForgeRock/ds-operator"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || (echo "Couldn't determine the root path" ; exit 1) 
 
 usage() {
 cat <<EOF
@@ -29,6 +30,7 @@ Options:
 -f      Forgeops tag/version to install/uninstall (default: "${FORGEOPS_VERSION}")
 -u      Uninstalls components
 -p      Prints relevant secrets/passwords and relevant urls
+-l      Use local (developer) mode. Deploys local manifests. Defaults to nightly docker images.
 -h      Prints this message
 
 Examples:
@@ -83,7 +85,6 @@ deployquickstart () {
     echo 
     echo "******Waiting for git-server and DS pods to come up. This can take several minutes******"
     kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s
-    kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-cts --timeout=600s
     kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-idrepo --timeout=300s
     echo
     echo "******Deploying AM and IDM******"
@@ -114,10 +115,53 @@ getcomponentURL () {
 
 ## Deploy the Component manifest
 deploycomponent () {
+    if [ ${LOCAL_MODE} = true ]; then
+        deploylocalmanifest ${1}
+    else
+        deployrepomanifest ${1}
+    fi
+}
+
+## Deploy the Component using released manifest
+deployrepomanifest () {
+
     FORGEOPS_URL=$(getcomponentURL ${1})
     curl -sL ${FORGEOPS_URL} 2>&1 | \
     sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
     sed  "s/default.iam.example.com/${FORGEOPS_FQDN}/g" | kubectl -n ${FORGEOPS_NAMESPACE} apply -f -
+}
+
+## Deploy local component (local mode)
+deploylocalmanifest () {
+    case "${1}" in
+    "base")
+        INSTALL_COMPONENTS=("dev/kustomizeConfig" "base/secrets" "base/7.0/ingress" "base/git-server" "dev/scripts")
+        ;;
+    "ds")
+        INSTALL_COMPONENTS=("base/ds-idrepo") #no "ds-cts" in dev-mode
+        ;;
+    "apps")
+        INSTALL_COMPONENTS=("base/amster" "dev/am" "dev/idm" "base/rcs-agent")
+        ;;
+    "ui")
+        INSTALL_COMPONENTS=("base/admin-ui" "base/end-user-ui" "base/login-ui")
+        ;;
+    "am"|"idm")
+        INSTALL_COMPONENTS=("dev/${1}")
+        ;;
+    *)
+        INSTALL_COMPONENTS=("base/${1}")
+        ;;
+    esac
+    # Temporarily add the wanted kustomize files
+    for component in "${INSTALL_COMPONENTS[@]}"; do
+        (cd kustomize/dev/image-defaulter && kustomize edit add resource ../../../kustomize/${component})
+    done
+    kustomize build kustomize/dev/image-defaulter 2> /dev/null | \
+        sed  "s/namespace: default/namespace: ${FORGEOPS_NAMESPACE}/g" | \
+        sed  "s/default.iam.example.com/${FORGEOPS_FQDN}/g" | kubectl -n ${FORGEOPS_NAMESPACE} apply -f -
+    # Clean out the temp kustomize files
+    (cd kustomize/dev/image-defaulter && kustomize edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*)
 }
 
 ## Uninstall a manifest
@@ -176,8 +220,9 @@ timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 ########################################################################################
 UNINSTALL_COMPONENT=false
 PRINT_SECRETS=false
+LOCAL_MODE=false
 # list of arguments expected in the input
-optstring=":hupn:f:a:c:"
+optstring=":hupln:f:a:c:"
 while getopts ${optstring} arg; do
   case ${arg} in
     h) echo "Usage:"; usage; exit 0;;
@@ -187,6 +232,7 @@ while getopts ${optstring} arg; do
     f) FORGEOPS_VERSION=${OPTARG};;
     u) UNINSTALL_COMPONENT=true;;
     p) PRINT_SECRETS=true;;
+    l) LOCAL_MODE=true;;
     :)
       echo "$0: Must supply an argument to -$OPTARG." >&2
       usage
@@ -199,6 +245,9 @@ while getopts ${optstring} arg; do
       ;;
   esac
 done
+
+# chdir to the forgeops root/..
+cd "${SCRIPT_DIR}/.."
 
 if [ ${UNINSTALL_COMPONENT} = true ]; then
     echo
@@ -216,7 +265,11 @@ if [ ${PRINT_SECRETS} = true ]; then
 fi
 installdependencies
 echo
-echo "Using forgeops repo:tag \"${FORGEOPS_REPO}:${FORGEOPS_VERSION}\""
+if [ ${LOCAL_MODE} = true ]; then
+    echo "Local mode enabled. Using K8s manifests from your local repo"
+else
+    echo "Using forgeops repo:tag \"${FORGEOPS_REPO}:${FORGEOPS_VERSION}\""
+fi
 echo "Targeting namespace: \"${FORGEOPS_NAMESPACE}\""
 echo
 echo "Installing component: \"${FORGEOPS_COMPONENT}\""
