@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")"
+
+SCRIPT_NAME="$(basename "$0")"
+
+usage () {
+read -r -d '' help <<-EOF
+Clone Docker Images not built in ForgeOps
+
+For Internal Use Only
+
+Usage:
+    ${SCRIPT_NAME} 7.1-dev
+    IMAGE_TAG=7.1-dev ${SCRIPT_NAME}
+EOF
+    printf "%-10s \n" "$help"
+}
+
+[[ -n "$1" ]] \
+    && IMAGE_TAG=$1
+
+[[ -n "$IMAGE_TAG" ]] \
+    || { echo "IMAGE_TAG must be set or supplied as an argument"; exit 1; }
+
+set -o pipefail -o errexit -o nounset
+
+while IFS= read -r image
+do
+    i=$(awk -F " image: " '{ print $2 }' <(echo "$image"))
+    case $i in
+        *enduser-ui*)
+            new_name="gcr.io/forgeops-public/enduser-ui:${IMAGE_TAG}"
+            ;;
+        *admin-ui*)
+            new_name="gcr.io/forgeops-public/admin-ui:${IMAGE_TAG}"
+            ;;
+        *login-ui*)
+            new_name="gcr.io/forgeops-public/login-ui:${IMAGE_TAG}"
+            ;;
+        *rcs-agent*)
+            new_name="gcr.io/forgeops-public/rcs-agent:${IMAGE_TAG}"
+            ;;
+        *)
+            echo "No name replacement rule found for: ${i}"
+            continue
+            ;;
+    esac
+    docker pull "${i}"
+    docker tag "${i}" "${new_name}"
+    docker push "${new_name}"
+done < <(grep -h "image: " ../kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml)

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+SCRIPT_NAME="$(basename "$0")"
+
+usage () {
+read -r -d '' help <<-EOF
+Build ForgeOps CDK Images
+
+For Internal Use Only
+
+Usage:
+    ${SCRIPT_NAME} 7.1-dev
+    IMAGE_TAG=7.1-dev ${SCRIPT_NAME}
+EOF
+    printf "%-10s \n" "$help"
+}
+
+[[ -n "$1" ]] \
+    && IMAGE_TAG=$1
+
+[[ -n "$IMAGE_TAG" ]] \
+    || { echo "IMAGE_TAG must be set or supplied as an argument"; exit 1; }
+
+
+if ! ./bin/config.sh init -p cdk;
+then
+    echo "failed to build config"
+    exit 1
+fi
+
+if ! skaffold -f skaffold.yaml \
+            -p docker-image-tag \
+            --default-repo gcr.io/forgeops-public \
+            build;
+then
+    echo "failed to build"
+    exit 1
+fi

@@ -3,49 +3,25 @@ steps:
 # clone all the things
 - name: gcr.io/cloud-builders/git
   args: ['fetch', '--all']
+
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   env:
     - IMAGE_TAG=$TAG_NAME
   args:
-    - '-eEuo'
-    - 'pipefail'
     - '-c'
     - |-
-      for i in $(grep -h image: kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml | awk -F " image: " '{ print $2 }');
-      do
-          case $i in
-              *enduser-ui*)
-                  new_name="gcr.io/forgeops-public/enduser-ui:${IMAGE_TAG}"
-                  ;;
-              *admin-ui*)
-                  new_name="gcr.io/forgeops-public/admin-ui:${IMAGE_TAG}"
-                  ;;
-              *login-ui*)
-                  new_name="gcr.io/forgeops-public/login-ui:${IMAGE_TAG}"
-                  ;;
-              *rcs-agent*)
-                  new_name="gcr.io/forgeops-public/rcs-agent:${IMAGE_TAG}"
-                  ;;
-              *)
-                  echo "No name replacement rule found for: ${i}"
-                  continue
-                  ;;                  
-          esac
-          docker pull "${i}"
-          docker tag "${i}" "${new_name}"
-          docker push "${new_name}"
-      done
+      ./bin/docker-clone
 
 - name: 'gcr.io/$PROJECT_ID/skaffold'
   entrypoint: bash
   env:
     - IMAGE_TAG=$TAG_NAME
-  args: 
+  args:
     - '-c'
     - |-
-      ./bin/config.sh init -p cdk \
-      && skaffold -f skaffold.yaml -p docker-image-tag --default-repo gcr.io/forgeops-public build
+      ./bin/build-cdk-image-tags
+
 - name: 'gcr.io/engineering-devops/repo'
   entrypoint: bash
   secretEnv:
@@ -57,6 +33,7 @@ steps:
     - '-c'
     - |-
       make -f docker/cli-tools/repo/Makefile release
+
 availableSecrets:
   secretManager:
     - versionName: projects/1067706085367/secrets/GH_API_CLOUDBUILD/versions/2
