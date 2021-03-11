@@ -6,11 +6,13 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+// pit2-upgrade-tests.groovy
+
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
-    def stageName = 'PIT2 Binary Upgrade'
+    def stageName = 'PIT2 Upgrade'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
@@ -19,7 +21,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 dir('lodestar') {
                     def stagesCloud = [:]
 
-                    def initialSubStageName = 'binary_upgrade'
+                    def initialSubStageName = 'upgrade'
 
                     def config_common = [
                         CLUSTER_DOMAIN                                  : 'pit-24-7.forgeops.com',
@@ -55,7 +57,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     }
 
                     // pit1 tests after binary upgrade tests
-                    subStageName = 'pit1_after_binary_upgrade'
+                    subStageName = 'pit1_after_upgrade'
                     stagesCloud[subStageName] = dashboard_utils.spyglaasStageCloud(subStageName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[subStageName]) {
