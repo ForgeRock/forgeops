@@ -25,6 +25,24 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 def pipelineRun
 
+def jobProperties = [
+    disableConcurrentBuilds(),
+    buildDiscarder(logRotator(numToKeepStr: '20')),
+    parameters([
+        string(name: 'PIT2_Greenfield', defaultValue: '10', description: '0 to not run<br>approx 1h per loop (minimum 2 loops when run)', trim: true),
+        booleanParam(name: 'PIT2_Upgrade', defaultValue: true, description: 'approx 45mins'),
+        booleanParam(name: 'PIT2_Perf_platform', defaultValue: true, description: 'approx 1h30mins'),
+        booleanParam(name: 'PIT2_Perf_am_authn', defaultValue: true, description: 'approx 1h'),
+        booleanParam(name: 'PIT2_Perf_am_access_token', defaultValue: true, description: 'approx 2h30mins'),
+        booleanParam(name: 'PIT2_Perf_idm_crud', defaultValue: true, description: 'approx 2h30mins'),
+    ])
+]
+
+if (params.PIT2_Greenfield.toInteger() == 1) {
+    currentBuild.result = 'ABORTED'
+    error 'Only 1 loop specified for Greenfield but minimum 2 required.'
+}
+
 if (env.TAG_NAME) {
     currentBuild.result = 'ABORTED'
     error 'This pipeline does not currently support building from a tag\nFor support, email releng@forgerock.com'
@@ -35,20 +53,11 @@ if (env.TAG_NAME) {
             'For support, email releng@forgerock.com'
 } else if (env.BRANCH_NAME.equals('master')) {
     // only master has a scheduled build; jobs for other branches can be launched manually
-    properties([
-            disableConcurrentBuilds(),
-            buildDiscarder(logRotator(numToKeepStr: '20')),
-            pipelineTriggers([cron('H 0 * * *')]),
-            parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
-    ])
+    jobProperties.add(pipelineTriggers([cron('H 20 * * 1-5')]))
+    properties(jobProperties)
 } else if (env.BRANCH_NAME.startsWith('idcloud-')) {
-    properties([
-            disableConcurrentBuilds(),
-            buildDiscarder(logRotator(numToKeepStr: '20')),
-            parameters([string(defaultValue: '10', description: '', name: 'GREENFIELD_REPEAT', trim: false)]),
-    ])
+    properties(jobProperties)
 } else {
-
     // safety guard, to prevent non-master branches from building
     currentBuild.result = 'ABORTED'
     error 'Only master PaaS release branches are allowed to run PIT#2 tests and promotion.\n' +
