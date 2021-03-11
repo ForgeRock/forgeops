@@ -25,6 +25,13 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 def pipelineRun
 
+def platformUiDefaultValue = true
+def platformUIDescription = 'approx 35mins'
+if (env.BRANCH_NAME.startsWith('idcloud-')) {
+    platformUiDefaultValue = false
+    platformUIDescription += '<br>Platform UI tests are only available on master version, and so it is possible that they could be incompatable with idcloud branch'
+}
+
 def jobProperties = [
     disableConcurrentBuilds(),
     buildDiscarder(logRotator(numToKeepStr: '20')),
@@ -35,6 +42,8 @@ def jobProperties = [
         booleanParam(name: 'PIT2_Perf_am_authn', defaultValue: true, description: 'approx 1h'),
         booleanParam(name: 'PIT2_Perf_am_access_token', defaultValue: true, description: 'approx 2h30mins'),
         booleanParam(name: 'PIT2_Perf_idm_crud', defaultValue: true, description: 'approx 2h30mins'),
+        booleanParam(name: 'PIT2_Platform_UI', defaultValue: platformUiDefaultValue, description: platformUIDescription),
+        booleanParam(name: 'Promote_to_stable_branch', defaultValue: true, description: "Promote product images to ${env.BRANCH_NAME}-stable"),
     ])
 ]
 
@@ -53,7 +62,7 @@ if (env.TAG_NAME) {
             'For support, email releng@forgerock.com'
 } else if (env.BRANCH_NAME.equals('master')) {
     // only master has a scheduled build; jobs for other branches can be launched manually
-    jobProperties.add(pipelineTriggers([cron('H 20 * * 1-5')]))
+    jobProperties.add(pipelineTriggers([cron('H 0 * * *')]))
     properties(jobProperties)
 } else if (env.BRANCH_NAME.startsWith('idcloud-')) {
     properties(jobProperties)
@@ -94,7 +103,8 @@ timestamps {
                 greenfieldTests = load("${stagesLocation}/pit2-greenfield-tests.groovy")
                 upgradeTests = load("${stagesLocation}/pit2-upgrade-tests.groovy")
                 perfTests = load("${stagesLocation}/pit2-perf-tests.groovy")
-                pit2Tests = load("${stagesLocation}/pit2-all-tests.groovy") // combines PERF, Greenfield, Upgrade
+                platformUiTests = load("${stagesLocation}/pit2-platform-ui-tests.groovy")
+                pit2Tests = load("${stagesLocation}/pit2-all-tests.groovy") // combines Greenfield, Upgrade, Perf, Platform UI
 
                 promoteToStableBranch = load("${stagesLocation}/promote-to-stable-branch.groovy")
 
@@ -108,7 +118,9 @@ timestamps {
 
         pit2Tests.runStage(pipelineRun)
 
-        promoteToStableBranch.runStage(pipelineRun)
+        if (params.Promote_to_stable_branch.toBoolean()) {
+            promoteToStableBranch.runStage(pipelineRun)
+        }
 
         currentBuild.result = 'SUCCESS'
     }

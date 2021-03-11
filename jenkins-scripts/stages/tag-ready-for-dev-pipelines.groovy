@@ -6,6 +6,8 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+// tag-ready-for-dev-pipelines.groovy
+
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 
@@ -24,12 +26,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
                 sh "git tag --force ${tagName}"
                 sh "git push --force origin ${tagName}"
-
-                // maintain this tag while the products are still using it
-                if (env.BRANCH_NAME == 'master') {
-                    sh "git tag --force ${tagBaseName}"
-                    sh "git push --force origin ${tagBaseName}"
-                }
 
                 return Status.SUCCESS.asOutcome()
             }

@@ -6,6 +6,8 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+// pit2-all-tests.groovy
+
 void runStage(pipelineRun) {
     def parallelTestsMap = [:]
 
@@ -18,7 +20,10 @@ void runStage(pipelineRun) {
     if (env.getEnvironment().any { name, value -> name.startsWith('PIT2_Perf') && value.toBoolean() }) {
         parallelTestsMap.put('Perf', { perfTests.runStage(pipelineRun) })
     }
-
+    if (params.PIT2_Platform_UI.toBoolean()) {
+        parallelTestsMap += ['Platform UI': { platformUiTests.runStage(pipelineRun) }]
+    }
+    
     parallel parallelTestsMap
 }
 

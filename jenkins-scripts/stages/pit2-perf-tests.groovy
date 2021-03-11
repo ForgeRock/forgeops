@@ -6,11 +6,9 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
+// pit2-perf-tests.groovy
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
-import com.forgerock.pipeline.stage.FailureOutcome
-import com.forgerock.pipeline.stage.Outcome
-import com.forgerock.pipeline.stage.Status
 
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
