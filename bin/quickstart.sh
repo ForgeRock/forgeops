@@ -133,6 +133,8 @@ deployrepomanifest () {
 
 ## Deploy local component (local mode)
 deploylocalmanifest () {
+    # Clean out the temp kustomize files
+    (cd kustomize/dev/image-defaulter && kustomize edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*)
     case "${1}" in
     "base")
         INSTALL_COMPONENTS=("dev/kustomizeConfig" "base/secrets" "base/7.0/ingress" "base/git-server" "dev/scripts")
