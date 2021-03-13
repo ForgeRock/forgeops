@@ -28,6 +28,10 @@ spec:
         volumeMounts:
         - mountPath: /srv/git
           name: git
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/usr/sbin/nginx", "-s", "quit"]
       volumes:
       - name: git
         persistentVolumeClaim:
