@@ -52,7 +52,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     String loginImageRepository = loginImageParts.first()
                     String loginImageTag = loginImageParts.last()
 
-                    def config = [
+                    def uiTestsConfig = [
                             TESTS_SCOPE                           : 'tests/k8s/postcommit/platform_ui',
                             CLUSTER_NAMESPACE                     : 'platform-ui',
                             COMPONENTS_ADMINUI_IMAGE_TAG          : adminImageTag,
@@ -68,61 +68,14 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             EXT_FORGEOPS_PATH                     : forgeopsPath,
                     ]
 
-                    try {
-                        dir('lodestar') {
-                            dashboard_utils.determineUnitOutcome(dashboard_utils.spyglaasStageCloud(normalizedStageName)) {
-                                withGKESpyglaasNoStages(config)
-                            }
-                        }
-
-                        def namespace = config.CLUSTER_NAMESPACE
-
-                        dir('platform-ui') {
-                            localGitUtils.shallowCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', env.BRANCH_NAME)
-                            sh "docker build --iidfile .iid -f e2e/Dockerfile ."
-
-                            try {
-                                withEnv(["KUBERNETES_NAMESPACE=${namespace}"]) {
-                                    sh "./e2e/passwords.sh docker run " +
-                                            "--cidfile .cid " +
-                                            "--ipc host " +
-                                            "-e VUE_APP_AM_URL=https://${namespace}.iam.pit-cluster.forgeops.com/am " +
-                                            "-e VUE_APP_AM_ADMIN_URL=https://${namespace}.iam.pit-cluster.forgeops.com/am/ui-admin " +
-                                            "-e VUE_APP_IDM_URL=https://${namespace}.iam.pit-cluster.forgeops.com/openidm " +
-                                            "-e VUE_APP_IDM_ADMIN_URL=https://${namespace}.iam.pit-cluster.forgeops.com/admin " +
-                                            "-e VUE_APP_ENDUSER_URL=https://${namespace}.iam.pit-cluster.forgeops.com/enduser " +
-                                            "-e CYPRESS_AM_USERNAME " +
-                                            "-e CYPRESS_IDM_USERNAME " +
-                                            "-e CYPRESS_AM_PASSWORD " +
-                                            "-e CYPRESS_IDM_PASSWORD " +
-                                            "-e CYPRESS_ACCESS_TOKEN " +
-                                            "-e CYPRESS_FQDN " +
-                                            "-e CYPRESS_BASE_URL " +
-                                            "\$(cat .iid)"
-                                }
-                            } finally {
-                                sh "docker cp \$(cat .cid):/workspace container_workspace"
-                                publishHTML(target: [
-                                        allowMissing         : false,
-                                        alwaysLinkToLastBuild: false,
-                                        keepAll              : true,
-                                        reportDir            : 'container_workspace/mochawesome-report',
-                                        reportFiles          : 'mochawesome-report.html',
-                                        reportName           : reportName
-                                ])
-                                reportUrl = "${env.BUILD_URL}/${reportName.replace(" ", "_20")}"
-                                archiveArtifacts(artifacts: 'container_workspace/packages/*/e2e/screenshots/**/*', allowEmptyArchive: true)
-                                archiveArtifacts(artifacts: 'container_workspace/packages/*/e2e/videos/**/*', allowEmptyArchive: true)
-                            }
-                        }
-                    } finally {
-                        // Cleanup the K8S deployment. This was skipped during withGKESpyglaasNoStages so the deployment could be used by the e2e tests.
-                        withEnv(cloud_utils.setEnvironment(config)) {
-                            dir('lodestar') {
-                                sh("./cleanup.py -n ${namespace}")
-                            }
-                        }
+                    dir("platform-ui") {
+                        localGitUtils.shallowCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', env.BRANCH_NAME)
+                        uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
                     }
+
+                    // The Platform UI repo needs to already be checked out in the platform-ui directory
+                    // for this method call to work
+                    reportUrl = uiTestsStage.runTests(uiTestsConfig, normalizedStageName, reportName)
                 }
             }
         } catch(Exception e) {
