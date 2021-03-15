@@ -44,19 +44,25 @@ def prune_disks():
         for item in disk_results['items']:
             # users is a link to the user (e.g. gke instance) using disk
             # we skip these disks
-            if 'users' in item:
-                continue
-            attached_time_str = item['lastAttachTimestamp']
-            attached_time = datetime.fromisoformat(attached_time_str)
-            current_time = datetime.now()
-            # skip if newer than max age
-            if current_time - attached_time.replace(tzinfo=None) < MAX_DISK_AGE:
-                continue
-            deleted = disk_delete(zone, item['name'])
-            if deleted:
-                delete_size_total += int(item['sizeGb'])
-            else:
+            try:
+                if 'users' in item:
+                    continue
+                attached_time_str = item['lastAttachTimestamp']
+                attached_time = datetime.fromisoformat(attached_time_str)
+                current_time = datetime.now()
+                # skip if newer than max age
+                if current_time - attached_time.replace(tzinfo=None) < MAX_DISK_AGE:
+                    continue
+                deleted = disk_delete(zone, item['name'])
+                if deleted:
+                    delete_size_total += int(item['sizeGb'])
+                else:
+                    delete_errors += 1
+            except Exception as e:
+                msg = str(e)
+                log.error(f'error during deletion zone={zone} disk={name}, error={e}')
                 delete_errors += 1
+
     if delete_errors != 0:
         log.error(f'{delete_errors} errors occured while pruning')
         return False
