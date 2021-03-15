@@ -29,32 +29,41 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         try {
             stage(stageName) {
-                node('google-cloud') {
+                node('pit2-upgrade') {
                     def forgeopsPath = localGitUtils.checkoutForgeops()
 
-                    // Admin UI Tag management
-                    def yamlAdminFile = 'kustomize/base/admin-ui/deployment.yaml'
-                    def adminImage = readYaml(file: yamlAdminFile).spec.template.spec.containers.image[0]
-                    Collection<String> adminImageParts = adminImage.split(':')
-                    String adminImageRepository = adminImage.first()
-                    String adminImageTag = adminImage.last()
+                    def adminImageTag
+                    def adminImageRepository
+                    def endUserImageTag
+                    def endUserImageRepository
+                    def loginImageTag
+                    def loginImageRepository
+                    dir('forgeops') {
+                        // Admin UI Tag management
+                        def yamlAdminFile = 'kustomize/base/admin-ui/deployment.yaml'
+                        def adminImage = readYaml(file: yamlAdminFile).spec.template.spec.containers.image[0]
+                        Collection<String> adminImageParts = adminImage.split(':')
+                        adminImageRepository = adminImageParts.first()
+                        adminImageTag = adminImageParts.last()
 
-                    // End User UI Tag management
-                    def yamlEndUserFile = 'kustomize/base/end-user-ui/deployment.yaml'
-                    def endUserImage = readYaml(file: yamlEndUserFile).spec.template.spec.containers.image[0]
-                    Collection<String> endUserImageParts = endUserImage.split(':')
-                    String endUserImageRepository = endUserImageParts.first()
-                    String endUserImageTag = endUserImageParts.last()
+                        // End User UI Tag management
+                        def yamlEndUserFile = 'kustomize/base/end-user-ui/deployment.yaml'
+                        def endUserImage = readYaml(file: yamlEndUserFile).spec.template.spec.containers.image[0]
+                        Collection<String> endUserImageParts = endUserImage.split(':')
+                        endUserImageRepository = endUserImageParts.first()
+                        endUserImageTag = endUserImageParts.last()
 
-                    // Login UI Tag management
-                    def yamlLoginFile = 'kustomize/base/login-ui/deployment.yaml'
-                    def loginImage = readYaml(file: yamlLoginFile).spec.template.spec.containers.image[0]
-                    Collection<String> loginImageParts = loginImage.split(':')
-                    String loginImageRepository = loginImageParts.first()
-                    String loginImageTag = loginImageParts.last()
+                        // Login UI Tag management
+                        def yamlLoginFile = 'kustomize/base/login-ui/deployment.yaml'
+                        def loginImage = readYaml(file: yamlLoginFile).spec.template.spec.containers.image[0]
+                        Collection<String> loginImageParts = loginImage.split(':')
+                        loginImageRepository = loginImageParts.first()
+                        loginImageTag = loginImageParts.last()
+                    }
 
                     def uiTestsConfig = [
                             TESTS_SCOPE                           : 'tests/k8s/postcommit/platform_ui',
+                            CLUSTER_DOMAIN                        : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE                     : 'platform-ui',
                             COMPONENTS_ADMINUI_IMAGE_TAG          : adminImageTag,
                             COMPONENTS_ADMINUI_IMAGE_REPOSITORY   : adminImageRepository,

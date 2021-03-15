@@ -35,7 +35,7 @@ def jobProperties = [
         booleanParam(name: 'PIT2_Perf_am_authn', defaultValue: true, description: 'approx 1h'),
         booleanParam(name: 'PIT2_Perf_am_access_token', defaultValue: true, description: 'approx 2h30mins'),
         booleanParam(name: 'PIT2_Perf_idm_crud', defaultValue: true, description: 'approx 2h30mins'),
-        booleanParam(name: 'PIT2_Platform_UI', defaultValue: true, description: 'approx 45mins'),
+        booleanParam(name: 'PIT2_Platform_UI', defaultValue: true, description: 'approx 35mins'),
     ])
 ]
 
