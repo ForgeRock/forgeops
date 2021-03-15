@@ -21,10 +21,9 @@ import com.forgerock.pipeline.stage.FailureOutcome
  * Reports are then generated via mochawesome and published to jenkins.
  */
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
-    def stageName = 'Platform UI Tests'
+    def stageName = 'PIT2 Platform UI'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def reportUrl = ''
-    def reportName = 'E2E Test Report'
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         try {
@@ -79,13 +78,14 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     ]
 
                     dir("platform-ui") {
-                        localGitUtils.shallowCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', env.BRANCH_NAME)
+                        // There are no idcloud branches created on Platform UI repository
+                        localGitUtils.shallowCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
                     }
 
                     // The Platform UI repo needs to already be checked out in the platform-ui directory
                     // for this method call to work
-                    reportUrl = uiTestsStage.runTests(uiTestsConfig, normalizedStageName, reportName)
+                    reportUrl = uiTestsStage.runTests(uiTestsConfig, normalizedStageName, normalizedStageName)
                 }
             }
         } catch(Exception e) {
