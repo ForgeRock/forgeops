@@ -3,7 +3,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: bash
   env:
-    - IMAGE_TAG=TAG_NAME
+    - IMAGE_TAG=$TAG_NAME
   waitFor: ['-']
   args:
     - -c
@@ -12,7 +12,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/skaffold'
   entrypoint: bash
   env:
-    - IMAGE_TAG=TAG_NAME
+    - IMAGE_TAG=$TAG_NAME
   waitFor: ['-']
   args:
     - -c
