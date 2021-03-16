@@ -21,7 +21,7 @@ data:
     agent.rcs_route=/rcs
     agent.health_route=/health
     agent.max_http_size=65536
-    agent.max_frame_bytes=655360
+    agent.max_frame_bytes=20971520
     agent.handshake_timeout_millis=10000
     agent.shutdown_timeout_millis=25000
     agent.ssl_enabled=false
