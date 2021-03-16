@@ -8,10 +8,35 @@
 set -o errexit
 set -o pipefail
 
+#####
+# Code for ForgeRock staff only
+#####
+FO_ENV=${FO_ENV:-env}
+# Load and enforce tags
+cd "$(dirname "$0")" && . ../../bin/lib-entsec-asset-tag-policy.sh
+if [[ -f $HOME/.forgeops.${FO_ENV}.sh ]];
+then
+    . $HOME/.forgeops.${FO_ENV}.sh
+fi
+is_fr_staff=$(IsForgeRock)
+if [ "$is_fr_staff" == "yes" ];
+then
+    if ! EnforceEntSecTags;
+    then
+        echo "ForgeRock staff are required to have tags that meet Enterprise Security rules."
+        echo "Please review $HOME/.forgeops.${ENV}.sh"
+        echo "If this isn't applicable run with the environment variable IS_FORGEROCK=no"
+        exit 1
+    fi
+    ASSET_LABELS="--labels es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
+    ADDITIONAL_OPTS+="${ASSET_LABELS} "
+fi
+#####
+# End code for ForgeRock staff only
+#####
+
 # Cluster name.
 NAME=${NAME:-small}
-
-
 # Default these values from the users configuration
 PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 PROJECT=${PROJECT:-$PROJECT_ID}
@@ -20,36 +45,7 @@ PROJECT=${PROJECT:-$PROJECT_ID}
 R=$(gcloud config list --format 'value(compute.region)')
 REGION=${REGION:-$R}
 
-GCLOUD_ACCT_EMAIL=$(gcloud config list account --format 'value(core.account)')
-SLUG_NAME=$(echo $GCLOUD_ACCT_EMAIL | awk -F "@" '{print $1 }' | sed 's/\./_/g')
-ES_USEREMAIL=${ES_USEREMAIL:-$SLUG_NAME}
-ES_ZONE=${ES_ZONE:-"empherical"}
-
-IS_FORGEROCK=$([[ "$GCLOUD_ACCT_EMAIL" =~ forgerock.com ]] && echo "yes" || echo "no")
-
-ES_BUSINESSUNIT=${ES_BUSINESSUNIT:-"engineering"}
-BILLING_ENTITY=${BILLING_ENTITY:-"us"}
-
 echo "Deploying to region: $REGION"
-
-I_AM_CDM=${I_AM_CDM:-0}
-ES_OWNEDBY=${ES_OWNEDBY:="unset"}
-ES_MANAGEDBY=${ES_MANAGEDBY:="unset"}
-
-if [ "$I_AM_CDM" == "1" ];
-then
-    ES_OWNEDBY="cdm"
-    ES_MANAGEDBY="cdm"
-fi
-
-if [ "$ES_OWNEDBY" == "unset" ] && [ "$IS_FORGEROCK" == "yes" ]; then
-    echo "please set ES_OWNEDBY for Enterprise Security Tag Rules"
-    exit 1
-fi
-if [ "$ES_MANAGEDBY" == "unset" ] && [ "$IS_FORGEROCK" == "yes" ]; then
-    echo "Please set ES_MANAGEDBY for Enterprise Security Tag Rules" 
-    exit 1
-fi
 
 if [ -z "$REGION" ]; then
   echo "Please set region in your gcloud config 'gcloud config set compute/region <region>' or in <my-cluster>.sh";
@@ -67,14 +63,6 @@ DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 # Create a separate node pool for ds
 CREATE_DS_POOL="${CREATE_DS_POOL:-false}"
 ADDITIONAL_OPTS=""
-
-# myname-<firstname>-<lastname>.  For example “openam-john-doe” or “benchmark-cluster-john-doe”
-
-if [ "$IS_FORGEROCK" == "yes" ];
-then
-    ASSET_LABELS="--labels es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
-    ADDITIONAL_OPTS+="${ASSET_LABELS} "
-fi
 
 # Get current user
 CREATOR="${USER:-unknown}"

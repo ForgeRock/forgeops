@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Script to create an AKS cluster. 
+# Script to create an AKS cluster.
 # The values below can be overridden by copying and sourcing an environment variable script. For example:
 # - `cp mini.sh my-cluster.sh`
 # - `source my-cluster.sh && ./cluster-up.sh`
@@ -7,6 +7,34 @@
 
 set -o errexit
 set -o pipefail
+
+# set empty var
+ASSET_LABELS=""
+#####
+# Code for ForgeRock staff only
+#####
+FO_ENV=${FO_ENV:-env}
+# Load and enforce tags
+cd "$(dirname "$0")" && . ../../bin/lib-entsec-asset-tag-policy.sh
+if [[ -f $HOME/.forgeops.${FO_ENV}.sh ]];
+then
+    . $HOME/.forgeops.${FO_ENV}.sh
+fi
+IS_FORGEROCK=$(IsForgeRock)
+if [ "$IS_FORGEROCK" == "yes" ];
+then
+    if ! EnforceEntSecTags;
+    then
+        echo "ForgeRock staff are required to have tags that meet Enterprise Security rules."
+        echo "Please review $HOME/.forgeops.${FO_ENV}.sh"
+        echo "If this isn't applicable run with the environment variable IS_FORGEROCK=no"
+        exit 1
+    fi
+    ASSET_LABELS=",es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
+fi
+#####
+# End code for ForgeRock staff only
+#####
 
 ######### GLOBAL VARS #########
 # Get the default region
@@ -19,6 +47,8 @@ CREATOR="${USER:-unknown}"
 # Labels can not contain dots that may be present in the user.name
 CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
+CLUSTER_TAGS="createdby=${CREATOR}${ASSET_LABELS}"
+
 ######### CLUSTER VARS #########
 # Cluster name.
 NAME=${NAME:-small}
@@ -27,10 +57,10 @@ NAME=${NAME:-small}
 ADMIN_USERNAME=${ADMIN_USERNAME:-"forgerock"}
 
 # Name of container registry used by cluster
-if [[ -z $ACR_NAME ]]; then 
+if [[ -z $ACR_NAME ]]; then
   echo "Set the value of the ACR_NAME environment variable to the name of your ACS container registry."
   echo "$ export ACR_NAME=my-container-registry"
-  exit 1 
+  exit 1
 fi
 
 ACR_NAME=${ACR_NAME}
@@ -69,12 +99,12 @@ if [ "$CREATE_DS_POOL" == "false" ]; then
   PRIMARY_POOL_LABELS="${PRIMARY_POOL_LABELS} ${DS_POOL_LABELS}"
 fi
 
-# By default we disable autoscaling for CDM. If you wish to use autoscaling, 
+# By default we disable autoscaling for CDM. If you wish to use autoscaling,
 # uncomment the following and adjust min/max-count as required:
 #AUTOSCALE="--enable-cluster-autoscaler --min-count 1 --max-count 3"
 
 # Check user is signed into Azure
-authn=$(az ad signed-in-user show | grep userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
+authn=$(az ad signed-in-user show | grep -i userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
 echo -e "\n\nYou are authenticated and logged into Azure as ${authn}.\n"
 
 # Creating resource group
@@ -92,10 +122,9 @@ az aks create \
     --node-vm-size "$VM_SIZE" \
     --node-osdisk-size 100 \
     --node-count "$NODE_COUNT" \
-    --nodepool-labels $PRIMARY_POOL_LABELS \
     --nodepool-name "prim${NAME}" \
-    --nodepool-tags "createdby=${CREATOR}" \
-    --tags "createdby=${CREATOR}"  \
+    --nodepool-tags "${CLUSTER_TAGS}" \
+    --tags "${CLUSTER_TAGS}"  \
     --enable-addons "monitoring" \
     --generate-ssh-keys \
     --network-plugin "azure" \
@@ -115,7 +144,8 @@ if [ "$CREATE_DS_POOL" == "true" ]; then
       --node-vm-size "$DS_VM_SIZE" \
       --node-taints "WorkerDedicatedDS=true:NoSchedule" \
       --labels $DS_POOL_LABELS \
-      --tags "createdby=${CREATOR}"  \
+      --nodepool-tags "${CLUSTER_TAGS}" \
+      --tags "${CLUSTER_TAGS}"  \
       --zones 3
 fi
 
