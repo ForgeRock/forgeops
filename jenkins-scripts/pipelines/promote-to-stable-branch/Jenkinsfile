@@ -43,6 +43,7 @@ def jobProperties = [
         booleanParam(name: 'PIT2_Perf_am_access_token', defaultValue: true, description: 'approx 2h30mins'),
         booleanParam(name: 'PIT2_Perf_idm_crud', defaultValue: true, description: 'approx 2h30mins'),
         booleanParam(name: 'PIT2_Platform_UI', defaultValue: platformUiDefaultValue, description: platformUIDescription),
+        booleanParam(name: 'PIT2_IDCloud', defaultValue: true, description: 'approx 10mins<br>Tests are run against static tenant')
     ])
 ]
 
@@ -103,7 +104,9 @@ timestamps {
                 upgradeTests = load("${stagesLocation}/pit2-upgrade-tests.groovy")
                 perfTests = load("${stagesLocation}/pit2-perf-tests.groovy")
                 platformUiTests = load("${stagesLocation}/pit2-platform-ui-tests.groovy")
+                idCloudTests = load("${stagesLocation}/pit2-idcloud-tests.groovy")
                 pit2Tests = load("${stagesLocation}/pit2-all-tests.groovy") // combines Greenfield, Upgrade, Perf, Platform UI
+                
 
                 promoteToStableBranch = load("${stagesLocation}/promote-to-stable-branch.groovy")
 
