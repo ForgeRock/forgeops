@@ -46,7 +46,7 @@ def kubectl(command):
 # The amster job always pauses - to wait for files to be uploaded, or to wait for files to be downloaded.
 def launch_amster_job(kustomize_path):
     # Surpress the output so we don't log errors in case the job does not exist.
-    subprocess.run('kubectl {namespace} delete job amster',
+    subprocess.run(f'kubectl {namespace} delete job amster',
                    shell=True, capture_output=True)
     print("starting the amster job")
     subprocess.run(
