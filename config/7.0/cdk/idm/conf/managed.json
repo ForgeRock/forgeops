@@ -658,14 +658,12 @@
                         "isVirtual" : false
                     },
                     "ownerOfOrg" : {
-                        "description" : null,
                         "title" : "Organizations I Own",
                         "viewable" : true,
                         "searchable" : false,
                         "userEditable" : false,
                         "policies" : [ ],
                         "returnByDefault" : false,
-                        "minLength" : null,
                         "type" : "array",
                         "items" : {
                             "type" : "relationship",
@@ -705,15 +703,12 @@
                         }
                     },
                     "adminOfOrg" : {
-                        "description" : null,
                         "title" : "Organizations I Administer",
                         "viewable" : true,
                         "searchable" : false,
                         "userEditable" : false,
                         "policies" : [ ],
                         "returnByDefault" : false,
-                        "minLength" : null,
-                        "pattern" : null,
                         "type" : "array",
                         "items" : {
                             "type" : "relationship",
@@ -753,15 +748,12 @@
                         }
                     },
                     "memberOfOrg" : {
-                        "description" : null,
                         "title" : "Organizations to which I Belong",
                         "viewable" : true,
                         "searchable" : false,
                         "userEditable" : false,
                         "policies" : [ ],
                         "returnByDefault" : false,
-                        "minLength" : null,
-                        "pattern" : null,
                         "type" : "array",
                         "items" : {
                             "type" : "relationship",
@@ -806,8 +798,6 @@
                         "viewable" : false,
                         "searchable" : false,
                         "userEditable" : false,
-                        "description" : null,
-                        "minLength" : null,
                         "isVirtual" : true,
                         "returnByDefault" : true,
                         "queryConfig" : {
@@ -1258,7 +1248,6 @@
                                 }
                             ]
                         },
-                        "description" : null,
                         "notifyRelationships" : ["children"]
                     },
                     "admins" : {
@@ -1306,7 +1295,6 @@
                                 }
                             ]
                         },
-                        "description" : null,
                         "notifyRelationships" : ["children"]
                     },
                     "members" : {
@@ -1353,8 +1341,7 @@
                                     }
                                 }
                             ]
-                        },
-                        "description" : null
+                        }
                     },
                     "parent" : {
                         "title" : "Parent Organization",
@@ -1408,8 +1395,6 @@
                         "userEditable" : false,
                         "policies" : [ ],
                         "returnByDefault" : false,
-                        "minLength" : null,
-                        "pattern" : null,
                         "type" : "array",
                         "items" : {
                             "type" : "relationship",
@@ -1455,8 +1440,6 @@
                         "viewable" : false,
                         "searchable" : false,
                         "userEditable" : false,
-                        "description" : null,
-                        "minLength" : null,
                         "isVirtual" : true,
                         "returnByDefault" : true,
                         "queryConfig" : {
@@ -1475,8 +1458,6 @@
                         "viewable" : false,
                         "searchable" : false,
                         "userEditable" : false,
-                        "description" : null,
-                        "minLength" : null,
                         "isVirtual" : true,
                         "returnByDefault" : true,
                         "queryConfig" : {
@@ -1495,8 +1476,6 @@
                         "viewable" : false,
                         "searchable" : false,
                         "userEditable" : false,
-                        "description" : null,
-                        "minLength" : null,
                         "isVirtual" : true,
                         "returnByDefault" : true,
                         "queryConfig" : {
@@ -1515,8 +1494,6 @@
                         "viewable" : false,
                         "searchable" : false,
                         "userEditable" : false,
-                        "description" : null,
-                        "minLength" : null,
                         "isVirtual" : true,
                         "returnByDefault" : true,
                         "queryConfig" : {
@@ -1535,8 +1512,6 @@
                         "viewable" : false,
                         "searchable" : false,
                         "userEditable" : false,
-                        "description" : null,
-                        "minLength" : null,
                         "isVirtual" : true,
                         "returnByDefault" : true,
                         "queryConfig" : {
