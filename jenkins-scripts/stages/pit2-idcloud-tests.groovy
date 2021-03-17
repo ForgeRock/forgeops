@@ -26,19 +26,15 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
-                       withCredentials([string(credentialsId: 'idc-tenant-passwprd', variable: 'TENANT_PASS')]) {
-                            def config = [
-                                TESTS_SCOPE                     : 'tests/pit1',
-                                STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                                EXT_FORGEOPS_PATH               : forgeopsPath,
-                                REPORT_NAME_PREFIX              : normalizedStageName,
-                                TENANT                          : 'openam-pitperf-tests',
-                                TENANT_USER                     : 'pavel.balcarek@forgerock.com',
-                                TENANT_PASSWORD                 : "${TENANT_PASS}"
-                            ]
+                        def config = [
+                            TESTS_SCOPE                     : 'tests/pit1',
+                            STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
+                            EXT_FORGEOPS_PATH               : forgeopsPath,
+                            REPORT_NAME_PREFIX              : normalizedStageName,
+                            TENANT                          : 'openam-pitperf-tests',
+                        ]
 
-                            withGKESpyglaasNoStages(config)
-                        }    
+                        withGKESpyglaasNoStages(config)
                     }
 
                     return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)

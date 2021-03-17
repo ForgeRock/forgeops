@@ -24,7 +24,7 @@ void runStage(pipelineRun) {
         parallelTestsMap += ['Platform UI': { platformUiTests.runStage(pipelineRun) }]
     }
     if (params.PIT2_IDCloud.toBoolean()) {
-        parallelTestsMap += ['IDCloud': idCloudTests.runStage(pipelineRun)]
+        parallelTestsMap += ['IDCloud': { idCloudTests.runStage(pipelineRun) }]
     }
     
     parallel parallelTestsMap
