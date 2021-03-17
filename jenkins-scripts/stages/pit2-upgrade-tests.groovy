@@ -22,8 +22,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     def stagesCloud = [:]
                     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
-                    dashboard_utils.determineUnitOutcome(stagesCloud[initialSubStageName]) {
-                        def config_common = [
+                    dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
+                        def config = [
                                 TESTS_SCOPE                                     : 'tests/pit1',
                                 UPGRADE_FIRST                                   : true,
                                 CLUSTER_DOMAIN                                  : 'pit-24-7.forgeops.com',

@@ -16,7 +16,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('google-cloud') {
+        // TODO: To update to use 'pit2-idcloud' once RELENG-1165 is done
+        node('pit2-upgrade') {
             stage(stageName) {
                 def forgeopsPath = localGitUtils.checkoutForgeops()
 

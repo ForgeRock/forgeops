@@ -28,6 +28,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         try {
             stage(stageName) {
+                // TODO: To update to use 'pit2-platform-ui' once RELENG-1165 is done
                 node('pit2-upgrade') {
                     def forgeopsPath = localGitUtils.checkoutForgeops()
 
