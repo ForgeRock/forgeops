@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # List of realm entities to export.
-realmEntities="OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity"
+realmEntities="OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications"
 
 # Create a temporary export folder.
 rm -fr /var/tmp/amster

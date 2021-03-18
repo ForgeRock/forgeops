@@ -18,9 +18,10 @@ parser_import = subparser.add_parser(
     'import', help='import json configuration files into AM')
 parser_import.add_argument('src', help='Source file or directory to import')
 parser_export = subparser.add_parser('export', help='Export files from amster')
+parser_export.add_argument('--global', dest='glob', action='store_true', help='Include the global/ configuration in the amster export')
+
 parser_export.add_argument(
     'dst', help='destination directory to export files to')
-
 
 args = parser.parse_args()
 
@@ -102,13 +103,17 @@ if args.cmd == 'export':
     print(f'started amster pod {pod}. Giving amster time to export')
     # TODO: Find a more robust method to check status
     time.sleep(10)
-    kubectl(f'cp {pod}:/var/tmp/amster {args.dst}')
+    # If args.glob is True, copy the realm AND global data
+    if args.glob:
+        kubectl(f'cp {pod}:/var/tmp/amster {args.dst}')
+    else:
+        kubectl(f'cp {pod}:/var/tmp/amster/realms {args.dst}/realms')
 
     if not os.listdir(args.dst):
         print('No files found. Will leave amster pod running!')
         sys.exit(1)
 
     # delete the amster job - this will terminate the sleeping pod as well.
-    subprocess.run(f'kubectl {namespace} delete job amster --force',
-                   shell=True, capture_output=True)
+    # subprocess.run(f'kubectl {namespace} delete job amster --force',
+    #                shell=True, capture_output=True)
     sys.exit(0)
