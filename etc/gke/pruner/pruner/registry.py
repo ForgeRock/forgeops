@@ -122,7 +122,11 @@ def filter_forgerock_io_digests(repo, digests):
 def filter_engineeringpit_digests(repo, digests):
     """Returns a dictionary of digests to prune; keys are the digests, values are that digest's tags
     """
-    filtered = filter_digests_by_tags_age(digests, '-stable', ENGINEERING_PIT_MAX_AGE)
+    filtered = {}
+    for digest_id, digest_meta in digests.items():
+        if '-stable' not in digest_meta['tag']:  # NEVER delete anything tagged with '*-stable'
+            if image_is_stale(digest_id, digest_meta, ENGINEERING_PIT_MAX_AGE):
+                filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)
     log.info(f'found {num_digests} to prune')
     return filtered
