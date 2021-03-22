@@ -42,7 +42,7 @@ patches:
 #     - op: "add"
 #       path: "/spec/template/spec/containers/0/env/-"
 #       value:
-#         name: "PLATFORM_TRUST_TRANSACTIONHEADER"
+#         name: "PLATFORM_TRUST_TRANSACTION_HEADER"
 #         value: "true"
 # ###############################################
 #                     WARNING
