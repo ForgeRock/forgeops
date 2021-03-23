@@ -125,7 +125,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --subnetwork "$SUB_NETWORK" \
     --default-max-pods-per-node "110" \
     --no-enable-master-authorized-networks \
-    --addons HorizontalPodAutoscaling,ConfigConnector \
+    --addons HorizontalPodAutoscaling,ConfigConnector,GcePersistentDiskCsiDriver \
     --workload-pool "$PROJECT.svc.id.goog" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
     $ADDITIONAL_OPTS  # Note: Do not quote this variable. It needs to expand
@@ -161,6 +161,16 @@ parameters:
 provisioner: kubernetes.io/gce-pd
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
+EOF
+
+# Create the volume snapshot class
+kubectl create -f - <<EOF
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshotClass
+metadata:
+  name: ds-snapshot-class
+driver: pd.csi.storage.gke.io
+deletionPolicy: Delete
 EOF
 
 # Create prod namespace for sample CDM deployment
