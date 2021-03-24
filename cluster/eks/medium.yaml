@@ -7,6 +7,12 @@ metadata:
   version: "1.18"
   tags:
     forgerock.io/cluster: "cdm-medium"
+    # ES_USEREMAIL: ${ES_USEREMAIL}
+    # ES_ZONE: ${ES_ZONE}
+    # ES_BUSINESSUNIT: ${ES_BUSINESSUNIT}
+    # BILLING_ENTITY: ${BILLING_ENTITY}
+    # ES_OWNEDBY: ${ES_OWNEDBY}
+    # ES_MANAGEDBY: ${ES_MANAGEDBY}
 
 vpc:
   clusterEndpoints:
@@ -28,7 +34,7 @@ nodeGroups:
       withAddonPolicies:
         autoScaler: true
         certManager: true
-    labels: 
+    labels:
       frontend: "true"
       ds: "true"
       forgerock.io/cluster: "cdm-medium"
@@ -36,10 +42,16 @@ nodeGroups:
     tags:
       forgerock.io/cluster: "cdm-medium"
       forgerock.io/role: "primary"
+      # ES_USEREMAIL: ${ES_USEREMAIL}
+      # ES_ZONE: ${ES_ZONE}
+      # ES_BUSINESSUNIT: ${ES_BUSINESSUNIT}
+      # BILLING_ENTITY: ${BILLING_ENTITY}
+      # ES_OWNEDBY: ${ES_OWNEDBY}
+      # ES_MANAGEDBY: ${ES_MANAGEDBY}
     privateNetworking: true
     ssh:
       # eksctl will use your default public key (e.a. $HOME/.ssh/id_rsa.pub) if no path is provided
-      # publicKeyPath: 
+      # publicKeyPath:
       allow: true
   # - name: ds
   #   instanceType: c5.4xlarge
@@ -47,17 +59,17 @@ nodeGroups:
   #   maxSize: 6
   #   desiredCapacity: 6
   #   volumeSize: 80
-  #   labels: 
+  #   labels:
   #     ds: "true"
   #     forgerock.io/cluster: "cdm-medium"
   #     forgerock.io/role: "ds"
   #   tags:
   #     forgerock.io/cluster: "cdm-medium"
   #     forgerock.io/role: "ds"
-  #   taints: 
+  #   taints:
   #     WorkerDedicatedDS: true:NoSchedule
   #   privateNetworking: true
   #   ssh:
   #     # eksctl will use your default public key (e.a. $HOME/.ssh/id_rsa.pub) if no path is provided
-  #     # publicKeyPath: 
+  #     # publicKeyPath:
   #     allow: true

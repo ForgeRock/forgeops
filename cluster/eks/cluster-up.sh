@@ -69,8 +69,59 @@ fi
 # Get values from yaml file
 cluster_name=$(grep -A1 '^metadata:$' $file | tail -n1 | awk '{ print $2 }')
 region=$(grep -A2 'metadata:' $file | tail -n1 | awk '{ print $2 }')
+#####
+# Code for ForgeRock staff only
+#####
+FO_ENV=${FO_ENV:-env}
+# Load and enforce tags
+cd "$(dirname "$0")" && . ../../bin/lib-entsec-asset-tag-policy.sh
+if [[ -f $HOME/.forgeops.${FO_ENV}.sh ]];
+then
+    . $HOME/.forgeops.${FO_ENV}.sh
+fi
 
-
+IS_FORGEROCK=$(IsForgeRock)
+if [ "$IS_FORGEROCK" == "yes" ];
+then
+    if ! EnforceEntSecTags;
+    then
+        echo "ForgeRock staff are required to have tags that meet Enterprise Security rules."
+        echo "Please review $HOME/.forgeops.${FO_ENV}.sh"
+        echo "If this isn't applicable run with the environment variable IS_FORGEROCK=no"
+        exit 1
+    fi
+    # Check for template tool
+    envsubst_installed=no
+    if command -v envsubst &> /dev/null;
+    then
+        envsubst_installed=yes
+    fi
+    # Check for tags being set
+    tags_set=no
+    if ! grep -q '${ES_ZONE}' ${file};
+    then
+        tags_set=yes
+    fi
+    # Print message and exit since we can't really help
+    if [[ "$tags_set" == "no" ]] && [[ "$envsubst_installed" == "no" ]];
+    then
+        echo "EntSec tags dont' appear to be configured, please make sure they are set"
+        echo "Couldn't find envsubst. Can't generate profile"
+        echo "Manually change the config examples are found in the current ${file}";
+        exit 1
+    fi
+    if [[ "$tags_set" == "no" ]] && [[ "$envsubst_installed" == "yes" ]];
+    then
+        new_conf_name=fr-${file}
+        cat "${file}" | envsubst > "${new_conf_name}"
+        echo "Found envsubst. Generating EntSec tag profile for you review tag values in ${new_conf_name} and uncomment as required"
+        echo "Then run $0 ${new_conf_name}"
+        exit 1
+    fi
+fi
+#####
+# End code for ForgeRock staff only
+#####
 
 
 echo "Creating EKS cluster..."
