@@ -1,0 +1,462 @@
+= Deploy DS on GKE Multi-cluster Services (MCS)
+
+:description: Deploy DS on GKE Multi-cluster Services. Step-by-step solution to make fully meshed replication, +
+needed for HA of DS, work on GKE multi-cluster level.
+:library: Asciidoctor
+ifdef::asciidoctor[]
+:source-highlighter: coderay
+endif::asciidoctor[]
+:idprefix:
+:stylesheet: asciidoc.css
+//:backend: docbook45
+//:backend: html5
+//:doctype: book
+//:sectids!:
+//:plus: &#43;
+
+These instructions show how to deploy a multi-region DS solution that spans two GKE clusters from different
+regions using MCS.
+
+This solution allows pods in one GKE cluster to discover pods in another GKE cluster simplifying configuration by automating creation of external DNS and firewall rules.
+
+NOTE: We will use the standard stateful applications (DS-CTS & DS-IDREPO) to deploy in each of the 2 GKE clusters and
+scale them out and back using native Cloud Console Kubernetes scaling approach.
+
+
+[[introduction,Introduction]]
+== Introduction
+
+For DS replication to work properly, the following criteria must be met:
+
+. [[introduction-topology, Introduction point 1]]All servers in the topology must be able to connect to each
+other; their network must be routed.
+. [[introduction-FQDN, Introduction point 2]]FQDNs must be unique and resolvable by all servers.
+. [[introduction-server-id, Introduction point 3: unique server ID in topology]]The server ID assigned to each server
+in the topology must be
+unique.
+. [[introduction-bootstrap, Introduction point 4: bootstrap RS servers]]The DS replication bootstrap server settings
+must include at least one server from each cluster in the topology.
+. [[introduction-certificates, Introduction point 5]]The certificates used to establish server identities must be
+verifiable,
+by using
+the
+same CA or by properly
+configuring the keystores.
+
+The method described in this document explains how to put in place a configuration according to the requirements.
+
+[[prerequisites,Prerequisites]]
+== Prerequisites
+
+* [[prerequisites-mcs-cluster-requirements, Prerequisites point 1]]2 GKE clusters running version 1.18.12+ with the following configuration: 
+** Provisioned in the same VPC network
+** VPC-native
+** Workload Identity enabled
+
+NOTE: this was the version used; the configuration might work on 1.17 or earlier)
+
+* [[prerequisites-same-namespace, Prerequisites point 2]]Same namespace name on both GKE clusters (Ex. +multi-region+)
+
+NOTE: This restriction is imposed by the +secret-agent+ solution used to retrieve DS certificates.
+For an alternative DS certificates storage/reconciliation solution, this restriction may not apply.
+
+* [[prerequisites-nodes, Prerequisites point 3]]2+ nodes in each GKE cluster for tests to scale out/scale back
+
+NOTE: tested configuration: the node pool with 2 machines of +e2-standard-8+ type (8 vCPU, 32 GB memory)
+
+* Skaffold v1.19.0+
+* Google Cloud SDK v331.0.0
+* APIs required for MCS
+
+```
+gcloud services enable gkehub.googleapis.com --project <my-project-id>
+gcloud services enable dns.googleapis.com --project <my-project-id>
+gcloud services enable trafficdirector.googleapis.com --project <my-project-id>
+gcloud services enable cloudresourcemanager.googleapis.com --project <my-project-id>
+```
+
+== Limitations
+Currently MCS only configures a single DNS entry for a headless service which returns all pod IPs so it is not possible to address Pods individually (unless logic is added to DS to work with the returned pod IPs).  This means that a Kubernetes service is required for each DS pod in each cluster. This works for a couple of Pods but would not work for large numbers of pods.  This is on MCS roadmap to address.
+
+[[enable-MCS,Enabling MCS]]
+== 1. Enabling MCS
+To enable MCS, please complete the following steps:
+
+[[create-ILB,Create internal load balancers in clusters]]
+=== a. Enable the MCS API
+```
+gcloud services enable multiclusterservicediscovery.googleapis.com \
+    --project <my-project-id>
+```
+
+=== b. Enable the MCS feature
+```
+gcloud alpha container hub multi-cluster-services enable \
+    --project <my-project-id>
+```
+
+=== c. Register your clusters to an environ
+```
+gcloud container hub memberships register <membership name> \
+   --gke-cluster <zone>/<cluster-name> \
+   --enable-workload-identity
+```
+NOTE: Choose a membership name to uniquely identify the cluster)
+
+=== d. Grant the required IAM permissions for MCS Importer
+```
+gcloud projects add-iam-policy-binding <my-project-id> \
+    --member "serviceAccount:<my-project-id>.svc.id.goog[gke-mcs/gke-mcs-importer]" \
+    --role "roles/compute.networkViewer"
+```
+
+=== e. Verify MCS is enabled
+```
+gcloud alpha container hub multi-cluster-services describe
+```
+look for `lifecycleState: ENABLED` in output
+
+[[configure-sa,Configure secret agent parameters]]
+== 2. Configure secret agent parameters
+
+If your DS installation is not using the +secret-agent+ operator as a manager of certificates for server identity
+verification  as mentioned in xref:introduction-certificates[], you can skip this step.
+
+The +multi-region-secrets/kustomization.yaml+ below was changed:
+
+. +secretsManagerPrefix+ is changed to ensure uniqueness of stored secrets
+. +secretsManager+ is changed to +GCP+ as a chosen Cloud Provider
+. +gcpProjectID+ is changed in order to be able to use Secret Manager API
+
+****
+multi-region-secrets/kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/multi-region-secrets/kustomization.yaml[(latest version)]
+```yaml
+resources:
+  - ../../../base/secrets
+
+patchesStrategicMerge:
+  - |-
+    #Patch the SAC
+    apiVersion: secret-agent.secrets.forgerock.io/v1alpha1
+    kind: SecretAgentConfiguration
+    metadata:
+      name: forgerock-sac
+    spec:
+      appConfig:
+        secretsManagerPrefix: "multi-region"
+        secretsManager: GCP # none, AWS, Azure, or GCP
+        gcpProjectID: engineering-devops
+```
+****
+
+[[configure-service-export-object,Configure ServiceExport objects]]
+== 3. Configure ServiceExport objects
+MCS requires a Kubernetes service that can be exposed externally to other clusters for multi cluster communication.
+As mentioned in the limitations section, a separate Kubernetes service is required for each DS pod in the cluster for replication between clusters.
+
+To expose a service so that it can made available to other member clusters, you need to create a ServiceExport object for each Service.  The metadata.name must match the name of the Service.  If you have Services for idrepo-0 and idrepo-1 then you'll need a ServiceExport object for each.
+
+****
+us-export.yaml https://github.com/ForgeRock/forgeops/tree/master/etc/multi-region/mcs/files/us-export.yaml[(latest version)]
+```yaml
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: prod
+ name: ds-r-idrepo-0-us
+spec:
+ ports:
+ - name: replication
+   port: 8989
+   protocol: TCP
+---
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: prod
+ name: ds-r-cts-0-us
+spec:
+ ports:
+ - name: replication
+   port: 8989
+   protocol: TCP
+```
+****
+
+The ServiceExport objects must be deployed first as they take approximately 5 minutes to sync to clusters registered in your environ. 
+
+In US cluster:
+```
+kubectl create -f etc/multi-region/mcs/files/us-export.yaml 
+```
+
+In EU cluster:
+```
+kubectl create -f etc/multi-region/mcs/files/eu-export.yaml 
+```
+Once created, the following domain name resolves to the exported service from any pod in any environ cluster:
+
+```
+SERVICE_EXPORT_NAME.NAMESPACE.svc.clusterset.local
+```
+
+[[setup-DS,Setup DS configuration]]
+== 4. Setup DS
+Both DS-CTS and DS-IDREPO will be deployed on 2 clusters to simulate the ForgeRock stack.
+
+This uses a ForgeOps configuration based on:
+
+* Kustomize - a standalone tool to customize Kubernetes objects through a `kustomization.yaml` file
+
+* Skaffold - a command line tool that facilitates continuous development for Kubernetes applications, handles the
+workflow for building, pushing and deploying your application.
+
+The examples show how to configure DS to be deployed on the US cluster. Apply a similar configuration for
+the other cluster.
+
+=== a. Configure replication services
+As mentioned in section 3, a Kubernetes service is required for each DS Pod. So that a service can be mapped directly to a Pod, we need to provide a pod-name selector as demonstrated below.
+
+The service name identifies the Pod(idrepo-0) and the cluster's region(us)
+****
+service.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs/service.yaml[(latest version)]
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-r-idrepo-0-us
+  labels:
+    component: ds
+spec:
+  clusterIP: None
+  ports:
+  - name: replication
+    port: 8989
+  selector:
+    statefulset.kubernetes.io/pod-name: ds-idrepo-0
+```
+****
+
+Equivalent services are required for each replica so if you require 2 idrepos you need a service called ds-r-idrepo-1-us with the correct pod-name selector.
+
+The same is required for the Europe cluster just changing _us_ for _eu_ in the service name.
+
+=== b. Docker configuration 
+*Configure server ID*
+
+To fulfill xref:introduction-server-id[] and configure a unique server ID inside the topology,
+the following change is made to +docker-entrypoint.sh+:
+
+* the server ID is computed using the hostname and the default DS service name(not the replication Service) defined in the current cluster (Ex. for FQDN +*ds-cts-0.ds-cts-us*.prod.svc.cluster.local+ the server ID will be
++*ds-cts-0_ds-cts-us*+).
+
+In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace
+
+****
+```
+export DS_SERVER_ID=${DS_SERVER_ID:-${HOSTNAME:-localhost}}`
+```
+****
+
+with 
+
+****
+```
+export DS_SERVER_ID=${DS_SERVER_ID:-$(hostname -f | awk -F. '{printf("%s_%s", $1, $2)}')}
+```
+****
+
+*Configure advertised listen address*
+
+Because we've added an additional layer to our replication topology by adding the replication Service, we need to change the advertised listen address to match the replication service rather than the current hostname(ds-idrepo-0.ds-idrepo-us) otherwise each RS server will receive communication from the replication service but will recognise the pod by the hostname which will break replication.  
+
+In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace:
+
+****
+```
+export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -f)}
+``` 
+****
+
+with:
+
+****
+```
+export ID=$(hostname -f | awk -F- '{printf($3)}' | cut -c1)
+export TYPE=$(hostname -f | awk -F- '{printf($2)}')
+export DS_ADVERTISED_LISTEN_ADDRESS=ds-r-${TYPE}-${ID}-${REGION}.prod.svc.clusterset.local
+```
+****
+
+*Copy docker-entrypoint.sh into Dockerfile*
+
+
+Configure the DS Dockerfiles to copy the docker-entrypoint.sh script into DS by adding the following line:
+****
+docker/7.0/ds/cts/Dockerfile, docker/7.0/ds/idrepo/Dockerfile
+```
+COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
+```
+****
+
+*Provide region variable*
+
+At docker build time, we currently don't have anyway of identifying which region we're building the docker image for, so we pass in the region as a build argument via the Skaffold profile(see below).
+
+****
+skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(latest version)]
+```
+- name: multi-region-ds-us
+  build:
+    artifacts:
+      ...
+      docker:
+        buildArgs:
+          region: "us"
+        dockerfile: idrepo/Dockerfile
+      ...
+```
+****
+
+See section D to implement the full Skaffold profiles
+
+=== c. Prepare Kustomize definitions
+
+*Make DS server ID unique*
+
+To make the server ID of each pod in our topology unique, the DS internal service name must contain a cluster specific suffix.  This is done by making the following change in the `kustomization.yaml` in each of the region's Kustomize overlay folders.
+
+****
+kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs-us/kustomization.yaml[(latest version)]
+```
+patches:
+     - target:
+         kind: Service
+         name: ds-cts
+       patch: |-
+         - op: replace
+           path: /metadata/name
+           value: ds-cts-us
+```
+****
+
+*Update bootstrap servers*
+
+Update the name of the bootstrap servers for each DS to include 1 local DS server and 1 DS server from the other cluster(EU).  Bootstrap FQDN: 
+
+`<replication_service>.<namespace>.svc.clusterset.local:8989` 
+
+Example below shows change for CTS.
+
+****
+kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs-us/kustomization.yaml[(latest version)]
+```
+patchesStrategicMerge:
+      - |-
+        #Patch DS CTS
+        apiVersion: apps/v1
+        kind: StatefulSet
+        metadata:
+          name: ds-cts
+        spec:
+          template:
+            spec:
+              subdomain: ds-cts-us
+              containers:
+                - name: ds
+                  env:
+                    - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+                      value: ds-r-cts-0-us.prod.svc.clusterset.local:8989,ds-r-cts-0-eu.prod.svc.clusterset.local:8989
+```
+****
+
+=== d. Prepare Skaffold profiles
+Add following profile to the `skaffold.yaml`. Repeat for EU switching `us` for `eu`
+
+****
+skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(latest version)]
+```
+# Multi-region DS : US profile
+- name: multi-region-ds-us
+  build:
+    artifacts:
+      - image: ds-cts
+        context: docker/7.0/ds
+        docker:
+          buildArgs:
+            region: "us"
+          dockerfile: cts/Dockerfile
+      - image: ds-idrepo
+        context: docker/7.0/ds
+        docker:
+          buildArgs:
+            region: "us"
+          dockerfile: idrepo/Dockerfile
+    tagPolicy:
+      sha256: { }
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/multi-region/mcs-us
+```
+****
+
+=== e. Deploy Skaffold profiles
+
+Once the configuration for all clusters is in place, you can start the topology. Below is an example of Skaffold command to run the pre-configured profile.
+
+Deploy to US:
+```
+skaffold run --profile multi-region-ds-us
+```
+
+And for EU:
+```
+skaffold run --profile multi-region-ds-eu
+```
+[[load-tests,Run load tests]]
+=== 5. Load tests
+
+=== a. Addrate load test
+
+Some basic load was added on a deployment consisting of three replicated servers, one in Europe and two in the US clusters, just to make sure the setup did not have any major problems, independently of absolute numbers.
+The `addrate` load was tested on the server in Europe (`ds-r-cts-0-eu`)
+on CTS-like entries for 30mins.
+A screenshot from Grafana shows the behaviour of the two servers in the US (`ds-r-cts-0-us` and `ds-r-cts-1-us`):
+
+image::addrate-30mins.png[]
+
+Both US servers are closely following the client load demonstrated by the low replication delay. There are some outliers but replication recovers easily.
+
+Greater testing was carried out on the kube-dns solution and results were comparable.  Please see that documentation for more in depth test results on addrate and modrate.
+
+[[pricing,Pricing]]
+== 6. Pricing
+
+The only additional costs are CloudDNS costs for the dynamically generated DNS records.
+
+== 6. Pros and Cons
+
+|===
+|Pros |Cons
+
+|1. Native Kubernetes solution: only modifies K8S objects
+|1. Few parameters to customize in _Dockerfile_, _docker-entrypoint.sh_, _kustomization.yaml_, _skaffold.yaml_
+
+|2. Simple installation: automatic generation of DNS records and firewall rules
+|2. Currently MCS can't return dns records for pods.  Current solution requires a service per pod(on MCS roadmap)
+
+|3. Scale out/scale back using Kubernetes: no additional administration
+|3. Additional service layer required for replication which requires altering the Advertised Listen Address to match
+
+|4. Explicit naming allows quick identification of servers (Ex: `ds-r-cts-0-us.<namespace>.clusterset.local`)
+|4. MCS managed Services generate healthchecks which are based on the service endpoint which requires a client secret.  This currently fails as the healthcheck is unconfigurable
+
+|5. No additional scripts required
+|
+
+|6. Supported by Google.
+|
+
+|7. So far, tests are reassuring: replication latency is acceptable
+|
+|===

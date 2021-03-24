@@ -1,0 +1,23 @@
+# Deploys multi-region DS: secrets
+# The namespace must match namespace used for multi-region-ds profiles
+namespace: multi-region
+resources:
+  - ../../../base/secrets
+
+patchesStrategicMerge:
+  - |-
+    #Patch the SAC
+    apiVersion: secret-agent.secrets.forgerock.io/v1alpha1
+    kind: SecretAgentConfiguration
+    metadata:
+      name: forgerock-sac
+    spec:
+      appConfig:
+        # To have an unique name in the secret manager
+        secretsManagerPrefix: "multi-region"
+        # A cloud provider's secret manager is the source of truth.
+        # If secrets don't exist, they are generated and stored in the manager.
+        secretsManager: GCP # none, AWS, Azure, or GCP
+        gcpProjectID: engineering-devops
+
+

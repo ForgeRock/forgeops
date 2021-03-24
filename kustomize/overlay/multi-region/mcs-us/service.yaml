@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-r-idrepo-0-us
+  labels:
+    component: ds
+spec:
+  clusterIP: None
+  ports:
+  - name: replication
+    port: 8989
+  selector:
+    statefulset.kubernetes.io/pod-name: ds-idrepo-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-r-cts-0-us
+  labels:
+    component: ds
+spec:
+  clusterIP: None
+  ports:
+  - name: replication
+    port: 8989
+  selector:
+    statefulset.kubernetes.io/pod-name: ds-cts-0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-r-idrepo-1-us
+  labels:
+    component: ds
+spec:
+  clusterIP: None
+  ports:
+  - name: replication
+    port: 8989
+  selector:
+    statefulset.kubernetes.io/pod-name: ds-idrepo-1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-r-cts-1-us
+  labels:
+    component: ds
+spec:
+  clusterIP: None
+  ports:
+  - name: replication
+    port: 8989
+  selector:
+    statefulset.kubernetes.io/pod-name: ds-cts-1

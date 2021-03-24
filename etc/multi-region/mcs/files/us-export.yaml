@@ -1,0 +1,39 @@
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: lee
+ name: ds-r-idrepo-0-us
+spec:
+ ports:
+ - name: replication
+   port: 8989
+---
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: lee
+ name: ds-r-cts-0-us
+spec:
+ ports:
+ - name: replication
+   port: 8989
+---
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: lee
+ name: ds-r-idrepo-1-us
+spec:
+ ports:
+ - name: replication
+   port: 8989
+---
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: lee
+ name: ds-r-cts-1-us
+spec:
+ ports:
+ - name: replication
+   port: 8989
