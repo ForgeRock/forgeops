@@ -116,7 +116,7 @@
         }
       ],
       "actions": [],
-      "filter": "/parent pr or /children pr"
+      "filter": "/parent pr or /children/0 pr"
     },
     {
       "name": "owner-view-update-delete-admins-and-members",
@@ -354,7 +354,7 @@
         }
       ],
       "actions": [],
-      "filter": "/memberOfOrg pr and /adminOfOrg pr and !(/ownerOfOrg pr)"
+      "filter": "/memberOfOrg/0 pr and /adminOfOrg/0 pr and !(/ownerOfOrg pr)"
     },
     {
       "name": "admin-view-update-delete-orgs",
@@ -472,7 +472,7 @@
         }
       ],
       "actions": [],
-      "filter": "/parent pr or /children pr"
+      "filter": "/parent pr or /children/0 pr"
     },
     {
       "name": "admin-view-update-delete-members",
@@ -710,7 +710,7 @@
         }
       ],
       "actions": [],
-      "filter": "/memberOfOrg pr and !(/adminOfOrg pr) and !(/ownerOfOrg pr)"
+      "filter": "/memberOfOrg/0 pr and !(/adminOfOrg pr) and !(/ownerOfOrg pr)"
     }
   ]
 }
