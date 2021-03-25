@@ -1,6 +1,6 @@
 # Utility ds image for testing, benchmarking, etc.
 # Also useful as a general purpose debugging tool
-FROM gcr.io/forgerock-io/ds/pit1:7.1.0-398888af2cbca3e64a84b1d86314a49d9a37b9ee
+FROM gcr.io/forgerock-io/ds/pit1:7.1.0-1846e79931e4a57731b358fb964805a0af295d06
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
