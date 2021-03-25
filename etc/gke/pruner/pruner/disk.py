@@ -5,6 +5,8 @@ import logging
 
 import googleapiclient.discovery
 
+log_level = os.environ.get('LOG_LEVEL', 'INFO')
+logging.basicConfig(stream=sys.stdout, level=log_level)
 log = logging.getLogger('disk-pruner')
 log.info('initializing disk pruner')
 
@@ -68,3 +70,6 @@ def prune_disks():
         return False
     log.info(f'pruned {delete_size_total} Gb')
     return True
+
+if __name__ == '__main__':
+    prune_disks()
