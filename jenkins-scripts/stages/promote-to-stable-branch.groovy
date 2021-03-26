@@ -79,7 +79,7 @@ private void promoteForgeOpsCommitToStable() {
             "git checkout ${STABLE_BRANCH}",
             // merge the temporary branch to stable; it contains the source+target branch merge commit
             "git merge --ff-only ${LOCAL_DEV_BRANCH}",
-            'git push'
+            "git push origin ${STABLE_BRANCH}"
     )
 }
 
