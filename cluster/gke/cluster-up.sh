@@ -18,13 +18,13 @@ if [[ -f $HOME/.forgeops.${FO_ENV}.sh ]];
 then
     . $HOME/.forgeops.${FO_ENV}.sh
 fi
-is_fr_staff=$(IsForgeRock)
-if [ "$is_fr_staff" == "yes" ];
+IS_FORGEROCK=$(IsForgeRock)
+if [ "$IS_FORGEROCK" == "yes" ];
 then
     if ! EnforceEntSecTags;
     then
         echo "ForgeRock staff are required to have tags that meet Enterprise Security rules."
-        echo "Please review $HOME/.forgeops.${ENV}.sh"
+        echo "Please review $HOME/.forgeops.${FO_ENV}.sh"
         echo "If this isn't applicable run with the environment variable IS_FORGEROCK=no"
         exit 1
     fi
