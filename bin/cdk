@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+import time
 from urllib import request
 import utils
 
@@ -93,10 +94,35 @@ def deploy_quickstart(ns, fqdn, tag):
     utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
     utils.message('\nRemoving "amster" deployment.')
     uninstall_component('amster', ns)
+    utils.message('\nWaiting for IDM deployment to become available. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} rollout status --watch statefulset idm --timeout=300s')
     utils.message('\nDeploying UI.')
     deploy_component('ui', ns, fqdn, tag)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
+
+def overlay_app_configs(ns, am=True, idm=True):
+    """Overlay local configs in the AM and IDM pods"""
+    config_profile_path = os.path.join(sys.path[0], '../config', '7.0', 'cdk')
+    if am:
+        am_config_path = os.path.join(config_profile_path, 'am', 'config')
+        _, am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
+                                      cstdout=True)
+        am_pod_name = am_pod_name.decode('ascii')
+        utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
+        utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
+    if idm:
+        idm_pod_name = 'idm-0' # This will change when we change idm to a k8s deployment
+        idm_config_path = os.path.join(config_profile_path, 'idm', 'conf')
+        utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
+        utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
+
+    utils.message('Waiting 30 Secs for git-sync event before restarting AM and IDM pods')
+    time.sleep(32) #git-sync event occurs every 30 secs
+    if am:
+        utils.run('kubectl', f'-n jcastillo exec {am_pod_name}  -c openam  -- kill 1')
+    if idm:
+        utils.run('kubectl', f'-n jcastillo exec {idm_pod_name} -c openidm -- kill 1')
 
 def install_dependencies():
     """Check and install dependencies"""
@@ -141,6 +167,7 @@ def main():
     parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
 
     _, ctx_namespace, _ = utils.run('kubectl',
@@ -156,6 +183,9 @@ def main():
     if args.cmd == 'info':
         utils.printsecrets(namespace)
         utils.printurls(namespace)
+        return
+    if args.cmd == 'config':
+        overlay_app_configs(namespace)
         return
     if args.cmd is None:
         parser.print_help()
@@ -175,6 +205,9 @@ def main():
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
         deploy_quickstart(namespace, fqdn, tag)
+        if tag is None:
+            print()
+            overlay_app_configs(namespace)
     else:
         for c in components:
             deploy_component(c, namespace, fqdn, tag)
