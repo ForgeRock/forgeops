@@ -1,223 +1,128 @@
-#!/usr/bin/python3
-'''This script deploys the ForgeRock Identity Plaform components to Kubernetes.'''
+#!/usr/bin/env python3
+"""This script deploys the ForgeRock Identity Plaform components to Kubernetes."""
 
 import argparse
 import os
-import subprocess
 import sys
-import time
 from urllib import request
-from threading import Thread
-
-CYAN = '\033[1;96m'
-YELLOW = '\033[2;93m'
-RED = '\033[1;91m'
-ENDC = '\033[0m'
-def message(s): print(f"{CYAN}{s}{ENDC}")
-def error(s): print(f"{RED}{s}{ENDC}")
-def warning(s): print(f"{YELLOW}{s}{ENDC}")
-
-def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None):
-    '''rC runs a given command. Raises error if command returns non-zero code'''
-    runcmd = f'{cmd} {" ".join(cmdArgs)}'
-    stde_pipe = subprocess.PIPE if cstderr else None
-    stdo_pipe = subprocess.PIPE if cstdout else None
-    _r = subprocess.run(runcmd.split(), stdout=stdo_pipe, stderr=stde_pipe,
-                        check=True, input=stdin, cwd=cwd)
-    return _r.returncode == 0, _r.stdout, _r.stderr
+import utils
 
 def get_component_url(component, tag):
-    '''Calculates the target URL of the desired component'''
-    if tag == "latest":
-        return f"https://github.com/ForgeRock/forgeops/releases/latest/download/{component}.yaml"
-    return f"https://github.com/ForgeRock/forgeops/releases/download/{tag}/{component}.yaml"
+    """Calculates the target URL of the desired component"""
+    if tag == 'latest':
+        return f'https://github.com/ForgeRock/forgeops/releases/latest/download/{component}.yaml'
+    return f'https://github.com/ForgeRock/forgeops/releases/download/{tag}/{component}.yaml'
 
-def deployrepomanifest(component, ns, tag, fqdn):
-    '''Deploy the component using released manifest'''
+def deploy_repo_manifest(component, ns, tag, fqdn):
+    """Deploy the component using released manifest"""
     component_url = get_component_url(component, tag)
     try:
         with request.urlopen(component_url, timeout=5) as r:
             contents = r.read().decode('ascii')
-            contents = contents.replace("namespace: default", f"namespace: {ns}")
-            contents = contents.replace("default.iam.example.com", f"{fqdn}")
-            run("kubectl", f"-n {ns} apply -f -", stdin=bytes(contents, 'ascii'))
+            contents = contents.replace('namespace: default', f'namespace: {ns}')
+            contents = contents.replace('default.iam.example.com', f'{fqdn}')
+            utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
     except Exception as e:
-        print(f"Could not deploy {component_url}. Got: {e}")
+        print(f'Could not deploy {component_url}. Got: {e}')
         sys.exit(1)  # Hide python traceback. kubectl error should be enough here
 
-def deploylocalmanifest(component, ns, fqdn):
-    '''Deploy local component (local mode)'''
+def deploy_local_manifest(component, ns, fqdn):
+    """Deploy local component (local mode)"""
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    image_defaulter = os.path.join(kustomize_dir, "dev", "image-defaulter")
-    run("kustomize", "edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*",
-        cwd=image_defaulter)
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+              cwd=image_defaulter)
     bundles = {
-        "base": ["dev/kustomizeConfig", "base/secrets", "base/7.0/ingress", "base/git-server", "dev/scripts"],
-        "ds": ["base/ds-idrepo"],
-        "apps": ["base/amster", "dev/am", "dev/idm", "base/rcs-agent"],
-        "ui": ["base/admin-ui", "base/end-user-ui", "base/login-ui"],
-        "am": ["dev/am"],
-        "idm": ["dev/idm"]
+        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/7.0/ingress', 'base/git-server', 'dev/scripts'],
+        'ds': ['base/ds-idrepo'],
+        'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
+        'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
+        'am': ['dev/am'],
+        'idm': ['dev/idm']
     }
-    components_to_install = bundles.get(component, [f"base/{component}"])
+    components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
-        run("kustomize", f"edit add resource ../../../kustomize/{c}", cwd=image_defaulter)
-    _, contents, _ = run("kustomize", f"build {image_defaulter}", cstdout=True)
+        utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+    _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
     contents = contents.decode('ascii')
-    contents = contents.replace("namespace: default", f"namespace: {ns}")
-    contents = contents.replace("default.iam.example.com", f"{fqdn}")
-    run("kubectl", f"-n {ns} apply -f -", stdin=bytes(contents, 'ascii'))
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    contents = contents.replace('default.iam.example.com', f'{fqdn}')
+    utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
     # Clean out the temp kustomize files
-    run("kustomize", "edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*",
-        cwd=image_defaulter)
+    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+              cwd=image_defaulter)
 
-def deploycomponent(component, ns, fqdn, tag):
-    '''Deploy the Component manifest'''
+def deploy_component(component, ns, fqdn, tag):
+    """Deploy the Component manifest"""
     if tag:
-        deployrepomanifest(component, ns, tag, fqdn)
+        deploy_repo_manifest(component, ns, tag, fqdn)
         return
-    deploylocalmanifest(component, ns, fqdn)
+    deploy_local_manifest(component, ns, fqdn)
 
-def uninstallcomponent(component, ns):
-    '''Uninstall a manifest'''
-    component_url = get_component_url(component, "latest")
+def uninstall_component(component, ns):
+    """Uninstall a manifest"""
+    component_url = get_component_url(component, 'latest')
     try:
         with request.urlopen(component_url, timeout=5) as r:
             contents = r.read().decode('ascii')
-            contents = contents.replace("namespace: default", f"namespace: {ns}")
-            run("kubectl", f"-n {ns} delete --ignore-not-found=true -f -",
-                stdin=bytes(contents, 'ascii'))
-            if component in ["base", "quickstart"]:
-                run("kubectl", f"-n {ns} delete pvc --all --ignore-not-found=true")
+            contents = contents.replace('namespace: default', f'namespace: {ns}')
+            utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -',
+                      stdin=bytes(contents, 'ascii'))
+            if component in ['base', 'quickstart']:
+                utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
     except Exception as e:
-        print(f"Could not delete {component}. Got: {e}")
+        print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
 
-def deployquickstart(ns, fqdn, tag):
-    '''Deploy the quickstart'''
-    message("Deploying base.yaml. This is a one time activity.")
-    deploycomponent("base", ns, fqdn, tag)
-    message("\nDeploying ds.yaml. This is includes all directory resources.")
-    deploycomponent("ds", ns, fqdn, tag)
-    message("\nWaiting for git-server and DS pods to come up. This can take several minutes.")
-    run("kubectl", f"-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s")
-    run("kubectl", f"-n {ns} rollout status --watch statefulset ds-idrepo --timeout=300s")
-    message("\nDeploying AM and IDM.")
-    deploycomponent("apps", ns, fqdn, tag)
-    message("\nWaiting for AM deployment to become available. This can take several minutes.")
-    run("kubectl", f"-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s")
-    message("\nWaiting for amster job to complete. This can take several minutes.")
-    run("kubectl", f"-n {ns} wait --for=condition=complete job/amster --timeout=600s")
-    message("\nRemoving \"amster\" deployment.")
-    uninstallcomponent("amster", ns)
-    message("\nDeploying UI.")
-    deploycomponent("ui", ns, fqdn, tag)
-    # message("\nWaiting for UI pods to become ready")
-    # run("kubectl", f"-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s")
+def deploy_quickstart(ns, fqdn, tag):
+    """Deploy the quickstart"""
+    utils.message('Deploying base.yaml. This is a one time activity.')
+    deploy_component('base', ns, fqdn, tag)
+    utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
+    deploy_component('ds', ns, fqdn, tag)
+    utils.message('\nWaiting for git-server and DS pods to come up. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s')
+    utils.run('kubectl', f'-n {ns} rollout status --watch statefulset ds-idrepo --timeout=300s')
+    utils.message('\nDeploying apps.')
+    deploy_component('apps', ns, fqdn, tag)
+    utils.message('\nWaiting for AM deployment to become available. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
+    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+    utils.message('\nRemoving "amster" deployment.')
+    uninstall_component('amster', ns)
+    utils.message('\nDeploying UI.')
+    deploy_component('ui', ns, fqdn, tag)
+    # message('\nWaiting for UI pods to become ready')
+    # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
-def getsec(ns, secret, secretKey):
-    '''Get secret contents'''
-    _, pipe, _ = run(
-        "kubectl", f'-n {ns} get secret {secret} -o jsonpath={{.data.{secretKey}}}', cstdout=True)
-    _, pipe, _ = run("base64", "--decode", cstdout=True, stdin=pipe)
-    return pipe.decode('ascii')
-
-def _waitforsecret(ns, secret_name):
-    print(f"waiting for secret: {secret_name} .", end="")
-    sys.stdout.flush()
-    while True:
-        try:
-            run("kubectl", f"-n {ns} get secret {secret_name}", cstderr=True, cstdout=True)
-            print("done")
-            break
-        except Exception as _:
-            print(".", end="")
-            sys.stdout.flush()
-            time.sleep(1)
-            continue
-
-def _runwithtimeout(target, args, secs):
-    t = Thread(target=target, args=args)
-    t.start()
-    t.join(timeout=secs)
-    if t.is_alive():
-        print(f"{target} timed out after {secs} secs")
-        sys.exit(1)
-
-def waitforsecrets(ns):
-    '''wait for the given secrets to exist in the k8s api'''
-    secrets = ["am-env-secrets", "idm-env-secrets",
-               "rcs-agent-env-secrets", "ds-passwords", "ds-env-secrets"]
-    message("\nWaiting for K8s secrets.")
-    for secret in secrets:
-        _runwithtimeout(_waitforsecret, [ns, secret], 60)
-
-def printsecrets(ns):
-    '''print relevant platform secrets'''
-    message("\nRelevant passwords:")
+def install_dependencies():
+    """Check and install dependencies"""
+    print('Checking secret-agent operator and related CRDs:', end=' ')
     try:
-        print(f'{getsec(ns, "am-env-secrets", "AM_PASSWORDS_AMADMIN_CLEAR")} (amadmin user)')
-        print(f'{getsec(ns, "idm-env-secrets", "OPENIDM_ADMIN_PASSWORD")} (openidm-admin user)')
-        print(f'{getsec(ns, "rcs-agent-env-secrets", "AGENT_IDM_SECRET")} (rcs-agent IDM secret)')
-        print(f'{getsec(ns, "rcs-agent-env-secrets", "AGENT_RCS_SECRET")} (rcs-agent RCS secret)')
-        print('{} (uid=admin user)'.format(getsec(ns, "ds-passwords", "dirmanager\\.pw"))) #f'strings' do not allow "\"
-        print(f'{getsec(ns, "ds-env-secrets", "AM_STORES_APPLICATION_PASSWORD")} (App str svc acct (uid=am-config,ou=admins,ou=am-config))')
-        print(f'{getsec(ns, "ds-env-secrets", "AM_STORES_CTS_PASSWORD")} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))')
-        print(f'{getsec(ns, "ds-env-secrets", "AM_STORES_USER_PASSWORD")} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))')
+        utils.run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
+                  cstderr=True, cstdout=True)
     except Exception as _e:
-        sys.exit(1)
-
-def printurls(ns):
-    '''print relevant platform URLs'''
-    message("\nRelevant URLs:")
-    _, fqdn, _ = run("kubectl", f"-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}", cstdout=True)
-    fqdn = fqdn.decode('ascii')
-    warning(f"https://{fqdn}/platform")
-    warning(f"https://{fqdn}/admin")
-    warning(f"https://{fqdn}/am")
-    warning(f"https://{fqdn}/enduser")
-
-def installDependencies():
-    '''Check and install dependencies'''
-    secretagent_url = "https://github.com/ForgeRock/secret-agent/releases/latest/download/secret-agent.yaml"
-    dsoperator_url = "https://github.com/ForgeRock/ds-operator/releases/latest/download/ds-operator.yaml"
-    print("Checking secret-agent operator and related CRDs:", end=" ")
-    try:
-        run("kubectl", "get crd secretagentconfigurations.secret-agent.secrets.forgerock.io",
-            cstderr=True, cstdout=True)
-    except Exception as _e:
-        warning("secret-agent CRD not found. Installing secret-agent.")
-        run("kubectl", f"-n secret-agent-system apply -f {secretagent_url}")
-        print("Waiting for secret agent operator...")
-        time.sleep(5)
-        run("kubectl", "wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s")
-        run("kubectl", "-n secret-agent-system wait --for=condition=available deployment  --all --timeout=120s")
-        run("kubectl", "-n secret-agent-system wait --for=condition=ready pod --all --timeout=120s")
-        print()
+        utils.warning('secret-agent CRD not found. Installing secret-agent.')
+        utils.secretagent('apply')
     else:
-        message("secret-agent CRD found in cluster.")
+        utils.message('secret-agent CRD found in cluster.')
 
-    print("Checking ds-operator and related CRDs:", end=" ")
+    print('Checking ds-operator and related CRDs:', end=' ')
     try:
-        run("kubectl", "get crd directoryservices.directory.forgerock.io", cstderr=True, cstdout=True)
+        utils.run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
     except Exception:
-        warning("ds-operator CRD not found. Installing ds-operator.")
-        run("kubectl", f"-n fr-system apply -f {dsoperator_url}")
-        print("Waiting for ds-operator...")
-        time.sleep(5)
-        run("kubectl", "wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s")
-        run("kubectl", "-n fr-system wait --for=condition=available deployment  --all --timeout=120s")
-        run("kubectl", "-n fr-system wait --for=condition=ready pod --all --timeout=120s")
+        utils.warning('ds-operator CRD not found. Installing ds-operator.')
+        utils.dsoperator('apply')
     else:
-        message("ds-operator CRD found in cluster.")
+        utils.message('ds-operator CRD found in cluster.')
     print()
 
 def main():
-    '''main'''
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument('-n', '--namespace', default="",
+    common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
     common.add_argument('components', nargs='*')
     parser = argparse.ArgumentParser(
@@ -225,61 +130,61 @@ def main():
     subparser = parser.add_subparsers(dest='cmd', required=True)
     parser_install = subparser.add_parser('install', parents=[common],
                                           help='Install the platform components or component bundles using local manifests')
-    parser_install.add_argument("-f", "--fqdn", dest='fqdn',
+    parser_install.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
-    parser_install.add_argument("--stable", dest='stable', action='store_true',
+    parser_install.add_argument('--stable', dest='stable', action='store_true',
                                 help='Install the platform using latest stable manifests. You can set the release tag using --tag')
-    parser_install.add_argument("-t", "--tag", dest='tag', default='latest',
+    parser_install.add_argument('-t', '--tag', dest='tag', default='latest',
                                 help='Select the forgeops tag to install when using --stable (default: latest)')
     parser_delete = subparser.add_parser(
         'delete', parents=[common], help='Delete ForgeRock Platform components or component bundles')
-    parser_delete.add_argument("-y", "--yes", dest="skip_confirmation", action='store_true',
-                                help="Skip delete confirmation")
+    parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
+                               help='Skip delete confirmation')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     args = parser.parse_args()
 
-    _, ctx_namespace, _ = run(
-        "kubectl", "config view --minify --output=jsonpath={..namespace}", cstdout=True)
-    ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else "default"
+    _, ctx_namespace, _ = utils.run('kubectl',
+                                    'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
     namespace = args.namespace or ctx_namespace
-    components = args.components if getattr(args, 'components', None) else ["quickstart"]
-    fqdn = args.fqdn if getattr(args, 'fqdn', None) else f"{namespace}.iam.example.com"
+    components = args.components if getattr(args, 'components', None) else ['quickstart']
+    fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
     stable = getattr(args, 'stable', None)
     tag = getattr(args, 'tag', None) if stable else None
     if stable:
-        warning(f"Using 'stable' images and k8s manifests as specified in ForgeRock/forgeops '{tag}' release")
-    if args.cmd == "info":
-        printsecrets(namespace)
-        printurls(namespace)
-        return None
+        utils.warning(f'Using "stable" images and k8s manifests as specified in ForgeRock/forgeops "{tag}" release')
+    if args.cmd == 'info':
+        utils.printsecrets(namespace)
+        utils.printurls(namespace)
+        return
     if args.cmd is None:
         parser.print_help()
         sys.exit(1)
-    if args.cmd == "delete":
-        message(f"Uninstalling component(s): {components}")
+    if args.cmd == 'delete':
+        utils.message(f'Uninstalling component(s): {components}')
         if not args.skip_confirmation:
-            if input("OK to delete these components? [Y/N] ").lower() not in ['yes', 'y']:
+            if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
                 return
-        if 'base' in components: #delete "base" last
+        if 'base' in components: #delete 'base' last
             components.append(components.pop(components.index('base')))
         for c in components:
-            uninstallcomponent(c, namespace)
-        return None
+            uninstall_component(c, namespace)
+        return
 
-    installDependencies()
-    message(f"Installing component(s): {components}\n")
-    if "quickstart" in components:
-        deployquickstart(namespace, fqdn, tag)
+    install_dependencies()
+    utils.message(f'Installing component(s): {components}\n')
+    if 'quickstart' in components:
+        deploy_quickstart(namespace, fqdn, tag)
     else:
         for c in components:
-            deploycomponent(c, namespace, fqdn, tag)
+            deploy_component(c, namespace, fqdn, tag)
 
-    if args.cmd == "install" and ("base" in components or "quickstart" in components):
-        waitforsecrets(namespace)
-        printsecrets(namespace)
-        printurls(namespace)
+    if args.cmd == 'install' and ('base' in components or 'quickstart' in components):
+        utils.waitforsecrets(namespace)
+        utils.printsecrets(namespace)
+        utils.printurls(namespace)
     print('\nEnjoy your deployment!')
-    return None
+    return
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

@@ -108,6 +108,11 @@ if [[ "$#" > 0 ]]; then
             ;;
     esac
 else
+    echo $'\e[5;31m'
+    echo "**********************************************************************************"
+    echo "*********THIS SCRIPT IS DEPRECATED. USE bin/print-secrets INSTEAD*****************"
+    echo "**********************************************************************************"
+    echo $'\e[0m'
     echo ""  
     echo "Administrator passwords:"
     echo ""  
