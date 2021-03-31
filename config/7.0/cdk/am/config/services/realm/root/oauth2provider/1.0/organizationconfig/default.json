@@ -79,7 +79,7 @@
       "tlsOcspResponderUri" : null,
       "tlsOcspResponderCert" : null,
       "allowedAudienceValues" : [
-
+        
       ]
     },
     "coreOIDCConfig" : {
@@ -126,12 +126,16 @@
         "PS512",
         "RS512"
       ],
-      "oidcClaimsScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5"
+      "oidcClaimsScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
+      "overrideableOIDCClaims" : [
+        
+      ],
+      "oidcDiscoveryEndpointEnabled" : true
     },
     "advancedOIDCConfig" : {
       "storeOpsTokens" : true,
       "defaultACR" : [
-
+        
       ],
       "supportedRequestParameterEncryptionEnc" : [
         "A256GCM",
@@ -151,7 +155,9 @@
         "A192CBC-HS384",
         "A256CBC-HS512"
       ],
-      "authorisedIdmDelegationClients" : ["idm-provisioning"],
+      "authorisedIdmDelegationClients" : [
+        "idm-provisioning"
+      ],
       "alwaysAddClaimsToToken" : false,
       "supportedUserInfoSigningAlgorithms" : [
         "ES384",
@@ -244,7 +250,8 @@
         "PS512",
         "RS512"
       ],
-      "loaMapping" : { }
+      "loaMapping" : { },
+      "includeAllKtyAlgCombinationsInJwksUri" : false
     },
     "clientDynamicRegistrationConfig" : {
       "dynamicClientRegistrationSoftwareStatementRequired" : false,

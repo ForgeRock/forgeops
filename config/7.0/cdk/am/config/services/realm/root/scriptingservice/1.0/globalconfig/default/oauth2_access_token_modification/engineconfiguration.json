@@ -85,7 +85,12 @@
       "java.util.Collections$EmptyList",
       "java.lang.Object",
       "java.util.HashMap$Node",
-      "org.forgerock.oauth2.core.StatefulAccessToken"
+      "org.forgerock.oauth2.core.StatefulAccessToken",
+      "java.util.HashMap$KeySet",
+      "java.net.URI",
+      "org.forgerock.oauth2.core.GrantType",
+      "java.util.Collections$UnmodifiableSet",
+      "java.util.Collections$UnmodifiableMap"
     ],
     "_id" : "default/OAUTH2_ACCESS_TOKEN_MODIFICATION/engineConfiguration",
     "maxThreads" : 50,

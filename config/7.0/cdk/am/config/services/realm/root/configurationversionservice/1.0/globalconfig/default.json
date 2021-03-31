@@ -22,7 +22,7 @@
       "collection" : false
     },
     "_id" : "default",
-    "configurationVersion" : "2.0.0.0",
-    "configurationCommit" : "7ea3c53727096e7531085e84f5603338d8e67c9e"
+    "configurationVersion" : "3.0.0.1",
+    "configurationCommit" : "1c17cc27b8237484b5c7b49ccabfd712da0c0f3e"
   }
 }

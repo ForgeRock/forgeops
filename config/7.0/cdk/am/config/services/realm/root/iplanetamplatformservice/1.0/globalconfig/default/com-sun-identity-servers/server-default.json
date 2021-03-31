@@ -239,7 +239,14 @@
       "org.forgerock.services.resourcesets.store.ssl.enabled=&{am.stores.uma.ssl.enabled|false}",
       "org.forgerock.services.cts.store.max.connections=66",
       "com.iplanet.am.buildRevision=e1f90a9775698f1ff471c70f9e4e476a81318494",
-      "openam.retained.http.headers=X-DSAMEVersion"
+      "openam.retained.http.headers=X-DSAMEVersion",
+      "openam.oauth2.client.jwt.encryption.algorithm.allow.list=RSA-OAEP,RSA-OAEP-256,ECDH-ES",
+      "org.forgerock.openam.httpclienthandler.system.clients.response.timeout=10 seconds",
+      "org.forgerock.openam.httpclienthandler.system.clients.reuse.connections.enabled=true",
+      "org.forgerock.openam.httpclienthandler.system.clients.retry.failed.requests.enabled=true",
+      "org.forgerock.openam.httpclienthandler.system.clients.max.connections=64",
+      "org.forgerock.openam.httpclienthandler.system.clients.connection.timeout=10 seconds",
+      "org.forgerock.openam.httpclienthandler.system.clients.pool.ttl=-1"
     ],
     "siteId" : null,
     "serverconfigxml" : null,

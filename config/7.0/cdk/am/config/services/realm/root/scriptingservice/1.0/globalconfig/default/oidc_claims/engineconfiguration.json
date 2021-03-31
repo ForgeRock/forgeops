@@ -81,7 +81,12 @@
       "java.lang.Object",
       "java.util.HashMap$Node",
       "org.forgerock.openam.oauth2.token.macaroon.MacaroonAccessToken",
-      "org.forgerock.macaroons.Macaroon"
+      "org.forgerock.macaroons.Macaroon",
+      "java.util.HashMap$KeySet",
+      "java.net.URI",
+      "org.forgerock.oauth2.core.GrantType",
+      "java.util.Collections$UnmodifiableSet",
+      "java.util.Collections$UnmodifiableMap"
     ],
     "_id" : "default/OIDC_CLAIMS/engineConfiguration",
     "maxThreads" : 50,
