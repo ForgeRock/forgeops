@@ -1,45 +1,14 @@
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
+commonLabels:
+  app.kubernetes.io/name: am
+  app.kubernetes.io/instance: am
+  app.kubernetes.io/component: am
+  app.kubernetes.io/part-of: forgerock
+  tier: middle
+  app: am
 resources:
-- ../am
-
-patchesStrategicMerge:
-- |-
-  #Patch AM
-  apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    name: am
-  spec:
-    replicas: 1
-    template:
-      spec:
-        containers:
-        - name: openam
-          volumeMounts:
-           - name: truststore
-             mountPath: /var/run/secrets/truststore
-           - name: am-secrets
-             mountPath: /var/run/secrets/am
-           - name: amster-key
-             mountPath: /var/run/secrets/amster
-        volumes:
-         - name: am-secrets
-           projected:
-             sources:
-             - secret:
-                name: am-passwords
-             - secret:
-                 name: am-keystore
-         - name: amster-keys
-           secret:
-             secretName: amster
-         - name: amster-key
-           secret:
-             secretName: amster
-             items:
-             - key: id_rsa.pub
-               path: authorized_keys
-         - name: truststore
-           secret:
-             secretName: truststore
+- deployment.yaml
+- service.yaml
+# Need k8s 1.18+ to enable HPA
+# - hpa.yaml

@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: am
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: am
+  template:
+    metadata:
+      labels:
+        app: am
+    spec:
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 0
+      initContainers:
+      # This init container copies the "immutable" configuration from the Docker image
+      # to shared volume that is mounted by the am container. Putting this on an emptyDir volume
+      # preserves configuration across pod restarts (for example, if AM crashes or suffers an OOM kill from k8s).
+      # This is most useful in development environments, so users do not lose their changes if the pod restarts.
+      - name: fbc-init
+        image: am
+        volumeMounts:
+        - mountPath: /fbc
+          name: fbc
+        command:
+        - /bin/bash
+        - -c
+        - |
+          if [ -d /fbc/.git ];
+          then
+            echo "Existing openam configuration found. Skipping copy"
+          else
+            echo "Copying docker image configuration files to the shared volume"
+            cd /home/forgerock/openam
+            cp -r .git .homeVersion * /fbc
+          fi
+      containers:
+      - name: openam
+        image: am
+        imagePullPolicy: IfNotPresent
+        command:
+          - bash
+          - /home/forgerock/docker-entrypoint.sh
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: AM_STORES_SSL_ENABLED
+          value: "false"
+        - name: TRUSTSTORE_PATH
+          value: /var/run/secrets/truststore/cacerts
+        - name: TRUSTSTORE_PASSWORD
+          value: changeit
+        - name: AM_STORES_USER_TYPE
+          value: LDAPv3ForForgeRockIAM
+        envFrom:
+        - secretRef:
+            name: am-env-secrets
+        - configMapRef:
+            name: platform-config
+        - secretRef:
+            name: amster-env-secrets # Needed for public amster key
+        - secretRef:
+            name: ds-env-secrets # passwords for cts, userstore, etc
+        livenessProbe:
+          httpGet:
+            path: /am/json/health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /am/json/health/ready
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 2000Mi
+          requests:
+            memory: 1800Mi
+            cpu: 250m
+        volumeMounts:
+        - name: truststore
+          mountPath: /var/run/secrets/truststore
+        - name: am-secrets
+          mountPath: /var/run/secrets/am
+        - name: amster-key
+          mountPath: /var/run/secrets/amster
+        - name: fbc
+          mountPath: /home/forgerock/openam
+      terminationGracePeriodSeconds: 10
+      # Shared volume that holds the AM configuration.
+      volumes:
+      - name: fbc
+        emptyDir: {}
+      - name: am-secrets
+        projected:
+          sources:
+          - secret:
+              name: am-passwords
+          - secret:
+              name: am-keystore
+      - name: amster-key
+        secret:
+          secretName: amster
+          items:
+          - key: id_rsa.pub
+            path: authorized_keys
+      - name: truststore
+        secret:
+          secretName: truststore
