@@ -23,8 +23,18 @@ import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-
 def pipelineRun
+
+def jobProperties = [
+    disableConcurrentBuilds(),
+    buildDiscarder(logRotator(numToKeepStr: '20')),
+    parameters([
+        booleanParam(name: 'PerfSprintRelease_authn_rest', defaultValue: true, description: 'approx 6h'),
+        booleanParam(name: 'PerfSprintRelease_access_token', defaultValue: true, description: 'approx 6h'),
+        booleanParam(name: 'PerfSprintRelease_platform', defaultValue: true, description: 'approx 6h'),
+        booleanParam(name: 'PerfSprintRelease_simple_managed_users', defaultValue: true, description: 'approx 6h'),
+    ])
+]
 
 if (env.TAG_NAME) {
     currentBuild.result = 'ABORTED'
@@ -36,22 +46,12 @@ if (env.TAG_NAME) {
             'For support, email releng@forgerock.com'
 } else if (env.BRANCH_NAME.equals('master')) {
     // only master has a scheduled build; jobs for other branches can be launched manually
-    properties([
-            disableConcurrentBuilds(),
-            buildDiscarder(logRotator(numToKeepStr: '20'))
-    ])
+    properties(jobProperties)
 } else if (env.BRANCH_NAME.startsWith('idcloud-')) {
-    properties([
-            disableConcurrentBuilds(),
-            buildDiscarder(logRotator(numToKeepStr: '20'))
-    ])
+    properties(jobProperties)
 } else if (env.BRANCH_NAME.startsWith('paas-ga-')) {
-    properties([
-            disableConcurrentBuilds(),
-            buildDiscarder(logRotator(numToKeepStr: '20'))
-    ])
+    properties(jobProperties)
 } else {
-
     // safety guard, to prevent non-master branches from building
     currentBuild.result = 'ABORTED'
     error 'Only master PaaS release branches are allowed to run long Perf tests .\n' +
@@ -73,14 +73,29 @@ timestamps {
                 // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
                 library "QaCloudUtils@${commonModule.LODESTAR_GIT_COMMIT}"
 
+                def FORGEOPS_GIT_COMMIT = commonModule.FORGEOPS_GIT_COMMIT
+                def FORGEOPS_GIT_COMMITTER = commonModule.FORGEOPS_GIT_COMMITTER
+                def FORGEOPS_GIT_MESSAGE = commonModule.FORGEOPS_GIT_MESSAGE
+                def FORGEOPS_GIT_COMMITTER_DATE = commonModule.FORGEOPS_GIT_COMMITTER_DATE
+                def FORGEOPS_GIT_BRANCH = commonModule.FORGEOPS_GIT_BRANCH
+                def currentProductCommitHashes = commonModule.getCurrentProductCommitHashes()
+                if (commonModule.FORGEOPS_GIT_BRANCH.endsWith('-stable')) {
+                    FORGEOPS_GIT_COMMIT = sh(script: 'git rev-list --max-count 1 --skip 1 HEAD', returnStdout: true).trim()
+                    FORGEOPS_GIT_COMMITTER = sh(returnStdout: true, script: "git show ${FORGEOPS_GIT_COMMIT} -s --pretty=%cn").trim()
+                    FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: "git show ${FORGEOPS_GIT_COMMIT} -s --pretty=%s").trim()
+                    FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: "git show ${FORGEOPS_GIT_COMMIT} -s --pretty=%cd --date=iso8601").trim()
+                    FORGEOPS_GIT_BRANCH = commonModule.FORGEOPS_GIT_BRANCH.replaceAll('-stable', '')
+                    currentProductCommitHashes.forgeops = FORGEOPS_GIT_COMMIT
+                }
+
                 pipelineRun = new PipelineRunLegacyAdapter(PipelineRun.builder(env, steps)
                         .pipelineName('forgeops-perf-sprint-release')
-                        .branch(commonModule.FORGEOPS_GIT_BRANCH)
-                        .commit(commonModule.FORGEOPS_GIT_COMMIT)
-                        .commits(commonModule.getCurrentProductCommitHashes())
-                        .committer(commonModule.FORGEOPS_GIT_COMMITTER)
-                        .commitMessage(commonModule.FORGEOPS_GIT_MESSAGE)
-                        .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.FORGEOPS_GIT_COMMITTER_DATE))
+                        .branch(FORGEOPS_GIT_BRANCH)
+                        .commit(FORGEOPS_GIT_COMMIT)
+                        .commits(currentProductCommitHashes)
+                        .committer(FORGEOPS_GIT_COMMITTER)
+                        .commitMessage(FORGEOPS_GIT_MESSAGE)
+                        .committerDate(dateTimeUtils.convertIso8601DateToInstant(FORGEOPS_GIT_COMMITTER_DATE))
                         .repo('forgeops')
                         .build())
 
