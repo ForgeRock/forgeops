@@ -117,12 +117,13 @@ def overlay_app_configs(ns, am=True, idm=True):
         utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
         utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
 
-    utils.message('Waiting 30 Secs for git-sync event before restarting AM and IDM pods')
-    time.sleep(32) #git-sync event occurs every 30 secs
+    # utils.message('Waiting 30 Secs for git-sync event before restarting AM and IDM pods')
+    # time.sleep(32) #git-sync event occurs every 30 secs
+    utils.message('Restarting AM and IDM pods')
     if am:
-        utils.run('kubectl', f'-n jcastillo exec {am_pod_name}  -c openam  -- kill 1')
+        utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- kill 1')
     if idm:
-        utils.run('kubectl', f'-n jcastillo exec {idm_pod_name} -c openidm -- kill 1')
+        utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
 
 def install_dependencies():
     """Check and install dependencies"""
@@ -158,8 +159,11 @@ def main():
                                           help='Install the platform components or component bundles using local manifests')
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
-    parser_install.add_argument('--stable', dest='stable', action='store_true',
-                                help='Install the platform using latest stable manifests. You can set the release tag using --tag')
+    install_mode_group = parser_install.add_mutually_exclusive_group()                
+    install_mode_group.add_argument('--stable', dest='stable', action='store_true',
+                                    help='Install the platform using latest stable manifests. You can set the release tag using --tag')
+    install_mode_group.add_argument('--dev', dest='dev', action='store_true',
+                                    help='Install the platform using local manifests and nightly Docker images. (This is the default mode)')
     parser_install.add_argument('-t', '--tag', dest='tag', default='latest',
                                 help='Select the forgeops tag to install when using --stable (default: latest)')
     parser_delete = subparser.add_parser(
