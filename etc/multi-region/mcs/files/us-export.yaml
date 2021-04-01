@@ -1,7 +1,7 @@
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
- namespace: lee
+ namespace: prod
  name: ds-r-idrepo-0-us
 spec:
  ports:
@@ -11,7 +11,7 @@ spec:
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
- namespace: lee
+ namespace: prod
  name: ds-r-cts-0-us
 spec:
  ports:
@@ -21,7 +21,7 @@ spec:
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
- namespace: lee
+ namespace: prod
  name: ds-r-idrepo-1-us
 spec:
  ports:
@@ -31,7 +31,7 @@ spec:
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
- namespace: lee
+ namespace: prod
  name: ds-r-cts-1-us
 spec:
  ports:

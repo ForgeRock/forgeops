@@ -116,13 +116,21 @@ gcloud alpha container hub multi-cluster-services describe
 ```
 look for `lifecycleState: ENABLED` in output
 
-[[configure-sa,Configure secret agent parameters]]
-== 2. Configure secret agent parameters
+[[configure-sa,Configure secret agent]]
+== 2. Configure secret agent
 
 If your DS installation is not using the +secret-agent+ operator as a manager of certificates for server identity
 verification  as mentioned in xref:introduction-certificates[], you can skip this step.
 
-The +multi-region-secrets/kustomization.yaml+ below was changed:
+=== a. Configure access to Google Cloud Secret Manager
+
+Follow instructions to configure secret-agent to work with Workload Identity: https://github.com/ForgeRock/secret-agent#set-up-cloud-backup-with-gcp-secret-manager[(Instructions)]  
+
+This is required for both clusters to share the same secrets as required by DS.
+
+=== b. Configure secret agent properties in SAC
+
+The +multi-region-secrets/kustomization.yaml+ requires the following changes:
 
 . +secretsManagerPrefix+ is changed to ensure uniqueness of stored secrets
 . +secretsManager+ is changed to +GCP+ as a chosen Cloud Provider
@@ -219,7 +227,7 @@ As mentioned in section 3, a Kubernetes service is required for each DS Pod. So 
 
 The service name identifies the Pod(idrepo-0) and the cluster's region(us)
 ****
-service.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs/service.yaml[(latest version)]
+service.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs-us/service.yaml[(latest version)]
 ```yaml
 apiVersion: v1
 kind: Service
@@ -247,7 +255,7 @@ The same is required for the Europe cluster just changing _us_ for _eu_ in the s
 To fulfill xref:introduction-server-id[] and configure a unique server ID inside the topology,
 the following change is made to +docker-entrypoint.sh+:
 
-* the server ID is computed using the hostname and the default DS service name(not the replication Service) defined in the current cluster (Ex. for FQDN +*ds-cts-0.ds-cts-us*.prod.svc.cluster.local+ the server ID will be
+* the server ID is computed using the hostname and the default DS service name (not the replication Service) defined in the current cluster (Ex. for FQDN +*ds-cts-0.ds-cts-us*.prod.svc.cluster.local+ the server ID will be
 +*ds-cts-0_ds-cts-us*+).
 
 In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace
@@ -290,7 +298,6 @@ export DS_ADVERTISED_LISTEN_ADDRESS=ds-r-${TYPE}-${ID}-${REGION}.prod.svc.cluste
 
 *Copy docker-entrypoint.sh into Dockerfile*
 
-
 Configure the DS Dockerfiles to copy the docker-entrypoint.sh script into DS by adding the following line:
 ****
 docker/7.0/ds/cts/Dockerfile, docker/7.0/ds/idrepo/Dockerfile
@@ -298,6 +305,18 @@ docker/7.0/ds/cts/Dockerfile, docker/7.0/ds/idrepo/Dockerfile
 COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
 ```
 ****
+
+*Set region var in Dockerfile*  
+
+Add these lines anywhere in the Dockerfile
+****
+docker/7.0/ds/cts/Dockerfile, docker/7.0/ds/idrepo/Dockerfile
+```
+ARG region
+ENV REGION=$region
+```
+****
+
 
 *Provide region variable*
 

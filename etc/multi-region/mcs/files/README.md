@@ -29,7 +29,7 @@ Deploy secret-agent in each cluster:
 ```
 bin/secret-agent.sh
 ```
-Follow instructions to setup Workload Identity with secret-agent: [Instructions](https://github.com/ForgeRock/secret-agent#set-up-cloud-backup-with-gcp-secret-manager)  
+Follow instructions to configure secret-agent to work with Workload Identity: [Instructions](https://github.com/ForgeRock/secret-agent#set-up-cloud-backup-with-gcp-secret-manager)  
 <br />
 
 ## Step 3: Setup MCS
@@ -148,13 +148,18 @@ export DS_ADVERTISED_LISTEN_ADDRESS=ds-r-${TYPE}-${ID}-${REGION}.prod.svc.cluste
 
 <br />  
 
-**6. Copy custom docker-entrypoint.sh to Dockerfile**  
+**6. Update Dockerfile**  
 >`NOTE:` Required step  
-
 
 In `docker/7.0/ds/cts/Dockerfile` and `docker/7.0/ds/idrepo/Dockerfile`, add/uncomment this line
 ```
 COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
+```
+
+Also add these lines anywhere
+```
+ARG region
+ENV REGION=$region
 ```
 <br />  
 

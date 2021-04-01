@@ -1,6 +1,4 @@
 # Deploys multi-region DS: secrets
-# The namespace must match namespace used for multi-region-ds profiles
-namespace: multi-region
 resources:
   - ../../../base/secrets
 
