@@ -32,3 +32,4 @@ cue/
 .CONFIGURED
 forgeops-toolbox/
 legacy-docs/7.0/site/
+dist/

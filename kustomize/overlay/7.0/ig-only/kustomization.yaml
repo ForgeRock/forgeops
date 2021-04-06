@@ -2,4 +2,4 @@ namespace: default
 resources:
   - ../../../base/kustomizeConfig
   - ../../../base/ig
-  - ../../../base/7.0/ingress
+  - ../../../base/ingress

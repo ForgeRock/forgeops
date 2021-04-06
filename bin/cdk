@@ -35,7 +35,7 @@ def deploy_local_manifest(component, ns, fqdn):
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
     bundles = {
-        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/7.0/ingress', 'base/git-server', 'dev/scripts'],
+        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'base/git-server', 'dev/scripts'],
         'ds': ['base/ds-idrepo'],
         'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
         'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],

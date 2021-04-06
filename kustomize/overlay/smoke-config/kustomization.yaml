@@ -2,7 +2,7 @@ commonLabels:
   app.kubernetes.io/part-of: "forgerock"
 resources:
 - ../../base/kustomizeConfig
-- ../../base/7.0/ingress
+- ../../base/ingress
 
 patchesStrategicMerge:
 - |-

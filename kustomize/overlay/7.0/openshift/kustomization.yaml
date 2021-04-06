@@ -7,7 +7,7 @@ resources:
   - ../../../base/amster
   - ../../../base/idm
   - ../../../base/end-user-ui
-  - ../../../base/7.0/ingress
+  - ../../../base/ingress
   - storage.yaml
   - sa.yaml
   - scc.yaml
