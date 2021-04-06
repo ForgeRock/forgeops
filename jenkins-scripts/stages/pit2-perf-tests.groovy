@@ -15,7 +15,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def stageName = 'PIT2 Perf'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome([tags : ['PIT2', 'performance'], stageDisplayName : stageName], normalizedStageName) {
         node('perf-cloud') {
             stage(stageName) {
                 def forgeopsPath = localGitUtils.checkoutForgeops()

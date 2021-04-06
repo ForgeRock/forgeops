@@ -15,7 +15,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def stageName = 'PIT2 IDCloud'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome([tags : ['PIT2'], stageDisplayName : stageName], normalizedStageName) {
         // TODO: To update to use 'pit2-idcloud' once RELENG-1165 is done
         node('pit2-upgrade') {
             stage(stageName) {

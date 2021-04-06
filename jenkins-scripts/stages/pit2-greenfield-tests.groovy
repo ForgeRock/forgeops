@@ -15,7 +15,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def stageName = 'PIT2 Greenfield'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome([tags : ['PIT2'], stageDisplayName : stageName], normalizedStageName) {
         node('pit2-greenfield') {
             stage(stageName) {
                 def forgeopsPath = localGitUtils.checkoutForgeops()
