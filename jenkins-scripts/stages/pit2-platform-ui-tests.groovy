@@ -25,7 +25,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def reportUrl = ''
 
-    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome([tags : ['PIT2'], stageDisplayName : stageName], normalizedStageName) {
         try {
             stage(stageName) {
                 // TODO: To update to use 'pit2-platform-ui' once RELENG-1165 is done

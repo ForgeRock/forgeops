@@ -15,7 +15,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def stageName = 'PIT2 Upgrade'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+    pipelineRun.pushStageOutcome([tags : ['PIT2'], stageDisplayName : stageName], normalizedStageName) {
         node('pit2-upgrade') {
             stage(stageName) {
                 dir('lodestar') {
