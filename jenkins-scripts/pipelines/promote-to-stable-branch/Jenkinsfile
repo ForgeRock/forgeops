@@ -139,13 +139,14 @@ def manageNotifications(boolean notificationsEnabled = true, Closure body) {
     try {
         body() // perform the build
         if (notificationsEnabled) {
-            slackUtils.sendMessage(
-                slackChannel,
-                " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promoted " +
-                        "commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} " +
-                        "from ${env.BRANCH_NAME} to ${promoteToStableBranch.STABLE_BRANCH} (<${env.BUILD_URL}|Open>)",
-                slackUtils.colour('SUCCESS')
-            )
+            slackMsg = " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promoted " +
+                "commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} " +
+                "from ${env.BRANCH_NAME} to ${promoteToStableBranch.STABLE_BRANCH} (<${env.BUILD_URL}|Open>)"
+            if (!params.Promote_to_stable_branch.toBoolean()) {
+                slackMsg = " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promotion stage has been skipped " +
+                "(<${env.BUILD_URL}|Open>)"
+            }
+            slackUtils.sendMessage(slackChannel, slackMsg, slackUtils.colour('SUCCESS'))
         }
     } catch (FlowInterruptedException ex) {
         currentBuild.result = 'ABORTED'

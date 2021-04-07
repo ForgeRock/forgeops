@@ -32,7 +32,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                             EXT_FORGEOPS_PATH       : forgeopsPath,
                             CLUSTER_NAMESPACE       : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             REPORT_NAME_PREFIX      : normalizedStageName,
-                            RUN_INSIDE_CLUSTER      : true,
                         ]
 
                         withGKESpyglaasNoStages(config)
