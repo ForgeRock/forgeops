@@ -4,7 +4,6 @@
 import argparse
 import os
 import sys
-import time
 from urllib import request
 import utils
 
@@ -72,7 +71,11 @@ def uninstall_component(component, ns):
             utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -',
                       stdin=bytes(contents, 'ascii'))
             if component in ['base', 'quickstart']:
+                utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
                 utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
+            if component in ['apps', 'idm']:
+                # Temporary: only need this IDM delete until we release. Latest release idm is a statefulset
+                utils.run('kubectl', f'-n {ns} delete deployment -l app.kubernetes.io/component=idm')
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
@@ -83,19 +86,19 @@ def deploy_quickstart(ns, fqdn, tag):
     deploy_component('base', ns, fqdn, tag)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
     deploy_component('ds', ns, fqdn, tag)
-    utils.message('\nWaiting for git-server and DS pods to come up. This can take several minutes.')
+    utils.message('\nWaiting for git-server and DS deployments. This can take a few mins. First installation takes longer.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s')
     utils.run('kubectl', f'-n {ns} rollout status --watch statefulset ds-idrepo --timeout=300s')
     utils.message('\nDeploying apps.')
     deploy_component('apps', ns, fqdn, tag)
-    utils.message('\nWaiting for AM deployment to become available. This can take several minutes.')
+    utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
     utils.message('\nRemoving "amster" deployment.')
     uninstall_component('amster', ns)
-    utils.message('\nWaiting for IDM deployment to become available. This can take several minutes.')
-    utils.run('kubectl', f'-n {ns} rollout status --watch statefulset idm --timeout=300s')
+    utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=idm --timeout=600s')
     utils.message('\nDeploying UI.')
     deploy_component('ui', ns, fqdn, tag)
     # message('\nWaiting for UI pods to become ready')
@@ -112,13 +115,13 @@ def overlay_app_configs(ns, am=True, idm=True):
         utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
         utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
     if idm:
-        idm_pod_name = 'idm-0' # This will change when we change idm to a k8s deployment
         idm_config_path = os.path.join(config_profile_path, 'idm', 'conf')
+        _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
+                                       cstdout=True)
+        idm_pod_name = idm_pod_name.decode('ascii')
         utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
         utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
 
-    # utils.message('Waiting 30 Secs for git-sync event before restarting AM and IDM pods')
-    # time.sleep(32) #git-sync event occurs every 30 secs
     utils.message('Restarting AM and IDM pods')
     if am:
         utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- kill 1')
@@ -159,7 +162,7 @@ def main():
                                           help='Install the platform components or component bundles using local manifests')
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
-    install_mode_group = parser_install.add_mutually_exclusive_group()                
+    install_mode_group = parser_install.add_mutually_exclusive_group()
     install_mode_group.add_argument('--stable', dest='stable', action='store_true',
                                     help='Install the platform using latest stable manifests. You can set the release tag using --tag')
     install_mode_group.add_argument('--dev', dest='dev', action='store_true',

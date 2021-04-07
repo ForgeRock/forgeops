@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idm
+  labels:
+    app: idm
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: idm
+    spec:
+      containers:
+      - name: openidm
+        image: idm
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: OPENIDM_REPO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ds-passwords
+              key: dirmanager.pw
+        - name: USERSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ds-passwords
+              key: dirmanager.pw
+        - name: RS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: amster-env-secrets
+              key: IDM_RS_CLIENT_SECRET
+        # see additional RCS Agent related config in configmap.yaml
+        - name: RCS_AGENT_IDM_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: rcs-agent-env-secrets
+              key: AGENT_IDM_SECRET
+        - name: OPENIDM_ICF_RETRY_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: RCS_AGENT_ENABLED
+        - name: OPENIDM_ICF_RETRY_UPDATES_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: RCS_AGENT_ENABLED
+        envFrom:
+        - configMapRef:
+            name: idm
+        - secretRef:
+            name: idm-env-secrets
+        livenessProbe:
+          httpGet:
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value: "true"
+            path: /openidm/info/ping
+            port: 8080
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            httpHeaders:
+            - name: X-OpenIDM-Username
+              value: anonymous
+            - name: X-OpenIDM-Password
+              value: anonymous
+            - name: X-OpenIDM-NoSession
+              value: "true"
+            path: /openidm/info/ping
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: 1280Mi
+          requests:
+            cpu: 250m
+            memory: 768Mi
+        volumeMounts:
+        - mountPath: /var/run/secrets/idm
+          name: idm-secrets
+        - mountPath: /opt/openidm/logs
+          name: logs
+        - mountPath: /opt/openidm/audit
+          name: audit-logs
+        - mountPath: /var/run/openidm/logging
+          name: idm-logging-properties
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: idm-secrets
+        secret:
+          secretName: idm
+      - emptyDir: {}
+        name: logs
+      - emptyDir: {}
+        name: audit-logs
+      - name: idm-logging-properties
+        configMap:
+           name: idm-logging-properties

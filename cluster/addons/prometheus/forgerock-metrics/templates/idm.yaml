@@ -28,7 +28,7 @@ spec:
   # This targets the service using a label.
   selector:
     matchLabels:
-      component: {{ .Values.idm.labelSelectorComponent }}
+      app.kubernetes.io/component: {{ .Values.idm.labelSelectorComponent }}
   namespaceSelector:
     {{ if eq .Values.namespaceSelectorStrategy "any" }}
     any: true

@@ -2,13 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- ../../base/idm
+- ../../base/idm-cdk
 
 patchesStrategicMerge:
 - |-
   #Patch IDM
   apiVersion: apps/v1
-  kind: StatefulSet
+  kind: Deployment
   metadata:
     name: idm
   spec:

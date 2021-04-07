@@ -3,7 +3,7 @@ commonLabels:
   app.kubernetes.io/part-of: "forgerock"
 resources:
 - ../../base/am-cdk
-- ../../base/idm
+- ../../base/idm-cdk
 - ../../base/rcs-agent
 - ../../base/end-user-ui
 - ../../base/login-ui

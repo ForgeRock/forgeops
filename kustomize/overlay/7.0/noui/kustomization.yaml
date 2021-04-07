@@ -7,7 +7,7 @@ resources:
 - ../../../base/ds-idrepo
 - ../../../base/am-cdk
 - ../../../base/amster
-- ../../../base/idm
+- ../../../base/idm-cdk
 - ../../../base/ingress
 
 patchesStrategicMerge:
