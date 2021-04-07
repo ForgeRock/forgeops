@@ -9,7 +9,7 @@ AM_IDENTITY_STORE="am-identity-store:7.0"
 IDM_REPO="idm-repo:7.1"
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.0"
-
+PEM_DIRECTORY="pem-trust-certs"
 
 # We also create the CTS backend for small deployments or development
 # environments where a separate CTS is not warranted.
@@ -34,6 +34,34 @@ setup-profile --profile ${CONFIG} \
 ##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
 #EOF
 
+# Set up a PEM Trust Manager Provider
+mkdir -p $PEM_DIRECTORY
+
+dsconfig --offline --no-prompt --batch <<EOF
+create-trust-manager-provider \
+            --provider-name "PEM Trust Manager" \
+            --type pem \
+            --set enabled:true \
+            --set pem-directory:${PEM_DIRECTORY}
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-connection-handler-prop \
+            --handler-name https \
+            --set trust-manager-provider:"PEM Trust Manager"
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-connection-handler-prop \
+            --handler-name ldaps \
+            --set trust-manager-provider:"PEM Trust Manager"
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-synchronization-provider-prop \
+            --provider-name "Multimaster Synchronization" \
+            --set trust-manager-provider:"PEM Trust Manager"
+EOF
 
 # These indexes are required for the combined AM/IDM repo
 dsconfig --offline --no-prompt --batch <<EOF
