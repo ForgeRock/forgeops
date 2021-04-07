@@ -73,22 +73,14 @@ kind: Config
 # Default profile
 build: &default-build
   artifacts: *default-artifacts
-  tagPolicy:
+  tagPolicy: &default-tag-policy
     sha256: {}
 deploy: &default-deploy
   statusCheckDeadlineSeconds: 600
   kustomize:
     path: ./kustomize/overlay/7.0/all
 
-
-# default.iam.forgeops.com
 profiles:
-- name: forgeops
-  build: *default-build
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/7.0/forgeops
-
 # Images tagged as environment variable in a dockerd or dockerd like environment
 - name: docker-image-tag
   build:
@@ -117,6 +109,95 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/large
+
+###################################################################
+#####################INDIVIDUAL COMPONENTS#########################
+###################################################################
+- name: am
+  build:
+    artifacts:
+    - *AM
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/am-cdk
+
+- name: amster
+  build:
+    artifacts:
+    - *AMSTER
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/amster
+
+- name: idm
+  build:
+    artifacts:
+    - *IDM
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/idm-cdk
+
+- name: ds-cts
+  build:
+    artifacts:
+    - *DS-CTS
+    # - *DS-PROXY
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/ds-cts
+
+- name: ds-idrepo
+  build:
+    artifacts:
+    - *DS-IDREPO
+    # - *DS-PROXY
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/ds-idrepo
+
+- name: ig
+  build:
+    artifacts:
+    - *IG
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/ig
+
+- name: config-upgrader
+  build:
+    artifacts:
+    - *AM_CONFIG_UPGRADER
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/am-config-upgrader
+
+###################################################################
+#######EVERYTHING BELOW THIS LINE WILL BE DEPRECATED###############
+###################################################################
+
+# default.iam.forgeops.com
+- name: forgeops
+  build: *default-build
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/7.0/forgeops
+
+- name: ldif-importer
+  build:
+    artifacts:
+    - *LDIF-IMPORTER
+    tagPolicy: *default-tag-policy
+  deploy:
+    kustomize:
+      path: ./kustomize/base/ldif-importer
+
 - name: dev
   build: *default-build
   deploy:
@@ -216,28 +297,6 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/amster-export
-
-- name: amster-import
-  build:
-    artifacts:
-    - *AMSTER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/base/amster
-
-- name: config-upgrader
-  build:
-    artifacts:
-      - *AM_CONFIG_UPGRADER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/base/am-config-upgrader
 
 - name: fr-config-exporter
   build:
