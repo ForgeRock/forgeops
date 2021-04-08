@@ -98,7 +98,7 @@ def deploy_quickstart(ns, fqdn, tag):
     utils.message('\nRemoving "amster" deployment.')
     uninstall_component('amster', ns)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
-    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=idm --timeout=600s')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
     utils.message('\nDeploying UI.')
     deploy_component('ui', ns, fqdn, tag)
     # message('\nWaiting for UI pods to become ready')
@@ -154,7 +154,8 @@ def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
-    common.add_argument('components', nargs='*')
+    common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui, rcs-agent'])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
     subparser = parser.add_subparsers(dest='cmd', required=True)
