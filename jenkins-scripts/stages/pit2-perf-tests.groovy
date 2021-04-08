@@ -27,7 +27,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf platform test
         if (params.PIT2_Perf_platform.toBoolean()) {
-            def stageName = "${parentStageName} - platform"
+            def stageName = "${parentStageName} platform"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
@@ -39,7 +39,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME   : "platform",
+                                    TEST_NAME   : 'platform',
                                     BASELINE_RPS: '[1983,1722,1136,360]',
                             ]
 
@@ -54,7 +54,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf am authn rest test
         if (params.PIT2_Perf_am_authn.toBoolean()) {
-            def stageName = "${parentStageName} - am_authn"
+            def stageName = "${parentStageName} am_authn"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
@@ -66,7 +66,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME   : "authn_rest",
+                                    TEST_NAME   : 'authn_rest',
                                     BASELINE_RPS: '2550',
                             ]
 
@@ -81,7 +81,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf am access token test
         if (params.PIT2_Perf_am_access_token.toBoolean()) {
-            def stageName = "${parentStageName} - am_access_token"
+            def stageName = "${parentStageName} am_access_token"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
@@ -93,7 +93,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME   : "access_token",
+                                    TEST_NAME   : 'access_token',
                                     BASELINE_RPS: '[2733,2453]',
                             ]
 
@@ -108,7 +108,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf IDM CRUD on simple managed users tests
         if (params.PIT2_Perf_idm_crud.toBoolean()) {
-            def stageName = "${parentStageName} - idm_crud"
+            def stageName = "${parentStageName} idm_crud"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
@@ -120,7 +120,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME   : "simple_managed_users",
+                                    TEST_NAME   : 'simple_managed_users',
                                     BASELINE_RPS: '[5688,0,0,0,1803,3977,1274,955]',
                             ]
 

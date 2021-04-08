@@ -25,11 +25,12 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 TIMEOUT_UNIT         : 'HOURS',
         ]
 
+        def parentStageName = 'PERF Sprint Release'
         def tags = ['performance', 'sprint_release']
 
         // perf am authn rest test
         if (params.PerfSprintRelease_authn_rest.toBoolean()) {
-            def stageName = 'PERF Sprint Release - am_authn'
+            def stageName = "${parentStageName} am_authn"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
@@ -41,7 +42,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME                  : "authn_rest",
+                                    TEST_NAME                  : 'authn_rest',
                                     DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/nemanja/3ds-10M-bis',
                                     DEPLOYMENT_MAKEBACKUP      : false,
                                     CONFIGFILE_NAME            : 'conf-stability.yaml',
@@ -59,7 +60,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf am access token test
         if (params.PerfSprintRelease_access_token.toBoolean()) {
-            def stageName = 'PERF Sprint Release - am_access_token'
+            def stageName = "${parentStageName} am_access_token"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
@@ -71,7 +72,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME                  : "access_token",
+                                    TEST_NAME                  : 'access_token',
                                     DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/nemanja/3ds-10M-bis',
                                     DEPLOYMENT_MAKEBACKUP      : false,
                                     BASELINE_RPS               : '[2733,2453]',
@@ -89,7 +90,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf platform test
         if (params.PerfSprintRelease_platform.toBoolean()) {
-            def stageName = 'PERF Sprint Release - platform'
+            def stageName = "${parentStageName} platform"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
@@ -101,7 +102,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME                  : "platform",
+                                    TEST_NAME                  : 'platform',
                                     DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/nemanja/platform-backup',
                                     DEPLOYMENT_MAKEBACKUP      : false,
                                     BASELINE_RPS               : '[1983,1722,1136,360]',
@@ -119,7 +120,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf IDM Crud test
         if (params.PerfSprintRelease_simple_managed_users.toBoolean()) {
-            def stageName = 'PERF Sprint Release - idm_crud'
+            def stageName = "${parentStageName} idm_crud"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
             pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
@@ -131,7 +132,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                             def config = config_common.clone()
                             config += [
-                                    TEST_NAME                  : "simple_managed_users",
+                                    TEST_NAME                  : 'simple_managed_users',
                                     CONFIGFILE_NAME            : 'conf-restore-backup-1m-stability.yaml',
                                     DEPLOYMENT_RESTOREBUCKETURL: 'gs://performance-bucket-us-east1/tinghua/1m',
                                     DEPLOYMENT_MAKEBACKUP      : false,
