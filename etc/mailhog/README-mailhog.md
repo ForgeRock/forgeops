@@ -9,7 +9,7 @@ for testing purposes. You can use Mailhog to:
 * View received email messages using the web UI
 * Optionally integrate with an SMTP server for email delivery
 
-**Note**: **This is not meant for use in production environment**. 
+**Note**: **This is not meant for use in production environments**. 
 ForgeRock does not guarantee the individual success developers may have in 
 implementing the code on their development platforms.
 
@@ -24,27 +24,23 @@ implementing the code on their development platforms.
 1. You have set up the CDK.
 1. You have installed Helm.
 1. Your Kubernetes context is set to your cluster.
-1. You have already enabled SMTP (such as Postfix) in your host system. 
+1. You have enabled SMTP (such as Postfix) in your host system so you can test SMTP message delivery from your local machine.
 
 ### Deploying Mailhog
 
-1. Install Mailhog in your namespace in the cluster using Helm:
+1. Set up your Kubernetes context and namespace, for example:
 
     ```
     kubectx minikube
 
     kubens my-namespace
+    ```
+1.  Install Mailhog in your namespace using Helm:
 
+    ```
     helm repo add codecentric https://codecentric.github.io/helm-charts
     
     helm install mailhog codecentric/mailhog 
-    ```
-
-1. Enable the postfix mailing daemon to route requests by inserting the following <br/>lines at the end of the `/etc/postfix/main.cf` file:
-
-    ```
-    myhostname = localhost
-    relayhost = [localhost]:1025
     ```
 
 1. Verify that the Mailhog pod is running:
@@ -54,7 +50,7 @@ implementing the code on their development platforms.
     mailhog-16...zl   1/1     Running     1          23m
     ```
 
-1. In a terminal window, set up port forwarding for SMTP (port 1025):
+1. In a terminal window, set up port forwarding for SMTP (port 1025), to verify that test messages are delivered:
 
     ```
     export POD_NAME=mailhog-16...zl
@@ -62,7 +58,7 @@ implementing the code on their development platforms.
     kubectl port-forward --namespace my-namespace $POD_NAME 1025
     ```
  
-1. In another terminal window, set up port forwarding for HTTP view (port 8025):
+1. In another terminal window, set up port forwarding for HTTP view (port 8025) to view the emails on the Mailhog server:
 
     ```
     export POD_NAME=mailhog-16...zl
@@ -82,8 +78,8 @@ implementing the code on their development platforms.
 
     1. Notice that the message you sent appears in the Mailhog HTTP interface.   
     
-
 ## Enable the email service in IDM
+
 After verifying that the Mailhog server is able to send and receive messages, you 
 can configure email settings in the IDM server.
 
@@ -92,9 +88,9 @@ can configure email settings in the IDM server.
 
 ## Test resetting a user's password
 
-1. Using a web browser, access the password reset service in your deployment, <br/> for example: https://my-namespace.iam.example.com/am/?service=ResetPassword 
+1. In a web browser, access the reset password  service in your deployment, <br/> for example: https://my-namespace.iam.example.com/am/?service=ResetPassword 
 
-1. Enter the email ID of the user whose password needs to be reset - for example `t1@mailhog.local`. <br/>(**Note**: @mailhog.local is the default email domain used.)
+1. Enter the email ID of the user whose password needs to be reset - for example  the email ID for our test user is `t1@mailhog.local`.
 
 1. A notification appears indicating that the password reset email has been sent.
 ![View notification of email](./images/email-notify.png)
