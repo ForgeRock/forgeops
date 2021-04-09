@@ -505,20 +505,8 @@ add_profile ()
         echo "Failed to clone addon profile"
         exit 1;
     fi
-    # get patch profile name
-    profile_path="${script_dir}/../config/fidc"
-    if [[ -d "${profile_path}" ]];
-    then
-        cp -r "${script_dir}/../config/7.0/cdk/amster" "${script_dir}/../config/fidc/amster"
-    fi
-    if [[ -d "${PROFILE_ROOT}/$1" ]]
-    then
-	    for p in am amster idm; do
-            echo "cp -r ${profile_path}/$p" "$DOCKER_ROOT"
-            cp -r "${profile_path}/$p" "$DOCKER_ROOT"
-        done
-        return
-    fi
+    # add amster
+    cp -r "${script_dir}/../config/7.0/cdk/amster" "$DOCKER_ROOT"
 }
 
 # chdir to the script root/..

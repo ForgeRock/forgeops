@@ -24,20 +24,16 @@ parsed_args = parser.parse_args()
 
 build_base = pathlib.Path(__file__).joinpath('../../build')
 build_config_base = build_base.joinpath('platform-config').resolve()
-forgeops_config = pathlib.Path(__file__).joinpath('../../config', parsed_args.profile_name).resolve()
-
-if forgeops_config.is_dir() and any(forgeops_config.glob('*')):
-    print('Refusing to overwrite an existing config.')
+forgeops_config = pathlib.Path(__file__).joinpath('../../docker/7.0').resolve()
 
 build_config_base.mkdir(parents=True, exist_ok=True)
 utils.clone_pipeline_images(build_config_base)
 
 try:
     profile_base = build_config_base.joinpath('etc', parsed_args.profile_name)
+    for product in ['am', 'idm']:
+        shutil.copytree(profile_base.joinpath(product), forgeops_config.joinpath(product), dirs_exist_ok=True)
 except IOError:
     print('Couldn\'t clone repo.')
-
-try:
-    shutil.copytree(profile_base, forgeops_config)
 except FileExistsError:
     print('Found exisiting configuration refusing to copy.')
