@@ -1,0 +1,14 @@
+{
+    "enabled" : false,
+    "from" : "",
+    "subject" : {
+        "en" : "Account Information - username",
+        "fr" : "Informations sur le compte - nom d'utilisateur"
+    },
+    "message" : {
+        "en" : "<html><body>{{#if object.userName}}<p>Your username is '{{object.userName}}'.</p>{{else}}If you received this email in error, please disregard.{{/if}}<h4><a href=\"{{object.resumeURI}}\">Click here to login</a></h4></body></html>",
+        "fr" : "<html><body>{{#if object.userName}}<p>Votre nom d'utilisateur est '{{object.userName}}'.</p>{{else}}Si vous avez reçu cet e-mail par erreur, veuillez ne pas en tenir compte.{{/if}}<h4><a href=\"{{object.resumeURI}}\">Cliquez ici pour vous connecter</a></h4></body></html>"
+    },
+    "defaultLocale" : "en",
+    "mimeType" : "text/html"
+}

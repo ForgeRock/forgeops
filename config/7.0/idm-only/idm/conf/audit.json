@@ -65,7 +65,10 @@
                     "sync",
                     "authentication",
                     "config"
-                ]
+                ],
+                "enabled" : {
+                    "$bool" : "&{openidm.audit.handler.json.enabled|true}"
+                }
             }
         },
         {
@@ -79,7 +82,27 @@
                     "sync",
                     "authentication",
                     "config"
-                ]
+                ],
+                "enabled" : {
+                    "$bool" : "&{openidm.audit.handler.repo.enabled|false}"
+                }
+            }
+        },
+        {
+            "class" : "org.forgerock.audit.handlers.json.stdout.JsonStdoutAuditEventHandler",
+            "config" : {
+                "elasticsearchCompatible" : false,
+                "name" : "json-stdout",
+                "topics" : [
+                    "config",
+                    "activity",
+                    "authentication",
+                    "access",
+                    "sync"
+                ],
+                "enabled" : {
+                    "$bool" : "&{openidm.audit.handler.stdout.enabled|false}"
+                }
             }
         }
     ],

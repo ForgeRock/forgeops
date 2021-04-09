@@ -1,5 +1,0 @@
-{
-    "context" : "util/validateQueryFilter",
-    "type" : "text/javascript",
-    "source" : "try { org.forgerock.json.resource.QueryFilters.parse(request.content._queryFilter).accept(new org.forgerock.util.query.MapFilterVisitor(), null); } catch (e) { throw { 'code' : 400, 'message' : e.message } };"
-}
