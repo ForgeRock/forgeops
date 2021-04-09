@@ -18,8 +18,11 @@ parser.add_argument('--repo',
 parser.add_argument('--file-path',
                     help='File path to pull configuration from.')
 parser.add_argument('--profile-name',
-                    help='Name of profile to copy',
+                    help='Name of profile to copy.',
                     default='fidc')
+parser.add_argument('--branch-name',
+                    help='Name of branch to use',
+                    default='master')
 parsed_args = parser.parse_args()
 
 build_base = pathlib.Path(__file__).joinpath('../../build')
@@ -27,7 +30,7 @@ build_config_base = build_base.joinpath('platform-config').resolve()
 forgeops_config = pathlib.Path(__file__).joinpath('../../docker/7.0').resolve()
 
 build_config_base.mkdir(parents=True, exist_ok=True)
-utils.clone_pipeline_images(build_config_base)
+utils.clone_pipeline_images(build_config_base, branch_name=parsed_args.branch_name)
 
 try:
     profile_base = build_config_base.joinpath('etc', parsed_args.profile_name)
@@ -35,5 +38,6 @@ try:
         shutil.copytree(profile_base.joinpath(product), forgeops_config.joinpath(product), dirs_exist_ok=True)
 except IOError:
     print('Couldn\'t clone repo.')
+    sys.exit(1)
 except FileExistsError:
     print('Found exisiting configuration refusing to copy.')

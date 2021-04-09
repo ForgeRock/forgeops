@@ -500,13 +500,16 @@ save_config()
 add_profile ()
 {
 
-    if ! ${script_dir}/platform-config --profile fidc;
+    # if the version isn't 7.0 use it as the branch for platform-images
+    [[ $_arg_version == "7.0" ]] && branch_name=$_arg_version
+    if ! ${script_dir}/platform-config --profile fidc --branch-name "${branch_name}"
     then
         echo "Failed to clone addon profile"
         exit 1;
     fi
     # add amster
     cp -r "${script_dir}/../config/7.0/cdk/amster" "$DOCKER_ROOT"
+
 }
 
 # chdir to the script root/..
