@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import tempfile
+import pathlib
+import shutil
+import argparse
+import sys
+
+import utils
+
+
+common = argparse.ArgumentParser(add_help=False)
+parser = argparse.ArgumentParser(
+    description='Add platform configuration from file or repo')
+
+parser.add_argument('--repo',
+                    help='Repository to pull configuration from.',
+                    default='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git')
+parser.add_argument('--file-path',
+                    help='File path to pull configuration from.')
+parser.add_argument('--profile-name',
+                    help='Name of profile to copy',
+                    default='fidc')
+parsed_args = parser.parse_args()
+
+build_base = pathlib.Path(__file__).joinpath('../../build')
+build_config_base = build_base.joinpath('platform-config').resolve()
+forgeops_config = pathlib.Path(__file__).joinpath('../../config', parsed_args.profile_name).resolve()
+
+if forgeops_config.is_dir() and any(forgeops_config.glob('*')):
+    print('Refusing to overwrite an existing config.')
+
+build_config_base.mkdir(parents=True, exist_ok=True)
+utils.clone_pipeline_images(build_config_base)
+
+try:
+    profile_base = build_config_base.joinpath('etc', parsed_args.profile_name)
+except IOError:
+    print('Couldn\'t clone repo.')
+
+try:
+    shutil.copytree(profile_base, forgeops_config)
+except FileExistsError:
+    print('Found exisiting configuration refusing to copy.')

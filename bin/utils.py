@@ -3,6 +3,7 @@
 import subprocess
 import sys
 import time
+import pathlib
 from threading import Thread
 
 CYAN = '\033[1;96m'
@@ -128,3 +129,25 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', 'wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s')
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
+
+def clone_pipeline_images(clone_path,
+                          branch_name='master',
+                          repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
+    """
+    Clone pipeline images and checkout branch to the given path.
+    Raise exception if not succesful
+    """
+    path = pathlib.Path(clone_path)
+    # check for emptydir
+    if any(path.glob('*')):
+        print('Found existing files, not cloning')
+        return
+    status, out, err = run('git',
+                                'clone',
+                                '--branch',
+                                branch_name,
+                                repo,
+                                str(path))
+    if not status:
+        print(err)
+        raise IOError(err)
