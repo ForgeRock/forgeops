@@ -120,7 +120,7 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/am-cdk
+      path: ./kustomize/dev/am
 
 - name: amster
   build:
@@ -138,7 +138,7 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/idm-cdk
+      path: ./kustomize/dev/idm
 
 - name: ds-cts
   build:

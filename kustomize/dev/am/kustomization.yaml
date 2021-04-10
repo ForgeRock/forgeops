@@ -77,7 +77,7 @@ patchesStrategicMerge:
             value: /home/forgerock/amtruststore
           - name: TRUSTSTORE_PASSWORD
             value: changeit
-          - name: SOURCE_PEM_FILE
+          - name: AM_PEM_TRUSTSTORE
             value: "/var/run/secrets/truststore/cacerts"
           volumeMounts:
           - name: git
