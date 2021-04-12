@@ -4,40 +4,156 @@ import pathlib
 import shutil
 import argparse
 import sys
+import os
+import textwrap
 
 import utils
 
 
-common = argparse.ArgumentParser(add_help=False)
-parser = argparse.ArgumentParser(
-    description='Add platform configuration from file or repo')
+HELP_EXAMPLES = """
+examples:
+# Initialize config.
+$ ./bin/platform-config
 
-parser.add_argument('--repo',
-                    help='Repository to pull configuration from.',
-                    default='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git')
-parser.add_argument('--file-path',
+# Remove old config.
+$ ./bin/platform-config --clean
+
+# Remove old config and initialize another profile
+$ ./bin/platform-config --clean --force --profile-name am-only
+
+# Initialize using explicit path.
+$ ./bin/platform-config --clean --force --profile-dir /tmp/myconfig
+
+# Initialize using platform-images and fidc
+$ ./bin/platform-config --profile-name fidc
+"""
+
+parser = argparse.ArgumentParser(
+    description='Manage ForgeRock platform configurations.',
+    epilog=textwrap.dedent(HELP_EXAMPLES),
+    # Do not wrap description and epilog.
+    formatter_class=argparse.RawDescriptionHelpFormatter)
+
+
+DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
+parser.add_argument('--repo-name',
+                    help='Repository to pull configuration from.')
+parser.add_argument('--profile-dir',
                     help='File path to pull configuration from.')
 parser.add_argument('--profile-name',
-                    help='Name of profile to copy.',
-                    default='fidc')
+                    help=('Name of profile to use. Only used if no --path-dir '
+                          'is not given.'),
+                    default='cdk')
 parser.add_argument('--branch-name',
-                    help='Name of branch to use',
+                    help='Name of repo branch to use.',
                     default='master')
+parser.add_argument('--clean',
+                    help=('Remove any existing Docker build configuration '
+                          'and quit.'),
+                    action='store_true',
+                    default=False)
+parser.add_argument('--force',
+                    help=('Remove any existing Docker build configuration '
+                          'and continue.'),
+                    action='store_true',
+                    default=False)
 parsed_args = parser.parse_args()
 
-build_base = pathlib.Path(__file__).joinpath('../../build')
-build_config_base = build_base.joinpath('platform-config').resolve()
-forgeops_config = pathlib.Path(__file__).joinpath('../../docker/7.0').resolve()
+forgeops_docker = pathlib.Path(__file__).joinpath('../../docker/7.0').resolve()
+forgeops_config = pathlib.Path(__file__).joinpath('../../config/7.0').resolve()
+build_base = pathlib.Path(__file__).joinpath('../../build').resolve()
 
-build_config_base.mkdir(parents=True, exist_ok=True)
-utils.clone_pipeline_images(build_config_base, branch_name=parsed_args.branch_name)
+
+# A profile that's located in 'config/7.0/*'
+in_repo_profile = parsed_args.profile_name in ('am-only',
+                                               'cdk',
+                                               'ds-only',
+                                               'idm-only',
+                                               'ig-only')
+# Top level directories we should remove
+
+# Clean up first
+if parsed_args.clean or parsed_args.force:
+    ok, *_ = utils.run('git', 'clean', '-f', '--', 'docker/7.0', 'build')
+    if not ok:
+        print('Git clean fialed.')
+        sys.exit(1)
+    # If we're aren't being told to continue via --force, exit.
+    if not parsed_args.force:
+        sys.exit(0)
+
+# Setup Configuration Paths
+profile_base = None
+
+# Profile isn't local and no set path then use default
+use_default_repo = not in_repo_profile and not parsed_args.profile_dir
+
+# Use a repo if it's set.
+if parsed_args.repo_name or use_default_repo:
+    # Using remote configuration from a repo.
+    build_config_base = build_base.joinpath('platform-config').resolve()
+    build_config_base.mkdir(parents=True, exist_ok=True)
+    utils.clone_pipeline_images(
+        build_config_base, branch_name=parsed_args.branch_name)
+    # Set `etc` for the default repo. A shortcut for the common use case.
+    # Profile Path must be set for none default repos.
+    if use_default_repo:
+        parsed_args.repo_name = DEFAULT_REPO
+        profile_base = build_config_base.joinpath('etc',
+                                                  parsed_args.profile_name)
+    elif parsed_args.profile_dir:
+        profile_base = build_config_base.joinpath(parsed_args.profile_dir,
+                                                  parsed_args.profile_name)
+        parsed_args.profile_name = profile_base.name
+    else:
+        print('When a repositry is given the path to the profile is required.')
+        sys.exit(1)
+
+# Use configuration from this repo.
+if in_repo_profile and not parsed_args.profile_dir:
+    profile_base = forgeops_config.joinpath(parsed_args.profile_name)
+    parsed_args.profile_name = profile_base.name
+    if not profile_base.is_dir():
+        print(f'{profile_base} is not a directory')
+        sys.exit(1)
+
+# Given a file system path only.
+if parsed_args.profile_dir and not parsed_args.repo_name:
+    profile_base = pathlib.Path(parsed_args.profile_dir).resolve()
+    parsed_args.profile_name = profile_base.name
+
+# Make sure we have a profile to use.
+if profile_base is None:
+    print('Couldn\'t find a profile to use.')
+    sys.exit(1)
+
+# Add additional paths to add to the built configuration e.g. amster for fidc
+profile_recipe = {'fidc': ['../../config/7.0/cdk/amster']}
 
 try:
-    profile_base = build_config_base.joinpath('etc', parsed_args.profile_name)
-    for product in ['am', 'idm']:
-        shutil.copytree(profile_base.joinpath(product), forgeops_config.joinpath(product), dirs_exist_ok=True)
-except IOError:
-    print('Couldn\'t clone repo.')
+    # Copy config.
+    for product in profile_base.iterdir():
+        print(f'Copying {product}.')
+        dst = forgeops_docker.joinpath(product.name)
+        src = profile_base.joinpath(product)
+        utils.copytree(src, dst)
+    # Copy any additional config.
+    # use dict default of empty itter to handle no additional paths
+    for addition in profile_recipe.get(parsed_args.profile_name, []):
+        print(f'Copying {addition}.')
+        additional_config = pathlib.Path(__file__).joinpath(addition).resolve()
+        if not additional_config.is_dir():
+            print(f'{addition} is not a directory, skipping.')
+            continue
+        dst = forgeops_docker.joinpath(additional_config.name)
+        shutil.copytree(additional_config, dst, dirs_exist_ok=True)
+    print('Completed')
+
+except IOError as e:
+    print('Failed to copy configuration')
+    print(e)
     sys.exit(1)
-except FileExistsError:
-    print('Found exisiting configuration refusing to copy.')
+
+except FileExistsError as e:
+    print(e)
+    sys.exit(1)

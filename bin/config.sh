@@ -190,26 +190,7 @@ upgrade_config(){
 # clear the product configs $1 from the docker directory.
 clean_config()
 {
-    for c in "${@}";
-    do
-        ## remove previously copied configs
-        echo "removing $c configs from $DOCKER_ROOT"
-
-        if [ "$c" == "amster" ]; then
-            rm -rf "$DOCKER_ROOT/$c/config"
-
-	    elif [ "$c" == "am" ]; then
-	    	rm -rf "$DOCKER_ROOT/$c/config"
-
-        elif [ "$c" == "idm" ]; then
-            rm -rf "$DOCKER_ROOT/$c/conf"
-	    	rm -rf "$DOCKER_ROOT/$c/script"
-	    	rm -rf "$DOCKER_ROOT/$c/ui"
-        elif [ "$c" == "ig" ]; then
-            rm -rf "$DOCKER_ROOT/$c/config"
-            rm -rf "$DOCKER_ROOT/$c/scripts"
-        fi
-    done
+    $script_dir/platform-config --clean
 }
 
 patch_container() {
@@ -266,20 +247,7 @@ patch_container() {
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-    if [[ -d "${PROFILE_ROOT}/$1" ]]
-    then
-	    for p in "${@}"; do
-            echo "cp -r ${PROFILE_ROOT}/$p" "$DOCKER_ROOT"
-            cp -r "${PROFILE_ROOT}/$p" "$DOCKER_ROOT"
-        done
-        return
-    fi
-    # get patch profile name
-    if [[ -d "${PROFILE_ROOT}/../$1" ]];
-    then
-        echo "cp -r ${PROFILE_ROOT}/../$1" "$DOCKER_ROOT"
-        cp -r "${PROFILE_ROOT}/../$1" "$DOCKER_ROOT"
-    fi
+    ${script_dir}/platform-config --clean --force --profile-name "${_arg_profile}"
 }
 
 # Show the differences between the source configuration and the current Docker configuration
@@ -501,7 +469,7 @@ add_profile ()
 {
 
     # if the version isn't 7.0 use it as the branch for platform-images
-    [[ $_arg_version == "7.0" ]] && branch_name=$_arg_version
+    [[ $_arg_version != "7.0" ]] && branch_name=$_arg_version
     if ! ${script_dir}/platform-config --profile fidc --branch-name "${branch_name}"
     then
         echo "Failed to clone addon profile"

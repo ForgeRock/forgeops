@@ -5,21 +5,29 @@ import sys
 import time
 import pathlib
 from threading import Thread
+import os
+import shutil
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
 RED = '\033[1;91m'
 ENDC = '\033[0m'
 
+
 def message(s):
     """Print info message"""
     print(f"{CYAN}{s}{ENDC}")
+
+
 def error(s):
     """Print error message"""
     print(f"{RED}{s}{ENDC}")
+
+
 def warning(s):
     """Print warning message"""
     print(f"{PURPLE}{s}{ENDC}")
+
 
 def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None):
     """rC runs a given command. Raises error if command returns non-zero code"""
@@ -30,12 +38,14 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None):
                         check=True, input=stdin, cwd=cwd)
     return _r.returncode == 0, _r.stdout, _r.stderr
 
+
 def _waitforsecret(ns, secret_name):
     print(f'Waiting for secret: {secret_name} .', end='')
     sys.stdout.flush()
     while True:
         try:
-            run('kubectl', f'-n {ns} get secret {secret_name}', cstderr=True, cstdout=True)
+            run('kubectl', f'-n {ns} get secret {secret_name}',
+                cstderr=True, cstdout=True)
             print('done')
             break
         except Exception as _:
@@ -43,6 +53,7 @@ def _waitforsecret(ns, secret_name):
             sys.stdout.flush()
             time.sleep(1)
             continue
+
 
 def _runwithtimeout(target, args, secs):
     t = Thread(target=target, args=args)
@@ -52,6 +63,7 @@ def _runwithtimeout(target, args, secs):
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
 
+
 def waitforsecrets(ns):
     """Wait for the given secrets to exist in the Kubernetes api."""
     secrets = ['am-env-secrets', 'idm-env-secrets',
@@ -60,6 +72,7 @@ def waitforsecrets(ns):
     for secret in secrets:
         _runwithtimeout(_waitforsecret, [ns, secret], 60)
 
+
 def getsec(ns, secret, secretKey):
     """Get secret contents"""
     _, pipe, _ = run('kubectl',
@@ -67,30 +80,39 @@ def getsec(ns, secret, secretKey):
     _, pipe, _ = run('base64', '--decode', cstdout=True, stdin=pipe)
     return pipe.decode('ascii')
 
+
 def printsecrets(ns):
     """Print relevant platform secrets"""
     message('\nRelevant passwords:')
     try:
-        print(f"{getsec(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
-        print(f"{getsec(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
-        print(f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
-        print(f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
-        print("{} (uid=admin user)".format(getsec(ns, 'ds-passwords', 'dirmanager\\.pw'))) #f'strings' do not allow '\'
+        print(
+            f"{getsec(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
+        print(
+            f"{getsec(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
+        print(
+            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
+        print(
+            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
+        print("{} (uid=admin user)".format(getsec(ns, 'ds-passwords',
+              'dirmanager\\.pw')))  # f'strings' do not allow '\'
         print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
         print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
         print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
     except Exception as _e:
         sys.exit(1)
 
+
 def printurls(ns):
     """Print relevant platform URLs"""
     message('\nRelevant URLs:')
-    _, fqdn, _ = run('kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
+    _, fqdn, _ = run(
+        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
     fqdn = fqdn.decode('ascii')
     warning(f'https://{fqdn}/platform')
     warning(f'https://{fqdn}/admin')
     warning(f'https://{fqdn}/am')
     warning(f'https://{fqdn}/enduser')
+
 
 def secretagent(k8s_op, tag='latest'):
     """Check and install secret-agent"""
@@ -111,6 +133,7 @@ def secretagent(k8s_op, tag='latest'):
         run('kubectl', '-n secret-agent-system wait --for=condition=ready pod --all --timeout=120s')
         print()
 
+
 def dsoperator(k8s_op, tag='latest'):
     """Check and install ds-operator"""
     opts = ''
@@ -130,6 +153,7 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
+
 def clone_pipeline_images(clone_path,
                           branch_name='master',
                           repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
@@ -143,11 +167,38 @@ def clone_pipeline_images(clone_path,
         print('Found existing files, not cloning')
         return
     status, out, err = run('git',
-                                'clone',
-                                '--branch',
-                                branch_name,
-                                repo,
-                                str(path))
+                           'clone',
+                           '--depth', '1',
+                           '--branch',
+                           branch_name,
+                           repo,
+                           str(path))
     if not status:
         print(err)
         raise IOError(err)
+
+def copytree(src, dst):
+    """
+    A simple version of 3.7+ shutil.copytree for 3.6.
+    No metadata.
+    No links.
+    Captures all errors and concats to a string.
+    """
+    errors = []
+    for src_entry in os.scandir(src):
+        try:
+            os.makedirs(dst, exist_ok=True)
+            src_name = os.path.join(src, src_entry.name)
+            dst_name = os.path.join(dst, src_entry.name)
+            if src_entry.is_file():
+                shutil.copyfile(src_name, dst_name)
+            elif src_entry.is_symlink():
+                raise IOError(f'Symlinks not supported {src_entry.path}')
+            elif src_entry.is_dir():
+                copytree(src_name, dst_name)
+        except Exception as e:
+            errors.extend(str(e))
+
+    if errors:
+        raise Exception('\n'.join(errors))
+

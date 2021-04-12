@@ -1,0 +1,65 @@
+# Deploys the apps only
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: skaffold-deploy-fidc-apps
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+  results:
+  - name: status
+    description: Deployment status
+
+  params:
+  - name: namespace
+    type: string
+    description: namespace to deploy in.
+
+  - name: skaffold-file
+    type: string
+    description: Filename of skaffold.yaml
+    default: nightly.yaml
+
+  - name: docker-repo
+    type: string
+    default: gcr.io/engineering-devops/fidc
+
+  - name: bitbucket-secret
+    type: string
+    default: bitbucket-secret
+
+  steps:
+  - name: deploy-new-env
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    imagePullPolicy: Always
+    env:
+      - name: BITBUCKET_KEY
+        valueFrom:
+          secretKeyRef:
+            name: $(params.bitbucket-secret)
+            key: bitbucket-key
+    script: |
+      #!/usr/bin/env bash
+      # setup ssh creds for config repo
+      echo "${BITBUCKET_KEY}" > ~/.bitbucket
+      chmod 0600 ~/.bitbucket
+      export GIT_SSH_COMMAND="ssh -o 'StrictHostKeyChecking=no' -i $HOME/.bitbucket"
+      cd /workspace/forgeops
+      {
+        set -e -o pipefail
+        set -x
+        # Get the fresh config
+        ./bin/platform-config --profile-name fidc
+        # Deploy the apps
+        skaffold -n '$(params.namespace)'  -f '$(params.skaffold-file)'  -p apps --default-repo='$(params.docker-repo)' run --status-check=false
+        kubectl wait po --for=condition=Ready --timeout=5m -n '$(params.namespace)'  -l 'app in (am, end-user-ui, admin-ui, login-ui)'
+        # TODO: What is the best way to wait for the apps to be available?
+        # The dynamic clients are not refreshed by default. Uncomment if you want rerun amster:
+        # skaffold -n '$(params.namespace)'  -f '$(params.skaffold-file)'  -p amster --default-repo='$(params.docker-repo)' run
+      } || {
+        msg="Skaffold failed to deploy the prod apps environment. See pipeline logs"
+        echo $msg | tee /tekton/results/status
+        exit 1
+      }
