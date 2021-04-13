@@ -87,7 +87,7 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
 }
 
 private void sendSlackNotification(String msgDetails) {
-    slackUtils.sendStatusMessage('#cloud-deploy-notify', currentBuild.result, msgDetails)
+    slackUtils.sendStatusMessage('#forgeops-notify', currentBuild.result, msgDetails)
 }
 
 return this
