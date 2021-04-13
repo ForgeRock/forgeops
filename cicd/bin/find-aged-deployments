@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+import sys
+import json
+import datetime
+import argparse
+import time
+
+import utils
+
+parser = argparse.ArgumentParser(
+    description='Find aged pvcs, deployments and statefulsets')
+
+parser.add_argument('--max-age',
+                    help='Maximum age of objects, in days.',
+                    type=int,
+                    default=30)
+parser.add_argument('--delete',
+                    help='Delete objects.',
+                    action="store_true",
+                    default=False)
+parsed_args = parser.parse_args()
+
+noop_ns = ('smoke',
+           'kube-system',
+           'xn--59g',
+           'secret-agent-system',
+           'tekton-pipelines',
+           'monitoring',
+           'fr-system',
+           'cert-manager',
+           'nginx',
+           'cronjob-system')
+
+now =  datetime.datetime.now()
+
+
+
+# Add warning and slight delay.
+if parsed_args.delete:
+    print(f'{utils.RED}Delete operations will occur{utils.ENDC}')
+    time.sleep(5)
+
+
+def delete(kind, name):
+    ok, out, err = utils.run('kubectl',
+                             'delete', kind, name,
+                             cstdout=True)
+    if not ok:
+        print(f'Error when deleting {kind} {name} error message: {err}')
+    return ok
+
+# Get all objects in cluster.
+ok, out, err = utils.run('kubectl',
+                         'get', 'pvc,deploy,sts',
+                         '--all-namespaces',
+                         '-o', 'json',
+                         cstdout=True)
+
+if not ok:
+    print('Failed to call kubernetes.')
+    print(err)
+    sys.exit(1)
+res = json.loads(out)
+max_length = 0
+old_objects = []
+
+
+for obj in res['items']:
+    if obj["metadata"]["namespace"] in noop_ns:
+        continue
+
+    created = datetime.datetime.strptime(obj["metadata"]["creationTimestamp"],
+                                         '%Y-%m-%dT%H:%M:%SZ')
+    age = now - created
+    if age > datetime.timedelta(parsed_args.max_age):
+        aged_data = (obj["metadata"]["namespace"],
+                     obj["kind"],
+                     obj["metadata"]["name"],
+                     str(age))
+        old_objects.append(aged_data)
+        # find the longest string for formating
+        l = max(len(x) for x in aged_data)
+        if l > max_length:
+            max_length = l
+
+if old_objects:
+    # cushion
+    max_length =  max_length + 2
+    print((f'{"namespace":<{max_length}} '
+           f'{"kind":^{max_length}} '
+           f'{"name":^{max_length}} '
+           f'{"created":^{max_length}} '
+           f'{"deleted":^{max_length}}'))
+    print(f'{"":{"-"}<{max_length * 5}}')
+    deleted = False
+    for o in old_objects:
+        if parsed_args.delete:
+            deleted = delete(o[1], o[2])
+        print(f'{o[0]:<{max_length}} {o[1]:^{max_length}} {o[2]:^{max_length}} {utils.PURPLE}{o[3]:^{max_length}}{utils.ENDC} {str(deleted):^{max_length}}')
+else:
+    print('Found no old objects.')
