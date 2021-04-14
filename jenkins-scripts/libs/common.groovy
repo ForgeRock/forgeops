@@ -67,10 +67,13 @@ String getCurrentTag(String productName) {
 }
 
 /** Does the branch support PaaS releases */
+// TODO Improve the code below to take into account new sustaining branches
+// We should only promote version >= 7.1.0
+// To be discussed with Bruno and Robin
 boolean branchSupportsIDCloudReleases() {
     return 'master' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
-            || (!isPR() && "${env.BRANCH_NAME}".startsWith('idcloud-')) \
-            || (isPR() && "${env.CHANGE_TARGET}".startsWith('idcloud-'))
+            || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}" == 'sustaining/7.1.x')) \
+            || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}" == 'sustaining/7.1.x'))
 }
 
 def getCurrentProductCommitHashes() {
