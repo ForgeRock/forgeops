@@ -7,26 +7,3 @@ nameSuffix: -idrepo
 images:
 - newName: ds-idrepo
   name: ds
-
-patchesStrategicMerge:
-- |-
-  #Patch DS idrepo
-  apiVersion: apps/v1
-  kind: StatefulSet
-  metadata:
-    name: ds
-  spec:
-    template:
-      spec:
-        containers:
-        - name: ds
-          volumeMounts:
-          - name: pem-trust-certs
-            mountPath: /opt/opendj/pem-trust-certs
-        volumes:
-        - name: pem-trust-certs
-          secret:
-            secretName: platform-ca
-            items:
-            - key: ca.pem
-              path: ca.pem

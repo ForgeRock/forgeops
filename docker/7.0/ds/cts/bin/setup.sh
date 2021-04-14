@@ -5,7 +5,6 @@
 # The CTS and proxy schemas have not changed for 7.x
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.0"
-PEM_DIRECTORY="pem-trust-certs"
 
 
 setup-profile --profile ${AM_CTS} \
@@ -14,35 +13,6 @@ setup-profile --profile ${AM_CTS} \
 && setup-profile --profile ${DS_PROXIED_SERVER} \
                   --set ds-proxied-server/proxyUserDn:uid=proxy \
                   --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com
-
-# Set up a PEM Trust Manager Provider
-mkdir -p $PEM_DIRECTORY
-
-dsconfig --offline --no-prompt --batch <<EOF
-create-trust-manager-provider \
-            --provider-name "PEM Trust Manager" \
-            --type pem \
-            --set enabled:true \
-            --set pem-directory:${PEM_DIRECTORY}
-EOF
-
-dsconfig --offline --no-prompt --batch <<EOF
-set-connection-handler-prop \
-            --handler-name https \
-            --set trust-manager-provider:"PEM Trust Manager"
-EOF
-
-dsconfig --offline --no-prompt --batch <<EOF
-set-connection-handler-prop \
-            --handler-name ldaps \
-            --set trust-manager-provider:"PEM Trust Manager"
-EOF
-
-dsconfig --offline --no-prompt --batch <<EOF
-set-synchronization-provider-prop \
-            --provider-name "Multimaster Synchronization" \
-            --set trust-manager-provider:"PEM Trust Manager"
-EOF
 
 # Reduce changelog purge interval to 12 hours
 dsconfig set-synchronization-provider-prop \
