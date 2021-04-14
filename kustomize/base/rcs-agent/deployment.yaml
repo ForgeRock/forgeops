@@ -26,7 +26,7 @@ spec:
           envFrom:
             - secretRef:
                 name: rcs-agent-env-secrets
-          image: gcr.io/forgerock-io/rcs-agent/pit1:1.5.20.0-68d65ab399078ed4e7d0683dd6f753bfb50b208f
+          image: gcr.io/forgerock-io/rcs-agent/pit1:1.5.20.0-0c7cdb040226d3ff47391f457a3ac5ec7aaa3e27
           imagePullPolicy: IfNotPresent
           name: rcs-agent
           ports:
