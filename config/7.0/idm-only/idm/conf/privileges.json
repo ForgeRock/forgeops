@@ -116,7 +116,7 @@
         }
       ],
       "actions": [],
-      "filter": "/parent pr or /children/0 pr"
+      "filter": "/parent pr"
     },
     {
       "name": "owner-view-update-delete-admins-and-members",
@@ -472,7 +472,7 @@
         }
       ],
       "actions": [],
-      "filter": "/parent pr or /children/0 pr"
+      "filter": "/parent pr"
     },
     {
       "name": "admin-view-update-delete-members",
