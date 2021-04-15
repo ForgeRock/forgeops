@@ -76,7 +76,7 @@ build: &default-build
   tagPolicy: &default-tag-policy
     sha256: {}
 deploy: &default-deploy
-  statusCheckDeadlineSeconds: 600
+  statusCheckDeadlineSeconds: 900
   kustomize:
     path: ./kustomize/overlay/7.0/all
 
