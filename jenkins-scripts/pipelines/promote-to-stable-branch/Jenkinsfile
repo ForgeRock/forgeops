@@ -27,9 +27,9 @@ def pipelineRun
 
 def platformUiDefaultValue = true
 def platformUIDescription = 'approx 35mins'
-if (env.BRANCH_NAME.startsWith('idcloud-')) {
+if (env.BRANCH_NAME.startsWith('idcloud-') || env.BRANCH_NAME.equals('sustaining/7.1.x')) {
     platformUiDefaultValue = false
-    platformUIDescription += '<br>Platform UI tests are only available on master version, and so it is possible that they could be incompatable with idcloud branch'
+    platformUIDescription += '<br>Platform UI tests are only available on master version, and so it is possible that they could be incompatible with idcloud branch'
 }
 
 def jobProperties = [
