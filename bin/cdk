@@ -115,12 +115,13 @@ def overlay_app_configs(ns, am=True, idm=True):
         utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
         utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
     if idm:
-        idm_config_path = os.path.join(config_profile_path, 'idm', 'conf')
         _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
                                        cstdout=True)
         idm_pod_name = idm_pod_name.decode('ascii')
         utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
-        utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
+        for directory in os.listdir(os.path.join(config_profile_path, 'idm')):
+            idm_config_path = os.path.join(config_profile_path, 'idm', directory)
+            utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
 
     utils.message('Restarting AM and IDM pods')
     if am:
