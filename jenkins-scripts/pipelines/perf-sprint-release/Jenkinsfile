@@ -44,12 +44,7 @@ if (env.TAG_NAME) {
     error 'Please check your Multibranch Pipeline configuration for this job' +
             '- it should not include settings that allow this build to be run from a PR.\n' +
             'For support, email releng@forgerock.com'
-} else if (env.BRANCH_NAME.equals('master')) {
-    // only master has a scheduled build; jobs for other branches can be launched manually
-    properties(jobProperties)
-} else if (env.BRANCH_NAME.startsWith('idcloud-')) {
-    properties(jobProperties)
-} else if (env.BRANCH_NAME.startsWith('paas-ga-')) {
+} else if (env.BRANCH_NAME.equals('master') || env.BRANCH_NAME.startsWith('idcloud-') || env.BRANCH_NAME.equals('sustaining/7.1.x')) {
     properties(jobProperties)
 } else {
     // safety guard, to prevent non-master branches from building
