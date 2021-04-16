@@ -48,7 +48,7 @@ def jobProperties = [
     ])
 ]
 
-if (params.PIT2_Greenfield.toInteger() == 1) {
+if (params.PIT2_Greenfield != null && params.PIT2_Greenfield.toInteger() == 1) {
     currentBuild.result = 'ABORTED'
     error 'Only 1 loop specified for Greenfield but minimum 2 required.'
 }
@@ -65,7 +65,7 @@ if (env.TAG_NAME) {
     // only master has a scheduled build; jobs for other branches can be launched manually
     jobProperties.add(pipelineTriggers([cron('H 0 * * *')]))
     properties(jobProperties)
-} else if (env.BRANCH_NAME.startsWith('idcloud-')) {
+} else if (env.BRANCH_NAME.startsWith('idcloud-') || env.BRANCH_NAME.equals('sustaining/7.1.x')) {
     properties(jobProperties)
 } else {
     // safety guard, to prevent non-master branches from building
