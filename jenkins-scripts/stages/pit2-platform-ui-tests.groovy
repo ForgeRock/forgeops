@@ -90,7 +90,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 }
             }
         } catch(Exception e) {
-            return new FailureOutcome(e, reportUrl)
+            return new FailureOutcome(e, "${env.BUILD_URL}/pit2-platform-ui/")
         }
 
         return new Outcome(Status.SUCCESS, reportUrl)
