@@ -72,7 +72,7 @@ in_repo_profile = parsed_args.profile_name in ('am-only',
                                                'idm-only',
                                                'ig-only')
 # Top level directories we should remove
-
+git_command = os.environ.get('GIT_SSH_COMMAND', 'foo')
 # Clean up first
 if parsed_args.clean or parsed_args.force:
     ok, *_ = utils.run('git', 'clean', '-f', '--', 'docker/7.0', 'build')
@@ -83,12 +83,12 @@ if parsed_args.clean or parsed_args.force:
     if not parsed_args.force:
         sys.exit(0)
 
-# Setup Configuration Paths
 profile_base = None
 
 # Profile isn't local and no set path then use default
 use_default_repo = not in_repo_profile and not parsed_args.profile_dir
 
+print(f'{vars(parsed_args)}')
 # Use a repo if it's set.
 if parsed_args.repo_name or use_default_repo:
     # Using remote configuration from a repo.
@@ -99,6 +99,7 @@ if parsed_args.repo_name or use_default_repo:
     # Set `etc` for the default repo. A shortcut for the common use case.
     # Profile Path must be set for none default repos.
     if use_default_repo:
+        print('Using default repo')
         parsed_args.repo_name = DEFAULT_REPO
         profile_base = build_config_base.joinpath('etc',
                                                   parsed_args.profile_name)
@@ -109,6 +110,8 @@ if parsed_args.repo_name or use_default_repo:
     else:
         print('When a repositry is given the path to the profile is required.')
         sys.exit(1)
+
+print(f'1: {profile_base}')
 
 # Use configuration from this repo.
 if in_repo_profile and not parsed_args.profile_dir:
@@ -123,6 +126,7 @@ if parsed_args.profile_dir and not parsed_args.repo_name:
     profile_base = pathlib.Path(parsed_args.profile_dir).resolve()
     parsed_args.profile_name = profile_base.name
 
+print(f'2: {profile_base}')
 # Make sure we have a profile to use.
 if profile_base is None:
     print('Couldn\'t find a profile to use.')

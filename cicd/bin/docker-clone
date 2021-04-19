@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-cd "$(dirname "$0")"
-
 SCRIPT_NAME="$(basename "$0")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="${SCRIPT_DIR}/../.."
+
+
+# This script copies images that aren't built from "skaffold" profiles
+# to the given repository allowing all images to be pulled from a single source.
+# This also help prevent registry pruners from removing important images
 
 usage () {
 read -r -d '' help <<-EOF
@@ -22,6 +27,12 @@ EOF
 [[ -n "$IMAGE_TAG" ]] \
     || { echo "IMAGE_TAG must be set or supplied as an argument"; exit 1; }
 
+[[ -n "$2" ]] \
+    && REPO=$2
+
+[[ -n "$REPO" ]] \
+    || { echo "REPO must be set or supplied as an argument"; exit 1; }
+
 set -o pipefail -o errexit -o nounset
 
 while IFS= read -r image
@@ -29,16 +40,16 @@ do
     i=$(awk -F " image: " '{ print $2 }' <(echo "$image"))
     case $i in
         *enduser-ui*)
-            new_name="gcr.io/forgeops-public/enduser-ui:${IMAGE_TAG}"
+            new_name="${REPO}/enduser-ui:${IMAGE_TAG}"
             ;;
         *admin-ui*)
-            new_name="gcr.io/forgeops-public/admin-ui:${IMAGE_TAG}"
+            new_name="${REPO}/admin-ui:${IMAGE_TAG}"
             ;;
         *login-ui*)
-            new_name="gcr.io/forgeops-public/login-ui:${IMAGE_TAG}"
+            new_name="${REPO}/login-ui:${IMAGE_TAG}"
             ;;
         *rcs-agent*)
-            new_name="gcr.io/forgeops-public/rcs-agent:${IMAGE_TAG}"
+            new_name="${REPO}/rcs-agent:${IMAGE_TAG}"
             ;;
         *)
             echo "No name replacement rule found for: ${i}"
@@ -48,4 +59,4 @@ do
     docker pull "${i}"
     docker tag "${i}" "${new_name}"
     docker push "${new_name}"
-done < <(grep -h "image: " ../kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml)
+done < <(grep -h "image: " ${REPO_DIR}/kustomize/base/{login-ui,end-user-ui,admin-ui,rcs-agent}/deployment.yaml)
