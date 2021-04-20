@@ -9,6 +9,7 @@ import textwrap
 
 import utils
 
+_PRODUCT_NAMES = ('am', 'amster', 'idm', 'ig')
 
 HELP_EXAMPLES = """
 examples:
@@ -136,7 +137,10 @@ try:
         print(f'Copying {product}.')
         dst = forgeops_docker.joinpath(product.name)
         src = profile_base.joinpath(product)
-        utils.copytree(src, dst)
+        if src.name not in _PRODUCT_NAMES:
+            print(f'Not a known product, not copying {src}')
+        if src.is_dir():
+            utils.copytree(src, dst)
     # Copy any additional config.
     # use dict default of empty itter to handle no additional paths
     for addition in profile_recipe.get(parsed_args.profile_name, []):

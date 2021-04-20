@@ -13,6 +13,7 @@ PURPLE = '\033[1;95m'
 RED = '\033[1;91m'
 ENDC = '\033[0m'
 
+_IGNORE_FILES = ('.DS_Store',)
 
 def message(s):
     """Print info message"""
@@ -187,6 +188,8 @@ def copytree(src, dst):
     errors = []
     for src_entry in os.scandir(src):
         try:
+            if src_entry.name in _IGNORE_FILES:
+                continue
             os.makedirs(dst, exist_ok=True)
             src_name = os.path.join(src, src_entry.name)
             dst_name = os.path.join(dst, src_entry.name)
