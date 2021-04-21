@@ -25,5 +25,5 @@ steps:
 
 availableSecrets:
   secretManager:
-    - versionName: projects/$PROJECT_NUMBER/secrets/cloudbuild-platform-config-ssh-key/versions/1
+    - versionName: projects/$PROJECT_NUMBER/secrets/cloudbuild-platform-config-ssh-key/versions/latest
       env: 'GIT_KEY'

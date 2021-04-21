@@ -1,5 +1,11 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/skaffold', '.' ]
+    args:
+    - 'build'
+    - '-t'
+    - 'gcr.io/$PROJECT_ID/skaffold'
+    - '-f'
+    - 'cicd/skaffold/Dockerfile'
+    - 'cicd/skaffold'
 images:
   - 'gcr.io/$PROJECT_ID/skaffold'
