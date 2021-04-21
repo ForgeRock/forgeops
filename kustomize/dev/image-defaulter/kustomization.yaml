@@ -7,28 +7,28 @@ images:
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
   newName: gcr.io/forgeops-public/am
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*amster.*
   newName: gcr.io/forgeops-public/amster
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*idm
   newName: gcr.io/forgeops-public/idm
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*rcs-agent.*
   newName: gcr.io/forgeops-public/rcs-agent
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*ds-idrepo.*
   newName: gcr.io/forgeops-public/ds-idrepo
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*admin-ui.*
   newName: gcr.io/forgeops-public/admin-ui
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*enduser-ui.*
   newName: gcr.io/forgeops-public/enduser-ui
-  newTag: 7.1-dev
+  newTag: latest
 - name: .*login-ui.*
   newName: gcr.io/forgeops-public/login-ui
-  newTag: 7.1-dev
+  newTag: latest

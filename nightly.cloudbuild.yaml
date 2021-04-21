@@ -10,6 +10,7 @@ steps:
     - -c
     - |-
       ./cicd/bin/docker-clone
+      IMAGE_TAG=latest ./cicd/bin/docker-clone
 - name: 'gcr.io/$PROJECT_ID/skaffold'
   entrypoint: bash
   secretEnv: ['GIT_KEY']
@@ -22,6 +23,7 @@ steps:
     - -c
     - |-
       ./cicd/bin/build-image-tags
+      IMAGE_TAG=latest ./cicd/bin/build-image-tags
 
 availableSecrets:
   secretManager:
