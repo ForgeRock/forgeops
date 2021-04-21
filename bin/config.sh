@@ -313,7 +313,7 @@ export_config(){
 
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 
-			kubectl exec $pod -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xvf - )
+			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xvf - )
 
 			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
 			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
