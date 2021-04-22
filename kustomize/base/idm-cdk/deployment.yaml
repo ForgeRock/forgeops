@@ -11,6 +11,22 @@ spec:
       labels:
         app: idm
     spec:
+      initContainers:
+      - name: truststore-init
+        image: idm
+        volumeMounts:
+        - name: new-truststore
+          mountPath: /truststore
+        - name: truststore
+          mountPath: /var/run/secrets/truststore
+        command: ["/opt/openidm/bin/import-pem-certs.sh"]
+        env:
+        - name: TRUSTSTORE_PATH
+          value: /truststore/idmtruststore
+        - name: TRUSTSTORE_PASSWORD
+          value: changeit
+        - name: IDM_PEM_TRUSTSTORE
+          value: "/var/run/secrets/truststore/cacerts"
       containers:
       - name: openidm
         image: idm
@@ -95,6 +111,10 @@ spec:
         volumeMounts:
         - mountPath: /var/run/secrets/idm
           name: idm-secrets
+        - name: new-truststore
+          mountPath: /opt/openidm/idmtruststore
+          readOnly: true
+          subPath: idmtruststore
         - mountPath: /opt/openidm/logs
           name: logs
         - mountPath: /opt/openidm/audit
@@ -106,10 +126,16 @@ spec:
       - name: idm-secrets
         secret:
           secretName: idm
-      - emptyDir: {}
-        name: logs
-      - emptyDir: {}
-        name: audit-logs
+      - name: new-truststore
+        emptyDir: {}
+      - name: truststore
+        secret:
+          secretName: truststore-pem
+      - name: logs
+        emptyDir: {}
+      - name: audit-logs
+        emptyDir: {}
       - name: idm-logging-properties
         configMap:
            name: idm-logging-properties
+
