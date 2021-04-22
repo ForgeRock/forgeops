@@ -10,6 +10,8 @@ spec:
     metadata:
       labels:
         app: idm
+      annotations:
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
     spec:
       initContainers:
       - name: truststore-init

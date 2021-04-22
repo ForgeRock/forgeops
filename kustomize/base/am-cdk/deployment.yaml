@@ -11,6 +11,8 @@ spec:
     metadata:
       labels:
         app: am
+      annotations:
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
     spec:
       securityContext:
         runAsUser: 11111
