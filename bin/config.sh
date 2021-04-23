@@ -175,7 +175,7 @@ upgrade_config(){
 	kubectl exec $pod -- /home/forgerock/tar-config.sh
 	kubectl cp $pod:/am-config/config/placeholdered-config.tar "$UPGRADER_DIR/placeholdered-config.tar"
 
-	tar -xvf $UPGRADER_DIR/placeholdered-config.tar -C $UPGRADER_DIR
+	tar -xf $UPGRADER_DIR/placeholdered-config.tar -C $UPGRADER_DIR
 
 	cp -R "$UPGRADER_DIR/config"  "$AM_DIR"
 	rm -fr "$UPGRADER_DIR/config"
@@ -313,7 +313,7 @@ export_config(){
 
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 
-			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xvf - )
+			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xf - )
 
 			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
 			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
