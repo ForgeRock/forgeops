@@ -32,4 +32,5 @@ spec:
     script: |
       #!/usr/bin/env bash
       set -x
-      bin/amster import config/7.0/cdk/amster
+      cd /workspace/forgeops
+      ./bin/amster import config/7.0/cdk/amster

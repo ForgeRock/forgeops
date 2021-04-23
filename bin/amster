@@ -57,6 +57,7 @@ def launch_amster_job(kustomize_path):
     # Get the pod name for the cp command
     r = subprocess.run(
         "kubectl get pod -l app=amster --output=jsonpath='{.items[0].metadata.name}'", shell=True,  capture_output=True)
+
     if r.returncode != 0:
         print(f'could not get amster pod name. {r.stdout} err: {r.stderr}  ')
         sys.exit(r.returncode)
@@ -68,6 +69,11 @@ def launch_amster_job(kustomize_path):
         print(
             f'Cant get pod. Name does not look correct. err = {r.stderr} stat={r.returncode}')
         sys.exit(1)
+
+    # Wait for the pod to start
+    r = subprocess.run(
+        f'kubectl wait pod/$pod --for=condition=ready', shell=True,  capture_output=True)
+
     return pod
 
 if args.cmd == 'clean':
