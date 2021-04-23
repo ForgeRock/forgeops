@@ -315,8 +315,7 @@ export_config(){
 
 			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xf - )
 
-			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
-			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
+			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
 
 			# Upgrade config and reapply placeholders
 			upgrade_config

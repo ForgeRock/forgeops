@@ -5,7 +5,6 @@
 dest=${1:-"/am-config/config/placeholdered-config.tar"}
 
 cd "/am-config"
-echo "AM config-upgrader: extracting configs from archive"
 tar -c "config/services" -f $dest &
 pid=$!
 wait
