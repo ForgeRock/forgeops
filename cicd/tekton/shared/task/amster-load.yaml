@@ -33,4 +33,4 @@ spec:
       #!/usr/bin/env bash
       set -x
       cd /workspace/forgeops
-      ./bin/amster import config/7.0/cdk/amster
+      ./bin/amster --namespace '$(params.namespace)' import config/7.0/cdk/amster

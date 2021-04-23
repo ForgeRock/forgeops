@@ -55,8 +55,9 @@ def launch_amster_job(kustomize_path):
         f'kustomize build {kustomize_path} | kubectl {namespace} apply -f -', shell=True)
     time.sleep(10)
     # Get the pod name for the cp command
-    r = subprocess.run(
-        "kubectl get pod -l app=amster --output=jsonpath='{.items[0].metadata.name}'", shell=True,  capture_output=True)
+    cmd = f'kubectl {namespace} get pod -l app=amster --output=jsonpath={{.items[0].metadata.name}}'
+    print(cmd)
+    r = subprocess.run(cmd, shell=True,  capture_output=True)
 
     if r.returncode != 0:
         print(f'could not get amster pod name. {r.stdout} err: {r.stderr}  ')
@@ -71,8 +72,9 @@ def launch_amster_job(kustomize_path):
         sys.exit(1)
 
     # Wait for the pod to start
+
     r = subprocess.run(
-        f'kubectl wait pod/$pod --for=condition=ready', shell=True,  capture_output=True)
+        f'kubectl {namespace} wait pod/$pod --for=condition=ready', shell=True,  capture_output=True)
 
     return pod
 
