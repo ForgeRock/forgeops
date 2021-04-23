@@ -19,6 +19,7 @@ parser_import = subparser.add_parser(
 parser_import.add_argument('src', help='Source file or directory to import')
 parser_export = subparser.add_parser('export', help='Export files from amster')
 parser_export.add_argument('--global', dest='glob', action='store_true', help='Include the global/ configuration in the amster export')
+parser_clean = subparser.add_parser('clean', help='Clean up and remove any amster pods')
 
 parser_export.add_argument(
     'dst', help='destination directory to export files to')
@@ -69,6 +70,9 @@ def launch_amster_job(kustomize_path):
         sys.exit(1)
     return pod
 
+if args.cmd == 'clean':
+        kubectl('delete job amster')
+        sys.exit(0)
 
 # Import files into amster.
 if args.cmd == 'import':

@@ -1,0 +1,47 @@
+# Deploys the apps only
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-apps
+spec:
+  resources:
+    inputs:
+    - name: forgeops
+      type: git
+  results:
+  - name: status
+    description: Deployment status
+
+  params:
+  - name: namespace
+    type: string
+    description: namespace to deploy in.
+
+  - name: skaffold-file
+    type: string
+    description: Filename of skaffold.yaml
+    default: nightly.yaml
+
+  - name: docker-repo
+    type: string
+    default: gcr.io/engineering-devops/nightly
+
+  steps:
+  - name: deploy-new-env
+    image: "gcr.io/engineering-devops/skaffold:latest"
+    script: |
+      #!/usr/bin/env bash
+      cd /workspace/forgeops
+      {
+        set -e -o pipefail
+        set -x
+        kubectl delete job amster || echo "amster cleaned up"
+
+        kustomize build kustomize/overlay/apps | kubectl -n '$(params.namespace)' apply -f -
+        kubectl -n '$(params.namespace)' rollout status deploy/am --timeout 300s
+        kubectl -n '$(params.namespace)' rollout status deploy/idm --timeout 300s
+      } || {
+        msg="Skaffold failed to deploy the prod apps environment. See pipeline logs"
+        echo $msg | tee /tekton/results/status
+        exit 1
+      }

@@ -11,13 +11,16 @@ profiles:
 # Before deploying ensure that ds is up and the service account passwords have been changed:
 # kubectl get directoryservice/ds-idrepo -o yaml | grep  serviceAccountPasswordsUpdatedTime
 # skaffold -n prod -f nightly.yaml -p apps run
+
+
+# Note: as of April 2021, these images are being built by cloudbuild. This is for reference only
 - name: apps
   build:
     artifacts:
-    - image: am
+    - image: gcr.io/forgeops-public/am
       context: docker/7.0/am
       kaniko: {}
-    - image: idm
+    - image: gcr.io/forgeops-public/idm
       context: docker/7.0/idm
       kaniko: {}
     cluster: &cluster

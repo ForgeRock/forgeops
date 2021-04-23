@@ -32,12 +32,4 @@ spec:
     script: |
       #!/usr/bin/env bash
       set -x
-      cd /workspace/forgeops
-      ./bin/config.sh init
-      skaffold -n '$(params.namespace)' -f '$(params.skaffold-file)'  -p amster --default-repo='$(params.docker-repo)' delete
-      sleep 10
-      set -e -o pipefail
-
-      skaffold -n '$(params.namespace)' -f '$(params.skaffold-file)'  -p amster --default-repo='$(params.docker-repo)' run
-
-      kubectl -n '$(params.namespace)' wait --timeout=600s job/amster --for=condition=complete
+      bin/amster import config/7.0/cdk/amster

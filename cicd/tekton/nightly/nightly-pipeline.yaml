@@ -57,9 +57,9 @@ spec:
         operator: in
         values: [ "nuke" ]
 
-    - name: skaffold-deploy-apps
+    - name: deploy-apps
       taskRef:
-        name: skaffold-deploy-apps
+        name: deploy-apps
       runAfter:
       - deploy-base-ds
       resources:
@@ -74,7 +74,7 @@ spec:
       taskRef:
         name: amster-load
       runAfter:
-      - skaffold-deploy-apps
+      - deploy-apps
       resources:
         inputs:
         - name: forgeops
