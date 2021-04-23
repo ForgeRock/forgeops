@@ -12,11 +12,9 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     node('perf-cloud') {
-        def forgeopsPath = localGitUtils.checkoutForgeops()
-
         def config_common = [
                 STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-                EXT_FORGEOPS_PATH       : forgeopsPath,
+                STASH_FORGEOPS_BRANCH   : commonModule.FORGEOPS_GIT_COMMIT,
                 PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
                 CHECK_REGRESSION        : true,
                 MAX_VARIATION           : '0.10',

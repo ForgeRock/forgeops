@@ -49,17 +49,4 @@ private void cloneBranch(String repoUrl, String branchName, boolean isShallowClo
     ])
 }
 
-/**
- * Checkout the ForgeOps repository.
- *
- * @return The directory containing the checked out repository.
- */
-String checkoutForgeops() {
-    dir('forgeops') {
-        checkout scm
-        sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
-        return pwd()
-    }
-}
-
 return this

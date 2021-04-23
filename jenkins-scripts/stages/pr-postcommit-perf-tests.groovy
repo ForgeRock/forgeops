@@ -20,8 +20,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
-                def forgeopsPath = localGitUtils.checkoutForgeops()
-
                 dir('lodestar') {
                     def stagesCloud = [:]
                     stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(testName)
@@ -29,7 +27,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
                             STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_PATH    : forgeopsPath,
+                            STASH_FORGEOPS_BRANCH: commonModule.FORGEOPS_GIT_COMMIT,
                             TEST_NAME            : testName,
                             DEPLOYMENT_NAME      : 'small',
                             CLUSTER_DOMAIN       : 'pit-cluster.forgeops.com',

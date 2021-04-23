@@ -30,8 +30,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
             stage(stageName) {
                 // TODO: To update to use 'pit2-platform-ui' once RELENG-1165 is done
                 node('pit2-upgrade') {
-                    def forgeopsPath = localGitUtils.checkoutForgeops()
-
                     def adminImageTag
                     def adminImageRepository
                     def endUserImageTag
@@ -75,7 +73,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             SKIP_CLEANUP                          : 'True', // Defer cleanup of the K8S cluster, so it can be used by the e2e tests.
                             REPORT_NAME_PREFIX                    : normalizedStageName,
                             STASH_LODESTAR_BRANCH                 : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_PATH                     : forgeopsPath,
+                            STASH_FORGEOPS_BRANCH                 : commonModule.FORGEOPS_GIT_COMMIT,
                     ]
 
                     dir("platform-ui") {

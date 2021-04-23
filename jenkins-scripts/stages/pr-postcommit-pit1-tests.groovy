@@ -19,8 +19,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         node('google-cloud') {
             stage(stageName) {
-                def forgeopsPath = localGitUtils.checkoutForgeops()
-
                 dir('lodestar') {
                     def stagesCloud = [:]
                     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
@@ -29,7 +27,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                         def config = [
                             TESTS_SCOPE             : 'tests/pit1',
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_PATH       : forgeopsPath,
+                            STASH_FORGEOPS_BRANCH   : commonModule.FORGEOPS_GIT_COMMIT,
                             CLUSTER_NAMESPACE       : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             REPORT_NAME_PREFIX      : normalizedStageName,
                         ]
