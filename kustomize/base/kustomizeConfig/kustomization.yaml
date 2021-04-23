@@ -27,8 +27,8 @@ configMapGenerator:
   - ENDUSER_CLIENT_ID=end-user-ui
   - ADMIN_CLIENT_ID=idm-admin-ui
   - THEME=default
-  - AM_STORES_CTS_SERVERS="ds-cts-0.ds-cts:1389"
-  - AM_STORES_USER_SERVERS="ds-idrepo-0.ds-idrepo:1389"
+  - AM_STORES_CTS_SERVERS="ds-cts-0.ds-cts:1636"
+  - AM_STORES_USER_SERVERS="ds-idrepo-0.ds-idrepo:1636"
   - AM_SERVER_FQDN="$(FQDN)"
   - AUTORESTORE_FROM_DSBACKUP="false" # Set to "true" to enable DS auto recovery. See documentation
   - DSBACKUP_DIRECTORY="" # Ex. gs://bucket | s3://bucket | az://container

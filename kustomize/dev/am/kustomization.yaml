@@ -67,18 +67,6 @@ patchesStrategicMerge:
             mountPath: /git
           command: ["/scripts/git-sync.sh"]
         - name: openam
-          command:
-            - bash
-            - /home/forgerock/custom-entrypoint.sh
-          env:
-          - name: AM_STORES_SSL_ENABLED
-            value: "true"
-          - name: TRUSTSTORE_PATH
-            value: /home/forgerock/amtruststore
-          - name: TRUSTSTORE_PASSWORD
-            value: changeit
-          - name: AM_PEM_TRUSTSTORE
-            value: "/var/run/secrets/truststore/cacerts"
           volumeMounts:
           - name: git
             mountPath: /home/forgerock/openam
@@ -88,9 +76,6 @@ patchesStrategicMerge:
           runAsUser: 11111
           fsGroup: 0
         volumes:
-        - name: truststore
-          secret:
-            secretName: truststore-pem
         - name: git
           emptyDir: {}
         - name: dev-utils

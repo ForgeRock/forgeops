@@ -17,7 +17,7 @@ patchesStrategicMerge:
   metadata:
     name: platform-config
   data:
-    AM_STORES_CTS_SERVERS: "ds-idrepo-0.ds-idrepo:1389"
+    AM_STORES_CTS_SERVERS: "ds-idrepo-0.ds-idrepo:1636"
 
 - |-
   #Patch AM

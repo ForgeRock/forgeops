@@ -123,7 +123,7 @@ the developer profile provides a single DS instance for the CTS and idrepo. User
 # Note: The default FQDN is set to default.iam.example.com. You can use "-a $FQDN" to change it while deploying "base"
 ./bin/cdk install base --fqdn myownfqdn.mydomain.com
 # Change the configmap directing AM to use ds-cts as CTS server
-kubectl patch cm platform-config --type=json -p='[{"op":"replace", "path": "/data/AM_STORES_CTS_SERVERS", "value": "ds-cts-0.ds-cts:1389"}]'
+kubectl patch cm platform-config --type=json -p='[{"op":"replace", "path": "/data/AM_STORES_CTS_SERVERS", "value": "ds-cts-0.ds-cts:1636"}]'
 # Deploy ds-idrepo and ds-cts
 ./bin/cdk install ds-idrepo ds-cts
 # Scale the ds-cts statefulset. By default, the developer profile has replicas=0 for ds-cts
