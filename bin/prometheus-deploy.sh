@@ -34,7 +34,7 @@ deploy() {
     # Add stable repo to helm
     helm repo add "stable" "https://charts.helm.sh/stable" --force-update
     helm repo add "prometheus-community" "https://prometheus-community.github.io/helm-charts" --force-update
-
+    helm repo update
     helm upgrade -i prometheus-operator prometheus-community/kube-prometheus-stack  -f $PROM_VALUES --namespace=$NAMESPACE
 
     kubectl -n $NAMESPACE wait --for condition=established --timeout=60s \
