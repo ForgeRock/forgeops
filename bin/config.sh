@@ -269,7 +269,9 @@ export_config(){
 		idm)
 			printf "\nExporting IDM configuration...\n\n"
 			rm -fr  "$DOCKER_ROOT/idm/conf"
-			kubectl cp idm-0:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
+			pod=$(kubectl get pod -l app=idm -o jsonpath='{.items[0].metadata.name}')
+			kubectl cp -c openidm $pod:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
+			printf "\nIDM configuration files have been exported to ${DOCKER_ROOT}/idm/config."
 			;;
 		amster)
 			rm -fr "$DOCKER_ROOT/amster/config"
@@ -310,11 +312,8 @@ export_config(){
 		am)
 			# Export AM configuration
 			printf "\nExporting AM configuration..\n\n"
-
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
-
 			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xf - )
-
 			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
 
 			# Upgrade config and reapply placeholders
