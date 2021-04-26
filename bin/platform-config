@@ -75,7 +75,7 @@ in_repo_profile = parsed_args.profile_name in ('am-only',
 git_command = os.environ.get('GIT_SSH_COMMAND', 'foo')
 # Clean up first
 if parsed_args.clean or parsed_args.force:
-    ok, *_ = utils.run('git', 'clean', '-fX', '--', 'docker/7.0', 'build')
+    ok, *_ = utils.run('git', 'clean', '-fdX', '--', 'docker/7.0', 'build')
     if not ok:
         print('Git clean failed.')
         sys.exit(1)
