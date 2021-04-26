@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# ****** THIS IS A COPY OF THE DS Entrypoint ****
-# This can be used for experimenting with alternate DS bootstrapping strategies
 #
 # The contents of this file are subject to the terms of the Common Development and
 # Distribution License (the License). You may not use this file except in compliance with the
@@ -14,26 +12,27 @@
 # Header, with the fields enclosed by brackets [] replaced by your own identifying
 # information: "Portions Copyright [year] [name of copyright owner]".
 #
-# Copyright 2019-2020 ForgeRock AS.
+# Copyright 2019-2021 ForgeRock AS.
 #
 set -eu
 
-#set -x
 # ParallelGC with a single generation tenuring threshold has been shown to give the best
 # performance vs determinism trade-off for servers using JVM heaps of less than 8GB,
 # as well as all batch tool use-cases such as import-ldif.
 # Unusual deployments, such as those requiring very large JVM heaps, should tune this setting
 # and use a different garbage collector, such as G1.
 # The /dev/urandom device is up to 4 times faster for crypto operations in some VM environments
-# where the Linux kernel runs low on entropy. This settting does not negatively impact random number security
+# where the Linux kernel runs low on entropy. This setting does not negatively impact random number security
 # and is recommended as the default.
-DEFAULT_OPENDJ_JAVA_ARGS="-XX:MaxRAMPercentage=75 -XX:+UseParallelGC -XX:MaxTenuringThreshold=1 -Djava.security.egd=file:/dev/urandom"
+DEFAULT_OPENDJ_JAVA_ARGS="-XX:MaxRAMPercentage=75 -XX:+UseParallelGC -XX:MaxTenuringThreshold=1
+                          -Djava.security.egd=file:/dev/urandom"
 export OPENDJ_JAVA_ARGS=${OPENDJ_JAVA_ARGS:-${DEFAULT_OPENDJ_JAVA_ARGS}}
 
 export DS_GROUP_ID=${DS_GROUP_ID:-default}
 export DS_SERVER_ID=${DS_SERVER_ID:-${HOSTNAME:-localhost}}
 export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -f)}
-
+export DS_CLUSTER_TOPOLOGY=${DS_CLUSTER_TOPOLOGY:-""}
+export MCS_ENABLED=${MCS_ENABLED:-false}
 # If the advertised listen address looks like a Kubernetes pod host name of the form
 # <statefulset-name>-<ordinal>.<domain-name> then derived the default bootstrap servers names as
 # <statefulset-name>-0.<domain-name>,<statefulset-name>-1.<domain-name>.
@@ -45,18 +44,71 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 #     userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #     ds-userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #
+# Additionally, in multi region deployments, build unique definitions based
+# on the regions, which are also part of the pod FQDN.
+# For example, givens regions "europe" and "us", european pods will have:
+# FQDN:              ds-cts-1.ds-cts-europe.namespace.svc.cluster.local
+# And we can compute:
+# Server ID:         ds-cts-1_europe
+# Group ID:          europe
+# Bootstrap servers: ds-cts-0.ds-cts-europe.namespace.svc.cluster.local,ds-cts-0.ds-cts-us.namespace.svc.cluster.local
+
 if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
+    # Domain is everything after the first dot
     podDomain=${DS_ADVERTISED_LISTEN_ADDRESS#*.}
+    # Name is everything up to the first dot
     podName=${DS_ADVERTISED_LISTEN_ADDRESS%%.*}
     podPrefix=${podName%-*}
 
     ds0=${podPrefix}-0.${podDomain}:8989
-    ds1=${podPrefix}-1.${podDomain}:8989
-    export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${ds0},${ds1}}
+    if [ -n "${DS_CLUSTER_TOPOLOGY}" ]; then
+        # Service name is the first subdomain of the FQDN
+        podService=${podDomain%%.*}
+        podServicePrefix=${podService%-*}
+        
+        newBootstrapServers=${ds0}
+        # Configure bootstrap servers to include replication service if MCS is enabled
+        if ${MCS_ENABLED}; then
+            domain=${podDomain#*.}
+            domain=${domain/cluster/clusterset}
+            replicationService=${podService/${podPrefix}/${podPrefix}-0}
+            newBootstrapServers="rep-${replicationService}.${domain}:8989"
+        fi
+        for cluster in ${DS_CLUSTER_TOPOLOGY//,/ }; do
+            regionService=${podServicePrefix}-${cluster}
+            # If the service name is ours, then set our identifiers
+            # else add the first pod of the cluster to the bootstrap servers
+            if [ ${regionService} == ${podService} ]; then
+               export DS_GROUP_ID=${cluster}
+               export DS_SERVER_ID=${podName}_${cluster}
+               if ${MCS_ENABLED}; then
+                    DS_ADVERTISED_LISTEN_ADDRESS="rep-${podName}-${cluster}.${domain}"
+               fi
+            else
+                if ${MCS_ENABLED}; then
+                    additional="rep-${podPrefix}-0-${cluster}.${domain}:8989"
+                else
+                    additional="${podPrefix}-0.${regionService}.${podDomain#*.}:8989"
+                fi
+                newBootstrapServers="${newBootstrapServers},${additional}"
+            fi
+        done
+        export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${newBootstrapServers}}
+    else
+        ds1=${podPrefix}-1.${podDomain}:8989
+        export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${ds0},${ds1}}
+    fi
 else
     export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${DS_ADVERTISED_LISTEN_ADDRESS}:8989}
 fi
 
+# Set to true in order to use the demo keystore and set the admin and monitor passwords to "password".
+export USE_DEMO_KEYSTORE_AND_PASSWORDS=${USE_DEMO_KEYSTORE_AND_PASSWORDS:-false}
+if [[ "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+then
+    echo "WARNING: The container will use the demo keystore, YOUR DATA IS AT RISK"
+    echo
+fi
 # Set to true in order to set the admin and monitor passwords before starting the server.
 export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-false}
 # By default the admin and monitor passwords are provided as plain-text.
@@ -72,7 +124,7 @@ export DS_UID_MONITOR_PASSWORD=${DS_UID_MONITOR_PASSWORD:-}
 export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-secrets/monitor.pwd}
 
 # List of directories which are expected to be found in the data directory.
-dataDirs="db import-tmp locks var"
+dataDirs="db changelogDb import-tmp locks var"
 
 # Build an array containing the list of pluggable backend base DNs by redirecting the command output to
 # mapfile using process substitution.
@@ -105,8 +157,11 @@ bootstrapDataFromImageIfNeeded() {
 linkKeyStoreAndDataDirectories() {
     # Ensure that the keystore from the Docker build is no longer being used.
     rm config/keystore config/keystore.pin
-    ln -s ../secrets/keystore ../secrets/keystore.pin config
-    ls -l secrets
+    if [[ "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+    then
+      cp samples/secrets/{keystore,keystore.pin} secrets
+    fi
+    ln -s ../secrets/{keystore,keystore.pin} config
 
     for d in ${dataDirs}; do
         rm -rf "$d"
@@ -164,9 +219,18 @@ EOF
 }
 
 setAdminAndMonitorPasswordsIfNeeded() {
-    if [[ "${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS}" == "true" ]]; then
-        setUserPasswordInLdifFile db/rootUser/rootUser.ldif       "uid=admin"   "${DS_UID_ADMIN_PASSWORD:-$(cat "${DS_UID_ADMIN_PASSWORD_FILE}")}"
-        setUserPasswordInLdifFile db/monitorUser/monitorUser.ldif "uid=monitor" "${DS_UID_MONITOR_PASSWORD:-$(cat "${DS_UID_MONITOR_PASSWORD_FILE}")}"
+    if [[ "${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS}" == "true" || "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+        if [[ "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+        then
+          adminPassword="password"
+          monitorPassword="password"
+        else
+          adminPassword="${DS_UID_ADMIN_PASSWORD:-$(cat "${DS_UID_ADMIN_PASSWORD_FILE}")}"
+          monitorPassword="${DS_UID_MONITOR_PASSWORD:-$(cat "${DS_UID_MONITOR_PASSWORD_FILE}")}"
+        fi
+    then
+        setUserPasswordInLdifFile db/rootUser/rootUser.ldif       "uid=admin"   $adminPassword
+        setUserPasswordInLdifFile db/monitorUser/monitorUser.ldif "uid=monitor" $monitorPassword
     fi
 }
 

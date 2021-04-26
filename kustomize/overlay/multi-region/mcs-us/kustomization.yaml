@@ -47,9 +47,6 @@ patchesStrategicMerge:
           containers:
             - name: ds
               imagePullPolicy: Always
-              env:
-                - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-                  value: ds-r-cts-0-us.prod.svc.clusterset.local:8989,ds-r-cts-0-eu.prod.svc.clusterset.local:8989
               resources:
                 requests:
                   memory: 4Gi
@@ -57,6 +54,11 @@ patchesStrategicMerge:
                 limits:
                   memory: 4Gi
                   cpu: 2
+              env: 
+              - name: DS_CLUSTER_TOPOLOGY
+                value: "eu,us"
+              - name: MCS_ENABLED
+                value: "true"
           initContainers:
             - name: initialize
               imagePullPolicy: Always
@@ -78,14 +80,12 @@ patchesStrategicMerge:
     metadata:
       name: ds-idrepo
     spec:
+      replicas: 2
       template:
         spec:
           containers:
             - name: ds
               imagePullPolicy: Always
-              env:
-                - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-                  value: ds-r-idrepo-0-us.prod.svc.clusterset.local:8989,ds-r-idrepo-0-eu.prod.svc.clusterset.local:8989
               resources:
                 requests:
                   memory: 4Gi
@@ -93,6 +93,11 @@ patchesStrategicMerge:
                 limits:
                   memory: 4Gi
                   cpu: 2
+              env: 
+              - name: DS_CLUSTER_TOPOLOGY
+                value: "eu,us"
+              - name: MCS_ENABLED
+                value: "true"
           initContainers:
             - name: initialize
               imagePullPolicy: Always

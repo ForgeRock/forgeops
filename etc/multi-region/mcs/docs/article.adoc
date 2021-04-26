@@ -101,7 +101,7 @@ gcloud container hub memberships register <membership name> \
    --gke-cluster <zone>/<cluster-name> \
    --enable-workload-identity
 ```
-NOTE: Choose a membership name to uniquely identify the cluster)
+NOTE: Choose a membership name to uniquely identify the cluster
 
 === d. Grant the required IAM permissions for MCS Importer
 ```
@@ -171,23 +171,13 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
  namespace: prod
- name: ds-r-idrepo-0-us
-spec:
- ports:
- - name: replication
-   port: 8989
-   protocol: TCP
+ name: rep-ds-idrepo-0-us
 ---
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
  namespace: prod
- name: ds-r-cts-0-us
-spec:
- ports:
- - name: replication
-   port: 8989
-   protocol: TCP
+ name: rep-ds-cts-0-us
 ```
 ****
 
@@ -232,7 +222,7 @@ service.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay
 apiVersion: v1
 kind: Service
 metadata:
-  name: ds-r-idrepo-0-us
+  name: rep-ds-idrepo-0-us
   labels:
     component: ds
 spec:
@@ -245,56 +235,13 @@ spec:
 ```
 ****
 
-Equivalent services are required for each replica so if you require 2 idrepos you need a service called ds-r-idrepo-1-us with the correct pod-name selector.
+Equivalent services are required for each replica so if you require 2 idrepo pods you need an additional service called rep-ds-idrepo-1-us with the correct pod-name selector.
 
 The same is required for the Europe cluster just changing _us_ for _eu_ in the service name.
 
-=== b. Docker configuration 
-*Configure server ID*
+=== b. Add customer docker-entrypoint
 
-To fulfill xref:introduction-server-id[] and configure a unique server ID inside the topology,
-the following change is made to +docker-entrypoint.sh+:
-
-* the server ID is computed using the hostname and the default DS service name (not the replication Service) defined in the current cluster (Ex. for FQDN +*ds-cts-0.ds-cts-us*.prod.svc.cluster.local+ the server ID will be
-+*ds-cts-0_ds-cts-us*+).
-
-In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace
-
-****
-```
-export DS_SERVER_ID=${DS_SERVER_ID:-${HOSTNAME:-localhost}}`
-```
-****
-
-with 
-
-****
-```
-export DS_SERVER_ID=${DS_SERVER_ID:-$(hostname -f | awk -F. '{printf("%s_%s", $1, $2)}')}
-```
-****
-
-*Configure advertised listen address*
-
-Because we've added an additional layer to our replication topology by adding the replication Service, we need to change the advertised listen address to match the replication service rather than the current hostname(ds-idrepo-0.ds-idrepo-us) otherwise each RS server will receive communication from the replication service but will recognise the pod by the hostname which will break replication.  
-
-In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace:
-
-****
-```
-export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -f)}
-``` 
-****
-
-with:
-
-****
-```
-export ID=$(hostname -f | awk -F- '{printf($3)}' | cut -c1)
-export TYPE=$(hostname -f | awk -F- '{printf($2)}')
-export DS_ADVERTISED_LISTEN_ADDRESS=ds-r-${TYPE}-${ID}-${REGION}.prod.svc.clusterset.local
-```
-****
+NOTE: This is a temporary step until the changes are built into the base Docker image.
 
 *Copy docker-entrypoint.sh into Dockerfile*
 
@@ -306,44 +253,11 @@ COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
 ```
 ****
 
-*Set region var in Dockerfile*  
-
-Add these lines anywhere in the Dockerfile
-****
-docker/7.0/ds/cts/Dockerfile, docker/7.0/ds/idrepo/Dockerfile
-```
-ARG region
-ENV REGION=$region
-```
-****
-
-
-*Provide region variable*
-
-At docker build time, we currently don't have anyway of identifying which region we're building the docker image for, so we pass in the region as a build argument via the Skaffold profile(see below).
-
-****
-skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(latest version)]
-```
-- name: multi-region-ds-us
-  build:
-    artifacts:
-      ...
-      docker:
-        buildArgs:
-          region: "us"
-        dockerfile: idrepo/Dockerfile
-      ...
-```
-****
-
-See section D to implement the full Skaffold profiles
-
 === c. Prepare Kustomize definitions
 
 *Make DS server ID unique*
 
-To make the server ID of each pod in our topology unique, the DS internal service name must contain a cluster specific suffix.  This is done by making the following change in the `kustomization.yaml` in each of the region's Kustomize overlay folders.
+To make the server ID of each pod in our topology unique, the DS internal service name must contain a cluster specific suffix.  This is done by adding the cluster suffix in the `kustomization.yaml` in each of the region's Kustomize overlay folders.
 
 ****
 kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs-us/kustomization.yaml[(latest version)]
@@ -359,33 +273,17 @@ patches:
 ```
 ****
 
-*Update bootstrap servers*
+*Enable MCS environment var*
 
-Update the name of the bootstrap servers for each DS to include 1 local DS server and 1 DS server from the other cluster(EU).  Bootstrap FQDN: 
+The DS_CLUSTER_TOPOLOGY env var defines a list of regional identifiers.  These settings will be used in the docker-entrypoint.sh to ensure the DS pods are unique across both clusters.  DS_CLUSTER_TOPOLOGY is configured in both the idepo and cts patches.
 
-`<replication_service>.<namespace>.svc.clusterset.local:8989` 
-
-Example below shows change for CTS.
+See `kustomize/overlay/multi-region/mcs-<region>/kustomization.yaml`   
 
 ****
-kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/mcs-us/kustomization.yaml[(latest version)]
 ```
-patchesStrategicMerge:
-      - |-
-        #Patch DS CTS
-        apiVersion: apps/v1
-        kind: StatefulSet
-        metadata:
-          name: ds-cts
-        spec:
-          template:
-            spec:
-              subdomain: ds-cts-us
-              containers:
-                - name: ds
-                  env:
-                    - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-                      value: ds-r-cts-0-us.prod.svc.clusterset.local:8989,ds-r-cts-0-eu.prod.svc.clusterset.local:8989
+              env: 
+              - name: DS_CLUSTER_TOPOLOGY
+                value: "eu,us"
 ```
 ****
 
@@ -399,18 +297,8 @@ skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(l
 - name: multi-region-ds-us
   build:
     artifacts:
-      - image: ds-cts
-        context: docker/7.0/ds
-        docker:
-          buildArgs:
-            region: "us"
-          dockerfile: cts/Dockerfile
-      - image: ds-idrepo
-        context: docker/7.0/ds
-        docker:
-          buildArgs:
-            region: "us"
-          dockerfile: idrepo/Dockerfile
+    - *DS-CTS
+    - *DS-IDREPO
     tagPolicy:
       sha256: { }
   deploy:
@@ -438,9 +326,9 @@ skaffold run --profile multi-region-ds-eu
 === a. Addrate load test
 
 Some basic load was added on a deployment consisting of three replicated servers, one in Europe and two in the US clusters, just to make sure the setup did not have any major problems, independently of absolute numbers.
-The `addrate` load was tested on the server in Europe (`ds-r-cts-0-eu`)
+The `addrate` load was tested on the server in Europe (`rep-ds-cts-0-eu`)
 on CTS-like entries for 30mins.
-A screenshot from Grafana shows the behaviour of the two servers in the US (`ds-r-cts-0-us` and `ds-r-cts-1-us`):
+A screenshot from Grafana shows the behaviour of the two servers in the US (`rep-ds-cts-0-us` and `rep-ds-cts-1-us`):
 
 image::addrate-30mins.png[]
 
@@ -467,7 +355,7 @@ The only additional costs are CloudDNS costs for the dynamically generated DNS r
 |3. Scale out/scale back using Kubernetes: no additional administration
 |3. Additional service layer required for replication which requires altering the Advertised Listen Address to match
 
-|4. Explicit naming allows quick identification of servers (Ex: `ds-r-cts-0-us.<namespace>.clusterset.local`)
+|4. Explicit naming allows quick identification of servers (Ex: `rep-ds-cts-0-us.<namespace>.clusterset.local`)
 |4. MCS managed Services generate healthchecks which are based on the service endpoint which requires a client secret.  This currently fails as the healthcheck is unconfigurable
 
 |5. No additional scripts required

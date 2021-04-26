@@ -84,7 +84,7 @@ gcloud alpha container hub multi-cluster-services describe
 **1. Configure secret-agent parameters**  
 >`NOTE:` Please check values and update to match requirements
 
-In `kustomize/overlay/mutli-region/multi-region-secrets/kustomization.yaml` fill out the following fields:  
+In `kustomize/overlay/multi-region/multi-region-secrets/kustomization.yaml` fill out the following fields:  
 1. secretsManagerPrefix: \<prefix name\> # ensures unique secret names in Secret Manager.  
 2. secretsManager: GCP
 3. gcpProjectID: \<Project ID\>  
@@ -92,7 +92,7 @@ In `kustomize/overlay/mutli-region/multi-region-secrets/kustomization.yaml` fill
 
 **2. Configure ServiceExport objects**  
 
->`NOTE:` Currently these files are configured based on 2 replicas of CTS and IDREPO.  Only change if you want a **larger** number of relicas. 
+>`NOTE:` Currently these files are configured based on 2 replicas of CTS and IDREPO.  Only change if you want a **larger** number of replicas. 
 
 MCS requires a Kubernetes service that can be exposed externally to other clusters for multi cluster communication.  
 
@@ -113,75 +113,42 @@ See `kustomize/overlay/multi-region/mcs-<region>/service.yaml`
 Ensure you have a service per pod  in your topology.  
 <br />
 
-**4. Update docker-entry-point.sh to ensure a unique server ID**  
->`NOTE:` Required step  
+**4. Configure regions**  
 
-In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace:
+>`NOTE:` Currently these files are configured based on eu and us regions.  Only change if you want a **different** regional identifies for your DS servers.  
+
+Change the DS_CLUSTER_TOLPOLOGY env var for a different list of regional identifiers.
+
+See `kustomize/overlay/multi-region/mcs-<region>/kustomization.yaml`  
+
 ```
-export DS_SERVER_ID=${DS_SERVER_ID:-${HOSTNAME:-localhost}}
+              env: 
+              - name: DS_CLUSTER_TOPOLOGY
+                value: "eu,us"
 ```
-with 
-```
-export DS_SERVER_ID=${DS_SERVER_ID:-$(hostname -f | awk -F. '{printf("%s_%s", $1,$2)}')}
-```  
+
+The above change needs to be applied to the idrepo and cts patch in both regional kustomization.yaml files.  
 <br />
 
-**5. Configure advertised listen address**  
->`NOTE:` Required step  
-
-The replication service has added an added an additional layer to our replication topology, so we need to change the  
-advertised listen address to match the replication service rather than the current hostname(ds-idrepo-0.ds-idrepo-<region>)  
-otherwise each  RS server will receive communication from the replication service but will recognise the pod  by the hostname  
-which will break replication.
-
-In `docker/7.0/ds/scripts/docker-entrypoint.sh` replace:  
-```
-export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname-f)}
-```
-with
-```
-export ID=$(hostname -f | awk -F- '{printf($3)}' | cut -c1)  
-export TYPE=$(hostname -f | awk -F- '{printf($2)}')
-export DS_ADVERTISED_LISTEN_ADDRESS=ds-r-${TYPE}-${ID}-${REGION}.prod.svc.clusterset.local
-```
-`TODO`: This will be fixed upstream
-
-<br />  
-
-**6. Update Dockerfile**  
->`NOTE:` Required step  
+**5. Update Dockerfile**  
+>`NOTE:` Required step.  Temporary until pushed to base DS image.  
 
 In `docker/7.0/ds/cts/Dockerfile` and `docker/7.0/ds/idrepo/Dockerfile`, add/uncomment this line
 ```
 COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
 ```
-
-Also add these lines anywhere
-```
-ARG region
-ENV REGION=$region
-```
 <br />  
 
-**7. Add Skaffold profiles**  
+**6. Add Skaffold profiles**  
+>`NOTE:` Required step 
 
 Add the following profiles to Skaffold.yaml:  
 ```
 - name: multi-region-ds-us
   build:
     artifacts:
-      - image: ds-cts
-        context: docker/7.0/ds
-        docker:
-          buildArgs:
-            region: "us"
-          dockerfile: cts/Dockerfile
-      - image: ds-idrepo
-        context: docker/7.0/ds
-        docker:
-          buildArgs:
-            region: "us"
-          dockerfile: idrepo/Dockerfile
+    - *DS-CTS
+    - *DS-IDREPO
     tagPolicy:
       sha256: { }
   deploy:
@@ -191,18 +158,8 @@ Add the following profiles to Skaffold.yaml:
 - name: multi-region-ds-eu
   build:
     artifacts:
-      - image: ds-cts
-        context: docker/7.0/ds
-        docker:
-          buildArgs:
-            region: "eu"
-          dockerfile: cts/Dockerfile
-      - image: ds-idrepo
-        context: docker/7.0/ds
-        docker:
-          buildArgs:
-            region: "eu"
-          dockerfile: idrepo/Dockerfile
+    - *DS-CTS
+    - *DS-IDREPO
     tagPolicy:
       sha256: { }
   deploy:

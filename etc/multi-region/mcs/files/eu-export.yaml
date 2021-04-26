@@ -2,42 +2,22 @@ kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
  namespace: prod
- name: ds-r-idrepo-0-eu
-spec:
- ports:
- - name: replication
-   port: 8989
-   protocol: TCP
+ name: rep-ds-idrepo-0-eu
 ---
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
  namespace: prod
- name: ds-r-cts-0-eu
-spec:
- ports:
- - name: replication
-   port: 8989
-   protocol: TCP
+ name: rep-ds-cts-0-eu
 ---
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
  namespace: prod
- name: ds-r-idrepo-1-eu
-spec:
- ports:
- - name: replication
-   port: 8989
-   protocol: TCP
+ name: rep-ds-idrepo-1-eu
 ---
 kind: ServiceExport
 apiVersion: net.gke.io/v1
 metadata:
  namespace: prod
- name: ds-r-cts-1-eu
-spec:
- ports:
- - name: replication
-   port: 8989
-   protocol: TCP
+ name: rep-ds-cts-1-eu

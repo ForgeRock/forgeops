@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ds-r-idrepo-0-eu
+  name: rep-ds-idrepo-0-eu
   labels:
     component: ds
 spec:
@@ -16,7 +16,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ds-r-cts-0-eu
+  name: rep-ds-cts-0-eu
   labels:
     component: ds
 spec:
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ds-r-idrepo-1-eu
+  name: rep-ds-idrepo-1-eu
   labels:
     component: ds
 spec:
@@ -46,7 +46,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ds-r-cts-1-eu
+  name: rep-ds-cts-1-eu
   labels:
     component: ds
 spec:
