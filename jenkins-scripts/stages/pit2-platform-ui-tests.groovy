@@ -36,7 +36,11 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     def endUserImageRepository
                     def loginImageTag
                     def loginImageRepository
-                    dir('forgeops') {
+
+                    privateWorkspace {
+                        checkout scm
+                        sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
+
                         // Admin UI Tag management
                         def yamlAdminFile = 'kustomize/base/admin-ui/deployment.yaml'
                         def adminImage = readYaml(file: yamlAdminFile).spec.template.spec.containers.image[0]
