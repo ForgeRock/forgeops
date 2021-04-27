@@ -23,16 +23,15 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 TIMEOUT_UNIT         : 'HOURS',
         ]
 
-        def groupStageName = dashboard_utils.normalizeStageName('PERF Sprint Release')
+        def parentStageName = 'PERF Sprint Release'
         def tags = ['performance', 'sprint_release']
 
         // perf am authn rest test
         if (params.PerfSprintRelease_authn_rest.toBoolean()) {
-            def stageName = "${groupStageName} am_authn"
+            def stageName = "${parentStageName} am_authn"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags : tags, stageDisplayName : stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
@@ -59,11 +58,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf am access token test
         if (params.PerfSprintRelease_access_token.toBoolean()) {
-            def stageName = "${groupStageName} am_access_token"
+            def stageName = "${parentStageName} am_access_token"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags : tags, stageDisplayName : stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
@@ -90,11 +88,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf platform test
         if (params.PerfSprintRelease_platform.toBoolean()) {
-            def stageName = "${groupStageName} platform"
+            def stageName = "${parentStageName} platform"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags : tags, stageDisplayName : stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
@@ -121,11 +118,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf IDM Crud test
         if (params.PerfSprintRelease_simple_managed_users.toBoolean()) {
-            def stageName = "${groupStageName} idm_crud"
+            def stageName = "${parentStageName} idm_crud"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags : tags, stageDisplayName : stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags : tags, stageDisplayName : stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]

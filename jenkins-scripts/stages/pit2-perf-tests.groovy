@@ -20,16 +20,15 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 MAX_VARIATION           : '0.10',
         ]
 
-        def groupStageName = dashboard_utils.normalizeStageName('PIT2 Perf')
+        def parentStageName = 'PIT2 Perf'
         def tags = ['PIT2', 'performance']
 
         // perf platform test
         if (params.PIT2_Perf_platform.toBoolean()) {
-            def stageName = "${groupStageName} platform"
+            def stageName = "${parentStageName} platform"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags: tags, stageDisplayName: stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
@@ -53,11 +52,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf am authn rest test
         if (params.PIT2_Perf_am_authn.toBoolean()) {
-            def stageName = "${groupStageName} am_authn"
+            def stageName = "${parentStageName} am_authn"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags: tags, stageDisplayName: stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
@@ -81,11 +79,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf am access token test
         if (params.PIT2_Perf_am_access_token.toBoolean()) {
-            def stageName = "${groupStageName} am_access_token"
+            def stageName = "${parentStageName} am_access_token"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags: tags, stageDisplayName: stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
@@ -109,11 +106,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         // perf IDM CRUD on simple managed users tests
         if (params.PIT2_Perf_idm_crud.toBoolean()) {
-            def stageName = "${groupStageName} idm_crud"
+            def stageName = "${parentStageName} idm_crud"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
-            pipelineRun.pushStageOutcome([group : groupStageName, tags: tags, stageDisplayName: stageName],
-                    normalizedStageName) {
+            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
                 stage(stageName) {
                     dir('lodestar') {
                         def stagesCloud = [:]
