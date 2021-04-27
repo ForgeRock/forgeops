@@ -1,0 +1,10 @@
+# Takes a snapshot of the first DS data disk of the idrepo
+# This can be done while the directory is running
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshot
+metadata:
+  name: ds-snapshot1
+spec:
+  volumeSnapshotClassName: ds-snapshot-class
+  source:
+    persistentVolumeClaimName: data-ds-idrepo-0

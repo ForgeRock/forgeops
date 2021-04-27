@@ -1,0 +1,16 @@
+resources:
+- pvc.yaml
+- export-ldif-job.yaml
+- sa.yaml
+
+commonLabels:
+  app: ds-export-ldif
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: export-scripts
+  files:
+  - export-ldif.sh
+  - gs-backup.sh
