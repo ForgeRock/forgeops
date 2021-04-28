@@ -247,7 +247,7 @@ patch_container() {
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-    ${script_dir}/platform-config --clean --force --profile-name "${_arg_profile}"
+    ${script_dir}/platform-config --clean --force --profile-dir "config/7.0/${_arg_profile}"
 }
 
 # Show the differences between the source configuration and the current Docker configuration
@@ -312,6 +312,7 @@ export_config(){
 		am)
 			# Export AM configuration
 			printf "\nExporting AM configuration..\n\n"
+            rm -fr  "$DOCKER_ROOT/am/config"
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xf - )
 			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
