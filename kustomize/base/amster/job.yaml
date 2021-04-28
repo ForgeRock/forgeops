@@ -23,7 +23,7 @@ spec:
         - secretRef:
             name: ds-env-secrets
         image: amster
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: amster
         resources:
           limits:
