@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+EXPORT_DIR="${EXPORT_DIR:-/var/tmp/amster}"
 
 # List of realm entities to export.
 realmEntities="OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications"
@@ -10,7 +11,7 @@ mkdir -p /var/tmp/amster
 # Create Amster export script.
 cat > /tmp/do_export.amster <<EOF
 connect -k  /var/run/secrets/amster/id_rsa http://am:80/am
-export-config --path /var/tmp/amster --realmEntities '${realmEntities}' --globalEntities ' '
+export-config --path $EXPORT_DIR --realmEntities '${realmEntities}' --globalEntities ' '
 :quit
 EOF
 

@@ -44,23 +44,13 @@ def kubectl(command):
     r = subprocess.run(args.split())
     return r.returncode
 
-# Launch an amster job specified by the path to the kustomize. Return the pod name.
-# The amster job always pauses - to wait for files to be uploaded, or to wait for files to be downloaded.
-def launch_amster_job(kustomize_path):
-    # Surpress the output so we don't log errors in case the job does not exist.
-    subprocess.run(f'kubectl {namespace} delete job amster',
-                   shell=True, capture_output=True)
-    print("starting the amster job")
-    subprocess.run(
-        f'kustomize build {kustomize_path} | kubectl {namespace} apply -f -', shell=True)
-    time.sleep(10)
-    # Get the pod name for the cp command
-    cmd = f'kubectl {namespace} get pod -l app=amster --output=jsonpath={{.items[0].metadata.name}}'
+def get_pod_name(label):
+    cmd = f'kubectl {namespace} get pod -l {label} --output=jsonpath={{.items[0].metadata.name}}'
     print(cmd)
     r = subprocess.run(cmd, shell=True,  capture_output=True)
 
     if r.returncode != 0:
-        print(f'could not get amster pod name. {r.stdout} err: {r.stderr}  ')
+        print(f'could not get pod name for {label}. {r.stdout} err: {r.stderr}  ')
         sys.exit(r.returncode)
 
     pod = r.stdout.decode("utf-8")
@@ -70,12 +60,28 @@ def launch_amster_job(kustomize_path):
         print(
             f'Cant get pod. Name does not look correct. err = {r.stderr} stat={r.returncode}')
         sys.exit(1)
+    return pod
 
-    # Wait for the pod to start
+def wait_pod_ready(pod):
+    print( f'Waiting for pod {pod}')
+    cmd = f'kubectl {namespace} wait --for=condition=ready pod {pod} --timeout=90s'
+    print(cmd)
+    r = subprocess.run(cmd, shell=True,  capture_output=True)
 
-    r = subprocess.run(
-        f'kubectl {namespace} wait pod/$pod --for=condition=ready', shell=True,  capture_output=True)
 
+# Launch an amster job specified by the path to the kustomize. Return the pod name.
+def launch_amster_job(kustomize_path):
+    # Surpress the output so we don't log errors in case the job does not exist.
+    print('Cleaning up any previous amster jobs...')
+    subprocess.run(f'kubectl {namespace} delete job amster',
+                   shell=True, capture_output=True)
+
+    print("starting the amster job")
+    cmd = f'kustomize build {kustomize_path} | kubectl {namespace} apply -f -'
+    print(cmd)
+    subprocess.run(cmd,shell=True)
+    time.sleep(15) # Give the new pod time to launch, and make sure any old pods have time to terminate
+    pod = get_pod_name('app=amster')
     return pod
 
 if args.cmd == 'clean':
@@ -84,20 +90,32 @@ if args.cmd == 'clean':
 
 # Import files into amster.
 if args.cmd == 'import':
-    # If the source dir/file does not exist - sys.exit.
+    # If the source dir/file does not exist exit
     src = args.src
     if not os.path.exists(src):
         print(f'Cant read path {src}')
         sys.exit(1)
     pod = launch_amster_job(amster_upload_job)
 
+    cpstat = 0
     # Copy the src files up to waiting amster pod
-    kubectl(f'cp {src} {pod}:/opt/amster/config/upload')
+    for i in range(5):
+        print('uploading files to the pod')
+        cpstat = kubectl(f'cp -c amster {src} {pod}:/opt/amster/config/upload')
+        if cpstat == 0:
+            break;
+        print('The cp failed. Will try again')
+        time.sleep(10)
+
+    if cpstat != 0:
+        print('Could not upload files to the amster pod')
+        sys.exit(1)
+
     print('Waiting for amster job to complete')
     stat = kubectl("wait --for=condition=complete job/amster --timeout=60s")
-    kubectl(f'logs {pod}')
+    kubectl(f'logs -c amster {pod}')
     if stat !=0:
-        print('amster import did not complete OK. Will leave amster job/pod running')
+        print('amster import did not complete OK')
         sys.exit(1)
 
     kubectl('delete job amster')
@@ -112,9 +130,8 @@ if args.cmd == 'export':
 
     # Create export - amster will export data, and wait.
     pod = launch_amster_job(amster_export_job)
-    print(f'started amster pod {pod}. Giving amster time to export')
-    # TODO: Find a more robust method to check status
-    time.sleep(10)
+    wait_pod_ready(pod)
+
     # If args.glob is True, copy the realm AND global data
     if args.glob:
         kubectl(f'cp {pod}:/var/tmp/amster {args.dst}')
@@ -122,10 +139,8 @@ if args.cmd == 'export':
         kubectl(f'cp {pod}:/var/tmp/amster/realms {args.dst}/realms')
 
     if not os.listdir(args.dst):
-        print('No files found. Will leave amster pod running!')
+        print('No files found!')
         sys.exit(1)
+    kubectl('delete job amster')
 
-    # delete the amster job - this will terminate the sleeping pod as well.
-    # subprocess.run(f'kubectl {namespace} delete job amster --force',
-    #                shell=True, capture_output=True)
     sys.exit(0)

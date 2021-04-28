@@ -9,7 +9,7 @@ spec:
       labels:
         app: amster
     spec:
-      containers:
+      initContainers:
       - env:
         - name: NAMESPACE
           valueFrom:
@@ -23,7 +23,7 @@ spec:
         - secretRef:
             name: ds-env-secrets
         image: amster
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: amster
         resources:
           limits:
@@ -35,8 +35,20 @@ spec:
         - mountPath: /var/run/secrets/amster
           name: amster-secrets
           readOnly: true
+        - name: export-files
+          mountPath: /var/tmp/amster
       restartPolicy: Never
-      terminationGracePeriodSeconds: 5
+      terminationGracePeriodSeconds: 0
+      # The pause container is there to give the bin/amster command time
+      # to copy the exported files
+      containers:
+      - name: pause
+        image: amster
+        imagePullPolicy: IfNotPresent
+        args:  ["bash", "-c", "sleep 20"]
+        volumeMounts:
+        - mountPath: /var/tmp/amster
+          name: export-files
       volumes:
       - name: amster-secrets
         secret:
@@ -44,3 +56,6 @@ spec:
       - name: platform-config
         configMap:
           name: platform-config
+      - name: export-files
+        emptyDir:
+          {}
