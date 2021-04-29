@@ -385,7 +385,7 @@ save_config()
 			cp -R "$DOCKER_ROOT/idm/conf"  "$PROFILE_ROOT/idm"
 			;;
 		amster)
-			printf "\nSaving Amster configuration..\n\n"
+			printf "\nSaving Amster configuration\n"
 			#****** REMOVE EXISTING FILES ******#
 			rm -fr "$PROFILE_ROOT/amster/config"
 			mkdir -p "$PROFILE_ROOT/amster/config"
@@ -400,26 +400,35 @@ save_config()
 			echo "Adding back amsterVersion placeholder ..."
 			echo "Adding back FQDN placeholder ..."
 			echo "Removing 'userpassword-encrypted' fields ..."
+			echo ""
 			find "$DOCKER_ROOT/amster/config" -name "*.json" \
 					\( -exec sed -i '' "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
 					\( -exec sed -i '' 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
 					-exec sed -i '' '/userpassword-encrypted/d' {} \; \
 
 			# Fix passwords in OAuth2Clients with placeholders or default values.
-			CLIENT_ROOT="$DOCKER_ROOT/amster/config/root/OAuth2Clients"
-			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/root/IdentityGatewayAgents"
+			CLIENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/OAuth2Clients"
+			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/IdentityGatewayAgents"
 
-			echo "Add back password placeholder with defaults"
+			echo "Adding back password placeholder with defaults in these files:"
+			echo ""
+			echo "idm-provisioning.json"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
+			echo "idm-resource-server.json"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json
+			echo "resource-server.json"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
+			echo "oauth2.json"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
+			echo "ig-agent.json"
 			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
 
 			#****** COPY FIXED FILES ******#
 			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
 
-			printf "\n*** The above fixes have been made to the Amster files. If you have exported new files that should contain commons placeholders or passwords, please update the rules in this script.***\n\n"
+			printf "\nThe above fixes have been made to the Amster files."
+			printf "\nIf you have exported new files that should contain commons "
+			printf "\nplaceholders or passwords, please update the rules in this script.\n\n"
 			;;
 
 		*)
