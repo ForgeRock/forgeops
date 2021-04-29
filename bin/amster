@@ -134,9 +134,9 @@ if args.cmd == 'export':
 
     # If args.glob is True, copy the realm AND global data
     if args.glob:
-        kubectl(f'cp {pod}:/var/tmp/amster {args.dst}')
+        kubectl(f'cp -c pause {pod}:/var/tmp/amster {args.dst}')
     else:
-        kubectl(f'cp {pod}:/var/tmp/amster/realms {args.dst}/realms')
+        kubectl(f'cp -c pause {pod}:/var/tmp/amster/realms {args.dst}/realms')
 
     if not os.listdir(args.dst):
         print('No files found!')

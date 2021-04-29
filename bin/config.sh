@@ -276,38 +276,8 @@ export_config(){
 		amster)
 			rm -fr "$DOCKER_ROOT/amster/config"
 			mkdir -p "$DOCKER_ROOT/amster/config"
+			echo "$script_dir/amster" export "$DOCKER_ROOT/amster/config"
 			"$script_dir/amster" export "$DOCKER_ROOT/amster/config"
-			echo "Removing any existing Amster jobs..."
-			kubectl delete job amster || true
-
-			# Deploy Amster job
-			echo "Deploying Amster job..."
-			exp=$(skaffold run -p amster-export)
-
-			# Check to see if Amster pod is running
-			echo "Waiting for Amster pod to come up."
-			while ! [[ "$(kubectl get pod -l app=amster --field-selector=status.phase=Running)" ]];
-			do
-					sleep 5;
-			done
-			printf "Amster job is responding..\n\n"
-
-			pod=`kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}'`
-
-			# Export OAuth2Clients and IG Agents
-			echo "Executing Amster export within the amster pod"
-			kubectl exec $pod -it /opt/amster/export.sh
-
-			# Copy files locally
-			echo "Copying the export to the ./tmp directory"
-			kubectl cp $pod:/var/tmp/amster/realms/ "$DOCKER_ROOT/amster/config"
-
-			printf "Dynamic config exported\n\n"
-
-			# Shut down Amster job
-			printf "Shutting down Amster job...\n"
-
-			del=$(skaffold delete -p amster-export)
 			;;
 		am)
 			# Export AM configuration
