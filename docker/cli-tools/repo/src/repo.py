@@ -5,6 +5,7 @@ import argparse
 import operator
 import os
 import requests
+import glob
 
 SPRINT_DATE_FMT = '%Y.%m.%d'
 GH_REPO = os.environ.get('GH_REPO', 'forgerock/forgeops')
@@ -91,17 +92,18 @@ def create_release_notes(args):
         sys.exit(1)
     print('Release {} created'.format(args.tag_name))
     try: 
-        for p in args.asset:
-            with open(p, "rb") as asset:
-                _, name = os.path.split(p) #grab the file name
-                res_upload = requests.post(res.json()["upload_url"].split("{")[0], 
-                                    data = asset,
-                                    params = {"name": name},
-                                    headers={'Authorization': f'token {token}',
-                                    "Content-Type": "text/plain"},
-                                    timeout=30)
-                res_upload.raise_for_status()
-                print('{} uploaded'.format(name))
+        for g in args.asset:
+            for p in glob.glob(g):
+                with open(p, "rb") as asset:
+                    _, name = os.path.split(p) #grab the file name
+                    res_upload = requests.post(res.json()["upload_url"].split("{")[0], 
+                                        data=asset,
+                                        params={"name": name},
+                                        headers={'Authorization': f'token {token}',
+                                        "Content-Type": "text/plain"},
+                                        timeout=30)
+                    res_upload.raise_for_status()
+                    print('{} uploaded'.format(name))
     except Exception as e:
         print(e)
         sys.exit(1)

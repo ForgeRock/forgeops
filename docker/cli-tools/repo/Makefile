@@ -112,21 +112,8 @@ quickstart: artifacts
 	kustomize build $($@_DIR) > $($@_OUT)
 
 release: changelog.md quickstart
-	sed -i "0,/FORGEOPS_VERSION/s/FORGEOPS_VERSION=.*/FORGEOPS_VERSION=\"${ACTIVE_TAG}\"/" bin/quickstart.sh
 	forgeops create-release-notes \
-	--asset=dist/quickstart.yaml --asset=bin/quickstart.sh \
-    --asset=dist/admin-ui.yaml \
-    --asset=dist/am.yaml \
-    --asset=dist/amster.yaml \
-    --asset=dist/apps.yaml \
-    --asset=dist/base.yaml \
-    --asset=dist/ds-cts.yaml \
-    --asset=dist/ds-idrepo.yaml \
-    --asset=dist/ds.yaml \
-    --asset=dist/end-user-ui.yaml \
-    --asset=dist/idm.yaml \
-    --asset=dist/login-ui.yaml \
-    --asset=dist/rcs-agent.yaml \
-    --asset=dist/ui.yaml \
+	--asset=bin/cdk \
+	--asset=dist/*.yaml \
     changelog.md
 
