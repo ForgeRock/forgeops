@@ -30,7 +30,7 @@ then
         echo "these labels are added to your clusters."
         exit 1
     fi
-    ASSET_LABELS=",es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
+    ASSET_LABELS="es_zone=${ES_ZONE} es_ownedby=${ES_OWNEDBY} es_managedby=${ES_MANAGEDBY} es_businessunit=${ES_BUSINESSUNIT} es_useremail=${ES_USEREMAIL} billing_entity=${BILLING_ENTITY}"
 fi
 #####
 # End code for ForgeRock staff only
@@ -47,7 +47,7 @@ CREATOR="${USER:-unknown}"
 # Labels can not contain dots that may be present in the user.name
 CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
-CLUSTER_TAGS="createdby=${CREATOR}${ASSET_LABELS}"
+CLUSTER_TAGS="createdby=${CREATOR} ${ASSET_LABELS}"
 
 ######### CLUSTER VARS #########
 # Cluster name.
@@ -122,9 +122,10 @@ az aks create \
     --node-vm-size "$VM_SIZE" \
     --node-osdisk-size 100 \
     --node-count "$NODE_COUNT" \
+    --nodepool-labels $PRIMARY_POOL_LABELS \
     --nodepool-name "prim${NAME}" \
-    --nodepool-tags "${CLUSTER_TAGS}" \
-    --tags "${CLUSTER_TAGS}"  \
+    --nodepool-tags ${CLUSTER_TAGS} \
+    --tags ${CLUSTER_TAGS}  \
     --enable-addons "monitoring" \
     --generate-ssh-keys \
     --network-plugin "azure" \
@@ -144,8 +145,8 @@ if [ "$CREATE_DS_POOL" == "true" ]; then
       --node-vm-size "$DS_VM_SIZE" \
       --node-taints "WorkerDedicatedDS=true:NoSchedule" \
       --labels $DS_POOL_LABELS \
-      --nodepool-tags "${CLUSTER_TAGS}" \
-      --tags "${CLUSTER_TAGS}"  \
+      --nodepool-tags ${CLUSTER_TAGS} \
+      --tags ${CLUSTER_TAGS}  \
       --zones 3
 fi
 
