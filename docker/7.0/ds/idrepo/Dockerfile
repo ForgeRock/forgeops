@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:7.1.0-7da440e0d1ce00ae8742129dc7c7f8503d8c05ed
+FROM gcr.io/forgerock-io/ds/pit1:7.1.1-5b222c087f3086d4621c27fe0005ed7d2aee33b5
 
 # If you want to update any o/s software, or require root access, uncomment the lines below
 # Ensure that the /opt/opendj is owned by forgeorock:root
