@@ -4,15 +4,15 @@ alertmanager:
         # Enable to use external url for Alertmanager.
         enabled: false
         pathType: Prefix
-        annotations: 
+        annotations:
             kubernetes.io/ingress.class : nginx
-            certmanager.k8s.io/cluster-issuer: default-issuer
+            cert-manager.k8s.io/cluster-issuer: default-issuer
             nginx.ingress.kubernetes.io/ssl-redirect: "true"
-        hosts: 
+        hosts:
           - alertmanager.iam.example.com
         tls:
           - secretName: sslcert
-            hosts: 
+            hosts:
               - alertmanager.iam.example.com
 
 prometheus:
@@ -34,15 +34,15 @@ prometheus:
         # Enable to use external url for Prometheus.
         enabled: false
         pathType: Prefix
-        annotations: 
+        annotations:
             kubernetes.io/ingress.class: nginx
-            certmanager.k8s.io/cluster-issuer: default-issuer
+            cert-manager.k8s.io/cluster-issuer: default-issuer
             nginx.ingress.kubernetes.io/ssl-redirect: "true"
-        hosts: 
+        hosts:
           - prometheus.iam.example.com
         tls:
           - secretName: sslcert
-            hosts: 
+            hosts:
               - prometheus.iam.example.com
 
 grafana:
@@ -52,15 +52,15 @@ grafana:
     ingress:
         enabled: false
         pathType: Prefix
-        annotations: 
+        annotations:
             kubernetes.io/ingress.class : nginx
-            certmanager.k8s.io/cluster-issuer: default-issuer
+            cert-manager.k8s.io/cluster-issuer: default-issuer
             nginx.ingress.kubernetes.io/ssl-redirect: "true"
-        hosts: 
+        hosts:
           - grafana.iam.example.com
         tls:
           - secretName: sslcert
-            hosts: 
+            hosts:
               - grafana.iam.example.com
 
 defaultRules:
