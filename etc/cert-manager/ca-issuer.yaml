@@ -1,5 +1,5 @@
 # Create a cluste wide issuer that uses cert managers built in CA issuer
-apiVersion: cert-manager.k8s.io/v1alpha2
+apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
   name: ca-issuer

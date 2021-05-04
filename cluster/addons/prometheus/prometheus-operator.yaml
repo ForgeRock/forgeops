@@ -6,7 +6,7 @@ alertmanager:
         pathType: Prefix
         annotations:
             kubernetes.io/ingress.class : nginx
-            cert-manager.k8s.io/cluster-issuer: default-issuer
+            cert-manager.io/cluster-issuer: default-issuer
             nginx.ingress.kubernetes.io/ssl-redirect: "true"
         hosts:
           - alertmanager.iam.example.com
@@ -36,7 +36,7 @@ prometheus:
         pathType: Prefix
         annotations:
             kubernetes.io/ingress.class: nginx
-            cert-manager.k8s.io/cluster-issuer: default-issuer
+            cert-manager.io/cluster-issuer: default-issuer
             nginx.ingress.kubernetes.io/ssl-redirect: "true"
         hosts:
           - prometheus.iam.example.com
@@ -54,7 +54,7 @@ grafana:
         pathType: Prefix
         annotations:
             kubernetes.io/ingress.class : nginx
-            cert-manager.k8s.io/cluster-issuer: default-issuer
+            cert-manager.io/cluster-issuer: default-issuer
             nginx.ingress.kubernetes.io/ssl-redirect: "true"
         hosts:
           - grafana.iam.example.com
