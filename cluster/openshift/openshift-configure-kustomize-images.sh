@@ -6,6 +6,5 @@ kustomize edit set image "amster=${REGISTRY}/amster:latest" \
                          "am=${REGISTRY}/am:latest" \
                          "ds-cts=${REGISTRY}/ds-cts:latest" \
                          "ds-idrepo=${REGISTRY}/ds-idrepo:latest" \
-                         "idm=${REGISTRY}/idm:latest" \
-                         "forgeops-secrets=${REGISTRY}/forgeops-secrets:latest"
+                         "idm=${REGISTRY}/idm:latest"
 cd - || exit
