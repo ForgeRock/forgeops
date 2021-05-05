@@ -74,13 +74,18 @@
                         "type" : "string",
                         "viewable" : false,
                         "searchable" : false,
-                        "minLength" : 8,
                         "userEditable" : false,
                         "scope" : "private",
                         "isProtected": true,
                         "usageDescription" : "",
                         "isPersonal" : false,
                         "policies" : [
+                            {
+                                "policyId" : "minimum-length",
+                                "params" : {
+                                    "minLength" : 8
+                                }
+                            },
                             {
                                 "policyId" : "at-least-X-capitals",
                                 "params" : {
@@ -507,7 +512,6 @@
                         "type" : "string",
                         "searchable" : true,
                         "userEditable" : true,
-                        "minLength" : 1,
                         "usageDescription" : "",
                         "isPersonal" : true,
                         "policies" : [
