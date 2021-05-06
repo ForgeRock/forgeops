@@ -41,7 +41,7 @@ spec:
       containers:
       # Import the ldif files mounted on /data
       - name: import
-        image: gcr.io/forgeops-public/ds-idrepo:7.1-dev
+        image: gcr.io/forgeops-public/ds-idrepo:7.1.0
         imagePullPolicy: IfNotPresent
         args: ["/opt/scripts/import-ldif.sh", "/data/ldif"]
         # Must mount the data, and the keystore secrets to read the data

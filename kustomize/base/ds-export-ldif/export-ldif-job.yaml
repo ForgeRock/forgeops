@@ -9,7 +9,7 @@ spec:
       initContainers:
       # Run the export as an init container. We can kubectl wait for completion in scripts
       - name: export
-        image: gcr.io/forgeops-public/ds-idrepo:7.1-dev
+        image: gcr.io/forgeops-public/ds-idrepo:7.1.0
         imagePullPolicy: IfNotPresent
         args: ["/opt/scripts/export-ldif.sh", "/mnt/export/ldif"]
         # Must mount the data, and the keystore secrets to read the data
