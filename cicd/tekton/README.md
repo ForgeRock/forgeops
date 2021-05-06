@@ -9,13 +9,13 @@ tooling is required.
 
 Create a Kubernetes secret named `kaniko-secret` in the default namespace. The
 secret must contain the JSON for a GCP service account with privileges to push
-and pull images to gcr.io. See the `cicd/bin/gke-kaniko.sh` script for an
+and pull images to gcr.io. See the `cicd/tekton/bin/gke-kaniko.sh` script for an
 example that creates the service account and the secret.
 
 ## Install Software
 
 * Install the latest Tekton release, including the dashboard, from tekton.dev.
-  See the `cicd/bin/install-tekton.sh` script for an example.
+  See the `cicd/tekton/bin/install-tekton.sh` script for an example.
 
 * (Optional) Install the `tkn` CLI tool. This tool lets you perform actions
   like getting the pipeline logs and starting a pipeline. More information
@@ -26,7 +26,7 @@ example that creates the service account and the secret.
 Run the `install-pipeline.sh` script for each desired pipeline in the
 `cicd/tekton/<pipeline>` directory.
 
-To access the Tekton dashboard, run the `cicd/bin/dashboard.sh` script and go
+To access the Tekton dashboard, run the `cicd/tekton/bin/dashboard.sh` script and go
 to http://localhost:9097 in your browser.
 
 ## Purging Completed Pods
