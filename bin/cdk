@@ -34,7 +34,7 @@ def deploy_local_manifest(component, ns, fqdn):
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
     bundles = {
-        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'base/git-server', 'dev/scripts'],
+        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
         'ds': ['base/ds-idrepo'],
         'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
         'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
@@ -86,8 +86,8 @@ def deploy_quickstart(ns, fqdn, tag):
     deploy_component('base', ns, fqdn, tag)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
     deploy_component('ds', ns, fqdn, tag)
-    utils.message('\nWaiting for git-server and DS deployments. This can take a few mins. First installation takes longer.')
-    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s')
+    utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    # utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s')
     utils.run('kubectl', f'-n {ns} rollout status --watch statefulset ds-idrepo --timeout=300s')
     utils.message('\nDeploying apps.')
     deploy_component('apps', ns, fqdn, tag)
@@ -156,7 +156,8 @@ def main():
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
     common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm', 
-                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'rcs-agent', []])
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 
+                                                          'rcs-agent', 'git-server', []])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
     subparser = parser.add_subparsers(dest='cmd', required=True)
@@ -165,12 +166,12 @@ def main():
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     install_mode_group = parser_install.add_mutually_exclusive_group()
-    install_mode_group.add_argument('--stable', dest='stable', action='store_true',
-                                    help='Install the platform using latest stable manifests. You can set the release tag using --tag')
+    install_mode_group.add_argument('--demo', dest='demo', action='store_true',
+                                    help='Install the platform using latest demo manifests. You can set the release tag using --tag')
     install_mode_group.add_argument('--dev', dest='dev', action='store_true',
                                     help='Install the platform using local manifests and nightly Docker images. (This is the default mode)')
     parser_install.add_argument('-t', '--tag', dest='tag', default='latest',
-                                help='Select the forgeops tag to install when using --stable (default: latest)')
+                                help='Select the forgeops tag to install when using --demo (default: latest)')
     parser_delete = subparser.add_parser(
         'delete', parents=[common], help='Delete ForgeRock Platform components or component bundles')
     parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
@@ -185,10 +186,10 @@ def main():
     namespace = args.namespace or ctx_namespace
     components = args.components if getattr(args, 'components', None) else ['quickstart']
     fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
-    stable = getattr(args, 'stable', None)
-    tag = getattr(args, 'tag', None) if stable else None
-    if stable:
-        utils.warning(f'Using "stable" images and k8s manifests as specified in ForgeRock/forgeops "{tag}" release')
+    demo = getattr(args, 'demo', None)
+    tag = getattr(args, 'tag', None) if demo else None
+    if demo:
+        utils.warning(f'Using "demo" images and k8s manifests as specified in ForgeRock/forgeops "{tag}" release')
     if args.cmd == 'info':
         utils.printsecrets(namespace)
         utils.printurls(namespace)
@@ -214,9 +215,6 @@ def main():
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
         deploy_quickstart(namespace, fqdn, tag)
-        if tag is None:
-            print()
-            overlay_app_configs(namespace)
     else:
         for c in components:
             deploy_component(c, namespace, fqdn, tag)
