@@ -526,6 +526,22 @@
                         "type" : "simple",
                         "ldapAttribute" : "fr-idm-managed-user-memberoforgid",
                         "isMultiValued" : true
+                    },
+                    "activeDate" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-managed-user-active-date"
+                    },
+                    "inactiveDate" : {
+                        "type" : "simple",
+                        "ldapAttribute" : "fr-idm-managed-user-inactive-date"
+                    },
+                    "expireAccount" : {
+                        "type" : "json",
+                        "ldapAttribute" : "fr-idm-managed-user-expire-account"
+                    },
+                    "activateAccount" : {
+                        "type" : "json",
+                        "ldapAttribute" : "fr-idm-managed-user-activate-account"
                     }
                 }
             },

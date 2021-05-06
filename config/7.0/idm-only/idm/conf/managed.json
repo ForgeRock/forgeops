@@ -47,7 +47,9 @@
                     "ownerOfOrg",
                     "adminOfOrg",
                     "memberOfOrg",
-                    "memberOfOrgIDs"
+                    "memberOfOrgIDs",
+                    "activeDate",
+                    "inactiveDate"
                 ],
                 "properties" : {
                     "_id" : {
@@ -790,6 +792,26 @@
                             "type" : "string",
                             "title" : "org identifiers"
                         }
+                    },
+                    "activeDate" : {
+                        "title": "Active Date",
+                        "description": "Active Date",
+                        "viewable": true,
+                        "type": "string",
+                        "searchable": false,
+                        "userEditable": false,
+                        "usageDescription": "",
+                        "isPersonal": false
+                    },
+                    "inactiveDate" : {
+                        "title": "Inactive Date",
+                        "description": "Inactive Date",
+                        "viewable": true,
+                        "type": "string",
+                        "searchable": false,
+                        "userEditable": false,
+                        "usageDescription": "",
+                        "isPersonal": false
                     }
                 },
                 "type" : "object",

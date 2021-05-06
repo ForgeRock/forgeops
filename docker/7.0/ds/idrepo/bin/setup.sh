@@ -6,7 +6,7 @@
 # changed - it may use an older version. For example, AM 7.1 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
 AM_IDENTITY_STORE="am-identity-store:7.0"
-IDM_REPO="idm-repo:7.1"
+IDM_REPO="idm-repo:7.2"
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.0"
 
@@ -115,6 +115,20 @@ create-backend-index \
         --index-name fr-idm-managed-organization-member \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
         --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:ordering \
+          --type generic \
+          --index-name fr-idm-managed-user-active-date
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:ordering \
+          --type generic \
+          --index-name fr-idm-managed-user-inactive-date
 EOF
 # Example of creating additional indexes.
 # Uncomment these as per your needs:

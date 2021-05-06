@@ -1,0 +1,30 @@
+{
+  "enabled" : false,
+  "type" : "simple",
+  "repeatInterval" : 86400000,
+  "persisted" : true,
+  "concurrentExecution" : false,
+  "invokeService" : "taskscanner",
+  "invokeContext" : {
+    "waitForCompletion" : false,
+    "numberOfThreads" : 5,
+    "scan" : {
+      "_queryFilter" : "((/inactiveDate lt \"${Time.nowWithOffset}\") AND (!(/activeDate pr) or /activeDate le \"${Time.nowWithOffset}\"))",
+      "object" : "managed/user",
+      "taskState" : {
+        "started" : "/expireAccount/task-started",
+        "completed" : "/expireAccount/task-completed"
+      },
+      "recovery" : {
+        "timeout" : "10m"
+      }
+    },
+    "task" : {
+      "script" : {
+        "type" : "text/javascript",
+        "globals" : { },
+        "source" : "var patch = [{ \"operation\" : \"replace\", \"field\" : \"/accountStatus\", \"value\" : \"inactive\" }];\n\nlogger.debug(\"Performing Expire Account Task on {} ({})\", input.mail, objectID);\n\nopenidm.patch(objectID, null, patch); true;"
+      }
+    }
+  }
+}
