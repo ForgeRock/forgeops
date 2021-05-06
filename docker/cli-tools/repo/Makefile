@@ -5,7 +5,7 @@ SHELL := /bin/bash
 RELEASE_REVS := $(shell forgeops release-revlist)
 ACTIVE_TAG := $(shell forgeops current-tag)
 
-BASE_COMPONENTS = 7.0/ingress secrets git-server ../dev/scripts
+BASE_COMPONENTS = 7.0/ingress secrets ../dev/scripts
 DS_COMPONENTS = ds-idrepo ds-cts
 APP_COMPONENTS = am amster idm rcs-agent
 UI_COMPONENTS = admin-ui end-user-ui login-ui
