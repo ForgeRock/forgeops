@@ -49,9 +49,6 @@ kind: Config
     - &IG
       image: ig
       context: docker/7.0/ig
-    - &AM_CONFIG_UPGRADER
-      image: am-config-upgrader
-      context: docker/7.0/am-config-upgrader
 
   commonArtifactSets:
     default-artifacts: &default-artifacts
@@ -169,14 +166,6 @@ profiles:
     kustomize:
       path: ./kustomize/base/ig
 
-- name: config-upgrader
-  build:
-    artifacts:
-    - *AM_CONFIG_UPGRADER
-    tagPolicy: *default-tag-policy
-  deploy:
-    kustomize:
-      path: ./kustomize/base/am-config-upgrader
 
 ###################################################################
 #######EVERYTHING BELOW THIS LINE WILL BE DEPRECATED###############
@@ -297,14 +286,3 @@ profiles:
   deploy:
     kustomize:
       path: ./kustomize/overlay/7.0/amster-export
-
-- name: fr-config-exporter
-  build:
-    artifacts:
-      - *AM_CONFIG_UPGRADER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/dev/fr-config-exporter
