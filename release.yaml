@@ -11,7 +11,7 @@ steps:
   args:
     - '-c'
     - |-
-      ./bin/docker-clone
+      ./cicd/bin/docker-clone
 
 - name: 'gcr.io/$PROJECT_ID/skaffold'
   entrypoint: bash
