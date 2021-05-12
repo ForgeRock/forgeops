@@ -24,11 +24,11 @@ images:
   newName: gcr.io/forgeops-public/ds-idrepo
   newTag: 7.1.0
 - name: .*admin-ui.*
-  newName: gcr.io/forgeops-public/admin-ui
+  newName: gcr.io/forgerock-io/platform-admin-ui
   newTag: 7.1.0
 - name: .*enduser-ui.*
-  newName: gcr.io/forgeops-public/enduser-ui
+  newName: gcr.io/forgerock-io/platform-enduser-ui
   newTag: 7.1.0
 - name: .*login-ui.*
-  newName: gcr.io/forgeops-public/login-ui
+  newName: gcr.io/forgerock-io/platform-login-ui
   newTag: 7.1.0
