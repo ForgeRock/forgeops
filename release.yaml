@@ -7,6 +7,7 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   entrypoint: 'bash'
   env:
+    - REPO=$_REPO
     - IMAGE_TAG=$TAG_NAME
   args:
     - '-c'
@@ -17,12 +18,14 @@ steps:
   entrypoint: bash
   env:
     - IMAGE_TAG=$TAG_NAME
+    - PROFILE_NAME=$_PROFILE_NAME
+    - REPO=$_REPO
   args:
     - '-c'
     - |-
-      ./bin/build-cdk-image-tags
+      ./cicd/bin/build-image-tags
 
-- name: 'gcr.io/engineering-devops/repo'
+- name: 'gcr.io/$PROJECT_ID/repo'
   entrypoint: bash
   secretEnv:
     - 'GH_TOKEN'
@@ -32,9 +35,11 @@ steps:
   args:
     - '-c'
     - |-
-      make -f docker/cli-tools/repo/Makefile release
+      [[ $_CREATE_RELEASE == 1 ]] \
+      && make -f docker/cli-tools/repo/Makefile release \
+      || echo "Not creating release."
 
 availableSecrets:
   secretManager:
-    - versionName: projects/1067706085367/secrets/GH_API_CLOUDBUILD/versions/2
+    - versionName: projects/1067706085367/secrets/GH_API_CLOUDBUILD/versions/latest
       env: 'GH_TOKEN'
