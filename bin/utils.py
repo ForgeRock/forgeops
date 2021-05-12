@@ -55,6 +55,22 @@ def _waitforsecret(ns, secret_name):
             time.sleep(1)
             continue
 
+def _waitfords(ns, ds_name):
+    print(f'Waiting for Service Account Password Update: .', end='')
+    sys.stdout.flush()
+    while True:
+        try:
+            _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
+                             cstderr=True, cstdout=True)
+            if len(valuestr) > 0:
+                print('done')
+                break
+            raise("DS not ready")
+        except Exception as _:
+            print('.', end='')
+            sys.stdout.flush()
+            time.sleep(1)
+            continue
 
 def _runwithtimeout(target, args, secs):
     t = Thread(target=target, args=args)
@@ -64,7 +80,6 @@ def _runwithtimeout(target, args, secs):
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
 
-
 def waitforsecrets(ns):
     """Wait for the given secrets to exist in the Kubernetes api."""
     secrets = ['am-env-secrets', 'idm-env-secrets',
@@ -73,6 +88,10 @@ def waitforsecrets(ns):
     for secret in secrets:
         _runwithtimeout(_waitforsecret, [ns, secret], 60)
 
+def wait_for_ds(ns, directoryservices_name):
+    """Wait for DS pods to be ready after ds-operator deployment"""
+    run('kubectl', f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
+    _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
 
 def getsec(ns, secret, secretKey):
     """Get secret contents"""
@@ -80,7 +99,6 @@ def getsec(ns, secret, secretKey):
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{secretKey}}}', cstdout=True)
     _, pipe, _ = run('base64', '--decode', cstdout=True, stdin=pipe)
     return pipe.decode('ascii')
-
 
 def printsecrets(ns):
     """Print relevant platform secrets"""
