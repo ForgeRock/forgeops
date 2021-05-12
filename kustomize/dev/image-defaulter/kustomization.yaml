@@ -15,8 +15,8 @@ images:
   newName: gcr.io/forgeops-public/idm
   newTag: 7.1.0
 - name: .*rcs-agent.*
-  newName: gcr.io/forgeops-public/rcs-agent
-  newTag: 7.1.0
+  newName: gcr.io/forgerock-io/rcs-agent
+  newTag: 1.5.20.0
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
   newTag: 7.1.0
