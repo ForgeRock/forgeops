@@ -84,12 +84,14 @@ deployquickstart () {
     deploycomponent "ds"
     echo 
     echo "******Waiting for DS pods to come up. This can take several minutes******"
+    sleep 2
     kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-idrepo --timeout=300s
     echo
     echo "******Deploying AM and IDM******"
     deploycomponent "apps"
     echo 
     echo "******Waiting for AM deployment to become available. This can take several minutes******"
+    sleep 2
     kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s
     echo
     echo "******Waiting for amster job to complete. This can take several minutes******"

@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+import time
 from urllib import request
 import utils
 
@@ -87,10 +88,12 @@ def deploy_quickstart(ns, fqdn, tag):
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
     deploy_component('ds', ns, fqdn, tag)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    time.sleep(2)
     utils.wait_for_ds(ns, 'ds-idrepo')
     utils.message('\nDeploying apps.')
     deploy_component('apps', ns, fqdn, tag)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
+    time.sleep(2)
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
