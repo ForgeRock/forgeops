@@ -83,8 +83,7 @@ deployquickstart () {
     echo "******Deploying ds.yaml. This is includes all directory resources******"
     deploycomponent "ds"
     echo 
-    echo "******Waiting for git-server and DS pods to come up. This can take several minutes******"
-    kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s
+    echo "******Waiting for DS pods to come up. This can take several minutes******"
     kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-idrepo --timeout=300s
     echo
     echo "******Deploying AM and IDM******"
@@ -137,7 +136,7 @@ deploylocalmanifest () {
     (cd kustomize/dev/image-defaulter && kustomize edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*)
     case "${1}" in
     "base")
-        INSTALL_COMPONENTS=("dev/kustomizeConfig" "base/secrets" "base/ingress" "base/git-server" "dev/scripts")
+        INSTALL_COMPONENTS=("dev/kustomizeConfig" "base/secrets" "base/ingress" "dev/scripts")
         ;;
     "ds")
         INSTALL_COMPONENTS=("base/ds-idrepo") #no "ds-cts" in dev-mode
