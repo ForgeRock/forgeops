@@ -5,7 +5,7 @@ SHELL := /bin/bash
 RELEASE_REVS := $(shell forgeops release-revlist)
 ACTIVE_TAG := $(shell forgeops current-tag)
 
-BASE_COMPONENTS = 7.0/ingress secrets ../dev/scripts
+BASE_COMPONENTS = ingress secrets ../dev/scripts
 DS_COMPONENTS = ds-idrepo ds-cts
 APP_COMPONENTS = am amster idm rcs-agent
 UI_COMPONENTS = admin-ui end-user-ui login-ui
@@ -24,8 +24,6 @@ clean_artifacts:
 	@rm -rf dist && mkdir -p dist
 
 artifacts: clean_artifacts $(BASE_COMPONENTS) $(DS_COMPONENTS) $(APP_COMPONENTS) $(UI_COMPONENTS)
-
-ingress: 7.0/ingress
 
 $(BASE_COMPONENTS):
 	$(eval $@_OUT := dist/base.yaml)
