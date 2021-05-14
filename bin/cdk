@@ -7,6 +7,7 @@ import sys
 import time
 from urllib import request
 import utils
+import json
 
 def get_component_url(component, tag):
     """Calculates the target URL of the desired component"""
@@ -153,6 +154,33 @@ def install_dependencies():
         utils.message('ds-operator CRD found in cluster.')
     print()
 
+def build_docker_image(component, default_repo):
+    """Builds custom docker images"""
+    # Clean out the temp kustomize files
+    base_dir = os.path.join(sys.path[0], '../')
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+              cwd=image_defaulter)
+    if default_repo:
+        default_repo_cmd = f'--default-repo={default_repo}'
+    else:
+        default_repo_cmd = ''
+    utils.run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd}', cwd=base_dir)
+    with open(os.path.join(base_dir, 'tag.json')) as tag_file:
+        tag_data = json.load(tag_file)['builds'][0]["tag"]
+    regex_name = {
+        'am': '.*am',
+        'amster' : '.*amster.*',
+        'idm': '.*idm',
+        'ds-idrepo': '.*ds-idrepo.*',
+        'ds-cts': '.*ds-cts.*'
+    }
+    name = regex_name.get(component, component)
+    utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
+    utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
+
+
 def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
@@ -178,6 +206,9 @@ def main():
         'delete', parents=[common], help='Delete ForgeRock Platform components or component bundles')
     parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
+    parser_build = subparser.add_parser('build', help='Build custom docker images')
+    parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts'])
+    parser_build.add_argument('-r', '--registry', dest='registry')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
@@ -185,7 +216,7 @@ def main():
     _, ctx_namespace, _ = utils.run('kubectl',
                                     'config view --minify --output=jsonpath={..namespace}', cstdout=True)
     ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
-    namespace = args.namespace or ctx_namespace
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
     components = args.components if getattr(args, 'components', None) else ['quickstart']
     fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
     demo = getattr(args, 'demo', None)
@@ -212,7 +243,10 @@ def main():
         for c in components:
             uninstall_component(c, namespace)
         return
-
+    if args.cmd == 'build':
+        for c in components:
+            build_docker_image(c, args.registry)
+        return
     install_dependencies()
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
