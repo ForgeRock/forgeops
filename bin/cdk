@@ -139,7 +139,7 @@ def install_dependencies():
                   cstderr=True, cstdout=True)
     except Exception as _e:
         utils.warning('secret-agent CRD not found. Installing secret-agent.')
-        utils.secretagent('apply')
+        utils.secretagent('apply', tag='v1.0.5')
     else:
         utils.message('secret-agent CRD found in cluster.')
 
@@ -148,7 +148,7 @@ def install_dependencies():
         utils.run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
     except Exception:
         utils.warning('ds-operator CRD not found. Installing ds-operator.')
-        utils.dsoperator('apply')
+        utils.dsoperator('apply', tag='v0.0.8')
     else:
         utils.message('ds-operator CRD found in cluster.')
     print()

@@ -49,7 +49,7 @@ installdependencies () {
     printf "Checking secret-agent operator and related CRDs: "
     if ! $(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io &> /dev/null); then
         printf "secret-agent CRD not found. Installing secret-agent\n"
-        kubectl -n secret-agent-system apply -f "https://github.com/${SECRETAGENT_REPO}/releases/latest/download/secret-agent.yaml"
+        kubectl -n secret-agent-system apply -f "https://github.com/${SECRETAGENT_REPO}/releases/download/v1.0.5/secret-agent.yaml"
         echo "Waiting for secret agent operator..."
         sleep 5
         kubectl wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s
@@ -62,7 +62,7 @@ installdependencies () {
     printf "Checking ds-operator and related CRDs: "
     if ! $(kubectl get crd directoryservices.directory.forgerock.io &> /dev/null); then
         printf "ds-operator CRD not found. Installing ds-operator\n"
-        kubectl -n fr-system apply -f "https://github.com/${DSOPERATOR_REPO}/releases/latest/download/ds-operator.yaml"
+        kubectl -n fr-system apply -f "https://github.com/${DSOPERATOR_REPO}/releases/download/v0.0.8/ds-operator.yaml"
         echo "Waiting for ds-operator..."
         sleep 5
         kubectl wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s
