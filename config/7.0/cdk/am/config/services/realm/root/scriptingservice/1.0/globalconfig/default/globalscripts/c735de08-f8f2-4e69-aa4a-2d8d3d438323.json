@@ -1,0 +1,36 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "ScriptingService",
+    "entityId" : "default/globalScripts/c735de08-f8f2-4e69-aa4a-2d8d3d438323",
+    "uid" : "ou=c735de08-f8f2-4e69-aa4a-2d8d3d438323,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID" : "globalScript",
+    "objectClass" : [
+      "top",
+      "sunServiceComponent"
+    ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "createdBy" : "null",
+    "lastModifiedDate" : "0",
+    "lastModifiedBy" : "null",
+    "_type" : {
+      "_id" : "ScriptingService",
+      "name" : "ScriptingService",
+      "collection" : false
+    },
+    "name" : "OAuth2 May Act Script",
+    "context" : "OAUTH2_MAY_ACT",
+    "description" : "Default global script for OAuth2 May Act",
+    "language" : "JAVASCRIPT",
+    "_id" : "default/globalScripts/c735de08-f8f2-4e69-aa4a-2d8d3d438323",
+    "creationDate" : "0",
+    "script" : {
+      "$base64:encode" : {
+        "$inline" : "OAuth2MayAct.javascript"
+      }
+    }
+  }
+}

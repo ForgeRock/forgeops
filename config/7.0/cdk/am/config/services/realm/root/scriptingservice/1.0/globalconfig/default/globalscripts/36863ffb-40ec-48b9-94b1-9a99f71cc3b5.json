@@ -26,12 +26,12 @@
     "name" : "OIDC Claims Script",
     "context" : "OIDC_CLAIMS",
     "description" : "Default global script for OIDC claims",
-    "language" : "GROOVY",
+    "language" : "JAVASCRIPT",
     "_id" : "default/globalScripts/36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
     "creationDate" : "0",
     "script" : {
       "$base64:encode" : {
-        "$inline" : "OIDCClaimsScript.groovy"
+        "$inline" : "OIDCClaimsScript.javascript"
       }
     }
   }

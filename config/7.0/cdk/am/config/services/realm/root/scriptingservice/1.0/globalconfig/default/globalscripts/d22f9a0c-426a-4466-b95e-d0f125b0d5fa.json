@@ -24,12 +24,12 @@
     "name" : "OAuth2 Access Token Modification Script",
     "context" : "OAUTH2_ACCESS_TOKEN_MODIFICATION",
     "description" : "Default global script for OAuth2 Access Token Modification",
-    "language" : "GROOVY",
+    "language" : "JAVASCRIPT",
     "_id" : "default/globalScripts/d22f9a0c-426a-4466-b95e-d0f125b0d5fa",
     "creationDate" : "1433147666269",
     "script" : {
       "$base64:encode" : {
-        "$inline" : "OAuth2AccessTokenModificationScript.groovy"
+        "$inline" : "OAuth2AccessTokenModificationScript.javascript"
       }
     }
   }
