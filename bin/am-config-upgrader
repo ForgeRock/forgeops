@@ -4,7 +4,6 @@
 # Usage: bin/am-upgrader [config-directory]
 #  Config directory defaults to the am config/ export in the docker folder
 #
-
 # The repo for the upgrader docker image
 REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader}
 # The am upgrader image tag to run. To override:
@@ -28,4 +27,4 @@ UPGRADER="/home/forgerock/amupgrade/amupgrade"
 CMD="$UPGRADER --inputConfig /am-config/config/services --output /am-config/config/services --fileBasedMode --prettyArrays --clean false --baseDn ou=am-config \$(ls /rules/*)"
 
 # Run the upgrader in docker. The config files and rules are mounted on the container. After exit, the config in $CONFIG will be upgraded/placedholdered
-docker run --volume "$CONFIG":/am-config --volume "$RULES:/rules" "$REPO:$TAG" sh  -c "$CMD"
+docker run --user :$UID --volume "$CONFIG":/am-config --volume "$RULES:/rules" "$REPO:$TAG" sh  -c "$CMD"
