@@ -288,9 +288,9 @@ save_config()
 			echo "Removing 'userpassword-encrypted' fields ..."
 			echo ""
 			find "$DOCKER_ROOT/amster/config" -name "*.json" \
-					\( -exec sed -i '' "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
-					\( -exec sed -i '' 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
-					-exec sed -i '' '/userpassword-encrypted/d' {} \; \
+					\( -exec $sed_cmd "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
+					\( -exec $sed_cmd 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
+					-exec $sed_cmd '/userpassword-encrypted/d' {} \; \
 
 			# Fix passwords in OAuth2Clients with placeholders or default values.
 			CLIENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/OAuth2Clients"
@@ -299,15 +299,15 @@ save_config()
 			echo "Adding back password placeholder with defaults in these files:"
 			echo ""
 			echo "idm-provisioning.json"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
+			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
 			echo "idm-resource-server.json"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json
+			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json
 			echo "resource-server.json"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
+			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
 			echo "oauth2.json"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
+			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
 			echo "ig-agent.json"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
+			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
 
 			#****** COPY FIXED FILES ******#
 			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
@@ -343,6 +343,14 @@ add_profile ()
     cp -r "${script_dir}/../config/7.0/cdk/amster" "$DOCKER_ROOT"
 
 }
+
+
+sed_flags=" -i "
+if [[ "${OSTYPE}" == "darwin"* ]];
+then
+    sed_flags+=" '' "
+fi
+sed_cmd="sed ${sed_flags}"
 
 # chdir to the script root/..
 cd "$script_dir/.."
