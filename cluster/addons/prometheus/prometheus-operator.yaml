@@ -2,7 +2,7 @@ alertmanager:
     enabled: true
     ingress:
         # Enable to use external url for Alertmanager.
-        enabled: true
+        enabled: false
         annotations: 
             kubernetes.io/ingress.class : nginx
             certmanager.k8s.io/cluster-issuer: default-issuer
@@ -31,7 +31,7 @@ prometheus:
                   storage: 100Gi
     ingress:
         # Enable to use external url for Prometheus.
-        enabled: true
+        enabled: false
         annotations: 
             kubernetes.io/ingress.class: nginx
             certmanager.k8s.io/cluster-issuer: default-issuer
@@ -48,7 +48,7 @@ grafana:
     adminPassword: password
     # Enable to use external url for Grafana.
     ingress:
-        enabled: true
+        enabled: false
         annotations: 
             kubernetes.io/ingress.class : nginx
             certmanager.k8s.io/cluster-issuer: default-issuer
