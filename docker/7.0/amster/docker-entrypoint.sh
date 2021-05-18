@@ -8,6 +8,9 @@ ACTION="${1:-import}"
 
 echo "amster action is $ACTION"
 
+# Default is to connect via the internal http service name
+# Note we use AMSTER_AM_RUL so we dont collide with the platform AM_URL - which might be external
+export AMSTER_AM_URL=${AMSTER_AM_URL:-http://am:80/am}
 
 pause() {
     echo "Args are $# "
@@ -19,9 +22,6 @@ pause() {
         sleep 1000000 & wait
     done
 }
-
-# Without this chmod, Docker does not know the file is executable on Windows
-chmod +x import.sh
 
 
 # Extract amster version for commons parameter to modify configs

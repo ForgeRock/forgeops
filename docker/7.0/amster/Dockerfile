@@ -15,4 +15,7 @@ ENV SERVER_URI /am
 
 COPY --chown=forgerock:root . /opt/amster
 
+# This is needed to make amster happy. It wants to create a preferences directory
+RUN chmod 777 /opt/amster
+
 ENTRYPOINT [ "/opt/amster/docker-entrypoint.sh" ]

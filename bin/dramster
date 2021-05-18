@@ -1,0 +1,128 @@
+#!/usr/bin/python3
+# Script to import or export dynamic configuration files from AM using an amster docker image
+import argparse
+import os
+import subprocess
+import sys
+import utils
+import tempfile
+import shutil
+import atexit
+
+# amster_docker_image='gcr.io/forgeops-public/amster:7.1.0'
+# TODO: For testing. Replace this once merged:bin
+amster_docker_image='gcr.io/engineering-devops/amster:ws-test'
+
+parser = argparse.ArgumentParser(
+    description='amster import or export json configuration files')
+
+parser.add_argument(
+    '-n', '--namespace', help='''
+The namespace where AM is running (defaults to the current namespace).\n
+    If --amUrl and --keyFile are both provided, this is not required.''')
+parser.add_argument(
+'-u', '--amUrl', help='The URL of the AM server. Defaults to https://$AM_URL/am  from the platform-configmap.)')
+parser.add_argument(
+'-k', '--keyFile', help='The path to the directory containing the amster ssh id_rsa key. Defaults to the Kubernetes secret "amster" with key id_rsa.)')
+parser.add_argument('-p', '--portForward', action='store_true',
+        help='Port forward mode. Use this on Minikube, where Docker can not connect directly to the AM URL')
+
+subparser = parser.add_subparsers(dest='cmd')
+parser_import = subparser.add_parser(
+    'import', help='Import JSON configuration files into AM.')
+parser_import.add_argument('src', help='Source file or directory to import.')
+parser_export = subparser.add_parser('export', help='Export files from Amster.')
+parser_export.add_argument('--global', dest='glob', action='store_true', help='Include the global configuration in the Amster export.')
+
+parser_export.add_argument(
+    'dst', help='destination directory to export files to')
+
+args = parser.parse_args()
+
+if args.cmd == None:
+    parser.print_help()
+    sys.exit(1)
+
+# Register clean up function
+def cleanUp():
+    if os.path.exists(keyDir):
+        shutil.rmtree(keyDir)
+    if 'pf' in globals():
+        pf.kill()
+
+atexit.register(cleanUp)
+
+amUrl = args.amUrl
+
+# If the user is running in minikube the docker container can not see the AM host. This
+# runs port forwarding using the host network.
+if args.portForward:
+    amUrl = 'http://am:8080/am'
+    pf=subprocess.Popen('kubectl port-forward service/am 8080:80'.split())
+    print(f'port forward process started pid: {pf.pid}')
+    docker_network='--network host --add-host=am:127.0.0.1'
+else:
+    docker_network = ''
+
+# We need to lookup the url
+if amUrl == None:
+    namespace = utils.get_namespace(args.namespace)
+    print(f'Looking up the AM URL in namespace {namespace}')
+    amUrl = utils.get_configmap_value(namespace, 'platform-config', 'AM_URL')
+    print( f'amUrl = {amUrl}')
+
+# Create a temp dir and the id_rsa file for amster ssh access
+keyFile = args.keyFile
+keyDir = tempfile.mkdtemp()
+
+
+
+id_rsa_file = open(f'{keyDir}/id_rsa','wb')
+
+
+# User has not provided the ssh key - look it up in the cluster
+if keyFile == None:
+    namespace = utils.get_namespace(args.namespace)
+    print(f'Looking up the amster ssh key in namespace {namespace}')
+    sshSecret = utils.get_secret_value(namespace, 'amster', 'id_rsa')
+    id_rsa_file.write(sshSecret)
+else:
+    # user provided the id_rsa file - copy it to keydir/id_rsa for consistency
+    r = open(keyFile,'rb')
+    bytes = r.read()
+    id_rsa_file.write(bytes)
+
+id_rsa_file.close()
+group = os.getegid()
+uid = os.getuid()
+
+if args.cmd == 'export':
+    if not os.path.isdir(args.dst):
+        try: os.mkdir(args.dst)
+        except OSError:
+            print (f'create of directory {args.dst} failed')
+            sys.exit(1)
+
+    dst_dir = os.path.abspath(args.dst)
+
+    cmd = f'docker run --rm --env AMSTER_AM_URL={amUrl} --user {uid}:{group} {docker_network} --volume {keyDir}:/var/run/secrets/amster --volume {dst_dir}:/var/tmp/amster {amster_docker_image} export-exit'
+    print(f'running\n{cmd}')
+    r = subprocess.run(cmd.split(), capture_output=True)
+    print(f'{r.stdout.decode()}\n{r.stderr.decode()}')
+    if r.returncode != 0:
+        sys.exit(r.returncode)
+
+if args.cmd == 'import':
+    if not os.path.isdir(args.src):
+        print(f'dst {args.src} is not a directory')
+        sys.exit(1)
+    src_dir=os.path.abspath(args.src)
+    cmd = f'docker run --rm --env AMSTER_AM_URL={amUrl} --user {uid}:{group} {docker_network} --volume {keyDir}:/var/run/secrets/amster --volume {src_dir}:/opt/amster/config {amster_docker_image} import'
+    print(f'running\n{cmd}')
+    r = subprocess.run(cmd.split(), capture_output=True)
+    print(f'{r.stdout.decode()}\n{r.stderr.decode()}')
+    if r.returncode != 0:
+        sys.exit(r.returncode)
+
+
+

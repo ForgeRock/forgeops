@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 # Import dynamic config.
 
-# Use 'am' as the internal cluster dns name.
-export SERVER_URL=${OPENAM_INSTANCE:-http://am:80}
-export URI=${SERVER_URI:-/am}
-
-export INSTANCE="${SERVER_URL}${URI}"
-
 # Alive check
-ALIVE="${INSTANCE}/json/health/ready"
+ALIVE="${AMSTER_AM_URL}/json/health/ready"
 
 wait_for_openam()
 {
@@ -80,19 +74,20 @@ import() {
    echo  "import done"
 }
 
+cat >/tmp/import.amster <<EOF
+connect $AMSTER_AM_URL -k /var/run/secrets/amster/id_rsa
+import-config --path /opt/amster/config  --clean false
+:exit
+EOF
+
 wait_for_openam
 
 # If there is no arg - just import any files found in config/
 if [[ -z "$1" ]]; then
-
-   import "amster-scripts/import.amster"
-
+   import "/tmp/import.amster"
 else
    # Else- wait for upload
    wait_config_file_upload
    sleep 5
-   import "amster-scripts/import-upload.amster"
+   import "/tmp/import.amster"
 fi
-
-
-

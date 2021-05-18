@@ -7,6 +7,7 @@ import pathlib
 from threading import Thread
 import os
 import shutil
+import base64
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -223,3 +224,44 @@ def copytree(src, dst):
     if errors:
         raise Exception('\n'.join(errors))
 
+# Run kubectl. If verbose is true, echo the command to the stdout
+# Returns the output as a string
+# def kubectl(cmd,verbose=True ):
+#      args = f'kubectl {namespace} {command}'
+#     print(args)
+#     r = subprocess.run(args.split())
+#     return r.returncode
+
+
+# IF ns is not None, then return it, otherwise lookup the current namespace context
+def get_namespace(ns):
+    if ns != None:
+        return ns
+
+    r = subprocess.run(f"kubectl config view --minify --output jsonpath='{{..namespace}}'", shell=True, capture_output=True)
+    if r.returncode != 0:
+        print(f'Can not not run kubectl to get the current namespace {r.stderr} : {r.stdout}')
+        sys.exit(1)
+    return r.stdout.decode("utf-8")
+
+# Lookup the value of a configmap key
+def get_configmap_value(namespace, configmap, key):
+    ks = "{.data." + key + "}"
+    r = subprocess.run(f'kubectl --namespace {namespace} get configmap {configmap} -o jsonpath={ks}', shell=True, capture_output=True)
+    if r.returncode != 0:
+        print(f'Kubectl error {r.stderr} : {r.stdout}')
+        sys.exit(1)
+    return r.stdout.decode("utf-8")
+
+
+# Lookup the value of a secret
+def get_secret_value(namespace, secret, key):
+    ks = "{.data." + key + "}"
+    r = subprocess.run(f'kubectl --namespace {namespace} get secret {secret} -o jsonpath={ks}', shell=True, capture_output=True)
+    if r.returncode != 0:
+        print(f'Kubectl error {r.stderr} : {r.stdout}')
+        sys.exit(1)
+
+         # base64 decode the secret
+    secret = base64.b64decode(r.stdout.decode("utf-8"))
+    return secret
