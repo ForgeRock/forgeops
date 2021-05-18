@@ -71,7 +71,8 @@ kind: Config
 build: &default-build
   artifacts: *default-artifacts
   tagPolicy: &default-tag-policy
-    sha256: {}
+    gitCommit:
+      variant: AbbrevTreeSha
 deploy: &default-deploy
   statusCheckDeadlineSeconds: 900
   kustomize:
