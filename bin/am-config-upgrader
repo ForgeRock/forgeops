@@ -43,7 +43,7 @@ REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader/pit1}
 TAG=${TAG:-7.2.0-latest-postcommit}
 
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 
 # Where the AM exported files are by default
 CONFIG_DIR=${1:-docker/7.0/am}
@@ -63,4 +63,5 @@ CONFIG=$(realpath $CONFIG_DIR)
 GID=$(id -g)
 
 # Run the upgrader in docker - optionally over mounting the /rules directory
+set -x
 docker run --rm --user $UID:$GID --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
