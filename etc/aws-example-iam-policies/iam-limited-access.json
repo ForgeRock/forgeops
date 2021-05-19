@@ -2,17 +2,46 @@
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Effect": "Allow",
             "Action": [
                 "iam:CreateInstanceProfile",
-                "iam:RemoveRoleFromInstanceProfile",
-                "iam:AddRoleToInstanceProfile",
-                "iam:PassRole",
                 "iam:DeleteInstanceProfile",
+                "iam:GetInstanceProfile",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:GetRole",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:AttachRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:ListInstanceProfiles",
+                "iam:AddRoleToInstanceProfile",
+                "iam:ListInstanceProfilesForRole",
+                "iam:PassRole",
                 "iam:DetachRolePolicy",
-                "iam:DeleteRole"
+                "iam:DeleteRolePolicy",
+                "iam:GetRolePolicy",
+                "iam:GetOpenIDConnectProvider",
+                "iam:CreateOpenIDConnectProvider",
+                "iam:DeleteOpenIDConnectProvider",
+                "iam:ListAttachedRolePolicies",
+                "iam:TagRole"
             ],
+            "Resource": [
+                "arn:aws:iam::*:instance-profile/eksctl-*",
+                "arn:aws:iam::*:role/eksctl-*",
+                "arn:aws:iam::*:oidc-provider/*",
+                "arn:aws:iam::*:role/aws-service-role/eks-nodegroup.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup",
+                "arn:aws:iam::*:role/eksctl-managed-*"
+            ]
+        },
+        {
             "Effect": "Allow",
-            "Resource": "*"
+            "Action": [
+                "iam:GetRole"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/*"
+            ]
         }
     ]
 }
