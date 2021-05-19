@@ -139,9 +139,10 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 # End of arg parsing
 
 
-#****** UPGRADE CONFIG AND REAPPLY PLACEHOLDERS ******#
+#****** REAPPLY PLACEHOLDERS ******#
+# Note: This DOES not run version upgrade rules. Run am-config-upgrader  $DOCKER_ROOT/am to use the built in version upgrade rules.
 upgrade_config(){
-	$script_dir/am-config-upgrader
+	$script_dir/am-config-upgrader  $DOCKER_ROOT/am config/am-upgrader-rules
 }
 
 # clear the product configs $1 from the docker directory.

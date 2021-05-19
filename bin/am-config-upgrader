@@ -1,30 +1,66 @@
 #!/usr/bin/env bash
-# Run the am-config upgrade script based on the rules found in /config/am-upgrader-rules
+# Run the am-config upgrade process on AM FBC configuration files.
 #
-# Usage: bin/am-upgrader [config-directory]
-#  Config directory defaults to the am config/ export in the docker folder
+# The default rules upgrade AM configuration to the same version as the upgrader image itself. For
+# example, if the upgrader docker image is version 7.2.1, AM FBC files will be upgraded to 7.2.1.
 #
-# The repo for the upgrader docker image
-REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader}
+# Usage: bin/am-upgrader [am-fbc-files] [rules-directory]
+#  [am-fbc-files] is the directory that contains the exported AM FBC Files. This defaults to docker/7.0/am.
+#   This script assumes FBC files have been previously exported.
+#
+#  If [rules-directory] is not provided, the version upgrade rules bundled in the image will be used. Otherwise
+#  the rules found in this directory will be run.
+#
+#
+# You can change the version of the upgrader used by supplying the REPO and TAG environment variables.
+# For example:
+# TAG=7.0.3 bin/am-config-upgrader
+
+
+# Mac does not come with realpath by default.
+# https://stackoverflow.com/questions/3572030/bash-script-absolute-path-with-os-x/18443300#18443300
+realpath() {
+  local OURPWD=$PWD
+  cd "$(dirname "$1")"
+  local LINK=$(readlink "$(basename "$1")")
+  while [ "$LINK" ]; do
+    cd "$(dirname "$LINK")"
+    local LINK=$(readlink "$(basename "$1")")
+  done
+  local REALPATH="$PWD/$(basename "$1")"
+  cd "$OURPWD"
+  echo "$REALPATH"
+}
+
+# For debugging
+# set  -x
+
+# The default repo for the upgrader docker image
+REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader/pit1}
+
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader
-TAG=${TAG:-7.1.0}
+TAG=${TAG:-7.2.0-latest-postcommit}
 
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."
 
-# Where the AM exported files are
+# Where the AM exported files are by default
 CONFIG_DIR=${1:-docker/7.0/am}
 # Where the rules are
-RULES_DIR=${2:-config/am-upgrader-rules}
+
+
+# If the user supplies a rules volume use that instead of the builtin rules
+RULES_VOLUME=""
+if [[ ! -z "$2" ]]; then
+    RDIR=$(realpath $2)
+    RULES_VOLUME="--volume $RDIR:/rules"
+fi
 
 # For docker volume mounts.
-CONFIG="$DIR/$CONFIG_DIR"
-RULES="$DIR/$RULES_DIR"
+CONFIG=$(realpath $CONFIG_DIR)
 
-# Command inside the docker image
-UPGRADER="/home/forgerock/amupgrade/amupgrade"
-CMD="$UPGRADER --inputConfig /am-config/config/services --output /am-config/config/services --fileBasedMode --prettyArrays --clean false --baseDn ou=am-config \$(ls /rules/*)"
+GID=$(id -g)
 
-# Run the upgrader in docker. The config files and rules are mounted on the container. After exit, the config in $CONFIG will be upgraded/placedholdered
-docker run --user :$UID --volume "$CONFIG":/am-config --volume "$RULES:/rules" "$REPO:$TAG" sh  -c "$CMD"
+# Run the upgrader in docker - optionally over mounting the /rules directory
+docker run --rm --user $UID:$GID --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
