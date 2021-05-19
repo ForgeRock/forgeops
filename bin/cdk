@@ -195,13 +195,6 @@ def main():
                                           help='Install the platform components or component bundles using local manifests')
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
-    install_mode_group = parser_install.add_mutually_exclusive_group()
-    install_mode_group.add_argument('--demo', dest='demo', action='store_true',
-                                    help='Install the platform using latest demo manifests. You can set the release tag using --tag')
-    install_mode_group.add_argument('--dev', dest='dev', action='store_true',
-                                    help='Install the platform using local manifests and nightly Docker images. (This is the default mode)')
-    parser_install.add_argument('-t', '--tag', dest='tag', default='latest',
-                                help='Select the forgeops tag to install when using --demo (default: latest)')
     parser_delete = subparser.add_parser(
         'delete', parents=[common], help='Delete ForgeRock Platform components or component bundles')
     parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
@@ -219,10 +212,6 @@ def main():
     namespace = getattr(args, 'namespace', None) or ctx_namespace
     components = args.components if getattr(args, 'components', None) else ['quickstart']
     fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
-    demo = getattr(args, 'demo', None)
-    tag = getattr(args, 'tag', None) if demo else None
-    if demo:
-        utils.warning(f'Using "demo" images and k8s manifests as specified in ForgeRock/forgeops "{tag}" release')
     if args.cmd == 'info':
         utils.printsecrets(namespace)
         utils.printurls(namespace)
@@ -250,10 +239,10 @@ def main():
     install_dependencies()
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
-        deploy_quickstart(namespace, fqdn, tag)
+        deploy_quickstart(namespace, fqdn, None)
     else:
         for c in components:
-            deploy_component(c, namespace, fqdn, tag)
+            deploy_component(c, namespace, fqdn, None)
 
     if args.cmd == 'install' and ('base' in components or 'quickstart' in components):
         utils.waitforsecrets(namespace)
