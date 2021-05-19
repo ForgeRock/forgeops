@@ -8,13 +8,56 @@ from threading import Thread
 import os
 import shutil
 import base64
+import logging
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
 RED = '\033[1;91m'
 ENDC = '\033[0m'
+MSG_FMT = '[%(levelname)s] %(message)s'
 
 _IGNORE_FILES = ('.DS_Store',)
+
+_log = None
+
+def loglevel(name):
+    try:
+        return getattr(logging, name.upper())
+    except AttributeError:
+        raise ValueError('Not a log level')
+
+def add_loglevel_arg(parser):
+    parser.add_argument('--log-level',
+                    default='INFO',
+                    type=loglevel)
+
+class ColorFormatter(logging.Formatter):
+    """Logging color"""
+    FORMATS = {
+        logging.DEBUG: f'{CYAN}{MSG_FMT}{ENDC}',
+        logging.INFO: f'{CYAN}{MSG_FMT}{ENDC}',
+        logging.WARNING: f'{PURPLE}{MSG_FMT}{ENDC}',
+        logging.ERROR: f'{RED}{MSG_FMT}{ENDC}',
+        logging.CRITICAL: f'{RED}{MSG_FMT}{ENDC}',
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        formatter.datefmt = '%Y-%m-%dT%H:%M:%S%z'
+        return formatter.format(record)
+
+
+def logger(name, level):
+    handler = logging.StreamHandler(stream=sys.stdout)
+    handler.setFormatter(ColorFormatter())
+    handler.setLevel(level)
+
+    log = logging.getLogger(name)
+    log.addHandler(handler)
+    log.setLevel(level)
+    return log
+
 
 def message(s):
     """Print info message"""
