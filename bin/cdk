@@ -201,7 +201,7 @@ def main():
                                help='Skip delete confirmation')
     parser_build = subparser.add_parser('build', help='Build custom docker images')
     parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts'])
-    parser_build.add_argument('-r', '--registry', dest='registry')
+    parser_build.add_argument('-r', '--default-repo', dest='registry')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
