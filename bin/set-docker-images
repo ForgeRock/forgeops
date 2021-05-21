@@ -2,6 +2,7 @@
 import tempfile
 from pathlib import Path
 import fileinput
+import os
 import json
 import argparse
 import textwrap
@@ -19,9 +20,22 @@ DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
 DEFAULT_CONFIG_PATH = str(
     SCRIPT_DIR.joinpath('../../build/platform-images').resolve()
 )
-PLATFORM_PRODUCTS = ['am', 'ig', 'idm', 'ds']
+# Dockerfiles requiring base image updates
+DOCKER_PRODUCTS = ('am', 'ig', 'idm', 'ds')
+# Directory names in forgeops
+UI_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
+# JSON key names in platform images
+UI_CONF_KEYNAME = ('imageNameAdmin', 'imageNameEnduser', 'imageNameLogin')
+# Other kustomize profiles
+MSC_PRODUCTS = ('rcs-agent',)
+# Product kustomize images
+KUSTOMIZE_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
+CLI_PRODUCTS = ('am', 'ig', 'idm', 'ds', 'ui')
 PLATFORM_DOCKER_BASE = '../../docker/7.0'
+PLATFORM_KUSTOMIZE_BASE = '../../kustomize/base'
 PLATFORM_DOCKER_PATH = SCRIPT_DIR.joinpath(PLATFORM_DOCKER_BASE).resolve()
+PLATFORM_KUSTOMIZE_PATH = SCRIPT_DIR.joinpath(
+    PLATFORM_KUSTOMIZE_BASE).resolve()
 DNS = re.compile(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}(:\d{1,})?$')
 
 HELP_EXAMPLES = """
@@ -150,8 +164,8 @@ def func_args():
     # Limit changes to these products
     parser.add_argument('--products',
                         help=('Replace base images for given products.'),
-                        default=PLATFORM_PRODUCTS,
-                        choices=PLATFORM_PRODUCTS, nargs='+')
+                        default=CLI_PRODUCTS,
+                        choices=CLI_PRODUCTS, nargs='+')
 
     # Operations
     parser.add_argument('--run-tests',
@@ -267,14 +281,70 @@ def load_product_configs(path, product_names):
     be path/<product_name>.json
     e.g. build/platform-images/am.json
     """
-    product_images = {}
+    docker_images = {}
+    kustomize_images = {}
     for name in product_names:
+        if name not in DOCKER_PRODUCTS:
+            # only add config for Dockerfile's only
+            continue
         p = path.joinpath(f'{name}.json')
         if p.exists():
             with p.open() as f:
                 config = json.load(f)
-            product_images[p.stem] = config
-    return product_images
+            docker_images[p.stem] = config
+
+    if 'ui' in product_names:
+        p = path.joinpath('ui.json')
+        if p.exists():
+            with p.open() as f:
+                config = json.load(f)
+            for product_name, keyname in zip(UI_PRODUCTS, UI_CONF_KEYNAME):
+                c = config
+                c['imageName'] = config[keyname]
+                kustomize_images[product_name] = c
+    if 'rcs-agent' in product_names:
+        p = path.joinpath('rcsagent.json')
+        if p.exists():
+            with p.open() as f:
+                config = json.load(f)
+            kustomize_images['rcs-agent'] = config
+    return docker_images, kustomize_images
+
+
+def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None):
+    """
+    Updates kustomization files to use image names and/or tags
+    update_repo and update_tag take precedents over product config.
+    """
+    for product_name, product_config in products.items():
+        kustomize_dir = kustomize_path.joinpath(product_name).resolve()
+        os.chdir(kustomize_dir)
+        new_image_name, new_tag = '', ''
+        if update_repo is not None:
+            new_image_name = f'{update_repo}/{product_name}'
+        else:
+            new_image_name = product_config['imageName']
+
+        # tag strings should start with ":" this makes it eastier to
+        # set the tag to be empty in case we are only changing a repo
+        if update_tag is not None:
+            new_tag = f':{update_tag}'
+        # if an update_repo operation set is set and update_tag isn't set
+        # then we don't change the tag and let it stay as defined in the
+        # kustomization.yaml
+        else:
+            new_tag = f':{product_config["imageTag"]}'
+        # Make sure that the image and tag have a value.
+        kustomize_set_image = f'.*{product_name}-ui.*={new_image_name}{new_tag}'
+        log.info(f'Running update for {kustomize_dir}')
+
+        success, _, _ = utils.run('kustomize',
+                                  'edit',
+                                  'set',
+                                  'image',
+                                  f'.*{product_name}-ui.*={new_image_name}{new_tag}')
+        if not success:
+            raise Exception(f'Couldn\'t update {product_name} kustomize')
 
 
 def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
@@ -353,7 +423,7 @@ def init_repo(args):
             if not ok:
                 log.critical(f'An error occured {err}.')
                 raise Exception
-    # warninging that we don't clone if it's there already
+    # Warning that we don't clone if it's there already
     elif args.git_repo != '' and args.config_path.is_dir():
         ok, commit_hash, err = utils.run('git',
                                          'rev-parse',
@@ -396,22 +466,37 @@ def run_from_args(args):
         log.critical(
             'A tag or repo must be set to use inplace updates to files')
         raise Exception
-    cli_only = {k: dict() for k in args.products}
     log.info('Updating products {}'.format(' '.join(args.products)))
-    update_dockerfiles(cli_only,
+    if 'ui' in args.products:
+        cli_only = {k: dict() for k in UI_PRODUCTS}
+        # update repo or tag to '' to force a NOOP change on component
+        update_repo = args.update_repo if args.update_repo else ''
+        update_tag = args.update_tag if args.update_tag else ''
+        update_kustomize(cli_only,
+                         PLATFORM_KUSTOMIZE_PATH,
+                         update_repo=update_repo,
+                         update_tag=update_tag)
+
+    if args.products in DOCKER_PRODUCTS:
+        cli_only = {k: dict() for k in args.products}
+        update_dockerfiles(cli_only,
                        PLATFORM_DOCKER_PATH,
                        args.update_repo,
                        args.update_tag)
 
 
 def run_from_files(args):
-    platform_images = load_product_configs(args.config_path,
-                                           args.products)
+    docker_images, kustomize_images = load_product_configs(args.config_path,
+                                                           args.products)
     log.info('Updating products {}'.format(' '.join(args.products)))
-    update_dockerfiles(platform_images,
+    update_dockerfiles(docker_images,
                        PLATFORM_DOCKER_PATH,
                        args.update_repo,
                        args.update_tag)
+    update_kustomize(kustomize_images,
+                     PLATFORM_KUSTOMIZE_PATH,
+                     args.update_repo,
+                     args.update_tag)
 
 
 def main():
