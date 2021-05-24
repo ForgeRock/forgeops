@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+cd /workspace/forgeops
+getsec () {
+kubectl -n $NAMESPACE get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
+}
+OUT=./temp.json
+cat <<EOF >$OUT
+{
+    "blocks": [{
+    "type": "section",
+    "text": {
+        "text": " \`$NAMESPACE pipeline\` Successful. Random Passwords generated for *$NAMESPACE*'s environment. See:\n<https://$NAMESPACE.iam.forgeops.com/platform>\n",
+        "type": "mrkdwn"
+    },
+    "fields": [
+        {
+        "type": "mrkdwn",
+        "text": "*uid=admin*: \`$(getsec ds-passwords dirmanager\\.pw)\`"
+        },
+        {				
+        "type": "mrkdwn",
+        "text": "*amadmin*: \`$(getsec  am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR)\`"
+        },
+        {	
+        "type": "mrkdwn",
+        "text": "*forgeops-commit-id*: \`$(git rev-parse --short HEAD)\`"
+        }              
+    ]
+    }]
+}
+EOF
+cat $OUT
+curl -X POST -H 'Content-type: application/json' --data @temp.json $SLACK_WEBHOOK_URL

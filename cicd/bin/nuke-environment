@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+#gcr.io/engineering-devops/skaffold:latest
+set -x
+kubectl -n $NAMESPACE delete  directoryservice --all
+kubectl -n $NAMESPACE delete sts,service,deployment,job,cronjob,ingress --all
+# Wait for the directory to delete before deleting secrets. Just in case the
+# ds-operator is performing a reconcile.
+sleep 5
+kubectl -n $NAMESPACE delete  secretagentconfiguration --all
+
+kubectl -n $NAMESPACE delete pvc --all

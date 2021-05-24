@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -x
+#gcr.io/engineering-devops/skaffold:latest
+
+{
+
+# Apply basic config
+PCONFIG="kustomize/overlay/nightly-config"
+kustomize build $PCONFIG | kubectl apply -n $NAMESPACE -f -
+kubectl apply -n $NAMESPACE -f kustomize/base/secrets/secret_agent_config.yaml
+
+# Wait for key secrets to be generated
+echo ""
+printf "waiting for secret: am-env-secrets ."; until kubectl -n ${NAMESPACE} get secret am-env-secrets &> /dev/null ; do sleep 1; printf "."; done ; echo "done"
+printf "waiting for secret: idm-env-secrets ."; until kubectl -n ${NAMESPACE} get secret idm-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
+printf "waiting for secret: rcs-agent-env-secrets ."; until kubectl -n ${NAMESPACE} get secret rcs-agent-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
+printf "waiting for secret: ds-passwords ."; until kubectl -n ${NAMESPACE} get secret ds-passwords &> /dev/null ; do sleep 1; printf "."; done; echo "done"
+printf "waiting for secret: ds-env-secrets ."; until kubectl -n ${NAMESPACE} get secret ds-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
+printf "waiting for secret: ds ."; until kubectl -n ${NAMESPACE} get secret ds &> /dev/null ; do sleep 1; printf "."; done; echo "done"
+
+# Build manifests using kustomize and deploy to cluster
+kustomize build kustomize/base/ds-cts | kubectl apply -n $NAMESPACE -f -
+kustomize build kustomize/base/ds-idrepo | kubectl apply -n $NAMESPACE -f -
+
+# Wait for DS to become healthy
+sleep 5 # Sleeping 2 seconds. Give kube-scheduler time to create pods
+kubectl -n ${NAMESPACE} rollout status --watch statefulset ds-cts --timeout=300s
+kubectl -n ${NAMESPACE} rollout status --watch statefulset ds-idrepo --timeout=300s
+} || {
+msg="Failed to deploy the base environment and directory to the $NAMESPACE namespace. See pipeline logs"
+echo $msg
+exit 1
+}
