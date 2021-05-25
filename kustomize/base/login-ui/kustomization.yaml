@@ -1,14 +1,11 @@
-kind: Kustomization
-apiVersion: kustomize.config.k8s.io/v1beta1
+kind: ""
+apiversion: ""
 commonLabels:
-  app.kubernetes.io/component: ui
-  app.kubernetes.io/instance: login-ui
   app.kubernetes.io/name: login-ui
+  app.kubernetes.io/instance: login-ui
+  app.kubernetes.io/component: ui
   app.kubernetes.io/part-of: forgerock
   tier: ui
 resources:
 - deployment.yaml
 - service.yaml
-images:
-- name: foo
-  newTag: bar
