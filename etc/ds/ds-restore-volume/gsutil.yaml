@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ds-restore
+spec:
+  template:
+    spec:
+      initContainers:
+      # Example that uses gsutil to copy files back from cloud storage
+      - name: gsutil
+        image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+        command: ['/opt/scripts/gs-restore.sh']
+        # If you use workload identity, mounting the service account is not required
+        # env:
+        # - name: GOOGLE_APPLICATION_CREDENTIALS
+        #   value: /var/run/secrets/service-account.json
+        volumeMounts:
+        - name: ds-backup
+          mountPath: /data
+        # Keeps gcloud happy
+        - name: config
+          mountPath: /.config
+        - name: scripts
+          mountPath: /opt/scripts
+        # Not needed for workload identity
+        # - name: sa
+        #   mountPath: /var/run/secrets
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        # Pass in GCS_PATH env var here for the source. If unset it defaults to the value in scripts/gs-restore.sh
+        # - name: GCS_PATH
+        #   value: gs://my-gcs/path/
+      volumes:
+      - name: config
+        emptyDir:
+          {}
+      # If using workload identity you do not need the service account
+      # - name: sa
+      #   secret:
+      #     secretName: gcs-secret
+

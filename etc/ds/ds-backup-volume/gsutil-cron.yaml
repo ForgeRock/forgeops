@@ -1,0 +1,44 @@
+# This patches the cronjob to include backup to a gcs bucket
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: ds-backup
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+        # An example of using the gsutil to copy the files to cloud storage
+          - name: gsutil
+            image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+            command: ['/opt/scripts/gs-backup.sh']
+            # If you use workload identity, mounting the service account is not required
+            # env:
+            # - name: GOOGLE_APPLICATION_CREDENTIALS
+            #   value: /var/run/secrets/service-account.json
+            volumeMounts:
+            - name: ds-backup
+              mountPath: /data
+            - name: config
+              mountPath: /.config
+            - name: scripts
+              mountPath: /opt/scripts
+            env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            # You can pass in GCS_PATH env var here to override the default. See scripts/gs-backup.sh
+            # Not needed if you use workload identity
+            # - name: sa
+            #   mountPath: /var/run/secrets
+          volumes:
+          # If using workload identity you do not need the service account json mounted
+          # - name: sa
+          #   secret:
+          #     secretName: gcs-secret
+          # Mounts the config dir that gsutil wants to see
+          - name: config
+            emptyDir:
+              {}

@@ -1,0 +1,6 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: ds-backup
+  annotations:
+    iam.gke.io/gcp-service-account: ds-backup@engineering-devops.iam.gserviceaccount.com

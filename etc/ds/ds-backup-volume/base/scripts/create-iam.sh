@@ -11,8 +11,8 @@ PROJECT=${GOOGLE_CLOUD_PROJECT:-engineering-devops}
 #   --clusterrole cluster-admin \
 #   --user "$(gcloud config get-value account)"
 
-# Create a service account for Kaniko to use
-SA_NAME=ldif-import-export
+# Create a GCP service account
+SA_NAME=ds-backup
 SA_ACCOUNT="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
 
 gcloud iam service-accounts create "$SA_NAME" \
@@ -27,18 +27,19 @@ gcloud projects add-iam-policy-binding "${PROJECT}" --member=serviceAccount:"${S
 
 # The command below needs to be run for each namespace!
 NAMESPACE=warren
-KSA_NAME=ldif-sa
+KSA_NAME=ds-backup
 gcloud iam service-accounts add-iam-policy-binding \
   --role roles/iam.workloadIdentityUser \
   --member "serviceAccount:${PROJECT}.svc.id.goog[${NAMESPACE}/${KSA_NAME}]" \
   $SA_ACCOUNT
 
 # If you do not want to use workload identity, you can also create a service account.json
-# See the comments in the export-ldif.job
+# See the comments in the gcs.yaml
+# Uncomment this below
 
-mkdir -p tmp
-gcloud iam service-accounts keys create tmp/service-account.json --iam-account "${SA_ACCOUNT}"
-# Use that file to create a K8S secret for kaniko
-kubectl delete secret gcs-secret || true
-kubectl create secret generic gcs-secret --from-file=tmp/service-account.json
+# mkdir -p tmp
+# gcloud iam service-accounts keys create tmp/service-account.json --iam-account "${SA_ACCOUNT}"
+# # Use that file to create a K8S secret for kaniko
+# kubectl delete secret gcs-secret || true
+# kubectl create secret generic gcs-secret --from-file=tmp/service-account.json
 

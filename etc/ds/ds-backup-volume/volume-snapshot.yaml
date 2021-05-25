@@ -5,6 +5,7 @@ kind: VolumeSnapshot
 metadata:
   name: ds-snapshot1
 spec:
+  # Your cluster admin needs to create the volume snapshot class
   volumeSnapshotClassName: ds-snapshot-class
   source:
     persistentVolumeClaimName: data-ds-idrepo-0

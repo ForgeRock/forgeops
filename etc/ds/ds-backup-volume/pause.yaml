@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ds-backup
+spec:
+  template:
+    spec:
+      containers:
+      # Example of a main container. This does nothing but sleep
+      # You could use this to kubectl cp the files
+      - name: pause
+        image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "sleep 600"]
+        volumeMounts:
+        - mountPath: /data/
+          name: ds-backup

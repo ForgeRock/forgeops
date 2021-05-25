@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ds-backup
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      # Run the export as an init container. We can kubectl wait for completion in scripts
+      - name: backup
+        image: gcr.io/forgeops-public/ds-idrepo:dev
+        imagePullPolicy: IfNotPresent
+        args: ["/opt/scripts/ds-backup.sh", "/mnt/export"]
+        # args: ["/opt/scripts/ds-backup.sh", "/mnt/export","ldif"]
+        # Must mount the data, and the keystore secrets to read the data
+        volumeMounts:
+        - name: data
+          mountPath: /opt/opendj/data
+        - name: secrets
+          mountPath: /opt/opendj/secrets
+        - name: scripts
+          mountPath: /opt/scripts
+      # The volume to export the ldif to
+        - name: ds-backup
+          mountPath: /backup
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        # Backup type is either ldif or ds-backup ()
+        - name: BACKUP_TYPE
+          value: ldif
+      # Use kustomize to include the container that copies the files to a backup medium.
+      containers: []
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      serviceAccount: ds-backup
+      volumes:
+      # The ds data to backup. This is a clone of the actuall data
+      - name: data
+        persistentVolumeClaim:
+          # Mounts the data from a clone or a snapshot of the data pvc
+          # The CSI driver must support cloning
+          claimName: ds-data-clone
+          # This example mounts the DS data pvc directly which means DS can not
+          # be running when you do the export.
+          # claimName: data-ds-idrepo-0
+      # Secondary volume that will contain the backed up files
+      - name: ds-backup
+        persistentVolumeClaim:
+          claimName: ds-backup
+      # ds keystore - needed to open and decrypt the ds data
+      - name: secrets
+        secret:
+          secretName: ds
+      - name: scripts
+        configMap:
+          name: backup-scripts
+          defaultMode: 0755
+

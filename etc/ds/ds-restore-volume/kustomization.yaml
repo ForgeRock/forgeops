@@ -1,0 +1,21 @@
+
+resources:
+- ds-restore-job.yaml
+- ../ds-backup-volume/base
+
+
+commonLabels:
+  app: ds-restore
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+# configMapGenerator:
+# - name: restore-scripts
+#   files:
+#   - scripts/ds-restore.sh
+#   - scripts/gs-restore.sh
+
+patchesStrategicMerge:
+- gsutil.yaml
+

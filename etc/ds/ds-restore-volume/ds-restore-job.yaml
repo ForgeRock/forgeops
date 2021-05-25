@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ds-restore
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      # It is assumed you will patch the init container with a container that restores files from
+      # a gcs backup, or other source.
+      initContainers: []
+      # When this container runs the data to restore should be sitting on the path /ds-restore
+      containers:
+      # Import the ldif files mounted on /data
+      - name: import
+        image: gcr.io/forgeops-public/ds-idrepo:dev
+        imagePullPolicy: IfNotPresent
+        args: ["/opt/scripts/ds-restore.sh", "/ds-restore"]
+        # Must mount the data, and the keystore secrets to read the data
+        volumeMounts:
+        - name: data
+          mountPath: /opt/opendj/data
+        - name: secrets
+          mountPath: /opt/opendj/secrets
+        - name: scripts
+          mountPath: /opt/scripts
+      # The volume to import the ldif from
+        - name: ds-backup
+          mountPath: /ds-restore
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+       # Type of backup to restore - ldif or ds-backup
+        - name: BACKUP_TYPE
+          value: ldif
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      serviceAccount: ds-backup
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          # Mounts the data from a clone or a snapshot of the data pvc
+          # The CSI driver must support cloning
+          claimName: ds-data-clone
+          # This example mounts the DS data pvc directly which means DS can not
+          # be running when you do the import.
+          # claimName: data-ds-idrepo-0
+      - name: ds-backup
+        persistentVolumeClaim:
+          claimName: ds-backup
+      - name: secrets
+        secret:
+          secretName: ds
+      - name: scripts
+        configMap:
+          name: backup-scripts
+          defaultMode: 0755
+

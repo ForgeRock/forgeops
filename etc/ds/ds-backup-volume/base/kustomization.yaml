@@ -1,0 +1,16 @@
+
+resources:
+- sa.yaml
+- pvc.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: backup-scripts
+  files:
+  - scripts/ds-backup.sh
+  - scripts/gs-backup.sh
+  - scripts/ds-restore.sh
+  - scripts/gs-restore.sh
+  - scripts/gs-rsync.sh
