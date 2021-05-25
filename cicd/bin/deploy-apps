@@ -4,7 +4,7 @@ set -x
 {
 kubectl -n $NAMESPACE delete job amster --ignore-not-found=true
 kustomize build kustomize/overlay/apps | kubectl -n $NAMESPACE apply -f -
-sleep 5
+sleep 45
 kubectl -n $NAMESPACE wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s
 kubectl -n $NAMESPACE wait --for=condition=Available deployment -l app.kubernetes.io/name=idm --timeout=600s
 } || {
