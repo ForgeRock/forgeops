@@ -9,6 +9,15 @@ from urllib import request
 import utils
 import json
 
+bundles = {
+    'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
+    'ds': ['base/ds-idrepo'],
+    'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
+    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
+    'am': ['dev/am'],
+    'idm': ['dev/idm']
+}
+
 def get_component_url(component, tag):
     """Calculates the target URL of the desired component"""
     if tag == 'latest':
@@ -35,14 +44,7 @@ def deploy_local_manifest(component, ns, fqdn):
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
-    bundles = {
-        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
-        'ds': ['base/ds-idrepo'],
-        'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
-        'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
-        'am': ['dev/am'],
-        'idm': ['dev/idm']
-    }
+
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
@@ -65,19 +67,30 @@ def deploy_component(component, ns, fqdn, tag):
 
 def uninstall_component(component, ns):
     """Uninstall a manifest"""
-    component_url = get_component_url(component, 'latest')
+    if  component == "quickstart":
+        for c in ['ui', 'apps', 'ds', 'base']:
+            uninstall_component(c, ns)
+        return
     try:
-        with request.urlopen(component_url, timeout=5) as r:
-            contents = r.read().decode('ascii')
-            contents = contents.replace('namespace: default', f'namespace: {ns}')
-            utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -',
-                      stdin=bytes(contents, 'ascii'))
-            if component in ['base', 'quickstart']:
-                utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
-                utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
-            if component in ['apps', 'idm']:
-                # Temporary: only need this IDM delete until we release. Latest release idm is a statefulset
-                utils.run('kubectl', f'-n {ns} delete deployment -l app.kubernetes.io/component=idm')
+        # Clean out the temp kustomize files
+        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+        image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
+        components_to_delete = bundles.get(component, [f'base/{component}'])
+        # Temporarily add the wanted kustomize files
+        for c in components_to_delete:
+            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
+        contents = contents.decode('ascii')
+        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
+        # Clean out the temp kustomize files
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
+
+        if component in ['base', 'quickstart']:
+            utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
+            utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
