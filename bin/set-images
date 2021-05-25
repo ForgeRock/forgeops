@@ -303,7 +303,7 @@ def load_product_configs(path, product_names):
                 c['imageName'] = config[keyname]
                 kustomize_images[product_name] = c
     if 'rcs-agent' in product_names:
-        p = path.joinpath('rcsagent.json')
+        p = path.joinpath('openicf-connectors.json')
         if p.exists():
             with p.open() as f:
                 config = json.load(f)
