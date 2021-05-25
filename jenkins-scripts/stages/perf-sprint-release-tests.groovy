@@ -15,14 +15,16 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         def forgeopsPath = localGitUtils.checkoutForgeops()
 
         def config_common = [
-                STASH_LODESTAR_BRANCH: commonModule.LODESTAR_GIT_COMMIT,
-                EXT_FORGEOPS_PATH    : forgeopsPath,
-                PIPELINE_NAME        : 'ForgeOps - Perf-Sprint-Release',
-                CHECK_REGRESSION     : true,
-                MAX_VARIATION        : '0.10',
-                CLUSTER_DOMAIN       : 'perf-sprint-release.forgeops.com',
-                TIMEOUT              : '12',
-                TIMEOUT_UNIT         : 'HOURS',
+                STASH_LODESTAR_BRANCH                   : commonModule.LODESTAR_GIT_COMMIT,
+                STASH_FORGEOPS_BRANCH                   : commonModule.FORGEOPS_GIT_COMMIT,
+                PIPELINE_NAME                           : 'ForgeOps - Perf-Sprint-Release',
+                CHECK_REGRESSION                        : true,
+                MAX_VARIATION                           : '0.10',
+                CLUSTER_DOMAIN                          : 'perf-sprint-release.forgeops.com',
+                TIMEOUT                                 : '12',
+                TIMEOUT_UNIT                            : 'HOURS',
+                DEPLOYMENT_CREATEPROMETHEUSSNAPSHOT     : 'true',
+                DEPLOYMENT_PROMETHEUSSNAPSHOTBUCKETURL  : 'gs://performance-bucket-us-east1/prometheus_snapshots'
         ]
 
         def parentStageName = 'PERF Sprint Release'
