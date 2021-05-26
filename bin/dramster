@@ -11,7 +11,7 @@ import atexit
 
 # amster_docker_image='gcr.io/forgeops-public/amster:7.1.0'
 # TODO: For testing. Replace this once merged:bin
-amster_docker_image='gcr.io/engineering-devops/amster:ws-test'
+amster_docker_image='gcr.io/forgeops-public/amster:dev'
 
 parser = argparse.ArgumentParser(
     description='amster import or export json configuration files')
@@ -71,6 +71,8 @@ if amUrl == None:
     amUrl = utils.get_configmap_value(namespace, 'platform-config', 'AM_URL')
     print( f'amUrl = {amUrl}')
 
+fqdn = utils.get_configmap_value(namespace, 'platform-config', 'FQDN')
+
 # Create a temp dir and the id_rsa file for amster ssh access
 keyFile = args.keyFile
 keyDir = tempfile.mkdtemp()
@@ -117,7 +119,7 @@ if args.cmd == 'import':
         print(f'dst {args.src} is not a directory')
         sys.exit(1)
     src_dir=os.path.abspath(args.src)
-    cmd = f'docker run --rm --env AMSTER_AM_URL={amUrl} --user {uid}:{group} {docker_network} --volume {keyDir}:/var/run/secrets/amster --volume {src_dir}:/opt/amster/config {amster_docker_image} import'
+    cmd = f'docker run --rm --env FQDN={fqdn} --env AMSTER_AM_URL={amUrl} --user {uid}:{group} {docker_network} --volume {keyDir}:/var/run/secrets/amster --volume {src_dir}:/opt/amster/config {amster_docker_image} import'
     print(f'running\n{cmd}')
     r = subprocess.run(cmd.split(), capture_output=True)
     print(f'{r.stdout.decode()}\n{r.stderr.decode()}')
