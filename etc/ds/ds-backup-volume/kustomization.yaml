@@ -1,9 +1,8 @@
 resources:
 # You either run this as a one shot job:
 - ds-backup-job.yaml
-# Or as a cron task that runs backup on a schedule. Please see the README for caveats.
-# - ds-backup-cron.yaml
-- base
+- ../backup-base
+- pvc.yaml
 
 commonLabels:
   app: ds-backup
@@ -11,9 +10,7 @@ commonLabels:
 # Choose one of the strategies below to backup the files. E.g. to gcs, s3, etc.
 # Add your own container here that backs up to the system of choice
 patchesStrategicMerge:
-# Patch with the gstil job
+# Patch with the gsutil job
 - gsutil.yaml
-# Or the cron job
-# - gsutil-cron.yaml
 # Pause just waits then exits. You could use kubectl cp to grab the files.
 # - pause.yaml

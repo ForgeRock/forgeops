@@ -14,3 +14,6 @@ configMapGenerator:
   - scripts/ds-restore.sh
   - scripts/gs-restore.sh
   - scripts/gs-rsync.sh
+  - scripts/snapshot.sh
+  - scripts/job.yaml
+

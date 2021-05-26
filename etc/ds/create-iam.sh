@@ -2,6 +2,8 @@
 # Sample script to create IAM roles to read/write to gcs storage
 #
 # This is run by a cluster administrator as a *one time process*.
+# This is used by ds backup/restore samples in this directory. The
+# Samples are configured to use GKE workload identity.
 
 
 PROJECT=${GOOGLE_CLOUD_PROJECT:-engineering-devops}
@@ -26,6 +28,7 @@ gcloud projects add-iam-policy-binding "${PROJECT}" --member=serviceAccount:"${S
 
 
 # The command below needs to be run for each namespace!
+# This creates the mapping between the GCP service account and the Kubernetes service account
 NAMESPACE=warren
 KSA_NAME=ds-backup
 gcloud iam service-accounts add-iam-policy-binding \

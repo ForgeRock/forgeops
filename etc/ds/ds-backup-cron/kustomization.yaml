@@ -1,0 +1,9 @@
+resources:
+- ds-backup-cron.yaml
+- rbac.yaml
+- ../backup-base
+
+# namespace: warren
+
+generatorOptions:
+  disableNameSuffixHash: true

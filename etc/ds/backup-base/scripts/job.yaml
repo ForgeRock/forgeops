@@ -1,0 +1,105 @@
+
+# This is a sample Job template that backs up the directory server disk from a clone of the primary disk
+# This template is called by the script snapshot.sh in the ds-backup-cron Job
+# See the comments inline to adjust the parameters for your environment
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ds-backup
+spec:
+  # This will clean up the job after completion.
+  # This feature entered beta in 1.20 and may not be available on all releases.
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      restartPolicy: Never
+
+      ##### the first container performs a backup to the ds-backup pvc using DS utilities ######
+      initContainers:
+      # Run the export as an init container. We can kubectl wait for completion in scripts
+      - name: backup
+        image: gcr.io/forgeops-public/ds-idrepo:dev
+        imagePullPolicy: IfNotPresent
+        args: ["/opt/scripts/ds-backup.sh"]
+        # Must mount the data, and the keystore secrets to read the data
+        volumeMounts:
+        - name: data
+          mountPath: /opt/opendj/data
+        - name: secrets
+          mountPath: /opt/opendj/secrets
+        - name: scripts
+          mountPath: /opt/scripts
+      # The volume to export the ldif or back to
+        - name: ds-backup
+          mountPath: /backup
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        # EDIT ME: Backup type is either ldif or ds-backup
+        # NOTE: ds-backups are encrypted. You must mount the ds keystore in order to save or recover the data.
+        - name: BACKUP_TYPE
+          value: ldif
+
+
+      ##### This container copies the backed up files on the ds-backup PVC to an archival medium ####
+      # This example uses gsutil to copy the files to cloud storage. You can replace this
+      # example with your archival container.
+      # GKE workload identity is used authorize writing to GCS.  See the GKE docs.
+      - name: gsutil
+        image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+        command: ['/opt/scripts/gs-backup.sh']
+        volumeMounts:
+        - name: ds-backup
+          mountPath: /data
+        - name: config
+          mountPath: /.config
+        - name: scripts
+          mountPath: /opt/scripts
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+
+      containers:
+      # Example of a main container. This does nothing but sleep
+      # You could use this to kubectl cp the files
+      - name: pause
+        image: busybox
+        command: ["/bin/sh"]
+        args: ["-c", "sleep 10"]
+        volumeMounts:
+        - mountPath: /data/
+          name: ds-backup
+
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      serviceAccount: ds-backup
+
+      volumes:
+      # The ds data to backup. This is a clone of the actuall data
+      - name: data
+        persistentVolumeClaim:
+          # Mounts the data from a clone or a snapshot of the data pvc
+          # This gets replaced by sed before the job runs
+          claimName: DS_DATA_CLONE_DISK
+      # Secondary volume that will contain the backed up files
+      - name: ds-backup
+        persistentVolumeClaim:
+          claimName: ds-backup
+      # ds keystore - needed to open and decrypt the ds data
+      - name: secrets
+        secret:
+          secretName: ds
+      - name: scripts
+        configMap:
+          name: backup-scripts
+          defaultMode: 0755
+      # Config dir that gsutil needs
+      - name: config
+        emptyDir:
+          {}

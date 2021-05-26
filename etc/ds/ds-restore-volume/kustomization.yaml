@@ -1,7 +1,7 @@
 
 resources:
 - ds-restore-job.yaml
-- ../ds-backup-volume/base
+- ../backup-base
 
 
 commonLabels:
@@ -9,12 +9,6 @@ commonLabels:
 
 generatorOptions:
   disableNameSuffixHash: true
-
-# configMapGenerator:
-# - name: restore-scripts
-#   files:
-#   - scripts/ds-restore.sh
-#   - scripts/gs-restore.sh
 
 patchesStrategicMerge:
 - gsutil.yaml

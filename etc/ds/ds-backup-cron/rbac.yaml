@@ -1,0 +1,31 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-snapshot
+rules:
+- apiGroups: [""]
+  resources: ["pods","pods/log"]
+  verbs: ["get", "watch", "create", "update", "patch", "delete","list"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "watch", "create", "update", "patch", "delete","list"]
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "watch", "create", "update", "patch", "delete","list"]
+- apiGroups: ["snapshot.storage.k8s.io"]
+  resources: ["volumesnapshots"]
+  verbs: ["get", "watch", "create", "update", "patch", "delete","list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-snapshot
+subjects:
+# You can specify more than one "subject"
+- kind: ServiceAccount
+  name: ds-backup
+  # namespace: warren
+roleRef:
+  kind: Role
+  name: pod-snapshot
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,10 @@
+# The claim for the backup storage volume. This must be large enough to host the ldif or ds backup
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: ds-backup
+spec:
+  accessModes: [ "ReadWriteOnce" ]
+  resources:
+    requests:
+      storage: 10Gi
