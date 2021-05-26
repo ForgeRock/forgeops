@@ -314,7 +314,7 @@ def load_product_configs(path, product_names):
 def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None):
     """
     Updates kustomization files to use image names and/or tags
-    update_repo and update_tag take precedents over product config.
+    update_repo and update_tag take precedence over product config.
     """
     for product_name, product_config in products.items():
         kustomize_dir = kustomize_path.joinpath(product_name).resolve()
