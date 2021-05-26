@@ -81,8 +81,11 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     ]
 
                     dir("platform-ui") {
-                        // There are no idcloud branches created on Platform UI repository
-                        localGitUtils.shallowCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
+                        // Checkout Platform UI repository commit corresponding to the UI images commit promoted to Forgeops
+                        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
+                        Collection<String> adminImageTagParts = adminImageTag.split('-')
+                        def adminImagecommit = adminImageTagParts.last()
+                        sh "git checkout ${adminImagecommit}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
                     }
 
