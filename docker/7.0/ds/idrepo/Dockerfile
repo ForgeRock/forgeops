@@ -10,6 +10,7 @@ WORKDIR  /opt/opendj
 COPY --chown=forgerock:root common  /opt/opendj/
 COPY --chown=forgerock:root idrepo  /opt/opendj/
 COPY --chown=forgerock:root scripts /opt/opendj/scripts
+COPY --chown=forgerock:root uma /opt/opendj/uma
 
 # Ldif for the alpha/bravo realm config
 COPY --chown=forgerock:root idrepo/*.ldif  /var/tmp/
@@ -25,6 +26,10 @@ COPY --chown=forgerock:root idrepo/*.ldif  /var/tmp/
 # This can be removed once AM can create these itself. See https://bugster.forgerock.org/jira/browse/AME-19010
 RUN chmod +w  template/setup-profiles/AM/config/6.5/base-entries.ldif \
         && cat scripts/external-am-datastore.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat uma/opendj_uma_audit.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat uma/opendj_uma_pending_requests.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat uma/opendj_uma_resource_set_labels.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat uma/opendj_uma_resource_sets.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
         && cat /var/tmp/alpha_bravo.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
         && chmod +w template/setup-profiles/AM/identity-store/7.0/base-entries.ldif \
         && cat /var/tmp/orgs.ldif >> template/setup-profiles/AM/identity-store/7.0/base-entries.ldif \
