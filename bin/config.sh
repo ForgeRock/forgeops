@@ -239,9 +239,13 @@ export_config(){
 		am)
 			# Export AM configuration
 			printf "\nExporting AM configuration..\n\n"
-            rm -fr  "$DOCKER_ROOT/am/config"
+			# TODO: When using a diff, we dont want to delete the existing folder contents
+            # rm -fr  "$DOCKER_ROOT/am/config"
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
-			kubectl exec $pod -c openam -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xf - )
+			# Run export.sh to export *everything*  or export-diff.sh to export only files that have changed
+			# The export command passes `-` as the destination - which writes to stdout
+			kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh - | tar xf -  -C "$DOCKER_ROOT"/am
+
 			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
 
 			# Upgrade config and reapply placeholders

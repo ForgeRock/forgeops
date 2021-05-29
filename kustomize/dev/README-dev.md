@@ -7,10 +7,7 @@ The developer profile provides:
 * **Reduced footprint deployment.**
   There is a single DS instance for the CTS and idrepo instead of multiple
   instances.
-* **Developer Git server.**
-  IDM and AM configurations are saved to an "emptyDir" volume, and then pushed
-  to a Git server pod running in the developer's namespace. Any changes the
-  developer makes in the AM and IDM UIs are be saved to Git.
+
 * **Phased deployment.** The developer profile is deployed in phases
   rather than by using a one-step _skaffold run_ deployment. The phased
   deployment lets you iterate on development without needing to reload users or

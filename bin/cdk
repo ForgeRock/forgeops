@@ -198,9 +198,9 @@ def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
-    common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm', 
-                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 
-                                                          'rcs-agent', 'git-server', []])
+    common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui',
+                                                          'rcs-agent', []])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
     subparser = parser.add_subparsers(dest='cmd', required=True)
