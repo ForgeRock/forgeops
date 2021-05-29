@@ -1,12 +1,12 @@
 FROM gcr.io/forgerock-io/am-base/pit1:7.2.0-e8458400f9e638e1d925819ce16d14fd6f3b61d9
 USER root
 
-ENV DEBIAN_FRONTEND=noninteractive                          
-ENV APT_OPTS="--no-install-recommends --yes"                
-RUN apt-get update \                                        
-        && apt-get install -y git \           
-        && apt-get clean \                                  
-        && rm -r /var/lib/apt/lists /var/cache/apt/archives 
+ENV DEBIAN_FRONTEND=noninteractive
+ENV APT_OPTS="--no-install-recommends --yes"
+RUN apt-get update \
+        && apt-get install -y git \
+        && apt-get clean \
+        && rm -r /var/lib/apt/lists /var/cache/apt/archives
 
 USER forgerock
 
@@ -34,5 +34,3 @@ WORKDIR /home/forgerock
 # If you want to debug AM uncomment these lines:
 #ENV JPDA_TRANSPORT=dt_socket
 #ENV JPDA_ADDRESS *:9009
-
-ENTRYPOINT ["/home/forgerock/custom-entrypoint.sh"]
