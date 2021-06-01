@@ -7,9 +7,6 @@ If you are not familiar with Kustomize, please read the documents and study the
 tutorials [here](https://kustomize.io/) before you try to work with ForgeRock's 
 Kustomize artifacts.
 
-**TL;DR;** With Kustomize, you create base assets (Kubernetes YAML files), and 
-then patch them or overlay them. The modified assets can then be used as new 
-bases. You can nest these to any arbitrary depth.
 
 ## Organization
 
@@ -47,4 +44,4 @@ For more information, see the forgeops repository's [top-level README](../README
 
 The `kustomize` directory demonstrates a directory-based organization. You could
 also use Git branching. For more information, see 
-[this discussion](https://kubectl.docs.kubernetes.io/pages/app_composition_and_deployment/diffing_local_and_remote_resources.html).
+[this page](https://kubectl.docs.kubernetes.io/guides/app_deployment/diffing_local_and_remote_resources/).

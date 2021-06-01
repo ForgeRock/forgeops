@@ -6,12 +6,15 @@ This README was written when OpenShift 4 and its installer were in pre-beta
 development. Most of the information in this README is likely to be out of date,
 since it's primarily a compilation of workarounds. But if you understand 
 OpenShift, you should be able to utilize this README. This deployment has been 
-tested only on AWS, but the os-install works for multiple providers.
+tested only on AWS, but the `openshift-install.sh` script will likely work for 
+multiple providers.
 
 ## File Locations
 
-The artifacts required to run the ForgeRock Identity Platform on OpenShift are 
-located in the `kustomize/overlay/7.0/openshift` directory.
+The ForgeRock Cloud Deployment team used Kustomize and Skaffold to orchestrate 
+and test deployment on OpenShift. The artifacts required to deploy the ForgeRock
+Identity Platform on OpenShift are located in the `kustomize/overlay/7.0/openshift`
+directory.
 
 ## Create a Red Hat developer account
 
@@ -41,10 +44,10 @@ the installer script in the next step.
 Run the installer script. Note that running the scriopt requires nearly all 
 privileges on your AWS account; see the OpenShift installer documentation: 
 
-```                                                                                                                                                          
-# to follow progress `less +F forgerock-openshift/.openshift_install.log`                                                                                    
-# last two lines will be kubeadmin and password                                                                                                              
-bash bin/openshift-install.sh forgerock-openshift                                                                                                            
+```                                                       
+# to follow progress `less +F forgerock-openshift/.openshift_install.log`
+# last two lines will be kubeadmin and password
+bash bin/openshift-install.sh forgerock-openshift 
 ```                                                                                                                                                          
 
 ## Deploy and Run the ForgeRock Identity Platform
@@ -147,11 +150,11 @@ effect except ugly shell output.
 
 The following Jira issues have full details:
 
-* CLOUD-1565 	Investigate OpenShift deployment
-* CLOUD-1585 	Bootstrap AWS account for OpenShift installer
-* CLOUD-1586 	install OpenShift on AWS
-* CLOUD-1587 	Deploy directory service to OpenShift
-* CLOUD-1588 	Deploy rest of services to OpenShift
+* [CLOUD-1565 	Investigate OpenShift deployment](https://bugster.forgerock.org/jira/browse/CLOUD-1565)
+* [CLOUD-1585 	Bootstrap AWS account for OpenShift installer](https://bugster.forgerock.org/jira/browse/CLOUD-1585)
+* [CLOUD-1586 	install OpenShift on AWS](https://bugster.forgerock.org/jira/browse/CLOUD-1586)
+* [CLOUD-1587 	Deploy directory service to OpenShift](https://bugster.forgerock.org/jira/browse/CLOUD-1587)
+* [CLOUD-1588 	Deploy rest of services to OpenShift](https://bugster.forgerock.org/jira/browse/CLOUD-1588)
 
 The following are known issues with ForgeRock Identity Platform deployments on 
 OpenShift:
