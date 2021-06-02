@@ -205,7 +205,7 @@ patch_container() {
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-    ${script_dir}/platform-config --clean --force --profile-dir "config/7.0/${_arg_profile}"
+    ${script_dir}/platform-config --profile-dir "config/7.0/${_arg_profile}"
 }
 
 # Show the differences between the source configuration and the current Docker configuration
