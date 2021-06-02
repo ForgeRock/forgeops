@@ -17,7 +17,7 @@ COPY skaffold.bash /builder/skaffold.bash
 RUN mkdir -p /builder/bin && \
     apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
-        openssh-client git python3 unzip curl wget ca-certificates && \
+        openssh-client git python3 unzip curl wget ca-certificates jq && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean all
 
