@@ -245,7 +245,11 @@ export_config(){
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 			# Run export.sh to export *everything*  or export-diff.sh to export only files that have changed
 			# The export command passes `-` as the destination - which writes to stdout
-			kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh - | tar xf -  -C "$DOCKER_ROOT"/am
+			kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh - | tar xf -  -C "$DOCKER_ROOT"/am || {
+				echo ""
+				echo "No changes were made to the AM configuration. Exiting."
+				exit 0
+			}
 
 			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
 
