@@ -40,10 +40,10 @@ objectClass: top
 objectClass: organizationalUnit
 ou: groups
 
-dn: ou=user,o=alpha,o=root,ou=identities
+dn: ou=people,o=alpha,o=root,ou=identities
 objectClass: top
 objectClass: organizationalUnit
-ou: user
+ou: people
 
 dn: ou=role,o=alpha,o=root,ou=identities
 objectClass: top
@@ -70,10 +70,10 @@ objectClass: top
 objectClass: organizationalUnit
 ou: groups
 
-dn: ou=user,o=bravo,o=root,ou=identities
+dn: ou=people,o=bravo,o=root,ou=identities
 objectClass: top
 objectClass: organizationalUnit
-ou: user
+ou: people
 
 dn: ou=role,o=bravo,o=root,ou=identities
 objectClass: top
