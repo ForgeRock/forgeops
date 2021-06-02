@@ -3,8 +3,8 @@
 The CDM uses the
 [kube-prometheus-stack Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
 for monitoring and alerts. Before you attempt to customize the default
-implementation, make sure you are familiar with Prometheus, Grafana, and
-Alertmanager concepts in the following documentation:
+implementation, make sure you are familiar with Prometheus, Alertmanager, and
+Grafana concepts in the following documentation:
 
 * [Alertmanager overview](https://prometheus.io/docs/alerting/overview/)
 
@@ -13,12 +13,12 @@ Alertmanager concepts in the following documentation:
 * [Grafana](https://grafana.com/docs/grafana/latest/)
 
 The following sections list the forgeops repository artifacts that are used to
-deploy Prometheus, Grafana, and Alertmanager in the CDM.  
+deploy Prometheus,Alertmanager, and Grafana in the CDM.  
 
 ## Helm charts
 
-* The ``kube-prometheus-stack`` chart deploys Prometheus, Grafana, and
-Alertmanager software. It also deploys the relevant metrics exporters. The
+* The ``kube-prometheus-stack`` chart deploys Prometheus, Alertmanager, and 
+Grafana software. It also deploys the relevant metrics exporters. The
 deployment creates custom resources to make Prometheus native to Kubernetes.
   
 * The ``forgerock-metrics`` chart provides configurable service monitors,
@@ -27,11 +27,11 @@ ForgeRock Identity Platform component endpoints that Prometheus monitors.
 
 ## Scripts
 
-* The ```bin/prometheus-deploy.sh``` script deploys the Helm charts mentioned
+* The ``bin/prometheus-deploy.sh`` script deploys the Helm charts mentioned
 above.
   
-* The ```bin/prometheus-connect.sh``` wrapper script port forwards the
-Prometheus, Grafana, and Alertmanager endpoints.
+* The ``bin/prometheus-connect.sh`` wrapper script port forwards the
+Prometheus, Alertmanager, and Grafana endpoints.
   
 Note: All path locations mentioned in this README are relative to the forgeops
 repository's top-level directory.
@@ -39,7 +39,7 @@ repository's top-level directory.
 ## Files in the ``cluster/addons/prometheus`` directory  
 
 * ``prometheus-operator.yaml``: Overrides values for the Prometheus operator,
-Prometheus, Grafana, and Alertmanager. See the `prometheus-community/kube-prometheus-stack`
+Prometheus, Alertmanager, and Grafana. See the `prometheus-community/kube-prometheus-stack`
 [values file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
 for default values. To modify default values, override the
 ``prometheus-operator.yaml`` file, or specify your own values file when you deploy Prometheus. For example:
@@ -72,26 +72,11 @@ the Prometheus operator, as described above. Prometheus uses its own
 configuration watcher to look for updated configurations.
 
 <br />
-
-## How Grafana works
-
-The Grafana Helm chart is deployed as part of the ``kube-prometheus-stack`` Helm
-chart.  Grafana automatically connects to Prometheus and syncs all the metrics.
-The metrics are visible through graphs.  
-
-Dashboards for ForgeRock products are added to the Grafana deployment from the
-``cluster/addons/prometheus/forgerock-metrics/dashboards`` directory.  The
-dashboards are automatically added to a configmap, and then imported into
-Grafana. For more information, see the **Import Custom Grafana Dashboards**  
-how-to below.
-
-<br />
-
 ## How Alertmanager works
 
 Alertmanager is used to redirect specific alerts from Prometheus to configured
 receivers. Use the Alertmanager configuration section in
-the ```cluster/addons/prometheus/prometheus-operator.yaml``` directory to
+the ``cluster/addons/prometheus/prometheus-operator.yaml`` directory to
 configure Alertmanager.  
 
 Alertmanager configuration details:
@@ -106,9 +91,24 @@ alerts to a Slack receiver.
 integrations.
 
 Prometheus alerts are configured by product, in the
-```cluster/addons/prometheus/forgerock-metrics/fr-alerts.yaml``` file.  
+``cluster/addons/prometheus/forgerock-metrics/fr-alerts.yaml`` file.  
 The Helm chart that includes the ``fr-alerts.yaml`` file also contains
 a Prometheus rules CRD. The CRD syncs the rules with Prometheus using labels.
+
+<br />
+
+## How Grafana works
+
+The Grafana Helm chart is deployed as part of the ``kube-prometheus-stack`` Helm
+chart.  Grafana automatically connects to Prometheus and syncs all the metrics.
+The metrics are visible through graphs.  
+
+Dashboards for ForgeRock products are added to the Grafana deployment from the
+``cluster/addons/prometheus/forgerock-metrics/dashboards`` directory.  The
+dashboards are automatically added to a configmap, and then imported into
+Grafana. For more information, see the **Import Custom Grafana Dashboards** how-to below.
+
+<br />
 
 ## Deployment instructions
 
@@ -131,16 +131,16 @@ ForgeRock product endpoints, across all namespaces, based on configured labels.
 configuration values, see the  
 **Override Prometheus and Alertmanager configuration values** how-to below.
 
-### Start the Prometheus, Grafana, and Alertmanager UIs
+### Start the Prometheus, Alertmanager, and Grafana UIs
 
 Before attempting to access the Prometheus, Grafana, and Alertmanager UIs,
 forward ports using the ```bin/prometheus-connect.sh``` script:
 
-* For Grafana, run ```bin/prometheus-connect.sh -G```
+* For Grafana, run ``bin/prometheus-connect.sh -G``
 
-* For Prometheus, run ```bin/prometheus-connect.sh -P```
+* For Alertmanager, run ``bin/prometheus-connect.sh -A``
 
-* For Alertmanager, run ```bin/prometheus-connect.sh -A```
+* For Prometheus, run ``bin/prometheus-connect.sh -P``
 
 By default, Grafana uses local port 3000, Prometheus, port 9090 and
 Alertmanager, 9093. You can specify alternate ports using the ``-p`` option
@@ -150,14 +150,14 @@ To access the UIs on the default ports:
 
 * For Grafana, go to localhost:3000. User admin/admin to log in. To view
 dashboards, select the top left icon, then select Dashboards.
+
+* For Alertmanager, go to localhost:9093. Select Status to see the Alertmanager
+configuration. Select Alerts to see current Alerts.
   
 * For Prometheus, go to localhost:9090. Select Status > Targets to see whether
 targets are up or down and the last scrape time. Select Status > Configuration
 to see the Prometheus scrape configurations provided by the service monitors.
-  
-* For Alertmanager, go to localhost:9093. Select Status to see the Alertmanager
-configuration. Select Alerts to see current Alerts.
-  
+ 
 <br />
 
 ## How-tos
