@@ -14,9 +14,6 @@ COPY --chown=forgerock:root scripts /opt/opendj/scripts
 # Ldif for the alpha/bravo realm config
 COPY --chown=forgerock:root idrepo/*.ldif  /var/tmp/
 
-# To experiment with a modified entrypoint, uncomment:
-# COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
-
 # This primes the idrepo datastore with the required base policy entries in ou=am-config
 # AM does not yet dynamically create the realm policy entries when it attaches to a new dynamic config
 # store - as is the case with File Based Config.

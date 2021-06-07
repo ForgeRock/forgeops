@@ -195,35 +195,9 @@ workflow for building, pushing and deploying your application.
 The examples show how to configure DS to be deployed on the US cluster. Apply a similar configuration for
 the other cluster.
 
-[[docker-config-DS,Docker configuration for DS]]
-=== a. Docker configuration for DS
-
-To fulfill xref:introduction-server-id[] and configure a unique server ID inside the topology,
-this makes the following change to +docker-entrypoint.sh+:
-
-* the server ID is computed using the hostname and the first subdomain which corresponds to the service name defined
-in a current cluster (Ex. for FQDN +*ds-cts-0.ds-cts-us*.multi-region.svc.cluster.local+ the server ID will be
-+*ds-cts-0_ds-cts-us*+)
-
-****
-docker-entrypoint.sh https://github.com/ForgeRock/forgeops/tree/master/docker/7.0/ds/scripts/docker-entrypoint.sh[(latest version)]
-....
-export DS_SERVER_ID=${DS_SERVER_ID:-$(hostname -f | awk -F. '{printf("%s_%s", $1, $2)}')}
-....
-****
-
-Also, this script is added as an execution step to DS-CTS and DS-IDREPO ++Dockerfile++s.
-
-****
-Dockerfile https://github.com/ForgeRock/forgeops/tree/master/docker/7.0/ds/cts/Dockerfile[(DS_CTS latest version)]
-https://github.com/ForgeRock/forgeops/tree/master/docker/7.0/ds/idrepo/Dockerfile[(DS_IDREPO latest version)]
-....
-COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
-....
-****
 
 [[prepare-kustomize,Prepare Kustomize definitions]]
-=== b. Prepare Kustomize definitions
+=== a. Prepare Kustomize definitions
 
 To make FQDNs of each DS pod in our topology unique, as required by xref:introduction-FQDN[], the FQDN of each pod
 has a cluster-specific subdomain, which in this case is implemented by changing the service name
@@ -274,7 +248,7 @@ patchesStrategicMerge:
 ****
 
 [[prepare-skaffold,Prepare Skaffold profiles]]
-=== c. Prepare Skaffold profiles
+=== b. Prepare Skaffold profiles
 
 Here is an extract from +skaffold.yaml+ file with a profile for multi-region definition for the US cluster.
 This uses ForgeOps dockerized artifacts, described in xref:docker-config-DS[], and the US kustomization from
@@ -316,7 +290,7 @@ profiles:
 ****
 
 [[deploy-DS,Skaffold profiles]]
-=== d. Deploy Skaffold profiles
+=== c. Deploy Skaffold profiles
 
 Once the configuration for all clusters is in place, you can start the topology.
 Below is an example of the Skaffold command to run the pre-configured profile.

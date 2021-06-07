@@ -239,21 +239,7 @@ Equivalent services are required for each replica so if you require 2 idrepo pod
 
 The same is required for the Europe cluster just changing _us_ for _eu_ in the service name.
 
-=== b. Add customer docker-entrypoint
-
-NOTE: This is a temporary step until the changes are built into the base Docker image.
-
-*Copy docker-entrypoint.sh into Dockerfile*
-
-Configure the DS Dockerfiles to copy the docker-entrypoint.sh script into DS by adding the following line:
-****
-docker/7.0/ds/cts/Dockerfile, docker/7.0/ds/idrepo/Dockerfile
-```
-COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
-```
-****
-
-=== c. Prepare Kustomize definitions
+=== b. Prepare Kustomize definitions
 
 *Make DS server ID unique*
 
@@ -287,7 +273,7 @@ See `kustomize/overlay/multi-region/mcs-<region>/kustomization.yaml`
 ```
 ****
 
-=== d. Prepare Skaffold profiles
+=== c. Prepare Skaffold profiles
 Add following profile to the `skaffold.yaml`. Repeat for EU switching `us` for `eu`
 
 ****
@@ -307,7 +293,7 @@ skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(l
 ```
 ****
 
-=== e. Deploy Skaffold profiles
+=== d. Deploy Skaffold profiles
 
 Once the configuration for all clusters is in place, you can start the topology. Below is an example of Skaffold command to run the pre-configured profile.
 

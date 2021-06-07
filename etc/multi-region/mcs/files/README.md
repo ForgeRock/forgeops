@@ -130,16 +130,7 @@ See `kustomize/overlay/multi-region/mcs-<region>/kustomization.yaml`
 The above change needs to be applied to the idrepo and cts patch in both regional kustomization.yaml files.  
 <br />
 
-**5. Update Dockerfile**  
->`NOTE:` Required step.  Temporary until pushed to base DS image.  
-
-In `docker/7.0/ds/cts/Dockerfile` and `docker/7.0/ds/idrepo/Dockerfile`, add/uncomment this line
-```
-COPY --chown=forgerock:root scripts/docker-entrypoint.sh /opt/opendj
-```
-<br />  
-
-**6. Add Skaffold profiles**  
+**5. Add Skaffold profiles**  
 >`NOTE:` Required step 
 
 Add the following profiles to Skaffold.yaml:  
