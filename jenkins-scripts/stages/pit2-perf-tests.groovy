@@ -22,112 +22,75 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
         def parentStageName = 'PIT2 Perf'
         def tags = ['PIT2', 'performance']
+        def parallelTestsMap = [:]
 
         // perf platform test
-        if (params.PIT2_Perf_platform.toBoolean()) {
-            def stageName = "${parentStageName} platform"
-            def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-
-            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
-                stage(stageName) {
-                    dir('lodestar') {
-                        def stagesCloud = [:]
-                        stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud('platform')
-
-                        dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
-                            def config = config_common.clone()
-                            config += [
-                                    TEST_NAME   : 'platform',
-                                    BASELINE_RPS: '[1983,1722,1136,360]',
-                            ]
-
-                            withGKEPyrockNoStages(config)
-                        }
-
-                        return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
+        if (params.PIT2_Perf_platform) {
+            parallelTestsMap.put("${parentStageName} platform",
+                    {
+                        runPyrock(pipelineRun, "${parentStageName} platform", tags, config_common +
+                                [TEST_NAME   : 'platform',
+                                 BASELINE_RPS: '[1983,1722,1136,360]']
+                        )
                     }
-                }
-            }
+            )
         }
 
         // perf am authn rest test
-        if (params.PIT2_Perf_am_authn.toBoolean()) {
-            def stageName = "${parentStageName} am_authn"
-            def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-
-            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
-                stage(stageName) {
-                    dir('lodestar') {
-                        def stagesCloud = [:]
-                        stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud('authn_rest')
-
-                        dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
-                            def config = config_common.clone()
-                            config += [
-                                    TEST_NAME   : 'authn_rest',
-                                    BASELINE_RPS: '2550',
-                            ]
-
-                            withGKEPyrockNoStages(config)
-                        }
-
-                        return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
+        if (params.PIT2_Perf_am_authn) {
+            parallelTestsMap.put("${parentStageName} am_authn",
+                    {
+                        runPyrock(pipelineRun, "${parentStageName} am_authn", tags, config_common +
+                                [TEST_NAME   : 'authn_rest',
+                                 BASELINE_RPS: '2550']
+                        )
                     }
-                }
-            }
+            )
         }
 
         // perf am access token test
-        if (params.PIT2_Perf_am_access_token.toBoolean()) {
-            def stageName = "${parentStageName} am_access_token"
-            def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-
-            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
-                stage(stageName) {
-                    dir('lodestar') {
-                        def stagesCloud = [:]
-                        stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud('access_token')
-
-                        dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
-                            def config = config_common.clone()
-                            config += [
-                                    TEST_NAME   : 'access_token',
-                                    BASELINE_RPS: '[2733,2453]',
-                            ]
-
-                            withGKEPyrockNoStages(config)
-                        }
-
-                        return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
+        if (params.PIT2_Perf_am_access_token) {
+            parallelTestsMap.put("${parentStageName} am_access_token",
+                    {
+                        runPyrock(pipelineRun, "${parentStageName} am_access_token", tags, config_common +
+                                [TEST_NAME   : 'access_token',
+                                 BASELINE_RPS: '[2733,2453]']
+                        )
                     }
-                }
-            }
+            )
         }
 
         // perf IDM CRUD on simple managed users tests
-        if (params.PIT2_Perf_idm_crud.toBoolean()) {
-            def stageName = "${parentStageName} idm_crud"
-            def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-
-            pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
-                stage(stageName) {
-                    dir('lodestar') {
-                        def stagesCloud = [:]
-                        stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud('simple_managed_users')
-
-                        dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
-                            def config = config_common.clone()
-                            config += [
-                                    TEST_NAME   : 'simple_managed_users',
-                                    BASELINE_RPS: '[5688,0,0,0,1803,3977,1274,955]',
-                            ]
-
-                            withGKEPyrockNoStages(config)
-                        }
-
-                        return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
+        if (params.PIT2_Perf_idm_crud) {
+            parallelTestsMap.put("${parentStageName} idm_crud",
+                    {
+                        runPyrock(pipelineRun, "${parentStageName} idm_crud", tags, config_common +
+                                [TEST_NAME   : 'simple_managed_users',
+                                 BASELINE_RPS: '[5688,0,0,0,1803,3977,1274,955]']
+                        )
                     }
+            )
+        }
+
+        parallel parallelTestsMap
+    }
+}
+
+def runPyrock(PipelineRunLegacyAdapter pipelineRun, String stageName, ArrayList tags, Map config) {
+    def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
+
+    pipelineRun.pushStageOutcome([tags: tags, stageDisplayName: stageName], normalizedStageName) {
+        stage(stageName) {
+            dir('lodestar') {
+                def stagesCloud = [:]
+                stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud('simple_managed_users')
+
+                dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
+                    def test_config = getCommonConfig() + config
+                    withGKEPyrockNoStages(config)
                 }
+
+                return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
             }
         }
     }

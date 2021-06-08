@@ -14,16 +14,16 @@ void runStage(pipelineRun) {
     if (params.PIT2_Greenfield.toInteger() > 0) {
         parallelTestsMap.put('Greenfield', { greenfieldTests.runStage(pipelineRun) })
     }
-    if (params.PIT2_Upgrade.toBoolean()) {
+    if (params.PIT2_Upgrade) {
         parallelTestsMap.put('Upgrade', { upgradeTests.runStage(pipelineRun) })
     }
-    if (env.getEnvironment().any { name, value -> name.startsWith('PIT2_Perf') && value.toBoolean() }) {
+    if (env.getEnvironment().any { name, value -> name.startsWith('PIT2_Perf') && value }) {
         parallelTestsMap.put('Perf', { perfTests.runStage(pipelineRun) })
     }
-    if (params.PIT2_Platform_UI.toBoolean()) {
+    if (params.PIT2_Platform_UI) {
         parallelTestsMap += ['Platform UI': { platformUiTests.runStage(pipelineRun) }]
     }
-    if (params.PIT2_IDCloud.toBoolean()) {
+    if (params.PIT2_IDCloud) {
         parallelTestsMap += ['IDCloud': { idCloudTests.runStage(pipelineRun) }]
     }
     

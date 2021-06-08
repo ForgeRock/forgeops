@@ -29,7 +29,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         def tags = ['performance', 'sprint_release']
 
         // perf am authn rest test
-        if (params.PerfSprintRelease_authn_rest.toBoolean()) {
+        if (params.PerfSprintRelease_authn_rest) {
             def stageName = "${parentStageName} am_authn"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
@@ -59,7 +59,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         }
 
         // perf am access token test
-        if (params.PerfSprintRelease_access_token.toBoolean()) {
+        if (params.PerfSprintRelease_access_token) {
             def stageName = "${parentStageName} am_access_token"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
@@ -89,7 +89,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         }
 
         // perf platform test
-        if (params.PerfSprintRelease_platform.toBoolean()) {
+        if (params.PerfSprintRelease_platform) {
             def stageName = "${parentStageName} platform"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
@@ -119,7 +119,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         }
 
         // perf IDM Crud test
-        if (params.PerfSprintRelease_simple_managed_users.toBoolean()) {
+        if (params.PerfSprintRelease_simple_managed_users) {
             def stageName = "${parentStageName} idm_crud"
             def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 

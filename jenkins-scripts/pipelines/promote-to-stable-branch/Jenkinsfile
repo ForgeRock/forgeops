@@ -25,13 +25,6 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 def pipelineRun
 
-def platformUiDefaultValue = true
-def platformUIDescription = 'approx 35mins'
-if (env.BRANCH_NAME.startsWith('idcloud-') || env.BRANCH_NAME.equals('sustaining/7.1.x')) {
-    platformUiDefaultValue = false
-    platformUIDescription += '<br>Platform UI tests are only available on master version, and so it is possible that they could be incompatible with idcloud branch'
-}
-
 def jobProperties = [
     disableConcurrentBuilds(),
     buildDiscarder(logRotator(numToKeepStr: '20')),
@@ -42,7 +35,7 @@ def jobProperties = [
         booleanParam(name: 'PIT2_Perf_am_authn', defaultValue: true, description: 'approx 1h'),
         booleanParam(name: 'PIT2_Perf_am_access_token', defaultValue: true, description: 'approx 2h30mins'),
         booleanParam(name: 'PIT2_Perf_idm_crud', defaultValue: true, description: 'approx 2h30mins'),
-        booleanParam(name: 'PIT2_Platform_UI', defaultValue: platformUiDefaultValue, description: platformUIDescription),
+        booleanParam(name: 'PIT2_Platform_UI', defaultValue: true, description: 'approx 35mins'),
         booleanParam(name: 'PIT2_IDCloud', defaultValue: true, description: 'approx 10mins<br>Tests are run against static tenant'),
         booleanParam(name: 'Promote_to_stable_branch', defaultValue: true, description: "Promote product images to ${env.BRANCH_NAME}-stable"),
     ])
@@ -120,7 +113,7 @@ timestamps {
 
         pit2Tests.runStage(pipelineRun)
 
-        if (params.Promote_to_stable_branch.toBoolean()) {
+        if (params.Promote_to_stable_branch) {
             promoteToStableBranch.runStage(pipelineRun)
         }
 
@@ -142,7 +135,7 @@ def manageNotifications(boolean notificationsEnabled = true, Closure body) {
             slackMsg = " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promoted " +
                 "commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} " +
                 "from ${env.BRANCH_NAME} to ${promoteToStableBranch.STABLE_BRANCH} (<${env.BUILD_URL}|Open>)"
-            if (!params.Promote_to_stable_branch.toBoolean()) {
+            if (!params.Promote_to_stable_branch) {
                 slackMsg = " ${URLDecoder.decode(env.JOB_NAME)} #${env.BUILD_NUMBER} promotion stage has been skipped " +
                 "(<${env.BUILD_URL}|Open>)"
             }
