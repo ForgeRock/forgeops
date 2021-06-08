@@ -1,0 +1,161 @@
+#!/usr/bin/env python3
+"""This script deploys the ForgeRock Identity Platform to Kubernetes."""
+
+import argparse
+import os
+import sys
+import time
+from urllib import request
+import utils
+import json
+
+profiles = {
+    'small': ['overlay/7.0/small'],
+    'medium': ['overlay/7.0/medium'],
+    'large': ['overlay/7.0/large'],
+    'secrets': ['base/secrets']
+}
+
+def deploy_local_manifest(component, ns, fqdn):
+    """Deploy local component (local mode)"""
+    # Clean out the temp kustomize files
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+              cwd=image_defaulter)
+
+    try: 
+        # Temporarily add the wanted kustomize files
+        for c in profiles.get(component, [f'overlay/{component}']):
+            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
+        contents = contents.decode('ascii')
+        contents = contents.replace('namespace: default', f'namespace: {ns}')
+        contents = contents.replace('namespace: prod', f'namespace: {ns}')
+        if fqdn:
+            contents = contents.replace('default.iam.example.com', f'{fqdn}')
+            contents = contents.replace('prod.iam.example.com', f'{fqdn}')
+        utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+    finally: 
+        # Clean out the temp kustomize files
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                  cwd=image_defaulter)
+
+def uninstall_component(component, ns, force):
+    """Uninstall a profile"""
+    try:
+        # Clean out the temp kustomize files
+        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+        image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
+        # Temporarily add the wanted kustomize files
+        for c in profiles.get(component, [f'overlay/{component}']):
+            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
+        contents = contents.decode('ascii')
+        contents = contents.replace('namespace: default', f'namespace: {ns}')
+        contents = contents.replace('namespace: prod', f'namespace: {ns}')
+        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
+        if force:
+            utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
+            utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
+            uninstall_component('secrets', ns, False)
+    except Exception as e:
+        print(f'Could not delete {component}. Got: {e}')
+        sys.exit(1)  # Hide python traceback.
+    finally: 
+        # Clean out the temp kustomize files
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                  cwd=image_defaulter)
+
+def build_docker_images(components, default_repo):
+    """Builds custom docker images"""
+
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+              cwd=image_defaulter)
+    for component in components:
+        tag_data = utils.build_docker_image(component, default_repo)
+        name = utils.DOCKER_REGEX_NAME.get(component, component)
+        utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
+        utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
+
+def main():
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument('-n', '--namespace', default='',
+                        help='Target namespace (default: current namespace)')
+    common.add_argument('components', nargs='*', choices=['all', []])
+    common.add_argument('-s', '--size', nargs='?', choices=['small', 'medium', 'large'])
+    parser = argparse.ArgumentParser(
+        description='Manage ForgeRock CDM Platform')
+    subparser = parser.add_subparsers(dest='cmd', required=True)
+    parser_install = subparser.add_parser('install', parents=[common],
+                                          help='Install the ForgeRock CDM platform')
+    parser_install.add_argument('-f', '--fqdn', dest='fqdn',
+                                help='Select the FQDN for this deployment')
+    parser_delete = subparser.add_parser(
+        'delete', parents=[common], help='Delete the ForgeRock CDM Platform')
+    parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
+                               help='Skip delete confirmation')
+    parser_delete.add_argument('-f', '--force', dest='force_delete', action='store_true',
+                               help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
+    parser_build = subparser.add_parser('build', help='Build ForgeRock Platform docker images')
+    parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 
+                                                                'ds-cts', 'ldif-importer', []])
+    parser_build.add_argument('-r', '--default-repo', dest='registry', required=False)
+    subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    args = parser.parse_args()
+
+    _, ctx_namespace, _ = utils.run('kubectl',
+                                    'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
+    size = args.size if getattr(args, 'size', None) else None
+    components = args.components[0] if getattr(args, 'components', None) else ['all']
+    fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
+    if args.cmd is None:
+        parser.print_help()
+        sys.exit(1)
+
+    if args.cmd == 'info':
+        utils.printsecrets(namespace)
+        utils.printurls(namespace)
+        return
+
+    if args.cmd == 'delete':
+        utils.message(f'Uninstalling CDM from namespace: "{namespace}"')
+        if not args.skip_confirmation:
+            if input('OK to delete all CDM components? [Y/N] ').lower() not in ['yes', 'y']:
+                return
+        if args.force_delete:
+            utils.message('Using --force delete: This will erase all your PVCs and Secrets. This cannot be undone.')
+            if not args.skip_confirmation:
+                if input('OK to proceed? [Y/N] ').lower() not in ['yes', 'y']:
+                    return
+        uninstall_component('small', namespace, args.force_delete)
+        if not args.force_delete:
+            utils.warning('Will not delete PVCs or Secrets to avoid data loss. You must delete those manually or use --force')
+        return
+    if args.cmd == 'build':
+        components = args.components if getattr(args, 'components', None) else ['ds-idrepo', 'ds-cts', 'am', 'amster', 'idm', 'ldif-importer']
+        build_docker_images(components, args.registry)
+        return
+    if not size:
+        utils.error('Must specify a CDM size to install using --size. No action taken')
+        return
+
+    utils.install_dependencies()
+    utils.message(f'Installing CDM size: "{size}" in namespace: "{namespace}"\n')
+    deploy_local_manifest('secrets', namespace, fqdn)
+    utils.waitforsecrets(namespace)
+    deploy_local_manifest(size, namespace, fqdn)
+
+    if args.cmd == 'install':
+        utils.printsecrets(namespace)
+        utils.printurls(namespace)
+    utils.message('\nEnjoy your CDM deployment!')
+
+if __name__ == '__main__':
+    main()

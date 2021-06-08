@@ -9,6 +9,7 @@ import os
 import shutil
 import base64
 import logging
+import json
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -19,6 +20,14 @@ MSG_FMT = '[%(levelname)s] %(message)s'
 _IGNORE_FILES = ('.DS_Store',)
 
 _log = None
+
+DOCKER_REGEX_NAME = {
+    'am': '.*am',
+    'amster' : '.*amster.*',
+    'idm': '.*idm',
+    'ds-idrepo': '.*ds-idrepo.*',
+    'ds-cts': '.*ds-cts.*'
+    }
 
 def loglevel(name):
     try:
@@ -176,6 +185,27 @@ def printurls(ns):
     warning(f'https://{fqdn}/am')
     warning(f'https://{fqdn}/enduser')
 
+def install_dependencies():
+    """Check and install dependencies"""
+    print('Checking secret-agent operator and related CRDs:', end=' ')
+    try:
+        run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
+                  cstderr=True, cstdout=True)
+    except Exception as _e:
+        warning('secret-agent CRD not found. Installing secret-agent.')
+        secretagent('apply')
+    else:
+        message('secret-agent CRD found in cluster.')
+
+    print('Checking ds-operator and related CRDs:', end=' ')
+    try:
+        run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
+    except Exception:
+        warning('ds-operator CRD not found. Installing ds-operator.')
+        dsoperator('apply')
+    else:
+        message('ds-operator CRD found in cluster.')
+    print()
 
 def secretagent(k8s_op, tag='latest'):
     """Check and install secret-agent"""
@@ -216,7 +246,20 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
+def build_docker_image(component, default_repo):
+    """Builds custom docker images. Returns the tag of the built image"""
+    # Clean out the temp kustomize files
+    base_dir = os.path.join(sys.path[0], '../')
 
+    if default_repo:
+        default_repo_cmd = f'--default-repo={default_repo}'
+    else:
+        default_repo_cmd = ''
+    run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd}', cwd=base_dir)
+    with open(os.path.join(base_dir, 'tag.json')) as tag_file:
+        tag_data = json.load(tag_file)['builds'][0]["tag"]
+    return tag_data
+    
 def clone_pipeline_images(clone_path,
                           branch_name='master',
                           repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):

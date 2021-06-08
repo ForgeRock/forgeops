@@ -44,19 +44,20 @@ def deploy_local_manifest(component, ns, fqdn):
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
-
-    components_to_install = bundles.get(component, [f'base/{component}'])
-    # Temporarily add the wanted kustomize files
-    for c in components_to_install:
-        utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
-    _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
-    contents = contents.decode('ascii')
-    contents = contents.replace('namespace: default', f'namespace: {ns}')
-    contents = contents.replace('default.iam.example.com', f'{fqdn}')
-    utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-    # Clean out the temp kustomize files
-    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-              cwd=image_defaulter)
+    try:
+        components_to_install = bundles.get(component, [f'base/{component}'])
+        # Temporarily add the wanted kustomize files
+        for c in components_to_install:
+            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
+        contents = contents.decode('ascii')
+        contents = contents.replace('namespace: default', f'namespace: {ns}')
+        contents = contents.replace('default.iam.example.com', f'{fqdn}')
+        utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+    finally:
+        # Clean out the temp kustomize files
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
 
 def deploy_component(component, ns, fqdn, tag):
     """Deploy the Component manifest"""
@@ -84,9 +85,6 @@ def uninstall_component(component, ns):
         _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
         contents = contents.decode('ascii')
         utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
-        # Clean out the temp kustomize files
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                cwd=image_defaulter)
 
         if component in ['base', 'quickstart']:
             utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
@@ -94,6 +92,10 @@ def uninstall_component(component, ns):
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
+    finally: 
+        # Clean out the temp kustomize files
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
 
 def deploy_quickstart(ns, fqdn, tag):
     """Deploy the quickstart"""
@@ -145,28 +147,6 @@ def overlay_app_configs(ns, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
 
-def install_dependencies():
-    """Check and install dependencies"""
-    print('Checking secret-agent operator and related CRDs:', end=' ')
-    try:
-        utils.run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
-                  cstderr=True, cstdout=True)
-    except Exception as _e:
-        utils.warning('secret-agent CRD not found. Installing secret-agent.')
-        utils.secretagent('apply')
-    else:
-        utils.message('secret-agent CRD found in cluster.')
-
-    print('Checking ds-operator and related CRDs:', end=' ')
-    try:
-        utils.run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
-    except Exception:
-        utils.warning('ds-operator CRD not found. Installing ds-operator.')
-        utils.dsoperator('apply')
-    else:
-        utils.message('ds-operator CRD found in cluster.')
-    print()
-
 def build_docker_image(component, default_repo):
     """Builds custom docker images"""
     # Clean out the temp kustomize files
@@ -175,21 +155,8 @@ def build_docker_image(component, default_repo):
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
-    if default_repo:
-        default_repo_cmd = f'--default-repo={default_repo}'
-    else:
-        default_repo_cmd = ''
-    utils.run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd}', cwd=base_dir)
-    with open(os.path.join(base_dir, 'tag.json')) as tag_file:
-        tag_data = json.load(tag_file)['builds'][0]["tag"]
-    regex_name = {
-        'am': '.*am',
-        'amster' : '.*amster.*',
-        'idm': '.*idm',
-        'ds-idrepo': '.*ds-idrepo.*',
-        'ds-cts': '.*ds-cts.*'
-    }
-    name = regex_name.get(component, component)
+    tag_data = utils.build_docker_image(component, default_repo)
+    name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
     utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
 
@@ -249,7 +216,7 @@ def main():
         for c in components:
             build_docker_image(c, args.registry)
         return
-    install_dependencies()
+    utils.install_dependencies()
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
         deploy_quickstart(namespace, fqdn, None)
@@ -261,8 +228,7 @@ def main():
         utils.waitforsecrets(namespace)
         utils.printsecrets(namespace)
         utils.printurls(namespace)
-    print('\nEnjoy your deployment!')
-    return
+    utils.message('\nEnjoy your deployment!')
 
 if __name__ == '__main__':
     main()
