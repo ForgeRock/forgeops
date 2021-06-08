@@ -83,7 +83,7 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, String stageName, ArrayList 
         stage(stageName) {
             dir('lodestar') {
                 def stagesCloud = [:]
-                stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud('simple_managed_users')
+                stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(config.TEST_NAME)
 
                 dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                     withGKEPyrockNoStages(config)
