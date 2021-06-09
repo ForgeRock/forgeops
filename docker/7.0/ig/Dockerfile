@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ig/pit1:7.1.1-03c378ae79f020bc7752cd5151ea5961821bf4ad
+FROM gcr.io/forgerock-io/ig/pit1:7.1.1-6cb7d1cc616d691f5265152d9457668cb5d8a597
 
 # Copy all config files into the docker image.
 # The default ig directory is /var/ig, and it expects subfolders config/ and scripts/ (if required)
