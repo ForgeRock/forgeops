@@ -4,7 +4,7 @@ metadata:
   name: smoke-slack-notifier
 spec:
   notification:
-    filter: build.build_trigger_id == a26c039a-364e-414f-9b08-6dcc715c3f76 && build.status in [Build.Status.INTERNAL_ERROR, Build.Status.FAILURE, Build.Status.TIMEOUT]
+    filter: build.build_trigger_id == "a26c039a-364e-414f-9b08-6dcc715c3f76" && build.status in [Build.Status.INTERNAL_ERROR, Build.Status.FAILURE, Build.Status.TIMEOUT]
     delivery:
       webhookUrl:
         secretRef: webhook-url
