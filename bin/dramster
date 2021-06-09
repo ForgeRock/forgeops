@@ -45,28 +45,34 @@ if args.cmd == None:
 
 # Register clean up function
 def cleanUp():
-    if os.path.exists(keyDir):
+    if 'keyDir' in globals() and os.path.exists(keyDir):
         shutil.rmtree(keyDir)
-    if 'pf' in globals():
-        pf.kill()
+    if 'portforward' in globals():
+        portforward.kill()
 
 atexit.register(cleanUp)
 
 amUrl = args.amUrl
 
+namespace = utils.get_namespace(args.namespace)
+
+
 # If the user is running in minikube the docker container can not see the AM host. This
 # runs port forwarding using the host network.
 if args.portForward:
-    amUrl = 'http://am:8080/am'
-    pf=subprocess.Popen('kubectl port-forward service/am 8080:80'.split())
-    print(f'port forward process started pid: {pf.pid}')
+    if sys.platform != 'linux':
+        print('port forward option is only supported on linux')
+        sys.exit(1)
+
+    amUrl = 'http://am:3001/am'
+    portforward=subprocess.Popen('kubectl port-forward service/am 3001:80'.split())
+    print(f'port forward process started pid: {portforward.pid}')
     docker_network='--network host --add-host=am:127.0.0.1'
 else:
     docker_network = ''
 
 # We need to lookup the url
 if amUrl == None:
-    namespace = utils.get_namespace(args.namespace)
     print(f'Looking up the AM URL in namespace {namespace}')
     amUrl = utils.get_configmap_value(namespace, 'platform-config', 'AM_URL')
     print( f'amUrl = {amUrl}')
@@ -84,7 +90,6 @@ id_rsa_file = open(f'{keyDir}/id_rsa','wb')
 
 # User has not provided the ssh key - look it up in the cluster
 if keyFile == None:
-    namespace = utils.get_namespace(args.namespace)
     print(f'Looking up the amster ssh key in namespace {namespace}')
     sshSecret = utils.get_secret_value(namespace, 'amster', 'id_rsa')
     id_rsa_file.write(sshSecret)
@@ -109,7 +114,14 @@ if args.cmd == 'export':
 
     cmd = f'docker run --rm --env AMSTER_AM_URL={amUrl} --user {uid}:{group} {docker_network} --volume {keyDir}:/var/run/secrets/amster --volume {dst_dir}:/var/tmp/amster {amster_docker_image} export-exit'
     print(f'running\n{cmd}')
-    r = subprocess.run(cmd.split(), capture_output=True)
+
+    try:
+        r = subprocess.run(cmd.split(), capture_output=True)
+    except:
+        print('Caught Exception')
+        cleanUp()
+        sys.exit(1)
+
     print(f'{r.stdout.decode()}\n{r.stderr.decode()}')
     if r.returncode != 0:
         sys.exit(r.returncode)
@@ -121,7 +133,14 @@ if args.cmd == 'import':
     src_dir=os.path.abspath(args.src)
     cmd = f'docker run --rm --env FQDN={fqdn} --env AMSTER_AM_URL={amUrl} --user {uid}:{group} {docker_network} --volume {keyDir}:/var/run/secrets/amster --volume {src_dir}:/opt/amster/config {amster_docker_image} import'
     print(f'running\n{cmd}')
-    r = subprocess.run(cmd.split(), capture_output=True)
+
+    try:
+        r = subprocess.run(cmd.split(), capture_output=True)
+    except:
+        print('Caught Exception')
+        cleanUp()
+        sys.exit(1)
+
     print(f'{r.stdout.decode()}\n{r.stderr.decode()}')
     if r.returncode != 0:
         sys.exit(r.returncode)

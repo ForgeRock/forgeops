@@ -80,8 +80,10 @@ def launch_amster_job(kustomize_path):
     cmd = f'kustomize build {kustomize_path} | kubectl {namespace} apply -f -'
     print(cmd)
     subprocess.run(cmd,shell=True)
-    time.sleep(15) # Give the new pod time to launch, and make sure any old pods have time to terminate
+    print('Giving the amster job plenty of time to start up. Please wait..')
+    time.sleep(30) # Give the new pod time to launch, and make sure any old pods have time to terminate
     pod = get_pod_name('app=amster')
+    print(f'amster pod = {pod}')
     return pod
 
 if args.cmd == 'clean':
