@@ -65,7 +65,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 {
                     runPyrock(pipelineRun, "${parentStageName} idm_crud", tags, config_common +
                             [TEST_NAME   : 'simple_managed_users',
-                             BASELINE_RPS: '[5688,0,0,0,1803,3977,1274,955]']
+                             BASELINE_RPS: '[5688,0,0,0,1336,1177,1274,955]']
                     )
                 }
         )
