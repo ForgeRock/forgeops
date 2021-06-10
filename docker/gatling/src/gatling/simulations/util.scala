@@ -49,7 +49,7 @@ class AMAuth (val config: BenchConfig) {
 
     // sample curl:
     // curl -u idm-provisioning:password --data 'grant_type=client_credentials&scope=fr:idm:*'
-    // -X POST https://smoke.iam.forgeops.com/am/oauth2/access_token
+    // -X POST https://smoke.eng.forgeops.com/am/oauth2/access_token
     // add this to a chain to get an access token.
     // tood: Do paramterize the client, grant, etc.
     val authenticate: ChainBuilder =

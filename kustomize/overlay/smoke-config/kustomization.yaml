@@ -11,5 +11,5 @@ patchesStrategicMerge:
   metadata:
     name: platform-config
   data:
-    FQDN: "smoke.iam.forgeops.com"
+    FQDN: "smoke.eng.forgeops.com"
     CERT_ISSUER: letsencrypt-prod

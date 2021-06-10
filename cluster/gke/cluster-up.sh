@@ -8,9 +8,19 @@
 set -o errexit
 set -o pipefail
 
+# Load regional/project values, they _can_ be used in profiles.
+# Default these values from the users configuration
+PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+PROJECT=${PROJECT:-$PROJECT_ID}
+
+# Get the default region
+R=$(gcloud config list --format 'value(compute.region)')
+REGION=${REGION:-$R}
+
 #####
 # Code for ForgeRock staff only
 #####
+
 FO_ENV=${FO_ENV:-env}
 # Load and enforce tags
 cd "$(dirname "$0")" && . ../../bin/lib-entsec-asset-tag-policy.sh
@@ -29,21 +39,11 @@ then
         exit 1
     fi
     ASSET_LABELS="--labels es_zone=${ES_ZONE},es_ownedby=${ES_OWNEDBY},es_managedby=${ES_MANAGEDBY},es_businessunit=${ES_BUSINESSUNIT},es_useremail=${ES_USEREMAIL},billing_entity=${BILLING_ENTITY}"
-    ADDITIONAL_OPTS+="${ASSET_LABELS} "
+    ADDITIONAL_OPTS+=" ${ASSET_LABELS} "
 fi
 #####
 # End code for ForgeRock staff only
 #####
-
-# Cluster name.
-NAME=${NAME:-small}
-# Default these values from the users configuration
-PROJECT_ID=$(gcloud config list --format 'value(core.project)')
-PROJECT=${PROJECT:-$PROJECT_ID}
-
-# Get the default region
-R=$(gcloud config list --format 'value(compute.region)')
-REGION=${REGION:-$R}
 
 echo "Deploying to region: $REGION"
 
@@ -62,7 +62,6 @@ DS_MACHINE=${DS_MACHINE:-n2-standard-8}
 
 # Create a separate node pool for ds
 CREATE_DS_POOL="${CREATE_DS_POOL:-false}"
-ADDITIONAL_OPTS=""
 
 # Get current user
 CREATOR="${USER:-unknown}"
@@ -101,16 +100,23 @@ PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
 NUM_NODES=${NUM_NODES:-"1"} # Primary Node Pool
 DS_NUM_NODES=${DS_NUM_NODES:-"1"}
 
+# Release Channel
+RELEASE_CHANNEL=${RELEASE_CHANNEL:="regular"}
+
+# Regional Control Plane
+HA_CTRL_PLANE=${HA_CTRL_PLANE:=0}
+CONTROL_PLANE_OPTS="--zone ${ZONE}"
+[[ $HA_CTRL_PLANE -eq 1 ]] && CONTROL_PLANE_OPTS="--region ${REGION}"
+
 # BY default we disable autoscaling for CDM. If you wish to use autoscaling, uncomment the following:
 #AUTOSCALE="--enable-autoscaling --min-nodes 0 --max-nodes 3"
 
 # shellcheck disable=SC2086
 gcloud beta container --project "$PROJECT" clusters create "$NAME" \
-    --zone "$ZONE" \
     --node-locations "$NODE_LOCATIONS" \
     --no-enable-basic-auth \
     --no-enable-master-authorized-networks \
-    --release-channel "regular" \
+    --release-channel "$RELEASE_CHANNEL" \
     --machine-type "$MACHINE" \
     --image-type "COS" \
     --disk-type "pd-ssd" --disk-size "100" \
@@ -128,6 +134,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --addons HorizontalPodAutoscaling,ConfigConnector,GcePersistentDiskCsiDriver \
     --workload-pool "$PROJECT.svc.id.goog" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
+    $CONTROL_PLANE_OPTS \
     $ADDITIONAL_OPTS  # Note: Do not quote this variable. It needs to expand
 
 # Create the DS pool. This pool does not autoscale.

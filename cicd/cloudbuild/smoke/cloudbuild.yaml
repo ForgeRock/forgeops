@@ -8,7 +8,7 @@ steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   id: authenticate
   waitFor: ['-']
-  args: ['container', 'clusters', 'get-credentials', 'eng-experimental', '--region=us-east1']
+  args: ['container', 'clusters', 'get-credentials', 'eng-shared-2', '--region=europe-west2']
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
@@ -21,7 +21,7 @@ steps:
     - |-
       ./bin/config.sh add
       ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
-  
+
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
   id: nuke-environment
@@ -38,7 +38,7 @@ steps:
   args:
     - -c
     - |-
-      ./bin/cdk install --fqdn smoke.iam.forgeops.com -n $$NAMESPACE
+      ./bin/cdk install --fqdn smoke.eng.forgeops.com -n $$NAMESPACE
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash

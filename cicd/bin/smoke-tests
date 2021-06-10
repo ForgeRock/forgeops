@@ -3,7 +3,7 @@
 # Pass in NAMESPACE, PROFILE and SLACK_FAILED_WEBHOOK_URL as env vars
 
 NAMESPACE="${NAMESPACE:-smoke}"
-FQDN="${FQDN:-$NAMESPACE.iam.forgeops.com}"
+FQDN="${FQDN:-$NAMESPACE.eng.forgeops.com}"
 
 TEST_SVC="https://smoketest.forgeops.com/test"
 

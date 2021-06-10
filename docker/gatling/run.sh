@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Global
-export TARGET_HOST="${TARGET_HOST:-smoke.iam.forgeops.com}"
+export TARGET_HOST="${TARGET_HOST:-smoke.eng.forgeops.com}"
 export USER_POOL="${USER_POOL:-1000}" # User pool size.
 export DURATION="${DURATION:-60}" # Duration of each simulation in seconds
 export CONCURRENCY="${CONCURRENCY:-50}" # Number of concurrent users for each simulation
@@ -45,7 +45,7 @@ platform() {
 }
 
 
-if [ $# -ne 1 ]; then 
+if [ $# -ne 1 ]; then
 	usage
 	exit
 fi

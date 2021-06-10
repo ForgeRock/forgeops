@@ -43,6 +43,6 @@ data:
   PERF_TEST_RESULTS_BUCKET_NAME: "mybucket-us-east1"
   DURATION: "300"
   CONCURRENCY: "40"
-  TARGET_HOST: "smoke.iam.forgeops.com"
+  TARGET_HOST: "smoke.eng.forgeops.com"
   CLIENT_PASSWORD: "vtt3qtncd1dabsvq7ikehm11expywabq"
   IDM_PASSWORD: "pw3j9uzgkx187fphchdzzxid48dridqa"

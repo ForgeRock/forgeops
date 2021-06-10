@@ -7,7 +7,7 @@ steps:
 - name: 'gcr.io/cloud-builders/gcloud'
   id: authenticate
   waitFor: ['-']
-  args: ['container', 'clusters', 'get-credentials', 'eng-experimental', '--region=us-east1']
+  args: ['container', 'clusters', 'get-credentials', 'eng-shared-2', '--region=europe-west2']
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
