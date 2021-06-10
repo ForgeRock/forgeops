@@ -14,7 +14,9 @@ USER forgerock
 RUN cp -R /usr/local/tomcat/webapps/am/XUI /usr/local/tomcat/webapps/am/OAuth2_XUI
 ENV CATALINA_USER_OPTS -Dorg.forgerock.am.oauth2.consent.xui_path=/OAuth2_XUI
 
-COPY  --chown=forgerock:root config/ /home/forgerock/openam/config/
+ARG CONFIG_PROFILE=temp
+RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"
+COPY  --chown=forgerock:root config-profiles/${CONFIG_PROFILE}/ /home/forgerock/openam/
 
 # Use a custom logback. Comment out if you want to use the default json logger.
 COPY --chown=forgerock:root logback.xml /usr/local/tomcat/webapps/am/WEB-INF/classes
