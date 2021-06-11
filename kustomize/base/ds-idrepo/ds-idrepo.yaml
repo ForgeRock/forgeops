@@ -21,7 +21,7 @@ spec:
   # must have the default storageClass admission controller enabled to use "default".
   # The "standard" storageClass is available on minikube, GKE, and EKS
   # standard-rwo / premium-rwo are the recommended CSI storageclasses on GKE
-  storageClassName: standard-rwo
+  storageClassName: standard
 
   ### Passwords ###
   # Passwords: maps DS accounts to new or existing secrets.
