@@ -75,7 +75,7 @@ in_repo_profile = parsed_args.profile_name in ('am-only',
 git_command = os.environ.get('GIT_SSH_COMMAND', 'foo')
 # Clean up first
 if parsed_args.clean or parsed_args.force:
-    ok, *_ = utils.run('git', 'clean', '-fdX', '--', 'docker/7.0', 'build')
+    ok, *_ = utils.run('git', 'clean', '-fd', '--', 'docker/7.0', 'build')
     if not ok:
         print('Git clean failed.')
         sys.exit(1)
@@ -137,11 +137,12 @@ profile_recipe = {'fidc': ['../../config/7.0/cdk/amster']}
 try:
     # Copy config.
     for product in profile_base.iterdir():
-        print(f'Copying {product}.')
-        dst = forgeops_docker.joinpath(product.name, 'config-profiles', 'temp')
+        if 'readme.txt' not in product.name.lower(): print(f'Copying {product}.')
+        dst = forgeops_docker.joinpath(product.name, 'config-profiles', parsed_args.profile_name)
         src = profile_base.joinpath(product)
         if src.name not in _PRODUCT_NAMES:
-            print(f'Not a known product, not copying {src}')
+            if 'readme.txt' not in product.name.lower(): print(f'Not a known product, not copying {src}')
+            continue
         if src.is_dir():
             utils.copytree(src, dst)
     # Copy any additional config.

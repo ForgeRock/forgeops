@@ -14,7 +14,7 @@ RUN rm conf/selfservice.propertymap.json
 # This sets the RAM based on cgroups to 65% of the container memory
 ENV JAVA_OPTS -XX:MaxRAMPercentage=65 -XX:InitialRAMPercentage=65 -XX:MaxTenuringThreshold=1 -Djava.security.egd=file:/dev/urandom -XshowSettings:vm  -XX:+PrintFlagsFinal
 
-ARG CONFIG_PROFILE=temp
+ARG CONFIG_PROFILE=cdk
 RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"
 COPY --chown=forgerock:root config-profiles/${CONFIG_PROFILE}/ /opt/openidm
 COPY --chown=forgerock:root . /opt/openidm
