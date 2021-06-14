@@ -147,7 +147,7 @@ def overlay_app_configs(ns, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
 
-def build_docker_image(component, default_repo, config_profile=None):
+def build_docker_image(component, default_repo):
     """Builds custom docker images"""
     # Clean out the temp kustomize files
     base_dir = os.path.join(sys.path[0], '../')
@@ -155,7 +155,7 @@ def build_docker_image(component, default_repo, config_profile=None):
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
-    tag_data = utils.build_docker_image(component, default_repo, config_profile)
+    tag_data = utils.build_docker_image(component, default_repo)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
     utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
@@ -182,7 +182,6 @@ def main():
     parser_build = subparser.add_parser('build', help='Build custom docker images')
     parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts'])
     parser_build.add_argument('-r', '--default-repo', dest='registry')
-    parser_build.add_argument('-p', '--config-profile', dest='config_profile')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
@@ -215,7 +214,7 @@ def main():
         return
     if args.cmd == 'build':
         for c in components:
-            build_docker_image(c, args.registry, args.config_profile)
+            build_docker_image(c, args.registry)
         return
     utils.install_dependencies()
     utils.message(f'Installing component(s): {components}\n')

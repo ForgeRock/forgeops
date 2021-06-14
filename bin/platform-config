@@ -138,7 +138,7 @@ try:
     # Copy config.
     for product in profile_base.iterdir():
         print(f'Copying {product}.')
-        dst = forgeops_docker.joinpath(product.name, 'config-profiles', 'temp')
+        dst = forgeops_docker.joinpath(product.name)
         src = profile_base.joinpath(product)
         if src.name not in _PRODUCT_NAMES:
             print(f'Not a known product, not copying {src}')

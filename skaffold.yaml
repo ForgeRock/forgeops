@@ -16,21 +16,12 @@ kind: Config
     - &AM
       image: am
       context: docker/7.0/am
-      docker:
-        buildArgs:
-          CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "temp"}}'
     - &AMSTER
       image: amster
       context: docker/7.0/amster
-      docker:
-        buildArgs:
-          CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "temp"}}'
     - &IDM
       image: idm
       context: docker/7.0/idm
-      docker:
-        buildArgs:
-          CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "temp"}}'
     - &DS-CTS_BASE
       image: ds-cts
       context: docker/7.0/ds
@@ -58,9 +49,6 @@ kind: Config
     - &IG
       image: ig
       context: docker/7.0/ig
-      docker:
-        buildArgs:
-          CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "temp"}}'
 
   commonArtifactSets:
     default-artifacts: &default-artifacts
