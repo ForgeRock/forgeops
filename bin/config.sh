@@ -142,7 +142,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 #****** REAPPLY PLACEHOLDERS ******#
 # Note: This DOES not run version upgrade rules. Run am-config-upgrader  $DOCKER_ROOT/am to use the built in version upgrade rules.
 upgrade_config(){
-	$script_dir/am-config-upgrader  $DOCKER_ROOT/am config/am-upgrader-rules
+	$script_dir/am-config-upgrader  $DOCKER_ROOT/am/config-profiles/temp config/am-upgrader-rules
 }
 
 # clear the product configs $1 from the docker directory.
@@ -226,16 +226,16 @@ export_config(){
 	   case $p in
 		idm)
 			printf "\nExporting IDM configuration...\n\n"
-			rm -fr  "$DOCKER_ROOT/idm/conf"
+			rm -fr  "$DOCKER_ROOT/idm/config-profiles/temp/conf"
 			pod=$(kubectl get pod -l app=idm -o jsonpath='{.items[0].metadata.name}')
-			kubectl cp -c openidm $pod:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
-			printf "\nIDM configuration files have been exported to ${DOCKER_ROOT}/idm/config."
+			kubectl cp -c openidm $pod:/opt/openidm/conf "$DOCKER_ROOT/idm/config-profiles/temp/conf"
+			printf "\nIDM configuration files have been exported to ${DOCKER_ROOT}/idm/config-profiles/temp/config."
 			;;
 		amster)
-			rm -fr "$DOCKER_ROOT/amster/config"
-			mkdir -p "$DOCKER_ROOT/amster/config"
-			echo "$script_dir/amster" export "$DOCKER_ROOT/amster/config"
-			"$script_dir/amster" export "$DOCKER_ROOT/amster/config"
+			rm -fr "$DOCKER_ROOT/amster/config-profiles/temp/config"
+			mkdir -p "$DOCKER_ROOT/amster/config-profiles/temp/config"
+			echo "$script_dir/amster" export "$DOCKER_ROOT/amster/config-profiles/temp/config"
+			"$script_dir/amster" export "$DOCKER_ROOT/amster/config-profiles/temp/config"
 			;;
 		am)
 			# Export AM configuration
@@ -245,13 +245,13 @@ export_config(){
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
 			# Run export.sh to export *everything*  or export-diff.sh to export only files that have changed
 			# The export command passes `-` as the destination - which writes to stdout
-			kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh - | tar xf -  -C "$DOCKER_ROOT"/am || {
+			kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh - | tar xf -  -C "$DOCKER_ROOT"/am/config-profiles/temp || {
 				echo ""
 				echo "No changes were made to the AM configuration. Exiting."
 				exit 0
 			}
 
-			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
+			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config-profiles/temp/config."
 
 			# Upgrade config and reapply placeholders
 			upgrade_config
@@ -277,7 +277,7 @@ save_config()
 			# clean existing files
 			rm -fr  "$PROFILE_ROOT/idm/conf"
 			mkdir -p "$PROFILE_ROOT/idm/conf"
-			cp -R "$DOCKER_ROOT/idm/conf"  "$PROFILE_ROOT/idm"
+			cp -R "$DOCKER_ROOT/idm/config-profiles/temp/conf"  "$PROFILE_ROOT/idm"
 			;;
 		amster)
 			printf "\nSaving Amster configuration\n"
@@ -296,14 +296,14 @@ save_config()
 			echo "Adding back FQDN placeholder ..."
 			echo "Removing 'userpassword-encrypted' fields ..."
 			echo ""
-			find "$DOCKER_ROOT/amster/config" -name "*.json" \
+			find "$DOCKER_ROOT/amster/config-profiles/temp/config" -name "*.json" \
 					\( -exec $sed_cmd "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
 					\( -exec $sed_cmd 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
 					-exec $sed_cmd '/userpassword-encrypted/d' {} \; \
 
 			# Fix passwords in OAuth2Clients with placeholders or default values.
-			CLIENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/OAuth2Clients"
-			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/IdentityGatewayAgents"
+			CLIENT_ROOT="$DOCKER_ROOT/amster/config-profiles/temp/config/realms/root/OAuth2Clients"
+			IGAGENT_ROOT="$DOCKER_ROOT/amster/config-profiles/temp/config/realms/root/IdentityGatewayAgents"
 
 			echo "Adding back password placeholder with defaults in these files:"
 			echo ""
@@ -319,7 +319,7 @@ save_config()
 			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
 
 			#****** COPY FIXED FILES ******#
-			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
+			cp -R "$DOCKER_ROOT/amster/config-profiles/temp/config"  "$PROFILE_ROOT/amster"
 
 			printf "\nThe above fixes have been made to the Amster files."
 			printf "\nIf you have exported new files that should contain commons "
@@ -333,7 +333,7 @@ save_config()
 			mkdir -p "$PROFILE_ROOT/am/config"
 
 			#****** COPY FIXED FILES ******#
-			cp -R "$DOCKER_ROOT/am/config"  "$PROFILE_ROOT/am"
+			cp -R "$DOCKER_ROOT/am/config-profiles/temp/config"  "$PROFILE_ROOT/am"
 		esac
 	done
 }

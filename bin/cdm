@@ -69,7 +69,7 @@ def uninstall_component(component, ns, force):
         utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
                   cwd=image_defaulter)
 
-def build_docker_images(components, default_repo, tag):
+def build_docker_images(components, default_repo, tag, config_profile=None):
     """Builds custom docker images"""
 
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
@@ -77,7 +77,7 @@ def build_docker_images(components, default_repo, tag):
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
     for component in components:
-        tag_data = utils.build_docker_image(component, default_repo, tag)
+        tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
         name = utils.DOCKER_REGEX_NAME.get(component, component)
         utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
         utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
@@ -106,6 +106,7 @@ def main():
                                                                 'ds-cts', 'ldif-importer', []])
     parser_build.add_argument('-r', '--default-repo', dest='registry', required=False)
     parser_build.add_argument('-t', '--tag', required=False)
+    parser_build.add_argument('-p', '--config-profile', dest='config_profile')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     args = parser.parse_args()
 
@@ -141,7 +142,7 @@ def main():
         return
     if args.cmd == 'build':
         components = args.components if getattr(args, 'components', None) else ['ds-idrepo', 'ds-cts', 'am', 'amster', 'idm', 'ldif-importer']
-        build_docker_images(components, args.registry, args.tag)
+        build_docker_images(components, args.registry, args.tag, args.config_profile)
         return
     if not size:
         utils.error('Must specify a CDM size to install using --size. No action taken')
