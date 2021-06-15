@@ -16,7 +16,7 @@ if [ -n "$(ls -A /opt/opendj/data -I lost+found)" ]; then
   ls -A /opt/opendj/data -I lost+found
 fi
 
-# Initialize DS regarless of dsbackup restore settings
+# Initialize DS regardless of dsbackup restore settings
 /opt/opendj/docker-entrypoint.sh initialize-only;
 
 if [ -z "${AUTORESTORE_FROM_DSBACKUP}" ] || [ "${AUTORESTORE_FROM_DSBACKUP}" != "true" ]; then
