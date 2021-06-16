@@ -46,7 +46,7 @@ echo "Targeting pods: ${pods[@]}"
 
 # only set $ADMIN_PASSWORD if the secret is available. This information is only used in 7.0.
 if [[ $(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}") ]] &>/dev/null; then
-  ADMIN_PASSWORD=$(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 --decode)
+  ADMIN_PASSWORD=$(kubectl -n $NAMESPACE get secret ds-passwords -o jsonpath="{.data.dirmanager\.pw}" | base64 -d)
 fi
 for pod in "${pods[@]}"
 do
