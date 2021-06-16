@@ -35,10 +35,6 @@ spec:
             runAsUser: 11111
           serviceAccount: ds-backup
           volumes:
-          # Secondary volume that will contain the backed up files
-          - name: ds-backup
-            persistentVolumeClaim:
-              claimName: ds-backup
           - name: scripts
             configMap:
               name: backup-scripts

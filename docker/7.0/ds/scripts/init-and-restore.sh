@@ -2,10 +2,10 @@
 # Simple script to automatically restore DS from backups
 # Note: This script assumes it runs in a k8s init-container with the proper volumes and environment variables attached.
 
-# Required environmental variables: 
+# Required environment variables:
 # AUTORESTORE_FROM_DSBACKUP: Set to true to restore from backup. Defaults to false
 # GOOGLE_CREDENTIALS_JSON: Contents of the service account JSON, if using GCP. The SA must have write privileges in the desired bucket
-# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Access key and secret for AWS, if using S3. 
+# AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Access key and secret for AWS, if using S3.
 # AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY: Storage account name and key, if using Azure
 
 set -e
@@ -16,7 +16,7 @@ if [ -n "$(ls -A /opt/opendj/data -I lost+found)" ]; then
   ls -A /opt/opendj/data -I lost+found
 fi
 
-# Initialize DS regarless of dsbackup restore settings
+# Initialize DS regardless of dsbackup restore settings
 /opt/opendj/docker-entrypoint.sh initialize-only;
 
 if [ -z "${AUTORESTORE_FROM_DSBACKUP}" ] || [ "${AUTORESTORE_FROM_DSBACKUP}" != "true" ]; then
@@ -44,7 +44,7 @@ fi
 
 if [ -n "${DATA_PRESENT_BEFORE_INIT}" ] && [ "${DATA_PRESENT_BEFORE_INIT}" != "false" ]; then
    echo "****"
-   echo "There's data already present in /opt/opendj/data. Skipping restore operation." 
+   echo "There's data already present in /opt/opendj/data. Skipping restore operation."
    echo "****"
    exit 0
 fi
@@ -59,7 +59,7 @@ EXTRA_PARAMS=""
 HOSTS=($(echo "${DSBACKUP_HOSTS}" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
 
 
-case "$DSBACKUP_DIRECTORY" in 
+case "$DSBACKUP_DIRECTORY" in
 s3://* )
     echo "S3 Bucket detected. Restoring backups from AWS S3"
     EXTRA_PARAMS="${AWS_PARAMS}"
@@ -77,7 +77,7 @@ gs://* )
     echo "Restoring backups from local storage"
     EXTRA_PARAMS=""
     ;;
-esac  
+esac
 # Recover from the first available backup that passes verification checks.
 for host in "${HOSTS[@]}"; do
     # Remove the pod idx and compare. ex. ds-idrepo-2 => ds-idrepo-
@@ -89,10 +89,10 @@ for host in "${HOSTS[@]}"; do
         echo "Attempting to verify backup from: ${BACKUP_LOCATION}"
         # If this host owns a backup task, restore the `tasks` backend. Else, skip the `tasks` backend
         if [[ " ${HOSTS[@]} " =~ " ${HOSTNAME} " ]]; then
-        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
+        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
             grep -i "backend name" | awk '{printf "%s %s ","--backendName", $3}')
         else
-        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} | 
+        BACKEND_NAMES=$(dsbackup list --last --verify --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} |
             grep -i "backend name" | grep -v "tasks" | awk '{printf "%s %s ","--backendName", $3}')
         fi
         if [ ! -z "${BACKEND_NAMES}" ]; then
@@ -113,7 +113,7 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
     echo "Verification completed."
     echo "Restoring backups from: ${BACKUP_LOCATION}"
     echo "Restoring ${BACKEND_NAMES}"
-    dsbackup restore --offline --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} ${BACKEND_NAMES} 
+    dsbackup restore --offline --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} ${BACKEND_NAMES}
     echo "Restore operation complete"
 else
     echo "No Backup found in ${BACKUP_LOCATION}. There's nothing to restore"
