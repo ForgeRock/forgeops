@@ -6,6 +6,30 @@ images:
   newName: gcr.io/forgeops-public/amster
   newTag: 7.1-dev
 
+# Insert a new init-container to unpack the tar file before our standard amster container
+patchesJSON6902:
+- target:
+    group: batch
+    version: v1
+    kind: Job
+    name: amster
+  patch: |-
+    - op: add
+      path: /spec/template/spec/initContainers/0
+      value:
+        name: unpack
+        image: busybox
+        volumeMounts:
+        - mountPath: /amster-staging
+          name: amster-import
+        - mountPath: /amster-config
+          name: amster-config
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cd /amster-staging
+          tar -xzvf amster-import.tar.gz -C /amster-config
+
 patchesStrategicMerge:
 - |-
   apiVersion: batch/v1
@@ -13,8 +37,18 @@ patchesStrategicMerge:
   metadata:
     name: amster
   spec:
+    backoffLimit: 0
     template:
       spec:
         initContainers:
         - name: amster
-          args: ["upload"]
+          args: ["import"]
+          volumeMounts:
+          - mountPath: /opt/amster/config
+            name: amster-config
+        volumes:
+        - name: amster-import
+          configMap:
+            name: amster-import
+        - name: amster-config
+          emptyDir: {}

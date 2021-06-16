@@ -7,142 +7,108 @@ import os
 import subprocess
 import sys
 import time
+import utils
 
-parser = argparse.ArgumentParser(
-    description='amster import or export json configuration files')
-
-parser.add_argument(
-    '-n', '--namespace', help='The namespace that AM is running in (default is the current namespace context)')
-subparser = parser.add_subparsers(dest='cmd')
-parser_import = subparser.add_parser(
-    'import', help='import json configuration files into AM')
-parser_import.add_argument('src', help='Source file or directory to import')
-parser_export = subparser.add_parser('export', help='Export files from amster')
-parser_export.add_argument('--global', dest='glob', action='store_true', help='Include the global/ configuration in the amster export')
-parser_clean = subparser.add_parser('clean', help='Clean up and remove any amster pods')
-
-parser_export.add_argument(
-    'dst', help='destination directory to export files to')
-
-args = parser.parse_args()
-
-if args.cmd == None:
-    parser.print_help()
-    sys.exit(1)
-
-# Namespace for kubectl.
-namespace = '' if args.namespace == None else f'--namespace {args.namespace}'
-
-kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-amster_upload_job = os.path.join(kustomize_dir, 'base/amster-upload')
-amster_export_job = os.path.join(kustomize_dir,'base/amster-export')
-
-
-def kubectl(command):
-    args = f'kubectl {namespace} {command}'
-    print(args)
-    r = subprocess.run(args.split())
-    return r.returncode
-
-def get_pod_name(label):
-    cmd = f'kubectl {namespace} get pod -l {label} --output=jsonpath={{.items[0].metadata.name}}'
-    print(cmd)
-    r = subprocess.run(cmd, shell=True,  capture_output=True)
-
-    if r.returncode != 0:
-        print(f'could not get pod name for {label}. {r.stdout} err: {r.stderr}  ')
-        sys.exit(r.returncode)
-
-    pod = r.stdout.decode("utf-8")
-
-    # Simple heuristic to look for a malformed pod string being returned from the kubectl command.
-    if not pod or len(pod) < 6 or len(pod) > 25:
-        print(
-            f'Cant get pod. Name does not look correct. err = {r.stderr} stat={r.returncode}')
+def amster_import(ns, src):
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    amster_upload_job_path = os.path.join(kustomize_dir, 'base/amster-upload')
+    # If the source dir/file does not exist exit
+    if not os.path.exists(src):
+        utils.error(f'Cant read path {src}. Please specify a valid path and try again')
         sys.exit(1)
-    return pod
 
-def wait_pod_ready(pod):
-    print( f'Waiting for pod {pod}')
-    cmd = f'kubectl {namespace} wait --for=condition=ready pod {pod} --timeout=90s'
-    print(cmd)
-    r = subprocess.run(cmd, shell=True,  capture_output=True)
+    try:
+        clean_amster_job(ns)
+        utils.message('Packing and uploading configs')
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        utils.run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
+        utils.run('kubectl', f'-n {ns} create cm amster-import --from-file=amster-import.tar.gz')
+        pod = launch_amster_job(amster_upload_job_path, ns)
+        utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+        utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+        utils.message('Captured logs from the amster pod')
+        utils.run('kubectl', f'-n {ns} logs -c amster {pod}')
+    finally:
+        clean_amster_job(ns)
 
+def amster_export(ns, dst, glob):
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    amster_export_job_path = os.path.join(kustomize_dir,'base/amster-export')
+    if not os.path.isdir(dst):
+        utils.error(f'{dst} is not a valid directory. Please specify a valid path and try again')
+        sys.exit(1)
+    try:
+        clean_amster_job(ns)
+        # Create export - amster will export data, and wait.
+        pod = launch_amster_job(amster_export_job_path, ns)
+        utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+        utils.run('kubectl', f'-n {ns} wait --for=condition=ready pod {pod} --timeout=600s')
+
+        # If args.glob is True, copy the realm AND global data
+        if glob:
+            utils.run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster {dst}')
+        else:
+            utils.run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster/realms {dst}/realms')
+
+        if not os.listdir(dst):
+            utils.error('No files were exported!')
+            sys.exit(1)
+    finally:
+        clean_amster_job(ns)
 
 # Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
-def launch_amster_job(kustomize_path):
-    # Surpress the output so we don't log errors in case the job does not exist.
-    print('Cleaning up any previous amster jobs...')
-    subprocess.run(f'kubectl {namespace} delete job amster',
-                   shell=True, capture_output=True)
+def launch_amster_job(kustomize_path, ns):
+    utils.message('Deploying amster')
+    _, contents, _ = utils.run('kustomize', f'build {kustomize_path}', cstdout=True)
+    contents = contents.decode('ascii')
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+    time.sleep(5) # Allow kube-scheduler to create the pod
+    _, amster_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
+                                      cstdout=True)
+    return amster_pod_name.decode('ascii')
 
-    print("starting the amster job")
-    cmd = f'kustomize build {kustomize_path} | kubectl {namespace} apply -f -'
-    print(cmd)
-    subprocess.run(cmd,shell=True)
-    print('Giving the amster job plenty of time to start up. Please wait..')
-    time.sleep(30) # Give the new pod time to launch, and make sure any old pods have time to terminate
-    pod = get_pod_name('app=amster')
-    print(f'amster pod = {pod}')
-    return pod
+def clean_amster_job(ns):
+    utils.message(f'Cleaning up amster components')
+    utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
+    utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-import')
+    if os.path.exists('amster-import.tar.gz'): 
+        os.remove('amster-import.tar.gz')
+    return
 
-if args.cmd == 'clean':
-        kubectl('delete job amster')
-        sys.exit(0)
+def main():
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument('-n', '--namespace', default='',
+                        help='Target namespace (default: current namespace)')
+    parser = argparse.ArgumentParser(
+        description='amster import or export json configuration files')
+    subparser = parser.add_subparsers(dest='cmd', required=True, help='select action to perform')
+    parser_import = subparser.add_parser('import', help='import json configuration files into AM', parents=[common])
+    parser_import.add_argument('src', help='Source file or directory to import')
+    parser_export = subparser.add_parser('export', help='Export files from amster', parents=[common])
+    parser_export.add_argument('--global', dest='glob', action='store_true', help='Include the global/ configuration in the amster export')
+    parser_export.add_argument('dst', help='destination directory to export files to')
+    parser_clean = subparser.add_parser('clean', help='Clean up and remove any amster pods', parents=[common])
 
-# Import files into amster.
-if args.cmd == 'import':
-    # If the source dir/file does not exist exit
-    src = args.src
-    if not os.path.exists(src):
-        print(f'Cant read path {src}')
-        sys.exit(1)
-    pod = launch_amster_job(amster_upload_job)
+    args = parser.parse_args()
+    _, ctx_namespace, _ = utils.run('kubectl',
+                                    'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
+    
+    if args.cmd == 'clean':
+        clean_amster_job(namespace)
 
-    cpstat = 0
-    # Copy the src files up to waiting amster pod
-    for i in range(5):
-        print('uploading files to the pod')
-        cpstat = kubectl(f'cp -c amster {src} {pod}:/opt/amster/config/upload')
-        if cpstat == 0:
-            break;
-        print('The cp failed. Will try again')
-        time.sleep(10)
+    # Import files into amster.
+    if args.cmd == 'import':
+        amster_import(namespace, args.src)
+        return
 
-    if cpstat != 0:
-        print('Could not upload files to the amster pod')
-        sys.exit(1)
+    # Export files out of amster
+    if args.cmd == 'export':
+        amster_export(namespace, args.dst, args.glob)
+        return
 
-    print('Waiting for amster job to complete')
-    stat = kubectl("wait --for=condition=complete job/amster --timeout=60s")
-    kubectl(f'logs -c amster {pod}')
-    if stat !=0:
-        print('amster import did not complete OK')
-        sys.exit(1)
-
-    kubectl('delete job amster')
-    sys.exit(0)
-
-
-# Export files out of amster
-if args.cmd == 'export':
-    if not os.path.isdir(args.dst):
-        print(f'dst {args.dst} is not a directory')
-        sys.exit(1)
-
-    # Create export - amster will export data, and wait.
-    pod = launch_amster_job(amster_export_job)
-    wait_pod_ready(pod)
-
-    # If args.glob is True, copy the realm AND global data
-    if args.glob:
-        kubectl(f'cp -c pause {pod}:/var/tmp/amster {args.dst}')
-    else:
-        kubectl(f'cp -c pause {pod}:/var/tmp/amster/realms {args.dst}/realms')
-
-    if not os.listdir(args.dst):
-        print('No files found!')
-        sys.exit(1)
-    kubectl('delete job amster')
-
-    sys.exit(0)
+if __name__ == '__main__':
+    main()
