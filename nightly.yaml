@@ -18,10 +18,10 @@ profiles:
   build:
     artifacts:
     - image: gcr.io/forgeops-public/am
-      context: docker/7.0/am
+      context: docker/am
       kaniko: {}
     - image: gcr.io/forgeops-public/idm
-      context: docker/7.0/idm
+      context: docker/idm
       kaniko: {}
     cluster: &cluster
       namespace: kaniko
@@ -41,7 +41,7 @@ profiles:
   build:
     artifacts:
     - image: amster
-      context: docker/7.0/amster
+      context: docker/amster
       kaniko: {}
     cluster: *cluster
     tagPolicy:

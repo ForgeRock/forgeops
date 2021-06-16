@@ -60,7 +60,7 @@ parser.add_argument('--force',
                     default=False)
 parsed_args = parser.parse_args()
 
-forgeops_docker = pathlib.Path(__file__).joinpath('../../docker/7.0').resolve()
+forgeops_docker = pathlib.Path(__file__).joinpath('../../docker').resolve()
 forgeops_config = pathlib.Path(__file__).joinpath('../../config/7.0').resolve()
 build_base = pathlib.Path(__file__).joinpath('../../build').resolve()
 
@@ -75,7 +75,7 @@ in_repo_profile = parsed_args.profile_name in ('am-only',
 git_command = os.environ.get('GIT_SSH_COMMAND', 'foo')
 # Clean up first
 if parsed_args.clean or parsed_args.force:
-    ok, *_ = utils.run('git', 'clean', '-fd', '--', 'docker/7.0', 'build')
+    ok, *_ = utils.run('git', 'clean', '-fd', '--', 'docker', 'build')
     if not ok:
         print('Git clean failed.')
         sys.exit(1)

@@ -1,8 +1,10 @@
 """This is a shared lib used by other /bin python scripts"""
 
 import subprocess
+import shlex
 import sys
 import time
+import json
 import pathlib
 from threading import Thread
 import os
@@ -10,6 +12,7 @@ import shutil
 import base64
 import logging
 import json
+import re
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -19,7 +22,7 @@ MSG_FMT = '[%(levelname)s] %(message)s'
 
 _IGNORE_FILES = ('.DS_Store',)
 
-_log = None
+log_name = 'foregops'
 
 DOCKER_REGEX_NAME = {
     'am': '.*am',
@@ -27,7 +30,9 @@ DOCKER_REGEX_NAME = {
     'idm': '.*idm',
     'ds-idrepo': '.*ds-idrepo.*',
     'ds-cts': '.*ds-cts.*'
-    }
+}
+
+class RunError(subprocess.CalledProcessError): pass
 
 def loglevel(name):
     try:
@@ -57,7 +62,7 @@ class ColorFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def logger(name, level):
+def logger(name=log_name, level=logging.INFO):
     handler = logging.StreamHandler(stream=sys.stdout)
     handler.setFormatter(ColorFormatter())
     handler.setLevel(level)
@@ -88,7 +93,7 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
     stdo_pipe = subprocess.PIPE if cstdout else None
-    _r = subprocess.run(runcmd.split(), stdout=stdo_pipe, stderr=stde_pipe,
+    _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
                         check=True, input=stdin, cwd=cwd, env=env)
     return _r.returncode == 0, _r.stdout, _r.stderr
 
@@ -268,7 +273,7 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
     with open(os.path.join(base_dir, 'tag.json')) as tag_file:
         tag_data = json.load(tag_file)['builds'][0]["tag"]
     return tag_data
-    
+
 def clone_pipeline_images(clone_path,
                           branch_name='master',
                           repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
@@ -291,6 +296,101 @@ def clone_pipeline_images(clone_path,
     if not status:
         print(err)
         raise IOError(err)
+
+_USER_PWD_EXPR_RULES = {
+    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
+    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
+    'resource-server.json': '&{ig.rs.client.secret|password}',
+    'oauth2.json': '&{pit.client.secret|password}',
+    'ig-agent.json': '&{ig.agent.password|password}',
+}
+ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
+
+def _convert_path_to_common_exp(path):
+    """
+    This changes:
+      docker/amster/foo/conf/realms/root-philA/OAuth2Clients/b.json
+      realms.rootphilA.oauth2clients.b.userpassword
+    """
+    path_parts = path.parent.parts
+    start = path_parts.index('config')
+    dotted_path = '.'.join(path_parts[start + 1:])
+    safe_path = ALLOWED_COMMONS_CHARS.sub('', dotted_path)
+    safe_name = ALLOWED_COMMONS_CHARS.sub('', path.stem)
+    return f'&{{{safe_path}.{safe_name}.userpassword}}'
+
+
+def upgrade_amster_conf(conf, conf_file_name, fqdn):
+    """
+    Recursively search objects looking at values and keys that need
+    to be updated.
+    """
+    log = logging.getLogger('forgeops')
+    # Go through all items in a list
+    if isinstance(conf, list):
+        for i in conf:
+            conf = upgrade_amster_conf(i, conf_file_name, fqdn)
+        return conf
+    # This is str, int, bool, float and nulls we don't do anything with these
+    # types.
+    elif not isinstance(conf, dict):
+        return conf
+
+    # use copy to iterate through so we can modify keys.
+    for k, v in conf.copy().items():
+        if isinstance(v, dict):
+            conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
+            continue
+        elif isinstance(v, list):
+            new_value = []
+            for i in v:
+                new_value.append(upgrade_amster_conf(v, conf_file_name, fqdn))
+            conf[k] = new_value
+            continue
+        # Update FQDN
+        try:
+            if fqdn in v:
+                log.debug('Found a fqdn entry, updating.')
+                conf[k] = v.replace(fqdn(), '&{fqdn}')
+        except TypeError:
+            # this happens if there's value of none.
+            pass
+        # Key based updates
+        # userpassword, amsterVersion, userpassword-encrypted
+        if k == 'userpassword-encrypted':
+            conf.pop(k)
+        # TODO this has two external things that need to be ported...
+        elif k == 'userpassword':
+            try:
+                conf[k] = _USER_PWD_EXPR_RULES[conf_file_name.name]
+                # log.debug(f'Updated {conf_file_name.name}')
+            except KeyError:
+                log.info(
+                     (f'A userpassword key found in {conf_file_name} '
+                      'but no replacement rule was found, using default'))
+                conf[k] = _convert_path_to_common_exp(conf_file_name)
+                log.info(f'{conf_file_name} has password changed to {conf[k]}')
+        # update amster version
+        elif k == 'amsterVersion':
+            conf[k] = '&{version}'
+    return conf
+
+
+def sort_dir_json(base):
+    """
+    Recursively search a path for json files. Round-tripping to sort alpha
+    numerically.
+    """
+    conf_base = pathlib.Path(base).resolve()
+    if not conf_base.is_dir():
+        raise NotADirectoryError(f'{conf_base} is not a directory')
+    for conf_file in conf_base.rglob('**/*.json'):
+        with conf_file.open('r+') as fp:
+            conf = json.load(fp)
+            fp.seek(0)
+            fp.truncate()
+            json.dump(conf, fp, sort_keys=True, indent=2)
+
 
 def copytree(src, dst):
     """

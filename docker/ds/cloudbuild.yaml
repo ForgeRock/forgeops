@@ -1,23 +1,23 @@
 # Builds the docker images used by the ds-operator (and may also be used for vanilla forgeops)
 # This is run by a trigger. To run manually, from the forgeops root directory:
-# gcloud builds submit --config docker/7.0/ds/cloudbuild.yaml
+# gcloud builds submit --config docker/ds/cloudbuild.yaml
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  dir: docker/7.0/ds
+  dir: docker/ds
   args: [ 'build',
     '-t', 'gcr.io/forgeops-public/ds-idrepo:latest',
     '-t', 'gcr.io/forgeops-public/ds-idrepo:7.1-dev',
     '-t', 'gcr.io/forgeops-public/ds-idrepo:7-dev',
     '-f', 'idrepo/Dockerfile', '.' ]
 - name: 'gcr.io/cloud-builders/docker'
-  dir: docker/7.0/ds
+  dir: docker/ds
   args: [ 'build',
     '-t', 'gcr.io/forgeops-public/ds-cts:latest',
     '-t', 'gcr.io/forgeops-public/ds-cts:7.1-dev',
     '-t', 'gcr.io/forgeops-public/ds-cts:7-dev',
     '-f', 'cts/Dockerfile', '.' ]
 - name: 'gcr.io/cloud-builders/docker'
-  dir: docker/7.0/ds
+  dir: docker/ds
   args: [ 'build',
     '-t', 'gcr.io/forgeops-public/ds-proxy:latest',
     '-t', 'gcr.io/forgeops-public/ds-proxy:7.1-dev',

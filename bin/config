@@ -1,0 +1,259 @@
+#!/usr/bin/env python3
+import argparse
+import pathlib
+import subprocess
+import shutil
+import io
+import tarfile
+import json
+import re
+import sys
+import textwrap
+
+import utils
+
+HELP_DESCRIPTION = """
+Manage ForgeRock Platform configuration.
+"""
+HELP_EXPORT_DESCRIPTION = """
+Export config from running instance to a given profile.
+"""
+HELP_EXPORT_COMPONENTS = """
+ForgeRock Identity Platform component to export config from.
+"""
+HELP_EXPORT_SORT = """
+Sort configuration json alphanumerically. This will lead to a large initial
+ diff but subsequent iterations should be smaller and more readable.
+"""
+
+HELP_EXAMPLES = """
+examples:
+  # Export just AM configuration to myprofile
+  $ ./bin/config export --component am myprofile
+
+  # Export just AM configuration to myprofile
+  $ ./bin/config export --component am myprofile
+
+  # Export All ForgeOps components
+  $ ./bin/config export --component all myprofile
+"""
+SCRIPT = pathlib.Path(__file__)
+SCRIPT_DIR = SCRIPT.parent.resolve()
+DOCKER_BASE = SCRIPT_DIR.joinpath('../docker').resolve()
+
+PLATFORM_COMPONENTS = {
+    'am': ('am',),
+    'amster': ('amster',),
+    'idm': ('idm',),
+    'ig': ('ig',),
+}
+
+APP_CONF_PATH_FMT = {
+    'am': 'docker/am/{profile}/config'.format,
+    'idm': 'docker/idm/{profile}/conf'.format,
+    'ig': 'docker/ig/{profile}/config'.format,
+    'amster': 'docker/amster/{profile}/config'.format,
+}
+USER_PWD_EXPR_RULES = {
+    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
+    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
+    'resource-server.json': '&{ig.rs.client.secret|password}',
+    'oauth2.json': '&{pit.client.secret|password}',
+    'ig-agent.json': '&{ig.agent.password|password}',
+}
+
+KUBECTL = shutil.which('kubectl')
+AMSTER = SCRIPT_DIR.joinpath('amster').resolve()
+AM_UPGRADER = SCRIPT_DIR.joinpath('am-config-upgrader').resolve()
+
+
+
+def profile_path(path):
+    """Make sure there's a profile directory"""
+    if path.is_dir():
+        log.info(f'Updating existing profile: {path}')
+    else:
+        log.info(f'Creating a new profile: {path}')
+        path.mkdir(parents=True)
+
+
+def export_amster(conf):
+    profile_path(conf)
+    try:
+        utils.run(AMSTER, f'export {conf}')
+    except utils.RunError as e:
+        log.error(f'{e.cmd} had the following error: \n {e.stderr}')
+        raise Exception('Couldn\'t run amster export')
+
+
+def convert_path_to_common_exp(path):
+    """
+    This changes:
+      docker/amster/foo/conf/realms/root-philA/OAuth2Clients/b.json
+      realms.rootphilA.oauth2clients.b.userpassword
+    """
+    path_parts = path.parent.parts
+    start = path_parts.index('conf')
+    dotted_path = '.'.join(path_parts[start + 1:])
+    safe_path = ALLOWED_COMMONS_CHARS.sub('', dotted_path)
+    safe_name = ALLOWED_COMMONS_CHARS.sub('', path.stem)
+    return f'&{{{safe_path}.{safe_name}.userpassword}}'
+
+
+def upgrade_amster(conf_path):
+    fqdn = utils.get_configmap_value(
+        utils.get_namespace(None), 'platform-config', 'FQDN')
+    for conf_file in conf_path.rglob('*.json'):
+        with conf_file.open('r+') as fp:
+            try:
+                conf = json.load(fp)
+                log.debug(f'Updating amster config {fp.name}')
+                conf = utils.upgrade_amster_conf(conf,
+                                                 pathlib.Path(fp.name),
+                                                 fqdn)
+                fp.seek(0)
+                fp.truncate()
+                json.dump(conf, fp)
+            except Exception as e:
+                log.error(f'Error with {fp.name} \n\n {e}')
+
+
+def export_idm(idm_conf, pod_name):
+    """Export IDM config"""
+    profile_path(idm_conf)
+    # Copy from the IDM container to a local path
+    cp_args = f"""
+    cp -c openidm
+        {pod_name}:/opt/openidm/conf {idm_conf}
+    """.strip()
+    try:
+        utils.run(KUBECTL, cp_args)
+    except utils.RunError as e:
+        log.error(f'{e.cmd} had the following error: \n {e.stderr}')
+
+
+def export_am(am_conf, pod_name):
+    profile_path(am_conf)
+    # Copy from the am container to a local path
+    exec_args = f"""
+        exec {pod_name} -- /home/forgerock/export-diff.sh -
+    """.strip()
+    try:
+        log.debug('Starting export')
+        _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
+        f = io.BytesIO(out)
+        with tarfile.open(fileobj=f) as tarball:
+            log.debug('Starting to extract tarball')
+            tarball.extractall(am_conf)
+            log.debug('Export Completed.')
+        log.info('Exported AM config')
+
+    except utils.RunError as e:
+        log.error(f'{e.cmd} had the following error: \n {e.stderr}')
+        raise e
+    except tarfile.ExtractError as e:
+        log.error(f'Couldn\'t extract tarball')
+        raise e
+
+
+def upgrade_am(am_conf):
+    """Run AM configuration through the AM control"""
+    try:
+        utils.run(AM_UPGRADER, str(am_conf))
+    except utils.RunError as e:
+        log.error(f'Error during upgrade {e.stderr}')
+
+    log.info('Completed upgrading AM configuration')
+
+
+def export_ig(ig_conf, pod_name):
+    """Export IG config"""
+    profile_path(ig_conf)
+    # Copy from the IG container to a local path
+    cp_args = f"""
+    cp -c ig {pod_name}:/var/ig/config {ig_conf}
+    """.strip()
+    try:
+        utils.run(KUBECTL, cp_args)
+    except utils.RunError as e:
+        log.error(f'{e.cmd} had the following error: \n {e.stderr}')
+        raise e
+
+
+def run_export(args):
+    # Amster doesn't use a running instance
+    conf_path = pathlib.Path(
+        APP_CONF_PATH_FMT[args.component](profile=args.profile)).resolve()
+    if args.component == 'amster':
+        amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
+        log.info('Exporting amster config.')
+        export_amster(conf_path)
+        log.info('Updating amster config.')
+        upgrade_amster(conf_path)
+        log.info('Updating amster config complete.')
+    # Configs from running containers
+    else:
+        jsonpath_expr = """
+        {range .items[*]}{.metadata.labels.app}{' '}{.metadata.name}{'\\n'}{end}
+        """.strip()
+        pod_name_args = f"""
+        get -l "app={args.component}" -o jsonpath="{jsonpath_expr}" pod
+        """.strip()
+        try:
+            _, out, _ = utils.run(KUBECTL, pod_name_args,
+                                  cstdout=True, cstderr=True)
+            log.debug('Gathered pod names.')
+        except subprocess.CalledProcessError as e:
+            log.error(f'{e.cmd} had the following error: \n {e.stderr}')
+            sys.exit(1)
+
+        # IDM, AM, IG export types
+        try:
+            component_name, pod_name = out.splitlines()[0].decode().split(' ')
+            log.info(f'Running export for {component_name} in {pod_name}')
+            if component_name == 'idm':
+                export_idm(conf_path, pod_name)
+            elif component_name == 'ig':
+                export_ig(conf_path, pod_name)
+            elif component_name == 'am':
+                export_am(conf_path, pod_name)
+                upgrade_am(conf_path)
+            log.info('Completed export')
+        except IndexError:
+            log.error('Unable to find running components.')
+            sys.exit(1)
+
+    if args.sort:
+        log.info('Sorting configuration.')
+        utils.sort_dir_json(conf_path)
+        log.info('Sorting completed.')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=HELP_DESCRIPTION)
+    utils.add_loglevel_arg(parser)
+    sub_cmd_parser = parser.add_subparsers(dest="cmd")
+
+    # export sub command
+    export_parser = sub_cmd_parser.add_parser('export',
+                                              epilog=textwrap.dedent(
+                                                  HELP_EXAMPLES),
+                                              formatter_class=argparse.RawDescriptionHelpFormatter,
+                                              description=HELP_EXPORT_DESCRIPTION)
+    export_parser.add_argument('component',
+                               choices=PLATFORM_COMPONENTS.keys(),
+                               help=HELP_EXPORT_COMPONENTS)
+    export_parser.add_argument('profile')
+    export_parser.add_argument('--sort', '-s',
+                               help=HELP_EXPORT_SORT,
+                               action='store_true',
+                               default=True)
+    export_parser.set_defaults(func=run_export)
+
+    parsed = parser.parse_args()
+    global log
+    log = utils.logger(level=parsed.log_level)
+    parsed.func(parsed)
+
+
+main()

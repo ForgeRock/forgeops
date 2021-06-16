@@ -32,14 +32,14 @@ LODESTAR_GIT_COMMIT = getLodestarCommit()
 
 /** Docker image metadata for individual ForgeRock products. */
 dockerImages = [
-        'am'        : DockerImagePromotion.load('docker/7.0/am/Dockerfile', 'gcr.io/forgerock-io/am-base', steps),
-        'amster'    : DockerImagePromotion.load('docker/7.0/amster/Dockerfile', 'gcr.io/forgerock-io/amster', steps),
-        'ds-cts'    : DockerImagePromotion.load('docker/7.0/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'ds-util'   : DockerImagePromotion.load('docker/7.0/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'ds-idrepo' : DockerImagePromotion.load('docker/7.0/ds/idrepo/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'ds-proxy'  : DockerImagePromotion.load('docker/7.0/ds/proxy/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'idm'       : DockerImagePromotion.load('docker/7.0/idm/Dockerfile', 'gcr.io/forgerock-io/idm', steps),
-        'ig'        : DockerImagePromotion.load('docker/7.0/ig/Dockerfile', 'gcr.io/forgerock-io/ig', steps),
+        'am'        : DockerImagePromotion.load('docker/am/Dockerfile', 'gcr.io/forgerock-io/am-base', steps),
+        'amster'    : DockerImagePromotion.load('docker/amster/Dockerfile', 'gcr.io/forgerock-io/amster', steps),
+        'ds-cts'    : DockerImagePromotion.load('docker/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
+        'ds-util'   : DockerImagePromotion.load('docker/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
+        'ds-idrepo' : DockerImagePromotion.load('docker/ds/idrepo/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
+        'ds-proxy'  : DockerImagePromotion.load('docker/ds/proxy/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
+        'idm'       : DockerImagePromotion.load('docker/idm/Dockerfile', 'gcr.io/forgerock-io/idm', steps),
+        'ig'        : DockerImagePromotion.load('docker/ig/Dockerfile', 'gcr.io/forgerock-io/ig', steps),
 ]
 
 productToRepo = [

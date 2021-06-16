@@ -18,7 +18,7 @@ for the Dockerfiles is maintained in the respective product source code
 repository. In general, these base images have the product binary laid down and 
 are "ready to run", but do not contain any configuration.
 
-The Dockerfiles in the [docker/7.0](7.0/) directory are the "child" images that 
+The Dockerfiles in the [docker](./) directory are the "child" images that 
 derive from the base images, and overlay any of your customizations and 
 configuration files. These Docker images are built by Skaffold and pushed to 
 your Kubernetes cluster.

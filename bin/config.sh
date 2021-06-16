@@ -173,7 +173,7 @@ patch_container() {
    fi
 
    # build baseline from target
-   OUTPUT_PATH=${BASE_PATH}/docker/7.0
+   OUTPUT_PATH=${BASE_PATH}/docker
    cp -R $TARGET_PATH/* "$OUTPUT_PATH/"
    shopt -s globstar
    # overwrite baseline with patches

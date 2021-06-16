@@ -30,7 +30,7 @@ UI_CONF_KEYNAME = ('imageNameAdmin', 'imageNameEnduser', 'imageNameLogin')
 MSC_PRODUCTS = ('rcs-agent',)
 # Product kustomize images
 KUSTOMIZE_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
-PLATFORM_DOCKER_BASE = '../../docker/7.0'
+PLATFORM_DOCKER_BASE = '../../docker'
 CLI_PRODUCTS = ('am', 'amster', 'ig', 'idm', 'ds', 'ui') + MSC_PRODUCTS
 PLATFORM_KUSTOMIZE_BASE = '../../kustomize/base'
 PLATFORM_DOCKER_PATH = SCRIPT_DIR.joinpath(PLATFORM_DOCKER_BASE).resolve()

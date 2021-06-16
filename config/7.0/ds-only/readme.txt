@@ -1,2 +1,2 @@
-This config profile has moved to docker/7.0/[COMPONENT]/config-profiles/[PROFILE].
+This config profile has moved to docker/[COMPONENT]/config-profiles/[PROFILE].
 

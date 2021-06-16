@@ -15,7 +15,7 @@ build () {
     OVERLAY_PATH=${BASE_PATH}/config/$2
     
     # build baseline from target
-    OUTPUT_PATH=${BASE_PATH}/docker/7.0
+    OUTPUT_PATH=${BASE_PATH}/docker
     cp -R $TARGET_PATH/* "$OUTPUT_PATH/"
     
     # overwrite baseline with patches

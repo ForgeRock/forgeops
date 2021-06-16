@@ -260,14 +260,14 @@ skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(l
 artifactDefinitions:
     - &DS-CTS_BASE
       image: ds-cts
-      context: docker/7.0/ds
+      context: docker/ds
     - &DS-CTS
       <<: *DS-CTS_BASE
       docker:
         dockerfile: cts/Dockerfile
     - &DS-IDREPO_BASE
       image: ds-idrepo
-      context: docker/7.0/ds/
+      context: docker/ds/
     - &DS-IDREPO
       <<: *DS-IDREPO_BASE
       docker:
