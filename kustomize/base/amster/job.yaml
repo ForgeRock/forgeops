@@ -45,10 +45,14 @@ spec:
       - name: pause
         image: amster
         imagePullPolicy: IfNotPresent
-        args:  ["bash", "-c", "sleep 20"]
+        args:  ["bash", "-c", "sleep 10"]
         volumeMounts:
         - mountPath: /var/tmp/amster
           name: export-files
+        readinessProbe:
+          exec:
+            command: ["cat", "/etc/hosts"]
+          initialDelaySeconds: 1
       volumes:
       - name: amster-secrets
         secret:

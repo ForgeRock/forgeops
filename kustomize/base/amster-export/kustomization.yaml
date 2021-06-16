@@ -13,6 +13,7 @@ patchesStrategicMerge:
   metadata:
     name: amster
   spec:
+    backoffLimit: 0
     template:
       spec:
         initContainers:

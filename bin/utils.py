@@ -30,13 +30,13 @@ def warning(s):
     print(f"{PURPLE}{s}{ENDC}")
 
 
-def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None):
+def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None):
     """rC runs a given command. Raises error if command returns non-zero code"""
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
     stdo_pipe = subprocess.PIPE if cstdout else None
     _r = subprocess.run(runcmd.split(), stdout=stdo_pipe, stderr=stde_pipe,
-                        check=True, input=stdin, cwd=cwd)
+                        check=True, input=stdin, cwd=cwd, env=env)
     return _r.returncode == 0, _r.stdout, _r.stderr
 
 
