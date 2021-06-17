@@ -30,7 +30,7 @@ UI_CONF_KEYNAME = ('imageNameAdmin', 'imageNameEnduser', 'imageNameLogin')
 MSC_PRODUCTS = ('rcs-agent',)
 # Product kustomize images
 KUSTOMIZE_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
-CLI_PRODUCTS = ('am', 'ig', 'idm', 'ds', 'ui')
+CLI_PRODUCTS = ('am', 'ig', 'idm', 'ds', 'ui') + MSC_PRODUCTS
 PLATFORM_DOCKER_BASE = '../../docker/7.0'
 PLATFORM_KUSTOMIZE_BASE = '../../kustomize/base'
 PLATFORM_DOCKER_PATH = SCRIPT_DIR.joinpath(PLATFORM_DOCKER_BASE).resolve()
@@ -477,12 +477,25 @@ def run_from_args(args):
                          update_repo=update_repo,
                          update_tag=update_tag)
 
+    if 'rcs-agent' in args.products:
+        cli_only = {'rcs-agent': dict() }
+        # update repo or tag to '' to force a NOOP change on component
+        update_repo = args.update_repo if args.update_repo else ''
+        update_tag = args.update_tag if args.update_tag else ''
+        update_kustomize(cli_only,
+                         PLATFORM_KUSTOMIZE_PATH,
+                         update_repo=update_repo,
+                         update_tag=update_tag)
+
     if args.products in DOCKER_PRODUCTS:
         cli_only = {k: dict() for k in args.products}
         update_dockerfiles(cli_only,
                        PLATFORM_DOCKER_PATH,
                        args.update_repo,
                        args.update_tag)
+
+
+
 
 
 def run_from_files(args):
