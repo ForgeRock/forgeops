@@ -15,13 +15,28 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 def build() {
-    properties([buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5'))])
+    prStageName = 'PR-ALL-TESTS'
+    prReportMessage = "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${prStageName}/)"
+
+    if (params.isEmpty()) {
+        properties([
+                buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
+                parameters([
+                        booleanParam(name: 'PR_pit1', defaultValue: true),
+                ] + commonLodestarModule.postcommitMandatoryStages(false)),
+        ])
+
+        sendInformationMessageToPR()
+    }
 
     // Abort any active builds relating to the current PR, as they are superseded by this build
     abortMultibranchPrBuilds()
 
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
-    bitbucketCommentId = bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(buildStatus: 'IN PROGRESS')
+    bitbucketCommentId = bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
+            buildStatus: 'IN PROGRESS',
+            commitHash: commonModule.FORGEOPS_GIT_COMMIT
+    )
 
     try {
         // in order to compare the PR with the target branch, we first need to fetch the target branch
@@ -38,14 +53,11 @@ def build() {
                 echo "Skipping build for 'docker/${buildDirectory['name']}'"
             }
         }
-    } catch (FlowInterruptedException ex) {
-        currentBuild.result = 'ABORTED'
-        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(buildStatus: 'ABORTED',
-                                                                      originalCommentId: bitbucketCommentId)
-        throw ex
+    } catch (FlowInterruptedException exception) {
+        sendBuildAbortedNotification()
+        throw exception
     } catch (exception) {
-        currentBuild.result = 'FAILURE'
-        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(originalCommentId: bitbucketCommentId)
+        sendBuildFailureNotification('')
         throw exception
     }
 }
@@ -72,22 +84,77 @@ void buildImage(String directoryName) {
 def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
         Random random = new Random()
-        def parallelTestsMap = [
-                'PIT1': { pit1TestStage.runStage(pipelineRun, random) },
-                'Basic Perf': { perfTestStage.runStage(pipelineRun, random) },
-        ]
+        if (params.PR_pit1) {
+            prTestsStage.runStage(pipelineRun, random)
+        }
 
-        parallel parallelTestsMap
+        if (commonLodestarModule.doRunPostcommitTests()) {
+            postcommitTestsStage.runStage(pipelineRun, random, false)
+        }
+
         currentBuild.result = 'SUCCESS'
-    } catch (FlowInterruptedException ex) {
-        echo "CAUGHT FlowInterruptedException"
-        currentBuild.result = 'ABORTED'
-        throw ex
-    } catch (exception) {
-        currentBuild.result = 'FAILURE'
+    } catch (FlowInterruptedException exception) {
+        sendBuildAbortedNotification()
         throw exception
+    } catch (exception) {
+        // If there is a pipeline error, or a timeout with the PIT/PERF tests, an exception is thrown.
+        sendBuildFailureNotification("PR tests failed. ${prReportMessage}")
     } finally {
-        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(originalCommentId: bitbucketCommentId)
+        if (currentBuild.result != 'ABORTED') {
+            node('gce-vm-small') {
+                summaryReportGen.createAndPublishSummaryReport(commonLodestarModule.allStagesCloud, prStageName, '', false,
+                        prStageName, "${prStageName}.html")
+            }
+        }
+    }
+}
+
+/** Post a comment on the PR, explaining rules and how to execute additional tests */
+void sendInformationMessageToPR() {
+    if (isPR()) {
+        bitbucketUtils.commentOnMultibranchPullRequest(
+                """#### Jenkins is building your PR
+                  |If you would like to know how to configure which tests are run against your PR, click [here](https://ci.forgerock.org/job/ForgeOps-build/job/PR-${env.CHANGE_ID}/build?delay=0sec)
+                """.stripMargin()
+        )
+    }
+}
+
+def sendBuildAbortedNotification() {
+    currentBuild.result = 'ABORTED'
+    bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
+            commitHash: commonModule.FORGEOPS_GIT_COMMIT,
+            originalCommentId: bitbucketCommentId
+    )
+}
+
+def sendBuildFailureNotification(String messageSuffix) {
+    currentBuild.result = 'FAILURE'
+    bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
+            commitHash: commonModule.FORGEOPS_GIT_COMMIT,
+            originalCommentId: bitbucketCommentId,
+            messageSuffix: messageSuffix
+    )
+}
+
+def finalNotification() {
+    stage('Final notification') {
+        // If some of the PR tests fail, the plugin that manages this doesn't throw an exception, but
+        // it does set the build result to UNSTABLE/FAILURE. If it didn't do that => SUCCESS
+        def message = ''
+        if (prStageName != '') {
+            message = prReportMessage
+        }
+        if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
+            currentBuild.result = 'SUCCESS'
+        } else {
+            message = "PR tests failed."
+        }
+        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
+                commitHash: commonModule.FORGEOPS_GIT_COMMIT,
+                originalCommentId: bitbucketCommentId,
+                messageSuffix: message
+        )
     }
 }
 

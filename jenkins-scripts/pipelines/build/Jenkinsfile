@@ -39,6 +39,7 @@ timestamps {
 
             localGitUtils = load("${libsLocation}/git-utils.groovy")
             commonModule = load("${libsLocation}/common.groovy")
+            commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
 
             currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
             currentBuild.description = 'built:'
@@ -53,13 +54,14 @@ timestamps {
                 if (isPR()) {
                     pipeline = load("${jobLocation}/pr.groovy")
                     prAutomation = load("${libsLocation}/pr-automation.groovy")
+                    prTestsStage = load("${stagesLocation}/pr-tests.groovy")
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
                     tagReadyForDevPipelines = load("${stagesLocation}/tag-ready-for-dev-pipelines.groovy")
                     createPlatformImagesPR = load("${stagesLocation}/create-platform-images-pr.groovy")
                 }
-                pit1TestStage = load("${stagesLocation}/pr-postcommit-pit1-tests.groovy")
-                perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
+                // Needed both for PR and postcommit
+                postcommitTestsStage = load("${stagesLocation}/postcommit-tests.groovy")
             }
 
             pipelineName = 'forgeops'
@@ -89,7 +91,11 @@ timestamps {
     }
 
     if (commonModule.branchSupportsIDCloudReleases()) {
-        pipeline.postBuildTests(pipelineRun)
+        // The node used has only one executor and so this code functions as a lock
+        // Remove this workaround once the Lodestar pipeline will be move to Jenkins in cloud, see LODESTAR-629
+        withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : 'postcommit-forgeops-lock-cloud') {
+            pipeline.postBuildTests(pipelineRun)
+        }
 
         if (isPR()) {
             prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.FORGEOPS_GIT_COMMIT)
@@ -97,5 +103,17 @@ timestamps {
             tagReadyForDevPipelines.runStage(pipelineRun)
             pipeline.createPlatformImagesPR(pipelineRun)
         }
+    }
+
+    pipeline.finalNotification()
+}
+
+def withPostcommitLock(String nodeName, Closure process) {
+    if (nodeName) {
+        node (nodeName) {
+            process()
+        }
+    } else {
+        process()
     }
 }

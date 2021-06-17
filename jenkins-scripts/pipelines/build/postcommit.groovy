@@ -21,6 +21,8 @@ def build() {
         buildDiscarder(logRotator(numToKeepStr: '20'))
     ])
 
+    slackChannel = '#forgeops'
+
     postcommitBuild = new Build(steps, env, currentBuild)
     def currentImage
 
@@ -72,12 +74,7 @@ void buildImage(String directoryName) {
 def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
         Random random = new Random()
-        def parallelTestsMap = [
-            'PIT1': { pit1TestStage.runStage(pipelineRun, random) },
-            'Basic Perf': { perfTestStage.runStage(pipelineRun, random) },
-        ]
-
-        parallel parallelTestsMap
+        postcommitTestsStage.runStage(pipelineRun, random, true)
         currentBuild.result = 'SUCCESS'
     } catch (exception) {
         currentBuild.result = 'FAILURE'
@@ -102,8 +99,25 @@ def createPlatformImagesPR(PipelineRunLegacyAdapter pipelineRun) {
     }
 }
 
-private void sendSlackNotification(String msgDetails) {
-    slackUtils.sendStatusMessage('#forgeops-notify', currentBuild.result, msgDetails)
+def finalNotification() {
+    stage('Final notification') {
+        // If some of the postcommit tests fail, the plugin that manages this doesn't throw an exception,
+        // but it does set the build result to UNSTABLE/FAILURE. If it does not do that => SUCCESS
+        if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
+            currentBuild.result = 'SUCCESS'
+
+            // Send a 'build is back to normal' notification if the previous build was not good
+            if (buildIsBackToNormal()) {
+                slackUtils.sendBackToNormalMessage(slackChannel)
+            }
+        } else {
+            sendSlackNotification()
+        }
+    }
+}
+
+private void sendSlackNotification(String msgDetails='') {
+    slackUtils.sendStatusMessage(slackChannel, currentBuild.result, msgDetails)
 }
 
 return this
