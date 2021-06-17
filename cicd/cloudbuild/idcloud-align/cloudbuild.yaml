@@ -1,0 +1,82 @@
+timeout: 900s
+options:
+  env:
+    - NAMESPACE=idcloud-align
+    - TAG_NAME=dev-fidc
+
+steps:
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: authenticate
+  waitFor: ['-']
+  args: ['container', 'clusters', 'get-credentials', 'eng-shared-2', '--region=europe-west2']
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: nuke-environment
+  waitFor: ['authenticate']
+  args:
+    - -c
+    - |-
+      ./cicd/bin/nuke-environment
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: change-images
+  waitFor: ['nuke-environment']
+  args:
+    - -c
+    - |-
+      ./cicd/bin/set-deploy-images
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: deploy-base-ds
+  waitFor: ['change-images']
+  args:
+    - -c
+    - |-
+      ./cicd/bin/deploy-base-ds
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: deploy-apps
+  waitFor: ['deploy-base-ds']
+  args:
+    - -c
+    - |-
+      ./cicd/bin/deploy-apps
+
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: amster-load
+  waitFor: ['deploy-apps']
+  args:
+    - -c
+    - |-
+      ./cicd/bin/amster-load
+
+
+# - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+#   entrypoint: bash
+#   id: smoke-tests
+#   waitFor: ['amster-load']
+#   args:
+#     - -c
+#     - |-
+#       ./cicd/bin/smoke-tests
+#
+# - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+#   entrypoint: bash
+#   id: slack-notify
+#   waitFor: ['smoke-tests']
+#   secretEnv: ['SLACK_WEBHOOK_URL']
+#   args:
+#     - -c
+#     - |-
+#       ./cicd/bin/nightly-slack-notify
+#
+# availableSecrets:
+#   secretManager:
+#     - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly/versions/latest
+#       env: 'SLACK_WEBHOOK_URL'

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -o errexit
+
+
+cd_or_die() {
+    cd $SCRIPT_DIR/$1 || (echo "Couldn't determine change directory $SCRIPT_DIR/$1" ; exit 1)
+}
+
+REGISTRY=$1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || (echo "Couldn't determine the root path" ; exit 1)
+REGISTRY="${REGISTRY:=gcr.io/engineering-devops/fidc}"
+TAG_NAME=${TAG_NAME:="dev"}
+
+cd_or_die ../../kustomize/overlay/apps
+kustomize edit set image am="${REGISTRY}/am:${TAG_NAME}"
+echo "kustomize edit set image am=${REGISTRY}/am:${TAG_NAME} completed"
+kustomize edit set image amster="${REGISTRY}/amster:${TAG_NAME}"
+echo "kustomize edit set image amster=${REGISTRY}/amster:${TAG_NAME} completed"
+kustomize edit set image idm="${REGISTRY}/idm:${TAG_NAME}"
+echo "kustomize edit set image idm=${REGISTRY}/idm:${TAG_NAME} completed"
+
+cd_or_die ../../kustomize/base/ds-idrepo
+kustomize edit set image ds-idrepo="${REGISTRY}/ds-idrepo:${TAG_NAME}"
+
+cd_or_die ../../kustomize/base/ds-cts
+kustomize edit set image ds-cts="${REGISTRY}/ds-cts:${TAG_NAME}"
+
+$SCRIPT_DIR/../../bin/set-images --inplace --products rcs-agent ui --update-repo "${REGISTRY}" --update-tag "${TAG_NAME}"
