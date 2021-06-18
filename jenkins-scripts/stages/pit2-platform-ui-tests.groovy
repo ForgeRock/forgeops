@@ -23,7 +23,7 @@ import com.forgerock.pipeline.stage.FailureOutcome
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def stageName = 'PIT2 Platform UI'
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def reportUrl = ''
+    def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome([tags : ['PIT2'], stageDisplayName : stageName], normalizedStageName) {
         try {
@@ -91,11 +91,11 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
                     // The Platform UI repo needs to already be checked out in the platform-ui directory
                     // for this method call to work
-                    reportUrl = uiTestsStage.runTests(uiTestsConfig, normalizedStageName, normalizedStageName)
+                    uiTestsStage.runTests(uiTestsConfig, normalizedStageName, normalizedStageName)
                 }
             }
         } catch(Exception e) {
-            return new FailureOutcome(e, "${env.BUILD_URL}/pit2-platform-ui/")
+            return new FailureOutcome(e, reportUrl)
         }
 
         return new Outcome(Status.SUCCESS, reportUrl)
