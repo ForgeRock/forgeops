@@ -15,18 +15,59 @@ import utils
 HELP_DESCRIPTION = """
 Manage ForgeRock Platform configuration.
 """
-HELP_EXPORT_DESCRIPTION = """
+HELP_EXPORT_CMD_DESCRIPTION = """
 Export config from running instance to a given profile.
 """
-HELP_EXPORT_COMPONENTS = """
-ForgeRock Identity Platform component to export config from.
+HELP_CMD_COMPONENTS = """
+ForgeRock Identity Platform component.
 """
-HELP_EXPORT_SORT = """
+HELP_EXPORT_CMD_SORT = """
 Sort configuration json alphanumerically. This will lead to a large initial
  diff but subsequent iterations should be smaller and more readable.
 """
+HELP_PATH_CMD_TOOL_NAME = """
+Directory of tool configuration files e.g. docker, kustomize
+"""
+HELP_PATH_CMD_DESCRIPTION = """
+Resolve an absolute path to a location in the forgeops directory tree.
+"""
 
-HELP_EXAMPLES = """
+HELP_PATH_DOCKER_CMD = """
+Resolve the path to a directory which contains a Dockerfile, optionally resolve
+ the path for a config profile used in a Dockerfile.
+"""
+HELP_PATH_DOCKER_PROFILE_NAME = """
+Add the config profile name to the path.
+"""
+
+HELP_PATH_KUSTOMIZE_CMD = """
+Resolve the path to a directory which contains kustomization
+ directories that hold many manifests. Optionally resolve to profile. e.g.
+ small.
+"""
+
+HELP_PATH_KUSTOMIZE_LAYER = """
+The parent directory containing multiple kustomize profile directories.
+  e.g. base or overlay
+"""
+
+HELP_PATH_KUSTOMIZE_PROFILE = """
+Directory which contians a kustomization.yaml. e.g. small,medium,large
+"""
+
+HELP_PATH_EXAMPLES = """
+examples:
+  # Path to the "small" kustomize profile
+  $ ./bin/config path kustomize overlay small
+
+  # Path to a IDM configuration profile
+  $ ./bin/config path docker idm idm-only
+
+  # Path to the directory containing IG Dockerfile
+  $ ./bin/config path docker ig
+"""
+
+HELP_EXPORT_EXAMPLES = """
 examples:
   # Export just AM configuration to myprofile
   $ ./bin/config export --component am myprofile
@@ -36,10 +77,8 @@ examples:
 
   # Export All ForgeOps components
   $ ./bin/config export --component all myprofile
+
 """
-SCRIPT = pathlib.Path(__file__)
-SCRIPT_DIR = SCRIPT.parent.resolve()
-DOCKER_BASE = SCRIPT_DIR.joinpath('../docker').resolve()
 
 PLATFORM_COMPONENTS = {
     'am': ('am',),
@@ -49,10 +88,10 @@ PLATFORM_COMPONENTS = {
 }
 
 APP_CONF_PATH_FMT = {
-    'am': 'docker/am/{profile}/config'.format,
-    'idm': 'docker/idm/{profile}/conf'.format,
-    'ig': 'docker/ig/{profile}/config'.format,
-    'amster': 'docker/amster/{profile}/config'.format,
+    'am': 'am/{profile}/config'.format,
+    'idm': 'idm/{profile}/conf'.format,
+    'ig': 'ig/{profile}/config'.format,
+    'amster': 'amster/{profile}/config'.format,
 }
 USER_PWD_EXPR_RULES = {
     'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
@@ -63,9 +102,8 @@ USER_PWD_EXPR_RULES = {
 }
 
 KUBECTL = shutil.which('kubectl')
-AMSTER = SCRIPT_DIR.joinpath('amster').resolve()
-AM_UPGRADER = SCRIPT_DIR.joinpath('am-config-upgrader').resolve()
-
+AMSTER_BIN = utils.SCRIPT_DIR.joinpath('amster').resolve()
+AM_UPGRADER = utils.SCRIPT_DIR.joinpath('am-config-upgrader').resolve()
 
 
 def profile_path(path):
@@ -80,7 +118,7 @@ def profile_path(path):
 def export_amster(conf):
     profile_path(conf)
     try:
-        utils.run(AMSTER, f'export {conf}')
+        utils.run(AMSTER_BIN, f'export {conf}')
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise Exception('Couldn\'t run amster export')
@@ -182,8 +220,8 @@ def export_ig(ig_conf, pod_name):
 
 def run_export(args):
     # Amster doesn't use a running instance
-    conf_path = pathlib.Path(
-        APP_CONF_PATH_FMT[args.component](profile=args.profile)).resolve()
+    conf_path = pathlib.Path(utils.DOCKER_BASE.joinpath(
+        APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
     if args.component == 'amster':
         amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
         log.info('Exporting amster config.')
@@ -229,26 +267,72 @@ def run_export(args):
         log.info('Sorting completed.')
 
 
+def run_path(args):
+    if args.tool == 'docker':
+        profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
+        print(utils.DOCKER_BASE_PATH.joinpath(args.component, profile))
+    elif args.tool == 'kustomize':
+        print(utils.KUSTOMIZE_BASE_PATH.joinpath(args.layer, args.profile))
+
+
 def main():
     parser = argparse.ArgumentParser(description=HELP_DESCRIPTION)
     utils.add_loglevel_arg(parser)
     sub_cmd_parser = parser.add_subparsers(dest="cmd")
 
     # export sub command
-    export_parser = sub_cmd_parser.add_parser('export',
-                                              epilog=textwrap.dedent(
-                                                  HELP_EXAMPLES),
-                                              formatter_class=argparse.RawDescriptionHelpFormatter,
-                                              description=HELP_EXPORT_DESCRIPTION)
-    export_parser.add_argument('component',
-                               choices=PLATFORM_COMPONENTS.keys(),
-                               help=HELP_EXPORT_COMPONENTS)
-    export_parser.add_argument('profile')
-    export_parser.add_argument('--sort', '-s',
-                               help=HELP_EXPORT_SORT,
-                               action='store_true',
-                               default=True)
-    export_parser.set_defaults(func=run_export)
+    export_cmd_parser = sub_cmd_parser.add_parser('export',
+                                                  epilog=textwrap.dedent(
+                                                      HELP_EXPORT_EXAMPLES),
+                                                  formatter_class=argparse.RawDescriptionHelpFormatter,
+                                                  description=HELP_EXPORT_CMD_DESCRIPTION)
+    export_cmd_parser.add_argument('component',
+                                   choices=PLATFORM_COMPONENTS.keys(),
+                                   help=HELP_CMD_COMPONENTS)
+    export_cmd_parser.add_argument('profile')
+    export_cmd_parser.add_argument('--sort', '-s',
+                                   help=HELP_EXPORT_CMD_SORT,
+                                   action='store_true',
+                                   default=True)
+    export_cmd_parser.set_defaults(func=run_export)
+
+    # path sub command
+    path_cmd_parser = sub_cmd_parser.add_parser('path',
+                                                epilog=textwrap.dedent(
+                                                    HELP_PATH_EXAMPLES),
+                                                formatter_class=argparse.RawTextHelpFormatter,
+                                                description=HELP_PATH_CMD_DESCRIPTION)
+    path_sub_cmd_parser = path_cmd_parser.add_subparsers(dest='tool')
+    path_cmd_parser.set_defaults(func=run_path)
+
+    # docker paths
+    path_docker_parser = path_sub_cmd_parser.add_parser('docker',
+                                                        epilog=textwrap.dedent(
+                                                            HELP_PATH_EXAMPLES),
+                                                        formatter_class=argparse.RawTextHelpFormatter,
+                                                        description=HELP_PATH_CMD_DESCRIPTION)
+    path_docker_parser.add_argument('component',
+                                    help=HELP_CMD_COMPONENTS,
+                                    choices=PLATFORM_COMPONENTS.keys())
+
+    path_docker_parser.add_argument('profile',
+                                    help=HELP_PATH_DOCKER_PROFILE_NAME,
+                                    nargs='?',
+                                    default='')
+
+    # kustomize paths
+    path_kustomize_parser = path_sub_cmd_parser.add_parser('kustomize',
+                                                           epilog=textwrap.dedent(
+                                                               HELP_PATH_EXAMPLES),
+                                                           formatter_class=argparse.RawTextHelpFormatter,
+                                                           description=HELP_PATH_CMD_DESCRIPTION)
+    path_kustomize_parser.add_argument('layer',
+                                       help=HELP_PATH_KUSTOMIZE_LAYER,
+                                       choices=('base', 'overlay'))
+    path_kustomize_parser.add_argument('kustomization',
+                                       help=HELP_PATH_KUSTOMIZE_PROFILE,
+                                       nargs='?',
+                                       default='')
 
     parsed = parser.parse_args()
     global log

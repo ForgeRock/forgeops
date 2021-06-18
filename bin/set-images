@@ -41,26 +41,26 @@ DNS = re.compile(r'^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}(:\d{1,})?$')
 HELP_EXAMPLES = """
 examples:
 # Checkout latest version of platform-images and update Dockerfiles to match it
-$ ./bin/set-docker-images
+$ ./bin/set-images
 
 # Remove old config.
-$ ./bin/set-docker-images --clean
+$ ./bin/set-images --clean
 
 # Use a specific branch in platform-images
-$ ./bin/set-docker-images --branch-name pit2-upgrade
+$ ./bin/set-images --branch-name pit2-upgrade
 
 # Use a specific branch in platform-images and checkout exact commit
-$ ./bin/set-docker-images --branch-name mybranch --commit fdsf123
+$ ./bin/set-images --branch-name mybranch --commit fdsf123
 
 # Use the given path to find the config and only change the am product.
-$ ./bin/set-docker-images --config-path /tmp/mychange --products am
+$ ./bin/set-images --config-path /tmp/mychange --products am
 
 # Update the dockerfile for AM to use the same repo and image but the tag of "sometagname"
-$ ./bin/set-docker-images --inplace --products am --update-tag sometagname
+$ ./bin/set-images --inplace --products am --update-tag sometagname
 
 # Change all the repo names, leaves docker image name (leaves the last part as is) to match the value
 # Changes tags to match platform-images repository
-$ ./bin/set-docker-images --update-repo gcr.io/forgeops-public
+$ ./bin/set-images --update-repo gcr.io/forgeops-public
 """
 
 ### Tests ###

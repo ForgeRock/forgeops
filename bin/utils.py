@@ -32,6 +32,13 @@ DOCKER_REGEX_NAME = {
     'ds-cts': '.*ds-cts.*'
 }
 
+SCRIPT = pathlib.Path(__file__)
+SCRIPT_DIR = SCRIPT.parent.resolve()
+REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
+DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
+KUSTOMIZE_BASE_PATH = REPO_BASE_PATH.joinpath('kustomize').resolve()
+
+
 class RunError(subprocess.CalledProcessError): pass
 
 def loglevel(name):
