@@ -29,7 +29,7 @@ def jobProperties = [
     disableConcurrentBuilds(),
     buildDiscarder(logRotator(numToKeepStr: '20')),
     parameters([
-        string(name: 'PIT2_Greenfield', defaultValue: '10', description: '0 to not run<br>approx 1h per loop (minimum 2 loops when run)', trim: true),
+        string(name: 'PIT2_Greenfield', defaultValue: '43200', description: '0 to not run<br>max duration in seconds (min 7200s when run)', trim: true),
         booleanParam(name: 'PIT2_Upgrade', defaultValue: true, description: 'approx 45mins'),
         booleanParam(name: 'PIT2_Perf_platform', defaultValue: true, description: 'approx 1h30mins'),
         booleanParam(name: 'PIT2_Perf_am_authn', defaultValue: true, description: 'approx 1h'),
@@ -41,9 +41,9 @@ def jobProperties = [
     ])
 ]
 
-if (params.PIT2_Greenfield != null && params.PIT2_Greenfield.toInteger() == 1) {
+if (params.PIT2_Greenfield != null && params.PIT2_Greenfield.toInteger() < 7200) {
     currentBuild.result = 'ABORTED'
-    error 'Only 1 loop specified for Greenfield but minimum 2 required.'
+    error "Only ${params.PIT2_Greenfield.toInteger()}s specified for Greenfield but minimum 7200s required."
 }
 
 if (env.TAG_NAME) {
