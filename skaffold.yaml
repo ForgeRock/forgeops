@@ -88,7 +88,7 @@ build: &default-build
 deploy: &default-deploy
   statusCheckDeadlineSeconds: 900
   kustomize:
-    path: ./kustomize/overlay/7.0/all
+    path: ./kustomize/overlay/all
 
 profiles:
 # Images tagged as environment variable in a dockerd or dockerd like environment
@@ -100,7 +100,7 @@ profiles:
     artifacts: *default-artifacts
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/all
+      path: ./kustomize/overlay/all
 
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
@@ -108,17 +108,17 @@ profiles:
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/small
+      path: ./kustomize/overlay/small
 - name: medium
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/medium
+      path: ./kustomize/overlay/medium
 - name: large
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/large
+      path: ./kustomize/overlay/large
 
 ###################################################################
 #####################INDIVIDUAL COMPONENTS#########################
@@ -189,7 +189,7 @@ profiles:
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/forgeops
+      path: ./kustomize/overlay/forgeops
 
 - name: ldif-importer
   build:
@@ -204,14 +204,14 @@ profiles:
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/dev
+      path: ./kustomize/overlay/dev
 
 # Platform deployment without default UI projects. UI to be installed separately, for development
 - name: no-ui
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/noui
+      path: ./kustomize/overlay/noui
 
 # Sample profiles to launch / test just a specific product
 - name: ig-only
@@ -222,7 +222,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/ig-only
+      path: ./kustomize/overlay/ig-only
 
 - name: am-only
   build:
@@ -237,7 +237,7 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/am-only
+      path: ./kustomize/overlay/am-only
 
 - name: idm-only
   build:
@@ -248,7 +248,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/idm-only
+      path: ./kustomize/overlay/idm-only
 
 - name: ds-only
   build:
@@ -259,7 +259,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/ds-only
+      path: ./kustomize/overlay/ds-only
 
 # Deploy only ds and secrets.
 - name: persistence
@@ -273,7 +273,7 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/persistence
+      path: ./kustomize/overlay/persistence
 
 # deploy only AM/IDM - for iterative testing
 - name: am-idm-only
@@ -287,7 +287,7 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/am-idm-only
+      path: ./kustomize/overlay/am-idm-only
 
 - name: amster-export
   build:
@@ -298,4 +298,4 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/amster-export
+      path: ./kustomize/overlay/amster-export

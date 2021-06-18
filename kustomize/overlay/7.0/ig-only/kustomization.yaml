@@ -1,5 +1,0 @@
-namespace: default
-resources:
-  - ../../../base/kustomizeConfig
-  - ../../../base/ig
-  - ../../../base/ingress

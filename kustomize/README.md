@@ -7,20 +7,20 @@ If you are not familiar with Kustomize, please read the documents and study the
 tutorials [here](https://kustomize.io/) before you try to work with ForgeRock's 
 Kustomize artifacts.
 
-
 ## Organization
 
 The `kustomize/base` directory includes bases for the components of the 
 ForgeRock Identity Platform - AM, IDM, DS, and IG. The `overlay` folder includes
 the environments. Environments pull together the components into a Kustomize 
-deployment. See the `kustomize/overlay/7.0/all` directory for an example.
+deployment. See the `kustomize/overlay/all` directory for an example.
 
 ## Reviewing Kustomize Output
 
 Use the `kustomize build` command to see the ouput that Kustomize generates. For
 example:
+
 ```bash
-cd kustomize/overlay/7.0/all
+cd kustomize/overlay/all
 # This will show you what is sent to the cluster
 kustomize build
 ```

@@ -1,0 +1,128 @@
+namespace: prod
+resources:                       
+- ../../base/kustomizeConfig  
+- ../../base/7.0/ds/cts       
+- ../../base/7.0/ds/idrepo    
+- ../../base/am-cdk           
+- ../../base/amster           
+- ../../base/idm-cdk              
+- ../../base/rcs-agent        
+- ../../base/end-user-ui      
+- ../../base/login-ui         
+- ../../base/admin-ui         
+- ../../base/ingress      
+- ../../base/ldif-importer    
+- ../../base/pdb              
+                                 
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    # Some optional settings
+    # If you are using cert-manager and Let's Encrypt in your cluster and want real certs - set this
+    # CERT_ISSUER: letsencrypt-prod
+    FQDN: "prod.iam.example.com"
+    AM_STORES_CTS_SERVERS: "ds-cts-0.ds-cts:1636,ds-cts-1.ds-cts:1636,ds-cts-2.ds-cts:1636"
+    AM_STORES_USER_SERVERS: "ds-idrepo-0.ds-idrepo:1636,ds-idrepo-1.ds-idrepo:1636"
+
+- |-
+  #Patch AM
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: am
+  spec:
+    replicas: 1
+    template:
+      spec:
+        containers:
+        - name: openam
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 4Gi
+            requests:
+              cpu: 2000m
+              memory: 4Gi
+- |-
+  #Patch IDM
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: idm
+  spec:
+    replicas: 1
+    template:
+      spec:
+        containers:
+        - name: openidm
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 2Gi
+            requests:
+              cpu: 1500m
+              memory: 2Gi
+
+- |-
+  #Patch DS CTS
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: ds-cts
+  spec:
+    replicas: 3
+    template:
+      spec:
+        containers:
+          - name: ds
+            resources:
+              requests:
+                memory: 3Gi
+                cpu: 2000m
+              limits:
+                memory: 5Gi
+    volumeClaimTemplates:
+    - metadata:
+        name: data
+        annotations:
+          pv.beta.kubernetes.io/gid: "0"
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: fast
+
+- |-
+  #Patch DS idrepo
+  apiVersion: apps/v1
+  kind: StatefulSet
+  metadata:
+    name: ds-idrepo
+  spec:
+    replicas: 2
+    template:
+      spec:
+        containers:
+          - name: ds
+            resources:
+              requests:
+                memory: 4Gi
+                cpu: 1500m
+              limits:
+                memory: 6Gi
+    volumeClaimTemplates:
+    - metadata:
+        name: data
+        annotations:
+          pv.beta.kubernetes.io/gid: "0"
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: fast

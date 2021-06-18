@@ -1,6 +1,6 @@
 # Deploys multi-cluster DS: secrets
 resources:
-  - ../../../base/secrets
+  - ../../base/secrets
 
 patchesStrategicMerge:
   - |-

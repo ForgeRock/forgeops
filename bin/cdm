@@ -10,9 +10,9 @@ import utils
 import json
 
 profiles = {
-    'small': ['overlay/7.0/small'],
-    'medium': ['overlay/7.0/medium'],
-    'large': ['overlay/7.0/large'],
+    'small': ['overlay/small'],
+    'medium': ['overlay/medium'],
+    'large': ['overlay/large'],
     'secrets': ['base/secrets']
 }
 

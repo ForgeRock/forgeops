@@ -1,8 +1,7 @@
 # Docker Images for the ForgeRock Identity Platform
 
 This directory contains Dockerfiles for building and deploying the ForgeRock 
-Identity Platform. It includes Dockerfiles that are specific to a release (under
-`7.0`), and Dockerfiles that are common across releases.
+Identity Platform.
 
 The Dockerfiles do not contain the configuration files needed to run the 
 platform. The `bin/config.sh` script must be used to initialize the 
@@ -33,4 +32,4 @@ your Kubernetes cluster.
  ## See Also
 
 * [Top-level forgeops README.md](../README.md)
-* [Directory Server image customization](7.0/ds/README-DS.md)
+* [Directory Server image customization](ds/README-DS.md)

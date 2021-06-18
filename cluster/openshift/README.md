@@ -13,7 +13,7 @@ multiple providers.
 
 The ForgeRock Cloud Deployment team used Kustomize and Skaffold to orchestrate 
 and test deployment on OpenShift. The artifacts required to deploy the ForgeRock
-Identity Platform on OpenShift are located in the `kustomize/overlay/7.0/openshift`
+Identity Platform on OpenShift are located in the `kustomize/overlay/openshift`
 directory.
 
 ## Create a Red Hat developer account
