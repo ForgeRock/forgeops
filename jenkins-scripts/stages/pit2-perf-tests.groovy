@@ -14,6 +14,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def config_common = [
             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
             STASH_FORGEOPS_BRANCH   : commonModule.FORGEOPS_GIT_COMMIT,
+            CLUSTER_DOMAIN          : 'pit2-perf.forgeops.com',
             PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
             CHECK_REGRESSION        : true,
             MAX_VARIATION           : '0.10',
