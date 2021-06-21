@@ -63,7 +63,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
                     def uiTestsConfig = [
                             TESTS_SCOPE                           : 'tests/k8s/postcommit/platform_ui',
-                            CLUSTER_DOMAIN                        : 'pit-24-7.forgeops.com',
+                            CLUSTER_DOMAIN                        : 'pit2.forgeops.com',
                             CLUSTER_NAMESPACE                     : 'platform-ui',
                             COMPONENTS_ADMINUI_IMAGE_TAG          : adminImageTag,
                             COMPONENTS_ADMINUI_IMAGE_REPOSITORY   : adminImageRepository,
