@@ -25,7 +25,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
                             TESTS_SCOPE                     : 'tests/pit1',
-                            CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
+                            CLUSTER_DOMAIN                  : 'pit2.forgeops.com',
                             CLUSTER_NAMESPACE               : 'greenfield',
                             CLUSTER_CRASHER                 : 'True',
                             REPEAT                          : params.PIT2_Greenfield.toInteger(),

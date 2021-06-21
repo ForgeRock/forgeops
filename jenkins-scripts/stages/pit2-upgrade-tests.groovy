@@ -26,7 +26,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         def config = [
                                 TESTS_SCOPE                                     : 'tests/pit1',
                                 UPGRADE_FIRST                                   : true,
-                                CLUSTER_DOMAIN                                  : 'pit-24-7.forgeops.com',
+                                CLUSTER_DOMAIN                                  : 'pit2.forgeops.com',
                                 CLUSTER_NAMESPACE                               : 'upgrade',
                                 COMPONENTS_AM_IMAGE_UPGRADE_TAG                 : commonModule.getCurrentTag('am'),
                                 COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY          : 'gcr.io/forgerock-io/am-base/pit1',
