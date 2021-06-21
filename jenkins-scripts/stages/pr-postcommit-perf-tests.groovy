@@ -30,7 +30,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                             STASH_FORGEOPS_BRANCH: commonModule.FORGEOPS_GIT_COMMIT,
                             TEST_NAME            : testName,
                             DEPLOYMENT_NAME      : 'small',
-                            CLUSTER_DOMAIN       : 'pit-cluster.forgeops.com',
                             CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             DO_RECORD_RESULT     : false,
                             PIPELINE_NAME        : 'FORGEOPS_POSTCOMMIT',
