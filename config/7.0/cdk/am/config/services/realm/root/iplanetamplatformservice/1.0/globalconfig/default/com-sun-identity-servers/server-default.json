@@ -246,7 +246,15 @@
       "org.forgerock.openam.httpclienthandler.system.clients.retry.failed.requests.enabled=true",
       "org.forgerock.openam.httpclienthandler.system.clients.max.connections=64",
       "org.forgerock.openam.httpclienthandler.system.clients.connection.timeout=10 seconds",
-      "org.forgerock.openam.httpclienthandler.system.clients.pool.ttl=-1"
+      "org.forgerock.openam.httpclienthandler.system.clients.pool.ttl=-1",
+      "org.forgerock.openam.httpclienthandler.system.proxy.uri=",
+      "org.forgerock.openam.httpclienthandler.system.proxy.username=",
+      "org.forgerock.openam.httpclienthandler.system.proxy.password=",
+      "org.forgerock.openam.idrepo.ldapv3.proxyauth.passwordreset.adminRequest=isAdminPasswordChangeRequest",
+      "org.forgerock.openam.httpclienthandler.system.nonProxyHosts=localhost,127.*,[::1],0.0.0.0,[::0]",
+      "org.forgerock.openam.smtp.system.connect.timeout=10000",
+      "org.forgerock.openam.smtp.system.socket.read.timeout=10000",
+      "org.forgerock.openam.smtp.system.socket.write.timeout=10000"
     ],
     "siteId" : null,
     "serverconfigxml" : null,

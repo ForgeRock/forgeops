@@ -24,7 +24,6 @@
       "codeLifetime" : 120,
       "issueRefreshTokenOnRefreshedToken" : true,
       "issueRefreshToken" : true,
-      "accessTokenModificationScript" : "d22f9a0c-426a-4466-b95e-d0f125b0d5fa",
       "accessTokenMayActScript" : "[Empty]",
       "oidcMayActScript" : "[Empty]",
       "statelessTokensEnabled" : false
@@ -53,7 +52,6 @@
         "profile",
         "email"
       ],
-      "scopeImplementationClass" : "org.forgerock.openam.oauth2.OpenAMScopeValidator",
       "responseTypeClasses" : [
         "code|org.forgerock.oauth2.core.AuthorizationCodeResponseTypeHandler",
         "id_token|org.forgerock.openidconnect.IdTokenResponseTypeHandler",
@@ -81,7 +79,7 @@
       "tlsOcspResponderUri" : null,
       "tlsOcspResponderCert" : null,
       "allowedAudienceValues" : [
-
+        
       ]
     },
     "coreOIDCConfig" : {
@@ -128,16 +126,15 @@
         "PS512",
         "RS512"
       ],
-      "oidcClaimsScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
       "overrideableOIDCClaims" : [
-
+        
       ],
       "oidcDiscoveryEndpointEnabled" : true
     },
     "advancedOIDCConfig" : {
       "storeOpsTokens" : true,
       "defaultACR" : [
-
+        
       ],
       "supportedRequestParameterEncryptionEnc" : [
         "A256GCM",
@@ -343,6 +340,11 @@
         "dir",
         "A192KW"
       ]
+    },
+    "pluginsConfig" : {
+      "scopeImplementationClass" : "org.forgerock.openam.oauth2.OpenAMScopeValidator",
+      "oidcClaimsScript" : "36863ffb-40ec-48b9-94b1-9a99f71cc3b5",
+      "accessTokenModificationScript" : "d22f9a0c-426a-4466-b95e-d0f125b0d5fa"
     }
   }
 }

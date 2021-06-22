@@ -110,7 +110,8 @@
       "javax.security.auth.callback.TextInputCallback",
       "javax.security.auth.callback.TextOutputCallback",
       "org.forgerock.openam.authentication.callbacks.PollingWaitCallback",
-      "org.forgerock.openam.core.rest.authn.callbackhandlers.*"
+      "org.forgerock.openam.core.rest.authn.callbackhandlers.*",
+      "org.forgerock.openam.auth.node.api.NodeState"
     ],
     "_id" : "default/AUTHENTICATION_TREE_DECISION_NODE/engineConfiguration",
     "maxThreads" : 50,
