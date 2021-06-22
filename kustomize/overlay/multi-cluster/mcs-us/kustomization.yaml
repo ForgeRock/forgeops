@@ -1,9 +1,9 @@
-# Deploys multi-region DS: ds-cts and ds-idrepo
+# Deploys multi-cluster DS: ds-cts and ds-idrepo
 # The namespace must be identical for all regions
-namespace: multi-region
+namespace: prod
 resources:
   - ../../../base/kustomizeConfig
-  - ../multi-region-secrets
+  - ../multi-cluster-secrets
   - ../../../base/7.0/ds/idrepo
   - ../../../base/7.0/ds/cts 
 
@@ -16,22 +16,21 @@ patches:
   patch: |-
     - op: replace
       path: /metadata/name
-      value: ds-idrepo-europe
+      value: ds-idrepo-us
+    - op: add
+      path: /spec/ports/5
+      value: { "name": "replication", "port": 8989 }
 - target:
     kind: Service
     name: ds-cts
   patch: |-
     - op: replace
       path: /metadata/name
-      value: ds-cts-europe
+      value: ds-cts-us
+    - op: add
+      path: /spec/ports/5
+      value: { "name": "replication", "port": 8989 }
 
-# There are two main settings to pay attention to in this section
-# 1) In each StatefulSet, the subdomain ('spec.template.spec.subdomain') must correspond to the service name, which includes
-#    the region as a suffix
-# 2) In each StatefulSet, the DS_BOOTSTRAP_REPLICATION_SERVERS must be set to match the FQDN of the DS bootstrap servers
-#    Note that in a multi-region setting, the FQDN has the following format: '[serverName].[serviceName].[namespace].svc.cluster.local'
-#         where serverName is built using number as a suffix, for example: 'ds-cts-0', 'ds-cts-1', ..., 'ds-cts-n'
-#         where serviceName is built using the region as a suffix, for example 'ds-cts-europe' or 'ds-cts-us'
 patchesStrategicMerge:
   - |-
     #Patch DS CTS
@@ -40,11 +39,12 @@ patchesStrategicMerge:
     metadata:
       name: ds-cts
     spec:
+      replicas: 2
       template:
         spec:
-          subdomain: ds-cts-europe
           containers:
             - name: ds
+              imagePullPolicy: Always
               resources:
                 requests:
                   memory: 4Gi
@@ -52,6 +52,11 @@ patchesStrategicMerge:
                 limits:
                   memory: 4Gi
                   cpu: 2
+              env: 
+              - name: DS_CLUSTER_TOPOLOGY
+                value: "eu,us"
+              - name: MCS_ENABLED
+                value: "true"
           initContainers:
             - name: initialize
               imagePullPolicy: Always
@@ -64,7 +69,8 @@ patchesStrategicMerge:
           accessModes: [ "ReadWriteOnce" ]
           resources:
             requests:
-              storage: 10Gi
+              storage: 250Gi
+              
   - |-
     #Patch DS IDREPO
     apiVersion: apps/v1
@@ -72,14 +78,12 @@ patchesStrategicMerge:
     metadata:
       name: ds-idrepo
     spec:
+      replicas: 2
       template:
         spec:
-          subdomain: ds-idrepo-europe
           containers:
             - name: ds
-              env:
-                - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-                  value: ds-idrepo-0.ds-idrepo-europe.multi-region.svc.cluster.local:8989,ds-idrepo-0.ds-idrepo-us.multi-region.svc.cluster.local:8989
+              imagePullPolicy: Always
               resources:
                 requests:
                   memory: 4Gi
@@ -87,6 +91,11 @@ patchesStrategicMerge:
                 limits:
                   memory: 4Gi
                   cpu: 2
+              env: 
+              - name: DS_CLUSTER_TOPOLOGY
+                value: "eu,us"
+              - name: MCS_ENABLED
+                value: "true"
           initContainers:
             - name: initialize
               imagePullPolicy: Always

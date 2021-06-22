@@ -1,4 +1,4 @@
-# Deploys multi-region DS: secrets
+# Deploys multi-cluster DS: secrets
 resources:
   - ../../../base/secrets
 
@@ -12,7 +12,7 @@ patchesStrategicMerge:
     spec:
       appConfig:
         # To have an unique name in the secret manager
-        secretsManagerPrefix: "multi-region"
+        secretsManagerPrefix: "multi-cluster"
         # A cloud provider's secret manager is the source of truth.
         # If secrets don't exist, they are generated and stored in the manager.
         secretsManager: GCP # none, AWS, Azure, or GCP

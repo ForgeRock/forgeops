@@ -1,4 +1,4 @@
-# Multi-region deployment for DS on GKE using MCS
+# Multi-cluster deployment for DS on GKE using MCS
 
 This document is a guide to deploy DS on multiple regions on GKE using Googles Multi-cluster Services(MCS).
 
@@ -35,7 +35,7 @@ Follow instructions to configure secret-agent to work with Workload Identity: [I
 ## Step 3: Setup MCS
 #
 
-**1. Ensure all required APIs are enabled for MCS**  
+**a. Ensure all required APIs are enabled for MCS**  
 ```
 gcloud services enable gkehub.googleapis.com --project <my-project-id>
 gcloud services enable dns.googleapis.com --project <my-project-id>
@@ -45,23 +45,23 @@ gcloud services enable multiclusterservicediscovery.googleapis.com --project <my
 ```  
 <br />
 
-**2. Enable MCS feature**
+**b. Enable MCS feature**
 ```
 gcloud alpha container hub multi-cluster-services enable --project <my-project-id>
 ```  
 <br />  
 
-**3. Register clusters to an environ**  
+**c. Register clusters to an environ**  
 
-Choose a membership name to uniquely identify the cluster
+Choose a membership name to uniquely identify the cluster.  Please do not use any symbols, just characters.  These names are also required as part of the fqdn when configuring server identifiers.
 ```
-gcloud container hub memberships register <membership-name> \
+gcloud container hub memberships register <membershipname> \
     --gke-cluster <zone>/<cluster-name> \
     --enable-workload-identity
 ```  
 <br />  
 
-**4. Grant the required IAM permissions for MCS Importer**  
+**d. Grant the required IAM permissions for MCS Importer**  
 
 ```
 gcloud projects add-iam-policy-binding <my-project-id> \
@@ -70,7 +70,7 @@ gcloud projects add-iam-policy-binding <my-project-id> \
 ```  
 <br />  
 
-**5. Verify MCS is enabled**  
+**e. Verify MCS is enabled**  
 
 ```
 gcloud alpha container hub multi-cluster-services describe
@@ -84,7 +84,7 @@ gcloud alpha container hub multi-cluster-services describe
 **1. Configure secret-agent parameters**  
 >`NOTE:` Please check values and update to match requirements
 
-In `kustomize/overlay/multi-region/multi-region-secrets/kustomization.yaml` fill out the following fields:  
+In `kustomize/overlay/multi-cluster/multi-cluster-secrets/kustomization.yaml` fill out the following fields:  
 1. secretsManagerPrefix: \<prefix name\> # ensures unique secret names in Secret Manager.  
 2. secretsManager: GCP
 3. gcpProjectID: \<Project ID\>  
@@ -94,48 +94,36 @@ In `kustomize/overlay/multi-region/multi-region-secrets/kustomization.yaml` fill
 
 >`NOTE:` Currently these files are configured based on 2 replicas of CTS and IDREPO.  Only change if you want a **larger** number of replicas. 
 
-MCS requires a Kubernetes service that can be exposed externally to other clusters for multi cluster communication.  
+MCS requires a Kubernetes service that can be exposed externally to other clusters for multi-cluster communication.  
 
-`etc/multi-region/mcs/files/<region>-export.yaml` must contain a ServiceExport object for each pod in the region.  
+`etc/multi-cluster/mcs/files/<region>-export.yaml` must contain a ServiceExport object where `metadata.name` field must match the DS service name.
+<br />   
 
-The `metadata.name` field must match the replication service name in `kustomize/overlay/multi-region/mcs-<region>/service.yaml`  
-<br />  
+**3. Configure clusters**  
 
-**3. Configure replication services**  
+>`NOTE:` Currently these files are configured based on eu and us regions. These values must match the MCS cluster membership names registered in step 3c.
 
->`NOTE:` Currently these files are configured based on 2 replicas of CTS and IDREPO.  Only change if you want a **different** number of relicas.  
+Change the DS_CLUSTER_TOPOLOGY env var for a different list of regional identifiers.
 
-As mentioned above, a k8s service is required for each DS pod .  
-A pod-name selector is required so the service can be mapped directly to a pod .
-
-See `kustomize/overlay/multi-region/mcs-<region>/service.yaml`  
-
-Ensure you have a service per pod  in your topology.  
-<br />
-
-**4. Configure regions**  
-
->`NOTE:` Currently these files are configured based on eu and us regions.  Only change if you want a **different** regional identifies for your DS servers.  
-
-Change the DS_CLUSTER_TOLPOLOGY env var for a different list of regional identifiers.
-
-See `kustomize/overlay/multi-region/mcs-<region>/kustomization.yaml`  
+See `kustomize/overlay/multi-cluster/mcs-<region>/kustomization.yaml`  
 
 ```
               env: 
               - name: DS_CLUSTER_TOPOLOGY
                 value: "eu,us"
+              - name: MCS_ENABLED
+                value: "true"
 ```
 
 The above change needs to be applied to the idrepo and cts patch in both regional kustomization.yaml files.  
 <br />
 
-**5. Add Skaffold profiles**  
+**4. Add Skaffold profiles**  
 >`NOTE:` Required step 
 
 Add the following profiles to Skaffold.yaml:  
 ```
-- name: multi-region-ds-us
+- name: mcs-us
   build:
     artifacts:
     - *DS-CTS
@@ -144,9 +132,9 @@ Add the following profiles to Skaffold.yaml:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-region/mcs-us
+      path: ./kustomize/overlay/multi-cluster/mcs-us
   
-- name: multi-region-ds-eu
+- name: mcs-eu
   build:
     artifacts:
     - *DS-CTS
@@ -155,9 +143,8 @@ Add the following profiles to Skaffold.yaml:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-region/mcs-eu
+      path: ./kustomize/overlay/multi-cluster/mcs-eu
 ```  
-`TODO`: This should be slimmed down once the region is handled differently  
 <br />  
 
 ## Step 5: Deploy
@@ -171,13 +158,13 @@ This is a 1 time activity so doesn't need to be repeated for each deployment.
 Deploy to US cluster
 
 ```
-kubectl apply -f etc/multi-region/mcs/files/us-export.yaml -n <namespace>
+kubectl apply -f etc/multi-cluster/mcs/files/us-export.yaml -n <namespace>
 ```  
 
 Deploy to EU cluster
 
 ```
-kubectl apply -f etc/multi-region/mcs/files/eu-export.yaml -n <namespace>
+kubectl apply -f etc/multi-cluster/mcs/files/eu-export.yaml -n <namespace>
 ```
 <br />
 
@@ -185,10 +172,10 @@ kubectl apply -f etc/multi-region/mcs/files/eu-export.yaml -n <namespace>
 
 Deploy to US:
 ```
-skaffold run --profile multi-region-ds-us
+skaffold run --profile mcs-us
 ```
 
 Deploy to EU:
 ```
-skaffold run --profile multi-region-ds-eu
+skaffold run --profile mcs-eu
 ```

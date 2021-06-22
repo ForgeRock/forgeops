@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Multi-region DS: this script sets up a global DNS across multiple GKE clusters so that servers in all
+# multi-cluster DS: this script sets up a global DNS across multiple GKE clusters so that servers in all
 # clusters can be reached using their FQDN.
 
 from __future__ import print_function
@@ -45,14 +45,14 @@ def output(args):
 # 1) namespace: the unique namespace used across regions
 # 2) service_list: comma-separated list of services
 # 3) cluster_map: comma-separated list of (region, gke context) pairs. A pair is using the format by "key:value"
-# Example: multi-region ds-idrepo,ds-cts us:gke-us-context,europe:gke-eu-context
+# Example: multi-cluster ds-idrepo,ds-cts us:gke-us-context,europe:gke-eu-context
 def read_args():
   n = len(argv)
   if n < 4 or n > 5:
       print("""\
-this script sets up a global DNS across multiple GKE clusters for multi-region DS deployment
+this script sets up a global DNS across multiple GKE clusters for multi-cluster DS deployment
 
-Usage:  multi-region-setup.py namespace service1,service2,... region1:gke_context_1,region2:gke_context_2,... [dry-run]
+Usage:  multi-cluster-setup.py namespace service1,service2,... region1:gke_context_1,region2:gke_context_2,... [dry-run]
 
 If last argument 'dry-run' is provided (actually any value is ok), the script only outputs what would be done.
 """)

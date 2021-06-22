@@ -1,4 +1,4 @@
-# Multi-region deployment for DS on GKE
+# multi-cluster deployment for DS on GKE
 
 This document shows you how to deploy DS on multiple regions on GKE.
 
@@ -48,10 +48,10 @@ For example, the service account for deployment in project _EngineeringDevOps_ i
 ## Step 3: Deploy DNS load balancers and configure DNS for the clusters
 *WARNING*: this will modify the DNS configuration for the entire cluster; if it is shared, it may impact other users.
 
-There is a script provided for this: `etc/multi-region/kubedns/files/multi-region-setup.py`
+There is a script provided for this: `etc/multi-cluster/kubedns/files/multi-cluster-setup.py`
 Run the script with the following arguments:
 ```
-python3 etc/multi-region/kubedns/files/multi-region-setup.py ${NAMESPACE} ${SERVICE_LIST} ${CONTEXT_MAP}
+python3 etc/multi-cluster/kubedns/files/multi-cluster-setup.py ${NAMESPACE} ${SERVICE_LIST} ${CONTEXT_MAP}
 ```
 where
 * `NAMESPACE` is the namespace which is used to deploy the DS instances in all the clusters.
@@ -70,17 +70,17 @@ where
 
 Example:
 ```
-python3 etc/multi-region/kubedns/files/multi-region-setup.py multi-region ds-cts,ds-idrepo us:gke_engineering-devops_us-west2-a_ds-wan-replication-us,europe:gke_engineering-devops_europe-west2-b_ds-wan-replication
+python3 etc/multi-cluster/kubedns/files/multi-cluster-setup.py multi-cluster ds-cts,ds-idrepo us:gke_engineering-devops_us-west2-a_ds-wan-replication-us,europe:gke_engineering-devops_europe-west2-b_ds-wan-replication
 ```
 
 Once the script is completed, one internal DNS load balancer will be created on each cluster, that will handle the redirection to the other cluster.
 
 ## Step 4: Deploy DS using the provided Skaffold profiles
-There is script provided to deploy the DS servers in the two clusters: `etc/multi-region/kubedns/files/deploy-ds.sh`
+There is script provided to deploy the DS servers in the two clusters: `etc/multi-cluster/kubedns/files/deploy-ds.sh`
 
 Run the script with the following arguments:
 ```
-etc/multi-region/kubedns/files/deploy-ds.sh ${NAMESPACE} ${US_CONTEXT} ${EUROPE_CONTEXT}
+etc/multi-cluster/kubedns/files/deploy-ds.sh ${NAMESPACE} ${US_CONTEXT} ${EUROPE_CONTEXT}
 ```
 where
 * `NAMESPACE` is the namespace which is used to deploy the DS instances in all the clusters
@@ -89,19 +89,19 @@ where
 
 Example:
 ```
-etc/multi-region/kubedns/files/deploy-ds.sh multi-region gke_engineering-devops_us-west2-a_ds-wan-replication-us gke_engineering-devops_europe-west2-b_ds-wan-replication
+etc/multi-cluster/kubedns/files/deploy-ds.sh multi-cluster gke_engineering-devops_us-west2-a_ds-wan-replication-us gke_engineering-devops_europe-west2-b_ds-wan-replication
 ```
 
 ## Adapting resources
-In case you need to change the default namespace used (_multi-region_), update the following files:
-* `kustomize/overlay/multi-region/kubedns-us/kustomization.yaml`
-* `kustomize/overlay/multi-region/kubedns-eu/kustomization.yaml`
-* `kustomize/overlay/multi-region/multi-region-secrets/kustomization.yaml`
+In case you need to change the default namespace used (_multi-cluster_), update the following files:
+* `kustomize/overlay/multi-cluster/kubedns-us/kustomization.yaml`
+* `kustomize/overlay/multi-cluster/kubedns-eu/kustomization.yaml`
+* `kustomize/overlay/multi-cluster/multi-cluster-secrets/kustomization.yaml`
 
 In case you need to change the default region names used (_us_ and _europe_)
 Update the following files:
-* `kustomize/overlay/multi-region/kubedns-us/kustomization.yaml`
-* `kustomize/overlay/multi-region/kubedns-eu/kustomization.yaml`
+* `kustomize/overlay/multi-cluster/kubedns-us/kustomization.yaml`
+* `kustomize/overlay/multi-cluster/kubedns-eu/kustomization.yaml`
 
 In these files you need to change the service name for the 2 defined services (_ds-cts_ and _ds-idrepo_):
 ```

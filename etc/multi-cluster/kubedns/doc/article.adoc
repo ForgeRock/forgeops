@@ -14,7 +14,7 @@ endif::asciidoctor[]
 //:sectids!:
 //:plus: &#43;
 
-These instructions show how to deploy a multi-region DS solution that spans two GKE clusters from different
+These instructions show how to deploy a multi-cluster DS solution that spans two GKE clusters from different
 regions.
 
 This configuration allows pods in one GKE cluster to discover pods in another GKE cluster without exposing any of the DNS information to the world outside your GKE project.
@@ -52,7 +52,7 @@ The method described in this document explains how to put configure a topology t
 
 NOTE: this was the version used; the configuration might work on 1.17 or earlier)
 
-* [[prerequisites-same-namespace, Prerequisites point 2]]Same namespace name on both GKE clusters (Ex. +multi-region+)
+* [[prerequisites-same-namespace, Prerequisites point 2]]Same namespace name on both GKE clusters.
 
 NOTE: This restriction is imposed by the +secret-agent+ solution used to retrieve DS certificates.
 For an alternative DS certificates storage/reconciliation solution, this restriction may not apply.
@@ -75,7 +75,7 @@ access the pods.
 === a. Create internal load balancers in clusters
 
 Having internal load balancers with configured global access installed on each cluster will allow Kubernetes DNS to balance the requests
-from each client in the same VPC network to the pods on each cluster involved in multi-region installation.
+from each client in the same VPC network to the pods on each cluster involved in multi-cluster installation.
 
 NOTE: Using external load balancers for this purpose is possible but is not recommended from a security best
 practices standpoint.
@@ -84,7 +84,7 @@ This is because it would make the DNS information for all the clusters available
 The YAML file below declares an internal load balancer with configured global access.
 
 ****
-dns-lb.yaml https://github.com/ForgeRock/forgeops/tree/master/etc/multi-region/kubedns/files/dns-lb.yaml[(latest version)]
+dns-lb.yaml https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/kubedns/files/dns-lb.yaml[(latest version)]
 ```yaml
 apiVersion: v1
 kind: Service
@@ -124,12 +124,12 @@ metadata:
   namespace: kube-system
 data:
   stubDomains: |
-    {"ds-cts-us.multi-region.svc.cluster.local": ["10.168.0.7"]}
+    {"ds-cts-us.multi-cluster.svc.cluster.local": ["10.168.0.7"]}
 ```
 
 As you can see, the ConfigMap contains a +stubDomains+ parameter; a JSON map where:
 
-* key is a DNS suffix (+"ds-cts-us.multi-region.svc.cluster.local"+)
+* key is a DNS suffix (+"ds-cts-us.multi-cluster.svc.cluster.local"+)
 * value is a JSON array of IPs (+["10.168.0.7"]+): the load balancer IP in the US cluster.
 
 This configuration instructs *DNS in Europe cluster* to forward the requests with specified DNS suffix to *load
@@ -137,7 +137,7 @@ balancer in US cluster*.
 
 image::K8S DNS.png[]
 
-The script https://github.com/ForgeRock/forgeops/tree/master/etc/multi-region/kubedns/files/multi-region-setup.py[+multi-region-setup.py+]
+The script https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/kubedns/files/multi-cluster-setup.py[+multi-cluster-setup.py+]
 will help you automate the following steps:
 
 . Create the internal load balancers in each Kubernetes cluster (using configuration from xref:create-ILB[])
@@ -151,14 +151,14 @@ will help you automate the following steps:
 If your DS installation is not using the +secret-agent+ operator as a manager of certificates for server identity
 verification  as mentioned in xref:introduction-certificates[], you can skip this step.
 
-The +multi-region-secrets/kustomization.yaml+ below was changed:
+The +multi-cluster-secrets/kustomization.yaml+ below was changed:
 
 . +secretsManagerPrefix+ is changed to ensure uniqueness of stored secrets
 . +secretsManager+ is changed to +GCP+ as a chosen Cloud Provider
 . +gcpProjectID+ is changed in order to be able to use Secret Manager API
 
 ****
-multi-region-secrets/kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/multi-region-secrets/kustomization.yaml[(latest version)]
+multi-cluster-secrets/kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-cluster/multi-cluster-secrets/kustomization.yaml[(latest version)]
 ```yaml
 resources:
   - ../../../base/secrets
@@ -172,7 +172,7 @@ patchesStrategicMerge:
       name: forgerock-sac
     spec:
       appConfig:
-        secretsManagerPrefix: "multi-region"
+        secretsManagerPrefix: "multi-cluster"
         secretsManager: GCP # none, AWS, Azure, or GCP
         gcpProjectID: engineering-devops
 ```
@@ -201,13 +201,13 @@ the other cluster.
 
 To make FQDNs of each DS pod in our topology unique, as required by xref:introduction-FQDN[], the FQDN of each pod
 has a cluster-specific subdomain, which in this case is implemented by changing the service name
-(Ex. +*ds-cts-us*+ in +ds-cts-0.*ds-cts-us*.multi-region.svc.cluster.local+).
+(Ex. +*ds-cts-us*+ in +ds-cts-0.*ds-cts-us*.multi-cluster.svc.cluster.local+).
 
 NOTE: FQDN uniqueness can be also guaranteed by a cluster-specific namespace +
-(Ex. +*multi-region-us*+ in +ds-cts-0.ds-cts.*multi-region-us*.svc.cluster.local+), but due to
+(Ex. +*multi-cluster-us*+ in +ds-cts-0.ds-cts.*multi-cluster-us*.svc.cluster.local+), but due to
 restrictions from xref:prerequisites-same-namespace[], this approach was not retained.
 
-As the extract from +multi-region-ds-us/kustomization.yaml+ shows, the following were changed:
+As the extract from +multi-cluster-ds-us/kustomization.yaml+ shows, the following were changed:
 
 . +Service metadata/name+ is unique among clusters (*ds-cts-us*)
 . +StatefulSet spec/template/spec/subdomain+ is added and is the same as +service metadata/name+ mentioned above (*ds-cts-us*)
@@ -215,7 +215,7 @@ As the extract from +multi-region-ds-us/kustomization.yaml+ shows, the following
 (*- name: DS_BOOTSTRAP_REPLICATION_SERVERS...*)
 
 ****
-kubedns-us/kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-region/kubedns-us/kustomization.yaml[(latest version)]
+kubedns-us/kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-cluster/kubedns-us/kustomization.yaml[(latest version)]
 ....
 patches:
 - target:
@@ -243,14 +243,14 @@ patchesStrategicMerge:
             - name: ds
               env:
                 - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-                  value: ds-cts-0.ds-cts-us.multi-region.svc.cluster.local:8989,ds-cts-0.ds-cts-europe.multi-region.svc.cluster.local:8989
+                  value: ds-cts-0.ds-cts-us.multi-cluster.svc.cluster.local:8989,ds-cts-0.ds-cts-europe.multi-cluster.svc.cluster.local:8989
 ....
 ****
 
 [[prepare-skaffold,Prepare Skaffold profiles]]
 === b. Prepare Skaffold profiles
 
-Here is an extract from +skaffold.yaml+ file with a profile for multi-region definition for the US cluster.
+Here is an extract from +skaffold.yaml+ file with a profile for multi-cluster definition for the US cluster.
 This uses ForgeOps dockerized artifacts, described in xref:docker-config-DS[], and the US kustomization from
 xref:prepare-kustomize[].
 
@@ -276,7 +276,7 @@ artifactDefinitions:
 ------------------------------------------------------------------
 
 profiles:
-- name: multi-region-ds-us
+- name: multi-cluster-ds-us
   build:
     artifacts:
       - *DS-CTS
@@ -285,7 +285,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-region/kubedns-us
+      path: ./kustomize/overlay/multi-cluster/kubedns-us
 ....
 ****
 
@@ -296,7 +296,7 @@ Once the configuration for all clusters is in place, you can start the topology.
 Below is an example of the Skaffold command to run the pre-configured profile.
 
 ....
-skaffold run --profile multi-region-ds-us
+skaffold run --profile multi-cluster-ds-us
 ....
 
 The command must be executed for each cluster in the topology with the appropriate namespace.
@@ -306,14 +306,14 @@ For example:
 ```bash
 #! /bin/bash
 
-# Multi-region DS: script to deploy DS CTS and DS IDREPO to US and Europe clusters
-# Usage: ./etc/multi-region/kubedns/deploy-ds.sh us-gke-context europe-gke-context namespace
+# multi-cluster DS: script to deploy DS CTS and DS IDREPO to US and Europe clusters
+# Usage: ./etc/multi-cluster/kubedns/deploy-ds.sh us-gke-context europe-gke-context namespace
 
-NAMESPACE=${1:-multi-region}
+NAMESPACE=${1:-multi-cluster}
 US_CONTEXT=${2:-cloud_us-west2_ds-topology}
 EUROPE_CONTEXT=${3:-cloud_europe-west2_ds-topology}
 
-echo "Multi-region DS deployment to GKE"
+echo "multi-cluster DS deployment to GKE"
 echo "Using the following values:"
 echo " - US GKE context: $US_CONTEXT"
 echo " - Europe GKE context: $EUROPE_CONTEXT"
@@ -323,15 +323,15 @@ echo
 echo "-----"
 echo "Deploying DS to US cluster"
 kubectx $US_CONTEXT
-kubens multi-region
-skaffold run --profile multi-region-ds-us
+kubens multi-cluster
+skaffold run --profile multi-cluster-ds-us
 
 echo
 echo "-----"
 echo "Deploying DS to EUROPE cluster"
 kubectx $EUROPE_CONTEXT
-kubens multi-region
-skaffold run --profile multi-region-ds-eu
+kubens multi-cluster
+skaffold run --profile multi-cluster-ds-eu
 ```
 
 == 4. Load tests
@@ -382,7 +382,7 @@ image::billing.png[]
 |4. Explicit naming allows quick identification of servers (Ex: `ds-cts-0.ds-cts-us.namespace.cluster.local`)
 |
 
-|5. Installation scripts ready: see 'multi-region' in the `forgeops` project
+|5. Installation scripts ready: see 'multi-cluster' in the `forgeops` project
 |
 
 |6. So far, tests are reassuring: replication latency is acceptable

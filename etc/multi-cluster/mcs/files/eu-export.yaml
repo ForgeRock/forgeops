@@ -1,0 +1,11 @@
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: prod
+ name: ds-idrepo-eu
+---
+kind: ServiceExport
+apiVersion: net.gke.io/v1
+metadata:
+ namespace: prod
+ name: ds-cts-eu
