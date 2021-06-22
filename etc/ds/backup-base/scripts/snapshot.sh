@@ -72,11 +72,13 @@ do
 
 done
 
-# Now create the pvc that uses that snapshot
-kubectl --namespace $NAMESPACE delete pvc $DS_CLONE_PVC
+echo "Deleting $DS_CLONE_PVC if it exists"
+kubectl --namespace $NAMESPACE delete pvc $DS_CLONE_PVC || echo "pvc not present. This is not a problem"
 
 sleep 5
 
+
+# Now create the pvc that uses that snapshot
 
 diskSize=$(kubectl get pvc $DS_VOLUME -o jsonpath='{.spec.resources.requests.storage}' )
 
