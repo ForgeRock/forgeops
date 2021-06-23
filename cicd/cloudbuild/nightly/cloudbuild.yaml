@@ -2,6 +2,7 @@ timeout: 900s
 options:
   env:
     - NAMESPACE=nightly
+    - DEFAULT_DOCKER_REPO=gcr.io/forgeops-public
 
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -11,46 +12,38 @@ steps:
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
-  id: nuke-environment
+  id: build-images
   waitFor: ['authenticate']
   args:
     - -c
     - |-
-      ./cicd/bin/nuke-environment
+      ./bin/config.sh add
+      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO --tag dev
+      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO --tag latest
+      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
-  id: deploy-base-ds
+  id: nuke-environment
+  waitFor: ['build-images']
+  args:
+    - -c
+    - |-
+      ./bin/cdk delete -n $$NAMESPACE --yes
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: deploy-cdk
   waitFor: ['nuke-environment']
   args:
     - -c
     - |-
-      ./cicd/bin/deploy-base-ds
-
-- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
-  entrypoint: bash
-  id: deploy-apps
-  waitFor: ['deploy-base-ds']
-  args:
-    - -c
-    - |-
-      ./cicd/bin/deploy-apps
-
-
-- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
-  entrypoint: bash
-  id: amster-load
-  waitFor: ['deploy-apps']
-  args:
-    - -c
-    - |-
-      ./cicd/bin/amster-load
-
+      ./bin/cdk install --fqdn nightly.eng.forgeops.com -n $$NAMESPACE
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
   id: smoke-tests
-  waitFor: ['amster-load']
+  waitFor: ['deploy-cdk']
   args:
     - -c
     - |-

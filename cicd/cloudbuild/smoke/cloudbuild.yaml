@@ -2,7 +2,7 @@ timeout: 900s
 options:
   env:
     - NAMESPACE=smoke
-    - DOCKER_REPO=gcr.io/engineering-devops
+    - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
 
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -14,8 +14,6 @@ steps:
   entrypoint: bash
   id: build-images
   waitFor: ['authenticate']
-  env:
-    - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
   args:
     - -c
     - |-
