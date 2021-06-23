@@ -246,7 +246,7 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
-def build_docker_image(component, default_repo):
+def build_docker_image(component, default_repo, tag):
     """Builds custom docker images. Returns the tag of the built image"""
     # Clean out the temp kustomize files
     base_dir = os.path.join(sys.path[0], '../')
@@ -255,7 +255,12 @@ def build_docker_image(component, default_repo):
         default_repo_cmd = f'--default-repo={default_repo}'
     else:
         default_repo_cmd = ''
-    run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd}', cwd=base_dir)
+    if tag:
+        tag_cmd = f'--tag={tag}'
+    else:
+        tag_cmd = ''
+
+    run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd} {tag_cmd}', cwd=base_dir)
     with open(os.path.join(base_dir, 'tag.json')) as tag_file:
         tag_data = json.load(tag_file)['builds'][0]["tag"]
     return tag_data
