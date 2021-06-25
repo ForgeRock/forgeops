@@ -15,6 +15,9 @@ spec:
       containers:
       - image: gcr.io/forgerock-io/platform-login-ui/docker-build:7.1.0-75fbfebc09c984fbe193959cbcb952ad69596dda
         imagePullPolicy: IfNotPresent
+        env:
+        - name: SUBFOLDER
+          value: "am/XUI"
         envFrom:
         - configMapRef:
             name: platform-config
@@ -41,4 +44,3 @@ spec:
           preStop:
             exec:
               command: ["/usr/sbin/nginx", "-s", "quit"]
-

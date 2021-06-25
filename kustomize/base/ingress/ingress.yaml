@@ -56,93 +56,23 @@ spec:
           serviceName: rcs-agent
           servicePort: 80
         path: /rcs
-      # end user UI currently has its own ingress. Needs to rewrite the url path...
-      # - backend:
-      #     serviceName: end-user-ui
-      #     servicePort: 80
-      #   path: /enduser-ui
+      - backend:
+          serviceName: end-user-ui
+          servicePort: 8080
+        path: /enduser
+      - backend:
+          serviceName: admin-ui
+          servicePort: 8080
+        path: /platform
+      - backend:
+          serviceName: login-ui
+          servicePort: 8080
+        path: /am/XUI
       # IG currently has its own ingress. Needs to rewrite the url path...
       # - backend:
       #    serviceName: ig
       #    servicePort: 80
       #  path: /ig
-  tls:
-  - hosts:
-    - $(FQDN)
-    secretName: sslcert
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: end-user-ui
-  annotations:
-    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^(/enduser)$ $1/ redirect;
-spec:
-  rules:
-  - host: $(FQDN)
-    http:
-      paths:
-      - backend:
-          serviceName: end-user-ui
-          servicePort: 8080
-        path: /enduser/?(.*)
-  tls:
-  - hosts:
-    - $(FQDN)
-    secretName: sslcert
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: login-ui
-  annotations:
-    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^(/login)$ $1/ redirect;
-      rewrite ^(/am/XUI)$ $1/ redirect;
-spec:
-  rules:
-  - host: $(FQDN)
-    http:
-      paths:
-      - backend:
-          serviceName: login-ui
-          servicePort: 8080
-        path: /login/?(.*)
-      - backend:
-          serviceName: login-ui
-          servicePort: 8080
-        path: /am/XUI/?(.*)
-  tls:
-  - hosts:
-    - $(FQDN)
-    secretName: sslcert
----
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: platform-ui
-  annotations:
-    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      rewrite ^(/platform)$ $1/ redirect;
-spec:
-  rules:
-  - host: $(FQDN)
-    http:
-      paths:
-      - backend:
-          serviceName: admin-ui
-          servicePort: 8080
-        path: /platform/?(.*)
   tls:
   - hosts:
     - $(FQDN)
