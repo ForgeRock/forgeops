@@ -18,7 +18,8 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 def build() {
 
     properties([
-        buildDiscarder(logRotator(numToKeepStr: '20'))
+            buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
+            parameters(commonModule.postcommitMandatoryStages(true)),
     ])
 
     slackChannel = '#forgeops'
