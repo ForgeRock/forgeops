@@ -13,8 +13,9 @@
 import com.forgerock.pipeline.PullRequestBuild
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
+import com.forgerock.pipeline.stage.Status
 
-def build() {
+def initialSteps() {
     prStageName = 'PR-ALL-TESTS'
     prReportMessage = "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${prStageName}/)"
 
@@ -38,27 +39,35 @@ def build() {
             commitHash: commonModule.FORGEOPS_GIT_COMMIT
     )
 
-    try {
-        // in order to compare the PR with the target branch, we first need to fetch the target branch
-        scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
+    // in order to compare the PR with the target branch, we first need to fetch the target branch
+    scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
+}
 
-        for (buildDirectory in buildDirectories) {
-            if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
-                stage("Build ${buildDirectory['name']} image") {
-                    echo "Building 'docker/${buildDirectory['name']}' ..."
-                    buildImage(buildDirectory['name'])
-                    currentBuild.description += " ${buildDirectory['name']}"
+def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
+    pipelineRun.pushStageOutcome('build-lodestar-images', stageDisplayName: 'Build Lodestar Images') {
+        def currentImage
+        try {
+            for (buildDirectory in buildDirectories) {
+                if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
+                    stage("Build ${buildDirectory['name']} image") {
+                        echo "Building 'docker/${buildDirectory['name']}' ..."
+                        currentImage = buildDirectory['name']
+                        buildImage(buildDirectory['name'])
+                        currentBuild.description += " ${buildDirectory['name']}"
+                    }
+                } else {
+                    echo "Skipping build for 'docker/${buildDirectory['name']}'"
                 }
-            } else {
-                echo "Skipping build for 'docker/${buildDirectory['name']}'"
             }
+        } catch (FlowInterruptedException exception) {
+            sendBuildAbortedNotification()
+            throw exception
+        } catch (exception) {
+            sendBuildFailureNotification("Error occurred while building the `${currentImage}` image")
+            throw exception
         }
-    } catch (FlowInterruptedException exception) {
-        sendBuildAbortedNotification()
-        throw exception
-    } catch (exception) {
-        sendBuildFailureNotification('')
-        throw exception
+
+        return Status.SUCCESS.asOutcome()
     }
 }
 
@@ -99,6 +108,7 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     } catch (exception) {
         // If there is a pipeline error, or a timeout with the PIT/PERF tests, an exception is thrown.
         sendBuildFailureNotification("PR tests failed. ${prReportMessage}")
+        throw exception
     } finally {
         if (currentBuild.result != 'ABORTED') {
             node('gce-vm-small') {

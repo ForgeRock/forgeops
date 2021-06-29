@@ -87,7 +87,8 @@ timestamps {
             pipelineRun  = new PipelineRunLegacyAdapter(builder.build())
         }
 
-        pipeline.build()
+        pipeline.initialSteps()
+        pipeline.buildDockerImages(pipelineRun)
     }
 
     if (commonModule.branchSupportsIDCloudReleases()) {

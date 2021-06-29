@@ -10,13 +10,11 @@
 // Postcommit pipeline for ForgeOps Docker images
 //===============================================
 
-import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
-
 import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
+import com.forgerock.pipeline.stage.Status
 
-def build() {
-
+def initialSteps() {
     properties([
             buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
             parameters(commonLodestarModule.postcommitMandatoryStages(true)),
@@ -25,28 +23,30 @@ def build() {
     slackChannel = '#forgeops'
 
     postcommitBuild = new Build(steps, env, currentBuild)
-    def currentImage
+}
 
-    try {
-        for (buildDirectory in buildDirectories) {
-            if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
-                stage ("Build ${buildDirectory['name']} image") {
-                    echo "Building 'docker/${buildDirectory['name']}' ..."
-                    currentImage = buildDirectory['name']
-                    buildImage(buildDirectory['name'])
-                    currentBuild.description += " ${buildDirectory['name']}"
+def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
+    pipelineRun.pushStageOutcome('build-lodestar-images', stageDisplayName: 'Build Lodestar Images') {
+        def currentImage
+        try {
+            for (buildDirectory in buildDirectories) {
+                if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
+                    stage("Build ${buildDirectory['name']} image") {
+                        echo "Building 'docker/${buildDirectory['name']}' ..."
+                        currentImage = buildDirectory['name']
+                        buildImage(buildDirectory['name'])
+                        currentBuild.description += " ${buildDirectory['name']}"
+                    }
+                } else {
+                    echo "Skipping build for 'docker/${buildDirectory['name']}'"
                 }
-            } else {
-                echo "Skipping build for 'docker/${buildDirectory['name']}'"
             }
+        } catch (exception) {
+            sendFailedSlackNotification("Error occurred while building the `${currentImage}` image")
+            throw exception
         }
-    } catch (FlowInterruptedException ex) {
-        currentBuild.result = 'ABORTED'
-        throw ex
-    } catch (exception) {
-        currentBuild.result = 'FAILURE'
-        sendSlackNotification("Error occurred while building the `${currentImage}` image")
-        throw exception
+
+        return Status.SUCCESS.asOutcome()
     }
 }
 
@@ -76,10 +76,8 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
         Random random = new Random()
         postcommitTestsStage.runStage(pipelineRun, random, true)
-        currentBuild.result = 'SUCCESS'
     } catch (exception) {
-        currentBuild.result = 'FAILURE'
-        sendSlackNotification("Error occurred while running postcommit tests")
+        sendFailedSlackNotification("Error occurred while running postcommit tests")
         throw exception
     }
 }
@@ -92,12 +90,15 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
 def createPlatformImagesPR(PipelineRunLegacyAdapter pipelineRun) {
     try {
         createPlatformImagesPR.runStage(pipelineRun)
-        currentBuild.result = 'SUCCESS'
     } catch (exception) {
-        currentBuild.result = 'FAILURE'
-        sendSlackNotification("Error occurred while running postcommit tests")
+        sendFailedSlackNotification("Error occurred while running postcommit tests")
         throw exception
     }
+}
+
+private void sendFailedSlackNotification(String msgDetails='') {
+    currentBuild.result = 'FAILURE'
+    slackUtils.sendStatusMessage(slackChannel, currentBuild.result, msgDetails)
 }
 
 def finalNotification() {
@@ -115,10 +116,6 @@ def finalNotification() {
             sendSlackNotification()
         }
     }
-}
-
-private void sendSlackNotification(String msgDetails='') {
-    slackUtils.sendStatusMessage(slackChannel, currentBuild.result, msgDetails)
 }
 
 return this
