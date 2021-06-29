@@ -32,3 +32,6 @@ images:
 - name: .*login-ui.*
   newName: gcr.io/forgeops-public/login-ui
   newTag: latest
+- name: .*ig.*
+  newName: gcr.io/forgeops-public/ig
+  newTag: latest

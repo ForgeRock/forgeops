@@ -92,7 +92,7 @@ def uninstall_component(component, ns):
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
-    finally: 
+    finally:
         # Clean out the temp kustomize files
         utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
                 cwd=image_defaulter)
@@ -166,7 +166,7 @@ def main():
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
     common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
-                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'rcs-agent', []])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
