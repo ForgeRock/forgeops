@@ -19,7 +19,7 @@ def build() {
 
     properties([
             buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
-            parameters(commonModule.postcommitMandatoryStages(true)),
+            parameters(commonLodestarModule.postcommitMandatoryStages(true)),
     ])
 
     slackChannel = '#forgeops'
