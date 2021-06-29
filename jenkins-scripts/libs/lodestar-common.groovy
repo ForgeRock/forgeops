@@ -10,7 +10,7 @@
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-fraasProdutionTag = 'fraas-production'
+fraasProductionTag = 'fraas-production'
 
 productLatestTag = '7.2.0-latest-postcommit'
 productPostcommitStable = 'postcommit-stable'

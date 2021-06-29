@@ -39,7 +39,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                                 COMPONENTS_DSCTS_IMAGE_UPGRADE_TAG              : commonModule.getCurrentTag('ds-cts'),
                                 COMPONENTS_DSCTS_IMAGE_UPGRADE_REPOSITORY       : 'gcr.io/forgerock-io/ds/pit1',
                                 STASH_LODESTAR_BRANCH                           : commonModule.LODESTAR_GIT_COMMIT,
-                                STASH_FORGEOPS_BRANCH                           : 'fraas-production',
+                                STASH_FORGEOPS_BRANCH                           : commonLodestarModule.fraasProductionTag,
+                                STASH_PLATFORM_IMAGES_BRANCH                    : commonLodestarModule.fraasProductionTag,
                                 REPORT_NAME_PREFIX                              : normalizedStageName,
                                 TIMEOUT                                         : '2',
                                 TIMEOUT_UNIT                                    : 'HOURS'
