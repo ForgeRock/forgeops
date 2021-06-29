@@ -44,7 +44,7 @@ def initialSteps() {
 }
 
 def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
-    pipelineRun.pushStageOutcome('build-lodestar-images', stageDisplayName: 'Build Lodestar Images') {
+    pipelineRun.pushStageOutcome('build-docker-images', stageDisplayName: 'Build Lodestar Images') {
         def currentImage
         try {
             for (buildDirectory in buildDirectories) {
