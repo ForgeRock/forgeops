@@ -21,7 +21,7 @@ DEFAULT_CONFIG_PATH = str(
     SCRIPT_DIR.joinpath('../../build/platform-images').resolve()
 )
 # Dockerfiles requiring base image updates
-DOCKER_PRODUCTS = ('am', 'ig', 'idm', 'ds')
+DOCKER_PRODUCTS = ('am', 'ig', 'idm', 'ds', 'amster')
 # Directory names in forgeops
 UI_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
 # JSON key names in platform images
@@ -30,8 +30,8 @@ UI_CONF_KEYNAME = ('imageNameAdmin', 'imageNameEnduser', 'imageNameLogin')
 MSC_PRODUCTS = ('rcs-agent',)
 # Product kustomize images
 KUSTOMIZE_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
-CLI_PRODUCTS = ('am', 'ig', 'idm', 'ds', 'ui') + MSC_PRODUCTS
 PLATFORM_DOCKER_BASE = '../../docker/7.0'
+CLI_PRODUCTS = ('am', 'amster', 'ig', 'idm', 'ds', 'ui') + MSC_PRODUCTS
 PLATFORM_KUSTOMIZE_BASE = '../../kustomize/base'
 PLATFORM_DOCKER_PATH = SCRIPT_DIR.joinpath(PLATFORM_DOCKER_BASE).resolve()
 PLATFORM_KUSTOMIZE_PATH = SCRIPT_DIR.joinpath(
@@ -287,11 +287,15 @@ def load_product_configs(path, product_names):
         if name not in DOCKER_PRODUCTS:
             # only add config for Dockerfile's only
             continue
-        p = path.joinpath(f'{name}.json')
+        if name == 'amster':
+            filename = 'am.json'
+        else:
+            filename = f'{name}.json'
+        p = path.joinpath(filename)
         if p.exists():
             with p.open() as f:
                 config = json.load(f)
-            docker_images[p.stem] = config
+            docker_images[name] = config
 
     if 'ui' in product_names:
         p = path.joinpath('ui.json')
@@ -336,13 +340,13 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
             new_tag = f':{product_config["imageTag"]}'
         # Make sure that the image and tag have a value.
         kustomize_set_image = f'.*{product_name}-ui.*={new_image_name}{new_tag}'
-        log.info(f'Running update for {kustomize_dir}')
+        log.info(f'Updating {kustomize_dir} to use {new_image_name}{new_tag}')
 
         success, _, _ = utils.run('kustomize',
                                   'edit',
                                   'set',
                                   'image',
-                                  f'.*{product_name}-ui.*={new_image_name}{new_tag}')
+                                  kustomize_set_image)
         if not success:
             raise Exception(f'Couldn\'t update {product_name} kustomize')
 
@@ -404,7 +408,7 @@ def init_repo(args):
     # Setup repo if need be.
     elif not args.config_path.is_dir():
         log.info(f'Cloning repo to {args.config_path}.')
-        log.info(f'Cloining {args.git_repo}, using branch {args.branch_name}.')
+        log.info(f'Cloning {args.git_repo}, using branch {args.branch_name}.')
         if args.git_repo and not args.commit:
             utils.clone_pipeline_images(args.config_path,
                                         branch_name=args.branch_name,
