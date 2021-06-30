@@ -76,8 +76,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             SKIP_TESTS                            : 'True', // Don't run any tests from lodestar, because it's only being used to deploy to k8s. Our own tests are run below.
                             SKIP_CLEANUP                          : 'True', // Defer cleanup of the K8S cluster, so it can be used by the e2e tests.
                             REPORT_NAME_PREFIX                    : normalizedStageName,
-                            STASH_LODESTAR_BRANCH                 : commonModule.LODESTAR_GIT_COMMIT,
+                            STASH_PLATFORM_IMAGES_BRANCH          : commonModule.platformImagesRevision,
                             STASH_FORGEOPS_BRANCH                 : commonModule.FORGEOPS_GIT_COMMIT,
+                            STASH_LODESTAR_BRANCH                 : commonModule.lodestarRevision,
                     ]
 
                     dir("platform-ui") {

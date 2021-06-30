@@ -7,6 +7,7 @@
  */
 
 import com.forgerock.pipeline.forgeops.DockerImage
+import com.forgerock.pipeline.GlobalConfig
 
 /*
  * Common configuration used by several stages of the ForgeOps pipeline.
@@ -22,13 +23,23 @@ FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s')
 FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 FORGEOPS_GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
-/** Globally scoped git commit information for the Lodestar repo */
-LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
+/** Default platform-images tag corresponding to this branch (or the PR target branch, if this is a PR build) */
+DEFAULT_PLATFORM_IMAGES_TAG = "${isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME}-ready-for-dev-pipelines"
 
-String getLodestarCommit() {
-    return readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
-}
-LODESTAR_GIT_COMMIT = getLodestarCommit()
+/** Revision of platform-images repo used for k8s and platform integration/perf tests. */
+platformImagesRevision = bitbucketUtils.getLatestCommitHash(
+        GlobalConfig.stashNotifierCredentialsId,
+        'cloud',
+        'platform-images',
+        env.STASH_PLATFORM_IMAGES_BRANCH ?: DEFAULT_PLATFORM_IMAGES_TAG)
+
+/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
+lodestarFileContent = bitbucketUtils.readFileContent(
+        'cloud',
+        'platform-images',
+        platformImagesRevision,
+        'lodestar.json').trim()
+lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 
 /** Docker image metadata for individual ForgeRock products. */
 dockerImages = [

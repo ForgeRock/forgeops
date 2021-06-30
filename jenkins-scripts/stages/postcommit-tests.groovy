@@ -202,8 +202,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
         throw exception
     } finally {
         if (generateSummaryReport) {
-            summaryReportGen.createAndPublishSummaryReport(commonLodestarModule.allStagesCloud, stageName, '', false,
-                    stageName, "${stageName}.html")
+            commonLodestarModule.generateSummaryTestReport(stageName)
         }
 
         node('forgeops-postcommit-cloud') {

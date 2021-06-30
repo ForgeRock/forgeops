@@ -100,8 +100,6 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
         if (commonLodestarModule.doRunPostcommitTests()) {
             postcommitTestsStage.runStage(pipelineRun, random, false)
         }
-
-        currentBuild.result = 'SUCCESS'
     } catch (FlowInterruptedException exception) {
         sendBuildAbortedNotification()
         throw exception
@@ -111,10 +109,7 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
         throw exception
     } finally {
         if (currentBuild.result != 'ABORTED') {
-            node('gce-vm-small') {
-                summaryReportGen.createAndPublishSummaryReport(commonLodestarModule.allStagesCloud, prStageName, '', false,
-                        prStageName, "${prStageName}.html")
-            }
+            commonLodestarModule.generateSummaryTestReport(prStageName)
         }
     }
 }

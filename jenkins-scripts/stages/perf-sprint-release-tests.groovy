@@ -13,8 +13,9 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     node('perf-long-cloud') {
         def config_common = [
-                STASH_LODESTAR_BRANCH                   : commonModule.LODESTAR_GIT_COMMIT,
+                STASH_PLATFORM_IMAGES_BRANCH            : commonModule.platformImagesRevision,
                 STASH_FORGEOPS_BRANCH                   : commonModule.FORGEOPS_GIT_COMMIT,
+                STASH_LODESTAR_BRANCH                   : commonModule.lodestarRevision,
                 PIPELINE_NAME                           : 'ForgeOps - Perf-Sprint-Release',
                 CHECK_REGRESSION                        : true,
                 MAX_VARIATION                           : '0.10',

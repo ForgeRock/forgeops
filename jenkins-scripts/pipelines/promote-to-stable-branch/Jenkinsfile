@@ -15,7 +15,7 @@ import java.net.URLDecoder
 import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Library([
-    'forgerock-pipeline-libs@5c8494b65053e9574e43782a1be52fe320d3c42a',
+    'forgerock-pipeline-libs@1760192b18109807e533e4519b02dd29b206d4ec',
     'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
     'java-pipeline-libs@eb0d680ae0a9b1aedaff7606c40228ce1fe7e30f'
 ])
@@ -81,7 +81,7 @@ timestamps {
                 commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
 
                 // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
-                library "QaCloudUtils@${commonModule.LODESTAR_GIT_COMMIT}"
+                library "QaCloudUtils@${commonModule.lodestarRevision}"
 
                 pipelineRun = new PipelineRunLegacyAdapter(PipelineRun.builder(env, steps)
                         .pipelineName('forgeops-promote-to-stable-branch')
@@ -108,7 +108,7 @@ timestamps {
 
                 echo "Testing ForgeOps commit ${commonModule.FORGEOPS_SHORT_GIT_COMMIT} " +
                         "(${commonModule.FORGEOPS_GIT_COMMIT})"
-                echo "Using Lodestar commit ${commonModule.LODESTAR_GIT_COMMIT} for the tests"
+                echo "Using Lodestar commit ${commonModule.lodestarRevision} for the tests"
             }
         }
 

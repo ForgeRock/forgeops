@@ -32,8 +32,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             WAIT_LOOP                       : 600,
                             TIMEOUT                         : '14',
                             TIMEOUT_UNIT                    : 'HOURS',
-                            STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
+                            STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
                             STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
+                            STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
                             REPORT_NAME_PREFIX              : normalizedStageName,
                         ]
 

@@ -43,19 +43,20 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
 def getDefaultConfig(Random random, String stageName) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def randomNumber = random.nextInt(9999) + 10000 // 5 digit random number to compute to namespace
-    return [STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-            STASH_FORGEOPS_BRANCH   : commonModule.FORGEOPS_GIT_COMMIT,
-            CLUSTER_NAMESPACE       : cloud_config.spyglaasConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
-            REPORT_NAME_PREFIX      : normalizedStageName,
-            PIPELINE_NAME           : 'Postcommit-Lodestar',
-            DO_RECORD_RESULT        : false]
+    return [STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
+            STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
+            STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
+            CLUSTER_NAMESPACE               : cloud_config.spyglaasConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
+            REPORT_NAME_PREFIX              : normalizedStageName,
+            PIPELINE_NAME                   : 'Postcommit-Lodestar',
+            DO_RECORD_RESULT                : false]
 }
 
 def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stagesCloud, Closure process) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('lodestar-cloud') {
+        node('google-cloud') {
             stage(stageName) {
                 dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                     process()
@@ -68,8 +69,8 @@ def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stages
 }
 
 def getLodestarDockerImagesTag() {
-    return [COMPONENTS_LODESTARBOX_IMAGE_TAG    : commonModule.LODESTAR_GIT_COMMIT,
-            COMPONENTS_LOCUST_IMAGE_TAG         : commonModule.LODESTAR_GIT_COMMIT]
+    return [COMPONENTS_LODESTARBOX_IMAGE_TAG    : commonModule.lodestarRevision,
+            COMPONENTS_LOCUST_IMAGE_TAG         : commonModule.lodestarRevision]
 }
 
 def runSpyglaas(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
@@ -95,6 +96,13 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 
     runCommon(pipelineRun, stageName, stagesCloud) {
         withGKEPyrockNoStages(testConfig)
+    }
+}
+
+def generateSummaryTestReport(String stageName) {
+    node('google-cloud') {
+        summaryReportGen.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
+                stageName, "${stageName}.html")
     }
 }
 

@@ -12,12 +12,13 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     def config_common = [
-            STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
-            STASH_FORGEOPS_BRANCH   : commonModule.FORGEOPS_GIT_COMMIT,
-            CLUSTER_DOMAIN          : 'pit2-perf.forgeops.com',
-            PIPELINE_NAME           : "ForgeOps-PIT2-promotion",
-            CHECK_REGRESSION        : true,
-            MAX_VARIATION           : '0.10',
+            STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
+            STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
+            STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
+            CLUSTER_DOMAIN                  : 'pit2-perf.forgeops.com',
+            PIPELINE_NAME                   : "ForgeOps-PIT2-promotion",
+            CHECK_REGRESSION                : true,
+            MAX_VARIATION                   : '0.10',
     ]
 
     def parentStageName = 'PIT2 Perf'
