@@ -24,7 +24,7 @@ to the code, or any service or software related thereto. ForgeRock shall not be
 liable for any direct, indirect or consequential damages or costs of any type 
 arising out of any action taken by you or others related to the samples.
 >
->See [Support from ForgeRock](https://backstage.forgerock.com/docs/forgeops/7.1/support.html)
+>See [Support from ForgeRock](https://ea.forgerock.com/docs/forgeops/support.html)
 for information about our support offering for this repository.
 
 ## What's New in 7.1 Release?
