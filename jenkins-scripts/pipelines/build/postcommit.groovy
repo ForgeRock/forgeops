@@ -20,7 +20,7 @@ def initialSteps() {
             parameters(commonLodestarModule.postcommitMandatoryStages(true)),
     ])
 
-    slackChannel = '#forgeops'
+    slackChannel = '#forgeops-notify'
 
     postcommitBuild = new Build(steps, env, currentBuild)
 }
