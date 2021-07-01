@@ -1,8 +1,8 @@
 namespace: prod
 resources:
 - ../../base/kustomizeConfig 
-- ../../base/7.0/ds/cts      
-- ../../base/7.0/ds/idrepo   
+- ../../base/ds/cts      
+- ../../base/ds/idrepo   
 - ../../base/am-cdk          
 - ../../base/amster          
 - ../../base/idm-cdk             

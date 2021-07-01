@@ -2,10 +2,10 @@
 # Simple script to schedule DS backups
 
 # Note:
-# In order to enable cloud storage in 7.0, the user must update the secret forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml with the appropriate credentials. To ahieve this you can run the following commands.
-# kubectl create secret generic cloud-storage-credentials --from-literal=AWS_ACCESS_KEY_ID=CHANGEME_key --from-literal=AWS_SECRET_ACCESS_KEY=CHANGEME_secret --dry-run -o yaml > ./forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml #AWS
-# kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json --dry-run -o yaml > ./forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml #GCP
-# kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_ACCOUNT_NAME=CHANGEME_storageAcctName --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run -o yaml > ./forgeops/kustomize/base/7.0/ds/base/cloud-storage-credentials.yaml #Azure
+# In order to enable cloud storage in 7.0, the user must update the secret forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml with the appropriate credentials. To ahieve this you can run the following commands.
+# kubectl create secret generic cloud-storage-credentials --from-literal=AWS_ACCESS_KEY_ID=CHANGEME_key --from-literal=AWS_SECRET_ACCESS_KEY=CHANGEME_secret --dry-run -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #AWS
+# kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json --dry-run -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #GCP
+# kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_ACCOUNT_NAME=CHANGEME_storageAcctName --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #Azure
 
 BACKUP_SCHEDULE_IDREPO="0 * * * *"
 BACKUP_SCHEDULE_CTS="10 * * * *"
