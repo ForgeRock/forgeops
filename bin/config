@@ -272,7 +272,7 @@ def run_path(args):
         profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
         print(utils.DOCKER_BASE_PATH.joinpath(args.component, profile))
     elif args.tool == 'kustomize':
-        print(utils.KUSTOMIZE_BASE_PATH.joinpath(args.layer, args.profile))
+        print(utils.KUSTOMIZE_BASE_PATH.joinpath(args.layer, args.kustomization))
 
 
 def main():
