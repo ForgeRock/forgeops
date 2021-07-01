@@ -55,6 +55,11 @@ HELP_PATH_KUSTOMIZE_PROFILE = """
 Directory which contians a kustomization.yaml. e.g. small,medium,large
 """
 
+HELP_PATH_KUSTOMIZE_SUBPROFILE = """
+Directory which contians a kustomization.yaml, this is used for variant images
+like ds which has multiple kustomizations. e.g cts,idrepo,base
+""".strip()
+
 HELP_PATH_EXAMPLES = """
 examples:
   # Path to the "small" kustomize profile
@@ -85,6 +90,7 @@ PLATFORM_COMPONENTS = {
     'amster': ('amster',),
     'idm': ('idm',),
     'ig': ('ig',),
+    'ds': ('ds',),
 }
 
 APP_CONF_PATH_FMT = {
@@ -268,8 +274,11 @@ def run_export(args):
 
 
 def run_path(args):
-    if args.tool == 'docker':
+    if args.tool == 'docker' and args.component != 'ds':
         profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
+        print(utils.DOCKER_BASE_PATH.joinpath(args.component, profile))
+    elif args.tool == 'docker' and args.component == 'ds':
+        profile = f'{args.profile}' if args.profile != '' else ''
         print(utils.DOCKER_BASE_PATH.joinpath(args.component, profile))
     elif args.tool == 'kustomize':
         print(utils.KUSTOMIZE_BASE_PATH.joinpath(args.layer, args.kustomization))
@@ -314,7 +323,6 @@ def main():
     path_docker_parser.add_argument('component',
                                     help=HELP_CMD_COMPONENTS,
                                     choices=PLATFORM_COMPONENTS.keys())
-
     path_docker_parser.add_argument('profile',
                                     help=HELP_PATH_DOCKER_PROFILE_NAME,
                                     nargs='?',
@@ -331,6 +339,10 @@ def main():
                                        choices=('base', 'overlay'))
     path_kustomize_parser.add_argument('kustomization',
                                        help=HELP_PATH_KUSTOMIZE_PROFILE,
+                                       nargs='?',
+                                       default='')
+    path_kustomize_parser.add_argument('sub-kustomization',
+                                       help=HELP_PATH_KUSTOMIZE_SUBPROFILE,
                                        nargs='?',
                                        default='')
 
