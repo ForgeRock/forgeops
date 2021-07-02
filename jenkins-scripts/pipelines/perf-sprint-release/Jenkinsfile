@@ -64,6 +64,7 @@ timestamps {
 
                 localGitUtils = load("${libsLocation}/git-utils.groovy")
                 commonModule = load("${libsLocation}/common.groovy")
+                commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
 
                 // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
                 library "QaCloudUtils@${commonModule.LODESTAR_GIT_COMMIT}"
