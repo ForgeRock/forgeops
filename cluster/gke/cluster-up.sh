@@ -108,6 +108,9 @@ HA_CTRL_PLANE=${HA_CTRL_PLANE:=0}
 CONTROL_PLANE_OPTS="--zone ${ZONE}"
 [[ $HA_CTRL_PLANE -eq 1 ]] && CONTROL_PLANE_OPTS="--region ${REGION}"
 
+# CloudDNS
+[[ $CLOUD_DNS_DOMAIN ]] && CLOUD_DNS_OPTS="--cluster-dns clouddns --cluster-dns-scope vpc --cluster-dns-domain ${CLOUD_DNS_DOMAIN}"
+
 # BY default we disable autoscaling for CDM. If you wish to use autoscaling, uncomment the following:
 #AUTOSCALE="--enable-autoscaling --min-nodes 0 --max-nodes 3"
 
@@ -135,6 +138,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --workload-pool "$PROJECT.svc.id.goog" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
     $CONTROL_PLANE_OPTS \
+    $CLOUD_DNS_OPTS \
     $ADDITIONAL_OPTS  # Note: Do not quote this variable. It needs to expand
 
 # Create the DS pool. This pool does not autoscale.

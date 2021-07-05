@@ -214,7 +214,7 @@ the other cluster.
 To make the server ID of each pod in our topology unique, the DS service name must contain a cluster specific suffix.  This is done by adding the cluster suffix in the `kustomization.yaml` in each of the region's Kustomize overlay folders e.g.
 
 ****
-kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-cluster/mcs-us/kustomization.yaml[(latest version)]
+kustomization.yaml https://github.com/ForgeRock/forgeops/tree/master/kustomize/overlay/multi-cluster/mcs/us/kustomization.yaml[(latest version)]
 ```
 patches:
      - target:
@@ -231,7 +231,7 @@ patches:
 
 For DS to configure the correct DS server identifiers, the following env vars must be configured.  These settings will be used in the docker-entrypoint.sh to ensure the DS pods are unique across both clusters.
 
-See `kustomize/overlay/multi-cluster/mcs-<region>/kustomization.yaml`   
+See `kustomize/overlay/multi-cluster/mcs/<region>/kustomization.yaml`   
 
 ****
 ```
@@ -277,7 +277,7 @@ skaffold.yaml https://github.com/ForgeRock/forgeops/blob/master/skaffold.yaml[(l
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-cluster/mcs-us
+      path: ./kustomize/overlay/multi-cluster/mcs/us
 ```
 ****
 

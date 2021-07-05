@@ -2,10 +2,10 @@
 # The namespace must be identical for all regions
 namespace: prod
 resources:
-  - ../../../base/kustomizeConfig
-  - ../multi-cluster-secrets
-  - ../../../base/7.0/ds/idrepo
-  - ../../../base/7.0/ds/cts 
+  - ../../../../base/kustomizeConfig
+  - ../../multi-cluster-secrets
+  - ../../../../base/7.0/ds/idrepo
+  - ../../../../base/7.0/ds/cts 
 
 # The name of the services for both ds (ds-cts, ds-idrepo) are modified to include the region as a suffix
 # The new name must match the 'subdomain' value in the corresponding StatefulSet (in 'patchesStrategicMerge' section)

@@ -10,7 +10,7 @@ There are 5 major steps to the deployment:
 * Prepare 2 clusters, one in US and one in Europe
 * Prepare configuration that enables the use of shared secrets across the clusters
 * Setup MCS in Google Cloud and enable clusters for use within an shared environ
-* Prepare docker and kustomize configure to ensure unique server IDs
+* Prepare kustomize configuration to ensure unique server IDs
 * Deploy DS using the provided skaffold profiles  
 <br />
 
@@ -132,7 +132,7 @@ Add the following profiles to Skaffold.yaml:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-cluster/mcs-us
+      path: ./kustomize/overlay/multi-cluster/mcs/us
   
 - name: mcs-eu
   build:
@@ -143,7 +143,7 @@ Add the following profiles to Skaffold.yaml:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-cluster/mcs-eu
+      path: ./kustomize/overlay/multi-cluster/mcs/eu
 ```  
 <br />  
 
