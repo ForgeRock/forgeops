@@ -15,7 +15,8 @@ spec:
       - name: import
         image: gcr.io/forgeops-public/ds-idrepo:dev
         imagePullPolicy: IfNotPresent
-        args: ["/opt/scripts/ds-restore.sh", "/ds-restore"]
+        command: ["/opt/scripts/ds-restore.sh"]
+        args: ["/ds-restore"]
         # Must mount the data, and the keystore secrets to read the data
         volumeMounts:
         - name: data
@@ -44,7 +45,7 @@ spec:
         persistentVolumeClaim:
           # Mounts the data from a clone or a snapshot of the data pvc
           # The CSI driver must support cloning
-          claimName: ds-data-clone
+          claimName: restored-ds-data
           # This example mounts the DS data pvc directly which means DS can not
           # be running when you do the import.
           # claimName: data-ds-idrepo-0

@@ -58,7 +58,7 @@ This diagram visualizes the process:
 
 ## Adhoc Backup Job
 
-[ds-backup-volume](ds-backup-volume) performs adhoc "one shot" backups.
+[ds-backup-volume](ds-backup-volume) performs an adhoc "one shot" backups.
 
 You need to edit this example. The basic process is:
 
@@ -99,9 +99,20 @@ spec:
 Repeat the above PVC for ds-data-idrepo-1 and ds-data-idrepo-2.  If you use the ds-operator you
 can initialize a cluster by specifying the snapshot in the Custom Resource Spec.
 
+## Adhoc Restore Job
 
+[ds-restore-volume](ds-restore-volume) performs an adhoc "one shot" restore.
 
+You need to edit this example. The basic process is:
 
+* Edit ds-restore-volume/restored-data-pvc.yaml and ds-restore-volume/take-snap.yaml
+* Run the restore.  This will not only create a PVC with the resotred data called "restored-ds-data" but also will create a snapshot of the PVC called "restored-ds-data-snapshot". 
+
+`kustomize build ds-restore-volume | kubectl apply -f -`
+
+To re-run this job, first remove the existing job `kubectl delete job/ds-restore`.
+
+NOTE: Subsiquently the "restored-ds-data-snapshot" snapshot can be used in conjuction with the [ds-operator](https://github.com/forgerock/ds-operator) to be the initilization source of the data volume.
 
 ## Operational notes
 

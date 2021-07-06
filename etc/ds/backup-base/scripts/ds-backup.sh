@@ -31,9 +31,9 @@ for B in "${BACK_ENDS[@]}"; do
     else
         if [[ $BACKUP_TYPE == "ldif" ]];
         then
-            F="$DEST/$B.ldif"
+            F="$DEST/$B.ldif.gz"
             echo "Backing up $B to $F"
-            export-ldif --ldifFile $F --backendId $B --offline
+            export-ldif --ldifFile $F --backendId $B --offline --compress
         else
             echo  "Backing up $B to $DEST"
             dsbackup --offline create --backupLocation "$DEST" --backendName $B

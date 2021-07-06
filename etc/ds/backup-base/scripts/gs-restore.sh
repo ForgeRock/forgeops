@@ -6,11 +6,12 @@
 # The source of the data to restore. This will be have been placed on the disk by the
 # previous container.
 
-DST=${1:-/data/$NAMESPACE}
+BACKUP_TYPE="${BACKUP_TYPE:-ldif}"
+DST=${1:-/data/$NAMESPACE/$BACKUP_TYPE}
 
 mkdir -p $DST
 
-GCS_PATH=${GCS_PATH:-"gs://forgeops/ds-backup/$NAMESPACE"}
+GCS_PATH=${GCS_PATH:-"gs://forgeops/ds-backup/$NAMESPACE/$BACKUP_TYPE"}
 
 set -x
 

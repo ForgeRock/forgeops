@@ -5,8 +5,7 @@
 # All files found at the directory will be restored. If you only want to partially restore files
 # you must modify this script or delete the files from the restore source.
 
-set -e
-
+set -x
 
 if [[ "$#" -lt 1 ]]; then
     echo "usage: $0 restore-files-dir"
@@ -22,27 +21,27 @@ SOURCE="$1/$NAMESPACE/$BACKUP_TYPE"
     exit 1
 }
 
-
-# Make sure the DS version matches any backend JE data
-echo "Upgrading configuration and data..."
-./upgrade --dataOnly --acceptLicense --force --ignoreErrors --no-prompt
-
+# Call the entrypoint - to make sure the proto backends are restored
+/opt/opendj/docker-entrypoint.sh initialize-only
 
 echo "Restoring files found in $SOURCE:"
 ls -lR $SOURCE
 
+
 if [[ $BACKUP_TYPE == "ldif" ]]; then
-     # Strip the .ldif from the filename to get the name of the backend
-    BACKEND=$(cd $SOURCE; ls | sed -e s/\.ldif//g )
-
-    for B in $BACKEND
+    LDIF=$(cd $SOURCE; ls *.ldif*)
+    for F in $LDIF
     do
-        # Import the data.
-        F="${SOURCE}/$B.ldif"
-        echo "Importing $F to $B"
-        import-ldif -F --ldifFile  "$F" --backendId $B --offline
+        # Strip the .ldif or .ldif.gz from the filename to get backend name
+        BACKEND=$(echo $F | sed -e s/\.ldif\.*//g) 
+        if [[ $F =~ ".gz" ]]; then
+            echo "=> Importing compressed $F to $BACKEND"
+            import-ldif --clearBackend --ldifFile "${SOURCE}/$F" --backendId ${BACKEND} --offline --isCompressed
+        else
+            echo "=> Importing $F to $BACKEND"
+            import-ldif --clearBackend --ldifFile "${SOURCE}/$F" --backendId ${BACKEND} --offline
+        fi
     done
-
 else
     # use ds-restore command
 
