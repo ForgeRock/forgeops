@@ -75,14 +75,10 @@ examples:
 HELP_EXPORT_EXAMPLES = """
 examples:
   # Export just AM configuration to myprofile
-  $ ./bin/config export --component am myprofile
+  $ ./bin/config export am myprofile
 
   # Export just AM configuration to myprofile
-  $ ./bin/config export --component am myprofile
-
-  # Export All ForgeOps components
-  $ ./bin/config export --component all myprofile
-
+  $ ./bin/config export am myprofile
 """
 
 PLATFORM_COMPONENTS = {
@@ -94,10 +90,10 @@ PLATFORM_COMPONENTS = {
 }
 
 APP_CONF_PATH_FMT = {
-    'am': 'am/{profile}/config'.format,
-    'idm': 'idm/{profile}/conf'.format,
-    'ig': 'ig/{profile}/config'.format,
-    'amster': 'amster/{profile}/config'.format,
+    'am': 'am/config-profiles/{profile}/config'.format,
+    'idm': 'idm/config-profiles/{profile}/conf'.format,
+    'ig': 'ig/config-profiles/{profile}/config'.format,
+    'amster': 'amster/config-profiles/{profile}/config'.format,
 }
 USER_PWD_EXPR_RULES = {
     'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
@@ -226,7 +222,7 @@ def export_ig(ig_conf, pod_name):
 
 def run_export(args):
     # Amster doesn't use a running instance
-    conf_path = pathlib.Path(utils.DOCKER_BASE.joinpath(
+    conf_path = pathlib.Path(utils.DOCKER_BASE_PATH.joinpath(
         APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
     if args.component == 'amster':
         amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
