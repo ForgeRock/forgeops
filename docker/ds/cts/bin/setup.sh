@@ -5,7 +5,8 @@
 # The CTS and proxy schemas have not changed for 7.x
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.0"
-
+PEM_KEYS_DIRECTORY="pem-keys-directory"
+PEM_TRUSTSTORE_DIRECTORY="pem-trust-directory"
 
 setup-profile --profile ${AM_CTS} \
               --set am-cts/tokenExpirationPolicy:am-sessions-only \
@@ -28,3 +29,72 @@ dsconfig set-synchronization-provider-prop \
 ##    set-password-storage-scheme-prop --scheme-name "Salted SHA-512" --set enabled:true
 ##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
 #EOF
+
+mkdir -p $PEM_TRUSTSTORE_DIRECTORY
+mkdir -p $PEM_KEYS_DIRECTORY
+
+# Set up a PEM Trust Manager Provider
+dsconfig --offline --no-prompt --batch <<EOF
+create-trust-manager-provider \
+            --provider-name "PEM Trust Manager" \
+            --type pem \
+            --set enabled:true \
+            --set pem-directory:${PEM_TRUSTSTORE_DIRECTORY}
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-connection-handler-prop \
+            --handler-name https \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-connection-handler-prop \
+            --handler-name ldap \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-connection-handler-prop \
+            --handler-name ldaps \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-synchronization-provider-prop \
+            --provider-name "Multimaster Synchronization" \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-administration-connector-prop \
+            --set trust-manager-provider:"PEM Trust Manager"
+EOF
+
+# Delete the default PCKS12 provider. 
+dsconfig --offline --no-prompt --batch <<EOF
+delete-trust-manager-provider \
+            --provider-name "PKCS12"
+EOF
+
+# Set up a PEM Key Manager Provider
+dsconfig --offline --no-prompt --batch <<EOF
+create-key-manager-provider \
+            --provider-name "PEM Key Manager" \
+            --type pem \
+            --set enabled:true \
+            --set pem-directory:${PEM_KEYS_DIRECTORY}
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-connection-handler-prop \
+            --handler-name https \
+            --set key-manager-provider:"PEM Key Manager"
+set-connection-handler-prop \
+            --handler-name ldap \
+            --set key-manager-provider:"PEM Key Manager"
+set-connection-handler-prop \
+            --handler-name ldaps \
+            --set key-manager-provider:"PEM Key Manager"
+set-synchronization-provider-prop \
+            --provider-name "Multimaster Synchronization" \
+            --set key-manager-provider:"PEM Key Manager"
+set-crypto-manager-prop \
+            --set key-manager-provider:"PEM Key Manager"
+set-administration-connector-prop \
+            --set key-manager-provider:"PEM Key Manager"
+EOF
+
+# Delete the default PCKS12 provider. 
+dsconfig --offline --no-prompt --batch <<EOF
+delete-key-manager-provider \
+            --provider-name "PKCS12"
+EOF
