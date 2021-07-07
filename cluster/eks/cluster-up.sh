@@ -86,7 +86,7 @@ then
     if ! EnforceEntSecTags;
     then
         echo "ForgeRock staff are required to add specific labels to their"
-        echo "Kubernetes clusters. Configure $HOME/.forgeops.${ENV}.sh so that"
+        echo "Kubernetes clusters. Configure $HOME/.forgeops.${FO_ENV}.sh so that"
         echo "these labels are added to your clusters."
         exit 1
     fi
