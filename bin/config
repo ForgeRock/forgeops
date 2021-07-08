@@ -90,7 +90,7 @@ PLATFORM_COMPONENTS = {
 }
 
 APP_CONF_PATH_FMT = {
-    'am': 'am/config-profiles/{profile}/config'.format,
+    'am': 'am/config-profiles/{profile}'.format,
     'idm': 'idm/config-profiles/{profile}/conf'.format,
     'ig': 'ig/config-profiles/{profile}/config'.format,
     'amster': 'amster/config-profiles/{profile}/config'.format,
