@@ -70,6 +70,8 @@ String getCurrentTag(String productName) {
 // To be discussed with Bruno and Robin
 boolean branchSupportsIDCloudReleases() {
     return 'master' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
+            || 'feature/config' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
+            || 'release/7.1.0' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
             || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}" == 'sustaining/7.1.x')) \
             || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}" == 'sustaining/7.1.x'))
 }
