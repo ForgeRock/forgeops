@@ -38,9 +38,13 @@ fi
 
 ######### GLOBAL VARS #########
 # Get the default region
-L=$(az configure -l --query "[?name=='location'].value" -o tsv)
+L=$(az configure -l --query "[?name=='location'].value" -o tsv || echo "")
 LOCATION=${LOCATION:-$L}
-
+if [[ $LOCATION == "" ]];
+then
+    echo "A default location must be configured (az configure --defaults location=westus2) or export LOCATION=westus2"
+    exit 1
+fi
 # Get current user
 CREATOR="${USER:-unknown}"
 
@@ -102,7 +106,12 @@ fi
 # By default we disable autoscaling for CDM. If you wish to use autoscaling,
 # uncomment the following and adjust min/max-count as required:
 #AUTOSCALE="--enable-cluster-autoscaler --min-count 1 --max-count 3"
+AUTOSCALE=${AUTOSCALE:-""}
 
+# Additional opts to add during creation
+ADDITIONAL_OPTS=${ADDITIONAL_OPTS:-""}
+
+OPTS+=" $AUTOSCALE $ADDITIONAL_OPTS "
 # Check user is signed into Azure
 authn=$(az ad signed-in-user show | grep -i userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
 echo -e "\n\nYou are authenticated and logged into Azure as ${authn}.\n"
@@ -131,7 +140,7 @@ az aks create \
     --network-plugin "azure" \
     --load-balancer-sku "standard" \
     --zones 3 \
-    $AUTOSCALE  # Note: Do not quote this variable. It needs to expand
+    $OPTS  # Note: Do not quote this variable. It needs to expand
 
 # Create the DS pool. This pool does not autoscale.
 
