@@ -1,49 +1,74 @@
+# Allow DS Operator to talk ldap to only the pods it manages
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: deny-all
+  name: ds-operator-ldap
+  labels:
+    tier: data
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: ds-operator
   policyTypes:
   - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          control-plane: ds-operator
+      podSelector:
+        matchExpressions:
+        - key: control-plane
+          operator: In
+          values:
+          - ds-operator
+    ports:
+    - protocol: TCP
+      port: 1636
+
+# Allow DS to replicate between themselves, you could further limit
+# CTS and idrepo replication port isolation
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: ds-replication
   labels:
-    tier: ds
+    tier: data
 spec:
   podSelector:
     matchExpressions:
-    - key: tier
+    - key: app.kubernetes.io/name
       operator: In
       values:
-      - data
+      - ds
   policyTypes:
   - Ingress
   ingress:
   - from:
     - podSelector:
         matchExpressions:
-        - key: tier
+        - key: app.kubernetes.io/name
           operator: In
           values:
-          - data
+          - ds
     ports:
     - protocol: TCP
       port: 8989
+
+# Allow Apps to talk LDAP to idrepo
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: ds-idrepo-ldap
+  name: ds-idrepo-app-ldap
   labels:
-    tier: ds
+    tier: data
 spec:
   podSelector:
     matchLabels:
-      app: ds-idrepo
+      app.kubernetes.io/instance: ds-idrepo
   policyTypes:
   - Ingress
   ingress:
@@ -63,17 +88,18 @@ spec:
       port: 1636
     - protocol: TCP
       port: 8080
+# Allow AM and Amster to talk LDAP to cts
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: ds-cts-ldap
+  name: ds-cts-app-ldap
   labels:
-    tier: ds
+    tier: data
 spec:
   podSelector:
     matchLabels:
-      app: ds-cts
+      app.kubernetes.io/instance: ds-cts
   policyTypes:
   - Ingress
   ingress:
@@ -92,45 +118,3 @@ spec:
       port: 1636
     - protocol: TCP
       port: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: backend-http-access
-  labels:
-    tier: middle
-spec:
-  podSelector:
-    matchExpressions:
-    - key: tier
-      operator: In
-      values:
-      - middle
-  policyTypes:
-  - Ingress
-  ingress:
-  - from: []
-    ports:
-      - protocol: TCP
-        port: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: front-end-http-access
-  labels:
-    tier: ui
-spec:
-  podSelector:
-    matchExpressions:
-    - key: tier
-      operator: In
-      values:
-      - ui
-  policyTypes:
-  - Ingress
-  ingress:
-  - from: []
-    ports:
-      - protocol: TCP
-        port: 80

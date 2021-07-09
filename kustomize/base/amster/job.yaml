@@ -8,6 +8,7 @@ spec:
     metadata:
       labels:
         app: amster
+        tier: middle
     spec:
       initContainers:
       - env:
