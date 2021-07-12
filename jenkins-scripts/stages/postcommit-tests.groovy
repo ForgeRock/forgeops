@@ -51,19 +51,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
             )
         }
 
-        if (params.Postcommit_perf_restore) {
-            parallelTestsMap.put('Perf Restore',
-                    {
-                        commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
-                                [TEST_NAME                      : 'platform',
-                                 DEPLOYMENT_NAME                : 'small',
-                                 CONFIGFILE_NAME                : 'conf-postcommit.yaml',
-                                 DEPLOYMENT_RESTOREBUCKETURL    : 'gs://performance-bucket-us-east1/postcommit/platform10k']
-                        )
-                    }
-            )
-        }
-
         // *************
         // DEV k8s tests
         // *************

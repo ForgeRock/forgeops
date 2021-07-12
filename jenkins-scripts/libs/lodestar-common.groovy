@@ -25,7 +25,6 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
     return [
         booleanParam(name: 'Postcommit_pit1', defaultValue: enabled),
         booleanParam(name: 'Postcommit_perf_postcommit', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_perf_restore', defaultValue: enabled),
         booleanParam(name: 'Postcommit_am_k8s_postcommit', defaultValue: enabled),
         booleanParam(name: 'Postcommit_am_k8s_upgrade', defaultValue: enabled),
         booleanParam(name: 'Postcommit_am_basic_perf', defaultValue: enabled),
