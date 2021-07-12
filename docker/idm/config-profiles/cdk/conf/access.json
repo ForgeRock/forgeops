@@ -180,6 +180,12 @@
       "actions"   : "sendTemplate"
     },
     {
+      "pattern"   : "system/*",
+      "roles"     : "internal/role/platform-provisioning",
+      "methods"   : "action",
+      "actions"   : "authenticate"
+    },
+    {
       "pattern"   : "policy/*",
       "roles"     : "internal/role/openidm-authorized",
       "methods"   : "read,action",
