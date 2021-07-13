@@ -31,13 +31,13 @@ spec:
         - /bin/bash
         - -c
         - |
-          if [ -d /fbc/.git ];
+          if [ -d /fbc/config ];
           then
             echo "Existing openam configuration found. Skipping copy"
           else
             echo "Copying docker image configuration files to the shared volume"
             cd /home/forgerock/openam
-            cp -r .git .homeVersion * /fbc
+            cp -vr .git .homeVersion * /fbc
           fi
       - name: truststore-init
         image: am

@@ -14,6 +14,23 @@ spec:
         "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
     spec:
       initContainers:
+      - name: fbc-init
+        image: idm
+        volumeMounts:
+        - mountPath: /fbc
+          name: fbc
+        command:
+        - /bin/bash
+        - -c
+        - |
+          if [ -d /fbc/conf ];
+          then
+            echo "Existing openidm configuration found. Skipping copy"
+          else
+            echo "Copying docker image configuration files to the shared volume"
+            cd /opt/openidm
+            cp -vr ui conf script /fbc
+          fi
       - name: truststore-init
         image: idm
         volumeMounts:
@@ -123,8 +140,19 @@ spec:
           name: audit-logs
         - mountPath: /var/run/openidm/logging
           name: idm-logging-properties
+        - name: fbc
+          mountPath: /opt/openidm/conf
+          subPath: conf
+        - name: fbc
+          mountPath: /opt/openidm/ui
+          subPath: ui
+        - name: fbc
+          mountPath: /opt/openidm/script
+          subPath: script
       terminationGracePeriodSeconds: 10
       volumes:
+      - name: fbc
+        emptyDir: {}
       - name: idm-secrets
         secret:
           secretName: idm
