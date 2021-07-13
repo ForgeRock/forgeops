@@ -25,4 +25,7 @@ kustomize edit set image ds-idrepo="${REGISTRY}/ds-idrepo:${TAG_NAME}"
 cd_or_die ../../kustomize/base/ds-cts
 kustomize edit set image ds-cts="${REGISTRY}/ds-cts:${TAG_NAME}"
 
+cd_or_die ../../kustomize/base/ig
+kustomize edit set image ig="${REGISTRY}/ig:${TAG_NAME}"
+
 $SCRIPT_DIR/../../bin/set-images --inplace --products rcs-agent ui --update-repo "${REGISTRY}" --update-tag "${TAG_NAME}"
