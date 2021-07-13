@@ -17,7 +17,7 @@ bundles = {
     'am': ['dev/am'],
     'idm': ['dev/idm']
 }
-build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts']
+build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
 
 def get_component_url(component, tag):
     """Calculates the target URL of the desired component"""

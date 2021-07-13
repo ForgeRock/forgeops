@@ -29,7 +29,8 @@ DOCKER_REGEX_NAME = {
     'amster' : '.*amster.*',
     'idm': '.*idm',
     'ds-idrepo': '.*ds-idrepo.*',
-    'ds-cts': '.*ds-cts.*'
+    'ds-cts': '.*ds-cts.*',
+    'ig': '.*ig.*'
 }
 
 SCRIPT = pathlib.Path(__file__)
