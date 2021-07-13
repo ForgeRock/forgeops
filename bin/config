@@ -181,6 +181,8 @@ def export_am(am_conf, pod_name):
     try:
         log.debug('Starting export')
         _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
+        if out == b'':
+            raise Exception('No configuration changes found.')
         f = io.BytesIO(out)
         with tarfile.open(fileobj=f) as tarball:
             log.debug('Starting to extract tarball')
@@ -261,6 +263,9 @@ def run_export(args):
             log.info('Completed export')
         except IndexError:
             log.error('Unable to find running components.')
+            sys.exit(1)
+        except Exception as e:
+            log.error(e)
             sys.exit(1)
 
     if args.sort:
