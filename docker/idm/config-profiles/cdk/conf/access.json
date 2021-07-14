@@ -25,6 +25,12 @@
       "actions"    : "*"
     },
     {
+      "pattern"    : "config/uilocale/*",
+      "roles"      : "*",
+      "methods"    : "read",
+      "actions"    : "*"
+    },
+    {
       "pattern"    : "info/uiconfig",
       "roles"      : "*",
       "methods"    : "read",
