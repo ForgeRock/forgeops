@@ -8,6 +8,12 @@
 # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Access key and secret for AWS, if using S3.
 # AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY: Storage account name and key, if using Azure
 
+
+#### Deprecation Notice   ####
+# The dsbackup / restore functionality is deprecated and will be removed in a future release.
+# Please see the etc/backup directory for more information.
+###################
+
 set -e
 
 if [ -n "$(ls -A /opt/opendj/data -I lost+found)" ]; then

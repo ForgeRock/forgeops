@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
 set -o errexit -o pipefail
 
+
+cat <<EOF
+
+***********************
+
+WARNING: The "$0" script is deprecated and will be removed in a future release.
+
+The recommended backup and restore strategy is to use Kubernetes volume snapshots with a 3rd party backup solution.
+
+See the etc/backup directory for more information.
+
+***************************
+
+
+EOF
+
+
 usage() {
     echo " This script allows users to preload the backup PVCs used by ds-cts and ds-idrepo with local data"
     echo "Usage: $0 [options]" >&2
@@ -13,7 +30,7 @@ usage() {
     echo "   -b   Set the source path for CTS"
     echo "   -u   Set the source path for IDREPO"
     echo
-    # echo some stuff here for the -a or --add-options 
+    # echo some stuff here for the -a or --add-options
 }
 
 NAMESPACE="default"
@@ -65,7 +82,7 @@ spec:
   replicas: 1
   template:
     metadata:
-      labels: 
+      labels:
         app: ds-name
       annotations:
         sidecar.istio.io/inject: "false"
@@ -102,7 +119,7 @@ then
   then
     echo "$STATEFULSET" | sed "s/ds-name/ds-cts/;    s/replicas:.*/replicas: $REPLICAS/; s/storage:.*/storage: $CTS_DISK_SIZE/"    | kubectl --namespace=$NAMESPACE create -f -
   fi
-  
+
   if [ "$IDREPO_BACKUP_PATH" ];
   then
     echo "$STATEFULSET" | sed "s/ds-name/ds-idrepo/; s/replicas:.*/replicas: $REPLICAS/; s/storage:.*/storage: $IDREPO_DISK_SIZE/" | kubectl --namespace=$NAMESPACE create -f -
@@ -120,8 +137,8 @@ if [ "$CTS_BACKUP_PATH" ];
 then
   echo ""
   echo "*** Starting kubectl cp for ds-cts"
-  for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-cts -o json| jq -r '.items[].metadata.name') 
-  do 
+  for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-cts -o json| jq -r '.items[].metadata.name')
+  do
     echo "copying backup files from $CTS_BACKUP_PATH to $podname"
     for file in ${CTS_BACKUP_PATH}/*; do
       kubectl --namespace=$NAMESPACE cp $file "${podname}":/bak/
@@ -134,8 +151,8 @@ if [ "$IDREPO_BACKUP_PATH" ];
 then
   echo ""
   echo "*** Starting kubectl cp for ds-idrepo"
-  for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-idrepo -o json| jq -r '.items[].metadata.name') 
-  do 
+  for podname in $(kubectl --namespace=$NAMESPACE get pods -l app=ds-idrepo -o json| jq -r '.items[].metadata.name')
+  do
     echo "copying backup files from $IDREPO_BACKUP_PATH to $podname"
     for file in ${IDREPO_BACKUP_PATH}/*; do
       kubectl --namespace=$NAMESPACE  cp $file "${podname}":/bak/

@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+
+#### Deprecation Notice   ####
+# The dsbackup / restore functionality is deprecated and will be removed in a future release.
+# Please see the etc/backup directory for more information.
+###################
+
+
+
+cat <<EOF
+The dsbackup / restore functionality is deprecated and will be removed in a future release.
+
+Please see the etc/backup directory for more information.
+
+EOF
+
 cd /opt/opendj
 INCREMENTAL_CRON=${BACKUP_SCHEDULE:-0 * * * *}
 
@@ -11,7 +26,7 @@ else
     echo "DSBACKUP_DIRECTORY is set to $DSBACKUP_DIRECTORY"
 fi
 
-TASK_NAME="recurringBackupTask" 
+TASK_NAME="recurringBackupTask"
 echo "Attempting to cancel task: ${TASK_NAME}. Ignore errors if the task does not exist"
 manage-tasks --cancel "${TASK_NAME}" --hostname "${FQDN_DS0:-localhost}" --port 4444 --bindDN "uid=admin" \
 --bindPassword  "${ADMIN_PASSWORD}" --trustAll | grep -i "canceled"
@@ -23,7 +38,7 @@ GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
 BACKUP_LOCATION="${DSBACKUP_DIRECTORY}/${HOSTNAME}"
 
-case "$DSBACKUP_DIRECTORY" in 
+case "$DSBACKUP_DIRECTORY" in
   s3://* )
     echo "S3 Bucket detected. Setting up backups in AwS S3"
     EXTRA_PARAMS="${AWS_PARAMS}"
@@ -40,7 +55,7 @@ case "$DSBACKUP_DIRECTORY" in
   *)
     EXTRA_PARAMS=""
     ;;
-esac    
+esac
 
 echo "Storing backups in ${BACKUP_LOCATION}"
 

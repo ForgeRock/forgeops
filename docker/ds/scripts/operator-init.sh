@@ -12,6 +12,14 @@
 set -x
 env
 
+
+#### Deprecation Notice   ####
+# The dsbackup / restore functionality is deprecated and will be removed in a future release.
+# Please see the etc/backup directory for more information.
+###################
+
+
+
 BACKUP_PATH="$1"
 # If no restore path provided just perform init and exit
 if [ -z "$BACKUP_PATH" ]; then

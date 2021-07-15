@@ -7,6 +7,19 @@
 # kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json --dry-run -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #GCP
 # kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_ACCOUNT_NAME=CHANGEME_storageAcctName --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #Azure
 
+cat <<EOF
+***********************
+
+WARNING: The "$0" script is deprecated and will be removed in a future release.
+
+The recommended backup and restore strategy is to use Kubernetes volume snapshots with a 3rd party backup solution.
+
+See the etc/backup directory for more information.
+
+***************************
+
+EOF
+
 BACKUP_SCHEDULE_IDREPO="0 * * * *"
 BACKUP_SCHEDULE_CTS="10 * * * *"
 kcontext=$(kubectl config current-context)
