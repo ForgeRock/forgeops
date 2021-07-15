@@ -303,7 +303,7 @@ def load_product_configs(path, product_names):
             with p.open() as f:
                 config = json.load(f)
             for product_name, keyname in zip(UI_PRODUCTS, UI_CONF_KEYNAME):
-                c = config
+                c = config.copy()
                 c['imageName'] = config[keyname]
                 kustomize_images[product_name] = c
     if 'rcs-agent' in product_names:
