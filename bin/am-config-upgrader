@@ -32,6 +32,15 @@ realpath() {
   echo "$REALPATH"
 }
 
+# Never run against a minikube daemon
+docker ps --format '{{.Names}}' | grep -q minikube \
+    && unset -v DOCKER_HOST DOCKER_CERT_PATH DOCKER_MACHINE_NAME DOCKER_TLS_VERIFY
+
+if ! docker info --format ' ';
+then
+    echo "Docker must be running. Please start your docker environment and run again."
+    exit 1
+fi
 # For debugging
 # set  -x
 
