@@ -1,4 +1,4 @@
-# Backup Strategies for the ForgeOps Identity Platform
+# Backup Strategies for the ForgeRock Identity Platform
 
 For backup, use Kubernetes volume snapshots, and perform offline backups in another container:
 
