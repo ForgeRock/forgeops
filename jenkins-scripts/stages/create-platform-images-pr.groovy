@@ -13,12 +13,13 @@ import com.forgerock.pipeline.stage.Status
 
 /** Open a pull request against the Platform-Images repo, containing latest ForgeOps commit */
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
-    commonModule.stage('create-platform-images-pr', 'Create Platform Images PR',
-            'Failed to create Platform Images PR') {
+    pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform-Images PR') {
         node('google-cloud') {
             privateWorkspace {
                 def dockerProperties = [
-                        'gitCommit': commonModule.FORGEOPS_GIT_COMMIT
+                        'gitCommit':            commonModule.FORGEOPS_GIT_COMMIT,
+                        'platformImagesCommit': commonModule.platformImagesRevision,
+                        'lodestarCommit':       commonModule.lodestarRevision,
                 ]
 
                 return platformImageUtils.createPlatformImagePR('forgeops', env.BRANCH_NAME, dockerProperties)
