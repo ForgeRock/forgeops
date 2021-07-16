@@ -74,11 +74,11 @@ examples:
 
 HELP_EXPORT_EXAMPLES = """
 examples:
-  # Export just AM configuration to myprofile
-  $ ./bin/config export am myprofile
+  # Export AM configuration to an existing profile <myprofile>
+  $ ./bin/config export am <myprofile>
 
-  # Export just AM configuration to myprofile
-  $ ./bin/config export am myprofile
+  # Export AM configruation for a profile that doesn't exist
+  $ ./bin/config export --baseline-profile cdk am <mynewprofile>
 """
 
 PLATFORM_COMPONENTS = {
@@ -226,6 +226,14 @@ def run_export(args):
     # Amster doesn't use a running instance
     conf_path = pathlib.Path(utils.DOCKER_BASE_PATH.joinpath(
         APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
+    # prime the config
+    if not conf_path.exists():
+        name = f'config-profiles/{args.profile}'
+        cdk = 'config-profiles/cdk'
+        error_msg = textwrap.fill('You\'re attempting to export configuration to a profile that doesn\'t exist. You should "prime" your config by doing the following:', width=120)
+        cmd = textwrap.indent(f'\ncp -r {utils.DOCKER_BASE_PATH.joinpath(args.component, cdk)} {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}', ' $ ')
+        log.error(error_msg + cmd)
+        sys.exit(1)
     if args.component == 'amster':
         amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
         log.info('Exporting amster config.')

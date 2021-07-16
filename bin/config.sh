@@ -115,7 +115,7 @@ Notice of Deprecation
     Assuming your baselines is CDK then:
       * Deploy CDK via the cdk install command
       * Make some changes via UI
-      * Run ./bin/confg export <product> <profilename> for every product that you need.
+      * Run ./bin/confg export --baseline-profile cdk <product> <profilename> for every product that you need.
       * Now follow the "How do I use a custom profile?" section
 
 
