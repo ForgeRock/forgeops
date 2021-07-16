@@ -96,8 +96,8 @@ if parsed_args.repo_name or use_default_repo:
     # Using remote configuration from a repo.
     build_config_base = build_base.joinpath('platform-config').resolve()
     build_config_base.mkdir(parents=True, exist_ok=True)
-    utils.clone_pipeline_images(
-        build_config_base, branch_name=parsed_args.branch_name)
+    utils.configure_platform_images(
+        build_config_base, ref=parsed_args.branch_name)
     # Set `etc` for the default repo. A shortcut for the common use case.
     # Profile Path must be set for none default repos.
     if use_default_repo:

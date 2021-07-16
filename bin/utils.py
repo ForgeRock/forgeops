@@ -282,28 +282,38 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
         tag_data = json.load(tag_file)['builds'][0]["tag"]
     return tag_data
 
-def clone_pipeline_images(clone_path,
-                          branch_name='master',
+def configure_platform_images(clone_path,
+                          ref='',
                           repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
     """
-    Clone pipeline images and checkout branch to the given path.
+    Clone platform images and checkout branch to the given path.
     Raise exception if not succesful
     """
     path = pathlib.Path(clone_path)
-    # check for emptydir
-    if any(path.glob('*')):
-        print('Found existing files, not cloning')
+    # handle existing config directory
+    if path.joinpath('.git').is_dir() and ref != '':
+        print('Found existing files, attempting to not clone')
+        try:
+            # capture stdout and stderr so git doesn't write to log
+            run('git', '--git-dir', str(path.joinpath('.git')), 'checkout', ref, cstdout=True, cstderr=True)
+            return
+        except:
+            print('Couldn\'t find reference. Getting fresh clone')
+            shutil.rmtree(str(path))
+    elif path.joinpath('.git').is_dir():
+        print('Using existing repo, remove it to get a fresh clone')
         return
-    status, out, err = run('git',
-                           'clone',
-                           '--depth', '1',
-                           '--branch',
-                           branch_name,
-                           repo,
-                           str(path))
-    if not status:
-        print(err)
-        raise IOError(err)
+    # some path that's not a git repo so don't do anything.
+    elif any(path.glob('*')) and not path.joinpath('.git').is_dir():
+        raise Exception('Found existing directory that is not a git repo')
+    if ref != '':
+        # clone
+        run('git', 'clone', repo, str(path))
+        # checkout
+        run('git', '--git-dir', str(path.joinpath('.git')), 'checkout', ref)
+    else:
+        # shallow setup
+        run('git', 'clone', '--depth', '1', repo, str(path))
 
 _USER_PWD_EXPR_RULES = {
     'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',

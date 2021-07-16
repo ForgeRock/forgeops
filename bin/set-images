@@ -47,10 +47,10 @@ $ ./bin/set-images
 $ ./bin/set-images --clean
 
 # Use a specific branch in platform-images
-$ ./bin/set-images --branch-name pit2-upgrade
+$ ./bin/set-images --ref pit2-upgrade
 
 # Use a specific branch in platform-images and checkout exact commit
-$ ./bin/set-images --branch-name mybranch --commit fdsf123
+$ ./bin/set-images --ref fdsf123
 
 # Use the given path to find the config and only change the am product.
 $ ./bin/set-images --config-path /tmp/mychange --products am
@@ -123,7 +123,7 @@ def run_tests(args):
 
 def func_args():
     parser = argparse.ArgumentParser(
-        description='Modify ForgeRock platform Dockerfile base images.',
+        description='Modify ForgeRock platform base images.',
         epilog=textwrap.dedent(HELP_EXAMPLES),
         # Do not wrap description and epilog.
         formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -135,14 +135,14 @@ def func_args():
                         help='Repository to pull configuration from.',
                         default=DEFAULT_REPO)
 
+    parser.add_argument('--ref',
+                        help='Git reference to use: branch, commit, or tag'),
     parser.add_argument('--branch-name',
-                        help='Name of repo branch to use.',
-                        default='master'),
+                        help='Deprecated, do not use.'),
     parser.add_argument('--commit',
-                        help=('Checkout a specific commit before loading config.'
-                              'config-path must not exist'))
+                        help='Deprecated, do not use.'),
     parser.add_argument('--force',
-                        help=('Remove existing git repo if found'),
+                        help=('Remove existing git repo before using config'),
                         default=False,
                         action='store_true')
 
@@ -187,6 +187,9 @@ def func_args():
     args = parser.parse_args()
     global log
     log = utils.logger('set-docker-image', args.log_level)
+    if args.branch_name or args.commit:
+        log.warning('Commit/Branch options now deprecated use --ref instead')
+        args.ref = args.commit if args.commit else args.branch_name
     if args.inplace:
         log.info('Updating files inplace. Not using any configuration')
         func = run_from_args
@@ -398,37 +401,23 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
 
 
 def init_repo(args):
-    """Initializes repository if required"""
+    """configure platform-images repository"""
+    # force - remove and re-setup
     if args.force and args.config_path.is_dir():
         run_clean(args)
-    if args.commit and args.config_path.is_dir():
-        log.critical(('Setting the commit requires a fresh clone, remove existing '
-                      'repository. Try using --clean'))
-        raise Exception
-    # Setup repo if need be.
-    elif not args.config_path.is_dir():
-        log.info(f'Cloning repo to {args.config_path}.')
-        log.info(f'Cloning {args.git_repo}, using branch {args.branch_name}.')
-        if args.git_repo and not args.commit:
-            utils.clone_pipeline_images(args.config_path,
-                                        branch_name=args.branch_name,
-                                        repo=args.git_repo)
 
-        if args.commit:
-            log.info(
-                f'Cloning and using branch {args.branch_name} and commit {args.commit}')
-            utils.clone_pipeline_images(args.config_path,
-                                        branch_name=args.branch_name,
-                                        repo=args.git_repo,
-                                        depth=True)
-            ok, _, err = utils.run('git',
-                                   '-C', str(args.config_path),
-                                   'checkout', args.commit)
-            if not ok:
-                log.critical(f'An error occured {err}.')
-                raise Exception
-    # Warning that we don't clone if it's there already
-    elif args.git_repo != '' and args.config_path.is_dir():
+    log.info(f'Setting repo up in {args.config_path}.')
+
+    # use a shallow clone
+    if not args.ref:
+        utils.configure_platform_images(args.config_path,
+                                        repo=args.git_repo)
+    if args.ref:
+        utils.configure_platform_images(args.config_path,
+                                        ref=args.ref,
+                                        repo=args.git_repo)
+    # dump info from repo.
+    if args.git_repo != '' and args.config_path.is_dir():
         ok, commit_hash, err = utils.run('git',
                                          'rev-parse',
                                          'HEAD',
@@ -446,9 +435,7 @@ def init_repo(args):
         if err != b'':
             log.error(f'Error when checking {args.config_path} {err.decode()}')
             raise Exception
-        log.warning(
-            f'Found existing config at {args.config_path}. Not cloning.')
-        log.warning(
+        log.info(
             (f'Repo is at {commit_hash.decode().strip()} '
              f'on branch {branch_name.decode().strip()}'))
 
@@ -482,7 +469,7 @@ def run_from_args(args):
                          update_tag=update_tag)
 
     if 'rcs-agent' in args.products:
-        cli_only = {'rcs-agent': dict() }
+        cli_only = {'rcs-agent': dict()}
         # update repo or tag to '' to force a NOOP change on component
         update_repo = args.update_repo if args.update_repo else ''
         update_tag = args.update_tag if args.update_tag else ''
@@ -494,12 +481,9 @@ def run_from_args(args):
     if args.products in DOCKER_PRODUCTS:
         cli_only = {k: dict() for k in args.products}
         update_dockerfiles(cli_only,
-                       PLATFORM_DOCKER_PATH,
-                       args.update_repo,
-                       args.update_tag)
-
-
-
+                           PLATFORM_DOCKER_PATH,
+                           args.update_repo,
+                           args.update_tag)
 
 
 def run_from_files(args):
