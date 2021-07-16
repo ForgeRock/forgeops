@@ -17,7 +17,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         node('google-cloud') {
             privateWorkspace {
                 def dockerProperties = [
-                        'gitCommit':            commonModule.FORGEOPS_GIT_COMMIT,
+                        'gitCommit':            commonModule.GIT_COMMIT,
                         'platformImagesCommit': commonModule.platformImagesRevision,
                         'lodestarCommit':       commonModule.lodestarRevision,
                 ]

@@ -16,12 +16,12 @@ import com.forgerock.pipeline.GlobalConfig
 /**
  * Globally scoped git commit information
  */
-FORGEOPS_SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnStdout: true).trim()
-FORGEOPS_GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-FORGEOPS_GIT_COMMITTER = sh(returnStdout: true, script: 'git show -s --pretty=%cn').trim()
-FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
-FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
-FORGEOPS_GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
+SHORT_GIT_COMMIT = sh(script: 'git rev-parse --short=15 HEAD', returnStdout: true).trim()
+GIT_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+GIT_COMMITTER = sh(returnStdout: true, script: 'git show -s --pretty=%cn').trim()
+GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
+GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
+GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
 /** Default platform-images tag corresponding to this branch (or the PR target branch, if this is a PR build) */
 DEFAULT_PLATFORM_IMAGES_TAG = "${isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME}-ready-for-dev-pipelines"
@@ -89,7 +89,7 @@ boolean branchSupportsIDCloudReleases() {
 
 def getCurrentProductCommitHashes() {
     return [
-            'forgeops' : commonModule.FORGEOPS_GIT_COMMIT,
+            'forgeops' : commonModule.GIT_COMMIT,
             'opendj' : getDockerImage('ds-idrepo').productCommit,
             'openig' : getDockerImage('ig').productCommit,
             'openidm' : getDockerImage('idm').productCommit,

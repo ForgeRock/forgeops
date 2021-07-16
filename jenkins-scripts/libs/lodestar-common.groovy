@@ -44,7 +44,7 @@ def getDefaultConfig(Random random, String stageName) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def randomNumber = random.nextInt(9999) + 10000 // 5 digit random number to compute to namespace
     return [STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
-            STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
+            STASH_FORGEOPS_BRANCH           : commonModule.GIT_COMMIT,
             STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
             CLUSTER_NAMESPACE               : cloud_config.spyglaasConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
             REPORT_NAME_PREFIX              : normalizedStageName,

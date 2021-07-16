@@ -36,7 +36,7 @@ def initialSteps() {
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
     bitbucketCommentId = bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
             buildStatus: 'IN PROGRESS',
-            commitHash: commonModule.FORGEOPS_GIT_COMMIT
+            commitHash: commonModule.GIT_COMMIT
     )
 
     // in order to compare the PR with the target branch, we first need to fetch the target branch
@@ -80,7 +80,7 @@ boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
 
 void buildImage(String directoryName) {
     String imageBaseName = "gcr.io/forgerock-io/${directoryName}"
-    String gitShaLabel = "${BASE_VERSION}-${commonModule.FORGEOPS_SHORT_GIT_COMMIT}" // e.g. 7.0.0-a7267fbc
+    String gitShaLabel = "${BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}" // e.g. 7.0.0-a7267fbc
 
     sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
 }
@@ -100,17 +100,18 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
         if (commonLodestarModule.doRunPostcommitTests()) {
             postcommitTestsStage.runStage(pipelineRun, random, false)
         }
+
+        commonLodestarModule.generateSummaryTestReport(prStageName)
     } catch (FlowInterruptedException exception) {
         sendBuildAbortedNotification()
         throw exception
     } catch (exception) {
         // If there is a pipeline error, or a timeout with the PIT/PERF tests, an exception is thrown.
-        sendBuildFailureNotification("PR tests failed. ${prReportMessage}")
-        throw exception
-    } finally {
         if (currentBuild.result != 'ABORTED') {
             commonLodestarModule.generateSummaryTestReport(prStageName)
         }
+        sendBuildFailureNotification("PR tests failed. ${prReportMessage}")
+        throw exception
     }
 }
 
@@ -128,7 +129,7 @@ void sendInformationMessageToPR() {
 def sendBuildAbortedNotification() {
     currentBuild.result = 'ABORTED'
     bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-            commitHash: commonModule.FORGEOPS_GIT_COMMIT,
+            commitHash: commonModule.GIT_COMMIT,
             originalCommentId: bitbucketCommentId
     )
 }
@@ -136,7 +137,7 @@ def sendBuildAbortedNotification() {
 def sendBuildFailureNotification(String messageSuffix) {
     currentBuild.result = 'FAILURE'
     bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-            commitHash: commonModule.FORGEOPS_GIT_COMMIT,
+            commitHash: commonModule.GIT_COMMIT,
             originalCommentId: bitbucketCommentId,
             messageSuffix: messageSuffix
     )
@@ -156,7 +157,7 @@ def finalNotification() {
             message = "PR tests failed."
         }
         bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-                commitHash: commonModule.FORGEOPS_GIT_COMMIT,
+                commitHash: commonModule.GIT_COMMIT,
                 originalCommentId: bitbucketCommentId,
                 messageSuffix: message
         )

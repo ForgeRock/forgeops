@@ -57,7 +57,7 @@ boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
 
 void buildImage(String directoryName) {
     String imageBaseName = "gcr.io/forgerock-io/${directoryName}"
-    String gitShaLabel = "${BASE_VERSION}-${commonModule.FORGEOPS_SHORT_GIT_COMMIT}" // e.g. 7.0.0-a7267fbc
+    String gitShaLabel = "${BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}" // e.g. 7.0.0-a7267fbc
 
     sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
     if (env.BRANCH_NAME == 'master') {

@@ -41,7 +41,7 @@ timestamps {
             commonModule = load("${libsLocation}/common.groovy")
             commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
 
-            currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
+            currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.SHORT_GIT_COMMIT}"
             currentBuild.description = 'built:'
 
             // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
@@ -57,7 +57,6 @@ timestamps {
                     prTestsStage = load("${stagesLocation}/pr-tests.groovy")
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
-                    tagReadyForDevPipelines = load("${stagesLocation}/tag-ready-for-dev-pipelines.groovy")
                     createPlatformImagesPR = load("${stagesLocation}/create-platform-images-pr.groovy")
                 }
                 // Needed both for PR and postcommit
@@ -71,18 +70,18 @@ timestamps {
 
             builder = PipelineRun.builder(env, steps)
                     .pipelineName(pipelineName)
-                    .branch(commonModule.FORGEOPS_GIT_BRANCH)
-                    .commit(commonModule.FORGEOPS_GIT_COMMIT)
-                    .committer(commonModule.FORGEOPS_GIT_COMMITTER)
-                    .commitMessage(commonModule.FORGEOPS_GIT_MESSAGE)
-                    .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.FORGEOPS_GIT_COMMITTER_DATE))
+                    .branch(commonModule.GIT_BRANCH)
+                    .commit(commonModule.GIT_COMMIT)
+                    .committer(commonModule.GIT_COMMITTER)
+                    .commitMessage(commonModule.GIT_MESSAGE)
+                    .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.GIT_COMMITTER_DATE))
                     .repo('forgeops')
 
 
             if (isPR() && prAutomation.isAutomatedPullRequest()) {
                 builder.commits(prAutomation.getPrProductCommitHashes())
             } else {
-                builder.commits(["forgeops": commonModule.FORGEOPS_GIT_COMMIT])
+                builder.commits(["forgeops": commonModule.GIT_COMMIT])
             }
             pipelineRun  = new PipelineRunLegacyAdapter(builder.build())
         }
@@ -99,7 +98,7 @@ timestamps {
         }
 
         if (isPR()) {
-            prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.FORGEOPS_GIT_COMMIT)
+            prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.GIT_COMMIT)
         } else {
             tagReadyForDevPipelines.runStage(pipelineRun)
             pipeline.createPlatformImagesPR(pipelineRun)
