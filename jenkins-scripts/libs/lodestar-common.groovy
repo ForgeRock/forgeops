@@ -9,6 +9,9 @@
 // lodestar-common.groovy
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
+import com.forgerock.pipeline.stage.Status
+import com.forgerock.pipeline.stage.Outcome
+import com.forgerock.pipeline.stage.FailureOutcome
 
 fraasProductionTag = 'fraas-production'
 
@@ -37,6 +40,7 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_ig_k8s_postcommit', defaultValue: enabled) ,
         booleanParam(name: 'Postcommit_ig_k8s_upgrade', defaultValue: enabled),
         booleanParam(name: 'Postcommit_ig_basic_perf', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_platform_ui', defaultValue: enabled),
     ]
 }
 
@@ -103,6 +107,56 @@ def generateSummaryTestReport(String stageName) {
     node('google-cloud') {
         summaryReportGen.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
                 stageName, "${stageName}.html")
+    }
+}
+
+def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
+    def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
+    def testConfig = getLodestarDockerImagesTag() + getDefaultConfig(random, stageName) + config
+    def stagesCloud = [:]
+    stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
+
+    def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
+
+    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+        node('google-cloud') {
+            stage(stageName) {
+                try {
+                    def adminImageTag
+                    privateWorkspace {
+                        checkout scm
+                        sh "git checkout ${commonModule.GIT_COMMIT}"
+
+                        // Admin UI Tag management
+                        def yamlAdminFile = 'kustomize/base/admin-ui/deployment.yaml'
+                        def adminImage = readYaml(file: yamlAdminFile).spec.template.spec.containers.image[0]
+                        Collection<String> adminImageParts = adminImage.split(':')
+                        adminImageTag = adminImageParts.last()
+                    }
+
+                    dir("platform-ui") {
+                        // Checkout Platform UI repository commit corresponding to the UI images commit promoted to Forgeops
+                        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
+                        Collection<String> adminImageTagParts = adminImageTag.split('-')
+                        def adminImagecommit = adminImageTagParts.last()
+                        sh "git checkout ${adminImagecommit}"
+                        uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
+                    }
+
+                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
+                    allStagesCloud[normalizedStageName].numFailedTests = 0
+                    allStagesCloud[normalizedStageName].reportUrl = reportUrl
+                    
+                    uiTestsStage.runTests(testConfig, normalizedStageName, normalizedStageName)
+                } catch(Exception e) {
+                    print(e.getMessage())
+                    allStagesCloud[normalizedStageName].numFailedTests = 1
+                    allStagesCloud[normalizedStageName].exception = e
+                    return new FailureOutcome(e, reportUrl)
+                }
+                return new Outcome(Status.SUCCESS, reportUrl)
+            }
+        }
     }
 }
 

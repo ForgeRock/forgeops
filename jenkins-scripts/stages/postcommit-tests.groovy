@@ -196,6 +196,18 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
             )
         }
 
+        if (params.Postcommit_platform_ui) {
+            parallelTestsMap.put('Platform UI',
+                    {
+                        commonLodestarModule.runPlatformUi(pipelineRun, random, 'Platform UI', clusterConfig +
+                                [TESTS_SCOPE: 'tests/k8s/postcommit/platform_ui',
+                                SKIP_TESTS   : 'True',
+                                SKIP_CLEANUP : 'True']
+                        )
+                    }
+            )
+        }
+
         parallel parallelTestsMap
     } catch (Exception exception) {
         println("Exception during parallel stage: ${exception}")
