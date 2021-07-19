@@ -287,34 +287,45 @@ def load_product_configs(path, product_names):
     docker_images = {}
     kustomize_images = {}
     for name in product_names:
-        if name not in DOCKER_PRODUCTS:
-            # only add config for Dockerfile's only
-            continue
-        if name == 'amster':
-            filename = 'am.json'
-        else:
-            filename = f'{name}.json'
-        p = path.joinpath(filename)
-        if p.exists():
-            with p.open() as f:
-                config = json.load(f)
-            docker_images[name] = config
+        try:
+            if name not in DOCKER_PRODUCTS:
+                # only add config for Dockerfile's only
+                continue
+            if name == 'amster':
+                filename = 'am.json'
+            else:
+                filename = f'{name}.json'
+            p = path.joinpath(filename)
+            if p.exists():
+                with p.open() as f:
+                    config = json.load(f)
+                docker_images[name] = config
+        except Exeption as e:
+            log.error(f'Repo is invalid {name}, {p}')
+            log.error(f'{e}')
+            sys.exit(1)
+    try:
+        if 'ui' in product_names:
+            p = path.joinpath('ui.json')
+            if p.exists():
+                with p.open() as f:
+                    config = json.load(f)
+                for product_name, keyname in zip(UI_PRODUCTS, UI_CONF_KEYNAME):
+                    c = config.copy()
+                    c['imageName'] = config[keyname]
+                    kustomize_images[product_name] = c
 
-    if 'ui' in product_names:
-        p = path.joinpath('ui.json')
-        if p.exists():
-            with p.open() as f:
-                config = json.load(f)
-            for product_name, keyname in zip(UI_PRODUCTS, UI_CONF_KEYNAME):
-                c = config.copy()
-                c['imageName'] = config[keyname]
-                kustomize_images[product_name] = c
-    if 'rcs-agent' in product_names:
-        p = path.joinpath('openicf-connectors.json')
-        if p.exists():
-            with p.open() as f:
-                config = json.load(f)
-            kustomize_images['rcs-agent'] = config
+        if 'rcs-agent' in product_names:
+            p = path.joinpath('openicf-connectors.json')
+            if p.exists():
+                with p.open() as f:
+                    config = json.load(f)
+                kustomize_images['rcs-agent'] = config
+    except Exception as e:
+        log.error(f'Repo is invalid {p}')
+        log.error(f'{e}')
+        sys.exit(1)
+
     return docker_images, kustomize_images
 
 
@@ -505,6 +516,7 @@ def main():
         func, args = func_args()
         func(args)
     except Exception as e:
+        __import__('ipdb').set_trace()
         print(e)
         sys.exit(1)
     sys.exit(0)

@@ -290,30 +290,38 @@ def configure_platform_images(clone_path,
     Raise exception if not succesful
     """
     path = pathlib.Path(clone_path)
+    def grun(*args, **kwargs):
+        run('git', '-C', str(path), *args, cstdout=True, cstderr=True)
+
+    git_dir = path.joinpath('.git')
     # handle existing config directory
-    if path.joinpath('.git').is_dir() and ref != '':
+    if git_dir.is_dir() and ref != '':
         print('Found existing files, attempting to not clone')
         try:
             # capture stdout and stderr so git doesn't write to log
-            run('git', '--git-dir', str(path.joinpath('.git')), 'checkout', ref, cstdout=True, cstderr=True)
+            # run('git', '-C', str(path), 'checkout', ref, cstdout=True, cstderr=True)
             return
         except:
             print('Couldn\'t find reference. Getting fresh clone')
             shutil.rmtree(str(path))
-    elif path.joinpath('.git').is_dir():
+    elif git_dir.is_dir():
         print('Using existing repo, remove it to get a fresh clone')
         return
     # some path that's not a git repo so don't do anything.
-    elif any(path.glob('*')) and not path.joinpath('.git').is_dir():
+    elif any(path.glob('*')) and not git_dir.is_dir():
         raise Exception('Found existing directory that is not a git repo')
     if ref != '':
-        # clone
-        run('git', 'clone', repo, str(path))
+        # initialize repo
+        run('git', 'init', str(path), cstdout=True, cstderr=True)
+        # add remote
+        grun('remote', 'add', 'origin', repo)
+        grun('config', '--add', 'remote.origin.fetch', '+refs/pull-requests/*/from:refs/remotes/origin/pr/*')
         # checkout
-        run('git', '--git-dir', str(path.joinpath('.git')), 'checkout', ref)
+        grun('fetch', 'origin')
+        grun('checkout', ref)
     else:
         # shallow setup
-        run('git', 'clone', '--depth', '1', repo, str(path))
+        run('git', 'clone', '--depth', '1', repo, str(path), cstdout=True, cstderr=True)
 
 _USER_PWD_EXPR_RULES = {
     'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
