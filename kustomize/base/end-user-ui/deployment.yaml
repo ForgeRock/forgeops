@@ -15,6 +15,9 @@ spec:
       containers:
       - image: gcr.io/forgerock-io/platform-enduser-ui/docker-build:7.1.0-b328bca3ad1c27013b47ec829b64bed2c95fe015
         imagePullPolicy: IfNotPresent
+        env:
+        - name: SUBFOLDER
+          value: enduser
         envFrom:
         - configMapRef:
             name: platform-config
@@ -41,4 +44,3 @@ spec:
           preStop:
             exec:
               command: ["/usr/sbin/nginx", "-s", "quit"]
-
