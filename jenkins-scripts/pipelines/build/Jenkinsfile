@@ -53,7 +53,6 @@ timestamps {
             } else {
                 if (isPR()) {
                     pipeline = load("${jobLocation}/pr.groovy")
-                    prAutomation = load("${libsLocation}/pr-automation.groovy")
                     prTestsStage = load("${stagesLocation}/pr-tests.groovy")
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
@@ -63,26 +62,16 @@ timestamps {
                 postcommitTestsStage = load("${stagesLocation}/postcommit-tests.groovy")
             }
 
-            pipelineName = 'forgeops'
-            if (isPR() && prAutomation.isAutomatedPullRequest()) {
-                pipelineName = 'forgeops-automated-pr'
-            }
-
             builder = PipelineRun.builder(env, steps)
-                    .pipelineName(pipelineName)
+                    .pipelineName('forgeops')
                     .branch(commonModule.GIT_BRANCH)
                     .commit(commonModule.GIT_COMMIT)
+                    .commits(["forgeops": commonModule.GIT_COMMIT])
                     .committer(commonModule.GIT_COMMITTER)
                     .commitMessage(commonModule.GIT_MESSAGE)
                     .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.GIT_COMMITTER_DATE))
                     .repo('forgeops')
 
-
-            if (isPR() && prAutomation.isAutomatedPullRequest()) {
-                builder.commits(prAutomation.getPrProductCommitHashes())
-            } else {
-                builder.commits(["forgeops": commonModule.GIT_COMMIT])
-            }
             pipelineRun  = new PipelineRunLegacyAdapter(builder.build())
         }
 
@@ -97,10 +86,7 @@ timestamps {
             pipeline.postBuildTests(pipelineRun)
         }
 
-        if (isPR()) {
-            prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.GIT_COMMIT)
-        } else {
-            tagReadyForDevPipelines.runStage(pipelineRun)
+        if (!isPR()) {
             pipeline.createPlatformImagesPR(pipelineRun)
         }
     }

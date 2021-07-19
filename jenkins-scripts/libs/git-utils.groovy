@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -9,16 +9,6 @@
 /*
  * Git operations used by the ForgeOps pipeline.
  */
-
-/**
- * Shallow clone a repository branch. If the branch has already been cloned, switch to it.
- *
- * @param repoUrl Url of the repository to clone.
- * @param branchName Name of the branch to clone.
- */
-void shallowCloneBranch(String repoUrl, String branchName) {
-    cloneBranch(repoUrl, branchName, true)
-}
 
 /**
  * Deep clone a repository branch. If the branch has already been cloned, switch to it.

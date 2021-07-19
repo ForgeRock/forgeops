@@ -6,7 +6,6 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-import com.forgerock.pipeline.forgeops.DockerImage
 import com.forgerock.pipeline.GlobalConfig
 
 /*
@@ -41,40 +40,6 @@ lodestarFileContent = bitbucketUtils.readFileContent(
         'lodestar.json').trim()
 lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 
-/** Docker image metadata for individual ForgeRock products. */
-dockerImages = [
-        'am'        : DockerImagePromotion.load('docker/am/Dockerfile', 'gcr.io/forgerock-io/am-base', steps),
-        'amster'    : DockerImagePromotion.load('docker/amster/Dockerfile', 'gcr.io/forgerock-io/amster', steps),
-        'ds-cts'    : DockerImagePromotion.load('docker/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'ds-util'   : DockerImagePromotion.load('docker/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'ds-idrepo' : DockerImagePromotion.load('docker/ds/idrepo/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'ds-proxy'  : DockerImagePromotion.load('docker/ds/proxy/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
-        'idm'       : DockerImagePromotion.load('docker/idm/Dockerfile', 'gcr.io/forgerock-io/idm', steps),
-        'ig'        : DockerImagePromotion.load('docker/ig/Dockerfile', 'gcr.io/forgerock-io/ig', steps),
-]
-
-productToRepo = [
-        'am' : 'openam',
-        'amster' : 'openam',
-        'ds-cts' : 'opendj',
-        'ds-util' : 'opendj',
-        'ds-idrepo' : 'opendj',
-        'ds-proxy' : 'opendj',
-        'idm' : 'openidm',
-        'ig' : 'openig',
-]
-
-DockerImagePromotion getDockerImage(String productName) {
-    if (!dockerImages.containsKey(productName)) {
-        error "No Dockerfile for image '${productName}'"
-    }
-    return dockerImages[productName]
-}
-
-String getCurrentTag(String productName) {
-    return getDockerImage(productName).tag
-}
-
 /** Does the branch support PaaS releases */
 // TODO Improve the code below to take into account new sustaining branches
 // We should only promote version >= 7.1.0
@@ -85,43 +50,6 @@ boolean branchSupportsIDCloudReleases() {
             || 'release/7.1.0' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
             || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}" == 'sustaining/7.1.x')) \
             || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}" == 'sustaining/7.1.x'))
-}
-
-def getCurrentProductCommitHashes() {
-    return [
-            'forgeops' : commonModule.GIT_COMMIT,
-            'opendj' : getDockerImage('ds-idrepo').productCommit,
-            'openig' : getDockerImage('ig').productCommit,
-            'openidm' : getDockerImage('idm').productCommit,
-            'openam' : getDockerImage('am').productCommit,
-            'lodestar' : getLodestarCommit()
-    ]
-}
-
-class DockerImagePromotion implements Serializable {
-    DockerImage dockerImage
-    String rootLevelBaseImageName
-
-    private DockerImagePromotion(DockerImage dockerImage, String rootLevelBaseImageName) {
-        this.dockerImage = dockerImage
-        this.rootLevelBaseImageName = rootLevelBaseImageName
-    }
-
-    static DockerImagePromotion load(String dockerfilePath, String rootLevelBaseImageName, def steps) {
-        return new DockerImagePromotion(DockerImage.load(dockerfilePath, steps), rootLevelBaseImageName)
-    }
-
-    String getDockerfilePath() { return dockerImage.getDockerfilePath() }
-    String getBaseImageName() { return dockerImage.getBaseImageName() }
-    String getTag() { return dockerImage.getTag() }
-    String getProductCommit() { return dockerImage.getProductCommit() }
-
-    // Overridden methods have to be annotated with @NonCPS to work properly.
-    // See https://www.jenkins.io/doc/book/pipeline/cps-method-mismatches/#overrides-of-non-cps-transformed-methods
-    @NonCPS
-    String toString() {
-        return "${dockerImage.toString()}, rootLevelBaseImageName: ${rootLevelBaseImageName}".toString()
-    }
 }
 
 return this
