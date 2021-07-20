@@ -123,24 +123,17 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
         node('google-cloud') {
             stage(stageName) {
                 try {
-                    def adminImageTag
-                    privateWorkspace {
-                        checkout scm
-                        sh "git checkout ${commonModule.GIT_COMMIT}"
-
-                        // Admin UI Tag management
-                        def yamlAdminFile = 'kustomize/base/admin-ui/deployment.yaml'
-                        def adminImage = readYaml(file: yamlAdminFile).spec.template.spec.containers.image[0]
-                        Collection<String> adminImageParts = adminImage.split(':')
-                        adminImageTag = adminImageParts.last()
-                    }
+                    def uiFileContent = bitbucketUtils.readFileContent(
+                            'cloud',
+                            'platform-images',
+                            commonModule.platformImagesRevision,
+                            'ui.json').trim()
+                    def uiTestRevision = readJSON(text: uiFileContent)['gitCommit']
 
                     dir("platform-ui") {
                         // Checkout Platform UI repository commit corresponding to the UI images commit promoted to Forgeops
                         localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
-                        Collection<String> adminImageTagParts = adminImageTag.split('-')
-                        def adminImagecommit = adminImageTagParts.last()
-                        sh "git checkout ${adminImagecommit}"
+                        sh "git checkout ${uiTestRevision}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
                     }
 
