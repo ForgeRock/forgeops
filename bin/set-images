@@ -240,6 +240,9 @@ def parse_repo_tag(image):
     else:
         name = name_and_tag[:first_colon_position]
         tag_or_digest = name_and_tag[first_colon_position:]
+    # The last bit of handle pipeline image names contain the stage.
+    if name == 'pit1':
+        host_path, name = host_path.rsplit('/', maxsplit=1)
 
     return host_path, name, tag_or_digest
 
@@ -321,10 +324,17 @@ def load_product_configs(path, product_names):
                 with p.open() as f:
                     config = json.load(f)
                 kustomize_images['rcs-agent'] = config
-        # amster images are all tagged with the same version as am-base
+        # amster images are all tagged with the same version as am-base.
+        # updating with forgeops-master doesn't use am base and am needs to be
+        # replaced
         if 'amster' in product_names:
             am_base_name = docker_images['amster']['imageName']
-            docker_images['amster']['imageName'] = am_base_name.replace('am-base', 'amster')
+            if 'am-base' in am_base_name:
+                new_name = am_base_name.replace('am-base', 'amster')
+            else:
+                new_name = am_base_name.replace('am', 'amster')
+            docker_images['amster']['imageName'] = new_name
+
     except Exception as e:
         log.error(f'Repo is invalid {p}')
         log.error(f'{e}')
@@ -357,7 +367,7 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
         else:
             new_tag = f':{product_config["imageTag"]}'
         # Make sure that the image and tag have a value.
-        kustomize_set_image = f'.*{product_name}-ui.*={new_image_name}{new_tag}'
+        kustomize_set_image = f'.*{product_name}.*={new_image_name}{new_tag}'
         log.info(f'Updating {kustomize_dir} to use {new_image_name}{new_tag}')
 
         success, _, _ = utils.run('kustomize',
@@ -493,9 +503,9 @@ def run_from_args(args):
                          update_repo=update_repo,
                          update_tag=update_tag)
 
-    if args.products in DOCKER_PRODUCTS:
-        cli_only = {k: dict() for k in args.products}
-        update_dockerfiles(cli_only,
+    cli_only_docker = {k: dict() for k in args.products if k in DOCKER_PRODUCTS}
+    if len(cli_only_docker) > 0:
+        update_dockerfiles(cli_only_docker,
                            PLATFORM_DOCKER_PATH,
                            args.update_repo,
                            args.update_tag)

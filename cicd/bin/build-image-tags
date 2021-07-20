@@ -40,13 +40,13 @@ EOF
     && { . ${SCRIPT_DIR}/lib-git-auth.sh \
         || { echo "failed to configure credentials" && exit 1; };}
 
-
-if ! ${REPO_DIR}/bin/platform-config --profile-name "${PROFILE_NAME}";
+# Use platform-images but the latest postcommit
+if ! ${REPO_DIR}/bin/set-images;
 then
-    echo "failed to build config"
-    exit 1
+    echo "failed to set base images for build"
 fi
 
+export CONFIG_PROFILE=${PROFILE}
 if ! (cd ${REPO_DIR}; skaffold --filename skaffold.yaml \
                                --profile docker-image-tag \
                                --default-repo "${REPO}" \

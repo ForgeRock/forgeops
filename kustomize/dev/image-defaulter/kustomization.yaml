@@ -7,31 +7,19 @@ images:
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
   newName: gcr.io/forgeops-public/am
-  newTag: latest
+  newTag: dev
 - name: .*amster.*
   newName: gcr.io/forgeops-public/amster
-  newTag: latest
+  newTag: dev
 - name: .*idm
   newName: gcr.io/forgeops-public/idm
-  newTag: latest
-- name: .*rcs-agent.*
-  newName: gcr.io/forgeops-public/rcs-agent
-  newTag: latest
+  newTag: dev
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
-  newTag: latest
+  newTag: dev
 - name: .*ds-idrepo.*
   newName: gcr.io/forgeops-public/ds-idrepo
-  newTag: latest
-- name: .*admin-ui.*
-  newName: gcr.io/forgerock-io/platform-admin-ui/docker-build
-  newTag: 7.2.0-postcommit-latest
-- name: .*enduser-ui.*
-  newName: gcr.io/forgerock-io/platform-enduser-ui/docker-build
-  newTag: 7.2.0-postcommit-latest
-- name: .*login-ui.*
-  newName: gcr.io/forgerock-io/platform-login-ui/docker-build
-  newTag: 7.2.0-postcommit-latest
+  newTag: dev
 - name: .*ig.*
   newName: gcr.io/forgeops-public/ig
-  newTag: latest
+  newTag: dev

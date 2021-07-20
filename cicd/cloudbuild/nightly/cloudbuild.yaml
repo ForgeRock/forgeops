@@ -12,20 +12,8 @@ steps:
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
-  id: build-images
-  waitFor: ['authenticate']
-  args:
-    - -c
-    - |-
-      ./bin/config.sh add
-      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO --tag dev
-      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO --tag latest
-      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
-
-- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
-  entrypoint: bash
   id: nuke-environment
-  waitFor: ['build-images']
+  waitFor: ['authenticate']
   args:
     - -c
     - |-

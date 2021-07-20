@@ -1,0 +1,19 @@
+timeout: 900s
+options:
+  env:
+    - REPO=gcr.io/forgeops-public
+    - PROFILE_NAME=cdk
+steps:
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  secretEnv:
+  - 'GIT_KEY'
+  args:
+    - -c
+    - |-
+      IMAGE_TAG=dev ./cicd/bin/build-image-tags
+      IMAGE_TAG=latest ./cicd/bin/build-image-tags
+availableSecrets:
+  secretManager:
+    - versionName: projects/427458503412/secrets/cloudbuild-platform-config-ssh-key/versions/latest
+      env: 'GIT_KEY'
