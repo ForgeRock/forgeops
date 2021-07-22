@@ -321,6 +321,10 @@ def load_product_configs(path, product_names):
                 with p.open() as f:
                     config = json.load(f)
                 kustomize_images['rcs-agent'] = config
+        # amster images are all tagged with the same version as am-base
+        if 'amster' in product_names:
+            am_base_name = docker_images['amster']['imageName']
+            docker_images['amster']['imageName'] = am_base_name.replace('am-base', 'amster')
     except Exception as e:
         log.error(f'Repo is invalid {p}')
         log.error(f'{e}')
@@ -516,7 +520,6 @@ def main():
         func, args = func_args()
         func(args)
     except Exception as e:
-        __import__('ipdb').set_trace()
         print(e)
         sys.exit(1)
     sys.exit(0)
