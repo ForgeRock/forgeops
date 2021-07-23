@@ -109,7 +109,7 @@ patchesStrategicMerge:
             resources:
               requests:
                 memory: 21Gi
-                cpu: 4000m
+                cpu: 8000m
               limits:
                 memory: 29Gi
     volumeClaimTemplates:
