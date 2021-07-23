@@ -1,4 +1,4 @@
-FROM gcr.io/forgeops-public/am:dev
+FROM gcr.io/forgerock-io/am-base/pit1:7.2.0-latest-postcommit
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive

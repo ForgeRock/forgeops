@@ -1,4 +1,4 @@
-FROM gcr.io/forgeops-public/amster:dev
+FROM gcr.io/forgerock-io/amster/pit1:7.2.0-latest-postcommit
 
 USER root
 
