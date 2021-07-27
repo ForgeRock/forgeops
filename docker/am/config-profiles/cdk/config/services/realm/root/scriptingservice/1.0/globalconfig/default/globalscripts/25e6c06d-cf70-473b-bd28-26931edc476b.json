@@ -3,7 +3,7 @@
     "realm" : null,
     "entityType" : "ScriptingService",
     "entityId" : "default/globalScripts/25e6c06d-cf70-473b-bd28-26931edc476b",
-    "uid" : "ou=25e6c06d-cf70-473b-bd28-26931edc476b,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,dc=openam,dc=forgerock,dc=org",
+    "uid" : "ou=25e6c06d-cf70-473b-bd28-26931edc476b,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
     "sunServiceID" : "globalScript",
     "objectClass" : [ "top", "sunServiceComponent" ],
     "pathParams" : { },
