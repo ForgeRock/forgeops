@@ -169,7 +169,7 @@ metadata:
   name: fast
 parameters:
   type: pd-ssd
-provisioner: kubernetes.io/gce-pd
+provisioner: pd.csi.storage.gke.io
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
 EOF
