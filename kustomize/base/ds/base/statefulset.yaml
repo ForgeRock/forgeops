@@ -52,7 +52,7 @@ spec:
       initContainers:
       - name: initialize
         image: ds
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command: ["/opt/opendj/scripts/init-and-restore.sh"]
         volumeMounts:
         - name: data
@@ -99,6 +99,7 @@ spec:
       containers:
       - name: ds
         image: ds
+        imagePullPolicy: Always
         args:
         - start-ds
         env:

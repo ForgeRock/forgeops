@@ -24,7 +24,7 @@ spec:
         - secretRef:
             name: ds-env-secrets
         image: amster
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: amster
         resources:
           limits:
@@ -45,7 +45,7 @@ spec:
       containers:
       - name: pause
         image: amster
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         args:  ["bash", "-c", "sleep 10"]
         volumeMounts:
         - mountPath: /var/tmp/amster

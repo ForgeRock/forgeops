@@ -16,6 +16,7 @@ spec:
       initContainers:
       - name: fbc-init
         image: idm
+        imagePullPolicy: Always
         volumeMounts:
         - mountPath: /fbc
           name: fbc
@@ -33,6 +34,7 @@ spec:
           fi
       - name: truststore-init
         image: idm
+        imagePullPolicy: Always
         volumeMounts:
         - name: new-truststore
           mountPath: /truststore
@@ -49,7 +51,7 @@ spec:
       containers:
       - name: openidm
         image: idm
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: NAMESPACE
           valueFrom:

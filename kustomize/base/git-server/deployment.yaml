@@ -18,7 +18,7 @@ spec:
       containers:
       - name: git-server
         image: git-server
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         resources:
           limits:
             memory: "128Mi"

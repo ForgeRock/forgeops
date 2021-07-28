@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - image: login-ui
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: SUBFOLDER
           value: "am/XUI"

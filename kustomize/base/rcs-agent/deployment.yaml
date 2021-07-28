@@ -27,7 +27,7 @@ spec:
             - secretRef:
                 name: rcs-agent-env-secrets
           image: rcs-agent
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: rcs-agent
           ports:
             - name: rcs-agent-port

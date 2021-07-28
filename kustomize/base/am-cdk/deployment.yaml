@@ -24,6 +24,7 @@ spec:
       # This is most useful in development environments, so users do not lose their changes if the pod restarts.
       - name: fbc-init
         image: am
+        imagePullPolicy: Always
         volumeMounts:
         - mountPath: /fbc
           name: fbc
@@ -41,6 +42,7 @@ spec:
           fi
       - name: truststore-init
         image: am
+        imagePullPolicy: Always
         volumeMounts:
         - name: new-truststore
           mountPath: /truststore
@@ -57,7 +59,7 @@ spec:
       containers:
       - name: openam
         image: am
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         command:
           - bash
           - /home/forgerock/docker-entrypoint.sh

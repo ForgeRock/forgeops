@@ -464,15 +464,15 @@ def copytree(src, dst):
 
 
 # IF ns is not None, then return it, otherwise lookup the current namespace context
-def get_namespace(ns):
+def get_namespace(ns=None):
     if ns != None:
         return ns
+    _, ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    return ctx_namespace.decode('ascii') if ctx_namespace else 'default'
 
-    r = subprocess.run(f"kubectl config view --minify --output jsonpath='{{..namespace}}'", shell=True, capture_output=True)
-    if r.returncode != 0:
-        print(f'Can not not run kubectl to get the current namespace {r.stderr} : {r.stdout}')
-        sys.exit(1)
-    return r.stdout.decode("utf-8")
+def get_context():
+    _, ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
+    return ctx.decode('ascii') if ctx else 'default'
 
 # Lookup the value of a configmap key
 def get_configmap_value(namespace, configmap, key):

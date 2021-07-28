@@ -38,7 +38,7 @@ def deploy_repo_manifest(component, ns, tag, fqdn):
         print(f'Could not deploy {component_url}. Got: {e}')
         sys.exit(1)  # Hide python traceback. kubectl error should be enough here
 
-def deploy_local_manifest(component, ns, fqdn):
+def deploy_local_manifest(component, ns, fqdn, ctx):
     """Deploy local component (local mode)"""
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
@@ -54,18 +54,20 @@ def deploy_local_manifest(component, ns, fqdn):
         contents = contents.decode('ascii')
         contents = contents.replace('namespace: default', f'namespace: {ns}')
         contents = contents.replace('default.iam.example.com', f'{fqdn}')
+        if ctx.lower() == 'minikube':
+            contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
         utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
     finally:
         # Clean out the temp kustomize files
         utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
                 cwd=image_defaulter)
 
-def deploy_component(component, ns, fqdn, tag):
+def deploy_component(component, ns, fqdn, tag, ctx):
     """Deploy the Component manifest"""
     if tag:
         deploy_repo_manifest(component, ns, tag, fqdn)
         return
-    deploy_local_manifest(component, ns, fqdn)
+    deploy_local_manifest(component, ns, fqdn, ctx)
 
 def uninstall_component(component, ns):
     """Uninstall a manifest"""
@@ -98,17 +100,17 @@ def uninstall_component(component, ns):
         utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
                 cwd=image_defaulter)
 
-def deploy_quickstart(ns, fqdn, tag):
+def deploy_quickstart(ns, fqdn, tag, ctx):
     """Deploy the quickstart"""
     utils.message('Deploying base.yaml. This is a one time activity.')
-    deploy_component('base', ns, fqdn, tag)
+    deploy_component('base', ns, fqdn, tag, ctx)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
-    deploy_component('ds', ns, fqdn, tag)
+    deploy_component('ds', ns, fqdn, tag, ctx)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_ds(ns, 'ds-idrepo')
     utils.message('\nDeploying apps.')
-    deploy_component('apps', ns, fqdn, tag)
+    deploy_component('apps', ns, fqdn, tag, ctx)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
@@ -119,7 +121,7 @@ def deploy_quickstart(ns, fqdn, tag):
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
     utils.message('\nDeploying UI.')
-    deploy_component('ui', ns, fqdn, tag)
+    deploy_component('ui', ns, fqdn, tag, ctx)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -191,10 +193,11 @@ def main():
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
 
-    _, ctx_namespace, _ = utils.run('kubectl',
-                                    'config view --minify --output=jsonpath={..namespace}', cstdout=True)
-    ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
-    namespace = getattr(args, 'namespace', None) or ctx_namespace
+    if args.cmd != 'build':
+        ctx_namespace = utils.get_namespace()
+        ctx = utils.get_context()
+        namespace = getattr(args, 'namespace', None) or ctx_namespace
+
     components = args.components if getattr(args, 'components', None) else ['quickstart']
     fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
     if args.cmd == 'info':
@@ -231,10 +234,10 @@ def main():
     utils.install_dependencies()
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
-        deploy_quickstart(namespace, fqdn, None)
+        deploy_quickstart(namespace, fqdn, None, ctx)
     else:
         for c in components:
-            deploy_component(c, namespace, fqdn, None)
+            deploy_component(c, namespace, fqdn, None, ctx)
 
     if args.cmd == 'install' and ('base' in components or 'quickstart' in components):
         utils.waitforsecrets(namespace)
