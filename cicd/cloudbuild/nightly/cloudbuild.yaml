@@ -2,7 +2,7 @@ timeout: 900s
 options:
   env:
     - NAMESPACE=nightly
-    - DEFAULT_DOCKER_REPO=gcr.io/forgeops-public
+    - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
 
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -12,8 +12,21 @@ steps:
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
-  id: nuke-environment
+  id: build-images
   waitFor: ['authenticate']
+  secretEnv:
+    - "GIT_KEY"
+  args:
+    - -c
+    - |-
+      . ./cicd/bin/lib-git-auth.sh || { echo "failed to configure credentials" && exit 1; }
+      ./bin/set-images
+      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
+
+- name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+  entrypoint: bash
+  id: nuke-environment
+  waitFor: ['build-images']
   args:
     - -c
     - |-
@@ -41,7 +54,7 @@ steps:
   entrypoint: bash
   id: slack-notify
   waitFor: ['smoke-tests']
-  secretEnv: ['SLACK_WEBHOOK_URL']
+  secretEnv: ['SLACK_WEBHOOK_URL', 'SLACK_FAILED_WEBHOOK_URL']
   args:
     - -c
     - |-
@@ -51,3 +64,7 @@ availableSecrets:
   secretManager:
     - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly/versions/latest
       env: 'SLACK_WEBHOOK_URL'
+    - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly_team/versions/latest
+      env: 'SLACK_FAILED_WEBHOOK_URL'
+    - versionName: projects/$PROJECT_NUMBER/secrets/cloudbuild-platform-config-ssh-key/versions/latest
+      env: 'GIT_KEY'
