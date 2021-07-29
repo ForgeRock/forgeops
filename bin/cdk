@@ -197,9 +197,9 @@ def main():
         ctx_namespace = utils.get_namespace()
         ctx = utils.get_context()
         namespace = getattr(args, 'namespace', None) or ctx_namespace
+        fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
 
     components = args.components if getattr(args, 'components', None) else ['quickstart']
-    fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
     if args.cmd == 'info':
         utils.printsecrets(namespace)
         utils.printurls(namespace)
