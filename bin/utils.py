@@ -26,7 +26,7 @@ log_name = 'foregops'
 
 DOCKER_REGEX_NAME = {
     'am': '.*am',
-    'amster' : '.*amster.*',
+    'amster': '.*amster.*',
     'idm': '.*idm',
     'ds-idrepo': '.*ds-idrepo.*',
     'ds-cts': '.*ds-cts.*',
@@ -40,7 +40,9 @@ DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
 KUSTOMIZE_BASE_PATH = REPO_BASE_PATH.joinpath('kustomize').resolve()
 
 
-class RunError(subprocess.CalledProcessError): pass
+class RunError(subprocess.CalledProcessError):
+    pass
+
 
 def loglevel(name):
     try:
@@ -48,23 +50,36 @@ def loglevel(name):
     except AttributeError:
         raise ValueError('Not a log level')
 
+
 def add_loglevel_arg(parser):
     parser.add_argument('--log-level',
-                    default='INFO',
-                    type=loglevel)
+                        default='INFO',
+                        type=loglevel)
+
 
 class ColorFormatter(logging.Formatter):
     """Logging color"""
-    FORMATS = {
+    TTY_FORMATS = {
         logging.DEBUG: f'{CYAN}{MSG_FMT}{ENDC}',
         logging.INFO: f'{CYAN}{MSG_FMT}{ENDC}',
         logging.WARNING: f'{PURPLE}{MSG_FMT}{ENDC}',
         logging.ERROR: f'{RED}{MSG_FMT}{ENDC}',
         logging.CRITICAL: f'{RED}{MSG_FMT}{ENDC}',
     }
+    NON_TTY_FORMATS = {
+        logging.DEBUG: f'{MSG_FMT}',
+        logging.INFO: f'{MSG_FMT}',
+        logging.WARNING: f'{MSG_FMT}',
+        logging.ERROR: f'{MSG_FMT}',
+        logging.CRITICAL: f'{MSG_FMT}',
 
+
+    }
     def format(self, record):
-        log_fmt = self.FORMATS.get(record.levelno)
+        if not sys.stdout.isatty():
+            log_fmt = self.NON_TTY_FORMATS.get(record.levelno)
+        else:
+            log_fmt = self.TTY_FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         formatter.datefmt = '%Y-%m-%dT%H:%M:%S%z'
         return formatter.format(record)
@@ -121,13 +136,14 @@ def _waitforsecret(ns, secret_name):
             time.sleep(1)
             continue
 
+
 def _waitfords(ns, ds_name):
     print(f'Waiting for Service Account Password Update: .', end='')
     sys.stdout.flush()
     while True:
         try:
             _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
-                             cstderr=True, cstdout=True)
+                                 cstderr=True, cstdout=True)
             if len(valuestr) > 0:
                 print('done')
                 break
@@ -138,6 +154,7 @@ def _waitfords(ns, ds_name):
             time.sleep(1)
             continue
 
+
 def _runwithtimeout(target, args, secs):
     t = Thread(target=target, args=args)
     t.start()
@@ -145,6 +162,7 @@ def _runwithtimeout(target, args, secs):
     if t.is_alive():
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
+
 
 def waitforsecrets(ns):
     """Wait for the given secrets to exist in the Kubernetes api."""
@@ -154,10 +172,13 @@ def waitforsecrets(ns):
     for secret in secrets:
         _runwithtimeout(_waitforsecret, [ns, secret], 60)
 
+
 def wait_for_ds(ns, directoryservices_name):
     """Wait for DS pods to be ready after ds-operator deployment"""
-    run('kubectl', f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
+    run('kubectl',
+        f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
+
 
 def getsec(ns, secret, secretKey):
     """Get secret contents"""
@@ -165,6 +186,7 @@ def getsec(ns, secret, secretKey):
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{secretKey}}}', cstdout=True)
     _, pipe, _ = run('base64', '--decode', cstdout=True, stdin=pipe)
     return pipe.decode('ascii')
+
 
 def printsecrets(ns):
     """Print relevant platform secrets"""
@@ -198,12 +220,13 @@ def printurls(ns):
     warning(f'https://{fqdn}/am')
     warning(f'https://{fqdn}/enduser')
 
+
 def install_dependencies():
     """Check and install dependencies"""
     print('Checking secret-agent operator and related CRDs:', end=' ')
     try:
         run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
-                  cstderr=True, cstdout=True)
+            cstderr=True, cstdout=True)
     except Exception as _e:
         warning('secret-agent CRD not found. Installing secret-agent.')
         secretagent('apply')
@@ -212,13 +235,15 @@ def install_dependencies():
 
     print('Checking ds-operator and related CRDs:', end=' ')
     try:
-        run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
+        run('kubectl', 'get crd directoryservices.directory.forgerock.io',
+            cstderr=True, cstdout=True)
     except Exception:
         warning('ds-operator CRD not found. Installing ds-operator.')
         dsoperator('apply')
     else:
         message('ds-operator CRD found in cluster.')
     print()
+
 
 def secretagent(k8s_op, tag='latest'):
     """Check and install secret-agent"""
@@ -259,6 +284,7 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
+
 def build_docker_image(component, default_repo, tag, config_profile=None):
     """Builds custom docker images. Returns the tag of the built image"""
     # Clean out the temp kustomize files
@@ -277,20 +303,23 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
     if config_profile:
         envVars = os.environ
         envVars['CONFIG_PROFILE'] = str(config_profile)
-    run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd} {tag_cmd}', cwd=base_dir, env=envVars)
+    run('skaffold',
+        f'build -p {component} --file-output=tag.json {default_repo_cmd} {tag_cmd}', cwd=base_dir, env=envVars)
     with open(os.path.join(base_dir, 'tag.json')) as tag_file:
         tag_data = json.load(tag_file)['builds'][0]["tag"]
     return tag_data
 
+
 def configure_platform_images(clone_path,
-                          ref='',
-                          repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
+                              ref='',
+                              repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
     """
     Clone platform images and checkout branch to the given path.
     Raise exception if not succesful
     """
     log = logger()
     path = pathlib.Path(clone_path)
+
     def grun(*args, **kwargs):
         run('git', '-C', str(path), *args, cstdout=True, cstderr=True)
 
@@ -300,7 +329,8 @@ def configure_platform_images(clone_path,
         log.info('Found existing files, attempting to not clone')
         try:
             # capture stdout and stderr so git doesn't write to log
-            run('git', '-C', str(path), 'checkout', ref, cstdout=True, cstderr=True)
+            run('git', '-C', str(path), 'checkout',
+                ref, cstdout=True, cstderr=True)
             return
         except:
             log.error('Couldn\'t find reference. Getting fresh clone')
@@ -317,13 +347,15 @@ def configure_platform_images(clone_path,
             run('git', 'init', str(path), cstdout=True, cstderr=True)
             # add remote
             grun('remote', 'add', 'origin', repo)
-            grun('config', '--add', 'remote.origin.fetch', '+refs/pull-requests/*/from:refs/remotes/origin/pr/*')
+            grun('config', '--add', 'remote.origin.fetch',
+                 '+refs/pull-requests/*/from:refs/remotes/origin/pr/*')
             # checkout
             grun('fetch', 'origin')
             grun('checkout', ref)
         else:
             # shallow setup
-            run('git', 'clone', '--depth', '1', repo, str(path), cstdout=True, cstderr=True)
+            run('git', 'clone', '--depth', '1', repo,
+                str(path), cstdout=True, cstderr=True)
     except RunError as e:
         log.error(f'Couldn\'t configure repo running {e.cmd} {e.output}')
         raise e
@@ -340,6 +372,7 @@ _USER_PWD_EXPR_RULES = {
     'ig-agent.json': '&{ig.agent.password|password}',
 }
 ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
+
 
 def _convert_path_to_common_exp(path):
     """
@@ -401,8 +434,8 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
                 # log.debug(f'Updated {conf_file_name.name}')
             except KeyError:
                 log.info(
-                     (f'A userpassword key found in {conf_file_name} '
-                      'but no replacement rule was found, using default'))
+                    (f'A userpassword key found in {conf_file_name} '
+                     'but no replacement rule was found, using default'))
                 conf[k] = _convert_path_to_common_exp(conf_file_name)
                 log.info(f'{conf_file_name} has password changed to {conf[k]}')
         # update amster version
@@ -477,7 +510,8 @@ def get_context():
 # Lookup the value of a configmap key
 def get_configmap_value(namespace, configmap, key):
     ks = "{.data." + key + "}"
-    r = subprocess.run(f'kubectl --namespace {namespace} get configmap {configmap} -o jsonpath={ks}', shell=True, capture_output=True)
+    r = subprocess.run(
+        f'kubectl --namespace {namespace} get configmap {configmap} -o jsonpath={ks}', shell=True, capture_output=True)
     if r.returncode != 0:
         print(f'Kubectl error {r.stderr} : {r.stdout}')
         sys.exit(1)
@@ -487,11 +521,12 @@ def get_configmap_value(namespace, configmap, key):
 # Lookup the value of a secret
 def get_secret_value(namespace, secret, key):
     ks = "{.data." + key + "}"
-    r = subprocess.run(f'kubectl --namespace {namespace} get secret {secret} -o jsonpath={ks}', shell=True, capture_output=True)
+    r = subprocess.run(
+        f'kubectl --namespace {namespace} get secret {secret} -o jsonpath={ks}', shell=True, capture_output=True)
     if r.returncode != 0:
         print(f'Kubectl error {r.stderr} : {r.stdout}')
         sys.exit(1)
 
-         # base64 decode the secret
+        # base64 decode the secret
     secret = base64.b64decode(r.stdout.decode("utf-8"))
     return secret

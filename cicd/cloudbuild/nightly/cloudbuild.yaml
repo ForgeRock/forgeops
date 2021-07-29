@@ -3,6 +3,7 @@ options:
   env:
     - NAMESPACE=nightly
     - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
+    - SET_IMAGES_LOG=/workspace/set_log.txt
 
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -20,7 +21,8 @@ steps:
     - -c
     - |-
       . ./cicd/bin/lib-git-auth.sh || { echo "failed to configure credentials" && exit 1; }
-      ./bin/set-images
+      # used for slack notification
+      ./bin/set-images > $$SET_IMAGES_LOG
       ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
