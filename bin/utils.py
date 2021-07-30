@@ -13,6 +13,7 @@ import base64
 import logging
 import json
 import re
+import pkg_resources
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -31,6 +32,17 @@ DOCKER_REGEX_NAME = {
     'ds-idrepo': '.*ds-idrepo.*',
     'ds-cts': '.*ds-cts.*',
     'ig': '.*ig.*'
+}
+
+REQ_OPERATOR_VERSIONS ={
+    'ds-operator': {
+        'MIN': 'v0.0.8',
+        'MAX': 'v100',
+    },
+    'secret-agent': {
+        'MIN': 'v1.1.1',
+        'MAX': 'v100',
+    },
 }
 
 SCRIPT = pathlib.Path(__file__)
@@ -221,6 +233,16 @@ def printurls(ns):
     warning(f'https://{fqdn}/enduser')
 
 
+def _check_operator_version(operator, version):
+
+    version = pkg_resources.parse_version(version)
+    version_max = pkg_resources.parse_version(REQ_OPERATOR_VERSIONS[operator]['MAX'])
+    version_min = pkg_resources.parse_version(REQ_OPERATOR_VERSIONS[operator]['MIN'])
+    if not version_min <= version <= version_max:
+        error(f'Unsupported {operator} version found: "{version}"')
+        message(f'Need {operator} versions: {version_min} <= X <= {version_max}')
+        sys.exit(1)
+
 def install_dependencies():
     """Check and install dependencies"""
     print('Checking secret-agent operator and related CRDs:', end=' ')
@@ -233,6 +255,10 @@ def install_dependencies():
     else:
         message('secret-agent CRD found in cluster.')
 
+    _, img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+        cstderr=True, cstdout=True)
+    _check_operator_version('secret-agent', img.decode('ascii').split(':')[1])
+
     print('Checking ds-operator and related CRDs:', end=' ')
     try:
         run('kubectl', 'get crd directoryservices.directory.forgerock.io',
@@ -242,6 +268,10 @@ def install_dependencies():
         dsoperator('apply')
     else:
         message('ds-operator CRD found in cluster.')
+
+    _, img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
+        cstderr=True, cstdout=True)
+    _check_operator_version('ds-operator', img.decode('ascii').split(':')[1])
     print()
 
 
