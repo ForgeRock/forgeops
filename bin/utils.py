@@ -7,6 +7,7 @@ import pathlib
 from threading import Thread
 import os
 import shutil
+import pkg_resources
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -14,6 +15,17 @@ RED = '\033[1;91m'
 ENDC = '\033[0m'
 
 _IGNORE_FILES = ('.DS_Store',)
+
+REQ_OPERATOR_VERSIONS ={
+    'ds-operator': {
+        'MIN': 'v0.0.8',
+        'MAX': 'v0.0.8',
+    },
+    'secret-agent': {
+        'MIN': 'v1.0.5',
+        'MAX': 'v100',
+    },
+}
 
 def message(s):
     """Print info message"""
@@ -131,6 +143,48 @@ def printurls(ns):
     warning(f'https://{fqdn}/admin')
     warning(f'https://{fqdn}/am')
     warning(f'https://{fqdn}/enduser')
+
+
+def _check_operator_version(operator, version):
+
+    version = pkg_resources.parse_version(version)
+    version_max = pkg_resources.parse_version(REQ_OPERATOR_VERSIONS[operator]['MAX'])
+    version_min = pkg_resources.parse_version(REQ_OPERATOR_VERSIONS[operator]['MIN'])
+    if not version_min <= version <= version_max:
+        error(f'Unsupported {operator} version found: "{version}"')
+        message(f'Need {operator} versions: {version_min} <= X <= {version_max}')
+        sys.exit(1)
+
+def install_dependencies():
+    """Check and install dependencies"""
+    print('Checking secret-agent operator and related CRDs:', end=' ')
+    try:
+        run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
+            cstderr=True, cstdout=True)
+    except Exception as _e:
+        warning('secret-agent CRD not found. Installing secret-agent.')
+        secretagent('apply', tag='v1.0.5')
+    else:
+        message('secret-agent CRD found in cluster.')
+
+    _, img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+        cstderr=True, cstdout=True)
+    _check_operator_version('secret-agent', img.decode('ascii').split(':')[1])
+
+    print('Checking ds-operator and related CRDs:', end=' ')
+    try:
+        run('kubectl', 'get crd directoryservices.directory.forgerock.io',
+            cstderr=True, cstdout=True)
+    except Exception:
+        warning('ds-operator CRD not found. Installing ds-operator.')
+        dsoperator('apply', tag='v0.0.8')
+    else:
+        message('ds-operator CRD found in cluster.')
+
+    _, img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
+        cstderr=True, cstdout=True)
+    _check_operator_version('ds-operator', img.decode('ascii').split(':')[1])
+    print()
 
 
 def secretagent(k8s_op, tag='latest'):

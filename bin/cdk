@@ -145,28 +145,6 @@ def overlay_app_configs(ns, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
 
-def install_dependencies():
-    """Check and install dependencies"""
-    print('Checking secret-agent operator and related CRDs:', end=' ')
-    try:
-        utils.run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
-                  cstderr=True, cstdout=True)
-    except Exception as _e:
-        utils.warning('secret-agent CRD not found. Installing secret-agent.')
-        utils.secretagent('apply', tag='v1.0.5')
-    else:
-        utils.message('secret-agent CRD found in cluster.')
-
-    print('Checking ds-operator and related CRDs:', end=' ')
-    try:
-        utils.run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
-    except Exception:
-        utils.warning('ds-operator CRD not found. Installing ds-operator.')
-        utils.dsoperator('apply', tag='v0.0.8')
-    else:
-        utils.message('ds-operator CRD found in cluster.')
-    print()
-
 def build_docker_image(component, default_repo):
     """Builds custom docker images"""
     # Clean out the temp kustomize files
@@ -250,7 +228,7 @@ def main():
         for c in components:
             build_docker_image(c, args.registry)
         return
-    install_dependencies()
+    utils.install_dependencies()
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
         deploy_quickstart(namespace, fqdn, None)
