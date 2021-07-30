@@ -187,7 +187,8 @@ def build_docker_image(component, default_repo):
         'amster' : '.*amster.*',
         'idm': '.*idm',
         'ds-idrepo': '.*ds-idrepo.*',
-        'ds-cts': '.*ds-cts.*'
+        'ds-cts': '.*ds-cts.*',
+        'ig': '.*ig.*'
     }
     name = regex_name.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
@@ -199,7 +200,7 @@ def main():
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
     common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
-                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'rcs-agent', []])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
@@ -213,7 +214,7 @@ def main():
     parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
     parser_build = subparser.add_parser('build', help='Build custom docker images')
-    parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts'])
+    parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig'])
     parser_build.add_argument('-r', '--default-repo', dest='registry')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')

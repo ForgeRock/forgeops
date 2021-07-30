@@ -32,3 +32,6 @@ images:
 - name: .*login-ui.*
   newName: gcr.io/forgerock-io/platform-login-ui
   newTag: 7.1.0
+- name: .*ig.*
+  newName: gcr.io/forgeops-public/ig
+  newTag: 7.1.0
