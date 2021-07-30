@@ -228,6 +228,8 @@ def main():
             return
         if 'all' in components:
             components = build_targets
+        if 'amster' in components:
+            utils. error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
         for c in components:
             build_docker_image(c, args.registry, args.tag, args.config_profile)
         return
