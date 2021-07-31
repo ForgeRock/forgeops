@@ -109,15 +109,44 @@ spec:
         path: /am/XUI
         pathType: Prefix
 
-      - backend:
-          service:
-            name: ig
-            port:
-              number: 80
-        path: /ig
-        pathType: Prefix
+
+      # TODO: use this once IG routes have been updated
+      # - backend:
+      #     service:
+      #       name: ig
+      #       port:
+      #         number: 8080
+      #   path: /ig
+      #   pathType: Prefix
 
   tls:
   - hosts:
     - $(FQDN)
     secretName: sslcert
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ig-web
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+    cert-manager.io/cluster-issuer: $(CERT_ISSUER)
+
+spec:
+  tls:
+  - hosts:
+    - $(FQDN)
+    secretName: sslcert
+  rules:
+  - host: $(FQDN)
+    http:
+      paths:
+      - backend:
+          service:
+            name: ig
+            port:
+              number: 8080
+        path: /ig(/|$)(.*)
+        pathType: Prefix
