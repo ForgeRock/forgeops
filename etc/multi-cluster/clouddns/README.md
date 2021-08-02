@@ -5,7 +5,7 @@
 Doc: https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns#enabling_scope_dns_in_a_new_cluster  
 
 ## Overview
-This guide explains how to deploy DS in 2 different regions on GKE, using one cluster in the US and one cluster in Europe.
+This guide explains how to deploy DS across 2 different GKE clusters, using one cluster in the US and one cluster in Europe.
 For different cluster names, just replace *eu* and *us* in the various files mentioned in the setup steps below .
 
 There are 4 major steps to the deployment:

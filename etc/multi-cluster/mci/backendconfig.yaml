@@ -1,0 +1,59 @@
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: am
+  labels:
+    app: am
+    app.kubernetes.io/component: am
+    app.kubernetes.io/instance: am
+    app.kubernetes.io/name: am
+    app.kubernetes.io/part-of: forgerock
+spec:
+  healthCheck:
+    checkIntervalSec: 5
+    timeoutSec: 5
+    # healthyThreshold: [int]
+    # unhealthyThreshold: [int]
+    type: HTTP
+    port: 8080
+    requestPath: /am/json/health/live
+---
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: idm
+  labels:
+    app: idm
+    app.kubernetes.io/component: idm
+    app.kubernetes.io/instance: idm
+    app.kubernetes.io/name: idm
+    app.kubernetes.io/part-of: forgerock
+spec:
+  healthCheck:
+    checkIntervalSec: 5
+    timeoutSec: 5
+    # healthyThreshold: [int]
+    # unhealthyThreshold: [int]
+    type: HTTP
+    port: 8080
+    requestPath: /openidm/info/ping
+---
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: rcs-agent
+  labels:
+    app: rcs-agent
+    app.kubernetes.io/component: rcs-agent
+    app.kubernetes.io/instance: rcs-agent
+    app.kubernetes.io/name: rcs-agent
+    app.kubernetes.io/part-of: forgerock
+spec:
+  healthCheck:
+    checkIntervalSec: 5
+    timeoutSec: 5
+    # healthyThreshold: [int]
+    # unhealthyThreshold: [int]
+    type: HTTP
+    port: 8080
+    requestPath: /health

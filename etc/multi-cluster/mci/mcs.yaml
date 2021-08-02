@@ -1,0 +1,134 @@
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: admin-ui
+  labels:
+    app: admin-ui
+    app.kubernetes.io/component: admin-ui
+    app.kubernetes.io/instance: admin-ui
+    app.kubernetes.io/name: admin-ui
+    app.kubernetes.io/part-of: forgerock
+spec:
+  template:
+    spec:
+      selector:
+        app: admin-ui
+      ports:
+      - name: http
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: end-user-ui
+  labels:
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
+    app.kubernetes.io/instance: end-user-ui
+    app.kubernetes.io/name: end-user-ui
+    app.kubernetes.io/part-of: forgerock
+spec:
+  template:
+    spec:
+      selector:
+        app: end-user-ui
+      ports:
+      - name: http
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: login-ui
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {
+    "8080":"admin-ui-healthcheck-cfg"}'
+  labels:
+    app: login-ui
+    app.kubernetes.io/component: login-ui
+    app.kubernetes.io/instance: login-ui
+    app.kubernetes.io/name: login-ui
+    app.kubernetes.io/part-of: forgerock
+spec:
+  template:
+    spec:
+      selector:
+        app: login-ui
+      ports:
+      - name: http
+        port: 8080
+        protocol: TCP
+        targetPort: 8080
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: am
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {"443":"am"}}'
+  labels:
+    app: am
+    app.kubernetes.io/component: am
+    app.kubernetes.io/instance: am
+    app.kubernetes.io/name: am
+    app.kubernetes.io/part-of: forgerock
+spec:
+  template:
+    spec:
+      selector:
+        app: am
+      ports:
+      - name: am
+        port: 443
+        protocol: TCP
+        targetPort: 8081
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: idm
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {"443":"idm"}}'
+  labels:
+    app: idm
+    app.kubernetes.io/component: idm
+    app.kubernetes.io/instance: idm
+    app.kubernetes.io/name: idm
+    app.kubernetes.io/part-of: forgerock
+spec:
+  template:
+    spec:
+      selector:
+        app: idm
+      ports:
+      - name: idm
+        port: 443
+        protocol: TCP
+        targetPort: 8081
+---
+apiVersion: networking.gke.io/v1
+kind: MultiClusterService
+metadata:
+  name: rcs-agent
+  annotations:
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"rcs-agent"}}'
+  labels:
+    app: rcs-agent
+    app.kubernetes.io/component: rcs-agent
+    app.kubernetes.io/instance: rcs-agent
+    app.kubernetes.io/name: rcs-agent
+    app.kubernetes.io/part-of: forgerock
+spec:
+  template:
+    spec:
+      selector:
+        app: rcs-agent
+      ports:
+      - name: am
+        protocol: TCP
+        port: 80
+        targetPort: 8080
