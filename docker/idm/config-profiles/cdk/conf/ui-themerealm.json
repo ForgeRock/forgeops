@@ -22,10 +22,10 @@
                 "logo": "https://cdn.forgerock.com/platform/themes/contrast/logo-contrast.svg",
                 "logoAltText": "Contrast",
                 "logoHeight": "72",
-                "logoProfile": "data:image/svg+xml,%0A%3Csvg width='46' height='46' viewBox='0 0 46 46' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24.3477 13.5664H43.9438C43.5192 12.6317 43.0319 11.734 42.4905 10.8711H24.3477V13.5664Z' fill='black'/%3E%3Cpath d='M24.3477 8.17578H40.5261C39.6996 7.2052 38.7974 6.30182 37.8224 5.48047H24.3477V8.17578Z' fill='black'/%3E%3Cpath d='M24.3477 40.5195H37.8224C38.7975 39.6982 39.6996 38.7948 40.5261 37.8242H24.3477V40.5195Z' fill='black'/%3E%3Cpath d='M24.3477 2.78516H33.8482C31.0136 1.27039 27.7313 0.198195 24.3477 0V2.78516Z' fill='black'/%3E%3Cpath d='M24.3477 18.957H45.6208C45.4566 18.0405 45.2557 17.1372 44.9856 16.2617H24.3477V18.957Z' fill='black'/%3E%3Cpath d='M24.3477 21.6523V24.3477H45.9317C45.958 23.8992 46 23.4549 46 23C46 22.5451 45.958 22.1008 45.9317 21.6523H24.3477Z' fill='black'/%3E%3Cpath d='M0 23C0 35.1781 9.64778 45.2964 21.6523 46V0C9.64778 0.703566 0 10.8219 0 23Z' fill='black'/%3E%3Cpath d='M24.3477 46C27.7313 45.8018 31.0136 44.7296 33.8482 43.2148H24.3477V46Z' fill='black'/%3E%3Cpath d='M45.6208 27.043H24.3477V29.7383H44.9857C45.2557 28.8628 45.4566 27.9595 45.6208 27.043V27.043Z' fill='black'/%3E%3Cpath d='M24.3477 35.1289H42.4905C43.0319 34.266 43.5192 33.3683 43.9438 32.4336H24.3477V35.1289Z' fill='black'/%3E%3C/svg%3E%0A",
+                "logoProfile": "https://cdn.forgerock.com/platform/themes/contrast/logo-contrast.svg",
                 "logoProfileAltText": "Contrast",
-                "logoProfileCollapsed": "data:image/svg+xml,%0A%3Csvg width='46' height='46' viewBox='0 0 46 46' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M24.3477 13.5664H43.9438C43.5192 12.6317 43.0319 11.734 42.4905 10.8711H24.3477V13.5664Z' fill='black'/%3E%3Cpath d='M24.3477 8.17578H40.5261C39.6996 7.2052 38.7974 6.30182 37.8224 5.48047H24.3477V8.17578Z' fill='black'/%3E%3Cpath d='M24.3477 40.5195H37.8224C38.7975 39.6982 39.6996 38.7948 40.5261 37.8242H24.3477V40.5195Z' fill='black'/%3E%3Cpath d='M24.3477 2.78516H33.8482C31.0136 1.27039 27.7313 0.198195 24.3477 0V2.78516Z' fill='black'/%3E%3Cpath d='M24.3477 18.957H45.6208C45.4566 18.0405 45.2557 17.1372 44.9856 16.2617H24.3477V18.957Z' fill='black'/%3E%3Cpath d='M24.3477 21.6523V24.3477H45.9317C45.958 23.8992 46 23.4549 46 23C46 22.5451 45.958 22.1008 45.9317 21.6523H24.3477Z' fill='black'/%3E%3Cpath d='M0 23C0 35.1781 9.64778 45.2964 21.6523 46V0C9.64778 0.703566 0 10.8219 0 23Z' fill='black'/%3E%3Cpath d='M24.3477 46C27.7313 45.8018 31.0136 44.7296 33.8482 43.2148H24.3477V46Z' fill='black'/%3E%3Cpath d='M45.6208 27.043H24.3477V29.7383H44.9857C45.2557 28.8628 45.4566 27.9595 45.6208 27.043V27.043Z' fill='black'/%3E%3Cpath d='M24.3477 35.1289H42.4905C43.0319 34.266 43.5192 33.3683 43.9438 32.4336H24.3477V35.1289Z' fill='black'/%3E%3C/svg%3E%0A",
-                "logoProfileCollapsedAltText": "",
+                "logoProfileCollapsed": "https://cdn.forgerock.com/platform/themes/contrast/logo-contrast.svg",
+                "logoProfileCollapsedAltText": "Contrast",
                 "logoProfileCollapsedHeight": "22",
                 "logoProfileHeight": "22",
                 "primaryColor": "#000000",
@@ -418,3 +418,4 @@
         ]
     }
 }
+
