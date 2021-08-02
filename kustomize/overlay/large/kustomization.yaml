@@ -42,7 +42,7 @@ patchesStrategicMerge:
             limits:
               memory: 26Gi
             requests:
-              cpu: 10000m
+              cpu: 11000m
               memory: 20Gi
 - |-
   #Patch IDM
@@ -61,7 +61,7 @@ patchesStrategicMerge:
             limits:
               memory: 8Gi
             requests:
-              cpu: 4000m
+              cpu: 8000m
               memory: 4Gi
 
 - |-
