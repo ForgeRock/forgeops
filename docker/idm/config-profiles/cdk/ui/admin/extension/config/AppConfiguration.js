@@ -1,6 +1,6 @@
 "use strict";
 /*
- * Copyright 2014-2020 ForgeRock AS. All Rights Reserved
+ * Copyright 2014-2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -30,7 +30,8 @@ define(["org/forgerock/openidm/ui/common/util/Constants"], function (constants) 
             configuration: {
                 "resource-assignment": "org/forgerock/openidm/ui/admin/assignment/AssignmentView",
                 "resource-user": "org/forgerock/openidm/ui/admin/user/EditUserView",
-                "resource-role": "org/forgerock/openidm/ui/admin/role/EditRoleView"
+                "resource-role": "org/forgerock/openidm/ui/admin/role/EditRoleView",
+                "resource-group": "org/forgerock/openidm/ui/admin/role/EditRoleView"
             }
         }, {
             moduleClass: "org/forgerock/commons/ui/common/components/Messages",
