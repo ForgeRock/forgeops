@@ -45,7 +45,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Postcommit', clusterConfig +
                                 [TEST_NAME      : 'postcommit',
-                                 DEPLOYMENT_NAME: 'small']
+                                 PROFILE_NAME   : 'small']
                         )
                     }
             )
@@ -56,7 +56,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
                                 [TEST_NAME                      : 'platform',
-                                 DEPLOYMENT_NAME                : 'small',
+                                 PROFILE_NAME                   : 'small',
                                  CONFIGFILE_NAME                : 'conf-postcommit-restore-100k.yaml',
                                  DEPLOYMENT_RESTOREBUCKETURL    : 'gs://performance-bucket-us-east1/postcommit/idrepo-100k']
                         )
@@ -97,7 +97,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPyrock(pipelineRun, random, 'AM Basic Perf', clusterConfig +
                                 [TEST_NAME      : 'am',
-                                 DEPLOYMENT_NAME: 'am-only']
+                                 PROFILE_NAME   : 'am-only']
                         )
                     }
             )
@@ -135,7 +135,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPyrock(pipelineRun, random, 'DS Basic Perf', clusterConfig +
                                 [TEST_NAME      : 'ds',
-                                 DEPLOYMENT_NAME: 'ds-only']
+                                 PROFILE_NAME   : 'ds-only']
                         )
                     }
             )
@@ -169,7 +169,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPyrock(pipelineRun, random, 'IDM Basic Perf', clusterConfig +
                                 [TEST_NAME      : 'idm_only',
-                                 DEPLOYMENT_NAME: 'idm-only']
+                                 PROFILE_NAME   : 'idm-only']
                         )
                     }
             )
@@ -203,7 +203,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPyrock(pipelineRun, random, 'IG Basic Perf', clusterConfig +
                                 [TEST_NAME      : 'ig',
-                                 DEPLOYMENT_NAME: 'ig-only']
+                                 PROFILE_NAME   : 'ig-only']
                         )
                     }
             )

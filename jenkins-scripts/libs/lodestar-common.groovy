@@ -51,7 +51,7 @@ def getDefaultConfig(Random random, String stageName) {
     return [STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
             STASH_FORGEOPS_BRANCH           : commonModule.GIT_COMMIT,
             STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
-            CLUSTER_NAMESPACE               : cloud_config.spyglaasConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
+            DEPLOYMENT_NAMESPACE            : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
             REPORT_NAME_PREFIX              : normalizedStageName,
             PIPELINE_NAME                   : 'Postcommit-Lodestar',
             DO_RECORD_RESULT                : false]
@@ -93,8 +93,7 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testConfig = getLodestarDockerImagesTag() + getDefaultConfig(random, stageName) +
             [DO_RECORD_RESULT   : false,
-             REPORT_NAME_PREFIX : normalizedStageName,
-             PIPELINE_NAME      : 'LODESTAR_POSTCOMMIT'] + config
+             PIPELINE_NAME      : 'FORGEOPS_POSTCOMMIT'] + config
     def stagesCloud = [:]
     def testName = cloud_utils.pyrockGetTestName(testConfig)
     stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(testName)
