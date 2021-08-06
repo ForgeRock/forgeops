@@ -3,9 +3,14 @@
 # See the tekton/ folder for an example of a CI/CD pipeline that deploys the ForgeRock Identity Platform.
 
 # the sdk can install everythiung for us, use the smallest image
+ARG KUSTOMIZE_VERSION=v4.2.0
+ARG KUBECTL_VERSION=v1.21.2
+
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine as base
 
 FROM debian:bullseye-backports
+ARG KUSTOMIZE_VERSION
+ARG KUBECTL_VERSION
 ENV DOCKER_CONFIG=/builder/home/.docker
 ENV PATH=/builder/google-cloud-sdk/bin:$PATH
 RUN mkdir --mode=0766 -p /builder/bin
@@ -21,8 +26,14 @@ RUN mkdir -p /builder/bin && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean all
 
-RUN /builder/google-cloud-sdk/install.sh --bash-completion=false --path-update=true --usage-reporting=false \
-	--additional-components kubectl kustomize skaffold
+RUN /builder/google-cloud-sdk/install.sh --bash-completion=false --path-update=true --usage-reporting=false
+# Install kubectl
+RUN curl -L "https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /tmp/kubectl \
+                && install /tmp/kubectl /usr/local/bin/kubectl
+# Install kustomize
+RUN curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz -o /tmp/kustomize.tar.gz \
+        && tar -xvf /tmp/kustomize.tar.gz -C /tmp \
+            && install /tmp/kustomize /usr/local/bin/kustomize
 
 RUN chmod +700 /builder/skaffold.bash
 ENTRYPOINT ["/builder/skaffold.bash"]
