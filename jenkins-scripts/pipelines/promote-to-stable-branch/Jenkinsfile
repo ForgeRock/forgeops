@@ -41,7 +41,9 @@ def jobProperties = [
     ])
 ]
 
-if (params.PIT2_Greenfield != null && params.PIT2_Greenfield.toInteger() < 7200) {
+if (params.PIT2_Greenfield != null
+        && params.PIT2_Greenfield.toInteger() > 0
+        && params.PIT2_Greenfield.toInteger() < 7200) {
     currentBuild.result = 'ABORTED'
     error "Only ${params.PIT2_Greenfield.toInteger()}s specified for Greenfield but minimum 7200s required."
 }
