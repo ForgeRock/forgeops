@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+
+SCRIPT_NAME="$(basename "$0")"
+
+
+usage () {
+read -r -d '' help <<-EOF
+
+Create gcr-cleaner trigger
+
+Usage:  ${SCRIPT_NAME} GCP-PROJECT
+
+EOF
+    printf "%-10s \n" "$help"
+}
+
+# arg check
+if [[ "$#" -ne 1 ]]; then
+    echo "Missing project name"
+    usage
+    exit 1
+fi
+
+project=$1
+
+gcloud --project "${project}" beta builds triggers create github \
+    --name="gcr-cleaner-build-deploy" \
+    --description="When a configuration file is changed in etc/gcr-cleaner build and deploy the gcr-cleaner. This assumes install-gcr-cleaner has been installed" \
+    --repo-name=forgeops \
+    --repo-owner=ForgeRock \
+    --branch-pattern=master \
+    --build-config=etc/gcr-cleaner/cloudbuild.yaml \
+    --included-files="etc/gcr-cleaner/**"
+

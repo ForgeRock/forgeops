@@ -1,0 +1,103 @@
+#!/usr/bin/bash
+
+[[ -z $1 ]] && { echo "a project is required"; exit 1; }
+
+PROJECT_ID=$1
+PROJECT_NUMBER=$(gcloud projects list | grep engineering-devops | awk '{ print $3 }' | tr -d '\n')
+gcloud config set project $PROJECT_ID
+# Initialize container
+
+INITCB=$(mktemp)
+
+cat >$INITCB <<'EOF'
+steps:
+  ## Build Project
+  ### Git setup
+- id: 'clone-git'
+  name: 'gcr.io/cloud-builders/git'
+  args:
+  - clone
+  - -n
+  - https://github.com/ForgeRock/gcr-cleaner.git
+
+- id: 'checkout-git'
+  name: 'gcr.io/cloud-builders/git'
+  waitFor: ['clone-git']
+  dir: /workspace/gcr-cleaner
+  env:
+  - _GCR_CLEANER_COMMIT=v0.5.0
+  args:
+  - checkout
+  - ${_GCR_CLEANER_COMMIT}
+
+  ### Docker builds
+- id: 'build-docker'
+  name: 'docker'
+  dir: /workspace/gcr-cleaner
+  entrypoint: '/bin/sh'
+  waitFor: ['checkout-git']
+  args:
+  - '-euo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    docker build --build-arg SERVICE=gcr-cleaner-server \
+                 --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server:latest .
+    docker push gcr.io/${PROJECT_ID}/gcr-cleaner-server:latest
+EOF
+
+if ! gcloud --project engineering-devops builds submit --substitutions=_GCR_CLEANER_COMMIT=v0.5.0 --config ${INITCB};
+then
+    echo "init build failed"
+fi
+
+# Allow PubSub to invoke cloud run
+if ! gcloud iam service-accounts describe cloud-run-pubsub-invoker@${PROJECT_ID}.iam.gserviceaccount.com;
+then
+    gcloud iam service-accounts create cloud-run-pubsub-invoker --display-name "Cloud Run Pub/Sub Invoker"
+fi
+
+# What the container runs as
+if ! gcloud iam service-accounts describe gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com;
+then
+    gcloud iam service-accounts create gcr-cleaner --display-name="GCR Cleaner account for Cloud Run";
+fi
+
+# Allow cleaner to access the registry bucket
+gsutil iam ch serviceAccount:gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com:admin gs://artifacts.${PROJECT_ID}.appspot.com
+
+# Allow Cloud Build to run as a service account for deployment
+gcloud iam service-accounts add-iam-policy-binding \
+  gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com \
+  --member="serviceAccount:${PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
+
+# Create the Service
+gcloud run deploy gcr-cleaner \
+  --image gcr.io/${PROJECT_ID}/gcr-cleaner-server:latest \
+  --platform managed \
+  --region us-west2 \
+  --service-account "gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --no-allow-unauthenticated \
+  --timeout "600s"
+
+# Allow the pubsub account to invoke service
+gcloud run services add-iam-policy-binding gcr-cleaner \
+  --member=serviceAccount:cloud-run-pubsub-invoker@${PROJECT_ID}.iam.gserviceaccount.com \
+  --platform managed \
+  --region us-west2 \
+  --role=roles/run.invoker
+
+# Topic
+gcloud pubsub topics create gcp-prune
+# Capture the URL of the Cloud Run service:
+export SERVICE_URL=$(gcloud run services describe gcr-cleaner --project "${PROJECT_ID}" --platform "managed" --region "us-west2" --format 'value(status.url)')
+
+# Setup registry subscriptions
+gcloud pubsub subscriptions create registry-prune --topic gcp-prune \
+  --push-endpoint=${SERVICE_URL}/pubsub \
+  --push-auth-service-account=cloud-run-pubsub-invoker@${PROJECT_ID}.iam.gserviceaccount.com \
+  --ack-deadline "600" \
+  --min-retry-delay "10" \
+  --max-retry-delay "600"
+

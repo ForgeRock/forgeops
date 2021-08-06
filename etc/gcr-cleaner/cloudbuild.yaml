@@ -1,0 +1,73 @@
+steps:
+  ## Build Project
+  ### Git setup
+- id: 'clone-git'
+  name: 'gcr.io/cloud-builders/git'
+  args:
+  - clone
+  - -n
+  - https://github.com/ForgeRock/gcr-cleaner.git
+
+- id: 'checkout-git'
+  name: 'gcr.io/cloud-builders/git'
+  waitFor: ['clone-git']
+  dir: /workspace/gcr-cleaner
+  env:
+  - _GCR_CLEANER_COMMIT=v0.5.0
+  args:
+  - checkout
+  - ${_GCR_CLEANER_COMMIT}
+
+  ### Docker builds
+- id: 'build-docker'
+  name: 'docker'
+  dir: /workspace/gcr-cleaner
+  entrypoint: '/bin/sh'
+  waitFor: ['checkout-git']
+  args:
+  - '-euo'
+  - 'pipefail'
+  - '-c'
+  - |-
+    docker build --build-arg SERVICE=gcr-cleaner-server \
+                 --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server:${BUILD_ID} \
+                 --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server .
+    docker push gcr.io/${PROJECT_ID}/gcr-cleaner-server
+    docker push gcr.io/${PROJECT_ID}/gcr-cleaner-server:${BUILD_ID}
+
+  ## Deployment
+  ### Cloud Run
+- id: 'cloud-run-deployment'
+  name: 'gcr.io/cloud-builders/gcloud'
+  waitFor: ['build-docker']
+  entrypoint: '/bin/bash'
+  args:
+  - '-c'
+  - |-
+    # Create the Service
+    gcloud run deploy gcr-cleaner \
+      --image gcr.io/${PROJECT_ID}/gcr-cleaner-server:${BUILD_ID} \
+      --platform managed \
+      --region us-west2 \
+      --service-account "gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com" \
+      --no-allow-unauthenticated \
+      --timeout "600s"
+  ### Cron Job
+- id: 'cron-deployment'
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: '/bin/bash'
+  args:
+  - '-c'
+  - |-
+    # Prunning Config - more to come when tags are fixed.
+    cat >weekly-tagless.json <<EOF
+    {
+        "grace": "720h",
+        "recursive": true,
+        "repo": "gcr.io/${PROJECT_ID}"
+    }
+    EOF
+    gcloud scheduler jobs create pubsub weekly-tagless-clean \
+      --schedule="every saturday 09:00" \
+      --topic=gcp-prune \
+      --message-body-from-file weekly-tagless.json
