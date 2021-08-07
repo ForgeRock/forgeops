@@ -20,15 +20,15 @@ def initialSteps() {
     prReportMessage = "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${prStageName}/)"
 
     if (params.isEmpty()) {
-        properties([
-                buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
-                parameters([
-                        booleanParam(name: 'PR_pit1', defaultValue: true),
-                ] + commonLodestarModule.postcommitMandatoryStages(false)),
-        ])
-
         sendInformationMessageToPR()
     }
+
+    properties([
+            buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
+            parameters([
+                    booleanParam(name: 'PR_pit1', defaultValue: true),
+            ] + commonLodestarModule.postcommitMandatoryStages(false)),
+    ])
 
     // Abort any active builds relating to the current PR, as they are superseded by this build
     abortMultibranchPrBuilds()
