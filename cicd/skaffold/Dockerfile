@@ -5,8 +5,12 @@
 # the sdk can install everythiung for us, use the smallest image
 ARG KUSTOMIZE_VERSION=v4.2.0
 ARG KUBECTL_VERSION=v1.21.2
+ARG SKAFFOLD_VERSION=v1.29.0
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine as base
+ARG SKAFFOLD_VERSION
+FROM gcr.io/k8s-skaffold/skaffold:${SKAFFOLD_VERSION} as skaffold
+
 
 FROM debian:bullseye-backports
 ARG KUSTOMIZE_VERSION
@@ -17,6 +21,7 @@ RUN mkdir --mode=0766 -p /builder/bin
 
 COPY --from=base /usr/local/bin/docker /usr/local/bin/
 COPY --from=base /google-cloud-sdk /builder/google-cloud-sdk
+COPY --from=skaffold /usr/bin/skaffold /usr/local/bin/skaffold
 COPY skaffold.bash /builder/skaffold.bash
 
 RUN mkdir -p /builder/bin && \
