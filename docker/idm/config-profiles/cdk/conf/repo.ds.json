@@ -12,6 +12,7 @@
         "bind": {
             "connectionSecurity": "ssl",
             "connectionPoolSize": 50,
+            "availabilityCheckTimeoutMilliSeconds": 2000,
             "heartBeatIntervalSeconds": 60,
             "heartBeatTimeoutMilliSeconds": 3000,
             "primaryLdapServers": [
