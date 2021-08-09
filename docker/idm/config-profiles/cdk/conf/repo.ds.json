@@ -13,7 +13,7 @@
             "connectionSecurity": "ssl",
             "connectionPoolSize": 50,
             "heartBeatIntervalSeconds": 60,
-            "heartBeatTimeoutMilliSeconds": 10000,
+            "heartBeatTimeoutMilliSeconds": 3000,
             "primaryLdapServers": [
                 {
                     "hostname": "&{openidm.repo.host}",
