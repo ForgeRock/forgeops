@@ -58,7 +58,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                                 [TEST_NAME                      : 'platform',
                                  PROFILE_NAME                   : 'small',
                                  CONFIGFILE_NAME                : 'conf-postcommit-restore-100k.yaml',
-                                 DEPLOYMENT_RESTOREBUCKETURL    : 'gs://performance-bucket-us-east1/postcommit/idrepo-100k']
+                                 DEPLOYMENT_RESTORE_BUCKET_URL  : 'gs://performance-bucket-us-east1/postcommit/idrepo-100k']
                         )
                     }
             )
