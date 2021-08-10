@@ -220,6 +220,15 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     }
             )
         }
+        if (params.Postcommit_set_images) {
+            parallelTestsMap.put('Set Images',
+                    {
+                        commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
+                                [TESTS_SCOPE: 'tests/set_images']
+                        )
+                    }
+            )
+        }
 
         parallel parallelTestsMap
     } catch (Exception exception) {
