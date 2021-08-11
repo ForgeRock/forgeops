@@ -1,3 +1,8 @@
+
+options:
+  env:
+    - NAMESPACE=smoke
+    - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
 steps:
   ## Build Project
   ### Git setup
@@ -12,11 +17,14 @@ steps:
   name: 'gcr.io/cloud-builders/git'
   waitFor: ['clone-git']
   dir: /workspace/gcr-cleaner
+  entrypoint: '/bin/sh'
   env:
-  - _GCR_CLEANER_COMMIT=v0.5.0
+  - GCR_CLEANER_COMMIT=v0.5.0
   args:
-  - checkout
-  - ${_GCR_CLEANER_COMMIT}
+  - '-c'
+  - |-
+    git checkout $$GCR_CLEANER_COMMIT
+
 
   ### Docker builds
 - id: 'build-docker'
@@ -67,7 +75,13 @@ steps:
         "repo": "gcr.io/${PROJECT_ID}"
     }
     EOF
-    gcloud scheduler jobs create pubsub weekly-tagless-clean \
+    if ! gcloud scheduler jobs update pubsub weekly-tagless-clean \
       --schedule="every saturday 09:00" \
       --topic=gcp-prune \
-      --message-body-from-file weekly-tagless.json
+      --message-body-from-file weekly-tagless.json;
+    then
+      gcloud scheduler jobs create pubsub weekly-tagless-clean \
+      --schedule="every saturday 09:00" \
+      --topic=gcp-prune \
+      --message-body-from-file weekly-tagless.json;
+    fi
