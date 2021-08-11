@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Create a support extract
+
+supportextract  --bindDN "uid=admin" --bindPassword $(cat /var/run/secrets/admin/dirmanager.pw)  --outputDirectory data/support-extract

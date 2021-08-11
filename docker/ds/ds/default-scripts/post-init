@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+echo "No new indexes to add"
+
+
+exit 0
+
+## Below is a sample of a user supplied add-index script int the configMap
+
+# This can be done offline...
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:equality \
+          --index-name carLicense
+EOF
+
+rebuild-index  --offline \
+ --baseDN ou=identities \
+ --index carLicense
+
+
+
+# These commands can be done online, but they are not automatically executed
+
+dsconfig --hostname localhost --port 4444 \
+    --bindDN uid=admin --bindPassword $(cat /var/run/secrets/admin/dirmanager.pw) \
+    --trustAll  --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:equality \
+          --index-name carLicense
+EOF
+
+
+rebuild-index --hostname localhost --port 4444 \
+    --bindDN uid=admin --bindPassword $(cat /var/run/secrets/admin/dirmanager.pw) \
+    --trustAll   \
+    --baseDN ou=identities \
+    --index carLicense
+
+

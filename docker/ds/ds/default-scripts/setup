@@ -1,0 +1,274 @@
+#!/usr/bin/env bash
+# Setup the directory server for the CDK idrepo and CTS backends.
+# This uses DS setup profiles. If the schema for a profile has not been
+# changed it may use an older version. For example, AM 7.1 still uses the 6.5 schema for configuration
+CONFIG="am-config:6.5"
+AM_IDENTITY_STORE="am-identity-store:7.1"
+IDM_REPO="idm-repo:7.2"
+AM_CTS="am-cts:6.5"
+DS_PROXIED_SERVER="ds-proxied-server:7.1"
+
+PEM_KEYS_DIRECTORY="pem-keys-directory"
+PEM_TRUSTSTORE_DIRECTORY="pem-trust-directory"
+
+# If we are running live in kubernetes, at this point the user has NOT provided their own setup script
+# We just restore the prototype idrepo setup that is in the docker image and exit.
+# This is a short cut to accelerate CDK deployment.
+
+if [[ -r idrepo.tar.z ]]; then
+        echo "No user supplied setup script found. Restoring the default idrepo configuration. This also includes a CTS backend"
+        mkdir -p data
+        cd data && tar -xvzf ../idrepo.tar.z
+        exit 0
+fi
+
+# If the above proto.tar.z file does not exist, we are running in docker build time - so build the default idrepo configuration.
+
+## This appends additional configuration to the bundled profiles ##
+chmod +w  template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat ldif-ext/external-am-datastore.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat ldif-ext/uma/*.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && cat ldif-ext/alpha_bravo.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
+        && chmod +w template/setup-profiles/AM/identity-store/7.0/base-entries.ldif \
+        && cat ldif-ext/orgs.ldif >> template/setup-profiles/AM/identity-store/7.0/base-entries.ldif
+
+# We also create the CTS backend for small deployments or development
+# environments where a separate CTS is not warranted.
+setup-profile --profile ${CONFIG} \
+                  --set am-config/amConfigAdminPassword:password \
+ && setup-profile --profile ${AM_IDENTITY_STORE} \
+                  --set am-identity-store/amIdentityStoreAdminPassword:password \
+ && setup-profile --profile ${IDM_REPO} \
+                  --set idm-repo/domain:forgerock.io \
+ && setup-profile --profile ${AM_CTS} \
+                  --set am-cts/tokenExpirationPolicy:ds \
+                  --set am-cts/amCtsAdminPassword:password \
+ && setup-profile --profile ${DS_PROXIED_SERVER} \
+                  --set ds-proxied-server/proxyUserDn:uid=proxy \
+                  --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com
+
+# The default in 7.x is to use PBKDF2 password hashing - which is many order of magnitude slower than
+# SHA-512. We recommend leaving PBKDF2 as the default as it more secure.
+# If you wish to revert to the less secure SHA-512, Uncomment these lines:
+#dsconfig --offline --no-prompt --batch <<EOF
+##    set-password-storage-scheme-prop --scheme-name "Salted SHA-512" --set enabled:true
+##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
+#EOF
+
+
+set -e
+# These indexes are required for the combined AM/IDM repo
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:equality \
+          --type generic \
+          --index-name fr-idm-uuid
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-manager \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-meta \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-notifications \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-roles \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-authzroles-internal-role \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-authzroles-managed-role \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-organization-owner \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-organization-admin \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-organization-member \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:ordering \
+          --type generic \
+          --index-name fr-idm-managed-user-active-date
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:ordering \
+          --type generic \
+          --index-name fr-idm-managed-user-inactive-date
+EOF
+# Example of creating additional indexes.
+# Uncomment these as per your needs:
+# dsconfig --offline --no-prompt --batch <<EOF
+# create-backend-index \
+#           --backend-name amIdentityStore \
+#           --set index-type:equality \
+#           --index-name fr-attr-i1
+# EOF
+
+# dsconfig --offline --no-prompt --batch <<EOF
+# create-backend-index \
+#           --backend-name amIdentityStore \
+#           --set index-type:equality \
+#           --index-name fr-attr-i2
+# EOF
+
+
+# dsconfig --offline --no-prompt --batch <<EOF
+# create-backend-index \
+#         --backend-name amIdentityStore \
+#         --index-name fr-attr-date1 \
+#         --set index-type:equality
+# EOF
+
+
+### Setup the PEM trustore. This is REQUIRED. ######
+
+# The pods will have the pem stores mounted at this location.
+mkdir -p $PEM_TRUSTSTORE_DIRECTORY
+mkdir -p $PEM_KEYS_DIRECTORY
+
+# Set up a PEM Trust Manager Provider
+dsconfig --offline --no-prompt --batch <<EOF
+create-trust-manager-provider \
+            --provider-name "PEM Trust Manager" \
+            --type pem \
+            --set enabled:true \
+            --set pem-directory:${PEM_TRUSTSTORE_DIRECTORY}
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-connection-handler-prop \
+            --handler-name https \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-connection-handler-prop \
+            --handler-name ldap \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-connection-handler-prop \
+            --handler-name ldaps \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-synchronization-provider-prop \
+            --provider-name "Multimaster Synchronization" \
+            --set trust-manager-provider:"PEM Trust Manager"
+set-administration-connector-prop \
+            --set trust-manager-provider:"PEM Trust Manager"
+EOF
+
+# Delete the default PCKS12 provider.
+dsconfig --offline --no-prompt --batch <<EOF
+delete-trust-manager-provider \
+            --provider-name "PKCS12"
+EOF
+
+# Set up a PEM Key Manager Provider
+dsconfig --offline --no-prompt --batch <<EOF
+create-key-manager-provider \
+            --provider-name "PEM Key Manager" \
+            --type pem \
+            --set enabled:true \
+            --set pem-directory:${PEM_KEYS_DIRECTORY}
+EOF
+
+dsconfig --offline --no-prompt --batch <<EOF
+set-connection-handler-prop \
+            --handler-name https \
+            --set key-manager-provider:"PEM Key Manager"
+set-connection-handler-prop \
+            --handler-name ldap \
+            --set key-manager-provider:"PEM Key Manager"
+set-connection-handler-prop \
+            --handler-name ldaps \
+            --set key-manager-provider:"PEM Key Manager"
+set-synchronization-provider-prop \
+            --provider-name "Multimaster Synchronization" \
+            --set key-manager-provider:"PEM Key Manager"
+set-crypto-manager-prop \
+            --set key-manager-provider:"PEM Key Manager"
+set-administration-connector-prop \
+            --set key-manager-provider:"PEM Key Manager"
+EOF
+
+# Delete the default PCKS12 provider.
+dsconfig --offline --no-prompt --batch <<EOF
+delete-key-manager-provider \
+            --provider-name "PKCS12"
+EOF
+
+
+echo "Done."
+
+
+## This patches the config.ldif to set the backends to the data/db directory.
+
+echo "Updating config.ldif to use the data/ directory"
+cp config/config.ldif /tmp/config.ldif
+
+sed  -e 's|ds-cfg-db-directory: db|ds-cfg-db-directory: data/db|'  \
+     -e 's|ds-cfg-replication-db-directory: changelogDb|ds-cfg-replication-db-directory: data/changelogDb|' \
+     -e 's|ds-cfg-ldif-file: db/adminRoot/admin-backend.ldif|ds-cfg-ldif-file: data/db/adminRoot/admin-backend.ldif|' \
+     -e 's|ds-cfg-ldif-file: db/monitorUser/monitorUser.ldif|ds-cfg-ldif-file: data/db/monitorUser/monitorUser.ldif|' \
+      /tmp/config.ldif > config/config.ldif
+
+
+# We want schema to be replicated and by default in docker it is not.
+# See https://stash.forgerock.org/projects/OPENDJ/repos/opendj/browse/opendj-server/resource/samples/docker/setup.sh#63-64
+dsconfig --offline --no-prompt --batch <<EOF
+create-replication-domain --provider-name "Multimaster synchronization" --domain-name "cn=schema" --set "base-dn:cn=schema" --set "enabled:&{ds.enable.schema.replication|true}"
+# TODO: Uncomment this once we support database encryption (OPENDJ-6598).
+# create-replication-domain --provider-name "Multimaster synchronization" --domain-name "cn=admin data" --set "base-dn:cn=admin data"
+EOF

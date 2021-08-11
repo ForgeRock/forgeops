@@ -1,84 +1,19 @@
 # DS Customization and Utilities
 
-## Customized DS Docker Images
+## Directory Folders
 
-There are a number of ways to customize the DS Docker images in order to
-contain additional indexes, log configuration, extensions or schema.
-
-1. **Add dsconfig RUN commands in the Dockerfile**. This is the simplest 
-   approach. Figure out which configuration changes you'd like to make, and then 
-   add them to the Dockerfile's RUN command sequence. Remember to use the 
-   `--offline` flag.
-
-2. **Add schema files or extensions into the Dockerfile**. Place schema files  
-   in the `docker/ds/(cts|idrepo)/config/schema` directory.
-
-3. **Gitops**. First, mount the Docker source locations into your 
-   locally-running Minikube VM:
-   
-   ```
-   minikube mount docker/ds/cts:/tmp/docker-ds-cts &
-   minikube mount docker/ds/idrepo:/tmp/docker-ds-idrepo &
-   ```
-
-   Next, deploy the platform.
-   
-   Then, configure a running DS instance using the `dsconfig` command:
-   
-   ```
-   kubectl exec ds-cts-0 -it dsconfig
-
-    >>>> Specify OpenDJ LDAP connection parameters
-
-    Password for user 'uid=admin':
-
-    >>>> OpenDJ configuration console main menu
-
-    What do you want to configure?
-
-        1)   Access Control Handler               22)  Key Manager Provider
-        2)   Access Log Filtering Criteria        23)  Log Publisher
-        3)   Account Status Notification Handler  24)  Log Retention Policy
-    ..
-   ```
-   
-   After you've made all your customizations, quit the `dsconfig` session. 
-   
-   Review changes in your local workspace:
-   
-   ```
-   git status
-   On branch master
-   Your branch is up to date with 'origin/master'.
-
-   Changes not staged for commit:
-     (use "git add <file>..." to update what will be committed)
-     (use "git checkout -- <file>..." to discard changes in working directory)
-
-	   modified:   docker/cts/config/config.ldif
-
-   no changes added to commit (use "git add" and/or "git commit -a")
-   ```
-   
-   Commit your changes and submit a pull request!
-
-## Sample Users
-
-The [make-users.sh](idrepo/bin/make-users.sh) script lets you create sample 
-users for benchmarking or other purposes.
-
-Exec into each `ds-idrepo` pod and run the script with the desired number of 
-users. For example:
-
-```bash
-kubectl exec ds-idrepo-0 -it make-users.sh 1000000
-kubectl exec ds-idrepo-1 -it make-users.sh 1000000
-kubectl exec ds-idrepo-2 -it make-users.sh 1000000
-```
+* common: common scripts used to build multiple images
+* cts:  DS image purpose built for CTS
+* ds-idrepo: Purpose built for DS shared repo for AM/IDM. Also includes a cts backend for small installations
+* proxy: DS proxy server. Experimental / unsupported.
+* dsutil:  Utlility image that can ne run in a pod to perform various DS related tasks. Has all the ds tools installed.
+* ds - Generic DS image- used by the ds-operator. This image is a fully "mutable" VM like image to run the directory. All state (including schema) is
+ maintained on the runtime PVC claim. Configuration is performed at _runtime_.  See the [DS Operator](https://github.com/ForgeRock/ds-operator) for more details.
+ Also see [ds/README.md](ds/README.md).
 
 ## Utility image (`dsutil`)
 
-The `dsutil` image provides a bash shell into a pod that has all the DS tools 
+The `dsutil` image provides a bash shell into a pod that has all the DS tools
 installed. Utility scripts are located in the `/opt/opendj/bin` directory.
 
 To build the `dsutil` image:
