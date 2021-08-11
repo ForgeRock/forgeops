@@ -213,9 +213,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
             parallelTestsMap.put('Platform UI',
                     {
                         commonLodestarModule.runPlatformUi(pipelineRun, random, 'Platform UI', clusterConfig +
-                                [TESTS_SCOPE: 'tests/k8s/postcommit/platform_ui',
-                                SKIP_TESTS   : 'True',
-                                SKIP_CLEANUP : 'True']
+                                [TESTS_SCOPE  : 'tests/k8s/postcommit/platform_ui',
+                                 SKIP_TESTS   : 'True',
+                                 SKIP_CLEANUP : 'True']
                         )
                     }
             )
@@ -224,7 +224,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
             parallelTestsMap.put('Set Images',
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
-                                [TESTS_SCOPE: 'tests/set_images']
+                                [TESTS_SCOPE                      : 'tests/set_images',
+                                 DEPLOYMENT_PLATFORM_IMAGES_BRANCH: 'idcloud-2021.8-stable']
                         )
                     }
             )
