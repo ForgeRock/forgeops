@@ -87,18 +87,18 @@ spec:
         - name: DSBACKUP_HOSTS
           valueFrom:
             configMapKeyRef:
-              name: platform-config 
+              name: platform-config
               key: DSBACKUP_HOSTS
         - name: DSBACKUP_DIRECTORY
           valueFrom:
             configMapKeyRef:
-              name: platform-config 
+              name: platform-config
               key: DSBACKUP_DIRECTORY
         - name: AUTORESTORE_FROM_DSBACKUP
           valueFrom:
             configMapKeyRef:
-              name: platform-config 
-              key: AUTORESTORE_FROM_DSBACKUP        
+              name: platform-config
+              key: AUTORESTORE_FROM_DSBACKUP
         resources:
           requests:
             memory: 512Mi
@@ -119,12 +119,12 @@ spec:
         - name: DSBACKUP_HOSTS
           valueFrom:
             configMapKeyRef:
-              name: platform-config 
+              name: platform-config
               key: DSBACKUP_HOSTS
         - name: DSBACKUP_DIRECTORY
           valueFrom:
             configMapKeyRef:
-              name: platform-config 
+              name: platform-config
               key: DSBACKUP_DIRECTORY
         # Best to let DS calculate this rather than hard code here.
         # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
@@ -182,6 +182,7 @@ spec:
       securityContext:
         fsGroup: 0
         runAsUser: 11111
+        runAsGroup: 0
       terminationGracePeriodSeconds: 30
       volumes:
       - name: secrets
