@@ -220,13 +220,12 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     }
             )
         }
-
         if (params.Postcommit_set_images) {
             parallelTestsMap.put('Set Images',
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
                                 [TESTS_SCOPE                      : 'tests/set_images',
-                                 STASH_PLATFORM_IMAGES_BRANCH     : 'idcloud-2021.8-stable']
+                                 DEPLOYMENT_PLATFORM_IMAGES_BRANCH: 'idcloud-2021.8-stable']
                         )
                     }
             )
