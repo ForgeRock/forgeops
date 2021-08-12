@@ -5,7 +5,7 @@
 # Profile and versions. If the schema for a profile has not been
 # changed - it may use an older version. For example, AM 7.1 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
-AM_IDENTITY_STORE="am-identity-store:7.0"
+AM_IDENTITY_STORE="am-identity-store:7.1"
 IDM_REPO="idm-repo:7.2"
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.0"
