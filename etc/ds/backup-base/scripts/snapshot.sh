@@ -45,7 +45,7 @@ kubectl --namespace $NAMESPACE get job $JOB_NAME && {
 echo "Creating snapshot $NAMESPACE/$SNAP_NAME"
 
 kubectl --namespace  $NAMESPACE apply -f  - <<EOF
-apiVersion: snapshot.storage.k8s.io/v1beta1
+apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
   name: $SNAP_NAME
