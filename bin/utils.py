@@ -60,11 +60,11 @@ REQ_VERSIONS ={
     },
     'skaffold':{
         'MIN': 'v1.20.0',
-        'MAX': 'v100.0.0',        
+        'MAX': 'v100.0.0',
     },
     'cert-manager': {
-        'MIN': 'v1.5.1', 
-        'MAX': 'v100.0.0'
+        'MIN': 'v1.5.1',
+        'MAX': 'v100.0.0',
     }
 }
 
@@ -126,15 +126,8 @@ def add_loglevel_arg(parser):
                         type=loglevel)
 
 
-class ColorFormatter(logging.Formatter):
-    """Logging color"""
-    TTY_FORMATS = {
-        logging.DEBUG: f'{CYAN}{MSG_FMT}{ENDC}',
-        logging.INFO: f'{CYAN}{MSG_FMT}{ENDC}',
-        logging.WARNING: f'{PURPLE}{MSG_FMT}{ENDC}',
-        logging.ERROR: f'{RED}{MSG_FMT}{ENDC}',
-        logging.CRITICAL: f'{RED}{MSG_FMT}{ENDC}',
-    }
+class NoColorFormatter(logging.Formatter):
+    """Logging with no color"""
     NON_TTY_FORMATS = {
         logging.DEBUG: f'{MSG_FMT}',
         logging.INFO: f'{MSG_FMT}',
@@ -144,22 +137,40 @@ class ColorFormatter(logging.Formatter):
 
 
     }
+
     def format(self, record):
-        if not sys.stdout.isatty():
-            log_fmt = self.NON_TTY_FORMATS.get(record.levelno)
-        else:
-            log_fmt = self.TTY_FORMATS.get(record.levelno)
+        log_fmt = self.NON_TTY_FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt)
+        formatter.datefmt = '%Y-%m-%dT%H:%M:%S%z'
+        return formatter.format(record)
+
+
+class ColorFormatter(logging.Formatter):
+    """Logging color"""
+    TTY_FORMATS = {
+        logging.DEBUG: f'{CYAN}{MSG_FMT}{ENDC}',
+        logging.INFO: f'{CYAN}{MSG_FMT}{ENDC}',
+        logging.WARNING: f'{PURPLE}{MSG_FMT}{ENDC}',
+        logging.ERROR: f'{RED}{MSG_FMT}{ENDC}',
+        logging.CRITICAL: f'{RED}{MSG_FMT}{ENDC}',
+    }
+
+    def format(self, record):
+        log_fmt = self.TTY_FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         formatter.datefmt = '%Y-%m-%dT%H:%M:%S%z'
         return formatter.format(record)
 
 
 def logger(name=log_name, level=logging.INFO):
-    handler = logging.StreamHandler(stream=sys.stdout)
-    handler.setFormatter(ColorFormatter())
-    handler.setLevel(level)
-
     log = logging.getLogger(name)
+    handler = logging.StreamHandler(stream=sys.stdout)
+    if not sys.stdout.isatty():
+        log_cls = NoColorFormatter()
+    else:
+        log_cls = ColorFormatter()
+    handler.setFormatter(log_cls)
+    handler.setLevel(level)
     log.addHandler(handler)
     log.setLevel(level)
     return log
@@ -272,7 +283,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
     shutil.rmtree(profile_dir, ignore_errors=True)
     Path(profile_dir).mkdir(parents=True, exist_ok=True)
     run('kustomize', f'create', cwd=profile_dir)
-    run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}', 
+    run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}',
               cwd=profile_dir)
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
@@ -293,7 +304,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
-            cwd=profile_dir) 
+            cwd=profile_dir)
     contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
     contents = contents.decode('ascii')
     contents = contents.replace('namespace: default', f'namespace: {ns}')
@@ -350,9 +361,9 @@ def _inject_kustomize_amster(kustomize_pkg_path):
         run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
         run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
     finally:
-        if os.path.exists('amster-import.tar.gz'): 
+        if os.path.exists('amster-import.tar.gz'):
             os.remove('amster-import.tar.gz')
-        if os.path.exists('amster-scripts.tar.gz'): 
+        if os.path.exists('amster-scripts.tar.gz'):
             os.remove('amster-scripts.tar.gz')
 
 def printsecrets(ns, to_stdout=True):
@@ -360,7 +371,7 @@ def printsecrets(ns, to_stdout=True):
     try:
         secrets = {
             'am-env-secrets': {
-                'AM_PASSWORDS_AMADMIN_CLEAR': None 
+                'AM_PASSWORDS_AMADMIN_CLEAR': None
             },
             'idm-env-secrets': {
                 'OPENIDM_ADMIN_PASSWORD': None
@@ -431,7 +442,7 @@ def check_base_toolset():
     ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
     ver = ver.decode('ascii').split(' ')[-1].strip()
     check_component_version('kubectl', ver)
-    
+
     # print('Checking kustomize version')
     ver, _ = run('kustomize', 'version --short', cstdout=True)
     ver = ver.decode('ascii').split()[0].split('/')[-1]
@@ -471,7 +482,7 @@ def install_dependencies():
     img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
     check_component_version('ds-operator', img.decode('ascii').split(':')[1])
-    
+
     # Uncomment this block to install/check for cert-manager installation
     # print('Checking cert-manager and related CRDs:', end=' ')
     # try:
@@ -480,7 +491,7 @@ def install_dependencies():
     #     run('kubectl', 'get crd certificates.cert-manager.io',
     #         cstderr=True, cstdout=True)
     #     run('kubectl', 'get crd clusterissuers.cert-manager.io',
-    #         cstderr=True, cstdout=True)   
+    #         cstderr=True, cstdout=True)
     # except Exception:
     #     warning('cert-manager CRD not found. Installing cert-manager.')
     #     certmanager('apply')
@@ -715,3 +726,84 @@ def get_secret_value(ns, secret, key):
     value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

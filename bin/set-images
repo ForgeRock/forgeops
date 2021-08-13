@@ -17,9 +17,9 @@ log = None
 
 SCRIPT_DIR = Path(__file__)
 DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
-DEFAULT_CONFIG_PATH = str(
-    SCRIPT_DIR.joinpath('../../build/platform-images').resolve()
-)
+DEFAULT_CONFIG_PATH = SCRIPT_DIR.joinpath(
+    '../../build/platform-images').resolve()
+
 # Dockerfiles requiring base image updates
 DOCKER_PRODUCTS = ('am', 'ig', 'idm', 'ds', 'amster')
 # Directory names in forgeops
@@ -85,6 +85,10 @@ _test_image_names = [
      'gcr.io',
      'busybox',
      '@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',),
+    ('gcr.io/forgerock/am/pit1@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',
+     'gcr.io/forgerock',
+     'am',
+     '@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',),
 ]
 
 _test_from_line = [
@@ -99,6 +103,18 @@ _test_from_line = [
     ('FROM redis AS base', 'FROM', 'redis', 'AS base'),
     ('FROM redis:latest AS base', 'FROM', 'redis:latest', 'AS base'),
 ]
+
+# Map docker "image name" to configuration file
+image_name_to_config_name = {
+    # image: configfile name
+    'am': 'am',
+    'am-base': 'am',
+    'amster': 'amster',
+    'ds': 'ds',
+    'idm-cloud': 'idm',
+    'idm': 'idm',
+    'ig': 'ig',
+}
 
 
 def run_tests(args):
@@ -219,6 +235,7 @@ def parse_repo_tag(image):
     except ValueError:
         # am:latest || am
         name_and_tag = image
+        host_path = ''
 
     # Get tag or digest position
     first_colon_position = name_and_tag.find(':')
@@ -378,48 +395,53 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
 
 def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
     # Track files changed.
-    changed = set()
-    for product_name, product_config in products.items():
-        docker_files = []
-        for path in dockerpath.joinpath(product_name).rglob('**/Dockerfile'):
-            docker_files.append(str(path))
-
-        # This makes an iterator that we just loop over and it handles all the file
-        # opening and closing for us.
-        # Anything "printed" to stdout is written to the file!
-        with fileinput.FileInput(files=docker_files, inplace=True) as f:
-            for line in f:
-                before, image, after = parse_from_line(line)
-                # not a FROM command, write the content back.
-                # or we've already written to this file
-                if not image or f.filename() in changed:
-                    print(line, end='')
-                    continue
-                # load the current repo and tag and use as the default.
+    docker_files = dockerpath.rglob('**/Dockerfile')
+    # This makes an iterator that we just loop over and it handles all the file
+    # opening and closing for us.
+    # Anything "printed" to stdout is written to the file!
+    with fileinput.FileInput(files=docker_files, inplace=True) as f:
+        for line in f:
+            before, image, after = parse_from_line(line)
+            # not a FROM command, write the content back.
+            # or we've already written to this file
+            if not image:
+                print(line, end='')
+                continue
+            # load the current repo and tag and use as the default.
+            log.debug(f'Found image {image.strip()} in {f.filename()}')
+            try:
                 current_repo, name, current_tag = parse_repo_tag(image)
+            except Exception:
+                log.error(f'Error {line} {f.filename()}')
+                sys.exit(1)
 
-                # Update repo
-                if update_repo is not None:
-                    repo_and_name = f'{update_repo}/{name}'
-                else:
-                    repo_and_name = product_config.get('imageName',
-                                                       f'{current_repo}/{name}')
-                # Update tags
-                config_tag = product_config.get('imageTag', None)
-                if update_tag is not None:
-                    image_tag = f':{update_tag}'
-                elif config_tag:
-                    # tags from config need the seperator
-                    image_tag = f':{config_tag}'
-                else:
-                    image_tag = current_tag
+            try:
+                product_config = products[image_name_to_config_name[name]]
+            except KeyError:
+                log.debug(
+                    f'Found an image but it is not a product {f.filename()} {name}')
+                print(line, end='')
+                continue
 
-                new_image = f'{repo_and_name}{image_tag}'
-                log.info(f'Updating {f.filename()} to use {new_image.strip()}')
-                print(f'{before} {new_image}{after}')
-                # only change the first entry in an file
-                changed.add(f.filename())
-                # only replace the first instance
+            # Update repo
+            if update_repo is not None:
+                repo_and_name = f'{update_repo}/{name}'
+            else:
+                repo_and_name = product_config.get('imageName',
+                                                   f'{current_repo}/{name}')
+            # Update tags
+            config_tag = product_config.get('imageTag', None)
+            if update_tag is not None:
+                image_tag = f':{update_tag}'
+            elif config_tag:
+                # tags from config need the seperator
+                image_tag = f':{config_tag}'
+            else:
+                image_tag = current_tag
+
+            new_image = f'{repo_and_name}{image_tag}'
+            log.info(f'Updating {f.filename()} to use {new_image.strip()}')
+            print(f'{before} {new_image}{after}')
 
 
 def init_repo(args):
@@ -427,6 +449,10 @@ def init_repo(args):
     # force - remove and re-setup
     if args.force and args.config_path.is_dir():
         run_clean(args)
+
+    if args.config_path != DEFAULT_CONFIG_PATH:
+        log.info(f'Using local directory at {args.config_path}')
+        return
 
     log.info(f'Setting repo up in {args.config_path}.')
 
@@ -500,7 +526,8 @@ def run_from_args(args):
                          update_repo=update_repo,
                          update_tag=update_tag)
 
-    cli_only_docker = {k: dict() for k in args.products if k in DOCKER_PRODUCTS}
+    cli_only_docker = {k: dict()
+                       for k in args.products if k in DOCKER_PRODUCTS}
     if len(cli_only_docker) > 0:
         update_dockerfiles(cli_only_docker,
                            PLATFORM_DOCKER_PATH,
@@ -526,8 +553,9 @@ def main():
     try:
         func, args = func_args()
         func(args)
-    except Exception as e:
-        print(e)
+    except Exception:
+        import traceback
+        traceback.print_exc(file=sys.stdout)
         sys.exit(1)
     sys.exit(0)
 
