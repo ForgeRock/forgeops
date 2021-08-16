@@ -34,7 +34,7 @@ DOCKER_REGEX_NAME = {
     'ig': '.*ig.*'
 }
 
-REQ_OPERATOR_VERSIONS ={
+REQ_VERSIONS ={
     'ds-operator': {
         'MIN': 'v0.1.0',
         'MAX': 'v100',
@@ -43,6 +43,10 @@ REQ_OPERATOR_VERSIONS ={
         'MIN': 'v1.1.1',
         'MAX': 'v100',
     },
+    'minikube': {
+        'MIN': 'v1.22.0',
+        'MAX': 'v100',
+    }
 }
 
 SCRIPT = pathlib.Path(__file__)
@@ -233,14 +237,14 @@ def printurls(ns):
     warning(f'https://{fqdn}/enduser')
 
 
-def _check_operator_version(operator, version):
+def check_component_version(component, version):
 
     version = pkg_resources.parse_version(version)
-    version_max = pkg_resources.parse_version(REQ_OPERATOR_VERSIONS[operator]['MAX'])
-    version_min = pkg_resources.parse_version(REQ_OPERATOR_VERSIONS[operator]['MIN'])
+    version_max = pkg_resources.parse_version(REQ_VERSIONS[component]['MAX'])
+    version_min = pkg_resources.parse_version(REQ_VERSIONS[component]['MIN'])
     if not version_min <= version <= version_max:
-        error(f'Unsupported {operator} version found: "{version}"')
-        message(f'Need {operator} versions: {version_min} <= X <= {version_max}')
+        error(f'Unsupported {component} version found: "{version}"')
+        message(f'Need {component} versions: {version_min} <= X <= {version_max}')
         sys.exit(1)
 
 def install_dependencies():
@@ -257,7 +261,7 @@ def install_dependencies():
 
     _, img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
-    _check_operator_version('secret-agent', img.decode('ascii').split(':')[1])
+    check_component_version('secret-agent', img.decode('ascii').split(':')[1])
 
     print('Checking ds-operator and related CRDs:', end=' ')
     try:
@@ -271,7 +275,7 @@ def install_dependencies():
 
     _, img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
-    _check_operator_version('ds-operator', img.decode('ascii').split(':')[1])
+    check_component_version('ds-operator', img.decode('ascii').split(':')[1])
     print()
 
 
