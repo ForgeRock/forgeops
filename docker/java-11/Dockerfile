@@ -33,7 +33,12 @@ RUN mkdir -p /opt/async-profiler && \
     wget -q -O-  https://github.com/jvm-profiling-tools/async-profiler/releases/download/v1.5/async-profiler-1.5-linux-x64.tar.gz \
     | tar xzv -C /opt/async-profiler
 
-FROM debian:stable-slim
+
+# This is a temporary fix until upstream debian-slim is rebuilt.
+# https://github.com/debuerreotype/docker-debian-artifacts/issues/134
+FROM debian:bullseye-slim
+# FROM debian:stable-slim
+
 
 COPY --from=0 /opt /opt
 
