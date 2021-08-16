@@ -36,7 +36,7 @@ RUN mkdir -p /opt/async-profiler && \
 
 # This is a temporary fix until upstream debian-slim is rebuilt.
 # https://github.com/debuerreotype/docker-debian-artifacts/issues/134
-FROM debian:bullseye-slim
+FROM debian:buster-slim
 # FROM debian:stable-slim
 
 
