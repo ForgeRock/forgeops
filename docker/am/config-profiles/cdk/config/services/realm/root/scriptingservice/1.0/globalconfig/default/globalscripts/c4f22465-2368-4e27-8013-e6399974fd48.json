@@ -1,0 +1,29 @@
+{
+  "metadata" : {
+    "realm" : null,
+    "entityType" : "ScriptingService",
+    "entityId" : "default/globalScripts/c4f22465-2368-4e27-8013-e6399974fd48",
+    "uid" : "ou=c4f22465-2368-4e27-8013-e6399974fd48,ou=globalScripts,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+    "sunServiceID" : "globalScript",
+    "objectClass" : [ "top", "sunServiceComponent" ],
+    "pathParams" : { },
+    "ou" : null
+  },
+  "data" : {
+    "_id" : "default/globalScripts/c4f22465-2368-4e27-8013-e6399974fd48",
+    "_type" : {
+      "_id" : "ScriptingService",
+      "name" : "ScriptingService",
+      "collection" : false
+    },
+    "createdBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "creationDate" : "1433147666269",
+    "language" : "JAVASCRIPT",
+    "script" : "LyoKICogQ29weXJpZ2h0IDIwMjEgRm9yZ2VSb2NrIEFTLiBBbGwgUmlnaHRzIFJlc2VydmVkCiAqIFVzZSBvZiB0aGlzIGNvZGUgcmVxdWlyZXMgYSBjb21tZXJjaWFsIHNvZnR3YXJlIGxpY2Vuc2Ugd2l0aCBGb3JnZVJvY2sgQVMuCiAqIG9yIHdpdGggb25lIG9mIGl0cyBhZmZpbGlhdGVzLiBBbGwgdXNlIHNoYWxsIGJlIGV4Y2x1c2l2ZWx5IHN1YmplY3QKICogdG8gc3VjaCBsaWNlbnNlIGJldHdlZW4gdGhlIGxpY2Vuc2VlIGFuZCBGb3JnZVJvY2sgQVMuCiAqLwoKLyoqCiAqIERlZmF1bHQgU0FNTDIgSURQIEF0dHJpYnV0ZSBNYXBwZXIuCiAqLwo=",
+    "description" : "Default global script for SAML2 IDP Attribute Mapper Script",
+    "lastModifiedBy" : "id=dsameuser,ou=user,dc=openam,dc=forgerock,dc=org",
+    "context" : "SAML2_IDP_ATTRIBUTE_MAPPER",
+    "lastModifiedDate" : "1433147666269",
+    "name" : "SAML2 IDP Attribute Mapper Script"
+  }
+}
