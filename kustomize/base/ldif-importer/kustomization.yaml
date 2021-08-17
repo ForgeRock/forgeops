@@ -8,3 +8,8 @@ commonLabels:
   app: ldif-importer
 resources:
 - job.yaml
+
+images:
+  - name: ldif-importer
+    newName: gcr.io/forgerock-io/ldif-importer
+    newTag: 7-stable

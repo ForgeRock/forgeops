@@ -71,7 +71,8 @@ kind: Config
     - *DS-IDREPO
     - *DS-PROXY
     - *IG
-    - *LDIF-IMPORTER
+    # Skip building LDIF-IMPORTER. We use a fixed tag for now
+    # - *LDIF-IMPORTER
 
 ## End YAML Anchors
 
