@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""This script starts/deletes a minikube instance"""
+
+import argparse
+import sys
+import utils
+import platform
+
+DEFAULT_K8S_VERSION = "stable"
+
+def main():
+    """main"""
+    parser = argparse.ArgumentParser(description='Start or delete a minikube instance')
+    parser.add_argument('operation', nargs='+', choices=['start', 'delete'],
+                        help='Select between start or delete (required)')
+    parser.add_argument('--version', '-v', help="Set the Kubernetes version (default: stable)", default=DEFAULT_K8S_VERSION)
+    parser.add_argument('--driver', '-d', help='Runtime driver', choices=['docker', 'hyperkit', 'vb'],
+                        default='vb')
+    args = parser.parse_args()
+
+    if len(args.operation) > 1:
+        utils.error('Must specify only one of ["start", "delete"]')
+        sys.exit(1)
+    operation = args.operation[0]
+    operation = 'apply' if operation == 'start' else operation
+
+    if operation == 'delete':
+        utils.message('Deleting the minikube instance.')
+        if input('Do you want to continue? [Y/N] ').lower() not in ['yes', 'y']:
+            return
+        utils.run('minikube', 'delete')
+        return
+    
+    dvr_opts = {
+        'docker': '--driver=docker',
+        'hyperkit': '--driver=hyperkit',
+        'vb': '--driver=virtualbox --bootstrapper kubeadm',
+    }
+    dvr = dvr_opts.get(args.driver, '')
+    if "darwin" in platform.system().lower():
+        if dvr == '' or args.driver == 'hyperkit':
+            utils.run('hyperkit', '-v') #check if hyperkit is installed
+        if dvr == '':
+            dvr = dvr_opts.get('hyperkit', '')
+        if args.driver == 'docker':
+            utils.error('The docker driver is not supported when deploying the CDK on macOS')
+            sys.exit(1)
+
+    _, minikube_ver, _ = utils.run('minikube', 'version', cstdout=True)
+    minikube_ver = str(minikube_ver).split('\\n')[0].split(' ')[-1]
+    utils.check_component_version('minikube', minikube_ver)
+
+    k8s_ver = f'--kubernetes-version={args.version}'
+    addons = '--addons=ingress,volumesnapshots'
+    minikube_args = f'start --cpus=3 --memory=9g --disk-size=40g {k8s_ver} {addons} {dvr}'
+    utils.message('Running: "minikube ' + minikube_args + '"')
+    utils.run('minikube', minikube_args)
+
+if __name__ == '__main__':
+    main()
