@@ -32,7 +32,7 @@ def main():
     
     dvr_opts = {
         'docker': '--driver=docker',
-        'hyperkit': '--driver=docker',
+        'hyperkit': '--driver=hyperkit',
         'vb': '--driver=virtualbox --bootstrapper kubeadm',
     }
     dvr = dvr_opts.get(args.driver, '')
