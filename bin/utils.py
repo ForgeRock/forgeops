@@ -37,15 +37,27 @@ DOCKER_REGEX_NAME = {
 REQ_VERSIONS ={
     'ds-operator': {
         'MIN': 'v0.1.0',
-        'MAX': 'v100',
+        'MAX': 'v100.0.0',
     },
     'secret-agent': {
         'MIN': 'v1.1.1',
-        'MAX': 'v100',
+        'MAX': 'v100.0.0',
     },
     'minikube': {
         'MIN': 'v1.22.0',
-        'MAX': 'v100',
+        'MAX': 'v100.0.0',
+    },
+    'kubectl': {
+        'MIN': 'v1.20.0',
+        'MAX': 'v100.0.0',
+    },
+    'kustomize': {
+        'MIN': 'v4.2.0',
+        'MAX': 'v100.0.0',
+    },
+    'skaffold':{
+        'MIN': 'v1.20.0',
+        'MAX': 'v100.0.0',        
     }
 }
 
@@ -244,11 +256,27 @@ def check_component_version(component, version):
     version_min = pkg_resources.parse_version(REQ_VERSIONS[component]['MIN'])
     if not version_min <= version <= version_max:
         error(f'Unsupported {component} version found: "{version}"')
-        message(f'Need {component} versions: {version_min} <= X <= {version_max}')
+        message(f'Need {component} versions between {version_min} and {version_max}')
         sys.exit(1)
+
+def check_base_toolset():
+    # print('Checking kubectl version')
+    _, ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
+    ver = ver.decode('ascii').split(' ')[-1].strip()
+    check_component_version('kubectl', ver)
+    
+    # print('Checking kustomize version')
+    _, ver, _ = run('kustomize', 'version --short', cstdout=True)
+    ver = ver.decode('ascii').split()[0].split('/')[-1]
+    check_component_version('kustomize', ver)
+
+    # print('Checking skaffold version')
+    _, ver, _ = run('skaffold', 'version', cstdout=True)
+    check_component_version('skaffold', ver.decode('ascii').strip())
 
 def install_dependencies():
     """Check and install dependencies"""
+    check_base_toolset()
     print('Checking secret-agent operator and related CRDs:', end=' ')
     try:
         run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',

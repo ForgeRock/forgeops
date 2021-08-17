@@ -193,6 +193,8 @@ def main():
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
 
+    # Check toolset versions before doing anything
+    utils.check_base_toolset()
     if args.cmd != 'build':
         ctx_namespace = utils.get_namespace()
         ctx = utils.get_context()
