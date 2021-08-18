@@ -1,5 +1,7 @@
 FROM gcr.io/forgerock-io/ds/pit1:7.1.1-60049be8ab08daec9facec0ef6b9c48615fb8e2d
 
+COPY debian-buster-sources.list /etc/apt/sources.list
+
 # If you want to update any o/s software, or require root access, uncomment the lines below
 # Ensure that the /opt/opendj is owned by forgeorock:root
 # USER root
