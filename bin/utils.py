@@ -592,3 +592,83 @@ def get_secret_value(namespace, secret, key):
         # base64 decode the secret
     secret = base64.b64decode(r.stdout.decode("utf-8"))
     return secret
+
+def amster_import(ns, src, printlogs=True):
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    # If the source dir/file does not exist exit
+    if not os.path.exists(src):
+        error(f'Cant read path {src}. Please specify a valid path and try again')
+        sys.exit(1)
+    try:
+        clean_amster_job(ns)
+        message('Packing and uploading configs')
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
+        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz')
+        pod = _launch_amster_job(amster_upload_job_path, ns)
+        message('\nWaiting for amster job to complete. This can take several minutes.')
+        run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+        if printlogs:
+            message('Captured logs from the amster pod')
+            run('kubectl', f'-n {ns} logs -c amster {pod}')
+    finally:
+        clean_amster_job(ns)
+
+def amster_export(ns, dst, glob):
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    if not os.path.isdir(dst):
+        error(f'{dst} is not a valid directory. Please specify a valid path and try again')
+        sys.exit(1)
+    try:
+        clean_amster_job(ns)
+        message('Packing and uploading configs')
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-scripts.tar.gz')
+        # Create export - amster will export data, and wait.
+        pod = _launch_amster_job(amster_export_job_path, ns)
+        message('\nWaiting for amster job to complete. This can take several minutes.')
+        run('kubectl', f'-n {ns} wait --for=condition=ready pod {pod} --timeout=600s')
+
+        # If args.glob is True, copy the realm AND global data
+        if glob:
+            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster {dst}')
+        else:
+            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster/realms {dst}/realms')
+
+        if not os.listdir(dst):
+            error('No files were exported!')
+            sys.exit(1)
+    finally:
+        clean_amster_job(ns)
+
+# Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
+def _launch_amster_job(kustomize_path, ns):
+    message('Deploying amster')
+    _, contents, _ = run('kustomize', f'build {kustomize_path}', cstdout=True)
+    contents = contents.decode('ascii')
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+    time.sleep(5) # Allow kube-scheduler to create the pod
+    _, amster_pod_name, _ = run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
+                                      cstdout=True)
+    return amster_pod_name.decode('ascii')
+
+def clean_amster_job(ns):
+    message(f'Cleaning up amster components')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
+    if os.path.exists('amster-import.tar.gz'): 
+        os.remove('amster-import.tar.gz')
+    if os.path.exists('amster-scripts.tar.gz'): 
+        os.remove('amster-scripts.tar.gz')
+    return

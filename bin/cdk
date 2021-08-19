@@ -9,13 +9,20 @@ from urllib import request
 import utils
 import json
 
+def amster_import(component, ns, fqdn, ctx):
+    utils.message('Starting amster import')
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', 'cdk')
+    utils.amster_import(ns, amster_config_path, printlogs=False)
+
 bundles = {
     'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
     'ds': ['base/ds-idrepo'],
-    'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
+    'apps': ['dev/am', 'dev/idm', 'base/rcs-agent'],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
     'am': ['dev/am'],
-    'idm': ['dev/idm']
+    'idm': ['dev/idm'],
+    'amster': [amster_import]
 }
 build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
 
@@ -46,17 +53,25 @@ def deploy_local_manifest(component, ns, fqdn, ctx):
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
     try:
+        to_call = [] 
         components_to_install = bundles.get(component, [f'base/{component}'])
         # Temporarily add the wanted kustomize files
         for c in components_to_install:
-            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+            if callable(c):
+                to_call.append(c)
+                continue
+            else:
+                utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
         _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
         contents = contents.decode('ascii')
-        contents = contents.replace('namespace: default', f'namespace: {ns}')
-        contents = contents.replace('default.iam.example.com', f'{fqdn}')
-        if ctx.lower() == 'minikube':
-            contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
-        utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+        if contents:
+            contents = contents.replace('namespace: default', f'namespace: {ns}')
+            contents = contents.replace('default.iam.example.com', f'{fqdn}')
+            if ctx.lower() == 'minikube':
+                contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
+            utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+        for c in to_call:
+            c(component, ns, fqdn, ctx)
     finally:
         # Clean out the temp kustomize files
         utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
@@ -114,10 +129,7 @@ def deploy_quickstart(ns, fqdn, tag, ctx):
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
-    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
-    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
-    utils.message('\nRemoving "amster" deployment.')
-    uninstall_component('amster', ns)
+    amster_import(None, ns, None, None)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
     utils.message('\nDeploying UI.')
