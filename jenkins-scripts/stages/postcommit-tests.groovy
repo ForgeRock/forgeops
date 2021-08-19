@@ -76,23 +76,23 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     }
             )
         }
-//        Restore once forgeops pipeline working
-//        if (params.Postcommit_am_k8s_upgrade) {
-//            parallelTestsMap.put('AM K8s Upgrade',
-//                    {
-//                        commonLodestarModule.runSpyglaas(pipelineRun, random, 'AM K8s Upgrade', clusterConfig +
-//                                [TESTS_SCOPE                           : 'tests/k8s/postcommit/am',
-//                                 UPGRADE_FIRST                         : true,
-//                                 COMPONENTS_AM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
-//                                 COMPONENTS_AM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/am',
-//                                 COMPONENTS_AMSTER_IMAGE_TAG           : commonLodestarModule.productPostcommitStable,
-//                                 COMPONENTS_AMSTER_IMAGE_REPOSITORY    : 'gcr.io/engineeringpit/lodestar-images/amster',
-//                                 COMPONENTS_AM_IMAGE_UPGRADE_TAG       : commonLodestarModule.productLatestTag,
-//                                 COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY: "gcr.io/forgerock-io/am-base/${upgradeImageLevel}"]
-//                        )
-//                    }
-//            )
-//        }
+
+        if (params.Postcommit_am_k8s_upgrade) {
+            parallelTestsMap.put('AM K8s Upgrade',
+                    {
+                        commonLodestarModule.runSpyglaas(pipelineRun, random, 'AM K8s Upgrade', clusterConfig +
+                                [TESTS_SCOPE                           : 'tests/k8s/postcommit/am',
+                                 UPGRADE_FIRST                         : true,
+                                 COMPONENTS_AM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
+                                 COMPONENTS_AM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/am',
+                                 COMPONENTS_AMSTER_IMAGE_TAG           : commonLodestarModule.productPostcommitStable,
+                                 COMPONENTS_AMSTER_IMAGE_REPOSITORY    : 'gcr.io/engineeringpit/lodestar-images/amster',
+                                 COMPONENTS_AM_IMAGE_UPGRADE_TAG       : commonLodestarModule.productLatestTag,
+                                 COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY: "gcr.io/forgerock-io/am-base/${upgradeImageLevel}"]
+                        )
+                    }
+            )
+        }
         if (params.Postcommit_am_basic_perf) {
             parallelTestsMap.put('AM Basic Perf',
                     {
