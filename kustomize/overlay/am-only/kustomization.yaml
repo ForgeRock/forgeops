@@ -1,5 +1,4 @@
 # am-only profile used for PIT tests
-namespace: default
 resources:
   - ../../base/kustomizeConfig
   - ../../base/am-cdk
@@ -9,3 +8,5 @@ resources:
   - ../../base/ldif-importer
   - ingress.yaml
 
+patches:
+  - path: base.yaml

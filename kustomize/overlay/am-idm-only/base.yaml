@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+data:
+  DOMAIN: "forgeops.com"
+  FQDN: fbc.iam.forgeops.com
+  CERT_ISSUER: letsencrypt-prod

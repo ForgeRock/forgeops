@@ -2,98 +2,170 @@
 """This script deploys the ForgeRock Identity Platform to Kubernetes."""
 
 import argparse
+from genericpath import exists
+from pathlib import Path
 import os
 import sys
 import time
-from urllib import request
 import utils
-import json
+import shutil
 
-profiles = {
-    'small': ['overlay/small'],
-    'medium': ['overlay/medium'],
-    'large': ['overlay/large'],
-    'secrets': ['base/secrets']
+def inject_kustomize_amster(kustomize_pkg_path):
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_cm_name = 'amster-files.yaml'
+    amster_cm_path = os.path.join(kustomize_pkg_path, amster_cm_name)
+    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', 'cdk')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    try:
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        utils.run('tar', f'-czf amster-import.tar.gz -C {amster_config_path} .', cstdout=True, env=envVars)
+        utils.run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        _, cm, _ = utils.run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
+                             cstdout=True)
+        with open(amster_cm_path, 'wt') as f:
+            f.write(cm.decode('ascii'))
+        utils.run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
+        utils.run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
+    finally:
+        if os.path.exists('amster-import.tar.gz'): 
+            os.remove('amster-import.tar.gz')
+        if os.path.exists('amster-scripts.tar.gz'): 
+            os.remove('amster-scripts.tar.gz')
+   
+size_paths = {
+    'mini': 'overlay/mini',
+    'small': 'overlay/small',
+    'medium': 'overlay/medium',
+    'large': 'overlay/large',
 }
+bundles = {
+    'base': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
+    'ds': ['base/ds-idrepo', 'base/ds-cts'],
+    'ds-old': ['base/ds/idrepo', 'base/ds/cts'],
+    'apps': ['base/am-cdk', 'base/idm-cdk', 'base/rcs-agent', inject_kustomize_amster],
+    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
+    'am': ['base/am-cdk'],
+    'idm': ['base/idm-cdk'],
+    'amster': [inject_kustomize_amster]
+}
+patcheable_components ={
+    'base/am-cdk': 'am.yaml',
+    'base/idm-cdk': 'idm.yaml',
+    'base/kustomizeConfig': 'base.yaml',
+    'base/ds/idrepo': 'ds-idrepo-old.yaml',
+    'base/ds/cts': 'ds-cts-old.yaml',
+    'base/ds-idrepo': 'ds-idrepo.yaml',
+    'base/ds-cts': 'ds-cts.yaml',
+    'base/ig': 'ig.yaml',
+}
+default_ds = 'ds'
 
-def deploy_local_manifest(component, ns, fqdn):
+def generate_package(component, size, ns, fqdn, custom_path=None):
     """Deploy local component (local mode)"""
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    src_profile_dir = os.path.join(kustomize_dir, size_paths[size])
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
-    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-              cwd=image_defaulter)
+    profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
+    shutil.rmtree(profile_dir, ignore_errors=True)
+    Path(profile_dir).mkdir(parents=True, exist_ok=True)
+    utils.run('kustomize', f'create', cwd=profile_dir)
+    utils.run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}', 
+              cwd=profile_dir)
 
-    try: 
-        # Temporarily add the wanted kustomize files
-        for c in profiles.get(component, [f'overlay/{component}']):
-            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
-        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
-        contents = contents.decode('ascii')
-        contents = contents.replace('namespace: default', f'namespace: {ns}')
-        contents = contents.replace('namespace: prod', f'namespace: {ns}')
-        if fqdn:
-            contents = contents.replace('default.iam.example.com', f'{fqdn}')
-            contents = contents.replace('prod.iam.example.com', f'{fqdn}')
-        utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-    finally: 
-        # Clean out the temp kustomize files
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                  cwd=image_defaulter)
+    components_to_install = bundles.get(component, [f'base/{component}'])
+    # Temporarily add the wanted kustomize files
+    for c in components_to_install:
+        if callable(c):
+            c(profile_dir)
+        else:
+            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
+        if c in patcheable_components:
+            p = patcheable_components[c]
+            shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
+            utils.run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
+    _, contents, _ = utils.run('kustomize', f'build {profile_dir}', cstdout=True)
+    contents = contents.decode('ascii')
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    contents = contents.replace('namespace: prod', f'namespace: {ns}')
+    contents = contents.replace('default.iam.example.com', f'{fqdn}')
+    contents = contents.replace('prod.iam.example.com', f'{fqdn}')
+    return profile_dir, contents
+
+def deploy_local_manifest(component, size, ns, fqdn):
+    """Generate and deploy component or bundle"""
+    _, contents = generate_package(component, size, ns, fqdn)
+    utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
 def uninstall_component(component, ns, force):
     """Uninstall a profile"""
+    if  component == "all":
+        for c in ['ui', 'apps', default_ds, 'base']:
+            uninstall_component(c, ns, force)
+        return
     try:
-        # Clean out the temp kustomize files
+        # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-        image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                cwd=image_defaulter)
-        # Temporarily add the wanted kustomize files
-        for c in profiles.get(component, [f'overlay/{component}']):
-            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
-        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
-        contents = contents.decode('ascii')
-        contents = contents.replace('namespace: default', f'namespace: {ns}')
-        contents = contents.replace('namespace: prod', f'namespace: {ns}')
+        uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
+        _, contents = generate_package(component, 'mini', ns, '.', custom_path=uninstall_dir)
         utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
-        if force:
+        if component == 'base' and force:
             utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
             utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
             uninstall_component('secrets', ns, False)
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
-    finally: 
-        # Clean out the temp kustomize files
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                  cwd=image_defaulter)
+    finally:
+        #clean up temp folder
+        shutil.rmtree(uninstall_dir, ignore_errors=True)
 
-def build_docker_images(components, default_repo, tag, config_profile=None):
-    """Builds custom docker images"""
-
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
-    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-              cwd=image_defaulter)
-    for component in components:
-        tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
-        name = utils.DOCKER_REGEX_NAME.get(component, component)
-        utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
-        utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
+def deploy_cdm(size, ns, fqdn):
+    """Deploy the CDM in sequence"""
+    utils.message('Deploying base.yaml. This is a one time activity.')
+    deploy_local_manifest('base', size, ns, fqdn)
+    deploy_local_manifest('secrets', size, ns, fqdn)
+    utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
+    deploy_local_manifest(default_ds, size, ns, fqdn)
+    utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    time.sleep(2)
+    utils.wait_for_ds(ns, 'ds-idrepo')
+    if size != 'mini': utils.wait_for_ds(ns, 'ds-cts')
+    utils.message('\nDeploying apps.')
+    deploy_local_manifest('apps', size, ns, fqdn)
+    utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
+    time.sleep(2)
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
+    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+    utils.message('\nRemoving "amster" deployment.')
+    uninstall_component('amster', ns, False)
+    utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
+    utils.message('\nDeploying UI.')
+    deploy_local_manifest('ui', size, ns, fqdn)
+    # message('\nWaiting for UI pods to become ready')
+    # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
 def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
-    common.add_argument('components', nargs='*', choices=['all', []])
-    common.add_argument('-s', '--size', nargs='?', choices=['small', 'medium', 'large'])
+    common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'ds-new', 'apps', 'ui', 'am', 'amster', 'idm',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
+                                                          'rcs-agent', 'secrets', []])
+    common.add_argument('-s', '--size', nargs='?', choices=['mini', 'small', 'medium', 'large'])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock CDM Platform')
     subparser = parser.add_subparsers(dest='cmd', required=True)
     parser_install = subparser.add_parser('install', parents=[common],
-                                          help='Install the ForgeRock CDM platform')
+                                          help='Generates and installs the ForgeRock CDM platform manifests')
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
+                                help='Select the FQDN for this deployment')
+    parser_generate = subparser.add_parser('generate', parents=[common],
+                                          help='Generates the ForgeRock CDM platform manifests')
+    parser_generate.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_delete = subparser.add_parser(
         'delete', parents=[common], help='Delete the ForgeRock CDM Platform')
@@ -101,21 +173,15 @@ def main():
                                help='Skip delete confirmation')
     parser_delete.add_argument('-f', '--force', dest='force_delete', action='store_true',
                                help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
-    parser_build = subparser.add_parser('build', help='Build ForgeRock Platform docker images')
-    parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 
-                                                                'ds-cts', 'ldif-importer', []])
-    parser_build.add_argument('-r', '--default-repo', dest='registry', required=False)
-    parser_build.add_argument('-t', '--tag', required=False)
-    parser_build.add_argument('-p', '--config-profile', dest='config_profile')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     args = parser.parse_args()
 
-    _, ctx_namespace, _ = utils.run('kubectl',
-                                    'config view --minify --output=jsonpath={..namespace}', cstdout=True)
-    ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
+    # Check toolset versions before doing anything
+    utils.check_base_toolset()
+    ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
-    size = args.size if getattr(args, 'size', None) else None
-    components = args.components[0] if getattr(args, 'components', None) else ['all']
+    size = args.size if getattr(args, 'size', None) else 'mini'
+    components = args.components if getattr(args, 'components', None) else ['all']
     fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
     if args.cmd is None:
         parser.print_help()
@@ -132,29 +198,44 @@ def main():
             if input('OK to delete all CDM components? [Y/N] ').lower() not in ['yes', 'y']:
                 return
         if args.force_delete:
-            utils.message('Using --force delete: This will erase all your PVCs and Secrets. This cannot be undone.')
+            utils.warning('Using --force delete: This will erase all your PVCs and Secrets. This cannot be undone.')
+            utils.warning('CTRL+C Now if you want to cancel.')
+            time.sleep(2)
             if not args.skip_confirmation:
                 if input('OK to proceed? [Y/N] ').lower() not in ['yes', 'y']:
                     return
-        uninstall_component('small', namespace, args.force_delete)
-        if not args.force_delete:
+        if 'base' in components: #delete 'base' last
+            components.append(components.pop(components.index('base')))
+        for c in components:
+            uninstall_component(c, namespace, args.force_delete)
+        if ('base' in components or 'all' in components) and not args.force_delete:
             utils.warning('Will not delete PVCs or Secrets to avoid data loss. You must delete those manually or use --force')
         return
-    if args.cmd == 'build':
-        components = args.components if getattr(args, 'components', None) else ['ds-idrepo', 'ds-cts', 'am', 'amster', 'idm', 'ldif-importer']
-        build_docker_images(components, args.registry, args.tag, args.config_profile)
-        return
-    if not size:
-        utils.error('Must specify a CDM size to install using --size. No action taken')
-        return
 
+    if 'base' in components:
+        components.insert(0, 'secrets')
+
+    if args.cmd == 'generate':
+        utils.message(f'Generating CDM manifests for {components} size: "{size}" for namespace: "{namespace}"\n')
+        if 'all' in components:
+            components = ['base', default_ds, 'apps', 'ui']
+        for c in components:
+            profile_path, _ = generate_package(c, size, namespace, fqdn)
+            print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
+        utils.message('\nEnjoy your CDM manifests!')
+        return 
+    # If we reach this point, we're installing the CDM 
     utils.install_dependencies()
     utils.message(f'Installing CDM size: "{size}" in namespace: "{namespace}"\n')
-    deploy_local_manifest('secrets', namespace, fqdn)
-    utils.waitforsecrets(namespace)
-    deploy_local_manifest(size, namespace, fqdn)
+    utils.message(f'Installing component(s): {components}\n')
+    if 'all' in components:
+        deploy_cdm(size, namespace, fqdn)
+    else:
+        for c in components:
+            deploy_local_manifest(c, size, namespace, fqdn)
 
-    if args.cmd == 'install':
+    if 'base' in components or 'all' in components:
+        utils.waitforsecrets(namespace)
         utils.printsecrets(namespace)
         utils.printurls(namespace)
     utils.message('\nEnjoy your CDM deployment!')

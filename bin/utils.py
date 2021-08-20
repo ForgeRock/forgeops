@@ -208,31 +208,23 @@ def wait_for_ds(ns, directoryservices_name):
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
 
 
-def getsec(ns, secret, secretKey):
-    """Get secret contents"""
-    _, pipe, _ = run('kubectl',
-                     f'-n {ns} get secret {secret} -o jsonpath={{.data.{secretKey}}}', cstdout=True)
-    _, pipe, _ = run('base64', '--decode', cstdout=True, stdin=pipe)
-    return pipe.decode('ascii')
-
-
 def printsecrets(ns):
     """Print relevant platform secrets"""
     message('\nRelevant passwords:')
     try:
         print(
-            f"{getsec(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
+            f"{get_secret_value(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
         print(
-            f"{getsec(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
+            f"{get_secret_value(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
         print(
-            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
+            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
         print(
-            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
-        print("{} (uid=admin user)".format(getsec(ns, 'ds-passwords',
-              'dirmanager\\.pw')))  # f'strings' do not allow '\'
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
+        print("{} (uid=admin user)".format(get_secret_value(ns, 'ds-passwords',
+              'dirmanager\\\.pw')))  # f'strings' do not allow '\'
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
     except Exception as _e:
         sys.exit(1)
 
@@ -570,28 +562,18 @@ def get_context():
     return ctx.decode('ascii') if ctx else 'default'
 
 # Lookup the value of a configmap key
-def get_configmap_value(namespace, configmap, key):
-    ks = "{.data." + key + "}"
-    r = subprocess.run(
-        f'kubectl --namespace {namespace} get configmap {configmap} -o jsonpath={ks}', shell=True, capture_output=True)
-    if r.returncode != 0:
-        print(f'Kubectl error {r.stderr} : {r.stdout}')
-        sys.exit(1)
-    return r.stdout.decode("utf-8")
-
+def get_configmap_value(ns, configmap, key):
+    """Get configmap contents"""
+    _, value, _ = run('kubectl',
+                     f'-n {ns} get configmap {configmap} -o jsonpath={{.data.{key}}}', cstdout=True)
+    return value.decode('utf-8')
 
 # Lookup the value of a secret
-def get_secret_value(namespace, secret, key):
-    ks = "{.data." + key + "}"
-    r = subprocess.run(
-        f'kubectl --namespace {namespace} get secret {secret} -o jsonpath={ks}', shell=True, capture_output=True)
-    if r.returncode != 0:
-        print(f'Kubectl error {r.stderr} : {r.stdout}')
-        sys.exit(1)
-
-        # base64 decode the secret
-    secret = base64.b64decode(r.stdout.decode("utf-8"))
-    return secret
+def get_secret_value(ns, secret, key):
+    """Get secret contents"""
+    _, value, _ = run('kubectl',
+                     f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
+    return base64.b64decode(value).decode('utf-8')
 
 def amster_import(ns, src, printlogs=True):
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')

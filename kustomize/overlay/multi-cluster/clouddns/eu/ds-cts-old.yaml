@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-cts
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: ds
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 2
+            limits:
+              memory: 4Gi
+              cpu: 2
+          env: 
+          - name: DS_CLUSTER_TOPOLOGY
+            value: "eu,us"
+          - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+            value: "ds-cts-0.ds-cts.prod.svc.eu:8989,ds-cts-0.ds-cts.prod.svc.us:8989"
+      initContainers:
+        - name: initialize
+          imagePullPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 250Gi

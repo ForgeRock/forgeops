@@ -18,11 +18,11 @@ def amster_import(component, ns, fqdn, ctx):
 bundles = {
     'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
     'ds': ['base/ds-idrepo'],
-    'apps': ['dev/am', 'dev/idm', 'base/rcs-agent'],
+    'apps': ['base/am-cdk', 'base/idm-cdk', 'base/rcs-agent'],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
-    'am': ['dev/am'],
-    'idm': ['dev/idm'],
-    'amster': [amster_import]
+    'am': ['base/am-cdk'],
+    'idm': ['base/idm-cdk'],
+    'amster': [amster_import],
 }
 build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
 
@@ -86,7 +86,7 @@ def deploy_component(component, ns, fqdn, tag, ctx):
 
 def uninstall_component(component, ns):
     """Uninstall a manifest"""
-    if  component == "quickstart":
+    if  component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
             uninstall_component(c, ns)
         return
@@ -104,7 +104,7 @@ def uninstall_component(component, ns):
         contents = contents.decode('ascii')
         utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
 
-        if component in ['base', 'quickstart']:
+        if component in ['base', 'all']:
             utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
             utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
     except Exception as e:
@@ -115,8 +115,8 @@ def uninstall_component(component, ns):
         utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
                 cwd=image_defaulter)
 
-def deploy_quickstart(ns, fqdn, tag, ctx):
-    """Deploy the quickstart"""
+def deploy_all(ns, fqdn, tag, ctx):
+    """Deploy all"""
     utils.message('Deploying base.yaml. This is a one time activity.')
     deploy_component('base', ns, fqdn, tag, ctx)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
@@ -181,7 +181,7 @@ def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
-    common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
+    common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'rcs-agent', []])
     parser = argparse.ArgumentParser(
@@ -213,8 +213,9 @@ def main():
         namespace = getattr(args, 'namespace', None) or ctx_namespace
         fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
 
-    components = args.components if getattr(args, 'components', None) else ['quickstart']
+    components = args.components if getattr(args, 'components', None) else ['all']
     if args.cmd == 'info':
+        utils.message(f'Targeting namesapce: "{namespace}"')
         utils.printsecrets(namespace)
         utils.printurls(namespace)
         return
@@ -225,7 +226,7 @@ def main():
         parser.print_help()
         sys.exit(1)
     if args.cmd == 'delete':
-        utils.message(f'Uninstalling component(s): {components}')
+        utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}"')
         if not args.skip_confirmation:
             if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
                 return
@@ -248,14 +249,14 @@ def main():
             build_docker_image(c, args.registry, args.tag, args.config_profile)
         return
     utils.install_dependencies()
-    utils.message(f'Installing component(s): {components}\n')
-    if 'quickstart' in components:
-        deploy_quickstart(namespace, fqdn, None, ctx)
+    utils.message(f'Installing component(s): {components} in namespace: "{namespace}"\n')
+    if 'all' in components:
+        deploy_all(namespace, fqdn, None, ctx)
     else:
         for c in components:
             deploy_component(c, namespace, fqdn, None, ctx)
 
-    if args.cmd == 'install' and ('base' in components or 'quickstart' in components):
+    if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace)
         utils.printsecrets(namespace)
         utils.printurls(namespace)

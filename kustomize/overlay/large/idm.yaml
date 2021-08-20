@@ -1,0 +1,18 @@
+#Patch IDM
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idm
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: openidm
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 8Gi
+          requests:
+            cpu: 8000m
+            memory: 4Gi

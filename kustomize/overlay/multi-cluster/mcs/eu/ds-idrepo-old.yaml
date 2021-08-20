@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: ds
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 2
+            limits:
+              memory: 4Gi
+              cpu: 2
+          env: 
+          - name: DS_CLUSTER_TOPOLOGY
+            value: "eu,us"
+          - name: MCS_ENABLED
+            value: "true"
+      initContainers:
+        - name: initialize
+          imagePullPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
