@@ -160,7 +160,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                                  COMPONENTS_IDM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
                                  COMPONENTS_IDM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/idm',
                                  COMPONENTS_IDM_IMAGE_UPGRADE_TAG       : commonLodestarModule.productLatestTag,
-                                 COMPONENTS_IDM_IMAGE_UPGRADE_REPOSITORY: "gcr.io/forgerock-io/idm/${upgradeImageLevel}"]
+                                 COMPONENTS_IDM_IMAGE_UPGRADE_REPOSITORY: "gcr.io/forgerock-io/idm-cloud/${upgradeImageLevel}"]
                         )
                     }
             )
