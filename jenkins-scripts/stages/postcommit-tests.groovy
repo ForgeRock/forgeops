@@ -227,7 +227,8 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
             parallelTestsMap.put('Set Images',
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
-                                [TESTS_SCOPE: 'tests/set_images']
+                                [TESTS_SCOPE                    : 'tests/set_images',
+                                 STASH_PLATFORM_IMAGES_BRANCH   : 'postcommit-forgeops']
                         )
                     }
             )
