@@ -105,6 +105,11 @@ profiles:
 
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
+- name: mini
+  build: *default-build
+  deploy:
+    kustomize:
+      path: ./kustomize/overlay/mini
 - name: small
   build: *default-build
   deploy:
