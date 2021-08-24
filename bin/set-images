@@ -85,10 +85,6 @@ _test_image_names = [
      'gcr.io',
      'busybox',
      '@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',),
-    ('gcr.io/forgerock/am/pit1@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',
-     'gcr.io/forgerock',
-     'am',
-     '@sha256:7cc4b5aefd1d0cadf8d97d4350462ba51c694ebca145b08d7d41b41acc8db5aa',),
 ]
 
 _test_from_line = [
@@ -103,18 +99,6 @@ _test_from_line = [
     ('FROM redis AS base', 'FROM', 'redis', 'AS base'),
     ('FROM redis:latest AS base', 'FROM', 'redis:latest', 'AS base'),
 ]
-
-# Map docker "image name" to configuration file
-image_name_to_config_name = {
-    # image: configfile name
-    'am': 'am',
-    'am-base': 'am',
-    'amster': 'am',
-    'ds': 'ds',
-    'idm-cloud': 'idm',
-    'idm': 'idm',
-    'ig': 'ig',
-}
 
 
 def run_tests(args):
@@ -397,48 +381,48 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
 
 def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
     # Track files changed.
-    docker_files = dockerpath.rglob('**/Dockerfile')
+    changed = set()
+    for product_name, product_config in products.items():
+        docker_files = []
+        for path in dockerpath.joinpath(product_name).rglob('**/Dockerfile'):
+            docker_files.append(str(path))
 
-    # This makes an iterator that we just loop over and it handles all the file
-    # opening and closing for us.
-    # Anything "printed" to stdout is written to the file!
-    with fileinput.FileInput(files=docker_files, inplace=True) as f:
-        for line in f:
-            before, image, after = parse_from_line(line)
-            # not a FROM command, write the content back.
-            # or we've already written to this file
-            if not image or f.filename():
-                print(line, end='')
-                continue
-            # load the current repo and tag and use as the default.
-            current_repo, name, current_tag = parse_repo_tag(image)
+        # This makes an iterator that we just loop over and it handles all the file
+        # opening and closing for us.
+        # Anything "printed" to stdout is written to the file!
+        with fileinput.FileInput(files=docker_files, inplace=True) as f:
+            for line in f:
+                before, image, after = parse_from_line(line)
+                # not a FROM command, write the content back.
+                # or we've already written to this file
+                if not image or f.filename() in changed:
+                    print(line, end='')
+                    continue
+                # load the current repo and tag and use as the default.
+                current_repo, name, current_tag = parse_repo_tag(image)
 
-            # Look up product by name, if there's no match skip
-            try:
-                product_config = products[image_name_to_config_name[name]]
-            except KeyError:
-                print(line, end='')
-                continue
+                # Update repo
+                if update_repo is not None:
+                    repo_and_name = f'{update_repo}/{name}'
+                else:
+                    repo_and_name = product_config.get('imageName',
+                                                       f'{current_repo}/{name}')
+                # Update tags
+                config_tag = product_config.get('imageTag', None)
+                if update_tag is not None:
+                    image_tag = f':{update_tag}'
+                elif config_tag:
+                    # tags from config need the seperator
+                    image_tag = f':{config_tag}'
+                else:
+                    image_tag = current_tag
 
-            # Update repo
-            if update_repo is not None:
-                repo_and_name = f'{update_repo}/{name}'
-            else:
-                repo_and_name = product_config.get('imageName',
-                                                   f'{current_repo}/{name}')
-            # Update tags
-            config_tag = product_config.get('imageTag', None)
-            if update_tag is not None:
-                image_tag = f':{update_tag}'
-            elif config_tag:
-                # tags from config need the seperator
-                image_tag = f':{config_tag}'
-            else:
-                image_tag = current_tag
-
-            new_image = f'{repo_and_name}{image_tag}'
-            log.info(f'Updating {f.filename()} to use {new_image.strip()}')
-            print(f'{before} {new_image}{after}')
+                new_image = f'{repo_and_name}{image_tag}'
+                log.info(f'Updating {f.filename()} to use {new_image.strip()}')
+                print(f'{before} {new_image}{after}')
+                # only change the first entry in an file
+                changed.add(f.filename())
+                # only replace the first instance
 
 
 def init_repo(args):
