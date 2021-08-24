@@ -4,7 +4,7 @@ resources:
 images:
 - name: amster
   newName: gcr.io/forgeops-public/amster
-  newTag: 7.1-dev
+  newTag: 7.1.0
 
 # Insert a new init-container to unpack the tar file before our standard amster container
 patchesJSON6902:
