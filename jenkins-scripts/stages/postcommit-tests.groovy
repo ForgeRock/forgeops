@@ -215,8 +215,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runPlatformUi(pipelineRun, random, 'Platform UI', clusterConfig +
                                 [TESTS_SCOPE: 'tests/k8s/postcommit/platform_ui',
-                                 SKIP_TESTS   : 'True',
-                                 SKIP_CLEANUP : 'True']
+                                 SKIP_TESTS                          : true,
+                                 SKIP_CLEANUP                        : true,
+                                 CLUSTER_DOMAIN                      : 'postcommit-forgeops.engineeringpit.com',
+                                 DEPLOYMENT_USE_LODESTAR_CERT        : true]
                         )
                     }
             )
