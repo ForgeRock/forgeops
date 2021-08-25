@@ -33,7 +33,7 @@ RUN mkdir -p /opt/async-profiler && \
     wget -q -O-  https://github.com/jvm-profiling-tools/async-profiler/releases/download/v1.5/async-profiler-1.5-linux-x64.tar.gz \
     | tar xzv -C /opt/async-profiler
 
-FROM debian:stable-slim
+FROM debian:buster-slim
 
 COPY --from=0 /opt /opt
 
