@@ -15,7 +15,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     def stageName = 'POSTCOMMIT-ALL-TESTS'
     def clusterConfig = [:]
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
-    clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.forgeops.com'
+    clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
 
     try {
         node('forgeops-postcommit-cloud') {
@@ -217,7 +217,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                                 [TESTS_SCOPE: 'tests/k8s/postcommit/platform_ui',
                                  SKIP_TESTS                          : true,
                                  SKIP_CLEANUP                        : true,
-                                 CLUSTER_DOMAIN                      : 'postcommit-forgeops.engineeringpit.com',
                                  DEPLOYMENT_USE_LODESTAR_CERT        : true]
                         )
                     }
