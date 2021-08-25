@@ -14,6 +14,7 @@ import logging
 import json
 import re
 import pkg_resources
+from pathlib import Path
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -59,6 +60,40 @@ REQ_VERSIONS ={
         'MIN': 'v1.20.0',
         'MAX': 'v100.0.0',        
     }
+}
+
+def inject_kustomize_amster(kustomize_pkg_path): return _inject_kustomize_amster(kustomize_pkg_path)
+
+size_paths = {
+    'mini': 'overlay/mini',
+    'small': 'overlay/small',
+    'medium': 'overlay/medium',
+    'large': 'overlay/large',
+    'base': 'base'
+}
+
+bundles = {
+    'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
+	'base-cdm': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
+    'ds': ['base/ds-idrepo'],
+    'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
+    'ds-old': ['base/ds/idrepo', 'base/ds/cts'],
+    'apps': ['base/am-cdk', 'base/idm-cdk', 'base/rcs-agent', inject_kustomize_amster],
+    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
+    'am': ['base/am-cdk'],
+    'idm': ['base/idm-cdk'],
+    'amster': [inject_kustomize_amster]
+}
+
+patcheable_components ={
+    'base/am-cdk': 'am.yaml',
+    'base/idm-cdk': 'idm.yaml',
+    'base/kustomizeConfig': 'base.yaml',
+    'base/ds/idrepo': 'ds-idrepo-old.yaml',
+    'base/ds/cts': 'ds-cts-old.yaml',
+    'base/ds-idrepo': 'ds-idrepo.yaml',
+    'base/ds-cts': 'ds-cts.yaml',
+    'base/ig': 'ig.yaml',
 }
 
 SCRIPT = pathlib.Path(__file__)
@@ -191,7 +226,6 @@ def _runwithtimeout(target, args, secs):
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
 
-
 def waitforsecrets(ns):
     """Wait for the given secrets to exist in the Kubernetes api."""
     secrets = ['am-env-secrets', 'idm-env-secrets',
@@ -207,6 +241,95 @@ def wait_for_ds(ns, directoryservices_name):
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
 
+def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
+    """Generate Kustomize package for component or bundle"""
+    # Clean out the temp kustomize files
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    src_profile_dir = os.path.join(kustomize_dir, size_paths[size])
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
+    shutil.rmtree(profile_dir, ignore_errors=True)
+    Path(profile_dir).mkdir(parents=True, exist_ok=True)
+    run('kustomize', f'create', cwd=profile_dir)
+    run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}', 
+              cwd=profile_dir)
+    components_to_install = bundles.get(component, [f'base/{component}'])
+    # Temporarily add the wanted kustomize files
+    for c in components_to_install:
+        if callable(c):
+            c(profile_dir)
+        else:
+            run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
+        if c in patcheable_components and size != 'base':
+            p = patcheable_components[c]
+            shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
+            run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
+
+    fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
+    # run('kustomize', f'edit set namespace {ns}', cwd=profile_dir)
+    if component in ['base', 'base-cdm']:
+        run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
+            cwd=profile_dir) 
+    _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
+    contents = contents.decode('ascii')
+    contents = contents.replace('namespace: default', f'namespace: {ns}')
+    contents = contents.replace('namespace: prod', f'namespace: {ns}')
+    if ctx.lower() == 'minikube':
+        contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
+    return profile_dir, contents
+
+def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None):
+    """Generate and deploy component or bundle"""
+    pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
+    custom_path = os.path.join(pkg_base_path, component)
+    _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path)
+    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
+
+def uninstall_component(component, ns, force):
+    """Uninstall a profile"""
+    if  component == "all":
+        for c in ['ui', 'apps', 'ds', 'base']:
+            uninstall_component(c, ns, force)
+        return
+    try:
+        # generate a manifest with the components to be uninstalled in a temp location
+        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+        uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
+        _, contents = generate_package(component, 'base', ns, '.', '', custom_path=uninstall_dir)
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
+        if component == 'base' and force:
+            run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
+            run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
+            uninstall_component('secrets', ns, False)
+    except Exception as e:
+        print(f'Could not delete {component}. Got: {e}')
+        sys.exit(1)  # Hide python traceback.
+    finally:
+        #clean up temp folder
+        shutil.rmtree(uninstall_dir, ignore_errors=True)
+
+def _inject_kustomize_amster(kustomize_pkg_path):
+    docker_dir = os.path.join(sys.path[0], '../docker')
+    amster_cm_name = 'amster-files.yaml'
+    amster_cm_path = os.path.join(kustomize_pkg_path, amster_cm_name)
+    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', 'cdk')
+    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    try:
+        envVars = os.environ
+        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
+        run('tar', f'-czf amster-import.tar.gz -C {amster_config_path} .', cstdout=True, env=envVars)
+        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        _, cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
+                             cstdout=True)
+        with open(amster_cm_path, 'wt') as f:
+            f.write(cm.decode('ascii'))
+        run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
+        run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
+    finally:
+        if os.path.exists('amster-import.tar.gz'): 
+            os.remove('amster-import.tar.gz')
+        if os.path.exists('amster-scripts.tar.gz'): 
+            os.remove('amster-scripts.tar.gz')
 
 def printsecrets(ns):
     """Print relevant platform secrets"""
@@ -574,83 +697,3 @@ def get_secret_value(ns, secret, key):
     _, value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
-
-def amster_import(ns, src, printlogs=True):
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    docker_dir = os.path.join(sys.path[0], '../docker')
-    amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
-    # If the source dir/file does not exist exit
-    if not os.path.exists(src):
-        error(f'Cant read path {src}. Please specify a valid path and try again')
-        sys.exit(1)
-    try:
-        clean_amster_job(ns)
-        message('Packing and uploading configs')
-        envVars = os.environ
-        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
-        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz')
-        pod = _launch_amster_job(amster_upload_job_path, ns)
-        message('\nWaiting for amster job to complete. This can take several minutes.')
-        run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
-        if printlogs:
-            message('Captured logs from the amster pod')
-            run('kubectl', f'-n {ns} logs -c amster {pod}')
-    finally:
-        clean_amster_job(ns)
-
-def amster_export(ns, dst, glob):
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    docker_dir = os.path.join(sys.path[0], '../docker')
-    amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
-    if not os.path.isdir(dst):
-        error(f'{dst} is not a valid directory. Please specify a valid path and try again')
-        sys.exit(1)
-    try:
-        clean_amster_job(ns)
-        message('Packing and uploading configs')
-        envVars = os.environ
-        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-scripts.tar.gz')
-        # Create export - amster will export data, and wait.
-        pod = _launch_amster_job(amster_export_job_path, ns)
-        message('\nWaiting for amster job to complete. This can take several minutes.')
-        run('kubectl', f'-n {ns} wait --for=condition=ready pod {pod} --timeout=600s')
-
-        # If args.glob is True, copy the realm AND global data
-        if glob:
-            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster {dst}')
-        else:
-            run('kubectl', f'-n {ns} cp -c pause {pod}:/var/tmp/amster/realms {dst}/realms')
-
-        if not os.listdir(dst):
-            error('No files were exported!')
-            sys.exit(1)
-    finally:
-        clean_amster_job(ns)
-
-# Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
-def _launch_amster_job(kustomize_path, ns):
-    message('Deploying amster')
-    _, contents, _ = run('kustomize', f'build {kustomize_path}', cstdout=True)
-    contents = contents.decode('ascii')
-    contents = contents.replace('namespace: default', f'namespace: {ns}')
-    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-    time.sleep(5) # Allow kube-scheduler to create the pod
-    _, amster_pod_name, _ = run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
-                                      cstdout=True)
-    return amster_pod_name.decode('ascii')
-
-def clean_amster_job(ns):
-    message(f'Cleaning up amster components')
-    run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
-    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
-    if os.path.exists('amster-import.tar.gz'): 
-        os.remove('amster-import.tar.gz')
-    if os.path.exists('amster-scripts.tar.gz'): 
-        os.remove('amster-scripts.tar.gz')
-    return

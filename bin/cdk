@@ -1,139 +1,40 @@
 #!/usr/bin/env python3
-"""This script deploys the ForgeRock Identity Plaform components to Kubernetes."""
+"""This script deploys the ForgeRock Identity Platform to Kubernetes."""
 
 import argparse
 import os
 import sys
 import time
-from urllib import request
 import utils
-import json
+import shutil
 
-def amster_import(component, ns, fqdn, ctx):
-    utils.message('Starting amster import')
-    docker_dir = os.path.join(sys.path[0], '../docker')
-    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', 'cdk')
-    utils.amster_import(ns, amster_config_path, printlogs=False)
-
-bundles = {
-    'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
-    'ds': ['base/ds-idrepo'],
-    'apps': ['base/am-cdk', 'base/idm-cdk', 'base/rcs-agent'],
-    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
-    'am': ['base/am-cdk'],
-    'idm': ['base/idm-cdk'],
-    'amster': [amster_import],
-}
 build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
 
-def get_component_url(component, tag):
-    """Calculates the target URL of the desired component"""
-    if tag == 'latest':
-        return f'https://github.com/ForgeRock/forgeops/releases/latest/download/{component}.yaml'
-    return f'https://github.com/ForgeRock/forgeops/releases/download/{tag}/{component}.yaml'
-
-def deploy_repo_manifest(component, ns, tag, fqdn):
-    """Deploy the component using released manifest"""
-    component_url = get_component_url(component, tag)
-    try:
-        with request.urlopen(component_url, timeout=5) as r:
-            contents = r.read().decode('ascii')
-            contents = contents.replace('namespace: default', f'namespace: {ns}')
-            contents = contents.replace('default.iam.example.com', f'{fqdn}')
-            utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-    except Exception as e:
-        print(f'Could not deploy {component_url}. Got: {e}')
-        sys.exit(1)  # Hide python traceback. kubectl error should be enough here
-
-def deploy_local_manifest(component, ns, fqdn, ctx):
-    """Deploy local component (local mode)"""
-    # Clean out the temp kustomize files
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
-    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-              cwd=image_defaulter)
-    try:
-        to_call = [] 
-        components_to_install = bundles.get(component, [f'base/{component}'])
-        # Temporarily add the wanted kustomize files
-        for c in components_to_install:
-            if callable(c):
-                to_call.append(c)
-                continue
-            else:
-                utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
-        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
-        contents = contents.decode('ascii')
-        if contents:
-            contents = contents.replace('namespace: default', f'namespace: {ns}')
-            contents = contents.replace('default.iam.example.com', f'{fqdn}')
-            if ctx.lower() == 'minikube':
-                contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
-            utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-        for c in to_call:
-            c(component, ns, fqdn, ctx)
-    finally:
-        # Clean out the temp kustomize files
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                cwd=image_defaulter)
-
-def deploy_component(component, ns, fqdn, tag, ctx):
-    """Deploy the Component manifest"""
-    if tag:
-        deploy_repo_manifest(component, ns, tag, fqdn)
-        return
-    deploy_local_manifest(component, ns, fqdn, ctx)
-
-def uninstall_component(component, ns):
-    """Uninstall a manifest"""
-    if  component == "all":
-        for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns)
-        return
-    try:
-        # Clean out the temp kustomize files
-        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-        image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                cwd=image_defaulter)
-        components_to_delete = bundles.get(component, [f'base/{component}'])
-        # Temporarily add the wanted kustomize files
-        for c in components_to_delete:
-            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
-        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
-        contents = contents.decode('ascii')
-        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
-
-        if component in ['base', 'all']:
-            utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
-            utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
-    except Exception as e:
-        print(f'Could not delete {component}. Got: {e}')
-        sys.exit(1)  # Hide python traceback.
-    finally:
-        # Clean out the temp kustomize files
-        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-                cwd=image_defaulter)
-
-def deploy_all(ns, fqdn, tag, ctx):
-    """Deploy all"""
+def install_all(size, ns, fqdn, ctx):
+    """Deploy all components in sequence"""
+    pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'cdk')
     utils.message('Deploying base.yaml. This is a one time activity.')
-    deploy_component('base', ns, fqdn, tag, ctx)
+    utils.install_component('base', size, ns, fqdn, ctx, pkg_path)
+    utils.install_component('secrets', size, ns, fqdn, ctx, pkg_path)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
-    deploy_component('ds', ns, fqdn, tag, ctx)
+    utils.install_component('ds', size, ns, fqdn, ctx, pkg_path)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_ds(ns, 'ds-idrepo')
+    if size not in ['base', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
     utils.message('\nDeploying apps.')
-    deploy_component('apps', ns, fqdn, tag, ctx)
+    utils.install_component('apps', size, ns, fqdn, ctx, pkg_path)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
-    amster_import(None, ns, None, None)
+    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+    utils.message('\nRemoving "amster" deployment.')
+    utils.uninstall_component('amster', ns, False)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
     utils.message('\nDeploying UI.')
-    deploy_component('ui', ns, fqdn, tag, ctx)
+    utils.install_component('ui', size, ns, fqdn, ctx, pkg_path)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -164,17 +65,12 @@ def overlay_app_configs(ns, am=True, idm=True):
 
 def build_docker_image(component, default_repo, tag, config_profile=None):
     """Builds custom docker images"""
-    # Clean out the temp kustomize files
-    base_dir = os.path.join(sys.path[0], '../')
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
-    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
-              cwd=image_defaulter)
     tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
     utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
-
 
 def main():
 
@@ -233,7 +129,7 @@ def main():
         if 'base' in components: #delete 'base' last
             components.append(components.pop(components.index('base')))
         for c in components:
-            uninstall_component(c, namespace)
+            utils.uninstall_component(c, namespace, True)
         return
     if args.cmd == 'build':
         if args.reset:
@@ -251,10 +147,11 @@ def main():
     utils.install_dependencies()
     utils.message(f'Installing component(s): {components} in namespace: "{namespace}"\n')
     if 'all' in components:
-        deploy_all(namespace, fqdn, None, ctx)
+        install_all('base', namespace, fqdn, ctx)
     else:
         for c in components:
-            deploy_component(c, namespace, fqdn, None, ctx)
+            pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'cdk')
+            utils.install_component(c, 'base', namespace, fqdn, ctx, pkg_path)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace)
