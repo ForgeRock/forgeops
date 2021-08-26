@@ -284,39 +284,6 @@ save_config()
 			rm -fr "$PROFILE_ROOT/amster/config"
 			mkdir -p "$PROFILE_ROOT/amster/config"
 
-			#****** FIX CONFIG RULES ******#
-
-			# Fix FQDN and amsterVersion fields with placeholders. Remove encrypted password field.
-			fqdn=$(kubectl get configmap platform-config -o yaml |grep AM_SERVER_FQDN | head -1 | awk '{print $2}')
-
-			printf "\n*** APPLYING FIXES ***\n"
-
-			echo "Adding back amsterVersion placeholder ..."
-			echo "Adding back FQDN placeholder ..."
-			echo "Removing 'userpassword-encrypted' fields ..."
-			echo ""
-			find "$DOCKER_ROOT/amster/config" -name "*.json" \
-					\( -exec $sed_cmd "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
-					\( -exec $sed_cmd 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
-					-exec $sed_cmd '/userpassword-encrypted/d' {} \; \
-
-			# Fix passwords in OAuth2Clients with placeholders or default values.
-			CLIENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/OAuth2Clients"
-			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/realms/root/IdentityGatewayAgents"
-
-			echo "Adding back password placeholder with defaults in these files:"
-			echo ""
-			echo "idm-provisioning.json"
-			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
-			echo "idm-resource-server.json"
-			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json
-			echo "resource-server.json"
-			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
-			echo "oauth2.json"
-			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
-			echo "ig-agent.json"
-			$sed_cmd 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
-
 			#****** COPY FIXED FILES ******#
 			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
 

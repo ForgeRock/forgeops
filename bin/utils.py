@@ -8,6 +8,8 @@ from threading import Thread
 import os
 import shutil
 import pkg_resources
+import base64
+import re
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -15,6 +17,8 @@ RED = '\033[1;91m'
 ENDC = '\033[0m'
 
 _IGNORE_FILES = ('.DS_Store',)
+
+ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
 
 REQ_VERSIONS ={
     'ds-operator': {
@@ -109,40 +113,31 @@ def wait_for_ds(ns, directoryservices_name):
     run('kubectl', f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
 
-def getsec(ns, secret, secretKey):
-    """Get secret contents"""
-    _, pipe, _ = run('kubectl',
-                     f'-n {ns} get secret {secret} -o jsonpath={{.data.{secretKey}}}', cstdout=True)
-    _, pipe, _ = run('base64', '--decode', cstdout=True, stdin=pipe)
-    return pipe.decode('ascii')
-
 def printsecrets(ns):
     """Print relevant platform secrets"""
     message('\nRelevant passwords:')
     try:
         print(
-            f"{getsec(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
+            f"{get_secret_value(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
         print(
-            f"{getsec(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
+            f"{get_secret_value(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
         print(
-            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
+            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
         print(
-            f"{getsec(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
-        print("{} (uid=admin user)".format(getsec(ns, 'ds-passwords',
+            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
+        print("{} (uid=admin user)".format(get_secret_value(ns, 'ds-passwords',
               'dirmanager\\.pw')))  # f'strings' do not allow '\'
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
-        print(f"{getsec(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
+        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
     except Exception as _e:
         sys.exit(1)
 
 
 def printurls(ns):
     """Print relevant platform URLs"""
+    fqdn = get_fqdn(ns)
     message('\nRelevant URLs:')
-    _, fqdn, _ = run(
-        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
-    fqdn = fqdn.decode('ascii')
     warning(f'https://{fqdn}/platform')
     warning(f'https://{fqdn}/admin')
     warning(f'https://{fqdn}/am')
@@ -173,7 +168,7 @@ def install_dependencies():
 
     _, img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
-    check_component_version('secret-agent', img.decode('ascii').split(':')[1])
+    check_component_version('secret-agent', img.decode('utf-8').split(':')[1])
 
     print('Checking ds-operator and related CRDs:', end=' ')
     try:
@@ -187,7 +182,7 @@ def install_dependencies():
 
     _, img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
-    check_component_version('ds-operator', img.decode('ascii').split(':')[1])
+    check_component_version('ds-operator', img.decode('utf-8').split(':')[1])
     print()
 
 
@@ -281,3 +276,32 @@ def copytree(src, dst):
     if errors:
         raise Exception('\n'.join(errors))
 
+def get_fqdn(ns):
+    _, fqdn, _ = run(
+        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
+    return fqdn.decode('utf-8')
+
+# IF ns is not None, then return it, otherwise lookup the current namespace context
+def get_namespace(ns=None):
+    if ns != None:
+        return ns
+    _, ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    return ctx_namespace.decode('utf-8') if ctx_namespace else 'default'
+
+def get_context():
+    _, ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
+    return ctx.decode('utf-8') if ctx else 'default'
+
+# Lookup the value of a configmap key
+def get_configmap_value(ns, configmap, key):
+    """Get configmap contents"""
+    _, value, _ = run('kubectl',
+                     f'-n {ns} get configmap {configmap} -o jsonpath={{.data.{key}}}', cstdout=True)
+    return value.decode('utf-8')
+
+# Lookup the value of a secret
+def get_secret_value(ns, secret, key):
+    """Get secret contents"""
+    _, value, _ = run('kubectl',
+                     f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
+    return base64.b64decode(value).decode('utf-8')
