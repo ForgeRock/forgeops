@@ -51,7 +51,7 @@ def getDefaultConfig(Random random, String stageName) {
     return [STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
             STASH_FORGEOPS_BRANCH           : commonModule.GIT_COMMIT,
             STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
-            CLUSTER_NAMESPACE               : cloud_config.spyglaasConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
+            DEPLOYMENT_NAMESPACE            : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
             REPORT_NAME_PREFIX              : normalizedStageName,
             PIPELINE_NAME                   : 'Postcommit-Lodestar',
             DO_RECORD_RESULT                : false]
