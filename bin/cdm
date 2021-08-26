@@ -8,7 +8,7 @@ import os
 import sys
 import time
 import utils
-import shutil
+import json
 
 cdm_bundles = {
     'base': 'base-cdm',
@@ -67,7 +67,8 @@ def main():
                                help='Skip delete confirmation')
     parser_delete.add_argument('-f', '--force', dest='force_delete', action='store_true',
                                help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
-    subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    parser_info = subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     args = parser.parse_args()
 
     # Check toolset versions before doing anything
@@ -83,8 +84,13 @@ def main():
         sys.exit(1)
 
     if args.cmd == 'info':
-        utils.printsecrets(namespace)
-        utils.printurls(namespace)
+        if not args.jsonfmt:
+            utils.message(f'Targeting namespace: "{namespace}"')
+        secrets = utils.printsecrets(namespace, not args.jsonfmt)
+        urls = utils.printurls(namespace, not args.jsonfmt)
+        output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
+        if args.jsonfmt:
+            print(json.dumps(output))
         return
 
     if args.cmd == 'delete':

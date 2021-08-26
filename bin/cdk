@@ -6,7 +6,7 @@ import os
 import sys
 import time
 import utils
-import shutil
+import json
 
 build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
 
@@ -21,7 +21,7 @@ def install_all(size, ns, fqdn, ctx):
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_ds(ns, 'ds-idrepo')
-    if size not in ['base', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
+    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
     utils.message('\nDeploying apps.')
     utils.install_component('apps', size, ns, fqdn, ctx, pkg_path)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
@@ -97,7 +97,8 @@ def main():
     parser_build.add_argument('-t', '--tag', required=False)
     parser_build.add_argument('-p', '--config-profile', dest='config_profile')
     parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
-    subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    parser_info = subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
     args = parser.parse_args()
 
@@ -111,9 +112,13 @@ def main():
 
     components = args.components if getattr(args, 'components', None) else ['all']
     if args.cmd == 'info':
-        utils.message(f'Targeting namesapce: "{namespace}"')
-        utils.printsecrets(namespace)
-        utils.printurls(namespace)
+        if not args.jsonfmt:
+            utils.message(f'Targeting namespace: "{namespace}"')
+        secrets = utils.printsecrets(namespace, not args.jsonfmt)
+        urls = utils.printurls(namespace, not args.jsonfmt)
+        output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
+        if args.jsonfmt:
+            print(json.dumps(output))
         return
     if args.cmd == 'config':
         overlay_app_configs(namespace)
@@ -147,11 +152,11 @@ def main():
     utils.install_dependencies()
     utils.message(f'Installing component(s): {components} in namespace: "{namespace}"\n')
     if 'all' in components:
-        install_all('base', namespace, fqdn, ctx)
+        install_all('cdk', namespace, fqdn, ctx)
     else:
         for c in components:
             pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'cdk')
-            utils.install_component(c, 'base', namespace, fqdn, ctx, pkg_path)
+            utils.install_component(c, 'cdk', namespace, fqdn, ctx, pkg_path)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace)

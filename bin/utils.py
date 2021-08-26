@@ -69,7 +69,7 @@ size_paths = {
     'small': 'overlay/small',
     'medium': 'overlay/medium',
     'large': 'overlay/large',
-    'base': 'base'
+    'cdk': 'base'
 }
 
 bundles = {
@@ -260,7 +260,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
             c(profile_dir)
         else:
             run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
-        if c in patcheable_components and size != 'base':
+        if c in patcheable_components and size != 'cdk':
             p = patcheable_components[c]
             shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
             run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
@@ -295,7 +295,7 @@ def uninstall_component(component, ns, force):
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(sys.path[0], '../kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'base', ns, '.', '', custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'cdk', ns, '.', '', custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == 'base' and force:
             run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
@@ -331,37 +331,67 @@ def _inject_kustomize_amster(kustomize_pkg_path):
         if os.path.exists('amster-scripts.tar.gz'): 
             os.remove('amster-scripts.tar.gz')
 
-def printsecrets(ns):
+def printsecrets(ns, to_stdout=True):
     """Print relevant platform secrets"""
-    message('\nRelevant passwords:')
     try:
-        print(
-            f"{get_secret_value(ns, 'am-env-secrets', 'AM_PASSWORDS_AMADMIN_CLEAR')} (amadmin user)")
-        print(
-            f"{get_secret_value(ns, 'idm-env-secrets', 'OPENIDM_ADMIN_PASSWORD')} (openidm-admin user)")
-        print(
-            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_IDM_SECRET')} (rcs-agent IDM secret)")
-        print(
-            f"{get_secret_value(ns, 'rcs-agent-env-secrets', 'AGENT_RCS_SECRET')} (rcs-agent RCS secret)")
-        print("{} (uid=admin user)".format(get_secret_value(ns, 'ds-passwords',
-              'dirmanager\\\.pw')))  # f'strings' do not allow '\'
-        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_APPLICATION_PASSWORD')} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
-        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_CTS_PASSWORD')} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
-        print(f"{get_secret_value(ns, 'ds-env-secrets', 'AM_STORES_USER_PASSWORD')} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+        secrets = {
+            'am-env-secrets': {
+                'AM_PASSWORDS_AMADMIN_CLEAR': None 
+            },
+            'idm-env-secrets': {
+                'OPENIDM_ADMIN_PASSWORD': None
+            },
+            'rcs-agent-env-secrets':{
+                'AGENT_IDM_SECRET': None,
+                'AGENT_RCS_SECRET': None,
+            },
+            'ds-passwords': {
+                'dirmanager\\\.pw': None,
+            },
+            'ds-env-secrets': {
+                'AM_STORES_APPLICATION_PASSWORD': None,
+                'AM_STORES_CTS_PASSWORD': None,
+                'AM_STORES_USER_PASSWORD': None,
+            },
+        }
+        for secret in secrets:
+            for key in secrets[secret]:
+                secrets[secret][key] = get_secret_value(ns, secret, key)
+        if to_stdout:
+            message('\nRelevant passwords:')
+            print(
+                f"{secrets['am-env-secrets']['AM_PASSWORDS_AMADMIN_CLEAR']} (amadmin user)")
+            print(
+                f"{secrets['idm-env-secrets']['OPENIDM_ADMIN_PASSWORD']} (openidm-admin user)")
+            print(
+                f"{secrets['rcs-agent-env-secrets']['AGENT_IDM_SECRET']} (rcs-agent IDM secret)")
+            print(
+                f"{secrets['rcs-agent-env-secrets']['AGENT_RCS_SECRET']} (rcs-agent RCS secret)")
+            print("{} (uid=admin user)".format(secrets['ds-passwords']['dirmanager\\\.pw']))  # f'strings' do not allow '\'
+            print(f"{secrets['ds-env-secrets']['AM_STORES_APPLICATION_PASSWORD']} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
+            print(f"{secrets['ds-env-secrets']['AM_STORES_CTS_PASSWORD']} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
+            print(f"{secrets['ds-env-secrets']['AM_STORES_USER_PASSWORD']} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
+        return secrets
     except Exception as _e:
         sys.exit(1)
 
 
-def printurls(ns):
+def printurls(ns, to_stdout=True):
     """Print relevant platform URLs"""
-    message('\nRelevant URLs:')
     _, fqdn, _ = run(
         'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
     fqdn = fqdn.decode('ascii')
-    warning(f'https://{fqdn}/platform')
-    warning(f'https://{fqdn}/admin')
-    warning(f'https://{fqdn}/am')
-    warning(f'https://{fqdn}/enduser')
+    urls = [
+        f'https://{fqdn}/platform',
+        f'https://{fqdn}/admin',
+        f'https://{fqdn}/am',
+        f'https://{fqdn}/enduser',
+    ]
+    if to_stdout:
+        message('\nRelevant URLs:')
+        for url in urls:
+            warning(url)
+    return urls
 
 
 def check_component_version(component, version):
