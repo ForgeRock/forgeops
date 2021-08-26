@@ -7,10 +7,20 @@ import utils
 import os
 import sys
 import time
+import json
+import pathlib
+
+USER_PWD_EXPR_RULES = {
+    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
+    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
+    'resource-server.json': '&{ig.rs.client.secret|password}',
+    'oauth2.json': '&{pit.client.secret|password}',
+    'ig-agent.json': '&{ig.agent.password|password}',
+}
 
 def amster_import(ns, src, printlogs=True):
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    docker_dir = os.path.join(sys.path[0], '../docker')
+    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
+    docker_dir = os.path.join(sys.path[0], '..', 'docker')
     amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     # If the source dir/file does not exist exit
@@ -35,10 +45,12 @@ def amster_import(ns, src, printlogs=True):
         clean_amster_job(ns)
 
 def amster_export(ns, dst, glob):
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    docker_dir = os.path.join(sys.path[0], '../docker')
+    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
+    docker_dir = os.path.join(sys.path[0], '..', 'docker')
     amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    fqdn = utils.get_fqdn(ns)
+    log = utils.logging.getLogger('forgeops')
     if not os.path.isdir(dst):
         utils.error(f'{dst} is not a valid directory. Please specify a valid path and try again')
         sys.exit(1)
@@ -63,8 +75,81 @@ def amster_export(ns, dst, glob):
         if not os.listdir(dst):
             utils.error('No files were exported!')
             sys.exit(1)
+        utils.message('Updating amster config.')
+        for conf_file in pathlib.Path(dst).resolve().rglob('*.json'):
+            with conf_file.open('r+') as fp:
+                try:
+                    conf = json.load(fp)
+                    log.debug(f'Updating amster config {fp.name}')
+                    conf = upgrade_amster_conf(conf, pathlib.Path(fp.name), fqdn)
+                    fp.seek(0)
+                    fp.truncate()
+                    json.dump(conf, fp)
+                except Exception as e:
+                    log.error(f'Error with {fp.name} \n\n {e}')
+        utils.message('Updating amster config complete.')
     finally:
         clean_amster_job(ns)
+
+def upgrade_amster_conf(conf, conf_file_name, fqdn):
+    """
+    Recursively search objects looking at values and keys that need
+    to be updated.
+    """
+    log = utils.logging.getLogger('forgeops')
+    # Go through all items in a list
+    if isinstance(conf, list):
+        for i in conf:
+            conf = upgrade_amster_conf(i, conf_file_name, fqdn)
+        return conf
+    # This is str, int, bool, float and nulls we don't do anything with these
+    # types.
+    elif not isinstance(conf, dict):
+        return conf
+
+    # use copy to iterate through so we can modify keys.
+    for k, v in conf.copy().items():
+        if isinstance(v, dict):
+            conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
+            continue
+        elif isinstance(v, list):
+            new_value = []
+            for i in v:
+                new_value.append(upgrade_amster_conf(v, conf_file_name, fqdn))
+            conf[k] = new_value
+            continue
+        # Update FQDN
+        try:
+            if fqdn in v:
+                log.debug('Found a fqdn entry, updating.')
+                conf[k] = v.replace(fqdn(), '&{fqdn}')
+        except TypeError:
+            # this happens if there's value of none.
+            pass
+        # Key based updates
+        # userpassword, amsterVersion, userpassword-encrypted
+        if k == 'userpassword-encrypted':
+            conf.pop(k)
+        # TODO this has two external things that need to be ported...
+        elif k == 'userpassword':
+            try:
+                conf[k] = USER_PWD_EXPR_RULES[conf_file_name.name]
+                # log.debug(f'Updated {conf_file_name.name}')
+            except KeyError:
+                log.info(
+                    (f'A userpassword key found in {conf_file_name} '
+                     'but no replacement rule was found, using default'))
+                path_parts = conf_file_name.parent.parts
+                start = path_parts.index('conf')
+                dotted_path = '.'.join(path_parts[start + 1:])
+                safe_path = utils.ALLOWED_COMMONS_CHARS.sub('', dotted_path)
+                safe_name = utils.ALLOWED_COMMONS_CHARS.sub('', conf_file_name.stem)
+                conf[k] = f'&{{{safe_path}.{safe_name}.userpassword}}'
+                log.info(f'{conf_file_name} has password changed to {conf[k]}')
+        # update amster version
+        elif k == 'amsterVersion':
+            conf[k] = '&{version}'
+    return conf
 
 # Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
 def _launch_amster_job(kustomize_path, ns):

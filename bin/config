@@ -95,13 +95,6 @@ APP_CONF_PATH_FMT = {
     'ig': 'ig/config-profiles/{profile}/config'.format,
     'amster': 'amster/config-profiles/{profile}/config'.format,
 }
-USER_PWD_EXPR_RULES = {
-    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
-    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
-    'resource-server.json': '&{ig.rs.client.secret|password}',
-    'oauth2.json': '&{pit.client.secret|password}',
-    'ig-agent.json': '&{ig.agent.password|password}',
-}
 
 KUBECTL = shutil.which('kubectl')
 AMSTER_BIN = utils.SCRIPT_DIR.joinpath('amster').resolve()
@@ -124,39 +117,6 @@ def export_amster(conf):
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise Exception('Couldn\'t run amster export')
-
-
-def convert_path_to_common_exp(path):
-    """
-    This changes:
-      docker/amster/foo/conf/realms/root-philA/OAuth2Clients/b.json
-      realms.rootphilA.oauth2clients.b.userpassword
-    """
-    path_parts = path.parent.parts
-    start = path_parts.index('conf')
-    dotted_path = '.'.join(path_parts[start + 1:])
-    safe_path = ALLOWED_COMMONS_CHARS.sub('', dotted_path)
-    safe_name = ALLOWED_COMMONS_CHARS.sub('', path.stem)
-    return f'&{{{safe_path}.{safe_name}.userpassword}}'
-
-
-def upgrade_amster(conf_path):
-    fqdn = utils.get_configmap_value(
-        utils.get_namespace(None), 'platform-config', 'FQDN')
-    for conf_file in conf_path.rglob('*.json'):
-        with conf_file.open('r+') as fp:
-            try:
-                conf = json.load(fp)
-                log.debug(f'Updating amster config {fp.name}')
-                conf = utils.upgrade_amster_conf(conf,
-                                                 pathlib.Path(fp.name),
-                                                 fqdn)
-                fp.seek(0)
-                fp.truncate()
-                json.dump(conf, fp)
-            except Exception as e:
-                log.error(f'Error with {fp.name} \n\n {e}')
-
 
 def export_idm(idm_conf, pod_name):
     """Export IDM config"""
@@ -238,9 +198,6 @@ def run_export(args):
         amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
         log.info('Exporting amster config.')
         export_amster(conf_path)
-        log.info('Updating amster config.')
-        upgrade_amster(conf_path)
-        log.info('Updating amster config complete.')
     # Configs from running containers
     else:
         jsonpath_expr = """

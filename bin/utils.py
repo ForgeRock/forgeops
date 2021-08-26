@@ -26,6 +26,8 @@ _IGNORE_FILES = ('.DS_Store',)
 
 log_name = 'foregops'
 
+ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
+
 DOCKER_REGEX_NAME = {
     'am': '.*am',
     'amster': '.*amster.*',
@@ -378,9 +380,7 @@ def printsecrets(ns, to_stdout=True):
 
 def printurls(ns, to_stdout=True):
     """Print relevant platform URLs"""
-    _, fqdn, _ = run(
-        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
-    fqdn = fqdn.decode('ascii')
+    fqdn = get_fqdn(ns)
     urls = [
         f'https://{fqdn}/platform',
         f'https://{fqdn}/admin',
@@ -570,87 +570,6 @@ def configure_platform_images(clone_path,
         log.error(f'Couldn\t configure repo {e}')
         raise e
 
-
-_USER_PWD_EXPR_RULES = {
-    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
-    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
-    'resource-server.json': '&{ig.rs.client.secret|password}',
-    'oauth2.json': '&{pit.client.secret|password}',
-    'ig-agent.json': '&{ig.agent.password|password}',
-}
-ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
-
-
-def _convert_path_to_common_exp(path):
-    """
-    This changes:
-      docker/amster/foo/conf/realms/root-philA/OAuth2Clients/b.json
-      realms.rootphilA.oauth2clients.b.userpassword
-    """
-    path_parts = path.parent.parts
-    start = path_parts.index('config')
-    dotted_path = '.'.join(path_parts[start + 1:])
-    safe_path = ALLOWED_COMMONS_CHARS.sub('', dotted_path)
-    safe_name = ALLOWED_COMMONS_CHARS.sub('', path.stem)
-    return f'&{{{safe_path}.{safe_name}.userpassword}}'
-
-
-def upgrade_amster_conf(conf, conf_file_name, fqdn):
-    """
-    Recursively search objects looking at values and keys that need
-    to be updated.
-    """
-    log = logging.getLogger('forgeops')
-    # Go through all items in a list
-    if isinstance(conf, list):
-        for i in conf:
-            conf = upgrade_amster_conf(i, conf_file_name, fqdn)
-        return conf
-    # This is str, int, bool, float and nulls we don't do anything with these
-    # types.
-    elif not isinstance(conf, dict):
-        return conf
-
-    # use copy to iterate through so we can modify keys.
-    for k, v in conf.copy().items():
-        if isinstance(v, dict):
-            conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
-            continue
-        elif isinstance(v, list):
-            new_value = []
-            for i in v:
-                new_value.append(upgrade_amster_conf(v, conf_file_name, fqdn))
-            conf[k] = new_value
-            continue
-        # Update FQDN
-        try:
-            if fqdn in v:
-                log.debug('Found a fqdn entry, updating.')
-                conf[k] = v.replace(fqdn(), '&{fqdn}')
-        except TypeError:
-            # this happens if there's value of none.
-            pass
-        # Key based updates
-        # userpassword, amsterVersion, userpassword-encrypted
-        if k == 'userpassword-encrypted':
-            conf.pop(k)
-        # TODO this has two external things that need to be ported...
-        elif k == 'userpassword':
-            try:
-                conf[k] = _USER_PWD_EXPR_RULES[conf_file_name.name]
-                # log.debug(f'Updated {conf_file_name.name}')
-            except KeyError:
-                log.info(
-                    (f'A userpassword key found in {conf_file_name} '
-                     'but no replacement rule was found, using default'))
-                conf[k] = _convert_path_to_common_exp(conf_file_name)
-                log.info(f'{conf_file_name} has password changed to {conf[k]}')
-        # update amster version
-        elif k == 'amsterVersion':
-            conf[k] = '&{version}'
-    return conf
-
-
 def sort_dir_json(base):
     """
     Recursively search a path for json files. Round-tripping to sort alpha
@@ -702,6 +621,10 @@ def copytree(src, dst):
 #     r = subprocess.run(args.split())
 #     return r.returncode
 
+def get_fqdn(ns):
+    _, fqdn, _ = run(
+        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
+    return fqdn.decode('ascii')
 
 # IF ns is not None, then return it, otherwise lookup the current namespace context
 def get_namespace(ns=None):
