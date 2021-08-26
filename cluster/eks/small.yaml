@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: small
   region: us-east-1
-  version: "1.18"
+  version: "1.20"
   tags:
     forgerock.io/cluster: "cdm-small"
     # ES_USEREMAIL: ${ES_USEREMAIL}
@@ -33,6 +33,7 @@ nodeGroups:
       withAddonPolicies:
         autoScaler: true
         certManager: true
+        ebs: true
     labels:
       frontend: "true"
       ds: "true"

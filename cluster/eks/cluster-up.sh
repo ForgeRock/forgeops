@@ -6,6 +6,10 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
+
+EXTERNAL_SNAPSHOT_VERSION=${EXTERNAL_SNAPSHOT_VERSION:=v4.2.1}
+HELM_EBS_CHART_VERSION=${HELM_EBS_CHART_VERSION:=2.1.0}
+
 usage() {
     printf "\nUsage: $0 <config file>\n\n"
     exit 1
@@ -23,6 +27,8 @@ create_cluster() {
     kubectl label nodes -l alpha.eksctl.io/nodegroup-name=primary new-label=$CREATOR
     kubectl label nodes -l alpha.eksctl.io/nodegroup-name=ds new-label=$CREATOR
 }
+
+
 
 # Create IAM role mappings
 createIAMMapping() {
@@ -55,6 +61,60 @@ EOF
     kubectl delete storageclass gp2
 }
 
+
+installSnapShots() {
+    aws_container_images=$(kubectl get po -n kube-system -l k8s-app=aws-node -o jsonpath='{ .items[].spec.containers[].image }')
+    aws_registry=$(tail -n 1 <<<$aws_container_images | cut -f1 -d '/')
+
+    if ! helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver;
+    then
+        echo "Failed to add helm aws-ebs-csi-driver repo"
+        exit 1;
+    fi
+
+    if ! helm repo update;
+    then
+        echo "Failed to update helm repos"
+        exit 1;
+    fi
+
+    if ! helm upgrade --install aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver \
+    	--version $HELM_EBS_CHART_VERSION \
+    	--namespace kube-system \
+    	--set image.repository="${aws_registry}/eks/aws-ebs-csi-driver" \
+    	--set enableVolumeResizing=true \
+    	--set enableVolumeSnapshot=true \
+    	--set controller.serviceAccount.create=false \
+    	--set controller.serviceAccount.name=ebs-csi-controller-sa;
+        then
+            echo "Failed to install ebs csi controller."
+            exit 1;
+    fi
+
+
+    # Install SnapShot CRD
+    {
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml;
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml;
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml;
+    } || { echo "Failed to install SnapShot CRDs"; exit 1; }
+
+    # Install SnapShot Controller
+    {
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml;
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml;
+    } || { echo "Failed to install External SnapShotterCRDs"; exit 1; }
+
+    kubectl create -f - <<EOF
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: ds-snapshot-class
+  driver: ebs.csi.aws.com
+  deletionPolicy: Delete
+EOF
+
+}
 if [[ "$#" != 1 ]]; then
     usage
 fi
@@ -124,6 +184,7 @@ fi
 #####
 
 
+AWS_ACCT_ID=$(aws sts get-caller-identity --output text | awk '{ print $1 }')
 echo "Creating EKS cluster..."
 eksctl create cluster -f ${file}
 #echo "Creating identity mappings..."
@@ -133,3 +194,6 @@ createStorageClasses
 echo "Creating prod namespace..."
 kubectl create ns prod
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+
+echo "Installing snapshots"
+installSnapShots
