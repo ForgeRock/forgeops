@@ -381,16 +381,16 @@ def printsecrets(ns, to_stdout=True):
 def printurls(ns, to_stdout=True):
     """Print relevant platform URLs"""
     fqdn = get_fqdn(ns)
-    urls = [
-        f'https://{fqdn}/platform',
-        f'https://{fqdn}/admin',
-        f'https://{fqdn}/am',
-        f'https://{fqdn}/enduser',
-    ]
+    urls = {
+        'platform': f'https://{fqdn}/platform',
+        'idm': f'https://{fqdn}/admin',
+        'am': f'https://{fqdn}/am',
+        'enduser': f'https://{fqdn}/enduser',
+    }
     if to_stdout:
         message('\nRelevant URLs:')
         for url in urls:
-            warning(url)
+            print(urls[url])
     return urls
 
 
