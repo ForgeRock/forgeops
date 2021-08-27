@@ -110,8 +110,8 @@ apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshotClass
 metadata:
   name: ds-snapshot-class
-  driver: ebs.csi.aws.com
-  deletionPolicy: Delete
+driver: ebsbcsi.aws.com
+deletionPolicy: Delete
 EOF
 
 }
