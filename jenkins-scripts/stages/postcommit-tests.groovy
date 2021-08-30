@@ -82,7 +82,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'AM K8s Upgrade', clusterConfig +
                                 [TESTS_SCOPE                           : 'tests/k8s/postcommit/am',
-                                 UPGRADE_FIRST                         : true,
+                                 DEPLOYMENT_UPGRADE_FIRST              : true,
                                  COMPONENTS_AM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
                                  COMPONENTS_AM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/am',
                                  COMPONENTS_AMSTER_IMAGE_TAG           : commonLodestarModule.productPostcommitStable,
@@ -118,7 +118,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'DS K8s Upgrade', clusterConfig +
                                 [TESTS_SCOPE                                 : 'tests/k8s/postcommit/ds/standard',
-                                 UPGRADE_FIRST                               : true,
+                                 DEPLOYMENT_UPGRADE_FIRST                    : true,
                                  COMPONENTS_DSIDREPO_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
                                  COMPONENTS_DSIDREPO_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/ds-idrepo',
                                  COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG       : commonLodestarModule.productLatestTag,
@@ -156,7 +156,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'IDM K8s Upgrade', clusterConfig +
                                 [TESTS_SCOPE                            : 'tests/k8s/postcommit/idm',
-                                 UPGRADE_FIRST                          : true,
+                                 DEPLOYMENT_UPGRADE_FIRST               : true,
                                  COMPONENTS_IDM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
                                  COMPONENTS_IDM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/idm',
                                  COMPONENTS_IDM_IMAGE_UPGRADE_TAG       : commonLodestarModule.productLatestTag,
@@ -190,7 +190,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                     {
                         commonLodestarModule.runSpyglaas(pipelineRun, random, 'IG K8s Upgrade', clusterConfig +
                                 [TESTS_SCOPE                           : 'tests/k8s/postcommit/ig',
-                                 UPGRADE_FIRST                         : true,
+                                 DEPLOYMENT_UPGRADE_FIRST              : true,
                                  COMPONENTS_IG_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
                                  COMPONENTS_IG_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/ig',
                                  COMPONENTS_IG_IMAGE_UPGRADE_TAG       : commonLodestarModule.productLatestTag,
