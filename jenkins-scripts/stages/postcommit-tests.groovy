@@ -16,12 +16,12 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     def clusterConfig = [:]
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
     clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
+    def scaleClusterConfig = [:]
+    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 4, 'primary-pool': 6]
 
     try {
         node('forgeops-postcommit-cloud') {
-            cloud_utils.authenticateGcloud()
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'frontend-pool', 2)
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'primary-pool', 6)
+            cloud_utils.scaleClusterUp(clusterConfig + scaleClusterConfig)
         }
 
         def upgradeImageLevel = 'pit1'
@@ -243,9 +243,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
         }
 
         node('forgeops-postcommit-cloud') {
-            cloud_utils.authenticateGcloud()
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'frontend-pool', 0)
-            cloud_utils.scaleClusterNodePool(clusterConfig, 'primary-pool', 0)
+            cloud_utils.scaleClusterDown(clusterConfig + scaleClusterConfig)
         }
     }
 }
