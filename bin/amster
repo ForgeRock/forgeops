@@ -73,7 +73,7 @@ def amster_export(ns, dst, glob):
                     conf = upgrade_amster_conf(conf, pathlib.Path(fp.name), fqdn)
                     fp.seek(0)
                     fp.truncate()
-                    json.dump(conf, fp)
+                    json.dump(conf, fp, indent=2, sort_keys=True)
                 except Exception as e:
                     utils.error(f'Error with {fp.name} \n\n {e}')
                     sys.exit(1)
@@ -88,9 +88,10 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
     """
     # Go through all items in a list
     if isinstance(conf, list):
+        new_value = []
         for i in conf:
-            conf = upgrade_amster_conf(i, conf_file_name, fqdn)
-        return conf
+            new_value.append(upgrade_amster_conf(i, conf_file_name, fqdn))
+        return new_value
     # This is str, int, bool, float and nulls we don't do anything with these
     # types.
     elif not isinstance(conf, dict):
@@ -118,7 +119,6 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
         # userpassword, amsterVersion, userpassword-encrypted
         if k == 'userpassword-encrypted':
             conf.pop(k)
-        # TODO this has two external things that need to be ported...
         elif k == 'userpassword':
             try:
                 conf[k] = USER_PWD_EXPR_RULES[conf_file_name.name]
@@ -127,8 +127,8 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
                     (f'A userpassword key found in {conf_file_name} '
                      'but no replacement rule was found, using default'))
                 path_parts = conf_file_name.parent.parts
-                start = path_parts.index('conf')
-                dotted_path = '.'.join(path_parts[start + 1:])
+                start = path_parts.index('realms')
+                dotted_path = '.'.join(path_parts[start:])
                 safe_path = utils.ALLOWED_COMMONS_CHARS.sub('', dotted_path)
                 safe_name = utils.ALLOWED_COMMONS_CHARS.sub('', conf_file_name.stem)
                 conf[k] = f'&{{{safe_path}.{safe_name}.userpassword}}'
@@ -154,7 +154,7 @@ def clean_amster_job(ns):
     utils.message(f'Cleaning up amster components')
     utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
     utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-import')
-    if os.path.exists('amster-import.tar.gz'): 
+    if os.path.exists('amster-import.tar.gz'):
         os.remove('amster-import.tar.gz')
     return
 
