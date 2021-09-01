@@ -86,36 +86,41 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
     Recursively search objects looking at values and keys that need
     to be updated.
     """
+
     # Go through all items in a list
     if isinstance(conf, list):
         new_value = []
         for i in conf:
             new_value.append(upgrade_amster_conf(i, conf_file_name, fqdn))
         return new_value
+    if isinstance(conf, str):
+        try:
+            if fqdn in conf:
+                return conf.replace(fqdn, '&{fqdn}')
+            else:
+                return conf
+        except TypeError:
+            # this happens if there's value of none.
+            return conf
     # This is str, int, bool, float and nulls we don't do anything with these
     # types.
+    # base case for recursion, eg. the stopping point
     elif not isinstance(conf, dict):
         return conf
 
     # use copy to iterate through so we can modify keys.
+    # check each key and value. Find keys that need placeholdering
+    # we should only place holder values that are strings, if the value is a
+    # dict or list, recurse on the value.
     for k, v in conf.copy().items():
         if isinstance(v, dict):
             conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
             continue
         elif isinstance(v, list):
-            new_value = []
-            for i in v:
-                new_value.append(upgrade_amster_conf(v, conf_file_name, fqdn))
+            new_value = upgrade_amster_conf(v, conf_file_name, fqdn)
             conf[k] = new_value
             continue
-        # Update FQDN
-        try:
-            if fqdn in v:
-                conf[k] = v.replace(fqdn(), '&{fqdn}')
-        except TypeError:
-            # this happens if there's value of none.
-            pass
-        # Key based updates
+        # Key based updates for well known keys:
         # userpassword, amsterVersion, userpassword-encrypted
         if k == 'userpassword-encrypted':
             conf.pop(k)
