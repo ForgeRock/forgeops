@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+# This script gets all logs, descriptions, events from a selected namespace.
+# It replaces debug-logs.sh.
+
+import argparse
+from datetime import datetime
+from pathlib import Path
+
+import utils
+
+def _get_container_logs(namespace, pod, containers, maxloglines):
+    container_logs = []
+    for container in containers:
+        container_log = ''
+        _, get_output, _ = utils.run('kubectl', f'--namespace {namespace} logs {pod} -c {container}', cstdout=True)
+        # Split the output into lines...
+        get_output = get_output.decode('utf-8').splitlines()
+        # ... and join the lines into a string, adding <br> at the end of each line
+        container_log ='<br>'.join(get_output[0:maxloglines])
+        container_logs.append(container_log)
+    return container_logs
+
+def _get_containers(namespace, pod):
+    containers = []
+
+    # Get app containers
+    _, get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
+        f'--namespace {namespace} --output=jsonpath="{{.spec.containers[*].name}}"',cstdout=True)
+    containers.append(get_pods_output.decode('utf-8').split())
+
+    # Get init containers
+    _, get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
+        f'--namespace {namespace} --output=jsonpath="{{.spec.initContainers[*].name}}"',cstdout=True)
+    containers.append(get_pods_output.decode('utf-8').split())
+
+    # Return a list with two elements: a list of non-init containers, and a list of containers
+    return containers
+
+def get_pods(namespace):
+    _, get_pods_output, _ = utils.run('kubectl', f'get pods '
+        f'--namespace {namespace} --output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
+    return get_pods_output.decode('utf-8').split()
+
+def write_header(output, namespace):
+    # Get current date and time
+    now = datetime.now()
+
+    # Write file heading
+    heading_html = '''
+    <html>
+    <h1>Debug output for namespace {namespace} logged at {now}</h1>
+    <br>
+    '''.format(namespace=namespace,now=now)
+    output.write(heading_html)
+
+def write_obj_yaml(output, namespace, obj):
+    # Get object YAML
+    _, get_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj} --output yaml',cstdout=True)
+    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+
+    # Write section
+    obj_html = '''
+    <br>
+    <h2><a id="{obj}">{obj}</a></h2>
+    <pre>{get_output}</pre>
+    '''.format(obj=obj,get_output=get_output)
+    output.write(obj_html)
+
+def write_pod_description_and_container_logs(output, namespace, pod, maxloglines):
+    # Get pod description
+    _, get_output, _ = utils.run('kubectl', f'--namespace {namespace} describe pod {pod}',cstdout=True)
+    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+
+    # Get logs for this pod's app and init containers
+    pod_containers = _get_containers(namespace, pod)
+    app_container_logs = _get_container_logs(namespace, pod, pod_containers[0], maxloglines)
+    init_container_logs = _get_container_logs(namespace, pod, pod_containers[1], maxloglines)
+
+    # Write pod description
+    poddesc_html = '''
+    <hr>
+    <h2><a id="{pod}">{pod}</a></h2>
+    <h3>Pod Description:</a></h3>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(pod=pod,get_output=get_output)
+    output.write(poddesc_html)
+
+    # Write the log for each app container
+    for i, container in enumerate(pod_containers[0]):
+        log = app_container_logs[i]
+        app_container_log_html = '''
+        <h3>Logs for Container {container}:</h3>
+        <pre>{log}</pre>
+        <p><a href="#toc">Back to Index</a></p>
+        '''.format(container=container,log=log)
+        output.write(app_container_log_html)
+
+    # Write the log for each init container
+    for i, container in enumerate(pod_containers[1]):
+        log = init_container_logs[i]
+        init_container_log_html = '''
+        <h3>Logs for Init Container {container}:</h3>
+        <pre>{log}</pre>
+        <p><a href="#toc">Back to Index</a></p>
+        '''.format(container=container,log=log)
+        output.write(init_container_log_html)
+
+def write_toc(output, pods, objs):
+    # Build TOCs of pods and other objects
+    pods_toc = ''
+    for pod in pods:
+        pods_toc += f'<li><a href="#{pod}">{pod}</a></li>'
+    objs_toc = ''
+    for obj in objs:
+        objs_toc += f'<li><a href="#{obj}">{obj}</a></li>'
+
+    # Write TOC
+    toc_html = '''
+    <h2><a id="toc">Pod Logs</a></h2>
+    <ul>
+    {pods_toc}
+    </ul>
+    <h2><a id="toc">Other Objects</a></h2>
+    <ul>
+    {objs_toc}
+    </ul>
+    '''.format(pods_toc=pods_toc,objs_toc=objs_toc)
+    output.write(toc_html)
+
+def main():
+    # Parse input arguments
+    parser = argparse.ArgumentParser(description='Aggregate pod logs and descriptions')
+    parser.add_argument('-m', '--max-log-lines', dest='maxloglines',
+                        help='Maximum lines to print from each container log (default: 400)')
+    parser.add_argument('-n', '--namespace',
+                        help='Target namespace (default: current namespace)')
+    args = parser.parse_args()
+    maxloglines = args.maxloglines if getattr(args, 'maxloglines', None) else 4002
+
+    # Get the namespace (either passed in as an arg, or set in the user's context)
+    ctx_namespace = utils.get_namespace()
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
+
+    # Get pod names in a list
+    pods = get_pods(namespace)
+
+    # Open the output file. Overwrite any previous content in it.
+    Path('/tmp/forgeops').mkdir(parents=True, exist_ok=True)
+    output_file = '/tmp/forgeops/log.html'
+    with open(output_file, 'w') as output:
+
+        # Write the header and TOC
+        write_header(output, namespace)
+        objs = ['service', 'ingress', 'configmap', 'secrets']
+        write_toc(output, pods, objs)
+
+        # Write pod descriptions and container logs
+        for pod in pods:
+            write_pod_description_and_container_logs(output, namespace, pod, int(maxloglines))
+
+        # Write YAML for the special objects
+        for obj in objs:
+            write_obj_yaml(output, namespace, obj)
+
+    # Print message to user
+    print(f'Open {output_file} in your browser.')
+
+if __name__ == "__main__":
+    main()
