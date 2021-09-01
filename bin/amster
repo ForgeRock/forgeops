@@ -84,7 +84,7 @@ def amster_export(ns, dst, glob):
                     conf = upgrade_amster_conf(conf, pathlib.Path(fp.name), fqdn)
                     fp.seek(0)
                     fp.truncate()
-                    json.dump(conf, fp)
+                    json.dump(conf, fp, indent=2, sort_keys=True)
                 except Exception as e:
                     log.error(f'Error with {fp.name} \n\n {e}')
         utils.message('Updating amster config complete.')
@@ -97,40 +97,43 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
     to be updated.
     """
     log = utils.logging.getLogger('forgeops')
+
     # Go through all items in a list
     if isinstance(conf, list):
+        new_value = []
         for i in conf:
-            conf = upgrade_amster_conf(i, conf_file_name, fqdn)
-        return conf
+            new_value.append(upgrade_amster_conf(i, conf_file_name, fqdn))
+        return new_value
+    if isinstance(conf, str):
+        try:
+            if fqdn in conf:
+                return conf.replace(fqdn, '&{fqdn}')
+            else:
+                return conf
+        except TypeError:
+            # this happens if there's value of none.
+            return conf
     # This is str, int, bool, float and nulls we don't do anything with these
     # types.
+    # base case for recursion, eg. the stopping point
     elif not isinstance(conf, dict):
         return conf
 
     # use copy to iterate through so we can modify keys.
+    # check each key and value. Find keys that need placeholdering
+    # we should only place holder values that are strings, if the value is a
+    # dict or list, recurse on the value.
     for k, v in conf.copy().items():
         if isinstance(v, dict):
             conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
             continue
         elif isinstance(v, list):
-            new_value = []
-            for i in v:
-                new_value.append(upgrade_amster_conf(v, conf_file_name, fqdn))
-            conf[k] = new_value
+            conf[k] = upgrade_amster_conf(v, conf_file_name, fqdn)
             continue
-        # Update FQDN
-        try:
-            if fqdn in v:
-                log.debug('Found a fqdn entry, updating.')
-                conf[k] = v.replace(fqdn(), '&{fqdn}')
-        except TypeError:
-            # this happens if there's value of none.
-            pass
-        # Key based updates
+        # Key based updates for well known keys:
         # userpassword, amsterVersion, userpassword-encrypted
         if k == 'userpassword-encrypted':
             conf.pop(k)
-        # TODO this has two external things that need to be ported...
         elif k == 'userpassword':
             try:
                 conf[k] = USER_PWD_EXPR_RULES[conf_file_name.name]
@@ -167,9 +170,9 @@ def clean_amster_job(ns):
     utils.message(f'Cleaning up amster components')
     utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
     utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
-    if os.path.exists('amster-import.tar.gz'): 
+    if os.path.exists('amster-import.tar.gz'):
         os.remove('amster-import.tar.gz')
-    if os.path.exists('amster-scripts.tar.gz'): 
+    if os.path.exists('amster-scripts.tar.gz'):
         os.remove('amster-scripts.tar.gz')
     return
 
