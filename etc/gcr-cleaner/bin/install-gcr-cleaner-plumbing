@@ -65,6 +65,7 @@ fi
 
 # Allow cleaner to access the registry bucket
 gsutil iam ch serviceAccount:gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com:admin gs://artifacts.${PROJECT_ID}.appspot.com
+gcloud projects add-iam-policy-binding ${PROJECT_ID} --member serviceAccount:gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com --role="roles/storage.objectAdmin"
 
 # Allow Cloud Build to run as a service account for deployment
 gcloud iam service-accounts add-iam-policy-binding \
