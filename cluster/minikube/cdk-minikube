@@ -17,7 +17,7 @@ def main():
     parser_delete.add_argument('--skip-confirmation', '-y', help='Skip delete confirmation', action='store_true')
     parser_start = subparser.add_parser('start', help='Start minikube')
     parser_start.add_argument('--version', '-v', help="Set the Kubernetes version (default: stable)", default=DEFAULT_K8S_VERSION)
-    parser_start.add_argument('--driver', '-d', help='Runtime driver', choices=['docker', 'hyperkit', 'vb'])
+    parser_start.add_argument('--driver', '-d', help='Runtime driver', choices=['docker', 'hyperkit', 'vb'], default='')
     parser_start.add_argument('--cpu', '-c', help='Number of CPUs', default='3')
     parser_start.add_argument('--ram', '-r', help='Amount of RAM', default='9g')
     parser_start.add_argument('--disk', '-k', help='Amount of Disk', default='40g')

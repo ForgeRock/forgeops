@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't determine the script's running directory" 2
-exec $SCRIPT_DIR/minikube delete
