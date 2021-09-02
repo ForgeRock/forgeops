@@ -143,8 +143,8 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
                     (f'A userpassword key found in {conf_file_name} '
                      'but no replacement rule was found, using default'))
                 path_parts = conf_file_name.parent.parts
-                start = path_parts.index('conf')
-                dotted_path = '.'.join(path_parts[start + 1:])
+                start = path_parts.index('realms')
+                dotted_path = '.'.join(path_parts[start:])
                 safe_path = utils.ALLOWED_COMMONS_CHARS.sub('', dotted_path)
                 safe_name = utils.ALLOWED_COMMONS_CHARS.sub('', conf_file_name.stem)
                 conf[k] = f'&{{{safe_path}.{safe_name}.userpassword}}'
