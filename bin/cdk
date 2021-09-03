@@ -99,7 +99,7 @@ def main():
     parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
     parser_info = subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
-    subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
+    subparser.add_parser('config', parents=[common]) # Internal use. Hidden
     args = parser.parse_args()
 
     # Check toolset versions before doing anything

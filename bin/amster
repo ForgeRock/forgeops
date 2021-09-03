@@ -75,21 +75,25 @@ def amster_export(ns, dst, glob):
         if not os.listdir(dst):
             utils.error('No files were exported!')
             sys.exit(1)
-        utils.message('Updating amster config.')
-        for conf_file in pathlib.Path(dst).resolve().rglob('*.json'):
-            with conf_file.open('r+') as fp:
-                try:
-                    conf = json.load(fp)
-                    log.debug(f'Updating amster config {fp.name}')
-                    conf = upgrade_amster_conf(conf, pathlib.Path(fp.name), fqdn)
-                    fp.seek(0)
-                    fp.truncate()
-                    json.dump(conf, fp, indent=2, sort_keys=True)
-                except Exception as e:
-                    log.error(f'Error with {fp.name} \n\n {e}')
-        utils.message('Updating amster config complete.')
+        upgrade_all_amster_files(dst, fqdn)
     finally:
         clean_amster_job(ns)
+
+def upgrade_all_amster_files(conf_path, fqdn):
+    log = utils.logging.getLogger('forgeops')
+    utils.message('Updating amster config.')
+    for conf_file in pathlib.Path(conf_path).resolve().rglob('*.json'):
+        with conf_file.open('r+') as fp:
+            try:
+                conf = json.load(fp)
+                log.debug(f'Updating amster config {fp.name}')
+                conf = upgrade_amster_conf(conf, pathlib.Path(fp.name), fqdn)
+                fp.seek(0)
+                fp.truncate()
+                json.dump(conf, fp, indent=2, sort_keys=True)
+            except Exception as e:
+                log.error(f'Error with {fp.name} \n\n {e}')
+    utils.message('Updating amster config complete.')
 
 def upgrade_amster_conf(conf, conf_file_name, fqdn):
     """
@@ -189,7 +193,9 @@ def main():
     parser_export.add_argument('--global', dest='glob', action='store_true', help='Include the global/ configuration in the amster export')
     parser_export.add_argument('dst', help='destination directory to export files to')
     parser_clean = subparser.add_parser('clean', help='Clean up and remove any amster pods', parents=[common])
-
+    parser_upgrade = subparser.add_parser('upgrade', help='Replace placeholders of given configs')
+    parser_upgrade.add_argument('src', help='Source file or directory to update')
+    parser_upgrade.add_argument('--fqdn', help='Set the FQDN to use as placeholder', required=True)
     args = parser.parse_args()
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
@@ -205,6 +211,11 @@ def main():
     # Export files out of amster
     if args.cmd == 'export':
         amster_export(namespace, args.dst, args.glob)
+        return
+
+    # Replace placeholders
+    if args.cmd == 'upgrade':
+        upgrade_all_amster_files(args.src, args.fqdn)
         return
 
 if __name__ == '__main__':
