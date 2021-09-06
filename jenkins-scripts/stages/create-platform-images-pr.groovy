@@ -14,7 +14,7 @@ import com.forgerock.pipeline.stage.Status
 /** Open a pull request against the Platform-Images repo, containing latest ForgeOps commit */
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform-Images PR') {
-        node('google-cloud') {
+        node('forgeops-postcommit-cloud') {
             privateWorkspace {
                 def dockerProperties = [
                         'gitCommit':            commonModule.GIT_COMMIT,

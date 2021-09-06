@@ -62,7 +62,7 @@ def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stages
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('google-cloud') {
+        node('forgeops-postcommit-cloud') {
             stage(stageName) {
                 dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                     process()
@@ -105,7 +105,7 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 }
 
 def generateSummaryTestReport(String stageName) {
-    node('google-cloud') {
+    node('forgeops-postcommit-cloud') {
         dashboard_utils.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
                 stageName, "${stageName}.html")
     }
@@ -120,7 +120,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('google-cloud') {
+        node('forgeops-postcommit-cloud') {
             stage(stageName) {
                 try {
                     def uiFileContent = bitbucketUtils.readFileContent(
