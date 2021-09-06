@@ -25,16 +25,26 @@ import com.forgerock.pipeline.stage.Status
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome('pit2-promote-to-forgeops-stable', stageDisplayName: 'ForgeOps Stable Promotion') {
         node('build&&linux') {
-            stage("Promote to ${STABLE_BRANCH}") {
-                // always deep-clone the branch, in order to perform a git merge
-                localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), env.BRANCH_NAME)
-                sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
+            stage("Promote ForgeOps to ${STABLE_BRANCH}") {
+                dir ('forgeops-promotion') {
+                    // always deep-clone the branch, in order to perform a git merge
+                    localGitUtils.deepCloneBranch(scmUtils.getRepoUrl(), env.BRANCH_NAME)
+                    sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
 
-                promoteDockerImagesToRootLevel()
-                promoteForgeOpsCommitToStable()
-                return Status.SUCCESS.asOutcome()
+                    promoteDockerImagesToRootLevel()
+                    promoteForgeOpsCommitToStable()
+                }
+            }
+
+            // temporary workaround, to have the promotion in both repos without running PIT tests twice
+            stage("Promote Platform Images to ${STABLE_BRANCH}") {
+                dir ('platform-images-promotion') {
+                    git url: 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git', branch: STABLE_BRANCH
+                    applyForgeOpsPromotionToPlatformImagesRepo()
+                }
             }
         }
+        return Status.SUCCESS.asOutcome()
     }
 }
 
@@ -88,6 +98,41 @@ private void useRootLevelImageNamesInDockerfiles() {
     commonModule.dockerImages.each { imageKey, image ->
         String rootImage = "${image.rootLevelBaseImageName}:${image.tag}"
         sh "sed -i 's@FROM gcr.io/forgerock-io.*@FROM ${rootImage}@g' ${image.dockerfilePath}"
+    }
+}
+
+/* Update Platform Images json to use correct git commit values. */
+private void applyForgeOpsPromotionToPlatformImagesRepo() {
+    commonModule.platformImages.each { image, rootLevelBaseImageName ->
+        def imageFileContent = platformImageUtils.readJSON(file: "${image}.json")
+        if (image.equals('lodestar')) {
+            [ 'gitCommit', 'platformImagesCommit', 'forgeopsCommit' ].each {
+                imageFileContent[ it ] = ""
+            }
+        } else if (image.equals('forgeops')) {
+            [ 'gitCommit', 'platformImagesCommit', 'lodestarCommit' ].each {
+                imageFileContent[ it ] = ""
+            }
+        } else {
+            imageFileContent['imageName'] = rootLevelBaseImageName
+            imageFileContent['imageTag'] = getImageTagFromDockerfile(image)
+            [ 'gitCommit', 'pyforgeCommit', 'lodestarCommit', 'forgeopsCommit', 'commonsVersion', "platformImagesCommit" ].each {
+                imageFileContent[ it ] = ""
+            }
+        }
+        platformImageUtils.writeJSON("${image}.json", imageFileContent)
+    }
+    gitUtils.commitModifiedFiles('Apply ForgeOps promotion to Platform Images repo')
+    sh "git push origin ${STABLE_BRANCH}"
+}
+
+String getImageTagFromDockerfile(String imageName) {
+    // This is brittle, but should be fine for the temporary PIT#2 promotion in both ForgeOps and Platform Images repos.
+    // No changes to the ForgeOps Dockerfiles are anticipated on the relevant branches (idcloud 2021.4 to 2021.8).
+    if (imageName.equals('ds')) {
+        return commonModule.getDockerImage('ds-cts').getTag()
+    } else {
+        return commonModule.getDockerImage(imageName).getTag()
     }
 }
 
