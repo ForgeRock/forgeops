@@ -43,6 +43,15 @@ dockerImages = [
         'ig'        : DockerImagePromotion.load('docker/7.0/ig/Dockerfile', 'gcr.io/forgerock-io/ig', steps),
 ]
 
+platformImages = [
+        'am'        : 'gcr.io/forgerock-io/am-base',
+        'ds'        : 'gcr.io/forgerock-io/ds',
+        'idm'       : 'gcr.io/forgerock-io/idm',
+        'ig'        : 'gcr.io/forgerock-io/ig',
+        'forgeops'  : 'n/a',
+        'lodestar'  : 'n/a',
+]
+
 productToRepo = [
         'am' : 'openam',
         'am-config-upgrader' : 'openam',
