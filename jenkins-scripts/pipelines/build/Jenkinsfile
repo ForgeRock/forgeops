@@ -8,7 +8,6 @@
 
 @Library([
     'forgerock-pipeline-libs@f9088ff035e6918dc504be4ff8fe59496f61afdb',
-    'QaUtils@3e3d971d34ff3efdd1435dc3402c14614493ab52',
     'java-pipeline-libs@eb0d680ae0a9b1aedaff7606c40228ce1fe7e30f'
 ]) _
 

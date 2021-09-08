@@ -106,7 +106,7 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 
 def generateSummaryTestReport(String stageName) {
     node('google-cloud') {
-        summaryReportGen.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
+        dashboard_utils.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
                 stageName, "${stageName}.html")
     }
 }
