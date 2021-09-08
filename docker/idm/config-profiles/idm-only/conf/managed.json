@@ -855,18 +855,6 @@
                 "type" : "text/javascript",
                 "file" : "roles/onDelete-roles.js"
             },
-            "postCreate" : {
-                "type" : "text/javascript",
-                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
-            },
-            "postUpdate" : {
-                "type" : "text/javascript",
-                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
-            },
-            "postDelete" : {
-                "type" : "text/javascript",
-                "source" : "require('roles/postOperation-roles').manageTemporalConstraints(resourceName);"
-            },
             "schema" : {
                 "id" : "urn:jsonschema:org:forgerock:openidm:managed:api:Role",
                 "$schema" : "http://forgerock.org/json-schema#",
