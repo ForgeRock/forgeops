@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -85,7 +85,7 @@ void runStage(PipelineRun pipelineRun) {
                         withGKEPyrockNoStages(config)
                     }
 
-                    summaryReportGen.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
+                    dashboard_utils.createAndPublishSummaryReport(stagesCloud, stageName, '', false,
                         normalizedStageName, "${normalizedStageName}.html")
                     return dashboard_utils.determineLodestarOutcome(stagesCloud,
                         "${env.BUILD_URL}/${normalizedStageName}/")
