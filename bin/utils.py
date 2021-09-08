@@ -162,7 +162,7 @@ def install_dependencies():
             cstderr=True, cstdout=True)
     except Exception as _e:
         warning('secret-agent CRD not found. Installing secret-agent.')
-        secretagent('apply', tag='v1.0.5')
+        secretagent('apply', tag='v1.1.3')
     else:
         message('secret-agent CRD found in cluster.')
 
