@@ -1,6 +1,5 @@
 # Deploys multi-cluster DS: ds-cts and ds-idrepo
 # The namespace must be identical for all regions
-namespace: multi-cluster
 resources:
   - ../../../base/kustomizeConfig
   - ../multi-cluster-secrets

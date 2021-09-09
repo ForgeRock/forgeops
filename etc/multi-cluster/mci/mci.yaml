@@ -2,7 +2,6 @@ apiVersion: networking.gke.io/v1
 kind: MultiClusterIngress
 metadata:
   name: forgerock
-  namespace: prod
   annotations:
     networking.gke.io/static-ip: 130.211.15.235
     networking.gke.io/pre-shared-certs: "mcicert"
