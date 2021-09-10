@@ -1,9 +1,0 @@
-resources:
-  - ../../base/kustomizeConfig
-  - ../../base/idm-cdk
-  - ../../base/ds/idrepo
-  - ../../base/ingress
-
-patches:
-  - path: base.yaml
-  - path: ds-idrepo-old.yaml

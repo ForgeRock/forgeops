@@ -1,7 +1,0 @@
-resources:
-  - ../../base/kustomizeConfig
-  - ../../base/ig
-  - ../../base/ingress
-
-patches:
-  - path: base.yaml

@@ -232,7 +232,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/ig-only
+      path: ./kustomize/overlay/internal-profiles/ig-only
 
 - name: am-only
   build:
@@ -247,7 +247,7 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/am-only
+      path: ./kustomize/overlay/internal-profiles/am-only
 
 - name: idm-only
   build:
@@ -258,7 +258,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/idm-only
+      path: ./kustomize/overlay/internal-profiles/idm-only
 
 - name: ds-only
   build:
@@ -269,7 +269,7 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/ds-only
+      path: ./kustomize/overlay/internal-profiles/ds-only
 
 - name: amster-export
   build:
