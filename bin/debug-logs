@@ -5,6 +5,8 @@
 import argparse
 from datetime import datetime
 from pathlib import Path
+import subprocess
+import sys
 
 import utils
 
@@ -41,6 +43,52 @@ def get_pods(namespace):
         f'--namespace {namespace} --output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
     return get_pods_output.decode('utf-8').split()
 
+def get_pvcs(namespace):
+    get_pvc_output, _ = utils.run('kubectl', f'get pvc '
+        f'--namespace {namespace} --output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
+    return get_pvc_output.decode('utf-8').split()
+
+def write_context(output):
+    get_output = utils.get_context()
+
+    # Write section
+    context_html = '''
+    <br>
+    <h2><a id="context">Kubernetes Context</a></h2>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    '''.format(get_output=get_output)
+    output.write(context_html)
+
+def write_crds(output):
+    get_output, _ = utils.run('kubectl', 'get crds',cstdout=True)
+    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+
+    # Write section
+    crds_html = '''
+    <br>
+    <h2><a id="crds">CRDs</a></h2>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    '''.format(get_output=get_output)
+    output.write(crds_html)
+
+def write_git_log(output):
+    get_output, _ = utils.run('git', f'--no-pager log -n 10',cstdout=True)
+    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+
+    # Write section
+    git_log_html = '''
+    <br>
+    <h2><a id="git">Forgeops Repository Git Log (Most Recent Entries)</a></h2>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    '''.format(get_output=get_output)
+    output.write(git_log_html)
+
 def write_header(output, namespace):
     # Get current date and time
     now = datetime.now()
@@ -53,18 +101,59 @@ def write_header(output, namespace):
     '''.format(namespace=namespace,now=now)
     output.write(heading_html)
 
-def write_obj_yaml(output, namespace, obj):
+def write_objects(output, namespace, obj):
+    # Get kubectl CLI output for the objects
+    get_cli_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj[0]}',cstdout=True)
+    get_cli_output = get_cli_output.decode('utf-8').replace('\n', '<br/>')
     # Get object YAML
-    get_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj} --output yaml',cstdout=True)
-    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    get_yaml_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj[0]} --output yaml',cstdout=True)
+    get_yaml_output = get_yaml_output.decode('utf-8').replace('\n', '<br/>')
 
     # Write section
     obj_html = '''
     <br>
-    <h2><a id="{obj}">{obj}</a></h2>
-    <pre>{get_output}</pre>
-    '''.format(obj=obj,get_output=get_output)
+    <h2><a id="{obj[1]}">{obj[1]}</a></h2>
+    <pre>{get_cli_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    <h2><a id="{obj[2]}">{obj[2]}</a></h2>
+    <pre>{get_yaml_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(obj=obj,get_cli_output=get_cli_output,get_yaml_output=get_yaml_output)
     output.write(obj_html)
+
+def write_operator_logs(output, operator, maxloglines):
+    # Get operator pod name
+    try:
+        get_pods_output, _ = utils.run('kubectl', f'get pods '
+            f'-l {operator[0]} -n {operator[1]} --field-selector=status.phase==Running '
+            f'--output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
+        pod = get_pods_output.decode('utf-8').split()[0]
+
+        # Get log
+        get_log_output, _ = utils.run('kubectl', f'--namespace {operator[1]} logs {pod} -c {operator[2]}', cstdout=True)
+    except subprocess.CalledProcessError as e:
+        print(f'Error getting pods or pod logs: {e.cmd} {e.output}')
+        sys.exit(1)
+    except IndexError as e:
+        print(f'Didn\'t find {operator[3]} operator pod')
+        sys.exit(1)
+    except Exception as e:
+        print(f'Unexpected error {e}')
+        sys.exit(1)
+
+    # Split the output into lines...
+    get_log_output = get_log_output.decode('utf-8').splitlines()
+    # ... and join the lines into a string, adding <br> at the end of each line
+    log ='<br>'.join(get_log_output[0:maxloglines])
+
+    # Write it out
+    operator_log_html = ''' 
+    <h2><a id="{operator_name}">{operator_name} Container Log:</a></h3>
+    <pre>{log}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(pod=pod,container=operator[2],log=log,operator_name=operator[3])
+    output.write(operator_log_html)
 
 def write_pod_description_and_container_logs(output, namespace, pod, maxloglines):
     # Get pod description
@@ -106,26 +195,101 @@ def write_pod_description_and_container_logs(output, namespace, pod, maxloglines
         '''.format(container=container,log=log)
         output.write(init_container_log_html)
 
-def write_toc(output, pods, objs):
-    # Build TOCs of pods and other objects
+def write_pvc_description(output, namespace, pvc):
+    # Get PVC description
+    get_output, _ = utils.run('kubectl', f'--namespace {namespace} describe pvc {pvc}',cstdout=True)
+    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+
+    # Write PVC description
+    pvcdesc_html = '''
+    <hr>
+    <h2><a id="{pvc}">{pvc}</a></h2>
+    <h3>PVC Description:</a></h3>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(pvc=pvc,get_output=get_output)
+    output.write(pvcdesc_html)
+
+def write_storage_classes(output, namespace):
+    get_output, _ = utils.run('kubectl', f'--namespace {namespace}, get storageclasses',cstdout=True)
+    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+
+    # Write section
+    storageclasses_html = '''
+    <br>
+    <h2><a id="storageclasses">Kubernetes Storage Classes</a></h2>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    '''.format(get_output=get_output)
+    output.write(storageclasses_html)
+
+def write_sw_versions(output):
+    # Get third-party software versions
+    kubectl, _ = utils.run('kubectl', 'version --client=true --short', cstdout=True, cstderr=True)
+    kubectl = kubectl.decode('ascii').split(' ')[-1].strip()
+    kustomize, _ = utils.run('kustomize', 'version --short', cstdout=True, cstderr=True)
+    kustomize = kustomize.decode('ascii').split()[0].split('/')[-1]
+    skaffold, _ = utils.run('skaffold', 'version', cstdout=True, cstderr=True)
+    skaffold = skaffold.decode('ascii').strip()
+
+    # Write PVC description
+    sw_versions_html = '''
+    <hr>
+    <h2><a id="sw_versions">Third-Party Software Versions:</a></h2>
+    <p>
+    kubectl: {kubectl}</br>
+    kustomize: {kustomize}</br>
+    skaffold: {skaffold}</br>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(kubectl=kubectl, kustomize=kustomize, skaffold=skaffold)
+    output.write(sw_versions_html)
+
+def write_toc(output, pods, pvcs, objs, operators):
+    # Build TOCs of pods, PVCs, and other objects
     pods_toc = ''
     for pod in pods:
         pods_toc += f'<li><a href="#{pod}">{pod}</a></li>'
-    objs_toc = ''
+    pvcs_toc = ''
+    for pvc in pvcs:
+        pvcs_toc += f'<li><a href="#{pvc}">{pvc}</a></li>'
+    operators_toc = ''
+    for operator in operators:
+        operators_toc += f'<li><a href="#{operator[3]}">{operator[3]}</a></li>'
+    objects_toc = ''
     for obj in objs:
-        objs_toc += f'<li><a href="#{obj}">{obj}</a></li>'
+        objects_toc += f'<li><a href="#{obj[1]}">{obj[1]}</a></li>'
+        objects_toc += f'<li><a href="#{obj[2]}">{obj[2]}</a></li>'
+    other_toc = ''
+    other_toc += f'<li><a href="#context">Kubernetes context</a></li>'
+    other_toc += f'<li><a href="#sw_versions">Third-Party Software Versions</a></li>'
+    other_toc += f'<li><a href="#crds">CRDs</a></li>'
+    other_toc += f'<li><a href="#storageclasses">Kubernetes storage classes</a></li>'
+    other_toc += f'<li><a href="#git">forgeops repository Git log (most recent entries)</a></li>'
 
     # Write TOC
     toc_html = '''
-    <h2><a id="toc">Pod Logs</a></h2>
+    <h2><a id="toc">Pod Descriptions and Container Logs</a></h2>
     <ul>
     {pods_toc}
     </ul>
-    <h2><a id="toc">Other Objects</a></h2>
+    <h2>PVC Descriptions</h2>
     <ul>
-    {objs_toc}
+    {pvcs_toc}
     </ul>
-    '''.format(pods_toc=pods_toc,objs_toc=objs_toc)
+    <h2>Operator Logs</h2>
+    <ul>
+    {operators_toc}
+    </ul>
+    <h2>Kubernetes Objects</h2>
+    <ul>
+    {objects_toc}
+    </ul>
+    <h2><a id="toc">Other Diagnostic Information</a></h2>
+    <ul>
+    {other_toc}
+    </ul>
+    '''.format(pods_toc=pods_toc,pvcs_toc=pvcs_toc,objects_toc=objects_toc,operators_toc=operators_toc,other_toc=other_toc)
     output.write(toc_html)
 
 def main():
@@ -142,8 +306,17 @@ def main():
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
-    # Get pod names in a list
+    # Definitions of some stuff we'll be getting information about
+    operators = [['app.kubernetes.io/name=secret-agent-manager', 'secret-agent-system', 'manager', 'secret-agent'],
+                 ['control-plane=ds-operator', 'fr-system', 'ds-operator', 'ds-operator']]
+    objs = [['service', 'Services (kubectl CLI output)', 'Services (YAML)'],
+            ['ingress', 'Ingress (kubectl CLI output)', 'Ingress (YAML)'],
+            ['configmap', 'Configmap (kubectl CLI output)', 'Configmap (YAML)'],
+            ['secrets', 'Secrets (kubectl CLI output)', 'Secrets (YAML)']]
+
+    # Get pod names and PVCs in lists
     pods = get_pods(namespace)
+    pvcs = get_pvcs(namespace)
 
     # Open the output file. Overwrite any previous content in it.
     Path('/tmp/forgeops').mkdir(parents=True, exist_ok=True)
@@ -152,16 +325,30 @@ def main():
 
         # Write the header and TOC
         write_header(output, namespace)
-        objs = ['service', 'ingress', 'configmap', 'secrets']
-        write_toc(output, pods, objs)
+        write_toc(output, pods, pvcs, objs, operators)
 
         # Write pod descriptions and container logs
         for pod in pods:
             write_pod_description_and_container_logs(output, namespace, pod, int(maxloglines))
 
-        # Write YAML for the special objects
+        # Write operator logs
+        for operator in operators:
+            write_operator_logs(output, operator, int(maxloglines))
+
+        # Write PVC descriptions
+        for pvc in pvcs:
+            write_pvc_description(output, namespace, pvc)
+
+        # Write special objects (CLI and YAML output)
         for obj in objs:
-            write_obj_yaml(output, namespace, obj)
+            write_objects(output, namespace, obj)
+
+        # Write some other miscellaneous diagnostics
+        write_context(output)
+        write_sw_versions(output)
+        write_crds(output)
+        write_storage_classes(output, namespace)
+        write_git_log(output)
 
     # Print message to user
     print(f'Open {output_file} in your browser.')
