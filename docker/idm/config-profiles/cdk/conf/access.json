@@ -31,6 +31,12 @@
       "actions"    : "*"
     },
     {
+      "pattern"    : "config/fieldPolicy/*",
+      "roles"      : "internal/role/openidm-authorized",
+      "methods"    : "read",
+      "actions"    : "*"
+    },
+    {
       "pattern"    : "info/uiconfig",
       "roles"      : "*",
       "methods"    : "read",
