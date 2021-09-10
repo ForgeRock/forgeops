@@ -26,7 +26,7 @@ After installation, you can test Velero to backup and restore your data. Here is
 ```
 kubectl create ns test
 k ns test
-bin/cdk install
+bin/forgeops install
 # Deploy the cdk....
 
 # Now backup the deployment in this namespace

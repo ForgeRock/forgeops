@@ -75,7 +75,7 @@ size_paths = {
 }
 
 bundles = {
-    'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
+    'base': ['dev/kustomizeConfig', 'base/ingress', 'dev/scripts'],
 	'base-cdm': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
     'ds': ['base/ds-idrepo'],
     'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
@@ -268,9 +268,12 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
             run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
 
     fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
+    sizepatchjson = [{"op": "add", "path": "data/data/FORGEOPS_PLATFORM_SIZE", "value": size}]
     # run('kustomize', f'edit set namespace {ns}', cwd=profile_dir)
     if component in ['base', 'base-cdm']:
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
+            cwd=profile_dir)
+        run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
             cwd=profile_dir) 
     _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
     contents = contents.decode('ascii')
@@ -299,7 +302,7 @@ def uninstall_component(component, ns, force):
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
         _, contents = generate_package(component, 'cdk', ns, '.', '', custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
-        if component == 'base' and force:
+        if component in ['base', 'base-cdm'] and force:
             run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
             run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
             uninstall_component('secrets', ns, False)

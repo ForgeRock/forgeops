@@ -23,7 +23,7 @@ steps:
       . ./cicd/bin/lib-git-auth.sh || { echo "failed to configure credentials" && exit 1; }
       # used for slack notification
       ./bin/set-images > $$SET_IMAGES_LOG
-      ./bin/cdk build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
+      ./bin/forgeops build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
@@ -32,7 +32,7 @@ steps:
   args:
     - -c
     - |-
-      ./bin/cdk delete -n $$NAMESPACE --yes
+      ./bin/forgeops delete -n $$NAMESPACE --yes
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash
@@ -41,7 +41,7 @@ steps:
   args:
     - -c
     - |-
-      ./bin/cdk install --fqdn nightly.eng.forgeops.com -n $$NAMESPACE
+      ./bin/forgeops install --fqdn nightly.eng.forgeops.com -n $$NAMESPACE
 
 - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
   entrypoint: bash

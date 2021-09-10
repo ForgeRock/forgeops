@@ -56,7 +56,7 @@ Notice of Deprecation
   ## Run CDK
 
     If you use the cdk profile out of the box, you simply don't need to use config.sh init.
-    Just run skaffold command or ./bin/cdk as outlined in the documentation.
+    Just run skaffold command or ./bin/forgeops as outlined in the documentation.
 
   ## Custom Config Profile:
 
@@ -105,7 +105,7 @@ Notice of Deprecation
 
   ## How do I use a custom profile?
 
-    Using ./bin/cdk build --config-profile <myprofile>; ./bin/cdk install -n <mynamespace> -f <fqdn>
+    Using ./bin/forgeops build --config-profile <myprofile>; ./bin/forgeops install -n <mynamespace> -f <fqdn>
 
     If you are using the "legacy" skaffold method then add the environment variable CONFIG_PROFILE=<myprofile>
     to the shell or the command e.g. CONFIG_PROFILE=idm-only skaffold -r my.prvt.registry/forgeops

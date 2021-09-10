@@ -111,7 +111,7 @@ quickstart: artifacts
 
 release: changelog.md quickstart
 	forgeops create-release-notes \
-	--asset=bin/cdk \
+	--asset=bin/forgeops \
 	--asset=dist/*.yaml \
     changelog.md
 

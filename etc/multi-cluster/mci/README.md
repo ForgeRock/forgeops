@@ -118,7 +118,7 @@ For more information on the above resources see the 2 Google doc links below:
 
 **1. Deploy AM, IDM and the UIs**
 ```bash
-bin/cdk install apps ui
+bin/forgeops install apps ui
 ```
 
 **2. Verify deployment**

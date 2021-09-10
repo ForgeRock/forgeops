@@ -1,0 +1,247 @@
+#!/usr/bin/env python3
+"""This script deploys the ForgeRock Identity Platform to Kubernetes."""
+
+import argparse
+import os
+import sys
+import time
+import utils
+import json
+
+build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
+
+size_map = {
+    'cdk': {
+    },
+    'mini': {
+        'base': 'base-cdm',
+        'ds': 'ds-cdm',
+    },
+    'small': {
+        'base': 'base-cdm',
+        'ds': 'ds-cdm',
+    },
+    'medium': {
+        'base': 'base-cdm',
+        'ds': 'ds-cdm',
+    },
+    'large': {
+        'base': 'base-cdm',
+        'ds': 'ds-cdm',
+    },
+}
+
+def install_all(size, ns, fqdn, ctx, pkg_path=None):
+    """Deploy all components in sequence"""
+    remap = size_map[size]
+    utils.message('Deploying base.yaml. This is a one time activity.')
+    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ctx, pkg_path)
+    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ctx, pkg_path)
+    utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
+    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ctx, pkg_path)
+    utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    time.sleep(2)
+    utils.wait_for_ds(ns, 'ds-idrepo')
+    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
+    utils.message('\nDeploying apps.')
+    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ctx, pkg_path)
+    utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
+    time.sleep(2)
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
+    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+    utils.message('\nRemoving "amster" deployment.')
+    utils.uninstall_component(remap.get('amster', 'amster'), ns, False)
+    utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
+    utils.message('\nDeploying UI.')
+    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ctx, pkg_path)
+    # message('\nWaiting for UI pods to become ready')
+    # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
+
+def overlay_app_configs(ns, am=True, idm=True):
+    """Overlay local configs in the AM and IDM pods"""
+    config_profile_path = os.path.join(sys.path[0], '../docker')
+    if am:
+        am_config_path = os.path.join(config_profile_path, 'am', 'config-profiles', 'cdk', 'config')
+        _, am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
+                                      cstdout=True)
+        am_pod_name = am_pod_name.decode('ascii')
+        utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
+        utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
+    if idm:
+        _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
+                                       cstdout=True)
+        idm_pod_name = idm_pod_name.decode('ascii')
+        utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
+        for directory in os.listdir(os.path.join(config_profile_path, 'idm', 'config-profiles', 'cdk')):
+            idm_config_path = os.path.join(config_profile_path, 'idm', 'config-profiles', 'cdk', directory)
+            utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
+
+    utils.message('Restarting AM and IDM pods')
+    if am:
+        utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- kill 1')
+    if idm:
+        utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
+
+def build_docker_image(component, default_repo, tag, config_profile=None):
+    """Builds custom docker images"""
+    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
+    name = utils.DOCKER_REGEX_NAME.get(component, component)
+    utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
+    utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
+
+def main():
+    parser = argparse.ArgumentParser(description='Manage ForgeRock platform components')
+    common_ns = argparse.ArgumentParser(add_help=False)
+    common_sz = argparse.ArgumentParser(add_help=False)
+    common = argparse.ArgumentParser(add_help=False)
+    common_ns.add_argument('--namespace', '-n', default='',
+                           help='Target namespace (default: current ctx namespace)')
+    common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
+                                                          'rcs-agent', 'secrets', []])
+    size_group = common_sz.add_mutually_exclusive_group()
+    size_group.add_argument('--cdk', action='store_const', dest='size', const='cdk', help='(Default) Install the CDK')
+    size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install the CDM mini platform')
+    size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install the CDM small platform')
+    size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install the CDM medium platform')
+    size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install the CDM large platform')
+    
+    subparser = parser.add_subparsers(dest='cmd', required=True)
+    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz], allow_abbrev=False,
+                                          help='Generate manifests and install the platform components or component bundles')
+    parser_install.add_argument('--fqdn', '-f', dest='fqdn',
+                                help='Select the FQDN for this deployment')
+    parser_generate = subparser.add_parser('generate', parents=[common, common_sz],
+                                          help='Generate the ForgeRock Platform manifests')
+    parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
+                                help='Select the FQDN for this deployment')
+    parser_delete = subparser.add_parser(
+        'delete', parents=[common_ns, common], help='Delete ForgeRock Platform components or component bundles')
+    parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
+                               help='Skip delete confirmation')
+    parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
+                               help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
+    parser_build = subparser.add_parser('build', help='Build custom docker images')
+    parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
+    parser_build.add_argument('--default-repo', '-r', dest='registry')
+    parser_build.add_argument('--tag', '-t', required=False, help='Set the tag used when building images')
+    parser_build.add_argument('--config-profile', '-p', dest='config_profile')
+    parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
+    parser_info = subparser.add_parser('info', parents=[common_ns], help='Print relevant deployment information')
+    parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
+    subparser.add_parser('config', parents=[common_ns]) # Internal use. Hidden
+    args = parser.parse_args()
+
+    # Check toolset versions before doing anything
+    utils.check_base_toolset()
+    if args.cmd != 'build':
+        ctx_namespace = utils.get_namespace()
+        ctx = utils.get_context()
+        namespace = getattr(args, 'namespace', None) or ctx_namespace
+        fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
+        size = args.size if getattr(args, 'size', None) else 'cdk'
+        remap = size_map[size]
+        if size == 'cdk':
+            pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'cdk')
+        else: 
+            pkg_path = None
+
+    components = args.components if getattr(args, 'components', None) else ['all']
+    if args.cmd == 'info':
+        if not args.jsonfmt:
+            utils.message(f'Targeting namespace: "{namespace}"')
+        secrets = utils.printsecrets(namespace, not args.jsonfmt)
+        urls = utils.printurls(namespace, not args.jsonfmt)
+        output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
+        if args.jsonfmt:
+            print(json.dumps(output))
+        return
+    if args.cmd == 'config':
+        overlay_app_configs(namespace)
+        return
+    if args.cmd is None:
+        parser.print_help()
+        sys.exit(1)
+
+    if args.cmd == 'delete':
+        try: 
+            deployed_sz = utils.get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE') 
+            utils.message(f'"{deployed_sz}" platform detected in namespace: "{namespace}"')
+            size = deployed_sz
+            remap = size_map[size]
+        except:
+            utils.error(f'Couldn\'t find deployment information. Is the platform deployed in namespace "{namespace}"?') 
+            if not args.skip_confirmation:
+                if input('Attempt delete assuming "CDM mini"? [Y/N] ').lower() not in ['yes', 'y']:
+                    return
+            utils.message('Assuming "CDM mini" for this operation')
+            deployed_sz = None
+            size = 'mini'
+            remap = size_map[size]
+        utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}"')
+        if not args.skip_confirmation:
+            if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
+                return
+        if args.force_delete:
+            utils.warning('Using --force delete: This will erase all your PVCs and Secrets. This cannot be undone.')
+            utils.warning('Press "CTRL+C" now if you want to cancel')
+            time.sleep(2)
+            if not args.skip_confirmation:
+                if input('OK to proceed? [Y/N] ').lower() not in ['yes', 'y']:
+                    return
+        if 'base' in components: #delete 'base' last
+            components.append(components.pop(components.index('base')))
+        if "all" in components:
+            components = ['ui', 'apps', 'ds', 'base']
+        for c in components:
+            utils.uninstall_component(remap.get(c, c), namespace, deployed_sz == 'cdk' or args.force_delete)
+        if ('base' in components or 'all' in components) and deployed_sz != 'cdk' and not args.force_delete:
+            utils.warning('Forgeops CDM deployment detected')
+            utils.warning('Will not delete PVCs or Secrets to avoid data loss. You must delete those manually or use --force')
+        return
+
+    if args.cmd == 'build':
+        if args.reset:
+            image_defaulter = os.path.join(sys.path[0], '../kustomize', 'dev', 'image-defaulter' )
+            utils.message(f'Reset to git index: {image_defaulter} ')
+            utils.run('git', f'checkout {image_defaulter}')
+            return
+        if 'all' in components:
+            components = build_targets
+        if 'amster' in components:
+            utils. error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
+        for c in components:
+            build_docker_image(c, args.registry, args.tag, args.config_profile)
+        return
+
+    if 'base' in components:
+        components.insert(0, 'secrets')
+    if args.cmd == 'generate':
+        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}"\n')
+        if 'all' in components:
+            components = ['secrets', 'base', 'ds', 'apps', 'ui']
+        for c in components:
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx)
+            print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
+        utils.message('\nEnjoy your forgeops manifests!')
+        return 
+    utils.install_dependencies()
+    utils.message(f'Installing component(s): {components} plarform: "{size}" in namespace: "{namespace}"\n')
+    if 'all' in components:
+        install_all(size, namespace, fqdn, ctx, pkg_path)
+    else:
+        for c in components:
+            utils.install_component(remap.get(c, c), size, namespace, fqdn, ctx, pkg_path)
+
+    if args.cmd == 'install' and ('base' in components or 'all' in components):
+        utils.waitforsecrets(namespace)
+        utils.printsecrets(namespace)
+        utils.printurls(namespace)
+    utils.message('\nEnjoy your deployment!')
+
+if __name__ == '__main__':
+    main()
