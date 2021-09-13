@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""This script deploys the ForgeRock Identity Platform to Kubernetes."""
+
+import argparse
+from genericpath import exists
+from pathlib import Path
+import os
+import sys
+import time
+import utils
+import json
+
+cdm_bundles = {
+    'base': 'base-cdm',
+    'ds': 'ds-cdm',
+}
+
+def deploy_cdm(size, ns, fqdn, ctx):
+    """Deploy the CDM in sequence"""
+    utils.message('Deploying base.yaml. This is a one time activity.')
+    utils.install_component(cdm_bundles['base'], size, ns, fqdn, ctx)
+    utils.install_component('secrets', size, ns, fqdn, ctx)
+    utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
+    utils.install_component(cdm_bundles['ds'], size, ns, fqdn, ctx)
+    utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    time.sleep(2)
+    utils.wait_for_ds(ns, 'ds-idrepo')
+    if size != 'mini': utils.wait_for_ds(ns, 'ds-cts')
+    utils.message('\nDeploying apps.')
+    utils.install_component('apps', size, ns, fqdn, ctx)
+    utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
+    time.sleep(2)
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
+    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+    utils.message('\nRemoving "amster" deployment.')
+    utils.uninstall_component('amster', ns, False)
+    utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
+    utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
+    utils.message('\nDeploying UI.')
+    utils.install_component('ui', size, ns, fqdn, ctx)
+    # message('\nWaiting for UI pods to become ready')
+    # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
+
+def main():
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument('-n', '--namespace', default='',
+                        help='Target namespace (default: current namespace)')
+    common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'ds-new', 'apps', 'ui', 'am', 'amster', 'idm',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
+                                                          'rcs-agent', 'secrets', []])
+    common.add_argument('-s', '--size', nargs='?', choices=['mini', 'small', 'medium', 'large'])
+    parser = argparse.ArgumentParser(
+        description='Manage ForgeRock CDM Platform')
+    subparser = parser.add_subparsers(dest='cmd', required=True)
+    parser_install = subparser.add_parser('install', parents=[common],
+                                          help='Generates and installs the ForgeRock CDM platform manifests')
+    parser_install.add_argument('-f', '--fqdn', dest='fqdn',
+                                help='Select the FQDN for this deployment')
+    parser_generate = subparser.add_parser('generate', parents=[common],
+                                          help='Generates the ForgeRock CDM platform manifests')
+    parser_generate.add_argument('-f', '--fqdn', dest='fqdn',
+                                help='Select the FQDN for this deployment')
+    parser_delete = subparser.add_parser(
+        'delete', parents=[common], help='Delete the ForgeRock CDM Platform')
+    parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
+                               help='Skip delete confirmation')
+    parser_delete.add_argument('-f', '--force', dest='force_delete', action='store_true',
+                               help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
+    parser_info = subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
+    parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
+    args = parser.parse_args()
+
+    # Check toolset versions before doing anything
+    utils.check_base_toolset()
+    ctx = utils.get_context()
+    ctx_namespace = utils.get_namespace()
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
+    size = args.size if getattr(args, 'size', None) else 'mini'
+    components = args.components if getattr(args, 'components', None) else ['all']
+    fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
+    if args.cmd is None:
+        parser.print_help()
+        sys.exit(1)
+
+    if args.cmd == 'info':
+        if not args.jsonfmt:
+            utils.message(f'Targeting namespace: "{namespace}"')
+        secrets = utils.printsecrets(namespace, not args.jsonfmt)
+        urls = utils.printurls(namespace, not args.jsonfmt)
+        output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
+        if args.jsonfmt:
+            print(json.dumps(output))
+        return
+
+    if args.cmd == 'delete':
+        utils.message(f'Uninstalling CDM from namespace: "{namespace}"')
+        if not args.skip_confirmation:
+            if input('OK to delete all CDM components? [Y/N] ').lower() not in ['yes', 'y']:
+                return
+        if args.force_delete:
+            utils.warning('Using --force delete: This will erase all your PVCs and Secrets. This cannot be undone.')
+            utils.warning('CTRL+C Now if you want to cancel.')
+            time.sleep(2)
+            if not args.skip_confirmation:
+                if input('OK to proceed? [Y/N] ').lower() not in ['yes', 'y']:
+                    return
+        if 'base' in components: #delete 'base' last
+            components.append(components.pop(components.index('base')))
+        for c in components:
+            utils.uninstall_component(c, namespace, args.force_delete)
+        if ('base' in components or 'all' in components) and not args.force_delete:
+            utils.warning('Will not delete PVCs or Secrets to avoid data loss. You must delete those manually or use --force')
+        return
+
+    if 'base' in components:
+        components.insert(0, 'secrets')
+
+    if args.cmd == 'generate':
+        utils.message(f'Generating CDM manifests for {components} size: "{size}" for namespace: "{namespace}"\n')
+        if 'all' in components:
+            components = ['secrets', cdm_bundles['base'], cdm_bundles['ds'], 'apps', 'ui']
+        for c in components:
+            profile_path, _ = utils.generate_package(c, size, namespace, fqdn, ctx)
+            print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
+        utils.message('\nEnjoy your CDM manifests!')
+        return 
+    # If we reach this point, we're installing the CDM 
+    utils.install_dependencies()
+    utils.message(f'Installing CDM size: "{size}" in namespace: "{namespace}"\n')
+    utils.message(f'Installing component(s): {components}\n')
+    if 'all' in components:
+        deploy_cdm(size, namespace, fqdn, ctx)
+    else:
+        for c in components:
+            c = cdm_bundles.get(c, c)
+            utils.install_component(c, size, namespace, fqdn, ctx)
+
+    if 'base' in components or 'all' in components:
+        utils.waitforsecrets(namespace)
+        utils.printsecrets(namespace)
+        utils.printurls(namespace)
+    utils.message('\nEnjoy your CDM deployment!')
+
+if __name__ == '__main__':
+    main()
