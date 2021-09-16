@@ -267,34 +267,6 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/ds-only
 
-# Deploy only ds and secrets.
-- name: persistence
-  build:
-    artifacts:
-    - *DS-CTS
-    - *DS-IDREPO
-    - *LDIF-IMPORTER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/persistence
-
-# deploy only AM/IDM - for iterative testing
-- name: am-idm-only
-  build:
-    artifacts:
-    - *AM
-    - *IDM
-    - *AMSTER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/am-idm-only
-
 - name: amster-export
   build:
     artifacts:

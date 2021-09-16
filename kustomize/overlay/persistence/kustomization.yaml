@@ -1,5 +1,0 @@
-resources:
-- ../../base/kustomizeConfig
-- ../../base/ds/idrepo
-- ../../base/ds/cts
-- ../../base/ldif-importer
