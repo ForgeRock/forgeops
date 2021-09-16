@@ -306,7 +306,7 @@ profiles:
     kustomize:
       path: ./kustomize/overlay/amster-export
 
-- name: clouddns-eu
+- name: clouddns
   build:
     artifacts:
     - *DS-CTS
@@ -316,16 +316,4 @@ profiles:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-cluster/clouddns/eu
-
-- name: clouddns-us
-  build:
-    artifacts:
-    - *DS-CTS
-    - *DS-IDREPO
-    - *LDIF-IMPORTER
-    tagPolicy:
-      sha256: { }
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/multi-cluster/clouddns/us
+      path: ./kustomize/overlay/multi-cluster/clouddns

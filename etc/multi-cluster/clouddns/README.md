@@ -105,42 +105,27 @@ The above change needs to be applied to the idrepo and cts patch in both regiona
 **3. Add Skaffold profiles**  
 >`NOTE:` Required step 
 
-Add the following profiles to Skaffold.yaml:  
+Add the following profile to Skaffold.yaml:  
 ```yaml
-- name: clouddns-us
+- name: clouddns
   build:
     artifacts:
     - *DS-CTS
     - *DS-IDREPO
+    - *LDIF-IMPORTER
     tagPolicy:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-cluster/clouddns/us
-  
-- name: clouddns-eu
-  build:
-    artifacts:
-    - *DS-CTS
-    - *DS-IDREPO
-    tagPolicy:
-      sha256: { }
-  deploy:
-    kustomize:
-      path: ./kustomize/overlay/multi-cluster/clouddns/eu
+      path: ./kustomize/overlay/multi-cluster/clouddns
 ```  
 <br />  
 
 ## Step 4: Deploy
 #  
 
-Deploy to US:
+Deploy following profile to both clusters:
 ```bash
-skaffold run --profile clouddns-us
-```
-
-Deploy to EU:
-```bash
-skaffold run --profile clouddns-eu
+skaffold run --profile clouddns
 ```
 

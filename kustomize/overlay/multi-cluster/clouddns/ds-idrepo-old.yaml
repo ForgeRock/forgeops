@@ -19,8 +19,6 @@ spec:
           env: 
           - name: DS_CLUSTER_TOPOLOGY
             value: "eu,us"
-          - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-            value: "ds-idrepo-0.ds-idrepo.prod.svc.us:8989,ds-idrepo-0.ds-idrepo.prod.svc.eu:8989"
       initContainers:
         - name: initialize
           imagePullPolicy: Always
