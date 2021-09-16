@@ -75,10 +75,7 @@ in_repo_profile = parsed_args.profile_name in ('am-only',
 git_command = os.environ.get('GIT_SSH_COMMAND', 'foo')
 # Clean up first
 if parsed_args.clean or parsed_args.force:
-    ok, *_ = utils.run('git', 'clean', '-fd', '--', 'docker', 'build')
-    if not ok:
-        print('Git clean failed.')
-        sys.exit(1)
+    utils.run('git', 'clean', '-fd', '--', 'docker', 'build')
     if build_base.exists():
         print('Removing build repositories now.')
         shutil.rmtree(build_base)

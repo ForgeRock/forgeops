@@ -12,7 +12,7 @@ def _get_container_logs(namespace, pod, containers, maxloglines):
     container_logs = []
     for container in containers:
         container_log = ''
-        _, get_output, _ = utils.run('kubectl', f'--namespace {namespace} logs {pod} -c {container}', cstdout=True)
+        get_output, _ = utils.run('kubectl', f'--namespace {namespace} logs {pod} -c {container}', cstdout=True)
         # Split the output into lines...
         get_output = get_output.decode('utf-8').splitlines()
         # ... and join the lines into a string, adding <br> at the end of each line
@@ -24,12 +24,12 @@ def _get_containers(namespace, pod):
     containers = []
 
     # Get app containers
-    _, get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
+    get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
         f'--namespace {namespace} --output=jsonpath="{{.spec.containers[*].name}}"',cstdout=True)
     containers.append(get_pods_output.decode('utf-8').split())
 
     # Get init containers
-    _, get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
+    get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
         f'--namespace {namespace} --output=jsonpath="{{.spec.initContainers[*].name}}"',cstdout=True)
     containers.append(get_pods_output.decode('utf-8').split())
 
@@ -37,7 +37,7 @@ def _get_containers(namespace, pod):
     return containers
 
 def get_pods(namespace):
-    _, get_pods_output, _ = utils.run('kubectl', f'get pods '
+    get_pods_output, _ = utils.run('kubectl', f'get pods '
         f'--namespace {namespace} --output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
     return get_pods_output.decode('utf-8').split()
 
@@ -55,7 +55,7 @@ def write_header(output, namespace):
 
 def write_obj_yaml(output, namespace, obj):
     # Get object YAML
-    _, get_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj} --output yaml',cstdout=True)
+    get_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj} --output yaml',cstdout=True)
     get_output = get_output.decode('utf-8').replace('\n', '<br/>')
 
     # Write section
@@ -68,7 +68,7 @@ def write_obj_yaml(output, namespace, obj):
 
 def write_pod_description_and_container_logs(output, namespace, pod, maxloglines):
     # Get pod description
-    _, get_output, _ = utils.run('kubectl', f'--namespace {namespace} describe pod {pod}',cstdout=True)
+    get_output, _ = utils.run('kubectl', f'--namespace {namespace} describe pod {pod}',cstdout=True)
     get_output = get_output.decode('utf-8').replace('\n', '<br/>')
 
     # Get logs for this pod's app and init containers

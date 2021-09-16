@@ -161,12 +161,12 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
 # Launch an amster job specified. Provide the path to the kustomize for the amster job. Returns the pod name.
 def _launch_amster_job(kustomize_path, ns):
     utils.message('Deploying amster')
-    _, contents, _ = utils.run('kustomize', f'build {kustomize_path}', cstdout=True)
+    contents, _ = utils.run('kustomize', f'build {kustomize_path}', cstdout=True)
     contents = contents.decode('ascii')
     contents = contents.replace('namespace: default', f'namespace: {ns}')
     utils.run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
     time.sleep(5) # Allow kube-scheduler to create the pod
-    _, amster_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
+    amster_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=amster -o jsonpath={{.items[0].metadata.name}}',
                                       cstdout=True)
     return amster_pod_name.decode('ascii')
 

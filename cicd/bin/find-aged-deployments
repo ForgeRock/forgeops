@@ -42,24 +42,18 @@ if parsed_args.delete:
 
 
 def delete(kind, name):
-    ok, out, err = utils.run('kubectl',
-                             'delete', kind, name,
-                             cstdout=True)
-    if not ok:
-        print(f'Error when deleting {kind} {name} error message: {err}')
-    return ok
+    utils.run('kubectl',
+              'delete', kind, name,
+              cstdout=True)
+    return True
 
 # Get all objects in cluster.
-ok, out, err = utils.run('kubectl',
-                         'get', 'pvc,deploy,sts',
-                         '--all-namespaces',
-                         '-o', 'json',
-                         cstdout=True)
+out, err = utils.run('kubectl',
+                     'get', 'pvc,deploy,sts',
+                     '--all-namespaces',
+                     '-o', 'json',
+                     cstdout=True)
 
-if not ok:
-    print('Failed to call kubernetes.')
-    print(err)
-    sys.exit(1)
 res = json.loads(out)
 max_length = 0
 old_objects = []

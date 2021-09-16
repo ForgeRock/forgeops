@@ -183,7 +183,7 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     stdo_pipe = subprocess.PIPE if cstdout else None
     _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
                         check=True, input=stdin, cwd=cwd, env=env)
-    return _r.returncode == 0, _r.stdout, _r.stderr
+    return _r.stdout, _r.stderr
 
 
 def _waitforsecret(ns, secret_name):
@@ -207,7 +207,7 @@ def _waitfords(ns, ds_name):
     sys.stdout.flush()
     while True:
         try:
-            _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
+            valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
                                  cstderr=True, cstdout=True)
             if len(valuestr) > 0:
                 print('done')
@@ -275,7 +275,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
             cwd=profile_dir) 
-    _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
+    contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
     contents = contents.decode('ascii')
     contents = contents.replace('namespace: default', f'namespace: {ns}')
     contents = contents.replace('namespace: prod', f'namespace: {ns}')
@@ -324,8 +324,8 @@ def _inject_kustomize_amster(kustomize_pkg_path):
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
         run('tar', f'-czf amster-import.tar.gz -C {amster_config_path} .', cstdout=True, env=envVars)
         run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        _, cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
-                             cstdout=True)
+        cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
+                    cstdout=True)
         with open(amster_cm_path, 'wt') as f:
             f.write(cm.decode('ascii'))
         run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
@@ -409,17 +409,17 @@ def check_component_version(component, version):
 
 def check_base_toolset():
     # print('Checking kubectl version')
-    _, ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
+    ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
     ver = ver.decode('ascii').split(' ')[-1].strip()
     check_component_version('kubectl', ver)
     
     # print('Checking kustomize version')
-    _, ver, _ = run('kustomize', 'version --short', cstdout=True)
+    ver, _ = run('kustomize', 'version --short', cstdout=True)
     ver = ver.decode('ascii').split()[0].split('/')[-1]
     check_component_version('kustomize', ver)
 
     # print('Checking skaffold version')
-    _, ver, _ = run('skaffold', 'version', cstdout=True)
+    ver, _ = run('skaffold', 'version', cstdout=True)
     check_component_version('skaffold', ver.decode('ascii').strip())
 
 def install_dependencies():
@@ -435,7 +435,7 @@ def install_dependencies():
     else:
         message('secret-agent CRD found in cluster.')
 
-    _, img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+    img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
     check_component_version('secret-agent', img.decode('ascii').split(':')[1])
 
@@ -449,7 +449,7 @@ def install_dependencies():
     else:
         message('ds-operator CRD found in cluster.')
 
-    _, img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
+    img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
     check_component_version('ds-operator', img.decode('ascii').split(':')[1])
     print()
@@ -625,7 +625,7 @@ def copytree(src, dst):
 #     return r.returncode
 
 def get_fqdn(ns):
-    _, fqdn, _ = run(
+    fqdn, _ = run(
         'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
     return fqdn.decode('ascii')
 
@@ -633,23 +633,23 @@ def get_fqdn(ns):
 def get_namespace(ns=None):
     if ns != None:
         return ns
-    _, ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
     return ctx_namespace.decode('ascii') if ctx_namespace else 'default'
 
 def get_context():
-    _, ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
+    ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
     return ctx.decode('ascii') if ctx else 'default'
 
 # Lookup the value of a configmap key
 def get_configmap_value(ns, configmap, key):
     """Get configmap contents"""
-    _, value, _ = run('kubectl',
+    value, _ = run('kubectl',
                      f'-n {ns} get configmap {configmap} -o jsonpath={{.data.{key}}}', cstdout=True)
     return value.decode('utf-8')
 
 # Lookup the value of a secret
 def get_secret_value(ns, secret, key):
     """Get secret contents"""
-    _, value, _ = run('kubectl',
+    value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')

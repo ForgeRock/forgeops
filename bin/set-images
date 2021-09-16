@@ -370,14 +370,11 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
         kustomize_set_image = f'.*{product_name}.*={new_image_name}{new_tag}'
         log.info(f'Updating {kustomize_dir} to use {new_image_name}{new_tag}')
 
-        success, _, _ = utils.run('kustomize',
-                                  'edit',
-                                  'set',
-                                  'image',
-                                  kustomize_set_image)
-        if not success:
-            raise Exception(f'Couldn\'t update {product_name} kustomize')
-
+        utils.run('kustomize',
+                  'edit',
+                  'set',
+                  'image',
+                  kustomize_set_image)
 
 def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
     # Track files changed.
@@ -443,20 +440,20 @@ def init_repo(args):
                                         repo=args.git_repo)
     # dump info from repo.
     if args.git_repo != '' and args.config_path.is_dir():
-        ok, commit_hash, err = utils.run('git',
-                                         'rev-parse',
-                                         'HEAD',
-                                         cwd=args.config_path,
-                                         cstdout=True, cstderr=True)
+        commit_hash, err = utils.run('git',
+                                      'rev-parse',
+                                      'HEAD',
+                                      cwd=args.config_path,
+                                      cstdout=True, cstderr=True)
         if err != b'':
             log.error(f'Error when checking {args.config_path} {err.decode()}')
             raise Exception
-        ok, branch_name, err = utils.run('git',
-                                         'rev-parse',
-                                         '--abbrev-ref',
-                                         'HEAD',
-                                         cwd=args.config_path,
-                                         cstdout=True, cstderr=True)
+        branch_name, err = utils.run('git',
+                                     'rev-parse',
+                                     '--abbrev-ref',
+                                     'HEAD',
+                                     cwd=args.config_path,
+                                     cstdout=True, cstderr=True)
         if err != b'':
             log.error(f'Error when checking {args.config_path} {err.decode()}')
             raise Exception

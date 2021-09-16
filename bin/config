@@ -140,7 +140,7 @@ def export_am(am_conf, pod_name):
     """.strip()
     try:
         log.debug('Starting export')
-        _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
+        out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
         if out == b'':
             raise Exception('No configuration changes found.')
         f = io.BytesIO(out)
@@ -207,7 +207,7 @@ def run_export(args):
         get -l "app={args.component}" -o jsonpath="{jsonpath_expr}" pod
         """.strip()
         try:
-            _, out, _ = utils.run(KUBECTL, pod_name_args,
+            out, _ = utils.run(KUBECTL, pod_name_args,
                                   cstdout=True, cstderr=True)
             log.debug('Gathered pod names.')
         except subprocess.CalledProcessError as e:
