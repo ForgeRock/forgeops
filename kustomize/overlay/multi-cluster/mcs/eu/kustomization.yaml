@@ -1,5 +1,6 @@
-# Deploys multi-cluster DS: ds-cts and ds-idrepo
-# The namespace must be identical for all regions
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
 resources:
   - ../../../../base/kustomizeConfig
   - ../../multi-cluster-secrets

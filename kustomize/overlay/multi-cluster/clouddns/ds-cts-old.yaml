@@ -11,11 +11,10 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              memory: 4Gi
-              cpu: 2
+              memory: 3Gi
+              cpu: 2000m
             limits:
-              memory: 4Gi
-              cpu: 2
+              memory: 5Gi
           env: 
           - name: DS_CLUSTER_TOPOLOGY
             value: "eu,us"
@@ -31,4 +30,5 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 250Gi
+          storage: 100Gi
+      storageClassName: fast

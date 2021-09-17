@@ -13,10 +13,14 @@ spec:
     checkIntervalSec: 5
     timeoutSec: 5
     # healthyThreshold: [int]
-    # unhealthyThreshold: [int]
+    unhealthyThreshold: 1
     type: HTTP
     port: 8080
     requestPath: /am/json/health/live
+  timeoutSec: 5
+  sessionAffinity:
+    affinityType: GENERATED_COOKIE
+    affinityCookieTtlSec: 300
 ---
 apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
@@ -33,10 +37,13 @@ spec:
     checkIntervalSec: 5
     timeoutSec: 5
     # healthyThreshold: [int]
-    # unhealthyThreshold: [int]
+    unhealthyThreshold: 1
     type: HTTP
     port: 8080
     requestPath: /openidm/info/ping
+  timeoutSec: 5
+  sessionAffinity:
+    affinityType: GENERATED_COOKIE
 ---
 apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
@@ -53,7 +60,10 @@ spec:
     checkIntervalSec: 5
     timeoutSec: 5
     # healthyThreshold: [int]
-    # unhealthyThreshold: [int]
+    unhealthyThreshold: 1
     type: HTTP
     port: 8080
     requestPath: /health
+  timeoutSec: 5
+  sessionAffinity:
+    affinityType: GENERATED_COOKIE

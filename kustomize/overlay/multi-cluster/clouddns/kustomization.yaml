@@ -1,5 +1,6 @@
-# Deploys multi-cluster DS: ds-cts and ds-idrepo
-# The namespace must be identical for all regions
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
 resources:
 - ../../../base/kustomizeConfig
 - ../multi-cluster-secrets
@@ -7,7 +8,6 @@ resources:
 - ../../../base/ds/cts
 - ../../../base/ldif-importer
 
-# If deploying the full ForgeRock stack the following changes need to be made to the platform-config configmap.
 patches:
 - path: base.yaml
 - path: ds-cts-old.yaml

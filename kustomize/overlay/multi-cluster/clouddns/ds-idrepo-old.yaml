@@ -12,10 +12,9 @@ spec:
           resources:
             requests:
               memory: 4Gi
-              cpu: 2
+              cpu: 1500m
             limits:
-              memory: 4Gi
-              cpu: 2
+              memory: 6Gi
           env: 
           - name: DS_CLUSTER_TOPOLOGY
             value: "eu,us"
@@ -31,4 +30,5 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 10Gi
+          storage: 100Gi
+      storageClassName: fast

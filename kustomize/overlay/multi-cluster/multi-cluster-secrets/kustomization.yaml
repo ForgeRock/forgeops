@@ -1,4 +1,6 @@
-# Deploys multi-cluster DS: secrets
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
 resources:
   - ../../../base/secrets
 

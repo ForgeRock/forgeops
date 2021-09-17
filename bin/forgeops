@@ -230,7 +230,7 @@ def main():
         utils.message('\nEnjoy your forgeops manifests!')
         return 
     utils.install_dependencies()
-    utils.message(f'Installing component(s): {components} plarform: "{size}" in namespace: "{namespace}"\n')
+    utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
     if 'all' in components:
         install_all(size, namespace, fqdn, ctx, pkg_path)
     else:
