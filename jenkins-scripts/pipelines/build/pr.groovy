@@ -25,7 +25,7 @@ def initialSteps() {
 
     properties([
             buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
-            parameters([
+            parameters(commonLodestarModule.commonParams() + [
                     booleanParam(name: 'PR_pit1', defaultValue: true),
             ] + commonLodestarModule.postcommitMandatoryStages(false)),
     ])

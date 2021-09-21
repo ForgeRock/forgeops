@@ -24,6 +24,12 @@ boolean doRunPostcommitTests() {
     return !params.isEmpty() && params.any { name, value -> name.startsWith('Postcommit_') && value }
 }
 
+ArrayList commonParams() {
+    return [
+        string(name: 'Lodestar_ref', defaultValue: '' , description: 'Leave empty for latest promoted version')
+    ]
+}
+
 ArrayList postcommitMandatoryStages(boolean enabled) {
     return [
         booleanParam(name: 'Postcommit_pit1', defaultValue: enabled),
@@ -49,13 +55,24 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
 def getDefaultConfig(Random random, String stageName) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def randomNumber = random.nextInt(9999) + 10000 // 5 digit random number to compute to namespace
-    return [STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
-            STASH_FORGEOPS_BRANCH           : commonModule.GIT_COMMIT,
-            STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision,
-            DEPLOYMENT_NAMESPACE            : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
-            REPORT_NAME_PREFIX              : normalizedStageName,
-            PIPELINE_NAME                   : 'Postcommit-Lodestar',
-            DO_RECORD_RESULT                : false]
+    def config = [
+        STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
+        STASH_FORGEOPS_BRANCH           : commonModule.GIT_COMMIT, 
+        DEPLOYMENT_NAMESPACE            : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
+        REPORT_NAME_PREFIX              : normalizedStageName,
+        PIPELINE_NAME                   : 'Postcommit-Lodestar',
+        DO_RECORD_RESULT                : false]
+    
+    if(params.Forgeops_ref != '' && params.Forgeops_Ref != null) {
+        config += [
+            STASH_LODESTAR_BRANCH           : params.Lodestar_ref
+        ]
+    } else {
+        config += [
+            STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision
+        ]
+    }
+    return config
 }
 
 def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stagesCloud, Closure process) {

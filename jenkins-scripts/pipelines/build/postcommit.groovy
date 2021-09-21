@@ -17,7 +17,7 @@ import com.forgerock.pipeline.stage.Status
 def initialSteps() {
     properties([
             buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
-            parameters(commonLodestarModule.postcommitMandatoryStages(true)),
+            parameters(commonLodestarModule.commonParams() + commonLodestarModule.postcommitMandatoryStages(true)),
     ])
 
     slackChannel = '#forgeops-notify'
