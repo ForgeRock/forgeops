@@ -241,7 +241,7 @@ def wait_for_ds(ns, directoryservices_name):
     """Wait for DS pods to be ready after ds-operator deployment"""
     run('kubectl',
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
-    _runwithtimeout(_waitfords, [ns, directoryservices_name], 120)
+    _runwithtimeout(_waitfords, [ns, directoryservices_name], 180)
 
 def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
     """Generate Kustomize package for component or bundle"""
