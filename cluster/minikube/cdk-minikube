@@ -23,7 +23,6 @@ def main():
     parser_start.add_argument('--disk', '-k', help='Amount of Disk', default='40g')
     args = parser.parse_args()
 
-    print(args)
     if args.cmd == 'delete':
         utils.message('Deleting the minikube instance.')
         if not args.skip_confirmation and input('Do you want to continue? [Y/N] ').lower() not in ['yes', 'y']:

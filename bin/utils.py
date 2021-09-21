@@ -633,11 +633,16 @@ def get_fqdn(ns):
 def get_namespace(ns=None):
     if ns != None:
         return ns
+    get_context() # Ensure k8s context is set/exists
     ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
     return ctx_namespace.decode('ascii') if ctx_namespace else 'default'
 
 def get_context():
-    ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
+    try:
+        ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
+    except Exception as _e:
+        error('Could not determine current k8s context. Check your kubeconfig file and try again')
+        sys.exit(1)
     return ctx.decode('ascii') if ctx else 'default'
 
 # Lookup the value of a configmap key
