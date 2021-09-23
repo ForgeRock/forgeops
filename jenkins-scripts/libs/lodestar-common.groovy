@@ -26,7 +26,8 @@ boolean doRunPostcommitTests() {
 
 ArrayList commonParams() {
     return [
-        string(name: 'Lodestar_ref', defaultValue: '' , description: 'Leave empty for latest promoted version')
+        string(name: 'Lodestar_ref', defaultValue: '',
+                description: 'Can be a branch, tag or commit. Leave empty for latest promoted')
     ]
 }
 
@@ -63,14 +64,10 @@ def getDefaultConfig(Random random, String stageName) {
         PIPELINE_NAME                   : 'Postcommit-Lodestar',
         DO_RECORD_RESULT                : false]
     
-    if(params.Forgeops_ref != '' && params.Forgeops_Ref != null) {
-        config += [
-            STASH_LODESTAR_BRANCH           : params.Lodestar_ref
-        ]
+    if(params.Forgeops_Ref != null && params.Forgeops_ref != '') {
+        config += [STASH_LODESTAR_BRANCH           : params.Lodestar_ref]
     } else {
-        config += [
-            STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision
-        ]
+        config += [STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision]
     }
     return config
 }
