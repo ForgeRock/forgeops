@@ -93,6 +93,7 @@ metadata:
   name: idm
   annotations:
     beta.cloud.google.com/backend-config: '{"ports": {"443":"idm"}}'
+    networking.gke.io/app-protocols: '{"idm":"HTTPS"}'
   labels:
     app: idm
     app.kubernetes.io/component: idm
@@ -108,7 +109,7 @@ spec:
       - name: idm
         port: 443
         protocol: TCP
-        targetPort: 8081
+        targetPort: 8443
 ---
 apiVersion: networking.gke.io/v1
 kind: MultiClusterService

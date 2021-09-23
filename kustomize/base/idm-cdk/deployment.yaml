@@ -123,6 +123,7 @@ spec:
           timeoutSeconds: 5
         ports:
         - containerPort: 8080
+        - containerPort: 8443
         resources:
           limits:
             memory: 1280Mi
