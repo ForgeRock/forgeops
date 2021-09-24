@@ -27,12 +27,12 @@ def _get_containers(namespace, pod):
 
     # Get app containers
     get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
-        f'--namespace {namespace} --output=jsonpath="{{.spec.containers[*].name}}"',cstdout=True)
+        f'--namespace {namespace} --output=jsonpath={{.spec.containers[*].name}}',cstdout=True)
     containers.append(get_pods_output.decode('utf-8').split())
 
     # Get init containers
     get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
-        f'--namespace {namespace} --output=jsonpath="{{.spec.initContainers[*].name}}"',cstdout=True)
+        f'--namespace {namespace} --output=jsonpath={{.spec.initContainers[*].name}}',cstdout=True)
     containers.append(get_pods_output.decode('utf-8').split())
 
     # Return a list with two elements: a list of non-init containers, and a list of containers
@@ -40,12 +40,12 @@ def _get_containers(namespace, pod):
 
 def get_pods(namespace):
     get_pods_output, _ = utils.run('kubectl', f'get pods '
-        f'--namespace {namespace} --output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
+        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True)
     return get_pods_output.decode('utf-8').split()
 
 def get_pvcs(namespace):
     get_pvc_output, _ = utils.run('kubectl', f'get pvc '
-        f'--namespace {namespace} --output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
+        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True)
     return get_pvc_output.decode('utf-8').split()
 
 def write_context(output):
@@ -127,7 +127,7 @@ def write_operator_logs(output, operator, maxloglines):
     try:
         get_pods_output, _ = utils.run('kubectl', f'get pods '
             f'-l {operator[0]} -n {operator[1]} --field-selector=status.phase==Running '
-            f'--output=jsonpath="{{.items..metadata.name}}"',cstdout=True)
+            f'--output=jsonpath={{.items..metadata.name}}',cstdout=True)
         pod = get_pods_output.decode('utf-8').split()[0]
 
         # Get log
