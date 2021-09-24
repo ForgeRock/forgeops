@@ -65,13 +65,10 @@ integration of IDM and AM.
 
 ## Getting Started
 
-If you just want to observe the ForgeRock Identity Platform in action on a 
-Kubernetes cluster, you can try out our [CDQ (Cloud Deployment 
-Quickstart)](https://backstage.forgerock.com/docs/forgeops/7.1/quickstart.html).
-You can get the CDQ up and running quickly, but its capabilities are _very_ limited.   
-
-For a full CDK deployment, you'll need to install the required third-party software, set
-up a Kubernetes cluster, and install the ForgeRock Identity Platform. 
+If you just want to observe the ForgeRock Identity Platform in action
+on a Kubernetes cluster, you can try out the CDK deployment. 
+You'll need to install the required third-party software, set up a
+Kubernetes cluster, and deploy the ForgeRock Identity Platform. 
 
 See the [CDK documentation](https://backstage.forgerock.com/docs/forgeops/7.1/cdk/overview.html) 
 for detailed information about all these tasks.
