@@ -225,7 +225,8 @@ def main():
         if 'all' in components:
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx)
+            custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, custom_path)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
         utils.message('\nEnjoy your forgeops manifests!')
         return 
