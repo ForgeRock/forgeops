@@ -57,18 +57,16 @@ def getDefaultConfig(Random random, String stageName) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def randomNumber = random.nextInt(9999) + 10000 // 5 digit random number to compute to namespace
     def config = [
-        STASH_PLATFORM_IMAGES_BRANCH    : commonModule.platformImagesRevision,
-        STASH_FORGEOPS_BRANCH           : commonModule.GIT_COMMIT, 
-        DEPLOYMENT_NAMESPACE            : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
-        REPORT_NAME_PREFIX              : normalizedStageName,
-        PIPELINE_NAME                   : 'Postcommit-Lodestar',
-        DO_RECORD_RESULT                : false]
-    
-    if(params.Forgeops_Ref != null && params.Forgeops_ref != '') {
-        config += [STASH_LODESTAR_BRANCH           : params.Lodestar_ref]
-    } else {
-        config += [STASH_LODESTAR_BRANCH           : commonModule.lodestarRevision]
-    }
+        STASH_PLATFORM_IMAGES_BRANCH        : commonModule.platformImagesRevision,
+        STASH_FORGEOPS_BRANCH               : commonModule.GIT_COMMIT,
+        STASH_LODESTAR_BRANCH               : params.Lodestar_ref != '' ? params.Lodestar_ref : commonModule.lodestarRevision,
+        DEPLOYMENT_NAMESPACE                : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
+        REPORT_NAME_PREFIX                  : normalizedStageName,
+        PIPELINE_NAME                       : 'Postcommit-Forgeops',
+        DO_RECORD_RESULT                    : false,
+        COMPONENTS_LODESTARBOX_IMAGE_TAG    : commonModule.lodestarRevision,
+        COMPONENTS_LOCUST_IMAGE_TAG         : commonModule.lodestarRevision
+    ]
     return config
 }
 
@@ -88,14 +86,9 @@ def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stages
     }
 }
 
-def getLodestarDockerImagesTag() {
-    return [COMPONENTS_LODESTARBOX_IMAGE_TAG    : commonModule.lodestarRevision,
-            COMPONENTS_LOCUST_IMAGE_TAG         : commonModule.lodestarRevision]
-}
-
 def runSpyglaas(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def testConfig = getLodestarDockerImagesTag() + getDefaultConfig(random, stageName) + config
+    def testConfig = getDefaultConfig(random, stageName) + config
     def stagesCloud = [:]
     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
@@ -106,9 +99,7 @@ def runSpyglaas(PipelineRunLegacyAdapter pipelineRun, Random random, String stag
 
 def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def testConfig = getLodestarDockerImagesTag() + getDefaultConfig(random, stageName) +
-            [DO_RECORD_RESULT   : false,
-             PIPELINE_NAME      : 'FORGEOPS_POSTCOMMIT'] + config
+    def testConfig = getDefaultConfig(random, stageName) + config
     def stagesCloud = [:]
     def testName = cloud_utils.pyrockGetTestName(testConfig)
     stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(testName)
@@ -118,16 +109,9 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
     }
 }
 
-def generateSummaryTestReport(String stageName) {
-    node('forgeops-postcommit-cloud') {
-        dashboard_utils.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
-                stageName, "${stageName}.html")
-    }
-}
-
 def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def testConfig = getLodestarDockerImagesTag() + getDefaultConfig(random, stageName) + config
+    def testConfig = getDefaultConfig(random, stageName) + config
     def stagesCloud = [:]
     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
@@ -165,6 +149,13 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                 return new Outcome(Status.SUCCESS, reportUrl)
             }
         }
+    }
+}
+
+def generateSummaryTestReport(String stageName) {
+    node('forgeops-postcommit-cloud') {
+        dashboard_utils.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
+                stageName, "${stageName}.html")
     }
 }
 
