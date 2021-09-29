@@ -1,4 +1,4 @@
-# Directory Services backup and Restore using Snapshots
+# Directory Services Backup and Restore Using Snapshots
 
 
 The following samples are provided:
@@ -46,7 +46,7 @@ The Cronjob works as follows:
 
 This diagram visualizes the process:
 
-(ds-volume-backup.png)
+![](ds-volume-backup.png)
 
 
  To modify the sample for your requirements:

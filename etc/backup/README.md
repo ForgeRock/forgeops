@@ -8,19 +8,22 @@ For backup, use Kubernetes volume snapshots, and perform offline backups in anot
 * There are already a variety of "last mile" backup archival solutions such as S3, gcs, and minio. We provide samples to backup to a snapshot, and let you "bring your own" backup job to meet your specific requirements.
 ## Snapshot Backup Examples
 
-The [../etc/ds](../etc/ds) directory contains an example of taking snapshots and backing them up to cloud storage. The sample demonstrates backup to a GCS bucket, but can be modified for other archival solutions.
+The [*ds*](../ds) directory contains an example of taking snapshots and backing them up to cloud storage. The sample demonstrates backup to a GCS bucket, but can be modified for other archival solutions.
 
-The samples backup the contents of the directory using an LDIF export or
+The samples back up the contents of the directory using an LDIF export or
 the dsbackup utility, which backs up the JE database. LDIF is recommended for long term archival of directory data.
 
 ## Other Backup Solutions
 
 In addition to the strategies outlined above, other solutions in the Kubernetes ecosystem perform backup and restore. ForgeRock has tested [Velero](https://velero.io/).
+
 ### Velero Install Notes
 
-Please refer to the [Velero Documentation](https://velero.io/docs) for installation and configuration instructions.
+Refer to the [Velero Basic Installation documentation](https://velero.io/docs/v1.6/basic-install/) for installation of the velero CLI and the server components. 
+Refer to the [Customize Velero Install documentation](https://velero.io/docs/v1.6/customize-installation/) for a customized installation and configuration instructions.
 
-We've provided an example script [velero-install.sh](./velero-install.sh) that you can modify to install Velero in a GKE cluster.
+We've provided an example script [velero-install.sh](./velero-install.sh) to perform the server component installation in a GKE cluster. You can modify to install Velero in your GKE cluster.
+
 After installation, you can test Velero to backup and restore your data. Here is a sample session:
 
 ```
@@ -48,5 +51,3 @@ Velero currently has limitations restoring snapshot backups across geographical 
 
 * https://stackoverflow.com/questions/63460096/unable-to-restore-gcp-persistent-disks-pvcs-to-another-region-when-backing-up-gk/63504435#63504435
 * https://github.com/vmware-tanzu/velero/issues/1624#issuecomment-671061689
-
-
