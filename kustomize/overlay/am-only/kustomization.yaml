@@ -10,3 +10,4 @@ resources:
 
 patches:
   - path: base.yaml
+  - path: ds-idrepo-old.yaml
