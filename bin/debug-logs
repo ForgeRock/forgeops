@@ -14,39 +14,55 @@ def _get_container_logs(namespace, pod, containers, maxloglines):
     container_logs = []
     for container in containers:
         container_log = ''
-        get_output, _ = utils.run('kubectl', f'--namespace {namespace} logs {pod} -c {container}', cstdout=True)
-        # Split the output into lines...
-        get_output = get_output.decode('utf-8').splitlines()
-        # ... and join the lines into a string, adding <br> at the end of each line
-        container_log ='<br>'.join(get_output[0:maxloglines])
-        container_logs.append(container_log)
+        success, get_output, _ = utils.run_condfail('kubectl',
+            f'--namespace {namespace} logs {pod} -c {container}', cstdout=True, ignoreFail=True)
+        if success:
+            # Split the output into lines...
+            get_output = get_output.decode('utf-8').splitlines()
+            # ... and join the lines into a string, adding <br> at the end of each line
+            container_log ='<br>'.join(get_output[0:maxloglines])
+            container_logs.append(container_log)
+        else:
+            container_logs.append('Command to get container logs failed\n')
     return container_logs
 
 def _get_containers(namespace, pod):
     containers = []
 
     # Get app containers
-    get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
-        f'--namespace {namespace} --output=jsonpath={{.spec.containers[*].name}}',cstdout=True)
-    containers.append(get_pods_output.decode('utf-8').split())
+    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods {pod} '
+        f'--namespace {namespace} --output=jsonpath={{.spec.containers[*].name}}',cstdout=True, ignoreFail=True)
+    if success:
+        containers.append(get_pods_output.decode('utf-8').split())
+    else:
+        containers.append([])
 
     # Get init containers
-    get_pods_output, _ = utils.run('kubectl', f'get pods {pod} '
-        f'--namespace {namespace} --output=jsonpath={{.spec.initContainers[*].name}}',cstdout=True)
-    containers.append(get_pods_output.decode('utf-8').split())
+    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods {pod} '
+        f'--namespace {namespace} --output=jsonpath={{.spec.initContainers[*].name}}',cstdout=True, ignoreFail=True)
+    if success:
+        containers.append(get_pods_output.decode('utf-8').split())
+    else:
+        containers.append([])
 
     # Return a list with two elements: a list of non-init containers, and a list of containers
     return containers
 
 def get_pods(namespace):
-    get_pods_output, _ = utils.run('kubectl', f'get pods '
-        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True)
-    return get_pods_output.decode('utf-8').split()
+    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods '
+        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True, ignoreFail=True)
+    if success:
+        return get_pods_output.decode('utf-8').split()
+    else:
+        return []
 
 def get_pvcs(namespace):
-    get_pvc_output, _ = utils.run('kubectl', f'get pvc '
-        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True)
-    return get_pvc_output.decode('utf-8').split()
+    success, get_pvc_output, _ = utils.run_condfail('kubectl', f'get pvc '
+        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True, ignoreFail=True)
+    if success:
+        return get_pvc_output.decode('utf-8').split()
+    else:
+        return []
 
 def write_context(output):
     get_output = utils.get_context()
@@ -62,8 +78,11 @@ def write_context(output):
     output.write(context_html)
 
 def write_crds(output):
-    get_output, _ = utils.run('kubectl', 'get crds',cstdout=True)
-    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_output, _ = utils.run_condfail('kubectl', 'get crds', cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_output = 'Command to get CRDs failed<br/>'
 
     # Write section
     crds_html = '''
@@ -76,8 +95,11 @@ def write_crds(output):
     output.write(crds_html)
 
 def write_git_log(output):
-    get_output, _ = utils.run('git', f'--no-pager log -n 10',cstdout=True)
-    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_output, _ = utils.run_condfail('git', f'--no-pager log -n 10',cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_output = 'Command to get the Git log failed<br/>'
 
     # Write section
     git_log_html = '''
@@ -103,11 +125,20 @@ def write_header(output, namespace):
 
 def write_objects(output, namespace, obj):
     # Get kubectl CLI output for the objects
-    get_cli_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj[0]}',cstdout=True)
-    get_cli_output = get_cli_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_cli_output, _ = utils.run_condfail('kubectl',
+        f'--namespace {namespace} get {obj[0]}',cstdout=True, ignoreFail=True)
+    if success:
+        get_cli_output = get_cli_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_cli_output = 'Command to get objects (CLI) failed<br/>'
+
     # Get object YAML
-    get_yaml_output, _ = utils.run('kubectl', f'--namespace {namespace} get {obj[0]} --output yaml',cstdout=True)
-    get_yaml_output = get_yaml_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_yaml_output, _ = utils.run_condfail('kubectl',
+        f'--namespace {namespace} get {obj[0]} --output yaml',cstdout=True, ignoreFail=True)
+    if success:
+        get_yaml_output = get_yaml_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_yaml_output = 'Command to get objects (YAML) failed<br/>'
 
     # Write section
     obj_html = '''
@@ -124,6 +155,8 @@ def write_objects(output, namespace, obj):
 
 def write_operator_logs(output, operator, maxloglines):
     # Get operator pod name
+    # This call doesn't return an error if it doesn't find anything, so we
+    # need to wrap it in a try block instead of using run with ignoreFail=true)
     try:
         get_pods_output, _ = utils.run('kubectl', f'get pods '
             f'-l {operator[0]} -n {operator[1]} --field-selector=status.phase==Running '
@@ -131,16 +164,17 @@ def write_operator_logs(output, operator, maxloglines):
         pod = get_pods_output.decode('utf-8').split()[0]
 
         # Get log
-        get_log_output, _ = utils.run('kubectl', f'--namespace {operator[1]} logs {pod} -c {operator[2]}', cstdout=True)
+        get_log_output, _ = utils.run('kubectl',
+            f'--namespace {operator[1]} logs {pod} -c {operator[2]}', cstdout=True)
     except subprocess.CalledProcessError as e:
         print(f'Error getting pods or pod logs: {e.cmd} {e.output}')
-        sys.exit(1)
+        return
     except IndexError as e:
         print(f'Didn\'t find {operator[3]} operator pod')
-        sys.exit(1)
+        return
     except Exception as e:
         print(f'Unexpected error {e}')
-        sys.exit(1)
+        return
 
     # Split the output into lines...
     get_log_output = get_log_output.decode('utf-8').splitlines()
@@ -157,8 +191,12 @@ def write_operator_logs(output, operator, maxloglines):
 
 def write_pod_description_and_container_logs(output, namespace, pod, maxloglines):
     # Get pod description
-    get_output, _ = utils.run('kubectl', f'--namespace {namespace} describe pod {pod}',cstdout=True)
-    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_output, _ = utils.run_condfail('kubectl',
+        f'--namespace {namespace} describe pod {pod}',cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_output = 'Command to describe pod failed<br/>'
 
     # Get logs for this pod's app and init containers
     pod_containers = _get_containers(namespace, pod)
@@ -197,8 +235,12 @@ def write_pod_description_and_container_logs(output, namespace, pod, maxloglines
 
 def write_pvc_description(output, namespace, pvc):
     # Get PVC description
-    get_output, _ = utils.run('kubectl', f'--namespace {namespace} describe pvc {pvc}',cstdout=True)
-    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_output, _ = utils.run_condfail('kubectl',
+        f'--namespace {namespace} describe pvc {pvc}',cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_output = 'Command to describe PVC failed<br/>'
 
     # Write PVC description
     pvcdesc_html = '''
@@ -211,8 +253,12 @@ def write_pvc_description(output, namespace, pvc):
     output.write(pvcdesc_html)
 
 def write_storage_classes(output, namespace):
-    get_output, _ = utils.run('kubectl', f'--namespace {namespace}, get storageclasses',cstdout=True)
-    get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    success, get_output, _ = utils.run_condfail('kubectl',
+        f'--namespace {namespace}, get storageclasses',cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_output = 'Command to get storage classes failed<br/>'
 
     # Write section
     storageclasses_html = '''
@@ -226,12 +272,24 @@ def write_storage_classes(output, namespace):
 
 def write_sw_versions(output):
     # Get third-party software versions
-    kubectl, _ = utils.run('kubectl', 'version --client=true --short', cstdout=True, cstderr=True)
-    kubectl = kubectl.decode('ascii').split(' ')[-1].strip()
-    kustomize, _ = utils.run('kustomize', 'version --short', cstdout=True, cstderr=True)
-    kustomize = kustomize.decode('ascii').split()[0].split('/')[-1]
-    skaffold, _ = utils.run('skaffold', 'version', cstdout=True, cstderr=True)
-    skaffold = skaffold.decode('ascii').strip()
+    success, kubectl, _ = utils.run_condfail('kubectl',
+        'version --client=true --short', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        kubectl = kubectl.decode('ascii').split(' ')[-1].strip()
+    else:
+        kubectl = 'Command to get kubectl version failed'
+    success, kustomize, _ = utils.run_condfail('kustomize',
+        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        kustomize = kustomize.decode('ascii').split()[0].split('/')[-1]
+    else:
+        kustomize = 'Command to get Kustomize version failed'
+    success, skaffold, _ = utils.run_condfail('skaffold',
+        'version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        skaffold = skaffold.decode('ascii').strip()
+    else:
+        skaffold = 'Command to get Skaffold version failed'
 
     # Write PVC description
     sw_versions_html = '''
