@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -14,9 +14,25 @@ import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
 
 fraasProductionTag = 'fraas-production'
-
-productLatestTag = '7.2.0-latest-postcommit'
 productPostcommitStable = 'postcommit-stable'
+
+def getPromotedProductTag(platformImagesRevision, productName) {
+    def content = bitbucketUtils.readFileContent(
+            'cloud',
+            'platform-images',
+            platformImagesRevision,
+            "${productName}.json").trim()
+    return readJSON(text: content)['imageTag']
+}
+
+def getPromotedProductRepo(platformImagesRevision, productName) {
+    def content = bitbucketUtils.readFileContent(
+            'cloud',
+            'platform-images',
+            platformImagesRevision,
+            "${productName}.json").trim()
+    return readJSON(text: content)['imageName']
+}
 
 allStagesCloud = [:]
 
@@ -74,7 +90,7 @@ def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stages
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('forgeops-postcommit-cloud') {
+        dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
             stage(stageName) {
                 dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                     process()
@@ -111,14 +127,15 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 
 def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def testConfig = getDefaultConfig(random, stageName) + config
+    def testConfig = getDefaultConfig(random, stageName) + config +
+            [EXT_PLATFORM_IMAGES_BRANCH: commonModule.platformImagesRevision]
     def stagesCloud = [:]
     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('forgeops-postcommit-cloud') {
+        dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
             stage(stageName) {
                 try {
                     def uiFileContent = bitbucketUtils.readFileContent(
@@ -129,7 +146,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     def uiTestRevision = readJSON(text: uiFileContent)['gitCommit']
 
                     dir("platform-ui") {
-                        // Checkout Platform UI repository commit corresponding to the UI images commit promoted to Forgeops
+                        // Checkout Platform UI repository commit corresponding to the UI images commit promoted
                         localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
                         sh "git checkout ${uiTestRevision}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
@@ -138,7 +155,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
                     allStagesCloud[normalizedStageName].numFailedTests = 0
                     allStagesCloud[normalizedStageName].reportUrl = reportUrl
-                    
+
                     uiTestsStage.runTests(testConfig, normalizedStageName, normalizedStageName)
                 } catch(Exception e) {
                     print(e.getMessage())
@@ -153,9 +170,9 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
 }
 
 def generateSummaryTestReport(String stageName) {
-    node('forgeops-postcommit-cloud') {
-        dashboard_utils.createAndPublishSummaryReport(allStagesCloud, stageName, '', false,
-                stageName, "${stageName}.html")
+    privateWorkspace {
+        dashboard_utils.createAndPublishSummaryReport(allStagesCloud, stageName, '', false, stageName,
+                "${stageName}.html")
     }
 }
 
