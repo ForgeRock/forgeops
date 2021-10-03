@@ -7,7 +7,7 @@
  */
 
 @Library([
-    'forgerock-pipeline-libs@c10ecd07fd57c2f6b85a05bf2024f48781e3f0c4',
+    'forgerock-pipeline-libs@10f8306c93783b8d59d69bc439dc274e1723c7c4',
     'java-pipeline-libs@7d909d2ffb9ab751dc96e9c7bc9d253d3d993dbb'
 ]) _
 
@@ -27,61 +27,57 @@ buildDirectories = [
 def pipeline
 def pipelineRun
 
-timestamps {
-    node ('build&&linux') {
+node('gce-vm-forgeops-n1-standard-4') {
+    stage('Clone repo') {
+        checkout scm
 
-        stage ('Clone repo') {
-            checkout scm
+        def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
+        def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
+        def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
 
-            def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
-            def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
-            def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
+        localGitUtils = load("${libsLocation}/git-utils.groovy")
+        commonModule = load("${libsLocation}/common.groovy")
+        commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
 
-            localGitUtils = load("${libsLocation}/git-utils.groovy")
-            commonModule = load("${libsLocation}/common.groovy")
-            commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
+        currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.SHORT_GIT_COMMIT}"
+        currentBuild.description = 'built:'
 
-            currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.SHORT_GIT_COMMIT}"
-            currentBuild.description = 'built:'
+        // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
+        library "QaCloudUtils@${commonModule.lodestarRevision}"
 
-            // Load the QaCloudUtils dynamically based on Lodestar commit promoted to Forgeops
-            library "QaCloudUtils@${commonModule.lodestarRevision}"
-
-            if (env.TAG_NAME) {
-                currentBuild.result = 'ABORTED'
-                error 'This pipeline does not currently support building from a tag'
+        if (env.TAG_NAME) {
+            currentBuild.result = 'ABORTED'
+            error 'This pipeline does not currently support building from a tag'
+        } else {
+            if (isPR()) {
+                pipeline = load("${jobLocation}/pr.groovy")
+                prTestsStage = load("${stagesLocation}/pr-tests.groovy")
             } else {
-                if (isPR()) {
-                    pipeline = load("${jobLocation}/pr.groovy")
-                    prTestsStage = load("${stagesLocation}/pr-tests.groovy")
-                } else {
-                    pipeline = load("${jobLocation}/postcommit.groovy")
-                    createPlatformImagesPR = load("${stagesLocation}/create-platform-images-pr.groovy")
-                }
-                // Needed both for PR and postcommit
-                postcommitTestsStage = load("${stagesLocation}/postcommit-tests.groovy")
+                pipeline = load("${jobLocation}/postcommit.groovy")
+                createPlatformImagesPR = load("${stagesLocation}/create-platform-images-pr.groovy")
             }
-
-            builder = PipelineRun.builder(env, steps)
-                    .pipelineName('forgeops')
-                    .branch(commonModule.GIT_BRANCH)
-                    .commit(commonModule.GIT_COMMIT)
-                    .commits(["forgeops": commonModule.GIT_COMMIT])
-                    .committer(commonModule.GIT_COMMITTER)
-                    .commitMessage(commonModule.GIT_MESSAGE)
-                    .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.GIT_COMMITTER_DATE))
-                    .repo('forgeops')
-
-            pipelineRun  = new PipelineRunLegacyAdapter(builder.build())
+            // Needed both for PR and postcommit
+            postcommitTestsStage = load("${stagesLocation}/postcommit-tests.groovy")
         }
 
-        pipeline.initialSteps()
-        pipeline.buildDockerImages(pipelineRun)
+        builder = PipelineRun.builder(env, steps)
+                .pipelineName('forgeops')
+                .branch(commonModule.GIT_BRANCH)
+                .commit(commonModule.GIT_COMMIT)
+                .commits(["forgeops": commonModule.GIT_COMMIT])
+                .committer(commonModule.GIT_COMMITTER)
+                .commitMessage(commonModule.GIT_MESSAGE)
+                .committerDate(dateTimeUtils.convertIso8601DateToInstant(commonModule.GIT_COMMITTER_DATE))
+                .repo('forgeops')
+
+        pipelineRun = new PipelineRunLegacyAdapter(builder.build())
     }
 
+    pipeline.initialSteps()
+    pipeline.buildDockerImages(pipelineRun)
+
     if (commonModule.branchSupportsIDCloudReleases()) {
-        // The node used has only one executor and so this code functions as a lock
-        // Remove this workaround once the Lodestar pipeline will be move to Jenkins in cloud, see LODESTAR-629
+        // Allow only one postcommit at a time accross all the branches
         withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : 'postcommit-forgeops-lock-cloud') {
             pipeline.postBuildTests(pipelineRun)
         }
@@ -96,7 +92,7 @@ timestamps {
 
 def withPostcommitLock(String nodeName, Closure process) {
     if (nodeName) {
-        node (nodeName) {
+        node(nodeName) {
             process()
         }
     } else {
