@@ -19,6 +19,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
             CHECK_REGRESSION        : true,
             MAX_VARIATION           : '0.10',
     ]
+    config_common = config_common + commonModule.getConfigImageTagsFromParams()
 
     def parentStageName = 'PIT2 Perf'
     def tags = ['PIT2', 'performance']
