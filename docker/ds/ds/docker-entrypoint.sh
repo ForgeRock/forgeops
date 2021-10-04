@@ -7,6 +7,7 @@
 # to such license between the licensee and ForgeRock AS.
 
 set -eu
+set -x
 
 # ParallelGC with a single generation tenuring threshold has been shown to give the best
 # performance vs determinism trade-off for servers using JVM heaps of less than 8GB,
@@ -90,7 +91,6 @@ if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
 else
     export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${DS_ADVERTISED_LISTEN_ADDRESS}:8989}
 fi
-
 
 
 validateImage() {
@@ -260,6 +260,9 @@ restore)
     ;;
 
 # Start the server.
+# start-ds falls through the case statement
+start-ds)
+    ;&
 start)
     init
     preExec
@@ -277,6 +280,7 @@ dev)
     linkDataDirectories
     removeLocks
     preExec
+    echo "Undefined entrypoint. Will exec $@"
     shift
     exec "$@"
     ;;

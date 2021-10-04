@@ -1,6 +1,6 @@
 # Builds the docker images used by the ds-operator (and may also be used for vanilla forgeops)
 # This is run by a trigger. To run manually, from the forgeops root directory:
-# gcloud builds submit --config docker/ds/cloudbuild.yaml
+# gcloud builds submit --project forgeops-public --config docker/ds/cloudbuild.yaml
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   dir: docker/ds
@@ -23,6 +23,14 @@ steps:
     '-t', 'gcr.io/forgeops-public/ds-proxy:7.1-dev',
     '-t', 'gcr.io/forgeops-public/ds-proxy:7-dev',
     '-f', 'proxy/Dockerfile', '.' ]
+  # This is the mutable docker image used by the newest ds-operator.
+- name: 'gcr.io/cloud-builders/docker'
+  dir: docker/ds/ds
+  args: [ 'build',
+    '-t', 'gcr.io/forgeops-public/ds:latest',
+    '-t', 'gcr.io/forgeops-public/ds:7.2-dev',
+    '-t', 'gcr.io/forgeops-public/ds:7-dev',
+    '-f', './Dockerfile', '.' ]
 images: [
     'gcr.io/forgeops-public/ds-idrepo:latest',
     'gcr.io/forgeops-public/ds-idrepo:7.1-dev',
@@ -32,5 +40,8 @@ images: [
     'gcr.io/forgeops-public/ds-cts:7-dev',
     'gcr.io/forgeops-public/ds-proxy:latest',
     'gcr.io/forgeops-public/ds-proxy:7.1-dev',
-    'gcr.io/forgeops-public/ds-proxy:7-dev'
+    'gcr.io/forgeops-public/ds-proxy:7-dev',
+    'gcr.io/forgeops-public/ds:7-dev',
+    'gcr.io/forgeops-public/ds:7.2-dev',
+    'gcr.io/forgeops-public/ds:latest'
    ]
