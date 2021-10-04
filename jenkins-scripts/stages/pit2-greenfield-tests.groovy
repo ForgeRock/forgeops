@@ -37,7 +37,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             REPORT_NAME_PREFIX              : normalizedStageName,
                         ]
 
-                        withGKESpyglaasNoStages(config)
+                        withGKESpyglaasNoStages(config + commonModule.getConfigImageTagsFromParams())
                     }
 
                     return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
