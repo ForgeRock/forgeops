@@ -59,6 +59,15 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
                         check=True, input=stdin, cwd=cwd, env=env)
     return _r.returncode == 0, _r.stdout, _r.stderr
 
+def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
+    """Wrapper function for run() that ignores failures if selected"""
+    try:
+        _, rstdout, rstderr = run(cmd, *cmdArgs, stdin=stdin, cstdout=cstdout, cstderr=cstderr, cwd=cwd, env=env)
+        return True, rstdout, rstderr
+    except Exception as e:
+        if ignoreFail:
+            return False, None, None
+        raise(e)
 
 def _waitforsecret(ns, secret_name):
     print(f'Waiting for secret: {secret_name} .', end='')
