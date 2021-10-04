@@ -79,6 +79,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             STASH_LODESTAR_BRANCH                 : commonModule.LODESTAR_GIT_COMMIT,
                             STASH_FORGEOPS_BRANCH                 : commonModule.FORGEOPS_GIT_COMMIT,
                     ]
+                    uiTestsConfig = uiTestsConfig + commonModule.getConfigImageTagsFromParams()
 
                     dir("platform-ui") {
                         // There are no idcloud branches created on Platform UI repository

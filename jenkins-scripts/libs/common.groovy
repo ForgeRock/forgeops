@@ -96,6 +96,34 @@ def getCurrentProductCommitHashes() {
     ]
 }
 
+def getConfigImageTagsFromParams() {
+    config = [:]
+
+    if(params.ds_image_tag != '') {
+        config += [
+                'COMPONENTS_DSCTS_IMAGE_TAG': params.ds_image_tag,
+                'COMPONENTS_DSIDREPO_IMAGE_TAG': params.ds_image_tag
+        ]
+    }
+    if(params.am_image_tag != '') {
+        config += [
+                'COMPONENTS_AM_IMAGE_TAG': params.am_image_tag
+        ]
+    }
+    if(params.idm_image_tag != '') {
+        config += [
+                'COMPONENTS_IDM_IMAGE_TAG': params.idm_image_tag
+        ]
+    }
+    if(params.ig_image_tag != '') {
+        config += [
+                'COMPONENTS_IG_IMAGE_TAG': params.ig_image_tag
+        ]
+    }
+
+    return config
+}
+
 class DockerImagePromotion implements Serializable {
     DockerImage dockerImage
     String rootLevelBaseImageName
