@@ -46,7 +46,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                                 TIMEOUT_UNIT                                    : 'HOURS'
                         ]
 
-                        withGKESpyglaasNoStages(config)
+                        withGKESpyglaasNoStages(config + commonModule.getConfigImageTagsFromParams())
                     }
 
                     return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)

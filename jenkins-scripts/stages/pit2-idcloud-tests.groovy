@@ -32,7 +32,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             TENANT                          : 'openam-pitperf-tests',
                         ]
 
-                        withGKESpyglaasNoStages(config)
+                        withGKESpyglaasNoStages(config + commonModule.getConfigImageTagsFromParams())
                     }
 
                     return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)

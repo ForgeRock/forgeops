@@ -79,6 +79,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             STASH_LODESTAR_BRANCH                 : commonModule.LODESTAR_GIT_COMMIT,
                             STASH_FORGEOPS_BRANCH                 : commonModule.FORGEOPS_GIT_COMMIT,
                     ]
+                    uiTestsConfig = uiTestsConfig + commonModule.getConfigImageTagsFromParams()
 
                     dir("platform-ui") {
                         // Checkout Platform UI repository commit corresponding to the UI images commit promoted to Forgeops

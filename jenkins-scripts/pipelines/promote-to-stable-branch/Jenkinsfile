@@ -29,6 +29,10 @@ def jobProperties = [
     disableConcurrentBuilds(),
     buildDiscarder(logRotator(numToKeepStr: '20')),
     parameters([
+        string(name: 'am_image_tag', defaultValue: '', description: 'AM image tag to use. Leave empty for default'),
+        string(name: 'ds_image_tag', defaultValue: '', description: 'DS image tag to use. Leave empty for default'),
+        string(name: 'idm_image_tag', defaultValue: '', description: 'IDM image tag to use. Leave empty for default'),
+        string(name: 'ig_image_tag', defaultValue: '', description: 'IG image tag to use. Leave empty for default'),
         string(name: 'PIT2_Greenfield', defaultValue: '43200', description: '0 to not run<br>max duration in seconds (min 7200s when run)', trim: true),
         booleanParam(name: 'PIT2_Upgrade', defaultValue: true, description: 'approx 45mins'),
         booleanParam(name: 'PIT2_Perf_platform', defaultValue: true, description: 'approx 1h30mins'),
