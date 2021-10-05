@@ -39,21 +39,6 @@ spec:
             cd /home/forgerock/openam
             cp -r .git .homeVersion * /fbc
           fi
-      - name: truststore-init
-        image: am
-        volumeMounts:
-        - name: new-truststore
-          mountPath: /truststore
-        - name: truststore
-          mountPath: /var/run/secrets/truststore
-        command: ["/home/forgerock/import-pem-certs.sh"]
-        env:
-        - name: TRUSTSTORE_PATH
-          value: /truststore/amtruststore
-        - name: TRUSTSTORE_PASSWORD
-          value: changeit
-        - name: AM_PEM_TRUSTSTORE
-          value: "/var/run/secrets/truststore/cacerts"
       containers:
       - name: openam
         image: am
@@ -67,9 +52,9 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: AM_STORES_SSL_ENABLED
-          value: "true"
+          value: "false"
         - name: TRUSTSTORE_PATH
-          value: /home/forgerock/amtruststore
+          value: /var/run/secrets/truststore/cacerts
         - name: TRUSTSTORE_PASSWORD
           value: changeit
         - name: AM_STORES_USER_TYPE
@@ -107,10 +92,8 @@ spec:
             memory: 1800Mi
             cpu: 250m
         volumeMounts:
-        - name: new-truststore
-          mountPath: /home/forgerock/amtruststore
-          readOnly: true
-          subPath: amtruststore
+        - name: truststore
+          mountPath: /var/run/secrets/truststore
         - name: am-secrets
           mountPath: /var/run/secrets/am
         - name: amster-key
@@ -137,6 +120,4 @@ spec:
             path: authorized_keys
       - name: truststore
         secret:
-          secretName: truststore-pem
-      - name: new-truststore
-        emptyDir: {}
+          secretName: truststore
