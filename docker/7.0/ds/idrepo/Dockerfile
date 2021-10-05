@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:7.1.2-c299b6d3922a9a1ea4a3d05cea89fd30ffc39982
+FROM gcr.io/forgerock-io/ds/pit1:7.1.2-a61da24848f8467409837ea15637435015d571fd
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
