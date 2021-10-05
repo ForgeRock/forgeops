@@ -2,15 +2,12 @@
     "embedded": false,
     "maxConnectionAttempts" : 5,
     "security": {
-        "keyManager": "none",
-        "trustManager": "file",
-        "fileBasedTrustManagerType": "JKS",
-        "fileBasedTrustManagerFile": "&{openidm.truststore.location}",
-        "fileBasedTrustManagerPassword": "changeit"
+        "keyManager": "jvm",
+        "trustManager": "jvm"
     },
     "ldapConnectionFactories": {
         "bind": {
-            "connectionSecurity": "ssl",
+            "connectionSecurity": "none",
             "connectionPoolSize": 50,
             "heartBeatIntervalSeconds": 60,
             "heartBeatTimeoutMilliSeconds": 10000,
