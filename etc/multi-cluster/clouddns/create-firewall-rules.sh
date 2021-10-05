@@ -9,7 +9,7 @@ CLUSTER2="clouddns-us"
 #### Don't edit below here ####
 
 create_firewall_rule() {
-    cluster_location=$(gcloud container clusters list |grep $2 | awk '{print $2}')
+    cluster_location=$(gcloud container clusters list --quiet --filter=NAME=$2 --format="value(location)" --limit=1)
     local source_range=$(gcloud container clusters describe $2 --zone $cluster_location --format="value(clusterIpv4Cidr)")
 
     # Check firewall rules doesn't already exist
