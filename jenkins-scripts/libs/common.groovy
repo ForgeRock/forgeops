@@ -107,7 +107,8 @@ def getConfigImageTagsFromParams() {
     }
     if(params.am_image_tag != '') {
         config += [
-                'COMPONENTS_AM_IMAGE_TAG': params.am_image_tag
+                'COMPONENTS_AM_IMAGE_TAG': params.am_image_tag,
+                'COMPONENTS_AMSTER_IMAGE_TAG': params.am_image_tag
         ]
     }
     if(params.idm_image_tag != '') {
