@@ -48,7 +48,7 @@ if [[ $GRAFANA -eq 1 ]]; then
         PORT=3000
     fi
 
-    kubectl port-forward $(kubectl get  pods --selector="app.kubernetes.io/name=grafana" --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:3000 --namespace=$NAMESPACE
+    kubectl port-forward $(kubectl get  pods --selector="app.kubernetes.io/name=grafana" --field-selector status.phase=Running --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:3000 --namespace=$NAMESPACE
 fi
 
 # Port forward to Grafana
@@ -59,7 +59,7 @@ if [[ $PROMETHEUS -eq 1 ]]; then
         PORT=9090
     fi
 
-    kubectl port-forward $(kubectl get  pods --selector=app=prometheus --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:9090 --namespace=$NAMESPACE
+    kubectl port-forward $(kubectl get  pods --selector=app=prometheus --field-selector status.phase=Running  --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:9090 --namespace=$NAMESPACE
 fi
 
 # Port forward to Alertmanager
@@ -69,7 +69,7 @@ if [[ $ALERTMANAGER -eq 1 ]]; then
         PORT=9093
     fi
 
-    kubectl port-forward  $(kubectl get  pods --selector=app=alertmanager --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:9093 --namespace=$NAMESPACE
+    kubectl port-forward  $(kubectl get  pods --selector=app=alertmanager --field-selector status.phase=Running  --output=jsonpath="{.items..metadata.name}" --namespace=$NAMESPACE) $PORT:9093 --namespace=$NAMESPACE
 fi
 
 echo "Incorrect usage: "
