@@ -123,6 +123,14 @@ def getConfigImageTagsFromParams() {
     return config
 }
 
+def isPromotionEnabled() {
+    promotion_enabled = params.Promote_to_stable_branch
+    if (!getConfigImageTagsFromParams().isEmpty()) {
+        promotion_enabled = false
+    }
+    return promotion_enabled
+}
+
 class DockerImagePromotion implements Serializable {
     DockerImage dockerImage
     String rootLevelBaseImageName

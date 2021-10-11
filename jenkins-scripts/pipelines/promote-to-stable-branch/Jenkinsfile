@@ -124,7 +124,7 @@ timestamps {
 
         pit2Tests.runStage(pipelineRun)
 
-        if (params.Promote_to_stable_branch.toBoolean()) {
+        if (commonModule.isPromotionEnabled()) {
             promoteToStableBranch.runStage(pipelineRun)
         }
 
