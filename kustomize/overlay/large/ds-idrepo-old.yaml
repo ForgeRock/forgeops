@@ -15,6 +15,14 @@ spec:
               cpu: 4000m
             limits:
               memory: 29Gi
+      initContainers:
+      - name: initialize
+        resources:
+          requests:
+            memory: 21Gi
+            cpu: 4000m
+          limits:
+            memory: 29Gi
   volumeClaimTemplates:
   - metadata:
       name: data
