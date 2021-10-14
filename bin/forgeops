@@ -40,7 +40,6 @@ def install_all(size, ns, fqdn, ctx, pkg_path=None):
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
     utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ctx, pkg_path)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
-    time.sleep(2)
     utils.wait_for_ds(ns, 'ds-idrepo')
     if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
     utils.message('\nDeploying apps.')

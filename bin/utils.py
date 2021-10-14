@@ -195,12 +195,12 @@ def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=No
             return False, None, None
         raise(e)
 
-def _waitforsecret(ns, secret_name):
-    print(f'Waiting for secret: {secret_name} .', end='')
+def _waitforresource(ns, resource_type, resource_name):
+    print(f'Waiting for {resource_type}: {resource_name} .', end='')
     sys.stdout.flush()
     while True:
         try:
-            run('kubectl', f'-n {ns} get secret {secret_name}',
+            run('kubectl', f'-n {ns} get {resource_type} {resource_name}',
                 cstderr=True, cstdout=True)
             print('done')
             break
@@ -243,11 +243,12 @@ def waitforsecrets(ns):
                'rcs-agent-env-secrets', 'ds-passwords', 'ds-env-secrets']
     message('\nWaiting for K8s secrets')
     for secret in secrets:
-        _runwithtimeout(_waitforsecret, [ns, secret], 60)
+        _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
 
 
 def wait_for_ds(ns, directoryservices_name):
     """Wait for DS pods to be ready after ds-operator deployment"""
+    _runwithtimeout(_waitforresource, [ns, 'statefulset', directoryservices_name], 30)
     run('kubectl',
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 180)
