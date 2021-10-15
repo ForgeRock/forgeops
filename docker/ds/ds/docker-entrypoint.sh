@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 #
-# Copyright 2019-2021 ForgeRock AS. All Rights Reserved
+# The contents of this file are subject to the terms of the Common Development and
+# Distribution License (the License). You may not use this file except in compliance with the
+# License.
 #
-# Use of this code requires a commercial software license with ForgeRock AS.
-# or with one of its affiliates. All use shall be exclusively subject
-# to such license between the licensee and ForgeRock AS.
-
+# You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+# specific language governing permission and limitations under the License.
+#
+# When distributing Covered Software, include this CDDL Header Notice in each file and include
+# the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+# Header, with the fields enclosed by brackets [] replaced by your own identifying
+# information: "Portions Copyright [year] [name of copyright owner]".
+#
+# Copyright 2019-2021 ForgeRock AS.
+#
 set -eu
-set -x
 
 # ParallelGC with a single generation tenuring threshold has been shown to give the best
 # performance vs determinism trade-off for servers using JVM heaps of less than 8GB,
@@ -15,9 +22,10 @@ set -x
 # Unusual deployments, such as those requiring very large JVM heaps, should tune this setting
 # and use a different garbage collector, such as G1.
 # The /dev/urandom device is up to 4 times faster for crypto operations in some VM environments
-# where the Linux kernel runs low on entropy. This settting does not negatively impact random number security
+# where the Linux kernel runs low on entropy. This setting does not negatively impact random number security
 # and is recommended as the default.
-DEFAULT_OPENDJ_JAVA_ARGS="-XX:MaxRAMPercentage=75 -XX:+UseParallelGC -XX:MaxTenuringThreshold=1 -Djava.security.egd=file:/dev/urandom"
+DEFAULT_OPENDJ_JAVA_ARGS="-XX:MaxRAMPercentage=75 -XX:+UseParallelGC -XX:MaxTenuringThreshold=1
+                          -Djava.security.egd=file:/dev/urandom"
 export OPENDJ_JAVA_ARGS=${OPENDJ_JAVA_ARGS:-${DEFAULT_OPENDJ_JAVA_ARGS}}
 
 export DS_GROUP_ID=${DS_GROUP_ID:-default}
@@ -37,15 +45,29 @@ export MCS_ENABLED=${MCS_ENABLED:-false}
 #     userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #     ds-userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #
-# Additionally, in multi region deployments, build unique definitions based
-# on the regions, which are also part of the pod FQDN.
-# For example, givens regions "europe" and "us", european pods will have:
-# FQDN:              ds-cts-1.ds-cts-europe.namespace.svc.cluster.local
-# And we can compute:
-# Server ID:         ds-cts-1_europe
-# Group ID:          europe
-# Bootstrap servers: ds-cts-0.ds-cts-europe.namespace.svc.cluster.local,ds-cts-0.ds-cts-us.namespace.svc.cluster.local
+# DS currently supports 3 multi-cluster solutions. The identifiers will be updated as follows assuming cluster names eu and us:
+# **CloudDNS for GKE**
+# FQDN:              ds-cts-1.ds-cts.<namespace>.svc.eu
+# Results in:
+# Server ID:         ds-cts-1_eu
+# Group ID:          eu
+# Bootstrap servers: ds-cts-0.ds-cts.<namespace>.svc.eu,ds-cts-0.ds-cts.<namespace>.svc.us
 #
+# **KubeDNS**
+# FQDN:              ds-cts-1.ds-cts-eu.<namespace>.svc.cluster.local
+# Results in:
+# Server ID:         ds-cts-1_eu
+# Group ID:          eu
+# Bootstrap servers: ds-cts-0.ds-cts-eu.<namespace>.svc.cluster.local,ds-cts-0.ds-cts-us.<namespace>.svc.cluster.local
+#
+# **GKE multi-cluster Services(MCS) **
+# FQDN:              ds-cts-1.ds-cts-eu.eu.<namespace>.svc.cluster.local
+# Results in:
+# Server ID:         ds-cts-1_eu
+# Group ID:          eu
+# Bootstrap servers: ds-cts-0.ds-cts-eu.eu.<namespace>.svc.cluster.local,ds-cts-0.ds-cts-us.us.<namespace>.svc.cluster.local
+#
+
 if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
     # Domain is everything after the first dot
     podDomain=${DS_ADVERTISED_LISTEN_ADDRESS#*.}
@@ -54,33 +76,58 @@ if [[ "${DS_ADVERTISED_LISTEN_ADDRESS}" =~ [^.]+-[0-9]+\..+ ]]; then
     podPrefix=${podName%-*}
 
     ds0=${podPrefix}-0.${podDomain}:8989
-    if [ -n "${DS_CLUSTER_TOPOLOGY}" ]; then
+
+    # Multi-cluster configurations
+    if [[ -n "${DS_CLUSTER_TOPOLOGY}" ]]; then
         # Service name is the first subdomain of the FQDN
         podService=${podDomain%%.*}
         podServicePrefix=${podService%-*}
         newBootstrapServers=${ds0}
-        # Configure bootstrap servers to include replication service if MCS is enabled
+        # If MCS is enabled, configure bootstrap servers to include replication service
         if ${MCS_ENABLED}; then
             podDomain=${podDomain/cluster/clusterset}
             newBootstrapServers="${podPrefix}-0.${podService##*-}.${podDomain}:8989"
         fi
         for cluster in ${DS_CLUSTER_TOPOLOGY//,/ }; do
-            regionService=${podServicePrefix}-${cluster}
-            # If the service name is ours, then set our identifiers
-            # else add the first pod of the cluster to the bootstrap servers
-            if [ ${regionService} == ${podService} ]; then
-               export DS_GROUP_ID=${cluster}
-               export DS_SERVER_ID=${podName}_${cluster}
-               if ${MCS_ENABLED}; then
+            ## Google CloudDNS
+            if [[ "$podDomain" != *cluster.local ]] && [[ "$podDomain" != *clusterset.local ]]; then
+                # set clusterIdentifier to match the CloudDNS domain
+                clusterIdentifier=${podDomain##*.}
+                # If ${cluster} is our cluster, then set identifiers else add the first pod to the bootstrap servers
+                if [[ "${clusterIdentifier}" == "${cluster}" ]]; then
+                    export DS_GROUP_ID=$cluster
+                    export DS_SERVER_ID=${podName}_${cluster}
+                else
+                    domain=${podDomain#*.}
+                    additional="${podPrefix}-0.${podService}.${domain%.*}.${cluster}:8989"
+                    newBootstrapServers="${newBootstrapServers},${additional}"
+                fi    
+            ## MCS (GKE multi-cluster Services)     
+            elif ${MCS_ENABLED}; then
+                # set clusterIdentifier to include service name and cluster
+                clusterIdentifier=${podServicePrefix}-${cluster}
+                # If ${cluster} is our cluster, then set identifiers else add the first pod to the bootstrap servers
+                if [ ${clusterIdentifier} == ${podService} ]; then
+                    export DS_GROUP_ID=$cluster
+                    export DS_SERVER_ID=${podName}_${cluster}e
+                    # Add replication service
                     DS_ADVERTISED_LISTEN_ADDRESS="${podPrefix}-0.${cluster}.${regionService}.${podDomain#*.}"
-               fi
-            else
-                if ${MCS_ENABLED}; then
+                else
                     additional="${podPrefix}-0.${cluster}.${regionService}.${podDomain#*.}:8989"
+                    newBootstrapServers="${newBootstrapServers},${additional}"
+                fi
+            ## KubeDNS
+            else
+                # set clusterIdentifier to include service name and cluster
+                clusterIdentifier=${podServicePrefix}-${cluster}
+                # If ${cluster} is our cluster, then set identifiers else add the first pod to the bootstrap servers
+                if [ ${clusterIdentifier} == ${podService} ]; then
+                    export DS_GROUP_ID=$cluster
+                    export DS_SERVER_ID=${podName}_${cluster}
                 else
                     additional="${podPrefix}-0.${regionService}.${podDomain#*.}:8989"
+                    newBootstrapServers="${newBootstrapServers},${additional}"
                 fi
-                newBootstrapServers="${newBootstrapServers},${additional}"
             fi
         done
         export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${newBootstrapServers}}
@@ -92,6 +139,33 @@ else
     export DS_BOOTSTRAP_REPLICATION_SERVERS=${DS_BOOTSTRAP_REPLICATION_SERVERS:-${DS_ADVERTISED_LISTEN_ADDRESS}:8989}
 fi
 
+# Set to true in order to use the demo keystore and set the admin and monitor passwords to "password".
+export USE_DEMO_KEYSTORE_AND_PASSWORDS=${USE_DEMO_KEYSTORE_AND_PASSWORDS:-false}
+if [[ "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+then
+    echo "WARNING: The container will use the demo keystore, YOUR DATA IS AT RISK"
+    echo
+fi
+# Set to true in order to set the admin and monitor passwords before starting the server.
+export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-false}
+# By default the admin and monitor passwords are provided as plain-text.
+# Set this to true if the passwords have been pre-encoded externally.
+export DS_USE_PRE_ENCODED_PASSWORDS=${DS_USE_PRE_ENCODED_PASSWORDS:-false}
+# This variable should contain the plain-text password or pre-encoded password for the uid=admin account.
+# If it is not set then fetch the password from a file instead.
+export DS_UID_ADMIN_PASSWORD=${DS_UID_ADMIN_PASSWORD:-}
+export DS_UID_ADMIN_PASSWORD_FILE=${DS_UID_ADMIN_PASSWORD_FILE:-secrets/admin.pwd}
+# This variable should contain the plain-text password or pre-encoded password for the uid=monitor account.
+# If it is not set then fetch the password from a file instead.
+export DS_UID_MONITOR_PASSWORD=${DS_UID_MONITOR_PASSWORD:-}
+export DS_UID_MONITOR_PASSWORD_FILE=${DS_UID_MONITOR_PASSWORD_FILE:-secrets/monitor.pwd}
+
+# List of directories which are expected to be found in the data directory.
+dataDirs="db changelogDb import-tmp locks var"
+
+# Build an array containing the list of pluggable backend base DNs by redirecting the command output to
+# mapfile using process substitution.
+mapfile -t BASE_DNS < <(./bin/ldifsearch -b cn=backends,cn=config -s one config/config.ldif "(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))" ds-cfg-base-dn | grep "^ds-cfg-base-dn" | cut -c17-)
 
 validateImage() {
     # FIXME: fail-fast if database encryption has been used when the image was built (OPENDJ-6598).
@@ -103,23 +177,33 @@ validateImage() {
     }
 }
 
-
-linkDataDirectories() {
-    # List of directories which are expected to be found in the data directory.
-    dataDirs="db changelogDb locks var config"
-
-    mkdir -p data
+# Initialize persisted data in the "data" directory if it is empty, using data from the data directories
+# contained in the Docker image. The data directory contains the server's persisted state, including db directories,
+# changelog, and locks. In dev environments it is expected to be an empty tmpfs volume whose content is lost after
+# restart.
+bootstrapDataFromImageIfNeeded() {
     for d in ${dataDirs}; do
-        if [[ ! -d "data/$d" ]]; then
-            echo "No data/$d directory present."
-            mv $d data
-        else
-            # the data/$d exists -we want to make sure it is used - not the one in the image
-            # rename the docker directory so the link works as it will want to overwrite the $d name
-            mv $d $d.docker
+        if [[ -z "$(ls -A "data/$d" 2>/dev/null)" ]]; then
+            echo "Initializing \"data/$d\" from Docker image"
+            mkdir -p data
+            mv "$d" data
         fi
-        echo "Linking $d to data/$d"
-        ln -s data/$d
+    done
+}
+
+linkKeyStoreAndDataDirectories() {
+    # Ensure that the keystore from the Docker build is no longer being used.
+    rm config/keystore config/keystore.pin
+    if [[ "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+    then
+      cp samples/secrets/{keystore,keystore.pin} secrets
+    fi
+    ln -s ../secrets/{keystore,keystore.pin} config
+
+    for d in ${dataDirs}; do
+        rm -rf "$d"
+        mkdir -p "data/$d"
+        ln -s "data/$d" .
     done
 }
 
@@ -135,11 +219,6 @@ setOnlineToolProperties() {
 }
 
 upgradeDataAndRebuildDegradedIndexes() {
-
-    # Build an array containing the list of pluggable backend base DNs by redirecting the command output to
-    # mapfile using process substitution.
-    mapfile -t BASE_DNS < <(./bin/ldifsearch -b cn=backends,cn=config -s one data/config/config.ldif "(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))" ds-cfg-base-dn | grep "^ds-cfg-base-dn" | cut -c17-)
-
     # Upgrade is idempotent, so it should have no effect if there is nothing to do.
     # Fail-fast if the config needs upgrading because it should have been done when the image was built.
     echo "Upgrading configuration and data..."
@@ -150,6 +229,46 @@ upgradeDataAndRebuildDegradedIndexes() {
         echo "Rebuilding degraded indexes for base DN \"${baseDn}\"..."
         rebuild-index --offline --noPropertiesFile --rebuildDegraded --baseDn "${baseDn}" > /dev/null
     done
+}
+
+setUserPasswordInLdifFile() {
+    file=$1
+    dn=$2
+    pwd=$3
+
+    echo "Updating the \"${dn}\" password"
+
+    if [[ "${DS_USE_PRE_ENCODED_PASSWORDS}" == "true" ]]; then
+        enc_pwd="${pwd}"
+    else
+        # Set the JVM args to avoid blowing up the container memory.
+        enc_pwd=$(OPENDJ_JAVA_ARGS="-Xmx256m -Djava.security.egd=file:/dev/./urandom" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pwd}")
+    fi
+
+    ldifmodify "${file}" > "${file}.tmp" << EOF
+dn: ${dn}
+changetype: modify
+replace: userPassword
+userPassword: ${enc_pwd}
+EOF
+    rm "${file}"
+    mv "${file}.tmp" "${file}"
+}
+
+setAdminAndMonitorPasswordsIfNeeded() {
+    if [[ "${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS}" == "true" || "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+        if [[ "${USE_DEMO_KEYSTORE_AND_PASSWORDS}" == "true" ]]
+        then
+          adminPassword="password"
+          monitorPassword="password"
+        else
+          adminPassword="${DS_UID_ADMIN_PASSWORD:-$(cat "${DS_UID_ADMIN_PASSWORD_FILE}")}"
+          monitorPassword="${DS_UID_MONITOR_PASSWORD:-$(cat "${DS_UID_MONITOR_PASSWORD_FILE}")}"
+        fi
+    then
+        setUserPasswordInLdifFile db/rootUser/rootUser.ldif       "uid=admin"   $adminPassword
+        setUserPasswordInLdifFile db/monitorUser/monitorUser.ldif "uid=monitor" $monitorPassword
+    fi
 }
 
 preExec() {
@@ -171,102 +290,32 @@ waitUntilSigTerm() {
     done
 }
 
-setUserPasswordInLdifFile() {
-    file=$1
-    dn=$2
-    pwd=$3
-
-    echo "Updating the \"${dn}\" password"
-
-    # Set the JVM args to avoid blowing up the container memory.
-    enc_pwd=$(OPENDJ_JAVA_ARGS="-Xmx256m -Djava.security.egd=file:/dev/./urandom" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pwd}")
-
-    ldifmodify "${file}" > "${file}.tmp" << EOF
-dn: ${dn}
-changetype: modify
-replace: userPassword
-userPassword: ${enc_pwd}
-EOF
-    rm "${file}"
-    mv "${file}.tmp" "${file}"
-}
-
-# These should be set and passed in by K8S. We use the same defaults here.
-export DS_UID_ADMIN_PASSWORD_FILE="${DS_UID_ADMIN_PASSWORD_FILE:-/var/run/secrets/admin/dirmanager.pw}"
-export DS_UID_MONITOR_PASSWORD_FILE="${DS_UID_MONITOR_PASSWORD_FILE:-/var/run/secrets/monitor/monitor.pw}"
-
-setAdminAndMonitorPasswords() {
-    adminPassword="${DS_UID_ADMIN_PASSWORD:-$(cat "${DS_UID_ADMIN_PASSWORD_FILE}")}"
-    monitorPassword="${DS_UID_MONITOR_PASSWORD:-$(cat "${DS_UID_MONITOR_PASSWORD_FILE}")}"
-    setUserPasswordInLdifFile data/db/rootUser/rootUser.ldif       "uid=admin"   $adminPassword
-    setUserPasswordInLdifFile data/db/monitorUser/monitorUser.ldif "uid=monitor" $monitorPassword
-}
-
-
-init() {
-    echo "initializing..."
-    linkDataDirectories
-    removeLocks
-    upgradeDataAndRebuildDegradedIndexes
-}
-
-# Check for a user supplied script $1, and if not found use the default one.
-executeScript() {
-    # Kubernetes creates a sym link from $1 to ..data/$1 - so we test for the sym link.
-    if [[ -L scripts/$1 ]]; then
-    echo "Executing user supplied script $1"
-        ./scripts/$1
-    else
-        echo "Executing default script $1"
-        ./default-scripts/$1
-    fi
-}
-
 CMD="${1:-help}"
 case "$CMD" in
-
-# init is run in an init container and prepares the directory for running.
-init)
-    [[ -d data/db ]] && {
-        echo "data/ directory contains data. setup skipped";
-        # Init still needs to check link the data/ directory and rebuild indexes.
-        init
-        # Set the admin and monitor passwords from K8S secrets
-        setAdminAndMonitorPasswords
-        # If the user supplies a post-init script, run it
-        # The default-script is a no-op.
-        executeScript post-init
-        exit 0;
-    }
-    # Else - no data is present, we need to run setup.
-    linkDataDirectories
-    executeScript setup
-    init
-    setAdminAndMonitorPasswords
+help)
+    cat docker-entrypoint-help.md
     ;;
 
-backup)
-    [[ ! -d data/db ]] && {
-        echo "There is no data to backup!";
-        exit 1
-    }
-    init
-    executeScript backup
-    ;;
-
-restore)
-    init
-    executeScript restore
-    ;;
-
-# Start the server.
-# start-ds falls through the case statement
 start-ds)
-    ;&
-start)
-    init
+    validateImage
+    bootstrapDataFromImageIfNeeded
+    linkKeyStoreAndDataDirectories
+    removeLocks
+    setOnlineToolProperties
+    upgradeDataAndRebuildDegradedIndexes
+    setAdminAndMonitorPasswordsIfNeeded
     preExec
     exec start-ds --nodetach
+    ;;
+
+initialize-only)
+    validateImage
+    bootstrapDataFromImageIfNeeded
+    linkKeyStoreAndDataDirectories
+    removeLocks
+    upgradeDataAndRebuildDegradedIndexes
+    setAdminAndMonitorPasswordsIfNeeded
+    echo "Initialization completed"
     ;;
 
 dev)
@@ -277,11 +326,9 @@ dev)
 
 *)
     validateImage
-    linkDataDirectories
+    linkKeyStoreAndDataDirectories
     removeLocks
     preExec
-    echo "Undefined entrypoint. Will exec $@"
-    shift
     exec "$@"
     ;;
 
