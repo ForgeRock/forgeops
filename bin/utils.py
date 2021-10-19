@@ -61,6 +61,10 @@ REQ_VERSIONS ={
     'skaffold':{
         'MIN': 'v1.20.0',
         'MAX': 'v100.0.0',        
+    },
+    'cert-manager': {
+        'MIN': 'v1.5.1', 
+        'MAX': 'v100.0.0'
     }
 }
 
@@ -462,7 +466,26 @@ def install_dependencies():
     img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
     check_component_version('ds-operator', img.decode('ascii').split(':')[1])
-    print()
+    
+    # Uncomment this block to install/check for cert-manager installation
+    # print('Checking cert-manager and related CRDs:', end=' ')
+    # try:
+    #     run('kubectl', 'get crd certificaterequests.cert-manager.io',
+    #         cstderr=True, cstdout=True)
+    #     run('kubectl', 'get crd certificates.cert-manager.io',
+    #         cstderr=True, cstdout=True)
+    #     run('kubectl', 'get crd clusterissuers.cert-manager.io',
+    #         cstderr=True, cstdout=True)   
+    # except Exception:
+    #     warning('cert-manager CRD not found. Installing cert-manager.')
+    #     certmanager('apply')
+    # else:
+    #     message('cert-manager CRD found in cluster.')
+
+    # img, _= run('kubectl', f'-n cert-manager get deployment cert-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+    #     cstderr=True, cstdout=True)
+    # check_component_version('cert-manager', img.decode('ascii').split(':')[1])
+    # print()
 
 
 def secretagent(k8s_op, tag='latest'):
@@ -504,6 +527,25 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
+
+def certmanager(k8s_op, tag='latest'):
+    """Check and install cert-manager"""
+    opts = ''
+    if k8s_op == 'delete':
+        opts = '--ignore-not-found=true'
+    if tag == 'latest':
+        run('kubectl',
+            f'{k8s_op} --validate=false -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml {opts}')
+    else:
+        run('kubectl',
+            f'{k8s_op} --validate=false -f https://github.com/jetstack/cert-manager/releases/download/{tag}/cert-manager.yaml {opts}')
+
+    if k8s_op == 'apply':
+        message('\nWaiting for cert-manager...')
+        time.sleep(5)
+        run('kubectl', 'wait --for=condition=Established crd certificaterequests.cert-manager.io --timeout=30s')
+        run('kubectl', '-n cert-manager wait --for=condition=available deployment  --all --timeout=120s')
+        run('kubectl', '-n cert-manager wait --for=condition=ready pod --all --timeout=120s')
 
 def build_docker_image(component, default_repo, tag, config_profile=None):
     """Builds custom docker images. Returns the tag of the built image"""
