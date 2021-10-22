@@ -13,6 +13,10 @@ build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
 size_map = {
     'cdk': {
     },
+    'custom': {
+        'base': 'base-cdm',
+        'ds': 'ds-cdm',
+    },
     'mini': {
         'base': 'base-cdm',
         'ds': 'ds-cdm',
@@ -31,19 +35,19 @@ size_map = {
     },
 }
 
-def install_all(size, ns, fqdn, ctx, pkg_path=None):
+def install_all(size, ns, fqdn, ctx, pkg_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
-    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ctx, pkg_path)
-    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ctx, pkg_path)
+    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
-    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ctx, pkg_path)
+    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
     utils.wait_for_ds(ns, 'ds-idrepo')
     if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
     utils.message('\nDeploying apps.')
-    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ctx, pkg_path)
+    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
@@ -54,7 +58,7 @@ def install_all(size, ns, fqdn, ctx, pkg_path=None):
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
     utils.message('\nDeploying UI.')
-    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ctx, pkg_path)
+    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -108,7 +112,8 @@ def main():
     size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install the CDM small platform')
     size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install the CDM medium platform')
     size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install the CDM large platform')
-    
+    size_group.add_argument('--custom', dest='custom', help='Path to a directory containing custom CDM patches. Must contain patches for all products.')
+
     subparser = parser.add_subparsers(dest='cmd', required=True)
     parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
@@ -143,8 +148,13 @@ def main():
         namespace = getattr(args, 'namespace', None) or ctx_namespace
         fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
         size = args.size if getattr(args, 'size', None) else 'cdk'
+        src_profile_dir = getattr(args, 'custom', None)
         remap = size_map[size]
-        if size == 'cdk':
+        if src_profile_dir:
+            size = 'custom'
+            pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'custom')
+            remap = size_map[size]
+        elif size == 'cdk':
             pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'cdk')
         else: 
             pkg_path = None
@@ -225,17 +235,17 @@ def main():
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, custom_path)
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, custom_path, src_profile_dir)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
         utils.message('\nEnjoy your forgeops manifests!')
         return 
     utils.install_dependencies()
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
     if 'all' in components:
-        install_all(size, namespace, fqdn, ctx, pkg_path)
+        install_all(size, namespace, fqdn, ctx, pkg_path, src_profile_dir)
     else:
         for c in components:
-            utils.install_component(remap.get(c, c), size, namespace, fqdn, ctx, pkg_path)
+            utils.install_component(remap.get(c, c), size, namespace, fqdn, ctx, pkg_path, src_profile_dir)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace)

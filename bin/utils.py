@@ -200,7 +200,7 @@ def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=No
         raise(e)
 
 def _waitforresource(ns, resource_type, resource_name):
-    print(f'Waiting for {resource_type}: {resource_name} .', end='')
+    print(f'Waiting for {resource_type} "{resource_name}": ', end='')
     sys.stdout.flush()
     while True:
         try:
@@ -216,8 +216,13 @@ def _waitforresource(ns, resource_type, resource_name):
 
 
 def _waitfords(ns, ds_name):
-    print(f'Waiting for Service Account Password Update: .', end='')
+    print(f'Waiting for Service Account Password Update: ', end='')
     sys.stdout.flush()
+    replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
+                      cstderr=True, cstdout=True)
+    if replicas.decode('utf-8') == '0':
+        print('skipped')
+        return
     while True:
         try:
             valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
@@ -257,11 +262,11 @@ def wait_for_ds(ns, directoryservices_name):
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], 180)
 
-def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
+def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profile_dir=None):
     """Generate Kustomize package for component or bundle"""
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    src_profile_dir = os.path.join(kustomize_dir, size_paths[size])
+    src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
     profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
     shutil.rmtree(profile_dir, ignore_errors=True)
@@ -297,11 +302,11 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None):
         contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None):
+def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None, src_profile_dir=None):
     """Generate and deploy component or bundle"""
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path)
+    _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path, src_profile_dir=src_profile_dir)
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
 def uninstall_component(component, ns, force):
