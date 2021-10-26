@@ -1,0 +1,28 @@
+kind: SecurityContextConstraints
+apiVersion: security.openshift.io/v1
+metadata:
+  name: forgerock-restricted
+readOnlyRootFilesystem: false
+allowHostIPC: false
+allowHostPID: false
+allowHostNetwork: false
+allowHostPorts: false
+allowHostDirVolumePlugin: false
+allowPrivilegedContainer: false
+runAsUser:
+  type: MustRunAs
+seLinuxContext:
+  type: RunAsAny
+fsGroup:
+  type: MustRunAs
+supplementalGroups:
+  type: RunAsAny
+users:
+- default
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
