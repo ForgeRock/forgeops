@@ -13,7 +13,7 @@ Once you've deployed the security object, you can deploy the CDK and CDM as per 
 
 ```
 # CDK
-./bin/forgeops install -n default -f default.iam.example.com
+./bin/cdk install -n default -f default.iam.example.com
 
 # CDM
 skaffold run -p small -n default --default-repo=my.registry.com
