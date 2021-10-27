@@ -46,7 +46,7 @@ def main():
                 utils.error('The docker driver is not supported when deploying the CDK on macOS')
                 sys.exit(1)
 
-        minikube_ver, _ = utils.run('minikube', 'version --short', cstdout=True)
+        _, minikube_ver, _ = utils.run('minikube', 'version --short', cstdout=True)
         minikube_ver = minikube_ver.decode('ascii')
         utils.check_component_version('minikube', minikube_ver)
 

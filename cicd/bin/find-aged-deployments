@@ -48,11 +48,11 @@ def delete(kind, name):
     return True
 
 # Get all objects in cluster.
-out, err = utils.run('kubectl',
-                     'get', 'pvc,deploy,sts',
-                     '--all-namespaces',
-                     '-o', 'json',
-                     cstdout=True)
+_, out, err = utils.run('kubectl',
+                        'get', 'pvc,deploy,sts',
+                        '--all-namespaces',
+                        '-o', 'json',
+                        cstdout=True)
 
 res = json.loads(out)
 max_length = 0

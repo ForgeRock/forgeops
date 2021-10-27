@@ -191,19 +191,24 @@ def warning(s):
     print(f"{PURPLE}{s}{ENDC}")
 
 
-def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None):
+def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
     """rC runs a given command. Raises error if command returns non-zero code"""
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
     stdo_pipe = subprocess.PIPE if cstdout else None
-    _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
-                        check=True, input=stdin, cwd=cwd, env=env)
-    return _r.stdout, _r.stderr
+    try:
+        _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
+                            check=True, input=stdin, cwd=cwd, env=env)
+        return _r.returncode == 0, _r.stdout, _r.stderr
+    except Exception as e:
+        if ignoreFail:
+            return False, None, None
+        raise(e)
 
 def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
     """Wrapper function for run() that ignores failures if selected"""
     try:
-        rstdout, rstderr = run(cmd, *cmdArgs, stdin=stdin, cstdout=cstdout, cstderr=cstderr, cwd=cwd, env=env)
+        _, rstdout, rstderr = run(cmd, *cmdArgs, stdin=stdin, cstdout=cstdout, cstderr=cstderr, cwd=cwd, env=env)
         return True, rstdout, rstderr
     except Exception as e:
         if ignoreFail:
@@ -229,14 +234,14 @@ def _waitforresource(ns, resource_type, resource_name):
 def _waitfords(ns, ds_name):
     print(f'Waiting for Service Account Password Update: ', end='')
     sys.stdout.flush()
-    replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
+    _, replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
                       cstderr=True, cstdout=True)
     if replicas.decode('utf-8') == '0':
         print('skipped')
         return
     while True:
         try:
-            valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
+            _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
                                  cstderr=True, cstdout=True)
             if len(valuestr) > 0:
                 print('done')
@@ -305,7 +310,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
             cwd=profile_dir)
-    contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
+    _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
     contents = contents.decode('ascii')
     contents = contents.replace('namespace: default', f'namespace: {ns}')
     contents = contents.replace('namespace: prod', f'namespace: {ns}')
@@ -354,7 +359,7 @@ def _inject_kustomize_amster(kustomize_pkg_path):
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
         run('tar', f'-czf amster-import.tar.gz -C {amster_config_path} .', cstdout=True, env=envVars)
         run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
+        _, cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
                     cstdout=True)
         with open(amster_cm_path, 'wt') as f:
             f.write(cm.decode('ascii'))
@@ -439,17 +444,17 @@ def check_component_version(component, version):
 
 def check_base_toolset():
     # print('Checking kubectl version')
-    ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
+    _, ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
     ver = ver.decode('ascii').split(' ')[-1].strip()
     check_component_version('kubectl', ver)
 
     # print('Checking kustomize version')
-    ver, _ = run('kustomize', 'version --short', cstdout=True)
+    _, ver, _ = run('kustomize', 'version --short', cstdout=True)
     ver = ver.decode('ascii').split()[0].split('/')[-1]
     check_component_version('kustomize', ver)
 
     # print('Checking skaffold version')
-    ver, _ = run('skaffold', 'version', cstdout=True)
+    _, ver, _ = run('skaffold', 'version', cstdout=True)
     check_component_version('skaffold', ver.decode('ascii').strip())
 
 def install_dependencies():
@@ -465,7 +470,7 @@ def install_dependencies():
     else:
         message('secret-agent CRD found in cluster.')
 
-    img, _= run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+    _, img, _ = run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
     check_component_version('secret-agent', img.decode('ascii').split(':')[1])
 
@@ -479,7 +484,7 @@ def install_dependencies():
     else:
         message('ds-operator CRD found in cluster.')
 
-    img, _= run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
+    _, img, _ = run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
         cstderr=True, cstdout=True)
     check_component_version('ds-operator', img.decode('ascii').split(':')[1])
 
@@ -693,7 +698,7 @@ def copytree(src, dst):
 #     return r.returncode
 
 def get_fqdn(ns):
-    fqdn, _ = run(
+    _, fqdn, _ = run(
         'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
     return fqdn.decode('ascii')
 
@@ -702,12 +707,12 @@ def get_namespace(ns=None):
     if ns != None:
         return ns
     get_context() # Ensure k8s context is set/exists
-    ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
+    _, ctx_namespace, _ = run('kubectl', 'config view --minify --output=jsonpath={..namespace}', cstdout=True)
     return ctx_namespace.decode('ascii') if ctx_namespace else 'default'
 
 def get_context():
     try:
-        ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
+        _, ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
     except Exception as _e:
         error('Could not determine current k8s context. Check your kubeconfig file and try again')
         sys.exit(1)
@@ -716,14 +721,14 @@ def get_context():
 # Lookup the value of a configmap key
 def get_configmap_value(ns, configmap, key):
     """Get configmap contents"""
-    value, _ = run('kubectl',
+    _, value, _ = run('kubectl',
                      f'-n {ns} get configmap {configmap} -o jsonpath={{.data.{key}}}', cstdout=True)
     return value.decode('utf-8')
 
 # Lookup the value of a secret
 def get_secret_value(ns, secret, key):
     """Get secret contents"""
-    value, _ = run('kubectl',
+    _, value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
 

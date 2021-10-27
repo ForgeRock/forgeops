@@ -67,13 +67,13 @@ def overlay_app_configs(ns, am=True, idm=True):
     config_profile_path = os.path.join(sys.path[0], '../docker')
     if am:
         am_config_path = os.path.join(config_profile_path, 'am', 'config-profiles', 'cdk', 'config')
-        am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
+        _, am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
                                       cstdout=True)
         am_pod_name = am_pod_name.decode('ascii')
         utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
         utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
     if idm:
-        idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
+        _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
                                        cstdout=True)
         idm_pod_name = idm_pod_name.decode('ascii')
         utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')

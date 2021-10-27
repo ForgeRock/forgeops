@@ -246,13 +246,13 @@ def write_operator_logs(output, operator, maxloglines):
     # This call doesn't return an error if it doesn't find anything, so we
     # need to wrap it in a try block instead of using run with ignoreFail=true)
     try:
-        get_pods_output, _ = utils.run('kubectl', f'get pods '
+        _, get_pods_output, _ = utils.run('kubectl', f'get pods '
             f'-l {operator[0]} -n {operator[1]} --field-selector=status.phase==Running '
             f'--output=jsonpath={{.items..metadata.name}}',cstdout=True)
         pod = get_pods_output.decode('utf-8').split()[0]
 
         # Get log
-        get_log_output, _ = utils.run('kubectl',
+        _, get_log_output, _ = utils.run('kubectl',
             f'--namespace {operator[1]} logs {pod} -c {operator[2]}', cstdout=True)
     except subprocess.CalledProcessError as e:
         print(f'Error getting pods or pod logs: {e.cmd} {e.output}')

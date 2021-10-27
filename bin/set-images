@@ -466,20 +466,20 @@ def init_repo(args):
                                         repo=args.git_repo)
     # dump info from repo.
     if args.git_repo != '' and args.config_path.is_dir():
-        commit_hash, err = utils.run('git',
-                                      'rev-parse',
-                                      'HEAD',
-                                      cwd=args.config_path,
-                                      cstdout=True, cstderr=True)
+        _, commit_hash, err = utils.run('git',
+                                        'rev-parse',
+                                        'HEAD',
+                                        cwd=args.config_path,
+                                        cstdout=True, cstderr=True)
         if err != b'':
             log.error(f'Error when checking {args.config_path} {err.decode()}')
             raise Exception
-        branch_name, err = utils.run('git',
-                                     'rev-parse',
-                                     '--abbrev-ref',
-                                     'HEAD',
-                                     cwd=args.config_path,
-                                     cstdout=True, cstderr=True)
+        _, branch_name, err = utils.run('git',
+                                        'rev-parse',
+                                        '--abbrev-ref',
+                                        'HEAD',
+                                        cwd=args.config_path,
+                                        cstdout=True, cstderr=True)
         if err != b'':
             log.error(f'Error when checking {args.config_path} {err.decode()}')
             raise Exception
