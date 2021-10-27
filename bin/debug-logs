@@ -48,6 +48,94 @@ def _get_containers(namespace, pod):
     # Return a list with two elements: a list of non-init containers, and a list of containers
     return containers
 
+def _get_awscli_version():
+    success, awscli, _ = utils.run_condfail('aws',
+        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return awscli.decode('ascii').split(' ')[0].split('/')[1]
+    else:
+        return 'command to get AWS CLI version failed'
+
+def _get_azcli_version():
+    success, azcli, _ = utils.run_condfail('az',
+        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return azcli.decode('ascii').splitlines()[0].split(' ')[-2]
+    else:
+        return 'command to get Azure CLI version failed'
+
+def _get_docker_version():
+    success, docker, _ = utils.run_condfail('docker',
+        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return docker.decode('ascii').split(' ')[2].rstrip(',')
+    else:
+        return 'command to get Docker version failed'
+
+def _get_eksctl_version():
+    success, eksctl, _ = utils.run_condfail('eksctl',
+        'version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return eksctl.decode('ascii').split(' ')[-1].strip()
+    else:
+        return 'command to get eksctl version failed'
+
+def _get_gcloud_version():
+    success, gcloud, _ = utils.run_condfail('gcloud',
+        'version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return gcloud.decode('ascii').splitlines()[0].split(' ')[-1]
+    else:
+        return 'command to get Google Cloud SDK version failed'
+
+def _get_kubectl_version():
+    success, kubectl, _ = utils.run_condfail('kubectl',
+        'version --client=true --short', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return kubectl.decode('ascii').split(' ')[-1].strip()[1:]
+    else:
+        return 'command to get kubectl version failed'
+
+def _get_kube_server_version():
+    success, kubectl, _ = utils.run_condfail('kubectl',
+        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return kubectl.decode('ascii').splitlines()[1].split(' ')[-1].strip()[1:]
+    else:
+        return 'command to get Kubernetes server version failed'
+
+def _get_kustomize_version():
+    success, kustomize, _ = utils.run_condfail('kustomize',
+        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return kustomize.decode('ascii').split()[0].split('/')[-1].strip()[1:]
+    else:
+        return 'command to get Kustomize version failed'
+
+def _get_minikube_version():
+    success, minikube, _ = utils.run_condfail('minikube',
+        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return minikube.decode('ascii').split()[0].split('/')[-1].strip()[1:]
+    else:
+        return 'command to get Minikube version failed'
+
+def _get_python3_version():
+    success, python3, _ = utils.run_condfail('python3',
+        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return python3.decode('ascii').split(' ')[-1]
+    else:
+        return 'command to get Python3 version failed'
+
+def _get_skaffold_version():
+    success, skaffold, _ = utils.run_condfail('skaffold',
+        'version', cstdout=True, cstderr=True, ignoreFail=True)
+    if success:
+        return skaffold.decode('ascii').strip()[1:]
+    else:
+        return 'command to get Skaffold version failed'
+
 def get_pods(namespace):
     success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods '
         f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True, ignoreFail=True)
@@ -252,6 +340,23 @@ def write_pvc_description(output, namespace, pvc):
     '''.format(pvc=pvc,get_output=get_output)
     output.write(pvcdesc_html)
 
+def write_skaffold_config(output):
+    success, get_output, _ = utils.run_condfail('skaffold', f'config list',cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        get_output = 'Command to get the Skaffold configuration failed<br/>'
+
+    # Write section
+    skaffold_config_html = '''
+    <br>
+    <h2><a id="skaffoldconfig">Skaffold Configuration</a></h2>
+    <pre>{get_output}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    '''.format(get_output=get_output)
+    output.write(skaffold_config_html)
+
 def write_storage_classes(output, namespace):
     success, get_output, _ = utils.run_condfail('kubectl',
         f'--namespace {namespace}, get storageclasses',cstdout=True, ignoreFail=True)
@@ -272,35 +377,46 @@ def write_storage_classes(output, namespace):
 
 def write_sw_versions(output):
     # Get third-party software versions
-    success, kubectl, _ = utils.run_condfail('kubectl',
-        'version --client=true --short', cstdout=True, cstderr=True, ignoreFail=True)
-    if success:
-        kubectl = kubectl.decode('ascii').split(' ')[-1].strip()
-    else:
-        kubectl = 'Command to get kubectl version failed'
-    success, kustomize, _ = utils.run_condfail('kustomize',
-        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
-    if success:
-        kustomize = kustomize.decode('ascii').split()[0].split('/')[-1]
-    else:
-        kustomize = 'Command to get Kustomize version failed'
-    success, skaffold, _ = utils.run_condfail('skaffold',
-        'version', cstdout=True, cstderr=True, ignoreFail=True)
-    if success:
-        skaffold = skaffold.decode('ascii').strip()
-    else:
-        skaffold = 'Command to get Skaffold version failed'
+    awscli_vers = _get_awscli_version()
+    azcli_vers = _get_azcli_version()
+    docker_vers = _get_docker_version()
+    eksctl_vers = _get_eksctl_version()
+    gcloud_vers= _get_gcloud_version()
+    kubectl_vers = _get_kubectl_version()
+    kube_server_vers = _get_kube_server_version()
+    kustomize_vers = _get_kustomize_version()
+    minikube_vers = _get_minikube_version()
+    python3_vers = _get_python3_version()
+    skaffold_vers = _get_skaffold_version()
 
-    # Write PVC description
+    # Write software versions
     sw_versions_html = '''
     <hr>
-    <h2><a id="sw_versions">Third-Party Software Versions:</a></h2>
+    <h2><a id="sw_versions">Third-Party Software Versions</a></h2>
     <p>
-    kubectl: {kubectl}</br>
-    kustomize: {kustomize}</br>
-    skaffold: {skaffold}</br>
-    <p><a href="#toc">Back to Index</a></p>
-    '''.format(kubectl=kubectl, kustomize=kustomize, skaffold=skaffold)
+    AWS CLI: {awscli_vers}</br>
+    Azure CLI: {azcli_vers}</br>
+    Docker: {docker_vers}</br>
+    eksctl: {eksctl_vers}</br>
+    Google Cloud SDK: {gcloud_vers}<br/>
+    kubectl: {kubectl_vers}</br>
+    Kubernetes server: {kube_server_vers}</br>
+    Kustomize: {kustomize_vers}</br>
+     Minikube: {minikube_vers}</br>
+     Python 3: {python3_vers}</br>
+     Skaffold: {skaffold_vers}</br>
+     <p><a href="#toc">Back to Index</a></p>
+     '''.format(awscli_vers=awscli_vers,
+         azcli_vers=azcli_vers,
+         docker_vers=docker_vers,
+         eksctl_vers=eksctl_vers,
+         gcloud_vers=gcloud_vers,
+         kubectl_vers=kubectl_vers,
+         kube_server_vers=kube_server_vers,
+         kustomize_vers=kustomize_vers,
+         minikube_vers=minikube_vers,
+         python3_vers=python3_vers,
+         skaffold_vers=skaffold_vers)
     output.write(sw_versions_html)
 
 def write_toc(output, pods, pvcs, objs, operators):
@@ -320,14 +436,19 @@ def write_toc(output, pods, pvcs, objs, operators):
         objects_toc += f'<li><a href="#{obj[2]}">{obj[2]}</a></li>'
     other_toc = ''
     other_toc += f'<li><a href="#context">Kubernetes context</a></li>'
-    other_toc += f'<li><a href="#sw_versions">Third-Party Software Versions</a></li>'
+    other_toc += f'<li><a href="#sw_versions">Third-party software versions</a></li>'
     other_toc += f'<li><a href="#crds">CRDs</a></li>'
     other_toc += f'<li><a href="#storageclasses">Kubernetes storage classes</a></li>'
+    other_toc += f'<li><a href="#skaffoldconfig">Skaffold configuration</a></li>'
     other_toc += f'<li><a href="#git">forgeops repository Git log (most recent entries)</a></li>'
 
     # Write TOC
     toc_html = '''
-    <h2><a id="toc">Pod Descriptions and Container Logs</a></h2>
+    <h2><a id="toc">Environment Information</a></h2>
+    <ul>
+    {other_toc}
+    </ul>
+    <h2>Pod Descriptions and Container Logs</h2>
     <ul>
     {pods_toc}
     </ul>
@@ -342,10 +463,6 @@ def write_toc(output, pods, pvcs, objs, operators):
     <h2>Kubernetes Objects</h2>
     <ul>
     {objects_toc}
-    </ul>
-    <h2><a id="toc">Other Diagnostic Information</a></h2>
-    <ul>
-    {other_toc}
     </ul>
     '''.format(pods_toc=pods_toc,pvcs_toc=pvcs_toc,objects_toc=objects_toc,operators_toc=operators_toc,other_toc=other_toc)
     output.write(toc_html)
@@ -385,28 +502,37 @@ def main():
         write_header(output, namespace)
         write_toc(output, pods, pvcs, objs, operators)
 
-        # Write pod descriptions and container logs
-        for pod in pods:
-            write_pod_description_and_container_logs(output, namespace, pod, int(maxloglines))
-
-        # Write operator logs
-        for operator in operators:
-            write_operator_logs(output, operator, int(maxloglines))
-
-        # Write PVC descriptions
-        for pvc in pvcs:
-            write_pvc_description(output, namespace, pvc)
-
-        # Write special objects (CLI and YAML output)
-        for obj in objs:
-            write_objects(output, namespace, obj)
-
-        # Write some other miscellaneous diagnostics
+        # Write diagnostics about the environment
+        print('Writing environment information')
         write_context(output)
         write_sw_versions(output)
         write_crds(output)
         write_storage_classes(output, namespace)
+        write_skaffold_config(output)
         write_git_log(output)
+
+        # Write pod descriptions and container logs
+        print('Writing pod descriptions and container logs')
+        for pod in pods:
+            print(f'  {pod}')
+            write_pod_description_and_container_logs(output, namespace, pod, int(maxloglines))
+
+        # Write PVC descriptions
+        print('Writing PVC descriptions')
+        for pvc in pvcs:
+            print(f'  {pvc}')
+            write_pvc_description(output, namespace, pvc)
+
+        # Write operator logs
+        print('Writing operator logs')
+        for operator in operators:
+            print(f'  {operator[3]}')
+            write_operator_logs(output, operator, int(maxloglines))
+
+        # Write special objects (CLI and YAML output)
+        print('Writing information about various Kubernetes objects')
+        for obj in objs:
+            write_objects(output, namespace, obj)
 
     # Print message to user
     print(f'Open {output_file} in your browser.')
