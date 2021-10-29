@@ -213,12 +213,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
         if (params.Postcommit_platform_ui) {
             parallelTestsMap.put('Platform UI',
                     {
-                        commonLodestarModule.runPlatformUi(pipelineRun, random, 'Platform UI', clusterConfig +
-                                [TESTS_SCOPE: 'tests/k8s/postcommit/platform_ui',
-                                 SKIP_TESTS                          : true,
-                                 SKIP_CLEANUP                        : true,
-                                 DEPLOYMENT_USE_LODESTAR_CERT        : true]
-                        )
+                        commonLodestarModule.runPlatformUi(pipelineRun, random, 'Platform UI', clusterConfig)
                     }
             )
         }

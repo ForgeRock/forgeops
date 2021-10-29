@@ -118,7 +118,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('forgeops-postcommit-cloud') {
+        node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
                     def uiFileContent = bitbucketUtils.readFileContent(
@@ -138,8 +138,14 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
                     allStagesCloud[normalizedStageName].numFailedTests = 0
                     allStagesCloud[normalizedStageName].reportUrl = reportUrl
-                    
-                    uiTestsStage.runTests(testConfig, normalizedStageName, normalizedStageName)
+
+                    def uiTestConfig = [
+                            containerRunOptions : getUiContainerRunOptions(testConfig),
+                            deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
+                    ]
+
+                    uiTestsStage.runTests(uiTestConfig, normalizedStageName, normalizedStageName,
+                            commonModule.lodestarRevision)
                 } catch(Exception e) {
                     print(e.getMessage())
                     allStagesCloud[normalizedStageName].numFailedTests = 1
@@ -150,6 +156,22 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
             }
         }
     }
+}
+
+def getUiContainerRunOptions(Map config) {
+    def optionsString = ''
+    for (entry in config) {
+        if (entry.key == 'PROJECT' ||
+                entry.key.startsWith('CLUSTER_') ||
+                (entry.key.startsWith('DEPLOYMENT_') && entry.key != 'DEPLOYMENT_NAMESPACE') ||
+                entry.key.startsWith('COMPONENTS_')) {
+            optionsString += " -e ${entry.key}=${entry.value}"
+        }
+    }
+    // The GCLOUD_CONNECTION_STRING will be used by the Lodestarbox entrypoint.sh to connect to specific cluster
+    cloud_utils.authenticateGcloud()
+    optionsString += " -e GCLOUD_CONNECTION_STRING=\"${cloud_utils.clusterInfo(config)}\""
+    return optionsString
 }
 
 def generateSummaryTestReport(String stageName) {
