@@ -18,7 +18,7 @@ echo "Upgrading configuration and data..."
 ./upgrade --dataOnly --acceptLicense --force --ignoreErrors --no-prompt
 
 # Calculate the list of backends.
-mapfile -t BACK_ENDS < <(./bin/ldifsearch -b cn=backends,cn=config -s one config/config.ldif "(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))" ds-cfg-backend-id | grep "^ds-cfg-backend-id" | cut -c20-)
+mapfile -t BACK_ENDS < <(./bin/ldifsearch -b cn=backends,cn=config -s one $DS_DATA_DIR/config/config.ldif "(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))" ds-cfg-backend-id | grep "^ds-cfg-backend-id" | cut -c20-)
 
 echo "Backends ${BACK_ENDS[@]}"
 
@@ -40,7 +40,7 @@ for B in "${BACK_ENDS[@]}"; do
 done
 
 echo "Backing up config directory"
-cp -r data/config $DEST
+cp -r $DS_DATA_DIR/config $DEST
 
 
 echo "Backed up files to $DEST:"

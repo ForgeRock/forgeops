@@ -2,7 +2,6 @@
 
 echo "No new indexes to add"
 
-
 exit 0
 
 ## Below is a sample of a user supplied add-index script int the configMap
@@ -18,8 +17,6 @@ EOF
 rebuild-index  --offline \
  --baseDN ou=identities \
  --index carLicense
-
-
 
 # These commands can be done online, but they are not automatically executed
 

@@ -1,15 +1,15 @@
-# DS Customization and Utilities
+# Directory Server (DS) Customization and Utilities
 
 ## Directory Folders
 
+* ds - Generic DS image used by the ds-operator or for fully "mutable" directory deployments. See [ds/README.md](ds/README-DS.md) for more information. This is
+the recommended ds image for new deployments.
 * common: common scripts used to build multiple images
 * cts:  DS image purpose built for CTS
 * ds-idrepo: Purpose built for DS shared repo for AM/IDM. Also includes a cts backend for small installations
 * proxy: DS proxy server. Experimental / unsupported.
-* dsutil:  Utlility image that can ne run in a pod to perform various DS related tasks. Has all the ds tools installed.
-* ds - Generic DS image- used by the ds-operator. This image is a fully "mutable" VM like image to run the directory. All state (including schema) is
- maintained on the runtime PVC claim. Configuration is performed at _runtime_.  See the [DS Operator](https://github.com/ForgeRock/ds-operator) for more details.
- Also see [ds/README.md](ds/README.md).
+* dsutil:  Utility image that can ne run in a pod to perform various DS related tasks. Has all the ds tools installed.
+* ds-k8s - Kubernetes deployment manifests used for testing and development of the ds image.
 
 ## Utility image (`dsutil`)
 

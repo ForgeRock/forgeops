@@ -1,30 +1,20 @@
-# Skaffold used for testing the ds image.
+# Skaffold used for testing and building the ds image.
 # Run using  skaffold dev --port-forward
-apiVersion: skaffold/v2beta10
+apiVersion: skaffold/v2beta24
 kind: Config
 metadata:
   name: ds
 build:
   artifacts:
-  - image: ds-idrepo
-    context: .
-    docker:
-      dockerfile: idrepo/Dockerfile
-  - image:  ds-cts
-    context: .
-    docker:
-      dockerfile: cts/Dockerfile
+  - image: ds
+    context: ds
   tagPolicy:
     gitCommit:
       variant: AbbrevCommitSha
-profiles:
-- name: ds-operator
-  deploy:
-    kustomize:
-      paths:
-      - ../../../kustomize/base/ds-idrepo
-      - ../../../kustomize/base/ds-cts
-      - ../../../kustomize/base/secrets
+deploy:
+  kustomize:
+    paths:
+    - ds-k8s
 
 
 

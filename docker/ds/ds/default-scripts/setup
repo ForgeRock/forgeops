@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
+#
+# Default setup script
 # Setup the directory server for the CDK idrepo and CTS backends.
+
+
 # This uses DS setup profiles. If the schema for a profile has not been
 # changed it may use an older version. For example, AM 7.1 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
@@ -8,37 +12,13 @@ IDM_REPO="idm-repo:7.2"
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.1"
 
-PEM_KEYS_DIRECTORY="pem-keys-directory"
-PEM_TRUSTSTORE_DIRECTORY="pem-trust-directory"
-
-# If we are running live in kubernetes, at this point the user has NOT provided their own setup script
-# We just restore the prototype idrepo setup that is in the docker image and exit.
-# This is a short cut to accelerate CDK deployment.
-
-if [[ -r idrepo.tar.z ]]; then
-        echo "No user supplied setup script found. Restoring the default idrepo configuration. This also includes a CTS backend"
-        mkdir -p data
-        cd data && tar -xvzf ../idrepo.tar.z
-        exit 0
-fi
-
-# If the above proto.tar.z file does not exist, we are running in docker build time - so build the default idrepo configuration.
-
-## This appends additional configuration to the bundled profiles ##
-chmod +w  template/setup-profiles/AM/config/6.5/base-entries.ldif \
-        && cat ldif-ext/external-am-datastore.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
-        && cat ldif-ext/uma/*.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
-        && cat ldif-ext/alpha_bravo.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif \
-        && chmod +w template/setup-profiles/AM/identity-store/7.0/base-entries.ldif \
-        && cat ldif-ext/orgs.ldif >> template/setup-profiles/AM/identity-store/7.0/base-entries.ldif
-
 # We also create the CTS backend for small deployments or development
 # environments where a separate CTS is not warranted.
 setup-profile --profile ${CONFIG} \
                   --set am-config/amConfigAdminPassword:password \
  && setup-profile --profile ${AM_IDENTITY_STORE} \
                   --set am-identity-store/amIdentityStoreAdminPassword:password \
- && setup-profile --profile ${IDM_REPO} \
+ && setup-profile  --profile ${IDM_REPO} \
                   --set idm-repo/domain:forgerock.io \
  && setup-profile --profile ${AM_CTS} \
                   --set am-cts/tokenExpirationPolicy:ds \
@@ -55,8 +35,6 @@ setup-profile --profile ${CONFIG} \
 ##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
 #EOF
 
-
-set -e
 # These indexes are required for the combined AM/IDM repo
 dsconfig --offline --no-prompt --batch <<EOF
 create-backend-index \
@@ -152,7 +130,7 @@ create-backend-index \
           --type generic \
           --index-name fr-idm-managed-user-inactive-date
 EOF
-# Example of creating additional indexes.
+# Example of creating additional indexes at setup time.
 # Uncomment these as per your needs:
 # dsconfig --offline --no-prompt --batch <<EOF
 # create-backend-index \
@@ -177,98 +155,4 @@ EOF
 # EOF
 
 
-### Setup the PEM trustore. This is REQUIRED. ######
-
-# The pods will have the pem stores mounted at this location.
-mkdir -p $PEM_TRUSTSTORE_DIRECTORY
-mkdir -p $PEM_KEYS_DIRECTORY
-
-# Set up a PEM Trust Manager Provider
-dsconfig --offline --no-prompt --batch <<EOF
-create-trust-manager-provider \
-            --provider-name "PEM Trust Manager" \
-            --type pem \
-            --set enabled:true \
-            --set pem-directory:${PEM_TRUSTSTORE_DIRECTORY}
-EOF
-
-dsconfig --offline --no-prompt --batch <<EOF
-set-connection-handler-prop \
-            --handler-name https \
-            --set trust-manager-provider:"PEM Trust Manager"
-set-connection-handler-prop \
-            --handler-name ldap \
-            --set trust-manager-provider:"PEM Trust Manager"
-set-connection-handler-prop \
-            --handler-name ldaps \
-            --set trust-manager-provider:"PEM Trust Manager"
-set-synchronization-provider-prop \
-            --provider-name "Multimaster Synchronization" \
-            --set trust-manager-provider:"PEM Trust Manager"
-set-administration-connector-prop \
-            --set trust-manager-provider:"PEM Trust Manager"
-EOF
-
-# Delete the default PCKS12 provider.
-dsconfig --offline --no-prompt --batch <<EOF
-delete-trust-manager-provider \
-            --provider-name "PKCS12"
-EOF
-
-# Set up a PEM Key Manager Provider
-dsconfig --offline --no-prompt --batch <<EOF
-create-key-manager-provider \
-            --provider-name "PEM Key Manager" \
-            --type pem \
-            --set enabled:true \
-            --set pem-directory:${PEM_KEYS_DIRECTORY}
-EOF
-
-dsconfig --offline --no-prompt --batch <<EOF
-set-connection-handler-prop \
-            --handler-name https \
-            --set key-manager-provider:"PEM Key Manager"
-set-connection-handler-prop \
-            --handler-name ldap \
-            --set key-manager-provider:"PEM Key Manager"
-set-connection-handler-prop \
-            --handler-name ldaps \
-            --set key-manager-provider:"PEM Key Manager"
-set-synchronization-provider-prop \
-            --provider-name "Multimaster Synchronization" \
-            --set key-manager-provider:"PEM Key Manager"
-set-crypto-manager-prop \
-            --set key-manager-provider:"PEM Key Manager"
-set-administration-connector-prop \
-            --set key-manager-provider:"PEM Key Manager"
-EOF
-
-# Delete the default PCKS12 provider.
-dsconfig --offline --no-prompt --batch <<EOF
-delete-key-manager-provider \
-            --provider-name "PKCS12"
-EOF
-
-
 echo "Done."
-
-
-## This patches the config.ldif to set the backends to the data/db directory.
-
-echo "Updating config.ldif to use the data/ directory"
-cp config/config.ldif /tmp/config.ldif
-
-sed  -e 's|ds-cfg-db-directory: db|ds-cfg-db-directory: data/db|'  \
-     -e 's|ds-cfg-replication-db-directory: changelogDb|ds-cfg-replication-db-directory: data/changelogDb|' \
-     -e 's|ds-cfg-ldif-file: db/adminRoot/admin-backend.ldif|ds-cfg-ldif-file: data/db/adminRoot/admin-backend.ldif|' \
-     -e 's|ds-cfg-ldif-file: db/monitorUser/monitorUser.ldif|ds-cfg-ldif-file: data/db/monitorUser/monitorUser.ldif|' \
-      /tmp/config.ldif > config/config.ldif
-
-
-# We want schema to be replicated and by default in docker it is not.
-# See https://stash.forgerock.org/projects/OPENDJ/repos/opendj/browse/opendj-server/resource/samples/docker/setup.sh#63-64
-dsconfig --offline --no-prompt --batch <<EOF
-create-replication-domain --provider-name "Multimaster synchronization" --domain-name "cn=schema" --set "base-dn:cn=schema" --set "enabled:&{ds.enable.schema.replication|true}"
-# TODO: Uncomment this once we support database encryption (OPENDJ-6598).
-# create-replication-domain --provider-name "Multimaster synchronization" --domain-name "cn=admin data" --set "base-dn:cn=admin data"
-EOF

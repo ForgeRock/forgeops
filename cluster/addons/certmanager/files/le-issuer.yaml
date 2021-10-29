@@ -9,13 +9,13 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     #server: https://acme-staging-v02.api.letsencrypt.org/directory
     # Email address used for ACME registration.
-    email: cloud_eng_team@forgerock.com
+    email: forgeops-team@forgerock.com
     # Name of a secret used to store the ACME account private key.
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
     - dns01:
-        clouddns:
+        cloudDNS:
           project: engineering-devops
           # Service account needs to have Kubernetes Engine Developer and DNS Administrator IAM roles.
           # After cert manager has been deployed to the cluster, service account json file must be encrypted using bin/encrypt.sh.
