@@ -206,8 +206,21 @@ def write_header(output, namespace):
     # Write file heading
     heading_html = '''
     <html>
-    <h1>Debug output for namespace {namespace} logged at {now}</h1>
+    <head>
+    <style type="text/css">
+    body {{
+        background-color: #fae5df; 
+        font-family: sans-serif;
+    }}    
+    </style>
+    </head>
+    <body>
+    <h1>ForgeOps Debug Output</h1>
+    <p>
+    Namespace: {namespace} 
     <br>
+    Logged at {now}
+    </p>
     '''.format(namespace=namespace,now=now)
     output.write(heading_html)
 
@@ -533,6 +546,13 @@ def main():
         print('Writing information about various Kubernetes objects')
         for obj in objs:
             write_objects(output, namespace, obj)
+
+        # Finish up HTML
+        ending_html = '''
+        </body>
+        </html>
+        '''.format()
+        output.write(ending_html)
 
     # Print message to user
     print(f'Open {output_file} in your browser.')
