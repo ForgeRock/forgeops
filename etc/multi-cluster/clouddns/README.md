@@ -84,7 +84,7 @@ In `kustomize/overlay/multi-cluster/multi-cluster-secrets/kustomization.yaml` fi
 
 Change the DS_CLUSTER_TOPOLOGY env var for a different list of regional identifiers.
 
-See `kustomize/overlay/multi-cluster/clouddns/<region>/kustomization.yaml`  
+See `kustomize/overlay/multi-cluster/clouddns/kustomization.yaml`  
 
 ```yaml
               env: 
@@ -92,14 +92,7 @@ See `kustomize/overlay/multi-cluster/clouddns/<region>/kustomization.yaml`
                 value: "eu,us"
 ```
 
-Bootstrap servers are also explicitly configured in the kustomization.yaml.  Bootstrap servers need to be configured for both idrepo and cts.  Switch the eu or us with your own domain name.  
-
-```yaml
-              - name: DS_BOOTSTRAP_REPLICATION_SERVERS
-                value: "ds-cts-0.ds-cts-us.prod.svc.us:8989,ds-cts-0.ds-cts-eu.prod.svc.eu:8989"
-````
-
-The above change needs to be applied to the idrepo and cts patch in both regional kustomization.yaml files.  
+The above change needs to be applied to the idrepo and cts patch in the ds-cts.yaml and ds-idrepo.yaml files.  
 <br />
 
 **3. Add Skaffold profiles**  
