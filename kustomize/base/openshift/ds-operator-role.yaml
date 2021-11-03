@@ -1,0 +1,208 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: ds-operator-manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - list
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - secrets
+  - services
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims/finalizers
+  - secrets/finalizers
+  - services/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - deployments/finalizers
+  - statefulsets/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - deployments/status
+  verbs:
+  - delete
+  - get
+  - patch
+  - update
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets/status
+  verbs:
+  - delete
+  - get
+  - patch
+  - update
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - batch
+  resources:
+  - jobs/status
+  verbs:
+  - delete
+  - get
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directorybackup
+  - directoryrestore
+  - directoryservices
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directorybackup/status
+  - directoryrestore/status
+  - directoryservices/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directorybackups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directorybackups/finalizers
+  verbs:
+  - '*'
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directorybackups/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directoryrestores
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directoryrestores/finalizers
+  verbs:
+  - '*'
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directoryrestores/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - directory.forgerock.io
+  resources:
+  - directoryservices/finalizers
+  verbs:
+  - '*'
+- apiGroups:
+  - snapshot.storage.k8s.io
+  resources:
+  - volumesnapshots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
