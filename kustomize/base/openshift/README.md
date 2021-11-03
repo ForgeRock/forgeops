@@ -31,9 +31,9 @@ To deploy CDK or CDM:
 ## Important Notes
 
 1. Route objects might need to have timeouts, upload limits, and other webserver tuning.
-1. Forgeops uses the [open source NGINX Ingress controller](https://kubernetes.github.io/ingress-nginx/deploy/) implementation.
+1. Forgeops uses the [open source NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/) implementation.
 Use `bin/ingress-controller-deploy.sh` to install the correct version of the operator.
-1. The [non open source version of the NGINX ingress operator](https://docs.nginx.com/nginx-ingress-controller/intro/overview/) is not supported out of the box. It can be used, but
+1. The [non open source version of the NGINX Ingress Operator](https://docs.nginx.com/nginx-ingress-controller/intro/overview/) is not supported out of the box. It can be used, but
 ingress rules and ingress definitions must be provided by the user. The ingress definitions
 [provided in forgeops](/kustomize/base/ingress/ingress.yaml) are not compatible with this
 operator.
