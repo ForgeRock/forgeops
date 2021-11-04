@@ -107,14 +107,14 @@ def main():
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'rcs-agent', 'secrets', []])
     size_group = common_sz.add_mutually_exclusive_group()
-    size_group.add_argument('--cdk', action='store_const', dest='size', const='cdk', help='(Default) Install the CDK')
-    size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install the CDM mini platform')
-    size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install the CDM small platform')
-    size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install the CDM medium platform')
-    size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install the CDM large platform')
+    size_group.add_argument('--cdk', action='store_const', dest='size', const='cdk', help='(Default) Install/generate manifests for the CDK')
+    size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install/generate manifests for the CDM mini platform')
+    size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install/generate manifests for the CDM small platform')
+    size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install/generate manifests for the CDM medium platform')
+    size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install/generate manifests for the CDM large platform')
     size_group.add_argument('--custom', dest='custom', help='Path to a directory containing custom CDM patches. Must contain patches for all products.')
 
-    subparser = parser.add_subparsers(dest='cmd', required=True)
+    subparser = parser.add_subparsers(dest='cmd', required=True, metavar='{command}')
     parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
@@ -137,7 +137,7 @@ def main():
     parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
     parser_info = subparser.add_parser('info', parents=[common_ns], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
-    subparser.add_parser('config', parents=[common_ns]) # Internal use. Hidden
+    subparser.add_parser('config', parents=[common_ns]) # Internal FR use only!!. Hidden
     args = parser.parse_args()
 
     # Check toolset versions before doing anything
