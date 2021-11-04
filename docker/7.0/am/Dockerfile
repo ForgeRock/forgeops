@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am-base/pit1:7.2.0-2021-7-7aef2afd293a76549e9bf740f8294f0048fe7442
+FROM gcr.io/forgerock-io/am-base/pit1:7.2.0-2021-7-c054b51e53aeb2acb172ecfc0d488fc71cc9550d
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
