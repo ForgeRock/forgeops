@@ -182,7 +182,7 @@ def main():
                                                           'rcs-agent', []])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
-    subparser = parser.add_subparsers(dest='cmd', required=True)
+    subparser = parser.add_subparsers(dest='cmd', required=True, metavar='{command}')
     parser_install = subparser.add_parser('install', parents=[common],
                                           help='Install the platform components or component bundles using local manifests')
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
@@ -195,7 +195,7 @@ def main():
     parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig'])
     parser_build.add_argument('-r', '--default-repo', dest='registry')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
-    subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
+    subparser.add_parser('config', parents=[common])
     args = parser.parse_args()
 
     _, ctx_namespace, _ = utils.run('kubectl',
