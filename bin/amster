@@ -18,6 +18,8 @@ USER_PWD_EXPR_RULES = {
     'ig-agent.json': '&{ig.agent.password|password}',
 }
 
+log = utils.logger(name='amster')
+
 def amster_import(ns, src, printlogs=True):
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     docker_dir = os.path.join(sys.path[0], '..', 'docker')
@@ -50,7 +52,6 @@ def amster_export(ns, dst, glob):
     amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     fqdn = utils.get_fqdn(ns)
-    log = utils.logging.getLogger('forgeops')
     if not os.path.isdir(dst):
         utils.error(f'{dst} is not a valid directory. Please specify a valid path and try again')
         sys.exit(1)
@@ -80,7 +81,6 @@ def amster_export(ns, dst, glob):
         clean_amster_job(ns)
 
 def upgrade_all_amster_files(conf_path, fqdn):
-    log = utils.logging.getLogger('forgeops')
     utils.message('Updating amster config.')
     for conf_file in pathlib.Path(conf_path).resolve().rglob('*.json'):
         with conf_file.open('r+') as fp:
@@ -100,8 +100,6 @@ def upgrade_amster_conf(conf, conf_file_name, fqdn):
     Recursively search objects looking at values and keys that need
     to be updated.
     """
-    log = utils.logging.getLogger('forgeops')
-
     # Go through all items in a list
     if isinstance(conf, list):
         new_value = []
