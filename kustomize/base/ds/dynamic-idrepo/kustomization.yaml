@@ -1,0 +1,6 @@
+# Deploy the idrepo service.
+commonLabels:
+  app: ds-idrepo
+resources:
+- ../dynamic
+nameSuffix: -idrepo

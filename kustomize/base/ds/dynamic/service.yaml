@@ -17,7 +17,5 @@ spec:
     port: 8080
   - name: https
     port: 8443
-  - name: repl
-    port: 8989
   selector:
     app: ds

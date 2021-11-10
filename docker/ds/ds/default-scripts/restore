@@ -1,37 +1,35 @@
 #!/usr/bin/env bash
-# restore data
-# This is done offline, and is expected to be run by a job that runs to termination.
-# The first argument ($1) is the directory to search for the files to restore
-# All files found at the directory will be restored. If you only want to partially restore files
-# you must modify this script or delete the files from the restore source.
+# Sample script to restore data taken from the backup script
+# This is done with the directory offline, and is expected to be run by a Kubernetes job that runs to termination.
+# On completion of the restore, the pvc can be snapshotted and that snapshot used to initialize a new directory instance.
+#
+# Currently the restore untar's the persistent data taken by the backup scripts.
+# It does NOT perform an ldif-import. 
+#
+# This is a sample script. Modify the script per your requireements. 
+#
 
-set -x
+set -e
 
+NAMESPACE=${NAMESPACE:-default}
 
-# Backup type is ldif or ds-backup
-BACKUP_TYPE="${BACKUP_TYPE:-ldif}"
-SOURCE="/backup/$NAMESPACE/$BACKUP_TYPE"
+# Backup type is  tar,ldif or dsbackup
+# You can restore one or more of these types in sequence.
+BACKUP_TYPE="${BACKUP_TYPE:-tar,ldif,dsbackup}"
+SOURCE="/backup/$NAMESPACE"
 
 [ -d "$SOURCE" ] || {
     echo "Directory $SOURCE DOES NOT exist."
     exit 1
 }
 
-echo "Restoring files found in $SOURCE:"
-ls -lR $SOURCE
+tarRestore() {
+    echo "Restoring tar backup found in $SOURCE:"
+    tar --no-overwrite-dir -C $DS_DATA_DIR -xvzf $SOURCE/ds-data.tar.gz
+}
 
-
-if [[ $BACKUP_TYPE == "ldif" ]]; then
-    echo "Restoring config.ldif"
-    # Move the docker supplied config to data/
-    mv config config.docker
-    # overwrite default config.ldif with the backup
-    cp  -r $SOURCE/config data
-    # Link the top level config so DS knows where to find it
-    ln -s data/config
-
+ldifRestore() {
     LDIF=$(cd $SOURCE; ls *.ldif.gz)
-
 
     for F in $LDIF
     do
@@ -45,21 +43,37 @@ if [[ $BACKUP_TYPE == "ldif" ]]; then
             import-ldif --clearBackend --ldifFile "${SOURCE}/$F" --backendId ${BACKEND} --offline
         fi
     done
+}
 
-else
-    # use ds-restore command
-
-    # For debugging:
-    # dsbackup --offline list --backupLocation $SOURCE
-
-    # Get a list of all the last backups
-    BACKENDS=$(dsbackup --offline list  --backupLocation $SOURCE --last | grep "Backup ID" | awk '{print $NF}' )
+dsbackupRestore() {
+    SRC=$SOURCE/dsbackup
+     # Get a list of all the last backups
+    BACKENDS=$(dsbackup --offline list  --backupLocation $SRC --last | grep "Backup ID" | awk '{print $NF}' )
 
     for B in $BACKENDS
     do
         echo "Restoring id $B"
-        echo dsbackup --offline  restore  --backupLocation $SOURCE --backupId $B
-        dsbackup --offline  restore  --backupLocation $SOURCE --backupId $B
+        echo dsbackup --offline  restore  --backupLocation $SRC --backupId $B
+        dsbackup --offline  restore  --backupLocation $SRC --backupId $B
     done
+}
 
-fi
+for type in ${BACKUP_TYPE//,/ }
+do
+    echo "Running restore type $type"
+    case $type in
+        tar)
+            tarRestore
+            ;;
+        ldif)
+            ldifRestore
+            ;;
+        dsbackup)
+            dsbackupRestore
+            ;;
+        *)
+            echo "Unknown backup type $type"
+            exit 1
+            ;;
+    esac
+done

@@ -9,11 +9,13 @@
 # or with one of its affiliates. All use shall be exclusively subject
 # to such license between the licensee and ForgeRock AS.
 
+# set -x 
+
+
 source /opt/opendj/env.sh
 
 # set -eu
 
-set -x 
 
 # If the pod was terminated abnormally then lock file may not have been cleaned up.
 removeLocks() {
@@ -35,7 +37,7 @@ upgradeDataAndRebuildDegradedIndexes() {
     # Upgrade is idempotent, so it should have no effect if there is nothing to do.
     # Fail-fast if the config needs upgrading because it should have been done when the image was built.
     echo "Upgrading configuration and data..."
-     ./upgrade --dataOnly --acceptLicense --force --ignoreErrors --no-prompt
+     ./upgrade --acceptLicense --force --ignoreErrors --no-prompt
 
     # Rebuild any corrupt/missing indexes.
     for baseDn in "${BASE_DNS[@]}"; do
@@ -124,9 +126,6 @@ init() {
 }
 
 
-
-set -x
-
 CMD="${1:-help}"
 case "$CMD" in
 
@@ -162,6 +161,8 @@ backup)
     ;;
 
 restore)
+    # restore needs acces to the master keypair to decrypt data
+    copyKeys
     executeScript restore
     ;;
 
@@ -174,20 +175,17 @@ start)
     exec start-ds --nodetach
     ;;
 
+dev-init)
+    init
+    ;&
+
 dev)
     # Sleep until Kubernetes terminates the pod using a SIGTERM.
     echo "Connect using 'kubectl exec -it POD -- /bin/bash'"
     waitUntilSigTerm
     ;;
-
-dev-init)
-    init
-    waitUntilSigTerm
-    ;;
-
 *)
     removeLocks
-    preExec
     echo "Undefined entrypoint. Will exec $@"
     shift
     exec "$@"

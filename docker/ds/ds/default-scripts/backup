@@ -1,47 +1,70 @@
 #!/usr/bin/env bash
-# Export backend data using ldif or ds-backup
+# A sample backup script. 
+# Modify this script to suit your requirements. 
+#
+#
+# 
 # This is done offline, and is expected to be run by a job that runs to termination
 
 set -ex
 
-# Target to export data to
+# Target directory to export data to
 BACKUP_DIR=${BACKUP_DIR:-/backup}
 
-# The backup type defaults to ldif. Use ds-backup for a directory backup command
-BACKUP_TYPE=${BACKUP_TYPE:-ldif}
+# This is csv seperated list of backup methods to run in sequence.
+# Valid types are tar,ldif,dsbackup
+# Defaults to all 3 methods..
+BACKUP_TYPE=${BACKUP_TYPE:-"tar,ldif,dsbackup"}
 
-DEST="$BACKUP_DIR/$NAMESPACE/$BACKUP_TYPE"
+DEST="$BACKUP_DIR/$NAMESPACE"
 mkdir -p  $DEST
 
-# The DS server version needs to match the JE data version
+tarBackup() {
+    echo "Taking a tar backup of the persistent volume"
+    (cd $DS_DATA_DIR && tar cvzf $DEST/ds-data.tar.gz *)
+}
+
+
+# The DS server version needs to match the JE data version before any backup can be attempted
 echo "Upgrading configuration and data..."
 ./upgrade --dataOnly --acceptLicense --force --ignoreErrors --no-prompt
 
 # Calculate the list of backends.
 mapfile -t BACK_ENDS < <(./bin/ldifsearch -b cn=backends,cn=config -s one $DS_DATA_DIR/config/config.ldif "(&(objectclass=ds-cfg-pluggable-backend)(ds-cfg-enabled=true))" ds-cfg-backend-id | grep "^ds-cfg-backend-id" | cut -c20-)
-
 echo "Backends ${BACK_ENDS[@]}"
 
-for B in "${BACK_ENDS[@]}"; do
 
-    if [[ "$B" =~ ^(rootUser|proxyUser|monitorUser|tasks|adminRoot)$ ]]; then
-        echo "Skipping system backend $B"
-    else
-        if [[ $BACKUP_TYPE == "ldif" ]];
-        then
-            F="$DEST/$B.ldif.gz"
-            echo "Backing up $B to $F"
-            export-ldif --ldifFile $F --backendId $B --offline --compress
-        else
-            echo  "Backing up $B to $DEST"
-            dsbackup --offline create --backupLocation "$DEST" --backendName $B
-        fi
-    fi
+ldifBackup() {
+    for B in "${BACK_ENDS[@]}"; do
+        F="$DEST/$B.ldif.gz"
+        echo "Backing up $B to $F"
+        export-ldif --ldifFile $F --backendId $B --offline --compress    
+    done
+}
+
+dsbackupCmd() {
+    dsbackup --offline create --backupLocation "$DEST/dsbackup" 
+}
+
+
+for type in ${BACKUP_TYPE//,/ }
+do
+    echo "Running backup type $type"
+    case $type in
+        tar)
+            tarBackup
+            ;;
+        ldif)
+            ldifBackup
+            ;;
+        dsbackup)
+            dsbackupCmd
+            ;;
+        *)
+            echo "Skipping unknown backup type $type"
+            ;;
+    esac
 done
 
-echo "Backing up config directory"
-cp -r $DS_DATA_DIR/config $DEST
+echo "done"
 
-
-echo "Backed up files to $DEST:"
-ls -lR $DEST

@@ -16,17 +16,25 @@ spec:
       labels:
         tier: ds
     spec:
+      # Attempt to spread out ds containers across zones
       topologySpreadConstraints:
       - maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
-        whenUnsatisfiable: DoNotSchedule
+        # Use DoNotSchedule if you want to prevent ds pods from being scheduled in the same zone
+        whenUnsatisfiable: ScheduleAnyway
         labelSelector:
           matchLabels:
             app: ds
+      # Create a toleration that allows this pod to be scheduled on a tainted node
+      # This is used to drive directory instances to dedicated nodes for performance.
+      # If a node is not tainted, this has no impact.
+      tolerations:
+      - key: "WorkerDedicatedDS"
+        operator: "Exists"
       initContainers:
       - name: initialize
         image: ds
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         args: ["init"]
         volumeMounts:
         - name: data
@@ -40,14 +48,7 @@ spec:
         - name: ds-master-keypair
           mountPath: /var/run/secrets/ds-master-keypair
         - name: keys
-          mountPath: /var/run/secrets/keys
-        env:
-        - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
-          value: "true"
-        - name: DS_UID_MONITOR_PASSWORD_FILE
-          value: "/var/run/secrets/opendj-passwords/monitor.pw"
-        - name: DS_UID_ADMIN_PASSWORD_FILE
-          value: "/var/run/secrets/opendj-passwords/dirmanager.pw"
+          mountPath: /var/run/secrets/keys      
         resources:
           requests:
             memory: 512Mi
@@ -101,7 +102,6 @@ spec:
         fsGroup: 0
         runAsUser: 11111
         runAsGroup: 0
-        runAsNonRoot: true
       terminationGracePeriodSeconds: 30
       volumes:
       - name: passwords
@@ -115,7 +115,8 @@ spec:
         secret:
           secretName: ds-ssl-keypair
           defaultMode: 384
-      # Where the ds keys will get copied to. 
+      # Where the ds keys will get copied to.  The keys need to be a format that DS likes - not cert-manager
+      # The init container copies /formats the cert-manager keys to this volume.
       - name: keys
         emptyDir: {}
   updateStrategy:

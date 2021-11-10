@@ -38,6 +38,9 @@ kind: Config
       <<: *DS-CTS_BASE
       docker:
         dockerfile: cts/Dockerfile
+    - &DS-DYNAMIC
+      image: ds
+      context: docker/ds/ds
     - &DS-IDREPO_BASE
       image: ds-idrepo
       context: docker/ds/
@@ -71,6 +74,7 @@ kind: Config
     - *DS-IDREPO
     - *DS-PROXY
     - *IG
+    - *DS-DYNAMIC
     # Skip building LDIF-IMPORTER. We use a fixed tag for now
     # - *LDIF-IMPORTER
 

@@ -28,18 +28,6 @@ fi
 ns=$1
 i=0
 
-while [ $i -le  30 ];
-do
-    if kubectl --namespace "${ns}" apply --filename=../kustomize/base/secrets/secret_agent_config.yaml > /dev/null 2>&1;
-    then
-        kubectl get --namespace "${ns}" secrets
-        echo "deploying secret agent configuration completed"
-        exit 0
-    fi
-    echo "deploying secret agent configuration failed, trying again"
-    sleepTime=$(( $i * 2 ))
-    sleep $sleepTime
+kustomize build ../kustomize/base/secrets | kubectl --namespace "${ns}" apply -f -
 
-    i=$(( $i + 1 ))
-done
-exit 1
+sleep 20

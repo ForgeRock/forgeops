@@ -7,12 +7,11 @@ FROM gcr.io/forgerock-io/ds-empty/pit1:7.2.0-latest-postcommit
 
 # FOR DEBUG. Remove for production deployment
 USER root
-RUN apt-get update && apt-get install -y vim
+RUN apt-get update && apt-get install -y --no-install-recommends vim ncat dnsutils 
 USER forgerock
 
 # The PVC mount point where all writeable data is stored.
-# revert to /opt/opendj/data once https://bugster.forgerock.org/jira/browse/OPENDJ-8372 is fixed.
-ENV DS_DATA_DIR /opt/opendj/dsdata
+ENV DS_DATA_DIR /opt/opendj/data
 
 # The ds deployment uses PEM based certificates. This sets the location of the certs.
 # This is set at docker *build* time. If you change this at runtime you must edit the config.ldif.

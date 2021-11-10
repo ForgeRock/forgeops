@@ -1,7 +1,7 @@
 # DS Dockerfile for the Directory Service Operator (ds-operator)
 
 This image is used by the [ds-operator](https://github.com/ForgeRock/ds-operator). It supports a
-a "mutable" directory deployment where data _and_ configuration are stored on a persistent volume claim (PVC).
+a "dynamic" directory deployment where data _and_ configuration are stored on a persistent volume claim (PVC).
 In this regard, it behaves more like a traditional VM install. Changes made at runtime are
 persisted to the PVC.
 

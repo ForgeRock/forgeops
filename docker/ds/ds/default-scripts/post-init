@@ -18,10 +18,10 @@ rebuild-index  --offline \
  --baseDN ou=identities \
  --index carLicense
 
-# These commands can be done online, but they are not automatically executed
+# Sample commands that can be done online.
 
 dsconfig --hostname localhost --port 4444 \
-    --bindDN uid=admin --bindPassword $(cat /var/run/secrets/admin/dirmanager.pw) \
+    --bindDN uid=admin --bindPasswordFile $DS_UID_ADMIN_PASSWORD_FILE \
     --trustAll  --no-prompt --batch <<EOF
 create-backend-index \
           --backend-name amIdentityStore \
@@ -31,9 +31,8 @@ EOF
 
 
 rebuild-index --hostname localhost --port 4444 \
-    --bindDN uid=admin --bindPassword $(cat /var/run/secrets/admin/dirmanager.pw) \
+    --bindDN uid=admin ---bindPasswordFile $DS_UID_ADMIN_PASSWORD_FILE \
     --trustAll   \
     --baseDN ou=identities \
     --index carLicense
-
 
