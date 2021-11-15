@@ -111,7 +111,8 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 
 def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def testConfig = getDefaultConfig(random, stageName) + config
+    def testConfig = getDefaultConfig(random, stageName) + config +
+            [EXT_PLATFORM_IMAGES_BRANCH: commonModule.platformImagesRevision]
     def stagesCloud = [:]
     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
@@ -140,7 +141,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     allStagesCloud[normalizedStageName].reportUrl = reportUrl
 
                     def uiTestConfig = [
-                            containerRunOptions : getUiContainerRunOptions(testConfig),
+                            containerRunOptions : cloud_utils.getUiContainerRunOptions(testConfig),
                             deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
                     ]
 
@@ -156,22 +157,6 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
             }
         }
     }
-}
-
-def getUiContainerRunOptions(Map config) {
-    def optionsString = ''
-    for (entry in config) {
-        if (entry.key == 'PROJECT' ||
-                entry.key.startsWith('CLUSTER_') ||
-                (entry.key.startsWith('DEPLOYMENT_') && entry.key != 'DEPLOYMENT_NAMESPACE') ||
-                entry.key.startsWith('COMPONENTS_')) {
-            optionsString += " -e ${entry.key}=${entry.value}"
-        }
-    }
-    // The GCLOUD_CONNECTION_STRING will be used by the Lodestarbox entrypoint.sh to connect to specific cluster
-    cloud_utils.authenticateGcloud()
-    optionsString += " -e GCLOUD_CONNECTION_STRING=\"${cloud_utils.clusterInfo(config)}\""
-    return optionsString
 }
 
 def generateSummaryTestReport(String stageName) {
