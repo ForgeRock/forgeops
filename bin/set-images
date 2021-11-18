@@ -111,7 +111,7 @@ image_name_to_config_name = {
     'am-base': 'am',
     'amster': 'amster',
     'ds': 'ds',
-    'idm-cloud': 'idm',
+    'idm-cdk': 'idm',
     'idm': 'idm',
     'ig': 'ig',
 }
