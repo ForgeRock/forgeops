@@ -1,66 +1,85 @@
 #!/usr/bin/env bash
-
-# Script to deploy Cert-Manager into kube-system namespace.
+# Script to deploy Cert-Manager
+#
 # Run ./certmanager-deploy.sh to deploy with default ca cert.
-# Run ./certmanager-deploy.sh -l to deploy with Let's Encrypt Issuer
 # Run ./certmanager-deploy.sh -d to delete cert-manager deployment
 #
 # To be used if namespace gets stuck in 'terminating state'
 #kubectl delete apiservice v1beta1.webhook.cert-manager.io
 set -oe pipefail
 
-VERSION="v1.6.0"
-ISSUER="ca"
+VERSION="v1.6.1"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CM_DIR="${CURRENT_DIR}/../cluster/addons/certmanager"
 
 # Print usage message to screen
 usage() {
-  printf "Usage: $0 [-l] [-d] \n\n"
+  printf "Usage: $0 [-d] \n\n"
   exit 2
 }
 
+
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+
 # Deploy cert-manager
 deploy() {
+    # Install CRDs
+    kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/$VERSION/cert-manager.crds.yaml
 
-    # Deploy manifests
-    kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/${VERSION}/cert-manager.yaml
+    # Set the minumum resource limits (these work for GKE autopilot clusters)
+    cat >/tmp/cert-manager-values.yaml <<EOF
+global:
+  leaderElection:
+    # Need for GKE autopilot as the kube-system namespace is locked down
+    namespace: cert-manager
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+cainjector:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+webhook:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+EOF
 
-    # Wait for webhook deployment to be ready
-    kubectl wait --for=condition=available deployment/cert-manager-webhook --timeout=300s -n cert-manager
+    helm install \
+        cert-manager jetstack/cert-manager \
+        --namespace cert-manager \
+        --create-namespace \
+        --version $VERSION \
+        --values /tmp/cert-manager-values.yaml
 
-    # Deploy Issuer.
-    kubectl apply -f ${CM_DIR}/files/${ISSUER}-issuer.yaml -n cert-manager
 
-    # Deploy secrets based on the type of Issuer deployed.
-    if [[ ${ISSUER} =~ "ca" ]]; then
-        kubectl apply -f ${CM_DIR}/secrets/ca-secret.yaml -n cert-manager
-    else
-        PROVIDER=$(kubectl get nodes -o jsonpath={.items[0].spec.providerID} | awk -F: '{print $1}')
-        if [[ "${PROVIDER}" == "gce" ]]; then
-            ${CM_DIR}/decrypt.sh ${CM_DIR}/secrets/cert-manager.json
-            kubectl create secret generic clouddns --from-file=${CM_DIR}/secrets/cert-manager.json -n cert-manager
-        else
-            echo "Not deploying to GCE. Create Let's Encrypt Issuer manually"
-        fi
-    fi
+    # Install a self signed cluster issuer
+    kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: default-issuer
+spec:
+  selfSigned: {}
+EOF
+
 }
 
 # Delete cert-manager and namespace
 delete() {
-    kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/${VERSION}/cert-manager.yaml
-
-    exit 1
+    echo "Deleting cert-manager"
+    helm -n cert-manager uninstall cert-manager
+    exit 0
 }
 
 # Validate arguments".
-[ $# -gt 0 ] && [[ ! ${1} =~ ^(-l|-d) ]] && usage
+[ $# -gt 0 ] && [[ ! ${1} =~ ^(-d) ]] && usage
 [ $# -gt 0 ] && [[ ${1} =~ "-d" ]] && delete
-[ $# -gt 0 ] && [[ ${1} =~ "-l" ]] && ISSUER="le"
 
-# Deploy cert-mamager manifests
+# Deploy cert-manager manifests
 deploy
-
-# Delete decrypted service account
-rm -f ${CM_DIR}/secrets/cert-manager.json || true
-
