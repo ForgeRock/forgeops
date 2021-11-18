@@ -66,6 +66,9 @@ delete-sasl-mechanism-handler --handler-name "GSSAPI"
 set-synchronization-provider-prop --provider-name "Multimaster synchronization" --set "bootstrap-replication-server:&{ds.bootstrap.replication.servers|localhost:8989}"
 # TODO: Uncomment this once we support database encryption (OPENDJ-6598).
 # create-replication-domain --provider-name "Multimaster synchronization" --domain-name "cn=admin data" --set "base-dn:cn=admin data"
+
+# Purge delay of 24 hours.
+set-synchronization-provider-prop --provider-name "Multimaster synchronization" --set "replication-purge-delay:86400 s"
 END_OF_COMMAND_INPUT
 
 
