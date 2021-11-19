@@ -35,7 +35,7 @@ patchesStrategicMerge:
   metadata:
     name: am
   spec:
-    replicas: 3
+    replicas: 2
     template:
       spec:
         containers:
