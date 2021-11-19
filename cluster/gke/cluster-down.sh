@@ -14,14 +14,16 @@ R=$(gcloud config list --format 'value(compute.region)')
 REGION=${REGION:-$R}
 
 ZONE=${ZONE:-"$REGION-a"}
-
+HA_CTRL_PLANE=${HA_CTRL_PLANE:=1}
+CONTROL_PLANE_OPTS="--zone=${ZONE}"
+[[ $HA_CTRL_PLANE -eq 1 ]] && CONTROL_PLANE_OPTS="--region=${REGION}"
 
 echo "The \"${NAME}\" cluster will be deleted. This action cannot be undone."
 echo "Press any key to continue, or CTRL+C to quit"
 read;
 
 echo "Getting the cluster credentials for $NAME in Zone $ZONE"
-gcloud container clusters get-credentials "$NAME" --zone "$ZONE" || exit 1
+gcloud container clusters get-credentials "$NAME" "$CONTROL_PLANE_OPTS" || exit 1
 
 
 read -r -p "Do you want to delete all PVCs allocated by this cluster (recommended for dev clusters)? [Y/N] " response
@@ -52,7 +54,7 @@ echo "***Cleaning all services and load balancers if any***"
 kubectl delete svc --all --all-namespaces
 
 # Delete the cluster. Defaults to the current project.
-gcloud container clusters delete --quiet "$NAME" --zone "$ZONE"
+gcloud container clusters delete --quiet "$NAME" "$CONTROL_PLANE_OPTS"
 
 # Delete static ip if $DELETE_STATIC_IP set to true
 if [ "$DELETE_STATIC_IP" == true ]; then

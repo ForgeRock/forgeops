@@ -104,7 +104,7 @@ DS_NUM_NODES=${DS_NUM_NODES:-"1"}
 RELEASE_CHANNEL=${RELEASE_CHANNEL:="regular"}
 
 # Regional Control Plane
-HA_CTRL_PLANE=${HA_CTRL_PLANE:=0}
+HA_CTRL_PLANE=${HA_CTRL_PLANE:=1}
 CONTROL_PLANE_OPTS="--zone ${ZONE}"
 [[ $HA_CTRL_PLANE -eq 1 ]] && CONTROL_PLANE_OPTS="--region ${REGION}"
 
@@ -134,7 +134,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --subnetwork "$SUB_NETWORK" \
     --default-max-pods-per-node "110" \
     --no-enable-master-authorized-networks \
-    --addons HorizontalPodAutoscaling,ConfigConnector,GcePersistentDiskCsiDriver \
+    --addons HorizontalPodAutoscaling,GcePersistentDiskCsiDriver \
     --workload-pool "$PROJECT.svc.id.goog" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 \
     $CONTROL_PLANE_OPTS \
