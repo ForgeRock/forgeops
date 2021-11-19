@@ -255,7 +255,7 @@ def _waitfords(ns, ds_name):
 
 
 def _runwithtimeout(target, args, secs):
-    t = Thread(target=target, args=args)
+    t = Thread(target=target, args=args, daemon=True)
     t.start()
     t.join(timeout=secs)
     if t.is_alive():
@@ -460,6 +460,25 @@ def check_base_toolset():
 def install_dependencies():
     """Check and install dependencies"""
     check_base_toolset()
+    
+    print('Checking cert-manager and related CRDs:', end=' ')
+    try:
+        run('kubectl', 'get crd certificaterequests.cert-manager.io',
+            cstderr=True, cstdout=True)
+        run('kubectl', 'get crd certificates.cert-manager.io',
+            cstderr=True, cstdout=True)
+        run('kubectl', 'get crd clusterissuers.cert-manager.io',
+            cstderr=True, cstdout=True)
+    except Exception:
+        warning('cert-manager CRD not found. Installing cert-manager.')
+        certmanager('apply')
+    else:
+        message('cert-manager CRD found in cluster.')
+
+    _, img, _= run('kubectl', f'-n cert-manager get deployment cert-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
+                   cstderr=True, cstdout=True)
+    check_component_version('cert-manager', img.decode('ascii').split(':')[1])
+
     print('Checking secret-agent operator and related CRDs:', end=' ')
     try:
         run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
@@ -488,25 +507,7 @@ def install_dependencies():
         cstderr=True, cstdout=True)
     check_component_version('ds-operator', img.decode('ascii').split(':')[1])
 
-    # Uncomment this block to install/check for cert-manager installation
-    # print('Checking cert-manager and related CRDs:', end=' ')
-    # try:
-    #     run('kubectl', 'get crd certificaterequests.cert-manager.io',
-    #         cstderr=True, cstdout=True)
-    #     run('kubectl', 'get crd certificates.cert-manager.io',
-    #         cstderr=True, cstdout=True)
-    #     run('kubectl', 'get crd clusterissuers.cert-manager.io',
-    #         cstderr=True, cstdout=True)
-    # except Exception:
-    #     warning('cert-manager CRD not found. Installing cert-manager.')
-    #     certmanager('apply')
-    # else:
-    #     message('cert-manager CRD found in cluster.')
-
-    # img, _= run('kubectl', f'-n cert-manager get deployment cert-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
-    #     cstderr=True, cstdout=True)
-    # check_component_version('cert-manager', img.decode('ascii').split(':')[1])
-    # print()
+    print()
 
 
 def secretagent(k8s_op, tag='latest'):
@@ -549,24 +550,54 @@ def dsoperator(k8s_op, tag='latest'):
         run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
 
+def _install_certmanager_issuer():
+    base_dir = os.path.join(sys.path[0], '../')
+    addons_dir = os.path.join(base_dir, 'cluster', 'addons', 'certmanager')
+    issuer = os.path.join(addons_dir, 'files', 'selfsigned-issuer.yaml')
+    print('\nInstalling cert-manager\'s self-signed issuer: ', end='')
+    sys.stdout.flush()
+    while True:
+        try:
+            time.sleep(5)
+            print('.', end='')
+            sys.stdout.flush()
+            _, res, _ = run('kubectl', f'-n cert-manager apply -f {issuer}', cstderr=True, cstdout=True)
+            print('Done.')
+            print(res.decode('utf-8'))
+            break
+        except:
+            continue
+
 def certmanager(k8s_op, tag='latest'):
     """Check and install cert-manager"""
     opts = ''
     if k8s_op == 'delete':
         opts = '--ignore-not-found=true'
     if tag == 'latest':
+        component_url = 'https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml'
         run('kubectl',
-            f'{k8s_op} --validate=false -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.yaml {opts}')
+            f'{k8s_op} -f https://github.com/jetstack/cert-manager/releases/latest/download/cert-manager.crds.yaml {opts}')
     else:
+        component_url = f'https://github.com/jetstack/cert-manager/releases/download/{tag}/cert-manager.yaml'
         run('kubectl',
-            f'{k8s_op} --validate=false -f https://github.com/jetstack/cert-manager/releases/download/{tag}/cert-manager.yaml {opts}')
+            f'{k8s_op} -f https://github.com/jetstack/cert-manager/releases/download/{tag}/cert-manager.crds.yaml {opts}')
 
     if k8s_op == 'apply':
-        message('\nWaiting for cert-manager...')
+        message('\nWaiting for cert-manager CRD registration...')
         time.sleep(5)
-        run('kubectl', 'wait --for=condition=Established crd certificaterequests.cert-manager.io --timeout=30s')
-        run('kubectl', '-n cert-manager wait --for=condition=available deployment  --all --timeout=120s')
-        run('kubectl', '-n cert-manager wait --for=condition=ready pod --all --timeout=120s')
+        run('kubectl', 'wait --for=condition=Established crd certificaterequests.cert-manager.io --timeout=60s')
+        run('kubectl', 'wait --for=condition=Established crd certificates.cert-manager.io --timeout=60s')
+        run('kubectl', 'wait --for=condition=Established crd clusterissuers.cert-manager.io --timeout=60s')
+
+    run('kubectl', f'{k8s_op} -f {component_url} {opts}')
+
+    if k8s_op == 'apply':
+        message('\nWaiting for cert-manager pods...')
+        run('kubectl', '-n cert-manager wait --for=condition=available deployment  --all --timeout=300s')
+        run('kubectl', '-n cert-manager wait --for=condition=ready pod --all --timeout=300s')
+        _runwithtimeout(_install_certmanager_issuer, [], 180)
+
+
 
 def build_docker_image(component, default_repo, tag, config_profile=None):
     """Builds custom docker images. Returns the tag of the built image"""

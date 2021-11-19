@@ -1,0 +1,8 @@
+# Create a cluster wide issuer that uses cert managers self-signed CA
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: default-issuer
+  namespace: cert-manager
+spec:
+  selfSigned: {}
