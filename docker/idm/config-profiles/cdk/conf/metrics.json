@@ -1,0 +1,4 @@
+{
+    "enabled" : true,
+    "prometheusRole" : "&{openidm.prometheus.role}"
+}

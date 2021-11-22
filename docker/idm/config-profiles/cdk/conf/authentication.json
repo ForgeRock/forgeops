@@ -1,0 +1,51 @@
+{
+    "rsFilter" : {
+        "clientId" : "idm-resource-server",
+        "clientSecret" : "&{rs.client.secret|password}",
+        "tokenIntrospectUrl" : "http://am/am/oauth2/introspect",
+        "scopes" : [ "fr:idm:*" ],
+        "cache" : {
+            "maxTimeout" : "300 seconds"
+        },
+        "augmentSecurityContext" : {
+          "type": "text/javascript",
+          "source": "require('auth/orgPrivileges').assignPrivilegesToUser(resource, security, properties, subjectMapping, privileges, 'privileges', 'privilegeAssignments');"
+        },
+        "subjectMapping" : [
+          {
+            "queryOnResource": "managed/user",
+            "propertyMapping": {
+              "sub": "_id"
+            },
+            "userRoles": "authzRoles/*",
+            "additionalUserFields": ["adminOfOrg", "ownerOfOrg"],
+            "defaultRoles" : [
+                "internal/role/openidm-authorized"
+            ]
+          }
+        ],
+        "anonymousUserMapping" : {
+            "localUser" : "internal/user/anonymous",
+            "roles" : [
+                "internal/role/openidm-reg"
+            ]
+        },
+        "staticUserMapping" : [
+            {
+                "subject" : "amadmin",
+                "localUser" : "internal/user/openidm-admin",
+                "roles" : [
+                    "internal/role/openidm-authorized",
+                    "internal/role/openidm-admin"
+                ]
+            },
+            {
+                "subject": "idm-provisioning",
+                "localUser": "internal/user/idm-provisioning",
+                "roles" : [
+                    "internal/role/platform-provisioning"
+                ]
+            }
+        ]
+    }
+}

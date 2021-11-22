@@ -1,0 +1,30 @@
+{
+  "enabled" : false,
+  "type" : "simple",
+  "repeatInterval" : 86400000,
+  "persisted" : true,
+  "concurrentExecution" : false,
+  "invokeService" : "taskscanner",
+  "invokeContext" : {
+    "waitForCompletion" : false,
+    "numberOfThreads" : 5,
+    "scan" : {
+      "_queryFilter" : "((/activeDate le \"${Time.nowWithOffset}\") AND (!(/inactiveDate pr) or /inactiveDate ge \"${Time.nowWithOffset}\"))",
+      "object" : "managed/user",
+      "taskState" : {
+        "started" : "/activateAccount/task-started",
+        "completed" : "/activateAccount/task-completed"
+      },
+      "recovery" : {
+        "timeout" : "10m"
+      }
+    },
+    "task" : {
+      "script" : {
+        "type" : "text/javascript",
+        "globals" : { },
+        "source" : "var patch = [{ \"operation\" : \"replace\", \"field\" : \"/accountStatus\", \"value\" : \"active\" }];\n\nlogger.debug(\"Performing Activate Account Task on {} ({})\", input.mail, objectID);\n\nopenidm.patch(objectID, null, patch); true;"
+      }
+    }
+  }
+}

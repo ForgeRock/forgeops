@@ -1,0 +1,114 @@
+{
+    "dashboard" : {
+        "widgets" : [
+            {
+                "type": "Welcome",
+                "size": "large"
+            }
+        ]
+    },
+    "adminDashboards" : [
+        {
+            "name" : "Quick Start",
+            "isDefault" : true,
+            "widgets" : [
+                {
+                    "type" : "quickStart",
+                    "size" : "large",
+                    "cards" : [
+                        {
+                            "name" : "Manage Users",
+                            "icon" : "fa-user",
+                            "href" : "#resource/managed/user/list/"
+                        },
+                        {
+                            "name" : "Manage Roles",
+                            "icon" : "fa-check-square-o",
+                            "href" : "#resource/managed/role/list/"
+                        },
+                        {
+                            "name" : "Add Device",
+                            "icon" : "fa-tablet",
+                            "href" : "#managed/add/"
+                        },
+                        {
+                            "name" : "Configure System Preferences",
+                            "icon" : "fa-user",
+                            "href" : "#settings/"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name" : "System Monitoring",
+            "isDefault" : false,
+            "widgets" : [
+                {
+                    "type" : "audit",
+                    "size" : "large",
+                    "minRange" : "#b0d4cd",
+                    "maxRange" : "#24423c",
+                    "legendRange" : {
+                        "week" : [
+                            10,
+                            30,
+                            90,
+                            270,
+                            810
+                        ],
+                        "month" : [
+                            500,
+                            2500,
+                            5000
+                        ],
+                        "year" : [
+                            10000,
+                            40000,
+                            100000,
+                            250000
+                        ]
+                    }
+                },
+                {
+                    "type" : "clusterStatus",
+                    "size" : "large"
+                },
+                {
+                    "type" : "systemHealthFull",
+                    "size" : "large"
+                },
+                {
+                    "type" : "lastRecon",
+                    "size" : "large",
+                    "barchart" : "false"
+                }
+            ]
+        },
+        {
+            "name" : "Resource Report",
+            "isDefault" : false,
+            "widgets" : [
+                {
+                    "type" : "counter",
+                    "size" : "x-small",
+                    "selected" : "activeUsers"
+                },
+                {
+                    "type" : "counter",
+                    "size" : "x-small",
+                    "selected" : "rolesEnabled"
+                },
+                {
+                    "type" : "counter",
+                    "size" : "x-small",
+                    "selected" : "activeConnectors"
+                },
+                {
+                    "type" : "resourceList",
+                    "size" : "large"
+                }
+            ]
+        }
+    ]
+}
