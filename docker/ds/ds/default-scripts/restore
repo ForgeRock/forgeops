@@ -23,6 +23,12 @@ SOURCE="/backup/$NAMESPACE"
     exit 1
 }
 
+configRestore() {
+    echo "Restoring configuration files"
+    tar --no-overwrite-dir -C $DS_DATA_DIR -xvzf $SOURCE/config.tar.gz
+}
+
+
 tarRestore() {
     echo "Restoring tar backup found in $SOURCE:"
     tar --no-overwrite-dir -C $DS_DATA_DIR -xvzf $SOURCE/ds-data.tar.gz
@@ -58,10 +64,14 @@ dsbackupRestore() {
     done
 }
 
+
 for type in ${BACKUP_TYPE//,/ }
 do
     echo "Running restore type $type"
     case $type in
+        config)
+            configRestore
+            ;;
         tar)
             tarRestore
             ;;

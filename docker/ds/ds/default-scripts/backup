@@ -19,6 +19,12 @@ BACKUP_TYPE=${BACKUP_TYPE:-"tar,ldif,dsbackup"}
 DEST="$BACKUP_DIR/$NAMESPACE"
 mkdir -p  $DEST
 
+
+configBackup() {
+    echo "backing up configuration files"
+    (cd $DS_DATA_DIR && tar cvfz $DEST/config.tar.gz config var lib)
+}
+
 tarBackup() {
     echo "Taking a tar backup of the persistent volume"
     (cd $DS_DATA_DIR && tar cvzf $DEST/ds-data.tar.gz *)
@@ -46,6 +52,8 @@ dsbackupCmd() {
     dsbackup --offline create --backupLocation "$DEST/dsbackup" 
 }
 
+# Always backup config files
+configBackup
 
 for type in ${BACKUP_TYPE//,/ }
 do
