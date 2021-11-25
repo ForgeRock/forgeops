@@ -36,6 +36,16 @@ fi
 # End code for ForgeRock staff only
 #####
 
+######### VERIFY INSTALLATION OF CSI DRIVER ###########
+
+if [[ ! $(az feature list --query "[?contains(name, 'Microsoft.ContainerService/EnableAzureDiskFileCSIDriver')].{State:properties.state}" | grep Registered) ]]; then
+   echo -e "\nAzure feature EnableAzureDiskFileCSIDriver is not enabled in your Azure account."
+   echo "Please enable by running:"
+   echo "$ az feature register --name EnableAzureDiskFileCSIDriver --namespace Microsoft.ContainerService"
+   echo "$ az provider register -n Microsoft.ContainerService"
+   exit 1
+fi
+
 ######### GLOBAL VARS #########
 # Get the default region
 L=$(az configure -l --query "[?name=='location'].value" -o tsv || echo "")
@@ -112,6 +122,12 @@ AUTOSCALE=${AUTOSCALE:-""}
 ADDITIONAL_OPTS=${ADDITIONAL_OPTS:-""}
 
 OPTS+=" $AUTOSCALE $ADDITIONAL_OPTS "
+
+# Add Kubernetes version
+if [ "$K8S_VERSION" ]; then
+  OPTS+=" --kubernetes-version ${K8S_VERSION}"
+fi
+
 # Check user is signed into Azure
 authn=$(az ad signed-in-user show | grep -i userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
 echo -e "\n\nYou are authenticated and logged into Azure as ${authn}.\n"
@@ -191,10 +207,22 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: fast
-provisioner: kubernetes.io/azure-disk
+provisioner: disk.csi.azure.com
 parameters:
   storageaccounttype: Premium_LRS
   kind: Managed
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+EOF
+
+# Create the volume snapshot class
+kubectl create -f - <<EOF
+apiVersion: snapshot.storage.k8s.io/v1beta1
+kind: VolumeSnapshotClass
+metadata:
+  name: ds-snapshot-class
+driver: disk.csi.azure.com
+deletionPolicy: Delete
 EOF
 
 # Create prod namespace for sample CDM deployment

@@ -5,6 +5,9 @@
 export NAME=medium
 export CLUSTER_LABELS="forgerock.io/cluster=cdm-medium"
 
+# Override default Kubernetes version
+export K8S_VERSION="1.21.1"
+
 # cluster-up.sh retrieves the location from the user's az config.  Uncomment below to override:
 # export LOCATION=eastus
 
