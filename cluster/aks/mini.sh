@@ -16,6 +16,6 @@ export VM_SIZE=Standard_DS3_v2
 export NODE_COUNT=1
 
 # DS NODE POOL VALUES
-export CREATE_DS_POOL=false
-export DS_VM_SIZE=Standard_DS3_v2
-export DS_NODE_COUNT=1
+# export CREATE_DS_POOL=false
+# export DS_VM_SIZE=Standard_DS3_v2
+# export DS_NODE_COUNT=1

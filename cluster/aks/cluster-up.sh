@@ -116,6 +116,8 @@ OPTS+=" $AUTOSCALE $ADDITIONAL_OPTS "
 authn=$(az ad signed-in-user show | grep -i userPrincipalName | awk -F: '{print $2}' | sed 's/,//g')
 echo -e "\n\nYou are authenticated and logged into Azure as ${authn}.\n"
 
+######### PROVISION CLUSTER ########
+
 # Creating resource group
 az group create \
    --name $RES_GROUP_NAME \
@@ -126,7 +128,6 @@ az aks create \
     --resource-group "$RES_GROUP_NAME" \
     --name "$NAME" \
     --admin-username "$ADMIN_USERNAME" \
-    --attach-acr "$ACR_NAME" \
     --location "$LOCATION" \
     --node-vm-size "$VM_SIZE" \
     --node-osdisk-size 100 \
@@ -162,8 +163,18 @@ fi
 # Get cluster credentials and set kube-context
 az aks get-credentials --resource-group $RES_GROUP_NAME --name $NAME
 
+######### CONNECT CLUSTER TO ACR REGISTRY ########
+
+# Get full registry ID. This will allow connecting to a registry even if in a different subscription.
+ACR_ID=$(az acr show -n $ACR_NAME --query id | tr -d '"')
+
+# Update cluster with permissions to connect to ACR registry
+az aks update -n $NAME -g $RES_GROUP_NAME --attach-acr $ACR_ID
+
 # Login to ACR
 az acr login --name $ACR_NAME
+
+######### STORAGE CLASSES ########
 
 # This standard sc is the same as "default" and the fast is same as "managed-premium"
 kubectl create -f - <<EOF
