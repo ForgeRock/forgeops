@@ -16,4 +16,4 @@ kubectl create secret generic clouddns --from-file=/tmp/cert-manager.json -n cer
 rm -f /tmp/cert-manager.json
 
 # Create the Let's Encrypt Issuer
-kubectl apply -f $DIR/le-issuer.yaml
+kubectl apply -f $DIR/files/le-issuer.yaml
