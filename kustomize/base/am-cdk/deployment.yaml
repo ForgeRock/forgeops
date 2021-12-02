@@ -38,7 +38,7 @@ spec:
           else
             echo "Copying docker image configuration files to the shared volume"
             cd /home/forgerock/openam
-            cp -r .git .homeVersion * /fbc
+            cp -r .homeVersion * /fbc
           fi
       - name: truststore-init
         image: am
