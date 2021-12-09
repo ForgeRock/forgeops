@@ -29,12 +29,12 @@ log_name = 'foregops'
 ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
 
 DOCKER_REGEX_NAME = {
-    'am': '.*am',
-    'amster': '.*amster.*',
-    'idm': '.*idm',
-    'ds-idrepo': '.*ds-idrepo.*',
-    'ds-cts': '.*ds-cts.*',
-    'ig': '.*ig.*'
+    'am': 'am',
+    'amster': 'amster',
+    'idm': 'idm',
+    'ds-idrepo': 'ds-idrepo',
+    'ds-cts': 'ds-cts',
+    'ig': 'ig'
 }
 
 REQ_VERSIONS ={

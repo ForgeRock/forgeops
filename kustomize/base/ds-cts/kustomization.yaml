@@ -6,10 +6,5 @@ commonLabels:
 resources:
 - ds-cts.yaml
 
-images:
-- name: ds-cts
-  newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1-dev
-
 configurations:
 - kustomizeConfig.yaml
