@@ -45,8 +45,7 @@ kind: MultiClusterService
 metadata:
   name: login-ui
   annotations:
-    beta.cloud.google.com/backend-config: '{"ports": {
-    "8080":"admin-ui-healthcheck-cfg"}'
+    beta.cloud.google.com/backend-config: '{"ports": {"8080":"admin-ui"}'
   labels:
     app: login-ui
     app.kubernetes.io/component: login-ui

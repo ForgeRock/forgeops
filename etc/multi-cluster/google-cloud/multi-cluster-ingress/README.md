@@ -36,16 +36,33 @@ gcloud services enable multiclusteringress.googleapis.com
 ## Step 2: Cluster provisioning and DS setup
 #
 
-* Follow the CloudDNS [readme](https://github.com/ForgeRock/forgeops/blob/master/etc/multi-cluster/clouddns/README.md) to set up US and EU clusters and deploy DS using CloudDNS for GKE.  
+* Follow the clouddns [readme](https://github.com/ForgeRock/forgeops/blob/master/etc/multi-cluster/google-cloud/clouddns/README.md) to set up US and EU clusters and deploy DS using Cloud DNS for GKE.  
 
 * Enable HTTP loadbalancing on the clusters.  This can be applied either at cluster creation time or after the clusters are created. 
 
-* After following the above readme you should have the following:
-  * 2 VPC native GKE clusters registered to the same fleet.
-  * HTTP loadbalancing and workload identity enabled on the clusters.
+* After following the above steps you should have the following:
+  * HTTP loadbalancing and workload identity enabled on both clusters.
   * Secret Agent Operator deployed.
   * DS deployed and communicating across both clusters.  
 
+* Now you need to register your new clusters to a fleet.  Multi-cluster works only on clusters that are registered to the same fleet. 
+Ensure:
+* \<cluster_location\> matches the location of the cluster master.
+* \<cluster_name\> matches the exact name of the cluster.
+* \<project_id> matches your Google Cloud Project ID.
+
+```bash
+gcloud container hub memberships register <cluster_name> \
+    --gke-cluster <cluster_location>/<cluster_name> \
+    --enable-workload-identity \
+    --project=<project_id>
+```
+
+Verify membership by running the following command
+
+```bash
+gcloud container hub memberships list --project=<project_id>
+```
 
 ## Step 3: Config cluster
 #
@@ -73,7 +90,7 @@ multiclusteringressFeatureSpec:
 **1. Create a Static IP**  
 A static IP is required for the HTTP(S) loadbalancer.  See doc [here](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#static).
 
-Add the IP address to the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/mci/mci.yaml) using the static-ip annotation:
+Add the IP address to the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml) using the static-ip annotation:
 
 ```yaml
   annotations:
@@ -86,14 +103,14 @@ There are various options for generating an SSL cert for external traffic to the
 * Google managed certificates [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#google-managed_certificates)
 * Configure SSL cert as Kubernetes secret [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#https_support)  
 
-For the first 2 options, update the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/mci/mci.yaml) using the pre-shared-certs annotation:
+For the first 2 options, update the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml) using the pre-shared-certs annotation:
 ```yaml
   annotations:
     networking.gke.io/pre-shared-certs: "certname"
 ```  
 
 **3. Configure FQDN**  
-Add FQDN to the host property in the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/mci/mci.yaml).  
+Add FQDN to the host property in the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml).  
 
 ```yaml
       rules:
@@ -101,8 +118,9 @@ Add FQDN to the host property in the MultiClusterIngress [file](https://github.c
 ```
 
 **4. Deploy the custom resources to the config server**
+
 ```bash
-cd etc/multi-cluster/mci
+cd etc/multi-cluster/google-cloud/multi-cluster-ingress/mci
 kubectl apply -f mci.yaml -n prod
 kubectl apply -f mcs.yaml -n prod
 kubectl apply -f backendconfig.yaml -n prod
@@ -111,32 +129,82 @@ kubectl apply -f backendconfig.yaml -n prod
 For more information on the above resources see the 2 Google doc links below:
 * MultiClusterIngress(mci.yaml): https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress#multiclusteringress_resource 
 * MultiClusterService(mcs.yaml): https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress#multiclusterservice_resources
-* BackendConfig(backendconfig.yaml): Additional load balancer backend configuration for things like healthchecks and session configuration.
+* BackendConfig(backendconfig.yaml): https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#backendconfig_support
 
 ## Step 5: Deploy Frontend Apps
 #
 
-**1. Deploy AM, IDM and the UIs**
+**1. Deploy AM, IDM and the UIs**  
+This example reflects a CDM medium size deployment which is the size used for testing.  Please adjust to suit your requirements.
 ```bash
-bin/forgeops install apps ui
+bin/forgeops install apps ui --medium
 ```
 
 **2. Verify deployment**
+
 Things to check:
 * All pods are deployed `kubectl get pods`
 * You can access the UIs e.g. https://prod.mci.forgeops.com/platform.
-* Load balancer pod status is green and backend services are green(healthchecks passed): 
+* Load balancer pod status is green and backend services are green(healthchecks passed) e.g. 
 https://console.cloud.google.com/kubernetes/multiclusteringress/us-west1-b/clouddns-us/prod/forgerock/details?project=\<projectID\>.
-* Verify requests from a US and EU location go to the relevant clusters.
+* Verify requests from a US and EU location go to their relevant/local clusters.
 
-## Step 6: Pricing
+## Step 6: Deleting the deployment 
+#
+
+Carry out the following commands in each cluster:
+
+```bash
+bin/forgeops delete apps ui
+```
+
+## Step 7: Deleting the Multi-cluster Ingress configuration
+#
+
+**1. Remove configs from config cluster**
+
+From the config cluster:
+
+```bash
+kubectl delete mcs --all
+kubectl delete backendconfig --all
+kubectl delete mci forgerock
+```
+
+**2. Remove clusters from fleet**
+```bash
+gcloud container hub memberships delete clouddns-eu
+gcloud container hub memberships delete clouddns-us
+```
+
+## Step 8: Pricing
 #
 https://cloud.google.com/kubernetes-engine/pricing#multi-cluster-ingress
 
-## Step 7: Testing
+## Step 9: Testing
 #
-**TODO**
+The following tests have been carried out across 2 clusters in different regions unless specified
+(failover is triggered by scaling down product to 0 pods):
+* Verify geolocation.
+* Test failover between europe-west1 and europe-west2/europe-west2 and us-west-2
+* Failover IDM while creating users.
+* Test failover of AM across 3 clusters in different regions.
+* Test split load by running test against 1 location with low available resources.
+* Failover IDM based on idrepo being down.
+* Failover AM which running AuthN and Access Token simulations.
+* Test failover across 3 different clusters.
+* Running performance tests for 1,6 and 12 hour durations.
+* Running AM performance tests with stateful and stateless tokens.
+* Running load simulataneously across 2 clusters and forcing failover of AM.  
 
-## Step 8: Use cases
+
+## TODO
 #
-**TODO**
+
+* Use healthcheck status to manage failovers
+  * Failover IDM if AM is down
+  * Failover AM if idrepo or cts is down
+  * Failover IDM if idrepo is down
+* Enable SSL endpoint of AM
+* Resolve throughput issues after 7 hours during dual load performance testing
+* IG/RCS agent?

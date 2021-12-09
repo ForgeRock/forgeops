@@ -14,7 +14,7 @@ There are 4 major steps to the deployment:
 
 ## Step 1: Prepare 2 clusters
 The clusters must be in the same VPC.
-The same namespace will be used in both clusters to deploy DS.
+The namespace used to deploy DS should have the same name in both clusters.
 
 ## Step 2: Enable the use of shared secrets across the clusters
 Verify that secret agent is installed in both clusters; if it isn't, install it:

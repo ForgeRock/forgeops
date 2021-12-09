@@ -19,7 +19,7 @@ There are 5 major steps to the deployment:
 * Provision 2 clusters with following requirements:
   * in the same VPC
   * create in different regions(example is configured for eu and us)
-* Create the same namespace in each cluster for DS (default: prod).
+* Create a namespace in each cluster with the same name for DS (default: prod).
 * Workload Identity enabled(for MCS and Secret Agent).  
 <br />
 
