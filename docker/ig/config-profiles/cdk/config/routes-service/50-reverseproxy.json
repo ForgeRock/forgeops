@@ -9,5 +9,5 @@
       "soTimeout" : "30 seconds"
     }
   },
-  "_condition" : "${matches(request.uri.path, '^/static/resource.*')}"
+  "_condition" : "${find(request.uri.path, '^/static/resource.*')}"
 }
