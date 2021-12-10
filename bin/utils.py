@@ -54,6 +54,10 @@ REQ_VERSIONS ={
         'MIN': 'v1.20.0',
         'MAX': 'v100.0.0',
     },
+    'kubernetes':{
+        'MIN':'v1.19.1',
+        'MAX':'v100.0.0',
+    },
     'kustomize': {
         'MIN': 'v4.2.0',
         'MAX': 'v100.0.0',
@@ -444,9 +448,17 @@ def check_component_version(component, version):
 
 def check_base_toolset():
     # print('Checking kubectl version')
-    _, ver, _ = run('kubectl', 'version --client=true --short', cstdout=True)
-    ver = ver.decode('ascii').split(' ')[-1].strip()
-    check_component_version('kubectl', ver)
+    _, output, _ = run('kubectl', 'version --client=true -o json', cstdout=True)
+    output = json.loads(output.decode('utf-8'))['clientVersion']['gitVersion']
+    check_component_version('kubectl', re.split('-|_|\+', output)[0])
+
+    # print('Attempting to check Kubernetes server version')
+    try:
+        _, output, _ = run('kubectl', 'version -o json', cstdout=True, cstderr=True)
+        output = json.loads(output.decode('utf-8'))['serverVersion']['gitVersion']
+    except:
+        message('Could not verify Kubernetes server version. Continuing for now.')
+    check_component_version('kubernetes', re.split('-|_|\+', output)[0])
 
     # print('Checking kustomize version')
     _, ver, _ = run('kustomize', 'version --short', cstdout=True)
