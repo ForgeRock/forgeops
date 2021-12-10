@@ -1,0 +1,29 @@
+{
+    "metadata": {
+      "realm": null,
+      "entityType": "ScriptingService",
+      "entityId": "default/CONFIG_PROVIDER_NODE",
+      "uid": "ou=CONFIG_PROVIDER_NODE,ou=default,ou=GlobalConfig,ou=1.0,ou=ScriptingService,ou=services,ou=am-config",
+      "sunServiceID": "scriptContext",
+      "objectClass": [
+        "top",
+        "sunServiceComponent"
+      ],
+      "pathParams": {},
+      "ou": null
+    },
+    "data": {
+      "_id": "default/CONFIG_PROVIDER_NODE",
+      "_type": {
+        "_id": "ScriptingService",
+        "name": "ScriptingService",
+        "collection": false
+      },
+      "i18nKey": "script-type-14",
+      "languages": [
+        "JAVASCRIPT",
+        "GROOVY"
+      ],
+      "defaultScript" : "[Empty]"
+    }
+  }
