@@ -4,7 +4,7 @@
 # and by creating a new kustomize profile in kustomize/overlay/
 # The default below for skaffold dev is to deploy all services in one shot:
 # Note: Upgrade to skaffold/v2alpha3 for skaffold 1.4
-apiVersion: skaffold/v1
+apiVersion: skaffold/v2beta26
 kind: Config
 
 ## Common YAML anchors
@@ -17,18 +17,21 @@ kind: Config
       image: am
       context: docker/am
       docker:
+        pullParent: true
         buildArgs:
           CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "cdk"}}'
     - &AMSTER
       image: amster
       context: docker/amster
       docker:
+        pullParent: true
         buildArgs:
           CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "cdk"}}'
     - &IDM
       image: idm
       context: docker/idm
       docker:
+        pullParent: true
         buildArgs:
           CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "cdk"}}'
     - &DS-CTS_BASE
@@ -37,16 +40,20 @@ kind: Config
     - &DS-CTS
       <<: *DS-CTS_BASE
       docker:
+        pullParent: true
         dockerfile: cts/Dockerfile
     - &DS-DYNAMIC
       image: ds
       context: docker/ds/ds
+      docker:
+        pullParent: true
     - &DS-IDREPO_BASE
       image: ds-idrepo
       context: docker/ds/
     - &DS-IDREPO
       <<: *DS-IDREPO_BASE
       docker:
+        pullParent: true
         dockerfile: idrepo/Dockerfile
     - &DS-PROXY_BASE
       image: ds-proxy
@@ -54,6 +61,7 @@ kind: Config
     - &DS-PROXY
       <<: *DS-PROXY_BASE
       docker:
+        pullParent: true
         dockerfile: proxy/Dockerfile
     - &LDIF-IMPORTER
       image: ldif-importer
@@ -62,6 +70,7 @@ kind: Config
       image: ig
       context: docker/ig
       docker:
+        pullParent: true
         buildArgs:
           CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "cdk"}}'
 
@@ -93,7 +102,8 @@ build: &default-build
 deploy: &default-deploy
   statusCheckDeadlineSeconds: 900
   kustomize:
-    path: ./kustomize/overlay/all
+    paths:
+    - ./kustomize/overlay/all
 
 profiles:
 # Images tagged as environment variable in a dockerd or dockerd like environment
@@ -105,7 +115,8 @@ profiles:
     artifacts: *default-artifacts
   deploy:
     kustomize:
-      path: ./kustomize/overlay/all
+      paths:
+      - ./kustomize/overlay/all
 
 
 # CDM s/m/l profiles. (For cdm-mini, use default profile.)
@@ -113,22 +124,26 @@ profiles:
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/mini
+      paths:
+      - ./kustomize/overlay/mini
 - name: small
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/small
+      paths:
+      - ./kustomize/overlay/small
 - name: medium
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/medium
+      paths:
+      - ./kustomize/overlay/medium
 - name: large
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/large
+      paths:
+      - ./kustomize/overlay/large
 
 ###################################################################
 #####################INDIVIDUAL COMPONENTS#########################
@@ -138,9 +153,12 @@ profiles:
     artifacts:
     - *AM
     tagPolicy: *default-tag-policy
+    local:
+      useDockerCLI: true
   deploy:
     kustomize:
-      path: ./kustomize/base/am-cdk
+      paths:
+      - ./kustomize/base/am-cdk
 
 - name: amster
   build:
@@ -149,7 +167,8 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/amster
+      paths:
+      - ./kustomize/base/amster
 
 - name: idm
   build:
@@ -158,7 +177,8 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/idm-cdk
+      paths:
+      - ./kustomize/base/idm-cdk
 
 - name: ds-cts
   build:
@@ -168,7 +188,8 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/ds-cts
+      paths:
+      - ./kustomize/base/ds-cts
 
 - name: ds-idrepo
   build:
@@ -178,7 +199,8 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/ds-idrepo
+      paths:
+      - ./kustomize/base/ds-idrepo
 
 - name: ig
   build:
@@ -187,7 +209,8 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/ig
+      paths:
+      - ./kustomize/base/ig
 
 
 ###################################################################
@@ -199,7 +222,8 @@ profiles:
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/forgeops
+      paths:
+      - ./kustomize/overlay/forgeops
 
 - name: ldif-importer
   build:
@@ -208,20 +232,23 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/ldif-importer
+      paths:
+      - ./kustomize/base/ldif-importer
 
 - name: dev
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/dev
+      paths:
+      - ./kustomize/overlay/dev
 
 # Platform deployment without default UI projects. UI to be installed separately, for development
 - name: no-ui
   build: *default-build
   deploy:
     kustomize:
-      path: ./kustomize/overlay/noui
+      paths:
+      - ./kustomize/overlay/noui
 
 # Sample profiles to launch / test just a specific product
 - name: ig-only
@@ -232,7 +259,8 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/internal-profiles/ig-only
+      paths: 
+      - ./kustomize/overlay/internal-profiles/ig-only
 
 - name: am-only
   build:
@@ -247,7 +275,8 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/internal-profiles/am-only
+      paths: 
+      - ./kustomize/overlay/internal-profiles/am-only
 
 - name: idm-only
   build:
@@ -258,7 +287,8 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/internal-profiles/idm-only
+      paths:
+      - ./kustomize/overlay/internal-profiles/idm-only
 
 - name: ds-only
   build:
@@ -269,7 +299,8 @@ profiles:
       sha256: {}
   deploy:
     kustomize:
-      path: ./kustomize/overlay/internal-profiles/ds-only
+      paths: 
+      - ./kustomize/overlay/internal-profiles/ds-only
 
 - name: amster-export
   build:
@@ -280,7 +311,8 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/amster-export
+      paths:
+      - ./kustomize/overlay/amster-export
 
 - name: clouddns
   build:
@@ -292,4 +324,5 @@ profiles:
       sha256: { }
   deploy:
     kustomize:
-      path: ./kustomize/overlay/multi-cluster/clouddns
+      paths:
+      - ./kustomize/overlay/multi-cluster/clouddns

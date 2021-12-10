@@ -63,7 +63,7 @@ REQ_VERSIONS ={
         'MAX': 'v100.0.0',
     },
     'skaffold':{
-        'MIN': 'v1.20.0',
+        'MIN': 'v1.35.0',
         'MAX': 'v100.0.0',
     },
     'cert-manager': {
