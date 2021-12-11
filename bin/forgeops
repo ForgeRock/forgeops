@@ -150,14 +150,10 @@ def main():
         size = args.size if getattr(args, 'size', None) else 'cdk'
         src_profile_dir = getattr(args, 'custom', None)
         remap = size_map[size]
+        pkg_path = None
         if src_profile_dir:
             size = 'custom'
-            pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'custom')
             remap = size_map[size]
-        elif size == 'cdk':
-            pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'cdk')
-        else: 
-            pkg_path = None
 
     components = args.components if getattr(args, 'components', None) else ['all']
     if args.cmd == 'info':
