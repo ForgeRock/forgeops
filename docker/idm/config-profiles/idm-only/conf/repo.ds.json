@@ -11,9 +11,10 @@
     "ldapConnectionFactories": {
         "bind": {
             "connectionSecurity": "ssl",
-            "connectionPoolSize": 50,
-            "heartBeatIntervalSeconds": 60,
-            "heartBeatTimeoutMilliSeconds": 10000,
+            "connectionPoolSize" : 50,
+            "availabilityCheckTimeoutMilliSeconds" : 2000,
+            "heartBeatIntervalSeconds" : 60,
+            "heartBeatTimeoutMilliSeconds" : 3000,
             "primaryLdapServers": [
                 {
                     "hostname": "&{openidm.repo.host}",
