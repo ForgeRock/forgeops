@@ -75,6 +75,7 @@
       "collection" : false
     },
     "description" : "Prompt for missing preferences on 3rd login",
-    "_id" : "default/ProgressiveProfile"
+    "_id" : "default/ProgressiveProfile",
+    "uiConfig": { "categories" : "[\"Progressive Profile\"]" }
   }
 }

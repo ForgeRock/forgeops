@@ -74,6 +74,7 @@
       "collection" : false
     },
     "description" : "Platform Login Tree",
-    "_id" : "default/Login"
+    "_id" : "default/Login",
+    "uiConfig": { "categories" : "[\"Authentication\"]" }
   }
 }

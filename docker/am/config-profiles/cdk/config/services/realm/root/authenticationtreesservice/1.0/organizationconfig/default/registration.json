@@ -64,6 +64,7 @@
       "collection" : false
     },
     "description" : "Platform Registration Tree",
-    "_id" : "default/Registration"
+    "_id" : "default/Registration",
+    "uiConfig": { "categories" : "[\"Registration\"]" }
   }
 }

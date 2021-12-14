@@ -74,6 +74,7 @@
       "collection" : false
     },
     "description" : "Forgotten Username Tree",
-    "_id" : "default/ForgottenUsername"
+    "_id" : "default/ForgottenUsername",
+    "uiConfig": { "categories" : "[\"Username Reset\"]" }
   }
 }
