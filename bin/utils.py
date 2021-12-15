@@ -220,7 +220,7 @@ def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=No
         raise(e)
 
 def _waitforresource(ns, resource_type, resource_name):
-    print(f'Waiting for {resource_type} "{resource_name}": ', end='')
+    print(f'Waiting for {resource_type} "{resource_name}" to exist in the cluster: ', end='')
     sys.stdout.flush()
     while True:
         try:
@@ -275,12 +275,24 @@ def waitforsecrets(ns):
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
 
 
-def wait_for_ds(ns, directoryservices_name):
+def wait_for_ds(ns, directoryservices_name, timeout_secs=300):
     """Wait for DS pods to be ready after ds-operator deployment"""
     _runwithtimeout(_waitforresource, [ns, 'statefulset', directoryservices_name], 30)
     run('kubectl',
-        f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout=300s')
-    _runwithtimeout(_waitfords, [ns, directoryservices_name], 180)
+        f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout={timeout_secs}s')
+    _runwithtimeout(_waitfords, [ns, directoryservices_name], timeout_secs)
+
+def wait_for_am(ns, timeout_secs=600):
+    _runwithtimeout(_waitforresource, [ns, 'deployment', 'am'], 30)
+    return run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout={timeout_secs}s')
+
+def wait_for_amster(ns, timeout_secs=600):
+    _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
+    return run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout={timeout_secs}s')
+
+def wait_for_idm(ns, timeout_secs=600):
+    _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
+    return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
 def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profile_dir=None):
     """Generate Kustomize package for component or bundle"""
@@ -739,6 +751,13 @@ def copytree(src, dst):
 #     print(args)
 #     r = subprocess.run(args.split())
 #     return r.returncode
+
+def get_deployed_size(namespace):
+    try: 
+        deployed_sz = get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE') 
+        return deployed_sz
+    except:
+        return None
 
 def get_fqdn(ns):
     _, fqdn, _ = run(

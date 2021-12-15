@@ -50,13 +50,13 @@ def install_all(size, ns, fqdn, ctx, pkg_path=None, src_profile_dir=None):
     utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
-    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
+    utils.wait_for_am(ns)
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
-    utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+    utils.wait_for_amster(ns)
     utils.message('\nRemoving "amster" deployment.')
     utils.uninstall_component(remap.get('amster', 'amster'), ns, False)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
-    utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app=idm --timeout=600s')
+    utils.wait_for_idm(ns)
     utils.message('\nDeploying UI.')
     utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
@@ -138,6 +138,9 @@ def main():
     parser_info = subparser.add_parser('info', parents=[common_ns], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns]) # Internal FR use only!!. Hidden
+    parser_build = subparser.add_parser('wait', parents=[common_ns], help='Wait for platform components', allow_abbrev=False)
+    parser_build.add_argument('components', nargs='*', choices=['ds', 'am', 'amster', 'idm'] + build_targets)
+    parser_build.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     args = parser.parse_args()
 
     # Check toolset versions before doing anything
@@ -173,12 +176,13 @@ def main():
         sys.exit(1)
 
     if args.cmd == 'delete':
-        try: 
-            deployed_sz = utils.get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE') 
+
+        deployed_sz = utils.get_deployed_size(namespace)
+        if deployed_sz:
             utils.message(f'"{deployed_sz}" platform detected in namespace: "{namespace}"')
             size = deployed_sz
             remap = size_map[size]
-        except:
+        else:
             utils.error(f'Couldn\'t find deployment information. Is the platform deployed in namespace "{namespace}"?') 
             if not args.skip_confirmation:
                 if input('Attempt delete assuming "CDM mini"? [Y/N] ').lower() not in ['yes', 'y']:
@@ -187,6 +191,7 @@ def main():
             deployed_sz = None
             size = 'mini'
             remap = size_map[size]
+
         utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}"')
         if not args.skip_confirmation:
             if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
@@ -223,6 +228,26 @@ def main():
             utils. error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
         for c in components:
             build_docker_image(c, args.registry, args.tag, args.config_profile)
+        return
+    
+    if args.cmd == 'wait':
+        size = utils.get_deployed_size(namespace)
+        if 'ds' in components:
+            utils.message('Waiting for DS deployment.')
+            utils.wait_for_ds(namespace, 'ds-idrepo', args.timeout)
+            if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts')
+        
+        if 'am' in components:
+            utils.message('Waiting for AM deployment.')
+            utils.wait_for_am(namespace, args.timeout)
+        
+        if 'amster' in components:
+            utils.message('Waiting for amster job to complete.')
+            utils.wait_for_amster(namespace, args.timeout)    
+        
+        if 'idm' in components:
+            utils.message('Waiting for IDM deployment.')
+            utils.wait_for_idm(namespace, args.timeout)
         return
 
     if 'base' in components:
