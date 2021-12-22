@@ -7,22 +7,22 @@ images:
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
   newName: gcr.io/forgeops-public/am
-  newTag: 7.1.0
+  newTag: 7.1.1
 - name: .*amster.*
   newName: gcr.io/forgeops-public/amster
-  newTag: 7.1.0
+  newTag: 7.1.1
 - name: .*idm
   newName: gcr.io/forgeops-public/idm
-  newTag: 7.1.0
+  newTag: 7.1.1
 - name: .*rcs-agent.*
   newName: gcr.io/forgerock-io/rcs-agent
   newTag: 1.5.20.0
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1.0
+  newTag: 7.1.1
 - name: .*ds-idrepo.*
   newName: gcr.io/forgeops-public/ds-idrepo
-  newTag: 7.1.0
+  newTag: 7.1.1
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui
   newTag: 7.1.0
@@ -34,4 +34,4 @@ images:
   newTag: 7.1.0
 - name: .*ig.*
   newName: gcr.io/forgeops-public/ig
-  newTag: 7.1.0
+  newTag: 7.1.1
