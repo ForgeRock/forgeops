@@ -62,6 +62,14 @@ grafana:
           - secretName: sslcert
             hosts:
               - grafana.iam.example.com
+            
+prometheusOperator:
+    admissionWebhooks:
+      certManager:
+        enabled: true
+        issuerRef:
+          name: "default-issuer"
+          kind: "ClusterIssuer"
 
 defaultRules:
     rules:
@@ -71,7 +79,7 @@ defaultRules:
         kubernetesSystem: false
 
 kubeScheduler:
-  enabled: false
+    enabled: false
 coreDns:
     enabled: false
 kubeEtcd:
