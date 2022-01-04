@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2020-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -16,7 +16,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Library([
     'forgerock-pipeline-libs@a4f6060382c4edd70bedfd33adfa87120772fb53',
-    'java-pipeline-libs@eb0d680ae0a9b1aedaff7606c40228ce1fe7e30f'
+    'java-pipeline-libs@7d909d2ffb9ab751dc96e9c7bc9d253d3d993dbb'
 ])
 import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRun
