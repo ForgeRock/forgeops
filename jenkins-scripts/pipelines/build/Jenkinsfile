@@ -7,7 +7,7 @@
  */
 
 @Library([
-    'forgerock-pipeline-libs@c10ecd07fd57c2f6b85a05bf2024f48781e3f0c4',
+    'forgerock-pipeline-libs@10f8306c93783b8d59d69bc439dc274e1723c7c4',
     'java-pipeline-libs@7d909d2ffb9ab751dc96e9c7bc9d253d3d993dbb'
 ]) _
 
@@ -78,7 +78,7 @@ node('gce-vm-forgeops-n1-standard-4') {
 
     if (commonModule.branchSupportsIDCloudReleases()) {
         // Allow only one postcommit at a time accross all the branches
-        withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : 'postcommit-forgeops-lock-cloud') {
+        withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : 'postcommit-forgeops') {
             pipeline.postBuildTests(pipelineRun)
         }
 
@@ -90,9 +90,9 @@ node('gce-vm-forgeops-n1-standard-4') {
     pipeline.finalNotification()
 }
 
-def withPostcommitLock(String nodeName, Closure process) {
-    if (nodeName) {
-        node(nodeName) {
+def withPostcommitLock(String resourceName, Closure process) {
+    if (resourceName) {
+        lock(resource: resourceName) {
             process()
         }
     } else {

@@ -135,7 +135,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
+        node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
                     def uiFileContent = bitbucketUtils.readFileContent(
@@ -156,13 +156,13 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     allStagesCloud[normalizedStageName].numFailedTests = 0
                     allStagesCloud[normalizedStageName].reportUrl = reportUrl
 
-                def uiTestConfig = [
-                        containerRunOptions : cloud_utils.getUiContainerRunOptions(testConfig),
-                        deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
-                ]
+                    def uiTestConfig = [
+                            containerRunOptions : cloud_utils.getUiContainerRunOptions(testConfig),
+                            deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
+                    ]
 
-                uiTestsStage.runTests(uiTestConfig, normalizedStageName, normalizedStageName,
-                        commonModule.lodestarRevision)
+                    uiTestsStage.runTests(uiTestConfig, normalizedStageName, normalizedStageName,
+                            commonModule.lodestarRevision)
                 } catch (Exception e) {
                     print(e.getMessage())
                     allStagesCloud[normalizedStageName].numFailedTests = 1
