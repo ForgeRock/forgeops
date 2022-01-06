@@ -1,4 +1,4 @@
-# Deploys ds-idrepo and ds-cts only. Used by PIT/Perf teams.
+# Deploys ds-idrepo and ds-cts only. Used by PIT/Perf/DS teams.
 resources:
   - ../../../base/kustomizeConfig
   - ../../../base/ds/cts
@@ -7,4 +7,5 @@ resources:
 patches:
   - path: base.yaml
   - path: ds-idrepo-old.yaml
+  - path: ds-cts-old.yaml
 
