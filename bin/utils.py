@@ -41,10 +41,17 @@ REQ_VERSIONS ={
     'ds-operator': {
         'MIN': 'v0.1.0',
         'MAX': 'v100.0.0',
+        'DEFAULT': 'latest',
     },
     'secret-agent': {
         'MIN': 'v1.1.1',
         'MAX': 'v100.0.0',
+        'DEFAULT': 'latest',
+    },
+    'cert-manager': {
+        'MIN': 'v1.5.1',
+        'MAX': 'v100.0.0',
+        'DEFAULT': 'latest',
     },
     'minikube': {
         'MIN': 'v1.22.0',
@@ -66,10 +73,6 @@ REQ_VERSIONS ={
         'MIN': 'v1.35.0',
         'MAX': 'v100.0.0',
     },
-    'cert-manager': {
-        'MIN': 'v1.5.1',
-        'MAX': 'v100.0.0',
-    }
 }
 
 def inject_kustomize_amster(kustomize_pkg_path): return _inject_kustomize_amster(kustomize_pkg_path)
@@ -495,7 +498,7 @@ def install_dependencies():
             cstderr=True, cstdout=True)
     except Exception:
         warning('cert-manager CRD not found. Installing cert-manager.')
-        certmanager('apply')
+        certmanager('apply', tag=REQ_VERSIONS['cert-manager']['DEFAULT'])
     else:
         message('cert-manager CRD found in cluster.')
 
@@ -509,7 +512,7 @@ def install_dependencies():
             cstderr=True, cstdout=True)
     except Exception as _e:
         warning('secret-agent CRD not found. Installing secret-agent.')
-        secretagent('apply')
+        secretagent('apply', tag=REQ_VERSIONS['secret-agent']['DEFAULT'])
     else:
         message('secret-agent CRD found in cluster.')
 
@@ -523,7 +526,7 @@ def install_dependencies():
             cstderr=True, cstdout=True)
     except Exception:
         warning('ds-operator CRD not found. Installing ds-operator.')
-        dsoperator('apply')
+        dsoperator('apply', tag=REQ_VERSIONS['ds-operator']['DEFAULT'])
     else:
         message('ds-operator CRD found in cluster.')
 
@@ -793,84 +796,4 @@ def get_secret_value(ns, secret, key):
     _, value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
