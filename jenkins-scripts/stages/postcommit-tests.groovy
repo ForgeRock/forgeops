@@ -72,12 +72,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                 },
                 'postcommit-set-1': {
                     runPostcommitInNode(1, sleepTimesMinutes) {
-                        runPostcommitSet0(pipelineRun, random, clusterConfig)
+                        runPostcommitSet1(pipelineRun, random, clusterConfig)
                     }
                 }
         )
-
-        parallel parallelTestsMap
     } catch (Exception exception) {
         println("Exception during parallel stage: ${exception}")
         throw exception
