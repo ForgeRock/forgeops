@@ -72,12 +72,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                 },
                 'postcommit-set-1': {
                     runPostcommitInNode(1, sleepTimesMinutes) {
-                        runPostcommitSet0(pipelineRun, random, clusterConfig)
+                        runPostcommitSet1(pipelineRun, random, clusterConfig)
                     }
                 }
         )
-
-        parallel parallelTestsMap
     } catch (Exception exception) {
         println("Exception during parallel stage: ${exception}")
         throw exception
@@ -330,7 +328,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                 {
                     commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
                             [TESTS_SCOPE                    : 'tests/set_images',
-                             STASH_PLATFORM_IMAGES_BRANCH   : 'postcommit-forgeops']
+                             STASH_PLATFORM_IMAGES_BRANCH   : 'postcommit-forgeops-old']
                     )
                 }
         )
