@@ -90,7 +90,7 @@ def overlay_app_configs(ns, am=True, idm=True):
 def build_docker_image(component, default_repo, tag, config_profile=None):
     """Builds custom docker images"""
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    image_defaulter = os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
     tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
@@ -216,7 +216,7 @@ def main():
 
     if args.cmd == 'build':
         if args.reset:
-            image_defaulter = os.path.join(sys.path[0], '../kustomize', 'dev', 'image-defaulter' )
+            image_defaulter = os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter' )
             utils.message(f'Reset to git index: {image_defaulter} ')
             utils.run('git', f'checkout {image_defaulter}')
             return

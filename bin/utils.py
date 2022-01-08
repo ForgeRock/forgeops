@@ -302,7 +302,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
     src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
-    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    image_defaulter = os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
     profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
     shutil.rmtree(profile_dir, ignore_errors=True)
     Path(profile_dir).mkdir(parents=True, exist_ok=True)

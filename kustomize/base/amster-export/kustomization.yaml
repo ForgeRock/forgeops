@@ -1,7 +1,7 @@
 resources:
   - ../amster
 components:
-- ../../dev/image-defaulter
+- ../../deploy/image-defaulter
 
 # Insert a new init-container to unpack the tar file before our standard amster container
 patchesJSON6902:
