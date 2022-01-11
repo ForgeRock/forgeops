@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -27,7 +27,6 @@ DEFAULT_PLATFORM_IMAGES_TAG = "${isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME}-r
 
 /** Revision of platform-images repo used for k8s and platform integration/perf tests. */
 platformImagesRevision = bitbucketUtils.getLatestCommitHash(
-        GlobalConfig.stashNotifierCredentialsId,
         'cloud',
         'platform-images',
         env.STASH_PLATFORM_IMAGES_BRANCH ?: DEFAULT_PLATFORM_IMAGES_TAG)
