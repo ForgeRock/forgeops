@@ -34,6 +34,12 @@ kind: Config
         pullParent: true
         buildArgs:
           CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "cdk"}}'
+    - &DS
+      image: ds
+      context: docker/ds/ds
+      docker:
+        pullParent: true
+        dockerfile: Dockerfile
     - &DS-CTS_BASE
       image: ds-cts
       context: docker/ds
@@ -42,11 +48,6 @@ kind: Config
       docker:
         pullParent: true
         dockerfile: cts/Dockerfile
-    - &DS-DYNAMIC
-      image: ds
-      context: docker/ds/ds
-      docker:
-        pullParent: true
     - &DS-IDREPO_BASE
       image: ds-idrepo
       context: docker/ds/
@@ -83,7 +84,7 @@ kind: Config
     - *DS-IDREPO
     - *DS-PROXY
     - *IG
-    - *DS-DYNAMIC
+    - *DS
     # Skip building LDIF-IMPORTER. We use a fixed tag for now
     # - *LDIF-IMPORTER
 
@@ -179,6 +180,17 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/base/idm-cdk
+
+- name: ds
+  build:
+    artifacts:
+    - *DS
+    tagPolicy: *default-tag-policy
+  # deploy:
+  #   kustomize:
+  #     paths:
+  #     - ./kustomize/base/ds-idrepo
+  #     - ./kustomize/base/ds-cts
 
 - name: ds-cts
   build:

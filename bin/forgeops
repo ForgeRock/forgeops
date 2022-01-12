@@ -8,7 +8,7 @@ import time
 import utils
 import json
 
-build_targets = ['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig']
+build_targets = ['am', 'amster', 'idm', 'ds', 'ds-idrepo', 'ds-cts', 'ig']
 
 size_map = {
     'cdk': {
@@ -138,9 +138,9 @@ def main():
     parser_info = subparser.add_parser('info', parents=[common_ns], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns]) # Internal FR use only!!. Hidden
-    parser_build = subparser.add_parser('wait', parents=[common_ns], help='Wait for platform components', allow_abbrev=False)
-    parser_build.add_argument('components', nargs='*', choices=['ds', 'am', 'amster', 'idm'] + build_targets)
-    parser_build.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
+    parser_wait = subparser.add_parser('wait', parents=[common_ns], help='Wait for platform components', allow_abbrev=False)
+    parser_wait.add_argument('components', nargs='*', choices=['ds', 'am', 'amster', 'idm'] + build_targets)
+    parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     args = parser.parse_args()
 
     # Check toolset versions before doing anything

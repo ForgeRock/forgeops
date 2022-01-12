@@ -34,6 +34,7 @@ DOCKER_REGEX_NAME = {
     'idm': 'idm',
     'ds-idrepo': 'ds-idrepo',
     'ds-cts': 'ds-cts',
+    'ds': 'ds',
     'ig': 'ig'
 }
 
