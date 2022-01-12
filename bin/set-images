@@ -15,6 +15,20 @@ import utils
 
 log = None
 
+#### NOTE: If you add a new product or repo, update the map below ####
+# This maps a repo prefix in a Dockerfile to a tag from the platform-images repo.
+REPO_TO_PLATFORM = {
+    # Example:
+    # The ds-empty image should use the ds.json file in platform-images to find the sha commit tag
+    'gcr.io/forgerock-io/ds-empty/pit1': 'ds',
+    'gcr.io/forgerock-io/ds/pit1' : 'ds',
+    'gcr.io/forgerock-io/am-base/pit1': 'am',
+    # Amster commits are the same as am
+    'gcr.io/forgerock-io/amster/pit1' : 'am',
+    'gcr.io/forgerock-io/idm-cdk/pit1': 'idm',
+    'gcr.io/forgerock-io/ig/pit1': 'ig',
+}
+
 SCRIPT_DIR = Path(__file__)
 DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
 DEFAULT_CONFIG_PATH = SCRIPT_DIR.joinpath(
@@ -103,18 +117,6 @@ _test_from_line = [
     ('FROM redis AS base', 'FROM', 'redis', 'AS base'),
     ('FROM redis:latest AS base', 'FROM', 'redis:latest', 'AS base'),
 ]
-
-# Map docker "image name" to configuration file
-image_name_to_config_name = {
-    # image: configfile name
-    'am': 'am',
-    'am-base': 'am',
-    'amster': 'amster',
-    'ds': 'ds',
-    'idm-cdk': 'idm',
-    'idm': 'idm',
-    'ig': 'ig',
-}
 
 
 def run_tests(args):
@@ -257,9 +259,6 @@ def parse_repo_tag(image):
     else:
         name = name_and_tag[:first_colon_position]
         tag_or_digest = name_and_tag[first_colon_position:]
-    # The last bit of handle pipeline image names contain the stage.
-    if name == 'pit1':
-        host_path, name = host_path.rsplit('/', maxsplit=1)
 
     return host_path, name, tag_or_digest
 
@@ -400,6 +399,7 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
     # opening and closing for us.
     # Anything "printed" to stdout is written to the file!
     with fileinput.FileInput(files=docker_files, inplace=True) as f:
+        # Read each line of the file
         for line in f:
             before, image, after = parse_from_line(line)
             # not a FROM command, write the content back.
@@ -407,41 +407,32 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
             if not image:
                 print(line, end='')
                 continue
-            # load the current repo and tag and use as the default.
-            log.debug(f'Found image {image.strip()} in {f.filename()}')
+            # At this point we have a FROM line
+            # Now parse the current repo and tag
             try:
                 current_repo, name, current_tag = parse_repo_tag(image)
             except Exception:
                 log.error(f'Error {line} {f.filename()}')
                 sys.exit(1)
 
-            try:
-                product_config = products[image_name_to_config_name[name]]
-            except KeyError:
-                log.debug(
-                    f'Found an image but it is not a product {f.filename()} {name}')
-                print(line, end='')
-                continue
+            k = f'{current_repo}/{name}'
+            # Is the repo in repo to platform map?
+            if k in REPO_TO_PLATFORM:
 
-            # Update repo
-            if update_repo is not None:
-                repo_and_name = f'{update_repo}/{name}'
-            else:
-                repo_and_name = product_config.get('imageName',
-                                                   f'{current_repo}/{name}')
-            # Update tags
-            config_tag = product_config.get('imageTag', None)
-            if update_tag is not None:
-                image_tag = f':{update_tag}'
-            elif config_tag:
-                # tags from config need the seperator
-                image_tag = f':{config_tag}'
-            else:
-                image_tag = current_tag
+                # v is set to the product config.
+                # For example v='ds' means use the ds.json file from platform-images
+                v = REPO_TO_PLATFORM[k]
 
-            new_image = f'{repo_and_name}{image_tag}'
-            log.info(f'Updating {f.filename()} to use {new_image.strip()}')
-            print(f'{before} {new_image}{after}')
+                # If its not in the list of products - we can skip it
+                if v in products:
+                    product_config = products[v]
+                    # The new tag is the old repo plus the new image tag
+                    new_image = f'{k}:{product_config["imageTag"]}'
+                    log.info(f'Updating {f.filename()} to use {new_image.strip()}')
+                    print(f'{before} {new_image}{after}')
+                    continue
+
+            print(line, end='')
 
 
 def init_repo(args):
