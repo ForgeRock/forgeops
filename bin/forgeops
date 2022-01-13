@@ -9,7 +9,7 @@ import utils
 import json
 
 build_targets = ['am', 'amster', 'idm', 'ds', 'ds-idrepo', 'ds-cts', 'ig']
-
+wait_targets = ['ds', 'am', 'amster', 'idm', 'apps']
 size_map = {
     'cdk': {
     },
@@ -139,7 +139,7 @@ def main():
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns]) # Internal FR use only!!. Hidden
     parser_wait = subparser.add_parser('wait', parents=[common_ns], help='Wait for platform components', allow_abbrev=False)
-    parser_wait.add_argument('components', nargs='*', choices=['ds', 'am', 'amster', 'idm'] + build_targets)
+    parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     args = parser.parse_args()
 
@@ -231,6 +231,9 @@ def main():
         return
     
     if args.cmd == 'wait':
+        if 'apps' in components:
+            components += ['am', 'amster', 'idm']
+            components.remove('apps')
         size = utils.get_deployed_size(namespace)
         if 'ds' in components:
             utils.message('Waiting for DS deployment.')
@@ -253,6 +256,8 @@ def main():
     if 'base' in components:
         components.insert(0, 'secrets')
     if args.cmd == 'generate':
+        instructions = []
+        components.sort(key=_sort_components)
         utils.message(f'Generating forgeops manifests for {components} plaform: "{size}"\n')
         if 'all' in components:
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
@@ -260,6 +265,12 @@ def main():
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
             profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, custom_path, src_profile_dir)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
+            instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
+            if c in wait_targets:
+                instructions.append(f'forgeops wait {c}')
+        if instructions:
+            utils.message('\nTo install the generated packages, run:')
+            print('\n'.join(instructions))
         utils.message('\nEnjoy your forgeops manifests!')
         return 
     utils.install_dependencies()
@@ -275,6 +286,10 @@ def main():
         utils.printsecrets(namespace)
         utils.printurls(namespace)
     utils.message('\nEnjoy your deployment!')
+
+def _sort_components(e):
+    template = ['secrets', 'base', 'ds', 'ds-idrepo', 'ds-cts', 'apps', 'am', 'amster', 'idm', 'ui']
+    return template.index(e) if e in template else 100
 
 if __name__ == '__main__':
     main()
