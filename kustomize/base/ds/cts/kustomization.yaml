@@ -1,5 +1,9 @@
 commonLabels:
   app: ds-cts
+  app.kubernetes.io/name: ds
+  app.kubernetes.io/instance: ds-cts
+  app.kubernetes.io/component: directory
+  app.kubernetes.io/part-of: forgerock
 resources:
 - ../base
 nameSuffix: -cts

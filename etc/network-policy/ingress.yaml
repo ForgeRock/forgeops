@@ -10,7 +10,7 @@ spec:
   podSelector:
     matchLabels:
       # Policy applies to opendj pods
-      component: ds
+      app.kubernetes.io/component: directory
   ingress:
   - from:
     - podSelector:

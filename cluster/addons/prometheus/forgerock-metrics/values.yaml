@@ -23,11 +23,11 @@ am:
   secretPassword: prometheus
 
 ds:
-  component: ds
+  component: directory
   enabled: true
   path: /metrics/prometheus
   port: http
-  labelSelectorComponent: ds
+  labelSelectorComponent: directory
   secretUser: monitor
   secretPassword: password
 
