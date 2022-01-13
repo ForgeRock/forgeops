@@ -116,10 +116,8 @@ REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
 DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
 KUSTOMIZE_BASE_PATH = REPO_BASE_PATH.joinpath('kustomize').resolve()
 
-
 class RunError(subprocess.CalledProcessError):
     pass
-
 
 def loglevel(name):
     try:
@@ -127,12 +125,10 @@ def loglevel(name):
     except AttributeError:
         raise ValueError('Not a log level')
 
-
 def add_loglevel_arg(parser):
     parser.add_argument('--log-level',
                         default='INFO',
                         type=loglevel)
-
 
 class NoColorFormatter(logging.Formatter):
     """Logging with no color"""
@@ -142,8 +138,6 @@ class NoColorFormatter(logging.Formatter):
         logging.WARNING: f'{MSG_FMT}',
         logging.ERROR: f'{MSG_FMT}',
         logging.CRITICAL: f'{MSG_FMT}',
-
-
     }
 
     def format(self, record):
@@ -151,7 +145,6 @@ class NoColorFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         formatter.datefmt = '%Y-%m-%dT%H:%M:%S%z'
         return formatter.format(record)
-
 
 class ColorFormatter(logging.Formatter):
     """Logging color"""
@@ -183,16 +176,13 @@ def logger(name=log_name, level=logging.INFO):
     log.setLevel(level)
     return log
 
-
 def message(s):
     """Print info message"""
     print(f"{CYAN}{s}{ENDC}")
 
-
 def error(s):
     """Print error message"""
     print(f"{RED}{s}{ENDC}")
-
 
 def warning(s):
     """Print warning message"""
@@ -200,7 +190,18 @@ def warning(s):
 
 
 def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
-    """rC runs a given command. Raises error if command returns non-zero code"""
+    """
+    Execute the given command. Raises error if command returns non-zero code.
+    cmd: command to run.
+    cmdArgs: arguments of the command. Can be a single string containing all args or multiple strings comma separated (one arg each).
+    stdin: stdin to pass the command during runtime. Useful to pipe the output of one command to another.
+    cstdout: set to True to capture stdout of the cmd. If set to False, stdout is printed to console.
+    cstderr: set to True to capture stderr of the cmd. If set to False, stderr is printed to console.
+    cwd: change working directory to this path during runtime.
+    env: dictionary containing environment variables to pass during runtime.
+    ignoreFail: if True, do not raise an exception if the cmd fails.
+    return: success, stdout, stderr. stdout and stderr are only populated if cstdout and cstderr are True.
+    """
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
     stdo_pipe = subprocess.PIPE if cstdout else None
@@ -214,7 +215,7 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
         raise(e)
 
 def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
-    """Wrapper function for run() that ignores failures if selected"""
+    """Wrapper function for run() that ignores failures if selected."""
     try:
         _, rstdout, rstderr = run(cmd, *cmdArgs, stdin=stdin, cstdout=cstdout, cstderr=cstderr, cwd=cwd, env=env)
         return True, rstdout, rstderr
@@ -224,6 +225,11 @@ def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=No
         raise(e)
 
 def _waitforresource(ns, resource_type, resource_name):
+    """
+    Wait for a resource to exist in the k8s api. This is a blocking call with no timeout.
+    resource_type: k8s resource type. e.a. pod, secret, deployment.
+    resource_name: k8s resource name.
+    """
     print(f'Waiting for {resource_type} "{resource_name}" to exist in the cluster: ', end='')
     sys.stdout.flush()
     while True:
@@ -240,6 +246,11 @@ def _waitforresource(ns, resource_type, resource_name):
 
 
 def _waitfords(ns, ds_name):
+    """
+    Wait for DS deployment to become healthy. This is a blocking call with no timeout.
+    ns: target namespace.
+    ds_name: name of the DS deployment to evaluate.
+    """
     print(f'Waiting for Service Account Password Update: ', end='')
     sys.stdout.flush()
     _, replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
@@ -263,6 +274,12 @@ def _waitfords(ns, ds_name):
 
 
 def _runwithtimeout(target, args, secs):
+    """
+    Run a function with a timeout. If timeout is reached, exit program.
+    target: target function to run.
+    args: list of positional arguments passed to the target function.
+    secs: timeout in seconds.
+    """
     t = Thread(target=target, args=args, daemon=True)
     t.start()
     t.join(timeout=secs)
@@ -271,7 +288,10 @@ def _runwithtimeout(target, args, secs):
         sys.exit(1)
 
 def waitforsecrets(ns):
-    """Wait for the given secrets to exist in the Kubernetes api."""
+    """
+    Wait for the platform secrets to exist in the Kubernetes api. Times out after 60 secs.
+    ns: target namespace.
+    """
     secrets = ['am-env-secrets', 'idm-env-secrets',
                'rcs-agent-env-secrets', 'ds-passwords', 'ds-env-secrets']
     message('\nWaiting for K8s secrets')
@@ -280,26 +300,57 @@ def waitforsecrets(ns):
 
 
 def wait_for_ds(ns, directoryservices_name, timeout_secs=300):
-    """Wait for DS pods to be ready after ds-operator deployment"""
+    """
+    Wait for DS pods to be ready after ds-operator deployment.
+    ns: target namespace.
+    directoryservices_name: name of the DS deployment to evaluate.
+    timeout_secs: timeout in secs.
+    """
     _runwithtimeout(_waitforresource, [ns, 'statefulset', directoryservices_name], 30)
     run('kubectl',
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout={timeout_secs}s')
     _runwithtimeout(_waitfords, [ns, directoryservices_name], timeout_secs)
 
 def wait_for_am(ns, timeout_secs=600):
+    """
+    Wait for AM pods to be ready after deployment.
+    ns: Target namespace.
+    timeout_secs: timeout in secs.
+    """
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'am'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout={timeout_secs}s')
 
 def wait_for_amster(ns, timeout_secs=600):
+    """
+    Wait for successful amster job run.
+    ns: target namespace.
+    timeout_secs: timeout in secs.
+    """
     _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout={timeout_secs}s')
 
 def wait_for_idm(ns, timeout_secs=600):
+    """
+    Wait for IDM pods to be ready after deployment.
+    ns: target namespace.
+    timeout_secs: timeout in secs.
+    """
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
 def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profile_dir=None):
-    """Generate Kustomize package for component or bundle"""
+    """
+    Generate Kustomize package and manifests for given component or bundle.
+    component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
+    size: size of the component to generate. e.a. cdk, mini, small, medium, large.
+    ns: target namespace.
+    fqdn: set the FQDN used in the generated package.
+    ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
+    custom_path: path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy/COMPONENT.
+    src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
+    return profile_dir: path to the generated package.
+    return contents: generated kubernetes manifest. This is equivalent to `kustomize build profile_dir`.
+    """
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
     src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
@@ -339,14 +390,28 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
     return profile_dir, contents
 
 def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None, src_profile_dir=None):
-    """Generate and deploy component or bundle"""
+    """
+    Generate and deploy the given component or bundle.
+    component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
+    size: size of the component to generate and install. e.a. cdk, mini, small, medium, large.
+    ns: target namespace.
+    fqdn: set the FQDN used in the deployment.
+    ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
+    pkg_base_path: base path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy.
+    src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
+    """
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
     _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path, src_profile_dir=src_profile_dir)
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
 def uninstall_component(component, ns, force):
-    """Uninstall a profile"""
+    """
+    Uninstall a component.
+    component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
+    ns: target namespace.
+    force: set to True to delete all forgeops resources including secrets and PVCs.
+    """
     if  component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
             uninstall_component(c, ns, force)
@@ -392,7 +457,12 @@ def _inject_kustomize_amster(kustomize_pkg_path):
             os.remove('amster-scripts.tar.gz')
 
 def printsecrets(ns, to_stdout=True):
-    """Print relevant platform secrets"""
+    """
+    Obtain and print platform secrets.
+    ns: target namespace.
+    to_stdout: set to true to print secrets to stdout. If false, secrets will not be printed.
+    return secrets: Dictionary containing the platform secrets. Secrets are returned even if to_stdout is set to False.
+    """
     try:
         secrets = {
             'am-env-secrets': {
@@ -437,7 +507,12 @@ def printsecrets(ns, to_stdout=True):
 
 
 def printurls(ns, to_stdout=True):
-    """Print relevant platform URLs"""
+    """
+    Calculate and print relevant platform URLs.
+    ns: target namespace.
+    to_stdout: set to true to print URLs to stdout. If false, URLs will not be printed.
+    return secrets: dictionary containing the URLs. URLs are returned even if to_stdout is set to False.
+    """
     fqdn = get_fqdn(ns)
     urls = {
         'platform': f'https://{fqdn}/platform',
@@ -453,7 +528,11 @@ def printurls(ns, to_stdout=True):
 
 
 def check_component_version(component, version):
-
+    """
+    Check if the given component is within the accepted version range.
+    component: name of the component to verify. e.a. kustomize, skaffold, etc.
+    version: version string to verify. If the version is out of range, an error is raised program terminates.
+    """
     version = pkg_resources.parse_version(version)
     version_max = pkg_resources.parse_version(REQ_VERSIONS[component]['MAX'])
     version_min = pkg_resources.parse_version(REQ_VERSIONS[component]['MIN'])
@@ -463,6 +542,9 @@ def check_component_version(component, version):
         sys.exit(1)
 
 def check_base_toolset():
+    """
+    Verify if the components/tools required are present and if they are the correct version.
+    """
     # print('Checking kubectl version')
     _, output, _ = run('kubectl', 'version --client=true -o json', cstdout=True)
     output = json.loads(output.decode('utf-8'))['clientVersion']['gitVersion']
@@ -486,7 +568,10 @@ def check_base_toolset():
     check_component_version('skaffold', ver.decode('ascii').strip())
 
 def install_dependencies():
-    """Check and install dependencies"""
+    """
+    Check for and install dependencies in the kubernetes cluster if they are not found.
+    If dependencies are found in K8s, this function does not modify or reinstall the components.
+    """
     check_base_toolset()
     
     print('Checking cert-manager and related CRDs:', end=' ')
@@ -539,7 +624,7 @@ def install_dependencies():
 
 
 def secretagent(k8s_op, tag='latest'):
-    """Check and install secret-agent"""
+    """Check if secret-agent is present in the cluster. If not, installs it."""
     opts = ''
     if k8s_op == 'delete':
         opts = '--ignore-not-found=true'
@@ -559,7 +644,7 @@ def secretagent(k8s_op, tag='latest'):
 
 
 def dsoperator(k8s_op, tag='latest'):
-    """Check and install ds-operator"""
+    """Check if ds-operator is present in the cluster. If not, installs it."""
     opts = ''
     if k8s_op == 'delete':
         opts = '--ignore-not-found=true'
@@ -579,6 +664,7 @@ def dsoperator(k8s_op, tag='latest'):
 
 
 def _install_certmanager_issuer():
+    """Install certmanager self-signed issuer. This works as a placeholder issuer."""
     base_dir = os.path.join(sys.path[0], '../')
     addons_dir = os.path.join(base_dir, 'cluster', 'addons', 'certmanager')
     issuer = os.path.join(addons_dir, 'files', 'selfsigned-issuer.yaml')
@@ -597,7 +683,7 @@ def _install_certmanager_issuer():
             continue
 
 def certmanager(k8s_op, tag='latest'):
-    """Check and install cert-manager"""
+    """Check if cert-manager is present in the cluster. If not, installs it."""
     opts = ''
     if k8s_op == 'delete':
         opts = '--ignore-not-found=true'
@@ -628,7 +714,14 @@ def certmanager(k8s_op, tag='latest'):
 
 
 def build_docker_image(component, default_repo, tag, config_profile=None):
-    """Builds custom docker images. Returns the tag of the built image"""
+    """
+    Build custom docker images.
+    component: name of the component to build the image for. e.a. am, idm, etc.
+    default_repo: set the default docker registry name. e.a. gcr.io/forgeops-public.
+    tag: set the image tag.
+    config_profile: set the CONFIG_PROFILE build envVar. This envVar is referenced by the Dockerfile of forgeops containers.
+    return tag_data: the tag of the built image.
+    """
     # Clean out the temp kustomize files
     base_dir = os.path.join(sys.path[0], '../')
 
@@ -657,7 +750,7 @@ def configure_platform_images(clone_path,
                               repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
     """
     Clone platform images and checkout branch to the given path.
-    Raise exception if not succesful
+    Raise exception if not succesful.
     """
     log = logger()
     path = pathlib.Path(clone_path)
@@ -707,7 +800,7 @@ def configure_platform_images(clone_path,
 
 def sort_dir_json(base):
     """
-    Recursively search a path for json files. Round-tripping to sort alpha
+    Recursively search a path for json files. Round-tripping to sort alpha.
     numerically.
     """
     conf_base = pathlib.Path(base).resolve()
@@ -757,6 +850,11 @@ def copytree(src, dst):
 #     return r.returncode
 
 def get_deployed_size(namespace):
+    """
+    Get the platform's size deployed in K8s. This is obtained from the platform-config configmap.
+    "Size" can be one of the following: mini, small, medium, large, cdk.
+    """
+
     try: 
         deployed_sz = get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE') 
         return deployed_sz
@@ -764,12 +862,14 @@ def get_deployed_size(namespace):
         return None
 
 def get_fqdn(ns):
+    """Get the FQDN of the deployment. This is obtained directly from the ingress definition"""
     _, fqdn, _ = run(
         'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
     return fqdn.decode('ascii')
 
 # IF ns is not None, then return it, otherwise lookup the current namespace context
 def get_namespace(ns=None):
+    """Get the default namespace from the active kubectl context"""
     if ns != None:
         return ns
     get_context() # Ensure k8s context is set/exists
@@ -777,6 +877,7 @@ def get_namespace(ns=None):
     return ctx_namespace.decode('ascii') if ctx_namespace else 'default'
 
 def get_context():
+    """Get the active kubectl context name"""
     try:
         _, ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
     except Exception as _e:
@@ -786,14 +887,26 @@ def get_context():
 
 # Lookup the value of a configmap key
 def get_configmap_value(ns, configmap, key):
-    """Get configmap contents"""
+    """
+    Get configmap contents.
+    ns: target namespace.
+    configmap: name of the configmap.
+    key: name of the key in the given configmap.
+    return value: contents of the configmap key.
+    """
     _, value, _ = run('kubectl',
                      f'-n {ns} get configmap {configmap} -o jsonpath={{.data.{key}}}', cstdout=True)
     return value.decode('utf-8')
 
 # Lookup the value of a secret
 def get_secret_value(ns, secret, key):
-    """Get secret contents"""
+    """
+    Get secret contents.
+    ns: target namespace.
+    secret: name of the secret.
+    key: name of the key in the given secret.
+    return value: b64 decoded contents of the secret key.
+    """
     _, value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
