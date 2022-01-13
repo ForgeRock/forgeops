@@ -208,13 +208,28 @@ init_config()
 }
 
 # Show the differences between the source configuration and the current Docker configuration
-# Ignore dot files, shell scripts and the Dockerfile
 # $1 - the product to diff
 diff_config()
 {
 	for p in "${COMPONENTS[@]}"; do
-		echo "diff  -u --recursive ${PROFILE_ROOT}/$p $DOCKER_ROOT/$p"
-		diff -u --recursive -x ".*" -x "Dockerfile" -x "*.sh" "${PROFILE_ROOT}/$p" "$DOCKER_ROOT/$p" || true
+		case $p in
+		idm)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/conf $DOCKER_ROOT/$p/conf"
+			diff -u --recursive "${PROFILE_ROOT}/$p/conf" "$DOCKER_ROOT/$p/conf" || true
+			;;
+		amster)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/config $DOCKER_ROOT/$p/config"
+			diff -u --recursive "${PROFILE_ROOT}/$p/config" "$DOCKER_ROOT/$p/config" || true
+			;;
+		am)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/config $DOCKER_ROOT/$p"
+			diff -u --recursive "${PROFILE_ROOT}/$p/config" "$DOCKER_ROOT/$p/config" || true
+			;;
+		ig)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/config $DOCKER_ROOT/$p/config"
+			diff -u --recursive "${PROFILE_ROOT}/$p/config" "$DOCKER_ROOT/$p/config" || true
+			;;
+		esac
 	done
 }
 
