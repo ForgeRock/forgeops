@@ -19,7 +19,7 @@ fi
 REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader}
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader
-TAG=${TAG:-7.1.0}
+TAG=${TAG:-7.1.1}
 
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/.."

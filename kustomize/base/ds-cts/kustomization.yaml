@@ -9,7 +9,7 @@ resources:
 images:
 - name: ds-cts
   newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1.0
+  newTag: 7.1.1
 
 configurations:
 - kustomizeConfig.yaml
