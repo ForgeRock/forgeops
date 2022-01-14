@@ -7,6 +7,7 @@ import sys
 import time
 import utils
 import json
+import logging
 
 build_targets = ['am', 'amster', 'idm', 'ds', 'ds-idrepo', 'ds-cts', 'ig']
 wait_targets = ['ds', 'am', 'amster', 'idm', 'apps']
@@ -100,9 +101,11 @@ def main():
     parser = argparse.ArgumentParser(description='Manage ForgeRock platform components')
     common_ns = argparse.ArgumentParser(add_help=False)
     common_sz = argparse.ArgumentParser(add_help=False)
+    common_dg = argparse.ArgumentParser(add_help=False)
     common = argparse.ArgumentParser(add_help=False)
     common_ns.add_argument('--namespace', '-n', default='',
                            help='Target namespace (default: current ctx namespace)')
+    common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
     common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'rcs-agent', 'secrets', []])
@@ -115,30 +118,30 @@ def main():
     size_group.add_argument('--custom', dest='custom', help='Path to a directory containing custom CDM patches. Must contain patches for all products.')
 
     subparser = parser.add_subparsers(dest='cmd', required=True, metavar='{command}')
-    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz], allow_abbrev=False,
+    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
-    parser_generate = subparser.add_parser('generate', parents=[common, common_sz],
+    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg],
                                           help='Generate the ForgeRock Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_delete = subparser.add_parser(
-        'delete', parents=[common_ns, common], help='Delete ForgeRock Platform components or component bundles')
+        'delete', parents=[common_ns, common, common_dg], help='Delete ForgeRock Platform components or component bundles')
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
     parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
                                help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
-    parser_build = subparser.add_parser('build', help='Build custom docker images')
+    parser_build = subparser.add_parser('build', parents=[common_dg], help='Build custom docker images')
     parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
     parser_build.add_argument('--default-repo', '-r', dest='registry')
     parser_build.add_argument('--tag', '-t', required=False, help='Set the tag used when building images')
     parser_build.add_argument('--config-profile', '-p', dest='config_profile')
-    parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
-    parser_info = subparser.add_parser('info', parents=[common_ns], help='Print relevant deployment information')
+    parser_build.add_argument('--reset', '--clean', action='store_true', help='Reset the image-defaulter file')
+    parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns]) # Internal FR use only!!. Hidden
-    parser_wait = subparser.add_parser('wait', parents=[common_ns], help='Wait for platform components', allow_abbrev=False)
+    parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg], help='Wait for platform components', allow_abbrev=False)
     parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     args = parser.parse_args()
@@ -157,6 +160,10 @@ def main():
         if src_profile_dir:
             size = 'custom'
             remap = size_map[size]
+
+    if getattr(args, 'debug', False):
+        utils.log.setLevel(logging.DEBUG)
+        utils.log.handlers[0].setLevel(logging.DEBUG)
 
     components = args.components if getattr(args, 'components', None) else ['all']
     if args.cmd == 'info':

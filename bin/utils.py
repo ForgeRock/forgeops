@@ -18,6 +18,7 @@ from pathlib import Path
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
+BLUE = '\033[1;94m'
 RED = '\033[1;91m'
 ENDC = '\033[0m'
 MSG_FMT = '[%(levelname)s] %(message)s'
@@ -149,7 +150,7 @@ class NoColorFormatter(logging.Formatter):
 class ColorFormatter(logging.Formatter):
     """Logging color"""
     TTY_FORMATS = {
-        logging.DEBUG: f'{CYAN}{MSG_FMT}{ENDC}',
+        logging.DEBUG: f'{BLUE}{MSG_FMT}{ENDC}',
         logging.INFO: f'{CYAN}{MSG_FMT}{ENDC}',
         logging.WARNING: f'{PURPLE}{MSG_FMT}{ENDC}',
         logging.ERROR: f'{RED}{MSG_FMT}{ENDC}',
@@ -175,6 +176,8 @@ def logger(name=log_name, level=logging.INFO):
     log.addHandler(handler)
     log.setLevel(level)
     return log
+
+log = logger(log_name)
 
 def message(s):
     """Print info message"""
@@ -205,6 +208,7 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
     stdo_pipe = subprocess.PIPE if cstdout else None
+    log.debug(f'Running: "{runcmd}"' + (f' in CWD="{os.path.abspath(cwd)}"' if cwd else ''))
     try:
         _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
                             check=True, input=stdin, cwd=cwd, env=env)
