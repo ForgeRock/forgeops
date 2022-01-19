@@ -1,6 +1,6 @@
 resources:
   - ../../../base/kustomizeConfig
-  - ../../../base/idm-cdk
+  - ../../../base/idm
   - ../../../base/ds/idrepo
   - ../../../base/ingress
 

@@ -7,14 +7,15 @@ spec:
   # The number of DS servers in the topology
   replicas: 3
   # The resources assigned to each DS pod
-  resources:
-    requests:
-      memory: 11Gi
-      cpu: 8000m
-    limits:
-      memory: 14Gi
-  volumeClaimSpec:
-    storageClassName: fast
+  podTemplate:
     resources:
       requests:
-        storage: 500Gi
+        memory: 11Gi
+        cpu: 8000m
+      limits:
+        memory: 14Gi
+    volumeClaimSpec:
+      storageClassName: fast
+      resources:
+        requests:
+          storage: 500Gi

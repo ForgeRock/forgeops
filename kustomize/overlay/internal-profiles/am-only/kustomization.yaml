@@ -1,7 +1,7 @@
 # am-only profile used for PIT tests
 resources:
   - ../../../base/kustomizeConfig
-  - ../../../base/am-cdk
+  - ../../../base/am
   - ../../../base/amster
   - ../../../base/ds/cts
   - ../../../base/ds/idrepo

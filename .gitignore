@@ -35,3 +35,4 @@ legacy-docs/7.0/site/
 dist/
 legacy-docs/7.0/site/build
 .gitignore.local
+tag.json

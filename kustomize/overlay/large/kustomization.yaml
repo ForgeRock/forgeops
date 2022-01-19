@@ -5,9 +5,9 @@ resources:
 - ../../base/kustomizeConfig
 - ../../base/ds/cts
 - ../../base/ds/idrepo
-- ../../base/am-cdk
+- ../../base/am
 - ../../base/amster
-- ../../base/idm-cdk
+- ../../base/idm
 - ../../base/rcs-agent
 - ../../base/end-user-ui
 - ../../base/login-ui

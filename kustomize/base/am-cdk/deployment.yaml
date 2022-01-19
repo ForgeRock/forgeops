@@ -55,11 +55,11 @@ spec:
         - name: TRUSTSTORE_PASSWORD
           value: changeit
         # For using secret agent generated truststore
-        - name: AM_PEM_TRUSTSTORE
-          value: "/var/run/secrets/truststore/cacerts"
-        # cert-manager truststore
         # - name: AM_PEM_TRUSTSTORE
-        #   value: "/var/run/secrets/truststore/ca.crt"
+        #   value: "/var/run/secrets/truststore/cacerts"
+        # cert-manager truststore
+        - name: AM_PEM_TRUSTSTORE
+          value: "/var/run/secrets/truststore/ca.crt"
       containers:
       - name: openam
         image: am
@@ -89,6 +89,12 @@ spec:
             name: amster-env-secrets # Needed for public amster key
         - secretRef:
             name: ds-env-secrets # passwords for cts, userstore, etc
+        startupProbe:
+          httpGet:
+            path: /am/json/health/live
+            port: 8080
+          failureThreshold: 40
+          periodSeconds: 10
         livenessProbe:
           httpGet:
             path: /am/json/health/live
@@ -144,8 +150,8 @@ spec:
       - name: truststore
         secret:
           # Secret agent generated truststore
-          secretName: truststore-pem
+          # secretName: truststore-pem
           # cert-manager generated truststore
-          # secretName: ds-ssl-keypair
+          secretName: ds-ssl-keypair
       - name: new-truststore
         emptyDir: {}

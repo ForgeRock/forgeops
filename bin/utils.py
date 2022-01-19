@@ -41,9 +41,9 @@ DOCKER_REGEX_NAME = {
 
 REQ_VERSIONS ={
     'ds-operator': {
-        'MIN': 'v0.1.0',
+        'MIN': 'v0.2.2',
         'MAX': 'v100.0.0',
-        'DEFAULT': 'latest',
+        'DEFAULT': 'v0.2.2',
     },
     'secret-agent': {
         'MIN': 'v1.1.1',
@@ -303,7 +303,7 @@ def waitforsecrets(ns):
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
 
 
-def wait_for_ds(ns, directoryservices_name, timeout_secs=300):
+def wait_for_ds(ns, directoryservices_name, timeout_secs=600):
     """
     Wait for DS pods to be ready after ds-operator deployment.
     ns: target namespace.
@@ -577,7 +577,7 @@ def install_dependencies():
     If dependencies are found in K8s, this function does not modify or reinstall the components.
     """
     check_base_toolset()
-    
+
     print('Checking cert-manager and related CRDs:', end=' ')
     try:
         run('kubectl', 'get crd certificaterequests.cert-manager.io',
@@ -664,7 +664,6 @@ def dsoperator(k8s_op, tag='latest'):
         time.sleep(5)
         run('kubectl', 'wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s')
         run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
-        run('kubectl', '-n fr-system wait --for=condition=ready pod --all --timeout=120s')
 
 
 def _install_certmanager_issuer():
@@ -859,8 +858,8 @@ def get_deployed_size(namespace):
     "Size" can be one of the following: mini, small, medium, large, cdk.
     """
 
-    try: 
-        deployed_sz = get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE') 
+    try:
+        deployed_sz = get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE')
         return deployed_sz
     except:
         return None

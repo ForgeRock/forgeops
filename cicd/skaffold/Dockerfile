@@ -3,9 +3,9 @@
 # See the tekton/ folder for an example of a CI/CD pipeline that deploys the ForgeRock Identity Platform.
 
 # the sdk can install everythiung for us, use the smallest image
-ARG KUSTOMIZE_VERSION=v4.2.0
+ARG KUSTOMIZE_VERSION=v4.4.1
 ARG KUBECTL_VERSION=v1.21.2
-ARG SKAFFOLD_VERSION=v1.35.0
+ARG SKAFFOLD_VERSION=v1.35.1
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine as base
 ARG SKAFFOLD_VERSION

@@ -46,12 +46,11 @@ spec:
           value: /truststore/idmtruststore
         - name: TRUSTSTORE_PASSWORD
           value: changeit
-        # Secret agent generated truststore
         - name: IDM_PEM_TRUSTSTORE
-          value: "/var/run/secrets/truststore/cacerts"
+        # Secret agent generated truststore
+        # value: "/var/run/secrets/truststore/cacerts"
         # cert-manager generated truststore
-        # - name: IDM_PEM_TRUSTSTORE
-        #   value: "/var/run/secrets/truststore/ca.crt"
+          value: "/var/run/secrets/truststore/ca.crt"
       containers:
       - name: openidm
         image: idm
@@ -165,14 +164,13 @@ spec:
           secretName: idm
       - name: new-truststore
         emptyDir: {}
-      # secret agent generated truststore
+
       - name: truststore
         secret:
-          secretName: truststore-pem
-      # cert-manager generated truststore
-      # - name: truststore
-      #   secret:
-      #     secretName: ds-ssl-keypair
+          # secret agent generated truststore
+          # secretName: truststore-pem
+          # cert-manager generated truststore
+          secretName: ds-ssl-keypair
       - name: logs
         emptyDir: {}
       - name: audit-logs

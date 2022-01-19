@@ -5,19 +5,15 @@ resources:
 - ../../base/kustomizeConfig
 - ../../base/ds/cts
 - ../../base/ds/idrepo
-# To use the dynamic ds image, use the following instead of the above:
-# - ../../base/ds/dynamic-cts
-# - ../../base/ds/dynamic-idrepo
-- ../../base/am-cdk
+- ../../base/am
 - ../../base/amster
-- ../../base/idm-cdk
+- ../../base/idm
 - ../../base/rcs-agent
 - ../../base/end-user-ui
 - ../../base/login-ui
 - ../../base/admin-ui
 - ../../base/ingress
 - ../../base/ldif-importer
-- ../../base/pdb
 
 patches:
 - path: am.yaml

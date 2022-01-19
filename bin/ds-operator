@@ -10,7 +10,8 @@ def main():
     parser = argparse.ArgumentParser(description='Install or delete the ds-operator')
     parser.add_argument('operation', nargs='+', choices=['install', 'delete'],
                         help='Select between install or delete (required)')
-    parser.add_argument('-t', '--tag', default='latest')
+    _v = utils.REQ_VERSIONS['ds-operator']['DEFAULT']
+    parser.add_argument('-t', '--tag', default=_v)
     args = parser.parse_args()
 
     if len(args.operation) > 1:
