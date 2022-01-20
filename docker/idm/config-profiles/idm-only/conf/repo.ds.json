@@ -13,6 +13,7 @@
             "connectionSecurity": "ssl",
             "connectionPoolSize" : 50,
             "availabilityCheckTimeoutMilliSeconds" : 2000,
+            "availabilityCheckIntervalSeconds" : 30,
             "heartBeatIntervalSeconds" : 60,
             "heartBeatTimeoutMilliSeconds" : 3000,
             "primaryLdapServers": [
