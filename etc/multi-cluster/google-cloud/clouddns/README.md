@@ -1,6 +1,6 @@
 # Multi-cluster deployment for DS on GKE using Cloud DNS for GKE
 
->`Cloud DNS for GKE is currently in Preview.`
+# **`Cloud DNS for GKE is currently in Preview.`**
 
 Doc: https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns#enabling_scope_dns_in_a_new_cluster  
 
@@ -8,12 +8,13 @@ Doc: https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns#enabling_s
 This guide explains how to deploy DS across 2 different GKE clusters, using one cluster in the US and one cluster in Europe.
 For different cluster names, just replace *eu* and *us* in the various files mentioned in the setup steps below .
 
-There are 5 major steps to the deployment:
-* Prepare 2 clusters configured to use Cloud DNS with one in the US and one in Europe.
-* Enable the use of shared secrets across the clusters.
-* Create firewall rules to allow replication traffic between clusters.
+> To deploy the full ForgeRock Identity Platform across multiple clusters using Multi-cluster Ingress and Cloud DNS for GKE, go straight to this [readme](https://github.com/ForgeRock/forgeops/blob/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/README.md).
+
+There are 4 major steps:
+* Configure 2 clusters to use Cloud DNS with one in the US and one in Europe.
 * Prepare kustomize configuration to ensure unique server IDs and configure bootstrap servers.
-* Deploy DS using the provided Skaffold profiles.
+* Deploy DS.
+* Verify replication is working.
 
 ## Step 1: Prepare clusters
 #
@@ -21,7 +22,6 @@ Provision 2 clusters with following requirements:
   * Same VPC
   * In different regions if multi-region(below example is configured in eu and us)
   * Create same namespace in each cluster for DS (default: prod).
-  * Workload Identity enabled(for Secret Agent).
   * Configure your Cloud DNS domain name(see below) 
 
 Create your cluster as described in the forgeops docs but also include the following arguments where cluster domain will be the domain configured for that cluster e.g. the following will replace pod domain `.cluster.local` with `.us` for the us cluster:
@@ -43,71 +43,50 @@ source cluster/gke/multi-cluster.sh
 cluster/gke/cluster-up.sh
 ```
 
-## Step 2: Configure firewall rules
-#
-Firewall rules need to be created to allow replication traffic between clusters.
-Either manually create firewall rules or there is a sample bash script that will create these for you.  
-```bash
-/etc/multi-cluster/clouddns/create-firewall-rules.sh
-```
-
-Just edit the cluster names at the top of the script.
-```yaml
-# Specify your cluster names
-CLUSTER1="clouddns-eu"
-CLUSTER2="clouddns-us"
-```
-
-Firewall rules will be generated with these cluster names.
-
-
-## Step 3: Enable the use of shared secrets across the clusters
-# 
-Deploy secret-agent in each cluster:
-```bash
-bin/secret-agent.sh
-```
-Follow instructions to configure secret-agent to work with Workload Identity: [Instructions](https://github.com/ForgeRock/secret-agent#set-up-cloud-backup-with-gcp-secret-manager)  
-<br />
-
-## Step 4: Prepare Deployment  
+## Step 2: Prepare Deployment  
 #  
 
-**1. Configure secret-agent parameters**  
->`NOTE:` Please check values and update to match requirements
+>Currently these files are configured based on eu and us regions. These values must match the value provided for `--cluster-dns-domain`  names registered in step 1.
 
-In `kustomize/overlay/multi-cluster/multi-cluster-secrets/kustomization.yaml` fill out the following fields:  
-1. secretsManagerPrefix: \<prefix name\> # ensures unique secret names in Secret Manager.  
-2. secretsManager: GCP
-3. gcpProjectID: \<Project ID\>  
-<br />  
+Change the DS_GROUP_ID and DS_BOOTSTRAP_REPLICATION_SERVERS env vars for a different list of regional identifiers.
 
-**2. Configure clusters**  
+See the env section in the `ds-idrepo.yaml` and `ds-cts.yaml` in kustomize/overlay/multi-cluster/clouddns/eu and kustomize/overlay/multi-cluster/clouddns/us.  
 
->`NOTE:` Currently these files are configured based on eu and us regions. These values must match the value provided for `--cluster-dns-domain`  names registered in step 1.
-
-Change the DS_CLUSTER_TOPOLOGY env var for a different list of regional identifiers.
-
-See `ds-idrepo.yaml` and `ds-cts.yaml` in kustomize/overlay/multi-cluster/clouddns.  
-
+For example:
 ```yaml
-              env: 
-              - name: DS_CLUSTER_TOPOLOGY
-                value: "eu,us"
+    env:
+    - name: "DS_GROUP_ID"
+      value: "eu"
+    - name: "DS_BOOTSTRAP_REPLICATION_SERVERS"
+      value: "ds-cts-0.ds-cts.prod.svc.eu:8989,ds-cts-0.ds-cts.prod.svc.us:8989"
 ```
 
-The above change needs to be applied to the idrepo and cts patch in the ds-cts.yaml and ds-idrepo.yaml files.  
+>`NOTE:` Ensure that the bootstrap servers include a ds instance from each cluster.
+
 <br />
 
-## Step 4: Deploy
+## Step 3: Deploy
 #  
 
-Deploy following profile to both clusters:
+Deploy DS to EU cluster
 ```bash
-skaffold run --profile clouddns
+eupath=$(bin/config path kustomize overlay multi-cluster/eu) # `/bin/config path` command will get the full path
+forgeops install --custom $eupath -n prod base ds
 ```
 
-## Step 5: Verify replication
+Both deployments must use the same secrets.  Run the following command to copy the secrets between clusters:
+```bash
+# --source-cluster and --dest-cluster need to match the cluster context names
+bin/copy-secrets --source-cluster eu --source-ns prod --dest-cluster us --dest-ns prod
+```
+
+Deploy DS to US cluster
+```bash
+uspath=$(bin/config path kustomize overlay multi-cluster/us) # `/bin/config path` command will get the full path
+forgeops install --custom $uspath -n prod base ds
+```  
+
+## Step 4: Verify replication
 #  
 
 The best way to check replication is using Grafana.  This can be deployed as part of the Prometheus Operator Helm chart package using our sample script:
@@ -130,18 +109,17 @@ Go to the ForgeRock Directory Services dashboard and look at the receive delay g
 
 If traffic isn't replicating between clusters, then revisit the steps in this readme and check the Google Cloud documentation described [here](https://cloud.google.com/kubernetes-engine/docs/how-to/cloud-dns)
 
-## Step 6: Delete
+
+## Step 5: Delete
 #  
 
 In each cluster run:
 ```bash
-skaffold delete --profile clouddns
-# Only run the following command if you want to delete all data
-kubectl delete pvc --all
+# Add --force to remove secrets and pvcs
+forgeops delete
 # To retain the idrepo pvcs if you want to hold on to the users
 kubectl delete pvc data-ds-cts-0 data-ds-cts-1 data-ds-cts-2
 ```
 
 Cleanup:
-* delete clusters
-* delete firewall rules(look for Ingress firewall rules with the same name as your cluster) (https://console.cloud.google.com/networking/firewalls/list?project=<projectID>)
+* Delete clusters.

@@ -311,7 +311,7 @@ Greater testing was carried out on the kube-dns solution and results were compar
 [[pricing,Pricing]]
 == 6. Pricing
 
-The only additional costs are CloudDNS costs for the dynamically generated DNS records.
+The only additional costs are Cloud DNS costs for the dynamically generated DNS records.
 
 == 6. Pros and Cons
 

@@ -22,5 +22,5 @@ export CREATE_STATIC_IP=false # set to true to create a static IP.
 # export STATIC_IP_NAME="" # uncomment and provide a unique name(defaults to cluster name).  Lowercase letters, numbers, hyphens allowed.
 export DELETE_STATIC_IP=false # set to true to delete static IP, named above, when running cluster-down.sh
 
-# CloudDNS domain for multi-cluster
+# Cloud DNS domain for multi-cluster
 export CLOUD_DNS_DOMAIN=us

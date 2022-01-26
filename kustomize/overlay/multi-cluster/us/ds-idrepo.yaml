@@ -1,0 +1,13 @@
+# Sample DirectoryService Deployment Custom Resource
+apiVersion: directory.forgerock.io/v1alpha1
+kind: DirectoryService
+metadata:
+  name: ds-idrepo
+spec:
+  replicas: 2
+  podTemplate:
+    env:
+    - name: "DS_GROUP_ID"
+      value: "us"
+    - name: "DS_BOOTSTRAP_REPLICATION_SERVERS"
+      value: "ds-idrepo-0.ds-idrepo.prod.svc.us:8989,ds-idrepo-0.ds-idrepo.prod.svc.eu:8989"

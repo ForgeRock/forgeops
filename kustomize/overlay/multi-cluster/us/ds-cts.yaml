@@ -1,0 +1,22 @@
+# Sample DirectoryService Deployment Custom Resource
+apiVersion: directory.forgerock.io/v1alpha1
+kind: DirectoryService
+metadata:
+  # Directory hostnames will be ds-idrepo-0, id-repo-1, id-repo-2, etc.
+  name: ds-cts
+spec:
+  replicas: 3
+  podTemplate:
+    # The volume spec for the directory data. This is the same as the Kubernetes PVC volume spec.
+    volumeClaimSpec:
+      storageClassName: fast
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1000Gi
+    # Use this to set any additional env vars on the DS pods. 
+    env:
+    - name: "DS_GROUP_ID"
+      value: "us"
+    - name: "DS_BOOTSTRAP_REPLICATION_SERVERS"
+      value: "ds-cts-0.ds-cts.prod.svc.us:8989,ds-cts-0.ds-cts.prod.svc.eu:8989"

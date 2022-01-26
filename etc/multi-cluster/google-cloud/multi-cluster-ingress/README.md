@@ -1,4 +1,4 @@
-# Multi-cluster deployment using Google Cloud Multi Cluster Ingress and CloudDNS for GKE
+# Multi-cluster deployment using Google Cloud Multi Cluster Ingress and Cloud DNS for GKE
 
 Google Docs:   
 * [Multi Cluster Ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress)
@@ -9,7 +9,7 @@ Google Docs:
 This guide explains how to deploy the ForgeRock Identity Platform across 2 different clusters and configure proximity-based routing with Multi Cluster Ingress.
 
 Features:
-* Fully meshed multi-cluster DS tolopology using CloudDNS for GKE.  
+* Fully meshed multi-cluster DS tolopology using Cloud DNS for GKE.  
 * Global HTTP(S) load balancing across multiple clusters with Multi Cluster Ingress.  
 * Healthchecks to manage application level failover between clusters.
 * Proximity-based routing.
@@ -36,20 +36,14 @@ gcloud services enable multiclusteringress.googleapis.com
 ## Step 2: Cluster provisioning and DS setup
 #
 
-* Follow the clouddns [readme](https://github.com/ForgeRock/forgeops/blob/master/etc/multi-cluster/google-cloud/clouddns/README.md) to set up US and EU clusters and deploy DS using Cloud DNS for GKE.  
+1. Follow steps 1 & 2 in the Cloud DNS [readme](https://github.com/ForgeRock/forgeops/blob/master/etc/multi-cluster/google-cloud/clouddns/README.md) to set up US and EU clusters with Cloud DNS for GKE. 
+> Enable HTTP loadbalancing on the clusters. This can be applied either at cluster creation time or in the Google Cloud UI after the clusters are created.
 
-* Enable HTTP loadbalancing on the clusters.  This can be applied either at cluster creation time or after the clusters are created. 
-
-* After following the above steps you should have the following:
-  * HTTP loadbalancing and workload identity enabled on both clusters.
-  * Secret Agent Operator deployed.
-  * DS deployed and communicating across both clusters.  
-
-* Now you need to register your new clusters to a fleet.  Multi-cluster works only on clusters that are registered to the same fleet. 
+2. Now register your new clusters to a [fleet](https://cloud.google.com/anthos/multicluster-management/fleets).  Multi-cluster works only on clusters that are registered to the same fleet. 
 Ensure:
-* \<cluster_location\> matches the location of the cluster master.
-* \<cluster_name\> matches the exact name of the cluster.
-* \<project_id> matches your Google Cloud Project ID.
+   * \<cluster_location\> matches the location of the cluster master.
+   * \<cluster_name\> matches the exact name of the cluster.
+   * \<project_id> matches your Google Cloud Project ID.
 
 ```bash
 gcloud container hub memberships register <cluster_name> \
@@ -97,7 +91,7 @@ Add the IP address to the MultiClusterIngress [file](https://github.com/ForgeRoc
     networking.gke.io/static-ip: <static ip address>
 ```  
 
-**2. SSL cert for the HTTP(S) load balancer**
+**2. SSL cert for the HTTP(S) load balancer**  
 There are various options for generating an SSL cert for external traffic to the HTTP(S) load balancer.  
 * Pre-shared certificates [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#pre-shared_certificates)
 * Google managed certificates [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#google-managed_certificates)
@@ -110,7 +104,7 @@ For the first 2 options, update the MultiClusterIngress [file](https://github.co
 ```  
 
 **3. Configure FQDN**  
-Add FQDN to the host property in the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml).  
+Add your FQDN for the frontend to the host property in the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml).  
 
 ```yaml
       rules:
@@ -131,20 +125,38 @@ For more information on the above resources see the 2 Google doc links below:
 * MultiClusterService(mcs.yaml): https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress#multiclusterservice_resources
 * BackendConfig(backendconfig.yaml): https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#backendconfig_support
 
-## Step 5: Deploy Frontend Apps
+## Step 5: Deploy the platform
 #
 
-**1. Deploy AM, IDM and the UIs**  
+**1. Deploy the platform**  
 This example reflects a CDM medium size deployment which is the size used for testing.  Please adjust to suit your requirements.
+
+> fqdn is the same as configured in Step 3  
+
+Deploy to EU cluster
 ```bash
-bin/forgeops install apps ui --medium
+eupath=$(bin/config path kustomize overlay multi-cluster/eu) # `/bin/config path` command will get the full path
+forgeops install --custom $eupath -n prod -f <fqdn>
 ```
+
+Both deployments must use the same secrets.  Run the following command to copy the secrets between clusters:
+```bash
+# --source-cluster and --dest-cluster need to match the cluster context names
+bin/copy-secrets --source-cluster eu --source-ns prod --dest-cluster us --dest-ns prod
+```
+
+Deploy to US cluster
+```bash
+uspath=$(bin/config path kustomize overlay multi-cluster/us) # `/bin/config path` command will get the full path
+forgeops install --custom $uspath -n prod -f <fqdn>
+```  
 
 **2. Verify deployment**
 
 Things to check:
 * All pods are deployed `kubectl get pods`
-* You can access the UIs e.g. https://prod.mci.forgeops.com/platform.
+* Check replication. See step 4 in the Cloud DNS [readme](https://github.com/ForgeRock/forgeops/blob/master/etc/multi-cluster/google-cloud/clouddns/README.md)
+* You can access the UIs e.g. https://<fqdn>/platform.
 * Load balancer pod status is green and backend services are green(healthchecks passed) e.g. 
 https://console.cloud.google.com/kubernetes/multiclusteringress/us-west1-b/clouddns-us/prod/forgerock/details?project=\<projectID\>.
 * Verify requests from a US and EU location go to their relevant/local clusters.
@@ -154,8 +166,9 @@ https://console.cloud.google.com/kubernetes/multiclusteringress/us-west1-b/cloud
 
 Carry out the following commands in each cluster:
 
+> Add the --force argument to delete secrets and pvcs.  WARNING: This will delete all data if not backed up.
 ```bash
-bin/forgeops delete apps ui
+bin/forgeops delete
 ```
 
 ## Step 7: Deleting the Multi-cluster Ingress configuration
