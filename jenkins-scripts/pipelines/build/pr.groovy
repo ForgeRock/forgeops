@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -120,7 +120,7 @@ void sendInformationMessageToPR() {
     if (isPR()) {
         bitbucketUtils.commentOnMultibranchPullRequest(
                 """#### Jenkins is building your PR
-                  |If you would like to know how to configure which tests are run against your PR, click [here](https://ci.forgerock.org/job/ForgeOps-build/job/PR-${env.CHANGE_ID}/build?delay=0sec)
+                  |If you would like to know how to configure which tests are run against your PR, click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
                 """.stripMargin()
         )
     }

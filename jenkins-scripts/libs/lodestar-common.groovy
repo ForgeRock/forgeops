@@ -71,7 +71,7 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
 
 def getDefaultConfig(Random random, String stageName) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
-    def randomNumber = random.nextInt(9999) + 10000 // 5 digit random number to compute to namespace
+    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
     def config = [
         STASH_PLATFORM_IMAGES_BRANCH        : commonModule.platformImagesRevision,
         STASH_FORGEOPS_BRANCH               : commonModule.GIT_COMMIT,
