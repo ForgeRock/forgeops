@@ -128,7 +128,7 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testConfig = getDefaultConfig(random, stageName) + config +
-            [EXT_PLATFORM_IMAGES_BRANCH: commonModule.platformImagesRevision]
+            [EXT_PLATFORM_IMAGES_REF: commonModule.platformImagesRevision]
     def stagesCloud = [:]
     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
