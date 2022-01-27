@@ -73,9 +73,9 @@ def getDefaultConfig(Random random, String stageName) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
     def config = [
-        STASH_PLATFORM_IMAGES_BRANCH        : commonModule.platformImagesRevision,
-        STASH_FORGEOPS_BRANCH               : commonModule.GIT_COMMIT,
-        STASH_LODESTAR_BRANCH               : params.Lodestar_ref != '' ? params.Lodestar_ref : commonModule.lodestarRevision,
+        STASH_PLATFORM_IMAGES_REF           : commonModule.platformImagesRevision,
+        STASH_FORGEOPS_REF                  : commonModule.GIT_COMMIT,
+        STASH_LODESTAR_REF                  : params.Lodestar_ref != '' ? params.Lodestar_ref : commonModule.lodestarRevision,
         DEPLOYMENT_NAMESPACE                : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
         REPORT_NAME_PREFIX                  : normalizedStageName,
         PIPELINE_NAME                       : 'Postcommit-Forgeops',

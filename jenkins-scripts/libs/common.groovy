@@ -29,7 +29,7 @@ DEFAULT_PLATFORM_IMAGES_TAG = "${isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME}-r
 platformImagesRevision = bitbucketUtils.getLatestCommitHash(
         'cloud',
         'platform-images',
-        env.STASH_PLATFORM_IMAGES_BRANCH ?: DEFAULT_PLATFORM_IMAGES_TAG)
+        env.STASH_PLATFORM_IMAGES_REF ?: DEFAULT_PLATFORM_IMAGES_TAG)
 
 /** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
 lodestarFileContent = bitbucketUtils.readFileContent(
