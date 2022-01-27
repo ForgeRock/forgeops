@@ -1,6 +1,6 @@
 {
   "name": "02-rs-tokeninfo",
-  "condition": "${find(request.uri.path, '^/rs-tokeninfo')}",
+  "condition": "${matches(request.uri.path, '^/rs-tokeninfo')}",
   "monitor": false,
   "heap": [],
   "handler": {

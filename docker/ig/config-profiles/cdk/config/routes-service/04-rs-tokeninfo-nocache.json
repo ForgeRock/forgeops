@@ -1,6 +1,6 @@
 {
   "name": "02-rs-tokeninfo-nocache",
-  "condition": "${find(request.uri.path, '^/rs-tokeninfo-nocache')}",
+  "condition": "${matches(request.uri.path, '^/rs-tokeninfo-nocache')}",
   "monitor": false,
   "heap": [],
   "handler": {

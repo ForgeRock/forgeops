@@ -1,12 +1,12 @@
 {
    "name": "Kubernetes endpoints",
-   "condition": "${find(request.uri.path, '^/kube')}",
+   "condition": "${matches(request.uri.path, '^/kube')}",
    "handler": {
       "type": "DispatchHandler",
       "config": {
          "bindings": [
            {
-             "condition": "${find(request.uri.path, 'liveness$')}",
+             "condition": "${matches(request.uri.path, 'liveness$')}",
              "handler": {
                "type": "StaticResponseHandler",
                "config": {
@@ -15,7 +15,7 @@
              }
            },
            {
-             "condition": "${find(request.uri.path, 'readiness$')}",
+             "condition": "${matches(request.uri.path, 'readiness$')}",
              "handler": {
                "type": "StaticResponseHandler",
                "config": {

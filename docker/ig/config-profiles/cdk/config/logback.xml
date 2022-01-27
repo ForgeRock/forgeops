@@ -49,6 +49,10 @@
         </sift>
     </appender>
      
+
+    <!-- Disable warnings for deprecated methods -->
+    <logger name="org.forgerock.openig.el.Functions" level="OFF" />
+
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
