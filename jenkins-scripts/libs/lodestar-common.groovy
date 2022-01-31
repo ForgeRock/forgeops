@@ -75,13 +75,11 @@ def getDefaultConfig(Random random, String stageName) {
     def config = [
         STASH_PLATFORM_IMAGES_REF           : commonModule.platformImagesRevision,
         STASH_FORGEOPS_REF                  : commonModule.GIT_COMMIT,
-        STASH_LODESTAR_REF                  : params.Lodestar_ref != '' ? params.Lodestar_ref : commonModule.lodestarRevision,
+        STASH_LODESTAR_REF                  : params.Lodestar_ref, // If empty, lodestar ref is computed from platform images
         DEPLOYMENT_NAMESPACE                : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
         REPORT_NAME_PREFIX                  : normalizedStageName,
         PIPELINE_NAME                       : 'Postcommit-Forgeops',
         DO_RECORD_RESULT                    : false,
-        COMPONENTS_LODESTARBOX_IMAGE_TAG    : commonModule.lodestarRevision,
-        COMPONENTS_LOCUST_IMAGE_TAG         : commonModule.lodestarRevision
     ]
     return config
 }
