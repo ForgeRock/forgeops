@@ -39,6 +39,6 @@ create-global-access-control-policy \
 
 # TODO: Need a better way to import schema from setup profiles or directly from backend servers
 cp /opt/opendj/template/setup-profiles/AM/config/6.5/schema/* /opt/opendj/config/schema/
-cp /opt/opendj/template/setup-profiles/IDM/repo/7.1/schema/* /opt/opendj/config/schema/
+cp /opt/opendj/template/setup-profiles/IDM/repo/7.2/schema/* /opt/opendj/config/schema/
 cp /opt/opendj/template/setup-profiles/AM/identity-store/7.0/schema/* /opt/opendj/config/schema/
 cp /opt/opendj/template/setup-profiles/AM/cts/6.5/schema/* /opt/opendj/config/schema/
