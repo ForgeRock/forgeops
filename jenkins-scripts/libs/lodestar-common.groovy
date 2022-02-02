@@ -116,7 +116,7 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
     def testConfig = getDefaultConfig(random, stageName) + config
     def stagesCloud = [:]
     def testName = cloud_utils.pyrockGetTestName(testConfig)
-    stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(testName)
+    stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(normalizedStageName)
 
     runCommon(pipelineRun, stageName, stagesCloud) {
         withGKEPyrockNoStages(testConfig)
