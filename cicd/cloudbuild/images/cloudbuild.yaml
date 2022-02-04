@@ -1,4 +1,4 @@
-timeout: 900s
+timeout: 1200s
 options:
   env:
     - PROFILE_NAME=cdk
