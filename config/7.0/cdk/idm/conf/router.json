@@ -11,7 +11,7 @@
             }
         },
         {
-            "pattern" : "^(managedß|internal)($|(/.+))",
+            "pattern" : "^(managed|internal)($|(/.+))",
             "onRequest" : {
                 "type" : "text/javascript",
                 "file" : "policyFilter.js"
