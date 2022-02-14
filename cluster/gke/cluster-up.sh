@@ -121,7 +121,8 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --no-enable-master-authorized-networks \
     --release-channel "$RELEASE_CHANNEL" \
     --machine-type "$MACHINE" \
-    --image-type "COS" \
+    --image-type "COS_CONTAINERD" \
+    --enable-image-streaming \
     --disk-type "pd-ssd" --disk-size "100" \
     --metadata disable-legacy-endpoints=true \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
@@ -149,7 +150,8 @@ if [ "$CREATE_DS_POOL" == "true" ]; then
     --zone "$ZONE" \
     --node-locations "$NODE_LOCATIONS" \
     --machine-type "$DS_MACHINE" \
-    --image-type "COS" \
+    --image-type "COS_CONTAINERD" \
+    --enable-image-streaming \
     --disk-type "pd-ssd" \
     --disk-size "100" \
     --metadata disable-legacy-endpoints=true \
