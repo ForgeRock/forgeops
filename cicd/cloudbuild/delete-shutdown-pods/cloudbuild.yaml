@@ -1,0 +1,43 @@
+timeout: 300s
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - eng-shared-1
+      - '--region=us-east1'
+    id: authenticate-eng-shared-1
+    waitFor:
+      - '-'
+  - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+    args:
+      - '-c'
+      - >-
+        kubectl delete pods --field-selector status.phase=Failed -A
+        --ignore-not-found=true
+    id: delete-shutdown-pods-eng-shared-1
+    waitFor:
+      - authenticate-eng-shared-1
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - eng-shared-2
+      - '--region=us-east1'
+    id: authenticate-eng-shared-2
+    waitFor:
+      - delete-shutdown-pods-eng-shared-1
+  - name: 'gcr.io/$PROJECT_ID/skaffold:latest'
+    args:
+      - '-c'
+      - >-
+        kubectl delete pods --field-selector status.phase=Failed -A
+        --ignore-not-found=true
+    id: delete-shutdown-pods-eng-shared-2
+    waitFor:
+      - authenticate-eng-shared-2
+    entrypoint: bash
+
