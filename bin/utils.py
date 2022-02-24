@@ -430,7 +430,6 @@ def uninstall_component(component, ns, force):
             run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
             run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
             uninstall_component('secrets', ns, False)
-            run('kubectl', f'-n {ns} delete secrets --field-selector type=kubernetes.io/tls --ignore-not-found=true')
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
