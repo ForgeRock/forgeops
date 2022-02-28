@@ -19,10 +19,10 @@ images:
   newTag: 1.5.20.0
 - name: .*ds-cts.*
   newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1.1
+  newTag: 7.1.2
 - name: .*ds-idrepo.*
   newName: gcr.io/forgeops-public/ds-idrepo
-  newTag: 7.1.1
+  newTag: 7.1.2
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui
   newTag: 7.1.1
