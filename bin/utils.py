@@ -41,12 +41,12 @@ DOCKER_REGEX_NAME = {
 
 REQ_VERSIONS ={
     'ds-operator': {
-        'MIN': 'v0.2.2',
+        'MIN': 'v0.2.3',
         'MAX': 'v100.0.0',
-        'DEFAULT': 'v0.2.2',
+        'DEFAULT': 'v0.2.3',
     },
     'secret-agent': {
-        'MIN': 'v1.1.1',
+        'MIN': 'v1.1.5',
         'MAX': 'v100.0.0',
         'DEFAULT': 'latest',
     },
