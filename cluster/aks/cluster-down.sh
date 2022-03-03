@@ -14,7 +14,8 @@ then
 fi
 KUBECONFIG="${tmp_kubeconfig}"
 
-echo "The \"${NAME}\" cluster will be deleted. This action cannot be undone."
+echo
+echo "***The \"${NAME}\" cluster will be deleted. This action cannot be undone.***"
 echo "Press any key to continue, or CTRL+C to quit"
 read;
 
@@ -52,3 +53,6 @@ az aks delete --resource-group $RES_GROUP_NAME --name $NAME --yes
 # Delete the resource group
 echo "Deleting resource group ${RES_GROUP_NAME}..."
 az group delete --resource-group $RES_GROUP_NAME --yes
+
+# Delete context
+kubectl config delete-context ${NAME}
