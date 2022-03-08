@@ -819,33 +819,6 @@ def sort_dir_json(base):
             json.dump(conf, fp, sort_keys=True, indent=2)
 
 
-def copytree(src, dst):
-    """
-    A simple version of 3.7+ shutil.copytree for 3.6.
-    No metadata.
-    No links.
-    Captures all errors and concats to a string.
-    """
-    errors = []
-    for src_entry in os.scandir(src):
-        try:
-            if src_entry.name in _IGNORE_FILES:
-                continue
-            os.makedirs(dst, exist_ok=True)
-            src_name = os.path.join(src, src_entry.name)
-            dst_name = os.path.join(dst, src_entry.name)
-            if src_entry.is_file():
-                shutil.copyfile(src_name, dst_name)
-            elif src_entry.is_symlink():
-                raise IOError(f'Symlinks not supported {src_entry.path}')
-            elif src_entry.is_dir():
-                copytree(src_name, dst_name)
-        except Exception as e:
-            errors.extend(str(e))
-
-    if errors:
-        raise Exception('\n'.join(errors))
-
 # Run kubectl. If verbose is true, echo the command to the stdout
 # Returns the output as a string
 # def kubectl(cmd,verbose=True ):
