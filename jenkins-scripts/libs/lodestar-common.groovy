@@ -136,23 +136,24 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
         node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
-                    def uiFileContent = bitbucketUtils.readFileContent(
-                            'cloud',
-                            'platform-images',
-                            commonModule.platformImagesRevision,
-                            'ui.json').trim()
-                    def uiTestRevision = readJSON(text: uiFileContent)['gitCommit']
+                    def platformUiRevision = bitbucketUtils.getLatestCommitHash(
+                            'ui',
+                            'platform-ui',
+                            'ID_Cloud_Production')
 
+                    // Get platform-ui tests from corresponding commit
                     dir("platform-ui") {
-                        // Checkout Platform UI repository commit corresponding to the UI images commit promoted
-                        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git', 'master')
-                        sh "git checkout ${uiTestRevision}"
+                        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git',
+                                'master')
+                        sh "git checkout ${platformUiRevision}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
                     }
 
-                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
-                    allStagesCloud[normalizedStageName].numFailedTests = 0
-                    allStagesCloud[normalizedStageName].reportUrl = reportUrl
+                    // Set UI image tag to the corresponding commit
+                    def platformUiImageTag = "7.2.0-${platformUiRevision}"
+                    testConfig.COMPONENTS_ADMINUI_IMAGE_TAG = platformUiImageTag
+                    testConfig.COMPONENTS_ENDUSERUI_IMAGE_TAG = platformUiImageTag
+                    testConfig.COMPONENTS_LOGINUI_IMAGE_TAG = platformUiImageTag
 
                     def uiTestConfig = [
                             containerRunOptions : cloud_utils.getUiContainerRunOptions(testConfig),
@@ -161,9 +162,15 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
 
                     uiTestsStage.runTests(uiTestConfig, normalizedStageName, normalizedStageName,
                             commonModule.lodestarRevision)
+
+                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
+                    allStagesCloud[normalizedStageName].numFailedTests = 0
+                    allStagesCloud[normalizedStageName].reportUrl = reportUrl
                 } catch (Exception e) {
                     print(e.getMessage())
+                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
                     allStagesCloud[normalizedStageName].numFailedTests = 1
+                    allStagesCloud[normalizedStageName].reportUrl = reportUrl
                     allStagesCloud[normalizedStageName].exception = e
                     return new FailureOutcome(e, reportUrl)
                 }
