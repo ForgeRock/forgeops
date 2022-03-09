@@ -616,6 +616,8 @@ def install_dependencies():
             cstderr=True, cstdout=True)
     except Exception:
         warning('ds-operator CRD not found. Installing ds-operator.')
+        run('kubectl', f'delete crd directorybackups.directory.forgerock.io --ignore-not-found=true')
+        run('kubectl', f'delete crd directoryrestores.directory.forgerock.io --ignore-not-found=true')
         dsoperator('apply', tag=REQ_VERSIONS['ds-operator']['DEFAULT'])
     else:
         message('ds-operator CRD found in cluster.')
