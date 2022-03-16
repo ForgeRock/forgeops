@@ -46,6 +46,12 @@ patchesStrategicMerge:
           - |
             cp /amster-scripts/* /opt/amster/
             ./docker-entrypoint.sh export-exit
+          env:
+          - name: TYPE
+            valueFrom:
+              configMapKeyRef:
+                name: amster-export-type
+                key: export
           volumeMounts:
           - mountPath: /opt/amster/config
             name: amster-config

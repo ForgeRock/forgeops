@@ -46,7 +46,7 @@ export-exit)
     # Like export - but exit immediately.
     # You must run another container after this
     # that will save the exported files.
-    ./export.sh
+    ./export.sh ${TYPE}
     ;;
 import)
     # invoke amster install.
