@@ -83,7 +83,9 @@
       "java.lang.Object",
       "org.forgerock.http.protocol.Cookie",
       "org.forgerock.http.protocol.Form",
-      "org.forgerock.openam.scripting.idrepo.ScriptIdentityRepository"
+      "org.forgerock.openam.scripting.idrepo.ScriptIdentityRepository",
+      "java.util.Collections$UnmodifiableRandomAccessList",
+      "java.util.Collections$UnmodifiableCollection$1"
     ],
     "_id" : "default/AUTHENTICATION_SERVER_SIDE/engineConfiguration",
     "maxThreads" : 50,
