@@ -84,9 +84,9 @@ def overlay_app_configs(ns, am=True, idm=True):
 
     utils.message('Restarting AM and IDM pods')
     if am:
-        utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- kill 1')
+        utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- /bin/sh -c "kill 1"')
     if idm:
-        utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
+        utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- /bin/sh -c "kill 1"')
 
 def build_docker_image(component, default_repo, tag, config_profile=None):
     """Builds custom docker images"""
@@ -140,7 +140,7 @@ def main():
     parser_build.add_argument('--reset', '--clean', action='store_true', help='Reset the image-defaulter file')
     parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
-    subparser.add_parser('config', parents=[common_ns]) # Internal FR use only!!. Hidden
+    subparser.add_parser('config', parents=[common_ns], help='Overlay local configs in the AM and IDM pods') # Internal FR use only!!. Hidden
     parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg], help='Wait for platform components', allow_abbrev=False)
     parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
