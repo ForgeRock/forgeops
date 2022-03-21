@@ -43,6 +43,17 @@ lodestarFileContent = bitbucketUtils.readFileContent(
         'lodestar.json').trim()
 lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 
+/** Does the branch support PIT tests */
+boolean branchSupportsPitTests() {
+    def supportedBranchPrefixes = [
+            'master',
+            'release/',
+            'sustaining/7.1',
+    ]
+    String branch = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+    return supportedBranchPrefixes.any { it -> branch.startsWith(it) }
+}
+
 /** Does the branch support PaaS releases */
 // TODO Improve the code below to take into account new sustaining branches
 // We should only promote version >= 7.1.0
