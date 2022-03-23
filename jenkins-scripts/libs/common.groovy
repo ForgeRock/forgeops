@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -62,6 +62,17 @@ DockerImagePromotion getDockerImage(String productName) {
 
 String getCurrentTag(String productName) {
     return getDockerImage(productName).tag
+}
+
+/** Does the branch support PIT tests */
+boolean branchSupportsPitTests() {
+    def supportedBranchPrefixes = [
+            'master',
+            'release/',
+            'sustaining/7.1',
+    ]
+    String branch = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+    return supportedBranchPrefixes.any { it -> branch.startsWith(it) }
 }
 
 /** Does the branch support PaaS releases */
