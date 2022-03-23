@@ -8,8 +8,8 @@ resources:
 
 images:
 - name: ds-cts
-  newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1.1
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
+  newTag: 7.1.2
 
 configurations:
 - kustomizeConfig.yaml

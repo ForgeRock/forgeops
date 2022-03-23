@@ -6,23 +6,23 @@ images:
 - name: git-server
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
-  newName: gcr.io/forgeops-public/am
-  newTag: 7.1.1
+  newName: us-docker.pkg.dev/forgeops-public/images/am
+  newTag: 7.1.2
 - name: .*amster.*
-  newName: gcr.io/forgeops-public/amster
-  newTag: 7.1.1
+  newName: us-docker.pkg.dev/forgeops-public/images/amster
+  newTag: 7.1.2
 - name: .*idm
-  newName: gcr.io/forgeops-public/idm
-  newTag: 7.1.1
+  newName: us-docker.pkg.dev/forgeops-public/images/idm
+  newTag: 7.1.2
 - name: .*rcs-agent.*
   newName: gcr.io/forgerock-io/rcs-agent
   newTag: 1.5.20.0
 - name: .*ds-cts.*
-  newName: gcr.io/forgeops-public/ds-cts
-  newTag: 7.1.1
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
+  newTag: 7.1.2
 - name: .*ds-idrepo.*
-  newName: gcr.io/forgeops-public/ds-idrepo
-  newTag: 7.1.1
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
+  newTag: 7.1.2
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui
   newTag: 7.1.1
