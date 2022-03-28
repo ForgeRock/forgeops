@@ -35,3 +35,8 @@ images:
 - name: .*ig.*
   newName: gcr.io/forgeops-public/ig
   newTag: 7.1.0
+resources:
+- ../../../kustomize/dev/kustomizeConfig
+- ../../../kustomize/base/secrets
+- ../../../kustomize/base/ingress
+- ../../../kustomize/dev/scripts

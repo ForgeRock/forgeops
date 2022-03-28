@@ -2,12 +2,8 @@
 # Script to deploy an nginx ingress controller using Helm3 to either EKS/GKE or AKS.
 #set -oe pipefail
 
-# Helm chart version. Note that chart versions 4.x and greater
-# require kubernetes >= 1.19 and ingress v1 support.
-# The version below supports k8s 1.18 and ingress v1beta1
-# To see the available chart versions, run
-# helm search repo ingress-nginx --versions
-VERSION="3.39.0"
+# Version is currently not used. We default to installing the latest stable version in the helm repo.
+#VERSION="0.34.1"
 
 IP_OPTS=""
 
@@ -78,15 +74,15 @@ fi
 
 if [ -n "$clustsize" ]; then
     echo "Detected cluster of type: $clustsize"
-fi
+fi 
 
-if [[ -n "$clustsize" && ($clustsize == "cdm-medium" || $clustsize == "cdm-large") ]]; then
+if [[ -n "$clustsize" && ($clustsize == "cdm-medium" || $clustsize == "cdm-large") ]]; then 
     echo "Setting ingress pod count to 3"
     INGRESS_POD_COUNT=3
-elif [[ -n "$clustsize" && ($clustsize == "cdm-small") ]]; then
+elif [[ -n "$clustsize" && ($clustsize == "cdm-small") ]]; then 
     echo "Setting ingress pod count to 2"
     INGRESS_POD_COUNT=2
-else
+else 
     echo "Setting ingress pod count to 1"
     INGRESS_POD_COUNT=1
 fi
@@ -101,4 +97,4 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-u
 
 # Deploy ingress controller Helm chart
 helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
-    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT} --version "$VERSION"
+    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}
