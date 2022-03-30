@@ -86,7 +86,11 @@
       "java.net.URI",
       "org.forgerock.oauth2.core.GrantType",
       "java.util.Collections$UnmodifiableSet",
-      "java.util.Collections$UnmodifiableMap"
+      "java.util.Collections$UnmodifiableMap",
+      "org.forgerock.oauth.clients.oidc.Claim",
+      "java.util.Locale",
+      "java.util.Collections$UnmodifiableRandomAccessList",
+      "java.util.Collections$UnmodifiableCollection$1"
     ],
     "_id" : "default/OIDC_CLAIMS/engineConfiguration",
     "maxThreads" : 50,

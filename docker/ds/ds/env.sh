@@ -46,7 +46,7 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 #
 # DS currently supports various multi-cluster solutions. To deploy in a multi-cluster scenario
 # explicitly set the DS_BOOTSTRAP_REPLICATION_SERVERS per your topology. Examples below:
-# **CloudDNS for GKE**
+# **Cloud DNS for GKE**
 # FQDN:              ds-cts-1.ds-cts.<namespace>.svc.eu
 # Results in:
 # Server ID:         ds-cts-1_eu

@@ -14,4 +14,4 @@ resources:
 images:
 - name: .*rcs-agent.*
   newName: gcr.io/forgerock-io/rcs-agent/pit1
-  newTag: 1.5.20.2-latest-postcommit
+  newTag: 1.5.20.6-latest-postcommit

@@ -27,6 +27,7 @@ data:
     agent.ssl_enabled=false
     agent.idm_principal=idmPrincipal
     agent.rcs_principal=rcsPrincipal
+    agent.netty_leakDetection_level=SIMPLE
     #agent.idm_secret=forgeopsInjectsThisViaEnvVar
     #agent.rcs_secret=forgeopsInjectsThisViaEnvVar
     #agent.keystore_file=/mounted/path/to/keystore/file

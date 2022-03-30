@@ -43,7 +43,7 @@ spec:
 
     # The volume spec for the DS data. This is the same as the Kubernetes PVC volume spec.
     volumeClaimSpec:
-      storageClassName: standard
+      storageClassName: fast
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:

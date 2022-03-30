@@ -34,18 +34,14 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_perf_restore',
                         'Postcommit_am_k8s_postcommit',
                         'Postcommit_am_k8s_upgrade',
-                        'Postcommit_am_basic_perf',
                         'Postcommit_ds_k8s_postcommit',
                         'Postcommit_ds_k8s_upgrade',
-                        'Postcommit_ds_basic_perf',
                 ],
                 [
                         'Postcommit_idm_k8s_postcommit',
                         'Postcommit_idm_k8s_upgrade',
-                        'Postcommit_idm_basic_perf',
                         'Postcommit_ig_k8s_postcommit',
                         'Postcommit_ig_k8s_upgrade',
-                        'Postcommit_ig_basic_perf',
                         'Postcommit_platform_ui',
                         'Postcommit_set_images',
                 ],
@@ -176,16 +172,6 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                 }
         )
     }
-    if (params.Postcommit_am_basic_perf) {
-        parallelTestsMap.put('AM Basic Perf',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'AM Basic Perf', clusterConfig +
-                            [TEST_NAME      : 'am',
-                             PROFILE_NAME   : 'am-only']
-                    )
-                }
-        )
-    }
 
     if (params.Postcommit_ds_k8s_postcommit) {
         parallelTestsMap.put('DS K8s Postcommit',
@@ -213,16 +199,6 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                              COMPONENTS_DSCTS_IMAGE_REPOSITORY           : 'gcr.io/engineeringpit/lodestar-images/ds-cts',
                              COMPONENTS_DSCTS_IMAGE_UPGRADE_TAG          : dsLatestPromotedTag,
                              COMPONENTS_DSCTS_IMAGE_UPGRADE_REPOSITORY   : dsLatestPromotedRepo]
-                    )
-                }
-        )
-    }
-    if (params.Postcommit_ds_basic_perf) {
-        parallelTestsMap.put('DS Basic Perf',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'DS Basic Perf', clusterConfig +
-                            [TEST_NAME      : 'ds',
-                             PROFILE_NAME   : 'ds-only']
                     )
                 }
         )
@@ -263,16 +239,6 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                 }
         )
     }
-    if (params.Postcommit_idm_basic_perf) {
-        parallelTestsMap.put('IDM Basic Perf',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'IDM Basic Perf', clusterConfig +
-                            [TEST_NAME      : 'idm_only',
-                             PROFILE_NAME   : 'idm-only']
-                    )
-                }
-        )
-    }
 
     if (params.Postcommit_ig_k8s_postcommit) {
         parallelTestsMap.put('IG K8s Postcommit',
@@ -296,16 +262,6 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                              COMPONENTS_IG_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/ig',
                              COMPONENTS_IG_IMAGE_UPGRADE_TAG       : igLatestPromotedTag,
                              COMPONENTS_IG_IMAGE_UPGRADE_REPOSITORY: igLatestPromotedRepo]
-                    )
-                }
-        )
-    }
-    if (params.Postcommit_ig_basic_perf) {
-        parallelTestsMap.put('IG Basic Perf',
-                {
-                    commonLodestarModule.runPyrock(pipelineRun, random, 'IG Basic Perf', clusterConfig +
-                            [TEST_NAME      : 'ig',
-                             PROFILE_NAME   : 'ig-only']
                     )
                 }
         )
