@@ -14,7 +14,7 @@ steps:
     - |-
       ./cicd/bin/docker-clone
 
-- name: 'gcr.io/$PROJECT_ID/skaffold'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold'
   entrypoint: bash
   env:
     - IMAGE_TAG=$TAG_NAME
@@ -25,12 +25,37 @@ steps:
     - |-
       ./cicd/bin/build-image-tags
 
-- name: 'gcr.io/$PROJECT_ID/repo'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/repo'
   entrypoint: bash
   secretEnv:
     - 'GH_TOKEN'
   env:
     - DOCKER_REPO=gcr.io/forgeops-public
+    - IMAGE_TAG=$TAG_NAME
+  args:
+    - '-c'
+    - |-
+      [[ $_CREATE_RELEASE == 1 ]] \
+      && make -f docker/cli-tools/repo/Makefile release \
+      || echo "Not creating release."
+
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold'
+  entrypoint: bash
+  env:
+    - IMAGE_TAG=$TAG_NAME
+    - PROFILE_NAME=$_PROFILE_NAME
+    - REPO=$_REPO
+  args:
+    - '-c'
+    - |-
+      ./cicd/bin/build-image-tags
+
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/repo'
+  entrypoint: bash
+  secretEnv:
+    - 'GH_TOKEN'
+  env:
+    - DOCKER_REPO=us-docker.pkg.dev/forgeops-public/images
     - IMAGE_TAG=$TAG_NAME
   args:
     - '-c'

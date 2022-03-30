@@ -17,10 +17,10 @@ profiles:
 - name: apps
   build:
     artifacts:
-    - image: gcr.io/forgeops-public/am
+    - image: us-docker.pkg.dev/forgeops-public/images/am
       context: docker/am
       kaniko: {}
-    - image: gcr.io/forgeops-public/idm
+    - image: us-docker.pkg.dev/forgeops-public/images/idm
       context: docker/idm
       kaniko: {}
     cluster: &cluster

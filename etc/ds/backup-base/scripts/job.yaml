@@ -19,7 +19,7 @@ spec:
       initContainers:
       # Run the export as an init container. We can kubectl wait for completion in scripts
       - name: backup
-        image: gcr.io/forgeops-public/ds-idrepo:dev
+        image: us-docker.pkg.dev/forgeops-public/images/ds-idrepo:dev
         imagePullPolicy: IfNotPresent
         args: ["/opt/scripts/ds-backup.sh"]
         # Must mount the data, and the keystore secrets to read the data

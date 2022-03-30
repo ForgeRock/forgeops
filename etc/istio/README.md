@@ -111,7 +111,7 @@ Deploy the Directory Server in each cluster *in the same namespace* (Important!)
 Use the `dsutil` pod to run LDAP tools to query the service names. For example:
 
 ```
-kubectl run -i --tty dsutil --image=gcr.io/forgeops-public/ds-util -- bash
+kubectl run -i --tty dsutil --image=us-docker.pkg.dev/forgeops-public/images/ds-util -- bash
 
 H=ds-idrepo-0-eu
 PW="password from bin/print-secrets.sh"

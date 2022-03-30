@@ -74,7 +74,7 @@ $ ./bin/set-images --inplace --products am --update-tag sometagname
 
 # Change all the repo names, leaves docker image name (leaves the last part as is) to match the value
 # Changes tags to match platform-images repository
-$ ./bin/set-images --update-repo gcr.io/forgeops-public
+$ ./bin/set-images --update-repo us-docker.pkg.dev/forgeops-public/images
 """
 
 ### Tests ###

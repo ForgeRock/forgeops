@@ -84,7 +84,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 ### Create the Service
 
 ```
-gcloud run deploy gcp-pruner --image gcr.io/$PROJECT_ID/gcp-pruner:latest --platform managed --region us-east4 --no-allow-unauthenticated
+gcloud run deploy gcp-pruner --image us-docker.pkg.dev/$PROJECT_ID/images/gcp-pruner:latest --platform managed --region us-east4 --no-allow-unauthenticated
 ```
 
 ### Pubsub

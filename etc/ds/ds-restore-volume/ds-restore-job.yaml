@@ -13,7 +13,7 @@ spec:
       containers:
       # Import the ldif files mounted on /data
       - name: import
-        image: gcr.io/forgeops-public/ds-idrepo:dev
+        image: us-docker.pkg.dev/forgeops-public/images/ds-idrepo:dev
         imagePullPolicy: IfNotPresent
         command: ["/opt/scripts/ds-restore.sh"]
         args: ["/ds-restore"]

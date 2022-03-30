@@ -4,25 +4,25 @@ commonLabels:
   app.kubernetes.io/part-of: forgerock
 images:
 - name: am
-  newName: gcr.io/forgeops-public/am
+  newName: us-docker.pkg.dev/forgeops-public/images/am
   newTag: dev
 - name: amster
   newName: gcr.io/forgerock-io/amster/pit1
   newTag: 7.2.0-latest-postcommit
 - name: ds
-  newName: gcr.io/forgeops-public/ds
+  newName: us-docker.pkg.dev/forgeops-public/images/ds
   newTag: dev
 - name: ds-cts
-  newName: gcr.io/forgeops-public/ds-cts
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
   newTag: dev
 - name: ds-idrepo
-  newName: gcr.io/forgeops-public/ds-idrepo
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
   newTag: dev
 - name: git-server
-  newName: gcr.io/forgeops-public/git-server
+  newName: us-docker.pkg.dev/forgeops-public/images/git-server
 - name: idm
-  newName: gcr.io/forgeops-public/idm
+  newName: us-docker.pkg.dev/forgeops-public/images/idm
   newTag: dev
 - name: ig
-  newName: gcr.io/forgeops-public/ig
+  newName: us-docker.pkg.dev/forgeops-public/images/ig
   newTag: dev

@@ -1,4 +1,4 @@
-FROM gcr.io/forgeops-public/toolbox as tools
+FROM us-docker.pkg.dev/forgeops-public/images/toolbox as tools
 FROM debian:buster-slim
 SHELL ["bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive

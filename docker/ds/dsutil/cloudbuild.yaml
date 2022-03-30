@@ -1,6 +1,6 @@
-# Builds the ds-util image. This should be pushed to the public repo:  gcr.io/forgeops-public/ds-util
+# Builds the ds-util image. This should be pushed to the public repo:  us-docker.pkg.dev/forgeops-public/images/ds-util
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/ds-util', '.' ]
+  args: [ 'build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/images/ds-util', '.' ]
 images:
-- 'gcr.io/$PROJECT_ID/ds-util'
+- 'us-docker.pkg.dev/$PROJECT_ID/images/ds-util'

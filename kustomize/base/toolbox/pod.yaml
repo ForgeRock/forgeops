@@ -9,7 +9,7 @@ spec:
   serviceAccountName: toolbox
   containers:
   - name: toolbox
-    image: gcr.io/forgeops-public/toolbox:latest
+    image: us-docker.pkg.dev/forgeops-public/images/toolbox:latest
     imagePullPolicy: Always
     args: ["pause"]
     ports:

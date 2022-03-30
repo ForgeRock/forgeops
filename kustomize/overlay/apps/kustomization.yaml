@@ -12,8 +12,8 @@ resources:
 # Set the image to the dev images that are built every night
 images:
 - name: am
-  newName: gcr.io/forgeops-public/am
+  newName: us-docker.pkg.dev/forgeops-public/images/am
   newTag: dev
 - name: idm
-  newName: gcr.io/forgeops-public/idm
+  newName: us-docker.pkg.dev/forgeops-public/images/idm
   newTag: dev

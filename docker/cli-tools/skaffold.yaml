@@ -15,7 +15,7 @@ profiles:
 - name: toolbox
   build:
     artifacts:
-    - image: gcr.io/forgeops-public/toolbox
+    - image: us-docker.pkg.dev/forgeops-public/images/toolbox
       context: toolbox
   deploy:
     kustomize:

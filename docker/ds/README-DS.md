@@ -25,11 +25,11 @@ gcloud builds submit .
 To run the `dsutil` image:
 
 ```
-kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash
+kubectl run -it dsutil --image=us-docker.pkg.dev/forgeops-public/images/ds-util --restart=Never -- bash
 ```
 
 To create a shell alias for the above command:
 
 ```
-alias fdebug='kubectl run -it dsutil --image=gcr.io/forgeops-public/ds-util --restart=Never -- bash'
+alias fdebug='kubectl run -it dsutil --image=us-docker.pkg.dev/forgeops-public/images/ds-util --restart=Never -- bash'
 ```

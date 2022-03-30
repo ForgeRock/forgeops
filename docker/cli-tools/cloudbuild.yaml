@@ -14,7 +14,23 @@ steps:
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/git-server', 'git-server']
   dir: docker/cli-tools
   waitFor: ['-']
+- name: 'gcr.io/cloud-builders/docker'
+  id: toolbox
+  args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/images/toolbox', 'toolbox']
+  dir: docker/cli-tools
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/images/repo', 'repo']
+  dir: docker/cli-tools
+  waitFor:
+    - toolbox
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/images/git-server', 'git-server']
+  dir: docker/cli-tools
+  waitFor: ['-']
 images:
 - gcr.io/$PROJECT_ID/toolbox
 - gcr.io/$PROJECT_ID/repo
 - gcr.io/$PROJECT_ID/git-server
+- us-docker.pkg.dev/$PROJECT_ID/images/toolbox
+- us-docker.pkg.dev/$PROJECT_ID/images/repo
+- us-docker.pkg.dev/$PROJECT_ID/images/git-server

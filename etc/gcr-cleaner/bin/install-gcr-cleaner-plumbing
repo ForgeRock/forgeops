@@ -42,7 +42,9 @@ steps:
   - '-c'
   - |-
     docker build --build-arg SERVICE=gcr-cleaner-server \
+                 --tag us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server:latest \
                  --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server:latest .
+    docker push us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server:latest
     docker push gcr.io/${PROJECT_ID}/gcr-cleaner-server:latest
 EOF
 
@@ -75,7 +77,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 
 # Create the Service
 gcloud run deploy gcr-cleaner \
-  --image gcr.io/${PROJECT_ID}/gcr-cleaner-server:latest \
+  --image us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server:latest \
   --platform managed \
   --region us-west2 \
   --service-account "gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com" \

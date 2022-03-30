@@ -39,9 +39,13 @@ steps:
   - |-
     docker build --build-arg SERVICE=gcr-cleaner-server \
                  --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server:${BUILD_ID} \
-                 --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server .
+                 --tag gcr.io/${PROJECT_ID}/gcr-cleaner-server \
+                 --tag us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server:${BUILD_ID} \
+                 --tag us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server .
     docker push gcr.io/${PROJECT_ID}/gcr-cleaner-server
     docker push gcr.io/${PROJECT_ID}/gcr-cleaner-server:${BUILD_ID}
+    docker push us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server
+    docker push us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server:${BUILD_ID}
 
   ## Deployment
   ### Cloud Run
@@ -54,7 +58,7 @@ steps:
   - |-
     # Create the Service
     gcloud run deploy gcr-cleaner \
-      --image gcr.io/${PROJECT_ID}/gcr-cleaner-server:${BUILD_ID} \
+      --image us-docker.pkg.dev/${PROJECT_ID}/images/gcr-cleaner-server:${BUILD_ID} \
       --platform managed \
       --region us-west2 \
       --service-account "gcr-cleaner@${PROJECT_ID}.iam.gserviceaccount.com" \

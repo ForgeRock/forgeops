@@ -8,6 +8,9 @@ steps:
     '-t', 'gcr.io/forgeops-public/ds-idrepo:latest',
     '-t', 'gcr.io/forgeops-public/ds-idrepo:7.1-dev',
     '-t', 'gcr.io/forgeops-public/ds-idrepo:7-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-idrepo:latest',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-idrepo:7.1-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-idrepo:7-dev',
     '-f', 'idrepo/Dockerfile', '.' ]
 - name: 'gcr.io/cloud-builders/docker'
   dir: docker/ds
@@ -15,6 +18,9 @@ steps:
     '-t', 'gcr.io/forgeops-public/ds-cts:latest',
     '-t', 'gcr.io/forgeops-public/ds-cts:7.1-dev',
     '-t', 'gcr.io/forgeops-public/ds-cts:7-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-cts:latest',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-cts:7.1-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-cts:7-dev',
     '-f', 'cts/Dockerfile', '.' ]
 - name: 'gcr.io/cloud-builders/docker'
   dir: docker/ds
@@ -22,6 +28,9 @@ steps:
     '-t', 'gcr.io/forgeops-public/ds-proxy:latest',
     '-t', 'gcr.io/forgeops-public/ds-proxy:7.1-dev',
     '-t', 'gcr.io/forgeops-public/ds-proxy:7-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-proxy:latest',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-proxy:7.1-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds-proxy:7-dev',
     '-f', 'proxy/Dockerfile', '.' ]
   # This is the mutable docker image used by the newest ds-operator.
 - name: 'gcr.io/cloud-builders/docker'
@@ -30,6 +39,9 @@ steps:
     '-t', 'gcr.io/forgeops-public/ds:latest',
     '-t', 'gcr.io/forgeops-public/ds:7.2-dev',
     '-t', 'gcr.io/forgeops-public/ds:7-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:latest',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:7.2-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:7-dev',
     '-f', './Dockerfile', '.' ]
 images: [
     'gcr.io/forgeops-public/ds-idrepo:latest',
@@ -43,5 +55,17 @@ images: [
     'gcr.io/forgeops-public/ds-proxy:7-dev',
     'gcr.io/forgeops-public/ds:7-dev',
     'gcr.io/forgeops-public/ds:7.2-dev',
-    'gcr.io/forgeops-public/ds:latest'
+    'gcr.io/forgeops-public/ds:latest',
+    'us-docker.pkg.dev/forgeops-public/images/ds-idrepo:latest',
+    'us-docker.pkg.dev/forgeops-public/images/ds-idrepo:7.1-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds-idrepo:7-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds-cts:latest',
+    'us-docker.pkg.dev/forgeops-public/images/ds-cts:7.1-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds-cts:7-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds-proxy:latest',
+    'us-docker.pkg.dev/forgeops-public/images/ds-proxy:7.1-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds-proxy:7-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds:7-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds:7.2-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds:latest'
    ]

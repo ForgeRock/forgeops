@@ -722,7 +722,7 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
     """
     Build custom docker images.
     component: name of the component to build the image for. e.a. am, idm, etc.
-    default_repo: set the default docker registry name. e.a. gcr.io/forgeops-public.
+    default_repo: set the default docker registry name. e.a. us-docker.pkg.dev/forgeops-public/images.
     tag: set the image tag.
     config_profile: set the CONFIG_PROFILE build envVar. This envVar is referenced by the Dockerfile of forgeops containers.
     return tag_data: the tag of the built image.
