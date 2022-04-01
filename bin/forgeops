@@ -183,8 +183,12 @@ def main():
         sys.exit(1)
 
     if args.cmd == 'delete':
-
+        # Get deployment size
         deployed_sz = utils.get_deployed_size(namespace)
+
+        # Set delete flag if PVCs and secrets should be deleted
+        delete = True if deployed_sz == 'cdk' or args.force_delete else False
+
         if deployed_sz:
             utils.message(f'"{deployed_sz}" platform detected in namespace: "{namespace}"')
             size = deployed_sz
@@ -203,22 +207,26 @@ def main():
         if not args.skip_confirmation:
             if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
                 return
-        if args.force_delete:
-            utils.warning('Using --force delete: This will erase all your PVCs and Secrets. This cannot be undone.')
-            utils.warning('Press "CTRL+C" now if you want to cancel')
-            time.sleep(2)
-            if not args.skip_confirmation:
-                if input('OK to proceed? [Y/N] ').lower() not in ['yes', 'y']:
-                    return
         if 'base' in components: #delete 'base' last
             components.append(components.pop(components.index('base')))
         if "all" in components:
             components = ['ui', 'apps', 'ds', 'base']
-        for c in components:
-            utils.uninstall_component(remap.get(c, c), namespace, deployed_sz == 'cdk' or args.force_delete)
-        if ('base' in components or 'all' in components) and deployed_sz != 'cdk' and not args.force_delete:
+
+        # Check to see if deployment is CDM and whether PVCs and secrets must be retained
+        if ('base' in components or 'all' in components) and deployed_sz != 'cdk' and not delete:
             utils.warning('Forgeops CDM deployment detected')
             utils.warning('Will not delete PVCs or Secrets to avoid data loss. You must delete those manually or use --force')
+        else:
+            utils.warning('This will erase all your PVCs(including backup PVCs) and Secrets. This cannot be undone.')
+            utils.warning('Press "CTRL+C" now if you want to cancel')
+            time.sleep(2)
+            if not args.skip_confirmation:
+                if input('OK to delete PVCs and Secrets? [Y/N] ').lower() not in ['yes', 'y']:
+                    delete = ""
+
+        # Uninstall components
+        for c in components:
+            utils.uninstall_component(remap.get(c, c), namespace, delete)
         return
 
     if args.cmd == 'build':
