@@ -843,8 +843,10 @@ def get_deployed_size(namespace):
 
 def get_fqdn(ns):
     """Get the FQDN of the deployment. This is obtained directly from the ingress definition"""
+    _, ingress_name, _ = run(
+        'kubectl', f'-n {ns} get ingress -o jsonpath={{.items[0].metadata.name}}', cstdout=True)
     _, fqdn, _ = run(
-        'kubectl', f'-n {ns} get ingress forgerock -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
+        'kubectl', f'-n {ns} get ingress {ingress_name.decode("utf-8")} -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
     return fqdn.decode('ascii')
 
 # IF ns is not None, then return it, otherwise lookup the current namespace context
