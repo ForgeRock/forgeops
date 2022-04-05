@@ -215,13 +215,13 @@ def main():
         # Check to see if deployment is CDM and whether PVCs and secrets must be retained
         if ('base' in components or 'all' in components) and deployed_sz != 'cdk' and not delete:
             utils.warning('Forgeops CDM deployment detected')
-            utils.warning('Will not delete PVCs or Secrets to avoid data loss. You must delete those manually or use --force')
+            utils.warning('Will not delete PVCs, VolumeSnapshots or Secrets to avoid data loss. You must delete those manually or use --force')
         else:
-            utils.warning('This will erase all your PVCs(including backup PVCs) and Secrets. This cannot be undone.')
+            utils.warning('This will erase all your PVCs(including backup PVCs), VolumeSnapshots and Secrets. This cannot be undone.')
             utils.warning('Press "CTRL+C" now if you want to cancel')
             time.sleep(2)
             if not args.skip_confirmation:
-                if input('OK to delete PVCs and Secrets? [Y/N] ').lower() not in ['yes', 'y']:
+                if input('OK to delete PVCs, VolumeSnapshots and Secrets? [Y/N] ').lower() not in ['yes', 'y']:
                     delete = ""
 
         # Uninstall components
