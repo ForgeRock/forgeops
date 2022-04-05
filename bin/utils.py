@@ -391,6 +391,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
     contents = contents.replace('namespace: prod', f'namespace: {ns}')
     if ctx.lower() == 'minikube':
         contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
+        contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
 def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None, src_profile_dir=None):
