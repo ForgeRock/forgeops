@@ -76,6 +76,7 @@ def getDefaultConfig(Random random, String stageName) {
         REPORT_NAME_PREFIX                  : normalizedStageName,
         PIPELINE_NAME                       : 'Postcommit-Forgeops',
         DO_RECORD_RESULT                    : false,
+        GATLING_PASS_PERCENTAGE             : 90,
     ]
     return config
 }
