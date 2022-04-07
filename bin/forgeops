@@ -3,6 +3,7 @@
 
 import argparse
 import os
+import shutil
 import sys
 import time
 import utils
@@ -137,13 +138,14 @@ def main():
     parser_build.add_argument('--default-repo', '-r', dest='registry')
     parser_build.add_argument('--tag', '-t', required=False, help='Set the tag used when building images')
     parser_build.add_argument('--config-profile', '-p', dest='config_profile')
-    parser_build.add_argument('--reset', '--clean', action='store_true', help='Reset the image-defaulter file')
+    parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
     parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns], help='Overlay local configs in the AM and IDM pods') # Internal FR use only!!. Hidden
     parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg], help='Wait for platform components', allow_abbrev=False)
     parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
+    subparser.add_parser('clean', help='Remove all locally generated manifests')
     args = parser.parse_args()
 
     # Check toolset versions before doing anything
@@ -181,6 +183,24 @@ def main():
     if args.cmd is None:
         parser.print_help()
         sys.exit(1)
+
+    if args.cmd == 'clean':
+        # Set the deploy directory
+        deploy_dir = os.path.join(sys.path[0], '../kustomize', 'deploy')
+
+        utils.message(f'Removing all locally generated manifests from the kustomize/deploy folder')
+        
+        # Get list of files in deploy directory
+        file_list = os.listdir(deploy_dir)
+
+        # Files that can't be deleted
+        keep_files = ["image-defaulter", ".gitignore"]
+
+        # Remove all generated manifests and folders
+        for file_name in file_list:
+            if file_name not in keep_files:
+                shutil.rmtree(deploy_dir+"/"+file_name)
+        return
 
     if args.cmd == 'delete':
         # Get deployment size
@@ -301,6 +321,9 @@ def main():
         utils.printsecrets(namespace)
         utils.printurls(namespace)
     utils.message('\nEnjoy your deployment!')
+
+
+
 
 def _sort_components(e):
     template = ['secrets', 'base', 'ds', 'ds-idrepo', 'ds-cts', 'apps', 'am', 'amster', 'idm', 'ui']
