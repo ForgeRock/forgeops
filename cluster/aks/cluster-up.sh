@@ -150,7 +150,7 @@ az aks create \
     --node-count "$NODE_COUNT" \
     --nodepool-labels $PRIMARY_POOL_LABELS \
     --nodepool-name "prim${NAME}" \
-    --nodepool-tags ${CLUSTER_TAGS} \
+    --nodepool-tags "${CLUSTER_TAGS}" \
     --tags ${CLUSTER_TAGS}  \
     --enable-addons "monitoring" \
     --generate-ssh-keys \
@@ -171,8 +171,7 @@ if [ "$CREATE_DS_POOL" == "true" ]; then
       --node-vm-size "$DS_VM_SIZE" \
       --node-taints "WorkerDedicatedDS=true:NoSchedule" \
       --labels $DS_POOL_LABELS \
-      --nodepool-tags ${CLUSTER_TAGS} \
-      --tags ${CLUSTER_TAGS}  \
+      --tags "${CLUSTER_TAGS}" \
       --zones 3
 fi
 
