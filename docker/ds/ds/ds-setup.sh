@@ -25,9 +25,12 @@ set -eux
 rm -f template/config/tools.properties
 rm -rf -- README* bat *.zip *.png *.bat setup.sh
 
+deploymentKey=`./bin/dskeymgr create-deployment-key --deploymentKeyPassword password`
+
 ./setup --instancePath $DS_DATA_DIR \
         --serverId                docker \
         --hostname                localhost \
+        --deploymentKey           ${deploymentKey} \
         --deploymentKeyPassword   password \
         --rootUserPassword        password \
         --adminConnectorPort      4444 \
