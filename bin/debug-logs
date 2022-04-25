@@ -488,7 +488,7 @@ def main():
     parser.add_argument('-n', '--namespace',
                         help='Target namespace (default: current namespace)')
     args = parser.parse_args()
-    maxloglines = args.maxloglines if getattr(args, 'maxloglines', None) else 4002
+    maxloglines = args.maxloglines if getattr(args, 'maxloglines', None) else 400
 
     # Get the namespace (either passed in as an arg, or set in the user's context)
     ctx_namespace = utils.get_namespace()
