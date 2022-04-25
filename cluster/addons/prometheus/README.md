@@ -19,7 +19,7 @@ deploy Prometheus,Alertmanager, and Grafana in the CDM.
 
 * The ``kube-prometheus-stack`` chart deploys Prometheus, Alertmanager, and 
 Grafana software. It also deploys the relevant metrics exporters. The
-deployment creates custom resources to make Prometheus native to Kubernetes.
+deployment creates Custom Resources to make Prometheus native to Kubernetes.
   
 * The ``forgerock-metrics`` chart provides configurable service monitors,
 alerting rules and custom ForgeRock dashboards. Service monitors define the
