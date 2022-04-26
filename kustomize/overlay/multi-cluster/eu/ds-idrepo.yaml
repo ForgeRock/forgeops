@@ -4,7 +4,7 @@ kind: DirectoryService
 metadata:
   name: ds-idrepo
 spec:
-  replicas: 2
+  replicas: 3
   podTemplate:
     env:
     - name: "DS_GROUP_ID"
