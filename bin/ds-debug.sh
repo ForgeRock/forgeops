@@ -3,7 +3,7 @@
 # This is an internal script provided for debugging purposes only and is not supported by ForgeRock.
 
 usage() {
-  echo "Usage: $0 status|rstatus|disaster|monitor|list-backups|purge [pod name]"
+  echo "Usage: $0 status|rstatus|disaster|idsearch|monitor|list-backups|purge [pod name]"
   exit 1
 }
 
