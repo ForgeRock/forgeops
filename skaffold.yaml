@@ -82,9 +82,7 @@ kind: Config
     - *IDM
     - *DS-CTS
     - *DS-IDREPO
-    - *DS-PROXY
     - *IG
-    - *DS
     # Skip building LDIF-IMPORTER. We use a fixed tag for now
     # - *LDIF-IMPORTER
 
