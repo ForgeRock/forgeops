@@ -6,8 +6,6 @@
  * to such license between the licensee and ForgeRock AS.
  */
 
-import com.forgerock.pipeline.GlobalConfig
-
 /*
  * Common configuration used by several stages of the ForgeOps pipeline.
  */
@@ -64,6 +62,10 @@ boolean branchSupportsIDCloudReleases() {
             || 'release/7.1.0' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
             || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}" == 'sustaining/7.1.x')) \
             || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}" == 'sustaining/7.1.x'))
+}
+
+void buildImage(String directoryName, String imageName, String arguments) {
+
 }
 
 return this

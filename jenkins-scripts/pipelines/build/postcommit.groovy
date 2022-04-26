@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -26,24 +26,28 @@ def initialSteps() {
 }
 
 def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
-    pipelineRun.pushStageOutcome('build-docker-images', stageDisplayName: 'Build Lodestar Images') {
-        def currentImage
-        try {
-            for (buildDirectory in buildDirectories) {
-                if (imageRequiresBuild(buildDirectory['name'], buildDirectory['forceBuild'])) {
-                    stage("Build ${buildDirectory['name']} image") {
-                        echo "Building 'docker/${buildDirectory['name']}' ..."
-                        currentImage = buildDirectory['name']
-                        buildImage(buildDirectory['name'])
-                        currentBuild.description += " ${buildDirectory['name']}"
+    pipelineRun.pushStageOutcome('build-docker-images', stageDisplayName: 'Build Forgeops Images') {
+        for (buildDirectory in buildDirectories) {
+            def directoryName = "${buildDirectory['folder']}/${buildDirectory['name']}"
+            try {
+                if (imageRequiresBuild(buildDirectory['folder'], buildDirectory['forceBuild'])) {
+                    stage("Build ${directoryName} image") {
+                        echo "Building 'docker/${directoryName}' ..."
+                        String imageBaseName = "gcr.io/forgerock-io/${buildDirectory['folder']}-${buildDirectory['name']}"
+                        // e.g. 7.2.0-a7267fbc
+                        String gitShaLabel = "${commonModule.BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}"
+
+                        sh commands("cd docker/${buildDirectory['folder']}",
+                                "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} ${buildDirectory['arguments']}")
+                        currentBuild.description += " ${directoryName}"
                     }
                 } else {
-                    echo "Skipping build for 'docker/${buildDirectory['name']}'"
+                    echo "Skipping build for 'docker/${directoryName}'"
                 }
+            } catch (exception) {
+                sendFailedSlackNotification("Error occurred while building the `${directoryName}` image")
+                throw exception
             }
-        } catch (exception) {
-            sendFailedSlackNotification("Error occurred while building the `${currentImage}` image")
-            throw exception
         }
 
         return Status.SUCCESS.asOutcome()
@@ -51,20 +55,8 @@ def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
 }
 
 boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
-    return forceBuild || BUILD_NUMBER == '1' ||
+    return forceBuild ||
             scmUtils.directoryContentsHaveChangedSincePreviousBuild("docker/${directoryName}")
-}
-
-void buildImage(String directoryName) {
-    String imageBaseName = "gcr.io/forgerock-io/${directoryName}"
-    String gitShaLabel = "${BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}" // e.g. 7.0.0-a7267fbc
-
-    sh "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} docker/${directoryName}"
-    if (env.BRANCH_NAME == 'master') {
-        sh "docker push ${imageBaseName}:${gitShaLabel}"
-        sh "docker tag ${imageBaseName}:${gitShaLabel} ${imageBaseName}:latest"
-        sh "docker push ${imageBaseName}:latest"
-    }
 }
 
 /**

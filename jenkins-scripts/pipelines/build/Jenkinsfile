@@ -14,12 +14,11 @@
 import com.forgerock.pipeline.reporting.PipelineRun
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-BASE_VERSION = '7.0.0'
+BASE_VERSION = '7.2.0'
 
-// Temporarily comment out directories to prevent that image being built
 buildDirectories = [
-    //[ name: 'git',              forceBuild: false ],
-    // [ name: 'util',             forceBuild: false ],
+    [ name: 'ds', folder: 'ds', arguments: 'ds', forceBuild: false ],
+    [ name: 'proxy', folder: 'ds', arguments: '-f proxy/Dockerfile .', forceBuild: false ],
 ]
 
 def pipeline
