@@ -34,6 +34,15 @@ def getPromotedProductRepo(platformImagesRevision, productName) {
     return readJSON(text: content)['imageName']
 }
 
+def getPromotedProductCommit(platformImagesRevision, productName) {
+    def content = bitbucketUtils.readFileContent(
+            'cloud',
+            'platform-images',
+            platformImagesRevision,
+            "${productName}.json").trim()
+    return readJSON(text: content)['gitCommit']
+}
+
 allStagesCloud = [:]
 
 boolean doRunPostcommitTests() {
@@ -133,10 +142,17 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
         node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
-                    def platformUiRevision = bitbucketUtils.getLatestCommitHash(
-                            'ui',
-                            'platform-ui',
-                            'ID_Cloud_Production')
+                    def platformUiRevision
+                    // When the UI tests are executed on master branch we use the UI commit from
+                    // platform-images master otherwise we use the ID_Cloud_Production tag
+                    if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+                        platformUiRevision = getPromotedProductCommit(commonModule.platformImagesRevision, 'ui')
+                    } else {
+                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
+                                'ui',
+                                'platform-ui',
+                                'ID_Cloud_Production')
+                    }
 
                     // Get platform-ui tests from corresponding commit
                     dir("platform-ui") {
