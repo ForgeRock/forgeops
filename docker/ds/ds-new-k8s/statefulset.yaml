@@ -16,39 +16,41 @@ spec:
       labels:
         tier: ds
     spec:
-      # Attempt to spread out ds containers across zones
-      topologySpreadConstraints:
-      - maxSkew: 1
-        topologyKey: topology.kubernetes.io/zone
-        # Use DoNotSchedule if you want to prevent ds pods from being scheduled in the same zone
-        whenUnsatisfiable: ScheduleAnyway
-        labelSelector:
-          matchLabels:
-            app: ds
-      # Create a toleration that allows this pod to be scheduled on a tainted node
-      # This is used to drive directory instances to dedicated nodes for performance.
-      # If a node is not tainted, this has no impact.
-      tolerations:
-      - key: "WorkerDedicatedDS"
-        operator: "Exists"
+      # topologySpreadConstraints:
+      # - maxSkew: 1
+      #   topologyKey: topology.kubernetes.io/zone
+      #   whenUnsatisfiable: DoNotSchedule
+      #   labelSelector:
+      #     matchLabels:
+      #       app: ds
       initContainers:
       - name: initialize
         image: ds
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         args: ["init"]
         volumeMounts:
         - name: data
           mountPath: /opt/opendj/data
         - name: passwords
           mountPath: /var/run/secrets/opendj-passwords
-        - name: ds-ssl-keypair
-          mountPath: /var/run/secrets/ds-ssl-keypair
-        - name: ds-ssl-keypair
-          mountPath: /var/run/secrets/truststore
-        - name: ds-master-keypair
-          mountPath: /var/run/secrets/ds-master-keypair
+        # These are not required at runtime because the init entrypoint script sets up all the
+        # keys in /var/run/secrets/keys.
+        # When DS can directly consume the cert-manager secrets, these can be reenabled.
+        # - name: ds-ssl-keypair
+        #   mountPath: /var/run/secrets/ds-ssl-keypair
+        # - name: ds-ssl-keypair
+        #   mountPath: /var/run/secrets/truststore
+        # - name: ds-master-keypair
+        #   mountPath: /var/run/secrets/ds-master-keypair
         - name: keys
-          mountPath: /var/run/secrets/keys      
+          mountPath: /var/run/secrets/keys
+        env:
+        - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+          value: "true"
+        - name: DS_UID_MONITOR_PASSWORD_FILE
+          value: "/var/run/secrets/opendj-passwords/monitor.pw"
+        - name: DS_UID_ADMIN_PASSWORD_FILE
+          value: "/var/run/secrets/opendj-passwords/dirmanager.pw"
         resources:
           requests:
             memory: 512Mi
@@ -102,6 +104,7 @@ spec:
         fsGroup: 0
         runAsUser: 11111
         runAsGroup: 0
+        runAsNonRoot: true
       terminationGracePeriodSeconds: 30
       volumes:
       - name: passwords
@@ -115,12 +118,11 @@ spec:
         secret:
           secretName: ds-ssl-keypair
           defaultMode: 384
-      # Where the ds keys will get copied to.  The keys need to be a format that DS likes - not cert-manager
-      # The init container copies /formats the cert-manager keys to this volume.
+      # Where the ds keys will get copied to.
       - name: keys
         emptyDir: {}
   updateStrategy:
-    type: RollingUpdate 
+    type: RollingUpdate
   volumeClaimTemplates:
   - metadata:
       name: data

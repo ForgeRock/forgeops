@@ -14,7 +14,7 @@ build:
 deploy:
   kustomize:
     paths:
-    - ds-k8s
+    - ds-new-k8s
 
 
 

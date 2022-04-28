@@ -1,5 +1,8 @@
+# TO deploy
+# Run kubectl apply -f kustomize/base/secrets/secret_agent_config.yaml
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
+# The affinity: directory label is used for anti-affinity. See statefulset.yaml.
 commonLabels:
   app: ds
   # Prometheus selector
@@ -8,3 +11,4 @@ commonLabels:
 resources:
 - service.yaml
 - statefulset.yaml
+- certs.yaml

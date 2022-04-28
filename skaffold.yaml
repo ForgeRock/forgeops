@@ -36,7 +36,7 @@ kind: Config
           CONFIG_PROFILE: '{{ or .CONFIG_PROFILE "cdk"}}'
     - &DS
       image: ds
-      context: docker/ds/ds
+      context: docker/ds/ds-new
       docker:
         pullParent: true
         dockerfile: Dockerfile
@@ -83,6 +83,7 @@ kind: Config
     - *DS-CTS
     - *DS-IDREPO
     - *IG
+    - *DS
     # Skip building LDIF-IMPORTER. We use a fixed tag for now
     # - *LDIF-IMPORTER
 
@@ -227,14 +228,6 @@ profiles:
 #######EVERYTHING BELOW THIS LINE WILL BE DEPRECATED###############
 ###################################################################
 
-# default.iam.forgeops.com
-- name: forgeops
-  build: *default-build
-  deploy:
-    kustomize:
-      paths:
-      - ./kustomize/overlay/forgeops
-
 - name: ldif-importer
   build:
     artifacts:
@@ -244,21 +237,6 @@ profiles:
     kustomize:
       paths:
       - ./kustomize/base/ldif-importer
-
-- name: dev
-  build: *default-build
-  deploy:
-    kustomize:
-      paths:
-      - ./kustomize/overlay/dev
-
-# Platform deployment without default UI projects. UI to be installed separately, for development
-- name: no-ui
-  build: *default-build
-  deploy:
-    kustomize:
-      paths:
-      - ./kustomize/overlay/noui
 
 # Sample profiles to launch / test just a specific product
 - name: ig-only
@@ -311,18 +289,6 @@ profiles:
     kustomize:
       paths: 
       - ./kustomize/overlay/internal-profiles/ds-only
-
-- name: amster-export
-  build:
-    artifacts:
-    - *AMSTER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      paths:
-      - ./kustomize/overlay/amster-export
 
 - name: clouddns
   build:

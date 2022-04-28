@@ -3,24 +3,17 @@
 This directory contains Dockerfiles for building and deploying the ForgeRock 
 Identity Platform.
 
-The Dockerfiles do not contain the configuration files needed to run the 
-platform. The `bin/config.sh` script must be used to initialize the 
-configuration. For more information, see the 
-[CDK documentation](https://ea.forgerock.com/docs/forgeops/cdk/develop/intro.html).
-
 ## Dockerfiles for Release 7.x
 
 For 7.x releases of the ForgeRock Identity Platform, the base Dockerfiles for 
 AM, IDM, DS and IG are built upstream in their product repositories. These 
 images are built and pushed to the `gcr.io/forgerock-io/` registry. The source 
 for the Dockerfiles is maintained in the respective product source code 
-repository. In general, these base images have the product binary laid down and 
-are "ready to run", but do not contain any configuration.
+repository. 
 
 The Dockerfiles in the [docker](./) directory are the "child" images that 
 derive from the base images, and overlay any of your customizations and 
-configuration files. These Docker images are built by Skaffold and pushed to 
-your Kubernetes cluster.
+configuration files. 
 
 ## Dockerfiles Used for Multiple Releases
 

@@ -59,7 +59,7 @@ set-administration-connector-prop \
             --set trust-manager-provider:"PEM Trust Manager"
 EOF
 
-# Delete the default PCKS12 provider. 
+# Delete the default PCKS12 provider.
 dsconfig --offline --no-prompt --batch <<EOF
 delete-trust-manager-provider \
             --provider-name "PKCS12"
@@ -93,7 +93,7 @@ set-administration-connector-prop \
             --set key-manager-provider:"PEM Key Manager"
 EOF
 
-# Delete the default PCKS12 provider. 
+# Delete the default PCKS12 provider.
 dsconfig --offline --no-prompt --batch <<EOF
 delete-key-manager-provider \
             --provider-name "PKCS12"

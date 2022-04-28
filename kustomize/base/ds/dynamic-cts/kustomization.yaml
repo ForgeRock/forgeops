@@ -1,6 +1,0 @@
-# Deploy the cts service.
-commonLabels:
-  app: ds-cts
-resources:
-- ../dynamic
-nameSuffix: -cts

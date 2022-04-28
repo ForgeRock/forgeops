@@ -83,7 +83,7 @@ spec:
     # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
     #   value: "ds-cts-0.ds-cts.mynamespace.svc.eu:8989,ds-cts-0.ds-cts.mynamespace.svc.us:8989"
     #
-    # See the README in forgeops/ds/ds. Understand what you are doing before setting this variable!
+    # See the README in forgeops/ds/ds-new. Understand what you are doing before setting this variable!
     #
     # 2. Set DS_GROUP_ID to indicate that we are in the eu region. The group ID is appended to the
     # hostname to ensure that the server has a unique identity within the Directory Service topology.
