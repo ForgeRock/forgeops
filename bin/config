@@ -271,8 +271,7 @@ def main():
     export_cmd_parser.add_argument('profile')
     export_cmd_parser.add_argument('--sort', '-s',
                                    help=HELP_EXPORT_CMD_SORT,
-                                   action='store_true',
-                                   default=True)
+                                   action='store_true')
     export_cmd_parser.set_defaults(func=run_export)
 
     # path sub command
