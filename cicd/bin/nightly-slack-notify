@@ -9,6 +9,8 @@ getsec () {
 uid_admin=$(getsec ds-passwords dirmanager\\.pw)
 amadmin=$(getsec  am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR)
 
+BRANCH_NAME=$1
+
 echo $OUT
 cat <<EOF >"${OUT}"
 {
