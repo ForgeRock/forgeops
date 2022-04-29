@@ -147,7 +147,7 @@ cat <<EOF >"${OUT}"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "<https://nightly.eng.forgeops.com/platform/>"
+					"text": "<https://nightly.eng71.forgeops.com/platform/>"
 				}
 			]
 		}
