@@ -8,7 +8,7 @@ getsec () {
 
 uid_admin=$(getsec ds-passwords dirmanager\\.pw)
 amadmin=$(getsec  am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR)
-forgeops_branch=$(git branch --show-current)
+
 echo $OUT
 cat <<EOF >"${OUT}"
 {
@@ -41,11 +41,11 @@ cat <<EOF >"${OUT}"
         		"type": "button",
         		"text": {
         			"type": "plain_text",
-        			"text": "${forgeops_branch}",
+        			"text": "${BRANCH_NAME}",
         			"emoji": true
         		},
-        		"value": "${forgeops_branch}",
-        		"url": "https://github.com/ForgeRock/forgeops/tree/${forgeops_branch}",
+        		"value": "${BRANCH_NAME}",
+        		"url": "https://github.com/ForgeRock/forgeops/tree/${BRANCH_NAME}",
         		"action_id": "button-action"
         	}
         },
