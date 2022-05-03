@@ -57,7 +57,7 @@ def main():
 
         k8s_ver = f'--kubernetes-version={args.version}'
         addons = '--addons=ingress,volumesnapshots'
-        minikube_args = f'start --cpus={args.cpu} --memory={args.ram} --disk-size={args.disk} {k8s_ver} {addons} {dvr}'
+        minikube_args = f'start --cpus={args.cpu} --memory={args.ram} --disk-size={args.disk} --cni=true {k8s_ver} {addons} {dvr}'
         utils.message('Running: "minikube ' + minikube_args + '"')
         utils.run('minikube', minikube_args)
         return
