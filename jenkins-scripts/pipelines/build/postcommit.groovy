@@ -30,19 +30,15 @@ def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
         for (buildDirectory in buildDirectories) {
             def directoryName = "${buildDirectory['folder']}/${buildDirectory['name']}"
             try {
-                if (imageRequiresBuild(buildDirectory['folder'], buildDirectory['forceBuild'])) {
-                    stage("Build ${directoryName} image") {
-                        echo "Building 'docker/${directoryName}' ..."
-                        String imageBaseName = "gcr.io/forgerock-io/${buildDirectory['folder']}-${buildDirectory['name']}"
-                        // e.g. 7.2.0-a7267fbc
-                        String gitShaLabel = "${commonModule.BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}"
+                stage("Build ${directoryName} image") {
+                    echo "Building 'docker/${directoryName}' ..."
+                    String imageBaseName = "gcr.io/forgerock-io/${buildDirectory['folder']}-${buildDirectory['name']}"
+                    // e.g. 7.2.0-a7267fbc
+                    String gitShaLabel = "${commonModule.BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}"
 
-                        sh commands("cd docker/${buildDirectory['folder']}",
-                                "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} ${buildDirectory['arguments']}")
-                        currentBuild.description += " ${directoryName}"
-                    }
-                } else {
-                    echo "Skipping build for 'docker/${directoryName}'"
+                    sh commands("cd docker/${buildDirectory['folder']}",
+                            "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} ${buildDirectory['arguments']}")
+                    currentBuild.description += " ${directoryName}"
                 }
             } catch (exception) {
                 sendFailedSlackNotification("Error occurred while building the `${directoryName}` image")
