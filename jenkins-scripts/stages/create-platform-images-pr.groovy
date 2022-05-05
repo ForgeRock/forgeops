@@ -13,17 +13,19 @@ import com.forgerock.pipeline.stage.Status
 
 /** Open a pull request against the Platform-Images repo, containing latest ForgeOps commit */
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
-    pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform-Images PR') {
-        privateWorkspace {
-            def dockerProperties = [
-                    'gitCommit':            commonModule.GIT_COMMIT,
-                    'platformImagesCommit': commonModule.platformImagesRevision,
-                    'lodestarCommit':       commonModule.lodestarRevision,
-            ]
+    stage ('Create Platform Images PR') {
+        pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform-Images PR') {
+            privateWorkspace {
+                def dockerProperties = [
+                        'gitCommit':            commonModule.GIT_COMMIT,
+                        'platformImagesCommit': commonModule.platformImagesRevision,
+                        'lodestarCommit':       commonModule.lodestarRevision,
+                ]
 
-            return platformImageUtils.createPlatformImagePR('forgeops', env.BRANCH_NAME, dockerProperties)
-                    ? Status.SUCCESS.asOutcome()
-                    : Status.SKIPPED.asOutcome()
+                return platformImageUtils.createPlatformImagePR('forgeops', env.BRANCH_NAME, dockerProperties)
+                        ? Status.SUCCESS.asOutcome()
+                        : Status.SKIPPED.asOutcome()
+            }
         }
     }
 }
