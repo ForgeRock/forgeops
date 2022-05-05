@@ -1,5 +1,5 @@
 resources:
-  - ../amster
+- ../amster
 components:
 - ../../deploy/image-defaulter
 
@@ -19,8 +19,6 @@ patchesJSON6902:
         volumeMounts:
         - mountPath: /amster-staging
           name: amster-files
-        - mountPath: /amster-config
-          name: amster-config
         - mountPath: /amster-scripts
           name: amster-scripts
         command: ["/bin/sh", "-c"]
@@ -28,6 +26,17 @@ patchesJSON6902:
         - |
           cd /amster-staging
           tar -xzvf amster-scripts.tar.gz -C /amster-scripts
+
+# Remove the amster initContainer as that is only required for import/export jobs
+patchesJSON6902:
+- target:
+    group: batch
+    version: v1
+    kind: Job
+    name: amster
+  patch: |-
+    - op: remove
+      path: /spec/template/spec/initContainers/0
 
 patchesStrategicMerge:
 - |-
@@ -39,32 +48,10 @@ patchesStrategicMerge:
     backoffLimit: 0
     template:
       spec:
-        initContainers:
-        - name: amster
+        containers:
+        - name: pause
           command: ["/bin/sh", "-c"]
           args:
           - |
             cp /amster-scripts/* /opt/amster/
-            ./docker-entrypoint.sh export-exit
-          env:
-          - name: TYPE
-            valueFrom:
-              configMapKeyRef:
-                name: amster-export-type
-                key: export
-          volumeMounts:
-          - mountPath: /opt/amster/config
-            name: amster-config
-          - mountPath: /amster-scripts
-            name: amster-scripts
-        volumes:
-        - name: amster-files
-          configMap:
-            name: amster-files
-        - name: amster-config
-          emptyDir: {}
-        - name: amster-scripts
-          emptyDir: {}
-        containers:
-        - name: pause
-          args: ["bash", "-c", "while : ; do sleep 1; done"]
+            ./docker-entrypoint.sh pause
