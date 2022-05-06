@@ -20,7 +20,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 10Giforgeop
+          storage: 10Gi
 
     # Used for snapshot creation
     volumeSnapshotClassName: ds-snapshot-class
