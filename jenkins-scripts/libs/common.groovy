@@ -45,6 +45,7 @@ lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 boolean branchSupportsPitTests() {
     def supportedBranchPrefixes = [
             'master',
+            'idcloud-',
             'release/',
             'sustaining/7.1',
     ]
