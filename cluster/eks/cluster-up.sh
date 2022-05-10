@@ -7,8 +7,8 @@ set -o pipefail
 set -o nounset
 
 
-EXTERNAL_SNAPSHOT_VERSION=${EXTERNAL_SNAPSHOT_VERSION:=v4.2.1}
-HELM_EBS_CHART_VERSION=${HELM_EBS_CHART_VERSION:=2.1.0}
+EXTERNAL_SNAPSHOT_VERSION=${EXTERNAL_SNAPSHOT_VERSION:=v5.0.1}
+HELM_EBS_CHART_VERSION=${HELM_EBS_CHART_VERSION:=2.6.7}
 
 usage() {
     printf "\nUsage: $0 <config file>\n\n"
@@ -97,12 +97,14 @@ installSnapShots() {
         kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml;
         kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml;
         kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml;
+        echo "CSI Snapshotter CRDs successfully installed."
     } || { echo "Failed to install SnapShot CRDs"; exit 1; }
 
     # Install SnapShot Controller
     {
         kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml;
         kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml;
+        echo "CSI Snapshotter controller successfully installed."
     } || { echo "Failed to install External SnapShotterCRDs"; exit 1; }
 
     kubectl create -f - <<EOF
