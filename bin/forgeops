@@ -118,7 +118,7 @@ def main():
     size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install/generate manifests for the CDM large platform')
     size_group.add_argument('--custom', dest='custom', help='Path to a directory containing custom CDM patches. Must contain patches for all products.')
 
-    subparser = parser.add_subparsers(dest='cmd', required=True, metavar='{command}')
+    subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
     parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
@@ -136,7 +136,7 @@ def main():
     parser_build = subparser.add_parser('build', parents=[common_dg], help='Build custom docker images')
     parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
     parser_build.add_argument('--default-repo', '-r', dest='registry')
-    parser_build.add_argument('--tag', '-t', required=False, help='Set the tag used when building images')
+    parser_build.add_argument('--tag', '-t', help='Set the tag used when building images')
     parser_build.add_argument('--config-profile', '-p', dest='config_profile')
     parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
     parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
