@@ -19,6 +19,3 @@ patchesStrategicMerge:
         initContainers:
         - name: amster
           args: ["export-exit"]
-        containers:
-        - name: pause
-          args: ["bash", "-c", "while : ; do sleep 1; done"]
