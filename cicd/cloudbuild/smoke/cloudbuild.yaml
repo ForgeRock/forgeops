@@ -2,7 +2,7 @@ timeout: 900s
 options:
   env:
     - NAMESPACE=smoke
-    - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
+    - DEFAULT_DOCKER_REPO=us-docker.pkg.dev/engineering-devops/images
 
 steps:
 - name: 'gcr.io/cloud-builders/gcloud'

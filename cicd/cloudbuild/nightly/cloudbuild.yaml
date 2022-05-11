@@ -2,7 +2,7 @@ timeout: 900s
 options:
   env:
     - NAMESPACE=nightly
-    - DEFAULT_DOCKER_REPO=gcr.io/engineering-devops
+    - DEFAULT_DOCKER_REPO=us-docker.pkg.dev/engineering-devops/images
     - SET_IMAGES_LOG=/workspace/set_log.txt
 
 steps:

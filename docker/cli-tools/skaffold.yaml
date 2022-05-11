@@ -7,7 +7,7 @@ profiles:
 - name: git
   build:
     artifacts:
-    - image: gcr.io/engineering-devops/git-server
+    - image: us-docker.pkg.dev/engineering-devops/images/git-server
       context: git-server
   deploy:
     kustomize:

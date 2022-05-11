@@ -72,7 +72,7 @@ configuration details. In addition, ensure that the `TARGET_HOST`, `USER_POOL`,
 To run the benchmarks in a cluster:
 
 ```
-skaffold --default-repo gcr.io/engineering-devops run
+skaffold --default-repo us-docker.pkg.dev/engineering-devops/images run
 ```
 
 Alternatively, you can use `skaffold dev` to see the output.

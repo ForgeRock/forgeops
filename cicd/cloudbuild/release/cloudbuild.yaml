@@ -30,7 +30,7 @@ steps:
   secretEnv:
     - 'GH_TOKEN'
   env:
-    - DOCKER_REPO=gcr.io/forgeops-public
+    - DOCKER_REPO=us-docker.pkg.dev/forgeops-public/images
     - IMAGE_TAG=$TAG_NAME
   args:
     - '-c'

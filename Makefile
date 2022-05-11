@@ -4,5 +4,5 @@
 %:
 	@docker run --rm \
 		-v $(shell pwd):/opt/workspace \
-			gcr.io/engineering-devops/repo:latest \
+			us-docker.pkg.dev/engineering-devops/images/repo:latest \
 				make -f docker/cli-tools/repo/Makefile $@

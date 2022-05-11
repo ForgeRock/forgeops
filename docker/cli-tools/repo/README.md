@@ -8,7 +8,7 @@ A simple set of tools for managing and releasing the ForgeOps repository.
 
 1. Pull the `repo` container from the `engineering-devops` registry:
     ```
-    docker pull gcr.io/engineering-devops/repo:latest
+    docker pull us-docker.pkg.dev/engineering-devops/images/repo:latest
     ```
 
 1. Change to the container's root directory.
