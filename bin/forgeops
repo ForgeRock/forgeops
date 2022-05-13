@@ -116,7 +116,7 @@ def main():
     size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install/generate manifests for the CDM small platform')
     size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install/generate manifests for the CDM medium platform')
     size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install/generate manifests for the CDM large platform')
-    size_group.add_argument('--custom', dest='custom', help='Path to a directory containing custom CDM patches. Must contain patches for all products.')
+    size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches.')
 
     subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
     parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg], allow_abbrev=False,
@@ -290,6 +290,7 @@ def main():
 
     if 'base' in components:
         components.insert(0, 'secrets')
+
     if args.cmd == 'generate':
         instructions = []
         components.sort(key=_sort_components)
@@ -308,8 +309,11 @@ def main():
             print('\n'.join(instructions))
         utils.message('\nEnjoy your forgeops manifests!')
         return 
+
     utils.install_dependencies()
+
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
+
     if 'all' in components:
         install_all(size, namespace, fqdn, ctx, pkg_path, src_profile_dir)
     else:
@@ -321,8 +325,6 @@ def main():
         utils.printsecrets(namespace)
         utils.printurls(namespace)
     utils.message('\nEnjoy your deployment!')
-
-
 
 
 def _sort_components(e):

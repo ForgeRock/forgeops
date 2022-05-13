@@ -109,6 +109,8 @@ patcheable_components ={
     'base/ds-idrepo': 'ds-idrepo.yaml',
     'base/ds-cts': 'ds-cts.yaml',
     'base/ig': 'ig.yaml',
+    'base/ingress': 'ingress.yaml',
+    'base/secrets': 'secret_agent_config.yaml'
 }
 
 SCRIPT = pathlib.Path(__file__)
@@ -374,8 +376,9 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
             run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
         if c in patcheable_components and size != 'cdk':
             p = patcheable_components[c]
-            shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
-            run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
+            if os.path.exists(os.path.join(src_profile_dir, p)):    
+                shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
+                run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
 
     fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
     sizepatchjson = [{"op": "add", "path": "data/data/FORGEOPS_PLATFORM_SIZE", "value": size}]
