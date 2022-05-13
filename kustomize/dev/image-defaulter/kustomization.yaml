@@ -34,4 +34,4 @@ images:
   newTag: 7.1.1
 - name: .*ig.*
   newName: gcr.io/forgeops-public/ig
-  newTag: 7.1.1
+  newTag: 7.1.2
