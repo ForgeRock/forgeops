@@ -109,7 +109,7 @@ def main():
     common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
     common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
-                                                          'rcs-agent', 'secrets', []])
+                                                          'secrets', []])
     size_group = common_sz.add_mutually_exclusive_group()
     size_group.add_argument('--cdk', action='store_const', dest='size', const='cdk', help='(Default) Install/generate manifests for the CDK')
     size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install/generate manifests for the CDM mini platform')

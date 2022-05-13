@@ -7,7 +7,6 @@ resources:
 - ../../base/am
 - ../../base/amster
 - ../../base/idm
-- ../../base/rcs-agent
 - ../../base/end-user-ui
 - ../../base/login-ui
 - ../../base/admin-ui

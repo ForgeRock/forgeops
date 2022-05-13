@@ -4,7 +4,6 @@ commonLabels:
 resources:
 - ../../base/am-cdk
 - ../../base/idm-cdk
-- ../../base/rcs-agent
 - ../../base/end-user-ui
 - ../../base/login-ui
 - ../../base/admin-ui

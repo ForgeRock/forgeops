@@ -93,7 +93,7 @@ bundles = {
     'ds': ['base/ds-idrepo'],
     'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
     'ds-old': ['base/ds/idrepo', 'base/ds/cts'],
-    'apps': ['base/am-cdk', 'base/idm-cdk', 'base/rcs-agent', inject_kustomize_amster],
+    'apps': ['base/am-cdk', 'base/idm-cdk', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
     'am': ['base/am-cdk'],
     'idm': ['base/idm-cdk'],
@@ -299,7 +299,7 @@ def waitforsecrets(ns):
     ns: target namespace.
     """
     secrets = ['am-env-secrets', 'idm-env-secrets',
-               'rcs-agent-env-secrets', 'ds-passwords', 'ds-env-secrets']
+               'ds-passwords', 'ds-env-secrets']
     message('\nWaiting for K8s secrets')
     for secret in secrets:
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
@@ -482,10 +482,6 @@ def printsecrets(ns, to_stdout=True):
             'idm-env-secrets': {
                 'OPENIDM_ADMIN_PASSWORD': None
             },
-            'rcs-agent-env-secrets':{
-                'AGENT_IDM_SECRET': None,
-                'AGENT_RCS_SECRET': None,
-            },
             'ds-passwords': {
                 'dirmanager\\\.pw': None,
             },
@@ -504,10 +500,6 @@ def printsecrets(ns, to_stdout=True):
                 f"{secrets['am-env-secrets']['AM_PASSWORDS_AMADMIN_CLEAR']} (amadmin user)")
             print(
                 f"{secrets['idm-env-secrets']['OPENIDM_ADMIN_PASSWORD']} (openidm-admin user)")
-            print(
-                f"{secrets['rcs-agent-env-secrets']['AGENT_IDM_SECRET']} (rcs-agent IDM secret)")
-            print(
-                f"{secrets['rcs-agent-env-secrets']['AGENT_RCS_SECRET']} (rcs-agent RCS secret)")
             print("{} (uid=admin user)".format(secrets['ds-passwords']['dirmanager\\\.pw']))  # f'strings' do not allow '\'
             print(f"{secrets['ds-env-secrets']['AM_STORES_APPLICATION_PASSWORD']} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
             print(f"{secrets['ds-env-secrets']['AM_STORES_CTS_PASSWORD']} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")

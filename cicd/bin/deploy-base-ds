@@ -13,7 +13,6 @@ kubectl apply -n $NAMESPACE -f kustomize/base/secrets/secret_agent_config.yaml
 echo ""
 printf "waiting for secret: am-env-secrets ."; until kubectl -n ${NAMESPACE} get secret am-env-secrets &> /dev/null ; do sleep 1; printf "."; done ; echo "done"
 printf "waiting for secret: idm-env-secrets ."; until kubectl -n ${NAMESPACE} get secret idm-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
-printf "waiting for secret: rcs-agent-env-secrets ."; until kubectl -n ${NAMESPACE} get secret rcs-agent-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
 printf "waiting for secret: ds-passwords ."; until kubectl -n ${NAMESPACE} get secret ds-passwords &> /dev/null ; do sleep 1; printf "."; done; echo "done"
 printf "waiting for secret: ds-env-secrets ."; until kubectl -n ${NAMESPACE} get secret ds-env-secrets &> /dev/null ; do sleep 1; printf "."; done; echo "done"
 printf "waiting for secret: ds ."; until kubectl -n ${NAMESPACE} get secret ds &> /dev/null ; do sleep 1; printf "."; done; echo "done"

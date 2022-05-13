@@ -95,10 +95,6 @@ cat <<EOF >"${OUT}"
                 },
                 {
                 	"type": "mrkdwn",
-                    "text": "RCS Agent: $(getHashId rcs-agent)"
-                },
-                {
-                	"type": "mrkdwn",
                     "text": "Login UI: $(getHashId platform-login-ui)"
                 },
                 {
