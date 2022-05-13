@@ -27,7 +27,7 @@ cat <<-IG > ${test_dir}/ig.json
     "imageTag": "ig-test-tag"
 }
 IG
-cat <<-RCS > ${test_dir}/openicf-connectors.json
+cat <<-RCS > ${test_dir}/rcs-agent.json
 {
     "imageName": "gcr.io/rcs-agent-tester/rcs-agent/pit1",
     "imageTag": "rcs-agent-test-tag"
