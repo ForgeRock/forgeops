@@ -45,7 +45,7 @@ patchesStrategicMerge:
           args:
           - |
             cp /amster-scripts/* /opt/amster/
-            ./docker-entrypoint.sh export-exit
+            ./docker-entrypoint.sh export
           env:
           - name: TYPE
             valueFrom:
@@ -65,6 +65,3 @@ patchesStrategicMerge:
           emptyDir: {}
         - name: amster-scripts
           emptyDir: {}
-        containers:
-        - name: pause
-          args: ["bash", "-c", "while : ; do sleep 1; done"]

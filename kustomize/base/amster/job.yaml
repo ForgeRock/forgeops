@@ -46,7 +46,10 @@ spec:
       - name: pause
         image: amster
         imagePullPolicy: Always
-        args:  ["bash", "-c", "sleep 10"]
+        args:  ["bash", "-c", "sleep ${DURATION:-100}"]
+        envFrom:
+        - configMapRef:
+            name: amster-retain
         volumeMounts:
         - mountPath: /var/tmp/amster
           name: export-files

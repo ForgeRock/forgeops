@@ -27,7 +27,7 @@ def amster_run(ns):
     amster_run_job_path = os.path.join(kustomize_dir, 'base', 'amster-run')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     try:
-        clean_amster_job(ns, False)
+        utils.clean_amster_job(ns, False)
         envVars = os.environ
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
         utils.run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
@@ -36,45 +36,48 @@ def amster_run(ns):
         utils.message('\nWaiting for amster pod to be running. This can take several minutes.')
         utils.run('kubectl', f'-n {ns} wait --for=condition=ready pod {pod} --timeout=600s')
     finally:
-        clean_amster_job(ns, True)
+        utils.clean_amster_job(ns, True)
 
-def amster_import(ns, src, printlogs=True):
+def amster_import(ns, src, duration, printlogs=True):
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     docker_dir = os.path.join(sys.path[0], '..', 'docker')
     amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    retain = True if duration > '200' else False
     # If the source dir/file does not exist exit
     if not os.path.exists(src):
         utils.error(f'Cant read path {src}. Please specify a valid path and try again')
         sys.exit(1)
     try:
-        clean_amster_job(ns, False)
+        utils.clean_amster_job(ns, False)
         utils.message('Packing and uploading configs')
         envVars = os.environ
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
         utils.run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
         utils.run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
         utils.run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz')
+        utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
         pod = _launch_amster_job(amster_upload_job_path, ns)
         utils.message('\nWaiting for amster job to complete. This can take several minutes.')
-        utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
+        utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=amster --timeout=600s')
         if printlogs:
             utils.message('Captured logs from the amster pod')
             utils.run('kubectl', f'-n {ns} logs -c amster {pod}')
     finally:
-        clean_amster_job(ns, False)
+        utils.clean_amster_job(ns, retain)
 
-def amster_export(ns, dst, glob, full, retain):
+def amster_export(ns, dst, glob, full, duration):
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     docker_dir = os.path.join(sys.path[0], '..', 'docker')
     amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    retain = True if duration > '200' else False
     fqdn = utils.get_fqdn(ns)
     if not os.path.isdir(dst):
         utils.error(f'{dst} is not a valid directory. Please specify a valid path and try again')
         sys.exit(1)
     try:
-        clean_amster_job(ns, False)
+        utils.clean_amster_job(ns, False)
         utils.message('Packing and uploading configs')
         envVars = os.environ
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
@@ -84,6 +87,7 @@ def amster_export(ns, dst, glob, full, retain):
             utils.run('kubectl', f'-n {ns} create cm amster-export-type --from-literal=export=full')
         else:
             utils.run('kubectl', f'-n {ns} create cm amster-export-type --from-literal=export=partial')
+        utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
         # Create export - amster will export data, and wait.
         pod = _launch_amster_job(amster_export_job_path, ns)
         utils.message('\nWaiting for amster job to complete. This can take several minutes.')
@@ -100,7 +104,7 @@ def amster_export(ns, dst, glob, full, retain):
             sys.exit(1)
         upgrade_all_amster_files(dst, fqdn)
     finally:
-        clean_amster_job(ns, retain)
+        utils.clean_amster_job(ns, retain)
 
 def upgrade_all_amster_files(conf_path, fqdn):
     utils.message('Updating amster config.')
@@ -190,18 +194,6 @@ def _launch_amster_job(kustomize_path, ns):
                                       cstdout=True)
     return amster_pod_name.decode('ascii')
 
-def clean_amster_job(ns, retain):
-    if not retain:
-        utils.message(f'Cleaning up amster components')
-        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
-        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
-        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-export-type')
-    if os.path.exists('amster-import.tar.gz'):
-        os.remove('amster-import.tar.gz')
-    if os.path.exists('amster-scripts.tar.gz'):
-        os.remove('amster-scripts.tar.gz')
-    return
-
 def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
@@ -211,10 +203,11 @@ def main():
     subparser = parser.add_subparsers(dest='cmd', required=True, help='select action to perform')
     parser_import = subparser.add_parser('import', help='Import json configuration files into AM', parents=[common])
     parser_import.add_argument('src', help='source file or directory to import')
+    parser_import.add_argument('--retain', '-r', dest='duration', default='100', help='keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_export = subparser.add_parser('export', help='export files from amster', parents=[common])
     parser_export.add_argument('--global', dest='glob', action='store_true', help='include the global/ configuration in the amster export')
     parser_export.add_argument('--full', dest='full', action='store_true', help='export all realm configuration')
-    parser_export.add_argument('--retain', dest='retain', action='store_true', help='retain amster pods for troubleshooting')
+    parser_export.add_argument('--retain', '-r', dest='duration', default='100', help='keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_export.add_argument('dst', help='destination directory to export files to')
     subparser.add_parser('clean', help='clean up and remove amster pods', parents=[common])
     parser_upgrade = subparser.add_parser('upgrade', help='replace placeholders of given configs')
@@ -226,16 +219,16 @@ def main():
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
     if args.cmd == 'clean':
-        clean_amster_job(namespace, False)
+        utils.clean_amster_job(namespace, False)
 
     # Import files into amster.
     if args.cmd == 'import':
-        amster_import(namespace, args.src)
+        amster_import(namespace, args.src, args.duration)
         return
 
     # Export files out of amster
     if args.cmd == 'export':
-        amster_export(namespace, args.dst, args.glob, args.full, args.retain)
+        amster_export(namespace, args.dst, args.glob, args.full, args.duration)
         return
 
     # Replace placeholders

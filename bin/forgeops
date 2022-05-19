@@ -37,30 +37,32 @@ size_map = {
     },
 }
 
-def install_all(size, ns, fqdn, ctx, pkg_path=None, src_profile_dir=None):
+def install_all(size, ns, fqdn, ctx, duration, pkg_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
-    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
-    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ctx, duration, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ctx, duration, pkg_path, src_profile_dir)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
-    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ctx, duration, pkg_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
     utils.wait_for_ds(ns, 'ds-idrepo')
     if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
+    # Clean any existing Amster resources
+    utils.clean_amster_job(ns, False)
     utils.message('\nDeploying apps.')
-    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ctx, duration, pkg_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_am(ns)
+    # Create amster-retain configmap
+    utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
     utils.wait_for_amster(ns)
-    utils.message('\nRemoving "amster" deployment.')
-    utils.uninstall_component(remap.get('amster', 'amster'), ns, False)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_idm(ns)
     utils.message('\nDeploying UI.')
-    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ctx, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ctx, duration, pkg_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -116,17 +118,19 @@ def main():
     size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install/generate manifests for the CDM small platform')
     size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install/generate manifests for the CDM medium platform')
     size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install/generate manifests for the CDM large platform')
-    size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches.')
+    size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches')
 
     subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
     parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
+    parser_install.add_argument('--amster-retain', '-a', dest='duration', default='100', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg],
                                           help='Generate the ForgeRock Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
+    parser_generate.add_argument('--amster-retain', '-r', dest='duration', default='100', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_delete = subparser.add_parser(
         'delete', parents=[common_ns, common, common_dg], help='Delete ForgeRock Platform components or component bundles')
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
@@ -299,7 +303,7 @@ def main():
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, custom_path, src_profile_dir)
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, args.duration, custom_path, src_profile_dir)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
             instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
             if c in wait_targets:
@@ -313,12 +317,11 @@ def main():
     utils.install_dependencies()
 
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
-
     if 'all' in components:
-        install_all(size, namespace, fqdn, ctx, pkg_path, src_profile_dir)
+        install_all(size, namespace, fqdn, ctx, args.duration, pkg_path, src_profile_dir)
     else:
         for c in components:
-            utils.install_component(remap.get(c, c), size, namespace, fqdn, ctx, pkg_path, src_profile_dir)
+            utils.install_component(remap.get(c, c), size, namespace, fqdn, ctx, args.duration, pkg_path, src_profile_dir)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace)

@@ -25,7 +25,7 @@ MSG_FMT = '[%(levelname)s] %(message)s'
 
 _IGNORE_FILES = ('.DS_Store',)
 
-log_name = 'foregops'
+log_name = 'forgeops'
 
 ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
 
@@ -333,7 +333,7 @@ def wait_for_amster(ns, timeout_secs=600):
     timeout_secs: timeout in secs.
     """
     _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
-    return run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout={timeout_secs}s')
+    return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
 
 def wait_for_idm(ns, timeout_secs=600):
     """
@@ -397,7 +397,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ctx, duration, pkg_base_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -411,6 +411,15 @@ def install_component(component, size, ns, fqdn, ctx, pkg_base_path=None, src_pr
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
     _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path, src_profile_dir=src_profile_dir)
+    
+    # Remove amster components
+    if component == "amster":
+        clean_amster_job(ns, False)
+    
+    # Create amster-retain configmap which defines the 
+    if component == 'amster':
+        run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
+
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
 def uninstall_component(component, ns, force):
@@ -430,6 +439,7 @@ def uninstall_component(component, ns, force):
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
         _, contents = generate_package(component, 'cdk', ns, '.', '', custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
+        clean_amster_job(ns, False)
         if component in ['base', 'base-cdm'] and force:
             run('kubectl', f'-n {ns} delete directorybackup -l app.kubernetes.io/part-of=forgerock --ignore-not-found=true')
             run('kubectl', f'-n {ns} delete directoryrestore -l app.kubernetes.io/part-of=forgerock --ignore-not-found=true')
@@ -889,4 +899,18 @@ def get_secret_value(ns, secret, key):
     _, value, _ = run('kubectl',
                      f'-n {ns} get secret {secret} -o jsonpath={{.data.{key}}}', cstdout=True)
     return base64.b64decode(value).decode('utf-8')
+
+# Clean up amster resources.
+def clean_amster_job(ns, retain):
+    if not retain:
+        message(f'Cleaning up amster components')
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-export-type')
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-retain')
+    if os.path.exists('amster-import.tar.gz'):
+        os.remove('amster-import.tar.gz')
+    if os.path.exists('amster-scripts.tar.gz'):
+        os.remove('amster-scripts.tar.gz')
+    return
 
