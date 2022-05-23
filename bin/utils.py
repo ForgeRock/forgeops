@@ -439,7 +439,8 @@ def uninstall_component(component, ns, force):
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
         _, contents = generate_package(component, 'cdk', ns, '.', '', custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
-        clean_amster_job(ns, False)
+        if component == "amster":
+            clean_amster_job(ns, False)
         if component in ['base', 'base-cdm'] and force:
             run('kubectl', f'-n {ns} delete directorybackup -l app.kubernetes.io/part-of=forgerock --ignore-not-found=true')
             run('kubectl', f'-n {ns} delete directoryrestore -l app.kubernetes.io/part-of=forgerock --ignore-not-found=true')
