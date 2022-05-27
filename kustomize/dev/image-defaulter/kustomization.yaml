@@ -33,5 +33,5 @@ images:
   newName: gcr.io/forgerock-io/platform-login-ui
   newTag: 7.1.1
 - name: .*ig.*
-  newName: gcr.io/forgeops-public/ig
+  newName: us-docker.pkg.dev/forgeops-public/images/ig
   newTag: 7.1.2
