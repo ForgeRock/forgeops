@@ -303,7 +303,7 @@ def main():
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, args.duration, custom_path, src_profile_dir)
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, custom_path, src_profile_dir)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
             instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
             if c in wait_targets:

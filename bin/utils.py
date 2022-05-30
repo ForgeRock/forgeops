@@ -574,7 +574,7 @@ def check_base_toolset():
 
     # print('Checking kustomize version')
     _, ver, _ = run('kustomize', 'version --short', cstdout=True)
-    ver = ver.decode('ascii').split()[0].split('/')[-1]
+    ver = ver.decode('ascii').split()[0].split('/')[-1].lstrip('{')
     check_component_version('kustomize', ver)
 
     # print('Checking skaffold version')
