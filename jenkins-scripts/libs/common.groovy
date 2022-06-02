@@ -47,7 +47,7 @@ boolean branchSupportsPitTests() {
             'master',
             'idcloud-',
             'release/',
-            'sustaining/7.1',
+            'sustaining/7.',
     ]
     String branch = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
     return supportedBranchPrefixes.any { it -> branch.startsWith(it) }
@@ -61,8 +61,8 @@ boolean branchSupportsIDCloudReleases() {
     return 'master' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
             || 'feature/config' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
             || 'release/7.1.0' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
-            || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}" == 'sustaining/7.1.x')) \
-            || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}" == 'sustaining/7.1.x'))
+            || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}".startsWith('sustaining/7.'))) \
+            || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}".startsWith('sustaining/7.')))
 }
 
 void buildImage(String directoryName, String imageName, String arguments) {
