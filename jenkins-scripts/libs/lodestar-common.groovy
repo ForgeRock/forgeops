@@ -142,16 +142,38 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
         node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
-                    def platformUiRevision
-                    // When the UI tests are executed on master branch we use the UI commit from
-                    // platform-images master otherwise we use the ID_Cloud_Production tag
+                    def platformUiImageTag
+                    // When the UI tests are executed on:
+                    // - master branch we use the UI commit from platform-images master
+                    // - sustaining/7.2.x we use the 7.2.0 UI tag
+                    // - otherwise we use the ID_Cloud_Production tag
                     if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
-                        platformUiRevision = getPromotedProductCommit(commonModule.platformImagesRevision, 'ui')
+                        checkout scm
+                        sh "git checkout ${commonModule.GIT_COMMIT}"
+                        platformUiImageTag = commonModule.getProductBaseImageTag('ui')
+                    } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+                        platformUiImageTag = '7.2.0'
                     } else {
-                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
+                        def platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
-                                'ID_Cloud_Production')
+                                'ID_Cloud_Production').substring(0, 11)
+
+                        def script = "git log --oneline | grep 'UI update to ${platformUiRevision}' | cut -d' ' -f1"
+                        def platformImagesRevision = sh(script: script, returnStdout: true).trim()
+                        if (platformImagesRevision == '') {
+                            error "Impossible to find ID_Cloud_Production commit ${platformUiRevision} " +
+                                    "in platform-images git log.\n" +
+                                    "Finding the docker image tag requires using a platform-ui commit that" +
+                                    " is listed in platform-images git log."
+                        }
+
+                        def content = bitbucketUtils.readFileContent(
+                                'cloud',
+                                'platform-images',
+                                platformImagesRevision,
+                                "ui.json").trim()
+                        platformUiImageTag = readJSON(text: content)['imageTag']
                     }
 
                     // Get platform-ui tests from corresponding commit
@@ -163,7 +185,6 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     }
 
                     // Set UI image tag to the corresponding commit
-                    def platformUiImageTag = "7.2.0-${platformUiRevision}"
                     testConfig.COMPONENTS_ADMINUI_IMAGE_TAG = platformUiImageTag
                     testConfig.COMPONENTS_ENDUSERUI_IMAGE_TAG = platformUiImageTag
                     testConfig.COMPONENTS_LOGINUI_IMAGE_TAG = platformUiImageTag
