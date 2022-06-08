@@ -41,9 +41,8 @@ kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
     name: fast
-provisioner: kubernetes.io/aws-ebs
-parameters:
-    type: gp2
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
@@ -66,6 +65,22 @@ installSnapShots() {
     aws_container_images=$(kubectl get po -n kube-system -l k8s-app=aws-node -o jsonpath='{ .items[].spec.containers[].image }')
     aws_registry=$(tail -n 1 <<<$aws_container_images | cut -f1 -d '/')
 
+
+    # Install SnapShot CRD
+    {
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml;
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml;
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml;
+        echo "CSI Snapshotter CRDs successfully installed."
+    } || { echo "Failed to install SnapShot CRDs"; exit 1; }
+
+    # Install SnapShot Controller
+    {
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml;
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml;
+        echo "CSI Snapshotter controller successfully installed."
+    } || { echo "Failed to install External SnapShotterCRDs"; exit 1; }
+
     if ! helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver;
     then
         echo "Failed to add helm aws-ebs-csi-driver repo"
@@ -84,28 +99,12 @@ installSnapShots() {
     	--set image.repository="${aws_registry}/eks/aws-ebs-csi-driver" \
     	--set enableVolumeResizing=true \
     	--set enableVolumeSnapshot=true \
-    	--set controller.serviceAccount.create=false \
+    	--set controller.serviceAccount.create=true \
     	--set controller.serviceAccount.name=ebs-csi-controller-sa;
         then
             echo "Failed to install ebs csi controller."
             exit 1;
     fi
-
-
-    # Install SnapShot CRD
-    {
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml;
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml;
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml;
-        echo "CSI Snapshotter CRDs successfully installed."
-    } || { echo "Failed to install SnapShot CRDs"; exit 1; }
-
-    # Install SnapShot Controller
-    {
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml;
-        kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/${EXTERNAL_SNAPSHOT_VERSION}/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml;
-        echo "CSI Snapshotter controller successfully installed."
-    } || { echo "Failed to install External SnapShotterCRDs"; exit 1; }
 
     kubectl create -f - <<EOF
 apiVersion: snapshot.storage.k8s.io/v1
