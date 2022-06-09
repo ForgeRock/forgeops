@@ -15,7 +15,7 @@ NAMESPACE=${NAMESPACE:-default}
 
 # Backup type is  tar,ldif or dsbackup
 # You can restore one or more of these types in sequence.
-BACKUP_TYPE="${BACKUP_TYPE:-tar,ldif,dsbackup}"
+BACKUP_TYPE="${DS_BACKUP_TYPE:-tar,ldif,dsbackup}"
 SOURCE="/backup/$NAMESPACE"
 
 [ -d "$SOURCE" ] || {
