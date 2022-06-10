@@ -104,8 +104,8 @@ spec:
     # Keep this many snapshots. Older snapshots will be deleted
     snapshotsRetained: 3
     # DS instance to take snapshot of. Default is 0(ds-idrepo-0).
-    # For deployment with multiple ds-idrepo servers, change this to a non primary ds-idrepo server(e.g. 1)
-    directoryInstance: 0
+    # For deployment with multiple ds-idrepo servers, change this to a non primary ds-idrepo server(e.g. 1).
+    # directoryInstance: 0
 
   ### Passwords ###
   # Passwords: maps DS accounts to new or existing secrets.
