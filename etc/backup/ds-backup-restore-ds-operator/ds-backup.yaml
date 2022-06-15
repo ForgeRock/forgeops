@@ -11,7 +11,7 @@ spec:
   # In this case, it applies to the DS Job that will run the backup.
   # The "backup" entrypoint will be called.
   podTemplate:
-    image:  us-docker.pkg.dev/forgeops-public/images/ds:7.2-dev
+    image:  us-docker.pkg.dev/forgeops-public/images/ds:dev
     imagePullPolicy: IfNotPresent
 
     # The spec for the volume that holds the backup. The volume name will be the same as our metadata.name (ds-backup in this case)

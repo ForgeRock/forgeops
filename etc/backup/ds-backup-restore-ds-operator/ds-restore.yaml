@@ -13,7 +13,7 @@ spec:
   podTemplate:
     # The directory server binary that contains commands to import ldif or run dsbackup
     # The "restore" entrypoint is called in the Job
-    image:  us-docker.pkg.dev/forgeops-public/images/ds:7.2-dev
+    image:  us-docker.pkg.dev/forgeops-public/images/ds:dev
     imagePullPolicy: IfNotPresent
 
     # Spec for the pvc that will hold the restored data in DS JE format.
