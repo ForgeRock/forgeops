@@ -7,7 +7,7 @@ spec:
   # The number of DS servers in the topology
   replicas: 1
   podTemplate:
-    image: us-docker.pkg.dev/forgeops-public/images/ds:dev
+    image: ds
     imagePullPolicy: IfNotPresent
 
     # The resources assigned to each DS pod
