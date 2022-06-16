@@ -6,11 +6,11 @@ for monitoring and alerts. Before you attempt to customize the default
 implementation, make sure you are familiar with Prometheus, Alertmanager, and
 Grafana concepts in the following documentation:
 
-* [Alertmanager overview](https://prometheus.io/docs/alerting/overview/)
+* [Alertmanager overview](https://prometheus.io/docs/alerting/latest/overview/)
 
-* [Alertmanager configuration](https://prometheus.io/docs/alerting/configuration/)
+* [Alertmanager configuration](https://prometheus.io/docs/alerting/latest/configuration/)
 
-* [Grafana](https://grafana.com/docs/grafana/latest/)
+* [Grafana documentation](https://grafana.com/docs/grafana/latest/)
 
 The following sections list the forgeops repository artifacts that are used to
 deploy Prometheus,Alertmanager, and Grafana in the CDM.  
@@ -39,9 +39,8 @@ repository's top-level directory.
 ## Files in the ``cluster/addons/prometheus`` directory  
 
 * ``prometheus-operator.yaml``: Overrides values for the Prometheus operator,
-Prometheus, Alertmanager, and Grafana. See the `prometheus-community/kube-prometheus-stack`
-[values file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
-for default values. To modify default values, override the
+Prometheus, Alertmanager, and Grafana. See the
+> [``values.yaml`` file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) in ``prometheus-community/helm-charts`` for default values. To modify default values, override the
 ``prometheus-operator.yaml`` file, or specify your own values file when you deploy Prometheus. For example:
   
 ```bash
@@ -72,26 +71,15 @@ the Prometheus operator, as described above. Prometheus uses its own
 configuration watcher to look for updated configurations.
 
 <br />
+
 ## How Alertmanager works
 
 Alertmanager is used to redirect specific alerts from Prometheus to configured
-receivers. Use the Alertmanager configuration section in
-the ``cluster/addons/prometheus/prometheus-operator.yaml`` directory to
-configure Alertmanager.  
-
-Alertmanager configuration details:
-
-* The ``global`` section defines attributes that apply to all alerts.
-  
-* The ``route`` section defines a tree topology of alert filters to direct
-particular alerts to a specific receiver. The example deployment sends all
-alerts to a Slack receiver.
-  
-* The ``receivers`` section defines named configurations of notification
-integrations.
+receivers. Use the ``alertmanager`` section in the ``prometheus-operator.yaml`` 
+> file in the ``cluster/addons/prometheus/`` directory to configure Alertmanager.
 
 Prometheus alerts are configured by product, in the
-``cluster/addons/prometheus/forgerock-metrics/fr-alerts.yaml`` file.  
+``cluster/addons/prometheus/forgerock-metrics/templates/fr-alerts.yaml`` file.  
 The Helm chart that includes the ``fr-alerts.yaml`` file also contains
 a Prometheus rules CRD. The CRD syncs the rules with Prometheus using labels.
 
