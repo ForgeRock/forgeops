@@ -24,6 +24,9 @@ helm repo update
 
 
 # Deploy cert-manager
+# Add below arg if you want to cleanup all ssl certificates when deleting the platform.
+#  extraArgs:
+#  - --enable-certificate-owner-ref=true
 deploy() {
     # Install CRDs
     kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/$VERSION/cert-manager.crds.yaml

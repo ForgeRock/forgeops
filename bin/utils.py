@@ -441,12 +441,10 @@ def uninstall_component(component, ns, force):
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)
+            run('kubectl', f'-n {ns} delete cm amster-retain')
         if component in ['base', 'base-cdm'] and force:
-            run('kubectl', f'-n {ns} delete directorybackup -l app.kubernetes.io/part-of=forgerock --ignore-not-found=true')
-            run('kubectl', f'-n {ns} delete directoryrestore -l app.kubernetes.io/part-of=forgerock --ignore-not-found=true')
-            run('kubectl', f'-n {ns} delete pvc -l app.kubernetes.io/managed-by=ds-operator --ignore-not-found=true')
-            run('kubectl', f'-n {ns} delete volumesnapshot -l app.kubernetes.io/managed-by=ds-operator --ignore-not-found=true')
-            run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
+            run('kubectl', f'-n {ns} delete pvc -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
+            run('kubectl', f'-n {ns} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
             uninstall_component('secrets', ns, False)
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')

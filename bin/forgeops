@@ -241,7 +241,7 @@ def main():
             utils.warning('Forgeops CDM deployment detected')
             utils.warning('Will not delete PVCs, VolumeSnapshots or Secrets to avoid data loss. You must delete those manually or use --force')
         else:
-            utils.warning('This will erase all your PVCs(including backup PVCs), VolumeSnapshots and Secrets. This cannot be undone.')
+            utils.warning('This will erase all your PVCs, VolumeSnapshots and Secrets. This cannot be undone.')
             utils.warning('Press "CTRL+C" now if you want to cancel')
             time.sleep(2)
             if not args.skip_confirmation:
