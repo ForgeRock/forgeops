@@ -199,6 +199,14 @@ create-backend-index \
           --type generic \
           --index-name fr-idm-managed-user-inactive-date
 EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:extensible \
+          --index-name fr-idm-managed-user-groups \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
 
 # Example of creating additional indexes.
 # Uncomment these as per your needs:
