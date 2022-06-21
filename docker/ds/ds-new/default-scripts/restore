@@ -54,13 +54,13 @@ ldifRestore() {
 dsbackupRestore() {
     SRC=$SOURCE/dsbackup
      # Get a list of all the last backups
-    BACKENDS=$(dsbackup --offline list  --backupLocation $SRC --last | grep "Backup ID" | awk '{print $NF}' )
+    BACKENDS=$(dsbackup list --offline  --backupLocation $SRC --last | grep "Backup ID" | awk '{print $NF}' )
 
     for B in $BACKENDS
     do
         echo "Restoring id $B"
-        echo dsbackup --offline  restore  --backupLocation $SRC --backupId $B
-        dsbackup --offline  restore  --backupLocation $SRC --backupId $B
+        echo dsbackup restore --offline --backupLocation $SRC --backupId $B
+        dsbackup restore --offline  --backupLocation $SRC --backupId $B
     done
 }
 

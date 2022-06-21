@@ -36,7 +36,7 @@ for B in "${BACK_ENDS[@]}"; do
             export-ldif --ldifFile $F --backendId $B --offline --compress
         else
             echo  "Backing up $B to $DEST"
-            dsbackup --offline create --backupLocation "$DEST" --backendName $B
+            dsbackup create --offline --backupLocation "$DEST" --backendName $B
         fi
     fi
 done

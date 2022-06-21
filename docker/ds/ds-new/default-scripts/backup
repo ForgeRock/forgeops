@@ -49,7 +49,7 @@ ldifBackup() {
 }
 
 dsbackupCmd() {
-    dsbackup --offline create --backupLocation "$DEST/dsbackup" 
+    dsbackup create --offline --backupLocation "$DEST/dsbackup" 
 }
 
 # Always backup config files

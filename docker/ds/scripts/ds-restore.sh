@@ -42,16 +42,16 @@ else
     # use ds-restore command
 
     # For debugging:
-    # dsbackup --offline list --backupLocation $SOURCE
+    # dsbackup list --offline --backupLocation $SOURCE
 
     # Get a list of all the last backups
-    BACKENDS=$(dsbackup --offline list  --backupLocation $SOURCE --last | grep "Backup ID" | awk '{print $NF}' )
+    BACKENDS=$(dsbackup list --offline --backupLocation $SOURCE --last | grep "Backup ID" | awk '{print $NF}' )
 
     for B in $BACKENDS
     do
         echo "Restoring id $B"
-        echo dsbackup --offline  restore  --backupLocation $SOURCE --backupId $B
-        dsbackup --offline  restore  --backupLocation $SOURCE --backupId $B
+        echo dsbackup restore --offline --backupLocation $SOURCE --backupId $B
+        dsbackup restore --offline --backupLocation $SOURCE --backupId $B
     done
 
 fi
