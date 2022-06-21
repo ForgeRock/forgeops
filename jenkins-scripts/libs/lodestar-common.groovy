@@ -43,6 +43,15 @@ def getPromotedProductCommit(platformImagesRevision, productName) {
     return readJSON(text: content)['gitCommit']
 }
 
+def getPromotedProductImageTag(platformImagesRevision, productName) {
+    def content = bitbucketUtils.readFileContent(
+            'cloud',
+            'platform-images',
+            platformImagesRevision,
+            "${productName}.json").trim()
+    return readJSON(text: content)['imageTag']
+}
+
 allStagesCloud = [:]
 
 boolean doRunPostcommitTests() {
@@ -149,13 +158,14 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     // - sustaining/7.2.x we use the 7.2.0 UI tag
                     // - otherwise we use the ID_Cloud_Production tag
                     if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
-                        checkout scm
-                        sh "git checkout ${commonModule.GIT_COMMIT}"
-                        platformUiRevision = commonModule.getProductCommit('ui')
-                        platformUiImageTag = commonModule.getProductBaseImageTag('ui')
+                        platformUiRevision = getPromotedProductCommit(platformImagesRevision, 'ui')
+                        platformUiImageTag = getPromotedProductImageTag(platformImagesRevision, 'ui')
                     } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
-                        platformUiRevision = '7.2.0'
-                        platformUiImageTag = '7.2.0'
+                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
+                                'ui',
+                                'platform-ui',
+                                '7.2.0')
+                        platformUiImageTag = "7.2.0-${platformUiRevision}"
                     } else {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
