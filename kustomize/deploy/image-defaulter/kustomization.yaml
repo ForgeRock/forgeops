@@ -8,7 +8,7 @@ images:
   newTag: dev
 - name: amster
   newName: gcr.io/forgerock-io/amster/pit1
-  newTag: 7.2.0-latest-postcommit
+  newTag: 7.3.0-latest-postcommit
 - name: ds
   newName: us-docker.pkg.dev/forgeops-public/images/ds
   newTag: dev
