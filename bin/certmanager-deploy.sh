@@ -77,6 +77,7 @@ EOF
 delete() {
     echo "Deleting cert-manager"
     helm -n cert-manager uninstall cert-manager
+    kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/$VERSION/cert-manager.crds.yaml
     exit 0
 }
 
