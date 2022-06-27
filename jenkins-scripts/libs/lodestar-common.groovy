@@ -43,15 +43,6 @@ def getPromotedProductCommit(platformImagesRevision, productName) {
     return readJSON(text: content)['gitCommit']
 }
 
-def getPromotedProductImageTag(platformImagesRevision, productName) {
-    def content = bitbucketUtils.readFileContent(
-            'cloud',
-            'platform-images',
-            platformImagesRevision,
-            "${productName}.json").trim()
-    return readJSON(text: content)['imageTag']
-}
-
 allStagesCloud = [:]
 
 boolean doRunPostcommitTests() {
@@ -152,53 +143,38 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
             stage(stageName) {
                 try {
                     def platformUiRevision
-                    def platformUiImageTag
                     // When the UI tests are executed on:
                     // - master branch we use the UI commit from platform-images master
                     // - sustaining/7.2.x we use the 7.2.0 UI tag
                     // - otherwise we use the ID_Cloud_Production tag
                     if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
                         platformUiRevision = getPromotedProductCommit(platformImagesRevision, 'ui')
-                        platformUiImageTag = getPromotedProductImageTag(platformImagesRevision, 'ui')
                     } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
                                 '7.2.0')
-                        platformUiImageTag = "7.2.0-${platformUiRevision}"
                     } else {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
                                 'ID_Cloud_Production')
-
-                        def platformUIShortRevision = platformUiRevision.substring(0, 11)
-                        def script = "git log --oneline | grep 'UI update to ${platformUIShortRevision}' | cut -d' ' -f1"
-                        def platformImagesRevision = sh(script: script, returnStdout: true).trim()
-                        if (platformImagesRevision == '') {
-                            error "Impossible to find ID_Cloud_Production commit ${platformUIShortRevision} " +
-                                    "in platform-images git log.\n" +
-                                    "Finding the docker image tag requires using a platform-ui commit that" +
-                                    " is listed in platform-images git log."
-                        }
-
-                        def content = bitbucketUtils.readFileContent(
-                                'cloud',
-                                'platform-images',
-                                platformImagesRevision,
-                                "ui.json").trim()
-                        platformUiImageTag = readJSON(text: content)['imageTag']
                     }
 
                     // Get platform-ui tests from corresponding commit
+                    def platformUiVersion
                     dir("platform-ui") {
                         localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git',
                                 'master')
                         sh "git checkout ${platformUiRevision}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
+
+                        def script = "cat jenkins-scripts/libs/common.groovy | awk '/^PLATFORM_UI_VERSION_PREFIX/ { print substr(\$3, 2 ,5)}'"
+                        platformUiVersion = sh(script: script, returnStdout: true).trim()
                     }
 
                     // Set UI image tag to the corresponding commit
+                    def platformUiImageTag = "${platformUiVersion}-${platformUiRevision}"
                     testConfig.COMPONENTS_ADMINUI_IMAGE_TAG = platformUiImageTag
                     testConfig.COMPONENTS_ENDUSERUI_IMAGE_TAG = platformUiImageTag
                     testConfig.COMPONENTS_LOGINUI_IMAGE_TAG = platformUiImageTag
