@@ -105,7 +105,7 @@ data:
     #java.util.logging.ConsoleHandler.level = WARNING
     # For Docker
     java.util.logging.ConsoleHandler.level = INFO
-    java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
+    java.util.logging.ConsoleHandler.formatter = org.forgerock.openidm.logger.SanitizedThreadIdLogFormatter
     # specifies the name of the filter class to be associated with this handler,
     # defaults to {@code null} if this property is not found or has an invalid value.
     java.util.logging.ConsoleHandler.filter=org.forgerock.openidm.logging.util.LogFilter
@@ -124,7 +124,7 @@ data:
     java.util.logging.FileHandler.count = 5
     # Style of output (Simple or XML):
     # Writes brief "human-readable" summaries of log records.
-    java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
+    java.util.logging.FileHandler.formatter = org.forgerock.openidm.logger.SanitizedThreadIdLogFormatter
     # Writes detailed XML-structured information.
     # java.util.logging.FileHandler.formatter = java.util.logging.XMLFormatter
     # specifies the character set encoding name.
