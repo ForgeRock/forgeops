@@ -6,7 +6,9 @@ import sys
 import utils
 import platform
 
-DEFAULT_K8S_VERSION = "stable"
+DEFAULT_K8S_VERSION = "1.23.3"
+# Revert when CLOUD-3823 has been resolved
+# DEFAULT_K8S_VERSION = "stable"
 
 def main():
     """main"""
