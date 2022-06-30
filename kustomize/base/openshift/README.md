@@ -2,7 +2,7 @@
 
 > This README is a collection of tips intended to point you in the right direction if you're deploying the ForgeRock Identity Platform in an OpenShift cluster.
 It should not be considered authoritative deployment documentation. 
-Before deploying the platform on OpenShift, please familiarize yourself with ForgeRock's [Statement of Support for deploying this platform on Kubernetes](https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services).
+Before deploying the platform on OpenShift, please familiarize yourself with ForgeRock's [Statement of Support for deploying this platform on Kubernetes](https://backstage.forgerock.com/docs/forgeops/7.2/start/support.html#kubernetes-services).
 
 OpenShift requires the deployment of a security object that adds required permissions for the service account used by the platform. The `SecurityContextConstraints` object should be deployed _once_ per cluster before deploying the ForgeRock Identity Platform.
 
