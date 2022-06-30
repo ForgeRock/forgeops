@@ -3,7 +3,7 @@
 # This image is designed to run setup at runtime, not docker build time. It is a
 # fully "mutable", database like image - where all volatile data (including configuration and schema)
 # is on a PVC. This behaves like a traditonal VM
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.2.0-latest-postcommit
+FROM gcr.io/forgerock-io/ds-empty/pit1:7.2.0-9799e558d11bc6318e3de265fbcb32b45888b240
 
 # FOR DEBUG. Remove for production deployment
 USER root
