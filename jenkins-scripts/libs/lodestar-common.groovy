@@ -166,6 +166,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     dir("platform-ui") {
                         localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git',
                                 'master')
+                        sh 'git fetch --tags'
                         sh "git checkout ${platformUiRevision}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
 
