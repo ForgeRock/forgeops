@@ -54,7 +54,7 @@ gradle gatlingClasses
 
 You can run the Gatling benchmarks locally if you have both Gradle and Docker 
 installed. See 
-[the documentation](https://ea.forgerock.com/docs/forgeops/deployment/benchmark/authrate.html)
+[the documentation](https://ea.forgerock.com/docs/forgeops/how-to/benchmark/authrate.html)
 for examples.
 
 ## Running in a Cluster
