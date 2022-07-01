@@ -71,10 +71,6 @@ REQ_VERSIONS ={
         'MIN': 'v4.2.0',
         'MAX': 'v100.0.0',
     },
-    'skaffold':{
-        'MIN': 'v1.35.0',
-        'MAX': 'v100.0.0',
-    },
 }
 
 def inject_kustomize_amster(kustomize_pkg_path): return _inject_kustomize_amster(kustomize_pkg_path)
@@ -546,7 +542,7 @@ def printurls(ns, to_stdout=True):
 def check_component_version(component, version):
     """
     Check if the given component is within the accepted version range.
-    component: name of the component to verify. e.a. kustomize, skaffold, etc.
+    component: name of the component to verify. e.a. kustomize, etc.
     version: version string to verify. If the version is out of range, an error is raised program terminates.
     """
     version = pkg_resources.parse_version(version)
@@ -578,10 +574,6 @@ def check_base_toolset():
     _, ver, _ = run('kustomize', 'version --short', cstdout=True)
     ver = ver.decode('ascii').split()[0].split('/')[-1].lstrip('{')
     check_component_version('kustomize', ver)
-
-    # print('Checking skaffold version')
-    _, ver, _ = run('skaffold', 'version', cstdout=True)
-    check_component_version('skaffold', ver.decode('ascii').strip())
 
 def install_dependencies():
     """
@@ -742,24 +734,16 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
     # Clean out the temp kustomize files
     base_dir = os.path.join(sys.path[0], '../')
 
-    if default_repo:
-        default_repo_cmd = f'--default-repo={default_repo}'
-    else:
-        default_repo_cmd = ''
-    if tag:
-        tag_cmd = f'--tag={tag}'
-    else:
-        tag_cmd = ''
-
-    envVars = None
     if config_profile:
-        envVars = os.environ
-        envVars['CONFIG_PROFILE'] = str(config_profile)
-    run('skaffold',
-        f'build -p {component} --file-output=tag.json {default_repo_cmd} {tag_cmd}', cwd=base_dir, env=envVars)
-    with open(os.path.join(base_dir, 'tag.json')) as tag_file:
-        tag_data = json.load(tag_file)['builds'][0]["tag"]
-    return tag_data
+        build_args = f'--build-arg CONFIG_PROFILE={config_profile}'
+    else:
+        build_args = ''
+    image = f'{default_repo}:{tag}'
+    run('docker',
+        f'build {build_args} -t {image} docker/{component}', cwd=base_dir)
+    run('docker',
+        f'push {image}', cwd=base_dir)
+    return image
 
 
 def configure_platform_images(clone_path,
