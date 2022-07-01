@@ -47,6 +47,9 @@ spec:
         imagePullPolicy: IfNotPresent
         args:  ["bash", "-c", "sleep 10"]
         volumeMounts:
+        - mountPath: /var/run/secrets/amster
+          name: amster-secrets
+          readOnly: true
         - mountPath: /var/tmp/amster
           name: export-files
         readinessProbe:
