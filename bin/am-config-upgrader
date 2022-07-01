@@ -2,7 +2,7 @@
 # Run the am-config upgrade process on AM FBC configuration files.
 #
 # The default rules upgrade AM configuration to the same version as the upgrader image itself. For
-# example, if the upgrader docker image is version 7.2.1, AM FBC files will be upgraded to 7.2.1.
+# example, if the upgrader docker image is version 7.3.1, AM FBC files will be upgraded to 7.3.1.
 #
 # Usage: bin/am-upgrader [am-fbc-files] [rules-directory]
 #  [am-fbc-files] is the directory that contains the exported AM FBC Files. This defaults to docker/am.

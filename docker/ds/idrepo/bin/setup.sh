@@ -3,7 +3,7 @@
 # Add in custom tuning, index creation, etc. to this file.
 
 # Profile and versions. If the schema for a profile has not been
-# changed - it may use an older version. For example, AM 7.1 still uses the 6.5 schema for configuration
+# changed - it may use an older version. For example, AM 7.3 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
 AM_IDENTITY_STORE="am-identity-store:7.2"
 IDM_REPO="idm-repo:7.3"

@@ -7,15 +7,15 @@ steps:
   dir: docker/ds/ds-new
   args: [ 'build',
     '-t', 'gcr.io/forgeops-public/ds:latest',
-    '-t', 'gcr.io/forgeops-public/ds:7.2-dev',
-    '-t', 'gcr.io/forgeops-public/ds:7.2.0',
+    '-t', 'gcr.io/forgeops-public/ds:7.3-dev',
+    '-t', 'gcr.io/forgeops-public/ds:7.3.0',
     '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:latest',
-    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:7.2-dev',
-    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:7.2.0',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:7.3-dev',
+    '-t', 'us-docker.pkg.dev/forgeops-public/images/ds:7.3.0',
     '-f', './Dockerfile', '.' ]
 images: [
-    'gcr.io/forgeops-public/ds:7.2-dev',
+    'gcr.io/forgeops-public/ds:7.3-dev',
     'gcr.io/forgeops-public/ds:latest',
-    'us-docker.pkg.dev/forgeops-public/images/ds:7.2-dev',
+    'us-docker.pkg.dev/forgeops-public/images/ds:7.3-dev',
     'us-docker.pkg.dev/forgeops-public/images/ds:latest'
    ]

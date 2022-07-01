@@ -4,7 +4,7 @@
 
 The current production image is the in the `ds-new` folder. This is the image used by the ds-operator.
 
-The ds-cts and ds-idrepo are the pre 7.2.0 images - and here for reference.
+The ds-cts and ds-idrepo are the pre 7.3.0 images - and here for reference.
 
 ## Directory Folders
 
