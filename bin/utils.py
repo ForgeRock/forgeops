@@ -168,6 +168,10 @@ class ColorFormatter(logging.Formatter):
 
 def logger(name=log_name, level=logging.INFO):
     log = logging.getLogger(name)
+    # Clear any current loggers
+    if (log.hasHandlers()):
+        log.handlers.clear()
+
     handler = logging.StreamHandler(stream=sys.stdout)
     if not sys.stdout.isatty():
         log_cls = NoColorFormatter()
