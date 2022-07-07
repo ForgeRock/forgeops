@@ -22,7 +22,7 @@ REPO_TO_PLATFORM = {
     # The ds-empty image should use the ds.json file in platform-images to find the sha commit tag
     'gcr.io/forgerock-io/ds-empty/pit1': 'ds',
     'gcr.io/forgerock-io/ds/pit1': 'ds',
-    'gcr.io/forgerock-io/am-base/pit1': 'am',
+    'gcr.io/forgerock-io/am-cdk/pit1': 'am',
     # Amster commits are the same as am
     'gcr.io/forgerock-io/amster/pit1': 'amster',
     'gcr.io/forgerock-io/idm-cdk/pit1': 'idm',
@@ -340,15 +340,23 @@ def load_product_configs(path, product_names):
                 with p.open() as f:
                     config = json.load(f)
                 kustomize_images['rcs-agent'] = config
-        # amster images are all tagged with the same version as am-base.
+
+        # temporary fix, to be removed
+        if 'am' in product_names:
+            new_name = docker_images['am']['imageName']
+            if 'am-base' in new_name:
+                new_name = new_name.replace('am-base', 'am-cdk')
+            docker_images['am']['imageName'] = new_name
+
+        # amster images are all tagged with the same version as am-cdk.
         # updating with forgeops-master doesn't use am base and am needs to be
         # replaced
         if 'amster' in product_names:
-            am_base_name = docker_images['amster']['imageName']
-            if 'am-base' in am_base_name:
-                new_name = am_base_name.replace('am-base', 'amster')
+            am_cdk_name = docker_images['amster']['imageName']
+            if 'am-cdk' in am_cdk_name:
+                new_name = am_cdk_name.replace('am-cdk', 'amster')
             else:
-                new_name = am_base_name.replace('am', 'amster')
+                new_name = am_cdk_name.replace('am-base', 'amster')
             docker_images['amster']['imageName'] = new_name
 
     except Exception as e:
