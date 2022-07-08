@@ -341,22 +341,13 @@ def load_product_configs(path, product_names):
                     config = json.load(f)
                 kustomize_images['rcs-agent'] = config
 
-        # temporary fix, to be removed
-        if 'am' in product_names:
-            new_name = docker_images['am']['imageName']
-            if 'am-base' in new_name:
-                new_name = new_name.replace('am-base', 'am-cdk')
-            docker_images['am']['imageName'] = new_name
-
         # amster images are all tagged with the same version as am-cdk.
         # updating with forgeops-master doesn't use am base and am needs to be
         # replaced
         if 'amster' in product_names:
-            am_cdk_name = docker_images['amster']['imageName']
-            if 'am-cdk' in am_cdk_name:
-                new_name = am_cdk_name.replace('am-cdk', 'amster')
-            else:
-                new_name = am_cdk_name.replace('am-base', 'amster')
+            new_name = docker_images['amster']['imageName']
+            if 'am-cdk' in new_name:
+                new_name = new_name.replace('am-cdk', 'amster')
             docker_images['amster']['imageName'] = new_name
 
     except Exception as e:
