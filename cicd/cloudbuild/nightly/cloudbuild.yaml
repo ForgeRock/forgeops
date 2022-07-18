@@ -12,7 +12,7 @@ steps:
   - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
     args:
       - '-c'
-      - ./bin/cdk delete -n $$NAMESPACE --yes
+      - ./bin/forgeops delete -n $$NAMESPACE --yes --force
     id: nuke-environment
     waitFor:
       - authenticate
@@ -20,7 +20,7 @@ steps:
   - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
     args:
       - '-c'
-      - ./bin/cdk install --fqdn nightly.eng72.forgeops.com -n $$NAMESPACE
+      - ./bin/forgeops install --fqdn nightly.eng72.forgeops.com -n $$NAMESPACE
     id: deploy-cdk
     waitFor:
       - nuke-environment
