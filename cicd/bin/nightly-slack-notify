@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 # cd /workspace/forgeops
 OUT=$(mktemp)
-platform_images_hash=$(git -C ./build/platform-images rev-parse --short HEAD | tr -d '\n')
 
 getsec () {
     kubectl -n $NAMESPACE get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
 }
 
-
-getHashId () {
-    awk -v PRODUCT="/${1}/" -F " " '$0 ~ PRODUCT { printf "<https://%s|%.12s>\n", $NF, substr($NF, index($NF, ":") +1) }' $SET_IMAGES_LOG | uniq
-}
-
-
 uid_admin=$(getsec ds-passwords dirmanager\\.pw)
 amadmin=$(getsec  am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR)
-forgeops_hash=$(git rev-parse --short HEAD)
-am=$(getHashId am)
+
+BRANCH_NAME=$1
+
 echo $OUT
 cat <<EOF >"${OUT}"
 {
@@ -26,7 +20,7 @@ cat <<EOF >"${OUT}"
 			"text": {
 				"type": "plain_text",
 				"emoji": true,
-				"text": "ForgeOps Nightly Images and Deployment"
+				"text": "ForgeOps 7.2.x Nightly Images and Deployment"
 			}
 		},
         {
@@ -39,24 +33,6 @@ cat <<EOF >"${OUT}"
         {
         	"type": "divider"
         },
-		{
-			"type": "section",
-			"text": {
-				"type": "mrkdwn",
-				"text": "⋄ Platform Images"
-			},
-			"accessory": {
-				"type": "button",
-				"text": {
-					"type": "plain_text",
-					"text": "${platform_images_hash}",
-					"emoji": true
-				},
-				"value": "hahss",
-				"url": "https://stash.forgerock.org/projects/CLOUD/repos/platform-images/commits/${platform_images_hash}|platform-images",
-				"action_id": "button-action"
-			}
-		},
         {
         	"type": "section",
         	"text": {
@@ -67,54 +43,17 @@ cat <<EOF >"${OUT}"
         		"type": "button",
         		"text": {
         			"type": "plain_text",
-        			"text": "${forgeops_hash}",
+        			"text": "${BRANCH_NAME}",
         			"emoji": true
         		},
-        		"value": "${forgeops_hash}",
-        		"url": "https://github.com/ForgeRock/forgeops/commit/${forgeops_hash}|forgeops",
+        		"value": "${BRANCH_NAME}",
+        		"url": "https://github.com/ForgeRock/forgeops/tree/${BRANCH_NAME}",
         		"action_id": "button-action"
         	}
         },
 		{
 			"type": "divider"
 		},
-		{
-			"type": "section",
-			"fields": [
-                {
-			    	"type": "mrkdwn",
-                    "text": "AM: $(getHashId am)"
-			    },
-                {
-                	"type": "mrkdwn",
-                    "text": "DS: $(getHashId ds)"
-                },
-                {
-                	"type": "mrkdwn",
-                    "text": "IDM: $(getHashId idm)"
-                },
-                {
-                	"type": "mrkdwn",
-                    "text": "Login UI: $(getHashId platform-login-ui)"
-                },
-                {
-                	"type": "mrkdwn",
-                    "text": "Enduser UI: $(getHashId platform-enduser-ui)"
-                },
-                {
-                	"type": "mrkdwn",
-                    "text": "Admin UI: $(getHashId platform-admin-ui)"
-                }
-            ],
-			"accessory": {
-				"type": "image",
-				"image_url": "https://i.pinimg.com/originals/0b/a1/a4/0ba1a49d4ed0e18b70faf8e457135cd6.png",
-				"alt_text": "docker logo"
-			}
-		},
-        {
-        	"type": "divider"
-        },
         {
         	"type": "section",
             "fields": [
@@ -143,7 +82,7 @@ cat <<EOF >"${OUT}"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "<https://nightly.eng.forgeops.com/platform/>"
+					"text": "<https://nightly.eng72.forgeops.com/platform/>"
 				}
 			]
 		}

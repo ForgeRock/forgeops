@@ -1,72 +1,60 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - eng-shared-7-2
+      - '--region=us-east1-b'
+    id: authenticate
+    waitFor:
+      - '-'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./bin/cdk delete -n $$NAMESPACE --yes
+    id: nuke-environment
+    waitFor:
+      - authenticate
+    entrypoint: bash
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./bin/cdk install --fqdn nightly.eng72.forgeops.com -n $$NAMESPACE
+    id: deploy-cdk
+    waitFor:
+      - nuke-environment
+    entrypoint: bash
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./cicd/bin/smoke-tests
+    id: smoke-tests
+    waitFor:
+      - deploy-cdk
+    entrypoint: bash
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./cicd/bin/nightly-slack-notify release/7.2.0
+    id: slack-notify
+    waitFor:
+      - smoke-tests
+    entrypoint: bash
+    secretEnv:
+      - SLACK_WEBHOOK_URL
+      - SLACK_FAILED_WEBHOOK_URL
 timeout: 900s
 options:
   env:
     - NAMESPACE=nightly
-    - DEFAULT_DOCKER_REPO=us-docker.pkg.dev/engineering-devops/images
+    - DEFAULT_DOCKER_REPO=us-docker.pkg.dev/engineering-devops/images/nightly-72
     - SET_IMAGES_LOG=/workspace/set_log.txt
-
-steps:
-- name: 'gcr.io/cloud-builders/gcloud'
-  id: authenticate
-  waitFor: ['-']
-  args: ['container', 'clusters', 'get-credentials', 'eng-shared-2', '--region=us-east1']
-
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
-  entrypoint: bash
-  id: build-images
-  waitFor: ['authenticate']
-  secretEnv:
-    - "GIT_KEY"
-  args:
-    - -c
-    - |-
-      . ./cicd/bin/lib-git-auth.sh || { echo "failed to configure credentials" && exit 1; }
-      # used for slack notification
-      ./bin/set-images > $$SET_IMAGES_LOG
-      ./bin/forgeops build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
-
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
-  entrypoint: bash
-  id: nuke-environment
-  waitFor: ['build-images']
-  args:
-    - -c
-    - |-
-      ./bin/forgeops delete -n $$NAMESPACE --yes
-
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
-  entrypoint: bash
-  id: deploy-cdk
-  waitFor: ['nuke-environment']
-  args:
-    - -c
-    - |-
-      ./bin/forgeops install --fqdn nightly.eng.forgeops.com -n $$NAMESPACE
-
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
-  entrypoint: bash
-  id: smoke-tests
-  waitFor: ['deploy-cdk']
-  args:
-    - -c
-    - |-
-      ./cicd/bin/smoke-tests
-
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
-  entrypoint: bash
-  id: slack-notify
-  waitFor: ['smoke-tests']
-  secretEnv: ['SLACK_WEBHOOK_URL', 'SLACK_FAILED_WEBHOOK_URL']
-  args:
-    - -c
-    - |-
-      ./cicd/bin/nightly-slack-notify
-
 availableSecrets:
   secretManager:
-    - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly/versions/latest
-      env: 'SLACK_WEBHOOK_URL'
-    - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly_team/versions/latest
-      env: 'SLACK_FAILED_WEBHOOK_URL'
-    - versionName: projects/$PROJECT_NUMBER/secrets/cloudbuild-platform-config-ssh-key/versions/latest
-      env: 'GIT_KEY'
+    - versionName: >-
+        projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly/versions/latest
+      env: SLACK_WEBHOOK_URL
+    - versionName: >-
+        projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly_team/versions/latest
+      env: SLACK_FAILED_WEBHOOK_URL
