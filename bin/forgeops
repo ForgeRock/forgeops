@@ -244,7 +244,7 @@ def main():
             utils.warning('This will erase all your PVCs, VolumeSnapshots and Secrets. This cannot be undone.')
             utils.warning('Press "CTRL+C" now if you want to cancel')
             time.sleep(2)
-            if not args.skip_confirmation:
+            if (not args.skip_confirmation and deployed_sz != 'cdk') or (not args.skip_confirmation and deployed_sz == 'cdk' and ('base' in components or 'ds' in components)):
                 if input('OK to delete PVCs, VolumeSnapshots and Secrets? [Y/N] ').lower() not in ['yes', 'y']:
                     delete = ""
 
