@@ -33,28 +33,9 @@ steps:
     waitFor:
       - deploy-cdk
     entrypoint: bash
-  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
-    args:
-      - '-c'
-      - ./cicd/bin/nightly-slack-notify release/7.1.2
-    id: slack-notify
-    waitFor:
-      - smoke-tests
-    entrypoint: bash
-    secretEnv:
-      - SLACK_WEBHOOK_URL
-      - SLACK_FAILED_WEBHOOK_URL
 timeout: 900s
 options:
   env:
     - NAMESPACE=nightly
     - DEFAULT_DOCKER_REPO=us-docker.pkg.dev/engineering-devops/images/nightly-71
     - SET_IMAGES_LOG=/workspace/set_log.txt
-availableSecrets:
-  secretManager:
-    - versionName: >-
-        projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly/versions/latest
-      env: SLACK_WEBHOOK_URL
-    - versionName: >-
-        projects/$PROJECT_NUMBER/secrets/slack_webhook_url_nightly_team/versions/latest
-      env: SLACK_FAILED_WEBHOOK_URL
