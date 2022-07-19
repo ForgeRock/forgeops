@@ -8,6 +8,13 @@ FQDN="${FQDN:-$NAMESPACE.eng.forgeops.com}"
 TEST_SVC="https://smoketest.forgeops.com/test"
 
 AMADMIN_PASS=$(kubectl get secret -n "$NAMESPACE" am-env-secrets -o jsonpath="{.data.AM_PASSWORDS_AMADMIN_CLEAR}"  | base64 --decode)
+# Be sure test service is available before attmpting to run the smoke test
+while ! curl -X POST "$TEST_SVC" --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS"; do
+    i=$((i+1))
+    [ "$i" = "5" ] && break
+    sleep 5
+done
+
 echo "Running smoke test against $FQDN"
 curl -X POST "$TEST_SVC" --data "fqdn=$FQDN&amadminPassword=$AMADMIN_PASS" | jq -e '.numberFailedTests == 0' || { #If something fails
     curl -X POST -H 'Content-type: application/json' --data \
