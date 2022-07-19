@@ -1,0 +1,38 @@
+timeout: 300s
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - eng-shared-1
+      - '--region=us-east1'
+    id: authenticate-eng-shared-1
+    waitFor:
+      - '-'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./cicd/bin/find-aged-deployments --max-age 30 --delete
+    id: delete-old-pods-eng-shared-1
+    waitFor:
+      - authenticate-eng-shared-1
+    entrypoint: bash
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - eng-shared-2
+      - '--region=us-east1'
+    id: authenticate-eng-shared-2
+    waitFor:
+      - delete-old-pods-eng-shared-1
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./cicd/bin/find-aged-deployments --max-age 30 --delete
+    id: delete-old-pods-eng-shared-2
+    waitFor:
+      - authenticate-eng-shared-2
+    entrypoint: bash
