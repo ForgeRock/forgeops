@@ -5,7 +5,7 @@ steps:
       - clusters
       - get-credentials
       - eng-shared-7-2
-      - '--region=us-east1-b'
+      - '--region=us-east1'
     id: authenticate
     waitFor:
       - '-'
