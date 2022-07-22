@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+OUT=$(mktemp)
+CLUSTER=$1
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+SCRIPT_OUT=
+
+SCRIPT_OUT=$($SCRIPT_DIR/find-aged-deployments --max-age 30 --ns-only | sed 's/\x1b\[[0-9;]*m//g' | jq -sR '.')
+
+if $(echo $SCRIPT_OUT | grep -q "Found no old objects") ; then
+  echo Found no old objects
+else
+  echo $OUT
+  cat <<EOM >"${OUT}"
+{
+  "blocks": [
+    {
+      "type": "header",
+      "text": {
+        "type": "plain_text",
+        "emoji": true,
+        "text": "Old deployments on $CLUSTER"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "text": {
+        "type": "plain_text",
+        "text": $SCRIPT_OUT
+      }
+    },
+    {
+      "type": "divider"
+    }
+  ]
+}
+EOM
+  jq '.' $OUT
+  curl -X POST -H 'Content-type: application/json' --data "@${OUT}" $SLACK_WEBHOOK_URL
+fi

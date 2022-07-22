@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import sys
-import json
-import datetime
 import argparse
+import datetime
+import json
+import sys
 import time
 
 import utils
@@ -18,18 +18,27 @@ parser.add_argument('--delete',
                     help='Delete objects.',
                     action="store_true",
                     default=False)
+parser.add_argument('--ns-only',
+                    help='Only print namespace name',
+                    action="store_true",
+                    default=False)
 parsed_args = parser.parse_args()
 
-noop_ns = ('smoke',
-           'kube-system',
-           'xn--59g',
-           'secret-agent-system',
-           'tekton-pipelines',
-           'monitoring',
+if parsed_args.delete and parsed_args.ns_only:
+    print('The options --delete and --ns_only are mutually exclusive. Pick one.')
+    sys.exit(1)
+
+noop_ns = ('cert-manager',
+           'cronjob-system'
            'fr-system',
-           'cert-manager',
+           'kube-system',
+           'monitoring',
+           'nightly',
            'nginx',
-           'cronjob-system')
+           'secret-agent-system',
+           'smoke',
+           'tekton-pipelines',
+           'xn--59g')
 
 now =  datetime.datetime.now()
 
@@ -57,6 +66,7 @@ _, out, err = utils.run('kubectl',
 res = json.loads(out)
 max_length = 0
 old_objects = []
+ns_list = []
 
 
 for obj in res['items']:
@@ -67,10 +77,18 @@ for obj in res['items']:
                                          '%Y-%m-%dT%H:%M:%SZ')
     age = now - created
     if age > datetime.timedelta(parsed_args.max_age):
-        aged_data = (obj["metadata"]["namespace"],
-                     obj["kind"],
-                     obj["metadata"]["name"],
-                     str(age))
+        ns = obj["metadata"]["namespace"]
+        if parsed_args.ns_only:
+            if ns not in ns_list:
+                ns_list.append(ns)
+                aged_data = (ns, str(age))
+            else:
+                continue
+        else:
+            aged_data = (ns,
+                         obj["kind"],
+                         obj["metadata"]["name"],
+                         str(age))
         old_objects.append(aged_data)
         # find the longest string for formating
         l = max(len(x) for x in aged_data)
@@ -80,16 +98,24 @@ for obj in res['items']:
 if old_objects:
     # cushion
     max_length =  max_length + 2
-    print((f'{"namespace":<{max_length}} '
-           f'{"kind":^{max_length}} '
-           f'{"name":^{max_length}} '
-           f'{"created":^{max_length}} '
-           f'{"deleted":^{max_length}}'))
-    print(f'{"":{"-"}<{max_length * 5}}')
+    if parsed_args.ns_only:
+        print((f'{"namespace":<{max_length}} '
+               f'{"created":^{max_length}} '))
+        print(f'{"":{"-"}<{max_length * 2}}')
+    else:
+        print((f'{"namespace":<{max_length}} '
+               f'{"kind":^{max_length}} '
+               f'{"name":^{max_length}} '
+               f'{"created":^{max_length}} '
+               f'{"deleted":^{max_length}}'))
+        print(f'{"":{"-"}<{max_length * 5}}')
     deleted = False
     for o in old_objects:
         if parsed_args.delete:
             deleted = delete(o[1], o[2])
-        print(f'{o[0]:<{max_length}} {o[1]:^{max_length}} {o[2]:^{max_length}} {utils.PURPLE}{o[3]:^{max_length}}{utils.ENDC} {str(deleted):^{max_length}}')
+        if parsed_args.ns_only:
+            print(f'{o[0]:<{max_length}} {utils.PURPLE}{o[1]:^{max_length}}{utils.ENDC}')
+        else:
+            print(f'{o[0]:<{max_length}} {o[1]:^{max_length}} {o[2]:^{max_length}} {utils.PURPLE}{o[3]:^{max_length}}{utils.ENDC} {str(deleted):^{max_length}}')
 else:
     print('Found no old objects.')
