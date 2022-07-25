@@ -1,5 +1,5 @@
 # Note: M5 integration with AM currently not working
-FROM gcr.io/forgerock-io/idm/pit1:7.1.3-66ed38f2dd8aaf5f2404af74e38def08c6b42897
+FROM gcr.io/forgerock-io/idm/pit1:7.1.3-175d7b95bc24fd68282fbcac4b2a09ad604ddcef
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
