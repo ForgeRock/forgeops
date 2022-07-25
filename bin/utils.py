@@ -33,6 +33,8 @@ DOCKER_REGEX_NAME = {
     'am': 'am',
     'amster': 'amster',
     'idm': 'idm',
+    'ds-idrepo-old': 'ds-idrepo-old',
+    'ds-cts-old': 'ds-cts-old',
     'ds-idrepo': 'ds-idrepo',
     'ds-cts': 'ds-cts',
     'ds': 'ds',
@@ -88,16 +90,19 @@ bundles = {
 	'base-cdm': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
     'ds': ['base/ds-idrepo'],
     'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
-    'ds-old': ['base/ds/idrepo', 'base/ds/cts'],
+    'ds-old': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
     'apps': ['base/am-cdk', 'base/idm-cdk', inject_kustomize_amster],
+    'apps-legacy': ['base/am', 'base/idm', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
     'am': ['base/am-cdk'],
     'idm': ['base/idm-cdk'],
+    'am-legacy': ['base/am'],
+    'idm-legacy': ['base/idm'],
     'amster': [inject_kustomize_amster]
 }
 
 patcheable_components ={
-    'base/am-cdk': 'am.yaml',
+    'base/am': 'am.yaml',
     'base/idm-cdk': 'idm.yaml',
     'base/kustomizeConfig': 'base.yaml',
     'base/ds/idrepo': 'ds-idrepo-old.yaml',
@@ -251,7 +256,7 @@ def _waitforresource(ns, resource_type, resource_name):
             continue
 
 
-def _waitfords(ns, ds_name):
+def _waitfords(ns, ds_name, legacy):
     """
     Wait for DS deployment to become healthy. This is a blocking call with no timeout.
     ns: target namespace.
@@ -259,15 +264,24 @@ def _waitfords(ns, ds_name):
     """
     print(f'Waiting for Service Account Password Update: ', end='')
     sys.stdout.flush()
-    _, replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
-                      cstderr=True, cstdout=True)
+    if legacy:
+        _, replicas, _ = run('kubectl', f'-n {ns} get statefulset {ds_name} -o jsonpath={{.spec.replicas}}',
+                    cstderr=True, cstdout=True)
+    else:
+        _, replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
+                    cstderr=True, cstdout=True)
     if replicas.decode('utf-8') == '0':
         print('skipped')
         return
     while True:
         try:
-            _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
+            if legacy:
+                _, valuestr, _ = run('kubectl', f'wait -n {ns} job/ldif-importer --for=condition=complete --timeout=60s',
+                                cstderr=True, cstdout=True)
+            else:
+                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
                                  cstderr=True, cstdout=True)
+
             if len(valuestr) > 0:
                 print('done')
                 break
@@ -305,7 +319,7 @@ def waitforsecrets(ns):
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
 
 
-def wait_for_ds(ns, directoryservices_name, timeout_secs=600):
+def wait_for_ds(ns, directoryservices_name, legacy, timeout_secs=600):
     """
     Wait for DS pods to be ready after ds-operator deployment.
     ns: target namespace.
@@ -315,7 +329,7 @@ def wait_for_ds(ns, directoryservices_name, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'statefulset', directoryservices_name], 30)
     run('kubectl',
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout={timeout_secs}s')
-    _runwithtimeout(_waitfords, [ns, directoryservices_name], timeout_secs)
+    _runwithtimeout(_waitfords, [ns, directoryservices_name, legacy], timeout_secs)
 
 def wait_for_am(ns, timeout_secs=600):
     """
@@ -344,7 +358,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, custom_path=None, src_profile_dir=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, custom_path=None, src_profile_dir=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -367,6 +381,17 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, custom_path=
     run('kustomize', f'create', cwd=profile_dir)
     run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}',
               cwd=profile_dir)
+
+    # Use legacy components if --legacy flag used
+    if legacy and component == 'apps':
+        component = 'apps-legacy'   
+
+    if legacy and component == 'am':
+        component = 'am-legacy' 
+    
+    if legacy and component == 'idm':
+        component = 'idm-legacy' 
+    
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
@@ -404,7 +429,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, custom_path=
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, pkg_base_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_base_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -417,8 +442,8 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, p
     """
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, custom_path=custom_path, src_profile_dir=src_profile_dir)
-
+    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, custom_path=custom_path, src_profile_dir=src_profile_dir)
+    
     # Remove amster components
     if component == "amster":
         clean_amster_job(ns, False)
@@ -429,7 +454,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, p
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force, ingress_class):
+def uninstall_component(component, ns, force, ingress_class, legacy):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -438,13 +463,13 @@ def uninstall_component(component, ns, force, ingress_class):
     """
     if  component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force, ingress_class)
+            uninstall_component(c, ns, force, ingress_class, legacy)
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(sys.path[0], '../kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)
@@ -452,7 +477,7 @@ def uninstall_component(component, ns, force, ingress_class):
         if component in ['base', 'base-cdm'] and force:
             run('kubectl', f'-n {ns} delete pvc -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
             run('kubectl', f'-n {ns} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
-            uninstall_component('secrets', ns, False, ingress_class)
+            uninstall_component('secrets', ns, False, ingress_class, legacy)
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
@@ -582,7 +607,7 @@ def check_base_toolset():
     ver = ver.decode('ascii').split()[0].split('/')[-1].lstrip('{')
     check_component_version('kustomize', ver)
 
-def install_dependencies():
+def install_dependencies(legacy):
     """
     Check for and install dependencies in the kubernetes cluster if they are not found.
     If dependencies are found in K8s, this function does not modify or reinstall the components.
@@ -621,24 +646,24 @@ def install_dependencies():
         cstderr=True, cstdout=True)
     check_component_version('secret-agent', img.decode('ascii').split(':')[1])
 
-    print('Checking ds-operator and related CRDs:', end=' ')
-    try:
-        run('kubectl', 'get crd directoryservices.directory.forgerock.io',
-            cstderr=True, cstdout=True)
-    except Exception:
-        warning('ds-operator CRD not found. Installing ds-operator.')
-        run('kubectl', f'delete crd directorybackups.directory.forgerock.io --ignore-not-found=true')
-        run('kubectl', f'delete crd directoryrestores.directory.forgerock.io --ignore-not-found=true')
-        dsoperator('apply', tag=REQ_VERSIONS['ds-operator']['DEFAULT'])
-    else:
-        message('ds-operator CRD found in cluster.')
+    if not legacy:
+        print('Checking ds-operator and related CRDs:', end=' ')
+        try:
+            run('kubectl', 'get crd directoryservices.directory.forgerock.io',
+                cstderr=True, cstdout=True)
+        except Exception:
+            warning('ds-operator CRD not found. Installing ds-operator.')
+            run('kubectl', f'delete crd directorybackups.directory.forgerock.io --ignore-not-found=true')
+            run('kubectl', f'delete crd directoryrestores.directory.forgerock.io --ignore-not-found=true')
+            dsoperator('apply', tag=REQ_VERSIONS['ds-operator']['DEFAULT'])
+        else:
+            message('ds-operator CRD found in cluster.')
 
-    _, img, _ = run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
-        cstderr=True, cstdout=True)
-    check_component_version('ds-operator', img.decode('ascii').split(':')[1])
+        _, img, _ = run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
+            cstderr=True, cstdout=True)
+        check_component_version('ds-operator', img.decode('ascii').split(':')[1])
 
     print()
-
 
 def secretagent(k8s_op, tag='latest'):
     """Check if secret-agent is present in the cluster. If not, installs it."""

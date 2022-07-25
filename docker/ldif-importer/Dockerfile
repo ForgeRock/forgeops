@@ -1,5 +1,3 @@
-# FROM gcr.io/forgerock-io/ds/pit1:7.0.0-ldif-importer
-# Temporary fix for debian build issue
 FROM gcr.io/forgerock-io/ds/docker-build:7.3.0-latest-postcommit
 
 USER 0

@@ -2,7 +2,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.io/ingress.class: nginx
     haproxy.router.openshift.io/cookie_name: route
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/session-cookie-hash: sha1
@@ -17,6 +16,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
   name: forgerock
 spec:
+  ingressClassName: nginx
   rules:
   - host: $(FQDN)
     http:

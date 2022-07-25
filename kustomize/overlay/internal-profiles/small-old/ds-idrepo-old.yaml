@@ -1,0 +1,36 @@
+#Patch DS idrepo
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: ds
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 1500m
+            limits:
+              memory: 6Gi
+      initContainers:
+      - name: initialize
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 1500m
+          limits:
+            memory: 6Gi
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Gi
+      storageClassName: fast

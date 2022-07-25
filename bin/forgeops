@@ -37,6 +37,10 @@ size_map = {
         'base': 'base-cdm',
         'ds': 'ds-cdm',
     },
+    'custom-old': {
+        'base': 'base-cdm',
+        'ds': 'ds-old',
+    },
     'mini': {
         'base': 'base-cdm',
         'ds': 'ds-cdm',
@@ -55,21 +59,21 @@ size_map = {
     },
 }
 
-def install_all(size, ns, fqdn, ingress_class, ctx, duration, pkg_path=None, src_profile_dir=None):
+def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
-    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, pkg_path, src_profile_dir)
-    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
-    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
-    utils.wait_for_ds(ns, 'ds-idrepo')
-    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts')
+    utils.wait_for_ds(ns, 'ds-idrepo', legacy)
+    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy)
     # Clean any existing Amster resources
     utils.clean_amster_job(ns, False)
     utils.message('\nDeploying apps.')
-    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_am(ns)
@@ -80,7 +84,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, pkg_path=None, src
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_idm(ns)
     utils.message('\nDeploying UI.')
-    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -150,6 +154,7 @@ def main():
                                 help='Select the FQDN for this deployment')
     parser_install.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
+    parser_install.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not install the DS Operator as a dependancy')
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg],
                                           help='Generate the ForgeRock Platform manifests')
@@ -192,7 +197,10 @@ def main():
         remap = size_map[size]
         pkg_path = None
         if src_profile_dir:
-            size = 'custom'
+            if args.legacy: 
+                size = 'custom-old'
+            else:
+                size = 'custom'
             remap = size_map[size]
 
     if getattr(args, 'debug', False):
@@ -272,13 +280,13 @@ def main():
             utils.warning('This will erase all your PVCs, VolumeSnapshots and Secrets. This cannot be undone.')
             utils.warning('Press "CTRL+C" now if you want to cancel')
             time.sleep(2)
-            if (not args.skip_confirmation and deployed_sz != 'cdk') or (not args.skip_confirmation and deployed_sz == 'cdk' and ('base' in components or 'ds' in components)):
+            if (not args.skip_confirmation and deployed_sz != 'cdk') or (not args.skip_confirmation and deployed_sz == 'cdk' and any(x in "base ds dsold" for x in components)):
                 if input('OK to delete PVCs, VolumeSnapshots and Secrets? [Y/N] ').lower() not in ['yes', 'y']:
                     delete = ""
 
-        # Uninstall components
+        # Uninstall components
         for c in components:
-            utils.uninstall_component(remap.get(c, c), namespace, delete, ingress_class)
+            utils.uninstall_component(remap.get(c, c), namespace, delete, ingress_class, False)
         return
 
     if args.cmd == 'build':
@@ -302,11 +310,11 @@ def main():
             components += ['am', 'amster', 'idm']
             components.remove('apps')
         size = utils.get_deployed_size(namespace)
-        if 'ds' in components:
+        if ('ds' in components or 'ds-old' in components):
             utils.message('Waiting for DS deployment.')
-            utils.wait_for_ds(namespace, 'ds-idrepo', args.timeout)
-            if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts')
-
+            utils.wait_for_ds(namespace, 'ds-idrepo', args.legacy, args.timeout)
+            if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts', args.legacy)
+        
         if 'am' in components:
             utils.message('Waiting for AM deployment.')
             utils.wait_for_am(namespace, args.timeout)
@@ -331,7 +339,7 @@ def main():
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, custom_path, src_profile_dir)
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.legacy, custom_path, src_profile_dir)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
             instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
             if c in wait_targets:
@@ -342,14 +350,14 @@ def main():
         utils.message('\nEnjoy your forgeops manifests!')
         return
 
-    utils.install_dependencies()
+    utils.install_dependencies(args.legacy)
 
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
     if 'all' in components:
-        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, pkg_path, src_profile_dir)
+        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, pkg_path, src_profile_dir)
     else:
         for c in components:
-            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, pkg_path, src_profile_dir)
+            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, pkg_path, src_profile_dir)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace)
@@ -359,7 +367,7 @@ def main():
 
 
 def _sort_components(e):
-    template = ['secrets', 'base', 'ds', 'ds-idrepo', 'ds-cts', 'apps', 'am', 'amster', 'idm', 'ui']
+    template = ['secrets', 'base', 'ds', 'ds-idrepo', 'ds-idrepo-old', 'ds-cts', 'ds-cts-old', 'apps', 'am', 'amster', 'idm', 'ui']
     return template.index(e) if e in template else 100
 
 if __name__ == '__main__':

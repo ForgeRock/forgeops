@@ -1,0 +1,18 @@
+#Patch AM
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: am
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: openam
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 26Gi
+          requests:
+            cpu: 11000m
+            memory: 20Gi

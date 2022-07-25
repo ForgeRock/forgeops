@@ -1,0 +1,5 @@
+#Patch DS idrepo
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
