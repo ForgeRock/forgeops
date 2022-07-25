@@ -107,6 +107,10 @@ def profile_path(path):
         log.info(f'Creating a new profile: {path}')
         path.mkdir(parents=True)
 
+def clean_path(path):
+    """Clean profile directory"""
+    log.info(f'Clean profile: {path}')
+    shutil.rmtree(path)
 
 def export_amster(conf):
     profile_path(conf)
@@ -132,15 +136,18 @@ def export_idm(idm_conf, pod_name):
 
 def export_am(am_conf, pod_name):
     profile_path(am_conf)
+    
     # Copy from the am container to a local path
     exec_args = f"""
-        exec {pod_name} -- /home/forgerock/export-diff.sh -
+        exec {pod_name} -- /home/forgerock/export.sh -
     """.strip()
     try:
         log.debug('Starting export')
         _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
         if out == b'':
             raise Exception('No configuration changes found.')
+        else:
+            clean_path(am_conf)
         f = io.BytesIO(out)
         with tarfile.open(fileobj=f) as tarball:
             log.debug('Starting to extract tarball')
@@ -189,10 +196,10 @@ def run_export(args):
         name = f'config-profiles/{args.profile}'
         cdk = 'config-profiles/cdk'
         if args.component == 'idm':
-            error_msg = textwrap.fill('You\'re attempting to export configuration to a profile that doesn\'t exist. Please create a new profile using this command:', width=140)
+            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn\'t exist. Please create a new profile using this command:", width=140)
             cmd = textwrap.indent(f'\nmkdir -p {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}', ' $ ')
         else:
-            error_msg = textwrap.fill('You\'re attempting a to export configuration to a profile that doesn\'t exist. You should "prime" your config by doing the following:', width=140)
+            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn\'t exist. You should \"prime\" your config by doing the following:", width=140)
             cmd = textwrap.indent(f'\ncp -r {utils.DOCKER_BASE_PATH.joinpath(args.component, cdk)} {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}', ' $ ')
         log.error(error_msg + cmd)
         sys.exit(1)
@@ -206,7 +213,7 @@ def run_export(args):
         {range .items[*]}{.metadata.labels.app}{' '}{.metadata.name}{'\\n'}{end}
         """.strip()
         pod_name_args = f"""
-        get -l "app={args.component}" -o jsonpath="{jsonpath_expr}" pod
+        get -l "app={args.component}" -o jsonpath="{jsonpath_expr}" --field-selector=status.phase==Running pod
         """.strip()
         try:
             _, out, _ = utils.run(KUBECTL, pod_name_args,
