@@ -6,7 +6,7 @@ export NAME=mini
 export CLUSTER_LABELS="forgerock.io/cluster=mini"
 
 # Override default Kubernetes version
-export K8S_VERSION="1.21.7"
+export K8S_VERSION="1.21.14"
 
 # cluster-up.sh retrieves the location from the user's az config.  Uncomment below to override:
 # export LOCATION=eastus 
