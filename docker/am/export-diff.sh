@@ -6,6 +6,12 @@ set -o errexit
 
 cd /home/forgerock/openam
 
+if [ "$1" = "--deleted" ]; then
+    # Get a list of files that have been deleted.
+    git diff --name-only --diff-filter=D
+    exit 0
+fi
+
 # Adds any new file so it shows up with git diff
 git add -N config
 

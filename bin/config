@@ -9,6 +9,7 @@ import json
 import re
 import sys
 import textwrap
+import os
 
 import utils
 
@@ -138,16 +139,28 @@ def export_am(am_conf, pod_name):
     exec_args = f"""
         exec {pod_name} -- /home/forgerock/export-diff.sh -
     """.strip()
+    exec_args_deleted = f"""
+        exec {pod_name} -- /home/forgerock/export-diff.sh --deleted
+    """.strip()
     try:
         log.debug('Starting export')
+        _, out_deleted, _ = utils.run(KUBECTL, exec_args_deleted, cstdout=True, cstderr=True)
         _, out, _ = utils.run(KUBECTL, exec_args, cstdout=True, cstderr=True)
-        if out == b'':
-            raise Exception('No configuration changes found.')
-        f = io.BytesIO(out)
-        with tarfile.open(fileobj=f) as tarball:
-            log.debug('Starting to extract tarball')
-            tarball.extractall(am_conf)
+        if out != b'' or out_deleted != b'':
+            if out != b'':
+                f = io.BytesIO(out)
+                with tarfile.open(fileobj=f) as tarball:
+                    log.debug('Starting to extract tarball')
+                    tarball.extractall(am_conf)
+            if out_deleted != b'':
+                deleted = out_deleted.decode().split()
+                log.debug('Removing deleted files')
+                for f in deleted:
+                    if os.path.exists(f'{am_conf}/{f}'):
+                        os.remove(f'{am_conf}/{f}')
             log.debug('Export Completed.')
+        else:
+            raise Exception('No configuration changes found.')
         log.info('Exported AM config')
 
     except utils.RunError as e:
