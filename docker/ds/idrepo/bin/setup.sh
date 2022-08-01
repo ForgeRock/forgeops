@@ -207,7 +207,39 @@ create-backend-index \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
-
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-vlv-index \
+          --backend-name amIdentityStore \
+          --index-name managed-group-by-cn \
+          --set base-dn:ou=groups,ou=identities \
+          --set sort-order:+cn \
+          --set scope:single-level \
+          --set filter:(&(objectClass=fr-idm-managed-group)(objectClass=groupOfURLs)(objectClass=top))
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-vlv-index \
+          --backend-name amIdentityStore \
+          --index-name managed-user-by-id \
+          --set base-dn:ou=people,ou=identities \
+          --set sort-order:+fr-idm-uuid \
+          --set scope:single-level \
+          --set filter:(&(objectClass=devicePrintProfilesContainer) \
+         (objectClass=forgerock-am-dashboard-service) \
+         (objectClass=fr-idm-managed-user-explicit) \
+         (objectClass=fr-idm-managed-user-hybrid-obj) \
+         (objectClass=iPlanetPreferences) \
+         (objectClass=inetOrgPerson) \
+         (objectClass=inetuser) \
+         (objectClass=iplanet-am-auth-configuration-service) \
+         (objectClass=iplanet-am-managed-person) \
+         (objectClass=iplanet-am-user-service) \
+         (objectClass=kbaInfoContainer) \
+         (objectClass=oathDeviceProfilesContainer)
+         (objectClass=pushDeviceProfilesContainer) \
+         (objectClass=sunAMAuthAccountLockout)
+         (objectClass=sunFMSAML2NameIdentifier) \
+         (objectClass=webauthnDeviceProfilesContainer))
+EOF
 # Example of creating additional indexes.
 # Uncomment these as per your needs:
 # dsconfig --offline --no-prompt --batch <<EOF
