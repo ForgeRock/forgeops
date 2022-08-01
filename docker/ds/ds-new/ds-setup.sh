@@ -18,7 +18,7 @@
 # Header, with the fields enclosed by brackets [] replaced by your own identifying
 # information: "Portions Copyright [year] [name of copyright owner]".
 #
-# Copyright 2019-2021 ForgeRock AS.
+# Copyright 2019-2022 ForgeRock AS.
 #
 set -eux
 
@@ -100,9 +100,7 @@ create-trust-manager-provider \
             --type pem \
             --set enabled:true \
             --set pem-directory:${PEM_TRUSTSTORE_DIRECTORY}
-EOF
 
-dsconfig --offline --no-prompt --batch <<EOF
 set-connection-handler-prop \
             --handler-name https \
             --set trust-manager-provider:"PEM Trust Manager"
@@ -117,25 +115,19 @@ set-synchronization-provider-prop \
             --set trust-manager-provider:"PEM Trust Manager"
 set-administration-connector-prop \
             --set trust-manager-provider:"PEM Trust Manager"
-EOF
 
 # Delete the default PCKS12 provider.
-dsconfig --offline --no-prompt --batch <<EOF
 delete-trust-manager-provider \
             --provider-name "PKCS12"
-EOF
 
 
 # Set up a PEM Key Manager Provider
-dsconfig --offline --no-prompt --batch <<EOF
 create-key-manager-provider \
             --provider-name "PEM Key Manager" \
             --type pem \
             --set enabled:true \
             --set pem-directory:${PEM_KEYS_DIRECTORY}
-EOF
 
-dsconfig --offline --no-prompt --batch <<EOF
 set-connection-handler-prop \
             --handler-name https \
             --set key-manager-provider:"PEM Key Manager"
@@ -152,10 +144,8 @@ set-crypto-manager-prop \
             --set key-manager-provider:"PEM Key Manager"
 set-administration-connector-prop \
             --set key-manager-provider:"PEM Key Manager"
-EOF
 
 # Delete the default PCKS12 provider.
-dsconfig --offline --no-prompt --batch <<EOF
 delete-key-manager-provider \
             --provider-name "PKCS12"
 EOF
