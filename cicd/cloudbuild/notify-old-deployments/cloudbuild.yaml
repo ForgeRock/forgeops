@@ -38,9 +38,9 @@ steps:
       - |-
         ./cicd/bin/old-deploy-slack-notify "eng-shared-2"
 
-    availableSecrets:
-      secretManager:
-        - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_old_deploy/versions/latest
-          env: 'SLACK_WEBHOOK_URL'
-        - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_old_deploy_fail/versions/latest
-          env: 'SLACK_FAILED_WEBHOOK_URL'
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_old_deploy/versions/latest
+      env: 'SLACK_WEBHOOK_URL'
+    - versionName: projects/$PROJECT_NUMBER/secrets/slack_webhook_url_old_deploy_fail/versions/latest
+      env: 'SLACK_FAILED_WEBHOOK_URL'
