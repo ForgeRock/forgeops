@@ -13,9 +13,8 @@ steps:
   - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
     args:
       - '-c'
-      - >-
-        kubectl delete pods --field-selector status.phase=Failed -A \
-        --ignore-not-found=true
+      - 'kubectl delete pods --field-selector status.phase=Failed -A'
+      - '--ignore-not-found=true'
     id: delete-shutdown-pods-eng-shared-1
     waitFor:
       - authenticate-eng-shared-1
@@ -33,9 +32,8 @@ steps:
   - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
     args:
       - '-c'
-      - >-
-        kubectl delete pods --field-selector status.phase=Failed -A \
-        --ignore-not-found=true
+      - 'kubectl delete pods --field-selector status.phase=Failed -A'
+      - '--ignore-not-found=true'
     id: delete-shutdown-pods-eng-shared-2
     waitFor:
       - authenticate-eng-shared-2
@@ -46,16 +44,15 @@ steps:
       - clusters
       - get-credentials
       - eng-shared-7-1
-      - '--region=us-east1'
+      - '--region=us-east1-b'
     id: authenticate-eng-shared-7-1
     waitFor:
       - delete-shutdown-pods-eng-shared-2
   - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
     args:
       - '-c'
-      - >-
-        kubectl delete pods --field-selector status.phase=Failed -A \
-        --ignore-not-found=true
+      - 'kubectl delete pods --field-selector status.phase=Failed -A'
+      - '--ignore-not-found=true'
     id: delete-shutdown-pods-eng-shared-7-1
     waitFor:
       - authenticate-eng-shared-7-1
@@ -73,9 +70,8 @@ steps:
   - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
     args:
       - '-c'
-      - >-
-        kubectl delete pods --field-selector status.phase=Failed -A \
-        --ignore-not-found=true
+      - 'kubectl delete pods --field-selector status.phase=Failed -A'
+      - '--ignore-not-found=true'
     id: delete-shutdown-pods-eng-shared-7-2
     waitFor:
       - authenticate-eng-shared-7-2
