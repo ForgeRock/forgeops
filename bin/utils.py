@@ -722,7 +722,8 @@ def certmanager(k8s_op, tag='latest'):
 
 
 
-def build_docker_image(component, default_repo, tag, config_profile=None):
+def build_docker_image(component, context, dockerfile, default_repo, tag,
+                       config_profile=None):
     """
     Build custom docker images.
     component: name of the component to build the image for. e.a. am, idm, etc.
@@ -742,7 +743,7 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
     if tag is not None:
         image = f'{default_repo}/{component}:{tag}'
     run('docker',
-        f'build {build_args} -t {image} docker/{component}', cwd=base_dir)
+        f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=base_dir)
     run('docker',
         f'push {image}', cwd=base_dir)
     return image

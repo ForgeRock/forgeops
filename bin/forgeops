@@ -11,6 +11,24 @@ import json
 import logging
 
 build_targets = ['am', 'amster', 'idm', 'ds', 'ds-idrepo', 'ds-cts', 'ig']
+build_contexts = {
+        'am': 'docker/am',
+        'amster': 'docker/amster',
+        'idm': 'docker/idm',
+        'ds': 'docker/ds/ds-new',
+        'ds-idrepo': 'docker/ds',
+        'ds-cts': 'docker/ds',
+        'ig': 'docker/ig'
+}
+build_dockerfiles = {
+        'am': 'docker/am/Dockerfile',
+        'amster': 'docker/amster/Dockerfile',
+        'idm': 'docker/idm/Dockerfile',
+        'ds': 'docker/ds/ds-new/Dockerfile',
+        'ds-idrepo': 'docker/ds/idrepo/Dockerfile',
+        'ds-cts': 'docker/ds/cts/Dockerfile',
+        'ig': 'docker/ig/Dockerfile'
+}
 wait_targets = ['ds', 'am', 'amster', 'idm', 'apps']
 size_map = {
     'cdk': {
@@ -100,7 +118,7 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
     if default_repo is None:
         print('--default-repo must be specified if the DEFAULT_REPO environment variable is not set.')
         sys.exit(1)
-    tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
+    tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], default_repo, tag, config_profile)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
     utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
