@@ -23,7 +23,7 @@ steps:
       . ./cicd/bin/lib-git-auth.sh || { echo "failed to configure credentials" && exit 1; }
       # used for slack notification
       ./bin/set-images > $$SET_IMAGES_LOG
-      ./bin/forgeops build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
+      ./bin/forgeops build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO --tag $$(git rev-parse --short HEAD)
 
 - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
   entrypoint: bash

@@ -738,7 +738,9 @@ def build_docker_image(component, default_repo, tag, config_profile=None):
         build_args = f'--build-arg CONFIG_PROFILE={config_profile}'
     else:
         build_args = ''
-    image = f'{default_repo}:{tag}'
+    image = f'{default_repo}/{component}'
+    if tag is not None:
+        image = f'{default_repo}/{component}:{tag}'
     run('docker',
         f'build {build_args} -t {image} docker/{component}', cwd=base_dir)
     run('docker',
