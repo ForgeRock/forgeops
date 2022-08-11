@@ -109,16 +109,16 @@ def overlay_app_configs(ns, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- /bin/sh -c "kill 1"')
 
-def build_docker_image(component, default_repo, tag, config_profile=None):
+def build_docker_image(component, push_to, tag, config_profile=None):
     """Builds custom docker images"""
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     image_defaulter = os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
-    if default_repo is None:
-        default_repo = os.getenv('DEFAULT_REPO')
-    if default_repo is None:
-        print('--default-repo must be specified if the DEFAULT_REPO environment variable is not set.')
+    if push_to is None:
+        push_to = os.getenv('PUSH_TO')
+    if push_to is None:
+        print('--push-to must be specified if the PUSH_TO environment variable is not set.')
         sys.exit(1)
-    tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], default_repo, tag, config_profile)
+    tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], push_to, tag, config_profile)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
     utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
@@ -162,7 +162,7 @@ def main():
                                help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
     parser_build = subparser.add_parser('build', parents=[common_dg], help='Build custom docker images')
     parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
-    parser_build.add_argument('--default-repo', '-r', dest='registry')
+    parser_build.add_argument('--push-to', '-r', dest='registry')
     parser_build.add_argument('--tag', '-t', help='Set the tag used when building images')
     parser_build.add_argument('--config-profile', '-p', dest='config_profile')
     parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')

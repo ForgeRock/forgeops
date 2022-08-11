@@ -722,12 +722,12 @@ def certmanager(k8s_op, tag='latest'):
 
 
 
-def build_docker_image(component, context, dockerfile, default_repo, tag,
+def build_docker_image(component, context, dockerfile, push_to, tag,
                        config_profile=None):
     """
     Build custom docker images.
     component: name of the component to build the image for. e.a. am, idm, etc.
-    default_repo: set the default docker registry name. e.a. us-docker.pkg.dev/forgeops-public/images.
+    push_to: set the docker registry name to push to. e.a. us-docker.pkg.dev/forgeops-public/images.
     tag: set the image tag.
     config_profile: set the CONFIG_PROFILE build envVar. This envVar is referenced by the Dockerfile of forgeops containers.
     return tag_data: the tag of the built image.
@@ -739,9 +739,9 @@ def build_docker_image(component, context, dockerfile, default_repo, tag,
         build_args = f'--build-arg CONFIG_PROFILE={config_profile}'
     else:
         build_args = ''
-    image = f'{default_repo}/{component}'
+    image = f'{push_to}/{component}'
     if tag is not None:
-        image = f'{default_repo}/{component}:{tag}'
+        image = f'{push_to}/{component}:{tag}'
     run('docker',
         f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=base_dir)
     run('docker',
