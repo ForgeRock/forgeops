@@ -14,7 +14,7 @@ steps:
     - |-
       ./cicd/bin/docker-clone
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild'
   entrypoint: bash
   env:
     - IMAGE_TAG=$TAG_NAME
@@ -39,7 +39,7 @@ steps:
       && make -f docker/cli-tools/repo/Makefile release \
       || echo "Not creating release."
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild'
   entrypoint: bash
   env:
     - IMAGE_TAG=$TAG_NAME

@@ -10,7 +10,7 @@ steps:
   waitFor: ['-']
   args: ['container', 'clusters', 'get-credentials', 'eng-shared-2', '--region=europe-west2']
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
   entrypoint: bash
   id: nuke-environment
   waitFor: ['authenticate']
@@ -19,7 +19,7 @@ steps:
     - |-
       ./cicd/bin/nuke-environment
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
   entrypoint: bash
   id: change-images
   waitFor: ['nuke-environment']
@@ -28,7 +28,7 @@ steps:
     - |-
       ./cicd/bin/set-deploy-images
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
   entrypoint: bash
   id: deploy-base-ds
   waitFor: ['change-images']
@@ -37,7 +37,7 @@ steps:
     - |-
       ./cicd/bin/deploy-base-ds
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
   entrypoint: bash
   id: deploy-apps
   waitFor: ['deploy-base-ds']
@@ -47,7 +47,7 @@ steps:
       ./cicd/bin/deploy-apps
 
 
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
   entrypoint: bash
   id: amster-load
   waitFor: ['deploy-apps']
@@ -57,7 +57,7 @@ steps:
       ./cicd/bin/amster-load
 
 
-# - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+# - name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
 #   entrypoint: bash
 #   id: smoke-tests
 #   waitFor: ['amster-load']
@@ -66,7 +66,7 @@ steps:
 #     - |-
 #       ./cicd/bin/smoke-tests
 #
-# - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+# - name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
 #   entrypoint: bash
 #   id: slack-notify
 #   waitFor: ['smoke-tests']

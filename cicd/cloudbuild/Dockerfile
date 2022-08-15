@@ -1,15 +1,12 @@
-# Dockerfile that packages up Skaffold, Kustomize and kubectl to run under a CI/CD pipeline.
+# Dockerfile that packages up Kustomize and kubectl to run under a CI/CD pipeline.
 # Publish this to your registry and update your CI/CD pipelines to point at this image.
 # See the tekton/ folder for an example of a CI/CD pipeline that deploys the ForgeRock Identity Platform.
 
 # the sdk can install everythiung for us, use the smallest image
 ARG KUSTOMIZE_VERSION=v4.4.1
 ARG KUBECTL_VERSION=v1.21.2
-ARG SKAFFOLD_VERSION=v1.35.1
 
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine as base
-ARG SKAFFOLD_VERSION
-FROM gcr.io/k8s-skaffold/skaffold:${SKAFFOLD_VERSION} as skaffold
 
 
 FROM debian:bullseye-backports
@@ -21,8 +18,6 @@ RUN mkdir --mode=0766 -p /builder/bin
 
 COPY --from=base /usr/local/bin/docker /usr/local/bin/
 COPY --from=base /google-cloud-sdk /builder/google-cloud-sdk
-COPY --from=skaffold /usr/bin/skaffold /usr/local/bin/skaffold
-COPY skaffold.bash /builder/skaffold.bash
 
 RUN mkdir -p /builder/bin && \
     apt-get update && \
@@ -40,5 +35,3 @@ RUN curl -sL https://github.com/kubernetes-sigs/kustomize/releases/download/kust
         && tar -xvf /tmp/kustomize.tar.gz -C /tmp \
             && install /tmp/kustomize /usr/local/bin/kustomize
 
-RUN chmod +700 /builder/skaffold.bash
-ENTRYPOINT ["/builder/skaffold.bash"]

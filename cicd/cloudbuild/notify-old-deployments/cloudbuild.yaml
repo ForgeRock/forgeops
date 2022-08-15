@@ -10,7 +10,7 @@ steps:
     id: authenticate-eng-shared-1
     waitFor:
       - '-'
-  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
     entrypoint: bash
     id: slack-notify-eng-shared-1
     waitFor: ['authenticate-eng-shared-1']
@@ -28,7 +28,7 @@ steps:
       - '--region=us-east1'
     id: authenticate-eng-shared-2
     waitFor: ['slack-notify-eng-shared-1']
-  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
     entrypoint: bash
     id: slack-notify-eng-shared-2
     waitFor: ['authenticate-eng-shared-2']

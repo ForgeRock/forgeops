@@ -1,0 +1,14 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+    - 'build'
+    - '-t'
+    - 'gcr.io/$PROJECT_ID/cloudbuild'
+    - '-t'
+    - 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild'
+    - '-f'
+    - 'cicd/cloudbuild/Dockerfile'
+    - 'cicd/cloudbuild'
+images:
+  - 'gcr.io/$PROJECT_ID/cloudbuild'
+  - 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild'
