@@ -17,7 +17,7 @@ steps:
   args:
     - -c
     - |-
-      ./bin/forgeops build am amster idm ds-idrepo --default-repo $$DEFAULT_DOCKER_REPO
+      ./bin/forgeops build am amster idm ds-idrepo --push-to $$DEFAULT_DOCKER_REPO
 
 - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
   entrypoint: bash
