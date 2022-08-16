@@ -3,7 +3,7 @@ options:
   env:
     - PROFILE_NAME=cdk
 steps:
-- name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
+- name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
   entrypoint: bash
   secretEnv:
   - 'GIT_KEY'
