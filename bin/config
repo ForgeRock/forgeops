@@ -196,10 +196,10 @@ def run_export(args):
         name = f'config-profiles/{args.profile}'
         cdk = 'config-profiles/cdk'
         if args.component == 'idm':
-            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn\'t exist. Please create a new profile using this command:", width=140)
-            cmd = textwrap.indent(f'\nmkdir -p {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}', ' $ ')
+            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn't exist. Please create a new profile using this command:", width=140)
+            cmd = textwrap.indent(f'\nmkdir -p {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}/conf', ' $ ')
         else:
-            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn\'t exist. You should \"prime\" your config by doing the following:", width=140)
+            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn't exist. You should \"prime\" your config by doing the following:", width=140)
             cmd = textwrap.indent(f'\ncp -r {utils.DOCKER_BASE_PATH.joinpath(args.component, cdk)} {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}', ' $ ')
         log.error(error_msg + cmd)
         sys.exit(1)
