@@ -344,7 +344,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profile_dir=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, custom_path=None, src_profile_dir=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -376,18 +376,25 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
             run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
         if c in patcheable_components and size != 'cdk':
             p = patcheable_components[c]
-            if os.path.exists(os.path.join(src_profile_dir, p)):    
+            if os.path.exists(os.path.join(src_profile_dir, p)):
                 shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
                 run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
 
     fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
     sizepatchjson = [{"op": "add", "path": "data/data/FORGEOPS_PLATFORM_SIZE", "value": size}]
+    ingressclasspatchjson = [{"op": "replace", "path": "/spec/ingressClassName", "value": ingress_class}]
     # run('kustomize', f'edit set namespace {ns}', cwd=profile_dir)
     if component in ['base', 'base-cdm']:
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
             cwd=profile_dir)
+        run('kustomize', f'edit add patch --name forgerock --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
+            cwd=profile_dir)
+        run('kustomize', f'edit add patch --name ig-web --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
+            cwd=profile_dir)
+        # run('kustomize', f'edit add patch --name icf-ingress --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
+        #     cwd=profile_dir)
     _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
     contents = contents.decode('ascii')
     contents = contents.replace('namespace: default', f'namespace: {ns}')
@@ -397,7 +404,7 @@ def generate_package(component, size, ns, fqdn, ctx, custom_path=None, src_profi
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ctx, duration, pkg_base_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, pkg_base_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -410,19 +417,19 @@ def install_component(component, size, ns, fqdn, ctx, duration, pkg_base_path=No
     """
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ctx, custom_path=custom_path, src_profile_dir=src_profile_dir)
-    
+    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, custom_path=custom_path, src_profile_dir=src_profile_dir)
+
     # Remove amster components
     if component == "amster":
         clean_amster_job(ns, False)
-    
-    # Create amster-retain configmap which defines the 
+
+    # Create amster-retain configmap which defines the
     if component == 'amster':
         run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force):
+def uninstall_component(component, ns, force, ingress_class):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -431,13 +438,13 @@ def uninstall_component(component, ns, force):
     """
     if  component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force)
+            uninstall_component(c, ns, force, ingress_class)
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(sys.path[0], '../kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'cdk', ns, '.', '', custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)
@@ -445,7 +452,7 @@ def uninstall_component(component, ns, force):
         if component in ['base', 'base-cdm'] and force:
             run('kubectl', f'-n {ns} delete pvc -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
             run('kubectl', f'-n {ns} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
-            uninstall_component('secrets', ns, False)
+            uninstall_component('secrets', ns, False, ingress_class)
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
@@ -903,4 +910,3 @@ def clean_amster_job(ns, retain):
     if os.path.exists('amster-scripts.tar.gz'):
         os.remove('amster-scripts.tar.gz')
     return
-
