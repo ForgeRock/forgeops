@@ -1,88 +1,181 @@
 #!/usr/bin/env bash
-# Script to deploy an nginx ingress controller using Helm3 to either EKS/GKE or AKS.
+# Script to deploy an ingress chart using Helm3 to either EKS/GKE or AKS.
 #set -oe pipefail
 
 # Version is currently not used. We default to installing the latest stable version in the helm repo.
 #VERSION="0.34.1"
 
-IP_OPTS=""
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/stdlib.sh
+cd $start_dir
 
 usage() {
-    echo -e "\nUsage: $0 [-g|--gke <ip-address>] [-e|--eks] [-a|--aks] [-d|delete] [-h|--help]\n"
-    echo -e "\t -g, --gke:      -   deploy to GKE. Optionally provide IP address (default: dynamically generate IP address)"
-    echo -e "\t -e, --eks:      -   deploy to EKS"
-    echo -e "\t -a, --aks:      -   deploy to AKS"
-    echo -e "\t -d, --delete:   -   delete ingress controller"
-    echo -e "\t -h, --help:     -   display options"
+    exit_code=$1
+    err=$2
+    prog=$(basename $0)
+    cat <<EOM
+Usage: $prog [-g|--gke] [-e|--eks] [-a|--aks] [-d|delete] [-h|--help] [-i|--ingress {haproxy,nginx}] [<ip_address>]
 
-    exit 2
+Install the haproxy or nginx ingress chart.
+
+NOTES:
+  * Supplying the IP address only works when installing to GKE.
+  * The IP address must be the last option.
+
+  OPTIONS:
+    -h|--help                    : display usage and exit
+    --debug                      : enable debugging output
+    --dryrun                     : do a dry run
+    -v|--verbose                 : be verbose
+    -a|--aks                     : deploy to AKS
+    -e|--eks                     : deploy to EKS
+    -g|--gke                     : deploy to GKE. Optionally provide IP address (default: dynamically generate IP address)
+    -i|--ingress {haproxy,nginx} : choose ingress chart (default: nginx)
+
+Requirements:
+  * helm installed
+  * kubectl installed
+
+Examples:
+  GKE without an IP using default chart:
+  $prog -g
+
+  GKE with an IP using default chart:
+  $prog -g 1.2.3.4
+
+  GKE with an IP using haproxy chart:
+  $prog -g -i haproxy 1.2.3.4
+
+  AKS using haproxy chart:
+  $prog -a -i haproxy
+
+EOM
+
+  if [ ! -z "$err" ] ; then
+    echo "ERROR: $err"
+    echo
+  fi
+
+  exit $exit_code
 }
 
 # Delete Helm chart
 delete() {
-    helm uninstall ingress-nginx --namespace nginx || true
+    echo "Deleting $CHART Helm chart."
+    runOrPrint "helm uninstall $CHART --namespace $NAMESPACE || true"
     exit 1
 }
 
-# If an argument is provided, ensure that it is either delete or an IP address for GKE
-if [[ $# > 0 ]]; then
-    case $1 in
-        -d|--delete)
-            echo "Deleting Ingress Controller Helm chart."
-            delete
-        ;;
-        -g|--gke)
-            if [[ "$#" == 2 ]]; then
-                # Check IP address format and don't continue if not valid.
-                [[ ! "$2" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo -e "\nERROR: Can't detect a valid IP address" && usage
+# Defaults
+DEBUG=false
+DRYRUN=false
+VERBOSE=false
+DELETE=false
+INGRESS=nginx
+IP=
+IP_OPTS=
+AKS=false
+EKS=false
+GKE=false
 
-                # Set the loadBalancerIP annotation.
-                echo "IP: $2"
-                IP_OPTS="--set controller.service.loadBalancerIP=${2}"
-            fi
-            echo -e "Deploying Ingress Controller to GKE...\n"
-            PROVIDER="gke"
-        ;;
-        -e|--eks)
-            echo -e "Deploying Ingress Controller to EKS...\n"
-            PROVIDER="eks"
-        ;;
-        -a|--aks)
-            echo -e "Deploying Ingress Controller to AKS...\n"
-            PROVIDER="aks"
-        ;;
-        -h|--help)
-            usage
-        ;;
-        *)
-            usage
-        ;;
-    esac
+while true; do
+  case "$1" in
+    -h|--help) usage 0 ;;
+    --debug) DEBUG=true; shift ;;
+    --dryrun) DRYRUN=true; shift ;;
+    -v|--verbose) VERBOSE=true; shift ;;
+    -d|--delete) DELETE=true; shift ;;
+    -a|--aks) AKS=true; shift ;;
+    -e|--eks) EKS=true; shift ;;
+    -g|--gke) GKE=true; shift ;;
+    -i|--ingress) INGRESS=$2; shift 2 ;;
+    *) [[ -n "$1" ]] && IP=$1
+       break
+       ;;
+  esac
+done
+
+message "DEBUG=$DEBUG" "debug"
+message "DRYRUN=$DRYRUN" "debug"
+message "VERBOSE=$VERBOSE" "debug"
+message "DELETE=$DELETE" "debug"
+message "INGRESS=$INGRESS" "debug"
+message "IP=$IP" "debug"
+
+if [[ "$GKE" = true && ("$AKS" = true || "$EKS" = true) ]] || \
+   [[ "$AKS" = true && ("$GKE" = true || "$EKS" = true) ]] || \
+   [[ "$EKS" = true && ("$GKE" = true || "$AKS" = true) ]] ; then
+     usage 1 "You must pick one cloud (-a, -e, or -g)"
+fi
+
+if [ "$AKS" = true ] ; then
+  echo "Deploying Ingress chart to AKS..."
+  PROVIDER="aks"
+elif [ "$EKS" = true ] ; then
+  echo "Deploying Ingress chart to EKS..."
+  PROVIDER="eks"
+elif [ "$GKE" = true ] ; then
+  if [ -n "$IP" ] ; then
+    message "We were given an IP address" "debug"
+    [[ ! "$2" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo -e "\nERROR: Can't detect a valid IP address" && usage
+    echo "IP: $IP"
+    IP_OPTS="--set chart.service.loadBalancerIP=${IP}"
+  fi
+  echo "Deploying Ingress chart to GKE..."
+  PROVIDER="gke"
+fi
+
+message "PROVIDER=$PROVIDER" "debug"
+
+case $INGRESS in
+  haproxy)
+    CHART=haproxy-ingress
+    NAMESPACE=haproxy
+    REPO=https://haproxy-ingress.github.io/charts
+    REPO_NAME=haproxy-ingress
+    ;;
+  nginx)
+    CHART=ingress-nginx
+    NAMESPACE=nginx
+    REPO=https://kubernetes.github.io/ingress-nginx
+    REPO_NAME=ingress-nginx
+    ;;
+  *)
+    usage 1 "You must pick either haproxy or nginx as an ingress"
+    ;;
+esac
+
+if [ "$DELETE" = true ] ; then
+  delete
 fi
 
 # Create namespace
-ns=$(kubectl get namespace | grep nginx | awk '{ print $1 }' || true)
+ns=$(kubectl get namespace | grep $NAMESPACE | awk '{ print $1 }' || true)
 
 # Identify cluster size
 clustsize=$(kubectl get nodes --label-columns forgerock.io/cluster --no-headers  | head -n 1 | awk '{print $6}')
 
 if [ -z "${ns}" ]; then
-    kubectl create namespace nginx
+    runOrPrint "kubectl create namespace $NAMESPACE"
 else
-    printf "*** nginx namespace already exists ***\n"
+    printf "*** $NAMESPACE namespace already exists ***\n"
 fi
 
 if [ -n "$clustsize" ]; then
     echo "Detected cluster of type: $clustsize"
-fi 
+fi
 
-if [[ -n "$clustsize" && ($clustsize == "cdm-medium" || $clustsize == "cdm-large") ]]; then 
+if [[ -n "$clustsize" && ($clustsize == "cdm-medium" || $clustsize == "cdm-large") ]]; then
     echo "Setting ingress pod count to 3"
     INGRESS_POD_COUNT=3
-elif [[ -n "$clustsize" && ($clustsize == "cdm-small") ]]; then 
+elif [[ -n "$clustsize" && ($clustsize == "cdm-small") ]]; then
     echo "Setting ingress pod count to 2"
     INGRESS_POD_COUNT=2
-else 
+else
     echo "Setting ingress pod count to 1"
     INGRESS_POD_COUNT=1
 fi
@@ -90,11 +183,11 @@ fi
 # Set script location
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
-ADDONS_DIR="${ADDONS_BASE}/nginx-ingress-controller"
+ADDONS_DIR="${ADDONS_BASE}/${NAMESPACE}-ingress-controller"
 
 # Add Helm repo
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx --force-update
+runOrPrint "helm repo add $REPO_NAME $REPO --force-update"
 
-# Deploy ingress controller Helm chart
-helm upgrade -i ingress-nginx --namespace nginx ingress-nginx/ingress-nginx \
-    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}
+# Deploy ingress Helm chart
+runOrPrint "helm upgrade -i $CHART --namespace $NAMESPACE $REPO_NAME/$CHART \
+    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set chart.replicaCount=${INGRESS_POD_COUNT}"
