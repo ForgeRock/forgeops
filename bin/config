@@ -16,6 +16,10 @@ Manage ForgeRock Platform configuration.
 HELP_EXPORT_CMD_DESCRIPTION = """
 Export config from running instance to a given profile.
 """
+HELP_EXPORT_BASELINE_PROFILE = """
+Specify a base profile to start with if the target profile doesn't
+ exist. (default: cdk)
+"""
 HELP_CMD_COMPONENTS = """
 ForgeRock Identity Platform component.
 """
@@ -136,7 +140,7 @@ def export_idm(idm_conf, pod_name):
 
 def export_am(am_conf, pod_name):
     profile_path(am_conf)
-    
+
     # Copy from the am container to a local path
     exec_args = f"""
         exec {pod_name} -- /home/forgerock/export.sh -
@@ -193,16 +197,14 @@ def run_export(args):
         APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
     # prime the config
     if not conf_path.exists():
-        name = f'config-profiles/{args.profile}'
-        cdk = 'config-profiles/cdk'
-        if args.component == 'idm':
-            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn't exist. Please create a new profile using this command:", width=140)
-            cmd = textwrap.indent(f'\nmkdir -p {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}/conf', ' $ ')
+        if args.component == 'ig':
+            log.debug('Given ig as a component, doing a copy from the baseline profile.')
+            baseline_profile = pathlib.Path(utils.DOCKER_BASE_PATH.joinpath(
+              APP_CONF_PATH_FMT[args.component](profile=args.baseline_profile))).resolve()
+            shutil.copytree(baseline_profile, conf_path)
         else:
-            error_msg = textwrap.fill("You're attempting to export configuration to a profile that doesn't exist. You should \"prime\" your config by doing the following:", width=140)
-            cmd = textwrap.indent(f'\ncp -r {utils.DOCKER_BASE_PATH.joinpath(args.component, cdk)} {utils.DOCKER_BASE_PATH.joinpath(args.component, name)}', ' $ ')
-        log.error(error_msg + cmd)
-        sys.exit(1)
+            log.debug(f'Doing a mkdir for {conf_path}')
+            conf_path.mkdir(0o755, True, True) # mode, parents, exist_ok
     if args.component == 'amster':
         amster_path = APP_CONF_PATH_FMT['amster'](profile=args.profile)
         log.info('Exporting amster config.')
@@ -270,6 +272,9 @@ def main():
                                                       HELP_EXPORT_EXAMPLES),
                                                   formatter_class=argparse.RawDescriptionHelpFormatter,
                                                   description=HELP_EXPORT_CMD_DESCRIPTION)
+    export_cmd_parser.add_argument('--baseline-profile',
+                                   default='cdk',
+                                   help=HELP_EXPORT_BASELINE_PROFILE)
     export_cmd_parser.add_argument('component',
                                    choices=PLATFORM_COMPONENTS.keys(),
                                    help=HELP_CMD_COMPONENTS)
