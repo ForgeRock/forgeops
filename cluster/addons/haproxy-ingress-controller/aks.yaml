@@ -1,0 +1,20 @@
+controller:
+    kind: Deployment
+    hostNetwork: true
+    # For testing and small installations one replica is sufficient. For larger tests
+    # you may want to increase the replicas
+    replicaCount: 1
+    service:
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        omitClusterIP: true
+    publishService:
+        enabled: true
+    stats:
+        enabled: true
+        service:
+            omitClusterIP: true
+    tolerations:
+      - key: "WorkerAttachedToExtLoadBalancer"
+        operator: "Exists"
+        effect: "NoSchedule"

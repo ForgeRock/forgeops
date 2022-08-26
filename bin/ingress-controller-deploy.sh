@@ -31,6 +31,7 @@ NOTES:
     --debug                      : enable debugging output
     --dryrun                     : do a dry run
     -v|--verbose                 : be verbose
+    -d|--delete                  : delete the ingress
     -a|--aks                     : deploy to AKS
     -e|--eks                     : deploy to EKS
     -g|--gke                     : deploy to GKE. Optionally provide IP address (default: dynamically generate IP address)
@@ -76,6 +77,7 @@ DRYRUN=false
 VERBOSE=false
 DELETE=false
 INGRESS=nginx
+INGRESS_CLASS_YAML=
 IP=
 IP_OPTS=
 AKS=false
@@ -137,6 +139,7 @@ case $INGRESS in
     NAMESPACE=haproxy
     REPO=https://haproxy-ingress.github.io/charts
     REPO_NAME=haproxy-ingress
+    INGRESS_CLASS_YAML=haproxy-ingressclass.yaml
     ;;
   nginx)
     CHART=ingress-nginx
@@ -159,13 +162,13 @@ ns=$(kubectl get namespace | grep $NAMESPACE | awk '{ print $1 }' || true)
 # Identify cluster size
 clustsize=$(kubectl get nodes --label-columns forgerock.io/cluster --no-headers  | head -n 1 | awk '{print $6}')
 
-if [ -z "${ns}" ]; then
+if [[ -z "${ns}" ]]; then
     runOrPrint "kubectl create namespace $NAMESPACE"
 else
     echo "*** $NAMESPACE namespace already exists ***"
 fi
 
-if [ -n "$clustsize" ]; then
+if [[ -n "$clustsize" ]]; then
     echo "Detected cluster of type: $clustsize"
 fi
 
@@ -191,3 +194,7 @@ runOrPrint "helm repo add $REPO_NAME $REPO --force-update"
 # Deploy ingress Helm chart
 runOrPrint "helm upgrade -i $CHART --namespace $NAMESPACE $REPO_NAME/$CHART \
     $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}"
+
+if [[ -n "$INGRESS_CLASS_YAML" ]] ; then
+  runOrPrint "kubectl apply -f ${ADDONS_DIR}/${INGRESS_CLASS_YAML}"
+fi
