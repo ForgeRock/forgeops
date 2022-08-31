@@ -121,7 +121,7 @@ elif [ "$EKS" = true ] ; then
 elif [ "$GKE" = true ] ; then
   if [ -n "$IP" ] ; then
     message "We were given an IP address" "debug"
-    [[ ! "$2" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && echo -e "\nERROR: Can't detect a valid IP address" && usage
+    [[ ! "$IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && usage 1 "Can't detect a valid IP address"
     echo "IP: $IP"
     IP_OPTS="--set chart.service.loadBalancerIP=${IP}"
   fi
@@ -162,7 +162,7 @@ clustsize=$(kubectl get nodes --label-columns forgerock.io/cluster --no-headers 
 if [ -z "${ns}" ]; then
     runOrPrint "kubectl create namespace $NAMESPACE"
 else
-    printf "*** $NAMESPACE namespace already exists ***\n"
+    echo "*** $NAMESPACE namespace already exists ***"
 fi
 
 if [ -n "$clustsize" ]; then
