@@ -23,7 +23,9 @@ GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F",
 /** Default platform-images tag corresponding to this branch (or the PR target branch, if this is a PR build) */
 String calculatePlatformImagsTag() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-    return "${branchName.startsWith('release/') ? 'master' : branchName}-ready-for-dev-pipelines"
+    def platformImagesBranchName = branchName.startsWith('release/') ? 'master' : branchName
+    platformImagesBranchName = branchName.startsWith('release/7.2.') ? 'sustaining/7.2.x' : platformImagesBranchName
+    return "${platformImagesBranchName}-ready-for-dev-pipelines"
 }
 DEFAULT_PLATFORM_IMAGES_TAG = calculatePlatformImagsTag()
 
