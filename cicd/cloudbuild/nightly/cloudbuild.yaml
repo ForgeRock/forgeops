@@ -41,7 +41,7 @@ steps:
   args:
     - -c
     - |-
-      ./bin/forgeops install --fqdn nightly.eng.forgeops.com -n $$NAMESPACE
+      ./bin/forgeops install --fqdn nightly.eng.forgeops.com -n $$NAMESPACE -i haproxy
 
 - name: 'us-docker.pkg.dev/$PROJECT_ID/images/cloudbuild:latest'
   entrypoint: bash
