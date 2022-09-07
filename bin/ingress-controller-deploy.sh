@@ -123,7 +123,7 @@ elif [ "$GKE" = true ] ; then
     message "We were given an IP address" "debug"
     [[ ! "$IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && usage 1 "Can't detect a valid IP address"
     echo "IP: $IP"
-    IP_OPTS="--set chart.service.loadBalancerIP=${IP}"
+    IP_OPTS="--set controller.service.loadBalancerIP=${IP}"
   fi
   echo "Deploying Ingress chart to GKE..."
   PROVIDER="gke"
@@ -190,4 +190,4 @@ runOrPrint "helm repo add $REPO_NAME $REPO --force-update"
 
 # Deploy ingress Helm chart
 runOrPrint "helm upgrade -i $CHART --namespace $NAMESPACE $REPO_NAME/$CHART \
-    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set chart.replicaCount=${INGRESS_POD_COUNT}"
+    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}"
