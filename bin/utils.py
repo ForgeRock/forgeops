@@ -384,14 +384,14 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, cust
 
     # Use legacy components if --legacy flag used
     if legacy and component == 'apps':
-        component = 'apps-legacy'   
+        component = 'apps-legacy'
 
     if legacy and component == 'am':
-        component = 'am-legacy' 
-    
+        component = 'am-legacy'
+
     if legacy and component == 'idm':
-        component = 'idm-legacy' 
-    
+        component = 'idm-legacy'
+
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
@@ -443,7 +443,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
     _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, custom_path=custom_path, src_profile_dir=src_profile_dir)
-    
+
     # Remove amster components
     if component == "amster":
         clean_amster_job(ns, False)
@@ -520,9 +520,6 @@ def printsecrets(ns, to_stdout=True):
             'am-env-secrets': {
                 'AM_PASSWORDS_AMADMIN_CLEAR': None
             },
-            'idm-env-secrets': {
-                'OPENIDM_ADMIN_PASSWORD': None
-            },
             'ds-passwords': {
                 'dirmanager\\\.pw': None,
             },
@@ -539,8 +536,6 @@ def printsecrets(ns, to_stdout=True):
             message('\nRelevant passwords:')
             print(
                 f"{secrets['am-env-secrets']['AM_PASSWORDS_AMADMIN_CLEAR']} (amadmin user)")
-            print(
-                f"{secrets['idm-env-secrets']['OPENIDM_ADMIN_PASSWORD']} (openidm-admin user)")
             print("{} (uid=admin user)".format(secrets['ds-passwords']['dirmanager\\\.pw']))  # f'strings' do not allow '\'
             print(f"{secrets['ds-env-secrets']['AM_STORES_APPLICATION_PASSWORD']} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
             print(f"{secrets['ds-env-secrets']['AM_STORES_CTS_PASSWORD']} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
