@@ -103,6 +103,7 @@ bundles = {
 
 patcheable_components ={
     'base/am': 'am.yaml',
+    'base/idm': 'idm.yaml',
     'base/idm-cdk': 'idm.yaml',
     'base/kustomizeConfig': 'base.yaml',
     'base/ds/idrepo': 'ds-idrepo-old.yaml',
@@ -340,14 +341,18 @@ def wait_for_am(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'am'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout={timeout_secs}s')
 
-def wait_for_amster(ns, timeout_secs=600):
+def wait_for_amster(ns, duration, timeout_secs=600):
     """
     Wait for successful amster job run.
     ns: target namespace.
     timeout_secs: timeout in secs.
     """
     _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
-    return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
+
+    if duration:
+        return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
+    else: 
+        return run('kubectl', f'-n {ns} wait --for=condition=Complete pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
 
 def wait_for_idm(ns, timeout_secs=600):
     """

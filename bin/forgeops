@@ -80,7 +80,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path=N
     # Create amster-retain configmap
     utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
-    utils.wait_for_amster(ns)
+    utils.wait_for_amster(ns, duration)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_idm(ns)
     utils.message('\nDeploying UI.')
@@ -321,7 +321,7 @@ def main():
 
         if 'amster' in components:
             utils.message('Waiting for amster job to complete.')
-            utils.wait_for_amster(namespace, args.timeout)
+            utils.wait_for_amster(namespace, duration, args.timeout)
 
         if 'idm' in components:
             utils.message('Waiting for IDM deployment.')
