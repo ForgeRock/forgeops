@@ -1,0 +1,19 @@
+resources:
+  - ../amster
+
+patchesStrategicMerge:
+- |-
+  apiVersion: batch/v1
+  kind: Job
+  metadata:
+    name: amster
+  spec:
+    backoffLimit: 0
+    template:
+      spec:
+        initContainers:
+        - name: amster
+          args: ["export-exit"]
+        containers:
+        - name: pause
+          args: ["bash", "-c", "while : ; do sleep 1; done"]
