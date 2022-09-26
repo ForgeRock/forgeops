@@ -1,0 +1,6 @@
+#!/bin/bash
+
+terraform apply -target=local_file.clusters -auto-approve -compact-warnings
+terraform init -upgrade
+terraform apply $*
+

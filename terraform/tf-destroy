@@ -1,0 +1,4 @@
+#!/bin/bash
+
+terraform destroy $*
+
