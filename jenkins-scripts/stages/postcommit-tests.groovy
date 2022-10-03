@@ -17,7 +17,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
     clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
     def scaleClusterConfig = [:]
-    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 4, 'primary-pool': 6]
+    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 5, 'primary-pool': 20]
 
     try {
         dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
