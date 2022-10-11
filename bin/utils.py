@@ -349,10 +349,9 @@ def wait_for_amster(ns, duration, timeout_secs=600):
     """
     _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
 
-    if duration:
-        return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
-    else: 
-        return run('kubectl', f'-n {ns} wait --for=condition=Complete pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
+    condition = 'ready' if duration > '10' else 'complete'
+
+    return run('kubectl', f'-n {ns} wait --for=condition={condition} job/amster --timeout={timeout_secs}s')
 
 def wait_for_idm(ns, timeout_secs=600):
     """

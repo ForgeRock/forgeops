@@ -321,7 +321,7 @@ def main():
 
         if 'amster' in components:
             utils.message('Waiting for amster job to complete.')
-            utils.wait_for_amster(namespace, duration, args.timeout)
+            utils.wait_for_amster(namespace, args.duration, args.timeout)
 
         if 'idm' in components:
             utils.message('Waiting for IDM deployment.')
