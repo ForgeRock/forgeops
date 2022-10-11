@@ -1,6 +1,18 @@
 #!/bin/bash
 
-terraform apply -target=local_file.clusters -auto-approve -compact-warnings
-terraform init -upgrade
-terraform apply $*
+terraform_dir=$(dirname $0)
+terraform_bin=$(type -p terraform)
+if [ -z "$terraform_bin" ]; then
+    echo "Could not find terraform binary in PATH.  Exiting."
+    exit 1
+fi
+terraform="$terraform_bin -chdir=$terraform_dir"
+
+set -e
+if [ ! -d $terraform_dir/.terraform ]; then
+    $terraform init
+fi
+$terraform apply -target=local_file.clusters -auto-approve -compact-warnings
+$terraform init -upgrade
+$terraform apply $*
 

@@ -14,6 +14,10 @@ output "metadata" {
     "elasticsearch"         = length(helm_release.elasticsearch) > 0 ? helm_release.elasticsearch[0].metadata[0] : null
     "logstash"              = length(helm_release.logstash) > 0 ? helm_release.logstash[0].metadata[0] : null
     "kibana"                = length(helm_release.kibana) > 0 ? helm_release.kibana[0].metadata[0] : null
+    "raw-k8s-resources"     = length(helm_release.raw_k8s_resources) > 0 ? helm_release.raw_k8s_resources[0].metadata[0] : null
+    "secret-agent"          = length(helm_release.secret_agent) > 0 ? helm_release.secret_agent[0].metadata[0] : null
+    "ds-operator"           = length(helm_release.ds_operator) > 0 ? helm_release.ds_operator[0].metadata[0] : null
+    "identity-platform"     = length(helm_release.identity_platform) > 0 ? helm_release.identity_platform[0].metadata[0] : null
   }
 }
 

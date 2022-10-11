@@ -196,9 +196,9 @@ resource "helm_release" "raw_haproxy_ingress" {
   count = contains(keys(var.charts), "haproxy-ingress") && contains(keys(var.chart_configs), "haproxy-ingress") ? (var.chart_configs["haproxy-ingress"]["deploy"] ? 1 : 0) : 0
 
   name                  = "raw-haproxy-ingress"
-  repository            = "https://charts.itscontained.io"
+  repository            = "https://bedag.github.io/helm-charts" # "https://charts.itscontained.io"
   chart                 = "raw"
-  version               = "0.2.5"
+  version               = "1.1.0" # "0.2.5"
   namespace             = "haproxy-ingress"
   create_namespace      = true
   reuse_values          = false
@@ -279,9 +279,9 @@ resource "helm_release" "raw_cert_manager" {
   count = contains(keys(var.charts), "cert-manager") && contains(keys(var.chart_configs), "cert-manager") ? (var.chart_configs["cert-manager"]["deploy"] ? 1 : 0) : 0
 
   name                  = "raw-cert-manager"
-  repository            = "https://charts.itscontained.io"
+  repository            = "https://bedag.github.io/helm-charts" # "https://charts.itscontained.io"
   chart                 = "raw"
-  version               = "0.2.5"
+  version               = "1.1.0" # "0.2.5"
   namespace             = "cert-manager"
   create_namespace      = true
   reuse_values          = false
@@ -409,9 +409,9 @@ resource "helm_release" "raw_k8s_resources" {
   count = contains(keys(var.charts), "raw-k8s-resources") ? 1 : 0
 
   name                  = "raw-k8s-resources"
-  repository            = "https://charts.itscontained.io"
+  repository            = "https://bedag.github.io/helm-charts" # "https://charts.itscontained.io"
   chart                 = "raw"
-  version               = "0.2.5"
+  version               = "1.1.0" # "0.2.5"
   namespace             = "identity-platform"
   create_namespace      = true
   reuse_values          = false
@@ -427,17 +427,72 @@ resource "helm_release" "raw_k8s_resources" {
 }
 
 locals {
-  values_identity_platform = <<-EOF
+  values_secret_agent = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
+resource "helm_release" "secret_agent" {
+  count = contains(keys(var.charts), "secret-agent") && contains(keys(var.chart_configs), "secret-agent") ? (var.chart_configs["secret-agent"]["deploy"] ? 1 : 0) : 0
+
+  name                  = "secret-agent"
+  repository            = contains(keys(var.chart_configs["secret-agent"]), "repository") ? var.chart_configs["secret-agent"]["repository"] : null
+  chart                 = "../helm/secret-agent"
+  version               = contains(keys(var.chart_configs["secret-agent"]), "version") ? var.chart_configs["secret-agent"]["version"] : null
+  namespace             = "secret-agent"
+  create_namespace      = true
+  reuse_values          = false
+  reset_values          = true
+  force_update          = true
+  max_history           = 12
+  render_subchart_notes = false
+  timeout               = 600
+
+  values = [local.values_secret_agent, var.charts["secret-agent"]["values"], contains(keys(var.chart_configs), "secret-agent") ? (contains(keys(var.chart_configs["secret-agent"]), "values") ? var.chart_configs["secret-agent"]["values"] : "") : ""]
+
+  depends_on = [helm_release.raw_k8s_resources]
+}
+
+locals {
+  values_ds_operator = <<-EOF
+  # Values from terraform helm module
+  EOF
+}
+
+resource "helm_release" "ds_operator" {
+  count = contains(keys(var.charts), "ds-operator") && contains(keys(var.chart_configs), "ds-operator") ? (var.chart_configs["ds-operator"]["deploy"] ? 1 : 0) : 0
+
+  name                  = "ds-operator"
+  repository            = contains(keys(var.chart_configs["ds-operator"]), "repository") ? var.chart_configs["ds-operator"]["repository"] : null
+  chart                 = "../helm/ds-operator"
+  version               = contains(keys(var.chart_configs["ds-operator"]), "version") ? var.chart_configs["ds-operator"]["version"] : null
+  namespace             = "ds-operator"
+  create_namespace      = true
+  reuse_values          = false
+  reset_values          = true
+  force_update          = true
+  max_history           = 12
+  render_subchart_notes = false
+  timeout               = 600
+
+  values = [local.values_ds_operator, var.charts["ds-operator"]["values"], contains(keys(var.chart_configs), "ds-operator") ? (contains(keys(var.chart_configs["ds-operator"]), "values") ? var.chart_configs["ds-operator"]["values"] : "") : ""]
+
+  depends_on = [helm_release.raw_k8s_resources]
+}
+
+locals {
+  values_identity_platform = <<-EOF
+  # Values from terraform helm module
+  timestamp: "${timestamp()}"
+  EOF
+}
+
 resource "helm_release" "identity_platform" {
-  count = contains(keys(var.charts), "identity-platform") ? 1 : 0
+  count = contains(keys(var.charts), "identity-platform") && contains(keys(var.chart_configs), "identity-platform") ? (var.chart_configs["identity-platform"]["deploy"] ? 1 : 0) : 0
 
   name                  = "identity-platform"
-  repository            = contains(keys(var.chart_configs["identity-platform"]), "repository") ? var.chart_configs["identity-platform"]["repository"] : "~/helm"
-  chart                 = "raw"
+  repository            = contains(keys(var.chart_configs["identity-platform"]), "repository") ? var.chart_configs["identity-platform"]["repository"] : null
+  chart                 = "../helm/identity-platform"
   version               = contains(keys(var.chart_configs["identity-platform"]), "version") ? var.chart_configs["identity-platform"]["version"] : null
   namespace             = "identity-platform"
   create_namespace      = true
@@ -448,8 +503,8 @@ resource "helm_release" "identity_platform" {
   render_subchart_notes = false
   timeout               = 600
 
-  values = [local.values_kibana, var.charts["identity-platform"]["values"], contains(keys(var.chart_configs), "identity-platform") ? (contains(keys(var.chart_configs["identity-platform"]), "values") ? var.chart_configs["identity-platform"]["values"] : "") : ""]
+  values = [local.values_identity_platform, var.charts["identity-platform"]["values"], contains(keys(var.chart_configs), "identity-platform") ? (contains(keys(var.chart_configs["identity-platform"]), "values") ? var.chart_configs["identity-platform"]["values"] : "") : ""]
 
-  depends_on = [helm_release.raw_k8s_resources]
+  depends_on = [helm_release.raw_k8s_resources, helm_release.secret_agent, helm_release.ds_operator]
 }
 
