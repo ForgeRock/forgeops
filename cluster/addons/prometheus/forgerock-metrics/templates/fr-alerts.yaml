@@ -2,7 +2,7 @@
 groups:
 - name: cluster.rules
   rules:
-  - alert: node_memory_MemFree
+  - alert: node_memory_MemFree_bytes
     expr: node_memory_MemFree < 100000000
     for: 5m
     labels:
@@ -22,9 +22,9 @@ groups:
     labels:
       severity: warning
     annotations:
-      description: "Instance cpu above 80% for over 5 mins" 
-  - alert: node_disk_io_time_ms
-    expr: rate(node_disk_io_time_ms[5m]) > 200
+      description: "Instance cpu above 80% for over 5 mins"
+  - alert: node_disk_io_time_seconds_total
+    expr: rate(node_disk_io_time_seconds_total[5m]) > 0.2
     for: 5m
     labels:
       severity: warning
@@ -33,30 +33,30 @@ groups:
 - name: am.rules
   rules:
   - alert: am_cts_task_seconds_total
-    expr: sum by (job) (rate(am_cts_task_seconds_total{job=~"$instance"}[90s])) / sum by (job) (rate(am_cts_task_count{job=~"$instance"}[90s])) > 0.1
+    expr: sum by (instance) (rate(am_cts_task_seconds_total[90s])) / sum by (instance) (rate(am_cts_task_count[90s])) > 0.1
     for: 3m
     labels:
       severity: warning
     annotations:
-      description: "Average Task Service Time"
-  - alert: am_cts_reaper_search_second
-    expr: am_cts_reaper_search_second > 0.25
+      description: "Average CTS Task Service Time"
+  - alert: am_cts_reaper_search_seconds
+    expr: am_cts_reaper_search_seconds > 0.25
     labels:
       severity: warning
     annotations:
       description: "CTS Overall Average search service time"
   - alert: am_cts_reaper_deletion_total
-    expr: irate(am_cts_reaper_deletion_total{reaper_type=~"search",outcome=~"$outcome"}[1m]) > 0
+    expr: irate(am_cts_reaper_deletion_total{reaper_type=~"search"}[1m]) > 0
     labels:
       severity: warning
     annotations:
-      description: "CTS Search based Deletion Throughput" 
+      description: "CTS Search based Deletion Throughput"
   - alert: am_cts_task_count
-    expr: rate(am_cts_task_count{job=~"$instance",token_type=~"$token_type",operation=~"$operation",outcome=~"failure"}[5m]) > 0
+    expr: rate(am_cts_task_count{outcome=~"failure"}[5m]) > 0
     labels:
       severity: warning
     annotations:
-      description: "CTS Delete task throughput failure" 
+      description: "CTS Delete task throughput failure"
 - name: ds.rules
   rules:
   - alert: ds_disk_free_space_bytes
@@ -135,4 +135,3 @@ groups:
     annotations:
       description: "Rate of successful/unsuccessful retrieval of a repo connection"
 {{ end }}
-          
