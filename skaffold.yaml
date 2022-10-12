@@ -286,4 +286,4 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/base/amster-export-cdm
+      path: ./kustomize/overlay/7.0/amster-export-skaffold

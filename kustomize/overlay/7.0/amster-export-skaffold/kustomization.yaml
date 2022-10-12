@@ -1,10 +1,5 @@
 resources:
-  - ../amster
-
-images:
-- name: amster
-  newName: us-docker.pkg.dev/forgeops-public/images/amster
-  newTag: 7.1.2
+  - ../../../base/amster
 
 patchesStrategicMerge:
 - |-
@@ -18,7 +13,7 @@ patchesStrategicMerge:
       spec:
         initContainers:
         - name: amster
-          args: ["export-exit"]
+          args: ["export"]
         containers:
         - name: pause
-          args: ["bash", "-c", "while : ; do sleep 1; done"]
+          args: ["pause"]

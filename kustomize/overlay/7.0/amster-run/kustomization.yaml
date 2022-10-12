@@ -1,5 +1,5 @@
 resources:
-  - ../amster
+  - ../../../base/amster
 
 images:
 - name: amster

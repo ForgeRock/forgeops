@@ -21,7 +21,7 @@ USER_PWD_EXPR_RULES = {
 def amster_run(ns):
     utils.message('starting...')
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    amster_run_job_path = os.path.join(kustomize_dir, 'base', 'amster-run')
+    amster_run_job_path = os.path.join(kustomize_dir, 'overlay/7.0/amster-run')
     try:
         clean_amster_job(ns, False)
         pod = _launch_amster_job(amster_run_job_path, ns)
@@ -32,7 +32,7 @@ def amster_run(ns):
 
 def amster_import(ns, src, printlogs=True):
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    amster_upload_job_path = os.path.join(kustomize_dir, 'base/amster-upload')
+    amster_upload_job_path = os.path.join(kustomize_dir, 'overlay/7.0/amster-upload')
     # If the source dir/file does not exist exit
     if not os.path.exists(src):
         utils.error(f'Cant read path {src}. Please specify a valid path and try again')
@@ -56,7 +56,7 @@ def amster_import(ns, src, printlogs=True):
 
 def amster_export(ns, dst, glob, retain):
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
-    amster_export_job_path = os.path.join(kustomize_dir,'base/amster-export')
+    amster_export_job_path = os.path.join(kustomize_dir,'overlay/7.0/amster-export')
     fqdn = utils.get_fqdn(ns)
     if not os.path.isdir(dst):
         utils.error(f'{dst} is not a valid directory. Please specify a valid path and try again')
