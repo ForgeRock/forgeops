@@ -39,13 +39,6 @@ pause)
     ;;
 export)
     ./export.sh
-    sleep infinity
-    ;;
-export-exit)
-    # Like export - but exit immediately.
-    # You must run another container after this
-    # that will save the exported files.
-    ./export.sh
     ;;
 import)
     # invoke amster install.
