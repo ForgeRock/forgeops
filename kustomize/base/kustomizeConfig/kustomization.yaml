@@ -35,6 +35,7 @@ configMapGenerator:
   - DSBACKUP_HOSTS="ds-cts-0,ds-idrepo-0" # Name of the pods running the backup tasks. Ex: "ds-cts-0,ds-idrepo-0"
   - CERT_ISSUER="default-issuer" # cert manager issuer. Patch with letsencrypt-prod for LE SSL certs.
   - RCS_AGENT_ENABLED="false" # Set to "true" when RCS Agent is enabled for use
+  - REALM_ENTITIES="OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications"
 
 generatorOptions:
   disableNameSuffixHash: true
