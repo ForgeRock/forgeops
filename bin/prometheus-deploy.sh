@@ -1,30 +1,31 @@
 #!/usr/bin/env bash
 # Deploys prometheus-operator Helm Chart and Forgerock Metrics which include custom
 # endpoints, alerting rules and Grafana dashboards.
-# ./prometheus-deploy.sh -n namespace - deploy to different namespace that monitoring.
+# ./prometheus-deploy.sh -n namespace - deploy to different namespace than monitoring.
 # ./prometheus-deploy.sh -v values file - use different custom values file.
 # ./prometheus-deploy.sh -d - delete deployment.
 #
 # Prerequisite: Helm version 3.04 or higher.
 
-# You can deploy your own custom values file by using the -f <values file> flag.
+# You can deploy your own custom values file by using the -v <values file> flag.
 set -oe pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ADDONS_BASE="${ADDONS_BASE:-${DIR}/../cluster/addons}"
 ADDONS_DIR="${ADDONS_BASE}/prometheus"
 PROM_VALUES="${ADDONS_DIR}/prometheus-operator.yaml"
+NAMESPACE=monitoring
 
 USAGE="Usage: $0 [-n <namespace>] [-v <values file>] [-d]"
 
 # Create namespace
 create_ns() {
-    ns=$(kubectl get namespace | grep monitoring | awk '{ print $1 }' || true)
+    ns=$(kubectl get namespace | grep $NAMESPACE | awk '{ print $1 }' || true)
 
     if [ -z "${ns}" ]; then
-        kubectl create namespace monitoring
+        kubectl create namespace $NAMESPACE
     else
-        printf "*** monitoring namespace already exists ***\n"
+        printf "*** $NAMESPACE namespace already exists ***\n"
     fi
 }
 
@@ -43,7 +44,7 @@ deploy() {
         crd/podmonitors.monitoring.coreos.com \
         crd/alertmanagers.monitoring.coreos.com \
         crd/alertmanagerconfigs.monitoring.coreos.com \
-        crd/probes.monitoring.coreos.com 
+        crd/probes.monitoring.coreos.com
 
     kubectl -n $NAMESPACE wait --for condition=Ready --timeout=60s pod --all
     # Install/Upgrade forgerock-servicemonitors
@@ -80,7 +81,7 @@ delete() {
 if [[ $1 == "-h" ]];then
     echo $USAGE
     echo "-n <namespace>    namespace"
-    echo "-v <values file>  add custom values file for Prometheus operator."
+    echo "-v <values file>  add custom values file for Prometheus operator (relative to $ADDONS_DIR)"
     echo "-d delete Prometheus Operator and Forgerock metrics"
     exit
 fi
@@ -99,9 +100,7 @@ done
 echo -e "\n**This script requires Helm version 3.04 or later due to changes in the behaviour of 'helm repo add' command.**\n"
 
 ## Validate arguments
-# Check if -n flag has been included
-[[ $1 != "-n" ]] && NAMESPACE=monitoring
-# set custom yaml file if not provided with the -f arg
+# set custom yaml file if not provided with the -v arg
 [ $VALUES ] && PROM_VALUES="${ADDONS_DIR}/${VALUES}"
 # delete chart if -d select
 [[ ${1} =~ "-d" ]] && delete
