@@ -24,7 +24,7 @@ def amster_run(ns):
     utils.message('starting...')
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     docker_dir = os.path.join(sys.path[0], '..', 'docker')
-    amster_run_job_path = os.path.join(kustomize_dir, 'base', 'amster-run')
+    amster_run_job_path = os.path.join(kustomize_dir, 'overlay', 'amster-run')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     try:
         utils.clean_amster_job(ns, False)
@@ -41,7 +41,7 @@ def amster_run(ns):
 def amster_import(ns, src, duration, printlogs=True):
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     docker_dir = os.path.join(sys.path[0], '..', 'docker')
-    amster_upload_job_path = os.path.join(kustomize_dir, 'base', 'amster-upload')
+    amster_upload_job_path = os.path.join(kustomize_dir, 'overlay', 'amster-upload')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     retain = True if duration > '200' else False
     # If the source dir/file does not exist exit
@@ -69,7 +69,7 @@ def amster_import(ns, src, duration, printlogs=True):
 def amster_export(ns, dst, glob, full, duration):
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     docker_dir = os.path.join(sys.path[0], '..', 'docker')
-    amster_export_job_path = os.path.join(kustomize_dir, 'base', 'amster-export')
+    amster_export_job_path = os.path.join(kustomize_dir, 'overlay', 'amster-export')
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     retain = True if duration > '200' else False
     fqdn = utils.get_fqdn(ns)

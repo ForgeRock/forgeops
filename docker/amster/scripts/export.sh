@@ -14,7 +14,7 @@ mkdir -p $EXPORT_DIR
 # Create Amster export script.
 cat > /tmp/do_export.amster <<EOF
 connect -k  /var/run/secrets/amster/id_rsa $AMSTER_AM_URL
-export-config --path $EXPORT_DIR ${realmEntities}
+export-config --path '$EXPORT_DIR' ${realmEntities}
 :quit
 EOF
 
