@@ -1,4 +1,4 @@
-# For schema see https://coreos.com/operators/prometheus/docs/latest/api.html#endpoint 
+# For schema see https://coreos.com/operators/prometheus/docs/latest/api.html#endpoint
 # This defines a prometheus operator spec for a service to scrape.
 {{- if .Values.ds.enabled }}
 apiVersion: monitoring.coreos.com/v1
@@ -8,7 +8,7 @@ metadata:
     k8s-apps: kube-prometheus
     # This label targets the prometheus operator instance
     # You could in theory have many operators running in a cluster (one for dev, qa, etc.)
-    # This targets the instance that the helm chart coreos/kube-prometheus creates. 
+    # This targets the instance that the helm chart coreos/kube-prometheus creates.
     # Note that this ServiceMonitor needs to be in the same namespace as the operator
     # The monitored targets can be in different namespaces.
     prometheus: prometheus-operator
@@ -30,7 +30,7 @@ spec:
   # This targets the service using a label.
   selector:
     matchLabels:
-      app.kubernetes.io/component: {{ .Values.ds.labelSelectorComponent }}
+      app.kubernetes.io/name: {{ .Values.ds.labelSelectorName }}
   namespaceSelector:
     {{ if eq .Values.namespaceSelectorStrategy "any" }}
     any: true
