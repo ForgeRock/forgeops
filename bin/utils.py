@@ -472,7 +472,7 @@ def _inject_kustomize_amster(kustomize_pkg_path):
                     cstdout=True)
         with open(amster_cm_path, 'wt') as f:
             f.write(cm.decode('ascii'))
-        run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
+        run('kustomize', f'edit add resource ../../../kustomize/overlay/amster-upload', cwd=kustomize_pkg_path)
         run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
     finally:
         if os.path.exists('amster-import.tar.gz'):

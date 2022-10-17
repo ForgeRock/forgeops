@@ -39,8 +39,7 @@ pause)
     pause
     ;;
 export)
-    # You must run another container after this
-    # that will save the exported files.
+    # invoke amster export
     ./export.sh ${TYPE}
     ;;
 import)
