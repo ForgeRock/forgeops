@@ -7,10 +7,10 @@ images:
   newName: gcr.io/forgeops-public/git-server
 - name: .*am
   newName: us-docker.pkg.dev/forgeops-public/images/am
-  newTag: 7.1.2
+  newTag: 7.1.3
 - name: .*amster.*
   newName: us-docker.pkg.dev/forgeops-public/images/amster
-  newTag: 7.1.2
+  newTag: 7.1.3
 - name: .*idm
   newName: us-docker.pkg.dev/forgeops-public/images/idm
   newTag: 7.1.2
@@ -19,19 +19,19 @@ images:
   newTag: 1.5.20.0
 - name: .*ds-cts.*
   newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: 7.1.2
+  newTag: 7.1.4
 - name: .*ds-idrepo.*
   newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: 7.1.2
+  newTag: 7.1.4
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui
-  newTag: 7.1.1
+  newTag: 7.1.2
 - name: .*enduser-ui.*
   newName: gcr.io/forgerock-io/platform-enduser-ui
-  newTag: 7.1.1
+  newTag: 7.1.2
 - name: .*login-ui.*
   newName: gcr.io/forgerock-io/platform-login-ui
-  newTag: 7.1.1
+  newTag: 7.1.2
 - name: .*ig.*
   newName: us-docker.pkg.dev/forgeops-public/images/ig
   newTag: 7.1.2

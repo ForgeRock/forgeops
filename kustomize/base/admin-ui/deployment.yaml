@@ -13,7 +13,7 @@ spec:
         app: admin-ui
     spec:
       containers:
-      - image: gcr.io/forgerock-io/platform-admin-ui:7.1.1
+      - image: gcr.io/forgerock-io/platform-admin-ui:7.1.2
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -41,4 +41,3 @@ spec:
           preStop:
             exec:
               command: ["/usr/sbin/nginx", "-s", "quit"]
-
