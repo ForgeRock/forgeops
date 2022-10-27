@@ -112,6 +112,18 @@ create-backend-index \
           --type generic \
           --index-name fr-idm-uuid
 EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:equality \
+          --index-name fr-idm-effectiveApplications
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
+          --set index-type:presence \
+          --index-name fr-idm-lastSync
+EOF
 
 dsconfig --offline --no-prompt --batch <<EOF
 create-backend-index \
@@ -206,6 +218,30 @@ create-backend-index \
           --index-name fr-idm-managed-user-groups \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-assignment-member \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-application-member \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-application-owner \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
 
 # Example of creating additional indexes.
