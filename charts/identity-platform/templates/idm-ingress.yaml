@@ -1,0 +1,65 @@
+{{- if and .Values.idm.enabled .Values.platform.ingress.enabled -}}
+{{- $svcPort := .Values.idm.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: idm
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.platform.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.platform.ingress.className }}
+  tls:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - hosts:
+        - {{ $host | quote }}
+      secretName: "tls-{{ $host }}"
+    {{- end }}
+  rules:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - host: {{ $host | quote }}
+      http:
+        paths:
+          - path: /openidm
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: {{ $svcPort }}
+          - path: /upload
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: {{ $svcPort }}
+          - path: /export
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: {{ $svcPort }}
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: {{ $svcPort }}
+          - path: /openicf
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: {{ $svcPort }}
+    {{- end }}
+{{- end }}

@@ -70,6 +70,23 @@ clusters = {
       },
       kibana = {
         deploy  = false
+      },
+      secret-agent = {
+        deploy     = true
+      },
+      ds-operator = {
+        deploy     = true
+      },
+      identity-platform = {
+        deploy     = true
+        version    = "7.2.0"
+        values     = <<-EOF
+        # Values from tfvars configuration
+        #platform:
+        #  ingress:
+        #    hosts:
+        #      - identity-platform.domain.local
+        EOF
       }
     }
   },
@@ -125,6 +142,23 @@ clusters = {
       },
       kibana = {
         deploy  = false
+      },
+      secret-agent = {
+        deploy     = true
+      },
+      ds-operator = {
+        deploy     = true
+      },
+      identity-platform = {
+        deploy     = true
+        version    = "7.2.0"
+        values     = <<-EOF
+        # Values from tfvars configuration
+        #platform:
+        #  ingress:
+        #    hosts:
+        #      - identity-platform.domain.local
+        EOF
       }
     }
   },
@@ -180,6 +214,23 @@ clusters = {
       },
       kibana = {
         deploy  = false
+      },
+      secret-agent = {
+        deploy     = true
+      },
+      ds-operator = {
+        deploy     = true
+      },
+      identity-platform = {
+        deploy     = true
+        version    = "7.2.0"
+        values     = <<-EOF
+        # Values from tfvars configuration
+        #platform:
+        #  ingress:
+        #    hosts:
+        #      - identity-platform.domain.local
+        EOF
       }
     }
   },

@@ -1,0 +1,23 @@
+{{- if .Values.idm.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: idm
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.idm.service.type }}
+  ports:
+    - port: {{ .Values.idm.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,37 @@
+{{- if and .Values.end_user_ui.enabled .Values.platform.ingress.enabled -}}
+{{- $svcPort := .Values.end_user_ui.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: end-user-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.end_user_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.platform.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.platform.ingress.className }}
+  tls:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - hosts:
+        - {{ $host | quote }}
+      secretName: "tls-{{ $host }}"
+    {{- end }}
+  rules:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - host: {{ $host | quote }}
+      http:
+        paths:
+          - path: /enduser
+            pathType: Prefix
+            backend:
+              service:
+                name: end-user-ui
+                port:
+                  number: {{ $svcPort }}
+    {{- end }}
+{{- end }}

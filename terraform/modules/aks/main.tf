@@ -4,6 +4,7 @@ module "common" {
   source = "../common"
 
   forgerock = var.forgerock
+  cluster   = var.cluster
 }
 
 data "azurerm_client_config" "current" {}

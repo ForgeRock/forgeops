@@ -276,6 +276,25 @@ module "helm" {
           driver: disk.csi.azure.com
           deletionPolicy: Delete
       EOF
+    },
+    "secret-agent" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      EOF
+    },
+    "ds-operator" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      EOF
+    },
+    "identity-platform" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      platform:
+        ingress:
+          hosts:
+            - identity-platform.${azurerm_public_ip.ingress.ip_address}.nip.io
+      EOF
     }
   }
 

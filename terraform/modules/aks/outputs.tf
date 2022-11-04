@@ -22,20 +22,17 @@ resource "local_file" "kube_config" {
   content              = module.aks.kube_config_raw
 }
 
+module "common-output" {
+  source = "../common-output"
+
+  cluster       = merge(var.cluster, {type = "AKS", meta = {cluster_name = local.cluster_name}})
+  kube_config   = local.kube_config
+  helm_metadata = module.helm.metadata
+
+  depends_on = [module.helm]
+}
+
 output "cluster_info" {
-  value = <<-EOF
-  =============================================================================
-
-      EKS cluster name: ${local.cluster_name}
-  EKS cluster location: ${var.cluster.location.region}
-
-  Execute the following to begin working with the new cluster:
-
-  export KUBECONFIG=${local.kube_config["config_path"]}
-
-  =============================================================================
-  EOF
-
-    depends_on = [module.helm]
+  value = module.common-output.cluster_info
 }
 

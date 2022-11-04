@@ -1,0 +1,415 @@
+# Default values for identity-platform.
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+platform:
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations: #{}
+      # kubernetes.io/tls-acme: "true"
+      # haproxy.router.openshift.io/cookie_name: route
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+      nginx.ingress.kubernetes.io/affinity: cookie
+      nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+      nginx.ingress.kubernetes.io/session-cookie-name: route
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      # CORS is now set in the AM and IDM configurations
+      nginx.ingress.kubernetes.io/enable-cors: "false"
+      nginx.ingress.kubernetes.io/body-size: "64m"
+      nginx.ingress.kubernetes.io/send-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      # RCS Agent websockets
+      nginx.org/websocket-services: "rcs-agent"
+      nginx.ingress.kubernetes.io/websocket-services: "rcs-agent"
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        add_header X-ForgeRock-TransactionId $req_id;
+        proxy_set_header X-ForgeRock-TransactionId $req_id;
+
+    host:
+      - identity-platform.domain.local
+      # - identity-platform-2.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+am:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/am
+    pullPolicy: IfNotPresent
+    tag: "dev"
+
+  ingress:
+    enabled: true
+
+  resources: {}
+    # limits:
+    #   cpu: 250m
+    #   memory: 2000Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 128Mi
+
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+
+  readinessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  startupProbe:
+    failureThreshold: 40
+    periodSeconds: 10
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: am
+
+  podSecurityContext:
+    runAsGroup: 0
+    runAsUser: 11111
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+amster:
+  enabled: true
+  backoffLimit: 6
+  restartPolicy: OnFailure
+  deleteOnSuccess: false
+
+  image:
+    repository: gcr.io/forgerock-io/amster/pit1
+    pullPolicy: IfNotPresent
+    tag: "7.3.0-latest-postcommit"
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 512
+    # requests:
+    #   cpu: 100m
+    #   memory: 512
+
+  readinessProbe:
+    initialDelaySeconds: 1
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: amster
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+  
+  env:
+    DURATION: "10"
+
+idm:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/idm
+    pullPolicy: IfNotPresent
+    tag: "dev"
+
+  ingress:
+    enabled: true
+
+  resources: {}
+    # limits:
+    #   cpu: 250m
+    #   memory: 1280Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 768Mi
+
+  livenessProbe:
+    initialDelaySeconds: 120
+    periodSeconds: 60
+    timeoutSeconds: 5
+
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 5
+
+  startupProbe:
+    failureThreshold: 40
+    periodSeconds: 10
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: idm
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+admin_ui:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: gcr.io/forgerock-io/platform-admin-ui/docker-build
+    pullPolicy: IfNotPresent
+    tag: "7.2.0-postcommit-latest"
+
+  ingress:
+    enabled: true
+
+  resources: {}
+    # limits:
+    #   cpu: 10m
+    #   memory: 100Mi
+    # requests:
+    #   cpu: 10m
+    #   memory: 100Mi
+
+  livenessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  readinessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: admin-ui
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+end_user_ui:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: gcr.io/forgerock-io/platform-enduser-ui/docker-build
+    pullPolicy: IfNotPresent
+    tag: "7.2.0-postcommit-latest"
+
+  ingress:
+    enabled: true
+
+  resources: {}
+    # limits:
+    #   cpu: 10m
+    #   memory: 100Mi
+    # requests:
+    #   cpu: 10m
+    #   memory: 100Mi
+
+  livenessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  readinessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: login-ui
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+login_ui:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: gcr.io/forgerock-io/platform-login-ui/docker-build
+    pullPolicy: IfNotPresent
+    tag: "7.2.0-postcommit-latest"
+
+  ingress:
+    enabled: true
+
+  resources: {}
+    # limits:
+    #   cpu: 10m
+    #   memory: 100Mi
+    # requests:
+    #   cpu: 10m
+    #   memory: 100Mi
+
+  livenessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  readinessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: login-ui
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8080
+

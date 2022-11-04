@@ -76,20 +76,17 @@ resource "local_file" "kube_config" {
   EOF
 }
 
-output "cluster_info" {
-  value = <<-EOF
-  =============================================================================
+module "common-output" {
+  source = "../common-output"
 
-      EKS cluster name: ${local.cluster_name}
-  EKS cluster location: ${var.cluster.location["region"]}
-
-  Execute the following to begin working with the new cluster:
-
-  export KUBECONFIG=${local.kube_config["config_path"]}
-
-  =============================================================================
-EOF
+  cluster       = merge(var.cluster, {type = "EKS", meta = {cluster_name = local.cluster_name}})
+  kube_config   = local.kube_config
+  helm_metadata = module.helm.metadata
 
   depends_on = [module.helm]
+}
+
+output "cluster_info" {
+  value = module.common-output.cluster_info
 }
 

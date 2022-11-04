@@ -1,0 +1,37 @@
+{{- if and .Values.login_ui.enabled .Values.platform.ingress.enabled -}}
+{{- $svcPort := .Values.login_ui.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: login-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.login_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.platform.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.platform.ingress.className }}
+  tls:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - hosts:
+        - {{ $host | quote }}
+      secretName: "tls-{{ $host }}"
+    {{- end }}
+  rules:
+    {{- range $host := .Values.platform.ingress.hosts }}
+    - host: {{ $host | quote }}
+      http:
+        paths:
+          - path: /am/XUI
+            pathType: Prefix
+            backend:
+              service:
+                name: login-ui
+                port:
+                  number: {{ $svcPort }}
+    {{- end }}
+{{- end }}

@@ -165,7 +165,7 @@ resource "helm_release" "haproxy_ingress" {
   name                  = "haproxy-ingress"
   repository            = contains(keys(var.chart_configs["haproxy-ingress"]), "repository") ? var.chart_configs["haproxy-ingress"]["repository"] : "https://haproxy-ingress.github.io/charts"
   chart                 = "haproxy-ingress"
-  version               = contains(keys(var.chart_configs["haproxy-ingress"]), "version") ? var.chart_configs["haproxy-ingress"]["version"] : "1.23.1"
+  version               = contains(keys(var.chart_configs["haproxy-ingress"]), "version") ? var.chart_configs["haproxy-ingress"]["version"] : "0.13.9"
   namespace             = "haproxy-ingress"
   create_namespace      = true
   reuse_values          = false
@@ -267,7 +267,41 @@ locals {
           email: forgeops-team@forgerock.com
           # Name of a secret used to store the ACME account private key.
           privateKeySecretRef:
-            name: letsencrypt-prod
+            name: letsencrypt-default
+          solvers:
+          - http01:
+              ingress:
+                class: nginx
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: letsencrypt-production
+      spec:
+        acme:
+          # The ACME server URL.
+          server: https://acme-v02.api.letsencrypt.org/directory
+          # Email address used for ACME registration.
+          email: forgeops-team@forgerock.com
+          # Name of a secret used to store the ACME account private key.
+          privateKeySecretRef:
+            name: letsencrypt-production
+          solvers:
+          - http01:
+              ingress:
+                class: nginx
+    - apiVersion: cert-manager.io/v1
+      kind: ClusterIssuer
+      metadata:
+        name: letsencrypt-staging
+      spec:
+        acme:
+          # The ACME server URL.
+          server: https://acme-staging-v02.api.letsencrypt.org/directory
+          # Email address used for ACME registration.
+          email: forgeops-team@forgerock.com
+          # Name of a secret used to store the ACME account private key.
+          privateKeySecretRef:
+            name: letsencrypt-staging
           solvers:
           - http01:
               ingress:
@@ -436,9 +470,9 @@ resource "helm_release" "secret_agent" {
   count = contains(keys(var.charts), "secret-agent") && contains(keys(var.chart_configs), "secret-agent") ? (var.chart_configs["secret-agent"]["deploy"] ? 1 : 0) : 0
 
   name                  = "secret-agent"
-  repository            = contains(keys(var.chart_configs["secret-agent"]), "repository") ? var.chart_configs["secret-agent"]["repository"] : null
-  chart                 = "../helm/secret-agent"
-  version               = contains(keys(var.chart_configs["secret-agent"]), "version") ? var.chart_configs["secret-agent"]["version"] : null
+  repository            = contains(keys(var.chart_configs["secret-agent"]), "repository") ? var.chart_configs["secret-agent"]["repository"] : "oci://us-docker.pkg.dev/forgeops-public/charts"
+  chart                 = "secret-agent"
+  version               = contains(keys(var.chart_configs["secret-agent"]), "version") ? var.chart_configs["secret-agent"]["version"] : "v1.1.6"
   namespace             = "secret-agent"
   create_namespace      = true
   reuse_values          = false
@@ -463,9 +497,9 @@ resource "helm_release" "ds_operator" {
   count = contains(keys(var.charts), "ds-operator") && contains(keys(var.chart_configs), "ds-operator") ? (var.chart_configs["ds-operator"]["deploy"] ? 1 : 0) : 0
 
   name                  = "ds-operator"
-  repository            = contains(keys(var.chart_configs["ds-operator"]), "repository") ? var.chart_configs["ds-operator"]["repository"] : null
-  chart                 = "../helm/ds-operator"
-  version               = contains(keys(var.chart_configs["ds-operator"]), "version") ? var.chart_configs["ds-operator"]["version"] : null
+  repository            = contains(keys(var.chart_configs["ds-operator"]), "repository") ? var.chart_configs["ds-operator"]["repository"] : "oci://us-docker.pkg.dev/forgeops-public/charts"
+  chart                 = "ds-operator"
+  version               = contains(keys(var.chart_configs["ds-operator"]), "version") ? var.chart_configs["ds-operator"]["version"] : "v0.2.5"
   namespace             = "ds-operator"
   create_namespace      = true
   reuse_values          = false
@@ -491,8 +525,8 @@ resource "helm_release" "identity_platform" {
   count = contains(keys(var.charts), "identity-platform") && contains(keys(var.chart_configs), "identity-platform") ? (var.chart_configs["identity-platform"]["deploy"] ? 1 : 0) : 0
 
   name                  = "identity-platform"
-  repository            = contains(keys(var.chart_configs["identity-platform"]), "repository") ? var.chart_configs["identity-platform"]["repository"] : null
-  chart                 = "../helm/identity-platform"
+  repository            = contains(keys(var.chart_configs["identity-platform"]), "repository") ? var.chart_configs["identity-platform"]["repository"] : "oci://us-docker.pkg.dev/forgeops-public/charts"
+  chart                 = "identity-platform"
   version               = contains(keys(var.chart_configs["identity-platform"]), "version") ? var.chart_configs["identity-platform"]["version"] : null
   namespace             = "identity-platform"
   create_namespace      = true
