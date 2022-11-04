@@ -163,6 +163,25 @@ module "helm" {
           driver: pd.csi.storage.gke.io
           deletionPolicy: Delete
       EOF
+    },
+    "secret-agent" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      EOF
+    },
+    "ds-operator" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      EOF
+    },
+    "identity-platform" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      platform:
+        ingress:
+          hosts:
+            - identity-platform.${google_compute_address.ingress.address}.nip.io
+      EOF
     }
   }
 

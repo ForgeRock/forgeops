@@ -1,0 +1,96 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "OAuth2Clients",
+    "entityId" : "resource-server",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "resource-server",
+    "advancedOAuth2ClientConfig" : {
+      "contacts" : [ ],
+      "clientUri" : [ ],
+      "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
+      "subjectType" : "Public",
+      "sectorIdentifierUri" : null,
+      "tokenEndpointAuthMethod" : "client_secret_basic",
+      "isConsentImplied" : false,
+      "tokenExchangeAuthLevel" : 0,
+      "updateAccessToken" : null,
+      "tosURI" : [ ],
+      "customProperties" : [ ],
+      "requestUris" : [ ],
+      "logoUri" : [ ],
+      "name" : [ ],
+      "softwareVersion" : null,
+      "softwareIdentity" : null,
+      "policyUri" : [ ],
+      "descriptions" : [ "Sample client Used for IG testing" ],
+      "mixUpMitigation" : false,
+      "grantTypes" : [ "authorization_code" ],
+      "javascriptOrigins" : [ ]
+    },
+    "coreOpenIDClientConfig" : {
+      "defaultMaxAgeEnabled" : false,
+      "claims" : [ ],
+      "clientSessionUri" : null,
+      "defaultMaxAge" : 600,
+      "postLogoutRedirectUri" : [ ],
+      "backchannel_logout_uri" : null,
+      "jwtTokenLifetime" : 0,
+      "backchannel_logout_session_required" : false,
+      "defaultAcrValues" : [ ]
+    },
+    "signEncOAuth2ClientConfig" : {
+      "userinfoEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
+      "requestParameterEncryptedEncryptionAlgorithm" : "A128CBC-HS256",
+      "userinfoSignedResponseAlg" : null,
+      "clientJwtPublicKey" : null,
+      "idTokenEncryptionAlgorithm" : "RSA-OAEP-256",
+      "jwksUri" : null,
+      "requestParameterEncryptedAlg" : null,
+      "idTokenSignedResponseAlg" : "RS256",
+      "jwksCacheTimeout" : 3600000,
+      "idTokenEncryptionEnabled" : false,
+      "mTLSTrustedCert" : null,
+      "tokenIntrospectionResponseFormat" : "JSON",
+      "idTokenPublicEncryptionKey" : null,
+      "tokenEndpointAuthSigningAlgorithm" : "RS256",
+      "mTLSCertificateBoundAccessTokens" : false,
+      "tokenIntrospectionEncryptedResponseAlg" : "RSA-OAEP-256",
+      "jwkSet" : null,
+      "jwkStoreCacheMissCacheTime" : 60000,
+      "tokenIntrospectionEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
+      "tokenIntrospectionSignedResponseAlg" : "RS256",
+      "userinfoEncryptedResponseAlg" : null,
+      "mTLSSubjectDN" : null,
+      "publicKeyLocation" : "jwks_uri",
+      "userinfoResponseFormat" : "JSON",
+      "idTokenEncryptionMethod" : "A128CBC-HS256",
+      "requestParameterSignedAlg" : null
+    },
+    "coreOAuth2ClientConfig" : {
+      "status" : "Active",
+      "loopbackInterfaceRedirection" : false,
+      "userpassword" : "&{ig.rs.client.secret|password}",
+      "authorizationCodeLifetime" : 0,
+      "accessTokenLifetime" : 0,
+      "clientType" : "Confidential",
+      "refreshTokenLifetime" : 0,
+      "clientName" : [ ],
+      "defaultScopes" : [ "am-introspect-all-tokens" ],
+      "redirectionUris" : [ "http://fake.com" ],
+      "agentgroup" : null,
+      "scopes" : [ ]
+    },
+    "coreUmaClientConfig" : {
+      "claimsRedirectionUris" : [ ]
+    },
+    "_type" : {
+      "_id" : "OAuth2Client",
+      "name" : "OAuth2 Clients",
+      "collection" : true
+    }
+  }
+}

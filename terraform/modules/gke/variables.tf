@@ -28,6 +28,7 @@ variable "forgerock" {
 variable "cluster" {
   description = "Cluster settings"
   type = object({
+    type = string
     auth = map(string)
     meta = map(string)
 
@@ -49,6 +50,7 @@ variable "cluster" {
   })
 
   default = {
+    type = null
     auth = null
     meta = null
 

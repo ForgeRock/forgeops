@@ -9,9 +9,7 @@ fi
 terraform="$terraform_bin -chdir=$terraform_dir"
 
 set -e
-if [ ! -d $terraform_dir/.terraform ]; then
-    $terraform init
-fi
+$terraform init -upgrade
 $terraform apply -target=local_file.clusters -auto-approve -compact-warnings
 $terraform init -upgrade
 $terraform apply $*

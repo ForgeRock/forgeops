@@ -1,0 +1,95 @@
+{
+  "metadata" : {
+    "realm" : "/",
+    "amsterVersion" : "&{version}",
+    "entityType" : "OAuth2Clients",
+    "entityId" : "idm-provisioning",
+    "pathParams" : { }
+  },
+  "data" : {
+    "_id" : "idm-provisioning",
+    "coreOAuth2ClientConfig" : {
+      "userpassword" : "&{idm.provisioning.client.secret|openidm}",
+      "loopbackInterfaceRedirection" : false,
+      "defaultScopes" : [ ],
+      "refreshTokenLifetime" : 0,
+      "scopes" : [ "openid", "fr:idm:*" ],
+      "status" : "Active",
+      "accessTokenLifetime" : 0,
+      "redirectionUris" : [ ],
+      "clientName" : [ ],
+      "clientType" : "Confidential",
+      "authorizationCodeLifetime" : 0
+    },
+    "advancedOAuth2ClientConfig" : {
+      "mixUpMitigation" : false,
+      "softwareVersion" : null,
+      "tokenEndpointAuthMethod" : "client_secret_basic",
+      "clientUri" : [ ],
+      "descriptions" : [ ],
+      "tokenExchangeAuthLevel" : 0,
+      "grantTypes" : [ "client_credentials" ],
+      "updateAccessToken" : null,
+      "name" : [ ],
+      "softwareIdentity" : null,
+      "contacts" : [ ],
+      "responseTypes" : [ "code", "token", "id_token", "code token", "token id_token", "code id_token", "code token id_token", "device_code", "device_code id_token" ],
+      "subjectType" : "public",
+      "sectorIdentifierUri" : null,
+      "requestUris" : [ ],
+      "customProperties" : [ ],
+      "tosURI" : [ ],
+      "policyUri" : [ ],
+      "isConsentImplied" : true,
+      "logoUri" : [ ],
+      "javascriptOrigins" : [ ]
+    },
+    "signEncOAuth2ClientConfig" : {
+      "tokenEndpointAuthSigningAlgorithm" : "RS256",
+      "idTokenEncryptionEnabled" : false,
+      "tokenIntrospectionEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
+      "requestParameterSignedAlg" : null,
+      "clientJwtPublicKey" : null,
+      "idTokenPublicEncryptionKey" : null,
+      "mTLSSubjectDN" : null,
+      "userinfoResponseFormat" : "JSON",
+      "mTLSCertificateBoundAccessTokens" : false,
+      "publicKeyLocation" : "jwks_uri",
+      "tokenIntrospectionResponseFormat" : "JSON",
+      "jwkStoreCacheMissCacheTime" : 60000,
+      "requestParameterEncryptedEncryptionAlgorithm" : "A128CBC-HS256",
+      "userinfoSignedResponseAlg" : null,
+      "idTokenEncryptionAlgorithm" : "RSA-OAEP-256",
+      "requestParameterEncryptedAlg" : null,
+      "mTLSTrustedCert" : null,
+      "jwkSet" : null,
+      "idTokenEncryptionMethod" : "A128CBC-HS256",
+      "jwksCacheTimeout" : 3600000,
+      "userinfoEncryptedResponseAlg" : null,
+      "idTokenSignedResponseAlg" : "RS256",
+      "jwksUri" : null,
+      "tokenIntrospectionSignedResponseAlg" : "RS256",
+      "userinfoEncryptedResponseEncryptionAlgorithm" : "A128CBC-HS256",
+      "tokenIntrospectionEncryptedResponseAlg" : "RSA-OAEP-256"
+    },
+    "coreOpenIDClientConfig" : {
+      "claims" : [ ],
+      "clientSessionUri" : null,
+      "backchannel_logout_uri" : null,
+      "defaultAcrValues" : [ ],
+      "jwtTokenLifetime" : 0,
+      "defaultMaxAgeEnabled" : false,
+      "defaultMaxAge" : 600,
+      "postLogoutRedirectUri" : [ ],
+      "backchannel_logout_session_required" : false
+    },
+    "coreUmaClientConfig" : {
+      "claimsRedirectionUris" : [ ]
+    },
+    "_type" : {
+      "_id" : "OAuth2Client",
+      "name" : "OAuth2 Clients",
+      "collection" : true
+    }
+  }
+}
