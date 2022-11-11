@@ -121,6 +121,12 @@ EOF
 dsconfig --offline --no-prompt --batch <<EOF
 create-backend-index \
           --backend-name amIdentityStore \
+          --set index-type:equality \
+          --index-name fr-idm-effectiveGroup
+EOF
+dsconfig --offline --no-prompt --batch <<EOF
+create-backend-index \
+          --backend-name amIdentityStore \
           --set index-type:presence \
           --index-name fr-idm-lastSync
 EOF
