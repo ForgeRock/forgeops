@@ -156,19 +156,33 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_am_k8s_upgrade) {
         parallelTestsMap.put('AM K8s Upgrade',
                 {
+                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
+                    def upgradeCommonConfig = clusterConfig + [
+                            TESTS_SCOPE         : 'tests/k8s/postcommit/am',
+                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
+                                    randomNumber,
+                    ]
+
+                    def deploymentConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX       : 'am_k8s_upgrade_deployment',
+                            SKIP_TESTS               : true,
+                            SKIP_CLEANUP             : true,
+                            STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
+                            STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction,
+                    ]
+
                     def amLatestPromotedTag = commonLodestarModule.getPromotedProductTag(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'am')
                     def amLatestPromotedRepo = commonLodestarModule.getPromotedProductRepo(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'am')
 
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'AM K8s Upgrade', clusterConfig +
-                            [TESTS_SCOPE                           : 'tests/k8s/postcommit/am',
-                             DEPLOYMENT_UPGRADE_FIRST              : true,
-                             COMPONENTS_AM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
-                             COMPONENTS_AM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/am',
-                             COMPONENTS_AMSTER_IMAGE_TAG           : commonLodestarModule.productPostcommitStable,
-                             COMPONENTS_AMSTER_IMAGE_REPOSITORY    : 'gcr.io/engineeringpit/lodestar-images/amster',
-                             COMPONENTS_AM_IMAGE_UPGRADE_TAG       : amLatestPromotedTag,
-                             COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY: amLatestPromotedRepo]
-                    )
+                    def testConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX                    : 'am_k8s_upgrade_upgrade',
+                            SKIP_DEPLOY                           : true,
+                            DEPLOYMENT_UPGRADE_FIRST              : true,
+                            COMPONENTS_AM_IMAGE_UPGRADE_TAG       : amLatestPromotedTag,
+                            COMPONENTS_AM_IMAGE_UPGRADE_REPOSITORY: amLatestPromotedRepo,
+                    ]
+
+                    commonLodestarModule.runUpgrade(pipelineRun, random, 'AM K8s Upgrade', deploymentConfig, testConfig)
                 }
         )
     }
@@ -185,21 +199,35 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_ds_k8s_upgrade) {
         parallelTestsMap.put('DS K8s Upgrade',
                 {
+                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
+                    def upgradeCommonConfig = clusterConfig + [
+                            TESTS_SCOPE         : 'tests/k8s/postcommit/ds/standard',
+                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
+                                    randomNumber,
+                    ]
+
+                    def deploymentConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX       : 'ds_k8s_upgrade_deployment',
+                            SKIP_TESTS               : true,
+                            SKIP_CLEANUP             : true,
+                            STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
+                            STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction,
+                    ]
+
                     def dsLatestPromotedTag = commonLodestarModule.getPromotedProductTag(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'ds')
                     def dsLatestPromotedRepo = commonLodestarModule.getPromotedProductRepo(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'ds')
 
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'DS K8s Upgrade', clusterConfig +
-                            [TESTS_SCOPE                                 : 'tests/k8s/postcommit/ds/standard',
-                             DEPLOYMENT_UPGRADE_FIRST                    : true,
-                             COMPONENTS_DSIDREPO_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
-                             COMPONENTS_DSIDREPO_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/ds-idrepo',
-                             COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG       : dsLatestPromotedTag,
-                             COMPONENTS_DSIDREPO_IMAGE_UPGRADE_REPOSITORY: dsLatestPromotedRepo,
-                             COMPONENTS_DSCTS_IMAGE_TAG                  : commonLodestarModule.productPostcommitStable,
-                             COMPONENTS_DSCTS_IMAGE_REPOSITORY           : 'gcr.io/engineeringpit/lodestar-images/ds-cts',
-                             COMPONENTS_DSCTS_IMAGE_UPGRADE_TAG          : dsLatestPromotedTag,
-                             COMPONENTS_DSCTS_IMAGE_UPGRADE_REPOSITORY   : dsLatestPromotedRepo]
-                    )
+                    def testConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX                          : 'ds_k8s_upgrade_upgrade',
+                            SKIP_DEPLOY                                 : true,
+                            DEPLOYMENT_UPGRADE_FIRST                    : true,
+                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_TAG       : dsLatestPromotedTag,
+                            COMPONENTS_DSIDREPO_IMAGE_UPGRADE_REPOSITORY: dsLatestPromotedRepo,
+                            COMPONENTS_DSCTS_IMAGE_UPGRADE_TAG          : dsLatestPromotedTag,
+                            COMPONENTS_DSCTS_IMAGE_UPGRADE_REPOSITORY   : dsLatestPromotedRepo,
+                    ]
+
+                    commonLodestarModule.runUpgrade(pipelineRun, random, 'DS K8s Upgrade', deploymentConfig, testConfig)
                 }
         )
     }
@@ -225,17 +253,33 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_idm_k8s_upgrade) {
         parallelTestsMap.put('IDM K8s Upgrade',
                 {
+                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
+                    def upgradeCommonConfig = clusterConfig + [
+                            TESTS_SCOPE         : 'tests/k8s/postcommit/idm',
+                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
+                                    randomNumber,
+                    ]
+
+                    def deploymentConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX       : 'idm_k8s_upgrade_deployment',
+                            SKIP_TESTS               : true,
+                            SKIP_CLEANUP             : true,
+                            STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
+                            STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction,
+                    ]
+
                     def idmLatestPromotedTag = commonLodestarModule.getPromotedProductTag(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'idm')
                     def idmLatestPromotedRepo = commonLodestarModule.getPromotedProductRepo(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'idm')
 
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'IDM K8s Upgrade', clusterConfig +
-                            [TESTS_SCOPE                            : 'tests/k8s/postcommit/idm',
-                             DEPLOYMENT_UPGRADE_FIRST               : true,
-                             COMPONENTS_IDM_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
-                             COMPONENTS_IDM_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/idm',
-                             COMPONENTS_IDM_IMAGE_UPGRADE_TAG       : idmLatestPromotedTag,
-                             COMPONENTS_IDM_IMAGE_UPGRADE_REPOSITORY: idmLatestPromotedRepo]
-                    )
+                    def testConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX                     : 'idm_k8s_upgrade_upgrade',
+                            SKIP_DEPLOY                            : true,
+                            DEPLOYMENT_UPGRADE_FIRST               : true,
+                            COMPONENTS_IDM_IMAGE_UPGRADE_TAG       : idmLatestPromotedTag,
+                            COMPONENTS_IDM_IMAGE_UPGRADE_REPOSITORY: idmLatestPromotedRepo,
+                    ]
+
+                    commonLodestarModule.runUpgrade(pipelineRun, random, 'IDM K8s Upgrade', deploymentConfig, testConfig)
                 }
         )
     }
@@ -252,17 +296,33 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_ig_k8s_upgrade) {
         parallelTestsMap.put('IG K8s Upgrade',
                 {
+                    def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
+                    def upgradeCommonConfig = clusterConfig + [
+                            TESTS_SCOPE         : 'tests/k8s/postcommit/ig',
+                            DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
+                                    randomNumber,
+                    ]
+
+                    def deploymentConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX       : 'ig_k8s_upgrade_deployment',
+                            SKIP_TESTS               : true,
+                            SKIP_CLEANUP             : true,
+                            STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
+                            STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction,
+                    ]
+
                     def igLatestPromotedTag = commonLodestarModule.getPromotedProductTag(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'ig')
                     def igLatestPromotedRepo = commonLodestarModule.getPromotedProductRepo(commonModule.DEFAULT_PLATFORM_IMAGES_TAG, 'ig')
 
-                    commonLodestarModule.runSpyglaas(pipelineRun, random, 'IG K8s Upgrade', clusterConfig +
-                            [TESTS_SCOPE                           : 'tests/k8s/postcommit/ig',
-                             DEPLOYMENT_UPGRADE_FIRST              : true,
-                             COMPONENTS_IG_IMAGE_TAG               : commonLodestarModule.productPostcommitStable,
-                             COMPONENTS_IG_IMAGE_REPOSITORY        : 'gcr.io/engineeringpit/lodestar-images/ig',
-                             COMPONENTS_IG_IMAGE_UPGRADE_TAG       : igLatestPromotedTag,
-                             COMPONENTS_IG_IMAGE_UPGRADE_REPOSITORY: igLatestPromotedRepo]
-                    )
+                    def testConfig = upgradeCommonConfig + [
+                            REPORT_NAME_PREFIX                    : 'ig_k8s_upgrade_upgrade',
+                            SKIP_DEPLOY                           : true,
+                            DEPLOYMENT_UPGRADE_FIRST              : true,
+                            COMPONENTS_IG_IMAGE_UPGRADE_TAG       : igLatestPromotedTag,
+                            COMPONENTS_IG_IMAGE_UPGRADE_REPOSITORY: igLatestPromotedRepo,
+                    ]
+
+                    commonLodestarModule.runUpgrade(pipelineRun, random, 'IG K8s Upgrade', deploymentConfig, testConfig)
                 }
         )
     }
@@ -279,8 +339,12 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('Set Images',
                 {
                     commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
-                            [TESTS_SCOPE                    : 'tests/set_images',
-                             STASH_PLATFORM_IMAGES_REF      : 'postcommit-forgeops']
+                            [TESTS_SCOPE              : 'tests/set_images',
+                             STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
+                             STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction,
+                             // Need a specific commit in which we have a fix for the set-images tests
+                             // TODO: to remove once fraas-production tag is moved to idcloud-2022.10
+                             STASH_LODESTAR_REF       : '91438c58e803b47c44dbee90cb7a6afad664e5a6']
                     )
                 }
         )
