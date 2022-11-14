@@ -13,9 +13,6 @@ import com.forgerock.pipeline.stage.Status
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
 
-fraasProductionTag = 'fraas-production'
-productPostcommitStable = 'postcommit-stable'
-
 def getPromotedProductTag(platformImagesRevision, productName) {
     def content = bitbucketUtils.readFileContent(
             'cloud',
@@ -51,6 +48,9 @@ def getPromotedProductImageTag(platformImagesRevision, productName) {
             "${productName}.json").trim()
     return readJSON(text: content)['imageTag']
 }
+
+fraasProductionTag = '7.2.0'
+forgeopsFraasProduction = getPromotedProductCommit(fraasProductionTag, 'forgeops')
 
 allStagesCloud = [:]
 
@@ -135,6 +135,41 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
 
     runCommon(pipelineRun, stageName, stagesCloud) {
         withGKEPyrockNoStages(testConfig)
+    }
+}
+
+def runUpgrade(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map deploymentConfig,
+               Map testConfig) {
+    def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
+    def stagesCloud = [:]
+    def deploymentReportNamePrefix = deploymentConfig.REPORT_NAME_PREFIX
+    def deploymentStageName = dashboard_utils.normalizeStageName(deploymentReportNamePrefix)
+    stagesCloud[deploymentStageName] = dashboard_utils.spyglaasStageCloud(deploymentStageName)
+    def testReportNamePrefix = testConfig.REPORT_NAME_PREFIX
+    def testStageName = dashboard_utils.normalizeStageName(testReportNamePrefix)
+    stagesCloud[testStageName] = dashboard_utils.spyglaasStageCloud(testStageName)
+
+    pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+        dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
+            stage(stageName) {
+                try {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[deploymentStageName]) {
+                        withGKESpyglaasNoStages(getDefaultConfig(random, deploymentStageName) + deploymentConfig)
+                    }
+                    allStagesCloud[deploymentReportNamePrefix] = stagesCloud[deploymentStageName]
+
+                    dashboard_utils.determineUnitOutcome(stagesCloud[testStageName]) {
+                        withGKESpyglaasNoStages(getDefaultConfig(random, testStageName) + testConfig)
+                    }
+                    allStagesCloud[testReportNamePrefix] = stagesCloud[testStageName]
+                } finally {
+                    // In the deployment part the cleanup is disabled to be able to run the test part
+                    // But if the deployment part fails we need to do the cleanup to remove the namespace
+                    sh("./cleanup.py --namespace=${deploymentConfig.DEPLOYMENT_NAMESPACE}")
+                }
+                return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
+            }
+        }
     }
 }
 
