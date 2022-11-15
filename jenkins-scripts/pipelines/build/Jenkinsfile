@@ -89,9 +89,7 @@ timestamps {
     if (commonModule.branchSupportsIDCloudReleases()) {
         pipeline.postBuildTests(pipelineRun)
 
-        if (isPR()) {
-            prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.FORGEOPS_GIT_COMMIT)
-        } else {
+        if (!isPR()) {
             tagReadyForDevPipelines.runStage(pipelineRun)
         }
     }
