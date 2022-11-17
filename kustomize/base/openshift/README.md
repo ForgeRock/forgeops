@@ -2,7 +2,7 @@
 
 > This README is a collection of tips intended to point you in the right direction if you're deploying the ForgeRock Identity Platform in an OpenShift cluster.
 It should not be considered authoritative deployment documentation. 
-Before deploying the platform on OpenShift, please familiarize yourself with ForgeRock's [Statement of Support for deploying this platform on Kubernetes](https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services).
+Before deploying the platform on OpenShift, please familiarize yourself with ForgeRock's [Statement of Support] for deploying this platform on Kubernetes.
 
 OpenShift requires the deployment of a security object that adds required permissions for the service account used by the platform. The `SecurityContextConstraints` object should be deployed _once_ per cluster before deploying the ForgeRock Identity Platform.
 
@@ -39,3 +39,14 @@ operator.
 1. You need to provide 2 `storageClass` definitions named "_standard_" and "_fast_".
 These storage classes are used to request PVCs for the platform. You can use the storage classes
 as defined in `cluster-up.sh` for [azure](/cluster/aks/cluster-up.sh) or [aws](/cluster/eks/cluster-up.sh) as a sample.
+
+[About the forgeops repository]:https://ea.forgerock.com/docs/forgeops/forgeops.html
+[Authentication rate]:https://ea.forgerock.com/docs/forgeops/how-to/benchmark/authrate.html
+[CDK documentation]:https://ea.forgerock.com/docs/forgeops/cdk/overview.html
+[CDK Shutdown and Removal]:https://ea.forgerock.com/docs/forgeops/cdk/shutdown.html
+[ForgeOps Release Notes]:https://ea.forgerock.com/docs/forgeops/rn/rn.html
+[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.2.0
+[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.2/index.html
+[Statement of support]:https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services
+[Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
+[UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html

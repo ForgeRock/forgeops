@@ -112,7 +112,7 @@ You need to edit this example. The basic process is:
 
 To re-run this job, first remove the existing job `kubectl delete job/ds-restore`.
 
-NOTE: Subsiquently the "restored-ds-data-snapshot" snapshot can be used in conjuction with the [ds-operator](https://github.com/forgerock/ds-operator) to be the initilization source of the data volume.
+NOTE: Subsequently the "restored-ds-data-snapshot" snapshot can be used in conjuction with the [ds-operator](https://github.com/forgerock/ds-operator) to be the initilization source of the data volume.
 
 ## Operational notes
 

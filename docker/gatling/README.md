@@ -53,9 +53,8 @@ gradle gatlingClasses
 ## Running Locally
 
 You can run the Gatling benchmarks locally if you have both Gradle and Docker 
-installed. See 
-[the documentation](https://ea.forgerock.com/docs/forgeops/how-to/benchmark/authrate.html)
-for examples.
+installed. See [Authentication rate] in the ForgeOps documentation for an example
+of how to run a benchmark locally.
 
 ## Running in a Cluster
 
@@ -144,3 +143,13 @@ reduce the `DURATION` of your simulation:
     ```
     09:02:12.566 [ERROR] i.g.c.a.SingletonFeed - Feed failed: Feeder is now empty, stopping engine, please report.
     ```
+[About the forgeops repository]:https://ea.forgerock.com/docs/forgeops/forgeops.html
+[Authentication rate]:https://ea.forgerock.com/docs/forgeops/how-to/benchmark/authrate.html
+[CDK documentation]:https://ea.forgerock.com/docs/forgeops/cdk/overview.html
+[CDK Shutdown and Removal]:https://ea.forgerock.com/docs/forgeops/cdk/shutdown.html
+[ForgeOps Release Notes]:https://ea.forgerock.com/docs/forgeops/rn/rn.html
+[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.2.0
+[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.2/index.html
+[Statement of support]:https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services
+[Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
+[UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html

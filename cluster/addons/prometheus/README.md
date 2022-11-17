@@ -40,7 +40,7 @@ repository's top-level directory.
 
 * ``prometheus-operator.yaml``: Overrides values for the Prometheus operator,
 Prometheus, Alertmanager, and Grafana. See the
-> [``values.yaml`` file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) in ``prometheus-community/helm-charts`` for default values. To modify default values, override the
+[``values.yaml`` file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) in ``prometheus-community/helm-charts`` for default values. To modify default values, override the
 ``prometheus-operator.yaml`` file, or specify your own values file when you deploy Prometheus. For example:
   
 ```bash
@@ -76,7 +76,7 @@ configuration watcher to look for updated configurations.
 
 Alertmanager is used to redirect specific alerts from Prometheus to configured
 receivers. Use the ``alertmanager`` section in the ``prometheus-operator.yaml`` 
-> file in the ``cluster/addons/prometheus/`` directory to configure Alertmanager.
+file in the ``cluster/addons/prometheus/`` directory to configure Alertmanager.
 
 Prometheus alerts are configured by product, in the
 ``cluster/addons/prometheus/forgerock-metrics/templates/fr-alerts.yaml`` file.  
