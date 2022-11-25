@@ -59,7 +59,7 @@ size_map = {
     },
 }
 
-def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path=None, src_profile_dir=None):
+def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, timeout, pkg_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
@@ -68,7 +68,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path=N
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
     utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
-    utils.wait_for_ds(ns, 'ds-idrepo', legacy)
+    utils.wait_for_ds(ns, 'ds-idrepo', legacy, timeout)
     if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy)
     # Clean any existing Amster resources
     utils.clean_amster_job(ns, False)
@@ -76,13 +76,13 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path=N
     utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
-    utils.wait_for_am(ns)
+    utils.wait_for_am(ns, timeout)
     # Create amster-retain configmap
     utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
-    utils.wait_for_amster(ns, duration)
+    utils.wait_for_amster(ns, duration, timeout)
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
-    utils.wait_for_idm(ns)
+    utils.wait_for_idm(ns, timeout)
     utils.message('\nDeploying UI.')
     utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
@@ -156,6 +156,7 @@ def main():
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
     parser_install.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not install the DS Operator as a dependancy')
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
+    parser_install.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg],
                                           help='Generate the ForgeRock Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
@@ -354,7 +355,7 @@ def main():
 
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
     if 'all' in components:
-        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, pkg_path, src_profile_dir)
+        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.timeout, pkg_path, src_profile_dir)
     else:
         for c in components:
             utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, pkg_path, src_profile_dir)
