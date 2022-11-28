@@ -9,12 +9,14 @@ metadata:
     {{- with .Values.idm.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-  {{- with .Values.platform.ingress.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
+    {{- if .Values.idm.ingress.annotations }}
+      {{- toYaml .Values.idm.ingress.annotations | nindent 4 }}
+    {{- else if .Values.platform.ingress.annotations }}
+      {{- toYaml .Values.platform.ingress.annotations | nindent 4 }}
+    {{- end }}
 spec:
-  ingressClassName: {{ .Values.platform.ingress.className }}
+  ingressClassName: {{ .Values.idm.ingress.className | default .Values.platform.ingress.className }}
   tls:
     {{- range $host := .Values.platform.ingress.hosts }}
     - hosts:

@@ -1,22 +1,22 @@
-{{- if and .Values.end_user_ui.enabled .Values.platform.ingress.enabled -}}
-{{- $svcPort := .Values.end_user_ui.service.port -}}
+{{- if and .Values.ig.enabled .Values.platform.ingress.enabled -}}
+{{- $svcPort := .Values.ig.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: end-user-ui
+  name: ig
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.end_user_ui.podLabels }}
+    {{- with .Values.ig.podLabels }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
   annotations:
-    {{- if .Values.end_user_ui.ingress.annotations }}
-      {{- toYaml .Values.end_user_ui.ingress.annotations | nindent 4 }}
+    {{- if .Values.ig.ingress.annotations }}
+      {{- toYaml .Values.ig.ingress.annotations | nindent 4 }}
     {{- else if .Values.platform.ingress.annotations }}
       {{- toYaml .Values.platform.ingress.annotations | nindent 4 }}
     {{- end }}
 spec:
-  ingressClassName: {{ .Values.end_user_ui.ingress.className | default .Values.platform.ingress.className }}
+  ingressClassName: {{ .Values.ig.ingress.className | default .Values.platform.ingress.className }}
   tls:
     {{- range $host := .Values.platform.ingress.hosts }}
     - hosts:
@@ -28,11 +28,11 @@ spec:
     - host: {{ $host | quote }}
       http:
         paths:
-          - path: /enduser
+          - path: /ig(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: end-user-ui
+                name: ig
                 port:
                   number: {{ $svcPort }}
     {{- end }}

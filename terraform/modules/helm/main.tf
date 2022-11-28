@@ -1,6 +1,7 @@
 # main.tf - helm module
 
 locals {
+  deploy_metrics_server = contains(keys(var.charts), "metrics-server") ? true : false
   values_metrics_server = <<-EOF
   # Values from terraform helm module
   priorityClassName: system-node-critical
@@ -17,7 +18,7 @@ locals {
 }
 
 resource "helm_release" "metrics_server" {
-  count = contains(keys(var.charts), "metrics-server") ? 1 : 0
+  count = local.deploy_metrics_server ? 1 : 0
 
   name                  = "metrics-server"
   repository            = "https://kubernetes-sigs.github.io/metrics-server"
@@ -36,13 +37,14 @@ resource "helm_release" "metrics_server" {
 }
 
 locals {
+  deploy_external_secrets = contains(keys(var.charts), "external-secrets") ? true : false
   values_external_secrets = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "external_secrets" {
-  count = contains(keys(var.charts), "external-secrets") ? 1 : 0
+  count = local.deploy_external_secrets ? 1 : 0
 
   name                  = "external-secrets"
   repository            = "https://charts.external-secrets.io"
@@ -62,6 +64,7 @@ resource "helm_release" "external_secrets" {
 }
 
 locals {
+  deploy_external_dns = contains(keys(var.charts), "external-dns") && contains(keys(var.chart_configs), "external-dns") ? (var.chart_configs["external-dns"]["deploy"] ? true : false) : false
   values_external_dns = <<-EOF
   # Values from terraform helm module
   image:
@@ -81,7 +84,7 @@ locals {
 }
 
 resource "helm_release" "external_dns" {
-  count = contains(keys(var.charts), "external-dns") && contains(keys(var.chart_configs), "external-dns") ? (var.chart_configs["external-dns"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_external_dns ? 1 : 0
 
   name                  = "external-dns"
   repository            = contains(keys(var.chart_configs["external-dns"]), "repository") ? var.chart_configs["external-dns"]["repository"] : "https://charts.bitnami.com/bitnami"
@@ -101,6 +104,7 @@ resource "helm_release" "external_dns" {
 }
 
 locals {
+  deploy_ingress_nginx = contains(keys(var.charts), "ingress-nginx") && contains(keys(var.chart_configs), "ingress-nginx") ? (var.chart_configs["ingress-nginx"]["deploy"] ? true : false) : false
   values_ingress_nginx = <<-EOF
   # Values from terraform helm module
   controller:
@@ -120,7 +124,7 @@ locals {
 }
 
 resource "helm_release" "ingress_nginx" {
-  count = contains(keys(var.charts), "ingress-nginx") && contains(keys(var.chart_configs), "ingress-nginx") ? (var.chart_configs["ingress-nginx"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_ingress_nginx ? 1 : 0
 
   name                  = "ingress-nginx"
   repository            = contains(keys(var.chart_configs["ingress-nginx"]), "repository") ? var.chart_configs["ingress-nginx"]["repository"] : "https://kubernetes.github.io/ingress-nginx"
@@ -140,32 +144,32 @@ resource "helm_release" "ingress_nginx" {
 }
 
 locals {
+  deploy_haproxy_ingress = contains(keys(var.charts), "haproxy-ingress") && contains(keys(var.chart_configs), "haproxy-ingress") ? (var.chart_configs["haproxy-ingress"]["deploy"] ? true : false) : false
   values_haproxy_ingress = <<-EOF
   # Values from terraform helm module
   controller:
     kind: Deployment
-    hostNetwork: true
     replicaCount: 2
     service:
       type: LoadBalancer
       externalTrafficPolicy: Local
-      omitClusterIP: true
     publishService:
       enabled: true
     stats:
       enabled: true
-      service:
-        omitClusterIP: true
+    ingressClassResource:
+      enabled: true
+    #hostNetwork: true
   EOF
 }
 
 resource "helm_release" "haproxy_ingress" {
-  count = contains(keys(var.charts), "haproxy-ingress") && contains(keys(var.chart_configs), "haproxy-ingress") ? (var.chart_configs["haproxy-ingress"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_haproxy_ingress ? 1 : 0
 
   name                  = "haproxy-ingress"
   repository            = contains(keys(var.chart_configs["haproxy-ingress"]), "repository") ? var.chart_configs["haproxy-ingress"]["repository"] : "https://haproxy-ingress.github.io/charts"
   chart                 = "haproxy-ingress"
-  version               = contains(keys(var.chart_configs["haproxy-ingress"]), "version") ? var.chart_configs["haproxy-ingress"]["version"] : "0.13.9"
+  version               = contains(keys(var.chart_configs["haproxy-ingress"]), "version") ? var.chart_configs["haproxy-ingress"]["version"] : "0.14.0-beta.2" #"0.13.9"
   namespace             = "haproxy-ingress"
   create_namespace      = true
   reuse_values          = false
@@ -180,39 +184,7 @@ resource "helm_release" "haproxy_ingress" {
 }
 
 locals {
-  values_raw_haproxy_ingress = <<-EOF
-  # Values from terraform helm module
-  resources:
-    - apiVersion: networking.k8s.io/v1
-      kind: IngressClass
-      metadata:
-        name: haproxy
-      spec:
-        controller: haproxy-ingress.github.io/controller
-  EOF
-}
-
-resource "helm_release" "raw_haproxy_ingress" {
-  count = contains(keys(var.charts), "haproxy-ingress") && contains(keys(var.chart_configs), "haproxy-ingress") ? (var.chart_configs["haproxy-ingress"]["deploy"] ? 1 : 0) : 0
-
-  name                  = "raw-haproxy-ingress"
-  repository            = "https://bedag.github.io/helm-charts" # "https://charts.itscontained.io"
-  chart                 = "raw"
-  version               = "1.1.0" # "0.2.5"
-  namespace             = "haproxy-ingress"
-  create_namespace      = true
-  reuse_values          = false
-  reset_values          = true
-  max_history           = 12
-  render_subchart_notes = false
-  timeout               = 600
-
-  values = [local.values_raw_haproxy_ingress]
-
-  depends_on = [helm_release.haproxy_ingress]
-}
-
-locals {
+  deploy_cert_manager = contains(keys(var.charts), "cert-manager") && contains(keys(var.chart_configs), "cert-manager") ? (var.chart_configs["cert-manager"]["deploy"] ? true : false) : false
   values_cert_manager = <<-EOF
   # Values from terraform helm module
   global:
@@ -231,7 +203,7 @@ locals {
 }
 
 resource "helm_release" "cert_manager" {
-  count = contains(keys(var.charts), "cert-manager") && contains(keys(var.chart_configs), "cert-manager") ? (var.chart_configs["cert-manager"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_cert_manager ? 1 : 0
 
   name                  = "cert-manager"
   repository            = "https://charts.jetstack.io"
@@ -271,7 +243,7 @@ locals {
           solvers:
           - http01:
               ingress:
-                class: nginx
+                class: ${local.ingressClass}
     - apiVersion: cert-manager.io/v1
       kind: ClusterIssuer
       metadata:
@@ -288,7 +260,7 @@ locals {
           solvers:
           - http01:
               ingress:
-                class: nginx
+                class: ${local.ingressClass}
     - apiVersion: cert-manager.io/v1
       kind: ClusterIssuer
       metadata:
@@ -305,12 +277,12 @@ locals {
           solvers:
           - http01:
               ingress:
-                class: nginx
+                class: ${local.ingressClass}
   EOF
 }
 
 resource "helm_release" "raw_cert_manager" {
-  count = contains(keys(var.charts), "cert-manager") && contains(keys(var.chart_configs), "cert-manager") ? (var.chart_configs["cert-manager"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_cert_manager ? 1 : 0
 
   name                  = "raw-cert-manager"
   repository            = "https://bedag.github.io/helm-charts" # "https://charts.itscontained.io"
@@ -330,13 +302,14 @@ resource "helm_release" "raw_cert_manager" {
 }
 
 locals {
+  deploy_kube_prometheus_stack = contains(keys(var.charts), "kube-prometheus-stack") && contains(keys(var.chart_configs), "kube-prometheus-stack") ? (var.chart_configs["kube-prometheus-stack"]["deploy"] ? true : false) : false
   values_kube_prometheus_stack = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "kube_prometheus_stack" {
-  count = contains(keys(var.charts), "kube-prometheus-stack") && contains(keys(var.chart_configs), "kube-prometheus-stack") ? (var.chart_configs["kube-prometheus-stack"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_kube_prometheus_stack ? 1 : 0
 
   name                  = "kube-prometheus-stack"
   repository            = contains(keys(var.chart_configs["kube-prometheus-stack"]), "repository") ? var.chart_configs["kube-prometheus-stack"]["repository"] : "https://prometheus-community.github.io/helm-charts"
@@ -356,13 +329,14 @@ resource "helm_release" "kube_prometheus_stack" {
 }
 
 locals {
+  deploy_elasticsearch = contains(keys(var.charts), "elasticsearch") && contains(keys(var.chart_configs), "elasticsearch") ? (var.chart_configs["elasticsearch"]["deploy"] ? true : false) : false
   values_elasticsearch = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "elasticsearch" {
-  count = contains(keys(var.charts), "elasticsearch") && contains(keys(var.chart_configs), "elasticsearch") ? (var.chart_configs["elasticsearch"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_elasticsearch ? 1 : 0
 
   name                  = "elasticsearch"
   repository            = contains(keys(var.chart_configs["elasticsearch"]), "repository") ? var.chart_configs["elasticsearch"]["repository"] : "https://helm.elastic.co"
@@ -382,13 +356,14 @@ resource "helm_release" "elasticsearch" {
 }
 
 locals {
+  deploy_logstash = contains(keys(var.charts), "logstash") && contains(keys(var.chart_configs), "logstash") ? (var.chart_configs["logstash"]["deploy"] ? true : false) : false
   values_logstash = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "logstash" {
-  count = contains(keys(var.charts), "logstash") && contains(keys(var.chart_configs), "logstash") ? (var.chart_configs["logstash"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_logstash ? 1 : 0
 
   name                  = "logstash"
   repository            = contains(keys(var.chart_configs["logstash"]), "repository") ? var.chart_configs["logstash"]["repository"] : "https://helm.elastic.co"
@@ -408,13 +383,14 @@ resource "helm_release" "logstash" {
 }
 
 locals {
+  deploy_kibana = contains(keys(var.charts), "kibana") && contains(keys(var.chart_configs), "kibana") ? (var.chart_configs["kibana"]["deploy"] ? true : false) : false
   values_kibana = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "kibana" {
-  count = contains(keys(var.charts), "kibana") && contains(keys(var.chart_configs), "kibana") ? (var.chart_configs["kibana"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_kibana ? 1 : 0
 
   name                  = "kibana"
   repository            = contains(keys(var.chart_configs["kibana"]), "repository") ? var.chart_configs["kibana"]["repository"] : "https://helm.elastic.co"
@@ -434,13 +410,14 @@ resource "helm_release" "kibana" {
 }
 
 locals {
+  deploy_raw_k8s_resources = contains(keys(var.charts), "raw-k8s-resources") ? true : false
   values_raw_k8s_resources = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "raw_k8s_resources" {
-  count = contains(keys(var.charts), "raw-k8s-resources") ? 1 : 0
+  count = local.deploy_raw_k8s_resources ? 1 : 0
 
   name                  = "raw-k8s-resources"
   repository            = "https://bedag.github.io/helm-charts" # "https://charts.itscontained.io"
@@ -457,17 +434,18 @@ resource "helm_release" "raw_k8s_resources" {
 
   values = [local.values_raw_k8s_resources, var.charts["raw-k8s-resources"]["values"]]
 
-  depends_on = [helm_release.metrics_server, helm_release.external_secrets, helm_release.external_dns, helm_release.ingress_nginx, helm_release.haproxy_ingress, helm_release.raw_haproxy_ingress, helm_release.cert_manager, helm_release.raw_cert_manager, helm_release.kube_prometheus_stack, helm_release.elasticsearch, helm_release.logstash, helm_release.kibana]
+  depends_on = [helm_release.metrics_server, helm_release.external_secrets, helm_release.external_dns, helm_release.ingress_nginx, helm_release.haproxy_ingress, helm_release.cert_manager, helm_release.raw_cert_manager, helm_release.kube_prometheus_stack, helm_release.elasticsearch, helm_release.logstash, helm_release.kibana]
 }
 
 locals {
+  deploy_secret_agent = contains(keys(var.charts), "secret-agent") && contains(keys(var.chart_configs), "secret-agent") ? (var.chart_configs["secret-agent"]["deploy"] ? true : false) : false
   values_secret_agent = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "secret_agent" {
-  count = contains(keys(var.charts), "secret-agent") && contains(keys(var.chart_configs), "secret-agent") ? (var.chart_configs["secret-agent"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_secret_agent ? 1 : 0
 
   name                  = "secret-agent"
   repository            = contains(keys(var.chart_configs["secret-agent"]), "repository") ? var.chart_configs["secret-agent"]["repository"] : "oci://us-docker.pkg.dev/forgeops-public/charts"
@@ -488,13 +466,14 @@ resource "helm_release" "secret_agent" {
 }
 
 locals {
+  deploy_ds_operator = contains(keys(var.charts), "ds-operator") && contains(keys(var.chart_configs), "ds-operator") ? (var.chart_configs["ds-operator"]["deploy"] ? true : false) : false
   values_ds_operator = <<-EOF
   # Values from terraform helm module
   EOF
 }
 
 resource "helm_release" "ds_operator" {
-  count = contains(keys(var.charts), "ds-operator") && contains(keys(var.chart_configs), "ds-operator") ? (var.chart_configs["ds-operator"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_ds_operator ? 1 : 0
 
   name                  = "ds-operator"
   repository            = contains(keys(var.chart_configs["ds-operator"]), "repository") ? var.chart_configs["ds-operator"]["repository"] : "oci://us-docker.pkg.dev/forgeops-public/charts"
@@ -515,14 +494,44 @@ resource "helm_release" "ds_operator" {
 }
 
 locals {
+   ingressClass = contains(keys(var.charts), "haproxy-ingress") && contains(keys(var.chart_configs), "haproxy-ingress") ? (var.chart_configs["haproxy-ingress"]["deploy"] ? "haproxy" : "nginx") : "nginx"
+
+  deploy_identity_platform = contains(keys(var.charts), "identity-platform") && contains(keys(var.chart_configs), "identity-platform") ? (var.chart_configs["identity-platform"]["deploy"] ? true : false) : false
   values_identity_platform = <<-EOF
   # Values from terraform helm module
   timestamp: "${timestamp()}"
+
+  platform:
+    ingress:
+      className: ${local.ingressClass}
+
+  ${local.deploy_ds_operator ? <<-EOF
+  ds_idrepo:
+    kind: DirectoryService
+    volumeClaimSpec:
+      storageClassName: fast
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+  ds_cts:
+    kind: DirectoryService
+    volumeClaimSpec:
+      storageClassName: fast
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 10Gi
+  EOF
+  : ""
+  }
   EOF
 }
 
 resource "helm_release" "identity_platform" {
-  count = contains(keys(var.charts), "identity-platform") && contains(keys(var.chart_configs), "identity-platform") ? (var.chart_configs["identity-platform"]["deploy"] ? 1 : 0) : 0
+  count = local.deploy_identity_platform ? 1 : 0
 
   name                  = "identity-platform"
   repository            = contains(keys(var.chart_configs["identity-platform"]), "repository") ? var.chart_configs["identity-platform"]["repository"] : "oci://us-docker.pkg.dev/forgeops-public/charts"

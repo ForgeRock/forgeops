@@ -17,10 +17,10 @@ platform:
   ingress:
     enabled: true
     className: "nginx"
-    annotations: #{}
+    annotations:
       # kubernetes.io/tls-acme: "true"
-      # haproxy.router.openshift.io/cookie_name: route
       cert-manager.io/cluster-issuer: letsencrypt-staging
+      # Nginx specific ingress annotations
       nginx.ingress.kubernetes.io/affinity: cookie
       nginx.ingress.kubernetes.io/session-cookie-hash: sha1
       nginx.ingress.kubernetes.io/session-cookie-name: route
@@ -59,6 +59,9 @@ am:
 
   ingress:
     enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    # annotations: {}
 
   resources: {}
     # limits:
@@ -174,6 +177,9 @@ idm:
 
   ingress:
     enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    # annotations: {}
 
   resources: {}
     # limits:
@@ -241,6 +247,9 @@ admin_ui:
 
   ingress:
     enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    # annotations: {}
 
   resources: {}
     # limits:
@@ -302,6 +311,9 @@ end_user_ui:
 
   ingress:
     enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    # annotations: {}
 
   resources: {}
     # limits:
@@ -363,6 +375,9 @@ login_ui:
 
   ingress:
     enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    # annotations: {}
 
   resources: {}
     # limits:
@@ -400,6 +415,187 @@ login_ui:
 
   podSecurityContext: {}
     # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+ig:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/ig
+    pullPolicy: IfNotPresent
+    tag: "dev"
+
+  ingress:
+    enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    annotations:
+      haproxy-ingress.github.io/ssl-redirect: "true"
+      haproxy-ingress.github.io/rewrite-target: "/$2"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+
+  resources: {}
+    # limits:
+    #   cpu: 200m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 200m
+    #   memory: 512Mi
+
+  livenessProbe:
+    periodSeconds: 30
+    timeoutSeconds: 5
+
+  readinessProbe:
+    initialDelaySeconds: 5
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: ig
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+ds_idrepo:
+  enabled: true
+  kind: StatefulSet  # "StatefulSet" or "DirectoryService"
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/ds
+    pullPolicy: IfNotPresent
+    tag: "dev"
+
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 1200Mi
+    # requests:
+    #   cpu: 500m
+    #   memory: 1200Mi
+
+  startupProbe:
+    failureThreshold: 720
+    initialDelaySeconds: 30
+
+  volumeClaimSpec: {}
+    # storageClassName: fast
+    # accessModes:
+    #   - ReadWriteOnce
+    # resources:
+    #   requests:
+    #     storage: 10Gi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: ds-idrepo
+
+  podSecurityContext:
+    fsGroup: 0
+    runAsUser: 11111
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+ds_cts:
+  enabled: true
+  kind: StatefulSet  # "StatefulSet" or "DirectoryService"
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/ds
+    pullPolicy: IfNotPresent
+    tag: "dev"
+
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 1024Mi
+    # requests:
+    #   cpu: 500m
+    #   memory: 1024Mi
+
+  startupProbe:
+    failureThreshold: 720
+    initialDelaySeconds: 30
+
+  volumeClaimSpec: {}
+    # storageClassName: fast
+    # accessModes:
+    #   - ReadWriteOnce
+    # resources:
+    #   requests:
+    #     storage: 10Gi
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: ds-cts
+
+  podSecurityContext:
+    fsGroup: 0
+    runAsUser: 11111
 
   securityContext: {}
     # capabilities:

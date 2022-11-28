@@ -1,0 +1,40 @@
+{{- if and .Values.ds_idrepo.enabled (eq .Values.ds_idrepo.kind "StatefulSet") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-idrepo
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_idrepo.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.ds_idrepo.service.type }}
+  clusterIP: None
+  ports:
+    - port: 4444
+      targetPort: 4444
+      protocol: TCP
+      name: tcp-admin
+    - port: 1389
+      targetPort: 1389
+      protocol: TCP
+      name: tcp-ldap
+    - port: 1636
+      targetPort: 1636
+      protocol: TCP
+      name: tcp-ldaps
+    - port: 8989
+      targetPort: 8989
+      protocol: TCP
+      name: tcp-replication
+    - port: {{ .Values.ds_idrepo.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
+    {{- with .Values.ds_idrepo.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,169 @@
+{{- if and .Values.ds_idrepo.enabled (eq .Values.ds_idrepo.kind "StatefulSet") }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_idrepo.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.ds_idrepo.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "identity-platform.selectorLabels" . | nindent 6 }}
+      {{- with .Values.ds_idrepo.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+  serviceName: ds-idrepo
+  template:
+    metadata:
+      annotations:
+        deployment-date: {{ now | quote }}
+        {{- with .Values.ds_idrepo.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "identity-platform.selectorLabels" . | nindent 8 }}
+        {{- with .Values.ds_idrepo.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.ds_idrepo.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: ds-master-keypair
+          secret:
+            secretName: ds-master-keypair
+        - name: ds-ssl-keypair
+          secret:
+            secretName: ds-ssl-keypair
+        - name: truststore
+          secret:
+            secretName: ds-ssl-keypair
+        - name: admin-password
+          secret:
+            secretName: ds-passwords
+        - name: monitor-password
+          secret:
+            secretName: ds-passwords
+        - name: keys
+          emptyDir: {}
+      initContainers:
+        - name: init
+          securityContext:
+            {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
+          image: "{{ .Values.ds_idrepo.image.repository }}:{{ .Values.ds_idrepo.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
+          volumeMounts:
+          {{- if .Values.ds_idrepo.volumeClaimSpec }}
+          - mountPath: /opt/opendj/data
+            name: data
+          {{- end }}
+          - mountPath: /var/run/secrets/admin
+            name: admin-password
+          - mountPath: /var/run/secrets/monitor
+            name: monitor-password
+          - mountPath: /var/run/secrets/ds-ssl-keypair
+            name: ds-ssl-keypair
+          - mountPath: /var/run/secrets/ds-master-keypair
+            name: ds-master-keypair
+          - mountPath: /var/run/secrets/truststore
+            name: truststore
+          - mountPath: /var/run/secrets/keys
+            name: keys
+          args:
+          - init
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+            value: "true"
+          - name: DS_UID_MONITOR_PASSWORD_FILE
+            value: /var/run/secrets/monitor/monitor.pw
+          - name: DS_UID_ADMIN_PASSWORD_FILE
+            value: /var/run/secrets/admin/dirmanager.pw
+      containers:
+        - name: ds
+          securityContext:
+            {{- toYaml .Values.ds_idrepo.securityContext | nindent 12 }}
+          image: "{{ .Values.ds_idrepo.image.repository }}:{{ .Values.ds_idrepo.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ds_idrepo.image.pullPolicy }}
+          args:
+          - start-ds
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+            value: "true"
+          - name: DS_UID_MONITOR_PASSWORD_FILE
+            value: /var/run/secrets/monitor/monitor.pw
+          - name: DS_UID_ADMIN_PASSWORD_FILE
+            value: /var/run/secrets/admin/dirmanager.pw
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /healthy
+              port: http
+            {{- with .Values.ds_idrepo.startupProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.ds_idrepo.resources | nindent 12 }}
+          volumeMounts:
+          {{- if .Values.ds_idrepo.volumeClaimSpec }}
+          - mountPath: /opt/opendj/data
+            name: data
+          {{- end }}
+          - mountPath: /var/run/secrets/admin
+            name: admin-password
+          - mountPath: /var/run/secrets/monitor
+            name: monitor-password
+          - mountPath: /var/run/secrets/ds-ssl-keypair
+            name: ds-ssl-keypair
+          - mountPath: /var/run/secrets/ds-master-keypair
+            name: ds-master-keypair
+          - mountPath: /var/run/secrets/truststore
+            name: truststore
+          - mountPath: /var/run/secrets/keys
+            name: keys
+      {{- with .Values.ds_idrepo.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ds_idrepo.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ds_idrepo.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+  {{- if .Values.ds_idrepo.volumeClaimSpec }}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+      labels:
+        {{- include "identity-platform.labels" . | nindent 8 }}
+        {{- with .Values.ds_idrepo.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- toYaml .Values.ds_idrepo.volumeClaimSpec | nindent 6 }}
+  {{- end }}
+{{- end }}
