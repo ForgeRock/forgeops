@@ -40,7 +40,7 @@ resource "null_resource" "aws_availability_zones_available" {
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  version = "~> 3.14"
+  version = "~> 3.18"
   #create_vpc = true
 
   name = "${local.cluster_name}-vpc"
@@ -84,7 +84,7 @@ data "aws_ami" "eks_arm64" {
 
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
-  version = "~> 18.29"
+  version = "~> 18.31"
 
   prefix_separator = ""
   cluster_name = local.cluster_name

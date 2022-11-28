@@ -279,17 +279,17 @@ module "helm" {
     },
     "secret-agent" = {
       "values" = <<-EOF
-      # Values from terraform GKE module
+      # Values from terraform AKS module
       EOF
     },
     "ds-operator" = {
       "values" = <<-EOF
-      # Values from terraform GKE module
+      # Values from terraform AKS module
       EOF
     },
     "identity-platform" = {
       "values" = <<-EOF
-      # Values from terraform GKE module
+      # Values from terraform AKS module
       platform:
         ingress:
           hosts:

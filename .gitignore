@@ -36,3 +36,6 @@ dist/
 legacy-docs/7.0/site/build
 .gitignore.local
 tag.json
+*.swp
+*.swo
+*~

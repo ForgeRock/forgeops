@@ -10,7 +10,7 @@ terraform="$terraform_bin -chdir=$terraform_dir"
 
 set -e
 $terraform init -upgrade
-$terraform apply -target=local_file.clusters -auto-approve -compact-warnings
+$terraform apply -target=local_file.clusters -auto-approve -compact-warnings $*
 $terraform init -upgrade
 $terraform apply $*
 

@@ -4,12 +4,12 @@ terraform {
   required_version = "~> 1.0"
 
   required_providers {
-    google     = "~> 4.18"
-    aws        = "~> 4.29"
-    azurerm     = "~> 3.24"
+    google     = "~> 4.44"
+    aws        = "~> 4.41"
+    azurerm     = "~> 3.33"
 
-    kubernetes = "~> 2.10"
-    helm       = "~> 2.5"
+    kubernetes = "~> 2.16"
+    helm       = "~> 2.7"
 
     random     = "~> 3.1"
     null       = "~> 3.1"
