@@ -429,7 +429,7 @@ login_ui:
     port: 8080
 
 ig:
-  enabled: true
+  enabled: false
   replicaCount: 1
 
   image:

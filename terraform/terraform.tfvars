@@ -1026,7 +1026,6 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
-        EOF
 
         am:
           replicaCount: 3
@@ -1072,6 +1071,7 @@ clusters = {
             resources:
               requests:
                 storage: 500Gi
+        EOF
       }
     }
   },
