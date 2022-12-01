@@ -278,6 +278,13 @@ profiles:
       paths:
       - ./kustomize/overlay/internal-profiles/idm-only
 
+- name: idm-pitf
+  build: *default-build
+  deploy:
+    kustomize:
+      paths:
+        - ./kustomize/overlay/internal-profiles/idm-pitf
+
 - name: ds-only
   build:
     artifacts:
