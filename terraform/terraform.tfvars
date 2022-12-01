@@ -111,7 +111,8 @@ clusters = {
             requests:
               memory: 4Gi
               cpu: 1500m
-            limits: 6Gi
+            limits:
+              memory: 6Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -230,7 +231,8 @@ clusters = {
             requests:
               memory: 11Gi
               cpu: 8000m
-            limits: 14Gi
+            limits:
+              memory: 14Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -349,7 +351,8 @@ clusters = {
             requests:
               memory: 21Gi
               cpu: 8000m
-            limits: 29Gi
+            limits:
+              memory: 29Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -466,7 +469,8 @@ clusters = {
             requests:
               memory: 4Gi
               cpu: 1500m
-            limits: 6Gi
+            limits:
+              memory: 6Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -583,7 +587,8 @@ clusters = {
             requests:
               memory: 11Gi
               cpu: 8000m
-            limits: 14Gi
+            limits:
+              memory: 14Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -700,7 +705,8 @@ clusters = {
             requests:
               memory: 21Gi
               cpu: 8000m
-            limits: 29Gi
+            limits:
+              memory: 29Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -817,7 +823,8 @@ clusters = {
             requests:
               memory: 4Gi
               cpu: 1500m
-            limits: 6Gi
+            limits:
+              memory: 6Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -934,7 +941,8 @@ clusters = {
             requests:
               memory: 11Gi
               cpu: 8000m
-            limits: 14Gi
+            limits:
+              memory: 14Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:
@@ -1051,7 +1059,8 @@ clusters = {
             requests:
               memory: 21Gi
               cpu: 8000m
-            limits: 29Gi
+            limits:
+              memory: 29Gi
           volumeClaimSpec:
             storageClassName: fast
             resources:

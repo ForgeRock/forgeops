@@ -2,7 +2,7 @@
 
 terraform {
   required_providers {
-    kubernetes = "~> 2.10"
+    kubernetes = "~> 2.16"
   }
 }
 
