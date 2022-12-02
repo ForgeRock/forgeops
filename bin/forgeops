@@ -182,6 +182,7 @@ def main():
     parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg], help='Wait for platform components', allow_abbrev=False)
     parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
     parser_wait.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not wait for the DS Operator')
+    parser_wait.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     subparser.add_parser('clean', help='Remove all locally generated manifests')
     args = parser.parse_args()
