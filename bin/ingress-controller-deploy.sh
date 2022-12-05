@@ -2,9 +2,6 @@
 # Script to deploy an ingress chart using Helm3 to either EKS/GKE or AKS.
 #set -oe pipefail
 
-# Version is currently not used. We default to installing the latest stable version in the helm repo.
-#VERSION="0.34.1"
-
 # Grab our starting dir
 start_dir=$(pwd)
 # Figure out the dir we live in
@@ -25,6 +22,7 @@ Install the haproxy or nginx ingress chart.
 NOTES:
   * Supplying the IP address only works when installing to GKE.
   * The IP address must be the last option.
+  * Setting version to "latest" calls helm without --version
 
   OPTIONS:
     -h|--help                    : display usage and exit
@@ -36,6 +34,7 @@ NOTES:
     -e|--eks                     : deploy to EKS
     -g|--gke                     : deploy to GKE. Optionally provide IP address (default: dynamically generate IP address)
     -i|--ingress {haproxy,nginx} : choose ingress chart (default: nginx)
+    -V|--version a.b.c           : version of helm chart to install
 
 Requirements:
   * helm installed
@@ -76,6 +75,7 @@ DEBUG=false
 DRYRUN=false
 VERBOSE=false
 DELETE=false
+CHART_VERSION=
 INGRESS=nginx
 INGRESS_CLASS_YAML=
 IP=
@@ -95,6 +95,7 @@ while true; do
     -e|--eks) EKS=true; shift ;;
     -g|--gke) GKE=true; shift ;;
     -i|--ingress) INGRESS=$2; shift 2 ;;
+    -V|--version) CHART_VERSION=$2; shift 2 ;;
     *) [[ -n "$1" ]] && IP=$1
        break
        ;;
@@ -110,7 +111,8 @@ message "IP=$IP" "debug"
 
 if [[ "$GKE" = true && ("$AKS" = true || "$EKS" = true) ]] || \
    [[ "$AKS" = true && ("$GKE" = true || "$EKS" = true) ]] || \
-   [[ "$EKS" = true && ("$GKE" = true || "$AKS" = true) ]] ; then
+   [[ "$EKS" = true && ("$GKE" = true || "$AKS" = true) ]] || \
+   [[ "$EKS" = false && "$GKE" = false && "$AKS" = false ]]; then
      usage 1 "You must pick one cloud (-a, -e, or -g)"
 fi
 
@@ -140,20 +142,30 @@ case $INGRESS in
     REPO=https://haproxy-ingress.github.io/charts
     REPO_NAME=haproxy-ingress
     INGRESS_CLASS_YAML=haproxy-ingressclass.yaml
+    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=0.13.9
     ;;
   nginx)
     CHART=ingress-nginx
     NAMESPACE=nginx
     REPO=https://kubernetes.github.io/ingress-nginx
     REPO_NAME=ingress-nginx
+    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=4.3.0
     ;;
   *)
     usage 1 "You must pick either haproxy or nginx as an ingress"
     ;;
 esac
 
+message "CHART_VERSION=$CHART_VERSION" "debug"
+
 if [ "$DELETE" = true ] ; then
   delete
+fi
+
+if [ "$CHART_VERSION" == "latest" ] ; then
+  VERSION_OPTS=
+else
+  VERSION_OPTS="--version $CHART_VERSION"
 fi
 
 # Create namespace
@@ -193,7 +205,8 @@ runOrPrint "helm repo add $REPO_NAME $REPO --force-update"
 
 # Deploy ingress Helm chart
 runOrPrint "helm upgrade -i $CHART --namespace $NAMESPACE $REPO_NAME/$CHART \
-    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml --set controller.replicaCount=${INGRESS_POD_COUNT}"
+    $IP_OPTS -f ${ADDONS_DIR}/${PROVIDER}.yaml \
+    --set controller.replicaCount=${INGRESS_POD_COUNT} $VERSION_OPTS"
 
 if [[ -n "$INGRESS_CLASS_YAML" ]] ; then
   runOrPrint "kubectl apply -f ${ADDONS_DIR}/${INGRESS_CLASS_YAML}"
