@@ -149,9 +149,9 @@ create-backend-vlv-index \
           (objectClass=iplanet-am-managed-person) \
           (objectClass=iplanet-am-user-service) \
           (objectClass=kbaInfoContainer) \
-          (objectClass=oathDeviceProfilesContainer)
+          (objectClass=oathDeviceProfilesContainer) \
           (objectClass=pushDeviceProfilesContainer) \
-          (objectClass=sunAMAuthAccountLockout)
+          (objectClass=sunAMAuthAccountLockout) \
           (objectClass=sunFMSAML2NameIdentifier) \
           (objectClass=webauthnDeviceProfilesContainer))
 create-backend-index \
