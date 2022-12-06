@@ -770,9 +770,15 @@ def build_docker_image(component, context, dockerfile, push_to, tag,
         build_args = f'--build-arg CONFIG_PROFILE={config_profile}'
     else:
         build_args = ''
-    image = f'{push_to}/{component}'
+    if push_to.lower() != 'none':
+        image = f'{push_to}/{component}'
+    else:
+        image = f'{component}'
     if tag is not None:
-        image = f'{push_to}/{component}:{tag}'
+        if push_to.lower() != 'none':
+            image = f'{push_to}/{component}:{tag}'
+        else:
+            image = f'{component}:{tag}'
     run('docker',
         f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=base_dir)
     if push_to.lower() != 'none':
