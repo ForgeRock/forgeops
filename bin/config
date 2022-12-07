@@ -181,7 +181,7 @@ def upgrade_am(am_conf):
 
     log.info('Running AM static config through the am-config-upgrader to replace any missing default placeholders.')
     try:
-        utils.run(AM_UPGRADER, str(am_conf), "etc/am-upgrader-rules")
+        utils.run(AM_UPGRADER, str(am_conf), str(utils.RULES_PATH))
     except utils.RunError as e:
         log.error(f'Error during placeholder replacement {e.stderr}')
         sys.exit(1)
