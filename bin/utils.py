@@ -316,7 +316,7 @@ def waitforsecrets(ns):
     """
     secrets = ['am-env-secrets', 'idm-env-secrets',
                'ds-passwords', 'ds-env-secrets']
-    message('\nWaiting for K8s secrets')
+    message('\nWaiting for K8s secrets.')
     for secret in secrets:
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
 
@@ -459,16 +459,16 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force, ingress_class, legacy):
+def uninstall_component(component, ns, force, delete_components, ingress_class, legacy):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
     ns: target namespace.
     force: set to True to delete all forgeops resources including secrets and PVCs.
     """
-    if  component == "all":
+    if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force, ingress_class, legacy)
+            uninstall_component(c, ns, force, delete_components, ingress_class, legacy)
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
@@ -479,10 +479,6 @@ def uninstall_component(component, ns, force, ingress_class, legacy):
         if component == "amster":
             clean_amster_job(ns, False)
             run('kubectl', f'-n {ns} delete cm amster-retain')
-        if component in ['base', 'base-cdm'] and force:
-            run('kubectl', f'-n {ns} delete pvc -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
-            run('kubectl', f'-n {ns} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
-            uninstall_component('secrets', ns, False, ingress_class, legacy)
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
@@ -581,8 +577,8 @@ def check_component_version(component, version):
     version_max = pkg_resources.parse_version(REQ_VERSIONS[component]['MAX'])
     version_min = pkg_resources.parse_version(REQ_VERSIONS[component]['MIN'])
     if not version_min <= version <= version_max:
-        error(f'Unsupported {component} version found: "{version}"')
-        message(f'Need {component} versions between {version_min} and {version_max}')
+        error(f'Unsupported {component} version found: "{version}".')
+        message(f'Need {component} versions between {version_min} and {version_max}.')
         sys.exit(1)
 
 def check_base_toolset():
@@ -803,21 +799,21 @@ def configure_platform_images(clone_path,
     git_dir = path.joinpath('.git')
     # handle existing config directory
     if git_dir.is_dir() and ref != '':
-        log.info('Found existing files, attempting to not clone')
+        log.info('Found existing files, attempting to not clone.')
         try:
             # capture stdout and stderr so git doesn't write to log
             run('git', '-C', str(path), 'checkout',
                 ref, cstdout=True, cstderr=True)
             return
         except:
-            log.error('Couldn\'t find reference. Getting fresh clone')
+            log.error('Couldn\'t find reference. Getting fresh clone.')
             shutil.rmtree(str(path))
     elif git_dir.is_dir():
-        log.info('Using existing repo, remove it to get a fresh clone')
+        log.info('Using existing repo, remove it to get a fresh clone.')
         return
     # some path that's not a git repo so don't do anything.
     elif any(path.glob('*')) and not git_dir.is_dir():
-        raise Exception('Found existing directory that is not a git repo')
+        raise Exception('Found existing directory that is not a git repo.')
     try:
         if ref != '':
             # initialize repo
@@ -834,10 +830,10 @@ def configure_platform_images(clone_path,
             run('git', 'clone', '--depth', '1', repo,
                 str(path), cstdout=True, cstderr=True)
     except RunError as e:
-        log.error(f'Couldn\'t configure repo running {e.cmd} {e.output}')
+        log.error(f'Couldn\'t configure repo running {e.cmd} {e.output}.')
         raise e
     except Exception as e:
-        log.error(f'Couldn\t configure repo {e}')
+        log.error(f'Couldn\t configure repo {e}.')
         raise e
 
 def sort_dir_json(base):
@@ -847,7 +843,7 @@ def sort_dir_json(base):
     """
     conf_base = pathlib.Path(base).resolve()
     if not conf_base.is_dir():
-        raise NotADirectoryError(f'{conf_base} is not a directory')
+        raise NotADirectoryError(f'{conf_base} is not a directory.')
     for conf_file in conf_base.rglob('**/*.json'):
         with conf_file.open('r+') as fp:
             conf = json.load(fp)
@@ -898,7 +894,7 @@ def get_context():
     try:
         _, ctx, _ = run('kubectl', 'config view --minify --output=jsonpath={..current-context}', cstdout=True)
     except Exception as _e:
-        error('Could not determine current k8s context. Check your kubeconfig file and try again')
+        error('Could not determine current k8s context. Check your kubeconfig file and try again.')
         sys.exit(1)
     return ctx.decode('ascii') if ctx else 'default'
 
@@ -931,7 +927,7 @@ def get_secret_value(ns, secret, key):
 # Clean up amster resources.
 def clean_amster_job(ns, retain):
     if not retain:
-        message(f'Cleaning up amster components')
+        message(f'Cleaning up amster components.')
         run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
         run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
         run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-export-type')

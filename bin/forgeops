@@ -12,22 +12,22 @@ import logging
 
 build_targets = ['am', 'amster', 'idm', 'ds', 'ds-idrepo', 'ds-cts', 'ig']
 build_contexts = {
-        'am': 'docker/am',
-        'amster': 'docker/amster',
-        'idm': 'docker/idm',
-        'ds': 'docker/ds/ds-new',
-        'ds-idrepo': 'docker/ds',
-        'ds-cts': 'docker/ds',
-        'ig': 'docker/ig'
+    'am': 'docker/am',
+    'amster': 'docker/amster',
+    'idm': 'docker/idm',
+    'ds': 'docker/ds/ds-new',
+    'ds-idrepo': 'docker/ds',
+    'ds-cts': 'docker/ds',
+    'ig': 'docker/ig'
 }
 build_dockerfiles = {
-        'am': 'docker/am/Dockerfile',
-        'amster': 'docker/amster/Dockerfile',
-        'idm': 'docker/idm/Dockerfile',
-        'ds': 'docker/ds/ds-new/Dockerfile',
-        'ds-idrepo': 'docker/ds/idrepo/Dockerfile',
-        'ds-cts': 'docker/ds/cts/Dockerfile',
-        'ig': 'docker/ig/Dockerfile'
+    'am': 'docker/am/Dockerfile',
+    'amster': 'docker/amster/Dockerfile',
+    'idm': 'docker/idm/Dockerfile',
+    'ds': 'docker/ds/ds-new/Dockerfile',
+    'ds-idrepo': 'docker/ds/idrepo/Dockerfile',
+    'ds-cts': 'docker/ds/cts/Dockerfile',
+    'ig': 'docker/ig/Dockerfile'
 }
 wait_targets = ['ds', 'am', 'amster', 'idm', 'apps']
 size_map = {
@@ -59,15 +59,21 @@ size_map = {
     },
 }
 
+delete_components = {
+    'pvc': False,
+    'snapshots': False,
+    'secrets': False
+}
+
 def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, timeout, pkg_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
     utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
     utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
-    utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
+    utils.message('\nDeploying ds.yaml. This includes all directory resources.')
     utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_path, src_profile_dir)
-    utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    utils.message('\nWaiting for DS deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_ds(ns, 'ds-idrepo', legacy, timeout)
     if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy)
     # Clean any existing Amster resources
@@ -96,18 +102,18 @@ def overlay_app_configs(ns, am=True, idm=True):
         _, am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
                                       cstdout=True)
         am_pod_name = am_pod_name.decode('ascii')
-        utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
+        utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace.')
         utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
     if idm:
         _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
                                        cstdout=True)
         idm_pod_name = idm_pod_name.decode('ascii')
-        utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
+        utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace.')
         for directory in os.listdir(os.path.join(config_profile_path, 'idm', 'config-profiles', 'cdk')):
             idm_config_path = os.path.join(config_profile_path, 'idm', 'config-profiles', 'cdk', directory)
             utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
 
-    utils.message('Restarting AM and IDM pods')
+    utils.message('Restarting AM and IDM pods.')
     if am:
         utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- /bin/sh -c "kill 1"')
     if idm:
@@ -125,10 +131,10 @@ def build_docker_image(component, push_to, tag, config_profile=None):
     tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], push_to, tag, config_profile)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
-    utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
+    utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}".')
 
 def main():
-    parser = argparse.ArgumentParser(description='Manage ForgeRock platform components')
+    parser = argparse.ArgumentParser(description='Manage ForgeRock Identity Platform components')
     common_ns = argparse.ArgumentParser(add_help=False)
     common_sz = argparse.ArgumentParser(add_help=False)
     common_dg = argparse.ArgumentParser(add_help=False)
@@ -158,19 +164,19 @@ def main():
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_install.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg],
-                                          help='Generate the ForgeRock Platform manifests')
+                                          help='Generate the ForgeRock Identity Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_generate.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
     parser_generate.add_argument('--amster-retain', '-r', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_delete = subparser.add_parser(
-        'delete', parents=[common_ns, common, common_dg], help='Delete ForgeRock Platform components or component bundles')
+        'delete', parents=[common_ns, common, common_dg], help='Delete ForgeRock Identity Platform components or component bundles')
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
     parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
-                               help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
-    parser_build = subparser.add_parser('build', parents=[common_dg], help='Build custom docker images')
+                               help='Delete all CDM components including PVCs, secrets, and volume snapshots. *This will erase all data*')
+    parser_build = subparser.add_parser('build', parents=[common_dg], help='Build custom Docker images')
     parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
     parser_build.add_argument('--push-to', '-r', dest='registry')
     parser_build.add_argument('--tag', '-t', help='Set the tag used when building images')
@@ -213,7 +219,7 @@ def main():
     components = args.components if getattr(args, 'components', None) else ['all']
     if args.cmd == 'info':
         if not args.jsonfmt:
-            utils.message(f'Targeting namespace: "{namespace}"')
+            utils.message(f'Targeting namespace: "{namespace}".')
         secrets = utils.printsecrets(namespace, not args.jsonfmt)
         urls = utils.printurls(namespace, not args.jsonfmt)
         output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
@@ -231,7 +237,7 @@ def main():
         # Set the deploy directory
         deploy_dir = os.path.join(sys.path[0], '../kustomize', 'deploy')
 
-        utils.message(f'Removing all locally generated manifests from the kustomize/deploy folder')
+        utils.message(f'Removing all locally generated manifests from the kustomize/deploy folder.')
 
         # Get list of files in deploy directory
         file_list = os.listdir(deploy_dir)
@@ -246,14 +252,15 @@ def main():
         return
 
     if args.cmd == 'delete':
+
         # Get deployment size
         deployed_sz = utils.get_deployed_size(namespace)
 
         # Set delete flag if PVCs and secrets should be deleted
-        delete = True if deployed_sz == 'cdk' or args.force_delete else False
+        delete = True if args.force_delete else False
 
         if deployed_sz:
-            utils.message(f'"{deployed_sz}" platform detected in namespace: "{namespace}"')
+            utils.message(f'"{deployed_sz}" platform detected in namespace: "{namespace}".')
             size = deployed_sz
             remap = size_map[size]
         else:
@@ -261,12 +268,12 @@ def main():
             if not args.skip_confirmation:
                 if input('Attempt delete assuming "CDM mini"? [Y/N] ').lower() not in ['yes', 'y']:
                     return
-            utils.message('Assuming "CDM mini" for this operation')
+            utils.message('Assuming "CDM mini" for this operation.')
             deployed_sz = None
             size = 'mini'
             remap = size_map[size]
 
-        utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}"')
+        utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}".')
         if not args.skip_confirmation:
             if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
                 return
@@ -275,27 +282,45 @@ def main():
         if "all" in components:
             components = ['ui', 'apps', 'ds', 'base']
 
-        # Check to see if deployment is CDM and whether PVCs and secrets must be retained
-        if ('base' in components or 'all' in components) and deployed_sz != 'cdk' and not delete:
-            utils.warning('Forgeops CDM deployment detected')
-            utils.warning('Will not delete PVCs, VolumeSnapshots or Secrets to avoid data loss. You must delete those manually or use --force')
-        else:
-            utils.warning('This will erase all your PVCs, VolumeSnapshots and Secrets. This cannot be undone.')
-            utils.warning('Press "CTRL+C" now if you want to cancel')
-            time.sleep(2)
-            if (not args.skip_confirmation and deployed_sz != 'cdk') or (not args.skip_confirmation and deployed_sz == 'cdk' and any(x in "base ds dsold" for x in components)):
-                if input('OK to delete PVCs, VolumeSnapshots and Secrets? [Y/N] ').lower() not in ['yes', 'y']:
-                    delete = ""
+        # When -y flag is used to skip prompts, don't automatically delete pvcs, secrets, or volume snapshots unless --force provided
+        if not delete and args.skip_confirmation:
+            if ('all' in components):
+                utils.warning('Will not delete PVCs, secrets, or volume snapshots. You must delete those manually or use --force.')
+            elif any(x in "ds dsold ds-idrepo ds-cts" for x in components):
+                utils.warning('Will not delete PVCs and volume snapshots. You must delete those manually or use --force.')
+        # If no -y or --force provided, prompt the user what assets they would like to delete
+        elif not delete and not args.skip_confirmation:
+            if any(x in "ds dsold ds-idrepo ds-cts all" for x in components):
+                if input('OK to delete PVCs? [Y/N] ').lower() in ['yes', 'y']:
+                    delete_components['pvc'] = True
+                if input('OK to delete volume snapshots? [Y/N] ').lower() in ['yes', 'y']:
+                    delete_components['snapshots'] = True
+            if any(x in "secrets all case base-cdm" for x in components):
+                if input('OK to delete secrets? [Y/N] ').lower() in ['yes', 'y']:
+                    delete_components['secrets'] = True
+        # If --force provided but neither ds or secrets provided, then don't delete pvcs, secrets, or volume snapshots
+        elif delete and not any(x in "ds dsold ds-idrepo ds-cts secrets all" for x in components):
+            delete = False
 
         # Uninstall components
         for c in components:
-            utils.uninstall_component(remap.get(c, c), namespace, delete, ingress_class, False)
+            utils.uninstall_component(remap.get(c, c), namespace, delete, delete_components, ingress_class, False)
+        
+        # Prompt to delete PVCs, secrets, and volume snapshots
+        if any(x in "ds dsold ds-idrepo ds-cts secrets all" for x in components):
+            if delete_components['pvc'] or delete:
+                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
+            if delete_components['snapshots'] or delete:
+                utils.run('kubectl', f'-n {namespace} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
+            if delete_components['secrets'] or delete:    
+                utils.uninstall_component('secrets', namespace, False, delete_components, ingress_class, False)
+            
         return
 
     if args.cmd == 'build':
         if args.reset:
             image_defaulter = os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter' )
-            utils.message(f'Reset to git index: {image_defaulter} ')
+            utils.message(f'Reset to git index: {image_defaulter}. ')
             utils.run('git', f'checkout {image_defaulter}')
             return
         if 'all' in components:
@@ -337,7 +362,7 @@ def main():
     if args.cmd == 'generate':
         instructions = []
         components.sort(key=_sort_components)
-        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}"\n')
+        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}".\n')
         if 'all' in components:
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
@@ -355,7 +380,7 @@ def main():
 
     utils.install_dependencies(args.legacy)
 
-    utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
+    utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}".\n')
     if 'all' in components:
         install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.timeout, pkg_path, src_profile_dir)
     else:
