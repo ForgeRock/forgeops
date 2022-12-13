@@ -50,6 +50,7 @@ boolean branchSupportsPitTests() {
             'idcloud-',
             'release/',
             'sustaining/7.',
+            'preview/',
     ]
     String branch = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
     return supportedBranchPrefixes.any { it -> branch.startsWith(it) }
@@ -60,11 +61,13 @@ boolean branchSupportsPitTests() {
 // We should only promote version >= 7.1.0
 // To be discussed with Bruno and Robin
 boolean branchSupportsIDCloudReleases() {
-    return 'master' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
-            || 'feature/config' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
-            || 'release/7.1.0' in [env.CHANGE_TARGET, env.BRANCH_NAME] \
-            || (!isPR() && ("${env.BRANCH_NAME}".startsWith('idcloud-') || "${env.BRANCH_NAME}".startsWith('sustaining/7.'))) \
-            || (isPR() && ("${env.CHANGE_TARGET}".startsWith('idcloud-') || "${env.CHANGE_TARGET}".startsWith('sustaining/7.')))
+    def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+    return branchName.equals('master') \
+            || branchName.equals('feature/config') \
+            || branchName.equals('release/7.1.0') \
+            || branchName.startsWith('idcloud-') \
+            || branchName.startsWith('sustaining/7.') \
+            || branchName.startsWith('preview/')
 }
 
 void buildImage(String directoryName, String imageName, String arguments) {
