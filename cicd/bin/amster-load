@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-set -x
-./bin/amster import --namespace $NAMESPACE config/7.0/cdk/amster
