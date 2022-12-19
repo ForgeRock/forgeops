@@ -130,6 +130,7 @@ spec:
         - name: fbc
           mountPath: /home/forgerock/openam
       terminationGracePeriodSeconds: 10
+      priorityClassName: high-priority
       # Shared volume that holds the AM configuration.
       volumes:
       - name: fbc
