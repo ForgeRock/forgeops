@@ -133,11 +133,11 @@ def runUpgrade(PipelineRunLegacyAdapter pipelineRun, Random random, String stage
                Map testConfig) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def stagesCloud = [:]
-    def deploymentReportNameSuffix = deploymentConfig.REPORT_NAME_PREFIX
-    def deploymentStageName = dashboard_utils.normalizeStageName(deploymentReportNameSuffix)
+    def deploymentReportNamePrefix = deploymentConfig.REPORT_NAME_PREFIX
+    def deploymentStageName = dashboard_utils.normalizeStageName(deploymentReportNamePrefix)
     stagesCloud[deploymentStageName] = dashboard_utils.spyglaasStageCloud(deploymentStageName)
-    def testReportNameSuffix = testConfig.REPORT_NAME_PREFIX
-    def testStageName = dashboard_utils.normalizeStageName(testReportNameSuffix)
+    def testReportNamePrefix = testConfig.REPORT_NAME_PREFIX
+    def testStageName = dashboard_utils.normalizeStageName(testReportNamePrefix)
     stagesCloud[testStageName] = dashboard_utils.spyglaasStageCloud(testStageName)
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
@@ -147,12 +147,12 @@ def runUpgrade(PipelineRunLegacyAdapter pipelineRun, Random random, String stage
                     dashboard_utils.determineUnitOutcome(stagesCloud[deploymentStageName]) {
                         withGKESpyglaasNoStages(getDefaultConfig(random, deploymentStageName) + deploymentConfig)
                     }
-                    allStagesCloud[deploymentReportNameSuffix] = stagesCloud[deploymentStageName]
+                    allStagesCloud[deploymentReportNamePrefix] = stagesCloud[deploymentStageName]
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[testStageName]) {
                         withGKESpyglaasNoStages(getDefaultConfig(random, testStageName) + testConfig)
                     }
-                    allStagesCloud[testReportNameSuffix] = stagesCloud[testStageName]
+                    allStagesCloud[testReportNamePrefix] = stagesCloud[testStageName]
                 } finally {
                     // In the deployment part the cleanup is disabled to be able to run the test part
                     // But if the deployment part fails we need to do the cleanup to remove the namespace
