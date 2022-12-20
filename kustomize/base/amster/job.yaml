@@ -58,6 +58,7 @@ spec:
           exec:
             command: ["cat", "/etc/hosts"]
           initialDelaySeconds: 1
+      priorityClassName: high-priority
       volumes:
       - name: amster-secrets
         secret:
