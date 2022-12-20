@@ -184,6 +184,7 @@ spec:
         runAsUser: 11111
         runAsGroup: 0
       terminationGracePeriodSeconds: 30
+      priorityClassName: high-priority
       volumes:
       - name: secrets
         secret:
