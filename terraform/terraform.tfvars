@@ -72,13 +72,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -192,13 +192,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -312,13 +312,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -430,13 +430,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -548,13 +548,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -666,13 +666,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -784,13 +784,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -902,13 +902,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
@@ -1020,13 +1020,13 @@ clusters = {
         deploy  = false
       },
       secret-agent = {
-        deploy     = true
+        deploy     = false
       },
       ds-operator = {
-        deploy     = true
+        deploy     = false
       },
       identity-platform = {
-        deploy     = true
+        deploy     = false
         version    = "7.3"
         values     = <<-EOF
         # Values from tfvars configuration
