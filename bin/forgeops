@@ -169,6 +169,7 @@ def main():
                                 help='Select the FQDN for this deployment')
     parser_generate.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
+    parser_generate.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not install the DS Operator as a dependancy')
     parser_generate.add_argument('--amster-retain', '-r', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_delete = subparser.add_parser(
         'delete', parents=[common_ns, common, common_dg], help='Delete ForgeRock Identity Platform components or component bundles')

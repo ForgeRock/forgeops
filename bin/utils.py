@@ -103,6 +103,7 @@ bundles = {
 
 patcheable_components ={
     'base/am': 'am.yaml',
+    'base/am-cdk': 'am.yaml',
     'base/idm': 'idm.yaml',
     'base/idm-cdk': 'idm.yaml',
     'base/kustomizeConfig': 'base.yaml',
