@@ -276,7 +276,7 @@ def main():
 
         utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}".')
         if not args.skip_confirmation:
-            if input('OK to delete these components? [Y/N] ').lower() not in ['yes', 'y']:
+            if input('OK to delete components? [Y/N] ').lower() not in ['yes', 'y']:
                 return
         if 'base' in components: #delete 'base' last
             components.append(components.pop(components.index('base')))
