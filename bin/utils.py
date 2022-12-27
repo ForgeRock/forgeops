@@ -338,7 +338,7 @@ def wait_for_amster(ns, timeout_secs=600):
     timeout_secs: timeout in secs.
     """
     _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
-    return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
+    return run('kubectl', f'-n {ns} wait --for=condition=complete job -l app.kubernetes.io/name=amster --timeout={timeout_secs}s')
 
 def wait_for_idm(ns, timeout_secs=600):
     """
