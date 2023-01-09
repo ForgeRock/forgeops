@@ -84,7 +84,7 @@ data "aws_ami" "eks_arm64" {
 
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
-  version = "~> 18.31"
+  version = "~> 19.5"
 
   prefix_separator = ""
   cluster_name = local.cluster_name

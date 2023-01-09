@@ -147,6 +147,10 @@ resource "helm_release" "aad_pod_identity" {
   #depends_on = [module.aks]
 }
 
+locals {
+  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? (var.cluster.helm["identity-platform"]["deploy"] ? true : false) : false
+}
+
 module "helm" {
   source = "../helm"
 
@@ -247,6 +251,7 @@ module "helm" {
                 serviceAccountRef:
                   name: external-secrets
                   namespace: external-secrets
+${local.deploy_identity_platform == false ? <<EOF
         - apiVersion: storage.k8s.io/v1
           kind: StorageClass
           metadata:
@@ -275,6 +280,9 @@ module "helm" {
             name: ds-snapshot-class
           driver: disk.csi.azure.com
           deletionPolicy: Delete
+EOF
+: ""
+}
       EOF
     },
     "secret-agent" = {
@@ -294,6 +302,18 @@ module "helm" {
         ingress:
           hosts:
             - identity-platform.${azurerm_public_ip.ingress.ip_address}.nip.io
+        storage:
+          storage_class:
+            name: fast
+            create:
+              provisioner: disk.csi.azure.com
+              parameters:
+                storageaccounttype: Premium_LRS
+                kind: Managed
+          volume_snapshot_class:
+            name: ds-snapshot-class
+            create:
+              driver: disk.csi.azure.com
       EOF
     }
   }

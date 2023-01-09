@@ -39,3 +39,6 @@ tag.json
 *.swp
 *.swo
 *~
+.terraform*
+terraform.tfstate*
+terraform/clusters.tf

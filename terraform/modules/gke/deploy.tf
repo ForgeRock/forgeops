@@ -55,6 +55,10 @@ resource "google_compute_address" "ingress" {
   depends_on = [module.gke]
 }
 
+locals {
+  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? (var.cluster.helm["identity-platform"]["deploy"] ? true : false) : false
+}
+
 module "helm" {
   source = "../helm"
 
@@ -105,6 +109,11 @@ module "helm" {
       # Values from terraform GKE module
       EOF
     },
+    "trust-manager" = {
+      "values" = <<-EOF
+      # Values from terraform GKE module
+      EOF
+    },
     "kube-prometheus-stack" = {
       "values" = <<-EOF
       # Values from terraform GKE module
@@ -145,6 +154,7 @@ module "helm" {
                     serviceAccountRef:
                       name: external-secrets
                       namespace: external-secrets
+${local.deploy_identity_platform == false ? <<EOF
         - apiVersion: storage.k8s.io/v1
           kind: StorageClass
           metadata:
@@ -162,6 +172,9 @@ module "helm" {
             name: ds-snapshot-class
           driver: pd.csi.storage.gke.io
           deletionPolicy: Delete
+EOF
+: ""
+}
       EOF
     },
     "secret-agent" = {
@@ -181,6 +194,17 @@ module "helm" {
         ingress:
           hosts:
             - identity-platform.${google_compute_address.ingress.address}.nip.io
+        storage:
+          storage_class:
+            name: fast
+            create:
+              provisioner: pd.csi.storage.gke.io
+              parameters:
+                type: pd-sdd
+          volume_snapshot_class:
+            name: ds-snapshot-class
+            create:
+              driver: pd.csi.storage.gke.io
       EOF
     }
   }

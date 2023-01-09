@@ -37,7 +37,7 @@ clusters = {
     node_pool = {
       type          = "n2-standard-8"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -86,6 +86,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 2
@@ -157,7 +164,7 @@ clusters = {
     node_pool = {
       type          = "c2-standard-30"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -206,6 +213,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 3
@@ -277,7 +291,7 @@ clusters = {
     node_pool = {
       type          = "c2-standard-16"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -326,6 +340,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 3
@@ -397,7 +418,7 @@ clusters = {
     node_pool = {
       type          = "m5.xlarge"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -444,6 +465,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 2
@@ -515,7 +543,7 @@ clusters = {
     node_pool = {
       type          = "c5.9xlarge"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -562,6 +590,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 3
@@ -633,7 +668,7 @@ clusters = {
     node_pool = {
       type          = "m5.8xlarge"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -680,6 +715,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 3
@@ -749,7 +791,7 @@ clusters = {
     node_pool = {
       type          = "Standard_DS4_v2"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -798,6 +840,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 2
@@ -867,7 +916,7 @@ clusters = {
     node_pool = {
       type          = "Standard_F32s_v2"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -916,6 +965,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 3
@@ -985,7 +1041,7 @@ clusters = {
     node_pool = {
       type          = "Standard_F16s_v2"
       initial_count = 3
-      min_count     = 1
+      min_count     = 3
       max_count     = 6
     }
 
@@ -1034,6 +1090,13 @@ clusters = {
         #  ingress:
         #    hosts:
         #      - identity-platform.domain.local
+        #    tls:
+        #      issuer:
+        #        name: identity-platform-issuer
+        #        kind: Issuer
+        #        create:
+        #          type: letsencrypt-prod # letsencrypt-staging self-signed
+        #          email: "email@domain.com"
 
         am:
           replicaCount: 3
