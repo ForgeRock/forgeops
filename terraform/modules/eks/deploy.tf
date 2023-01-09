@@ -191,6 +191,10 @@ resource "null_resource" "helm_module_sleep_after_destroy" {
   depends_on = [module.eks, module.vpc, helm_release.aws_load_balancer_controller, aws_eip.ingress, local_file.kube_config]
 }
 
+locals {
+  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? (var.cluster.helm["identity-platform"]["deploy"] ? true : false) : false
+}
+
 module "helm" {
   source = "../helm"
 
@@ -291,6 +295,7 @@ module "helm" {
       "values" = <<-EOF
       # Values from terraform EKS module
       resources:
+${local.deploy_identity_platform == false ? <<EOF
         - apiVersion: storage.k8s.io/v1
           kind: StorageClass
           metadata:
@@ -323,6 +328,9 @@ module "helm" {
             name: ds-snapshot-class
           driver: ebs.csi.aws.com
           deletionPolicy: Delete
+EOF
+: ""
+}
       EOF
     },
     "secret-agent" = {
@@ -342,6 +350,15 @@ module "helm" {
         ingress:
           hosts:
             - identity-platform.${aws_eip.ingress[0].public_ip}.nip.io
+        storage:
+          storage_class:
+            name: fast
+            create:
+              provisioner: ebs.csi.aws.com
+          volume_snapshot_class:
+            name: ds-snapshot-class
+            create:
+              driver: ebs.csi.amazon.com
       EOF
     }
   }

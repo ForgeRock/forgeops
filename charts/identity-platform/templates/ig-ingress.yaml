@@ -15,13 +15,24 @@ metadata:
     {{- else if .Values.platform.ingress.annotations }}
       {{- toYaml .Values.platform.ingress.annotations | nindent 4 }}
     {{- end }}
+    {{- if .Values.platform.ingress.tls.issuer.name }}
+    {{- if (eq "ClusterIssuer" .Values.platform.ingress.tls.issuer.kind) }}
+    cert-manager.io/cluster-issuer: {{ .Values.platform.ingress.tls.issuer.name }}
+    {{- else }}
+    cert-manager.io/issuer: {{ .Values.platform.ingress.tls.issuer.name }}
+    {{- end }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ig.ingress.className | default .Values.platform.ingress.className }}
   tls:
     {{- range $host := .Values.platform.ingress.hosts }}
     - hosts:
         - {{ $host | quote }}
+      {{- if $.Values.platform.ingress.tls.secret.name }}
+      secretName: {{ $.Values.platform.tls.secret.name }}
+      {{- else }}
       secretName: "tls-{{ $host }}"
+      {{- end }}
     {{- end }}
   rules:
     {{- range $host := .Values.platform.ingress.hosts }}

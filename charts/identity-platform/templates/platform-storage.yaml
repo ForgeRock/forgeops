@@ -1,0 +1,23 @@
+{{- if .Values.platform.storage.storage_class.create -}}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.platform.storage.storage_class.name }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+{{ toYaml .Values.platform.storage.storage_class.create }}
+---
+{{- end }}
+{{- if .Values.platform.storage.volume_snapshot_class.create -}}
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: {{ .Values.platform.storage.volume_snapshot_class.name }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+deletionPolicy: Delete
+{{ toYaml .Values.platform.storage.volume_snapshot_class.create }}
+---
+{{- end }}

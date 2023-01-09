@@ -193,6 +193,8 @@ locals {
 
   installCRDs: true
 
+  featureGates: "ExperimentalCertificateSigningRequestControllers=true"
+
   ingressShim:
     defaultIssuerName: default-issuer
     defaultIssuerKind: ClusterIssuer
@@ -208,7 +210,7 @@ resource "helm_release" "cert_manager" {
   name                  = "cert-manager"
   repository            = "https://charts.jetstack.io"
   chart                 = "cert-manager"
-  version               = contains(keys(var.chart_configs["cert-manager"]), "version") ? var.chart_configs["cert-manager"]["version"] : "v1.8.0"
+  version               = contains(keys(var.chart_configs["cert-manager"]), "version") ? var.chart_configs["cert-manager"]["version"] : "v1.10.1"
   namespace             = "cert-manager"
   create_namespace      = true
   reuse_values          = false
@@ -220,6 +222,33 @@ resource "helm_release" "cert_manager" {
   values = [local.values_cert_manager, var.charts["cert-manager"]["values"], contains(keys(var.chart_configs), "cert-manager") ? (contains(keys(var.chart_configs["cert-manager"]), "values") ? var.chart_configs["cert-manager"]["values"] : "") : ""]
 
   depends_on = [helm_release.ingress_nginx, helm_release.haproxy_ingress, helm_release.external_dns]
+}
+
+locals {
+  deploy_trust_manager = contains(keys(var.charts), "trust-manager") && contains(keys(var.chart_configs), "trust-manager") ? (var.chart_configs["trust-manager"]["deploy"] ? true : false) : false
+  values_trust_manager = <<-EOF
+  # Values from terraform helm module
+  EOF
+}
+
+resource "helm_release" "trust_manager" {
+  count = local.deploy_trust_manager ? 1 : 0
+
+  name                  = "trust-manager"
+  repository            = "https://charts.jetstack.io"
+  chart                 = "trust-manager"
+  version               = contains(keys(var.chart_configs["trust-manager"]), "version") ? var.chart_configs["trust-manager"]["version"] : "v0.3.0"
+  namespace             = "cert-manager"
+  create_namespace      = true
+  reuse_values          = false
+  reset_values          = true
+  max_history           = 12
+  render_subchart_notes = false
+  timeout               = 600
+
+  values = [local.values_trust_manager, var.charts["trust-manager"]["values"], contains(keys(var.chart_configs), "trust-manager") ? (contains(keys(var.chart_configs["trust-manager"]), "values") ? var.chart_configs["trust-manager"]["values"] : "") : ""]
+
+  depends_on = [helm_release.ingress_nginx, helm_release.haproxy_ingress, helm_release.external_dns, helm_release.cert_manager]
 }
 
 locals {
@@ -434,7 +463,7 @@ resource "helm_release" "raw_k8s_resources" {
 
   values = [local.values_raw_k8s_resources, var.charts["raw-k8s-resources"]["values"]]
 
-  depends_on = [helm_release.metrics_server, helm_release.external_secrets, helm_release.external_dns, helm_release.ingress_nginx, helm_release.haproxy_ingress, helm_release.cert_manager, helm_release.raw_cert_manager, helm_release.kube_prometheus_stack, helm_release.elasticsearch, helm_release.logstash, helm_release.kibana]
+  depends_on = [helm_release.metrics_server, helm_release.external_secrets, helm_release.external_dns, helm_release.ingress_nginx, helm_release.haproxy_ingress, helm_release.cert_manager, helm_release.raw_cert_manager, helm_release.trust_manager, helm_release.kube_prometheus_stack, helm_release.elasticsearch, helm_release.logstash, helm_release.kibana]
 }
 
 locals {
@@ -504,6 +533,9 @@ locals {
   platform:
     ingress:
       className: ${local.ingressClass}
+
+  ldif_importer:
+    enabled: ${local.deploy_ds_operator ? "false" : "true"}
 
   ${local.deploy_ds_operator ? <<-EOF
   ds_idrepo:

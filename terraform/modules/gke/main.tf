@@ -27,6 +27,8 @@ data "google_client_config" "default" {}
 
 module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google"
+  version                    = "~> 24.0"
+
   project_id                 = var.cluster.auth.project_id
   name                       = local.cluster_name
   region                     = var.cluster.location.region
@@ -47,6 +49,16 @@ module "gke" {
   release_channel            = "REGULAR"
   kubernetes_version         = var.cluster.meta.kubernetes_version
   cluster_resource_labels    = module.common.asset_labels
+
+  #cluster_autoscaling = {
+  #  enabled             = true
+  #  autoscaling_profile = "BALANCED"
+  #  min_cpu_cores       = 1
+  #  max_cpu_cores       = 10000
+  #  min_memory_gb       = 1
+  #  max_memory_gb       = 100000
+  #  gpu_resources       = []
+  #}
 
   node_pools = [
     {
