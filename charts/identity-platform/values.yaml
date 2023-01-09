@@ -19,7 +19,6 @@ platform:
     className: "nginx"
     annotations:
       # kubernetes.io/tls-acme: "true"
-      cert-manager.io/cluster-issuer: letsencrypt-staging
       # Nginx specific ingress annotations
       nginx.ingress.kubernetes.io/affinity: cookie
       nginx.ingress.kubernetes.io/session-cookie-hash: sha1
@@ -40,13 +39,98 @@ platform:
         add_header X-ForgeRock-TransactionId $req_id;
         proxy_set_header X-ForgeRock-TransactionId $req_id;
 
-    host:
+    hosts:
       - identity-platform.domain.local
       # - identity-platform-2.local
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
+    tls:
+      # cert-manager must be deployed in order create/use a certificate issuer
+      issuer:
+        name: # "identity-platform-issuer"
+        kind: Issuer  # ClusterIssuer
+      #  create:
+      #    type: "letsencrypt-prod" # "letsencrypt-staging" # "self-signed"
+      #    email: "address@domain.com"
+      secret:
+        name: # "identity-platform-tls"
+      #  create:
+      #    crt: # base64 encoded string (Ex: base64 -w 0 <domain-file>.pem)
+      #    key: # base64 encoded string (Ex: base64 -w 0 <domain-file>.key)
+
+  storage:
+    storage_class:
+      name: fast
+      #create:
+      #  # GKE
+      #  provisioner: pd.csi.storage.gke.io
+      #  parameters:
+      #    type: pd-sdd
+      #  # EKS
+      #  provisioner: ebs.csi.aws.com
+      #  # AKS
+      #  provisioner: disk.csi.azure.com
+      #  parameters:
+      #    storageaccounttype: Premium_LRS
+      #    kind: Managed
+    volume_snapshot_class:
+      name: ds-snapshot-class
+      #create:
+      #  driver: pd.csi.storage.gke.io  # GKE
+      #  driver: ebs.csi.amazon.com     # EKS
+      #  driver: disk.csi.azure.com     # AKS
+
+  #secrets:
+  #  ds-passwords:
+  #    - name: dirmanager.pw
+  #      length: 32
+  #    - name: monitor.pw
+  #      value: password
+  #  am-passwords:
+  #    - name: .keypass
+  #      length: 24
+  #    - name: .storepass
+  #      length: 24
+  #    - name: username
+  #      value: amadmin
+  #  am-env-secrets:
+  #    - name: AM_AUTHENTICATION_SHARED_SECRET
+  #      length: 32
+  #      useBinaryCharacters: true
+  #    - name: AM_ENCRYPTION_KEY
+  #      length: 24
+  #    - name: AM_OIDC_CLIENT_SUBJECT_IDENTIFIER_HASH_SALT
+  #      length: 20
+  #    - name: AM_PASSWORDS_AMADMIN_CLEAR
+  #      length: 24
+  #    - name: AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY
+  #      length: 32
+  #      useBinaryCharacters: true
+  #    - name: AM_SESSION_STATELESS_ENCRYPTION_KEY
+  #      length: 32
+  #      useBinaryCharacters: true
+  #    - name: AM_SESSION_STATELESS_SIGNING_KEY
+  #      length: 32
+  #      useBinaryCharacters: true
+  #  amster-env-secrets:
+  #    - name: IDM_PROVISIONING_CLIENT_SECRET
+  #      length: 24
+  #    - name: IDM_RS_CLIENT_SECRET
+  #  ds-env-secrets:
+  #    - name: AM_STORES_APPLICATION_PASSWORD
+  #      length: 32
+  #    - name: AM_STORES_CTS_PASSWORD
+  #      length: 32
+  #    - name: AM_STORES_USER_PASSWORD
+  #      length: 32
+  #  idm-env-secrets:
+  #    - name: OPENIDM_ADMIN_PASSWORD
+  #      length: 24
+  #    - name: OPENIDM_KEYSTORE_PASSWORD
+  #      length: 24
+  #  rcs-agent-env-secrets:
+  #    - name: AGENT_IDM_SECRET
+  #      length: 32
+  #    - name: AGENT_RCS_SECRET
+  #      length: 32
 
 am:
   enabled: true
@@ -54,8 +138,9 @@ am:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/am
-    pullPolicy: IfNotPresent
     tag: "dev"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   ingress:
     enabled: true
@@ -124,11 +209,13 @@ amster:
   backoffLimit: 6
   restartPolicy: OnFailure
   deleteOnSuccess: false
+  #ttlSecondsAfterFinished: 300
 
   image:
     repository: gcr.io/forgerock-io/amster/pit1
-    pullPolicy: IfNotPresent
     tag: "7.3.0-latest-postcommit"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   resources: {}
     # limits:
@@ -166,14 +253,61 @@ amster:
   env:
     DURATION: "10"
 
+ldif_importer:
+  enabled: true
+  backoffLimit: 6
+  restartPolicy: OnFailure
+  ttlSecondsAfterFinished: 300
+
+  image:
+    repository: gcr.io/forgerock-io/ldif-importer
+    tag: "7-stable"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+
+  resources: {}
+    # limits:
+    #   cpu: 100m
+    #   memory: 512
+    # requests:
+    #   cpu: 100m
+    #   memory: 512
+
+  readinessProbe:
+    initialDelaySeconds: 1
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: ldif-importer
+
+  podSecurityContext:
+    fsGroup: 0
+    runAsUser: 11111
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
 idm:
   enabled: true
   replicaCount: 1
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/idm
-    pullPolicy: IfNotPresent
     tag: "dev"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   ingress:
     enabled: true
@@ -242,8 +376,9 @@ admin_ui:
 
   image:
     repository: gcr.io/forgerock-io/platform-admin-ui/docker-build
-    pullPolicy: IfNotPresent
     tag: "7.2.0-postcommit-latest"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   ingress:
     enabled: true
@@ -306,8 +441,9 @@ end_user_ui:
 
   image:
     repository: gcr.io/forgerock-io/platform-enduser-ui/docker-build
-    pullPolicy: IfNotPresent
     tag: "7.2.0-postcommit-latest"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   ingress:
     enabled: true
@@ -370,8 +506,9 @@ login_ui:
 
   image:
     repository: gcr.io/forgerock-io/platform-login-ui/docker-build
-    pullPolicy: IfNotPresent
     tag: "7.2.0-postcommit-latest"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   ingress:
     enabled: true
@@ -434,8 +571,9 @@ ig:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ig
-    pullPolicy: IfNotPresent
     tag: "dev"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   ingress:
     enabled: true
@@ -502,8 +640,9 @@ ds_idrepo:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    pullPolicy: IfNotPresent
     tag: "dev"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   resources: {}
     # limits:
@@ -559,8 +698,9 @@ ds_cts:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    pullPolicy: IfNotPresent
     tag: "dev"
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
 
   resources: {}
     # limits:

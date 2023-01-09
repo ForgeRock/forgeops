@@ -30,11 +30,15 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- if .Values.ds_cts.image.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.ds_cts.image.imagePullSecrets | nindent 8 }}
+      {{- else if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
+      subdomain: ds-cts
       securityContext:
         {{- toYaml .Values.ds_cts.podSecurityContext | nindent 8 }}
       volumes:
@@ -113,6 +117,21 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+            - name: tcp-ldap
+              containerPort: 1389
+              protocol: TCP
+            - name: tcp-ldaps
+              containerPort: 1636
+              protocol: TCP
+            - name: tcp-admin
+              containerPort: 4444
+              protocol: TCP
+            - name: tcp-replication
+              containerPort: 8989
               protocol: TCP
           startupProbe:
             httpGet:

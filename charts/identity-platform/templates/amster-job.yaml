@@ -17,6 +17,9 @@ metadata:
     {{- end }}
 spec:
   backoffLimit: {{ .Values.amster.backoffLimit }}
+  {{- if .Values.amster.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.amster.ttlSecondsAfterFinished }}
+  {{- end }}
   template:
     metadata:
       annotations:
@@ -31,9 +34,12 @@ spec:
         {{- end }}
     spec:
       restartPolicy: {{ .Values.amster.restartPolicy }}
-      {{- with .Values.imagePullSecrets }}
+      {{- if .Values.amster.image.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml .Values.amster.image.imagePullSecrets | nindent 8 }}
+      {{- else if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
       securityContext:
