@@ -63,7 +63,7 @@ platform:
       #  # GKE
       #  provisioner: pd.csi.storage.gke.io
       #  parameters:
-      #    type: pd-sdd
+      #    type: pd-ssd
       #  # EKS
       #  provisioner: ebs.csi.aws.com
       #  # AKS

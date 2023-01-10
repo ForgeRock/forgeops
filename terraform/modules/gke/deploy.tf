@@ -200,7 +200,7 @@ EOF
             create:
               provisioner: pd.csi.storage.gke.io
               parameters:
-                type: pd-sdd
+                type: pd-ssd
           volume_snapshot_class:
             name: ds-snapshot-class
             create:
