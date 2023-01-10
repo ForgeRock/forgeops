@@ -422,7 +422,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, cust
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name forgerock --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
             cwd=profile_dir)
-        run('kustomize', f'edit add patch --name ig-web --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
+        run('kustomize', f'edit add patch --name ig --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
             cwd=profile_dir)
         # run('kustomize', f'edit add patch --name icf-ingress --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
         #     cwd=profile_dir)
