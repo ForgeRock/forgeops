@@ -148,7 +148,7 @@ resource "helm_release" "aad_pod_identity" {
 }
 
 locals {
-  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? (var.cluster.helm["identity-platform"]["deploy"] ? true : false) : false
+  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? tobool(lookup(var.cluster.helm["identity-platform"], "deploy", false)) : false
 }
 
 module "helm" {
