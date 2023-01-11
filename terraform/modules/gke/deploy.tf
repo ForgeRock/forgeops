@@ -56,7 +56,7 @@ resource "google_compute_address" "ingress" {
 }
 
 locals {
-  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? (var.cluster.helm["identity-platform"]["deploy"] ? true : false) : false
+  deploy_identity_platform = contains(keys(var.cluster.helm), "identity-platform") ? tobool(lookup(var.cluster.helm["identity-platform"], "deploy", false)) : false
 }
 
 module "helm" {
