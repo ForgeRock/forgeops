@@ -15,12 +15,6 @@ export MACHINE=e2-standard-16
 export NUM_NODES="2"
 export PREEMPTIBLE=""
 
-# DS NODE POOL VALUES
-export CREATE_DS_POOL=true
-export DS_MACHINE=c2-standard-16
-# 2 nodes per zone, total of 6 DS nodes
-export DS_NUM_NODES="2"
-
 # Values for creating a static IP
 export CREATE_STATIC_IP=false # set to true to create a static IP.
 # export STATIC_IP_NAME="" # uncomment to provide a unique name(defaults to cluster name).  Lowercase letters, numbers, hyphens allowed.

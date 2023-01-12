@@ -18,7 +18,3 @@ export K8S_VERSION="1.23.8"
 export VM_SIZE=Standard_F16s_v2 # vCPU*16, Mem GiB*32, Compute Intensive, Premium Storage(with caching)
 export NODE_COUNT=6
 
-# DS NODE POOL VALUES
-export CREATE_DS_POOL=true
-export DS_VM_SIZE=Standard_DS5_v2 # vCPU*16, Mem GiB*56, Premium Storage(with caching)
-export DS_NODE_COUNT=6

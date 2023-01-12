@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script to create a CDM cluster on GKE. This will create a cluster with
-# a default nodepool for the apps, and a ds-pool for the DS nodes.
+# a default nodepool for the apps.
 # The values below can be overridden by copying and sourcing an environment variable script. For example:
 # - `cp mini.sh my-cluster.sh`
 # - `source my-cluster.sh && ./cluster-up.sh`
@@ -58,10 +58,6 @@ ZONE=${ZONE:-"$REGION-a"}
 
 # The machine types for primary and ds node pools
 MACHINE=${MACHINE:-e2-standard-8}
-DS_MACHINE=${DS_MACHINE:-n2-standard-8}
-
-# Create a separate node pool for ds
-CREATE_DS_POOL="${CREATE_DS_POOL:-false}"
 
 # Get current user
 CREATOR="${USER:-unknown}"
@@ -71,14 +67,7 @@ CREATOR=$(echo $CREATOR | sed 's/\./_/' | tr "[:upper:]" "[:lower:]")
 
 # Labels to add to the default pool
 # We need at least one node label to make the command happy
-DEFAULT_POOL_LABELS="frontend=true"
-
-if [ "$CREATE_DS_POOL" == "false" ]; then
-  # If there is no ds node pool we must label the primary node pool to allow
-  # ds pods to be scheduled there.
-  DEFAULT_POOL_LABELS="${DEFAULT_POOL_LABELS},forgerock.io/role=ds,forgerock.io/cluster=${NAME}"
-fi
-
+DEFAULT_POOL_LABELS="frontend=true,forgerock.io/role=ds,forgerock.io/cluster=${NAME}"
 
 NETWORK=${NETWORK:-"projects/$PROJECT/global/networks/default"}
 SUB_NETWORK=${SUB_NETWORK:-"projects/$PROJECT/regions/$REGION/subnetworks/default"}
@@ -98,7 +87,6 @@ PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
 
 # Number of nodes in each zone
 NUM_NODES=${NUM_NODES:-"1"} # Primary Node Pool
-DS_NUM_NODES=${DS_NUM_NODES:-"1"}
 
 # Release Channel
 RELEASE_CHANNEL=${RELEASE_CHANNEL:="regular"}
@@ -141,27 +129,6 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     $CONTROL_PLANE_OPTS \
     $CLOUD_DNS_OPTS \
     $ADDITIONAL_OPTS  # Note: Do not quote this variable. It needs to expand
-
-# Create the DS pool. This pool does not autoscale.
-
-if [ "$CREATE_DS_POOL" == "true" ]; then
-  gcloud beta container --project "$PROJECT" node-pools create "ds-pool" \
-    --cluster "$NAME" \
-    --zone "$ZONE" \
-    --node-locations "$NODE_LOCATIONS" \
-    --machine-type "$DS_MACHINE" \
-    --image-type "COS_CONTAINERD" \
-    --enable-image-streaming \
-    --disk-type "pd-ssd" \
-    --disk-size "100" \
-    --metadata disable-legacy-endpoints=true \
-    --node-labels forgerock.io/role=ds,forgerock.io/cluster=${NAME} \
-    --node-taints WorkerDedicatedDS=true:NoSchedule \
-    --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
-    "$PREEMPTIBLE" \
-    --num-nodes "$DS_NUM_NODES" \
-    --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0
-fi
 
 # Create the fast storageclass needed by DS
 kubectl create -f - <<EOF

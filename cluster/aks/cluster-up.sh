@@ -90,28 +90,13 @@ RES_GROUP_NAME=${RES_GROUP_NAME:-"${NAME}-res-group"}
 
 ######### NODE GROUP VARS ########
 VM_SIZE=${VM_SIZE:-"Standard_DS3_v2"}
-DS_VM_SIZE=${DS_VM_SIZE:-"Standard_DS3_v2"}
 NODE_OSDISK_SIZE=${NODE_OSDISK_SIZE:-80}
 
 # Primary node count
 NODE_COUNT=${NODE_COUNT:-3}
 
 # Labels to add to the default pool
-PRIMARY_POOL_LABELS="${CLUSTER_LABELS} frontend=true forgerock.io/role=primary"
-
-# Set to "false" if you do not want to create a seperate pool for ds nodes
-CREATE_DS_POOL="${CREATE_DS_POOL:-true}"
-
-# Number of DS nodes
-DS_NODE_COUNT=${DS_NODE_COUNT:-3}
-
-DS_POOL_LABELS="${CLUSTER_LABELS} forgerock.io/role=ds"
-
-if [ "$CREATE_DS_POOL" == "false" ]; then
-  # If there is no ds node pool we must label the primary node pool to allow
-  # ds pods to be scheduled there.
-  PRIMARY_POOL_LABELS="${PRIMARY_POOL_LABELS} ${DS_POOL_LABELS}"
-fi
+PRIMARY_POOL_LABELS="${CLUSTER_LABELS} frontend=true forgerock.io/role=primary forgerock.io/role=ds"
 
 # By default we disable autoscaling for CDM. If you wish to use autoscaling,
 # uncomment the following and adjust min/max-count as required:
@@ -158,22 +143,6 @@ az aks create \
     --load-balancer-sku "standard" \
     --zones 3 \
     $OPTS  # Note: Do not quote this variable. It needs to expand
-
-# Create the DS pool. This pool does not autoscale.
-
-if [ "$CREATE_DS_POOL" == "true" ]; then
-    az aks nodepool add \
-      --cluster-name "$NAME" \
-      --name "ds${NAME}" \
-      --resource-group "$RES_GROUP_NAME" \
-      --node-count "$DS_NODE_COUNT" \
-      --node-osdisk-size 100 \
-      --node-vm-size "$DS_VM_SIZE" \
-      --node-taints "WorkerDedicatedDS=true:NoSchedule" \
-      --labels $DS_POOL_LABELS \
-      --tags "${CLUSTER_TAGS}" \
-      --zones 3
-fi
 
 # Get cluster credentials and set kube-context
 az aks get-credentials --resource-group $RES_GROUP_NAME --name $NAME
