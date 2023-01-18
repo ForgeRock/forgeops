@@ -13,7 +13,7 @@ export NAME="large"
 export MACHINE=e2-standard-16
 # 2 nodes per zone, total of 6 Primary nodes
 export NUM_NODES="2"
-export PREEMPTIBLE=""
+export PREEMPTIBLE_NODE=false
 
 # Values for creating a static IP
 export CREATE_STATIC_IP=false # set to true to create a static IP.
