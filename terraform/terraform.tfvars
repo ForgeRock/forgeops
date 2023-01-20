@@ -71,13 +71,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -198,13 +198,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -289,7 +289,7 @@ clusters = {
     }
 
     node_pool = {
-      type          = "c2-standard-16"
+      type          = "c2-standard-30"
       initial_count = 3
       min_count     = 3
       max_count     = 6
@@ -325,13 +325,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -450,13 +450,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -575,13 +575,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -666,7 +666,7 @@ clusters = {
     }
 
     node_pool = {
-      type          = "m5.8xlarge"
+      type          = "c5.9xlarge"
       initial_count = 3
       min_count     = 3
       max_count     = 6
@@ -700,13 +700,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -825,13 +825,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -950,13 +950,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF
@@ -1039,7 +1039,7 @@ clusters = {
     }
 
     node_pool = {
-      type          = "Standard_F16s_v2"
+      type          = "Standard_F32s_v2"
       initial_count = 3
       min_count     = 3
       max_count     = 6
@@ -1075,13 +1075,13 @@ clusters = {
       kibana = {
         deploy  = false
       },
-      secret-agent = {
+      secret-agent = {  # Technology preview, not supported
         deploy     = false
       },
-      ds-operator = {
+      ds-operator = {  # Technology preview, not supported
         deploy     = false
       },
-      identity-platform = {
+      identity-platform = {  # Technology preview, not supported
         deploy     = false
         version    = "7.3"
         values     = <<-EOF

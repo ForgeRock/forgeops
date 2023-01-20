@@ -24,10 +24,10 @@ availabilityZones: ["us-east-1a","us-east-1b","us-east-1c"]
 
 nodeGroups:
   - name: primary
-    instanceType: m5.8xlarge
+    instanceType: c5.9xlarge
     minSize: 1
-    maxSize: 4
-    desiredCapacity: 3
+    maxSize: 6
+    desiredCapacity: 6
     volumeSize: 80
     iam:
       withAddonPolicies:
@@ -55,3 +55,23 @@ nodeGroups:
       # eksctl will use your default public key (e.a. $HOME/.ssh/id_rsa.pub) if no path is provided
       # publicKeyPath:
       allow: true
+  # - name: ds
+  #   instanceType: c5.4xlarge
+  #   minSize: 6
+  #   maxSize: 6
+  #   desiredCapacity: 6
+  #   volumeSize: 80
+  #   labels:
+  #     ds: "true"
+  #     forgerock.io/cluster: "cdm-large"
+  #     forgerock.io/role: "ds"
+  #   tags:
+  #     forgerock.io/cluster: "cdm-large"
+  #     forgerock.io/role: "ds"
+  #   taints:
+  #     WorkerDedicatedDS: true:NoSchedule
+  #   privateNetworking: true
+  #   ssh:
+  #     # eksctl will use your default public key (e.a. $HOME/.ssh/id_rsa.pub) if no path is provided
+  #     # publicKeyPath:
+  #     allow: true
