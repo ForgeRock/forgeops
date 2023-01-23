@@ -87,8 +87,12 @@ SUB_NETWORK=${SUB_NETWORK:-"projects/$PROJECT/regions/$REGION/subnetworks/defaul
 CREATE_STATIC_IP="${CREATE_STATIC_IP:-false}"
 STATIC_IP_NAME="${STATIC_IP_NAME:-$NAME}"
 
-# Uncomment to use preemptible nodes, or export PREEMPTIBLE="" to override
-PREEMPTIBLE=${PREEMPTIBLE:="--preemptible"}
+# default behaviour should not use preemptible
+if [ "${PREEMPTIBLE_NODE}" == "true" ] ; then
+   PREEMPTIBLE_NODE="--preemptible"
+else
+   PREEMPTIBLE_NODE=""
+fi
 
 # For GKE we default to use the release channel - where Google selects the kubernetes version and upgrades the cluster
 # If you want a specific cluster version uncomment the line below
@@ -126,7 +130,7 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --disk-type "pd-ssd" --disk-size "100" \
     --metadata disable-legacy-endpoints=true \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
-    $PREEMPTIBLE \
+    $PREEMPTIBLE_NODE \
     --node-labels "$DEFAULT_POOL_LABELS" \
     --enable-stackdriver-kubernetes \
     --enable-ip-alias \
@@ -158,7 +162,7 @@ if [ "$CREATE_DS_POOL" == "true" ]; then
     --node-labels forgerock.io/role=ds,forgerock.io/cluster=${NAME} \
     --node-taints WorkerDedicatedDS=true:NoSchedule \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
-    "$PREEMPTIBLE" \
+    "$PREEMPTIBLE_NODE" \
     --num-nodes "$DS_NUM_NODES" \
     --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0
 fi
