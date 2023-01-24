@@ -84,7 +84,7 @@ data "aws_ami" "eks_arm64" {
 
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
-  version = "~> 19.5"
+  version = "~> 18.9"
 
   prefix_separator = ""
   cluster_name = local.cluster_name
@@ -145,28 +145,28 @@ module "eks" {
     }
     ingress_cluster_all = {
       description = "Allow workers pods to receive communication from the cluster control plane."
-        protocol = "-1"
-        from_port = 0
-        to_port = 65535
-        type = "ingress"
-        source_cluster_security_group = true
-      }
-      egress_self_all = {
-        description = "Allow nodes to communicate with each other."
-        protocol = "-1"
-        from_port = 0
-        to_port = 65535
-        type = "egress"
-        self = true
-      }
-      ingress_self_all = {
-        description = "Allow nodes to communicate with each other."
-        protocol = "-1"
-        from_port = 0
-        to_port = 65535
-        type = "ingress"
-        self = true
-      }
+      protocol = "-1"
+      from_port = 0
+      to_port = 65535
+      type = "ingress"
+      source_cluster_security_group = true
+    }
+    egress_self_all = {
+      description = "Allow nodes to communicate with each other."
+      protocol = "-1"
+      from_port = 0
+      to_port = 65535
+      type = "egress"
+      self = true
+    }
+    ingress_self_all = {
+      description = "Allow nodes to communicate with each other."
+      protocol = "-1"
+      from_port = 0
+      to_port = 65535
+      type = "ingress"
+      self = true
+    }
   }
 
   self_managed_node_group_defaults = {
