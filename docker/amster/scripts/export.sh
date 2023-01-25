@@ -5,7 +5,7 @@ EXPORT_DIR="${EXPORT_DIR:-/var/tmp/amster}"
 if [[ "$1" == "full" ]]; then
     realmEntities=""
 else
-    realmEntities="--realmEntities 'OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications'"
+    realmEntities="--realmEntities 'OAuth2Clients IdentityGatewayAgents J2eeAgents WebAgents SoapStsAgents Policies CircleOfTrust Saml2Entity Applications TrustedJwtIssuer'"
 fi
 
 # Create a temporary export folder.
