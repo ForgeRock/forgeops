@@ -75,7 +75,7 @@ REQ_VERSIONS ={
     },
 }
 
-def inject_kustomize_amster(kustomize_pkg_path): return _inject_kustomize_amster(kustomize_pkg_path)
+def inject_kustomize_amster(kustomize_pkg_path, config_profile): return _inject_kustomize_amster(kustomize_pkg_path, config_profile)
 
 size_paths = {
     'mini': 'overlay/mini',
@@ -364,7 +364,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, custom_path=None, src_profile_dir=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=None, src_profile_dir=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -402,7 +402,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, cust
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
         if callable(c):
-            c(profile_dir)
+            c(profile_dir, config_profile)
         else:
             run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
         if c in patcheable_components and size != 'cdk':
@@ -435,7 +435,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, cust
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, pkg_base_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_base_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -448,7 +448,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     """
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, custom_path=custom_path, src_profile_dir=src_profile_dir)
+    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=custom_path, src_profile_dir=src_profile_dir)
 
     # Remove amster components
     if component == "amster":
@@ -460,7 +460,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force, delete_components, ingress_class, legacy):
+def uninstall_component(component, ns, force, delete_components, ingress_class, legacy, config_profile):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -475,7 +475,7 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(sys.path[0], '../kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, config_profile, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)
@@ -487,11 +487,11 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
         #clean up temp folder
         shutil.rmtree(uninstall_dir, ignore_errors=True)
 
-def _inject_kustomize_amster(kustomize_pkg_path):
+def _inject_kustomize_amster(kustomize_pkg_path, config_profile):
     docker_dir = os.path.join(sys.path[0], '../docker')
     amster_cm_name = 'amster-files.yaml'
     amster_cm_path = os.path.join(kustomize_pkg_path, amster_cm_name)
-    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', 'cdk')
+    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', config_profile)
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     try:
         envVars = os.environ
