@@ -7,7 +7,7 @@ images:
   newName: us-docker.pkg.dev/forgeops-public/images/am
   newTag: 7.2.0
 - name: amster
-  newName: gcr.io/forgerock-io/amster
+  newName: us-docker.pkg.dev/forgeops-public/images/amster
   newTag: 7.2.0
 - name: ds
   newName: us-docker.pkg.dev/forgeops-public/images/ds
