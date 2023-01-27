@@ -639,6 +639,8 @@ def install_dependencies(legacy):
     else:
         message('secret-agent CRD found in cluster.')
         message('\nChecking secret-agent operator is running...')
+        # Check that there are no pods running in a completed state
+        run('kubectl', '-n secret-agent-system delete pod --field-selector=status.phase==Succeeded')
         run('kubectl', 'wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s')
         run('kubectl', '-n secret-agent-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n secret-agent-system wait --for=condition=ready pod --all --timeout=120s')
