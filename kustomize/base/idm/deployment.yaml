@@ -13,6 +13,9 @@ spec:
       annotations:
         "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
     spec:
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 0
       initContainers:
       - name: fbc-init
         image: idm
