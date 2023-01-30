@@ -12,6 +12,9 @@ spec:
       labels:
         app: end-user-ui
     spec:
+      securityContext:
+        runAsUser: 101
+        runAsGroup: 0
       containers:
       - image: end-user-ui
         imagePullPolicy: Always
