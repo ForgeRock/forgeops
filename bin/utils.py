@@ -639,11 +639,13 @@ def install_dependencies(legacy):
     else:
         message('secret-agent CRD found in cluster.')
         message('\nChecking secret-agent operator is running...')
-        # Check that there are no pods running in a completed state
-        run('kubectl', '-n secret-agent-system delete pod --field-selector=status.phase==Succeeded')
         run('kubectl', 'wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s')
         run('kubectl', '-n secret-agent-system wait --for=condition=available deployment  --all --timeout=120s')
-        run('kubectl', '-n secret-agent-system wait --for=condition=ready pod --all --timeout=120s')
+        try:
+            run('kubectl', '-n secret-agent-system get pod -l app.kubernetes.io/name=secret-agent-manager --field-selector=status.phase==Running')
+        except Exception as e:
+            error(f'Could not find a running secret-agent pod. See the following error: {e}')
+            sys.exit(1)
         message('secret-agent operator is running')
 
     _, img, _ = run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
