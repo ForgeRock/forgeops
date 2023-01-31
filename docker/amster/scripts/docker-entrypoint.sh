@@ -10,7 +10,7 @@ ACTION="${1:-import}"
 echo "amster action is $ACTION"
 
 # Default is to connect via the internal http service name
-# Note we use AMSTER_AM_RUL so we dont collide with the platform AM_URL - which might be external
+# Note we use AMSTER_AM_URL so we don't collide with the platform AM_URL - which might be external
 export AMSTER_AM_URL=${AMSTER_AM_URL:-http://am:80/am}
 
 pause() {
@@ -39,8 +39,7 @@ pause)
     pause
     ;;
 export)
-    # You must run another container after this
-    # that will save the exported files.
+    # invoke amster export
     ./export.sh ${TYPE}
     ;;
 import)
