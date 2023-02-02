@@ -118,7 +118,6 @@ SCRIPT_DIR = SCRIPT.parent.resolve()
 REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
 DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
 KUSTOMIZE_BASE_PATH = REPO_BASE_PATH.joinpath('kustomize').resolve()
-RULES_PATH = REPO_BASE_PATH.joinpath("config/am-upgrader-rules").resolve()
 
 class RunError(subprocess.CalledProcessError):
     pass
@@ -473,7 +472,7 @@ def _inject_kustomize_amster(kustomize_pkg_path):
                     cstdout=True)
         with open(amster_cm_path, 'wt') as f:
             f.write(cm.decode('ascii'))
-        run('kustomize', f'edit add resource ../../../kustomize/overlay/amster-upload', cwd=kustomize_pkg_path)
+        run('kustomize', f'edit add resource ../../../kustomize/base/amster-upload', cwd=kustomize_pkg_path)
         run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
     finally:
         if os.path.exists('amster-import.tar.gz'):

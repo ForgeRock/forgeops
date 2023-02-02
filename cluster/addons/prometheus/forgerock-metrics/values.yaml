@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Select namespace strategy.
+# Select namespace strategy. 
 #   any = scrape all namespaces[default].
 #   selection = user defined array of namespaces to scrape.
 namespaceSelectorStrategy: any
@@ -28,7 +28,6 @@ ds:
   path: /metrics/prometheus
   port: http
   labelSelectorComponent: directory
-  labelSelectorName: ds
   secretUser: monitor
   secretPassword: password
 
@@ -53,3 +52,8 @@ ig:
 additionalRulesLabels:
   prometheus: prometheus-operator
   role: alert-rules
+
+  
+
+
+
