@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2023 ForgeRock AS. All Rights Reserved
+  ~
+  ~ Use of this code requires a commercial software license with ForgeRock AS.
+  ~ or with one of its affiliates. All use shall be exclusively subject
+  ~ to such license between the licensee and ForgeRock AS.
+  -->
+<rss version="2.0">
+ <channel>
+  <title>ForgeOps Early Availability Release Notes</title>
+  <description>Early availability (master branch) release notes</description>
+  <link>https://github.com/forgerock/forgeops/README.md</link>
+  <copyright>2023 ForgeRock AS. All rights reserved</copyright>
+  <lastBuildDate>Thu, 02 Feb 2023 00:10:00 GMT</lastBuildDate>
+  <ttl>1</ttl>
+
+  <item>
+   <title>01 Feb 2023</title>
+   <description><![CDATA[
+    <h2>
+     Terraform for CDM cluster creation and deletion
+    </h2>
+    <p>
+     Use Terraform to create clusters in which you can install the CDM.
+     Terraform artifacts are now available in the top-level `terraform`
+     directory of the new `forgeops-extras` repository. Install Terraform software
+     before you install the CDM to take advantage of this new capability.
+    </p>
+    <p>
+     The `cluster-up.sh` and `cluster-down.sh` scripts are no
+     longer available. Use Terraform for cluster creation and deletion instead.
+    </p>
+   ]]></description>
+   <guid isPermaLink="false">forgeops-ea-rn-feed:01_feb_2023</guid>
+   <pubDate>Thu, 02 Feb 2023 00:10:00 GMT</pubDate>
+  </item>
+
+ </channel>
+</rss>
