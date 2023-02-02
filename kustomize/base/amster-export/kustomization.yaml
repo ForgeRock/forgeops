@@ -1,5 +1,5 @@
 resources:
-- ../../base/amster
+  - ../amster
 components:
 - ../../deploy/image-defaulter
 
@@ -27,7 +27,6 @@ patchesJSON6902:
         args:
         - |
           cd /amster-staging
-          tar -xzvf amster-import.tar.gz -C /amster-config
           tar -xzvf amster-scripts.tar.gz -C /amster-scripts
 
 patchesStrategicMerge:
@@ -46,7 +45,13 @@ patchesStrategicMerge:
           args:
           - |
             cp /amster-scripts/* /opt/amster/
-            ./docker-entrypoint.sh import
+            ./docker-entrypoint.sh export
+          env:
+          - name: TYPE
+            valueFrom:
+              configMapKeyRef:
+                name: amster-export-type
+                key: export
           volumeMounts:
           - mountPath: /opt/amster/config
             name: amster-config

@@ -13,7 +13,7 @@ export NAME="medium"
 export MACHINE=c2-standard-30
 # 2 nodes per zone, total of 6 Primary nodes
 export NUM_NODES="2"
-export PREEMPTIBLE_NODE=false
+export PREEMPTIBLE=""
 
 # DS NODE POOL VALUES
 # export CREATE_DS_POOL=true

@@ -13,7 +13,7 @@ export NAME="large"
 export MACHINE=e2-standard-16
 # 2 nodes per zone, total of 6 Primary nodes
 export NUM_NODES="2"
-export PREEMPTIBLE_NODE=false
+export PREEMPTIBLE=""
 
 # DS NODE POOL VALUES
 export CREATE_DS_POOL=true

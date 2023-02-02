@@ -11,7 +11,7 @@ export ZONE="$REGION-b" # required for cluster master
 
 # PRIMARY NODE POOL VALUES
 export MACHINE=c2-standard-30
-export PREEMPTIBLE_NODE=false
+export PREEMPTIBLE=""
 
 # DS NODE POOL VALUES
 export CREATE_DS_POOL=false

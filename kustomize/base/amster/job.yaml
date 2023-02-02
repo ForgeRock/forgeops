@@ -52,9 +52,6 @@ spec:
             name: amster-retain
             optional: true
         volumeMounts:
-        - mountPath: /var/run/secrets/amster
-          name: amster-secrets
-          readOnly: true
         - mountPath: /var/tmp/amster
           name: export-files
         readinessProbe:

@@ -171,24 +171,12 @@ def export_am(am_conf, pod_name):
 
 def upgrade_am(am_conf):
     """Run AM configuration through the AM control"""
-
-    log.info('Running AM static config through the am-config-upgrader to upgrade to the current version of forgeops.')
     try:
         utils.run(AM_UPGRADER, str(am_conf))
     except utils.RunError as e:
         log.error(f'Error during upgrade {e.stderr}')
-        sys.exit(1)
 
     log.info('Completed upgrading AM configuration')
-
-    log.info('Running AM static config through the am-config-upgrader to replace any missing default placeholders.')
-    try:
-        utils.run(AM_UPGRADER, str(am_conf), str(utils.RULES_PATH))
-    except utils.RunError as e:
-        log.error(f'Error during placeholder replacement {e.stderr}')
-        sys.exit(1)
-
-    log.info('Completed replacing AM placeholders')
 
 
 def export_ig(ig_conf, pod_name):

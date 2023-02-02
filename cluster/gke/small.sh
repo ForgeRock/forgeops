@@ -11,7 +11,7 @@ export NAME="small"
 
 # PRIMARY NODE POOL VALUES
 export MACHINE=e2-standard-8
-export PREEMPTIBLE_NODE=false
+export PREEMPTIBLE=""
 
 # DS NODE POOL VALUES
 export CREATE_DS_POOL=false
