@@ -4,6 +4,8 @@
 
 set -o errexit
 
+git config --global --add safe.directory /home/forgerock/openam
+
 cd /home/forgerock/openam
 
 if [ "$1" = "--deleted" ]; then
