@@ -1,0 +1,36 @@
+version: 1
+
+dn: ou=ou=am-config^^RealmAdmin,ou=default,ou=default,ou=OrganizationConfig,
+ ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationser
+ vicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675775413965=creationdate
+ou: 1675775413965=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^RealmAdmin
+ou: ou=am-config^^RealmAdmin
+ou: |1675775413965=creationdate
+ou: |1675775413965=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75775413965,"policyName":"ou=am-config^^RealmAdmin","lastModifiedBy":"uid=d
+ sameuser","name":"ou=am-config^^RealmAdmin","description":"","active":"true
+ ","entitlement":{"resourceNames":["sms://*ou=am-config/*"],"actionsValues":
+ {"READ":true,"MODIFY":true,"DELEGATE":true},"name":"delegation-rule","appli
+ cationName":"sunAMDelegationService"},"className":"com.sun.identity.entitle
+ ment.opensso.OpenSSOPrivilege","creationDate":1675775413965,"eSubject":{"cl
+ assName":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n 
+  \"values\": [\"id=realmadmins,ou=group,ou=am-config\"],\n  \"name\": \"del
+ egation-subject\",\n  \"exclusive\": false,\n  \"className\": \"com.sun.ide
+ ntity.policy.plugins.AMIdentitySubject\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: subjectindex=identity:=all
+
