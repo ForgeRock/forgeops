@@ -208,5 +208,5 @@ cd /opt/opendj
 # The profiles are read only - make them writable
 chmod -R a+rw  template/setup-profiles/AM
 
-cat ldif-ext/external-am-datastore.ldif ldif-ext/uma/*.ldif ldif-ext/alpha_bravo.ldif ldif-ext/NBdigital_NBintern.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif
+cat ldif-ext/external-am-datastore.ldif ldif-ext/uma/*.ldif ldif-ext/alpha_bravo.ldif ldif-ext/NBdigital_NBintern.ldif ldif-ext/realmadmins.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif
 cat ldif-ext/orgs.ldif >> template/setup-profiles/AM/identity-store/7.0/base-entries.ldif
