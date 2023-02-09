@@ -1,0 +1,1185 @@
+version: 1
+
+dn: o=sunamhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: sunRealmService
+objectClass: top
+o: sunamhiddenrealmdelegationservicepermissions
+
+dn: ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=services,o
+ u=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: services
+
+dn: ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationservice
+ permissions,ou=services,ou=am-config
+objectClass: sunService
+objectClass: top
+ou: sunEntitlementIndexes
+
+dn: ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegation
+ servicepermissions,ou=services,ou=am-config
+objectClass: sunService
+objectClass: top
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=suna
+ mhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalunit
+objectClass: top
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=serv
+ ices,o=sunamhiddenrealmdelegationservicepermissions,ou=services,ou=am-confi
+ g
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: default
+
+dn: ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementInde
+ xes,ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=services,
+ ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: default
+sunserviceID: type
+sunsmspriority: 0
+
+dn: ou=AllUserReadableServices1,ou=default,ou=default,ou=OrganizationConfig,
+ ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationser
+ vicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580055984=creationdate
+ou: 1578580055984=lastmodifieddate
+ou: AllUserReadableServices1
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=AllUserReadableServices1
+ou: |1578580055984=creationdate
+ou: |1578580055984=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580055984,"policyName":"AllUserReadableService
+ s1","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name":"All
+ UserReadableServices1","active":"true","entitlement":{"resourceNames":["sms
+ ://ou=am-config/sunIdentityRepositoryService/1.0/globalConfig/*","sms://ou=
+ am-config/iPlanetAMAdminConsoleService/1.0/globalConfig/*","sms://ou=am-con
+ fig/sunFMCOTConfigService/1.0/OrganizationConfig/*","sms://ou=am-config/sun
+ FMSAML2MetadataService/1.0/OrganizationConfig/*"],"actionsValues":{"READ":t
+ rue},"name":"delegation-rule1","applicationName":"sunAMDelegationService"},
+ "className":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creati
+ onDate":1578580055984,"eSubject":{"className":"com.sun.identity.entitlement
+ .opensso.PolicySubject","state":"{\n  \"className\": \"com.sun.identity.pol
+ icy.plugins.AuthenticatedUsers\",\n  \"exclusive\": false,\n  \"name\": \"d
+ elegation-subject\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/iplanetamadminconsoleservice/1.0/globalconfig
+sunxmlKeyValue: pathindex=/sunfmcotconfigservice/1.0/organizationconfig
+sunxmlKeyValue: pathindex=/sunfmsaml2metadataservice/1.0/organizationconfig
+sunxmlKeyValue: pathindex=/sunidentityrepositoryservice/1.0/globalconfig
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/iplanetamadminconsoleservice
+sunxmlKeyValue: pathparentindex=/iplanetamadminconsoleservice/1.0
+sunxmlKeyValue: pathparentindex=/iplanetamadminconsoleservice/1.0/globalconf
+ ig
+sunxmlKeyValue: pathparentindex=/sunfmcotconfigservice
+sunxmlKeyValue: pathparentindex=/sunfmcotconfigservice/1.0
+sunxmlKeyValue: pathparentindex=/sunfmcotconfigservice/1.0/organizationconfi
+ g
+sunxmlKeyValue: pathparentindex=/sunfmsaml2metadataservice
+sunxmlKeyValue: pathparentindex=/sunfmsaml2metadataservice/1.0
+sunxmlKeyValue: pathparentindex=/sunfmsaml2metadataservice/1.0/organizationc
+ onfig
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0/globalconf
+ ig
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=SelfReadAttributes,ou=default,ou=default,ou=OrganizationConfig,ou=1.0
+ ,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationservicepe
+ rmissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056266=creationdate
+ou: 1578580056266=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=SelfReadAttributes
+ou: SelfReadAttributes
+ou: |1578580056266=creationdate
+ou: |1578580056266=lastmodifieddate
+sunKeyValue: serializable={"eCondition":{"className":"com.sun.identity.entit
+ lement.opensso.PolicyCondition","state":"{\n  \"className\": \"com.sun.iden
+ tity.policy.plugins.UserSelfCheckCondition\",\n  \"name\": \"condition\",\n
+   \"properties\": {\"attributes\": [\"*\"]}\n}"},"createdBy":"cn=dsameuser,
+ ou=DSAME Users,ou=am-config","lastModifiedDate":1578580056266,"policyName":
+ "SelfReadAttributes","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","name":"SelfReadAttributes","active":"true","entitlement":{"resourceN
+ ames":["sms://*ou=am-config/sunIdentityRepositoryService/1.0/application/*"
+ ],"actionsValues":{"READ":true},"name":"user-read-rule","applicationName":"
+ sunAMDelegationService"},"className":"com.sun.identity.entitlement.opensso.
+ OpenSSOPrivilege","creationDate":1578580056266,"eSubject":{"className":"com
+ .sun.identity.entitlement.opensso.PolicySubject","state":"{\n  \"className\
+ ": \"com.sun.identity.policy.plugins.AuthenticatedUsers\",\n  \"exclusive\"
+ : false,\n  \"name\": \"delegation-subject\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunidentityrepositoryservice/1.0/application
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0/applicatio
+ n
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=SelfWriteAttributes,ou=default,ou=default,ou=OrganizationConfig,ou=1.
+ 0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationservicep
+ ermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056299=creationdate
+ou: 1578580056299=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=SelfWriteAttributes
+ou: SelfWriteAttributes
+ou: |1578580056299=creationdate
+ou: |1578580056299=lastmodifieddate
+sunKeyValue: serializable={"eCondition":{"className":"com.sun.identity.entit
+ lement.opensso.PolicyCondition","state":"{\n  \"className\": \"com.sun.iden
+ tity.policy.plugins.UserSelfCheckCondition\",\n  \"name\": \"condition\",\n
+   \"properties\": {\"attributes\": [\n    \"givenname\",\n    \"sn\",\n\"cn
+ \",\n    \"userpassword\",\n    \"mail\",\n    \"telephonenumber\",\n  \"po
+ staladdress\",\n    \"preferredlocale\",\n    \"iplanet-am-user-password-re
+ set-options\",\n    \"iplanet-am-user-password-reset-question-answer\",\n  
+   \"description\",\n    \"oath2faEnabled\",\n    \"push2faEnabled\",\n    \
+ "sunIdentityServerDeviceKeyValue\",\n    \"sunIdentityServerDeviceStatus\"\
+ n  ]}\n}"},"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","lastModi
+ fiedDate":1578580056299,"policyName":"SelfWriteAttributes","lastModifiedBy"
+ :"cn=dsameuser,ou=DSAME Users,ou=am-config","name":"SelfWriteAttributes","a
+ ctive":"true","entitlement":{"resourceNames":["sms://*ou=am-config/sunIdent
+ ityRepositoryService/1.0/application/*"],"actionsValues":{"MODIFY":true},"n
+ ame":"user-read-rule","applicationName":"sunAMDelegationService"},"classNam
+ e":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":1
+ 578580056299,"eSubject":{"className":"com.sun.identity.entitlement.opensso.
+ PolicySubject","state":"{\n  \"className\": \"com.sun.identity.policy.plugi
+ ns.AuthenticatedUsers\",\n  \"exclusive\": false,\n  \"name\": \"delegation
+ -subject\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunidentityrepositoryservice/1.0/application
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0/applicatio
+ n
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=SharedAgentReadOnlyPermission,ou=default,ou=default,ou=OrganizationCo
+ nfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegati
+ onservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056321=creationdate
+ou: 1578580056321=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=SharedAgentReadOnlyPermission
+ou: SharedAgentReadOnlyPermission
+ou: |1578580056321=creationdate
+ou: |1578580056321=lastmodifieddate
+sunKeyValue: serializable={"eCondition":{"className":"com.sun.identity.entit
+ lement.opensso.PolicyCondition","state":"{\n  \"className\": \"com.sun.iden
+ tity.policy.plugins.AuthenticatedSharedAgentsCondition\",\n  \"name\": \"co
+ ndition\",\n  \"properties\": {}\n}"},"createdBy":"cn=dsameuser,ou=DSAME Us
+ ers,ou=am-config","lastModifiedDate":1578580056321,"policyName":"SharedAgen
+ tReadOnlyPermission","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","name":"SharedAgentReadOnlyPermission","active":"true","entitlement":
+ {"resourceNames":["sms://*ou=am-config/sunIdentityRepositoryService/1.0/app
+ lication/agent*"],"actionsValues":{"READ":true},"name":"sharedagent-idrepo-
+ read-rule","applicationName":"sunAMDelegationService"},"className":"com.sun
+ .identity.entitlement.opensso.OpenSSOPrivilege","creationDate":157858005632
+ 1,"eSubject":{"className":"com.sun.identity.entitlement.opensso.PolicySubje
+ ct","state":"{\n  \"className\": \"com.sun.identity.policy.plugins.Authenti
+ catedSharedAgents\",\n\"exclusive\": false,\n  \"name\": \"AuthenticatedSha
+ redAgents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunidentityrepositoryservice/1.0/application
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0/applicatio
+ n
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=AgentRealmPermission,ou=default,ou=default,ou=OrganizationConfig,ou=1
+ .0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationservice
+ permissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056341=creationdate
+ou: 1578580056341=lastmodifieddate
+ou: AgentRealmPermission
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=AgentRealmPermission
+ou: |1578580056341=creationdate
+ou: |1578580056341=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056341,"policyName":"AgentRealmPermission",
+ "lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name":"AgentRe
+ almPermission","active":"true","entitlement":{"resourceNames":["sms://*ou=a
+ m-config/sunAMRealmService/*"],"actionsValues":{"READ":true},"name":"agent-
+ realm-read-rule","applicationName":"sunAMDelegationService"},"className":"c
+ om.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":157858
+ 0056341,"eSubject":{"className":"com.sun.identity.entitlement.opensso.Polic
+ ySubject","state":"{\n\"className\": \"com.sun.identity.policy.plugins.Auth
+ enticatedAgents\",\n\"exclusive\": false,\n  \"name\": \"AuthenticatedAgent
+ s\",\n  \"values\":[]\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunamrealmservice
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunamrealmservice
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^AgentLogging,ou=default,ou=default,ou=OrganizationConfi
+ g,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegations
+ ervicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056357=creationdate
+ou: 1578580056357=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=ou=am-config^^AgentLogging
+ou: ou=am-config^^AgentLogging
+ou: |1578580056357=creationdate
+ou: |1578580056357=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056357,"policyName":"ou=am-config^^AgentLog
+ ging","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name":"o
+ u=am-config^^AgentLogging","active":"true","entitlement":{"resourceNames":[
+ "sms://*ou=am-config/iPlanetAMLoggingService/1.0/application/*"],"actionsVa
+ lues":{"MODIFY":true},"name":"delegation-rule1","applicationName":"sunAMDel
+ egationService"},"className":"com.sun.identity.entitlement.opensso.OpenSSOP
+ rivilege","creationDate":1578580056357,"eSubject":{"className":"com.sun.ide
+ ntity.entitlement.opensso.PolicySubject","state":"{\n  \"className\": \"com
+ .sun.identity.policy.plugins.AuthenticatedAgents\",\n  \"exclusive\": false
+ ,\n  \"name\": \"AuthenticatedAgents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/iplanetamloggingservice/1.0/application
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/iplanetamloggingservice
+sunxmlKeyValue: pathparentindex=/iplanetamloggingservice/1.0
+sunxmlKeyValue: pathparentindex=/iplanetamloggingservice/1.0/application
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementEval_delegation-rule5,ou=default,ou=default,
+ ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhi
+ ddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056374=creationdate
+ou: 1578580056374=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=ou=am-config^^EntitlementEval_delegation-rule5
+ou: ou=am-config^^EntitlementEval_delegation-rule5
+ou: |1578580056374=creationdate
+ou: |1578580056374=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056374,"policyName":"ou=am-config^^Entitlem
+ entEval","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name"
+ :"ou=am-config^^EntitlementEval_delegation-rule5","active":"true","entitlem
+ ent":{"resourceNames":["sms://ou=am-config/sunEntitlementService/1.0/applic
+ ation/ws/1/entitlement/listener*"],"actionsValues":{"MODIFY":true},"name":"
+ delegation-rule5","applicationName":"sunAMDelegationService"},"className":"
+ com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":15785
+ 80056374,"eSubject":{"className":"com.sun.identity.entitlement.opensso.Poli
+ cySubject","state":"{\n  \"className\": \"com.sun.identity.policy.plugins.A
+ uthenticatedAgents\",\n  \"exclusive\": false,\n  \"name\": \"Authenticated
+ Agents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementEval_delegation-rule2,ou=default,ou=default,
+ ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhi
+ ddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056374=creationdate
+ou: 1578580056374=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=ou=am-config^^EntitlementEval_delegation-rule2
+ou: ou=am-config^^EntitlementEval_delegation-rule2
+ou: |1578580056374=creationdate
+ou: |1578580056374=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056374,"policyName":"ou=am-config^^Entitlem
+ entEval","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name"
+ :"ou=am-config^^EntitlementEval_delegation-rule2","active":"true","entitlem
+ ent":{"resourceNames":["sms://ou=am-config/sunEntitlementService/1.0/applic
+ ation/ws/1/entitlement/decisions"],"actionsValues":{"READ":true},"name":"de
+ legation-rule2","applicationName":"sunAMDelegationService"},"className":"co
+ m.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":1578580
+ 056374,"eSubject":{"className":"com.sun.identity.entitlement.opensso.Policy
+ Subject","state":"{\n  \"className\": \"com.sun.identity.policy.plugins.Aut
+ henticatedAgents\",\n  \"exclusive\": false,\n  \"name\": \"AuthenticatedAg
+ ents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/decisions
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/decisions
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementEval_delegation-rule1,ou=default,ou=default,
+ ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhi
+ ddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056374=creationdate
+ou: 1578580056374=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=ou=am-config^^EntitlementEval_delegation-rule1
+ou: ou=am-config^^EntitlementEval_delegation-rule1
+ou: |1578580056374=creationdate
+ou: |1578580056374=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056374,"policyName":"ou=am-config^^Entitlem
+ entEval","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name"
+ :"ou=am-config^^EntitlementEval_delegation-rule1","active":"true","entitlem
+ ent":{"resourceNames":["sms://ou=am-config/sunEntitlementService/1.0/applic
+ ation/ws/1/entitlement/decision"],"actionsValues":{"READ":true},"name":"del
+ egation-rule1","applicationName":"sunAMDelegationService"},"className":"com
+ .sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":15785800
+ 56374,"eSubject":{"className":"com.sun.identity.entitlement.opensso.PolicyS
+ ubject","state":"{\n  \"className\": \"com.sun.identity.policy.plugins.Auth
+ enticatedAgents\",\n  \"exclusive\": false,\n  \"name\": \"AuthenticatedAge
+ nts\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/decision
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/decision
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementEval_delegation-rule3,ou=default,ou=default,
+ ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhi
+ ddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056374=creationdate
+ou: 1578580056374=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=ou=am-config^^EntitlementEval_delegation-rule3
+ou: ou=am-config^^EntitlementEval_delegation-rule3
+ou: |1578580056374=creationdate
+ou: |1578580056374=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056374,"policyName":"ou=am-config^^Entitlem
+ entEval","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name"
+ :"ou=am-config^^EntitlementEval_delegation-rule3","active":"true","entitlem
+ ent":{"resourceNames":["sms://ou=am-config/sunEntitlementService/1.0/applic
+ ation/ws/1/entitlement/entitlement"],"actionsValues":{"READ":true},"name":"
+ delegation-rule3","applicationName":"sunAMDelegationService"},"className":"
+ com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":15785
+ 80056374,"eSubject":{"className":"com.sun.identity.entitlement.opensso.Poli
+ cySubject","state":"{\n  \"className\": \"com.sun.identity.policy.plugins.A
+ uthenticatedAgents\",\n  \"exclusive\": false,\n  \"name\": \"Authenticated
+ Agents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/entitlement
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/entitlement
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementEval_delegation-rule4,ou=default,ou=default,
+ ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhi
+ ddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056374=creationdate
+ou: 1578580056374=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=ou=am-config^^EntitlementEval_delegation-rule4
+ou: ou=am-config^^EntitlementEval_delegation-rule4
+ou: |1578580056374=creationdate
+ou: |1578580056374=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056374,"policyName":"ou=am-config^^Entitlem
+ entEval","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name"
+ :"ou=am-config^^EntitlementEval_delegation-rule4","active":"true","entitlem
+ ent":{"resourceNames":["sms://ou=am-config/sunEntitlementService/1.0/applic
+ ation/ws/1/entitlement/entitlements"],"actionsValues":{"READ":true},"name":
+ "delegation-rule4","applicationName":"sunAMDelegationService"},"className":
+ "com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate":1578
+ 580056374,"eSubject":{"className":"com.sun.identity.entitlement.opensso.Pol
+ icySubject","state":"{\n  \"className\": \"com.sun.identity.policy.plugins.
+ AuthenticatedAgents\",\n  \"exclusive\": false,\n  \"name\": \"Authenticate
+ dAgents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/entitlements
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/entitlements
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=AgentAccessToValidationService,ou=default,ou=default,ou=OrganizationC
+ onfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegat
+ ionservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056451=creationdate
+ou: 1578580056451=lastmodifieddate
+ou: AgentAccessToValidationService
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=AgentAccessToValidationService
+ou: |1578580056451=creationdate
+ou: |1578580056451=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056451,"policyName":"AgentAccessToValidatio
+ nService","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name
+ ":"AgentAccessToValidationService","active":"true","entitlement":{"resource
+ Names":["sms://*ou=am-config/validationService/1.0/OrganizationConfig/*"],"
+ actionsValues":{"READ":true},"name":"agent-read-access-to-validation-servic
+ e","applicationName":"sunAMDelegationService"},"className":"com.sun.identit
+ y.entitlement.opensso.OpenSSOPrivilege","creationDate":1578580056451,"eSubj
+ ect":{"className":"com.sun.identity.entitlement.opensso.PolicySubject","sta
+ te":"{\n  \"className\": \"com.sun.identity.policy.plugins.AuthenticatedAge
+ nts\",\n  \"exclusive\": false,\n  \"name\": \"AuthenticatedAgents\",\n  \"
+ values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/validationservice/1.0/organizationconfig
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/validationservice
+sunxmlKeyValue: pathparentindex=/validationservice/1.0
+sunxmlKeyValue: pathparentindex=/validationservice/1.0/organizationconfig
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=AgentAccessToEvaluatePolicies,ou=default,ou=default,ou=OrganizationCo
+ nfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegati
+ onservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056467=creationdate
+ou: 1578580056467=lastmodifieddate
+ou: AgentAccessToEvaluatePolicies
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=AgentAccessToEvaluatePolicies
+ou: |1578580056467=creationdate
+ou: |1578580056467=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056467,"policyName":"AgentAccessToEvaluateP
+ olicies","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,ou=am-config","name"
+ :"AgentAccessToEvaluatePolicies","active":"true","entitlement":{"resourceNa
+ mes":["sms://*ou=am-config/rest/1.0/policies/evaluate"],"actionsValues":{"R
+ EAD":true},"name":"agent-read-access-to-evaluate-policies","applicationName
+ ":"sunAMDelegationService"},"className":"com.sun.identity.entitlement.opens
+ so.OpenSSOPrivilege","creationDate":1578580056467,"eSubject":{"className":"
+ com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n  \"classNa
+ me\": \"com.sun.identity.policy.plugins.AuthenticatedAgents\",\n  \"exclusi
+ ve\": false,\n  \"name\": \"AuthenticatedAgents\",\n  \"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/rest/1.0/policies/evaluate
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/rest
+sunxmlKeyValue: pathparentindex=/rest/1.0
+sunxmlKeyValue: pathparentindex=/rest/1.0/policies
+sunxmlKeyValue: pathparentindex=/rest/1.0/policies/evaluate
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=AgentsReadOnlyPermissionToUsersProfileAttributes,ou=default,ou=defaul
+ t,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunam
+ hiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056485=creationdate
+ou: 1578580056485=lastmodifieddate
+ou: AgentsReadOnlyPermissionToUsersProfileAttributes
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=AgentsReadOnlyPermissionToUsersProfileAttributes
+ou: |1578580056485=creationdate
+ou: |1578580056485=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"cn=dsameuser,ou=DSAME Users,ou=am-co
+ nfig","lastModifiedDate":1578580056485,"policyName":"AgentsReadOnlyPermissi
+ onToUsersProfileAttributes","lastModifiedBy":"cn=dsameuser,ou=DSAME Users,o
+ u=am-config","name":"AgentsReadOnlyPermissionToUsersProfileAttributes","act
+ ive":"true","entitlement":{"resourceNames":["sms://*ou=am-config/sunIdentit
+ yRepositoryService/1.0/application/user*"],"actionsValues":{"READ":true},"n
+ ame":"agent-users-read-rule","applicationName":"sunAMDelegationService"},"c
+ lassName":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creation
+ Date":1578580056485,"eSubject":{"className":"com.sun.identity.entitlement.o
+ pensso.PolicySubject","state":"{\n  \"className\": \"com.sun.identity.polic
+ y.plugins.AuthenticatedAgents\",\n  \"exclusive\": false,\n  \"name\": \"Au
+ thenticatedAgents\",\n\"values\": []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunidentityrepositoryservice/1.0/application
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0/applicatio
+ n
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=UssSelfWriteAttributes,ou=default,ou=default,ou=OrganizationConfig,ou
+ =1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationservi
+ cepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1578580056501=creationdate
+ou: 1578580056501=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: lastmodifiedby=cn=dsameuser,ou=DSAME Users,ou=am-config
+ou: name=UssSelfWriteAttributes
+ou: UssSelfWriteAttributes
+ou: |1578580056501=creationdate
+ou: |1578580056501=lastmodifieddate
+sunKeyValue: serializable={"eCondition":{"className":"com.sun.identity.entit
+ lement.opensso.PolicyCondition","state":"{\n  \"className\": \"com.sun.iden
+ tity.policy.plugins.UserSelfCheckCondition\",\n  \"name\": \"condition\",\n
+   \"properties\": {\"attributes\": [\"kbaInfo\"]}\n}"},"createdBy":"cn=dsam
+ euser,ou=DSAME Users,ou=am-config","lastModifiedDate":1578580056501,"policy
+ Name":"UssSelfWriteAttributes","lastModifiedBy":"cn=dsameuser,ou=DSAME User
+ s,ou=am-config","name":"UssSelfWriteAttributes","active":"true","entitlemen
+ t":{"resourceNames":["sms://*ou=am-config/sunIdentityRepositoryService/1.0/
+ application/*"],"actionsValues":{"MODIFY":true},"name":"user-read-rule","ap
+ plicationName":"sunAMDelegationService"},"className":"com.sun.identity.enti
+ tlement.opensso.OpenSSOPrivilege","creationDate":1578580056501,"eSubject":{
+ "className":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{
+ \n  \"className\": \"com.sun.identity.policy.plugins.AuthenticatedUsers\",\
+ n  \"exclusive\": false,\n  \"name\": \"delegation-subject\",\n  \"values\"
+ : []\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunidentityrepositoryservice/1.0/application
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0
+sunxmlKeyValue: pathparentindex=/sunidentityrepositoryservice/1.0/applicatio
+ n
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^RealmAdmin,ou=default,ou=default,ou=OrganizationConfig,
+ ou=1.0,ou=sunEntitlementIndexes,ou=services,o=sunamhiddenrealmdelegationser
+ vicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675775413965=creationdate
+ou: 1675775413965=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^RealmAdmin
+ou: ou=am-config^^RealmAdmin
+ou: |1675775413965=creationdate
+ou: |1675775413965=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75775413965,"policyName":"ou=am-config^^RealmAdmin","lastModifiedBy":"uid=d
+ sameuser","name":"ou=am-config^^RealmAdmin","description":"","active":"true
+ ","entitlement":{"resourceNames":["sms://*ou=am-config/*"],"actionsValues":
+ {"READ":true,"MODIFY":true,"DELEGATE":true},"name":"delegation-rule","appli
+ cationName":"sunAMDelegationService"},"className":"com.sun.identity.entitle
+ ment.opensso.OpenSSOPrivilege","creationDate":1675775413965,"eSubject":{"cl
+ assName":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n 
+  \"values\": [\"id=realmadmins,ou=group,ou=am-config\"],\n  \"name\": \"del
+ egation-subject\",\n  \"exclusive\": false,\n  \"className\": \"com.sun.ide
+ ntity.policy.plugins.AMIdentitySubject\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=sunEntitlementService,ou=services,o=sunamhiddenrealmdelegationservice
+ permissions,ou=services,ou=am-config
+objectClass: sunService
+objectClass: top
+ou: sunEntitlementService
+
+dn: ou=1.0,ou=sunEntitlementService,ou=services,o=sunamhiddenrealmdelegation
+ servicepermissions,ou=services,ou=am-config
+objectClass: sunService
+objectClass: top
+ou: 1.0
+
+dn: ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=services,o=suna
+ mhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalunit
+objectClass: top
+ou: OrganizationConfig
+
+dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementService,ou=serv
+ ices,o=sunamhiddenrealmdelegationservicepermissions,ou=services,ou=am-confi
+ g
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: default
+
+dn: ou=ou=am-config^^EntitlementRestAccess_delegation-rule3,ou=default,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=s
+ unamhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675945903366=creationdate
+ou: 1675945903366=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^EntitlementRestAccess_delegation-rule3
+ou: ou=am-config^^EntitlementRestAccess_delegation-rule3
+ou: |1675945903366=creationdate
+ou: |1675945903366=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75945903366,"policyName":"ou=am-config^^EntitlementRestAccess","lastModifie
+ dBy":"uid=dsameuser","name":"ou=am-config^^EntitlementRestAccess_delegation
+ -rule3","description":"","active":"true","entitlement":{"resourceNames":["s
+ ms://ou=am-config/sunEntitlementService/1.0/application/ws/1/entitlement/de
+ cision"],"actionsValues":{"READ":true},"name":"delegation-rule3","applicati
+ onName":"sunAMDelegationService"},"className":"com.sun.identity.entitlement
+ .opensso.OpenSSOPrivilege","creationDate":1675945903366,"eSubject":{"classN
+ ame":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n  \"v
+ alues\": [],\n  \"name\": \"AuthenticatedUsers\",\n  \"exclusive\": false,\
+ n  \"className\": \"com.sun.identity.policy.plugins.AuthenticatedUsers\"\n}
+ "}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/decision
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/decision
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementRestAccess_delegation-rule2,ou=default,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=s
+ unamhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675945903366=creationdate
+ou: 1675945903366=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^EntitlementRestAccess_delegation-rule2
+ou: ou=am-config^^EntitlementRestAccess_delegation-rule2
+ou: |1675945903366=creationdate
+ou: |1675945903366=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75945903366,"policyName":"ou=am-config^^EntitlementRestAccess","lastModifie
+ dBy":"uid=dsameuser","name":"ou=am-config^^EntitlementRestAccess_delegation
+ -rule2","description":"","active":"true","entitlement":{"resourceNames":["s
+ ms://ou=am-config/sunEntitlementService/1.0/application/ws/1/entitlement/de
+ cisions"],"actionsValues":{"READ":true},"name":"delegation-rule2","applicat
+ ionName":"sunAMDelegationService"},"className":"com.sun.identity.entitlemen
+ t.opensso.OpenSSOPrivilege","creationDate":1675945903366,"eSubject":{"class
+ Name":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n  \"
+ values\": [],\n  \"name\": \"AuthenticatedUsers\",\n  \"exclusive\": false,
+ \n  \"className\": \"com.sun.identity.policy.plugins.AuthenticatedUsers\"\n
+ }"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/decisions
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/decisions
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementRestAccess_delegation-rule4,ou=default,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=s
+ unamhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675945903366=creationdate
+ou: 1675945903366=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^EntitlementRestAccess_delegation-rule4
+ou: ou=am-config^^EntitlementRestAccess_delegation-rule4
+ou: |1675945903366=creationdate
+ou: |1675945903366=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75945903366,"policyName":"ou=am-config^^EntitlementRestAccess","lastModifie
+ dBy":"uid=dsameuser","name":"ou=am-config^^EntitlementRestAccess_delegation
+ -rule4","description":"","active":"true","entitlement":{"resourceNames":["s
+ ms://ou=am-config/sunEntitlementService/1.0/application/ws/1/entitlement/en
+ titlement"],"actionsValues":{"READ":true},"name":"delegation-rule4","applic
+ ationName":"sunAMDelegationService"},"className":"com.sun.identity.entitlem
+ ent.opensso.OpenSSOPrivilege","creationDate":1675945903366,"eSubject":{"cla
+ ssName":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n  
+ \"values\": [],\n  \"name\": \"AuthenticatedUsers\",\n  \"exclusive\": fals
+ e,\n  \"className\": \"com.sun.identity.policy.plugins.AuthenticatedUsers\"
+ \n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/entitlement
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/entitlement
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementRestAccess_delegation-rule1,ou=default,ou=de
+ fault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=s
+ unamhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675945903366=creationdate
+ou: 1675945903366=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^EntitlementRestAccess_delegation-rule1
+ou: ou=am-config^^EntitlementRestAccess_delegation-rule1
+ou: |1675945903366=creationdate
+ou: |1675945903366=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75945903366,"policyName":"ou=am-config^^EntitlementRestAccess","lastModifie
+ dBy":"uid=dsameuser","name":"ou=am-config^^EntitlementRestAccess_delegation
+ -rule1","description":"","active":"true","entitlement":{"resourceNames":["s
+ ms://ou=am-config/rest/1.0/policies/evaluate"],"actionsValues":{"READ":true
+ },"name":"delegation-rule1","applicationName":"sunAMDelegationService"},"cl
+ assName":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationD
+ ate":1675945903366,"eSubject":{"className":"com.sun.identity.entitlement.op
+ ensso.PolicySubject","state":"{\n  \"values\": [],\n  \"name\": \"Authentic
+ atedUsers\",\n  \"exclusive\": false,\n  \"className\": \"com.sun.identity.
+ policy.plugins.AuthenticatedUsers\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/rest/1.0/policies/evaluate
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/rest
+sunxmlKeyValue: pathparentindex=/rest/1.0
+sunxmlKeyValue: pathparentindex=/rest/1.0/policies
+sunxmlKeyValue: pathparentindex=/rest/1.0/policies/evaluate
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=ou=am-config^^EntitlementRestAccess_delegation-rule,ou=default,ou=def
+ ault,ou=OrganizationConfig,ou=1.0,ou=sunEntitlementIndexes,ou=services,o=su
+ namhiddenrealmdelegationservicepermissions,ou=services,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675945903366=creationdate
+ou: 1675945903366=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=ou=am-config^^EntitlementRestAccess_delegation-rule
+ou: ou=am-config^^EntitlementRestAccess_delegation-rule
+ou: |1675945903366=creationdate
+ou: |1675945903366=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75945903366,"policyName":"ou=am-config^^EntitlementRestAccess","lastModifie
+ dBy":"uid=dsameuser","name":"ou=am-config^^EntitlementRestAccess_delegation
+ -rule","description":"","active":"true","entitlement":{"resourceNames":["sm
+ s://ou=am-config/sunEntitlementService/1.0/application/ws/1/entitlement/ent
+ itlements"],"actionsValues":{"READ":true},"name":"delegation-rule","applica
+ tionName":"sunAMDelegationService"},"className":"com.sun.identity.entitleme
+ nt.opensso.OpenSSOPrivilege","creationDate":1675945903366,"eSubject":{"clas
+ sName":"com.sun.identity.entitlement.opensso.PolicySubject","state":"{\n  \
+ "values\": [],\n  \"name\": \"AuthenticatedUsers\",\n  \"exclusive\": false
+ ,\n  \"className\": \"com.sun.identity.policy.plugins.AuthenticatedUsers\"\
+ n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/entitlements
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/entitlements
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegatio
+ n-rule4,ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlemen
+ tIndexes,ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=serv
+ ices,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675946035821=creationdate
+ou: 1675946035821=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegat
+ ion-rule4
+ou: o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegation-r
+ ule4
+ou: |1675946035821=creationdate
+ou: |1675946035821=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75946035821,"policyName":"o=nbdigital^ou=services^ou=am-config^^Entitlement
+ RestAccess","lastModifiedBy":"uid=dsameuser","name":"o=nbdigital^ou=service
+ s^ou=am-config^^EntitlementRestAccess_delegation-rule4","description":"","a
+ ctive":"true","entitlement":{"resourceNames":["sms://ou=am-config/sunEntitl
+ ementService/1.0/application/ws/1/entitlement/entitlement"],"actionsValues"
+ :{"READ":true},"name":"delegation-rule4","applicationName":"sunAMDelegation
+ Service"},"className":"com.sun.identity.entitlement.opensso.OpenSSOPrivileg
+ e","creationDate":1675946035821,"eSubject":{"className":"com.sun.identity.e
+ ntitlement.opensso.PolicySubject","state":"{\n  \"values\": [],\n  \"name\"
+ : \"AuthenticatedUsers\",\n  \"exclusive\": false,\n  \"className\": \"com.
+ sun.identity.policy.plugins.AuthenticatedUsers\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/entitlement
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/entitlement
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegatio
+ n-rule2,ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlemen
+ tIndexes,ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=serv
+ ices,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675946035821=creationdate
+ou: 1675946035821=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegat
+ ion-rule2
+ou: o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegation-r
+ ule2
+ou: |1675946035821=creationdate
+ou: |1675946035821=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75946035821,"policyName":"o=nbdigital^ou=services^ou=am-config^^Entitlement
+ RestAccess","lastModifiedBy":"uid=dsameuser","name":"o=nbdigital^ou=service
+ s^ou=am-config^^EntitlementRestAccess_delegation-rule2","description":"","a
+ ctive":"true","entitlement":{"resourceNames":["sms://ou=am-config/sunEntitl
+ ementService/1.0/application/ws/1/entitlement/decision"],"actionsValues":{"
+ READ":true},"name":"delegation-rule2","applicationName":"sunAMDelegationSer
+ vice"},"className":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege",
+ "creationDate":1675946035821,"eSubject":{"className":"com.sun.identity.enti
+ tlement.opensso.PolicySubject","state":"{\n  \"values\": [],\n  \"name\": \
+ "AuthenticatedUsers\",\n  \"exclusive\": false,\n  \"className\": \"com.sun
+ .identity.policy.plugins.AuthenticatedUsers\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/decision
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/decision
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegatio
+ n-rule,ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlement
+ Indexes,ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=servi
+ ces,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675946035821=creationdate
+ou: 1675946035821=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegat
+ ion-rule
+ou: o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegation-r
+ ule
+ou: |1675946035821=creationdate
+ou: |1675946035821=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75946035821,"policyName":"o=nbdigital^ou=services^ou=am-config^^Entitlement
+ RestAccess","lastModifiedBy":"uid=dsameuser","name":"o=nbdigital^ou=service
+ s^ou=am-config^^EntitlementRestAccess_delegation-rule","description":"","ac
+ tive":"true","entitlement":{"resourceNames":["sms://ou=am-config/sunEntitle
+ mentService/1.0/application/ws/1/entitlement/entitlements"],"actionsValues"
+ :{"READ":true},"name":"delegation-rule","applicationName":"sunAMDelegationS
+ ervice"},"className":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege
+ ","creationDate":1675946035821,"eSubject":{"className":"com.sun.identity.en
+ titlement.opensso.PolicySubject","state":"{\n  \"values\": [],\n  \"name\":
+  \"AuthenticatedUsers\",\n  \"exclusive\": false,\n  \"className\": \"com.s
+ un.identity.policy.plugins.AuthenticatedUsers\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/entitlements
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/entitlements
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegatio
+ n-rule1,ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlemen
+ tIndexes,ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=serv
+ ices,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675946035821=creationdate
+ou: 1675946035821=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegat
+ ion-rule1
+ou: o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegation-r
+ ule1
+ou: |1675946035821=creationdate
+ou: |1675946035821=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75946035821,"policyName":"o=nbdigital^ou=services^ou=am-config^^Entitlement
+ RestAccess","lastModifiedBy":"uid=dsameuser","name":"o=nbdigital^ou=service
+ s^ou=am-config^^EntitlementRestAccess_delegation-rule1","description":"","a
+ ctive":"true","entitlement":{"resourceNames":["sms://ou=am-config/sunEntitl
+ ementService/1.0/application/ws/1/entitlement/decisions"],"actionsValues":{
+ "READ":true},"name":"delegation-rule1","applicationName":"sunAMDelegationSe
+ rvice"},"className":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege"
+ ,"creationDate":1675946035821,"eSubject":{"className":"com.sun.identity.ent
+ itlement.opensso.PolicySubject","state":"{\n  \"values\": [],\n  \"name\": 
+ \"AuthenticatedUsers\",\n  \"exclusive\": false,\n  \"className\": \"com.su
+ n.identity.policy.plugins.AuthenticatedUsers\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/sunentitlementservice/1.0/application/ws/1/entitl
+ ement/decisions
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/sunentitlementservice
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement
+sunxmlKeyValue: pathparentindex=/sunentitlementservice/1.0/application/ws/1/
+ entitlement/decisions
+sunxmlKeyValue: subjectindex=identity:=all
+
+dn: ou=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegatio
+ n-rule3,ou=default,ou=default,ou=OrganizationConfig,ou=1.0,ou=sunEntitlemen
+ tIndexes,ou=services,o=sunamhiddenrealmdelegationservicepermissions,ou=serv
+ ices,ou=am-config
+objectClass: organizationalUnit
+objectClass: sunServiceComponent
+objectClass: top
+ou: 1675946035821=creationdate
+ou: 1675946035821=lastmodifieddate
+ou: application=sunAMDelegationService
+ou: createdby=uid=dsameuser
+ou: description=
+ou: lastmodifiedby=uid=dsameuser
+ou: name=o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegat
+ ion-rule3
+ou: o=nbdigital^ou=services^ou=am-config^^EntitlementRestAccess_delegation-r
+ ule3
+ou: |1675946035821=creationdate
+ou: |1675946035821=lastmodifieddate
+sunKeyValue: serializable={"createdBy":"uid=dsameuser","lastModifiedDate":16
+ 75946035821,"policyName":"o=nbdigital^ou=services^ou=am-config^^Entitlement
+ RestAccess","lastModifiedBy":"uid=dsameuser","name":"o=nbdigital^ou=service
+ s^ou=am-config^^EntitlementRestAccess_delegation-rule3","description":"","a
+ ctive":"true","entitlement":{"resourceNames":["sms://o=NBdigital,ou=service
+ s,ou=am-config/rest/1.0/policies/evaluate"],"actionsValues":{"READ":true},"
+ name":"delegation-rule3","applicationName":"sunAMDelegationService"},"class
+ Name":"com.sun.identity.entitlement.opensso.OpenSSOPrivilege","creationDate
+ ":1675946035821,"eSubject":{"className":"com.sun.identity.entitlement.opens
+ so.PolicySubject","state":"{\n  \"values\": [],\n  \"name\": \"Authenticate
+ dUsers\",\n  \"exclusive\": false,\n  \"className\": \"com.sun.identity.pol
+ icy.plugins.AuthenticatedUsers\"\n}"}}
+sunserviceID: indexes
+sunxmlKeyValue: hostindex=://o=nbdigital,ou=services,ou=am-config
+sunxmlKeyValue: indexDescriptor=standard
+sunxmlKeyValue: pathindex=/rest/1.0/policies/evaluate
+sunxmlKeyValue: pathparentindex=/
+sunxmlKeyValue: pathparentindex=/rest
+sunxmlKeyValue: pathparentindex=/rest/1.0
+sunxmlKeyValue: pathparentindex=/rest/1.0/policies
+sunxmlKeyValue: pathparentindex=/rest/1.0/policies/evaluate
+sunxmlKeyValue: subjectindex=identity:=all
+
