@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2023 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -225,8 +225,12 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     testConfig.COMPONENTS_ENDUSERUI_IMAGE_TAG = platformUiImageTag
                     testConfig.COMPONENTS_LOGINUI_IMAGE_TAG = platformUiImageTag
 
+                    def containerOptions = cloud_utils.getUiContainerRunOptions(testConfig) +
+                            ' -e TEST_PACKAGES=\"@forgerock/platform-login @forgerock/platform-enduser @forgerock/platform-admin\"' +
+                            ' -e TEST_SPEC_FILES=\"\"'
+
                     def uiTestConfig = [
-                            containerRunOptions : cloud_utils.getUiContainerRunOptions(testConfig),
+                            containerRunOptions : containerOptions,
                             deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
                     ]
 
