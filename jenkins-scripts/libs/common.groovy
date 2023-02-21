@@ -49,7 +49,7 @@ boolean branchSupportsPitTests() {
             'master',
             'idcloud-',
             'release/',
-            'sustaining/7.',
+            'sustaining/',
             'preview/',
     ]
     String branch = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
@@ -66,7 +66,7 @@ boolean branchSupportsIDCloudReleases() {
             || branchName.equals('feature/config') \
             || branchName.equals('release/7.1.0') \
             || branchName.startsWith('idcloud-') \
-            || branchName.startsWith('sustaining/7.') \
+            || branchName.startsWith('sustaining/') \
             || branchName.startsWith('preview/')
 }
 
