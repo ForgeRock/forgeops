@@ -28,6 +28,7 @@ WORKDIR /home/forgerock/openam
 # This lets the user see what FBC files have been modified
 RUN git config --global user.email "cloud-deployment@forgerock.com" && \
     git config --global user.name "Cloud Deployment" && \
+    git config --global --add safe.directory /home/forgerock/openam && \
     git add . && \
     git commit -m "CDM file-based configuration overlay"
 
