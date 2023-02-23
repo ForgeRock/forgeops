@@ -41,7 +41,7 @@ UI_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
 # JSON key names in platform images
 UI_CONF_KEYNAME = ('imageNameAdmin', 'imageNameEnduser', 'imageNameLogin')
 # Other kustomize profiles
-MSC_PRODUCTS = ('rcs-agent',)
+MSC_PRODUCTS = ()
 # Product kustomize images
 KUSTOMIZE_PRODUCTS = ('admin-ui', 'end-user-ui', 'login-ui')
 PLATFORM_DOCKER_BASE = '../../docker'
@@ -334,13 +334,6 @@ def load_product_configs(path, product_names):
                     c['imageName'] = config[keyname]
                     kustomize_images[product_name] = c
 
-        if 'rcs-agent' in product_names:
-            p = path.joinpath('rcs-agent.json')
-            if p.exists():
-                with p.open() as f:
-                    config = json.load(f)
-                kustomize_images['rcs-agent'] = config
-
         # amster images are all tagged with the same version as am-cdk.
         # updating with forgeops-master doesn't use am base and am needs to be
         # replaced
@@ -503,16 +496,6 @@ def run_from_args(args):
     log.info('Updating products {}'.format(' '.join(args.products)))
     if 'ui' in args.products:
         cli_only = {k: dict() for k in UI_PRODUCTS}
-        # update repo or tag to '' to force a NOOP change on component
-        update_repo = args.update_repo if args.update_repo else ''
-        update_tag = args.update_tag if args.update_tag else ''
-        update_kustomize(cli_only,
-                         PLATFORM_KUSTOMIZE_PATH,
-                         update_repo=update_repo,
-                         update_tag=update_tag)
-
-    if 'rcs-agent' in args.products:
-        cli_only = {'rcs-agent': dict()}
         # update repo or tag to '' to force a NOOP change on component
         update_repo = args.update_repo if args.update_repo else ''
         update_tag = args.update_tag if args.update_tag else ''

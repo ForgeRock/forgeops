@@ -53,32 +53,6 @@ spec:
 apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
 metadata:
-  name: rcs-agent
-  labels:
-    app: rcs-agent
-    app.kubernetes.io/component: rcs-agent
-    app.kubernetes.io/instance: rcs-agent
-    app.kubernetes.io/name: rcs-agent
-    app.kubernetes.io/part-of: forgerock
-spec:
-  healthCheck:
-    checkIntervalSec: 5
-    timeoutSec: 5
-    healthyThreshold: 2
-    unhealthyThreshold: 1
-    type: HTTP
-    port: 8080
-    requestPath: /health
-  timeoutSec: 5
-  connectionDraining:
-    drainingTimeoutSec: 5
-  sessionAffinity:
-    affinityType: GENERATED_COOKIE
-    affinityCookieTtlSec: 300
----
-apiVersion: cloud.google.com/v1beta1
-kind: BackendConfig
-metadata:
   name: admin-ui
   labels:
     app: admin-ui

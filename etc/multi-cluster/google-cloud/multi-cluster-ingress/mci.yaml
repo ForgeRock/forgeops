@@ -78,14 +78,6 @@ spec:
               servicePort: 443
             path: /openicf
           - backend:
-              serviceName: rcs-agent
-              servicePort: 80
-            path: /rcs/*
-          - backend:
-              serviceName: rcs-agent
-              servicePort: 80
-            path: /rcs
-          - backend:
               serviceName: end-user-ui
               servicePort: 8080
             path: /enduser/*

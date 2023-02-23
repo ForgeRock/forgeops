@@ -107,26 +107,3 @@ spec:
         port: 443
         protocol: TCP
         targetPort: 8443
----
-apiVersion: networking.gke.io/v1
-kind: MultiClusterService
-metadata:
-  name: rcs-agent
-  annotations:
-    beta.cloud.google.com/backend-config: '{"ports": {"80":"rcs-agent"}}'
-  labels:
-    app: rcs-agent
-    app.kubernetes.io/component: rcs-agent
-    app.kubernetes.io/instance: rcs-agent
-    app.kubernetes.io/name: rcs-agent
-    app.kubernetes.io/part-of: forgerock
-spec:
-  template:
-    spec:
-      selector:
-        app: rcs-agent
-      ports:
-      - name: am
-        protocol: TCP
-        port: 80
-        targetPort: 8080

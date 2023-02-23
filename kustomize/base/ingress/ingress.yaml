@@ -16,9 +16,6 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-    # RCS Agent websockets
-    nginx.org/websocket-services: "rcs-agent"
-    nginx.ingress.kubernetes.io/websocket-services: "rcs-agent"
     nginx.ingress.kubernetes.io/configuration-snippet: |
       add_header X-ForgeRock-TransactionId $req_id;
       proxy_set_header X-ForgeRock-TransactionId $req_id;
@@ -75,14 +72,6 @@ spec:
             port:
               number: 80
         path: /openicf
-        pathType: Prefix
-
-      - backend:
-          service:
-            name: rcs-agent
-            port:
-              number: 80
-        path: /rcs
         pathType: Prefix
 
       - backend:
