@@ -18,7 +18,7 @@
 # Header, with the fields enclosed by brackets [] replaced by your own identifying
 # information: "Portions Copyright [year] [name of copyright owner]".
 #
-# Copyright 2019-2022 ForgeRock AS.
+# Copyright 2019-2023 ForgeRock AS.
 #
 set -eux
 
@@ -53,7 +53,6 @@ set-global-configuration-prop --set "advertised-listen-address:&{ds.advertised.l
 set-global-configuration-prop --advanced --set "trust-transaction-ids:&{platform.trust.transaction.header|false}"
 
 delete-log-publisher --publisher-name "File-Based Error Logger"
-delete-log-publisher --publisher-name "Replication Repair Logger"
 delete-log-publisher --publisher-name "File-Based Access Logger"
 delete-log-publisher --publisher-name "File-Based Audit Logger "
 delete-log-publisher --publisher-name "File-Based HTTP Access Logger"
