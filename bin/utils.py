@@ -310,7 +310,7 @@ def _runwithtimeout(target, args, secs):
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
 
-def waitforsecrets(ns):
+def waitforsecrets(ns, timeout=60):
     """
     Wait for the platform secrets to exist in the Kubernetes api. Times out after 60 secs.
     ns: target namespace.
@@ -319,7 +319,7 @@ def waitforsecrets(ns):
                'ds-passwords', 'ds-env-secrets']
     message('\nWaiting for K8s secrets.')
     for secret in secrets:
-        _runwithtimeout(_waitforresource, [ns, 'secret', secret], 60)
+        _runwithtimeout(_waitforresource, [ns, 'secret', secret], timeout)
 
 
 def wait_for_ds(ns, directoryservices_name, legacy, timeout_secs=600):

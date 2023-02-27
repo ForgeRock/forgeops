@@ -29,7 +29,7 @@ build_dockerfiles = {
     'ds-cts': 'docker/ds/cts/Dockerfile',
     'ig': 'docker/ig/Dockerfile'
 }
-wait_targets = ['ds', 'am', 'amster', 'idm', 'apps']
+wait_targets = ['ds', 'am', 'amster', 'idm', 'apps', 'secrets']
 size_map = {
     'cdk': {
     },
@@ -71,6 +71,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_pro
     utils.message('Deploying base.yaml. This is a one time activity.')
     utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
     utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
+    utils.waitforsecrets(ns, timeout)
     utils.message('\nDeploying ds.yaml. This includes all directory resources.')
     utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few minutes. First installation takes longer.')
@@ -340,7 +341,7 @@ def main():
             components += ['am', 'amster', 'idm']
             components.remove('apps')
         size = utils.get_deployed_size(namespace)
-        if ('ds' in components or 'ds-old' in components):
+        if 'ds' in components or 'ds-old' in components:
             utils.message('Waiting for DS deployment.')
             utils.wait_for_ds(namespace, 'ds-idrepo', args.legacy, args.timeout)
             if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts', args.legacy)
@@ -356,6 +357,11 @@ def main():
         if 'idm' in components:
             utils.message('Waiting for IDM deployment.')
             utils.wait_for_idm(namespace, args.timeout)
+
+        if 'secrets' in components:
+            utils.message('Waiting for secrets.')
+            utils.waitforsecrets(namespace, args.timeout)
+
         return
 
     if 'base' in components:
@@ -390,7 +396,7 @@ def main():
             utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, pkg_path, src_profile_dir)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
-        utils.waitforsecrets(namespace)
+        utils.waitforsecrets(namespace, args.timeout)
         utils.printsecrets(namespace)
         utils.printurls(namespace)
     utils.message('\nEnjoy your deployment!')
