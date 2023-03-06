@@ -10,7 +10,9 @@ import utils
 import json
 import logging
 
-build_targets = ['am', 'amster', 'idm', 'ds', 'ds-idrepo', 'ds-cts', 'ig']
+build_targets = ['am', 'amster', 'idm', 'ds', 'ig']
+legacy_build_targets = ['ds-idrepo', 'ds-cts']
+
 build_contexts = {
     'am': 'docker/am',
     'amster': 'docker/amster',
@@ -29,7 +31,7 @@ build_dockerfiles = {
     'ds-cts': 'docker/ds/cts/Dockerfile',
     'ig': 'docker/ig/Dockerfile'
 }
-wait_targets = ['ds', 'am', 'amster', 'idm', 'apps', 'secrets']
+wait_targets = ['ds', 'am', 'amster', 'idm', 'apps', 'secrets', 'ig']
 size_map = {
     'cdk': {
     },
@@ -136,14 +138,16 @@ def build_docker_image(component, push_to, tag, config_profile=None):
 
 def main():
     parser = argparse.ArgumentParser(description='Manage ForgeRock Identity Platform components')
-    common_ns = argparse.ArgumentParser(add_help=False)
-    common_sz = argparse.ArgumentParser(add_help=False)
-    common_dg = argparse.ArgumentParser(add_help=False)
-    common_pf = argparse.ArgumentParser(add_help=False)
+    common_ns = argparse.ArgumentParser(add_help=False) # namespace
+    common_sz = argparse.ArgumentParser(add_help=False) # predefined deployment size
+    common_dg = argparse.ArgumentParser(add_help=False) # debug
+    common_pf = argparse.ArgumentParser(add_help=False) # config profile
+    common_lg = argparse.ArgumentParser(add_help=False) # legacy
     common = argparse.ArgumentParser(add_help=False)
     common_ns.add_argument('--namespace', '-n', default='',
                            help='Target namespace (default: current ctx namespace)')
     common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
+    common_lg.add_argument('--legacy', dest='legacy', default=False, action='store_true', help=argparse.SUPPRESS)
     common_pf.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of config profile in docker/<component>/config-profiles")
     common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
@@ -157,22 +161,22 @@ def main():
     size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches')
 
     subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
-    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_pf], allow_abbrev=False,
+    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_lg], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_install.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
-    parser_install.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not install the DS Operator as a dependancy')
+    parser_install.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_install.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
-    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_pf],
+    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_lg],
                                           help='Generate the ForgeRock Identity Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_generate.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
-    parser_generate.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not install the DS Operator as a dependancy')
+    parser_generate.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
     parser_generate.add_argument('--amster-retain', '-r', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_delete = subparser.add_parser(
         'delete', parents=[common_ns, common, common_dg, common_pf], help='Delete ForgeRock Identity Platform components or component bundles')
@@ -181,17 +185,15 @@ def main():
     parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
                                help='Delete all CDM components including PVCs, secrets, and volume snapshots. *This will erase all data*')
     parser_build = subparser.add_parser('build', parents=[common_dg, common_pf], help='Build custom Docker images')
-    parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
+    parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets + legacy_build_targets, default='all', metavar=build_targets)
     parser_build.add_argument('--push-to', '-r', dest='registry')
     parser_build.add_argument('--tag', '-t', help='Set the tag used when building images')
     parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
     parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns, common_pf], help='Overlay local configs in the AM and IDM pods') # Internal FR use only!!. Hidden
-    parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg], help='Wait for platform components', allow_abbrev=False)
-    parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
-    parser_wait.add_argument('--legacy', dest='legacy', default=False, action='store_true', help='Do not wait for the DS Operator')
-    parser_wait.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
+    parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg, common_lg], help='Wait for platform components', allow_abbrev=False)
+    parser_wait.add_argument('components', nargs='*', choices=wait_targets)
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
     subparser.add_parser('clean', help='Remove all locally generated manifests')
     args = parser.parse_args()
@@ -327,7 +329,7 @@ def main():
             utils.run('git', f'checkout {image_defaulter}')
             return
         if 'all' in components:
-            components = build_targets
+            components = build_targets + legacy_build_targets
             if 'amster' in components:
                 components.remove('amster')
         if 'amster' in components:
