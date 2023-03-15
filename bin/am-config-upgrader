@@ -14,7 +14,7 @@
 #
 # You can change the version of the upgrader used by supplying the REPO and TAG environment variables.
 # For example:
-# TAG=7.0.3 bin/am-config-upgrader
+# TAG=7.3.0 bin/am-config-upgrader
 
 
 # Mac does not come with realpath by default.

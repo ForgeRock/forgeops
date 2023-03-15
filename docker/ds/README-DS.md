@@ -2,7 +2,7 @@
 
 **NOTE**
 
-The current production image is the in the `ds-new` folder. This is the image used by the ds-operator.
+The current production image is in the `ds-new` folder. This is the image used by the ds-operator.
 
 The ds-cts and ds-idrepo are the pre 7.3.0 images - and here for reference.
 
@@ -11,10 +11,10 @@ The ds-cts and ds-idrepo are the pre 7.3.0 images - and here for reference.
 * ds-new - Generic DS image used by the ds-operator or for fully "mutable" directory deployments. This is
 the recommended ds image for new deployments.
 * common: common scripts used to build multiple images
-* cts:  DS image purpose built for CTS
-* ds-idrepo: Purpose built for DS shared repo for AM/IDM. Also includes a cts backend for small installations
+* cts:  Legacy DS image purpose built for CTS. ** For internal purposes only **
+* ds-idrepo: Legacy Purpose built for DS shared repo for AM/IDM. Also includes a cts backend for small installations. ** For internal purposes only **
 * proxy: DS proxy server. Experimental / unsupported.
-* dsutil:  Utility image that can ne run in a pod to perform various DS related tasks. Has all the ds tools installed.
+* dsutil:  Utility image that can be run in a pod to perform various DS related tasks. Has all the ds tools installed.
 
 ## Utility image (`dsutil`)
 

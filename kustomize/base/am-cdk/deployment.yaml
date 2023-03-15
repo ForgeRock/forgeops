@@ -20,7 +20,7 @@ spec:
       initContainers:
       # This init container copies the "immutable" configuration from the Docker image
       # to shared volume that is mounted by the am container. Putting this on an emptyDir volume
-      # preserves configuration across pod restarts (for example, if AM crashes or suffers an OOM kill from k8s).
+      # preserves configuration across container restarts (for example, if AM crashes or suffers an OOM kill from k8s).
       # This is most useful in development environments, so users do not lose their changes if the pod restarts.
       - name: fbc-init
         image: am

@@ -8,7 +8,7 @@ ForgeRock Identity Platform on a Kubernetes cluster.
 This GitHub repository is a read-only mirror of
 ForgeRock's [Bitbucket Server repository](https://stash.forgerock.org/projects/CLOUD/repos/forgeops). 
 Users with ForgeRock BackStage accounts can make pull requests on our Bitbucket 
-Server repository. ForgeRock does not accept pull requests on GitHub.
+Server repository. ForgeRock accepts pull requests on GitHub for review only.
 
 ## Disclaimer
 

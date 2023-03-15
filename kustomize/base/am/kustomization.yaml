@@ -7,9 +7,7 @@ commonLabels:
   app.kubernetes.io/part-of: forgerock
   tier: middle
   app: am
-# - ingress.yaml
 resources:
 - deployment.yaml
 - service.yaml
-# Need k8s 1.18+ to enable HPA
 # - hpa.yaml

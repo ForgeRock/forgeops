@@ -17,9 +17,6 @@ configuration files.
 
 ## Dockerfiles Used for Multiple Releases
 
-* `java-11`: The foundational Java 11 image used to build ForgeRock DS, IDM and 
-  IG.
-* `cli-tools`: Deployment and release management tooling.
 * `gatling`: Gatling image used to benchmark and exercise the platform.
 
  ## See Also

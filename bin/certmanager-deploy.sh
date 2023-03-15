@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Script to deploy Cert-Manager
+# Script to deploy cert-manager
 #
 # Run ./certmanager-deploy.sh to deploy with default ca cert.
 # Run ./certmanager-deploy.sh -d to delete cert-manager deployment
