@@ -364,7 +364,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=None, src_profile_dir=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=None, src_profile_dir=None, deploy_pkg_path=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -374,13 +374,14 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
     custom_path: path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy/COMPONENT.
     src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
+    deploy_pkg_path: path to root of generated kustomize deployment manifests. Defaults to kustomize/deploy-[--deploy-path value if requested] or kustomize/deploy if --deploy-path parameter not requested.
     return profile_dir: path to the generated package.
     return contents: generated kubernetes manifest. This is equivalent to `kustomize build profile_dir`.
     """
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
     src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
-    image_defaulter = os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
+    image_defaulter = os.path.join(deploy_pkg_path, 'image-defaulter') if deploy_pkg_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
     profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
     shutil.rmtree(profile_dir, ignore_errors=True)
     Path(profile_dir).mkdir(parents=True, exist_ok=True)
