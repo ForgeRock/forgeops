@@ -31,8 +31,7 @@ See [About the forgeops repository] in the ForgeOps documentation for informatio
 >Note: The forgeops repository’s master branch contains pre-release software that is not supported by ForgeRock.
 
 If you want to work with the latest stable forgeops repository release, use the 
-[latest release branch](https://github.com/ForgeRock/forgeops/tree/release/7.2.0),
-and use the [latest release documentation].
+[latest release branch] and the [latest release documentation].
 
 ## What's New?
 
@@ -82,13 +81,13 @@ See [Troubleshooting] in the ForgeOps documentation.
 
 See [CDK Shutdown and Removal] in the ForgeOps documentation. 
 
-[About the forgeops repository]:https://ea.forgerock.com/docs/forgeops/forgeops.html
-[Authentication rate]:https://ea.forgerock.com/docs/forgeops/how-to/benchmark/authrate.html
-[CDK documentation]:https://ea.forgerock.com/docs/forgeops/cdk/overview.html
-[CDK Shutdown and Removal]:https://ea.forgerock.com/docs/forgeops/cdk/shutdown.html
-[ForgeOps Release Notes]:https://ea.forgerock.com/docs/forgeops/rn/rn.html
-[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.2.0
-[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.2/index.html
-[Statement of support]:https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services
-[Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
-[UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html
+[About the forgeops repository]:https://backstage.forgerock.com/docs/forgeops/7.3/forgeops.html
+[Authentication rate]:https://backstage.forgerock.com/docs/forgeops/7.3/how-to/benchmark/authrate.html
+[CDK documentation]:https://backstage.forgerock.com/docs/forgeops/7.3/cdk/overview.html
+[CDK Shutdown and Removal]:https://backstage.forgerock.com/docs/forgeops/7.3/cdk/shutdown.html
+[ForgeOps Release Notes]:https://backstage.forgerock.com/docs/forgeops/7.3/rn/rn.html
+[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.3.0
+[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.3/index.html
+[Statement of support]:https://backstage.forgerock.com/docs/forgeops/7.3/start/support.html#kubernetes-services
+[Troubleshooting]:https://backstage.forgerock.com/docs/forgeops/7.3/troubleshooting/overview.html
+[UI and API access]:https://backstage.forgerock.com/docs/forgeops/7.3/cdk/access.html
