@@ -91,10 +91,10 @@ def overlay_app_configs(ns, config_profile, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- /bin/sh -c "kill 1"')
 
-def build_docker_image(component, default_repo, tag, config_profile=None):
+def build_docker_image(component, default_repo, tag, config_profile=None, pkg_path=None):
     """Builds custom docker images"""
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    image_defaulter = os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
+    image_defaulter = os.path.join(pkg_path, 'image-defaulter') if pkg_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
     tag_data = utils.build_docker_image(component, default_repo, tag, config_profile)
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
@@ -106,11 +106,14 @@ def main():
     common_sz = argparse.ArgumentParser(add_help=False)
     common_dg = argparse.ArgumentParser(add_help=False)
     common_pf = argparse.ArgumentParser(add_help=False)
+    common_dl = argparse.ArgumentParser(add_help=False)
     common = argparse.ArgumentParser(add_help=False)
     common_ns.add_argument('--namespace', '-n', default='',
                            help='Target namespace (default: current ctx namespace)')
     common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
     common_pf.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help='Name of config profile in docker/am/config-profiles')
+    common_dl.add_argument('--deploy-env', dest='deploy_env',
+                                help='Set the deploy script suffix path for multiple deployment environments')
     common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'secrets', []])
@@ -123,12 +126,12 @@ def main():
     size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches')
 
     subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
-    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_pf], allow_abbrev=False,
+    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_pf, common_dl], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
-    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_pf],
+    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_pf, common_dl],
                                           help='Generate the ForgeRock Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
@@ -139,7 +142,7 @@ def main():
                                help='Skip delete confirmation')
     parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
                                help='Delete all CDM components including PVCs and secrets. *This will erase all data*')
-    parser_build = subparser.add_parser('build', parents=[common_dg, common_pf], help='Build custom docker images')
+    parser_build = subparser.add_parser('build', parents=[common_dg, common_pf, common_dl], help='Build custom docker images')
     parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets, default= 'all')
     parser_build.add_argument('--default-repo', '-r', dest='registry')
     parser_build.add_argument('--tag', '-t', help='Set the tag used when building images')
@@ -150,11 +153,12 @@ def main():
     parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg], help='Wait for platform components', allow_abbrev=False)
     parser_wait.add_argument('components', nargs='*', choices=wait_targets + build_targets)
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
-    subparser.add_parser('clean', help='Remove all locally generated manifests')
+    subparser.add_parser('clean', parents=[common_dl], help='Remove all locally generated manifests')
     args = parser.parse_args()
 
     # Check toolset versions before doing anything
     utils.check_base_toolset()
+    pkg_path = None
     if args.cmd != 'build':
         ctx_namespace = utils.get_namespace()
         ctx = utils.get_context()
@@ -163,10 +167,13 @@ def main():
         size = args.size if getattr(args, 'size', None) else 'cdk'
         src_profile_dir = getattr(args, 'custom', None)
         remap = size_map[size]
-        pkg_path = None
         if src_profile_dir:
             size = 'custom'
             remap = size_map[size]
+
+    if getattr(args, 'deploy_env', None):
+        pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'deploy-' + str(args.deploy_env)) 
+        utils.message(f'deployment manifest path: kustomize/"{pkg_path}"')
 
     if getattr(args, 'debug', False):
         utils.log.setLevel(logging.DEBUG)
@@ -191,9 +198,9 @@ def main():
 
     if args.cmd == 'clean':
         # Set the deploy directory
-        deploy_dir = os.path.join(sys.path[0], '../kustomize', 'deploy')
+        deploy_dir = pkg_path or os.path.join(sys.path[0], '../kustomize', 'deploy')
 
-        utils.message(f'Removing all locally generated manifests from the kustomize/deploy folder')
+        utils.message(f'Removing all locally generated manifests from {deploy_dir}')
 
         # Get list of files in deploy directory
         file_list = os.listdir(deploy_dir)
@@ -256,7 +263,7 @@ def main():
 
     if args.cmd == 'build':
         if args.reset:
-            image_defaulter = os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter' )
+            image_defaulter = os.path.join(pkg_path, 'image-defaulter' ) if pkg_path else os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter')
             utils.message(f'Reset to git index: {image_defaulter} ')
             utils.run('git', f'checkout {image_defaulter}')
             return
@@ -267,7 +274,7 @@ def main():
         if 'amster' in components:
             utils. error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
         for c in components:
-            build_docker_image(c, args.registry, args.tag, args.config_profile)
+            build_docker_image(c, args.registry, args.tag, args.config_profile, pkg_path)
         return
 
     if args.cmd == 'wait':
@@ -299,12 +306,12 @@ def main():
     if args.cmd == 'generate':
         instructions = []
         components.sort(key=_sort_components)
-        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}"\n')
+        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}" to deploy path: "{pkg_path}".\n')
         if 'all' in components:
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, args.config_profile, custom_path, src_profile_dir)
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ctx, args.config_profile, custom_path, src_profile_dir, pkg_path)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
             instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
             if c in wait_targets:
@@ -317,7 +324,7 @@ def main():
 
     utils.install_dependencies()
 
-    utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}"\n')
+    utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}" from deployment manifests in "{args.deploy_env}"\n')
     if 'all' in components:
         install_all(size, namespace, fqdn, ctx, args.duration, args.config_profile, pkg_path, src_profile_dir)
     else:
