@@ -68,8 +68,8 @@ prometheusOperator:
       certManager:
         enabled: true
         issuerRef:
-          name: "default-issuer"
-          kind: "ClusterIssuer"
+          name: "selfsigned-issuer"
+          kind: "Issuer"
 
 defaultRules:
     rules:
