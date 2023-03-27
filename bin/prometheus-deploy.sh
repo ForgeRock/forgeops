@@ -32,6 +32,16 @@ create_ns() {
 # deploy Prometheus Operator and forgerock metrics
 deploy() {
 
+    # Deploy self-signed cert-manager issuer to generate a certificate for the webhook connection
+    kubectl apply -f - <<EOF
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+    name: selfsigned-issuer
+spec:
+    selfSigned: {}
+EOF
+
     # Add prometheus-community repo to helm
     helm repo add "prometheus-community" "https://prometheus-community.github.io/helm-charts" --force-update
     helm repo update
