@@ -326,7 +326,7 @@ def main():
                 utils.run('kubectl', f'-n {namespace} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
             if delete_components['secrets'] or delete:
                 utils.uninstall_component('secrets', namespace, False, delete_components, ingress_class, False, args.config_profile)
-
+                utils.run('kubectl', f'-n {namespace} delete secret ds-master-keypair ds-ssl-keypair --ignore-not-found=true')
         return
 
     if args.cmd == 'build':
