@@ -190,7 +190,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
-                                '7.2.0')
+                                'sustaining/7.2.x')
                     } else if ('sustaining/7.3.x' in branchName) {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
