@@ -186,11 +186,16 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     if (branchName.equals('master') || branchName.startsWith('preview/')) {
                         platformUiRevision = getPromotedProductCommit(commonModule.platformImagesRevision,
                                 'ui')
-                    } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+                    } else if ('sustaining/7.2.x' in branchName) {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
                                 '7.2.0')
+                    } else if ('sustaining/7.3.x' in branchName) {
+                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
+                                'ui',
+                                'platform-ui',
+                                'master')
                     } else {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
