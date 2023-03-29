@@ -9,6 +9,9 @@ spec:
       labels:
         app: amster
     spec:
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 0
       initContainers:
       - env:
         - name: NAMESPACE
