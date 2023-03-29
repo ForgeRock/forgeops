@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2023 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -199,7 +199,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
-                                '7.2.0')
+                                'sustaining/7.2.x')
                         platformUiImageTag = "7.2.0-${platformUiRevision}"
                     } else {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
