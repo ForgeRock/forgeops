@@ -180,18 +180,19 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     def platformUiRevision
                     // When the UI tests are executed on:
                     // - master branch we use the UI commit from platform-images master
-                    // - sustaining/7.2.x we use the 7.2.0 UI tag
+                    // - sustaining/7.2.x/release/7.2.x we use the UI commit from sustaining/7.2.x branch
+                    // - sustaining/7.3.x/release/7.3.x we use the UI commit from master branch
                     // - otherwise we use the ID_Cloud_Production tag
                     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
                     if (branchName.equals('master') || branchName.startsWith('preview/')) {
                         platformUiRevision = getPromotedProductCommit(commonModule.platformImagesRevision,
                                 'ui')
-                    } else if ('sustaining/7.2.x' in branchName) {
+                    } else if ('sustaining/7.2.x' in branchName || 'release/7.2' in branchName) {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
-                                '7.2.0')
-                    } else if ('sustaining/7.3.x' in branchName) {
+                                'sustaining/7.2.x')
+                    } else if ('sustaining/7.3.x' in branchName || 'release/7.3' in branchName) {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
