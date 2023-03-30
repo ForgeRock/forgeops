@@ -190,12 +190,12 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     def platformUiImageTag
                     // When the UI tests are executed on:
                     // - master branch we use the UI commit from platform-images master
-                    // - sustaining/7.2.x we use the 7.2.0 UI tag
+                    // - sustaining/7.2.x/release/7.2.x we use the UI commit from sustaining/7.2.x branch
                     // - otherwise we use the ID_Cloud_Production tag
                     if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
                         platformUiRevision = getPromotedProductCommit(platformImagesRevision, 'ui')
                         platformUiImageTag = getPromotedProductImageTag(platformImagesRevision, 'ui')
-                    } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME] || 'release/7.2.0' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
+                    } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME] || 'release/7.2' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
                         platformUiRevision = bitbucketUtils.getLatestCommitHash(
                                 'ui',
                                 'platform-ui',
@@ -229,6 +229,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
                     dir("platform-ui") {
                         localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git',
                                 'master')
+                        sh 'git fetch --tags'
                         sh "git checkout ${platformUiRevision}"
                         uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
                     }
