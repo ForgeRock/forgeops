@@ -186,66 +186,8 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
         node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
-                    def platformUiRevision
-                    def platformUiImageTag
-                    // When the UI tests are executed on:
-                    // - master branch we use the UI commit from platform-images master
-                    // - sustaining/7.2.x/release/7.2.x we use the UI commit from sustaining/7.2.x branch
-                    // - otherwise we use the ID_Cloud_Production tag
-                    if ('master' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
-                        platformUiRevision = getPromotedProductCommit(platformImagesRevision, 'ui')
-                        platformUiImageTag = getPromotedProductImageTag(platformImagesRevision, 'ui')
-                    } else if ('sustaining/7.2.x' in [env.CHANGE_TARGET, env.BRANCH_NAME] || 'release/7.2' in [env.CHANGE_TARGET, env.BRANCH_NAME]) {
-                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
-                                'ui',
-                                'platform-ui',
-                                'sustaining/7.2.x')
-                        platformUiImageTag = "7.2.0-${platformUiRevision}"
-                    } else {
-                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
-                                'ui',
-                                'platform-ui',
-                                'ID_Cloud_Production')
-
-                        def platformUIShortRevision = platformUiRevision.substring(0, 11)
-                        def script = "git log --oneline | grep 'UI update to ${platformUIShortRevision}' | cut -d' ' -f1"
-                        def platformImagesRevision = sh(script: script, returnStdout: true).trim()
-                        if (platformImagesRevision == '') {
-                            error "Impossible to find ID_Cloud_Production commit ${platformUIShortRevision} " +
-                                    "in platform-images git log.\n" +
-                                    "Finding the docker image tag requires using a platform-ui commit that" +
-                                    " is listed in platform-images git log."
-                        }
-
-                        def content = bitbucketUtils.readFileContent(
-                                'cloud',
-                                'platform-images',
-                                platformImagesRevision,
-                                "ui.json").trim()
-                        platformUiImageTag = readJSON(text: content)['imageTag']
-                    }
-
-                    // Get platform-ui tests from corresponding commit
-                    dir("platform-ui") {
-                        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git',
-                                'master')
-                        sh 'git fetch --tags'
-                        sh "git checkout ${platformUiRevision}"
-                        uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
-                    }
-
-                    // Set UI image tag to the corresponding commit
-                    testConfig.COMPONENTS_ADMINUI_IMAGE_TAG = platformUiImageTag
-                    testConfig.COMPONENTS_ENDUSERUI_IMAGE_TAG = platformUiImageTag
-                    testConfig.COMPONENTS_LOGINUI_IMAGE_TAG = platformUiImageTag
-
-                    def uiTestConfig = [
-                            containerRunOptions : cloud_utils.getUiContainerRunOptions(testConfig),
-                            deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
-                    ]
-
-                    uiTestsStage.runTests(uiTestConfig, normalizedStageName, normalizedStageName,
-                            commonModule.lodestarRevision)
+                    platformUI.runPlatformUI(commonModule.lodestarRevision, commonModule.platformImagesRevision,
+                            testConfig, normalizedStageName, commonModule.calculatePlatformImagesBranch())
 
                     allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
                     allStagesCloud[normalizedStageName].numFailedTests = 0
