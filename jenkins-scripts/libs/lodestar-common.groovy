@@ -177,71 +177,8 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
         node('gce-vm-lodestar-n1-standard-8') {
             stage(stageName) {
                 try {
-                    def platformUiRevision
-                    // When the UI tests are executed on:
-                    // - master branch we use the UI commit from platform-images master
-                    // - sustaining/7.2.x/release/7.2.x we use the UI commit from sustaining/7.2.x branch
-                    // - sustaining/7.3.x/release/7.3.x we use the UI commit from master branch
-                    // - otherwise we use the ID_Cloud_Production tag
-                    def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-                    if (branchName.equals('master') || branchName.startsWith('preview/')) {
-                        platformUiRevision = getPromotedProductCommit(commonModule.platformImagesRevision,
-                                'ui')
-                    } else if ('sustaining/7.2.x' in branchName || 'release/7.2' in branchName) {
-                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
-                                'ui',
-                                'platform-ui',
-                                'sustaining/7.2.x')
-                    } else if ('sustaining/7.3.x' in branchName || 'release/7.3' in branchName) {
-                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
-                                'ui',
-                                'platform-ui',
-                                'master')
-                    } else {
-                        platformUiRevision = bitbucketUtils.getLatestCommitHash(
-                                'ui',
-                                'platform-ui',
-                                'ID_Cloud_Production')
-                    }
-
-                    // Get platform-ui tests from corresponding commit
-                    def platformUiVersion
-                    dir("platform-ui") {
-                        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/ui/platform-ui.git',
-                                'master')
-                        sh 'git fetch --tags'
-                        sh "git checkout ${platformUiRevision}"
-                        uiTestsStage = load('jenkins-scripts/stages/ui-tests.groovy')
-
-                        try {
-                            def script = "awk '/^PLATFORM_UI_VERSION_PREFIX/ { print substr(\$3, 2 ,5) }' jenkins-scripts/libs/common.groovy"
-                            platformUiVersion = sh(script: script, returnStdout: true).trim()
-                        } catch (Exception exc) {
-                            println('Cannot determine platform ui version, script failed with: ' + exc.getMessage())
-                            throw exc
-                        }
-                        if (platformUiVersion == '') {
-                            error 'Cannot determine platform ui version, script returned an empty string'
-                        }
-                    }
-
-                    // Set UI image tag to the corresponding commit
-                    def platformUiImageTag = "${platformUiVersion}-${platformUiRevision}"
-                    testConfig.COMPONENTS_ADMINUI_IMAGE_TAG = platformUiImageTag
-                    testConfig.COMPONENTS_ENDUSERUI_IMAGE_TAG = platformUiImageTag
-                    testConfig.COMPONENTS_LOGINUI_IMAGE_TAG = platformUiImageTag
-
-                    def containerOptions = cloud_utils.getUiContainerRunOptions(testConfig) +
-                            ' -e TEST_PACKAGES=\"@forgerock/platform-login @forgerock/platform-enduser @forgerock/platform-admin\"' +
-                            ' -e TEST_SPEC_FILES=\"\"'
-
-                    def uiTestConfig = [
-                            containerRunOptions : containerOptions,
-                            deploymentNamespace : testConfig.DEPLOYMENT_NAMESPACE,
-                    ]
-
-                    uiTestsStage.runTests(uiTestConfig, normalizedStageName, normalizedStageName,
-                            commonModule.lodestarRevision)
+                    platformUI.runPlatformUI(commonModule.lodestarRevision, commonModule.platformImagesRevision,
+                            testConfig, normalizedStageName, commonModule.calculatePlatformImagesBranch())
 
                     allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
                     allStagesCloud[normalizedStageName].numFailedTests = 0
