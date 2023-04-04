@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2023 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -21,13 +21,20 @@ GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --
 GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
 /** Default platform-images tag corresponding to this branch (or the PR target branch, if this is a PR build) */
-String calculatePlatformImagsTag() {
-    def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-    def platformImagesBranchName = branchName.startsWith('release/') ? 'master' : branchName
-    platformImagesBranchName = branchName.startsWith('release/7.2.') ? 'sustaining/7.2.x' : platformImagesBranchName
-    return "${platformImagesBranchName}-ready-for-dev-pipelines"
+String calculatePlatformImagesTag() {
+    return "${calculatePlatformImagesBranch()}-ready-for-dev-pipelines"
 }
-DEFAULT_PLATFORM_IMAGES_TAG = calculatePlatformImagsTag()
+DEFAULT_PLATFORM_IMAGES_TAG = calculatePlatformImagesTag()
+
+String calculatePlatformImagesBranch() {
+    def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+    if (branchName.startsWith('release/')) {
+        def versionParts = (branchName - 'release/').tokenize('-')[0].tokenize('.')
+        return "sustaining/${versionParts[0]}.${versionParts[1]}.x"
+    } else {
+        return 'master'
+    }
+}
 
 /** Revision of platform-images repo used for k8s and platform integration/perf tests. */
 platformImagesRevision = bitbucketUtils.getLatestCommitHash(
