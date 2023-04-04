@@ -21,18 +21,20 @@ GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --
 GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
 /** Default platform-images tag corresponding to this branch (or the PR target branch, if this is a PR build) */
-String calculatePlatformImagsTag() {
-    def platformImagesBranchName
+String calculatePlatformImagesTag() {
+    return "${calculatePlatformImagesBranch()}-ready-for-dev-pipelines"
+}
+DEFAULT_PLATFORM_IMAGES_TAG = calculatePlatformImagesTag()
+
+String calculatePlatformImagesBranch() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
     if (branchName.startsWith('release/')) {
         def versionParts = (branchName - 'release/').tokenize('-')[0].tokenize('.')
-        platformImagesBranchName = "sustaining/${versionParts[0]}.${versionParts[1]}.x"
+        return "sustaining/${versionParts[0]}.${versionParts[1]}.x"
     } else {
-        platformImagesBranchName = 'master'
+        return 'master'
     }
-    return "${platformImagesBranchName}-ready-for-dev-pipelines"
 }
-DEFAULT_PLATFORM_IMAGES_TAG = calculatePlatformImagsTag()
 
 /** Revision of platform-images repo used for k8s and platform integration/perf tests. */
 platformImagesRevision = bitbucketUtils.getLatestCommitHash(
