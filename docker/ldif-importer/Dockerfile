@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/docker-build:7.3.0-latest-postcommit
+FROM gcr.io/forgerock-io/ds:7.3.0
 
 USER 0
 
