@@ -88,7 +88,7 @@ can configure email settings in the IDM server.
 
 ## Test resetting a user's password
 
-1. In a web browser, access the reset password  service in your deployment, <br/> for example: https://my-namespace.iam.example.com/am/?service=ResetPassword 
+1. In a web browser, access the reset password  service in your deployment, <br/> for example: https<nolink>://my-namespace.iam.example.com/am/?service=ResetPassword 
 
 1. Enter the email ID of the user whose password needs to be reset - for example  the email ID for our test user is `t1@mailhog.local`.
 

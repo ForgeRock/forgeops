@@ -2,8 +2,8 @@
 
 Google Docs:   
 * [Multi Cluster Ingress](https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress)
-* [Setup Multi Cluster Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress-setup)  
-* [Deploy Multi Cluster Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress)
+* [Setting up Multi Cluster ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress-setup)  
+* [Deploying Ingress across clusters](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress)
 
 ## Overview
 This guide explains how to deploy the ForgeRock Identity Platform across 2 different clusters and configure proximity-based routing with Multi Cluster Ingress.
@@ -60,7 +60,7 @@ gcloud container hub memberships list --project=<project_id>
 
 ## Step 3: Config cluster
 #
-For more info on configuring the config cluster, see Google doc [here](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress-setup#specifying_a_config_cluster).
+For more info on configuring the config cluster, see the Google doc [here](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress-setup#specifying_a_config_cluster).
 
 Enable the US cluster as the config cluster:
 ```bash
@@ -84,7 +84,7 @@ multiclusteringressFeatureSpec:
 **1. Create a Static IP**  
 A static IP is required for the HTTP(S) loadbalancer.  See doc [here](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#static).
 
-Add the IP address to the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml) using the static-ip annotation:
+Add the IP address to the MultiClusterIngress [mci.yaml file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml) using the static-ip annotation:
 
 ```yaml
   annotations:
@@ -94,17 +94,17 @@ Add the IP address to the MultiClusterIngress [file](https://github.com/ForgeRoc
 **2. SSL cert for the HTTP(S) load balancer**  
 There are various options for generating an SSL cert for external traffic to the HTTP(S) load balancer.  
 * Pre-shared certificates [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#pre-shared_certificates)
-* Google managed certificates [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#google-managed_certificates)
+* Google-managed certificates [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#google-managed_certificates)
 * Configure SSL cert as Kubernetes secret [doc](https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#https_support)  
 
-For the first 2 options, update the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml) using the pre-shared-certs annotation:
+For the first 2 options, update the MultiClusterIngress [mci.yaml file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml) using the pre-shared-certs annotation:
 ```yaml
   annotations:
     networking.gke.io/pre-shared-certs: "certname"
 ```  
 
 **3. Configure FQDN**  
-Add your FQDN for the frontend to the host property in the MultiClusterIngress [file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml).  
+Add your FQDN for the frontend to the host property in the MultiClusterIngress [mci.yaml file](https://github.com/ForgeRock/forgeops/tree/master/etc/multi-cluster/google-cloud/multi-cluster-ingress/mci.yaml).  
 
 ```yaml
       rules:
@@ -120,7 +120,7 @@ kubectl apply -f mcs.yaml -n prod
 kubectl apply -f backendconfig.yaml -n prod
 ```
 
-For more information on the above resources see the 2 Google doc links below:
+For more information on the above resources see the doc links below:
 * MultiClusterIngress(mci.yaml): https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress#multiclusteringress_resource 
 * MultiClusterService(mcs.yaml): https://cloud.google.com/kubernetes-engine/docs/concepts/multi-cluster-ingress#multiclusterservice_resources
 * BackendConfig(backendconfig.yaml): https://cloud.google.com/kubernetes-engine/docs/how-to/multi-cluster-ingress#backendconfig_support

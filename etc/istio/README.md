@@ -6,7 +6,7 @@ These notes cover:
 
 * Deploying Directory Server across the mesh.
 
-If you are only interested in deploying DS, skip to [Deployment](#Deployment).
+If you are only interested in deploying DS, skip to [Deploy DS](#deploy-ds).
 
 The sample configures Istio across two existing Kubernetes clusters in the
 `us-east1` and `europe-west` regions. The two clusters are on the same Google

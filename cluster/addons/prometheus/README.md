@@ -40,7 +40,7 @@ repository's top-level directory.
 
 * ``prometheus-operator.yaml``: Overrides values for the Prometheus operator,
 Prometheus, Alertmanager, and Grafana. See the
-[``values.yaml`` file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) in ``prometheus-community/helm-charts`` for default values. To modify default values, override the
+[``values.yaml`` file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack/values.yaml) in ``prometheus-community/helm-charts`` for default values. To modify default values, override the
 ``prometheus-operator.yaml`` file, or specify your own values file when you deploy Prometheus. For example:
   
 ```bash

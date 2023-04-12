@@ -12,8 +12,7 @@ Use this at your own risk.
   or script before running the simulations. <u>This is a critical step which, if 
   missed, will lead to failures</u>.
 
-* Get administrative passwords by running the 
-  [print-secrets](../../bin/print-secrets.sh) script.  
+* Get administrative passwords by running the `forgeops info` command.  
   
 * The simulations that require provisioning to IDM also need the secrets for the
   `idm-provisioning` OAuth2 client. Obtain them by running:
@@ -62,7 +61,7 @@ You can run these benchmarks in a Kubernetes cluster. It does not need to be
 the same cluster as your test target - the benchmark uses an external FQDN. 
 Before you attempt to run the benchmarks in a cluster, make sure that your GCS  
 Service Account key is copied locally. See 
-[GCS Service Account Configuration](#gcs-service-account-configuration) for 
+[GCS Service Account Configuration](#gcs-service-account-configuration) below for 
 configuration details. In addition, ensure that the `TARGET_HOST`, `USER_POOL`, 
 `DURATION`, `CONCURRRENCY`, `CLIENT_PASSWORD`, `IDM_PASSWORD` and 
 `PERF_TEST_RESULTS_BUCKET_NAME` keys are set correctly in the 
@@ -148,8 +147,8 @@ reduce the `DURATION` of your simulation:
 [CDK documentation]:https://ea.forgerock.com/docs/forgeops/cdk/overview.html
 [CDK Shutdown and Removal]:https://ea.forgerock.com/docs/forgeops/cdk/shutdown.html
 [ForgeOps Release Notes]:https://ea.forgerock.com/docs/forgeops/rn/rn.html
-[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.2.0
-[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.2/index.html
-[Statement of support]:https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services
+[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.3-20230404
+[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.3/index.html
+[Statement of support]:https://backstage.forgerock.com/docs/forgeops/7.3/start/support.html#kubernetes-services
 [Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
 [UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html

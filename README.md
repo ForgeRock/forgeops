@@ -31,7 +31,7 @@ See [About the forgeops repository] in the ForgeOps documentation for informatio
 >Note: The forgeops repository’s master branch contains pre-release software that is not supported by ForgeRock.
 
 If you want to work with the latest stable forgeops repository release, use the 
-[latest release branch], and use the [latest release documentation].
+[latest release branch] and the [latest release documentation].
 
 ## What's New?
 
@@ -88,6 +88,6 @@ See [CDK Shutdown and Removal] in the ForgeOps documentation.
 [ForgeOps Release Notes]:https://ea.forgerock.com/docs/forgeops/rn/rn.html
 [latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.3-20230404
 [latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.3/index.html
-[Statement of support]:https://ea.forgerock.com/docs/forgeops/start/support.html#kubernetes-services
+[Statement of support]:https://backstage.forgerock.com/docs/forgeops/7.3/start/support.html#kubernetes-services
 [Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
 [UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html
