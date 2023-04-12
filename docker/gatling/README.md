@@ -12,8 +12,7 @@ Use this at your own risk.
   or script before running the simulations. <u>This is a critical step which, if 
   missed, will lead to failures</u>.
 
-* Get administrative passwords by running the 
-  [print-secrets](../../bin/print-secrets.sh) script.  
+* Get administrative passwords by running the `forgeops info` command.  
   
 * The simulations that require provisioning to IDM also need the secrets for the
   `idm-provisioning` OAuth2 client. Obtain them by running:
@@ -62,7 +61,7 @@ You can run these benchmarks in a Kubernetes cluster. It does not need to be
 the same cluster as your test target - the benchmark uses an external FQDN. 
 Before you attempt to run the benchmarks in a cluster, make sure that your GCS  
 Service Account key is copied locally. See 
-[GCS Service Account Configuration](#gcs-service-account-configuration) for 
+[GCS Service Account Configuration](#gcs-service-account-configuration) below for 
 configuration details. In addition, ensure that the `TARGET_HOST`, `USER_POOL`, 
 `DURATION`, `CONCURRRENCY`, `CLIENT_PASSWORD`, `IDM_PASSWORD` and 
 `PERF_TEST_RESULTS_BUCKET_NAME` keys are set correctly in the 

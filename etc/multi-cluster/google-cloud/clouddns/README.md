@@ -31,8 +31,6 @@ Create your cluster as described in the forgeops docs but also include the follo
   --cluster-dns-domain us
 ```
 
-There is a helpful script to create your cluster [cluster-up.sh](https://github.com/ForgeRock/forgeops/blob/master/cluster/gke/cluster-up.sh)
-
 Edit the [multi-cluster.sh](https://github.com/ForgeRock/forgeops/blob/master/cluster/gke/multi-cluster.sh) file with your cluster spec including required values for:
 * CLOUD_DNS_DOMAIN
 * REGION

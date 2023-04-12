@@ -29,14 +29,12 @@ kustomize build
 
 The Docker images referenced in the Kustomize files are generic (for example, 
 `am` or `ig`), and are not specific to a Docker registry (such as 
-`gcr.io/forgerock-io/am-base:7.3.0`).
+`gcr.io/forgerock-io/am-base:7.x.0`).
 
-We can not directly deploy the generic images, because we need a Docker image
-that has the configuration "baked in". This is where Skaffold comes in to the 
-picture. Skaffold builds new Docker images that include configuration, and 
-"fix up" the Docker image tags in Kustomize, replacing the generic names (`am`) 
-with specific image names tagged with an SHA hash (for pre-release builds) or a 
-Git hash (for release builds).
+You can not directly deploy the generic images, because you need Docker images
+that have the configuration "baked in". The `forgeops build` command builds new 
+Docker images that include configuration, and sets up the Docker image tags in 
+the image defaulter. 
 
 For more information, see the forgeops repository's [top-level README](../README.md).
 
@@ -44,4 +42,5 @@ For more information, see the forgeops repository's [top-level README](../README
 
 The `kustomize` directory demonstrates a directory-based organization. You could
 also use Git branching. For more information, see 
-[this page](https://kubectl.docs.kubernetes.io/guides/app_deployment/diffing_local_and_remote_resources/).
+[Diffing Local and Remote Resources](https://kubectl.docs.kubernetes.io/guides/app_deployment/diffing_local_and_remote_resources/)
+in the Kubernetes documentation.

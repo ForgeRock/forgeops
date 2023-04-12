@@ -31,7 +31,7 @@ in "git" somewhere so that the environment can be recreated or promoted. A
 disciplined approach to capturing these changes is needed as the schema
 is not maintained as part of the Dockerfile. This could be as simple
 as scripts maintained in git that update the schema. This is an adhoc
-implementation of the concepts behind [Flyway](https://flywaydb.org/)
+implementation of the concepts behind [Flyway](https://flywaydb.org/).
 
 ## Default Scripts / Life-Cycle Hooks.
 
@@ -79,12 +79,12 @@ the index to all ds pods.
 ## Certificates
 
 The image is configured to use PEM based certificates instead of a Java Keystore (JKS). The provided Kubernetes sample
-generates these certificates using [cert-manager](cert-manager.io). The ds-operator is
+generates these certificates using [cert-manager](https://cert-manager.io). The ds-operator is
 migrating to cert-manager, as it is the canonical method of generating certificates for
 Kubernetes.
 
-> :warning: Directory data is encrypted using the private key
-in the master-key certificate. You *must* backup certificates or
+> WARNING: Directory data is encrypted using the private key
+in the master-key certificate. You must back up certificates or
 risk rendering all your data (including backups) unreadable.
 The private key must be backed up. You can not recover data using
 a newly generated certificate, even if that certificate is from
