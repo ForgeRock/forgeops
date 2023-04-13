@@ -12,4 +12,4 @@ resources:
 images:
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui
-  newTag: 7.2.0
+  newTag: 7.2.1
