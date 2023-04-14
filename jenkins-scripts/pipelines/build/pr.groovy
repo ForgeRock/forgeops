@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2023 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -16,9 +16,6 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 import com.forgerock.pipeline.stage.Status
 
 def initialSteps() {
-    prStageName = 'PR-ALL-TESTS'
-    prReportMessage = "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${prStageName}/)"
-
     if (params.isEmpty()) {
         sendInformationMessageToPR()
     }
@@ -94,16 +91,16 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
             postcommitTestsStage.runStage(pipelineRun, random, false)
         }
 
-        commonLodestarModule.generateSummaryTestReport(prStageName)
+        commonLodestarModule.generateSummaryTestReport()
     } catch (FlowInterruptedException exception) {
         sendBuildAbortedNotification()
         throw exception
     } catch (exception) {
         // If there is a pipeline error, or a timeout with the PIT/PERF tests, an exception is thrown.
         if (currentBuild.result != 'ABORTED') {
-            commonLodestarModule.generateSummaryTestReport(prStageName)
+            commonLodestarModule.generateSummaryTestReport()
         }
-        sendBuildFailureNotification("PR tests failed. ${prReportMessage}")
+        sendBuildFailureNotification("PR tests failed. ${prReportMessage()}")
         throw exception
     }
 }
@@ -140,12 +137,9 @@ def finalNotification() {
     stage('Final notification') {
         // If some of the PR tests fail, the plugin that manages this doesn't throw an exception, but
         // it does set the build result to UNSTABLE/FAILURE. If it didn't do that => SUCCESS
-        def message = ''
-        if (prStageName != '') {
-            message = prReportMessage
-        }
         if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
             currentBuild.result = 'SUCCESS'
+            message = prReportMessage()
         } else {
             message = "PR tests failed."
         }
@@ -155,6 +149,10 @@ def finalNotification() {
                 messageSuffix: message
         )
     }
+}
+
+String prReportMessage() {
+    return "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${commonLodestarModule.SUMMARY_REPORT_NAME}/)"
 }
 
 return this
