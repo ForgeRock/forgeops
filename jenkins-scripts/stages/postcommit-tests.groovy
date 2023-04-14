@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2023 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -12,7 +12,6 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean generateSummaryReport) {
 
-    def stageName = 'POSTCOMMIT-ALL-TESTS'
     def clusterConfig = [:]
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
     clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
@@ -77,7 +76,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
         throw exception
     } finally {
         if (generateSummaryReport) {
-            commonLodestarModule.generateSummaryTestReport(stageName)
+            commonLodestarModule.generateSummaryTestReport()
         }
 
         dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
