@@ -201,7 +201,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
 
 def generateSummaryTestReport() {
     privateWorkspace {
-        stageName = SUMMARY_REPORT_NAME
+        def stageName = SUMMARY_REPORT_NAME
         dashboard_utils.createAndPublishSummaryReport(
                 allStagesCloud, stageName, '', false, stageName, "${stageName}.html")
     }
