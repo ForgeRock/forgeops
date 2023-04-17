@@ -59,7 +59,7 @@ delete-log-publisher --publisher-name "File-Based HTTP Access Logger"
 delete-log-publisher --publisher-name "Json File-Based Access Logger"
 delete-log-publisher --publisher-name "Json File-Based HTTP Access Logger"
 
-create-log-publisher --type console-error --publisher-name "Console Error Logger" --set enabled:true --set default-severity:error --set default-severity:warning --set default-severity:notice --set override-severity:SYNC=INFO,ERROR,WARNING,NOTICE
+create-log-publisher --type console-error --publisher-name "Console Error Logger" --set enabled:true --set default-severity:notice --set override-severity:SYNC=INFO
 create-log-publisher --type external-access --publisher-name "Console LDAP Access Logger" --set enabled:true --set config-file:config/audit-handlers/ldap-access-stdout.json --set "filtering-policy:&{ds.log.filtering.policy|inclusive}"
 create-log-publisher --type external-http-access --publisher-name "Console HTTP Access Logger" --set enabled:true --set config-file:config/audit-handlers/http-access-stdout.json
 
