@@ -41,22 +41,27 @@ def main():
         dvr = dvr_opts.get(getattr(args, 'driver', None), '')
 
         if "darwin" in platform.system().lower():
-            if args.driver in ['hyperkit', '']:
-                utils.run('hyperkit', '-v', cstdout=True, cstderr=True) #check if hyperkit is installed
-                dvr = dvr_opts.get('hyperkit', '')
-            if args.driver == 'docker':
-                utils.error('The docker driver is not supported when deploying the CDK on macOS')
-                sys.exit(1)
             if args.driver == 'kvm2':
                 utils.error('The kvm2 driver is not available on macOS')
                 sys.exit(1)
+            if platform.processor() == 'i386':
+                if args.driver in ['hyperkit', '']:
+                    utils.run('hyperkit', '-v', cstdout=True, cstderr=True) #check if hyperkit is installed
+                    dvr = dvr_opts.get('hyperkit', '')
+                if args.driver == 'docker':
+                    utils.error('The docker driver is not supported when deploying the CDK on Intel-based Macs')
+                    sys.exit(1)
+            if platform.processor() == 'arm':
+                if args.driver == 'hyperkit':
+                    utils.error('The hyperkit driver is not available on ARM-based Macs')
+                    sys.exit(1)
 
         _, minikube_ver, _ = utils.run('minikube', 'version --short', cstdout=True)
         minikube_ver = minikube_ver.decode('ascii')
         utils.check_component_version('minikube', minikube_ver)
 
         k8s_ver = f'--kubernetes-version={args.version}'
-        addons = '--addons=ingress,volumesnapshots'
+        addons = '--addons=ingress,volumesnapshots,metrics-server'
         minikube_args = f'start --cpus={args.cpu} --memory={args.ram} --disk-size={args.disk} --cni=true {k8s_ver} {addons} {dvr}'
         utils.message('Running: "minikube ' + minikube_args + '"')
         utils.run('minikube', minikube_args)
