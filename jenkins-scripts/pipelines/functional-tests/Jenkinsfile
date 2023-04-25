@@ -1,0 +1,68 @@
+
+/*
+ * Copyright 2023 ForgeRock AS. All Rights Reserved
+ *
+ * Use of this code requires a commercial software license with ForgeRock AS.
+ * or with one of its affiliates. All use shall be exclusively subject
+ * to such license between the licensee and ForgeRock AS.
+ */
+
+@Library([
+    'forgerock-pipeline-libs@3475f82df20563edc6a67a90021bbb5f24d0f494',
+    'java-pipeline-libs@c7f1fb930553cac9e84d4af6ddc80fc4b10916d9'
+]) _
+
+node('gce-vm-forgeops-n1-standard-8') {
+    stage('Clone repo') {
+        checkout scm
+
+        def jobLocation = "${env.WORKSPACE}/jenkins-scripts/pipelines/build"
+        def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
+        def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
+
+        localGitUtils = load("${libsLocation}/git-utils.groovy")
+        commonModule = load("${libsLocation}/common.groovy")
+
+        currentBuild.displayName = "#${BUILD_NUMBER} - ${commonModule.SHORT_GIT_COMMIT}"
+        currentBuild.description = 'built:'
+
+        if (env.TAG_NAME) {
+            currentBuild.result = 'ABORTED'
+            error 'This pipeline does not currently support building from a tag'
+        }
+        functionalTests = load("${stagesLocation}/functional-tests.groovy")
+    }
+
+    initialSteps()
+    functionalTests.runStage()
+    finalNotification()
+}
+
+def initialSteps() {
+    properties([
+            buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
+    ])
+
+    slackChannel = '#forgeops-notify'
+
+    postcommitBuild = new Build(steps, env, currentBuild)
+}
+
+def finalNotification() {
+    stage('Final notification') {
+        // If some of the postcommit tests fail, the plugin that manages this doesn't throw an exception,
+        // but it does set the build result to UNSTABLE/FAILURE. If it does not do that => SUCCESS
+        if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
+            currentBuild.result = 'SUCCESS'
+
+            // Send a 'build is back to normal' notification if the previous build was not good
+            if (buildIsBackToNormal()) {
+                slackUtils.sendBackToNormalMessage(slackChannel)
+            }
+        } else {
+            sendSlackNotification()
+        }
+    }
+}
+
+

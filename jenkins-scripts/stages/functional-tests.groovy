@@ -1,0 +1,22 @@
+/*
+ * Copyright 2023 ForgeRock AS. All Rights Reserved
+ *
+ * Use of this code requires a commercial software license with ForgeRock AS.
+ * or with one of its affiliates. All use shall be exclusively subject
+ * to such license between the licensee and ForgeRock AS.
+ */
+
+// functional-tests.groovy
+
+void runStage() {
+    stage('Functional Tests')
+    dir('guillotine') {
+        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
+        def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+        sh("./configure.py env --gke-only")
+        sh("./configure.py runtime --forgeops-branch-name ${branchName} --keywords FUNCTIONAL")
+        sh("./run.py")
+    }
+}
+
+return this
