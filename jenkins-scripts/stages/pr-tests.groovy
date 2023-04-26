@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2023 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -11,8 +11,8 @@
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
-    return commonLodestarModule.runSpyglaas(pipelineRun, random, 'PIT1',
-            [TESTS_SCOPE    : 'tests/pit1'])
+    return commonLodestarModule.runSpyglaas(pipelineRun, random, 'Deploymnent Only',
+            [TESTS_SCOPE    : 'tests/deployment_only'])
 }
 
 return this

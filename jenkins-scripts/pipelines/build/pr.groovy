@@ -23,7 +23,7 @@ def initialSteps() {
     properties([
             buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
             parameters(commonLodestarModule.commonParams() + [
-                    booleanParam(name: 'PR_pit1', defaultValue: true),
+                    booleanParam(name: 'PR_deployment_only', defaultValue: true),
             ] + commonLodestarModule.postcommitMandatoryStages(false)),
     ])
 
@@ -83,7 +83,7 @@ boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
 def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
     try {
         Random random = new Random()
-        if (params.PR_pit1) {
+        if (params.PR_deployment_only) {
             prTestsStage.runStage(pipelineRun, random)
         }
 
