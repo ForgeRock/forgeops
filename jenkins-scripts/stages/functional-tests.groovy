@@ -10,12 +10,16 @@
 
 void runStage() {
     stage('Functional Tests')
-    dir('guillotine') {
-        localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
-        def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-        sh("./configure.py env --gke-only")
-        sh("./configure.py runtime --forgeops-branch-name ${branchName} --keywords FUNCTIONAL")
-        sh("./run.py")
+
+    // Create container to be able to use python3
+    dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
+        dir('guillotine') {
+            localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
+            def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+            sh("./configure.py env --gke-only")
+            sh("./configure.py runtime --forgeops-branch-name ${branchName} --keywords FUNCTIONAL")
+            sh("./run.py")
+        }
     }
 }
 
