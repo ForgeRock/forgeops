@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    affinity: directory
+    app: ds-idrepo
+    app.kubernetes.io/instance: ds-idrepo
+    component: ds
+  name: ds-idrepo
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: admin
+    port: 4444
+    protocol: TCP
+    targetPort: 4444
+  - name: ldap
+    port: 1389
+    protocol: TCP
+    targetPort: 1389
+  - name: ldaps
+    port: 1636
+    protocol: TCP
+    targetPort: 1636
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  - name: https
+    port: 8443
+    protocol: TCP
+    targetPort: 8443
+  selector:
+    app.kubernetes.io/controller: DirectoryService
+    app.kubernetes.io/instance: ds-idrepo
+    app.kubernetes.io/managed-by: ds-operator
+    app.kubernetes.io/name: ds
+    app.kubernetes.io/part-of: forgerock
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
