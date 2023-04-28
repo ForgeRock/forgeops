@@ -10,7 +10,7 @@ configMapGenerator:
 - name: platform-config
   # The env vars below can be passed into a pod using the envFrom pod spec.
   # These global variables can be used to parameterize your deployments.
-  # The FQDN and URLs here should match your ingress or istio gateway definitions
+  # The FQDN and URLs here should match your ingress definitions
   literals:
   - FQDN=default.iam.example.com
   - AM_URL=https://$(FQDN)/am
