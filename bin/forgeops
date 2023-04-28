@@ -179,7 +179,6 @@ def main():
     parser_generate.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
     parser_generate.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
-    parser_generate.add_argument('--amster-retain', '-r', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_delete = subparser.add_parser(
         'delete', parents=[common_ns, common, common_dg, common_pf], help='Delete ForgeRock Identity Platform components or component bundles')
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
