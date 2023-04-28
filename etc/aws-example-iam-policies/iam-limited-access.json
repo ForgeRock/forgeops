@@ -12,6 +12,7 @@
                 "iam:CreateRole",
                 "iam:DeleteRole",
                 "iam:AttachRolePolicy",
+                "iam:CreatePolicy",
                 "iam:PutRolePolicy",
                 "iam:ListInstanceProfiles",
                 "iam:AddRoleToInstanceProfile",
@@ -28,6 +29,7 @@
             ],
             "Resource": [
                 "arn:aws:iam::*:instance-profile/eksctl-*",
+                "arn:aws:iam::*:policy/*",
                 "arn:aws:iam::*:role/eksctl-*",
                 "arn:aws:iam::*:oidc-provider/*",
                 "arn:aws:iam::*:role/aws-service-role/eks-nodegroup.amazonaws.com/AWSServiceRoleForAmazonEKSNodegroup",
