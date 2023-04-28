@@ -25,7 +25,8 @@
                 "iam:CreateOpenIDConnectProvider",
                 "iam:DeleteOpenIDConnectProvider",
                 "iam:ListAttachedRolePolicies",
-                "iam:TagRole"
+                "iam:TagRole",
+                "iam:TagPolicy"
             ],
             "Resource": [
                 "arn:aws:iam::*:instance-profile/eksctl-*",
