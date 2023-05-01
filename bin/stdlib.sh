@@ -1,11 +1,11 @@
 runOrPrint() {
   local result=0
   if [ "$DRYRUN" = true ] || [ "$VERBOSE" = true ] || [ "$DEBUG" = true ] ; then
-    echo "$1"
+    echo "$*"
   fi
 
   if [ "$DRYRUN" = false ] ; then
-    eval "$1"
+    eval "$*"
     result=$?
   fi
 
