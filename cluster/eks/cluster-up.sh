@@ -7,8 +7,8 @@ set -o pipefail
 set -o nounset
 
 
-EXTERNAL_SNAPSHOT_VERSION=${EXTERNAL_SNAPSHOT_VERSION:=v5.0.1}
-HELM_EBS_CHART_VERSION=${HELM_EBS_CHART_VERSION:=2.6.7}
+EXTERNAL_SNAPSHOT_VERSION=${EXTERNAL_SNAPSHOT_VERSION:=v6.2.1}
+HELM_EBS_CHART_VERSION=${HELM_EBS_CHART_VERSION:=2.18.0}
 
 usage() {
     printf "\nUsage: $0 <config file>\n\n"
@@ -194,7 +194,12 @@ echo "Creating storage classes..."
 createStorageClasses
 echo "Creating prod namespace..."
 kubectl create ns prod
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+
+helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+helm upgrade --install metrics-server metrics-server/metrics-server
+#kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+sleep 30
 
 echo "Installing snapshots"
 installSnapShots
