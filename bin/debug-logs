@@ -4,6 +4,7 @@
 
 import argparse
 from datetime import datetime
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -64,13 +65,13 @@ def _get_azcli_version():
     else:
         return 'command to get Azure CLI version failed'
 
-def _get_docker_version():
-    success, docker, _ = utils.run_condfail('docker',
+def _get_container_engine_version(container_engine):
+    success, container_engine, _ = utils.run_condfail(f'{container_engine}',
         '--version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
-        return docker.decode('ascii').split(' ')[2].rstrip(',')
+        return container_engine.decode('ascii').split(' ')[2].rstrip(',')
     else:
-        return 'command to get Docker version failed'
+        return 'command to get container_engine version failed'
 
 def _get_eksctl_version():
     success, eksctl, _ = utils.run_condfail('eksctl',
@@ -388,11 +389,12 @@ def write_storage_classes(output, namespace):
     '''.format(get_output=get_output)
     output.write(storageclasses_html)
 
-def write_sw_versions(output):
+def write_sw_versions(output, container_engine):
     # Get third-party software versions
     awscli_vers = _get_awscli_version()
     azcli_vers = _get_azcli_version()
-    docker_vers = _get_docker_version()
+    container_engine_vers = _get_container_engine_version(container_engine)
+    # podman_vers = _get_container_engine_version("podman")
     eksctl_vers = _get_eksctl_version()
     gcloud_vers= _get_gcloud_version()
     kubectl_vers = _get_kubectl_version()
@@ -409,7 +411,7 @@ def write_sw_versions(output):
     <p>
     AWS CLI: {awscli_vers}</br>
     Azure CLI: {azcli_vers}</br>
-    Docker: {docker_vers}</br>
+    {container_engine}: {container_engine_vers}</br>
     eksctl: {eksctl_vers}</br>
     Google Cloud SDK: {gcloud_vers}<br/>
     kubectl: {kubectl_vers}</br>
@@ -421,7 +423,8 @@ def write_sw_versions(output):
     <p><a href="#toc">Back to Index</a></p>
     '''.format(awscli_vers=awscli_vers,
         azcli_vers=azcli_vers,
-        docker_vers=docker_vers,
+        container_engine=container_engine,
+        container_engine_vers=container_engine_vers,
         eksctl_vers=eksctl_vers,
         gcloud_vers=gcloud_vers,
         kubectl_vers=kubectl_vers,
@@ -510,6 +513,13 @@ def main():
     pods = get_pods(namespace)
     pvcs = get_pvcs(namespace)
 
+    # Set container engine
+    if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
+        print('Podman set as container engine.')
+        container_engine = 'Podman'
+    else:
+        container_engine = 'Docker'
+
     # Open the output file. Overwrite any previous content in it.
     Path('/tmp/forgeops').mkdir(parents=True, exist_ok=True)
     output_file = '/tmp/forgeops/log.html'
@@ -522,7 +532,7 @@ def main():
         # Write diagnostics about the environment
         print('Writing environment information')
         write_context(output)
-        write_sw_versions(output)
+        write_sw_versions(output, container_engine)
         write_crds(output)
         write_storage_classes(output, namespace)
         write_skaffold_config(output)
