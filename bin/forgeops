@@ -126,12 +126,25 @@ def build_docker_image(component, push_to, tag, config_profile=None, pkg_path=No
     """Builds custom docker images"""
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
     image_defaulter = os.path.join(pkg_path, 'image-defaulter') if pkg_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
+    
+    # Look for PUSH_TO environment variable
     if push_to is None:
         push_to = os.getenv('PUSH_TO')
     if push_to is None:
         print('--push-to must be specified if the PUSH_TO environment variable is not set.')
         sys.exit(1)
-    tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], push_to, tag, config_profile)
+    
+    # Set container engine
+    if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
+        print('Podman set as container engine.')
+        container_engine = 'podman'
+    else:
+        container_engine = 'docker'
+    
+    # Build docker image
+    tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], push_to, tag, container_engine, config_profile)
+    
+    # Set image url in image defaulter
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
     utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}".')
@@ -339,7 +352,7 @@ def main():
             if 'amster' in components:
                 components.remove('amster')
         if 'amster' in components:
-            utils. error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
+            utils.error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
         for c in components:
             build_docker_image(c, args.registry, args.tag, args.config_profile, pkg_path)
         return

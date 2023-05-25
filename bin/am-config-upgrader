@@ -16,29 +16,42 @@
 # For example:
 # TAG=7.3.0 bin/am-config-upgrader
 
-
 # Mac does not come with realpath by default.
 # https://stackoverflow.com/questions/3572030/bash-script-absolute-path-with-os-x/18443300#18443300
 realpath() {
-  local OURPWD=$PWD
-  cd "$(dirname "$1")"
-  local LINK=$(readlink "$(basename "$1")")
-  while [ "$LINK" ]; do
-    cd "$(dirname "$LINK")"
+    local OURPWD=$PWD
+    cd "$(dirname "$1")"
     local LINK=$(readlink "$(basename "$1")")
-  done
-  local REALPATH="$PWD/$(basename "$1")"
-  cd "$OURPWD"
-  echo "$REALPATH"
+    while [ "$LINK" ]; do
+        cd "$(dirname "$LINK")"
+        local LINK=$(readlink "$(basename "$1")")
+    done
+    local REALPATH="$PWD/$(basename "$1")"
+    cd "$OURPWD"
+    echo "$REALPATH"
 }
+     
+# Set container engine
+if [[ -n "${CONTAINER_ENGINE}" ]] && [[ $(echo ${CONTAINER_ENGINE} | awk '{print tolower($0)}') == 'podman' ]];
+then
+    echo "Podman set as container engine."
+    container_engine='podman'
+else
+    container_engine='docker'
+fi
 
 # Never run against a minikube daemon
-docker ps --format '{{.Names}}' | grep -q minikube \
-    && unset -v DOCKER_HOST DOCKER_CERT_PATH DOCKER_MACHINE_NAME DOCKER_TLS_VERIFY
-
-if ! docker info --format ' ';
+## TODO update for podman with minikube
+if [[ $container_engine == 'docker' ]];
 then
-    echo "Docker must be running. Please start your docker environment and run again."
+    docker ps --format '{{.Names}}' | grep -q minikube \
+        && unset -v DOCKER_HOST DOCKER_CERT_PATH DOCKER_MACHINE_NAME DOCKER_TLS_VERIFY
+fi
+
+# Check to see if your container engine is running
+if ! $container_engine info --format ' ';
+then
+    echo "A container engine must be running. Please start your container environment and run again."
     exit 1
 fi
 # For debugging
@@ -71,6 +84,6 @@ CONFIG=$(realpath $CONFIG_DIR)
 
 GID=$(id -g)
 
-# Run the upgrader in docker - optionally over mounting the /rules directory
+# Run the upgrader locally - optionally over mounting the /rules directory
 set -x
-docker run --rm --user $UID:$GID --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
+$container_engine run --rm --user $UID:$GID --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
