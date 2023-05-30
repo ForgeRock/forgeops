@@ -420,8 +420,8 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
                 if v in products:
                     if update_repo is not None or update_tag is not None:
                         repo = k if update_repo is None else update_repo
-                        tag = current_tag if update_tag is None else update_tag
-                        new_image = f'{repo}:{tag}'
+                        tag = current_tag if update_tag is None else f':{update_tag}'
+                        new_image = f'{repo}{tag}'
                     else:
                         product_config = products[v]
                         new_image = f'{product_config["imageName"]}:{product_config["imageTag"]}'
