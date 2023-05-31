@@ -120,8 +120,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('Perf Postcommit',
                 {
                     commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Postcommit', clusterConfig +
-                            [TEST_NAME      : 'postcommit',
-                             PROFILE_NAME   : 'small']
+                            [TEST_NAME      : 'postcommit']
                     )
                 }
         )
@@ -131,10 +130,10 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('Perf Restore',
                 {
                     commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
-                            [TEST_NAME                      : 'platform',
-                             PROFILE_NAME                   : 'small',
-                             CONFIGFILE_NAME                : 'conf-postcommit-restore-100k.yaml',
-                             DEPLOYMENT_RESTORE_BUCKET_URL  : 'gs://performance-bucket-us-east1/postcommit/idrepo-100k']
+                            [
+                                    TEST_NAME                      : 'platform',
+                                    CONFIGFILE_NAME                : 'conf-postcommit-restore-100k.yaml'
+                            ]
                     )
                 }
         )
