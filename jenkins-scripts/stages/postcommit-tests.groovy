@@ -120,7 +120,10 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('Perf Postcommit',
                 {
                     commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Postcommit', clusterConfig +
-                            [TEST_NAME      : 'postcommit']
+                            [
+                                    TEST_NAME      : 'postcommit',
+                                    PROFILE_NAME   : 'small',
+                            ]
                     )
                 }
         )
