@@ -6,4 +6,4 @@ cd /home/forgerock/openam
 # Pass `-` as the argument to output the tar stream to stdout. Use kubectl exec am-pod -- export.sh - > tar.out
 dest=${1:-"/home/forgerock/updated-config.tar"}
 
-tar --exclude boot.json  -c config -f $dest
+tar --exclude boot.json -cf $dest config
