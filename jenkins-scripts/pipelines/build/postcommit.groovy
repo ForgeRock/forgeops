@@ -10,7 +10,6 @@
 // Postcommit pipeline for ForgeOps Docker images
 //===============================================
 
-import com.forgerock.pipeline.Build
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 
@@ -21,8 +20,6 @@ def initialSteps() {
     ])
 
     slackChannel = '#forgeops-notify'
-
-    postcommitBuild = new Build(steps, env, currentBuild)
 }
 
 def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
