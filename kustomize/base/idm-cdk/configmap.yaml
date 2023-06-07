@@ -94,7 +94,7 @@ data:
     # Override of global logging level
     #java.util.logging.ConsoleHandler.level = WARNING
     # For Docker
-    java.util.logging.ConsoleHandler.level = INFO
+    java.util.logging.ConsoleHandler.level = ALL
     java.util.logging.ConsoleHandler.formatter = org.forgerock.openidm.logger.SanitizedThreadIdLogFormatter
     # specifies the name of the filter class to be associated with this handler,
     # defaults to {@code null} if this property is not found or has an invalid value.

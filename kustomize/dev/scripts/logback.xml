@@ -1,8 +1,16 @@
+<!--
+  ~ Copyright 2022-2023 ForgeRock AS. All Rights Reserved
+  ~
+  ~ Use of this code requires a commercial software license with ForgeRock AS.
+  ~ or with one of its affiliates. All use shall be exclusively subject
+  ~ to such license between the licensee and ForgeRock AS.
+  -->
+
 <configuration>
 
     <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+            <layout class="org.forgerock.openam.logback.JsonLayout">
                 <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>
                 <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>
                 <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter"/>
@@ -10,10 +18,6 @@
             </layout>
         </encoder>
     </appender>
-
-    <logger name="org.forgerock.openam.cors" level="DEBUG">
-        <appender-ref ref="JSON" />
-    </logger>
 
     <logger name="org.forgerock.openam.core.rest.authn.http.AuthenticationServiceV2" level="WARN">
         <appender-ref ref="JSON" />

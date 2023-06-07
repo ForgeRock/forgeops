@@ -129,6 +129,8 @@ spec:
           mountPath: /var/run/secrets/amster
         - name: fbc
           mountPath: /home/forgerock/openam
+        - name: logback
+          mountPath: /home/forgerock/logging
       terminationGracePeriodSeconds: 10
       # Shared volume that holds the AM configuration.
       volumes:
@@ -156,3 +158,6 @@ spec:
               name: ds-ssl-keypair
       - name: new-truststore
         emptyDir: {}
+      - name: logback
+        configMap:
+          name: am-logback
