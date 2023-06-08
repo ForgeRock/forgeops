@@ -8,7 +8,7 @@ COPY --chown=forgerock:root *.sh /home/forgerock/
 
 RUN mkdir -p /home/forgerock/logging/
 
-ENV CATALINA_OPTS="$CATALINA_OPTS -Dlogback.configurationFile=/home/forgerock/logging/logback.xml"
+ENV CATALINA_OPTS="${CATALINA_OPTS} -Dlogback.configurationFile=/home/forgerock/logging/logback.xml"
 
 WORKDIR /home/forgerock
 
