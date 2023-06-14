@@ -10,5 +10,12 @@ commonLabels:
 resources:
 - deployment.yaml
 - service.yaml
-- configmap.yaml
 # - hpa.yaml
+
+configMapGenerator:
+- name: am-logback
+  files:
+  - config/logback.xml
+
+generatorOptions:
+  disableNameSuffixHash: true

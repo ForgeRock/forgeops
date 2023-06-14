@@ -1,0 +1,100 @@
+<!--
+    ~ Copyright 2022-2023 ForgeRock AS. All Rights Reserved
+    ~
+    ~ Use of this code requires a commercial software license with ForgeRock AS.
+    ~ or with one of its affiliates. All use shall be exclusively subject
+    ~ to such license between the licensee and ForgeRock AS.
+    -->
+
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="com.forgerock.idc.LogFilter" />
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.forgerock.openam.logback.JsonLayout">
+                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>
+                <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>
+                <jsonFormatter class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter"/>
+                <appendLineSeparator>true</appendLineSeparator>
+            </layout>
+        </encoder>
+    </appender>
+
+    <!-- The following sets the default logging level -->
+    <root level="WARN">
+        <appender-ref ref="JSON" />
+    </root>
+
+    <!-- The following section sets logging to INFO level & above in certain packages/classes to filter out noise -->
+    <!-- individual classes -->
+    <logger name="com.sun.identity.authentication.client.AuthClientUtils" level="INFO" />
+
+    <!-- The following section sets logging to WARN level & above in certain packages/classes to filter out noise -->
+    <!-- packages -->
+    <logger name="oauth2" level="WARN" />
+    <logger name="org.apache.http" level="WARN" />
+    <logger name="com.iplanet.dpro.session" level="WARN" />
+    <logger name="com.sun.identity.sm" level="WARN" />
+    <logger name="org.forgerock.am.health.ReadinessCheckEndpoint" level="WARN" />
+    <logger name="org.forgerock.openam.core.rest.session" level="WARN" />
+    <logger name="org.forgerock.openam.core.rest.sms" level="WARN" />
+    <logger name="org.forgerock.openam.core.sms" level="WARN" />
+    <logger name="org.forgerock.openam.session" level="WARN" />
+    <logger name="org.forgerock.openam.sm" level="WARN" />
+    <!-- individual classes -->
+    <logger name="com.iplanet.services.naming.WebtopNaming" level="WARN" />
+    <logger name="com.iplanet.sso.providers.dpro.SSOProviderImpl" level="WARN" />
+    <logger name="com.iplanet.sso.providers.dpro.SessionSsoToken" level="WARN" />
+    <logger name="com.sun.identity.authentication.AuthContext" level="WARN" />
+    <logger name="com.sun.identity.authentication.config.AMAuthConfigType" level="WARN" />
+    <logger name="com.sun.identity.authentication.config.AMAuthLevelManager" level="WARN" />
+    <logger name="com.sun.identity.authentication.config.AMAuthenticationManager" level="WARN" />
+    <logger name="com.sun.identity.authentication.config.AMConfiguration" level="WARN" />
+    <logger name="com.sun.identity.authentication.internal.server.SMSAuthModule" level="WARN" />
+    <logger name="com.sun.identity.authentication.jaas.LoginContext" level="WARN" />
+    <logger name="com.sun.identity.authentication.modules.application.Application" level="WARN" />
+    <logger name="com.sun.identity.authentication.server.AuthContextLocal" level="WARN" />
+    <logger name="com.sun.identity.authentication.service.AMLoginContext" level="WARN" />
+    <logger name="com.sun.identity.authentication.service.AuthContextLookup" level="WARN" />
+    <logger name="com.sun.identity.authentication.service.AuthD" level="WARN" />
+    <logger name="com.sun.identity.authentication.service.DSAMECallbackHandler" level="WARN" />
+    <logger name="com.sun.identity.authentication.service.LoginState" level="WARN" />
+    <logger name="com.sun.identity.authentication.spi.AMLoginModule" level="WARN" />
+    <logger name="com.sun.identity.delegation.DelegationEvaluatorImpl" level="WARN" />
+    <logger name="com.sun.identity.entitlement.opensso.OpenSSOPrivilege" level="WARN" />
+    <logger name="com.sun.identity.idm.plugins.internal.AgentsRepo" level="WARN" />
+    <logger name="com.sun.identity.idm.plugins.internal.SpecialRepo" level="WARN" />
+    <logger name="com.sun.identity.idm.server.IdCachedServicesImpl" level="WARN" />
+    <logger name="com.sun.identity.idm.server.IdRepoJAXRPCObjectImpl" level="WARN" />
+    <logger name="com.sun.identity.idm.server.IdRepoPluginsCache" level="WARN" />
+    <logger name="com.sun.identity.idm.server.IdServicesImpl" level="WARN" />
+    <logger name="com.sun.identity.log.spi.ISDebug" level="WARN" />
+    <logger name="com.sun.identity.policy.SubjectEvaluationCache" level="WARN" />
+    <logger name="com.sun.identity.shared.encode.CookieUtils" level="WARN" />
+    <logger name="org.forgerock.audit.AuditServiceImpl" level="WARN" />
+    <logger name="org.forgerock.openam.auth.nodes.DataStoreDecisionNode" level="WARN" />
+    <logger name="org.forgerock.openam.auth.nodes.PasswordCollectorNode" level="WARN" />
+    <logger name="org.forgerock.openam.auth.nodes.UsernameCollectorNode" level="WARN" />
+    <logger name="org.forgerock.openam.authentication.service.JAASModuleDetector" level="WARN" />
+    <logger name="org.forgerock.openam.authentication.service.LoginContextFactory" level="WARN" />
+    <logger name="org.forgerock.openam.blacklist.BloomFilterBlacklist" level="WARN" />
+    <logger name="org.forgerock.openam.core.realms.impl.CachingRealmLookup" level="WARN" />
+    <logger name="org.forgerock.openam.cors.CorsFilter" level="WARN" />
+    <logger name="org.forgerock.openam.cts.impl.CoreTokenAdapter" level="WARN" />
+    <logger name="org.forgerock.openam.cts.reaper.ReaperDeleteOnQueryResultHandler" level="WARN" />
+    <logger name="org.forgerock.openam.headers.DisableSameSiteCookiesFilter" level="WARN" />
+    <logger name="org.forgerock.openam.rest.CsrfFilter" level="WARN" />
+    <logger name="org.forgerock.openam.rest.SSOTokenFactory" level="WARN" />
+    <logger name="org.forgerock.openam.rest.fluent.CrestLoggingFilter" level="WARN" />
+    <logger name="org.forgerock.openam.rest.restAuthenticationFilter" level="WARN" />
+    <logger name="org.forgerock.openam.scripting.sandbox.RhinoSandboxClassShutter" level="WARN" />
+    <logger name="org.forgerock.openam.utils.ClientUtils" level="WARN" />
+    <logger name="org.forgerock.openidconnect.backchannel.BackChannelLogoutNotifier" level="WARN" />
+    <logger name="org.forgerock.secrets.SecretReference" level="WARN" />
+    <logger name="org.forgerock.secrets.propertyresolver.PropertyResolverSecretStore" level="WARN" />
+    <logger name="org.forgerock.util.i18n.PreferredLocales" level="WARN" />
+
+    <!-- The following section sets logging to ERROR level & above in certain packages/classes to filter out noise -->
+    <!-- <logger name="org.forgerock.openam.PLACEHOLDER" level="ERROR" />  -->
+
+</configuration>
