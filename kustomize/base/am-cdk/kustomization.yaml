@@ -11,3 +11,11 @@ resources:
 - deployment.yaml
 - service.yaml
 # - hpa.yaml
+
+configMapGenerator:
+- name: am-logback
+  files:
+  - config/logback.xml
+
+generatorOptions:
+  disableNameSuffixHash: true
