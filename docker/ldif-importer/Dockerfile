@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds:7.3.0
+FROM gcr.io/forgerock-io/ds:7.3.1
 
 USER 0
 
