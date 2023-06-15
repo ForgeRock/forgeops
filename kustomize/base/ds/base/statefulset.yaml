@@ -99,10 +99,10 @@ spec:
               key: AUTORESTORE_FROM_DSBACKUP
         resources:
           requests:
-            memory: 512Mi
+            memory: 1366Mi
             cpu: 250m
           limits:
-            memory: 1024Mi
+            memory: 1366Mi
       containers:
       - name: ds
         image: ds
@@ -153,10 +153,10 @@ spec:
             name: cloud-storage-credentials
         resources:
           requests:
-            memory: 512Mi
+            memory: 1366Mi
             cpu: 250m
           limits:
-            memory: 1024Mi
+            memory: 1366Mi
         volumeMounts:
         - name: data
           mountPath: /opt/opendj/data
