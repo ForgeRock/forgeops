@@ -12,4 +12,4 @@ resources:
 images:
 - name: .*login-ui.*
   newName: gcr.io/forgerock-io/platform-login-ui/docker-build
-  newTag: 7.3.0-7.3.x-postcommit-latest
+  newTag: 7.3.1-postcommit-latest
