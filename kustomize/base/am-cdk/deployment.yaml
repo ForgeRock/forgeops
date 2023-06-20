@@ -158,6 +158,6 @@ spec:
               name: ds-ssl-keypair
       - name: new-truststore
         emptyDir: {}
-      - name: logback
+      - name: am-logback
         configMap:
           name: am-logback
