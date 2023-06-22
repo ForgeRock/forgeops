@@ -10,10 +10,10 @@ spec:
   podTemplate:
     resources:
       requests:
-        memory: 900Mi
+        memory: 1366Mi
         cpu: 250m
       limits:
-        memory: 1024Mi
+        memory: 1366Mi
     volumeClaimSpec:
       storageClassName: standard
       resources:
