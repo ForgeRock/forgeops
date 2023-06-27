@@ -14,7 +14,7 @@ spec:
               memory: 3Gi
               cpu: 2000m
             limits:
-              memory: 5Gi
+              memory: 3Gi
       initContainers:
       - name: initialize
         resources:
@@ -22,7 +22,7 @@ spec:
             memory: 3Gi
             cpu: 2000m
           limits:
-            memory: 5Gi
+            memory: 3Gi
   volumeClaimTemplates:
   - metadata:
       name: data

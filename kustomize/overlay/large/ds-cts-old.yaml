@@ -14,7 +14,7 @@ spec:
               memory: 21Gi
               cpu: 12000m
             limits:
-              memory: 28Gi
+              memory: 21Gi
       initContainers:
       - name: initialize
         resources:
@@ -22,7 +22,7 @@ spec:
             memory: 21Gi
             cpu: 12000m
           limits:
-            memory: 28Gi
+            memory: 21Gi
   volumeClaimTemplates:
   - metadata:
       name: data

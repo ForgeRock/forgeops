@@ -14,7 +14,7 @@ spec:
               memory: 4Gi
               cpu: 1500m
             limits:
-              memory: 6Gi
+              memory: 4Gi
       initContainers:
       - name: initialize
         resources:
@@ -22,7 +22,7 @@ spec:
             memory: 4Gi
             cpu: 1500m
           limits:
-            memory: 6Gi
+            memory: 4Gi
   volumeClaimTemplates:
   - metadata:
       name: data

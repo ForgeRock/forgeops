@@ -88,10 +88,10 @@ spec:
         name: init
         resources:
           limits:
-            memory: 1Gi
+            memory: 1366Mi
           requests:
             cpu: 500m
-            memory: 900Mi
+            memory: 1366Mi
         volumeMounts:
         - mountPath: /opt/opendj/data
           name: data

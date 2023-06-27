@@ -13,7 +13,7 @@ spec:
         memory: 11Gi
         cpu: 8000m
       limits:
-        memory: 14Gi
+        memory: 11Gi
     volumeClaimSpec:
       storageClassName: fast
       resources:

@@ -12,7 +12,7 @@ spec:
         imagePullPolicy: Always
         resources:
           limits:
-            memory: 2Gi
+            memory: 1Gi
           requests:
             cpu: 1
             memory: 1Gi

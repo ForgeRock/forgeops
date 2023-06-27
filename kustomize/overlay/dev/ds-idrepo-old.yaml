@@ -11,10 +11,10 @@ spec:
         - name: ds
           resources:
             requests:
-              memory: 1Gi
+              memory: 1366Mi
               cpu: 1
             limits:
-              memory: 2Gi
+              memory: 1366Mi
   volumeClaimTemplates:
   - metadata:
       name: data

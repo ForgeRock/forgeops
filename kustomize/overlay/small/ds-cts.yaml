@@ -13,7 +13,7 @@ spec:
         memory: 3Gi
         cpu: 2000m
       limits:
-        memory: 5Gi
+        memory: 3Gi
     volumeClaimSpec:
       storageClassName: fast
       resources:
