@@ -169,7 +169,8 @@ def runUpgrade(PipelineRunLegacyAdapter pipelineRun, Random random, String stage
 def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String stageName, Map config) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testConfig = getDefaultConfig(random, stageName) + config +
-            [EXT_PLATFORM_IMAGES_REF: commonModule.platformImagesRevision]
+            [EXT_PLATFORM_IMAGES_REF: commonModule.platformImagesRevision,
+             EXT_FORGEOPS_REF       : commonModule.GIT_COMMIT]
     def stagesCloud = [:]
     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
 
