@@ -27,6 +27,20 @@ void runStage() {
             sh("./configure.py env --gke-only")
             sh("./configure.py runtime --forgeops-branch-name ${branchName} --keywords FUNCTIONAL")
             sh("./run.py")
+
+            dir('tmp_dir'){
+                // Archive all folders and files out of the docker container
+                sh(script:"cp -r ../reports/latest/* .")
+                archiveArtifacts(artifacts: '**')
+
+                // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
+                sh(script:"rm -rf tmp")
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
+                             reportDir   : '.', reportFiles: 'report.html',
+                             reportName  : "Guillotine Test Report",
+                             reportTitles: ''])
+            }
+
         }
     }
 }
