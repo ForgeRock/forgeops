@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # Setup the directory server for the idrepo service.
 # Add in custom tuning, index creation, etc. to this file.
 
