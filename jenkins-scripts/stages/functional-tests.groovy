@@ -24,23 +24,26 @@ void runStage() {
 
             localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
             def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+            // Configure environment to make Guillotine works on GKE
             sh("./configure.py env --gke-only")
+            // Configure Guillotine to run functional tests (all test suites with FUNCTIONAL keyword)
             sh("./configure.py runtime --forgeops-branch-name ${branchName} --keywords FUNCTIONAL")
-            sh("./run.py")
-
-            dir('tmp_dir'){
-                // Archive all folders and files out of the docker container
-                sh(script:"cp -r ../reports/latest/* .")
-                archiveArtifacts(artifacts: '**')
-
-                // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
-                sh(script:"rm -rf tmp")
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
-                             reportDir   : '.', reportFiles: 'report.html',
-                             reportName  : "Guillotine Test Report",
-                             reportTitles: ''])
+            try {
+                // Run the tests
+                sh("./run.py")
+            } finally {
+                dir('tmp_dir'){
+                    // Archive all folders and files out of the docker container
+                    sh(script:"cp -r ../reports/latest/* .")
+                    archiveArtifacts(artifacts: '**')
+                    // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
+                    sh(script:"rm -rf tmp")
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
+                                 reportDir   : '.', reportFiles: 'report.html',
+                                 reportName  : "Guillotine Test Report",
+                                 reportTitles: ''])
+                }
             }
-
         }
     }
 }
