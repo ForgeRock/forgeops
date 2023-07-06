@@ -11,13 +11,13 @@ images:
   newTag: 7.3.0
 - name: ds
   newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: 7.3.1
+  newTag: 7.3.2
 - name: ds-cts
   newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: 7.3.1
+  newTag: 7.3.2
 - name: ds-idrepo
   newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: 7.3.1
+  newTag: 7.3.2
 - name: git-server
   newName: us-docker.pkg.dev/forgeops-public/images/git-server
 - name: idm
@@ -25,4 +25,4 @@ images:
   newTag: 7.3.0
 - name: ig
   newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: 2023.2.0
+  newTag: 2023.6.0
