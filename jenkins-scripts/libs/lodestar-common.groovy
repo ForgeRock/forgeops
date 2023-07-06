@@ -49,7 +49,7 @@ def getPromotedProductImageTag(platformImagesRevision, productName) {
     return readJSON(text: content)['imageTag']
 }
 
-fraasProductionTag = '7.2.0'
+fraasProductionTag = 'sustaining/7.2.x'
 forgeopsFraasProduction = getPromotedProductCommit(fraasProductionTag, 'forgeops')
 
 SUMMARY_REPORT_NAME = 'SummaryReport'
