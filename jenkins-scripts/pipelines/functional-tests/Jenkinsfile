@@ -43,6 +43,7 @@ node('gce-vm-forgeops-n1-standard-8') {
 def initialSteps() {
     properties([
             buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
+            pipelineTriggers([cron('0 H * * 1-5')]),
     ])
 
     slackChannel = '#forgeops-notify'
