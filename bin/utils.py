@@ -91,16 +91,21 @@ bundles = {
     'ds': ['base/ds-idrepo'],
     'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
     'ds-old': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
-    'apps': ['base/am', 'base/idm', inject_kustomize_amster],
+    'apps': ['base/am-cdk', 'base/idm-cdk', inject_kustomize_amster],
+    'apps-legacy': ['base/am', 'base/idm', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
-    'am': ['base/am'],
-    'idm': ['base/idm'],
+    'am': ['base/am-cdk'],
+    'idm': ['base/idm-cdk'],
+    'am-legacy': ['base/am'],
+    'idm-legacy': ['base/idm'],
     'amster': [inject_kustomize_amster]
 }
 
 patcheable_components ={
     'base/am': 'am.yaml',
+    'base/am-cdk': 'am.yaml',
     'base/idm': 'idm.yaml',
+    'base/idm-cdk': 'idm.yaml',
     'base/kustomizeConfig': 'base.yaml',
     'base/ds/idrepo': 'ds-idrepo-old.yaml',
     'base/ds/cts': 'ds-cts-old.yaml',
@@ -383,6 +388,16 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     run('kustomize', f'create', cwd=profile_dir)
     run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}',
               cwd=profile_dir)
+
+    # Use legacy components if --legacy flag used
+    if legacy and component == 'apps':
+        component = 'apps-legacy'
+
+    if legacy and component == 'am':
+        component = 'am-legacy'
+
+    if legacy and component == 'idm':
+        component = 'idm-legacy'
 
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files

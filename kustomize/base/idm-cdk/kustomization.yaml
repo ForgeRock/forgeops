@@ -11,3 +11,11 @@ resources:
 - configmap.yaml
 - deployment.yaml
 - service.yaml
+
+configMapGenerator:
+- name: idm-logging-properties
+  files:
+  - config/logging.properties
+
+generatorOptions:
+  disableNameSuffixHash: true

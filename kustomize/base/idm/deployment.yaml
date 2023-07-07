@@ -50,10 +50,10 @@ spec:
         - name: TRUSTSTORE_PASSWORD
           value: changeit
         - name: IDM_PEM_TRUSTSTORE
+        # Secret agent generated truststore
           value: "/var/run/secrets/truststore/cacerts"
-        # cert-manager truststore used for the connection to DS
-        # - name: IDM_PEM_TRUSTSTORE_DS
-        #   value: "/var/run/secrets/truststore/ca.crt"
+        # cert-manager generated truststore
+          # value: "/var/run/secrets/truststore/ca.crt"
       containers:
       - name: openidm
         image: idm
@@ -151,9 +151,13 @@ spec:
           secretName: idm
       - name: new-truststore
         emptyDir: {}
+
       - name: truststore
         secret:
+          # secret agent generated truststore
           secretName: truststore-pem
+          # cert-manager generated truststore
+          # secretName: ds-ssl-keypair
       - name: logs
         emptyDir: {}
       - name: audit-logs
