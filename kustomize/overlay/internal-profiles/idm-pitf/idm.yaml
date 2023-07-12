@@ -6,6 +6,10 @@ metadata:
 spec:
   replicas: 1
   template:
+    metadata:
+      annotations:
+        # prevent autoscaler from terminating the pod
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
     spec:
       containers:
         - name: openidm
