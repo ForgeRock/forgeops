@@ -20,13 +20,13 @@ log = None
 REPO_TO_PLATFORM = {
     # Example:
     # The ds-empty image should use the ds.json file in platform-images to find the sha commit tag
-    'gcr.io/forgerock-io/ds-empty/pit1': 'ds',
-    'gcr.io/forgerock-io/ds/pit1': 'ds',
-    'gcr.io/forgerock-io/am-cdk/pit1': 'am',
+    'gcr.io/forgerock-io/ds-empty': 'ds',
+    'gcr.io/forgerock-io/ds': 'ds',
+    'gcr.io/forgerock-io/am-cdk': 'am',
     # Amster commits are the same as am
-    'gcr.io/forgerock-io/amster/pit1': 'amster',
-    'gcr.io/forgerock-io/idm-cdk/pit1': 'idm',
-    'gcr.io/forgerock-io/ig/pit1': 'ig',
+    'gcr.io/forgerock-io/amster': 'amster',
+    'gcr.io/forgerock-io/idm-cdk': 'idm',
+    'gcr.io/forgerock-io/ig': 'ig',
 }
 
 SCRIPT_DIR = Path(__file__)
@@ -420,8 +420,8 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
                 if v in products:
                     if update_repo is not None or update_tag is not None:
                         repo = k if update_repo is None else update_repo
-                        tag = current_tag if update_tag is None else update_tag
-                        new_image = f'{repo}:{tag}'
+                        tag = current_tag if update_tag is None else f':{update_tag}'
+                        new_image = f'{repo}{tag}'
                     else:
                         product_config = products[v]
                         new_image = f'{product_config["imageName"]}:{product_config["imageTag"]}'
