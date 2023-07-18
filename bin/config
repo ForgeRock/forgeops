@@ -98,6 +98,7 @@ APP_CONF_PATH_FMT = {
 KUBECTL = shutil.which('kubectl')
 AMSTER_BIN = utils.SCRIPT_DIR.joinpath('amster').resolve()
 AM_UPGRADER = utils.SCRIPT_DIR.joinpath('am-config-upgrader').resolve()
+AM_UPGRADER_TAG = '7.2.2-004c995b364505812590d3172d2e18eb9236964c'
 
 
 def profile_path(path):
@@ -182,6 +183,9 @@ def upgrade_am(am_conf):
     log.info('Completed upgrading AM configuration')
 
     log.info('Running AM static config through the am-config-upgrader to replace any missing default placeholders.')
+    
+    # Temporarily change the am_config_upgrader tag. This will be removed when AM 7.2.2 is released and we create a new forgeops release branch for 7.2.
+    os.environ["TAG"] = AM_UPGRADER_TAG
     try:
         utils.run(AM_UPGRADER, str(am_conf), str(utils.RULES_PATH))
     except utils.RunError as e:
