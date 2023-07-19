@@ -7,3 +7,6 @@ commonLabels:
 resources:
 - ../base
 nameSuffix: -cts
+images:
+- newName: ds-cts
+  name: ds

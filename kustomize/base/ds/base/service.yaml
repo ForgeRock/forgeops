@@ -3,19 +3,32 @@ kind: Service
 metadata:
   name: ds
   labels:
-    component: ds
+    app.kubernetes.io/instance: ds-idrepo
+    app.kubernetes.io/name: ds
+    app.kubernetes.io/part-of: forgerock
 spec:
   clusterIP: None
   ports:
-  - name: admin
+  - name: tcp-admin
     port: 4444
-  - name: ldap
+    protocol: TCP
+    targetPort: 4444
+  - name: tcp-ldap
     port: 1389
-  - name: ldaps
+    protocol: TCP
+    targetPort: 1389
+  - name: tcp-ldaps
     port: 1636
+    protocol: TCP
+    targetPort: 1636
+  - name: tcp-replication
+    port: 8989
+    protocol: TCP
+    targetPort: 8989
   - name: http
     port: 8080
-  - name: https
-    port: 8443
+    protocol: TCP
+    targetPort: 8080
   selector:
-    app: ds
+    app.kubernetes.io/instance: ds-idrepo
+    app.kubernetes.io/name: ds

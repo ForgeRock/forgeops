@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Checking idrepo store is up
+# Checking DS is up
 
 wait_repo() {
     REPO="$1-0.$1"
@@ -12,15 +12,21 @@ wait_repo() {
     echo "$REPO is responding"
 }
 
+# Check whether deployment is CDK or CDM
+size=$FORGEOPS_PLATFORM_SIZE
 
 wait_repo ds-idrepo
-wait_repo ds-cts
+
+# Wait for cts server to be ready when deploying CDM
+if [ $size != "cdk" ]; then 
+    wait_repo ds-cts
+fi
 
 
 # Set the DS passwords for each store
 if [ -f "/opt/opendj/ds-passwords.sh" ]; then
     echo "Setting directory service account passwords"
-    /opt/opendj/ds-passwords.sh
+    /opt/opendj/ds-passwords.sh $size
     if [ $? -ne 0 ]; then
         echo "ERROR: Pre install script failed"
         exit 1

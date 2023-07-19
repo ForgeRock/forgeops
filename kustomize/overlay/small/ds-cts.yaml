@@ -1,21 +1,36 @@
-# Sample DirectoryService deployment
-apiVersion: directory.forgerock.io/v1alpha1
-kind: DirectoryService
+#Patch DS CTS
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: ds-cts
 spec:
-  # The number of DS servers in the topology
   replicas: 3
-  # The resources assigned to each DS pod
-  podTemplate:
-    resources:
-      requests:
-        memory: 3Gi
-        cpu: 2000m
-      limits:
-        memory: 3Gi
-    volumeClaimSpec:
-      storageClassName: fast
+  template:
+    spec:
+      containers:
+      - name: ds
+        resources:
+          requests:
+            memory: 3Gi
+            cpu: 2000m
+          limits:
+            memory: 3Gi
+      initContainers:
+      - name: init
+        resources:
+          requests:
+            memory: 3Gi
+            cpu: 2000m
+          limits:
+            memory: 3Gi
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
           storage: 100Gi
+      storageClassName: fast

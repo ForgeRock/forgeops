@@ -11,5 +11,5 @@ resources:
 
 images:
   - name: ldif-importer
-    newName: gcr.io/forgerock-io/ldif-importer
-    newTag: 7-stable
+    newName: us-docker.pkg.dev/forgeops-public/images/ldif-importer
+    newTag: dev
