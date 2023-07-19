@@ -1,0 +1,221 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds
+  labels:
+    tier: ds
+spec:
+  selector:
+    matchLabels:
+      app: ds
+  serviceName: ds
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        tier: ds
+    spec:
+      affinity:
+        # Pod anti-affinity will attempt to spread out (repel) DS instances on to different nodes
+        # Note that the anti affinity is based on the label in the match expression below, and impacts *all* ds instances
+        # Example: You deploy 3 cts instances, and 3 idrepos. The expression below will attempt to schedule those
+        # across 6 nodes.
+        podAntiAffinity:
+          # We use soft anti-affinity to schedule on a best efforts basis.
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: affinity
+                  operator: In
+                  values:
+                  - directory
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: ds
+                operator: Exists
+
+      # Create a toleration that allows this pod to be scheduled on a tainted node
+      # This is used to drive directory instances to dedicated nodes for performance.
+      # If a node is not tainted, this has no impact.
+      tolerations:
+      - key: "WorkerDedicatedDS"
+        operator: "Exists"
+      initContainers:
+      - name: initialize
+        image: ds
+        imagePullPolicy: Always
+        command: ["/opt/opendj/scripts/init-and-restore.sh"]
+        volumeMounts:
+        - name: data
+          mountPath: /opt/opendj/data
+        - name: secrets
+          mountPath: /opt/opendj/secrets
+        - name: secrets
+          mountPath: /var/run/secrets/opendj
+        - name: secrets
+          mountPath: /opt/opendj/pem-keys-directory/ssl-key-pair
+          subPath: ssl-key-pair-combined.pem
+        - name: secrets
+          mountPath: /opt/opendj/pem-keys-directory/master-key
+          subPath: master-key-pair-combined.pem
+        - name: truststore
+          mountPath: /opt/opendj/pem-trust-directory/cacerts.pem
+          subPath: cacerts
+        - name: cloud-credentials-cache
+          mountPath: /var/run/secrets/cloud-credentials-cache/
+        - name: passwords
+          mountPath: /var/run/secrets/opendj-passwords
+        envFrom:
+        - secretRef:
+            name: cloud-storage-credentials
+        env:
+        - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+          value: "true"
+        - name: DS_UID_MONITOR_PASSWORD_FILE
+          value: "/var/run/secrets/opendj-passwords/monitor.pw"
+        - name: DS_UID_ADMIN_PASSWORD_FILE
+          value: "/var/run/secrets/opendj-passwords/dirmanager.pw"
+        - name: DSBACKUP_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: DSBACKUP_HOSTS
+        - name: DSBACKUP_DIRECTORY
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: DSBACKUP_DIRECTORY
+        - name: AUTORESTORE_FROM_DSBACKUP
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: AUTORESTORE_FROM_DSBACKUP
+        resources:
+          requests:
+            memory: 1366Mi
+            cpu: 250m
+          limits:
+            memory: 1366Mi
+      containers:
+      - name: ds
+        image: ds
+        imagePullPolicy: Always
+        args:
+        - start-ds
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: DSBACKUP_HOSTS
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: DSBACKUP_HOSTS
+        - name: DSBACKUP_DIRECTORY
+          valueFrom:
+            configMapKeyRef:
+              name: platform-config
+              key: DSBACKUP_DIRECTORY
+        # Best to let DS calculate this rather than hard code here.
+        # - name: DS_BOOTSTRAP_REPLICATION_SERVERS
+        #   value: ds-0.ds.default.svc.cluster.local:8989
+        # See https://bugster.forgerock.org/jira/browse/CLOUD-1877
+        # Live / Ready probes complicate DS operations. Pod restart rarely solves DB issues.
+        # livenessProbe:
+        #   initialDelaySeconds: 60
+        #   periodSeconds: 120
+        #   httpGet:
+        #     path: /alive
+        #     port: http
+        ports:
+          - name: ldap
+            containerPort: 1389
+          - name: ldaps
+            containerPort: 1636
+          - name: admin
+            containerPort: 4444
+          - name: replication
+            containerPort: 8989
+          - name: http
+            containerPort: 8080
+          - name: https
+            containerPort: 8443
+        envFrom:
+        - secretRef:
+            name: cloud-storage-credentials
+        resources:
+          requests:
+            memory: 1366Mi
+            cpu: 250m
+          limits:
+            memory: 1366Mi
+        volumeMounts:
+        - name: data
+          mountPath: /opt/opendj/data
+#       - name: backup
+#         mountPath: /opt/opendj/bak
+        - name: secrets
+          mountPath: /opt/opendj/secrets
+        - name: secrets
+          mountPath: /var/run/secrets/opendj
+        - name: secrets
+          mountPath: /opt/opendj/pem-keys-directory/ssl-key-pair
+          subPath: ssl-key-pair-combined.pem
+        - name: secrets
+          mountPath: /opt/opendj/pem-keys-directory/master-key
+          subPath: master-key-pair-combined.pem
+        - name: truststore
+          mountPath: /opt/opendj/pem-trust-directory/cacerts.pem
+          subPath: cacerts
+        - name: cloud-credentials-cache
+          mountPath: /var/run/secrets/cloud-credentials-cache/
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+        runAsGroup: 0
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: secrets
+        secret:
+          secretName: ds
+      - name: passwords
+        secret:
+          secretName: ds-passwords
+      - name: cloud-credentials-cache
+        emptyDir: {}
+      - name: truststore
+        secret:
+          secretName: truststore-pem
+          defaultMode: 384
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      # Include below storageClass in overlay if wanting to use local SSD.
+      # storageClassName: "local-storage"
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+
+#  - metadata:
+#      name: backup
+#      annotations:
+#        pv.beta.kubernetes.io/gid: "0"
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      resources:
+#        requests:
+#          storage: 10Gi

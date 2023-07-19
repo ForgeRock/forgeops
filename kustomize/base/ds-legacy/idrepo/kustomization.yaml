@@ -2,8 +2,12 @@ commonLabels:
   app: ds-idrepo
   app.kubernetes.io/name: ds
   app.kubernetes.io/instance: ds-idrepo
+  app.kubernetes.io/component: directory
   app.kubernetes.io/part-of: forgerock
 resources:
 - ../base
 #- loadbalancer.yaml #Uncomment if public load balancer is required in front of DS.
 nameSuffix: -idrepo
+images:
+- newName: ds-idrepo
+  name: ds

@@ -1,0 +1,21 @@
+# Sample DirectoryService deployment
+apiVersion: directory.forgerock.io/v1alpha1
+kind: DirectoryService
+metadata:
+  name: ds-idrepo
+spec:
+  # The number of DS servers in the topology
+  replicas: 3
+  # The resources assigned to each DS pod
+  podTemplate:
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 1500m
+      limits:
+        memory: 4Gi
+    volumeClaimSpec:
+      storageClassName: fast
+      resources:
+        requests:
+          storage: 100Gi

@@ -67,22 +67,22 @@ delete_components = {
     'secrets': False
 }
 
-def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, timeout, pkg_path=None, src_profile_dir=None):
+def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, timeout, operator, pkg_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
-    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
-    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
     utils.waitforsecrets(ns, timeout)
     utils.message('\nDeploying ds.yaml. This includes all directory resources.')
-    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few minutes. First installation takes longer.')
-    utils.wait_for_ds(ns, 'ds-idrepo', legacy, timeout)
-    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy)
+    utils.wait_for_ds(ns, 'ds-idrepo', legacy, operator, timeout)
+    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy, operator)
     # Clean any existing Amster resources
     utils.clean_amster_job(ns, False)
     utils.message('\nDeploying apps.')
-    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_am(ns, timeout)
@@ -93,7 +93,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_pro
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_idm(ns, timeout)
     utils.message('\nDeploying UI.')
-    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -156,12 +156,14 @@ def main():
     common_dg = argparse.ArgumentParser(add_help=False) # debug
     common_pf = argparse.ArgumentParser(add_help=False) # config profile
     common_lg = argparse.ArgumentParser(add_help=False) # legacy
+    common_op = argparse.ArgumentParser(add_help=False) # use DS Operator
     common_dl = argparse.ArgumentParser(add_help=False) # generated deployment manifest path
     common = argparse.ArgumentParser(add_help=False)
     common_ns.add_argument('--namespace', '-n', default='',
                            help='Target namespace (default: current ctx namespace)')
     common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
     common_lg.add_argument('--legacy', dest='legacy', default=False, action='store_true', help=argparse.SUPPRESS)
+    common_op.add_argument('--operator', '-o', dest='operator', default=False, action='store_true', help="Use DS Operator to deploy DS")
     common_pf.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of config profile in docker/<component>/config-profiles")
     common_dl.add_argument('--deploy-env', dest='deploy_env', default=None, help='Suffix of kustomize manifest directory for multiple deployments. For example: kustomize/deploy-<suffix>')
     common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
@@ -176,7 +178,7 @@ def main():
     size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches')
 
     subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
-    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_lg, common_dl], allow_abbrev=False,
+    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_lg, common_dl, common_op], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
@@ -185,7 +187,7 @@ def main():
     parser_install.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_install.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
-    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_lg, common_dl],
+    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_lg, common_dl, common_op],
                                           help='Generate the ForgeRock Identity Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
@@ -193,7 +195,7 @@ def main():
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
     parser_generate.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
     parser_delete = subparser.add_parser(
-        'delete', parents=[common_ns, common, common_dg, common_pf], help='Delete ForgeRock Identity Platform components or component bundles')
+        'delete', parents=[common_ns, common, common_dg, common_pf, common_op], help='Delete ForgeRock Identity Platform components or component bundles')
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
     parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
@@ -206,7 +208,7 @@ def main():
     parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
     parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
     subparser.add_parser('config', parents=[common_ns, common_pf], help='Overlay local configs in the AM and IDM pods') # Internal FR use only!!. Hidden
-    parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg, common_lg], help='Wait for platform components', allow_abbrev=False)
+    parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg, common_lg, common_op], help='Wait for platform components', allow_abbrev=False)
     parser_wait.add_argument('components', nargs='*', choices=wait_targets)
     parser_wait.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
@@ -223,6 +225,8 @@ def main():
         fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
         size = args.size if getattr(args, 'size', None) else 'cdk'
         ingress_class = args.ingress_class if getattr(args, 'ingress_class', None) else 'nginx'
+        
+        # Set custom size
         src_profile_dir = getattr(args, 'custom', None)
         remap = size_map[size]
         if src_profile_dir:
@@ -328,16 +332,16 @@ def main():
 
         # Uninstall components
         for c in components:
-            utils.uninstall_component(remap.get(c, c), namespace, delete, delete_components, ingress_class, False, args.config_profile)
+            utils.uninstall_component(remap.get(c, c), namespace, delete, delete_components, ingress_class, False, args.config_profile, args.operator)
 
         # Prompt to delete PVCs, secrets, and volume snapshots
         if any(x in "ds dsold ds-idrepo ds-cts secrets all" for x in components):
             if delete_components['pvc'] or delete:
-                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
+                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/name=ds --ignore-not-found=true')
             if delete_components['snapshots'] or delete:
                 utils.run('kubectl', f'-n {namespace} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
             if delete_components['secrets'] or delete:
-                utils.uninstall_component('secrets', namespace, False, delete_components, ingress_class, False, args.config_profile)
+                utils.uninstall_component('secrets', namespace, False, delete_components, ingress_class, False, args.config_profile, args.operator)
                 utils.run('kubectl', f'-n {namespace} delete secret ds-master-keypair ds-ssl-keypair --ignore-not-found=true')
         return
 
@@ -364,8 +368,8 @@ def main():
         size = utils.get_deployed_size(namespace)
         if 'ds' in components or 'ds-old' in components:
             utils.message('Waiting for DS deployment.')
-            utils.wait_for_ds(namespace, 'ds-idrepo', args.legacy, args.timeout)
-            if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts', args.legacy)
+            utils.wait_for_ds(namespace, 'ds-idrepo', args.legacy, args.operator, args.timeout)
+            if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts', args.legacy, args.operator)
 
         if 'am' in components:
             utils.message('Waiting for AM deployment.')
@@ -396,7 +400,7 @@ def main():
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
             custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.legacy, args.config_profile, custom_path, src_profile_dir, pkg_path)
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.legacy, args.config_profile, args.operator, custom_path, src_profile_dir, pkg_path)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
             instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
             if c in wait_targets:
@@ -407,14 +411,14 @@ def main():
         utils.message('\nEnjoy your forgeops manifests!')
         return
 
-    utils.install_dependencies(args.legacy)
+    utils.install_dependencies(args.legacy, args.operator)
 
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}" from deployment manifests in "{args.deploy_env}".\n')
     if 'all' in components:
-        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.timeout, pkg_path, src_profile_dir)
+        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.timeout, args.operator, pkg_path, src_profile_dir)
     else:
         for c in components:
-            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, pkg_path, src_profile_dir)
+            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.operator, pkg_path, src_profile_dir)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace, args.timeout)

@@ -1,0 +1,21 @@
+# Sample DirectoryService deployment
+apiVersion: directory.forgerock.io/v1alpha1
+kind: DirectoryService
+metadata:
+  name: ds-cts
+spec:
+  # The number of DS servers in the topology
+  replicas: 1
+  # The resources assigned to each DS pod
+  podTemplate:
+    resources:
+      requests:
+        memory: 1366Mi
+        cpu: 250m
+      limits:
+        memory: 1366Mi
+    volumeClaimSpec:
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 10Gi
