@@ -51,7 +51,7 @@ def initialSteps() {
 
 def finalNotification() {
     stage('Final notification') {
-        // If some of the postcommit tests fail, the plugin that manages this doesn't throw an exception,
+        // If some of the tests fail, the plugin that manages this doesn't throw an exception,
         // but it does set the build result to UNSTABLE/FAILURE. If it does not do that => SUCCESS
         if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
             currentBuild.result = 'SUCCESS'
@@ -59,6 +59,8 @@ def finalNotification() {
             // Send a 'build is back to normal' notification if the previous build was not good
             if (buildIsBackToNormal()) {
                 slackUtils.sendBackToNormalMessage(slackChannel)
+            } else {
+                sendSlackNotification()
             }
         } else {
             sendSlackNotification()
