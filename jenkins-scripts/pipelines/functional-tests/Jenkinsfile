@@ -68,4 +68,6 @@ def finalNotification() {
     }
 }
 
-
+private void sendSlackNotification(String messageSuffix = '') {
+    slackUtils.sendNoisyStatusMessage(slackChannel, currentBuild.result, messageSuffix)
+}
