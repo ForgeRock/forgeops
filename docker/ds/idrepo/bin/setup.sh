@@ -6,7 +6,7 @@ set -e
 # Profile and versions. If the schema for a profile has not been
 # changed - it may use an older version. For example, AM 7.3 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
-AM_IDENTITY_STORE="am-identity-store:7.2"
+AM_IDENTITY_STORE="am-identity-store"
 IDM_REPO="idm-repo"
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.0"
