@@ -1,0 +1,12 @@
+resources:
+  - ../all
+  - ../../base/ig
+  - ../../base/pdb
+
+patches:
+- path: am.yaml
+- path: base.yaml
+- path: ds-cts-old.yaml
+- path: ds-idrepo-old.yaml
+- path: idm.yaml
+

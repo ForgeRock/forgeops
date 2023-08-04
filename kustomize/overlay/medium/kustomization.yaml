@@ -18,6 +18,6 @@ resources:
 patches:
 - path: am.yaml
 - path: base.yaml
-- path: ds-cts.yaml
-- path: ds-idrepo.yaml
+- path: ds-cts-old.yaml
+- path: ds-idrepo-old.yaml
 - path: idm.yaml

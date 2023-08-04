@@ -88,11 +88,9 @@ size_paths = {
 bundles = {
     'base': ['dev/kustomizeConfig', 'base/ingress', 'dev/scripts'],
 	'base-cdm': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
-    'ds-operator': ['base/ds-idrepo'],
-    'ds-operator-cdm': ['base/ds-idrepo', 'base/ds-cts'],
-    'ds': ['base/ds/idrepo', 'base/ldif-importer'],
-    'ds-cdm': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
-    'ds-old': ['base/ds-legacy/idrepo', 'base/ds-legacy/cts', 'base/ldif-importer'],
+    'ds': ['base/ds-idrepo'],
+    'ds-cdm': ['base/ds-idrepo', 'base/ds-cts'],
+    'ds-old': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
     'apps': ['base/am', 'base/idm', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
     'am': ['base/am'],
@@ -104,12 +102,10 @@ patcheable_components ={
     'base/am': 'am.yaml',
     'base/idm': 'idm.yaml',
     'base/kustomizeConfig': 'base.yaml',
-    'base/ds/idrepo': 'ds-idrepo.yaml',
-    'base/ds/cts': 'ds-cts.yaml',
-    'base/ds-legacy/idrepo': 'ds-idrepo-old.yaml',
-    'base/ds-legacy/cts': 'ds-cts-old.yaml',
-    'base/ds-idrepo': 'ds-idrepo-op.yaml',
-    'base/ds-cts': 'ds-cts-op.yaml',
+    'base/ds/idrepo': 'ds-idrepo-old.yaml',
+    'base/ds/cts': 'ds-cts-old.yaml',
+    'base/ds-idrepo': 'ds-idrepo.yaml',
+    'base/ds-cts': 'ds-cts.yaml',
     'base/ig': 'ig.yaml',
     'base/ingress': 'ingress.yaml',
     'base/secrets': 'secret_agent_config.yaml'
@@ -321,7 +317,7 @@ def waitforsecrets(ns, timeout=60):
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], timeout)
 
 
-def wait_for_ds(ns, directoryservices_name, legacy, operator, timeout_secs=600):
+def wait_for_ds(ns, directoryservices_name, legacy, timeout_secs=600):
     """
     Wait for DS pods to be ready after ds-operator deployment.
     ns: target namespace.
@@ -363,7 +359,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=None, src_profile_dir=None, deploy_pkg_path=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=None, src_profile_dir=None, deploy_pkg_path=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -387,13 +383,6 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     run('kustomize', f'create', cwd=profile_dir)
     run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}',
               cwd=profile_dir)
-
-    # Set component to DS Operator if operator argument is true
-    if operator:
-        if component == 'ds':
-            component = 'ds-operator'
-        if component == 'ds-cdm':
-            component = 'ds-operator-cdm'
 
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
@@ -432,7 +421,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_base_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, pkg_base_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -445,7 +434,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     """
     pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
     custom_path = os.path.join(pkg_base_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=custom_path, src_profile_dir=src_profile_dir)
+    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=custom_path, src_profile_dir=src_profile_dir)
 
     # Remove amster components
     if component == "amster":
@@ -457,7 +446,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force, delete_components, ingress_class, legacy, config_profile, operator):
+def uninstall_component(component, ns, force, delete_components, ingress_class, legacy, config_profile):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -466,13 +455,13 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
     """
     if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force, delete_components, ingress_class, legacy, operator)
+            uninstall_component(c, ns, force, delete_components, ingress_class, legacy)
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(sys.path[0], '../kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, config_profile, operator, custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, config_profile, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)
@@ -601,7 +590,7 @@ def check_base_toolset():
     ver = ver.decode('ascii').split()[0].split('/')[-1].lstrip('{')
     check_component_version('kustomize', ver)
 
-def install_dependencies(legacy, operator):
+def install_dependencies(legacy):
     """
     Check for and install dependencies in the kubernetes cluster if they are not found.
     If dependencies are found in K8s, this function does not modify or reinstall the components.
@@ -649,7 +638,7 @@ def install_dependencies(legacy, operator):
         cstderr=True, cstdout=True)
     check_component_version('secret-agent', img.decode('ascii').split(':')[1])
 
-    if not legacy and operator:
+    if not legacy:
         print('Checking ds-operator and related CRDs:', end=' ')
         try:
             run('kubectl', 'get crd directoryservices.directory.forgerock.io',
