@@ -278,6 +278,23 @@ profiles:
       paths:
       - ./kustomize/overlay/internal-profiles/idm-only
 
+- name: idm-pitf
+  build:
+    artifacts:
+      - *AM
+      - *AMSTER
+      - *DS-CTS
+      - *DS-IDREPO
+      - *IDM
+      - *IG
+      - *LDIF-IMPORTER
+    tagPolicy:
+      sha256: {}
+  deploy:
+    kustomize:
+      paths:
+        - ./kustomize/overlay/internal-profiles/idm-pitf
+
 - name: ds-only
   build:
     artifacts:
