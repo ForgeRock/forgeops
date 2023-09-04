@@ -31,17 +31,23 @@ void runStage() {
             try {
                 // Run the tests
                 sh("./run.py")
+                currentBuild.result = 'SUCCESS'
+            } catch (Exception exc) {
+                currentBuild.result = 'FAILURE'
+                println('Exception in main(): ' + exc.getMessage())
             } finally {
-                dir('tmp_dir'){
-                    // Archive all folders and files out of the docker container
-                    sh(script:"cp -r ../reports/latest/* .")
-                    archiveArtifacts(artifacts: '**')
-                    // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
-                    sh(script:"rm -rf tmp")
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
-                                 reportDir   : '.', reportFiles: 'report.html',
-                                 reportName  : "Guillotine Test Report",
-                                 reportTitles: ''])
+                if (fileExists('../reports/latest')) {
+                    dir('tmp_dir'){
+                        // Archive all folders and files out of the docker container
+                        sh(script:"cp -r ../reports/latest/* .")
+                        archiveArtifacts(artifacts: '**')
+                        // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
+                        sh(script:"rm -rf tmp")
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
+                                     reportDir   : '.', reportFiles: 'report.html',
+                                     reportName  : "Guillotine Test Report",
+                                     reportTitles: ''])
+                    }
                 }
             }
         }
