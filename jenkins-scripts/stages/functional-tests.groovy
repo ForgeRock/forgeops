@@ -36,7 +36,7 @@ void runStage() {
                 currentBuild.result = 'FAILURE'
                 println('Exception in main(): ' + exc.getMessage())
             } finally {
-                if (fileExists('../reports/latest')) {
+                if (fileExists('reports/latest')) {
                     dir('tmp_dir'){
                         // Archive all folders and files out of the docker container
                         sh(script:"cp -r ../reports/latest/* .")
