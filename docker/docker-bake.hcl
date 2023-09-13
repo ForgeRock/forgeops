@@ -34,7 +34,8 @@ variable "PLATFORM_VERSION" {
 }
 
 variable "PLATFORM_RELEASE" {
-  default = regex_replace(timestamp(), "[- TZ:]", "")
+  #default = regex_replace(timestamp(), "[- TZ:]", "")
+  default = ""
 }
 
 variable "BUILD_TAG" {
