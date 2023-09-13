@@ -75,7 +75,7 @@ REQ_VERSIONS ={
     },
 }
 
-def inject_kustomize_amster(kustomize_pkg_path, config_profile): return _inject_kustomize_amster(kustomize_pkg_path, config_profile)
+def inject_kustomize_amster(kustomize_profile_path, config_profile): return _inject_kustomize_amster(kustomize_profile_path, config_profile)
 
 size_paths = {
     'mini': 'overlay/mini',
@@ -362,7 +362,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=None, src_profile_dir=None, deploy_pkg_path=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=None, src_profile_dir=None, deploy_path=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -372,15 +372,15 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
     custom_path: path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy/COMPONENT.
     src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
-    deploy_pkg_path: path to root of generated kustomize deployment manifests. Defaults to kustomize/deploy-[--deploy-path value if requested] or kustomize/deploy if --deploy-path parameter not requested.
+    deploy_env: path to root of generated kustomize deployment manifests. Defaults to kustomize/deploy-[--deploy-path value if requested] or kustomize/deploy if --deploy-path parameter not requested.
     return profile_dir: path to the generated package.
     return contents: generated kubernetes manifest. This is equivalent to `kustomize build profile_dir`.
     """
     # Clean out the temp kustomize files
     kustomize_dir = os.path.join(sys.path[0], '../kustomize')
     src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
-    image_defaulter = os.path.join(deploy_pkg_path, 'image-defaulter') if deploy_pkg_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
-    profile_dir = custom_path or os.path.join(kustomize_dir, 'deploy', component)
+    image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
+    profile_dir = custom_path or os.path.join(deploy_path, component)
     shutil.rmtree(profile_dir, ignore_errors=True)
     Path(profile_dir).mkdir(parents=True, exist_ok=True)
     run('kustomize', f'create', cwd=profile_dir)
@@ -393,7 +393,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
             component = 'ds-operator'
         if component == 'ds-cdm':
             component = 'ds-operator-cdm'
-        
+
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
@@ -424,7 +424,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
         run('kustomize', f'edit add patch --name forgerock --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name ig --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
-            cwd=profile_dir)     
+            cwd=profile_dir)
         # run('kustomize', f'edit add patch --name icf-ingress --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
         #     cwd=profile_dir)
     _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
@@ -436,7 +436,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_base_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -444,12 +444,12 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     ns: target namespace.
     fqdn: set the FQDN used in the deployment.
     ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
-    pkg_base_path: base path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy.
+    deploy_path: base path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy.
     src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
     """
-    pkg_base_path = pkg_base_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
-    custom_path = os.path.join(pkg_base_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=custom_path, src_profile_dir=src_profile_dir)
+    deploy_path = deploy_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
+    custom_path = os.path.join(deploy_path, component)
+    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=custom_path, src_profile_dir=src_profile_dir, deploy_path=deploy_path)
 
     # Remove amster components
     if component == "amster":
@@ -474,7 +474,7 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
             ds_operator_deployed = get_configmap_value(ns, 'platform-config', 'DS_OPERATOR_ENABLED')
         except:
             ds_operator_deployed = None
-        if ds_operator_deployed: operator = True    
+        if ds_operator_deployed: operator = True
 
     if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
@@ -496,10 +496,10 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
         #clean up temp folder
         shutil.rmtree(uninstall_dir, ignore_errors=True)
 
-def _inject_kustomize_amster(kustomize_pkg_path, config_profile):
+def _inject_kustomize_amster(kustomize_profile_path, config_profile):
     docker_dir = os.path.join(sys.path[0], '../docker')
     amster_cm_name = 'amster-files.yaml'
-    amster_cm_path = os.path.join(kustomize_pkg_path, amster_cm_name)
+    amster_cm_path = os.path.join(kustomize_profile_path, amster_cm_name)
     amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', config_profile)
     amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
     try:
@@ -511,8 +511,8 @@ def _inject_kustomize_amster(kustomize_pkg_path, config_profile):
                     cstdout=True)
         with open(amster_cm_path, 'wt') as f:
             f.write(cm.decode('ascii'))
-        run('kustomize', f'edit add resource ../../../kustomize/overlay/amster-upload', cwd=kustomize_pkg_path)
-        run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_pkg_path)
+        run('kustomize', f'edit add resource ../../../kustomize/overlay/amster-upload', cwd=kustomize_profile_path)
+        run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_profile_path)
     finally:
         if os.path.exists('amster-import.tar.gz'):
             os.remove('amster-import.tar.gz')

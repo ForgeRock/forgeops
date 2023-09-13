@@ -67,22 +67,22 @@ delete_components = {
     'secrets': False
 }
 
-def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, timeout, operator, pkg_path=None, src_profile_dir=None):
+def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, timeout, operator, deploy_path=None, src_profile_dir=None):
     """Deploy all components in sequence"""
     remap = size_map[size]
     utils.message('Deploying base.yaml. This is a one time activity.')
-    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
-    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path, src_profile_dir)
+    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path, src_profile_dir)
     utils.waitforsecrets(ns, timeout)
     utils.message('\nDeploying ds.yaml. This includes all directory resources.')
-    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_ds(ns, 'ds-idrepo', legacy, operator, timeout)
     if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy, operator)
     # Clean any existing Amster resources
     utils.clean_amster_job(ns, False)
     utils.message('\nDeploying apps.')
-    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path, src_profile_dir)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
     time.sleep(2)
     utils.wait_for_am(ns, timeout)
@@ -93,7 +93,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_pro
     utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_idm(ns, timeout)
     utils.message('\nDeploying UI.')
-    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, pkg_path, src_profile_dir)
+    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path, src_profile_dir)
     # message('\nWaiting for UI pods to become ready')
     # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
 
@@ -122,28 +122,28 @@ def overlay_app_configs(ns, config_profile, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- /bin/sh -c "kill 1"')
 
-def build_docker_image(component, push_to, tag, config_profile=None, pkg_path=None):
+def build_docker_image(component, push_to, tag, config_profile=None, deploy_path=None):
     """Builds custom docker images"""
     kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    image_defaulter = os.path.join(pkg_path, 'image-defaulter') if pkg_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
-    
+    image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
+
     # Look for PUSH_TO environment variable
     if push_to is None:
         push_to = os.getenv('PUSH_TO')
     if push_to is None:
         print('--push-to must be specified if the PUSH_TO environment variable is not set.')
         sys.exit(1)
-    
+
     # Set container engine
     if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
         print('Podman set as container engine.')
         container_engine = 'podman'
     else:
         container_engine = 'docker'
-    
+
     # Build docker image
     tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], push_to, tag, container_engine, config_profile)
-    
+
     # Set image url in image defaulter
     name = utils.DOCKER_REGEX_NAME.get(component, component)
     utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
@@ -217,7 +217,7 @@ def main():
 
     # Check toolset versions before doing anything
     utils.check_base_toolset()
-    pkg_path = None
+    deploy_path = None
     if args.cmd != 'build':
         ctx_namespace = utils.get_namespace()
         ctx = utils.get_context()
@@ -225,7 +225,7 @@ def main():
         fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
         size = args.size if getattr(args, 'size', None) else 'cdk'
         ingress_class = args.ingress_class if getattr(args, 'ingress_class', None) else 'nginx'
-        
+
         # Set custom size
         src_profile_dir = getattr(args, 'custom', None)
         remap = size_map[size]
@@ -236,10 +236,15 @@ def main():
                 size = 'custom'
             remap = size_map[size]
 
+    # Set the deploy directory
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
     if getattr(args, 'deploy_env', None):
-        pkg_path = os.path.join(sys.path[0], '..', 'kustomize', 'deploy-' + str(args.deploy_env))
-        utils.message(f'deployment manifest path: kustomize/"{pkg_path}"')
-        
+        deploy_path = os.path.join(kustomize_dir, 'deploy-' + str(args.deploy_env))
+    else:
+        deploy_path = os.path.join(kustomize_dir, 'deploy')
+
+    utils.message(f'deployment manifest path: "{deploy_path}"')
+
     if getattr(args, 'debug', False):
         utils.log.setLevel(logging.DEBUG)
         utils.log.handlers[0].setLevel(logging.DEBUG)
@@ -262,13 +267,10 @@ def main():
         sys.exit(1)
 
     if args.cmd == 'clean':
-        # Set the deploy directory
-        deploy_dir = pkg_path or os.path.join(sys.path[0], '../kustomize', 'deploy')
-
-        utils.message(f'Removing all locally generated manifests from {deploy_dir}')
+        utils.message(f'Removing all locally generated manifests from {deploy_path}')
 
         # Get list of files in deploy directory
-        file_list = os.listdir(deploy_dir)
+        file_list = os.listdir(deploy_path)
 
         # Files that can't be deleted
         keep_files = ["image-defaulter", ".gitignore"]
@@ -276,7 +278,7 @@ def main():
         # Remove all generated manifests and folders
         for file_name in file_list:
             if file_name not in keep_files:
-                shutil.rmtree(deploy_dir+"/"+file_name)
+                shutil.rmtree(deploy_path+"/"+file_name)
         return
 
     if args.cmd == 'delete':
@@ -346,7 +348,7 @@ def main():
 
     if args.cmd == 'build':
         if args.reset:
-            image_defaulter = os.path.join(pkg_path, 'image-defaulter' ) if pkg_path else os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter' )
+            image_defaulter = os.path.join(deploy_path, 'image-defaulter' ) if deploy_path else os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter' )
             utils.message(f'Reset to git index: {image_defaulter}. ')
             utils.run('git', f'checkout {image_defaulter}')
             return
@@ -357,7 +359,7 @@ def main():
         if 'amster' in components:
             utils.error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
         for c in components:
-            build_docker_image(c, args.registry, args.tag, args.config_profile, pkg_path)
+            build_docker_image(c, args.registry, args.tag, args.config_profile, deploy_path)
         return
 
     if args.cmd == 'wait':
@@ -394,12 +396,12 @@ def main():
     if args.cmd == 'generate':
         instructions = []
         components.sort(key=_sort_components)
-        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}" to deploy path: "{pkg_path}".\n')
+        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}" to deploy path: "{deploy_path}".\n')
         if 'all' in components:
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:
-            custom_path = os.path.join(pkg_path, remap.get(c, c)) if pkg_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.legacy, args.config_profile, args.operator, custom_path, src_profile_dir, pkg_path)
+            custom_path = os.path.join(deploy_path, remap.get(c, c)) if deploy_path else None
+            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.legacy, args.config_profile, args.operator, custom_path, src_profile_dir, deploy_path)
             print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
             instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
             if c in wait_targets:
@@ -414,10 +416,10 @@ def main():
 
     utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}" from deployment manifests in "{args.deploy_env}".\n')
     if 'all' in components:
-        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.timeout, args.operator, pkg_path, src_profile_dir)
+        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.timeout, args.operator, deploy_path, src_profile_dir)
     else:
         for c in components:
-            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.operator, pkg_path, src_profile_dir)
+            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.operator, deploy_path, src_profile_dir)
 
     if args.cmd == 'install' and ('base' in components or 'all' in components):
         utils.waitforsecrets(namespace, args.timeout)
