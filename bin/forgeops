@@ -243,7 +243,8 @@ def main():
     else:
         deploy_path = os.path.join(kustomize_dir, 'deploy')
 
-    utils.message(f'deployment manifest path: "{deploy_path}"')
+    if getattr(args, 'debug', True):
+        utils.message(f'deployment manifest path: "{deploy_path}"')
 
     if getattr(args, 'debug', False):
         utils.log.setLevel(logging.DEBUG)
