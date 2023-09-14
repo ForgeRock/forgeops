@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 # Simple script to schedule DS backups
 
+# Creating cloud storage credentials:
+# In order to enable cloud storage, the user must update the secret forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml with the appropriate credentials. To achieve this you can run the following commands.
+## For AWS deployments, use:
+# kubectl create secret generic cloud-storage-credentials --from-literal=AWS_ACCESS_KEY_ID=CHANGEME_key --from-literal=AWS_SECRET_ACCESS_KEY=CHANGEME_secret --dry-run=client -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #AWS
+## For Google Cloud deployments, use:
+# kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json --dry-run=client -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #GCP
+## For Azure deployments, use:
+# kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_ACCOUNT_NAME=CHANGEME_storageAcctName --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run=client -o yaml > ./forgeops/kustomize/base/ds/base/cloud-storage-credentials.yaml #Azure
+
+
 ## CONFIGURE DSBACKUP PROPERTIES IN THE SECTION BELOW ONLY
 #######################################################################################
 
@@ -11,10 +21,12 @@ hosts="ds-idrepo-0"
 BACKUP_LIST_DIR="/tmp/backupLists"
 
 ### IDREPO SCHEDULE ###
-BACKUP_SCHEDULE_IDREPO="*/30 * * * *"
+BACKUP_SCHEDULE_IDREPO="*/1 * * * *"
 TASK_NAME_IDREPO="recurringBackupTask"
-# BACKUP_DIRECTORY can be set to: /local/path | s3://bucket/path | az://container/path | gs://bucket/path "
-BACKUP_DIRECTORY="/opt/opendj/data/bak"
+# BACKUP_DIRECTORY can be set to either an existing directory on the pod or a pre-existing cloud storage bucket: 
+# Pod:         /local/path
+# Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
+BACKUP_DIRECTORY_IDREPO="gs://dj-backup-tests"
 # Optional backends, default: all backends
 # Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
 BACKENDS_IDREPO=""
@@ -22,8 +34,10 @@ BACKENDS_IDREPO=""
 ### CTS SCHEDULE ###
 BACKUP_SCHEDULE_CTS="*/30 * * * *"
 TASK_NAME_CTS="recurringBackupTask"
-# BACKUP_DIRECTORY can be set to: /local/path | s3://bucket/path | az://container/path | gs://bucket/path "
-BACKUP_DIRECTORY="/opt/opendj/data/bak"
+# BACKUP_DIRECTORY can be set to either an existing directory on the pod or a pre-existing cloud storage bucket: 
+# Pod:         /local/path
+# Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
+BACKUP_DIRECTORY_CTS="/opt/opendj/data/bak"
 # Optional backends, default: all backends
 # Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
 BACKENDS_CTS=""
@@ -74,10 +88,12 @@ for pod in "${pods[@]}"
 do
     if [[ "${pod}" = "ds-idrepo"* ]]; then
         BACKUP_SCHEDULE="${BACKUP_SCHEDULE_IDREPO}"
+        BACKUP_DIRECTORY="${BACKUP_DIRECTORY_IDREPO}"
         TASK_NAME="${TASK_NAME_IDREPO}"
         BACKENDS="${BACKENDS_IDREPO}"
     else
         BACKUP_SCHEDULE="${BACKUP_SCHEDULE_CTS}"
+        BACKUP_DIRECTORY="${BACKUP_DIRECTORY_CTS}"
         TASK_NAME="${TASK_NAME_CTS}"
         BACKENDS="${BACKENDS_CTS}"
     fi

@@ -81,6 +81,9 @@ spec:
             configMapKeyRef:
               name: platform-config
               key: AUTORESTORE_FROM_DSBACKUP
+        envFrom:
+        - secretRef:
+            name: cloud-storage-credentials
         volumeMounts:
         - mountPath: /opt/opendj/data
           name: data
@@ -96,6 +99,8 @@ spec:
           name: truststore
         - mountPath: /var/run/secrets/keys
           name: keys
+        - name: cloud-credentials-cache
+          mountPath: /var/run/secrets/cloud-credentials-cache/
         resources:
           requests:
             memory: 1366Mi
@@ -122,6 +127,9 @@ spec:
           value: /var/run/secrets/admin/dirmanager.pw
         - name: DS_TEST
           value: MY_TEST_VARIABLE
+        envFrom:
+        - secretRef:
+            name: cloud-storage-credentials 
         ports:
         - containerPort: 8080
           name: http
@@ -157,6 +165,8 @@ spec:
           name: truststore
         - mountPath: /var/run/secrets/keys
           name: keys
+        - name: cloud-credentials-cache
+          mountPath: /var/run/secrets/cloud-credentials-cache
       securityContext:
         fsGroup: 0
         runAsUser: 11111
@@ -183,8 +193,10 @@ spec:
         secret:
           defaultMode: 420
           secretName: ds-passwords
-      - emptyDir: {}
-        name: keys
+      - name: keys
+        emptyDir: {}
+      - name: cloud-credentials-cache
+        emptyDir: {}
   updateStrategy:
     rollingUpdate:
       partition: 0

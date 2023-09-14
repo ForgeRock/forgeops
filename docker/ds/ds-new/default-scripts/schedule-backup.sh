@@ -43,7 +43,7 @@ case "$BACKUP_DIRECTORY" in
         EXTRA_PARAMS="${AZ_PARAMS}"
         ;;
     gs://* )
-        echo "GCP Bucket detected. Setting up backups in GCP block storage"
+        echo "Google Cloud Storage Bucket detected. Setting up backups in Google Cloud Storage"
         printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
         EXTRA_PARAMS="${GCP_PARAMS}"
         ;;
