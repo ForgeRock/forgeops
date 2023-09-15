@@ -4,7 +4,7 @@
 
 # Required environment variables:
 # AUTORESTORE_FROM_DSBACKUP: Set to true to restore from backup. Defaults to false
-# GOOGLE_CREDENTIALS_JSON: Contents of the service account JSON, if using Google Cloud. The SA must have write privileges in the desired bucket
+# GOOGLE_CREDENTIALS_JSON: Contents of the service account JSON, if using GCP. The SA must have write privileges in the desired bucket
 # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Access key and secret for AWS, if using S3.
 # AZURE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY: Storage account name and key, if using Azure
 
@@ -69,7 +69,7 @@ az://* )
     EXTRA_PARAMS="${AZ_PARAMS}"
     ;;
 gs://* )
-    echo "Google Cloud Storage Bucket detected. Restoring backups from GCP block storage"
+    echo "GCP Bucket detected. Restoring backups from GCP block storage"
     printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
     EXTRA_PARAMS="${GCP_PARAMS}"
     ;;
@@ -118,4 +118,6 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
 else
     echo "No Backup found in ${BACKUP_LOCATION}. There's nothing to restore"
 fi
+
+/opt/opendj/docker-entrypoint.sh set-passwords-only;
 

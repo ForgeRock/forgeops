@@ -151,6 +151,10 @@ init)
     init
     ;;
 
+set-passwords-only)
+    setAdminAndMonitorPasswords
+    ;;
+
 backup)
     [[ ! -d $DS_DATA_DIR/db ]] && {
         echo "There is no data to backup!";

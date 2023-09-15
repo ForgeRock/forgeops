@@ -50,8 +50,7 @@ spec:
         value: directory
       initContainers:
       - name: init
-        args:
-        - init
+        command: ["/opt/opendj/default-scripts/init-and-restore.sh"]
         image: ds
         imagePullPolicy: IfNotPresent
         env:
