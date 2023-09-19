@@ -28,14 +28,14 @@ fi
 
 # Cloud storage backup properties
 AWS_PARAMS="--storageProperty s3.keyId.env.var:AWS_ACCESS_KEY_ID  --storageProperty s3.secret.env.var:AWS_SECRET_ACCESS_KEY"
-AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_ACCOUNT_NAME  --storageProperty az.accountKey.env.var:AZURE_ACCOUNT_KEY"
+AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_STORAGE_ACCOUNT_NAME  --storageProperty az.accountKey.env.var:AZURE_ACCOUNT_KEY --storageProperty endpoint:https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
 GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.json"
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 BACKUP_LOCATION="${BACKUP_DIRECTORY}/${HOSTNAME}"
 
 case "$BACKUP_DIRECTORY" in 
     s3://* )
-        echo "S3 Bucket detected. Setting up backups in AwS S3"
+        echo "S3 Bucket detected. Setting up backups in AWS S3"
         EXTRA_PARAMS="${AWS_PARAMS}"
         ;;
     az://* )
@@ -43,7 +43,7 @@ case "$BACKUP_DIRECTORY" in
         EXTRA_PARAMS="${AZ_PARAMS}"
         ;;
     gs://* )
-        echo "GCP Bucket detected. Setting up backups in GCP block storage"
+        echo "Google Cloud Storage Bucket detected. Setting up backups in Google Cloud Storage"
         printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
         EXTRA_PARAMS="${GCP_PARAMS}"
         ;;
