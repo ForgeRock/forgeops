@@ -43,6 +43,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_ig_k8s_upgrade',
                         'Postcommit_platform_ui',
                         'Postcommit_set_images',
+                        'Postcommit_fo_set_images',
                 ],
         ]
 
@@ -344,6 +345,14 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                              STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
                              STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction]
                     )
+                }
+        )
+    }
+
+    if (params.Postcommit_fo_set_images) {
+        parallelTestsMap.put('FO Set Images',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO Set Images', '--test-names Forgeops.SetImages')
                 }
         )
     }

@@ -73,6 +73,7 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_ig_k8s_upgrade', defaultValue: enabled),
         booleanParam(name: 'Postcommit_platform_ui', defaultValue: enabled),
         booleanParam(name: 'Postcommit_set_images', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_fo_set_images', defaultValue: enabled),
     ]
 }
 
