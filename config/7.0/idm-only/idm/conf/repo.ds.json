@@ -190,7 +190,7 @@
                 }
             },
             "locks": {
-                "dnTemplate": "ou=locks,ou=internal,dc=openidm,dc=forgerock,dc=io",
+                "dnTemplate": "ou=locks,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-lock"
