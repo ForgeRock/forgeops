@@ -136,7 +136,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
 }
 
 def withPipelineRun(PipelineRunLegacyAdapter pipelineRun, String stageName, Closure process) {
-    def reportUrl = "(${env.JOB_URL}/${env.BUILD_NUMBER}/Guillotine_20Test_20Report_20${stageName}"
+    def reportUrl = "${env.JOB_URL}/${env.BUILD_NUMBER}/Guillotine_20Test_20Report_20${stageName}"
     if (pipelineRun != null) {
         pipelineRun.pushStageOutcome(stageName, stageDisplayName: stageName) {
             try {
