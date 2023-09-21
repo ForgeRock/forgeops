@@ -24,6 +24,10 @@ GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
 GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
+def normalizeStageName(String stageName) {
+    return stageName.toLowerCase().replaceAll('\\s', '-')
+}
+
 /** Default platform-images tag corresponding to this branch (or the PR target branch, if this is a PR build) */
 String calculatePlatformImagesTag() {
     return "${calculatePlatformImagesBranch()}-ready-for-dev-pipelines"
@@ -93,7 +97,8 @@ def authenticateGcloud() {
 
 def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
     stage(stageName) {
-        withPipelineRun(pipelineRun, dashboard_utils.normalizeStageName(stageName)) {
+        def normalizedStageName = normalizeStageName(stageName)
+        withPipelineRun(pipelineRun, stageName, normalizedStageName) {
             // Create container to be able to use python3
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
                 dir('guillotine') {
@@ -124,7 +129,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
                                 sh(script: "rm -rf tmp")
                                 publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
                                              reportDir   : '.', reportFiles: 'report.html',
-                                             reportName  : "Guillotine Test Report ${stageName}",
+                                             reportName  : "Guillotine Test Report ${normalizedStageName}",
                                              reportTitles: ''])
                             }
                         }
@@ -135,10 +140,11 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
     }
 }
 
-def withPipelineRun(PipelineRunLegacyAdapter pipelineRun, String stageName, Closure process) {
-    def reportUrl = "${env.JOB_URL}/${env.BUILD_NUMBER}/Guillotine_20Test_20Report_20${stageName}"
+def withPipelineRun(PipelineRunLegacyAdapter pipelineRun, String stageName, String normalizedStageName, Closure process) {
+    // Warning :  reportUrl value must map the name defined in runGuillotine() : publishHTML.reportName
+    def reportUrl = "${env.JOB_URL}/${env.BUILD_NUMBER}/Guillotine_20Test_20Report_20${normalizedStageName}"
     if (pipelineRun != null) {
-        pipelineRun.pushStageOutcome(stageName, stageDisplayName: stageName) {
+        pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
             try {
                 process()
                 return new Outcome(Status.SUCCESS, reportUrl)
