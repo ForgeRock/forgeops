@@ -9,3 +9,13 @@ spec:
       annotations:
         # prevent autoscaler from terminating the pod
         "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+  spec:
+    containers:
+      - name: openam
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 2500Mi
+          requests:
+            cpu: 2000m
+            memory: 2500Mi
