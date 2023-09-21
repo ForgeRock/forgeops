@@ -8,7 +8,6 @@
 
 // functional-tests.groovy
 void runStage() {
-    stage('Functional Tests')
     commonModule.runGuillotine(null, 'functional', '--keywords FUNCTIONAL')
 }
 
