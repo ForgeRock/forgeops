@@ -14,7 +14,7 @@ HELP_DESCRIPTION = """
 Manage ForgeRock Platform configuration.
 """
 HELP_EXPORT_CMD_DESCRIPTION = """
-Export config from running instance to a given profile.
+Export config from running instance to a given profile. AM and IDM only.
 """
 HELP_EXPORT_BASELINE_PROFILE = """
 Specify a base profile to start with if the target profile doesn't
@@ -89,6 +89,11 @@ PLATFORM_COMPONENTS = {
     'idm': ('idm',),
     'ig': ('ig',),
     'ds': ('ds',),
+}
+
+EXPORT_COMPONENTS = {
+    'am': ('am',),
+    'idm': ('idm',),
 }
 
 APP_CONF_PATH_FMT = {
@@ -288,7 +293,7 @@ def main():
                                    default='cdk',
                                    help=HELP_EXPORT_BASELINE_PROFILE)
     export_cmd_parser.add_argument('component',
-                                   choices=PLATFORM_COMPONENTS.keys(),
+                                   choices=EXPORT_COMPONENTS.keys(),
                                    help=HELP_CMD_COMPONENTS)
     export_cmd_parser.add_argument('profile')
     export_cmd_parser.add_argument('--sort', '-s',
