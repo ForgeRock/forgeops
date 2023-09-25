@@ -109,8 +109,8 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
                     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
                     // Configure environment to make Guillotine works on GKE
                     sh("./configure.py env --gke-only")
-                    // Configure Guillotine to run functional tests (all test suites with FUNCTIONAL keyword)
-                    sh("./configure.py runtime --forgeops-branch-name ${branchName} ${options}")
+                    // Configure Guillotine to run tests
+                    sh("./configure.py runtime --forgeops-branch-name ${branchName} --set platform.platform-image-ref=${DEFAULT_PLATFORM_IMAGES_TAG} ${options}")
                     try {
                         // Run the tests
                         sh("./run.py")
