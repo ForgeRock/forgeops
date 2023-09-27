@@ -44,6 +44,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_platform_ui',
                         'Postcommit_set_images',
                         'Postcommit_fo_set_images',
+                        'Postcommit_fo_am_only',
+                        'Postcommit_fo_idm_only',
+                        'Postcommit_fo_ig_only',
+                        'Postcommit_fo_ds_only',
                 ],
         ]
 
@@ -353,6 +357,37 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('FO Set Images',
                 {
                     commonModule.runGuillotine(pipelineRun, 'FO Set Images', '--test-names Forgeops.SetImages')
+                }
+        )
+    }
+
+    if (params.Postcommit_fo_am_only) {
+        parallelTestsMap.put('FO AM only',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO AM only', '--test-names Deployment.AmOnly')
+                }
+        )
+    }
+
+    if (params.Postcommit_fo_idm_only) {
+        parallelTestsMap.put('FO IDM only',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO IDM only', '--test-names Deployment.IdmOnly')
+                }
+        )
+    }
+
+    if (params.Postcommit_fo_ig_only) {
+        parallelTestsMap.put('FO IG only',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO IG only', '--test-names Deployment.IgOnly')
+                }
+        )
+    }
+    if (params.Postcommit_fo_ds_only) {
+        parallelTestsMap.put('FO DS only',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO DS only', '--test-names Deployment.DsOnly')
                 }
         )
     }

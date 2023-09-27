@@ -74,6 +74,10 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_platform_ui', defaultValue: enabled),
         booleanParam(name: 'Postcommit_set_images', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_set_images', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_fo_am_only', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_fo_idm_only', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_fo_ig_only', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_fo_ds_only', defaultValue: enabled),
     ]
 }
 
