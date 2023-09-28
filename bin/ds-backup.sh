@@ -15,27 +15,28 @@
 ## CONFIGURE DSBACKUP PROPERTIES IN THE SECTION BELOW ONLY
 #######################################################################################
 
-# Backup hosts(e.g. ds-idrepo-0,ds-cts-0)
-hosts="ds-idrepo-0"
-
-# Directory to store backup list file. `dsbackup list` only
-BACKUP_LIST_DIR="/tmp/backupLists"
+# HOSTS
+#  - CTS    : consists of loadbalanced pods so use any available pod for backups. (e.g HOSTS="ds-cts-0" or HOSTS="ds-idrepo-2,ds-cts-0")
+#  - IDREPO : ds-idrepo-0 is the primary server so use the largest available pod for backups as it won't impact live traffic. (e.g HOSTS="ds-idrepo-2" or HOSTS="ds-idrepo-2,ds-cts-0")
+#  - CDK    : only one ds-idrepo pod (HOSTS="ds-idrepo-0")
+HOSTS="ds-idrepo-2"
 
 ### IDREPO SCHEDULE ###
+# Cron schedule for backup task to run
 BACKUP_SCHEDULE_IDREPO="*/30 * * * *"
-TASK_NAME_IDREPO="recurringBackupTask"
 # BACKUP_DIRECTORY can be set to either an existing directory on the pod or a pre-existing cloud storage bucket: 
 #   Pod:         /local/path
 #   Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
-# Azure path is the container not the storage account which is defined in cloud-storage-credentials
 BACKUP_DIRECTORY_IDREPO="/opt/opendj/data/bak"
 # Optional backends, default: all backends
 # Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
 BACKENDS_IDREPO=""
+# Name of task on DS pod. Change if configuring multiple backup schedules.
+TASK_NAME_IDREPO="recurringBackupTask"
 
 ### CTS SCHEDULE ###
+# Cron schedule for backup task to run
 BACKUP_SCHEDULE_CTS="*/30 * * * *"
-TASK_NAME_CTS="recurringBackupTask"
 # BACKUP_DIRECTORY can be set to either an existing directory on the pod or a pre-existing cloud storage bucket: 
 # Pod:         /local/path
 # Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
@@ -43,6 +44,8 @@ BACKUP_DIRECTORY_CTS="/opt/opendj/data/bak"
 # Optional backends, default: all backends
 # Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
 BACKENDS_CTS=""
+# Name of task on DS pod. Change if configuring multiple backup schedules.
+TASK_NAME_CTS="recurringBackupTask"
 
 #######################################################################################
 
@@ -52,32 +55,13 @@ if [ -z "$1" ] || ! [[ $1 =~ ^(create|list|cancel)$ ]]; then
     exit -1
 fi
 
-# Set context
-kcontext=$(kubectl config current-context)
-NS=$(kubectl config view -o jsonpath="{.contexts[?(@.name==\"$kcontext\")].context.namespace}")
-
-if [ -n "${NS}" ] || [ $# = '1' ]; then
-    NAMESPACE="${NS:=$1}"
-    # BACKUP_DIRECTORY_ENV=""
-else
-    echo "usage: $0 [NAMESPACE]"
-    echo "example: $0 mynamespace"
-    echo "NAMESPACE is optional. NAMESPACE will default to the one set in kubeconfig"
-    exit -1
-fi
-
-if [[ -z "$NAMESPACE" ]] ; then
-    echo "Please provide the target namespace. Example: $0 mynamespace"
-    exit -1
-fi
-
 # Get DS version
-ds_version=$(kubectl -n $NAMESPACE exec ds-idrepo-0 -- /opt/opendj/bin/dsconfig --version)
+ds_version=$(kubectl exec ds-idrepo-0 -- /opt/opendj/bin/dsconfig --version)
 major_version=$(printf $ds_version| awk -F' ' '{print $1}'| cut -d'.' -f1)
 echo "DS server version: ${ds_version}"
 
 # Convert comma separated values to array
-pods=($(echo "$hosts" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
+pods=($(echo "$HOSTS" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
 
 if [ -z "${pods}" ]; then
     echo "No DS hosts provided. No backups were scheduled."
@@ -91,11 +75,19 @@ do
     if [[ "${pod}" = "ds-idrepo"* ]]; then
         BACKUP_SCHEDULE="${BACKUP_SCHEDULE_IDREPO}"
         BACKUP_DIRECTORY="${BACKUP_DIRECTORY_IDREPO}"
+        if [[ -z $BACKUP_DIRECTORY ]]; then
+            echo "Please provide value for BACKUP_DIRECTORY_IDREPO"
+            exit 1
+        fi 
         TASK_NAME="${TASK_NAME_IDREPO}"
         BACKENDS="${BACKENDS_IDREPO}"
     else
         BACKUP_SCHEDULE="${BACKUP_SCHEDULE_CTS}"
         BACKUP_DIRECTORY="${BACKUP_DIRECTORY_CTS}"
+        if [[ -z $BACKUP_DIRECTORY ]]; then
+            echo "Please provide value for BACKUP_DIRECTORY_CTS"
+            exit 1
+        fi 
         TASK_NAME="${TASK_NAME_CTS}"
         BACKENDS="${BACKENDS_CTS}"
     fi
@@ -103,7 +95,7 @@ do
     case $1 in 
         create )
             echo "scheduling backup schedule $BACKUP_SCHEDULE for pod: $pod"
-            kubectl -n $NAMESPACE exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
+            kubectl exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         BACKENDS='${BACKENDS}' \
@@ -111,16 +103,18 @@ do
             ;;
         list )
             echo "Listing backups scheduled on: $pod"
-            if BACKUP_LIST=$(kubectl -n $NAMESPACE exec $pod -- bash -c "dsbackup list -d ${BACKUP_DIRECTORY}/${pod}"); then
-                 mkdir -p $BACKUP_LIST_DIR/${pod}
-                 backupfile="${BACKUP_LIST_DIR}/${pod}/backup-list.$(date "+%Y.%m.%d-%H.%M.%S")"
+            # Directory to store backup list file.
+            backup_list_dir="/tmp/backupLists"
+            if BACKUP_LIST=$(kubectl exec $pod -- bash -c "dsbackup list -d ${BACKUP_DIRECTORY}/${pod}"); then
+                 mkdir -p $backup_list_dir/${pod}
+                 backupfile="${backup_list_dir}/${pod}/backup-list.$(date "+%Y.%m.%d-%H.%M.%S")"
                  echo $BACKUP_LIST > $backupfile
                  echo -e "Backup saved to ${backupfile}\n\n"
             fi
             ;;
         cancel )
             echo "Cancelling backup schedule: ${TASK_NAME} "
-            kubectl -n $NAMESPACE exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
+            kubectl exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         CANCEL=TRUE \
