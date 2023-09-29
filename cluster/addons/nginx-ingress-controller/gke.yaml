@@ -13,6 +13,7 @@ controller:
         enabled: true
         service:
             omitClusterIP: true
+    allowSnippetAnnotations: true
 # Optional settings if you have dedicated front end nodes. Most implementations will not need this
 #    nodeSelector:
 #        "frontend": "true"

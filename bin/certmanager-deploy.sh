@@ -8,7 +8,7 @@
 #kubectl delete apiservice v1beta1.webhook.cert-manager.io
 set -oe pipefail
 
-VERSION="v1.6.1"
+VERSION="v1.13.0"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CM_DIR="${CURRENT_DIR}/../cluster/addons/certmanager"
 

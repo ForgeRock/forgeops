@@ -17,3 +17,4 @@ controller:
       - key: "WorkerAttachedToExtLoadBalancer"
         operator: "Exists"
         effect: "NoSchedule"
+    allowSnippetAnnotations: true
