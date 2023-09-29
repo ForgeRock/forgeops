@@ -99,6 +99,7 @@ EXPORT_COMPONENTS = {
 APP_CONF_PATH_FMT = {
     'am': 'am/config-profiles/{profile}'.format,
     'idm': 'idm/config-profiles/{profile}/conf'.format,
+    'idm-ui': 'idm/config-profiles/{profile}/ui/admin/default/config'.format,
     'ig': 'ig/config-profiles/{profile}/config'.format,
     'amster': 'amster/config-profiles/{profile}/config'.format,
 }
@@ -129,16 +130,24 @@ def export_amster(conf):
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise Exception('Couldn\'t run amster export')
 
-def export_idm(idm_conf, pod_name):
+def export_idm(idm_conf, idm_ui_conf, pod_name):
     """Export IDM config"""
     profile_path(idm_conf)
+    profile_path(idm_ui_conf)
+    idm_ui_conf_file = idm_ui_conf.joinpath("AppConfiguration.js")
     # Copy from the IDM container to a local path
     cp_args = f"""
     cp -c openidm
         {pod_name}:/opt/openidm/conf {idm_conf}
     """.strip()
+
+    cp_args_ui = f"""
+    cp -c openidm
+        {pod_name}:/opt/openidm/ui/admin/default/config/AppConfiguration.js {idm_ui_conf_file}
+    """.strip()
     try:
         utils.run(KUBECTL, cp_args)
+        utils.run(KUBECTL, cp_args_ui)
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
 
@@ -247,7 +256,9 @@ def run_export(args):
             component_name, pod_name = out.splitlines()[0].decode().split(' ')
             log.info(f'Running export for {component_name} in {pod_name}')
             if component_name == 'idm':
-                export_idm(conf_path, pod_name)
+                conf_ui_path = pathlib.Path(utils.DOCKER_BASE_PATH.joinpath(
+                    APP_CONF_PATH_FMT["idm-ui"](profile=args.profile))).resolve()
+                export_idm(conf_path, conf_ui_path, pod_name)
             elif component_name == 'ig':
                 export_ig(conf_path, pod_name)
             elif component_name == 'am':
