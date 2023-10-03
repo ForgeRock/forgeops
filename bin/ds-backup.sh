@@ -10,7 +10,7 @@
 # kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json --dry-run=client -o yaml > ./kustomize/base/ds/base/cloud-storage-credentials.yaml
 ## For Azure deployments, use:
 # kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_STORAGE_ACCOUNT_NAME="CHANGEME_storageAcctName" --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run=client -o yaml > ./kustomize/base/ds/base/cloud-storage-credentials.yaml
-
+## Note : You may want to run the command above before running "forgeops install" or restart the ds pods to pick up the updated secret if the ds pods are already running.
 
 ## CONFIGURE DSBACKUP PROPERTIES IN THE SECTION BELOW ONLY
 #######################################################################################
