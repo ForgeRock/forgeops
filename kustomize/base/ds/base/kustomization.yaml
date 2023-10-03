@@ -9,4 +9,3 @@ commonLabels:
 resources:
 - service.yaml
 - statefulset.yaml
-- cloud-storage-credentials.yaml
