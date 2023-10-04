@@ -30,6 +30,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                             TESTS_SCOPE             : 'tests/pit1',
                             STASH_LODESTAR_BRANCH   : commonModule.LODESTAR_GIT_COMMIT,
                             EXT_FORGEOPS_PATH       : forgeopsPath,
+                            CLUSTER_DOMAIN          : 'postcommit-dev-pr-all.engineeringpit.com',
                             CLUSTER_NAMESPACE       : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             REPORT_NAME_PREFIX      : normalizedStageName,
                         ]

@@ -32,6 +32,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
                             EXT_FORGEOPS_PATH    : forgeopsPath,
                             TEST_NAME            : testName,
                             DEPLOYMENT_NAME      : 'small',
+                            CLUSTER_DOMAIN       : 'postcommit-dev-pr-all.engineeringpit.com',
                             CLUSTER_NAMESPACE    : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
                             DO_RECORD_RESULT     : false,
                             PIPELINE_NAME        : 'FORGEOPS_POSTCOMMIT',
