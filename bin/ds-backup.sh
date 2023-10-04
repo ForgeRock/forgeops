@@ -27,7 +27,7 @@ BACKUP_SCHEDULE_IDREPO="*/30 * * * *"
 # BACKUP_DIRECTORY can be set to either an existing directory on the pod or a pre-existing cloud storage bucket: 
 #   Pod:         /local/path
 #   Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
-BACKUP_DIRECTORY_IDREPO="/opt/opendj/data/bak"
+BACKUP_DIRECTORY_IDREPO=""
 # Optional backends, default: all backends
 # Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
 BACKENDS_IDREPO=""
@@ -40,7 +40,7 @@ BACKUP_SCHEDULE_CTS="*/30 * * * *"
 # BACKUP_DIRECTORY can be set to either an existing directory on the pod or a pre-existing cloud storage bucket: 
 # Pod:         /local/path
 # Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
-BACKUP_DIRECTORY_CTS="/opt/opendj/data/bak"
+BACKUP_DIRECTORY_CTS=""
 # Optional backends, default: all backends
 # Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
 BACKENDS_CTS=""
@@ -50,9 +50,9 @@ TASK_NAME_CTS="recurringBackupTask"
 #######################################################################################
 
 # Check that the correct arguments have been provided
-if [ -z "$1" ] || ! [[ $1 =~ ^(create|list|cancel)$ ]]; then
-    echo "Usage: $0 [create|list|cancel]"
-    exit -1
+if [ -z "$1" ] || ! [[ $1 =~ ^(create|cancel)$ ]]; then
+    echo "Usage: $0 [create|cancel]"
+    exit 0
 fi
 
 # Get DS version
@@ -101,17 +101,6 @@ do
                                                         BACKENDS='${BACKENDS}' \
                                                         /opt/opendj/default-scripts/schedule-backup.sh"
             ;;
-        list )
-            echo "Listing backups scheduled on: $pod"
-            # Directory to store backup list file.
-            backup_list_dir="/tmp/backupLists"
-            if BACKUP_LIST=$(kubectl exec $pod -- bash -c "dsbackup list -d ${BACKUP_DIRECTORY}/${pod}"); then
-                 mkdir -p $backup_list_dir/${pod}
-                 backupfile="${backup_list_dir}/${pod}/backup-list.$(date "+%Y.%m.%d-%H.%M.%S")"
-                 echo $BACKUP_LIST > $backupfile
-                 echo -e "Backup saved to ${backupfile}\n\n"
-            fi
-            ;;
         cancel )
             echo "Cancelling backup schedule: ${TASK_NAME} "
             kubectl exec $pod -- bash -c "BACKUP_SCHEDULE='${BACKUP_SCHEDULE}' \
@@ -121,7 +110,7 @@ do
                                                         /opt/opendj/default-scripts/schedule-backup.sh"
             ;;
         *)
-          echo "Usage: $0 [create|list|cancel]"
+          echo "Usage: $0 [create|cancel]"
           ;;
     esac   
 

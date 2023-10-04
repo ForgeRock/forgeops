@@ -17,13 +17,16 @@ ADMIN_PASSWORD=$(cat ${DS_UID_ADMIN_PASSWORD_FILE})
 
 # Get task name, if task with name already running, then cancel
 TASK_NAME=${TASK_NAME:-"recurringBackupTask"}
-echo "Attempting to cancel task: ${TASK_NAME}. Ignore errors if the task does not exist"
+echo "Cancelling task: ${TASK_NAME} if it exists. Ignore errors if the task does not exist"
 manage-tasks --cancel "${TASK_NAME}" --hostname "localhost" \
     --port 4444 --bindDN "uid=admin" \
     --bindPassword  "${ADMIN_PASSWORD}" --trustAll | grep -i "cancelled"
 
+echo "Cancelling task operation complete"
+
+# Exit if request was to cancel task
 if [[ "$CANCEL" ]]; then
-    exit -1
+    exit 0
 fi
 
 # Cloud storage backup properties
