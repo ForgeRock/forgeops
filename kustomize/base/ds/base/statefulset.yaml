@@ -83,6 +83,7 @@ spec:
         envFrom:
         - secretRef:
             name: cloud-storage-credentials
+            optional: true
         volumeMounts:
         - mountPath: /opt/opendj/data
           name: data
@@ -128,7 +129,8 @@ spec:
           value: MY_TEST_VARIABLE
         envFrom:
         - secretRef:
-            name: cloud-storage-credentials 
+            name: cloud-storage-credentials
+            optional: true 
         ports:
         - containerPort: 8080
           name: http
