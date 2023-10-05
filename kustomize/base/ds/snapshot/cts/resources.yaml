@@ -1,0 +1,48 @@
+---
+# Source: identity-platform/templates/ds-cts-snapshot-cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ds-cts-snapshot
+spec:
+  schedule: "0 0 * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          name: ds-cts-snapshot
+          labels:
+            app: ds-cts-snapshot-job
+        spec:
+          serviceAccountName: ds-snapshot
+          securityContext:
+              {}
+          containers:
+          - name: ds-cts-snapshot
+            image: bitnami/kubectl:latest
+            imagePullPolicy: IfNotPresent
+            command:
+            - /bin/bash
+            - -c
+            - /scripts/snapshot.sh ds-cts-snapshot data-ds-cts-0 ds-snapshot-class
+            env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: PURGE_DELAY
+              value: "-3 day"
+            volumeMounts:
+            - name: ds-snapshot-script
+              mountPath: /scripts
+          volumes:
+          - name: ds-snapshot-script
+            configMap:
+              name: ds-snapshot-script
+              defaultMode: 0555
+          restartPolicy: Never
