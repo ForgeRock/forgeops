@@ -45,7 +45,7 @@ REQ_VERSIONS ={
     'ds-operator': {
         'MIN': 'v0.2.5',
         'MAX': 'v100.0.0',
-        'DEFAULT': 'v0.2.6',
+        'DEFAULT': 'v0.2.7',
     },
     'secret-agent': {
         'MIN': 'v1.1.5',
