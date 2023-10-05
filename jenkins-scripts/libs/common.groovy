@@ -37,7 +37,7 @@ DEFAULT_PLATFORM_IMAGES_TAG = calculatePlatformImagesTag()
 String calculatePlatformImagesBranch() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
     if (branchName.startsWith('release/')) {
-        def versionParts = (branchName - 'release/').tokenize('.').tokenize('-')[0].tokenize('.')
+        def versionParts = (branchName - 'release/').tokenize('-')[0].tokenize('.')
         return "sustaining/${versionParts[0]}.${versionParts[1]}.x"
     } else {
         return 'master'
