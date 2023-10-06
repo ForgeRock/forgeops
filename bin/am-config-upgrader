@@ -30,7 +30,7 @@ realpath() {
     cd "$OURPWD"
     echo "$REALPATH"
 }
-     
+
 # Set container engine
 if [[ -n "${CONTAINER_ENGINE}" ]] && [[ $(echo ${CONTAINER_ENGINE} | awk '{print tolower($0)}') == 'podman' ]];
 then
@@ -62,7 +62,7 @@ REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader/pit1}
 
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader
-TAG=${TAG:-7.4.0-latest-postcommit}
+TAG=${TAG:-7.4.0}
 
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"

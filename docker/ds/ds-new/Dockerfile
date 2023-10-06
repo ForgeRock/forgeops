@@ -3,11 +3,11 @@
 # This image is designed to run setup at runtime, not docker build time. It is a
 # fully "mutable", database like image - where all volatile data (including configuration and schema)
 # is on a PVC. This behaves like a traditonal VM
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.4.0-latest-postcommit
+FROM gcr.io/forgerock-io/ds-empty:7.4.0
 
 # FOR DEBUG. Remove for production deployment
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends vim ncat dnsutils 
+RUN apt-get update && apt-get install -y --no-install-recommends vim ncat dnsutils
 USER forgerock
 
 # The PVC mount point where all writeable data is stored.

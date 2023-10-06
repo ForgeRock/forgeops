@@ -11,5 +11,5 @@ resources:
 - service.yaml
 images:
 - name: .*admin-ui.*
-  newName: gcr.io/forgerock-io/platform-admin-ui/docker-build
-  newTag: 7.3.1-postcommit-latest
+  newName: gcr.io/forgerock-io/platform-admin-ui
+  newTag: 7.4.0
