@@ -1,0 +1,49 @@
+---
+# Source: identity-platform/templates/ds-snapshot-rbac-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ds-snapshot
+---
+# Source: identity-platform/templates/ds-snapshot-rbac-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ds-snapshot
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+      - cronjobs
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+  - apiGroups:
+      - snapshot.storage.k8s.io
+    resources:
+      - volumesnapshots
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+---
+# Source: identity-platform/templates/ds-snapshot-rbac-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ds-snapshot
+subjects:
+  - kind: ServiceAccount
+    name: ds-snapshot
+    namespace: prod
+roleRef:
+  kind: ClusterRole
+  name: ds-snapshot
+  apiGroup: rbac.authorization.k8s.io
