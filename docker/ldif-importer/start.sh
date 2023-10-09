@@ -18,7 +18,7 @@ size=$FORGEOPS_PLATFORM_SIZE
 wait_repo ds-idrepo
 
 # Wait for cts server to be ready when deploying CDM
-if [ $size != "cdk" ]; then 
+if [[ "$size" != "cdk" ]]; then 
     wait_repo ds-cts
 fi
 

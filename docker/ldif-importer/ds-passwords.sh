@@ -37,7 +37,7 @@ chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=identities "uid=am-iden
 chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=am-config "uid=am-config" ${AM_STORES_APPLICATION_PASSWORD}
 
 # Update cts server if deploying CDM
-if [ $1 != "cdk" ]; then
+if [[ "$1" != "cdk" ]]; then
     chgPass ds-cts-0.ds-cts ${ADMIN_PASS} ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
 fi
 # These are not required as the CTS is only used for tokens. Uncomment these if you ever wish to use the CTS store
