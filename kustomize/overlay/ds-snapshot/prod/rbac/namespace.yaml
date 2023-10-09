@@ -1,0 +1,9 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ds-snapshot
+subjects:
+- kind: ServiceAccount
+  name: ds-snapshot
+  # Change namespace to match where forgeops is installed
+  namespace: prod
