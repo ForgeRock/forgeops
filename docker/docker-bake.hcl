@@ -30,7 +30,7 @@ variable "BUILD_ARCH" {
 }
 
 variable "PLATFORM_VERSION" {
-  default = "7.4.0"
+  default = "7.5.0"
 }
 
 variable "PLATFORM_RELEASE" {

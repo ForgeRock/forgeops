@@ -14,7 +14,7 @@
 #
 # You can change the version of the upgrader used by supplying the REPO and TAG environment variables.
 # For example:
-# TAG=7.4.0 bin/am-config-upgrader
+# TAG=7.5.0 bin/am-config-upgrader
 
 # Mac does not come with realpath by default.
 # https://stackoverflow.com/questions/3572030/bash-script-absolute-path-with-os-x/18443300#18443300
@@ -62,7 +62,7 @@ REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader/pit1}
 
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader
-TAG=${TAG:-7.4.0-latest-postcommit}
+TAG=${TAG:-7.5.0-latest-postcommit}
 
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
