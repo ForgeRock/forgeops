@@ -339,8 +339,9 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                 {
                     commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
                             [TESTS_SCOPE              : 'tests/set_images',
+                             STASH_FORGEOPS_REF       : GIT_COMMIT,
                              STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
-                             STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction]
+                             STASH_LODESTAR_REF       : commonModule.lodestarRevision]
                     )
                 }
         )
