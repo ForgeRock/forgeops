@@ -339,11 +339,9 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                 {
                     commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
                             [TESTS_SCOPE              : 'tests/set_images',
+                             STASH_FORGEOPS_REF       : GIT_COMMIT,
                              STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
-                             STASH_FORGEOPS_REF       : commonLodestarModule.forgeopsFraasProduction,
-                             // Need a specific commit in which we have a fix for the set-images tests
-                             // TODO: to remove once fraas-production tag is moved to idcloud-2022.10
-                             STASH_LODESTAR_REF       : '91438c58e803b47c44dbee90cb7a6afad664e5a6']
+                             STASH_LODESTAR_REF       : commonModule.lodestarRevision]
                     )
                 }
         )
