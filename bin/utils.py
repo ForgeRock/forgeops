@@ -699,6 +699,12 @@ def secretagent(k8s_op, tag='latest'):
         run('kubectl', '-n secret-agent-system wait --for=condition=ready pod --all --timeout=120s')
         print()
 
+def is_legacy_install(ns):
+    try:
+        run('kubectl', f'-n {ns} get sts -l app.kubernetes.io/managed-by=ds-operator', cstderr=True, cstdout=True)
+        return True
+    except Exception:
+        return False
 
 def dsoperator(k8s_op, tag='latest'):
     """Check if ds-operator is present in the cluster. If not, installs it."""

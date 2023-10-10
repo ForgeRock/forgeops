@@ -226,6 +226,10 @@ def main():
         size = args.size if getattr(args, 'size', None) else 'cdk'
         ingress_class = args.ingress_class if getattr(args, 'ingress_class', None) else 'nginx'
 
+        # Check for legacy installation
+        if utils.is_legacy_install(namespace):
+            args.operator = True
+
         # Set custom size
         src_profile_dir = getattr(args, 'custom', None)
         remap = size_map[size]
