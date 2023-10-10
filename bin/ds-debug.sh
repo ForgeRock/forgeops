@@ -96,4 +96,4 @@ purge)
 esac
 
 # Sample commands to recover from known state
-# https://backstage.forgerock.com/docs/ds/7/config-guide/replication.html#reinit-repl
+# https://backstage.forgerock.com/docs/ds/7.4/config-guide/repl-init.html

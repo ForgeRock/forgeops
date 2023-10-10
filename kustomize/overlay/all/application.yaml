@@ -31,7 +31,7 @@ spec:
     - description: About ForgeRock
       url: "https://forgerock.com/"
     - description: Documentation
-      url: https://backstage.forgerock.com/docs/forgeops/6.5
+      url: https://backstage.forgerock.com/docs/forgeops/7.4
     version: "7.0-nightly"
     description: "ForgeRock Identity and Access Management"
     icons:
