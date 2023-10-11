@@ -1,4 +1,4 @@
-FROM my-repo/ds-empty:7.4.0
+FROM gcr.io/forgerock-io/ds:7.4.0
 
 USER 0
 
