@@ -133,13 +133,13 @@ group "base" {
     "amster",
     "idm",
     "ig",
+    "ldif-importer",
   ]
 }
 
 group "base-extra" {
   targets = [
     "ds-proxy",
-    "ldif-importer",
     "rcs-agent",
     "git-server",
   ]
