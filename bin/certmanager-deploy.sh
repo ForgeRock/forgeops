@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
 # Script to deploy cert-manager
 #
-# Run ./certmanager-deploy.sh to deploy with default ca cert.
-# Run ./certmanager-deploy.sh -d to delete cert-manager deployment
+# Run ./certmanager-deploy.sh to install with default ca cert or upgrade if already deployed.
+# Run ./certmanager-deploy.sh -d to delete your cert-manager deployment
 #
 # To be used if namespace gets stuck in 'terminating state'
 #kubectl delete apiservice v1beta1.webhook.cert-manager.io
 set -oe pipefail
 
-VERSION="v1.13.0"
+VERSION="v1.13.1"
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CM_DIR="${CURRENT_DIR}/../cluster/addons/certmanager"
 
 # Print usage message to screen
 usage() {
-  printf "Usage: $0 [-d] \n\n"
+  printf "Usage: $0 [-d] \n"
+  echo "-d  delete"
   exit 2
 }
-
-
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-
 
 # Deploy cert-manager
 # Add below arg if you want to cleanup all ssl certificates when deleting the platform.
@@ -53,8 +49,9 @@ webhook:
       memory: "512Mi"
 EOF
 
-    helm install \
-        cert-manager jetstack/cert-manager \
+    helm upgrade -i \
+        cert-manager cert-manager \
+        --repo https://charts.jetstack.io \
         --namespace cert-manager \
         --create-namespace \
         --version $VERSION \
