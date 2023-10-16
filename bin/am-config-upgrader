@@ -58,7 +58,7 @@ fi
 # set  -x
 
 # The default repo for the upgrader docker image
-REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader/pit1}
+REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader}
 
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader

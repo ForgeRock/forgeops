@@ -140,4 +140,4 @@ spec:
             port:
               number: 8080
         path: /ig(/|$)(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
