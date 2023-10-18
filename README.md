@@ -86,8 +86,8 @@ See [CDK Shutdown and Removal] in the ForgeOps documentation.
 [CDK documentation]:https://ea.forgerock.com/docs/forgeops/cdk/overview.html
 [CDK Shutdown and Removal]:https://ea.forgerock.com/docs/forgeops/cdk/shutdown.html
 [ForgeOps Release Notes]:https://ea.forgerock.com/docs/forgeops/rn/rn.html
-[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.3-20230404
-[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.3/index.html
-[Statement of support]:https://backstage.forgerock.com/docs/forgeops/7.3/start/support.html#kubernetes-services
+[latest release branch]:https://github.com/ForgeRock/forgeops/tree/release/7.4-20231003
+[latest release documentation]:https://backstage.forgerock.com/docs/forgeops/7.4/index.html
+[Statement of support]:https://backstage.forgerock.com/docs/forgeops/7.4/start/support.html#kubernetes-services
 [Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
 [UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html
