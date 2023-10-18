@@ -45,7 +45,7 @@ REQ_VERSIONS ={
     'ds-operator': {
         'MIN': 'v0.2.5',
         'MAX': 'v100.0.0',
-        'DEFAULT': 'v0.2.6',
+        'DEFAULT': 'v0.2.7',
     },
     'secret-agent': {
         'MIN': 'v1.1.5',
@@ -389,11 +389,13 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
 
     # Set component to DS Operator if operator argument is true
     if operator:
+        log.debug('ds-operator requested.')
         if component == 'ds':
             component = 'ds-operator'
         if component == 'ds-cdm':
             component = 'ds-operator-cdm'
 
+    log.debug('component = ' + component)
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
@@ -700,11 +702,11 @@ def secretagent(k8s_op, tag='latest'):
         print()
 
 def is_legacy_install(ns):
-    try:
-        run('kubectl', f'-n {ns} get sts -l app.kubernetes.io/managed-by=ds-operator', cstderr=True, cstdout=True)
-        return True
-    except Exception:
+    _, _, out = run('kubectl', f'-n {ns} get sts -l app.kubernetes.io/managed-by=ds-operator', cstderr=True, cstdout=True)
+    if "No resources found" in out.decode('utf-8'):
         return False
+    else:
+        return True
 
 def dsoperator(k8s_op, tag='latest'):
     """Check if ds-operator is present in the cluster. If not, installs it."""
