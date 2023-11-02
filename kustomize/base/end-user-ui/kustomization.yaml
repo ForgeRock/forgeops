@@ -10,6 +10,6 @@ resources:
 - deployment.yaml
 - service.yaml
 images:
-- name: .*end-user-ui.*
+- name: .*enduser-ui.*
   newName: gcr.io/forgerock-io/platform-enduser-ui/docker-build
   newTag: 7.4.0-postcommit-latest

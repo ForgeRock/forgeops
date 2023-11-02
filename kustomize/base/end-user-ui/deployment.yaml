@@ -16,7 +16,7 @@ spec:
         runAsUser: 101
         runAsGroup: 0
       containers:
-      - image: end-user-ui
+      - image: enduser-ui
         imagePullPolicy: Always
         env:
         - name: SUBFOLDER
