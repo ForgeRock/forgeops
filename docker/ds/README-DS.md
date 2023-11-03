@@ -1,18 +1,19 @@
 # Directory Server (DS) Customization and Utilities
 
+>CAUTION The DS Operator is deprecated and will be removed in a future release
+
 **NOTE**
 
-The current production image is in the `ds-new` folder. This is the image used by the ds-operator.
+The current production image is in the `ds-new` folder.
 
-The ds-cts and ds-idrepo are the pre 7.3.0 images - and here for reference.
+The pre 7.3.0 images cts and idrepo here are for reference and ForgeOps internal use only.
 
 ## Directory Folders
 
-* ds-new - Generic DS image used by the ds-operator or for fully "mutable" directory deployments. This is
-the recommended DS image for new deployments.
+* ds-new - The default DS image used in all ds deployments
 * common: common scripts used to build multiple images
 * cts:  Legacy DS image purpose-built for CTS. ** For internal purposes only **
-* ds-idrepo: Legacy DS image purpose-built for DS as the shared repository for AM/IDM. Also includes a CTS backend for small installations. ** For internal purposes only **
+* idrepo: Legacy DS image purpose-built for DS as the shared repository for AM/IDM. Also includes a CTS backend for small installations. ** For internal purposes only **
 * proxy: DS proxy server. Experimental / unsupported.
 * dsutil:  Utility image that can be run in a pod to perform various DS related tasks. Has all the DS tools installed.
 

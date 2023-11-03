@@ -1,5 +1,6 @@
 # Directory Services Backup and Restore Using Snapshots
 
+>CAUTION The DS Operator is deprecated and will be removed in a future release
 
 The following samples are provided:
 
