@@ -1,4 +1,6 @@
-# Backup Strategies for the ForgeRock Identity Platform
+# Backup Strategies for the ForgeRock Identity Platform when using the DS Operator
+
+>CAUTION The DS Operator is deprecated and will be removed in a future release
 
 For backup, use Kubernetes volume snapshots, and perform offline backups in another container:
 
