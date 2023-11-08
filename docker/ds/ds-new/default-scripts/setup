@@ -138,22 +138,7 @@ create-backend-vlv-index \
           --set base-dn:ou=people,ou=identities \
           --set sort-order:+fr-idm-uuid \
           --set scope:single-level \
-          --set filter:(&(objectClass=devicePrintProfilesContainer) \
-          (objectClass=forgerock-am-dashboard-service) \
-          (objectClass=fr-idm-managed-user-explicit) \
-          (objectClass=fr-idm-managed-user-hybrid-obj) \
-          (objectClass=iPlanetPreferences) \
-          (objectClass=inetOrgPerson) \
-          (objectClass=inetuser) \
-          (objectClass=iplanet-am-auth-configuration-service) \
-          (objectClass=iplanet-am-managed-person) \
-          (objectClass=iplanet-am-user-service) \
-          (objectClass=kbaInfoContainer) \
-          (objectClass=oathDeviceProfilesContainer) \
-          (objectClass=pushDeviceProfilesContainer) \
-          (objectClass=sunAMAuthAccountLockout) \
-          (objectClass=sunFMSAML2NameIdentifier) \
-          (objectClass=webauthnDeviceProfilesContainer))
+          --set filter:(&(objectClass=devicePrintProfilesContainer)(objectClass=forgerock-am-dashboard-service)(objectClass=fr-idm-managed-user-explicit)(objectClass=fr-idm-managed-user-hybrid-obj)(objectClass=iPlanetPreferences)(objectClass=inetOrgPerson)(objectClass=inetuser)(objectClass=iplanet-am-auth-configuration-service)(objectClass=iplanet-am-managed-person)(objectClass=iplanet-am-user-service)(objectClass=kbaInfoContainer)(objectClass=oathDeviceProfilesContainer)(objectClass=pushDeviceProfilesContainer)(objectClass=sunAMAuthAccountLockout)(objectClass=sunFMSAML2NameIdentifier)(objectClass=webauthnDeviceProfilesContainer))
 create-backend-index \
         --backend-name amIdentityStore \
         --set index-type:extensible \
