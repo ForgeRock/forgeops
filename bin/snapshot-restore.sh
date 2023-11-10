@@ -29,7 +29,7 @@ clean.
 
 NOTES:
   * Valid restore actions: ${VALID_ACTIONS[@]}
-  * Valid restore targets: ${VALID_TARGET[@]}
+  * Valid restore targets: ${VALID_TARGETS[@]}
   * Only one action and target allowed per run
   * If a namespace isn't supplied, kubectl will rely on context and environment
 
@@ -62,7 +62,7 @@ Examples:
   $prog -s ds-idrepo-snapshot-20231003-0000 selective idrepo
 
   Clean up k8s resources from selective restore:
-  $prog -d /tmp/snapshot-restore-idrepo.20231003T21:40:53Z clean
+  $prog -d /tmp/snapshot-restore-idrepo.20231003T21:40:53Z clean idrepo
 
 EOM
 
@@ -88,7 +88,7 @@ stripMetadata() {
   message "Starting stripMetadata()" "debug"
 
   local file=$1
-  local newfile="${file}.new"
+  local new_file="${file}.new"
   local jq_filter=$(cat <<-END
     del(
       .metadata.annotations."autoscaling.alpha.kubernetes.io/conditions",
@@ -120,9 +120,9 @@ END)
 
   cat $file | \
   jq --exit-status --compact-output --monochrome-output --raw-output --sort-keys 2>/dev/null "$jq_filter" | \
-  yq eval --prettyPrint --no-colors --exit-status - > $newfile
+  yq eval --prettyPrint --no-colors --exit-status - > $new_file
 
-  mv $newfile $file
+  mv $new_file $file
 
   message "Finishing stripMetadata()" "debug"
 }
@@ -133,10 +133,10 @@ mergeYaml() {
 
   local file=$1
   local add_file=$2
-  local newfile="$$_new.yaml"
+  local new_file="$$_new.yaml"
 
-  yq eval-all '. as $item ireduce ({}; . * $item)' $file $add_file > $newfile
-  mv $newfile $file
+  yq eval-all '. as $item ireduce ({}; . * $item)' $file $add_file > $new_file
+  mv $new_file $file
 
   message "Finishing mergeYaml()" "debug"
 }
@@ -249,7 +249,7 @@ getPvcs() {
   message "Starting getPvcs()" "debug"
 
   PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=ds-${TARGET}" --no-headers=true | awk '{ print $1 }')
-  for pvc in $PVCS ; do
+  for pvc in "$PVCS" ; do
     local pvc_path="${RESTORE_DIR}/${pvc}.yaml"
     $K_GET pvc $pvc -o json > $pvc_path
     stripMetadata $pvc_path
@@ -263,7 +263,7 @@ prepPvcs() {
   message "Starting prepPvcs()" "debug"
 
   createPvcAdd
-  for pvc in $PVCS ; do
+  for pvc in "$PVCS" ; do
     local file="$RESTORE_DIR/${pvc}.yaml"
     mergeYaml $file $PVC_ADD_FILE
   done
@@ -275,7 +275,7 @@ prepPvcs() {
 deletePvcs() {
   message "Starting deletePvcs()" "debug"
 
-  for pvc in $PVCS ; do
+  for pvc in "$PVCS" ; do
     kube delete pvc $pvc
   done
 
@@ -305,7 +305,7 @@ SNAPSHOT_NAME=
 TARGET=
 
 VALID_ACTIONS=("full" "selective" "clean")
-VALID_TARGET=("idrepo" "cts")
+VALID_TARGETS=("idrepo" "cts")
 
 while true; do
   case "$1" in
@@ -317,14 +317,14 @@ while true; do
     -n|--namespace) NAMESPACE=$2; shift 2 ;;
     -s|--snapshot) SNAPSHOT_NAME=$2; shift 2 ;;
     "") break ;;
-    *) if [ -z $ACTION ] ; then
+    *) if [ -z "$ACTION" ] ; then
          ACTION=$1
          shift
-       elif [ -z $TARGET ] ; then
+       elif [ -z "$TARGET" ] ; then
          TARGET=$1
          shift
        else
-         usage 1 "Unknown flag: $1"
+         usage 1 "Unknown arg: $1"
        fi
        ;;
   esac
@@ -339,12 +339,32 @@ message "NAMESPACE=$NAMESPACE" "debug"
 message "SNAPSHOT_NAME=$SNAPSHOT_NAME" "debug"
 message "TARGET=$TARGET" "debug"
 
-if [ "$ACTION" == "clean" ] && [ -z $RESTORE_DIR ] ; then
-  usage 1 "You must use -d/--dir with clean"
+if [ -n "$ACTION" ] ; then
+  if containsElement $ACTION ${VALID_ACTIONS[@]} ; then
+    message "Restore type is valid: $ACTION" "debug"
+  else
+    usage 1 "Invalid restore type: $ACTION"
+  fi
+
+  if [ "$ACTION" == "clean" ] && [ -z $RESTORE_DIR ] ; then
+    usage 1 "You must use -d/--dir with clean"
+  fi
+else
+  usage 1 "An action is required. ( ${VALID_ACTIONS[*]} )"
+fi
+
+if [ -n "$TARGET" ] ; then
+  if containsElement $TARGET ${VALID_TARGETS[@]} ; then
+    message "Restore target is valid: $TARGET" "debug"
+  else
+    usage 1 "Invalid restore target: $TARGET"
+  fi
+else
+  usage 1 "A target is required. ( ${VALID_TARGETS[*]} )"
 fi
 
 # Namespace string
-if [ -z $NAMESPACE ] ; then
+if [ -z "$NAMESPACE" ] ; then
   NAMESPACE_OPT=""
 else
   NAMESPACE_OPT="-n $NAMESPACE"
@@ -353,20 +373,6 @@ fi
 # kubectl commands
 K_CMD="$(type -P kubectl)"
 K_GET="$K_CMD get $NAMESPACE_OPT"
-
-if containsElement $ACTION ${VALID_ACTIONS[@]} ; then
-  message "Restore type is valid: $ACTION" "debug"
-else
-  usage 1 "Invalid restore type: $ACTION"
-fi
-
-if [ -n $TARGET ] ; then
-  if containsElement $TARGET ${VALID_TARGET[@]} ; then
-    message "Restore target is valid: $TARGET" "debug"
-  else
-    usage 1 "Invalid restore target: $TARGET"
-  fi
-fi
 
 JOB_LABEL="ds-${TARGET}-snapshot-job"
 message "JOB_LABEL=$JOB_LABEL" "debug"
@@ -399,7 +405,7 @@ STS_RESTORE_PATH="$RESTORE_DIR/$STS_RESTORE_FILE"
 SVC_FILE="svc.yaml"
 SVC_PATH="$RESTORE_DIR/$SVC_FILE"
 
-case $ACTION in
+case "$ACTION" in
   full)
     message "Requested restore type: full" "debug"
     getSts
