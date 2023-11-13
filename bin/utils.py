@@ -411,8 +411,6 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
 
     fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
     sizepatchjson = [{"op": "add", "path": "data/data/FORGEOPS_PLATFORM_SIZE", "value": size}]
-    if operator:
-        dsoperatorpatchjson = [{"op": "add", "path": "data/data/DS_OPERATOR_ENABLED", "value": "true"}]
     ingressclasspatchjson = [{"op": "replace", "path": "/spec/ingressClassName", "value": ingress_class}]
     # run('kustomize', f'edit set namespace {ns}', cwd=profile_dir)
     if component in ['base', 'base-cdm']:
@@ -420,15 +418,10 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
             cwd=profile_dir)
-        if operator:
-            run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(dsoperatorpatchjson)}\'',
-                cwd=profile_dir)
         run('kustomize', f'edit add patch --name forgerock --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name ig --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
             cwd=profile_dir)
-        # run('kustomize', f'edit add patch --name icf-ingress --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
-        #     cwd=profile_dir)
     _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
     contents = contents.decode('ascii')
     contents = contents.replace('namespace: default', f'namespace: {ns}')
@@ -470,13 +463,11 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
     ns: target namespace.
     force: set to True to delete all forgeops resources including secrets and PVCs.
     """
-    # Check for the DS_OPERATOR_ENABLED setting so we know to delete directoryservice resources
-    if component in ['ds', 'ds-idrepo', 'ds-cts', 'ds-cdm']:
-        try:
-            ds_operator_deployed = get_configmap_value(ns, 'platform-config', 'DS_OPERATOR_ENABLED')
-        except:
-            ds_operator_deployed = None
-        if ds_operator_deployed: operator = True
+    # Supports deleting of DS Operator custom resources when upgrading from 7.3 to 7.4
+    if component in ['ds','ds-cdm','ds-idrepo']:
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-idrepo')
+    if component == ['ds-cdm','ds-cts']:
+        run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-cts')
 
     if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
