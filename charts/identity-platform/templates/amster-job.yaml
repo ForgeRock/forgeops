@@ -1,0 +1,148 @@
+{{- if .Values.amster.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: amster
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    {{- if .Values.amster.deleteOnSuccess }}
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    {{- else }}
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    {{- end }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.amster.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  backoffLimit: {{ .Values.amster.backoffLimit }}
+  {{- if .Values.amster.ttlSecondsAfterFinished }}
+  ttlSecondsAfterFinished: {{ .Values.amster.ttlSecondsAfterFinished }}
+  {{- end }}
+  template:
+    metadata:
+      annotations:
+        deployment-date: {{ now | quote }}
+        {{- with .Values.amster.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "identity-platform.selectorLabels" . | nindent 8 }}
+        {{- with .Values.amster.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: {{ .Values.amster.restartPolicy }}
+      {{- if .Values.amster.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.amster.image.imagePullSecrets | nindent 8 }}
+      {{- else if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.amster.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: amster-config
+          configMap:
+            name: amster-config
+        - name: amster-scripts
+          configMap:
+            name: amster-scripts
+        - name: amster-secrets
+          secret:
+            secretName: amster
+        - name: platform-config
+          configMap:
+            name: platform-config
+        - name: export-files
+          emptyDir: {}
+      initContainers:
+        - name: amster
+          securityContext:
+            {{- toYaml .Values.amster.securityContext | nindent 12 }}
+          image: "{{ .Values.amster.image.repository }}:{{ .Values.amster.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.amster.image.pullPolicy }}
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              for f in $(find /amster-scripts); do
+                cp $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)
+              done
+              ./docker-entrypoint.sh import
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          envFrom:
+          - configMapRef:
+              name: platform-config
+          - secretRef:
+              name: amster-env-secrets
+          - secretRef:
+              name: ds-env-secrets
+          resources:
+            {{- toYaml .Values.amster.resources | nindent 12 }}
+          volumeMounts:
+          {{- range $path, $_ := .Files.Glob "files/amster/config/**" }}
+          - name: amster-config
+            mountPath: /opt/amster/config/{{ $path | replace "files/amster/" "" }}
+            subPath: {{ $path | replace "files/amster/" "" | sha256sum }}
+          {{- end }}
+          {{- range $path, $_ := .Files.Glob "files/amster/scripts/**" }}
+          - name: amster-scripts
+            mountPath: /amster-scripts/{{ $path | replace "files/amster/scripts/" "" }}
+            subPath: {{ $path | replace "files/amster/scripts/" "" | sha256sum }}
+          {{- end }}
+          - name: amster-secrets
+            mountPath: /var/run/secrets/amster
+            readOnly: true
+          - name: export-files
+            mountPath: /var/tmp/amster
+      containers:
+        - name: pause
+          securityContext:
+            {{- toYaml .Values.amster.securityContext | nindent 12 }}
+          image: "{{ .Values.amster.image.repository }}:{{ .Values.amster.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.amster.image.pullPolicy }}
+          args:
+            - bash
+            - -c
+            - sleep ${DURATION:-10}
+          envFrom:
+          - configMapRef:
+              name: amster-retain
+              optional: true
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /etc/hosts
+            {{- with .Values.amster.readinessProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.amster.resources | nindent 12 }}
+          volumeMounts:
+          - name: export-files
+            mountPath: /var/tmp/amster
+      {{- with .Values.amster.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.amster.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      tolerations:
+      {{- if .Values.amster.tolerations }}
+        {{- toYaml .Values.amster.tolerations | nindent 8 }}
+      {{- else if .Values.platform.tolerations }}
+        {{- toYaml .Values.platform.tolerations | nindent 8 }}
+      {{- end }}
+{{- end }}

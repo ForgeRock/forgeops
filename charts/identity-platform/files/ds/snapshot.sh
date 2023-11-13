@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# This script is called by the cron job to manage snapshots, pvcs and the backup job.
+# It snapshots the desired disk (default date-ds-idrepo-0) and then creates a cloned PVC from the snapshot.
+# The cloned pvc is then used by the customer supplied job to backup the directory server. On job
+# completion the script will clean up the Job. This is required to get the job to release the cloned PVC so it can be
+# reclaimed.
+#
+# set -x
+
+
+DS_SNAPSHOT_NAME="${1:-ds-snapshot}"
+DS_VOLUME="${2:-data-ds-idrepo-0}"
+DS_SNAPSHOT_CLASS="${3:-ds-snapshot-class}"
+
+# To use the pod name for the snap - instead of a fixed name
+SNAP_NAME=$DS_SNAPSHOT_NAME-$(date +%Y%m%d-%H%M --utc)
+
+JOB_NAME="${DS_SNAPSHOT_NAME}-job"
+
+# Delete snapshots older than this date. Set env PURGE_DELAY to a valid date
+# range. You can use 'last day', 'last hour', '-10 min', etc.
+purgeTime=$(date -d "$PURGE_DELAY" -Ins --utc)
+
+#
+for snapshot in $(kubectl --namespace $NAMESPACE get volumesnapshot -l app="${JOB_NAME}"  -o jsonpath="{.items[*].metadata.name}")
+do
+  dt=$(kubectl  --namespace $NAMESPACE get volumesnapshot $snapshot -o jsonpath="{.metadata.creationTimestamp"})
+
+  # This does a lexigraphical comparison which works because the string is in UTC format
+  if [[ $dt < $purgeTime ]]; then
+    echo "Purging $snapshot with age $dt"
+    kubectl --namespace $NAMESPACE delete volumesnapshot $snapshot
+  else
+    echo "Snapshot $snapshot creation time $dt is newer than $purgeTime. Retaining"
+  fi
+
+done
+
+echo "Creating snapshot $NAMESPACE/$SNAP_NAME"
+
+kubectl --namespace  $NAMESPACE apply -f - <<EOF
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: $SNAP_NAME
+  labels:
+    app: $JOB_NAME
+spec:
+  # The volume snapshot class needs to exist in the cluster
+  volumeSnapshotClassName: $DS_SNAPSHOT_CLASS
+  source:
+    persistentVolumeClaimName: $DS_VOLUME
+EOF
+
+
+if [ $? == 0 ] ; then
+  echo "Job finished. Job logs"
+  kubectl --namespace $NAMESPACE  --all-containers=true logs -l app="${DS_SNAPSHOT_NAME}-job"
+  echo "Cleaning up job"
+  kubectl --namespace $NAMESPACE delete job -l app="${DS_SNAPSHOT_NAME}-job"
+  exit 0
+fi
+
+echo "Job $DS_SNAPSHOT_NAME did not complete successfully. Exiting"
+exit 1

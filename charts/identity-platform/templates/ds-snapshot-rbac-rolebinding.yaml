@@ -1,0 +1,14 @@
+{{- if and .Values.ds_snapshot.rbacCreate (or .Values.ds_idrepo.snapshot.enabled .Values.ds_cts.snapshot.enabled .Values.ds_snapshot.rbacOnly) -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.ds_snapshot.serviceAccountName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.ds_snapshot.serviceAccountName }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Values.ds_snapshot.serviceAccountName }}
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

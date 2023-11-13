@@ -1,0 +1,96 @@
+{{- if .Values.ig.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ig
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ig.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.ig.autoscaling.enabled }}
+  replicas: {{ .Values.ig.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "identity-platform.selectorLabels" . | nindent 6 }}
+      {{- with .Values.ig.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      annotations:
+        deployment-date: {{ now | quote }}
+        {{- with .Values.ig.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "identity-platform.selectorLabels" . | nindent 8 }}
+        {{- with .Values.ig.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.ig.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.ig.image.imagePullSecrets | nindent 8 }}
+      {{- else if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.ig.podSecurityContext | nindent 8 }}
+      containers:
+        - name: ig
+          securityContext:
+            {{- toYaml .Values.ig.securityContext | nindent 12 }}
+          image: "{{ .Values.ig.image.repository }}:{{ .Values.ig.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ig.image.pullPolicy }}
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          envFrom:
+          - secretRef:
+              name: openig-secrets-env
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /kube/liveness
+              port: http
+            {{- with .Values.ig.livenessProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /kube/readiness
+              port: http
+            {{- with .Values.ig.readinessProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.ig.resources | nindent 12 }}
+      {{- with .Values.ig.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ig.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      tolerations:
+      {{- if .Values.ig.tolerations }}
+        {{- toYaml .Values.ig.tolerations | nindent 8 }}
+      {{- else if .Values.platform.tolerations }}
+        {{- toYaml .Values.platform.tolerations | nindent 8 }}
+      {{- end }}
+{{- end }}

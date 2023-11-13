@@ -1,0 +1,33 @@
+{{- if and .Values.platform.storage.storage_class.create (not (lookup "storage.k8s.io/v1" "StorageClass" "" .Values.platform.storage.storage_class.name).metadata) -}}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.platform.storage.storage_class.name }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": "hook-failed"
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+{{- if .Values.platform.storage.storage_class.create }}
+{{ toYaml .Values.platform.storage.storage_class.create }}
+{{- else if (lookup "storage.k8s.io/v1" "CSIDriver" "" "pd.csi.storage.gke.io").metadata }}
+provisioner: pd.csi.storage.gke.io
+allowVolumeExpansion: true
+parameters:
+  type: pd-ssd
+{{- else if (lookup "storage.k8s.io/v1" "CSIDriver" "" "ebs.csi.aws.com").metadata }}
+provisioner: ebs.csi.aws.com
+allowVolumeExpansion: true
+{{- else if (lookup "storage.k8s.io/v1" "CSIDriver" "" "disk.csi.azure.com").metadata }}
+provisioner: disk.csi.azure.com
+allowVolumeExpansion: true
+parameters:
+  storageaccounttype: Premium_LRS
+  kind: Managed
+{{- else }}
+{{- required "***** !!!!!  Could not auto-detect a StorageClass.  Please provide a StorageClass name.  !!!!! *****" .Values.platform.storage.storage_class.name }}
+{{- end }}
+---
+{{- end }}

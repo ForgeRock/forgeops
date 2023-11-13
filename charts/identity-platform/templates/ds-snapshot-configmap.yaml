@@ -1,0 +1,10 @@
+{{- if and .Values.ds_snapshot.configmapCreate (or .Values.ds_idrepo.snapshot.enabled .Values.ds_cts.snapshot.enabled .Values.ds_snapshot.configmapOnly) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ds_snapshot.configMapName" . }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+data:
+  {{ (.Files.Glob "files/ds/snapshot.sh").AsConfig | nindent 2 }}
+{{- end }}

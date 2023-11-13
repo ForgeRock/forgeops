@@ -1,0 +1,216 @@
+{{- if .Values.idm.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idm
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.idm.autoscaling.enabled }}
+  replicas: {{ .Values.idm.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "identity-platform.selectorLabels" . | nindent 6 }}
+      {{- with .Values.idm.podLabels }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+  template:
+    metadata:
+      annotations:
+        deployment-date: {{ now | quote }}
+        {{- with .Values.idm.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "identity-platform.selectorLabels" . | nindent 8 }}
+        {{- with .Values.idm.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.idm.image.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.idm.image.imagePullSecrets | nindent 8 }}
+      {{- else if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "identity-platform.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.idm.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: fbc
+          emptyDir: {}
+        - name: idm-secrets
+          secret:
+            secretName: idm
+        - name: truststore
+          secret:
+            secretName: ds-ssl-keypair
+        - name: new-truststore
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: audit-logs
+          emptyDir: {}
+        - name: idm-logging-properties
+          configMap:
+            name: idm-logging-properties
+      initContainers:
+        - name: fbc-init
+          image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
+          volumeMounts:
+          - mountPath: /fbc
+            name: fbc
+          command:
+          - /bin/bash
+          - -c
+          - |
+            if [ -d /fbc/config ];
+            then
+              echo "Existing openidm configuration found. Skipping copy"
+            else
+              echo "Copying docker image configuration files to the shared volume"
+              cd /opt/openidm
+              cp -vr ui conf script /fbc
+            fi
+        - name: truststore-init
+          image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
+          volumeMounts:
+          - name: new-truststore
+            mountPath: /truststore
+          - name: truststore
+            mountPath: /var/run/secrets/truststore
+          command:
+            - /opt/openidm/bin/import-pem-certs.sh
+          env:
+          - name: TRUSTSTORE_PATH
+            value: /truststore/idmtruststore
+          - name: TRUSTSTORE_PASSWORD
+            value: changeit
+          - name: IDM_PEM_TRUSTSTORE
+            value: /var/run/secrets/truststore/ca.crt
+      containers:
+        - name: openidm
+          securityContext:
+            {{- toYaml .Values.idm.securityContext | nindent 12 }}
+          image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.idm.image.pullPolicy }}
+          env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: OPENIDM_REPO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ds-passwords
+                key: dirmanager.pw
+          - name: USERSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ds-passwords
+                key: dirmanager.pw
+          - name: RS_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: amster-env-secrets
+                key: IDM_RS_CLIENT_SECRET
+          envFrom:
+          - configMapRef:
+              name: idm
+          - secretRef:
+              name: idm-env-secrets
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            {{- with .Values.idm.livenessProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            {{- with .Values.idm.readinessProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          startupProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            {{- with .Values.idm.startupProbe }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.idm.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /var/run/secrets/idm
+            name: idm-secrets
+          - name: new-truststore
+            mountPath: /opt/openidm/idmtruststore
+            readOnly: true
+            subPath: idmtruststore
+          - mountPath: /opt/openidm/logs
+            name: logs
+          - mountPath: /opt/openidm/audit
+            name: audit-logs
+          - mountPath: /var/run/openidm/logging
+            name: idm-logging-properties
+          - name: fbc
+            mountPath: /opt/openidm/conf
+            subPath: conf
+          - name: fbc
+            mountPath: /opt/openidm/ui
+            subPath: ui
+          - name: fbc
+            mountPath: /opt/openidm/script
+            subPath: script
+      {{- with .Values.idm.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.idm.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      tolerations:
+      {{- if .Values.idm.tolerations }}
+        {{- toYaml .Values.idm.tolerations | nindent 8 }}
+      {{- else if .Values.platform.tolerations }}
+        {{- toYaml .Values.platform.tolerations | nindent 8 }}
+      {{- end }}
+{{- end }}

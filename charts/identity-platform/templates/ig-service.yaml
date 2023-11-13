@@ -1,0 +1,23 @@
+{{- if .Values.ig.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: ig
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ig.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.ig.service.type }}
+  ports:
+    - port: {{ .Values.ig.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
+    {{- with .Values.ig.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}

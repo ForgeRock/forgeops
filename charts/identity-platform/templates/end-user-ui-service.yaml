@@ -1,0 +1,23 @@
+{{- if .Values.end_user_ui.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: end-user-ui
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.end_user_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  type: {{ .Values.end_user_ui.service.type }}
+  ports:
+    - port: {{ .Values.end_user_ui.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "identity-platform.selectorLabels" . | nindent 4 }}
+    {{- with .Values.end_user_ui.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+{{- end }}
