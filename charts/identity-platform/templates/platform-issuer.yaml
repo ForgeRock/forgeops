@@ -1,0 +1,26 @@
+{{- if .Values.platform.ingress.tls.issuer.create -}}
+apiVersion: cert-manager.io/v1
+kind: {{ .Values.platform.ingress.tls.issuer.kind }}
+metadata:
+  name: {{ .Values.platform.ingress.tls.issuer.name }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+spec:
+  {{- if not (eq "self-signed" .Values.platform.ingress.tls.issuer.create.type) }}
+  acme:
+    {{- if (eq "letsencrypt-prod" .Values.platform.ingress.tls.issuer.create.type) }}
+    server: 'https://acme-v02.api.letsencrypt.org/directory'
+    {{- else }}
+    server: 'https://acme-staging-v02.api.letsencrypt.org/directory'
+    {{- end }}
+    email: "{{ .Values.platform.ingress.tls.issuer.create.email }}"
+    privateKeySecretRef:
+      name: "{{ .Values.platform.ingress.tls.issuer.name }}"
+    solvers:
+    - http01:
+        ingress:
+          class: {{ .Values.platform.ingress.className }}
+  {{- else }}
+  selfSigned: {}
+  {{- end }}
+{{- end }}

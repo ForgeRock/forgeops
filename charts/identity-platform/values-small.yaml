@@ -1,0 +1,58 @@
+# Default override values for small identity-platform cluster.
+
+am:
+  replicaCount: 2
+
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      cpu: 2000m
+      memory: 4Gi
+
+idm:
+  replicaCount: 2
+
+  resources:
+    limits:
+      memory: 2Gi
+    requests:
+      cpu: 1500m
+      memory: 2Gi
+
+ds_idrepo:
+  replicaCount: 3
+
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      cpu: 1500m
+      memory: 4Gi
+
+  volumeClaimSpec:
+    storageClassName: fast
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+
+ds_cts:
+  replicaCount: 3
+
+  resources:
+    limits:
+      memory: 3Gi
+    requests:
+      cpu: 2000m
+      memory: 3Gi
+
+  volumeClaimSpec:
+    storageClassName: fast
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 100Gi
+

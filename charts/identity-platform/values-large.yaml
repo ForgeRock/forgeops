@@ -1,0 +1,58 @@
+# Default override values for medium identity-platform cluster.
+
+am:
+  replicaCount: 3
+
+  resources:
+    limits:
+      memory: 21Gi
+    requests:
+      cpu: 11000m
+      memory: 21Gi
+
+idm:
+  replicaCount: 2
+
+  resources:
+    limits:
+      memory: 6Gi
+    requests:
+      cpu: 8000m
+      memory: 6Gi
+
+ds_idrepo:
+  replicaCount: 3
+
+  resources:
+    limits:
+      memory: 21Gi
+    requests:
+      cpu: 8000m
+      memory: 21Gi
+
+  volumeClaimSpec:
+    storageClassName: fast
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 512Gi
+
+ds_cts:
+  replicaCount: 3
+
+  resources:
+    limits:
+      memory: 21Gi
+    requests:
+      cpu: 12000m
+      memory: 21Gi
+
+  volumeClaimSpec:
+    storageClassName: fast
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1000Gi
+

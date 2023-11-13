@@ -1,0 +1,10 @@
+{{- if .Values.amster.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amster-retain
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+data:
+  DURATION: {{ .Values.amster.env.DURATION | quote }}
+{{- end }}

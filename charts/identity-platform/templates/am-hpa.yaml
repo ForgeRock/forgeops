@@ -1,0 +1,31 @@
+{{- if and .Values.am.enabled .Values.am.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: am
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.am.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "identity-platform.fullname" . }}
+  minReplicas: {{ .Values.am.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.am.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.am.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.am.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.am.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.am.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

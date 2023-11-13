@@ -1,0 +1,23 @@
+{{- if .Values.amster.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amster-config
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+binaryData:
+{{- range $path, $_ := .Files.Glob "files/amster/config/**" }}
+  {{ $path | replace "files/amster/" "" | sha256sum }}: {{ $.Files.Get $path | b64enc }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: amster-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+binaryData:
+{{- range $path, $_ := .Files.Glob "files/amster/scripts/**" }}
+  {{ $path | replace "files/amster/scripts/" "" | sha256sum }}: {{ $.Files.Get $path | b64enc }}
+{{- end }}
+{{- end }}

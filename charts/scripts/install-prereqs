@@ -1,0 +1,114 @@
+#!/bin/bash
+
+ingress=nginx
+[ "$1" = "--haproxy" ] && ingress=haproxy
+
+sa_repo=oci://us-docker.pkg.dev/forgeops-public/charts/secret-agent
+sa_namespace=secret-agent
+sa_version="v1.2.0"
+sa_installed=$(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io 2>/dev/null)
+if [ -n "$sa_installed" ]; then
+    echo "Secret agent has already been installed."
+else
+    echo "Secret agent not found.  Installing..."
+    kubectl create namespace $sa_namespace 2>/dev/null || true
+    helm upgrade secret-agent $sa_repo \
+        ${sa_version:+--version=$sa_version} \
+        --namespace $sa_namespace --install --reset-values \
+        \
+        --set tolerations[0]."key"="kubernetes\.io/arch" \
+        --set tolerations[0]."effect"="NoSchedule" \
+        --set tolerations[0]."operator"="Exists"
+fi
+
+cm_repo=https://charts.jetstack.io
+cm_namespace=cert-manager
+cm_version=
+cm_installed=$(kubectl get crd -l app=cert-manager 2>/dev/null)
+if [ -n "$cm_installed" ]; then
+    echo "Certificate manager has already been installed."
+else
+    echo "Certificate manager not found.  Installing..."
+    kubectl create namespace $cm_namespace 2>/dev/null || true
+    helm upgrade cert-manager cert-manager --repo $cm_repo \
+        --namespace $cm_namespace --install --reset-values \
+        ${cm_version:+--version=$cm_version} \
+        --set installCRDs=true \
+        --set global.leaderElection.namespace=$cm_namespace \
+        \
+        --set tolerations[0]."key"="kubernetes\.io/arch" \
+        --set tolerations[0]."effect"="NoSchedule" \
+        --set tolerations[0]."operator"="Exists" \
+        --set caininjector.tolerations[0]."key"="kubernetes\.io/arch" \
+        --set caininjector.tolerations[0]."effect"="NoSchedule" \
+        --set caininjector.tolerations[0]."operator"="Exists" \
+        --set startupapicheck.tolerations[0]."key"="kubernetes\.io/arch" \
+        --set startupapicheck.tolerations[0]."effect"="NoSchedule" \
+        --set startupapicheck.tolerations[0]."operator"="Exists" \
+        --set webhook.tolerations[0]."key"="kubernetes\.io/arch" \
+        --set webhook.tolerations[0]."effect"="NoSchedule" \
+        --set webhook.tolerations[0]."operator"="Exists"
+fi
+
+if [ "$ingress" = "nginx" ]; then
+    nx_repo=https://kubernetes.github.io/ingress-nginx
+    nx_namespace=ingress-nginx
+    nx_version=
+    nx_installed=$(kubectl get clusterroles -l app.kubernetes.io/name=ingress-nginx 2>/dev/null)
+    if [ -n "$nx_installed" ]; then
+        echo "NGINX Ingress has already been installed."
+    else
+        echo "NGINX Ingress not found.  Installing..."
+        kubectl create namespace $nx_namespace 2>/dev/null || true
+        helm upgrade ingress-nginx ingress-nginx --repo $nx_repo \
+            --namespace $nx_namespace --install --reset-values \
+            ${nx_version:+--version=$nx_version} \
+            --set controller.kind=Deployment \
+            --set controller.replicaCount=2 \
+            --set controller.allowSnippetAnnotations=true \
+            --set controller.service.type=LoadBalancer \
+            --set controller.service.externalTrafficPolicy=Local \
+            --set controller.service.omitClusterIP=true \
+            --set controller.publishService.enabled=true \
+            --set controller.stats.enabled=true \
+            --set controller.stats.service.omitClusterIP=true \
+            --set controller.tolerations[0]."key"="kubernetes\.io/arch" \
+            --set controller.tolerations[0]."effect"="NoSchedule" \
+            --set controller.tolerations[0]."operator"="Exists" \
+            --set controller.admissionWebhooks.patch.tolerations[0]."key"="kubernetes\.io/arch" \
+            --set controller.admissionWebhooks.patch.tolerations[0]."effect"="NoSchedule" \
+            --set controller.admissionWebhooks.patch.tolerations[0]."operator"="Exists" \
+            --set defaultBackend.tolerations[0]."key"="kubernetes\.io/arch" \
+            --set defaultBackend.tolerations[0]."effect"="NoSchedule" \
+            --set defaultBackend.tolerations[0]."operator"="Exists"
+    fi
+else
+    hp_repo=https://haproxy-ingress.github.io/charts
+    hp_namespace=haproxy-ingress
+    hp_version=
+    hp_installed=$(kubectl get clusterroles -l app.kubernetes.io/name=haproxy-ingress 2>/dev/null)
+    if [ -n "$hp_installed" ]; then
+        echo "HAProxy Ingress has already been installed."
+    else
+        echo "HAProxy Ingress not found.  Installing..."
+        kubectl create namespace $hp_namespace 2>/dev/null || true
+        helm upgrade haproxy-ingress haproxy-ingress --repo $hp_repo \
+            --namespace $hp_namespace --install --reset-values \
+            ${hp_version:+--version=$hp_version} \
+            --set controller.kind=Deployment \
+            --set controller.replicaCount=2 \
+            --set controller.minAvailable=2 \
+            --set controller.service.type=LoadBalancer \
+            --set controller.service.externalTrafficPolicy=Local \
+            --set controller.publishService.enabled=true \
+            --set controller.stats.enabled=true \
+            --set controller.ingressClassResource.enabled=true \
+            --set controller.tolerations[0]."key"="kubernetes\.io/arch" \
+            --set controller.tolerations[0]."effect"="NoSchedule" \
+            --set controller.tolerations[0]."operator"="Exists" \
+            --set defaultBackend.tolerations[0]."key"="kubernetes\.io/arch" \
+            --set defaultBackend.tolerations[0]."effect"="NoSchedule" \
+            --set defaultBackend.tolerations[0]."operator"="Exists"
+    fi
+fi
+
