@@ -140,12 +140,18 @@ def runUpgrade(PipelineRunLegacyAdapter pipelineRun, Random random, String stage
                Map testConfig) {
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def stagesCloud = [:]
+
     def deploymentReportNamePrefix = deploymentConfig.REPORT_NAME_PREFIX
     def deploymentStageName = dashboard_utils.normalizeStageName(deploymentReportNamePrefix)
     stagesCloud[deploymentStageName] = dashboard_utils.spyglaasStageCloud(deploymentStageName)
+    deploymentConfig += [SKIP_TESTS: true]
+    deploymentConfig += [SKIP_CLEANUP: true]
+
     def testReportNamePrefix = testConfig.REPORT_NAME_PREFIX
     def testStageName = dashboard_utils.normalizeStageName(testReportNamePrefix)
     stagesCloud[testStageName] = dashboard_utils.spyglaasStageCloud(testStageName)
+    testConfig += [SKIP_DEPLOY: true]
+    testConfig += [DEPLOYMENT_UPGRADE_FIRST: true]
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
