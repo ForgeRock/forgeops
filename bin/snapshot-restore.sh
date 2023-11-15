@@ -32,6 +32,7 @@ NOTES:
   * Valid restore targets: ${VALID_TARGETS[@]}
   * Only one action and target allowed per run
   * If a namespace isn't supplied, kubectl will rely on context and environment
+  * While -d is required for clean, it can be used with any action
 
   OPTIONS:
     -h|--help                    : display usage and exit
@@ -56,13 +57,16 @@ Examples:
   $prog -s ds-idrepo-snapshot-20231003-0000 full cts
 
   Use a specific dir for restore artifacts:
-  $prod -d $HOME/ds-restore -s ds-idrepo-snapshot-20231003-0000 full idrepo
+  $prog -d /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 full idrepo
 
   Selective restore of specific snapshot for idrepo:
   $prog -s ds-idrepo-snapshot-20231003-0000 selective idrepo
 
+  Perform a selective restore with a user defined dir:
+  $prog -d /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 selective idrepo
+
   Clean up k8s resources from selective restore:
-  $prog -d /tmp/snapshot-restore-idrepo.20231003T21:40:53Z clean idrepo
+  $prog -d /tmp/ds-restore clean idrepo
 
 EOM
 
@@ -249,7 +253,7 @@ getPvcs() {
   message "Starting getPvcs()" "debug"
 
   PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=ds-${TARGET}" --no-headers=true | awk '{ print $1 }')
-  for pvc in "$PVCS" ; do
+  for pvc in $PVCS ; do
     local pvc_path="${RESTORE_DIR}/${pvc}.yaml"
     $K_GET pvc $pvc -o json > $pvc_path
     stripMetadata $pvc_path
@@ -263,7 +267,7 @@ prepPvcs() {
   message "Starting prepPvcs()" "debug"
 
   createPvcAdd
-  for pvc in "$PVCS" ; do
+  for pvc in $PVCS ; do
     local file="$RESTORE_DIR/${pvc}.yaml"
     mergeYaml $file $PVC_ADD_FILE
   done
@@ -275,7 +279,7 @@ prepPvcs() {
 deletePvcs() {
   message "Starting deletePvcs()" "debug"
 
-  for pvc in "$PVCS" ; do
+  for pvc in $PVCS ; do
     kube delete pvc $pvc
   done
 
