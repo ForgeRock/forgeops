@@ -464,10 +464,17 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
     force: set to True to delete all forgeops resources including secrets and PVCs.
     """
     # Supports deleting of DS Operator custom resources when upgrading from 7.3 to 7.4
-    if component in ['ds','ds-cdm','ds-idrepo']:
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-idrepo')
-    if component == ['ds-cdm','ds-cts']:
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-cts')
+    if component in ['ds','ds-cdm','ds-idrepo','ds-cts']:
+        try: 
+            # Check if the directoryservice CRD is installed. If not then skip the delete.
+            run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
+        except:
+            pass
+        else:
+            if component in ['ds','ds-cdm','ds-idrepo']:
+                run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-idrepo')
+            if component == ['ds-cdm','ds-cts']:
+                run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-cts')
 
     if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
