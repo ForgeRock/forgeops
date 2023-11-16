@@ -47,7 +47,6 @@ NOTES:
 Requirements:
   * kubectl
   * jq
-  * yq (mikefarrah) 4.x+
 
 Examples:
   Full restore of latest snapshot on idrepo:
@@ -87,7 +86,7 @@ kube() {
   message "Finishing kube()" "debug"
 }
 
-# Strip k8s metadata out of a yaml file
+# Strip k8s metadata out of a json file
 stripMetadata() {
   message "Starting stripMetadata()" "debug"
 
@@ -112,6 +111,7 @@ stripMetadata() {
       .metadata.uid,
       .spec.clusterIP,
       .spec.clusterIPs,
+      .spec.dataSourceRef,
       .spec.progressDeadlineSeconds,
       .spec.revisionHistoryLimit,
       .spec.template.metadata.annotations."kubectl.kubernetes.io/restartedAt",
@@ -122,27 +122,24 @@ stripMetadata() {
     )
 END)
 
-  cat $file | \
-  jq --exit-status --compact-output --monochrome-output --raw-output --sort-keys 2>/dev/null "$jq_filter" | \
-  yq eval --prettyPrint --no-colors --exit-status - > $new_file
-
+  jq --exit-status --compact-output --monochrome-output --raw-output --sort-keys 2>/dev/null "$jq_filter" $file > $new_file
   mv $new_file $file
 
   message "Finishing stripMetadata()" "debug"
 }
 
-# Merge two yaml files together
-mergeYaml() {
-  message "Starting mergeYaml()" "debug"
+# Merge two json files together
+mergeJson() {
+  message "Starting mergeJson()" "debug"
 
   local file=$1
   local add_file=$2
-  local new_file="$$_new.yaml"
+  local new_file="$$_new.json"
 
-  yq eval-all '. as $item ireduce ({}; . * $item)' $file $add_file > $new_file
+  jq -s '.[0] * .[1]' $file $add_file > $new_file
   mv $new_file $file
 
-  message "Finishing mergeYaml()" "debug"
+  message "Finishing mergeJson()" "debug"
 }
 
 # Get the currently running service definition
@@ -189,18 +186,25 @@ getSts() {
 prepSts() {
   message "Starting prepSts()" "debug"
 
-  if [ "$ACTION" == "full" ] ; then
-    sed -e 's/replicas: [0-9]*$/replicas: 0/' $STS_PATH > $STS_RESTORE_PATH
-  elif [ "$ACTION" == "selective" ] ; then
-    sed -e 's/replicas: *$/replicas: 1/' $STS_PATH > $STS_RESTORE_PATH
+  local replicas=0 # Assume full restore by default
+  cp $STS_PATH $STS_RESTORE_PATH
+  if [ "$ACTION" == "selective" ] ; then
+    replicas=1
     sed -i .bak -e "s/ds-$TARGET/ds-$TARGET-restore/g" $STS_RESTORE_PATH
-
     createPvcAdd
-    yq eval-all \
-      'select(fileIndex==0).spec.volumeClaimTemplates[0] = select(fileIndex==1) | select(fileIndex==0)' \
-      $STS_RESTORE_PATH $PVC_ADD_FILE > $STS_RESTORE_PATH.new
-    mv $STS_RESTORE_PATH.new $STS_RESTORE_PATH
+    mergeJson $STS_RESTORE_PATH $PVC_ADD_FILE
   fi
+
+  local add_file=$RESTORE_DIR/replicas.json
+  cat > $add_file <<EOM
+{
+  "spec": {
+    "replicas": $replicas
+  }
+}
+EOM
+
+  mergeJson $STS_RESTORE_PATH $add_file
 
   message "Finishing prepSts()" "debug"
 }
@@ -227,22 +231,27 @@ restoreSts() {
 createPvcAdd() {
   message "Starting createPvcAdd()" "debug"
 
-  local temp_add_file="$RESTORE_DIR/pvc_snip.yaml"
-  cat > $temp_add_file << EOM
-spec:
-  dataSource:
-    name: $SNAPSHOT_NAME
-    kind: VolumeSnapshot
-    apiGroup: snapshot.storage.k8s.io
+  local add_file="$RESTORE_DIR/pvc_snip.json"
+  cat > $add_file << EOM
+{
+  "spec": {
+    "dataSource": {
+      "name": "$SNAPSHOT_NAME",
+      "kind": "VolumeSnapshot",
+      "apiGroup": "snapshot.storage.k8s.io"
+    }
+  }
+}
 EOM
 
   if [ "$ACTION" == "full" ] ; then
-    mv $temp_add_file $PVC_ADD_FILE
+    mv $add_file $PVC_ADD_FILE
   elif [ "$ACTION" == "selective" ] ; then
-    local vct_file="$RESTORE_DIR/vct.yaml"
-    yq -r '.spec.volumeClaimTemplates[0]' $STS_RESTORE_PATH > $vct_file
-    mergeYaml $vct_file $temp_add_file
-    mv $vct_file $PVC_ADD_FILE
+    local vct_file="$RESTORE_DIR/vct.json"
+    jq '.spec.volumeClaimTemplates[0]' $STS_RESTORE_PATH > $vct_file
+    stripMetadata $vct_file
+    mergeJson $vct_file $add_file
+    echo '{"spec":{"volumeClaimTemplates":[]}}' | jq --argjson pvc_add "$(<$vct_file)" '.spec.volumeClaimTemplates = [$pvc_add]' > $PVC_ADD_FILE
   fi
 
   message "Finishing createPvcAdd()" "debug"
@@ -254,7 +263,7 @@ getPvcs() {
 
   PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=ds-${TARGET}" --no-headers=true | awk '{ print $1 }')
   for pvc in $PVCS ; do
-    local pvc_path="${RESTORE_DIR}/${pvc}.yaml"
+    local pvc_path="${RESTORE_DIR}/${pvc}.json"
     $K_GET pvc $pvc -o json > $pvc_path
     stripMetadata $pvc_path
   done
@@ -268,8 +277,8 @@ prepPvcs() {
 
   createPvcAdd
   for pvc in $PVCS ; do
-    local file="$RESTORE_DIR/${pvc}.yaml"
-    mergeYaml $file $PVC_ADD_FILE
+    local file="$RESTORE_DIR/${pvc}.json"
+    mergeJson $file $PVC_ADD_FILE
   done
 
   message "Finishing prepPvcs()" "debug"
@@ -291,7 +300,7 @@ createPvcs() {
   message "Starting createPvcs()" "debug"
 
   for pvc in $PVCS ; do
-    kube apply -f $RESTORE_DIR/${pvc}.yaml
+    kube apply -f $RESTORE_DIR/${pvc}.json
   done
 
   message "Finishing createPvcs()" "debug"
@@ -401,12 +410,12 @@ if [ ! -d "$RESTORE_DIR" ] ; then
   mkdir -p $RESTORE_DIR
 fi
 
-PVC_ADD_FILE="$RESTORE_DIR/pvc_add.yaml"
-STS_FILE="sts.yaml"
+PVC_ADD_FILE="$RESTORE_DIR/pvc_add.json"
+STS_FILE="sts.json"
 STS_PATH="$RESTORE_DIR/$STS_FILE"
-STS_RESTORE_FILE="sts-restore.yaml"
+STS_RESTORE_FILE="sts-restore.json"
 STS_RESTORE_PATH="$RESTORE_DIR/$STS_RESTORE_FILE"
-SVC_FILE="svc.yaml"
+SVC_FILE="svc.json"
 SVC_PATH="$RESTORE_DIR/$SVC_FILE"
 
 case "$ACTION" in
