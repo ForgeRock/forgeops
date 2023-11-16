@@ -40,9 +40,6 @@ def getPromotedProductCommit(platformImagesRevision, productName) {
     return readJSON(text: content)['gitCommit']
 }
 
-fraasProductionTag = 'fraas-production'
-forgeopsFraasProduction = getPromotedProductCommit(fraasProductionTag, 'forgeops')
-
 SUMMARY_REPORT_NAME = 'SummaryReport'
 
 allStagesCloud = [:]
@@ -90,7 +87,6 @@ def getDefaultConfig(Random random, String stageName) {
         STASH_LODESTAR_REF                  : params.Lodestar_ref, // If empty, lodestar ref is computed from platform images
         DEPLOYMENT_NAMESPACE                : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
         REPORT_NAME_PREFIX                  : normalizedStageName,
-        PIPELINE_NAME                       : isPR() ? 'forgeops-pr' : 'forgeops-postcommit',
         DO_RECORD_RESULT                    : false,
         GATLING_PASS_PERCENTAGE             : 90,
     ]

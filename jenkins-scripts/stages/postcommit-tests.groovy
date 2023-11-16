@@ -18,7 +18,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     def clusterConfig = [:]
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
     clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
-    clusterConfig['PIPELINE_NAME'] = isPR() ? 'lodestar-pr' : 'lodestar-postcommit'
+    clusterConfig['PIPELINE_NAME'] = isPR() ? 'forgeops-pr' : 'forgeops-postcommit'
 
     def scaleClusterConfig = [:]
     scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 5, 'primary-pool': 20]
@@ -310,7 +310,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                     commonLodestarModule.runSpyglaas(pipelineRun, random, 'Set Images', clusterConfig +
                             [TESTS_SCOPE              : 'tests/set_images',
                              STASH_FORGEOPS_REF       : GIT_COMMIT,
-                             STASH_PLATFORM_IMAGES_REF: commonLodestarModule.fraasProductionTag,
+                             STASH_PLATFORM_IMAGES_REF: 'fraas-production',
                              STASH_LODESTAR_REF       : commonModule.lodestarRevision]
                     )
                 }
