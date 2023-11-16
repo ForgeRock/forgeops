@@ -31,6 +31,7 @@ NOTES:
   * Valid restore actions: ${VALID_ACTIONS[@]}
   * Valid restore targets: ${VALID_TARGETS[@]}
   * Only one action and target allowed per run
+  * Only one active selective restore per restore target
   * If a namespace isn't supplied, kubectl will rely on context and environment
   * While -d is required for clean, it can be used with any action
 
@@ -84,6 +85,18 @@ kube() {
   runOrPrint "$K_CMD $* $NAMESPACE_OPT"
 
   message "Finishing kube()" "debug"
+}
+
+kubeExists() {
+  message "Starting kubeExists()" "debug"
+
+  local exit_code=1
+  if $K_GET $1 $2 --no-headers > /dev/null 2>&1 ; then
+    exit_code=0
+  fi
+
+  message "Finishing kubeExists()" "debug"
+  return $exit_code
 }
 
 # Strip k8s metadata out of a json file
@@ -261,7 +274,8 @@ EOM
 getPvcs() {
   message "Starting getPvcs()" "debug"
 
-  PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=ds-${TARGET}" --no-headers=true | awk '{ print $1 }')
+  PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=ds-${TARGET}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+
   for pvc in $PVCS ; do
     local pvc_path="${RESTORE_DIR}/${pvc}.json"
     $K_GET pvc $pvc -o json > $pvc_path
@@ -397,6 +411,10 @@ if [ -z "$SNAPSHOT_NAME" ] ; then
 fi
 message "SNAPSHOT_NAME=$SNAPSHOT_NAME" "debug"
 
+if [ "$ACTION" == "selective" ] || [ "$ACTION" == "clean" ] ; then
+  STS_RESTORE_NAME="ds-${TARGET}-restore"
+fi
+
 # Setup directory to hold files needed to do the restore
 if [ -z "$RESTORE_DIR" ] && [ "$ACTION" == "clean" ]; then
   usage 1 "Must supply -d|--dir when doing a clean"
@@ -433,6 +451,9 @@ case "$ACTION" in
 
   selective)
     message "Requested restore type: selective" "debug"
+    if kubeExists sts $STS_RESTORE_NAME ; then
+      usage 1 "Only one selective restore can be active at a time"
+    fi
     getSts
     prepSts
     applySts
@@ -443,9 +464,8 @@ case "$ACTION" in
 
   clean)
     message "Requested restore type: clean" "debug"
-    tgt_name="ds-${TARGET}-restore"
-    kube delete svc $tgt_name --ignore-not-found=true
-    kube delete sts $tgt_name --ignore-not-found=true
-    kube delete pvc -l "app.kubernetes.io/instance=$tgt_name" --ignore-not-found=true
+    kube delete svc $STS_RESTORE_NAME --ignore-not-found=true
+    kube delete sts $STS_RESTORE_NAME --ignore-not-found=true
+    kube delete pvc -l "app.kubernetes.io/instance=$STS_RESTORE_NAME" --ignore-not-found=true
     ;;
 esac
