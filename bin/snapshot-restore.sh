@@ -320,6 +320,20 @@ createPvcs() {
   message "Finishing createPvcs()" "debug"
 }
 
+# Check if a volumesnapshot is ready
+volumeSnapReady() {
+  message "Starting volumeSnapReady()" "debug"
+
+  local exit_code=1
+  local ready=$($K_GET volumesnapshot $1 -o custom-columns=READY:.status.readyToUse --no-headers)
+  if [ "$ready" == "true" ] ; then
+    exit_code=0
+  fi
+
+  message "Finishing volumeSnapReady()" "debug"
+  return $exit_code
+}
+
 # Defaults
 DEBUG=false
 DRYRUN=false
@@ -333,6 +347,8 @@ TARGET=
 
 VALID_ACTIONS=("full" "selective" "clean")
 VALID_TARGETS=("idrepo" "cts")
+RESTORE_ACTIONS=("full" "selective")
+NON_RESTORE_ACTIONS=("clean")
 
 while true; do
   case "$1" in
@@ -405,9 +421,26 @@ JOB_LABEL="ds-${TARGET}-snapshot-job"
 message "JOB_LABEL=$JOB_LABEL" "debug"
 
 # Use latest snapshot if none given
-if [ -z "$SNAPSHOT_NAME" ] ; then
+if [ -z "$SNAPSHOT_NAME" ] && containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
   message "No snapshot name given to use for restore. Using latest." "debug"
-  SNAPSHOT_NAME=$($K_GET volumesnapshot -l "app=$JOB_LABEL" | tail -1 | awk '{ print $1 }')
+  for snap in $($K_GET volumesnapshot -l "app=$JOB_LABEL" -o custom-columns=NAME:.metadata.name --no-headers | sort -r) ; do
+    if volumeSnapReady $snap ; then
+      SNAPSHOT_NAME=$snap
+      break
+    fi
+  done
+  if [ -z "$SNAPSHOT_NAME" ] ; then
+    echo "ERROR!! No volume snapshots are ready to use"
+    exit 1
+  fi
+elif containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
+  message "Snapshot name given: $SNAPSHOT_NAME" "debug"
+  if volumeSnapReady $SNAPSHOT_NAME ; then
+    message "VolumeSnapshot $SNAPSHOT_NAME is ready to use"
+  else
+    echo "ERROR!! VolumeSnapshot $SNAPSHOT_NAME is not ready to use"
+    exit 1
+  fi
 fi
 message "SNAPSHOT_NAME=$SNAPSHOT_NAME" "debug"
 
@@ -416,7 +449,7 @@ if [ "$ACTION" == "selective" ] || [ "$ACTION" == "clean" ] ; then
 fi
 
 # Setup directory to hold files needed to do the restore
-if [ -z "$RESTORE_DIR" ] && [ "$ACTION" == "clean" ]; then
+if [ -z "$RESTORE_DIR" ] && [ "$ACTION" == "clean" ] ; then
   usage 1 "Must supply -d|--dir when doing a clean"
 elif [ -z "$RESTORE_DIR" ] ; then
   TIMESTAMP=$(date -u "+%Y%m%dT%TZ")
