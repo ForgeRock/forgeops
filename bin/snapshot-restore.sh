@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Script to restore a volume snapshot to a DS statefulset.
-#set -oe pipefail
+set -oe pipefail
 
 # Grab our starting dir
 start_dir=$(pwd)
@@ -35,11 +35,11 @@ NOTES:
 
   OPTIONS:
     -h|--help                    : display usage and exit
-    --debug                      : enable debugging output
-    --dryrun                     : do a dry run
+    -d|--debug                   : enable debugging output
+    -r|--dryrun                  : do a dry run
     -v|--verbose                 : be verbose
-    -d|--dir /path/to/restore/   : path to dir to use for restore artifacts
     -n|--namespace NAMESPACE     : namespace to work in
+    -p|--path /path/to/restore/  : path to dir to use for restore artifacts
     -s|--snapshot SNAPSHOT_NAME  : name of the snapshot to restore from
                                    (default: latest snapshot)
 
@@ -55,13 +55,13 @@ Examples:
   $prog -s ds-idrepo-snapshot-20231003-0000 full cts
 
   Use a specific dir for restore artifacts:
-  $prog -d /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 full idrepo
+  $prog -p /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 full idrepo
 
   Selective restore of specific snapshot for idrepo:
   $prog -s ds-idrepo-snapshot-20231003-0000 selective idrepo
 
   Perform a selective restore with a user defined dir:
-  $prog -d /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 selective idrepo
+  $prog -p /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 selective idrepo
 
   Clean up k8s resources from selective restore:
   $prog clean idrepo
@@ -352,10 +352,10 @@ NON_RESTORE_ACTIONS=("clean")
 while true; do
   case "$1" in
     -h|--help) usage 0 ;;
-    --debug) DEBUG=true; shift ;;
-    --dryrun) DRYRUN=true; shift ;;
+    -d|--debug) DEBUG=true; shift ;;
+    -r|--dryrun) DRYRUN=true; shift ;;
     -v|--verbose) VERBOSE=true; shift ;;
-    -d|--dir) RESTORE_DIR=$2; shift 2 ;;
+    -p|--path) RESTORE_DIR=$2; shift 2 ;;
     -n|--namespace) NAMESPACE=$2; shift 2 ;;
     -s|--snapshot) SNAPSHOT_NAME=$2; shift 2 ;;
     "") break ;;
