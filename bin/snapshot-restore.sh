@@ -24,8 +24,7 @@ with the snapshot as the data source. This operation requires downtime.
 The selective restore creates a new PVC, StatefulSet, and Service that creates a
 single new DS pod. This allows you to selectively export and import data as
 needed. After restoring all needed data, the clean action will clean up the
-temporary resources. You need to use --dir to specify the restore dir when using
-clean.
+temporary resources.
 
 NOTES:
   * Valid restore actions: ${VALID_ACTIONS[@]}
@@ -33,7 +32,6 @@ NOTES:
   * Only one action and target allowed per run
   * Only one active selective restore per restore target
   * If a namespace isn't supplied, kubectl will rely on context and environment
-  * While -d is required for clean, it can be used with any action
 
   OPTIONS:
     -h|--help                    : display usage and exit
@@ -66,7 +64,7 @@ Examples:
   $prog -d /tmp/ds-restore -s ds-idrepo-snapshot-20231003-0000 selective idrepo
 
   Clean up k8s resources from selective restore:
-  $prog -d /tmp/ds-restore clean idrepo
+  $prog clean idrepo
 
 EOM
 
@@ -87,6 +85,7 @@ kube() {
   message "Finishing kube()" "debug"
 }
 
+# Check if a k8s resource exists
 kubeExists() {
   message "Starting kubeExists()" "debug"
 
@@ -388,10 +387,6 @@ if [ -n "$ACTION" ] ; then
   else
     usage 1 "Invalid restore type: $ACTION"
   fi
-
-  if [ "$ACTION" == "clean" ] && [ -z $RESTORE_DIR ] ; then
-    usage 1 "You must use -d/--dir with clean"
-  fi
 else
   usage 1 "An action is required. ( ${VALID_ACTIONS[*]} )"
 fi
@@ -449,15 +444,13 @@ if [ "$ACTION" == "selective" ] || [ "$ACTION" == "clean" ] ; then
 fi
 
 # Setup directory to hold files needed to do the restore
-if [ -z "$RESTORE_DIR" ] && [ "$ACTION" == "clean" ] ; then
-  usage 1 "Must supply -d|--dir when doing a clean"
-elif [ -z "$RESTORE_DIR" ] ; then
+if [ -z "$RESTORE_DIR" ] ; then
   TIMESTAMP=$(date -u "+%Y%m%dT%TZ")
   RESTORE_DIR=/tmp/snapshot-restore-${TARGET}.$TIMESTAMP
 fi
 message "RESTORE_DIR=$RESTORE_DIR" "debug"
 
-if [ ! -d "$RESTORE_DIR" ] ; then
+if [ ! -d "$RESTORE_DIR" ] && containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
   mkdir -p $RESTORE_DIR
 fi
 
