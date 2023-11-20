@@ -158,7 +158,7 @@ mergeJson() {
 getSvc() {
   message "Starting getSvc()" "debug"
 
-  $K_GET svc ds-$TARGET -o json > $SVC_PATH
+  $K_GET svc $TARGET_NAME -o json > $SVC_PATH
   stripMetadata $SVC_PATH
 
   message "Finishing getSvc()" "debug"
@@ -169,7 +169,7 @@ prepSvc() {
   message "Starting prepSvc()" "debug"
 
   if [ "$ACTION" == "selective" ] ; then
-    sed -i .bak -e "s/ds-$TARGET/ds-$TARGET-restore/" $SVC_PATH
+    sed -i .bak -e "s/$TARGET_NAME/$RESTORE_TARGET_NAME/" $SVC_PATH
   fi
 
   message "Finishing prepSvc()" "debug"
@@ -188,7 +188,7 @@ applySvc() {
 getSts() {
   message "Starting getSts()" "debug"
 
-  $K_GET sts ds-$TARGET -o json > $STS_PATH
+  $K_GET sts $TARGET_NAME -o json > $STS_PATH
   stripMetadata $STS_PATH
 
   message "Finishing getSts()" "debug"
@@ -202,7 +202,7 @@ prepSts() {
   cp $STS_PATH $STS_RESTORE_PATH
   if [ "$ACTION" == "selective" ] ; then
     replicas=1
-    sed -i .bak -e "s/ds-$TARGET/ds-$TARGET-restore/g" $STS_RESTORE_PATH
+    sed -i .bak -e "s/$TARGET_NAME/$RESTORE_TARGET_NAME/g" $STS_RESTORE_PATH
     createPvcAdd
     mergeJson $STS_RESTORE_PATH $PVC_ADD_FILE
   fi
@@ -263,7 +263,9 @@ EOM
     jq '.spec.volumeClaimTemplates[0]' $STS_RESTORE_PATH > $vct_file
     stripMetadata $vct_file
     mergeJson $vct_file $add_file
-    echo '{"spec":{"volumeClaimTemplates":[]}}' | jq --argjson pvc_add "$(<$vct_file)" '.spec.volumeClaimTemplates = [$pvc_add]' > $PVC_ADD_FILE
+
+    echo '{"spec":{"volumeClaimTemplates":[]}}' | \
+    jq --argjson pvc_add "$(<$vct_file)" '.spec.volumeClaimTemplates = [$pvc_add]' > $PVC_ADD_FILE
   fi
 
   message "Finishing createPvcAdd()" "debug"
@@ -273,7 +275,7 @@ EOM
 getPvcs() {
   message "Starting getPvcs()" "debug"
 
-  PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=ds-${TARGET}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+  PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=${TARGET_NAME}" --no-headers=true -o custom-columns=NAME:.metadata.name)
 
   for pvc in $PVCS ; do
     local pvc_path="${RESTORE_DIR}/${pvc}.json"
@@ -331,6 +333,49 @@ volumeSnapReady() {
 
   message "Finishing volumeSnapReady()" "debug"
   return $exit_code
+}
+
+suspendCronjob() {
+  message "Starting suspendCronjob()" "debug"
+
+  kube patch cronjobs $CRONJOB_NAME -p "'{\"spec\": {\"suspend\": true}}'"
+
+  message "Finishing suspendCronjob()" "debug"
+}
+
+resumeCronjob() {
+  message "Starting resumeCronjob()" "debug"
+
+  kube patch cronjobs $CRONJOB_NAME -p "'{\"spec\": {\"suspend\": false}}'"
+
+  message "Finishing resumeCronjob()" "debug"
+}
+
+waitPvcs() {
+  message "Starting waitPvcs()" "debug"
+
+  echo -n 'Waiting for PVC(s) to be ready...'
+  while true ; do
+    local ready="false"
+    for pvc in $PVCS ; do
+      if [ "$($K_GET pvc $pvc -o 'jsonpath={.status.phase}')" == 'Bound' ] ; then
+        ready="true"
+      else
+        ready="false"
+        break
+      fi
+    done
+
+    if [ "$ready" == "true" ] ; then
+      echo "ready!"
+      break
+    else
+      echo -n '.'
+      sleep 10
+    fi
+  done
+
+  message "Finishing waitPvcs()" "debug"
 }
 
 # Defaults
@@ -401,6 +446,10 @@ else
   usage 1 "A target is required. ( ${VALID_TARGETS[*]} )"
 fi
 
+TARGET_NAME="ds-${TARGET}"
+CRONJOB_NAME="${TARGET_NAME}-snapshot"
+RESTORE_TARGET_NAME="${TARGET_NAME}-restore"
+
 # Namespace string
 if [ -z "$NAMESPACE" ] ; then
   NAMESPACE_OPT=""
@@ -439,10 +488,6 @@ elif containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
 fi
 message "SNAPSHOT_NAME=$SNAPSHOT_NAME" "debug"
 
-if [ "$ACTION" == "selective" ] || [ "$ACTION" == "clean" ] ; then
-  STS_RESTORE_NAME="ds-${TARGET}-restore"
-fi
-
 # Setup directory to hold files needed to do the restore
 if [ -z "$RESTORE_DIR" ] ; then
   TIMESTAMP=$(date -u "+%Y%m%dT%TZ")
@@ -465,6 +510,7 @@ SVC_PATH="$RESTORE_DIR/$SVC_FILE"
 case "$ACTION" in
   full)
     message "Requested restore type: full" "debug"
+    suspendCronjob
     getSts
     prepSts
     applySts
@@ -473,11 +519,13 @@ case "$ACTION" in
     deletePvcs
     createPvcs
     restoreSts
+    waitPvcs
+    resumeCronjob
     ;;
 
   selective)
     message "Requested restore type: selective" "debug"
-    if kubeExists sts $STS_RESTORE_NAME ; then
+    if kubeExists sts $RESTORE_TARGET_NAME ; then
       usage 1 "Only one selective restore can be active at a time"
     fi
     getSts
@@ -490,8 +538,8 @@ case "$ACTION" in
 
   clean)
     message "Requested restore type: clean" "debug"
-    kube delete svc $STS_RESTORE_NAME --ignore-not-found=true
-    kube delete sts $STS_RESTORE_NAME --ignore-not-found=true
-    kube delete pvc -l "app.kubernetes.io/instance=$STS_RESTORE_NAME" --ignore-not-found=true
+    kube delete svc $RESTORE_TARGET_NAME --ignore-not-found=true
+    kube delete sts $RESTORE_TARGET_NAME --ignore-not-found=true
+    kube delete pvc -l "app.kubernetes.io/instance=$RESTORE_TARGET_NAME" --ignore-not-found=true
     ;;
 esac
