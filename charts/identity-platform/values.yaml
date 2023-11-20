@@ -195,6 +195,7 @@ am:
 
   podLabels:
     app.kubernetes.io/component: am
+    app: am
 
   podSecurityContext:
     runAsGroup: 0
@@ -246,6 +247,7 @@ amster:
 
   podLabels:
     app.kubernetes.io/component: amster
+    app: amster
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -294,6 +296,7 @@ ldif_importer:
 
   podLabels:
     app.kubernetes.io/component: ldif-importer
+    app: ldif-importer
 
   podSecurityContext:
     fsGroup: 0
@@ -362,6 +365,7 @@ idm:
 
   podLabels:
     app.kubernetes.io/component: idm
+    app: idm
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -430,6 +434,7 @@ admin_ui:
 
   podLabels:
     app.kubernetes.io/component: admin-ui
+    app: admin-ui
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -498,6 +503,7 @@ end_user_ui:
 
   podLabels:
     app.kubernetes.io/component: login-ui
+    app: login-ui
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -566,6 +572,7 @@ login_ui:
 
   podLabels:
     app.kubernetes.io/component: login-ui
+    app: login-ui
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -634,6 +641,7 @@ ig:
 
   podLabels:
     app.kubernetes.io/component: ig
+    app: ig
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -716,6 +724,7 @@ ds_idrepo:
 
   podLabels:
     app.kubernetes.io/component: ds-idrepo
+    app: ds-idrepo
 
   podSecurityContext:
     fsGroup: 0
@@ -784,6 +793,7 @@ ds_cts:
 
   podLabels:
     app.kubernetes.io/component: ds-cts
+    app: ds-cts
 
   podSecurityContext:
     fsGroup: 0
