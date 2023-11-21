@@ -1,14 +1,11 @@
-# DS Dockerfile for the Directory Service Operator (ds-operator)
+# Default DS image
 
-This image is used by the [ds-operator](https://github.com/ForgeRock/ds-operator). It supports a
-a "dynamic" directory deployment where data _and_ configuration are stored on a persistent volume claim (PVC).
-In this regard, it behaves more like a traditional VM install. Changes made at runtime are
-persisted to the PVC.
+This image supports a "dynamic" directory deployment where data _and_ configuration are stored on a persistent volume claim (PVC).
+In this regard, it behaves more like a traditional VM install. Changes made at runtime are persisted to the PVC.
 
 Note that directory setup is mostly performed at _runtime_, not docker build time. A default setup script is provided, but
  you can to bring your own script (BYOS) to customize the image.
 
-The image is also suitable for non operator deployment. The sample Kubernetes manifest provided at `../ds-k8s` can be used as a starting point.
 ## Pros / Cons
 
 Pros:
@@ -35,14 +32,15 @@ implementation of the concepts behind [Flyway](https://flywaydb.org/).
 
 ## Default Scripts / Life-Cycle Hooks.
 
-The image supports a number of "hooks" that can be used to run custom script actions at various stages of
-the directory deployment. If the user does not provide
-their own script, a default script is called (see the `default-scripts/` folder) .
+The image supports a number of "hooks" that can be used to run custom script actions at 
+various stages of the directory deployment. If the user does not provide their own 
+script, a default script is called (see the `default-scripts/` folder).
 
-The ds-operator  mounts user provided script on /opt/opendj/scripts. Set
-the  `spec.scriptConfigMapName` field in the DirectoryService CR to the name of a configmap that holds your scripts. See the [ds-operator](https://github.com/ForgeRock/ds-operator) project.
+For legacy DS Operator deployments, the ds-operator mounts user provided scripts on /opt/opendj/scripts. 
+Set the  `spec.scriptConfigMapName` field in the DirectoryService CR to the name of a configmap 
+that holds your scripts. See the [ds-operator](https://github.com/ForgeRock/ds-operator) project.
 
-While defaults are provided, the idea is to bring your owb scripts to implement the exact
+While defaults are provided, the idea is to bring your own scripts to implement the exact
 desired behavior. This strategy provides flexibility to accommodate a wide range of use cases.
 
 The life cycle hooks are:
@@ -79,9 +77,7 @@ the index to all ds pods.
 ## Certificates
 
 The image is configured to use PEM based certificates instead of a Java Keystore (JKS). The provided Kubernetes sample
-generates these certificates using [cert-manager](https://cert-manager.io). The ds-operator is
-migrating to cert-manager, as it is the canonical method of generating certificates for
-Kubernetes.
+generates these certificates using [cert-manager](https://cert-manager.io). 
 
 > WARNING: Directory data is encrypted using the private key
 in the master-key certificate. You must back up certificates or
@@ -91,6 +87,10 @@ a newly generated certificate, even if that certificate is from
 the same trusted CA.
 
 As currently implemented, the pem keys are read from k8s secrets and copied to the PVC when the pod starts. If you backup the PVC using something like velero.io, the keys will be included in the file system backup. You must protect the backup carefully.
+
+## Custom Schema updates
+To provide a custom schema file, add your custom file to the config/schema directory 
+prior to building your image.  There is a sample file in there for guidance.
 
 ## Development
 
