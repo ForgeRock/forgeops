@@ -13,15 +13,15 @@ configMapGenerator:
   # The FQDN and URLs here should match your ingress definitions
   literals:
   - FQDN=default.iam.example.com
-  - AM_URL=https://$(FQDN)/am
-  - AM_ADMIN_URL=https://$(FQDN)/am/ui-admin/
-  - IDM_ADMIN_URL=https://$(FQDN)/admin
-  - IDM_UPLOAD_URL=https://$(FQDN)/upload
-  - IDM_EXPORT_URL=https://$(FQDN)/export
-  - PLATFORM_ADMIN_URL=https://$(FQDN)/platform
-  - IDM_REST_URL=https://$(FQDN)/openidm
-  - ENDUSER_UI_URL=https://$(FQDN)/enduser
-  - LOGIN_UI_URL=https://$(FQDN)/login/#/service/Login
+  - AM_URL=/am
+  - AM_ADMIN_URL=/am/ui-admin/
+  - IDM_ADMIN_URL=/admin
+  - IDM_UPLOAD_URL=/upload
+  - IDM_EXPORT_URL=/export
+  - PLATFORM_ADMIN_URL=/platform
+  - IDM_REST_URL=/openidm
+  - ENDUSER_UI_URL=/enduser
+  - LOGIN_UI_URL=/login/#/service/Login
   - PLATFORM_UI_IS_FRAAS="false" # FRaaS functionality is disabled in the platform
   - FRAAS_LOGGING_URL="" # Location of FRaaS log api key service for the deployment
   - ENDUSER_CLIENT_ID=end-user-ui
