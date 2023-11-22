@@ -338,7 +338,9 @@ volumeSnapReady() {
 suspendCronjob() {
   message "Starting suspendCronjob()" "debug"
 
-  kube patch cronjobs $CRONJOB_NAME -p "'{\"spec\": {\"suspend\": true}}'"
+  if kubeExists cronjobs $CRONJOB_NAME ; then
+    kube patch cronjobs $CRONJOB_NAME -p "'{\"spec\": {\"suspend\": true}}'"
+  fi
 
   message "Finishing suspendCronjob()" "debug"
 }
@@ -346,7 +348,9 @@ suspendCronjob() {
 resumeCronjob() {
   message "Starting resumeCronjob()" "debug"
 
-  kube patch cronjobs $CRONJOB_NAME -p "'{\"spec\": {\"suspend\": false}}'"
+  if kubeExists cronjobs $CRONJOB_NAME ; then
+    kube patch cronjobs $CRONJOB_NAME -p "'{\"spec\": {\"suspend\": false}}'"
+  fi
 
   message "Finishing resumeCronjob()" "debug"
 }
