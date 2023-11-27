@@ -104,7 +104,7 @@ stripMetadata() {
 
   local file=$1
   local new_file="${file}.new"
-  local jq_filter=$(cat <<-END
+  mapfile -d '' jq_filter <<-END
     del(
       .metadata.annotations."autoscaling.alpha.kubernetes.io/conditions",
       .metadata.annotations."autoscaling.alpha.kubernetes.io/current-metrics",
@@ -132,9 +132,9 @@ stripMetadata() {
       .spec.volumeMode,
       .status
     )
-END)
+END
 
-  jq --exit-status --compact-output --monochrome-output --raw-output --sort-keys 2>/dev/null "$jq_filter" $file > $new_file
+  jq --exit-status --monochrome-output --raw-output --sort-keys 2>/dev/null "$jq_filter" $file > $new_file
   mv $new_file $file
 
   message "Finishing stripMetadata()" "debug"
