@@ -47,6 +47,13 @@ spec:
             {{- toYaml .Values.ldif_importer.securityContext | nindent 12 }}
           image: "{{ .Values.ldif_importer.image.repository }}:{{ .Values.ldif_importer.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.ldif_importer.image.pullPolicy }}
+          env:
+          - name: FORGEOPS_PLATFORM_SIZE
+            {{- if .Values.ds_cts.enabled }}
+            value: cdm
+            {{- else }}
+            value: cdk
+            {{- end }}
           envFrom:
           - secretRef:
               name: ds-env-secrets

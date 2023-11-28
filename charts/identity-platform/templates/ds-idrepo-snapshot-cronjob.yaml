@@ -1,4 +1,4 @@
-{{- if .Values.ds_idrepo.snapshot.enabled }}
+{{- if and .Values.ds_idrepo.enabled .Values.ds_idrepo.snapshot.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
