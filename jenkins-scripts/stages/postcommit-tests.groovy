@@ -23,7 +23,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     def scaleClusterConfig = [:]
     scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 5, 'primary-pool': 20]
 
-    saasProductInfo = upgrade.getSaasProductInfo()
+    saasProductInfo = cloud_utils.getSaasProductInfo()
     platformImagesProductInfo = upgrade.getPlatformImagesProductInfo(commonModule.platformImagesRevision)
 
     try {
