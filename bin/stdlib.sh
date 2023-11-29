@@ -29,3 +29,13 @@ containsElement () {
   for e in "${@:2}"; do [[ "$e" == "$1" ]] && return 0; done
   return 1
 }
+
+# Setup sed based on our system
+sedDetect() {
+  local bsd_systems=( "Darwin" )
+  SED_CMD=$(type -P sed)
+  SED_I="-i"
+  if containsElement $(uname -s) ${bsd_systems[@]} ; then
+    SED_I="-i .bak"
+  fi
+}

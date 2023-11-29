@@ -154,36 +154,6 @@ mergeJson() {
   message "Finishing mergeJson()" "debug"
 }
 
-# Get the currently running service definition
-getSvc() {
-  message "Starting getSvc()" "debug"
-
-  $K_GET svc $TARGET_NAME -o json > $SVC_PATH
-  stripMetadata $SVC_PATH
-
-  message "Finishing getSvc()" "debug"
-}
-
-# Prep the service when doing a selective restore
-prepSvc() {
-  message "Starting prepSvc()" "debug"
-
-  if [ "$ACTION" == "selective" ] ; then
-    sed -i .bak -e "s/$TARGET_NAME/$RESTORE_TARGET_NAME/" $SVC_PATH
-  fi
-
-  message "Finishing prepSvc()" "debug"
-}
-
-# Apply the SVC
-applySvc() {
-  message "Starting applySvc()" "debug"
-
-  kube apply -f $SVC_PATH
-
-  message "Finishing applySvc()" "debug"
-}
-
 # Get the currently running STS definition
 getSts() {
   message "Starting getSts()" "debug"
@@ -202,7 +172,7 @@ prepSts() {
   cp $STS_PATH $STS_RESTORE_PATH
   if [ "$ACTION" == "selective" ] ; then
     replicas=1
-    sed -i .bak -e "s/$TARGET_NAME/$RESTORE_TARGET_NAME/g" $STS_RESTORE_PATH
+    $SED_CMD $SED_I -e "s/$TARGET_NAME/$RESTORE_TARGET_NAME/g" $STS_RESTORE_PATH
     createPvcAdd
     mergeJson $STS_RESTORE_PATH $PVC_ADD_FILE
   fi
@@ -465,6 +435,8 @@ fi
 K_CMD="$(type -P kubectl)"
 K_GET="$K_CMD get $NAMESPACE_OPT"
 
+sedDetect
+
 JOB_LABEL="ds-${TARGET}-snapshot-job"
 message "JOB_LABEL=$JOB_LABEL" "debug"
 
@@ -535,9 +507,6 @@ case "$ACTION" in
     getSts
     prepSts
     applySts
-    getSvc
-    prepSvc
-    applySvc
     ;;
 
   clean)
