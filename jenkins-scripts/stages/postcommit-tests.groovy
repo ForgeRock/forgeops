@@ -51,6 +51,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_ig_k8s_upgrade',
                         'Postcommit_platform_ui',
                         'Postcommit_set_images',
+                        'Postcommit_fo_acceptance',
                         'Postcommit_fo_set_images',
                         'Postcommit_fo_am_only',
                         'Postcommit_fo_idm_only',
@@ -313,6 +314,14 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                              STASH_PLATFORM_IMAGES_REF: 'fraas-production',
                              STASH_LODESTAR_REF       : commonModule.lodestarRevision]
                     )
+                }
+        )
+    }
+
+    if (params.Postcommit_fo_acceptance) {
+        parallelTestsMap.put('FO Acceptance',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO Acceptance', '--test-names Deployment.Acceptance')
                 }
         )
     }
