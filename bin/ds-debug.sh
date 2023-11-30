@@ -17,7 +17,12 @@ BACKUP_LOCATION="gs://ds-operator-engineering-devops/ds-backup-test"
 
 HOST="ds-idrepo-0"
 
-if [ ! -z "$2" ]; then
+if [ -n "$2" ] ; then
+  if [[ "$2" == *"--help"* ]]; then
+    echo "[error] '${1}' subcommand does not have help usage"
+    usage
+    exit 1
+  fi
   HOST="$2"
 fi
 
@@ -86,7 +91,7 @@ purge)
     --backupLocation "${BACKUP_LOCATION}" \
     --olderThan '12h'
     ;;
--h)
+-h | --help)
   # Help
   usage
   ;;
