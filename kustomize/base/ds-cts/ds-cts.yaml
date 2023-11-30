@@ -3,8 +3,19 @@ apiVersion: directory.forgerock.io/v1alpha1
 kind: DirectoryService
 metadata:
   name: ds-cts
+  # Replace example label below with your own.
+  # Default labels are already included. 
+  # labels:
+  #   app.kubernetes.io/env: ds
+
+  # Replace example annotation below with your own.
+  # annotations:
+  #   "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
 spec:
   replicas: 1
+  # Default labels are already included. Add extra statefulset labels below.
+  # labels:
+  #   app.kubernetes.io/env: ds
   podTemplate:
     image: ds
     imagePullPolicy: IfNotPresent
