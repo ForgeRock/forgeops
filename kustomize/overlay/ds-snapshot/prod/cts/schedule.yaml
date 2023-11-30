@@ -9,7 +9,7 @@ spec:
       template:
         spec:
           containers:
-            - name: ds-idrepo-snapshot
+            - name: ds-cts-snapshot
               env:
                 - name: PURGE_DELAY
                   value: "-3 day"
