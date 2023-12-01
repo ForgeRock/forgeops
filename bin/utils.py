@@ -43,9 +43,9 @@ DOCKER_REGEX_NAME = {
 
 REQ_VERSIONS ={
     'ds-operator': {
-        'MIN': 'v0.2.8',
+        'MIN': 'v0.2.5',
         'MAX': 'v100.0.0',
-        'DEFAULT': 'v0.2.8',
+        'DEFAULT': 'v0.2.6',
     },
     'secret-agent': {
         'MIN': 'v1.1.5',
@@ -278,7 +278,7 @@ def _waitfords(ns, ds_name, legacy, operator):
     while True:
         try:
             if operator:
-                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.metadata.annotations.password-updated-status}}',
+                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
                                  cstderr=True, cstdout=True)
             else:
                 _, valuestr, _ = run('kubectl', f'wait -n {ns} job/ldif-importer --for=condition=complete --timeout=60s',
