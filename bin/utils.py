@@ -284,6 +284,12 @@ def _waitfords(ns, ds_name, legacy):
             else:
                 _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
                                  cstderr=True, cstdout=True)
+                if len(valuestr) > 0:
+                    print('done')
+                    break
+                # Support for customers using ds operator v0.2.8
+                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.metadata.annotations.password-updated-status}}',
+                                 cstderr=True, cstdout=True)
 
             if len(valuestr) > 0:
                 print('done')
