@@ -28,7 +28,6 @@ data:
     {{- $idrepoServersList = append $idrepoServersList (printf "ds-idrepo-%d.ds-idrepo:1636" $i) }}
   {{- end }}
   {{- $idrepoServers := printf ($idrepoServersList | join ",") }}
-  {{- if .Values.ds_cts.enabled }}
   {{- $ctsCount := .Values.ds_cts.replicaCount }}
   {{- $ctsServersList := (list) }}
   {{- range $i, $none := until (int $ctsCount) }}
@@ -36,9 +35,6 @@ data:
   {{- end }}
   {{- $ctsServers := printf ($ctsServersList | join ",") }}
   AM_STORES_CTS_SERVERS: {{ $ctsServers }}
-  {{- else }}
-  AM_STORES_CTS_SERVERS: {{ $idrepoServers }}
-  {{- end }}
   AM_STORES_USER_SERVERS: {{ $idrepoServers }}
   AM_SERVER_FQDN: {{ first .Values.platform.ingress.hosts }}
   AUTORESTORE_FROM_DSBACKUP: {{ .Values.ds_restore.autoRestore | quote }}

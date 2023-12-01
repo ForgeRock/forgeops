@@ -36,28 +36,28 @@ size_map = {
     'cdk': {
     },
     'custom': {
-        'base': 'base-cdm',
-        'ds': 'ds-cdm',
+        'base': 'base',
+        'ds': 'ds',
     },
     'custom-old': {
-        'base': 'base-cdm',
+        'base': 'base',
         'ds': 'ds-old',
     },
     'mini': {
-        'base': 'base-cdm',
-        'ds': 'ds-cdm',
+        'base': 'base',
+        'ds': 'ds',
     },
     'small': {
-        'base': 'base-cdm',
-        'ds': 'ds-cdm',
+        'base': 'base',
+        'ds': 'ds',
     },
     'medium': {
-        'base': 'base-cdm',
-        'ds': 'ds-cdm',
+        'base': 'base',
+        'ds': 'ds',
     },
     'large': {
-        'base': 'base-cdm',
-        'ds': 'ds-cdm',
+        'base': 'base',
+        'ds': 'ds',
     },
 }
 
@@ -78,7 +78,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_pro
     utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path, src_profile_dir)
     utils.message('\nWaiting for DS deployment. This can take a few minutes. First installation takes longer.')
     utils.wait_for_ds(ns, 'ds-idrepo', legacy, operator, timeout)
-    if size not in ['cdk', 'mini']: utils.wait_for_ds(ns, 'ds-cts', legacy, operator)
+    utils.wait_for_ds(ns, 'ds-cts', legacy, operator)
     # Clean any existing Amster resources
     utils.clean_amster_job(ns, False)
     utils.message('\nDeploying apps.')
@@ -199,7 +199,7 @@ def main():
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
     parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
-                               help='Delete all CDM components including PVCs, secrets, and volume snapshots. *This will erase all data*')
+                               help='Delete all components including PVCs, secrets, and volume snapshots. *This will erase all data*')
     parser_build = subparser.add_parser('build', parents=[common_dg, common_pf, common_dl], help='Build custom Docker images')
     parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets + legacy_build_targets, default='all', metavar=build_targets)
     parser_build.add_argument('--push-to', '-r', dest='registry')
@@ -288,25 +288,8 @@ def main():
 
     if args.cmd == 'delete':
 
-        # Get deployment size
-        deployed_sz = utils.get_deployed_size(namespace)
-
         # Set delete flag if PVCs and secrets should be deleted
         delete = True if args.force_delete else False
-
-        if deployed_sz:
-            utils.message(f'"{deployed_sz}" platform detected in namespace: "{namespace}".')
-            size = deployed_sz
-            remap = size_map[size]
-        else:
-            utils.error(f'Couldn\'t find deployment information. Is the platform deployed in namespace "{namespace}"?')
-            if not args.skip_confirmation:
-                if input('Attempt delete assuming "CDM mini"? [Y/N] ').lower() not in ['yes', 'y']:
-                    return
-            utils.message('Assuming "CDM mini" for this operation.')
-            deployed_sz = None
-            size = 'mini'
-            remap = size_map[size]
 
         utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}".')
         if not args.skip_confirmation:
@@ -330,7 +313,7 @@ def main():
                     delete_components['pvc'] = True
                 if input('OK to delete volume snapshots? [Y/N] ').lower() in ['yes', 'y']:
                     delete_components['snapshots'] = True
-            if any(x in "secrets all case base-cdm" for x in components):
+            if any(x in "secrets all base" for x in components):
                 if input('OK to delete secrets? [Y/N] ').lower() in ['yes', 'y']:
                     delete_components['secrets'] = True
         # If --force provided but neither ds or secrets provided, then don't delete pvcs, secrets, or volume snapshots
@@ -372,11 +355,10 @@ def main():
         if 'apps' in components:
             components += ['am', 'amster', 'idm']
             components.remove('apps')
-        size = utils.get_deployed_size(namespace)
         if 'ds' in components or 'ds-old' in components:
             utils.message('Waiting for DS deployment.')
             utils.wait_for_ds(namespace, 'ds-idrepo', args.legacy, args.operator, args.timeout)
-            if size not in ['cdk', 'mini']: utils.wait_for_ds(namespace, 'ds-cts', args.legacy, args.operator)
+            utils.wait_for_ds(namespace, 'ds-cts', args.legacy, args.operator)
 
         if 'am' in components:
             utils.message('Waiting for AM deployment.')
@@ -402,7 +384,7 @@ def main():
     if args.cmd == 'generate':
         instructions = []
         components.sort(key=_sort_components)
-        utils.message(f'Generating forgeops manifests for {components} plaform: "{size}" to deploy path: "{deploy_path}".\n')
+        utils.message(f'Generating forgeops manifests for {components} platform: "{size}" to deploy path: "{deploy_path}".\n')
         if 'all' in components:
             components = ['secrets', 'base', 'ds', 'apps', 'ui']
         for c in components:

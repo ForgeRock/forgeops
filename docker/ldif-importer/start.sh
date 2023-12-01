@@ -12,21 +12,13 @@ wait_repo() {
     echo "$REPO is responding"
 }
 
-# Check whether deployment is CDK or CDM
-size=$FORGEOPS_PLATFORM_SIZE
-
 wait_repo ds-idrepo
-
-# Wait for cts server to be ready when deploying CDM
-if [[ "$size" != "cdk" ]]; then 
-    wait_repo ds-cts
-fi
-
+wait_repo ds-cts
 
 # Set the DS passwords for each store
 if [ -f "/opt/opendj/ds-passwords.sh" ]; then
     echo "Setting directory service account passwords"
-    /opt/opendj/ds-passwords.sh $size
+    /opt/opendj/ds-passwords.sh
     if [ $? -ne 0 ]; then
         echo "ERROR: Pre install script failed"
         exit 1

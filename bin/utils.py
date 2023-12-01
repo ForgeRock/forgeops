@@ -86,12 +86,9 @@ size_paths = {
 }
 
 bundles = {
-    'base': ['dev/kustomizeConfig', 'base/ingress', 'dev/scripts'],
-	'base-cdm': ['base/kustomizeConfig', 'base/ingress', 'dev/scripts'],
-    'ds-operator': ['base/ds-idrepo'],
-    'ds-operator-cdm': ['base/ds-idrepo', 'base/ds-cts'],
-    'ds': ['base/ds/idrepo', 'base/ldif-importer'],
-    'ds-cdm': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
+	'base': ['base/kustomizeConfig', 'base/ingress'],
+    'ds-operator': ['base/ds-idrepo', 'base/ds-cts'],
+    'ds': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
     'ds-old': ['base/ds-legacy/idrepo', 'base/ds-legacy/cts', 'base/ldif-importer'],
     'apps': ['base/am', 'base/idm', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
@@ -392,8 +389,6 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
         log.debug('ds-operator requested.')
         if component == 'ds':
             component = 'ds-operator'
-        if component == 'ds-cdm':
-            component = 'ds-operator-cdm'
 
     log.debug('component = ' + component)
     components_to_install = bundles.get(component, [f'base/{component}'])
@@ -410,15 +405,11 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
                 run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
 
     fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
-    sizepatchjson = [{"op": "add", "path": "data/data/FORGEOPS_PLATFORM_SIZE", "value": size}]
     if operator:
         dsoperatorpatchjson = [{"op": "add", "path": "data/data/DS_OPERATOR_ENABLED", "value": "true"}]
     ingressclasspatchjson = [{"op": "replace", "path": "/spec/ingressClassName", "value": ingress_class}]
-    # run('kustomize', f'edit set namespace {ns}', cwd=profile_dir)
-    if component in ['base', 'base-cdm']:
+    if component in ['base']:
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
-            cwd=profile_dir)
-        run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(sizepatchjson)}\'',
             cwd=profile_dir)
         if operator:
             run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(dsoperatorpatchjson)}\'',
@@ -471,16 +462,16 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
     force: set to True to delete all forgeops resources including secrets and PVCs.
     """
     # Supports deleting of DS Operator custom resources when upgrading from 7.3 to 7.4
-    if component in ['ds','ds-cdm','ds-idrepo','ds-cts']:
+    if component in ['ds','ds-idrepo','ds-cts']:
         try: 
             # Check if the directoryservice CRD is installed. If not then skip the delete.
             run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
         except:
             pass
         else:
-            if component in ['ds','ds-cdm','ds-idrepo']:
+            if component in ['ds','ds-idrepo']:
                 run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-idrepo')
-            if component == ['ds-cdm','ds-cts']:
+            if component == ['ds','ds-cts']:
                 run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-cts')
 
     if component == "all":
@@ -891,18 +882,6 @@ def sort_dir_json(base):
 #     print(args)
 #     r = subprocess.run(args.split())
 #     return r.returncode
-
-def get_deployed_size(namespace):
-    """
-    Get the platform's size deployed in K8s. This is obtained from the platform-config configmap.
-    "Size" can be one of the following: mini, small, medium, large, cdk.
-    """
-
-    try:
-        deployed_sz = get_configmap_value(namespace, 'platform-config', 'FORGEOPS_PLATFORM_SIZE')
-        return deployed_sz
-    except:
-        return None
 
 def get_fqdn(ns):
     """Get the FQDN of the deployment. This is obtained directly from the ingress definition"""
