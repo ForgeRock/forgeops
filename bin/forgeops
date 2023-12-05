@@ -339,16 +339,17 @@ def main():
 
         # Uninstall components
         for c in components:
-            utils.uninstall_component(remap.get(c, c), namespace, delete, delete_components, ingress_class, False, args.config_profile, False)
+            utils.uninstall_component(remap.get(c, c), namespace, delete, ingress_class, False, args.config_profile, False)
 
         # Prompt to delete PVCs, secrets, and volume snapshots
         if any(x in "ds dsold ds-idrepo ds-cts secrets all" for x in components):
             if delete_components['pvc'] or delete:
-                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/name=ds --ignore-not-found=true')
+                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/instance=ds-idrepo --ignore-not-found=true')
+                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/instance=ds-cts --ignore-not-found=true')
             if delete_components['snapshots'] or delete:
                 utils.run('kubectl', f'-n {namespace} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
             if delete_components['secrets'] or delete:
-                utils.uninstall_component('secrets', namespace, False, delete_components, ingress_class, False, args.config_profile, False)
+                utils.uninstall_component('secrets', namespace, False, ingress_class, False, args.config_profile, False)
         return
 
     if args.cmd == 'build':

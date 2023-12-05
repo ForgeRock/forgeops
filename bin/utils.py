@@ -463,7 +463,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force, delete_components, ingress_class, legacy, config_profile, operator):
+def uninstall_component(component, ns, force, ingress_class, legacy, config_profile, operator):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -485,7 +485,7 @@ def uninstall_component(component, ns, force, delete_components, ingress_class, 
 
     if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force, delete_components, ingress_class, legacy, operator)
+            uninstall_component(c, ns, force, ingress_class, legacy, operator)
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
