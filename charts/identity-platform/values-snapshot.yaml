@@ -1,0 +1,12 @@
+# Default snapshot config for idrepo and cts
+
+ds_idrepo:
+  snapshot:
+    enabled: true
+    # schedule: "0 0 * * *"
+    # purgeDelay: "-3 day"
+ds_cts:
+  snapshot:
+    enabled: true
+    # schedule: "0 0 * * *"
+    # purgeDelay: "-3 day"
