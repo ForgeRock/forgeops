@@ -8,15 +8,15 @@ metadata:
 data:
   FORGEOPS_PLATFORM_SIZE: cdk
   FQDN: {{ first .Values.platform.ingress.hosts }}
-  AM_URL: https://{{ first .Values.platform.ingress.hosts }}/am
-  AM_ADMIN_URL: https://{{ first .Values.platform.ingress.hosts }}/am/ui-admin/
-  IDM_ADMIN_URL: https://{{ first .Values.platform.ingress.hosts }}/admin
-  IDM_UPLOAD_URL: https://{{ first .Values.platform.ingress.hosts }}/upload
-  IDM_EXPORT_URL: https://{{ first .Values.platform.ingress.hosts }}/export
-  PLATFORM_ADMIN_URL: https://{{ first .Values.platform.ingress.hosts }}/platform
-  IDM_REST_URL: https://{{ first .Values.platform.ingress.hosts }}/openidm
-  ENDUSER_UI_URL: https://{{ first .Values.platform.ingress.hosts }}/enduser
-  LOGIN_UI_URL: https://{{ first .Values.platform.ingress.hosts }}/login/#/service/Login
+  AM_URL: /am
+  AM_ADMIN_URL: /am/ui-admin/
+  IDM_ADMIN_URL: /admin
+  IDM_UPLOAD_URL: /upload
+  IDM_EXPORT_URL: /export
+  PLATFORM_ADMIN_URL: /platform
+  IDM_REST_URL: /openidm
+  ENDUSER_UI_URL: /enduser
+  LOGIN_UI_URL: /login/#/service/Login
   PLATFORM_UI_IS_FRAAS: "false"
   FRAAS_LOGGING_URL: ""
   ENDUSER_CLIENT_ID: end-user-ui
