@@ -1,0 +1,29 @@
+{{- if .Values.ds_idrepo.lifecycleScripts.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-idrepo-lifecycle-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+data:
+{{- $scripts := printf "%s%s" .Values.ds_idrepo.lifecycleScripts.path "/*" -}}
+{{- range $path, $_ := .Files.Glob $scripts }}
+  {{ base $path }}: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}
+---
+{{- if .Values.ds_cts.lifecycleScripts.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ds-cts-lifecycle-scripts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+data:
+{{- $scripts := printf "%s%s" .Values.ds_cts.lifecycleScripts.path "/*" -}}
+{{- range $path, $_ := .Files.Glob $scripts }}
+  {{ base $path }}: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}
