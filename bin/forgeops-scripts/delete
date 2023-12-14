@@ -1,0 +1,186 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../stdlib.sh
+# Bring in common.sh
+source $SCRIPT_DIR/common.sh
+# Go back to where we started
+cd $start_dir
+
+usage() {
+  local usage_msg=$(cat<<EOM
+Usage:
+$PROG -l OVERLAY [OPTIONS] [<component> <component> ...]
+
+Delete ForgeRock Identity Platform from a k8s namespace.
+
+OPTIONS:
+  -h|--help           : display usage and exit
+  --debug             : turn on debugging
+  --dryrun            : do a dry run
+  -v|--verbose        : be verbose
+  -f|--force          : delete all components + pvcs, secrets, volume snapshots
+  -n|--namespace      : k8s namespace to delete from
+  -l|--overlay        : overlay to use (default: single-instance)
+                        (full path or relative to kustomize/overlay)
+  -y|--yes            : skip delete confirmation
+
+Valid components:
+  ${COMPONENTS_VALID[@]}
+
+Examples:
+  Normal operation:
+  $PROG
+
+  Do a dryrun:
+  $PROG --dryrun
+
+EOM
+)
+
+  usageStd $1 "$usage_msg" "$2"
+}
+
+deletePvcs() {
+  message "Starting deletePvcs()" "debug"
+
+  if [ "$DELETE_PVCS" = true ] ; then
+    message "Deleting PVCs" "debug"
+    for c in $* ; do
+      message "c=$c" "debug"
+      local pvcs=
+      pvcs=$($K_GET pvc $NAMESPACE_OPT -l "app.kubernetes.io/component=${c}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+      message "pvcs=$pvcs" "debug"
+      for p in $pvcs ; do
+        kube delete pvc $p --ignore-not-found=true
+      done
+    done
+  fi
+
+  message "Finishing deletePvcs()" "debug"
+}
+
+deleteSecrets() {
+  message "Starting deleteSecrets()" "debug"
+
+  if [ "$DELETE_SECRETS" = true ] ; then
+    for c in $* ; do
+      local secrets=
+      secrets=$($K_GET volumesnapshot -l "app.kubernetes.io/instance=${c}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+      for s in $secrets ; do
+        kube delete volumesnapshot $p --ignore-not-found=true
+      done
+    done
+  fi
+
+  message "Finishing deleteSecrets()" "debug"
+}
+
+deleteSnaps() {
+  message "Starting deleteSnaps()" "debug"
+
+  if [ "$DELETE_SNAPS" = true ] ; then
+    for c in $* ; do
+      local snaps=
+      snaps=$($K_GET volumesnapshot -l "app.kubernetes.io/instance=${c}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+      for s in $snaps ; do
+        kube delete volumesnapshot $p --ignore-not-found=true
+      done
+    done
+  fi
+
+  message "Finishing deleteSnaps()" "debug"
+}
+
+# Setup valid components now so they get presented in the usage
+COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_INSTALL[@]} 'all')
+
+# Code in common.sh
+processArgs $*
+checkComponents
+shiftBaseComponent "last"
+kubeInit
+
+# If all is given as one of many components, set COMPONENTS to a list of
+# sub-overlays to delete. This is an ordered list, and items higher up in the
+# list should be deleted before those lower down.
+if containsElement 'all' ${COMPONENTS[@]} ; then
+  COMPONENTS=(
+      'admin-ui'
+      'end-user-ui'
+      'login-ui'
+      'am'
+      'amster'
+      'idm'
+      'ds-cts'
+      'ds-idrepo'
+      'ldif-importer'
+      'secrets'
+      'base' )
+fi
+
+DELETE_PVCS=false
+DELETE_SNAPS=false
+DELETE_SECRETS=false
+
+if [ -d "$OVERLAY" ] ; then
+  message "Overlay exists: $OVERLAY" "debug"
+else
+  usage 1 "Overlay dir doesn't exist: $OVERLAY"
+fi
+
+echo "Uninstalling component(s): ${COMPONENTS[@]} from namespace: $NAMESPACE"
+if [ "$SKIP_CONFIRM" = false ] ; then
+  read -p "OK to delete components? [Y/N] " prompt
+  if [[ ! "$prompt" =~ ^[yY] ]] ; then
+    echo "Not deleting any components. Exiting."
+    exit 0
+  fi
+fi
+
+if [ "$FORCE" = true ] && [ "$SKIP_CONFIRM" = true ] ; then
+  DELETE_PVCS=true
+  DELETE_SNAPS=true
+  DELETE_SECRETS=true
+elif [ "$FORCE" = false ] && [ "$SKIP_CONFIRM" = true ] ; then
+  if containsElement "all" ${COMPONENTS[@]} ; then
+    echo "Will not delete PVCs, secrets, or volume snapshots. You must delete those manually or use --force."
+  elif containsElementLike "^ds" ${COMPONENTS[@]} ; then
+    echo "Will not delete PVCs and volume snapshots. You must delete those manually or use --force."
+  fi
+elif [ "$FORCE" = false ] && [ "$SKIP_CONFIRM" = false ] ; then
+  if containsElementLike "^ds-" ${COMPONENTS[@]} || containsElement "all" ${COMPONENTS[@]} ; then
+    read -p "OK to delete PVCs? [Y/N] " prompt
+    [[ "$prompt" =~ ^[yY] ]] && DELETE_PVCS=true
+    read -p "OK to delete volume snapshots? [Y/N] " prompt
+    [[ "$prompt" =~ ^[yY] ]] && DELETE_SNAPS=true
+  fi
+  SECRETS_COMP=("secrets" "all" "base")
+  if containsElements ${SECRETS_COMP[@]} ${COMPONENTS[@]}; then
+    read -p "OK to delete secrets? [Y/N] " prompt
+    [[ "$prompt" =~ ^[yY] ]] && DELETE_SECRETS=true
+  fi
+fi
+message "DELETE_PVCS=$DELETE_PVCS" "debug"
+message "DELETE_SNAPS=$DELETE_SNAPS" "debug"
+message "DELETE_SECRETS=$DELETE_SECRETS" "debug"
+
+for c in ${COMPONENTS[@]} ; do
+  message "c=$c" "debug"
+  if [ "$c" == "secrets" ] && [ "$DELETE_SECRETS" = false ] ; then
+    continue
+  fi
+
+  kube delete --ignore-not-found=true -k $OVERLAY/$c
+
+  if [[ "$c" =~ ^ds- ]] ; then
+    deletePvcs $c
+    deleteSnaps $c
+  fi
+done

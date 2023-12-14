@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ds-cts-snapshot
+spec:
+  schedule: "0 0 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: ds-cts-snapshot
+              env:
+                - name: PURGE_DELAY
+                  value: "-3 day"

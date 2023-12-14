@@ -1,0 +1,35 @@
+platform:
+  base:
+    enabled: false
+  notes:
+    enabled: false
+  disable_secret_agent_config: true
+admin_ui:
+  enabled: false
+am:
+  enabled: false
+amster:
+  enabled: false
+ds:
+  enabled: false
+ds_snapshot:
+  configmapCreate: true
+  configmapOnly: true
+ds_cts:
+  enabled: false
+  snapshot:
+    enabled: false
+ds_idrepo:
+  enabled: false
+  snapshot:
+    enabled: false
+end_user_ui:
+  enabled: false
+idm:
+  enabled: false
+ig:
+  enabled: false
+ldif_importer:
+  enabled: false
+login_ui:
+  enabled: false

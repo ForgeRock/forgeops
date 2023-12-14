@@ -133,6 +133,11 @@ def add_loglevel_arg(parser):
                         default='INFO',
                         type=loglevel)
 
+def exit_msg(msg, code=1):
+    """Exit script with error code and message"""
+    print(f'ERROR: {msg}')
+    sys.exit(code)
+
 class NoColorFormatter(logging.Formatter):
     """Logging with no color"""
     NON_TTY_FORMATS = {
@@ -463,7 +468,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
     """
     # Supports deleting of DS Operator custom resources when upgrading from 7.3 to 7.4
     if component in ['ds','ds-idrepo','ds-cts']:
-        try: 
+        try:
             # Check if the directoryservice CRD is installed. If not then skip the delete.
             run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
         except:

@@ -1,0 +1,5 @@
+# am-only profile used for PIT tests
+resources:
+- ./base
+- ./am
+- ./ds-idrepo-legacy

@@ -1,4 +1,4 @@
-{{- if or .Values.am.enabled .Values.idm.enabled }}
+{{- if .Values.platform.base.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

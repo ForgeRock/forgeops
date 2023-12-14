@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../stdlib.sh
+# Bring in common.sh
+source $SCRIPT_DIR/common.sh
+# Go back to where we started
+cd $start_dir
+
+usage() {
+  local usage_msg=$(cat<<EOM
+Usage: $PROG [OPTIONS] [<component> <component> ...]
+
+Wait for platform components to be ready
+
+OPTIONS:
+  -h|--help                   : display usage and exit
+  --debug                     : turn on debugging
+  --dryrun                    : do a dry run
+  -v|--verbose                : be verbose
+  -a|--amster-retain <n>      : Keep amster pod running for n seconds. (default: 10)
+                                Add "infinity" to keep up indefinitely
+  -n|--namespace <ns>         : k8s namespace to install into
+  -o|--overlay OVERLAY        : overlay to use (default: cdk)
+                                (full path or relative to kustomize/overlay)
+  -p|--config-profile PROFILE : Config profile to use for IDP apps
+                                (full path or relative to config dir)
+
+Valid components:
+  ${COMPONENTS_VALID[@]}
+
+Examples:
+  Normal operation:
+  $PROG
+
+  Do a dryrun:
+  $PROG --dryrun
+
+EOM
+)
+
+  usageStd $1 "$usage_msg" $2
+}
+
+waitForResource() {
+  message "Starting waitForResource()" "debug"
+
+  local resource_type=$1
+  local resource_name=$2
+  local start_time=$(date +%s)
+  local now=$(date +%s)
+  local return_code=1
+
+  while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
+    if runOrPrint "$K_CMD -n $NAMESPACE get $resource_type $resource_name > /dev/null 2>&1" ; then
+      echo done
+      return_code=0
+      break
+    else
+      echo '.'
+      sleep 1
+    fi
+    now=$(date +%s)
+  done
+
+  return $return_code
+}
+
+# Setup valid components now so they get presented in the usage
+COMPONENTS_VALID=$COMPONENTS_WAIT
+
+# Code in common.sh
+processArgs $*
+checkComponents
+
+SECRET_NAMES=('am-env-secrets' 'idm-env-secrets' 'ds-passwords' 'ds-env-secrets')
+
+for c in ${COMPONENTS[@]} ; do
+  message "c=$c" "debug"
+  case $c in
+    secrets)
+      TIMEOUT=${TIMEOUT:-60}
+      for s in ${SECRET_NAMES[@]} ; do
+        message "s=$s" "debug"
+        waitForResource secret $s
+      done
+      ;;
+
+    *)
+      usage 1 "Invalid wait target: $c"
+      ;;
+  esac
+done

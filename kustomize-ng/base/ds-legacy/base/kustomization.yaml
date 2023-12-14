@@ -1,0 +1,14 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+# The affinity: directory label is used for anti-affinity. See statefulset.yaml.
+  # Prometheus selector
+  # component: ds
+resources:
+- service.yaml
+- statefulset.yaml
+- cloud-storage-credentials.yaml
+labels:
+- includeSelectors: true
+  pairs:
+    affinity: directory
+    app: ds

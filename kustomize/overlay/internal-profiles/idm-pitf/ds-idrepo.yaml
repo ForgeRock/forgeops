@@ -8,10 +8,6 @@ spec:
   replicas: 1
   # The resources assigned to each DS pod
   podTemplate:
-    metadata:
-      annotations:
-        # prevent autoscaler from terminating the pod
-        "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
     resources:
       requests:
         memory: 1366Mi

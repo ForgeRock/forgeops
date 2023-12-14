@@ -1,0 +1,13 @@
+#Patch IDM
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idm
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: openidm
+        imagePullPolicy: Always
+        resources: {}

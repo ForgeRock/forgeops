@@ -31,10 +31,16 @@ resources file.
     -k|--kustomize KustomizePath     : path to kustomize dir (default: $KUSTOMIZE_BASE_DEF)
     -n|--namespace NAMESPACE         : namespace to work in
     -r|--resources ResourceFileName  : resource file name to output to (default: $RESOURCES_FILE_DEF)
+    -s|--source (local|remote)       : use local or remote chart (default: local)
     -V|--chartver ChartVersion       : version of the chart to use (default: $CHART_VER_DEF)
 
 Requirements:
   * helm installed
+
+Notes:
+  * sources
+    * local: charts dir in this repo
+    * remote: $CHART
 
 Examples:
   Generate new base using defaults:
@@ -69,11 +75,10 @@ processDir() {
 
     if [ -f $d/$VALUES_FILE ] ; then
       message "Found $VALUES_FILE in ${d%*/}" "debug"
-      local cwd=$(pwd)
-      cd $d
+      local override_opt=
+      [[ -f $d/$VALUES_OVERRIDE ]] && override_opt="-f $d/$VALUES_OVERRIDE"
       echo "Generating $d/$RESOURCES_FILE"
-      runOrPrint "$HELM_CMD template $CHART/$CHART_NAME $HELM_OPTS -f $VALUES_FILE > $RESOURCES_FILE"
-      cd $cwd
+      runOrPrint "$HELM_CMD template $HELM_OPTS -f $d/$VALUES_FILE $override_opt > $d/$RESOURCES_FILE"
       processDir ${d%*/}
     else
       message "Didn't find $VALUES_FILE in ${d%*/}" "debug"
@@ -95,6 +100,7 @@ CHART="oci://us-docker.pkg.dev/forgeops-public/charts"
 CHART_NAME="identity-platform"
 CHART_VER_DEF="7.4"
 CHART_VER=
+CHART_SOURCE="local"
 KUSTOMIZE_BASE_DEF=$SCRIPT_DIR/../kustomize/base
 KUSTOMIZE_BASE=
 NAMESPACE_DEF="prod"
@@ -103,6 +109,8 @@ RESOURCES_FILE_DEF=resources.yaml
 RESOURCES_FILE=
 VALUES_FILE_DEF=values.yaml
 VALUES_FILE=
+VALUES_OVERRIDE_DEF=values-override.yaml
+VALUES_OVERRIDE=
 
 while true; do
   case "$1" in
@@ -111,9 +119,11 @@ while true; do
     --dryrun) DRYRUN=true; shift ;;
     -v|--verbose) VERBOSE=true; shift ;;
     -f|--file) VALUES_FILE=$2; shift 2 ;;
+    -F|--override) VALUES_OVERRIDE=$2; shift 2 ;;
     -k|--kustomize) KUSTOMIZE_BASE=$2; shift 2 ;;
     -n|--namespace) NAMESPACE=$2; shift 2 ;;
     -r|--resources) RESOURCES_FILE=$2; shift 2 ;;
+    -s|--source) CHART_SOURCE=$2; shfit 2 ;;
     -V|--chartver) CHART_VER=$2; shift 2 ;;
     "") break ;;
     *) if [ -z $ACTION ] ; then
@@ -145,11 +155,18 @@ RESOURCES_FILE=${RESOURCES_FILE:-$RESOURCES_FILE_DEF}
 message "RESOURCES_FILE=$RESOURCES_FILE" "debug"
 VALUES_FILE=${VALUES_FILE:-$VALUES_FILE_DEF}
 message "VALUES_FILE=$VALUES_FILE" "debug"
+VALUES_OVERRIDE=${VALUES_OVERRIDE:-$VALUES_OVERRIDE_DEF}
+message "VALUES_OVERRIDE=$VALUES_OVERRIDE" "debug"
 NAMESPACE=${NAMESPACE:-$NAMESPACE_DEF}
 message "NAMESPACE=$NAMESPACE" "debug"
 
 VERSION_OPT="--version $CHART_VER"
 NAMESPACE_OPT="-n $NAMESPACE"
-HELM_OPTS="$NAMESPACE_OPT $VERSION_OPT"
+
+if [ "$CHART_SOURCE" == "local" ] ; then
+  HELM_OPTS="$CHART_NAME $SCRIPT_DIR/../charts/identity-platform"
+else
+  HELM_OPTS="$CHART/$CHART_NAME $NAMESPACE_OPT $VERSION_OPT"
+fi
 
 processDir "$KUSTOMIZE_BASE"

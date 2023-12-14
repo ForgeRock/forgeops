@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/stdlib.sh
+
+usage() {
+  prog=$(basename $0)
+
+  ! read -r -d '' usage_msg <<- EOM
+  Usage:
+  $prog COMMAND [OPTIONS] [<component> <component> ...]
+
+  Central interface to the scripts in forgeops-scripts. Use -h with any command
+  to see its usage.
+
+  OPTIONS:
+  -h|--help                 : display usage and exit
+  --debug                   : turn on debugging
+  --dryrun                  : do a dry run
+
+  Commands: ${COMMANDS[@]}
+  Deprecated Commands: ${COMMANDS_DEPRECATED[@]}
+
+EOM
+
+  usageStd $1 "$usage_msg" $2
+
+}
+
+DEBUG=false
+DRYRUN=false
+VERBOSE=false
+
+# Since we want to see dryruns for both this script and the called script,
+# setting RUNANDPRINT to true so the sub script gets called.
+RUNANDPRINT=true
+
+ARG_ARRAY=("$@") # Create an array out of our arguments
+
+COMMANDS=(
+  'apply'
+  'build'
+  'delete'
+  'env'
+  'info'
+  'wait'
+)
+
+COMMANDS_DEPRECATED=(
+  'clean'
+  'config'
+  'install'
+  'generate'
+)
+
+# Avoiding our pattern of looping and shifting ARG elements as we want to
+# pass those as is to the worker scripts.
+
+COMMAND=$1 # Our first arg should be the command
+
+# We need to detect --dryrun and --debug.
+if containsElement '--debug' ${ARG_ARRAY[@]} ; then
+  DEBUG=true
+fi
+
+if containsElement '--dryrun' ${ARG_ARRAY[@]} ; then
+  DRYRUN=true
+fi
+
+message "COMMAND=$COMMAND" "debug"
+message "DEBUG=$DEBUG" "debug"
+message "DRYRUN=$DRYRUN" "debug"
+
+message "Validating command: $COMMAND" "debug"
+if containsElement $COMMAND ${COMMANDS[@]} ; then
+  message "Valid command: $COMMAND" "debug"
+  VALID_COMMAND=true
+elif containsElement $COMMAND ${COMMANDS_DEPRECATED[@]} ; then
+  message "Deprecated command: $COMMAND" "debug"
+  VALID_COMMAND=true
+else
+  VALID_COMMAND=false
+fi
+message "VALID_COMMAND=$VALID_COMMAND" "debug"
+
+if [ "$VALID_COMMAND" = false ] && containsElement "-h" ${ARG_ARRAY[@]} ; then
+  usage 0
+elif [ "$VALID_COMMAND" = false ] ; then
+  usage 1 "Invalid command: $COMMAND"
+else
+  message "Removing $COMMAND from arguments" "debug"
+  shift
+fi
+
+FORGEOPS_CFG="$SCRIPT_DIR/../forgeops-ng.cfg"
+if [ -f "$FORGEOPS_CFG" ] ; then
+  set -a
+  source $FORGEOPS_CFG
+  set +a
+fi
+
+if [ -z "$VIRTUAL_ENV" ] && [ "$SKIP_VIRTUAL_ENV" = false ] ; then
+  message "VIRTUAL_ENV is empty" "debug"
+  if [ ! -f $SCRIPT_DIR/activate ] ; then
+    $SCRIPT_DIR/pyenv setup
+  fi
+  source $SCRIPT_DIR/activate
+fi
+message "VIRTUAL_ENV=$VIRTUAL_ENV" "debug"
+
+
+runOrPrint "$SCRIPT_DIR/forgeops-scripts/${COMMAND} $*"

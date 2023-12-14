@@ -1,0 +1,31 @@
+
+platform:
+  base:
+    enabled: false
+  notes:
+    enabled: false
+  disable_secret_agent_config: true
+  ingress:
+    enabled: false
+admin_ui:
+  enabled: false
+am:
+  enabled: false
+amster:
+  enabled: true
+ds:
+  enabled: false
+ds_cts:
+  enabled: false
+ds_idrepo:
+  enabled: false
+end_user_ui:
+  enabled: false
+idm:
+  enabled: false
+ig:
+  enabled: false
+ldif_importer:
+  enabled: false
+login_ui:
+  enabled: false

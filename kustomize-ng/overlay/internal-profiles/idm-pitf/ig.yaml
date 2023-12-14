@@ -1,0 +1,11 @@
+#Patch AM
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ig
+spec:
+  template:
+    metadata:
+      annotations:
+        # prevent autoscaler from terminating the pod
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"

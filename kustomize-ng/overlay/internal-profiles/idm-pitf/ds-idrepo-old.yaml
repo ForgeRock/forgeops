@@ -1,0 +1,11 @@
+#Patch DS idrepo
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+spec:
+  template:
+    metadata:
+      annotations:
+        # prevent autoscaler from terminating the pod
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"

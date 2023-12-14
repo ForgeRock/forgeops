@@ -1,0 +1,8 @@
+#Patch DS CTS
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-cts
+  annotations:
+    # prevent autoscaler from terminating the pod
+    "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"

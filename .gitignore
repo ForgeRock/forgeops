@@ -20,6 +20,7 @@ reports/
 res.txt
 results.txt
 /venv/
+/lib/
 skaffold-dev.yaml
  __pycache__/
 build/
@@ -36,6 +37,12 @@ dist/
 legacy-docs/7.0/site/build
 .gitignore.local
 tag.json
+/bin/Activate.ps1
+/bin/activate*
+/bin/deactivate*
+/bin/pip*
+/bin/python*
+pyenv.cfg
 *.swp
 *.swo
 *~

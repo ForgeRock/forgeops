@@ -1,0 +1,12 @@
+# Deploys ds-idrepo and ds-cts only. Used by PIT/Perf/DS teams.
+resources:
+- ../../../base/kustomizeConfig
+- ../../../base/ds/cts
+- ../../../base/ds/idrepo
+
+patches:
+- path: base.yaml
+- path: ds-idrepo-old.yaml
+- path: ds-cts-old.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization

@@ -1,0 +1,60 @@
+---
+# Source: identity-platform/templates/ldif-importer-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ldif-importer
+  labels:
+    helm.sh/chart: identity-platform-7.4
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/managed-by: Helm
+    app: ldif-importer
+    app.kubernetes.io/component: ldif-importer
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      annotations:
+        deployment-date: "2024-02-01 09:11:10.513292 -0600 CST m=+0.038073251"
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: ldif-importer
+        app.kubernetes.io/component: ldif-importer
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      volumes:
+        - name: passwords
+          secret:
+            secretName: ds-passwords
+      containers:
+        - name: ldif-importer
+          securityContext:
+            {}
+          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:7.4.0"
+          imagePullPolicy: Always
+          envFrom:
+          - secretRef:
+              name: ds-env-secrets
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /etc/hosts
+            initialDelaySeconds: 1
+          resources:
+            {}
+          volumeMounts:
+          - name: passwords
+            mountPath: /var/run/secrets/opendj-passwords
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Exists

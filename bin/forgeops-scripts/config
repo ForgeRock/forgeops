@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../stdlib.sh
+# Go back to where we started
+cd $start_dir
+
+echo << EOM
+
+The config command is no longer needed.
+
+EOM

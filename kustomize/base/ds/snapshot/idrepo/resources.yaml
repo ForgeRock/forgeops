@@ -46,7 +46,3 @@ spec:
               name: ds-snapshot-script
               defaultMode: 0555
           restartPolicy: Never
-          tolerations:
-            - key: kubernetes.io/arch
-              operator: Exists
-              effect: NoSchedule

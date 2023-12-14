@@ -1,0 +1,11 @@
+# This configures git to ignore the generated files.
+# If you want to commit your generated files to git comment out these lines.
+base/
+secrets/
+apps/
+ds/
+ds-idrepo/
+ds-cts/
+ui/
+base-cdm/
+ds-cdm/

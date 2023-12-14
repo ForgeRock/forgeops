@@ -1,0 +1,17 @@
+resources:
+- ../base
+#- loadbalancer.yaml #Uncomment if public load balancer is required in front of DS.
+nameSuffix: -idrepo
+images:
+- name: ds
+  newName: ds-idrepo
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+labels:
+- includeSelectors: true
+  pairs:
+    app: ds-idrepo
+    app.kubernetes.io/component: directory
+    app.kubernetes.io/instance: ds-idrepo
+    app.kubernetes.io/name: ds
+    app.kubernetes.io/part-of: forgerock

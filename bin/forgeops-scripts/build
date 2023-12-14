@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../stdlib.sh
+# Bring in common.sh
+source $SCRIPT_DIR/common.sh
+# Go back to where we started
+cd $start_dir
+
+usage() {
+  local usage_msg=$(cat<<EOM
+Usage:
+$PROG -l OVERLAY [OPTIONS] COMPONENT [COMPONENT]...
+
+Build container images for one or more ForgeRock components.
+
+Notes:
+  * building amster images is not supported, use bin/amster
+  * Only ${COMPONENTS_FBC[*]} respect --config-profile
+  * You must use --push-to or set PUSH_TO in your environment/forgeops.cfg
+
+OPTIONS:
+  -h|--help                     : display usage and exit
+  -d|--debug                    : turn on debugging
+  --dryrun                      : do a dry run
+  -v|--verbose                  : be verbose
+  -b|--build-path <path>        : path to build dir (default: docker)
+  -k|--kustomize                : path to kustomize dir (default: kustomize)
+                                  (full path or relative to git root)
+  -l|--overlay OVERLAY          : overlay to use (default: cdk)
+                                  (full path or relative to kustomize/overlay)
+  -p|--config-profile <profile> : name of the config profile to use
+  -r|--push-to <registry>       : container registry to push built images to
+  --reset                       : reset image-defaulter to git index
+
+Valid Components:
+  ${COMPONENTS_VALID[*]}
+
+Deprecated Components:
+  ${COMPONENTS_BUILD_DEP[*]}
+
+Examples:
+  Normal operation:
+  $PROG -p prod -l prod am
+
+  Do a dryrun:
+  $PROG -p prod -l prod --dryrun am
+
+EOM
+)
+
+  usageStd $1 "$usage_msg" "$2"
+}
+
+# Setup valid components now so they get presented in the usage
+COMPONENTS_FBC=( "am" "idm" "ig" )
+COMPONENTS_BUILD_DEP=( "amster" ) # Deprecated build components
+COMPONENTS_VALID=( ${COMPONENTS_STD[@]} ${COMPONENTS_BUILD[@]} ${COMPONENTS_BUILD_DEP[@]} 'all' )
+
+# Code in common.sh
+processArgs $*
+checkComponents
+kubeInit
+
+if [ -d "$OVERLAY" ] ; then
+  message "Overlay exists: $OVERLAY" "debug"
+else
+  usage 1 "Overlay dir doesn't exist: $OVERLAY"
+fi
+
+CONTAINER_ENGINE=${CONTAINER_ENGINE:-docker}
+message "CONTAINER_ENGINE=$CONTAINER_ENGINE" "debug"
+
+if [ -d "$BUILD_PATH" ] ; then
+  message "Build path exists: $BUILD_PATH" "debug"
+else
+  usage 1 "Build path doesn't exist: $BUILD_PATH"
+fi
+
+if [ "$RESET" = true ] ; then
+  echo "Reset to git index: $BUILD_PATH/image-defaulter"
+  runOrPrint git restore $OVERLAY/image-defaulter
+  exit 0
+fi
+
+if containsElement "amster" ${COMPONENTS[@]} ; then
+  usage 1 "Embedding AM dynamic configs in the amster image is not supported. Manage AM dynamic config with the bin/amster cmd instead."
+fi
+
+if containsElement "all" ${COMPONENTS[@]} ; then
+  message "Component 'all' given, setting components"
+  COMPONENTS=( ${COMPONENTS_STD[@]} ${COMPONENTS_BUILD[@]} )
+fi
+message "COMPONENTS=$COMPONENTS" "debug"
+
+for c in ${COMPONENTS[@]} ; do
+  message "c=$c" "debug"
+  BUILD_ARGS=${BUILD_ARGS:-}
+  if containsElement $c ${COMPONENTS_FBC[@]} && [ -n "$CONFIG_PROFILE" ] ; then
+    BUILD_ARGS+=" --build-arg CONFIG_PROFILE=$CONFIG_PROFILE"
+  fi
+
+  build_d=$BUILD_PATH/$c
+  [[ "$c" == "ds" ]] && build_d=$BUILD_PATH/ds/ds-new
+  if [ -d "$build_d" ] ; then
+    message "$build_d exists." "debug"
+  else
+    echo "WARNING: $build_d doesn't exist, skipping"
+    continue
+  fi
+
+  IMAGE=$c
+  if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
+    IMAGE="${PUSH_TO}/${IMAGE}"
+  fi
+  [[ -n "$TAG" ]] && IMAGE="${IMAGE}:${TAG}"
+
+  runOrPrint cd $build_d
+  runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS -t $IMAGE .
+
+  if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
+    runOrPrint $CONTAINER_ENGINE push $IMAGE
+  fi
+
+  kube kustomize edit set image name=$IMAGE $OVERLAY/image-defaulter
+done

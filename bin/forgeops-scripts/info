@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""Output secrets and URLs for a ForgeRock deployment"""
+
+import argparse
+import datetime
+import json
+import os
+import shutil
+import sys
+import yaml
+
+sys.path.append(os.path.join(sys.path[0], '..'))
+import utils
+
+def main():
+    parser = argparse.ArgumentParser(description="Display basic info for a ForgeRock Identity Platform k8s deployment",
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--debug', '-d', dest='debug', action='store_true', help='Turn on debugging')
+    parser.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
+    parser.add_argument('--namespace', '-n', dest='namespace', help='Target namespace (default: current ctx namespace)')
+    # Needed to be called from bin/forgeops, but ignored
+    parser.add_argument('--dryrun', dest='dryrun', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--verbose', dest='verbose', action='store_true', help=argparse.SUPPRESS)
+
+    args = parser.parse_args()
+
+    ctx_namespace = utils.get_namespace()
+    ctx = utils.get_context()
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
+
+    if not args.jsonfmt:
+        utils.message(f'Targeting namespace: "{namespace}".')
+    secrets = utils.printsecrets(namespace, not args.jsonfmt)
+    urls = utils.printurls(namespace, not args.jsonfmt)
+    output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
+    if args.jsonfmt:
+        print(json.dumps(output))
+
+if __name__ == '__main__':
+    main()

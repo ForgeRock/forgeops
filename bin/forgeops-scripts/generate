@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../stdlib.sh
+# Go back to where we started
+cd $start_dir
+
+echo << EOM
+
+The generate command is deprecated. It was used to craft an overlay in the
+kustomize/deploy directory. We have replaced it with an environment management
+command that can create and update discrete overlays for your environments.
+
+The env command requires you to specify an overlay to manage. If you did
+not use -l/--overlay when calling this, the default of demo will be added to
+the arguments.
+
+For more information:
+forgeops env -h
+
+Running the following env command for you.
+
+EOM
+
+ARG=("$@") # Create an array out of our arguments
+ENV_ARGS=("-l" "--overlay")
+
+if ! containsElements ${ENV_ARGS[@]} ${ARG_ARRAY[@]} ; then
+  ARGS+=("--overlay demo")
+fi
+
+# Enable debugging so runOrPrint will always print the command before running it
+DEBUG=true
+
+runOrPrint $SCRIPT_DIR/../forgeops-ng env ${ARGS[*]}
