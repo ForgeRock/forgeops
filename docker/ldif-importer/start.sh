@@ -5,7 +5,7 @@
 wait_repo() {
     REPO="$1-0.$1"
     echo "Waiting for $REPO to be available. Trying /alive endpoint"
-    while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $REPO:8080/alive)" != "200" ]];
+    while [[ "$(wget --server-response $REPO:8080/alive --spider 2>&1 | awk '/^  HTTP/{print $2}')" != "200" ]];
     do
             sleep 5;
     done
