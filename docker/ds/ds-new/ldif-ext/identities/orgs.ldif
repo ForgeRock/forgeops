@@ -1,5 +1,5 @@
 #
-# Copyright 2020 ForgeRock AS. All Rights Reserved
+# Copyright 2023 ForgeRock AS. All Rights Reserved
 #
 # Use of this code requires a commercial software license with ForgeRock AS.
 # or with one of its affiliates. All use shall be exclusively subject
@@ -7,7 +7,7 @@
 #
 
 # These base entries are set up to theoretically allow any hierachy of realms with any name; each realm
-# having it's own idRepo under anotther OU in this DIT.
+# having it's own idRepo under another OU in this DIT.
 # Each realm will have a people OU, a groups OU, and a realms Organization (o=<realm>).
 
 dn: o=root,ou=identities
