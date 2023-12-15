@@ -16,11 +16,13 @@ ENV PEM_TRUSTSTORE_DIRECTORY "/var/run/secrets/keys/truststore"
 # Add the default scripts to be used if the deployer does not provide an implementation.
 # See default-scripts/setup
 COPY --chown=forgerock:root default-scripts /opt/opendj/default-scripts
-COPY --chown=forgerock:root ldif-ext /opt/opendj/ldif-ext
 COPY --chown=forgerock:root *.sh /opt/opendj/
 
 # Add custom schema files
 COPY --chown=forgerock:root config/schema/*.ldif /opt/opendj/template/db/schema
+
+# Add custom ldap configuration
+COPY --chown=forgerock:root ldif-ext /opt/opendj/ldif-ext
 
 # This is the basic DS setup from the DS repo. It does the bare bones
 # setup - without any profiles. Profile setup will come later at runtime.

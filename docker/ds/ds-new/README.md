@@ -92,6 +92,15 @@ As currently implemented, the pem keys are read from k8s secrets and copied to t
 To provide a custom schema file, add your custom file to the config/schema directory 
 prior to building your image.  There is a sample file in there for guidance.
 
+## Custom LDAP entries
+To provide an ldif file with custom ldap entries, add your custom file to:
+- ldif-ext/am-config/ for the am-config backend
+- ldif-ext/identities/ for the identities backend
+- ldif-ext/tokens/ for the tokens backend
+- ldif-ext/idm-repo/ for the openidm backend
+
+To update any other backends, please update ds-setup.sh to copy the files to the relevant setup-profile.
+
 ## Development
 
 See the inline comments in the Dockerfile and the docker-entrypoint.sh script.

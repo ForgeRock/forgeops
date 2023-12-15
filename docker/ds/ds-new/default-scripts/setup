@@ -54,7 +54,6 @@ create-backend-index \
           --backend-name amIdentityStore \
           --set index-type:presence \
           --index-name fr-idm-lastSync
-
 create-backend-index \
           --backend-name amIdentityStore \
           --set index-type:extensible \

@@ -196,6 +196,22 @@ cd /opt/opendj
 
 # The profiles are read only - make them writable
 chmod -R a+rw  template/setup-profiles/AM
+chmod -R a+rw  template/setup-profiles/IDM
 
-cat ldif-ext/external-am-datastore.ldif ldif-ext/uma/*.ldif ldif-ext/alpha_bravo.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif
-cat ldif-ext/orgs.ldif >> template/setup-profiles/AM/identity-store/7.0/base-entries.ldif
+# Add custom ldap entries to the am-config base entries
+cat ldif-ext/am-config/uma/*.ldif ldif-ext/am-config/*.ldif >> template/setup-profiles/AM/config/6.5/base-entries.ldif
+
+# Add custom ldap entries to the identity-store base entries
+if [ -f ldif-ext/identities/*.ldif ]; then
+    cat ldif-ext/identities/*.ldif >> template/setup-profiles/AM/identity-store/7.0/base-entries.ldif
+fi
+
+# Add custom ldap entries to the tokens base entries
+if [ -f ldif-ext/tokens/*.ldif ]; then
+    cat ldif-ext/tokens/*.ldif >> template/setup-profiles/AM/cts/6.5/base-entries.ldif
+fi
+
+# Add custom ldap entries to the idm-repo base entries
+if [ -f ldif-ext/idm-repo/*.ldif ]; then
+    cat ldif-ext/idm-repo/*.ldif >> template/setup-profiles/IDM/repo/7.3/base-entries.ldif
+fi
