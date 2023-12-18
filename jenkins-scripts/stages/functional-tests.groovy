@@ -8,7 +8,7 @@
 
 // functional-tests.groovy
 void runStage() {
-    commonModule.runGuillotine(null, 'functional', '--keywords FUNCTIONAL')
+    commonModule.runGuillotine(null, 'functional', '--keywords RELEASE')
 }
 
 return this
