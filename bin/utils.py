@@ -271,8 +271,17 @@ def _waitfords(ns, ds_name):
         return
     while True:
         try:
-            _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
-                                 cstderr=True, cstdout=True)
+            # Get the deployed DS Operator version
+            _, img, _ = run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
+                            cstderr=True, cstdout=True)
+            version = img.decode('ascii').split(':')[1]
+            # Validate the password check based on the DS Operator version
+            if version >= 'v0.2.8':
+                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.metadata.annotations.password-updated-status}}',
+                                    cstderr=True, cstdout=True)
+            else:
+                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.status.serviceAccountPasswordsUpdatedTime}}',
+                                    cstderr=True, cstdout=True)
             if len(valuestr) > 0:
                 print('done')
                 break
