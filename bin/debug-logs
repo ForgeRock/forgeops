@@ -308,6 +308,38 @@ def write_operator_logs(output, operator, max_log_lines):
     output.write(operator_log_html)
 
 
+def write_pods_list(output, namespace):
+    # Get pods list
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get pod',
+                                                cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8')
+    else:
+        get_output = 'Command to describe pod failed<br/>'
+
+    # build html table to display pods list information. Add a href to pod info and description
+    table_html = ['<table border=0>']
+    num_line = 0
+    for line in get_output.splitlines():
+        table_html.append('<tr>')
+        num_column = 0
+        for column in line.split():
+            if num_line > 0 and num_column == 0:
+                column = f'<a href=#{column}>{column}</a>'
+            table_html.append(f'<td>{column}</td>')
+            num_column += 1
+        table_html.append('</tr>')
+        num_line += 1
+    # Convert html table from list to string
+    table_html.append('</table>')
+    # Write pods list
+    pods_list_html = fr'''
+    <h2><a id="pods_list">Pods (kubectl CLI output)</a></h2>
+    {"".join(table_html)}
+    <p><a href="#toc">Back to Index</a></p>'''
+    output.write(pods_list_html)
+
+
 def write_pod_description_and_container_logs(output, namespace, pod, max_log_lines):
     # Get pod description
     success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} describe pod {pod}',
@@ -328,7 +360,7 @@ def write_pod_description_and_container_logs(output, namespace, pod, max_log_lin
     <h2><a id="{pod}">{pod}</a></h2>
     <h3>Pod Description:</a></h3>
     <pre>{get_output}</pre>
-    <p><a href="#toc">Back to Index</a></p>
+    <p><a href="#pods_list">Back to Pods List</a><br/><a href="#toc">Back to Index</a></p>
     '''.format(pod=pod, get_output=get_output)
     output.write(pod_desc_html)
 
@@ -338,7 +370,7 @@ def write_pod_description_and_container_logs(output, namespace, pod, max_log_lin
         app_container_log_html = '''
         <h3>Logs for Container {container}:</h3>
         <pre>{log}</pre>
-        <p><a href="#toc">Back to Index</a></p>
+        <p><a href="#pods_list">Back to Pods List</a><br/><a href="#toc">Back to Index</a></p>
         '''.format(container=container, log=log)
         output.write(app_container_log_html)
 
@@ -348,7 +380,7 @@ def write_pod_description_and_container_logs(output, namespace, pod, max_log_lin
         init_container_log_html = '''
         <h3>Logs for Init Container {container}:</h3>
         <pre>{log}</pre>
-        <p><a href="#toc">Back to Index</a></p>
+        <p><a href="#pods_list">Back to Pods List</a><br/><a href="#toc">Back to Index</a></p>
         '''.format(container=container, log=log)
         output.write(init_container_log_html)
 
@@ -487,9 +519,13 @@ def write_toc(output, pods, pvcs, objs, operators):
     <ul>
     {other_toc}
     </ul>
-    <h2>Pod Descriptions and Container Logs</h2>
+    <h2>Pods Information</h2>
     <ul>
-    {pods_toc}
+        <li><a href="#pods_list">Pods (kubectl CLI output)</a></li>
+        <li>Pod Descriptions and Container Logs</li>
+        <ul>
+        {pods_toc}
+        </ul>
     </ul>
     <h2>PVC Descriptions</h2>
     <ul>
@@ -565,6 +601,11 @@ def main():
 
         # Write pod descriptions and container logs
         print('Writing pod descriptions and container logs')
+        pods_title_html = '''
+        <hr>
+        <h2>Pods Information</h2>'''
+        output.write(pods_title_html)
+        write_pods_list(output, namespace)
         for pod in pods:
             print(f'  {pod}')
             write_pod_description_and_container_logs(output, namespace, pod, int(max_log_lines))
