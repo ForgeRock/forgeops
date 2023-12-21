@@ -3,7 +3,6 @@
 # It replaces debug-logs.sh.
 
 import argparse
-import sys
 from datetime import datetime
 import os
 from pathlib import Path
@@ -187,7 +186,8 @@ def write_crds(output):
     output.write(crds_html)
 
 
-def write_git_log(output):
+def write_forgeops_info(output, forgeops_branch):
+    # write Forgeops branch name and git log
     success, get_output, _ = utils.run_condfail('git', f'--no-pager log -n 10', cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
@@ -195,14 +195,17 @@ def write_git_log(output):
         get_output = 'Command to get the Git log failed<br/>'
 
     # Write section
-    git_log_html = '''
+    html = f'''
     <br>
+    <h2><a id="forgeops_branch">Forgeops Branch Name</a></h2>
+    <pre>{forgeops_branch}</pre>
+    <p><a href="#toc">Back to Index</a></p>
     <h2><a id="git">Forgeops Repository Git Log (Most Recent Entries)</a></h2>
     <pre>{get_output}</pre>
     <p><a href="#toc">Back to Index</a></p>
     <br>
-    '''.format(get_output=get_output)
-    output.write(git_log_html)
+    '''
+    output.write(html)
 
 
 def write_header(output, namespace):
@@ -517,7 +520,8 @@ def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
     other_toc += f'<li><a href="#crds">CRDs</a></li>'
     other_toc += f'<li><a href="#storageclasses">Kubernetes storage classes</a></li>'
     other_toc += f'<li><a href="#skaffoldconfig">Skaffold configuration</a></li>'
-    other_toc += f'<li><a href="#git">forgeops repository Git log (most recent entries)</a></li>'
+    other_toc += f'<li><a href="#forgeops_branch">Forgeops branch name</a></li>'
+    other_toc += f'<li><a href="#git">Forgeops repository Git log (most recent entries)</a></li>'
 
     # Write TOC
 
@@ -594,8 +598,15 @@ def main():
                         help='Maximum lines to print from each container log (default: 400)')
     parser.add_argument('-n', '--namespace',
                         help='Target namespace (default: current namespace)')
+    parser.add_argument('-b', '--forgeops-branch', dest='forgeops_branch',
+                        help='Forgeops branch used to deploy the platform (e.g. release/7.4-20231204)')
     args = parser.parse_args()
     max_log_lines = args.max_log_lines if getattr(args, 'max_log_lines', None) else 400
+    if getattr(args, 'forgeops_branch', None):
+        forgeops_branch = args.forgeops_branch
+    else:
+        forgeops_branch = input('Please provide the Forgeops branch used to deploy the platform '
+                                '(e.g. release/7.4-20231204) : ')
 
     # Get the namespace (either passed in as an arg, or set in the user's context)
     ctx_namespace = utils.get_namespace()
@@ -639,7 +650,7 @@ def main():
         write_crds(output)
         write_storage_classes(output, namespace)
         write_skaffold_config(output)
-        write_git_log(output)
+        write_forgeops_info(output, forgeops_branch)
 
         # Write pod descriptions and container logs
         print('Writing pod descriptions and container logs')
