@@ -7,40 +7,42 @@ from datetime import datetime
 import os
 from pathlib import Path
 import subprocess
-import sys
-
 import utils
 
-def _get_container_logs(namespace, pod, containers, maxloglines):
+
+def _get_container_logs(namespace, pod, containers, max_log_lines):
     container_logs = []
     for container in containers:
-        container_log = ''
         success, get_output, _ = utils.run_condfail('kubectl',
-            f'--namespace {namespace} logs {pod} -c {container}', cstdout=True, ignoreFail=True)
+                                                    f'--namespace {namespace} logs {pod} -c {container}',
+                                                    cstdout=True, ignoreFail=True)
         if success:
             # Split the output into lines...
             get_output = get_output.decode('utf-8').splitlines()
             # ... and join the lines into a string, adding <br> at the end of each line
-            container_log ='<br>'.join(get_output[0:maxloglines])
+            container_log = '<br>'.join(get_output[0:max_log_lines])
             container_logs.append(container_log)
         else:
             container_logs.append('Command to get container logs failed\n')
     return container_logs
 
+
 def _get_containers(namespace, pod):
     containers = []
 
     # Get app containers
-    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods {pod} '
-        f'--namespace {namespace} --output=jsonpath={{.spec.containers[*].name}}',cstdout=True, ignoreFail=True)
+    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods {pod} --namespace {namespace} '
+                                                                f'--output=jsonpath={{.spec.containers[*].name}}',
+                                                     cstdout=True, ignoreFail=True)
     if success:
         containers.append(get_pods_output.decode('utf-8').split())
     else:
         containers.append([])
 
     # Get init containers
-    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods {pod} '
-        f'--namespace {namespace} --output=jsonpath={{.spec.initContainers[*].name}}',cstdout=True, ignoreFail=True)
+    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods {pod} --namespace {namespace} '
+                                                                f'--output=jsonpath={{.spec.initContainers[*].name}}',
+                                                     cstdout=True, ignoreFail=True)
     if success:
         containers.append(get_pods_output.decode('utf-8').split())
     else:
@@ -49,109 +51,108 @@ def _get_containers(namespace, pod):
     # Return a list with two elements: a list of non-init containers, and a list of containers
     return containers
 
+
 def _get_awscli_version():
-    success, awscli, _ = utils.run_condfail('aws',
-        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    success, awscli, _ = utils.run_condfail('aws', '--version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return awscli.decode('ascii').split(' ')[0].split('/')[1]
     else:
         return 'command to get AWS CLI version failed'
 
+
 def _get_azcli_version():
-    success, azcli, _ = utils.run_condfail('az',
-        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    success, azcli, _ = utils.run_condfail('az', '--version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return azcli.decode('ascii').splitlines()[0].split(' ')[-2]
     else:
         return 'command to get Azure CLI version failed'
 
+
 def _get_container_engine_version(container_engine):
-    success, container_engine, _ = utils.run_condfail(f'{container_engine}',
-        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    success, container_engine, _ = utils.run_condfail(f'{container_engine}', '--version',
+                                                      cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return container_engine.decode('ascii').split(' ')[2].rstrip(',')
     else:
         return 'command to get container_engine version failed'
 
-def _get_eksctl_version():
-    success, eksctl, _ = utils.run_condfail('eksctl',
-        'version', cstdout=True, cstderr=True, ignoreFail=True)
+
+def _get_eks_ctl_version():
+    success, eksctl, _ = utils.run_condfail('eksctl', 'version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return eksctl.decode('ascii').split(' ')[-1].strip()
     else:
         return 'command to get eksctl version failed'
 
+
 def _get_gcloud_version():
-    success, gcloud, _ = utils.run_condfail('gcloud',
-        'version', cstdout=True, cstderr=True, ignoreFail=True)
+    success, gcloud, _ = utils.run_condfail('gcloud', 'version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return gcloud.decode('ascii').splitlines()[0].split(' ')[-1]
     else:
         return 'command to get Google Cloud SDK version failed'
 
+
 def _get_kubectl_version():
-    success, kubectl, _ = utils.run_condfail('kubectl',
-        'version --client=true --short', cstdout=True, cstderr=True, ignoreFail=True)
+    success, kubectl, _ = utils.run_condfail('kubectl', 'version --client=true --short',
+                                             cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return kubectl.decode('ascii').split(' ')[-1].strip()[1:]
     else:
         return 'command to get kubectl version failed'
 
+
 def _get_kube_server_version():
-    success, kubectl, _ = utils.run_condfail('kubectl',
-        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    success, kubectl, _ = utils.run_condfail('kubectl', 'version --short', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return kubectl.decode('ascii').splitlines()[1].split(' ')[-1].strip()[1:]
     else:
         return 'command to get Kubernetes server version failed'
 
+
 def _get_kustomize_version():
-    success, kustomize, _ = utils.run_condfail('kustomize',
-        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    success, kustomize, _ = utils.run_condfail('kustomize', 'version --short', cstdout=True, cstderr=True,
+                                               ignoreFail=True)
     if success:
         return kustomize.decode('ascii').split()[0].split('/')[-1].strip()[1:]
     else:
         return 'command to get Kustomize version failed'
 
+
 def _get_minikube_version():
-    success, minikube, _ = utils.run_condfail('minikube',
-        'version --short', cstdout=True, cstderr=True, ignoreFail=True)
+    success, minikube, _ = utils.run_condfail('minikube', 'version --short', cstdout=True, cstderr=True,
+                                              ignoreFail=True)
     if success:
         return minikube.decode('ascii').split()[0].split('/')[-1].strip()[1:]
     else:
         return 'command to get Minikube version failed'
 
+
 def _get_python3_version():
-    success, python3, _ = utils.run_condfail('python3',
-        '--version', cstdout=True, cstderr=True, ignoreFail=True)
+    success, python3, _ = utils.run_condfail('python3', '--version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return python3.decode('ascii').split(' ')[-1]
     else:
         return 'command to get Python3 version failed'
 
+
 def _get_skaffold_version():
-    success, skaffold, _ = utils.run_condfail('skaffold',
-        'version', cstdout=True, cstderr=True, ignoreFail=True)
+    success, skaffold, _ = utils.run_condfail('skaffold', 'version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
         return skaffold.decode('ascii').strip()[1:]
     else:
         return 'command to get Skaffold version failed'
 
-def get_pods(namespace):
-    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods '
-        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True, ignoreFail=True)
+
+def get_names(name, namespace):
+    success, get_output, _ = utils.run_condfail('kubectl', f'get {name} --namespace {namespace} '
+                                                           f'--output=jsonpath={{.items[*].metadata.name}}',
+                                                cstdout=True, ignoreFail=True)
     if success:
-        return get_pods_output.decode('utf-8').split()
+        return get_output.decode('utf-8').split()
     else:
         return []
 
-def get_pvcs(namespace):
-    success, get_pvc_output, _ = utils.run_condfail('kubectl', f'get pvc '
-        f'--namespace {namespace} --output=jsonpath={{.items..metadata.name}}',cstdout=True, ignoreFail=True)
-    if success:
-        return get_pvc_output.decode('utf-8').split()
-    else:
-        return []
 
 def write_context(output):
     get_output = utils.get_context()
@@ -165,6 +166,7 @@ def write_context(output):
     <br>
     '''.format(get_output=get_output)
     output.write(context_html)
+
 
 def write_crds(output):
     success, get_output, _ = utils.run_condfail('kubectl', 'get crds', cstdout=True, ignoreFail=True)
@@ -183,22 +185,28 @@ def write_crds(output):
     '''.format(get_output=get_output)
     output.write(crds_html)
 
-def write_git_log(output):
-    success, get_output, _ = utils.run_condfail('git', f'--no-pager log -n 10',cstdout=True, ignoreFail=True)
+
+def write_forgeops_info(output, forgeops_branch):
+    # write Forgeops branch name and git log
+    success, get_output, _ = utils.run_condfail('git', f'--no-pager log -n 10', cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
     else:
         get_output = 'Command to get the Git log failed<br/>'
 
     # Write section
-    git_log_html = '''
+    html = f'''
     <br>
+    <h2><a id="forgeops_branch">Forgeops Branch Name</a></h2>
+    <pre>{forgeops_branch}</pre>
+    <p><a href="#toc">Back to Index</a></p>
     <h2><a id="git">Forgeops Repository Git Log (Most Recent Entries)</a></h2>
     <pre>{get_output}</pre>
     <p><a href="#toc">Back to Index</a></p>
     <br>
-    '''.format(get_output=get_output)
-    output.write(git_log_html)
+    '''
+    output.write(html)
+
 
 def write_header(output, namespace):
     # Get current date and time
@@ -222,21 +230,22 @@ def write_header(output, namespace):
     <br>
     Logged at {now}
     </p>
-    '''.format(namespace=namespace,now=now)
+    '''.format(namespace=namespace, now=now)
     output.write(heading_html)
+
 
 def write_objects(output, namespace, obj):
     # Get kubectl CLI output for the objects
-    success, get_cli_output, _ = utils.run_condfail('kubectl',
-        f'--namespace {namespace} get {obj[0]}',cstdout=True, ignoreFail=True)
+    success, get_cli_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get {obj[0]}',
+                                                    cstdout=True, ignoreFail=True)
     if success:
         get_cli_output = get_cli_output.decode('utf-8').replace('\n', '<br/>')
     else:
         get_cli_output = 'Command to get objects (CLI) failed<br/>'
 
     # Get object YAML
-    success, get_yaml_output, _ = utils.run_condfail('kubectl',
-        f'--namespace {namespace} get {obj[0]} --output yaml',cstdout=True, ignoreFail=True)
+    success, get_yaml_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get {obj[0]} --output yaml',
+                                                     cstdout=True, ignoreFail=True)
     if success:
         get_yaml_output = get_yaml_output.decode('utf-8').replace('\n', '<br/>')
     else:
@@ -252,22 +261,23 @@ def write_objects(output, namespace, obj):
     <h2><a id="{obj[2]}">{obj[2]}</a></h2>
     <pre>{get_yaml_output}</pre>
     <p><a href="#toc">Back to Index</a></p>
-    '''.format(obj=obj,get_cli_output=get_cli_output,get_yaml_output=get_yaml_output)
+    '''.format(obj=obj, get_cli_output=get_cli_output, get_yaml_output=get_yaml_output)
     output.write(obj_html)
 
-def write_operator_logs(output, operator, maxloglines):
+
+def write_operator_logs(output, operator, max_log_lines):
     # Get operator pod name
     # This call doesn't return an error if it doesn't find anything, so we
     # need to wrap it in a try block instead of using run with ignoreFail=true)
     try:
-        _, get_pods_output, _ = utils.run('kubectl', f'get pods '
-            f'-l {operator[0]} -n {operator[1]} --field-selector=status.phase==Running '
-            f'--output=jsonpath={{.items..metadata.name}}',cstdout=True)
+        _, get_pods_output, _ = utils.run('kubectl', f'get pods -l {operator[0]} -n {operator[1]} '
+                                                     f'--field-selector=status.phase==Running '
+                                                     f'--output=jsonpath={{.items..metadata.name}}', cstdout=True)
         pod = get_pods_output.decode('utf-8').split()[0]
 
         # Get log
-        _, get_log_output, _ = utils.run('kubectl',
-            f'--namespace {operator[1]} logs {pod} -c {operator[2]}', cstdout=True)
+        _, get_log_output, _ = utils.run('kubectl', f'--namespace {operator[1]} logs {pod} -c {operator[2]}',
+                                         cstdout=True)
     except subprocess.CalledProcessError as e:
         print(f'Error getting pods or pod logs: {e.cmd} {e.output}')
         return
@@ -281,20 +291,60 @@ def write_operator_logs(output, operator, maxloglines):
     # Split the output into lines...
     get_log_output = get_log_output.decode('utf-8').splitlines()
     # ... and join the lines into a string, adding <br> at the end of each line
-    log ='<br>'.join(get_log_output[0:maxloglines])
+    log = '<br>'.join(get_log_output[0:max_log_lines])
 
     # Write it out
     operator_log_html = ''' 
     <h2><a id="{operator_name}">{operator_name} Container Log:</a></h3>
     <pre>{log}</pre>
     <p><a href="#toc">Back to Index</a></p>
-    '''.format(pod=pod,container=operator[2],log=log,operator_name=operator[3])
+    '''.format(pod=pod, container=operator[2], log=log, operator_name=operator[3])
     output.write(operator_log_html)
 
-def write_pod_description_and_container_logs(output, namespace, pod, maxloglines):
+
+def write_k_list(name, output, namespace):
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get {name}',
+                                                cstdout=True, ignoreFail=True)
+    if success:
+        get_output = get_output.decode('utf-8')
+    else:
+        get_output = f'Command to get {name} failed<br/>'
+
+    # build html table to display object list information. Add a href to pod info and description
+    table_html = ['<table border=0>']
+    num_line = 0
+    for line in get_output.splitlines():
+        table_html.append('<tr>')
+        num_column = 0
+        for column in line.split():
+            if num_line > 0 and num_column == 0:
+                if name.endswith('s') and name != 'sts':
+                    anchor = f'{name[:-1]}_{column}'
+                else:
+                    anchor = f'{name}_{column}'
+                column = f'<a href=#{anchor}>{column}</a>'
+            table_html.append(f'<td>{column}</td>')
+            num_column += 1
+        table_html.append('</tr>')
+        num_line += 1
+    # Convert html table from list to string
+    table_html.append('</table>')
+    # Write list
+    if name == 'sts':
+        name_to_display = 'Statefulset'
+    else:
+        name_to_display = f'{name[0].upper()}{name[1:]}'
+    html = fr'''
+    <h2><a id="{name}_list">{name_to_display} (kubectl CLI output)</a></h2>
+    {"".join(table_html)}
+    <p><a href="#toc">Back to Index</a></p>'''
+    output.write(html)
+
+
+def write_pod_description_and_container_logs(output, namespace, pod, max_log_lines):
     # Get pod description
-    success, get_output, _ = utils.run_condfail('kubectl',
-        f'--namespace {namespace} describe pod {pod}',cstdout=True, ignoreFail=True)
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} describe pod {pod}',
+                                                cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
     else:
@@ -302,18 +352,18 @@ def write_pod_description_and_container_logs(output, namespace, pod, maxloglines
 
     # Get logs for this pod's app and init containers
     pod_containers = _get_containers(namespace, pod)
-    app_container_logs = _get_container_logs(namespace, pod, pod_containers[0], maxloglines)
-    init_container_logs = _get_container_logs(namespace, pod, pod_containers[1], maxloglines)
+    app_container_logs = _get_container_logs(namespace, pod, pod_containers[0], max_log_lines)
+    init_container_logs = _get_container_logs(namespace, pod, pod_containers[1], max_log_lines)
 
     # Write pod description
-    poddesc_html = '''
+    pod_desc_html = '''
     <hr>
-    <h2><a id="{pod}">{pod}</a></h2>
+    <h2><a id="pod_{pod}">{pod}</a></h2>
     <h3>Pod Description:</a></h3>
     <pre>{get_output}</pre>
-    <p><a href="#toc">Back to Index</a></p>
-    '''.format(pod=pod,get_output=get_output)
-    output.write(poddesc_html)
+    <p><a href="#pod_list">Back to Pods List</a><br/><a href="#toc">Back to Index</a></p>
+    '''.format(pod=pod, get_output=get_output)
+    output.write(pod_desc_html)
 
     # Write the log for each app container
     for i, container in enumerate(pod_containers[0]):
@@ -321,8 +371,8 @@ def write_pod_description_and_container_logs(output, namespace, pod, maxloglines
         app_container_log_html = '''
         <h3>Logs for Container {container}:</h3>
         <pre>{log}</pre>
-        <p><a href="#toc">Back to Index</a></p>
-        '''.format(container=container,log=log)
+        <p><a href="#pod_list">Back to Pods List</a><br/><a href="#toc">Back to Index</a></p>
+        '''.format(container=container, log=log)
         output.write(app_container_log_html)
 
     # Write the log for each init container
@@ -331,31 +381,36 @@ def write_pod_description_and_container_logs(output, namespace, pod, maxloglines
         init_container_log_html = '''
         <h3>Logs for Init Container {container}:</h3>
         <pre>{log}</pre>
-        <p><a href="#toc">Back to Index</a></p>
-        '''.format(container=container,log=log)
+        <p><a href="#pod_list">Back to Pods List</a><br/><a href="#toc">Back to Index</a></p>
+        '''.format(container=container, log=log)
         output.write(init_container_log_html)
 
-def write_pvc_description(output, namespace, pvc):
-    # Get PVC description
-    success, get_output, _ = utils.run_condfail('kubectl',
-        f'--namespace {namespace} describe pvc {pvc}',cstdout=True, ignoreFail=True)
+
+def write_k_description(output, namespace, k_type, k_name):
+    # Get description
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} describe {k_type} {k_name}',
+                                                cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
     else:
-        get_output = 'Command to describe PVC failed<br/>'
+        get_output = f'Command to describe {k_type} failed<br/>'
 
-    # Write PVC description
-    pvcdesc_html = '''
+    # Write description
+    k_type_to_display = k_type
+    if k_type == 'sts':
+        k_type_to_display = 'Statefulset'
+    html = f'''
     <hr>
-    <h2><a id="{pvc}">{pvc}</a></h2>
-    <h3>PVC Description:</a></h3>
+    <h2><a id="{k_type}_{k_name}">{k_name}</a></h2>
+    <h3>{k_type_to_display.upper()} Description:</a></h3>
     <pre>{get_output}</pre>
-    <p><a href="#toc">Back to Index</a></p>
-    '''.format(pvc=pvc,get_output=get_output)
-    output.write(pvcdesc_html)
+    <p><a href="#{k_type}_list">Back to {k_type_to_display} List</a><br/><a href="#toc">Back to Index</a></p>
+    '''
+    output.write(html)
+
 
 def write_skaffold_config(output):
-    success, get_output, _ = utils.run_condfail('skaffold', f'config list',cstdout=True, ignoreFail=True)
+    success, get_output, _ = utils.run_condfail('skaffold', f'config list', cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
     else:
@@ -371,31 +426,34 @@ def write_skaffold_config(output):
     '''.format(get_output=get_output)
     output.write(skaffold_config_html)
 
+
 def write_storage_classes(output, namespace):
-    success, get_output, _ = utils.run_condfail('kubectl',
-        f'--namespace {namespace}, get storageclasses',cstdout=True, ignoreFail=True)
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace}, get storageclasses',
+                                                cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
     else:
         get_output = 'Command to get storage classes failed<br/>'
 
     # Write section
-    storageclasses_html = '''
+    storage_classes_html = '''
     <br>
     <h2><a id="storageclasses">Kubernetes Storage Classes</a></h2>
     <pre>{get_output}</pre>
     <p><a href="#toc">Back to Index</a></p>
     <br>
     '''.format(get_output=get_output)
-    output.write(storageclasses_html)
+    output.write(storage_classes_html)
+
 
 def write_sw_versions(output, container_engine):
     # Get third-party software versions
     awscli_vers = _get_awscli_version()
     azcli_vers = _get_azcli_version()
     container_engine_vers = _get_container_engine_version(container_engine)
-    eksctl_vers = _get_eksctl_version()
-    gcloud_vers= _get_gcloud_version()
+    # podman_vers = _get_container_engine_version("podman")
+    eksctl_vers = _get_eks_ctl_version()
+    gcloud_vers = _get_gcloud_version()
     kubectl_vers = _get_kubectl_version()
     kube_server_vers = _get_kube_server_version()
     kustomize_vers = _get_kustomize_version()
@@ -421,27 +479,34 @@ def write_sw_versions(output, container_engine):
     Skaffold: {skaffold_vers}</br>
     <p><a href="#toc">Back to Index</a></p>
     '''.format(awscli_vers=awscli_vers,
-        azcli_vers=azcli_vers,
-        container_engine=container_engine,
-        container_engine_vers=container_engine_vers,
-        eksctl_vers=eksctl_vers,
-        gcloud_vers=gcloud_vers,
-        kubectl_vers=kubectl_vers,
-        kube_server_vers=kube_server_vers,
-        kustomize_vers=kustomize_vers,
-        minikube_vers=minikube_vers,
-        python3_vers=python3_vers,
-        skaffold_vers=skaffold_vers)
+               azcli_vers=azcli_vers,
+               container_engine=container_engine,
+               container_engine_vers=container_engine_vers,
+               eksctl_vers=eksctl_vers,
+               gcloud_vers=gcloud_vers,
+               kubectl_vers=kubectl_vers,
+               kube_server_vers=kube_server_vers,
+               kustomize_vers=kustomize_vers,
+               minikube_vers=minikube_vers,
+               python3_vers=python3_vers,
+               skaffold_vers=skaffold_vers)
     output.write(sw_versions_html)
 
-def write_toc(output, pods, pvcs, objs, operators):
+
+def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
     # Build TOCs of pods, PVCs, and other objects
     pods_toc = ''
     for pod in pods:
-        pods_toc += f'<li><a href="#{pod}">{pod}</a></li>'
+        pods_toc += f'<li><a href="#pod_{pod}">{pod}</a></li>'
+    sts_toc = ''
+    for sts in stss:
+        sts_toc += f'<li><a href="#sts_{sts}">{sts}</a></li>'
     pvcs_toc = ''
     for pvc in pvcs:
-        pvcs_toc += f'<li><a href="#{pvc}">{pvc}</a></li>'
+        pvcs_toc += f'<li><a href="#pvc_{pvc}">{pvc}</a></li>'
+    jobs_toc = ''
+    for job in jobs:
+        jobs_toc += f'<li><a href="#job_{job}">{job}</a></li>'
     operators_toc = ''
     for operator in operators:
         operators_toc += f'<li><a href="#{operator[3]}">{operator[3]}</a></li>'
@@ -455,22 +520,53 @@ def write_toc(output, pods, pvcs, objs, operators):
     other_toc += f'<li><a href="#crds">CRDs</a></li>'
     other_toc += f'<li><a href="#storageclasses">Kubernetes storage classes</a></li>'
     other_toc += f'<li><a href="#skaffoldconfig">Skaffold configuration</a></li>'
-    other_toc += f'<li><a href="#git">forgeops repository Git log (most recent entries)</a></li>'
+    other_toc += f'<li><a href="#forgeops_branch">Forgeops branch name</a></li>'
+    other_toc += f'<li><a href="#git">Forgeops repository Git log (most recent entries)</a></li>'
 
     # Write TOC
-    toc_html = '''
+
+    # write directoryservice TOC only if directoryservice objects found
+    ds_srv_html = ''
+    if len(ds_srvs) > 0:
+        ds_srvs_toc = ''
+        for ds_srv in ds_srvs:
+            ds_srvs_toc += f'<li><a href="#directoryservice_{ds_srv}">{ds_srv}</a></li>'
+        ds_srv_html = f'''<h2>DirectoryService</h2>
+    <ul>
+        <li><a href="#directoryservice_list">DirectoryService (kubectl CLI output)</a></li>
+        <li>DirectoryService Descriptions</li>
+        <ul>
+        {ds_srvs_toc}
+        </ul>
+    </ul>
+'''
+
+    toc_html = f'''
     <h2><a id="toc">Environment Information</a></h2>
     <ul>
     {other_toc}
     </ul>
-    <h2>Pod Descriptions and Container Logs</h2>
+    <h2>Pods Information</h2>
     <ul>
-    {pods_toc}
+        <li><a href="#pod_list">Pods (kubectl CLI output)</a></li>
+        <li>Pod Descriptions and Container Logs</li>
+        <ul>
+        {pods_toc}
+        </ul>
+    </ul>
+    <h2>Statefulset Information</h2>
+    <ul>
+        <li><a href="#sts_list">Statefulset (kubectl CLI output)</a></li>
+        <li>Statefulset Descriptions</li>
+        <ul>
+        {sts_toc}
+        </ul>
     </ul>
     <h2>PVC Descriptions</h2>
     <ul>
     {pvcs_toc}
     </ul>
+    {ds_srv_html}
     <h2>Operator Logs</h2>
     <ul>
     {operators_toc}
@@ -479,22 +575,38 @@ def write_toc(output, pods, pvcs, objs, operators):
     <ul>
     {objects_toc}
     </ul>
+    <h2>Jobs Information</h2>
+    <ul>
+        <li><a href="#job_list">Jobs (kubectl CLI output)</a></li>
+        <li>Jobs Descriptions</li>
+        <ul>
+        {jobs_toc}
+        </ul>
+    </ul>
     <h2><a id="toc">Environment</a></h2>
     <ul>
     {other_toc}
     </ul>
-    '''.format(pods_toc=pods_toc,pvcs_toc=pvcs_toc,objects_toc=objects_toc,operators_toc=operators_toc,other_toc=other_toc)
+    '''
     output.write(toc_html)
+
 
 def main():
     # Parse input arguments
     parser = argparse.ArgumentParser(description='Aggregate pod logs and descriptions')
-    parser.add_argument('-m', '--max-log-lines', dest='maxloglines',
+    parser.add_argument('-m', '--max-log-lines', dest='max_log_lines',
                         help='Maximum lines to print from each container log (default: 400)')
     parser.add_argument('-n', '--namespace',
                         help='Target namespace (default: current namespace)')
+    parser.add_argument('-b', '--forgeops-branch', dest='forgeops_branch',
+                        help='Forgeops branch used to deploy the platform (e.g. release/7.4-20231204)')
     args = parser.parse_args()
-    maxloglines = args.maxloglines if getattr(args, 'maxloglines', None) else 400
+    max_log_lines = args.max_log_lines if getattr(args, 'max_log_lines', None) else 400
+    if getattr(args, 'forgeops_branch', None):
+        forgeops_branch = args.forgeops_branch
+    else:
+        forgeops_branch = input('Please provide the Forgeops branch used to deploy the platform '
+                                '(e.g. release/7.4-20231204) : ')
 
     # Get the namespace (either passed in as an arg, or set in the user's context)
     ctx_namespace = utils.get_namespace()
@@ -509,8 +621,11 @@ def main():
             ['secrets', 'Secrets (kubectl CLI output)', 'Secrets (YAML)']]
 
     # Get pod names and PVCs in lists
-    pods = get_pods(namespace)
-    pvcs = get_pvcs(namespace)
+    pods = get_names('pod', namespace)
+    stss = get_names('statefulset', namespace)
+    pvcs = get_names('pvc', namespace)
+    jobs = get_names('job', namespace)
+    ds_srvs = get_names('directoryservice', namespace)
 
     # Set container engine
     if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
@@ -526,7 +641,7 @@ def main():
 
         # Write the header and TOC
         write_header(output, namespace)
-        write_toc(output, pods, pvcs, objs, operators)
+        write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators)
 
         # Write diagnostics about the environment
         print('Writing environment information')
@@ -535,30 +650,69 @@ def main():
         write_crds(output)
         write_storage_classes(output, namespace)
         write_skaffold_config(output)
-        write_git_log(output)
+        write_forgeops_info(output, forgeops_branch)
 
         # Write pod descriptions and container logs
         print('Writing pod descriptions and container logs')
+        pods_title_html = '''
+        <hr>
+        <h2>Pods Information</h2>'''
+        output.write(pods_title_html)
+        write_k_list('pod', output, namespace)
         for pod in pods:
             print(f'  {pod}')
-            write_pod_description_and_container_logs(output, namespace, pod, int(maxloglines))
+            write_pod_description_and_container_logs(output, namespace, pod, int(max_log_lines))
+
+        # Write statefulset information
+        print('Writing statefulset information')
+        sts_title_html = '''
+        <hr>
+        <h2>Statefulset Information</h2>'''
+        output.write(sts_title_html)
+        write_k_list('sts', output, namespace)
+        for sts in stss:
+            print(f'  {sts}')
+            write_k_description(output, namespace, 'sts', sts)
 
         # Write PVC descriptions
         print('Writing PVC descriptions')
         for pvc in pvcs:
             print(f'  {pvc}')
-            write_pvc_description(output, namespace, pvc)
+            write_k_description(output, namespace, 'pvc', pvc)
+
+        # Write directoryservice only if directoryservice objects found
+        if len(ds_srvs) > 0:
+            print('Writing directoryservice information')
+            ds_srv_title_html = '''
+            <hr>
+            <h2>DirectoryService</h2>'''
+            output.write(ds_srv_title_html)
+            write_k_list('directoryservice', output, namespace)
+            for ds_srv in ds_srvs:
+                print(f'  {ds_srv}')
+                write_k_description(output, namespace, 'directoryservice', ds_srv)
 
         # Write operator logs
         print('Writing operator logs')
         for operator in operators:
             print(f'  {operator[3]}')
-            write_operator_logs(output, operator, int(maxloglines))
+            write_operator_logs(output, operator, int(max_log_lines))
 
         # Write special objects (CLI and YAML output)
         print('Writing information about various Kubernetes objects')
         for obj in objs:
             write_objects(output, namespace, obj)
+
+        # Write jobs information
+        print('Writing jobs information')
+        jobs_title_html = '''
+        <hr>
+        <h2>Jobs Information</h2>'''
+        output.write(jobs_title_html)
+        write_k_list('job', output, namespace)
+        for job in jobs:
+            print(f'  {job}')
+            write_k_description(output, namespace, 'job', job)
 
         # Finish up HTML
         ending_html = '''
@@ -569,6 +723,7 @@ def main():
 
     # Print message to user
     print(f'Open {output_file} in your browser.')
+
 
 if __name__ == "__main__":
     main()
