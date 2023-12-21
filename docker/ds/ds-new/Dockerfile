@@ -1,8 +1,3 @@
-# Mutable DS image used by the ds-operator
-#
-# This image is designed to run setup at runtime, not docker build time. It is a
-# fully "mutable", database like image - where all volatile data (including configuration and schema)
-# is on a PVC. This behaves like a traditonal VM
 FROM gcr.io/forgerock-io/ds-empty:7.2.4
 
 # FOR DEBUG. Remove for production deployment
