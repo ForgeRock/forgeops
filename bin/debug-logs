@@ -145,32 +145,12 @@ def _get_skaffold_version():
         return 'command to get Skaffold version failed'
 
 
-def get_pods(namespace):
-    success, get_pods_output, _ = utils.run_condfail('kubectl', f'get pods --namespace {namespace} '
-                                                                f'--output=jsonpath={{.items..metadata.name}}',
-                                                     cstdout=True, ignoreFail=True)
+def get_names(name, namespace):
+    success, get_output, _ = utils.run_condfail('kubectl', f'get {name} --namespace {namespace} '
+                                                           f'--output=jsonpath={{.items[*].metadata.name}}',
+                                                cstdout=True, ignoreFail=True)
     if success:
-        return get_pods_output.decode('utf-8').split()
-    else:
-        return []
-
-
-def get_statefulset(namespace):
-    success, get_sts_output, _ = utils.run_condfail('kubectl', f'get statefulset --namespace {namespace} '
-                                                               f'--output=jsonpath={{.items[*].metadata.name}}',
-                                                    cstdout=True, ignoreFail=True)
-    if success:
-        return get_sts_output.decode('utf-8').split()
-    else:
-        return []
-
-
-def get_pvcs(namespace):
-    success, get_pvc_output, _ = utils.run_condfail('kubectl', f'get pvc --namespace {namespace} '
-                                                               f'--output=jsonpath={{.items..metadata.name}}',
-                                                    cstdout=True, ignoreFail=True)
-    if success:
-        return get_pvc_output.decode('utf-8').split()
+        return get_output.decode('utf-8').split()
     else:
         return []
 
@@ -320,18 +300,8 @@ def write_operator_logs(output, operator, max_log_lines):
 
 
 def write_k_list(name, output, namespace):
-    if name == 'pod':
-        # Get pods list
-        success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get pod',
-                                                    cstdout=True, ignoreFail=True)
-    elif name == 'sts':
-        # Get statefulset list
-        success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get statefulset',
-                                                    cstdout=True, ignoreFail=True)
-    else:
-        print(f'Error : unknown name {name}')
-        sys.exit(1)
-
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get {name}',
+                                                cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8')
     else:
@@ -345,7 +315,11 @@ def write_k_list(name, output, namespace):
         num_column = 0
         for column in line.split():
             if num_line > 0 and num_column == 0:
-                column = f'<a href=#{name}_{column}>{column}</a>'
+                if name.endswith('s') and name != 'sts':
+                    anchor = f'{name[:-1]}_{column}'
+                else:
+                    anchor = f'{name}_{column}'
+                column = f'<a href=#{anchor}>{column}</a>'
             table_html.append(f'<td>{column}</td>')
             num_column += 1
         table_html.append('</tr>')
@@ -361,26 +335,6 @@ def write_k_list(name, output, namespace):
     <h2><a id="{name}_list">{name_to_display} (kubectl CLI output)</a></h2>
     {"".join(table_html)}
     <p><a href="#toc">Back to Index</a></p>'''
-    output.write(html)
-
-
-def write_sts_description(output, namespace, sts):
-    # Get pod description
-    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} describe sts {sts}',
-                                                cstdout=True, ignoreFail=True)
-    if success:
-        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
-    else:
-        get_output = 'Command to describe pod failed<br/>'
-
-    # Write sts description
-    html = '''
-    <hr>
-    <h2><a id="sts_{sts}">{sts}</a></h2>
-    <h3>Statefulset Description:</a></h3>
-    <pre>{get_output}</pre>
-    <p><a href="#sts_list">Back to Statefulset List</a><br/><a href="#toc">Back to Index</a></p>
-    '''.format(sts=sts, get_output=get_output)
     output.write(html)
 
 
@@ -429,25 +383,27 @@ def write_pod_description_and_container_logs(output, namespace, pod, max_log_lin
         output.write(init_container_log_html)
 
 
-def write_pvc_description(output, namespace, pvc):
-    # Get PVC description
-    success, get_output, _ = utils.run_condfail('kubectl',
-                                                f'--namespace {namespace} describe pvc {pvc}',
+def write_k_description(output, namespace, k_type, k_name):
+    # Get description
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} describe {k_type} {k_name}',
                                                 cstdout=True, ignoreFail=True)
     if success:
         get_output = get_output.decode('utf-8').replace('\n', '<br/>')
     else:
-        get_output = 'Command to describe PVC failed<br/>'
+        get_output = f'Command to describe {k_type} failed<br/>'
 
-    # Write PVC description
-    pvc_desc_html = '''
+    # Write description
+    k_type_to_display = k_type
+    if k_type == 'sts':
+        k_type_to_display = 'Statefulset'
+    html = f'''
     <hr>
-    <h2><a id="{pvc}">{pvc}</a></h2>
-    <h3>PVC Description:</a></h3>
+    <h2><a id="{k_type}_{k_name}">{k_name}</a></h2>
+    <h3>{k_type_to_display.upper()} Description:</a></h3>
     <pre>{get_output}</pre>
-    <p><a href="#toc">Back to Index</a></p>
-    '''.format(pvc=pvc, get_output=get_output)
-    output.write(pvc_desc_html)
+    <p><a href="#{k_type}_list">Back to {k_type_to_display} List</a><br/><a href="#toc">Back to Index</a></p>
+    '''
+    output.write(html)
 
 
 def write_skaffold_config(output):
@@ -534,7 +490,7 @@ def write_sw_versions(output, container_engine):
     output.write(sw_versions_html)
 
 
-def write_toc(output, pods, stss, pvcs, objs, operators):
+def write_toc(output, pods, stss, pvcs, jobs, objs, operators):
     # Build TOCs of pods, PVCs, and other objects
     pods_toc = ''
     for pod in pods:
@@ -544,7 +500,10 @@ def write_toc(output, pods, stss, pvcs, objs, operators):
         sts_toc += f'<li><a href="#sts_{sts}">{sts}</a></li>'
     pvcs_toc = ''
     for pvc in pvcs:
-        pvcs_toc += f'<li><a href="#{pvc}">{pvc}</a></li>'
+        pvcs_toc += f'<li><a href="#pvc_{pvc}">{pvc}</a></li>'
+    jobs_toc = ''
+    for job in jobs:
+        jobs_toc += f'<li><a href="#job_{job}">{job}</a></li>'
     operators_toc = ''
     for operator in operators:
         operators_toc += f'<li><a href="#{operator[3]}">{operator[3]}</a></li>'
@@ -594,11 +553,19 @@ def write_toc(output, pods, stss, pvcs, objs, operators):
     <ul>
     {objects_toc}
     </ul>
+    <h2>Jobs Information</h2>
+    <ul>
+        <li><a href="#job_list">Jobs (kubectl CLI output)</a></li>
+        <li>Jobs Descriptions</li>
+        <ul>
+        {jobs_toc}
+        </ul>
+    </ul>
     <h2><a id="toc">Environment</a></h2>
     <ul>
     {other_toc}
     </ul>
-    '''.format(pods_toc=pods_toc, sts_toc=sts_toc, pvcs_toc=pvcs_toc, objects_toc=objects_toc,
+    '''.format(pods_toc=pods_toc, sts_toc=sts_toc, pvcs_toc=pvcs_toc, jobs_toc=jobs_toc, objects_toc=objects_toc,
                operators_toc=operators_toc, other_toc=other_toc)
     output.write(toc_html)
 
@@ -626,9 +593,10 @@ def main():
             ['secrets', 'Secrets (kubectl CLI output)', 'Secrets (YAML)']]
 
     # Get pod names and PVCs in lists
-    pods = get_pods(namespace)
-    stss = get_statefulset(namespace)
-    pvcs = get_pvcs(namespace)
+    pods = get_names('pod', namespace)
+    stss = get_names('statefulset', namespace)
+    pvcs = get_names('pvc', namespace)
+    jobs = get_names('job', namespace)
 
     # Set container engine
     if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
@@ -644,7 +612,7 @@ def main():
 
         # Write the header and TOC
         write_header(output, namespace)
-        write_toc(output, pods, stss, pvcs, objs, operators)
+        write_toc(output, pods, stss, pvcs, jobs, objs, operators)
 
         # Write diagnostics about the environment
         print('Writing environment information')
@@ -675,13 +643,13 @@ def main():
         write_k_list('sts', output, namespace)
         for sts in stss:
             print(f'  {sts}')
-            write_sts_description(output, namespace, sts)
+            write_k_description(output, namespace, 'sts', sts)
 
         # Write PVC descriptions
         print('Writing PVC descriptions')
         for pvc in pvcs:
             print(f'  {pvc}')
-            write_pvc_description(output, namespace, pvc)
+            write_k_description(output, namespace, 'pvc', pvc)
 
         # Write operator logs
         print('Writing operator logs')
@@ -693,6 +661,17 @@ def main():
         print('Writing information about various Kubernetes objects')
         for obj in objs:
             write_objects(output, namespace, obj)
+
+        # Write jobs information
+        print('Writing jobs information')
+        jobs_title_html = '''
+        <hr>
+        <h2>Jobs Information</h2>'''
+        output.write(jobs_title_html)
+        write_k_list('job', output, namespace)
+        for job in jobs:
+            print(f'  {job}')
+            write_k_description(output, namespace, 'job', job)
 
         # Finish up HTML
         ending_html = '''
