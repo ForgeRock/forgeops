@@ -490,7 +490,7 @@ def write_sw_versions(output, container_engine):
     output.write(sw_versions_html)
 
 
-def write_toc(output, pods, stss, pvcs, jobs, objs, operators):
+def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
     # Build TOCs of pods, PVCs, and other objects
     pods_toc = ''
     for pod in pods:
@@ -520,7 +520,24 @@ def write_toc(output, pods, stss, pvcs, jobs, objs, operators):
     other_toc += f'<li><a href="#git">forgeops repository Git log (most recent entries)</a></li>'
 
     # Write TOC
-    toc_html = '''
+
+    # write directoryservice TOC only if directoryservice objects found
+    ds_srv_html = ''
+    if len(ds_srvs) > 0:
+        ds_srvs_toc = ''
+        for ds_srv in ds_srvs:
+            ds_srvs_toc += f'<li><a href="#directoryservice_{ds_srv}">{ds_srv}</a></li>'
+        ds_srv_html = f'''<h2>DirectoryService</h2>
+    <ul>
+        <li><a href="#directoryservice_list">DirectoryService (kubectl CLI output)</a></li>
+        <li>DirectoryService Descriptions</li>
+        <ul>
+        {ds_srvs_toc}
+        </ul>
+    </ul>
+'''
+
+    toc_html = f'''
     <h2><a id="toc">Environment Information</a></h2>
     <ul>
     {other_toc}
@@ -545,6 +562,7 @@ def write_toc(output, pods, stss, pvcs, jobs, objs, operators):
     <ul>
     {pvcs_toc}
     </ul>
+    {ds_srv_html}
     <h2>Operator Logs</h2>
     <ul>
     {operators_toc}
@@ -565,8 +583,7 @@ def write_toc(output, pods, stss, pvcs, jobs, objs, operators):
     <ul>
     {other_toc}
     </ul>
-    '''.format(pods_toc=pods_toc, sts_toc=sts_toc, pvcs_toc=pvcs_toc, jobs_toc=jobs_toc, objects_toc=objects_toc,
-               operators_toc=operators_toc, other_toc=other_toc)
+    '''
     output.write(toc_html)
 
 
@@ -597,6 +614,7 @@ def main():
     stss = get_names('statefulset', namespace)
     pvcs = get_names('pvc', namespace)
     jobs = get_names('job', namespace)
+    ds_srvs = get_names('directoryservice', namespace)
 
     # Set container engine
     if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
@@ -612,7 +630,7 @@ def main():
 
         # Write the header and TOC
         write_header(output, namespace)
-        write_toc(output, pods, stss, pvcs, jobs, objs, operators)
+        write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators)
 
         # Write diagnostics about the environment
         print('Writing environment information')
@@ -650,6 +668,18 @@ def main():
         for pvc in pvcs:
             print(f'  {pvc}')
             write_k_description(output, namespace, 'pvc', pvc)
+
+        # Write directoryservice only if directoryservice objects found
+        if len(ds_srvs) > 0:
+            print('Writing directoryservice information')
+            ds_srv_title_html = '''
+            <hr>
+            <h2>DirectoryService</h2>'''
+            output.write(ds_srv_title_html)
+            write_k_list('directoryservice', output, namespace)
+            for ds_srv in ds_srvs:
+                print(f'  {ds_srv}')
+                write_k_description(output, namespace, 'directoryservice', ds_srv)
 
         # Write operator logs
         print('Writing operator logs')
