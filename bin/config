@@ -27,6 +27,9 @@ HELP_EXPORT_CMD_SORT = """
 Sort configuration json alphanumerically. This will lead to a large initial
  diff but subsequent iterations should be smaller and more readable.
 """
+HELP_EXPORT_CMD_AM_NO_UPGRADE = """
+Do not run AM upgrader rules when exporting configuration.
+"""
 HELP_PATH_CMD_TOOL_NAME = """
 Directory of tool configuration files e.g. docker, kustomize
 """
@@ -263,7 +266,10 @@ def run_export(args):
                 export_ig(conf_path, pod_name)
             elif component_name == 'am':
                 export_am(conf_path, pod_name)
-                upgrade_am(conf_path)
+                if args.am_export_no_upgrade:
+                    log.debug('Skip AM upgrader rules')
+                else:
+                    upgrade_am(conf_path)
             log.info('Completed export')
         except IndexError:
             log.error('Unable to find running components.')
@@ -310,6 +316,9 @@ def main():
     export_cmd_parser.add_argument('--sort', '-s',
                                    help=HELP_EXPORT_CMD_SORT,
                                    action='store_true')
+    export_cmd_parser.add_argument('--no-upgrade', dest='am_export_no_upgrade',
+                                   help=HELP_EXPORT_CMD_AM_NO_UPGRADE,
+                                   action='store_true', default=False)
     export_cmd_parser.set_defaults(func=run_export)
 
     # path sub command
@@ -356,6 +365,9 @@ def main():
     parsed = parser.parse_args()
     global log
     log = utils.logger(level=parsed.log_level)
+    if parsed.cmd == 'export' and parsed.am_export_no_upgrade and not parsed.component == 'am':
+        log.error(f'--no-upgrade is only available for AM')
+        sys.exit(1)
     parsed.func(parsed)
 
 
