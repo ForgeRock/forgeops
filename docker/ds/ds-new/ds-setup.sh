@@ -25,13 +25,13 @@ set -eux
 rm -f template/config/tools.properties
 rm -rf -- README* bat *.zip *.png *.bat setup.sh
 
-deploymentKey=`./bin/dskeymgr create-deployment-key --deploymentKeyPassword password`
+deploymentId=`./bin/dskeymgr create-deployment-id --deploymentIdPassword password`
 
 ./setup --instancePath $DS_DATA_DIR \
         --serverId                docker \
         --hostname                localhost \
-        --deploymentKey           ${deploymentKey} \
-        --deploymentKeyPassword   password \
+        --deploymentId            ${deploymentId} \
+        --deploymentIdPassword    password \
         --rootUserPassword        password \
         --adminConnectorPort      4444 \
         --ldapPort                1389 \
