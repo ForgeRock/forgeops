@@ -1,11 +1,13 @@
-kind: ""
-apiversion: ""
-commonLabels:
-    app: gatling
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
 #namespace: smoke
 resources:
 - perf-test-job.yaml
 secretGenerator:
-- name: gcs-key
-  files:
-    - key.json
+- files:
+  - key.json
+  name: gcs-key
+labels:
+- includeSelectors: true
+  pairs:
+    app: gatling

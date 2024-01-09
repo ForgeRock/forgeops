@@ -1,16 +1,18 @@
-resources:
 # You either run this as a one shot job:
+resources:
 - ds-backup-job.yaml
 - ../backup-base
 - pvc.yaml
 
-commonLabels:
-  app: ds-backup
 
 # Choose one of the strategies below to backup the files. E.g. to gcs, s3, etc.
 # Add your own container here that backs up to the system of choice
-patchesStrategicMerge:
 # Patch with the gsutil job
-- gsutil.yaml
-# Pause just waits then exits. You could use kubectl cp to grab the files.
-# - pause.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+labels:
+- includeSelectors: true
+  pairs:
+    app: ds-backup
+patches:
+- path: gsutil.yaml

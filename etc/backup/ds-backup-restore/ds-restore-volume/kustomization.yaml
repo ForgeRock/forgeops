@@ -4,12 +4,15 @@ resources:
 - ds-restore-job.yaml
 - ../backup-base
 
-commonLabels:
-  app: ds-restore
 
 generatorOptions:
   disableNameSuffixHash: true
 
-patchesStrategicMerge:
-- gsutil.yaml
-
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+labels:
+- includeSelectors: true
+  pairs:
+    app: ds-restore
+patches:
+- path: gsutil.yaml

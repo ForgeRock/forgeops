@@ -1,11 +1,5 @@
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
-commonLabels:
-  app.kubernetes.io/component: ui
-  app.kubernetes.io/instance: admin-ui
-  app.kubernetes.io/name: admin-ui
-  app.kubernetes.io/part-of: forgerock
-  tier: ui
 resources:
 - deployment.yaml
 - service.yaml
@@ -13,3 +7,11 @@ images:
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui/docker-build
   newTag: 7.4.0-9c6cd57fe26b2b2ec5c2273f6a1c1f60704a31ab
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/component: ui
+    app.kubernetes.io/instance: admin-ui
+    app.kubernetes.io/name: admin-ui
+    app.kubernetes.io/part-of: forgerock
+    tier: ui

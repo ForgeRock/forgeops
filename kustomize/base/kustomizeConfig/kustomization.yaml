@@ -1,4 +1,3 @@
----
 kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 
@@ -6,12 +5,11 @@ configurations:
 - kustomizeConfig.yaml
 
 
-configMapGenerator:
-- name: platform-config
   # The env vars below can be passed into a pod using the envFrom pod spec.
   # These global variables can be used to parameterize your deployments.
   # The FQDN and URLs here should match your ingress definitions
-  literals:
+configMapGenerator:
+- literals:
   - FQDN=default.iam.example.com
   - AM_URL=/am
   - AM_ADMIN_URL=/am/ui-admin/
@@ -35,22 +33,23 @@ configMapGenerator:
   - DSBACKUP_HOSTS="ds-cts-0,ds-idrepo-0" # Name of the pods running the backup tasks. Ex: "ds-cts-0,ds-idrepo-0"
   - CERT_ISSUER="default-issuer" # cert manager issuer. Patch with letsencrypt-prod for LE SSL certs.
   - ENABLE_WORKFORCE="true" # Enables the platform-ui Workforce functionality. This is the supported UI mode going forwards.
+  name: platform-config
 
 generatorOptions:
   disableNameSuffixHash: true
 
 # The variables defined below can be referenced in resources using the syntax $(VARIABLE)
 vars:
-- name: FQDN
-  fieldref:
+- fieldref:
     fieldpath: data.FQDN
+  name: FQDN
   objref:
     apiVersion: v1
     kind: ConfigMap
     name: platform-config
-- name: CERT_ISSUER
-  fieldref:
+- fieldref:
     fieldpath: data.CERT_ISSUER
+  name: CERT_ISSUER
   objref:
     apiVersion: v1
     kind: ConfigMap

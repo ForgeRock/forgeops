@@ -1,7 +1,5 @@
 kind: Component
 apiVersion: kustomize.config.k8s.io/v1alpha1
-commonLabels:
-  app.kubernetes.io/part-of: forgerock
 images:
 - name: am
   newName: us-docker.pkg.dev/forgeops-public/images/am
@@ -26,3 +24,7 @@ images:
 - name: ig
   newName: us-docker.pkg.dev/forgeops-public/images/ig
   newTag: dev
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/part-of: forgerock

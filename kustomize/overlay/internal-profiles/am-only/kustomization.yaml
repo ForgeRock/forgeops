@@ -1,13 +1,15 @@
 # am-only profile used for PIT tests
 resources:
-  - ../../../base/kustomizeConfig
-  - ../../../base/am
-  - ../../../base/amster
-  - ../../../base/ds/cts
-  - ../../../base/ds/idrepo
-  - ../../../base/ldif-importer
-  - ingress.yaml
+- ../../../base/kustomizeConfig
+- ../../../base/am
+- ../../../base/amster
+- ../../../base/ds/cts
+- ../../../base/ds/idrepo
+- ../../../base/ldif-importer
+- ingress.yaml
 
 patches:
-  - path: base.yaml
-  - path: ds-idrepo-old.yaml
+- path: base.yaml
+- path: ds-idrepo-old.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
