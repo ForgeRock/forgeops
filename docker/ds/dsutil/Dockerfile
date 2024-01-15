@@ -1,6 +1,6 @@
 # Utility ds image for testing, benchmarking, etc.
 # Also useful as a general purpose debugging tool
-FROM gcr.io/forgerock-io/ds:7.2.1
+FROM gcr.io/forgerock-io/ds:7.2.4
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive

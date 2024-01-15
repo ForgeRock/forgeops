@@ -10,19 +10,19 @@ images:
   newTag: 7.2.1
 - name: ds
   newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: 7.2.1
+  newTag: 7.2.4
 - name: ds-cts
   newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: 7.2.1
+  newTag: 7.2.4
 - name: ds-idrepo
   newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: 7.2.1
+  newTag: 7.2.4
 - name: git-server
   newName: us-docker.pkg.dev/forgeops-public/images/git-server
 - name: idm
   newName: us-docker.pkg.dev/forgeops-public/images/idm
-  newTag: 7.2.1
+  newTag: 7.2.2
 - name: ig
   newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: 7.2.0
+  newTag: 2023.11.0
 kind: Component
