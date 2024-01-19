@@ -67,7 +67,7 @@ EOM
 delete() {
     echo "Deleting $CHART Helm chart."
     runOrPrint "helm uninstall $CHART --namespace $NAMESPACE || true"
-    exit 1
+    exit 0
 }
 
 # Defaults

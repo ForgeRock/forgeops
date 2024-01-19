@@ -85,7 +85,7 @@ delete() {
 
     # Delete monitoring namespace
     kubectl delete ns $NAMESPACE
-    exit 1
+    exit 0
 }
 
 # Output help if -h is included
