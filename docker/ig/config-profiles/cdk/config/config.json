@@ -39,25 +39,41 @@
       "config": {
           "url": "http://am/am",
           "realm": "/",
+          "secretsProvider": "amSecretsProvider",
           "agent": {
               "username": "ig-agent",
-              "password": "password"
+              "passwordSecretId": "agent.password"
           },
           "sessionCache": {
               "enabled": true
           }
       }
     },
-  {
-      "name": "ForgeRockClientHandler",
-      "type": "ClientHandler",
+    {
+        "name": "ForgeRockClientHandler",
+        "type": "ClientHandler",
+        "config": {
+            "trustManager": {
+                "type": "TrustAllManager"
+              }
+        },
+        "_capture": "all"
+    },
+    {
+      "type": "SecretsProvider",
+      "name": "amSecretsProvider",
       "config": {
-          "trustManager": {
-              "type": "TrustAllManager"
+        "stores": [{
+          "type": "Base64EncodedSecretStore",
+          "config": {
+            "_comment": "base64('password') = 'cGFzc3dvcmQ='",
+            "secrets": {
+              "agent.password": "cGFzc3dvcmQ="
             }
-      },
-      "_capture": "all"
-  }
+          }
+        }]
+      }
+    }
   ],
   "monitor": true
 }

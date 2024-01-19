@@ -19,7 +19,7 @@
             "realm": "OpenIG",
             "accessTokenResolver": {
               "name": "token-resolver-1",
-              "type": "OpenAmAccessTokenResolver",
+              "type": "TokenIntrospectionAccessTokenResolver",
               "config": {
                 "amService": "AmService-1"
               }
