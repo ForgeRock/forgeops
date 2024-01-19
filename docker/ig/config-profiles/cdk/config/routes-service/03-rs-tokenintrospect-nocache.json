@@ -1,7 +1,7 @@
 {
   "name": "03-rs-tokenintrospect",
   "monitor": false,
-  "condition": "${find(request.uri.path, '^/rs-tokenintrospect')}",
+  "condition": "${find(request.uri.path, '^/rs-tokenintrospect-nocache')}",
   "handler": {
     "type": "Chain",
     "config": {
@@ -38,9 +38,7 @@
                   }
                 },
                 "cache": {
-                  "enabled": true,
-                  "defaultTimeout": "1 hour",
-                  "maxTimeout": "1 day"
+                  "enabled": false
                 }
               }
             }
