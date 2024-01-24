@@ -161,3 +161,7 @@ spec:
       - name: am-logback
         configMap:
           name: am-logback
+      tolerations:
+        - key: kubernetes.io/arch
+          operator: Exists
+          effect: NoSchedule

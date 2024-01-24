@@ -20,6 +20,12 @@ spec:
     - http01:
         ingress:
           class: {{ .Values.platform.ingress.className }}
+          podTemplate:
+            spec:
+              tolerations:
+                - key: kubernetes.io/arch
+                  operator: Exists
+                  effect: NoSchedule
   {{- else }}
   selfSigned: {}
   {{- end }}

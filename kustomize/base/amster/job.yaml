@@ -74,3 +74,7 @@ spec:
       - name: export-files
         emptyDir:
           {}
+      tolerations:
+        - key: kubernetes.io/arch
+          operator: Exists
+          effect: NoSchedule

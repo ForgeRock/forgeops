@@ -48,6 +48,9 @@ spec:
         key: key
         operator: Equal
         value: directory
+      - key: kubernetes.io/arch
+        operator: Exists
+        effect: NoSchedule
       initContainers:
       - name: init
         command: ["/opt/opendj/default-scripts/init-and-restore.sh"]

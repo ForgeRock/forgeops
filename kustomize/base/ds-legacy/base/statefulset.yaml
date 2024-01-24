@@ -47,6 +47,9 @@ spec:
       tolerations:
       - key: "WorkerDedicatedDS"
         operator: "Exists"
+      - key: kubernetes.io/arch
+        operator: Exists
+        effect: NoSchedule
       initContainers:
       - name: initialize
         image: ds

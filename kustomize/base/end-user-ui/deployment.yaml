@@ -47,3 +47,7 @@ spec:
           preStop:
             exec:
               command: ["/usr/sbin/nginx", "-s", "quit"]
+      tolerations:
+        - key: kubernetes.io/arch
+          operator: Exists
+          effect: NoSchedule
