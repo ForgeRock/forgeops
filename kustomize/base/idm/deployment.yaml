@@ -166,4 +166,8 @@ spec:
       - name: idm-logging-properties
         configMap:
            name: idm-logging-properties
+      tolerations:
+        - key: kubernetes.io/arch
+          operator: Exists
+          effect: NoSchedule
 

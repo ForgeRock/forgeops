@@ -28,3 +28,7 @@ spec:
       - name: passwords
         secret:
           secretName: ds-passwords
+      tolerations:
+        - key: kubernetes.io/arch
+          operator: Exists
+          effect: NoSchedule
