@@ -690,7 +690,7 @@ ds_idrepo:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "7.4.0"
+    tag: "7.4.1"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -759,7 +759,7 @@ ds_cts:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "7.4.0"
+    tag: "7.4.1"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 

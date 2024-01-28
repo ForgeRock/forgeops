@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds:7.4.0
+FROM gcr.io/forgerock-io/ds:7.4.1
 
 USER root
 

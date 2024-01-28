@@ -136,6 +136,14 @@ group "base" {
   ]
 }
 
+group "ds-base" {
+  targets = [
+    "ds",
+    "ds-cts",
+    "ds-idrepo",
+  ]
+}
+
 group "base-extra" {
   targets = [
     "ds-proxy",
