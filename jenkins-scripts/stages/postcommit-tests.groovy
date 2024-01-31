@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2024 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -52,6 +52,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_platform_ui',
                         'Postcommit_set_images',
                         'Postcommit_fo_acceptance',
+                        'Postcommit_fo_smoke_small',
                         'Postcommit_fo_set_images',
                         'Postcommit_fo_dsbackup',
 //                         'Postcommit_fo_am_only',
@@ -323,6 +324,14 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('FO Acceptance',
                 {
                     commonModule.runGuillotine(pipelineRun, 'FO Acceptance', '--test-names Deployment.Acceptance')
+                }
+        )
+    }
+
+    if (params.Postcommit_fo_smoke_small) {
+        parallelTestsMap.put('FO Smoke on Small profile',
+                {
+                    commonModule.runGuillotine(pipelineRun, 'FO Smoke on Small profile', '--test-names Deployment.Smoke --forgeops-profile small')
                 }
         )
     }

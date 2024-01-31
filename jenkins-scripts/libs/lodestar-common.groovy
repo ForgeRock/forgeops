@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 ForgeRock AS. All Rights Reserved
+ * Copyright 2021-2024 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -71,6 +71,7 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_platform_ui', defaultValue: enabled),
         booleanParam(name: 'Postcommit_set_images', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_acceptance', defaultValue: enabled),
+        booleanParam(name: 'Postcommit_fo_smoke_small', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_set_images', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_dsbackup', defaultValue: enabled),
 //         booleanParam(name: 'Postcommit_fo_am_only', defaultValue: enabled),
