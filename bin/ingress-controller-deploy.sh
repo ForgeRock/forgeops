@@ -123,33 +123,33 @@ elif [ "$EKS" = true ] ; then
   echo "Deploying Ingress chart to EKS..."
   PROVIDER="eks"
 elif [ "$GKE" = true ] ; then
-  if [ -n "$IP" ] ; then
-    message "We were given an IP address" "debug"
-    [[ ! "$IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && usage 1 "Can't detect a valid IP address"
-    echo "IP: $IP"
-    IP_OPTS="--set controller.service.loadBalancerIP=${IP}"
-  fi
   echo "Deploying Ingress chart to GKE..."
   PROVIDER="gke"
 fi
-
 message "PROVIDER=$PROVIDER" "debug"
+
+if [ -n "$IP" ] ; then
+  message "We were given an IP address" "debug"
+  [[ ! "$IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] && usage 1 "Can't detect a valid IP address"
+  echo "IP: $IP"
+  IP_OPTS="--set controller.service.loadBalancerIP=${IP}"
+fi
 
 case $INGRESS in
   haproxy)
-    CHART=haproxy-ingress
+    CHART=kubernetes-ingress
     NAMESPACE=haproxy
-    REPO=https://haproxy-ingress.github.io/charts
-    REPO_NAME=haproxy-ingress
+    REPO=https://haproxytech.github.io/helm-charts
+    REPO_NAME=haproxytech
     INGRESS_CLASS_YAML=haproxy-ingressclass.yaml
-    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=0.13.9
+    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=1.36.1
     ;;
   nginx)
     CHART=ingress-nginx
     NAMESPACE=nginx
     REPO=https://kubernetes.github.io/ingress-nginx
     REPO_NAME=ingress-nginx
-    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=4.3.0
+    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=4.8.0
     ;;
   *)
     usage 1 "You must pick either haproxy or nginx as an ingress"
