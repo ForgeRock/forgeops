@@ -25,4 +25,4 @@ images:
   newTag: 7.3.0
 - name: ig
   newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: 2023.6.0
+  newTag: 2023.11.0
