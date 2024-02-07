@@ -683,6 +683,9 @@ ds_restore:
   backupLocation: ""
   # Name of hosts running the backups (e.g. ds-idrepo-2,ds-cts-2)
   backupHosts: ""
+  # Set the Disaster Recover to unique value when restoring from a previous backup
+  # This value must be changed in order to trigger the disaster recovery process on pod restart
+  disasterRecoveryId: "initial-restore"
 
 ds_idrepo:
   enabled: true

@@ -3,8 +3,28 @@
 # This is an internal script provided for debugging purposes only and is not supported by ForgeRock.
 
 usage() {
-  echo "Usage: $0 status|rstatus|disaster|idsearch|monitor|list-backups|purge [pod name]"
-  exit 1
+  echo "Usage: $0 [-p|--pod-name POD_NAME] SUB_COMMAND [SUB_COMMAND_OPTIONS]"
+  echo "Options:"
+  echo "  -p, --pod-name       Name of DS pod. Default is ${POD_NAME}"
+  echo "  SUB-COMMAND (run on DS pod) :"
+  echo "    status             Display basic server information"
+  echo "    rstatus            Check replication status"
+  echo "    idsearch           Run ldapsearch on ou=identities base dn"
+  echo "    monitor            Run ldapsearch on cn=monitor base dn"
+  echo "    list-backups       List backups stored in a cloud bucket"
+  echo "                       usage: $0 [-p|--pod-name POD_NAME] list-backups --backupLocation gs://BUCKET_PATH/POD_NAME"
+  echo "    purge              Remove backups older than 12h"
+  echo "                       usage: $0 [-p|--pod-name POD_NAME] purge --backupLocation gs://BUCKET_PATH/POD_NAME"
+  echo ""
+  echo "Note for list-backups and purge sub-commands :"
+  echo "  - limitation : work with Google Storage. Could be updated to work with AKS, EKS,... storages"
+  echo "  - DS pod must have Google Storage credentials file in ${POD_CREDENTIALS_FILE}"
+  echo ""
+  echo "Examples: $0 list-backups --backupLocation gs://my-bucket/ds-backup/project-1/site-1/ds-idrepo-0"
+  echo "          $0 purge --backupLocation gs://my-bucket/ds-backup/project-1/site-1/ds-idrepo-0"
+  echo "          $0 rstatus"
+  echo "          $0 -p ds-idrepo-0 rstatus -X"
+  exit 0
 }
 
 if [ "$#" -lt 1 ]; then
@@ -33,15 +53,6 @@ setArgs() {
   args="-w $pw -p $2"
 }
 
-disaster() {
-  echo "Running disaster recovery procedure to reset change log db for $*"
-  echo "Starting in 5 seconds. Kill this NOW if you dont want to lose your changelog!"
-  sleep 5
-  kcmd  dsrepl start-disaster-recovery -X $args $*
-  echo "About to run the end DR command..."
-  kcmd  dsrepl end-disaster-recovery -X  $args $*
-}
-
 kcmd() {
   echo $*
   kubectl exec $HOST -it -- $*
@@ -52,11 +63,6 @@ status)
   # Display basic server information
   setArgs dirmanager 4444
   kcmd status $args
-  ;;
-disaster)
-  # Run disaster recovery
-  setArgs dirmanager 4444
-  disaster $args
   ;;
 rstatus)
   # Check replication status
