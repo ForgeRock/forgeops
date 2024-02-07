@@ -40,5 +40,6 @@ data:
   AUTORESTORE_FROM_DSBACKUP: {{ .Values.ds_restore.autoRestore | quote }}
   DSBACKUP_DIRECTORY: {{ .Values.ds_restore.backupLocation | quote }}
   DSBACKUP_HOSTS: {{ .Values.ds_restore.backupHosts | quote }}
+  DISASTER_RECOVERY_ID: {{ .Values.ds_restore.disasterRecoveryId | quote }}
   CERT_ISSUER: default-issuer
 {{- end }}

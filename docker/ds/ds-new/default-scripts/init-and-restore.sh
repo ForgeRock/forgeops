@@ -19,6 +19,7 @@ fi
 # Initialize DS regardless of dsbackup restore settings
 /opt/opendj/docker-entrypoint.sh initialize-only;
 
+echo ""
 if [ -z "${AUTORESTORE_FROM_DSBACKUP}" ] || [ "${AUTORESTORE_FROM_DSBACKUP}" != "true" ]; then
     echo "AUTORESTORE_FROM_DSBACKUP is missing or not set to true. Skipping restore"
     exit 0
@@ -111,10 +112,22 @@ fi
 
 if [ ! -z "${BACKEND_NAMES}" ]; then
     echo "Verification completed."
+    echo
     echo "Restoring backups from: ${BACKUP_LOCATION}"
     echo "Restoring ${BACKEND_NAMES}"
     dsbackup restore --offline --noPropertiesFile --backupLocation ${BACKUP_LOCATION} ${EXTRA_PARAMS} ${BACKEND_NAMES}
-    echo "Restore operation complete"
+    echo "Restore operation completed."
+    echo
+    echo "Running disaster recovery with version: ${DISASTER_RECOVERY_ID}"
+    recovery_backends=(${BACKEND_NAMES})
+    for ((i = 0 ; i < ${#recovery_backends[@]} ; i+=2 )); do
+        basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${recovery_backends[$(($i+1))]} --property base-dn | awk '{print $2}')
+        for basedn in ${basedns}; do
+            echo "Running disaster recovery on basedn ${basedn} for backend ${recovery_backends[$(($i+1))]}"
+            dsrepl disaster-recovery --no-prompt --user-generated-id ${DISASTER_RECOVERY_ID} --baseDn "${basedn}"
+        done
+    done
+    echo "Disaster recovery completed."
 else
     echo "No Backup found in ${BACKUP_LOCATION}. There's nothing to restore"
 fi

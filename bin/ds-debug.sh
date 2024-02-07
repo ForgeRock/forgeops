@@ -12,7 +12,6 @@ usage() {
   echo "  SUB-COMMAND (run on DS pod) :"
   echo "    status             Display basic server information"
   echo "    rstatus            Check replication status"
-  echo "    disaster           Run disaster recovery"
   echo "    idsearch           Run ldapsearch on ou=identities base dn"
   echo "    monitor            Run ldapsearch on cn=monitor base dn"
   echo "    list-backups       List backups stored in a cloud bucket"
@@ -63,15 +62,6 @@ setArgs() {
   bind_args="-w $pw -p $2"
 }
 
-disaster() {
-  echo "Running disaster recovery procedure to reset change log db for $*"
-  echo "Starting in 5 seconds. Kill this NOW if you dont want to lose your changelog!"
-  sleep 5
-  kcmd dsrepl start-disaster-recovery "${*}"
-  echo "About to run the end DR command..."
-  kcmd dsrepl end-disaster-recovery "${*}"
-}
-
 kcmd() {
   echo "${*}"
   kubectl exec "${POD_NAME}" -it -- ${*}
@@ -92,11 +82,6 @@ status)
   # Display basic server information
   setArgs dirmanager 4444
   kcmd status "${bind_args}" "${cmd_options}"
-  ;;
-disaster)
-  # Run disaster recovery
-  setArgs dirmanager 4444
-  disaster "${bind_args}" "${cmd_options}"
   ;;
 rstatus)
   # Check replication status
