@@ -94,6 +94,8 @@ Collection<String> getPrProductCommitHashes() {
         }
     }
 
+    relatedCommits['forgeops'] = commonModule.FORGEOPS_GIT_COMMIT
+
     return relatedCommits
 }
 
