@@ -22,13 +22,13 @@ FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s')
 FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 FORGEOPS_GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
-/** Globally scoped git commit information for the Lodestar repo */
-LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
-
-String getLodestarCommit() {
-    return readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
-}
-LODESTAR_GIT_COMMIT = getLodestarCommit()
+/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
+lodestarFileContent = bitbucketUtils.readFileContent(
+        'cloud',
+        'platform-images',
+        isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME,
+        'lodestar.json').trim()
+LODESTAR_GIT_COMMIT = readJSON(text: lodestarFileContent)['gitCommit']
 
 /** Docker image metadata for individual ForgeRock products. */
 dockerImages = [

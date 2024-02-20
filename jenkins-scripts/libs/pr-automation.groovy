@@ -94,11 +94,6 @@ Collection<String> getPrProductCommitHashes() {
         }
     }
 
-    // Check changes to Lodestar
-    if (scmUtils.fileHasChangedComparedToBranch(env.CHANGE_TARGET, commonModule.LODESTAR_GIT_COMMIT_FILE)) {
-        relatedCommits['lodestar'] = LODESTAR_GIT_COMMIT
-    }
-
     return relatedCommits
 }
 
