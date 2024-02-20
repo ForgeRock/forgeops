@@ -1,12 +1,12 @@
 /*
- * Copyright 2023 ForgeRock AS. All Rights Reserved
+ * Copyright 2024 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
  * to such license between the licensee and ForgeRock AS.
  */
 //===============================================
-// functional-tests pipeline for ForgeOps
+// functional-tests-gke pipeline for ForgeOps
 //===============================================
 
 @Library([
@@ -34,7 +34,7 @@ node('gce-vm-forgeops-n1-standard-8') {
             currentBuild.result = 'ABORTED'
             error 'This pipeline does not currently support building from a tag'
         }
-        functionalTests = load("${stagesLocation}/functional-tests.groovy")
+        functionalTests = load("${stagesLocation}/functional-tests-gke.groovy")
     }
 
     initialSteps()

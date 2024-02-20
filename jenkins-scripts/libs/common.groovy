@@ -89,13 +89,19 @@ void buildImage(String directoryName, String imageName, String arguments) {
 
 }
 
-def authenticateGcloud() {
+def authenticateGke() {
     withCredentials([file(credentialsId: 'jenkins-guillotine-sa-key', variable: 'GC_KEY')]) {
         sh("gcloud auth activate-service-account --key-file=${env.GC_KEY} --project=engineering-devops")
     }
 }
 
-def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
+def authenticateEks() {
+    withCredentials([file(credentialsId: 'guillotineAWSKeyCSV', variable: 'EKS_KEY')]) {
+        sh("aws configure import --csv file://${env.EKS_KEY}")
+    }
+}
+
+def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName, options) {
     stage(stageName) {
         def normalizedStageName = normalizeStageName(stageName)
         withPipelineRun(pipelineRun, stageName, normalizedStageName) {
@@ -103,14 +109,24 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
                 dir('guillotine') {
 
-                    authenticateGcloud()
-
                     localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
                     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
 
-                    // Configure environment to make Guillotine works on GKE
-                    withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
-                        sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
+                    if (providerName == 'GKE'){
+                        authenticateGke()
+                        // Configure environment to make Guillotine works on GKE
+                        withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
+                            sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
+                        }
+                    }
+                    else if (providerName == 'EKS'){
+                        authenticateEks()
+                        // Configure environment to make Guillotine works on EKS
+                        sh("./configure.py env --eks-only")
+                    }
+                    else {
+                        echo("FAILURE : unknown providerName `${providerName}`")
+                        currentBuild.result = 'FAILURE'
                     }
 
                     // Configure Guillotine to run tests
