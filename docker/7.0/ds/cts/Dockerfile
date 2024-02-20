@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds:7.1.4
+FROM gcr.io/forgerock-io/ds:7.1.7
 USER root
 
 COPY debian-buster-sources.list /etc/apt/sources.list

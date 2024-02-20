@@ -4,7 +4,7 @@ resources:
 images:
 - name: amster
   newName: gcr.io/forgeops-public/amster
-  newTag: 7.1.0
+  newTag: 7.1.4
 
 # Remove the amster initContainer as that is only required for import/export jobs
 patchesJSON6902:

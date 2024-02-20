@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/amster:7.1.3
+FROM gcr.io/forgerock-io/amster:7.1.4
 
 USER root
 

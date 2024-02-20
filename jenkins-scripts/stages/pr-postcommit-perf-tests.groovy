@@ -26,16 +26,16 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
 
                     dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
-                            STASH_LODESTAR_BRANCH          : commonModule.LODESTAR_GIT_COMMIT,
-                            STASH_FORGEOPS_BRANCH          : commonModule.FORGEOPS_GIT_COMMIT,
-                            TEST_NAME                      : testName,
-                            DEPLOYMENT_NAME                : 'small',
-                            CLUSTER_DOMAIN                 : 'postcommit-dev-pr-all.engineeringpit.com',
-                            CLUSTER_NAMESPACE              : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
-                            COMPONENTS_LODESTABOX_IMAGE_TAG: commonModule.LODESTAR_GIT_COMMIT,
-                            COMPONENTS_LOCUST_IMAGE_TAG    : commonModule.LODESTAR_GIT_COMMIT,
-                            DO_RECORD_RESULT               : false,
-                            PIPELINE_NAME                  : 'FORGEOPS_POSTCOMMIT',
+                            STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
+                            STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
+                            TEST_NAME                       : testName,
+                            DEPLOYMENT_NAME                 : 'small',
+                            CLUSTER_DOMAIN                  : 'postcommit-dev-pr-all.engineeringpit.com',
+                            CLUSTER_NAMESPACE               : cloud_config.commonConfig()['CLUSTER_NAMESPACE'] + '-' + randomNumber,
+                            COMPONENTS_LODESTARBOX_IMAGE_TAG: commonModule.LODESTAR_GIT_COMMIT,
+                            COMPONENTS_LOCUST_IMAGE_TAG     : commonModule.LODESTAR_GIT_COMMIT,
+                            DO_RECORD_RESULT                : false,
+                            PIPELINE_NAME                   : 'FORGEOPS_POSTCOMMIT',
                         ]
 
                         withGKEPyrockNoStages(config)
