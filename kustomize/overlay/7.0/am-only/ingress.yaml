@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -18,14 +18,17 @@ metadata:
   name: forgerock
 spec:
   rules:
-  - host: $(FQDN)
-    http:
-      paths:
-      - backend:
-          serviceName: am
-          servicePort: 80
-        path: /am
+    - host: $(FQDN)
+      http:
+        paths:
+          - backend:
+              service:
+                name: am
+                port:
+                  number: 80
+            path: /am
+            pathType: Prefix
   tls:
-  - hosts:
-    - $(FQDN)
-    secretName: sslcert
+    - hosts:
+        - $(FQDN)
+      secretName: sslcert
