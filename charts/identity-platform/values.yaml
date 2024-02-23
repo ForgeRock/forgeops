@@ -32,9 +32,9 @@ platform:
       nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
       nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
       nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        add_header X-ForgeRock-TransactionId $req_id;
-        proxy_set_header X-ForgeRock-TransactionId $req_id;
+      # nginx.ingress.kubernetes.io/configuration-snippet: |
+      #   add_header X-ForgeRock-TransactionId $req_id;
+      #   proxy_set_header X-ForgeRock-TransactionId $req_id;
 
     hosts:
       - identity-platform.domain.local
