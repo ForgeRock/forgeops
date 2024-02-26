@@ -139,7 +139,6 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                     } catch (Exception exc) {
                         currentBuild.result = 'FAILURE'
                         println('Exception in main(): ' + exc.getMessage())
-                        throw exc
                     } finally {
                         if (fileExists('reports/latest')) {
                             dir('tmp_dir') {
