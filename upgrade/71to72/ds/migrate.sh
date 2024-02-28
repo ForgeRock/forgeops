@@ -153,7 +153,7 @@ patchOwnerRef() {
 
     uid=$($KUBECTL_CMD get directoryservice ds-idrepo -o jsonpath='{.metadata.uid}')
 
-    read -r -d '' stsPatch << EOM
+    ! read -r -d '' stsPatch << EOM
 [{
   "op": "add",
   "path": "/metadata/ownerReferences",
@@ -168,7 +168,7 @@ patchOwnerRef() {
 }]
 EOM
 
-    stsPatch=$(cat $stsPatch | tr '\n' ' ') # Remove newlines before using
+    stsPatch=$(echo $stsPatch | tr '\n' ' ') # Remove newlines before using
     runOrPrint "$KUBECTL_CMD patch statefulset ds-${1} --type='json' -p='$stsPatch'"
 }
 
