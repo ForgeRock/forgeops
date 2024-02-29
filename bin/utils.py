@@ -89,6 +89,10 @@ bundles = {
 	'base': ['base/kustomizeConfig', 'base/ingress'],
     'ds-operator': ['base/ds-idrepo', 'base/ds-cts'],
     'ds': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
+    'ds-idrepo': ['base/ds/idrepo', 'base/ldif-importer'],
+    'ds-cts': ['base/ds/cts', 'base/ldif-importer'],
+    'ds-idrepo-op': ['base/ds-idrepo'],
+    'ds-cts-op': ['base/ds-cts'],
     'ds-old': ['base/ds-legacy/idrepo', 'base/ds-legacy/cts', 'base/ldif-importer'],
     'apps': ['base/am', 'base/idm', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
@@ -394,9 +398,22 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
         log.debug('ds-operator requested.')
         if component == 'ds':
             component = 'ds-operator'
+        if component == 'ds-idrepo':
+            component = 'ds-idrepo-op'
+        if component == 'ds-cts':
+            component = 'ds-cts-op'
 
     log.debug('component = ' + component)
     components_to_install = bundles.get(component, [f'base/{component}'])
+
+    # Check components when installing ds-idrepo or ds-cts to ensure the correct components are installed
+    if operator and (component == "ds-idrepo" or component == "ds-cts"):
+        components_to_install = bundles.get(component, [f'base/{component}'])
+    elif not operator and (component == "ds-idrepo" or component == "ds-cts"):
+        components_to_install = bundles.get(component, [f'base/ds/{component}'])
+    else:
+        components_to_install = bundles.get(component, [f'base/{component}'])
+
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
         if callable(c):
@@ -476,7 +493,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
         else:
             if component in ['ds','ds-idrepo']:
                 run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-idrepo')
-            if component == ['ds','ds-cts']:
+            if component in ['ds','ds-cts']:
                 run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-cts')
 
     if component == "all":
