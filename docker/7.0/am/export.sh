@@ -3,14 +3,17 @@
 
 cd /home/forgerock/openam
 
-# Adds any new file so it shows up with git diff
-git add -N config
+cfgServiceDir="config/services/realm/root/configurationversionservice/1.0/globalconfig"
 
-# Get a list of files that have changed. Prune boot.json as we can ignore.
-git diff --name-only | grep -v boot.json  >/var/tmp/export-list
+# copy the configurationservice over so it can be exported and used by the am-config-upgrader
+mkdir -p ${cfgServiceDir}
+cp "/home/forgerock/cdk/${cfgServiceDir}/default.json" ${cfgServiceDir}
 
 # tar destination defaults to /home/forgerock/updated-config.tar
 # Pass `-` as the argument to output the tar stream to stdout. Use kubectl exec am-pod -- export.sh - > tar.out
+export.sh - > tar.out
 dest=${1:-"/home/forgerock/updated-config.tar"}
 
 tar -c --files-from=/var/tmp/export-list -f $dest
+
+tar --exclude boot.json -cf $dest config
