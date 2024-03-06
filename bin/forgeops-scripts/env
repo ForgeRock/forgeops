@@ -37,7 +37,7 @@ def writeYamlFile(data, file):
 def main():
     prog = 'forgeops-ng env'
 
-    parser = argparse.ArgumentParser(description='Manage a ForgeRock Identity Platform kustomize overlay',
+    parser = argparse.ArgumentParser(description='Manage a ForgeRock Identity Platform environment',
                                      prog=prog,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', '-d', dest='debug', action='store_true', help='Turn on debugging')
@@ -48,7 +48,7 @@ def main():
     parser.add_argument('--namespace', '-n', dest='namespace', help='Namespace to set in the overlay')
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--operator', '-o', dest='operator', action='store_true', help='Use ds-operator')
-    parser.add_argument('--overlay', '-l', dest='overlay', required=True, help='Overlay to manage (absolute or relative to kustomize/overlay')
+    parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
     parser.add_argument('--source', '-s', dest='source', help='Source overlay to copy. (absolute or relative to kustomize/overlay')
     parser.add_argument('--am-cpu', dest='am_cpu', help='Specify CPU setting for am pods')
@@ -66,8 +66,8 @@ def main():
     parser.add_argument('--idrepo-mem', dest='idrepo_mem', help='Specify memory setting for ds-idrepo pods')
     parser.add_argument('--idrepo-rep', dest='idrepo_rep', type=int, help='Specify replicas for ds-idrepo pods')
     parser.add_argument('--pull-policy', dest='pull_policy', help='Set policy for all platform images')
-    parser.add_argument('--no-helm', dest='no_helm', help="Don't create/manage helm values files")
-    parser.add_argument('--no-kustomize', dest='no_kustomize', help="Don't create/manage kustomize overlay")
+    parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage helm values files")
+    parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage kustomize overlay")
     parser.add_argument('--small', dest='size', action='store_const', const='small', help='A small sized deployment')
     parser.add_argument('--medium', dest='size', action='store_const', const='medium', help='A medium sized deployment')
     parser.add_argument('--large', dest='size', action='store_const', const='large', help='A large sized deployment')
@@ -128,8 +128,8 @@ def main():
 
     size = {}
     if args.size:
-        valuesPath = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
-        size = yaml.safe_load(open(valuesPath))
+        values_path = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
+        size = yaml.safe_load(open(values_path))
 
     if args.am_cpu or args.am_mem or args.am_rep or args.single:
         if 'am' not in size.keys():
@@ -277,10 +277,7 @@ def main():
     if not overlay_root.is_dir():
        utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
 
-    if Path(args.overlay).is_absolute():
-        overlay_path = Path(args.overlay)
-    else:
-        overlay_path = overlay_root / args.overlay
+    overlay_path = overlay_root / args.env_name
     if args.debug: print(f"overlay_path={overlay_path}")
 
     if Path(source).is_absolute():
@@ -447,7 +444,7 @@ To: {overlay_path}
             helm_path = Path(helm)
         else:
             helm_path = root_path / helm
-        helm_path = helm_path / overlay_path.name
+        helm_path = helm_path / args.env_name
         if args.debug: print(f"helm_path={helm_path}")
 
         values_file = helm_path / 'values.yaml'

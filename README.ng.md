@@ -132,7 +132,7 @@ apply to deploy those changes.
 ### Create an environment
 
 The first thing you do is use `forgeops-ng env` to create an environment. You
-need to provide an FQDN (--fqdn) and an environment name (--overlay).
+need to provide an FQDN (--fqdn) and an environment name (--env-name).
 
 Previously, we had t-shirt sized overlays called small, medium, and large. Now,
 we just have `kustomize-ng/overlay/default` which is a single instance overlay.
@@ -143,13 +143,13 @@ requested.
 So if we want a medium sized stage deployment with an FQDN of iam.example.com,
 we'd do this:
 
-`./bin/forgeops-ng env --fqdn iam.example.com --medium --overlay stage`
+`./bin/forgeops-ng env --fqdn iam.example.com --medium --env-name stage`
 
 We recommend creating a single-instance environment to go along with each
 actual environment. This allows you to use the single to develop your file
 based config, and build images with the config(s) for that environment.
 
-`./bin/forgeops-ng env --fqdn iam.example.com --overlay stage-single`
+`./bin/forgeops-ng env --fqdn iam.example.com --env-name stage-single`
 
 You will find the environments in `kustomize-ng/overlay/` and `helm/`.
 
@@ -162,11 +162,11 @@ For Kustomize, you have two options. Running `kubectl apply -k
 
 To apply the example from above, you'd do:
 
-`./bin/forgeops-ng apply --overlay stage`
+`./bin/forgeops-ng apply --env-name stage`
 
 or
 
-`./bin/forgeops-ng apply --overlay stage-single`
+`./bin/forgeops-ng apply --env-name stage-single`
 
 ### Build images for an environment
 
@@ -179,7 +179,7 @@ image-defaulter and values files for the targeted environment.
 If we want to build new am and idm images for our stage environment using the
 stage-cfg profile, we'd do this:
 
-`./bin/forgeops-ng build --overlay stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am idm`
+`./bin/forgeops-ng build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am idm`
 
 Once that is done, you'd apply the environment via Helm or Kustomize to deploy.
 
@@ -212,19 +212,19 @@ inside that script.
 
 As of 7.5, both Kustomize and Helm are supported by forgeops. Those of you that
 want to use the Helm chart, can use forgeops-ng to generate a values file per
-environment. Also, the `forgeops-ng build -l ENV` command will update the
-values file for the environment given just like it updates the
+environment. Also, the `forgeops-ng build --env-name ENV_NAME` command will
+update the values file for the environment given just like it updates the
 `image-defaulter` in the Kustomize overlay.
 
 The `values.yaml` file contains all of the values. The other files group the
 different values so that you may use them individually if you need or want to.
 
-The `forgeops-ng env --overlay test` command will create or update a folder in
+The `forgeops-ng env --env-name test` command will create or update a folder in
 /path/to/forgeops/helm/test with different values files.
 
 ```
 > cd $HOME/git/forgeops
-> ./bin/forgeops-ng env --overlay test --small -f test.example.com
+> ./bin/forgeops-ng env --env-name test --small -f test.example.com
 
     Creating new overlay
     From: /Users/myUser/git/forgeops/kustomize-ng/overlay/default
@@ -261,7 +261,7 @@ Kustomize path is absolute or relative to the repo root. It can be set with
 `forgeops-ng.conf`. (Default: `kustomize-ng`)
 
 Overlay path is relative to the kustomize path
-`/path/to/kustomize/overlay/OVERLAY`. It can be set with `--overlay` on
+`/path/to/kustomize/overlay/OVERLAY`. It can be set with `--env-name` on
 the command line or by setting `OVERLAY_PATH` in `forgeops-ng.conf`. It is a
 required flag except in apply where it defaults to demo for easy demos.
 
@@ -282,7 +282,7 @@ The build command still builds your application images with any customizations
 and configuration (am/idm). However, now you must provide the environment you
 are building for.
 
-`forgeops-ng build -l stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am`
+`forgeops-ng build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am`
 
 All of this still occurs in `/path/to/forgeops/docker`.
 
@@ -293,7 +293,7 @@ components, just one, or a few. By default, it will leave the PVCs and secrets
 around unless you tell it otherwise. Like build, the major change is that you
 need to specify the overlay to work on.
 
-`forgeops-ng delete -l stage`
+`forgeops-ng delete --env-name stage`
 
 #### env
 
@@ -324,26 +324,26 @@ size to use. However, you can also override specific values at the same time.
 For example, if you want to create a small deployment, but you want AM and IDM
 to use 3 replicas instead of 2, you can do this:
 
-`forgeops-ng env -l test -f test.example.com --small --am-rep 3 --idm-rep 3`
+`forgeops-ng env --env-name test --fqdn test.example.com --small --am-rep 3 --idm-rep 3`
 
 or you can create the environment, then update it:
 
 ```
-forgeops-ng env -l test -f test.example.com --small
-forgeops-ng env -l test --am-rep 3 --idm-rep 3
+forgeops-ng env --env-name test --fqdn test.example.com --small
+forgeops-ng env --env-name test --am-rep 3 --idm-rep 3
 ```
 
 If you don't specify a size, it will automatically create the env as a single
 instance deployment. If you do select a size, and want to convert that
 environment into a single instance deployment, you can use `--single-instance`.
 
-`forgeops-ng env -l test -f test.example.com --small --single-instance`
+`forgeops-ng env --env-name test --fqdn test.example.com --small --single-instance`
 
 or
 
 ```
-forgeops-ng env -l test -f test.example.com --small
-forgeops-ng env -l test --single-instance
+forgeops-ng env --env-name test --fqdn test.example.com --small
+forgeops-ng env --env-name test --single-instance
 ```
 
 This will set the mem, cpu, and disk to the small definition, but set the

@@ -16,7 +16,7 @@ cd $start_dir
 usage() {
   local usage_msg=$(cat<<EOM
 Usage:
-$PROG --overlay OVERLAY [OPTIONS] [<component> <component> ...]
+$PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
 
 Apply a ForgeRock Identity Platform kustomize overlay into a k8s namespace.
 This runs \`kubectl apply -k\` on an overlay dir.
@@ -33,12 +33,11 @@ OPTIONS:
   -a|--amster-retain <n>      : keep amster pod running for n seconds. (default: 10)
                                 add "infinity" to keep up indefinitely
   -c|--create-namespace       : create the namespace if it doesn't exist
+  -e|--env-name ENV_NAME      : Name of environment to apply (default: demo)
   -f|--fqdn FQDN[,FQDN]       : list of FQDNs to use when generating a fresh overlay
   -n|--namespace <ns>         : k8s namespace to install into
   -k|--kustomize PATH         : kustomize dir to use (default: kustomize)
                                 (full path or relative to forgeops root)
-  -l|--overlay PATH           : overlay to use (default: demo)
-                                (full path or relative to kustomize/overlay)
 
 Valid components:
   ${COMPONENTS_VALID[@]}
@@ -48,10 +47,10 @@ Examples:
   $PROG
 
   Use custom overlay:
-  $PROG -l my_overlay
+  $PROG -e my_overlay
 
   Do a dryrun:
-  $PROG --dryrun -l my_overlay
+  $PROG --dryrun -e my_overlay
 
 EOM
 )
@@ -92,20 +91,20 @@ fi
 
 # Create logic to check if platform-config and secrets are there if ds- is given
 
-if [ ! -d "$OVERLAY" ] ; then
-  echo "Overlay dir is missing, generating $OVERLAY"
+if [ ! -d "$OVERLAY_PATH" ] ; then
+  echo "Overlay directory is missing, generating $OVERLAY_PATH"
   GEN_OPTS=""
   [[ -n "$FQDN" ]] && GEN_OPTS+=" --fqdn ${FQDN}"
   [[ -n "$SIZE" ]] && GEN_OPTS+=" --${SIZE}"
-  runOrPrint $ROOT_PATH/bin/forgeops overlay -l $OVERLAY $GEN_OPTS
+  runOrPrint $ROOT_PATH/bin/forgeops overlay -l $OVERLAY_PATH $GEN_OPTS
 fi
 
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
   if [ "$c" == "all" ] ; then
-    c_path=$OVERLAY
+    c_path=$OVERLAY_PATH
   else
-    c_path=$OVERLAY/$c
+    c_path=$OVERLAY_PATH/$c
   fi
   [[ -d $c_path ]] && kube apply -k $c_path
 done

@@ -65,7 +65,7 @@ processArgs() {
   COMPONENTS=()
   CREATE_NAMESPACE=false
   DEP_SIZE=false
-  OVERLAY=demo
+  ENV_NAME=
   FORCE=false
   RESET=false
   SIZE=
@@ -83,8 +83,8 @@ processArgs() {
       -a|--amster-retain) AMSTER_RETAIN=$2 ; shift 2 ;;
       -b|--build-path) BUILD_PATH=$2 ; shift 2 ;;
       -c|--create-namespace) CREATE_NAMESPACE=true ; shift ;;
+      -e|--env-name) ENV_NAME=$2 ; shift 2 ;;
       -k|--kustomize) KUSTOMIZE_PATH=$2; shift 2 ;;
-      -l|--overlay) OVERLAY=$2 ; shift 2 ;;
       -n|--namespace) NAMESPACE=$2 ; shift 2 ;;
       -o|--operator) OPERATOR=true ; shift ;;
       -p|--config-profile) CONFIG_PROFILE=$2 ; shift 2 ;;
@@ -94,7 +94,6 @@ processArgs() {
       -y|--yes) SKIP_CONFIRM=true ; shift ;;
       --reset) RESET=true ; shift ;;
       --ds-snapshots) DS_SNAPSHOTS="$2" ; shift 2 ;;
-      --custom) OVERLAY=$2 ; shift 2 ; DEP_SIZE=true ;;
       --cdk) SIZE='cdk'; shift ;;
       --mini) SIZE='mini' ; shift ;;
       --small) SIZE='small' ; shift ;;
@@ -145,13 +144,13 @@ processArgs() {
   fi
   message "KUSTOMIZE_PATH=$KUSTOMIZE_PATH" "debug"
 
-  if [[ "$OVERLAY" =~ ^/ ]] ; then
-    message "Overlay is a full path: $OVERLAY" "debug"
-  else
-    message "Overlay is relative to $KUSTOMIZE_PATH/overlay: $OVERLAY" "debug"
-    OVERLAY=$KUSTOMIZE_PATH/overlay/$OVERLAY
+  if [ -z "$ENV_NAME" ] && [ "$PROG" =~ apply ] ; then
+    ENV_NAME=demo
+  elif [ -z "$ENV_NAME" ] ; then
+    usage 1 'An environment name (--env-name) is required.'
   fi
-  message "OVERLAY=$OVERLAY" "debug"
+  OVERLAY_PATH=$KUSTOMIZE_PATH/overlay/$ENV_NAME
+  message "OVERLAY_PATH=$OVERLAY_PATH" "debug"
 
   if [[ "$BUILD_PATH" =~ ^/ ]] ; then
     message "Build path is a full path: $BUILD_PATH" "debug"
@@ -214,11 +213,11 @@ checkComponents() {
 }
 
 validateOverlay() {
-  message "Starting validateOverlay() to validate $OVERLAY" "debug"
+  message "Starting validateOverlay() to validate $OVERLAY_PATH" "debug"
 
-  if [ ! -d "$OVERLAY/image-defaulter" ] ; then
+  if [ ! -d "$OVERLAY_PATH/image-defaulter" ] ; then
     cat <<- EOM
-    ERROR: Missing $OVERLAY/image-defaulter.
+    ERROR: Missing $OVERLAY_PATH/image-defaulter.
     Please copy an image-defaulter into place, or run the container build
     process against this overlay.
 EOM

@@ -16,30 +16,29 @@ cd $start_dir
 usage() {
   local usage_msg=$(cat<<EOM
 Usage:
-$PROG -l OVERLAY [OPTIONS] [<component> <component> ...]
+$PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
 
 Delete ForgeRock Identity Platform from a k8s namespace.
 
 OPTIONS:
-  -h|--help           : display usage and exit
-  --debug             : turn on debugging
-  --dryrun            : do a dry run
-  -v|--verbose        : be verbose
-  -f|--force          : delete all components + pvcs, secrets, volume snapshots
-  -n|--namespace      : k8s namespace to delete from
-  -l|--overlay        : overlay to use (default: single-instance)
-                        (full path or relative to kustomize/overlay)
-  -y|--yes            : skip delete confirmation
+  -h|--help               : display usage and exit
+  --debug                 : turn on debugging
+  --dryrun                : do a dry run
+  -v|--verbose            : be verbose
+  -e|--env-name ENV_NAME  : name of environment to target
+  -f|--force              : delete all components + pvcs, secrets, volume snapshots
+  -n|--namespace NS       : k8s namespace to delete from
+  -y|--yes                : skip delete confirmation
 
 Valid components:
   ${COMPONENTS_VALID[@]}
 
 Examples:
   Normal operation:
-  $PROG
+  $PROG -e my_overlay
 
   Do a dryrun:
-  $PROG --dryrun
+  $PROG -e my_overlay --dryrun
 
 EOM
 )
@@ -129,10 +128,10 @@ DELETE_PVCS=false
 DELETE_SNAPS=false
 DELETE_SECRETS=false
 
-if [ -d "$OVERLAY" ] ; then
-  message "Overlay exists: $OVERLAY" "debug"
+if [ -d "$OVERLAY_PATH" ] ; then
+  message "Overlay exists: $OVERLAY_PATH" "debug"
 else
-  usage 1 "Overlay dir doesn't exist: $OVERLAY"
+  usage 1 "Overlay dir doesn't exist: $OVERLAY_PATH"
 fi
 
 echo "Uninstalling component(s): ${COMPONENTS[@]} from namespace: $NAMESPACE"
@@ -177,7 +176,7 @@ for c in ${COMPONENTS[@]} ; do
     continue
   fi
 
-  kube delete --ignore-not-found=true -k $OVERLAY/$c
+  kube delete --ignore-not-found=true -k $OVERLAY_PATH/$c
 
   if [[ "$c" =~ ^ds- ]] ; then
     deletePvcs $c

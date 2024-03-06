@@ -16,7 +16,7 @@ cd $start_dir
 usage() {
   local usage_msg=$(cat<<EOM
 Usage:
-$PROG -l OVERLAY [OPTIONS] COMPONENT [COMPONENT]...
+$PROG --env-name ENV_NAME [OPTIONS] COMPONENT [COMPONENT]...
 
 Build container images for one or more ForgeRock components.
 
@@ -31,10 +31,9 @@ OPTIONS:
   --dryrun                      : do a dry run
   -v|--verbose                  : be verbose
   -b|--build-path <path>        : path to build dir (default: docker)
+  -e|--env-name ENV_NAME        : Name of environment to target
   -k|--kustomize                : path to kustomize dir (default: kustomize)
                                   (full path or relative to git root)
-  -l|--overlay OVERLAY          : overlay to use (default: cdk)
-                                  (full path or relative to kustomize/overlay)
   -p|--config-profile <profile> : name of the config profile to use
   -r|--push-to <registry>       : container registry to push built images to
   --reset                       : reset image-defaulter to git index
@@ -47,10 +46,10 @@ Deprecated Components:
 
 Examples:
   Normal operation:
-  $PROG -p prod -l prod am
+  $PROG -p prod -e prod am
 
   Do a dryrun:
-  $PROG -p prod -l prod --dryrun am
+  $PROG -p prod -e prod --dryrun am
 
 EOM
 )
@@ -68,10 +67,10 @@ processArgs $*
 checkComponents
 kubeInit
 
-if [ -d "$OVERLAY" ] ; then
+if [ -d "$OVERLAY_PATH" ] ; then
   message "Overlay exists: $OVERLAY" "debug"
 else
-  usage 1 "Overlay dir doesn't exist: $OVERLAY"
+  usage 1 "Overlay dir doesn't exist: $OVERLAY_PATH"
 fi
 
 CONTAINER_ENGINE=${CONTAINER_ENGINE:-docker}
@@ -85,7 +84,7 @@ fi
 
 if [ "$RESET" = true ] ; then
   echo "Reset to git index: $BUILD_PATH/image-defaulter"
-  runOrPrint git restore $OVERLAY/image-defaulter
+  runOrPrint git restore $OVERLAY_PATH/image-defaulter
   exit 0
 fi
 
@@ -128,5 +127,5 @@ for c in ${COMPONENTS[@]} ; do
     runOrPrint $CONTAINER_ENGINE push $IMAGE
   fi
 
-  kube kustomize edit set image name=$IMAGE $OVERLAY/image-defaulter
+  kube kustomize edit set image name=$IMAGE $OVERLAY_PATH/image-defaulter
 done
