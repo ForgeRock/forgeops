@@ -52,7 +52,7 @@ processArgs() {
   DRYRUN=false
   VERBOSE=false
 
-  # Vars that can be set in /path/to/forgeops/forgeops-ng.cfg
+  # Vars that can be set in /path/to/forgeops/forgeops-ng.conf
   BUILD_PATH=${BUILD_PATH:-docker}
   KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize}
   NO_HELM=${NO_HELM:-false}
@@ -60,7 +60,7 @@ processArgs() {
   OPERATOR=${OPERATOR:-false}
   PUSH_TO=${PUSH_TO:-}
 
-  # Vars that cannot be set in /path/to/forgeops/forgeops-ng.cfg
+  # Vars that cannot be set in /path/to/forgeops/forgeops-ng.conf
   AMSTER_RETAIN=10
   COMPONENTS=()
   CREATE_NAMESPACE=false

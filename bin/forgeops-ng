@@ -98,7 +98,7 @@ else
   shift
 fi
 
-FORGEOPS_CFG="$SCRIPT_DIR/../forgeops-ng.cfg"
+FORGEOPS_CFG="$SCRIPT_DIR/../forgeops-ng.conf"
 if [ -f "$FORGEOPS_CFG" ] ; then
   set -a
   source $FORGEOPS_CFG

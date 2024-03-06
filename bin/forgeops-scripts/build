@@ -23,7 +23,7 @@ Build container images for one or more ForgeRock components.
 Notes:
   * building amster images is not supported, use bin/amster
   * Only ${COMPONENTS_FBC[*]} respect --config-profile
-  * You must use --push-to or set PUSH_TO in your environment/forgeops.cfg
+  * You must use --push-to or set PUSH_TO in your environment/forgeops-ng.conf
 
 OPTIONS:
   -h|--help                     : display usage and exit

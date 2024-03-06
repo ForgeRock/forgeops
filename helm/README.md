@@ -28,4 +28,4 @@ helm install -f helm/stage/values.yaml ./charts/identity-platform
 
 By default, the env command outputs values files and a kustomize overlay. If
 you don't want it to output a kustomize overlay, set `NO_KUSTOMIZE=true` in
-`/path/to/forgeops/forgeops-ng.cfg`.
+`/path/to/forgeops/forgeops-ng.conf`.

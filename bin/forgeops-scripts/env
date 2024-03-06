@@ -88,7 +88,7 @@ def main():
     if args.single and (args.am_rep or args.idm_rep or args.cts_rep or args.idrepo_rep):
         utils.exit_msg('--single-instance is incompatible with *_rep options')
 
-    # Setup defaults for values that can be set in forgeops.cfg
+    # Setup defaults for values that can be set in forgeops-ng.conf
     helm = 'helm'
     if args.helm:
         helm = args.helm
@@ -304,12 +304,17 @@ def main():
             utils.exit_msg('An FQDN is required when generating a new overlay')
         else:
             msg = f"""
-    Creating new overlay
-    From: {sourcePath}
-    To: {overlayPath}
-    """
+Creating new overlay
+From: {sourcePath}
+To: {overlayPath}
+"""
             print(msg)
-            shutil.copytree(sourcePath, overlayPath)
+            if sourcePath.is_dir():
+                shutil.copytree(sourcePath, overlayPath)
+            elif sourcePath.is_file():
+                utils.exit_msg(f"Source overlay isn't a directory: {sourcePath")
+            else:
+                utils.exit_msg(f"Source overlay doesn't exist: {sourcePath}")
 
         for d in overlayPath.iterdir():
             if args.debug: print(f"d={d}")
