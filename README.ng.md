@@ -251,18 +251,18 @@ By default, forgeops-ng uses the docker, kustomize-ng, and helm directories
 that exist in the forgeops repository. However, you can setup your own
 locations separately, and tell forgeops-ng to use them. You can do this with
 flags on the command line, or you can set the appropriate environment variable
-in `/path/to/forgeops/forgeops-ng.cfg`. You'll notice this is how we are
+in `/path/to/forgeops/forgeops-ng.conf`. You'll notice this is how we are
 telling forgeops-ng to use `kustomize-ng` as its kustomize dir.
 
 The paths can be relative or absolute.
 
 Kustomize path is absolute or relative to the repo root. It can be set with
 `--kustomzie` on the command line, or by setting `KUSTOMIZE_PATH` in
-`forgeops-ng.cfg`. (Default: `kustomize-ng`)
+`forgeops-ng.conf`. (Default: `kustomize-ng`)
 
 Overlay path is relative to the kustomize path
 `/path/to/kustomize/overlay/OVERLAY`. It can be set with `--overlay` on
-the command line or by setting `OVERLAY_PATH` in `forgeops-ng.cfg`. It is a
+the command line or by setting `OVERLAY_PATH` in `forgeops-ng.conf`. It is a
 required flag except in apply where it defaults to demo for easy demos.
 
 Build path is absolute, or relative to the repo root. You can set it with `

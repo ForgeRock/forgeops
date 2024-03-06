@@ -77,10 +77,10 @@ def main():
 
     args = parser.parse_args()
 
-    scriptPath = Path(__file__).parent
-    if args.debug: print(f'scriptPath = {scriptPath}')
-    rootPath = scriptPath.parent.parent
-    if args.debug: print(f'rootPath = {rootPath}')
+    script_path = Path(__file__).parent
+    if args.debug: print(f'script_path = {script_path}')
+    root_path = script_path.parent.parent
+    if args.debug: print(f'root_path = {root_path}')
 
     if args.namespace and args.no_namespace:
         utils.exit_msg('Specify --namespace or --no-namespace, not both')
@@ -128,7 +128,7 @@ def main():
 
     size = {}
     if args.size:
-        valuesPath = rootPath / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
+        valuesPath = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
         size = yaml.safe_load(open(valuesPath))
 
     if args.am_cpu or args.am_mem or args.am_rep or args.single:
@@ -221,11 +221,11 @@ def main():
         if args.single:
             size['ds_idrepo']['replicaCount'] = 1
 
-    valuesIngress = {}
+    values_ingress = {}
     if args.fqdn:
         hosts = args.fqdn.split(',')
         if args.debug: print(f"hosts={hosts}")
-        valuesIngress = {
+        values_ingress = {
             'platform': {
                 'ingress': {
                     'hosts': hosts
@@ -234,13 +234,13 @@ def main():
         }
 
     if args.ingress:
-        if 'platform' not in valuesIngress.keys():
-           valuesIngress['platform'] = { 'ingress': {} }
-        valuesIngress['platform']['ingress']['className'] = args.ingress
+        if 'platform' not in values_ingress.keys():
+           values_ingress['platform'] = { 'ingress': {} }
+        values_ingress['platform']['ingress']['className'] = args.ingress
 
-    valuesImages = {}
+    values_images = {}
     if pull_policy:
-        valuesImages = {
+        values_images = {
             'am': { 'image': {} },
             'amster': { 'image': {} },
             'ds_cts': { 'image': {} },
@@ -253,70 +253,70 @@ def main():
             'end_user_ui': { 'image': {} },
             'login_ui': { 'image': {} },
         }
-        valuesImages['am']['image']['pullPolicy'] = pull_policy
-        valuesImages['amster']['image']['pullPolicy'] = pull_policy
-        valuesImages['ds_cts']['image']['pullPolicy'] = pull_policy
-        valuesImages['ds_idrepo']['image']['pullPolicy'] = pull_policy
-        valuesImages['idm']['image']['pullPolicy'] = pull_policy
-        valuesImages['ldif_importer']['image']['pullPolicy'] = pull_policy
-        valuesImages['admin_ui']['image']['pullPolicy'] = pull_policy
-        valuesImages['end_user_ui']['image']['pullPolicy'] = pull_policy
-        valuesImages['login_ui']['image']['pullPolicy'] = pull_policy
-        valuesImages['ig']['image']['pullPolicy'] = pull_policy
-        valuesImages['ds_snapshot']['image']['pullPolicy'] = pull_policy
+        values_images['am']['image']['pullPolicy'] = pull_policy
+        values_images['amster']['image']['pullPolicy'] = pull_policy
+        values_images['ds_cts']['image']['pullPolicy'] = pull_policy
+        values_images['ds_idrepo']['image']['pullPolicy'] = pull_policy
+        values_images['idm']['image']['pullPolicy'] = pull_policy
+        values_images['ldif_importer']['image']['pullPolicy'] = pull_policy
+        values_images['admin_ui']['image']['pullPolicy'] = pull_policy
+        values_images['end_user_ui']['image']['pullPolicy'] = pull_policy
+        values_images['login_ui']['image']['pullPolicy'] = pull_policy
+        values_images['ig']['image']['pullPolicy'] = pull_policy
+        values_images['ds_snapshot']['image']['pullPolicy'] = pull_policy
 
     if Path(kustomize).is_absolute():
-        kustomizePath = Path(kustomize)
+        kustomize_path = Path(kustomize)
     else:
-        kustomizePath = rootPath / kustomize
-    if args.debug: print(f"kustomizePath={kustomizePath}")
-    if not kustomizePath.is_dir():
-       utils.exit_msg(f"Kustomize dir ({kustomizePath}) isn't a dir or doesn't exist")
+        kustomize_path = root_path / kustomize
+    if args.debug: print(f"kustomize_path={kustomize_path}")
+    if not kustomize_path.is_dir():
+       utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
 
-    overlayRoot = kustomizePath / 'overlay'
-    if not overlayRoot.is_dir():
-       utils.exit_msg(f"Overlay root ({overlayRoot}) isn't a dir or doesn't exist")
+    overlay_root = kustomize_path / 'overlay'
+    if not overlay_root.is_dir():
+       utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
 
     if Path(args.overlay).is_absolute():
-        overlayPath = Path(args.overlay)
+        overlay_path = Path(args.overlay)
     else:
-        overlayPath = overlayRoot / args.overlay
-    if args.debug: print(f"overlayPath={overlayPath}")
+        overlay_path = overlay_root / args.overlay
+    if args.debug: print(f"overlay_path={overlay_path}")
 
     if Path(source).is_absolute():
-        sourcePath = Path(source)
+        source_path = Path(source)
     else:
-        sourcePath = overlayRoot / source
-    if args.debug: print(f"sourcePath={sourcePath}")
+        source_path = overlay_root / source
+    if args.debug: print(f"source_path={source_path}")
 
-    logAction = 'Create'
+    log_action = 'Create'
 
     ###
     ### Configure kustomize overlay
     ###
     if do_kustomize:
-        if overlayPath.is_dir():
+        if overlay_path.is_dir():
             print('Updating existing overlay.')
-            logAction = 'Update'
-        elif overlayPath.is_file():
+            log_action = 'Update'
+        elif overlay_path.is_file():
             utils.exit_msg('Overlay exists as a file. Remove it and try again')
         elif not args.fqdn:
             utils.exit_msg('An FQDN is required when generating a new overlay')
         else:
             msg = f"""
 Creating new overlay
-From: {sourcePath}
-To: {overlayPath}
+From: {source_path}
+To: {overlay_path}
 """
             print(msg)
-            if sourcePath.is_dir():
-                shutil.copytree(sourcePath, overlayPath)
-            elif sourcePath.is_file():
-                utils.exit_msg(f"Source overlay isn't a directory: {sourcePath")
+            if source_path.is_dir():
+                shutil.copytree(source_path, overlay_path)
+            elif source_path.is_file():
+                utils.exit_msg(f"Source overlay isn't a directory: {source_path}")
             else:
-                utils.exit_msg(f"Source overlay doesn't exist: {sourcePath}")
+                utils.exit_msg(f"Source overlay doesn't exist: {source_path}")
 
-        for d in overlayPath.iterdir():
+        for d in overlay_path.iterdir():
             if args.debug: print(f"d={d}")
 
             if d.is_file():
@@ -336,18 +336,18 @@ To: {overlayPath}
                     shutil.rmtree(d)
                     continue
 
-                resFile = 'directoryservice.yaml' if operator else 'sts.yaml'
+                res_file = 'directoryservice.yaml' if operator else 'sts.yaml'
                 if 'op' in skey:
                     skey = skey.removesuffix('_op')
             else:
-                resFile = 'deployment.yaml'
+                res_file = 'deployment.yaml'
 
-            kustPath = d / 'kustomization.yaml'
-            if args.debug: print(f"kustPath={kustPath}")
+            kust_path = d / 'kustomization.yaml'
+            if args.debug: print(f"kust_path={kust_path}")
 
-            if kustPath.is_file():
-                if args.debug: print(f"{kustPath} exists")
-                kust = yaml.safe_load(open(kustPath))
+            if kust_path.is_file():
+                if args.debug: print(f"{kust_path} exists")
+                kust = yaml.safe_load(open(kust_path))
                 if args.namespace:
                     if args.debug: print(f"Setting namespace for {skey}")
                     kust['namespace'] = args.namespace
@@ -356,15 +356,15 @@ To: {overlayPath}
                     if 'namespace' in kust.keys():
                         del kust['namespace']
 
-                writeYamlFile(kust, kustPath)
+                writeYamlFile(kust, kust_path)
 
-            ingressPath = d / 'ingress-fqdn.yaml'
-            if args.debug: print(f"ingressPath={ingressPath}")
+            ingress_path = d / 'ingress-fqdn.yaml'
+            if args.debug: print(f"ingress_path={ingress_path}")
 
-            if ingressPath.is_file():
-                if args.debug: print(f"{ingressPath} exists")
-                ingressClassFound = False
-                ing = yaml.safe_load(open(ingressPath))
+            if ingress_path.is_file():
+                if args.debug: print(f"{ingress_path} exists")
+                ingress_class_found = False
+                ing = yaml.safe_load(open(ingress_path))
                 for idx, item in enumerate(ing):
                     if args.fqdn:
                         if 'secretName' in item['path'] or item['path'] == '/spec/rules/0/host':
@@ -373,24 +373,24 @@ To: {overlayPath}
                             ing[idx]['value'] = hosts
                     if args.ingress:
                         if 'ingressClassName' in item['path']:
-                            ingressClassFound = True
+                            ingress_class_found = True
                             ing[idx]['value'] = args.ingress
 
-                if args.ingress and not ingressClassFound:
+                if args.ingress and not ingress_class_found:
                     ing.append({
                         'op': 'replace',
                         'path': '/spec/ingressClassName',
                         'value': args.ingress
                     })
 
-                writeYamlFile(ing, ingressPath)
+                writeYamlFile(ing, ingress_path)
 
-            platformConfig = d / 'platform-config.yaml'
-            if args.debug: print(f"platformConfig={platformConfig}")
+            platform_config = d / 'platform-config.yaml'
+            if args.debug: print(f"platform_config={platform_config}")
 
-            if skey == 'base' and platformConfig.is_file():
-                if args.debug: print(f"{platformConfig} exists")
-                pc = yaml.safe_load(open(platformConfig))
+            if skey == 'base' and platform_config.is_file():
+                if args.debug: print(f"{platform_config} exists")
+                pc = yaml.safe_load(open(platform_config))
                 if args.fqdn:
                     pc['data']['FQDN'] = hosts[0]
 
@@ -404,14 +404,14 @@ To: {overlayPath}
                         pc['data']['AM_STORES_USER_SERVERS'] = genDsConnection(
                             name='ds-idrepo', num=size['ds_idrepo']['replicaCount'])
 
-                writeYamlFile(pc, platformConfig)
+                writeYamlFile(pc, platform_config)
 
-            resPath = d / resFile
-            if args.debug: print(f"resPath={resPath}")
+            res_path = d / res_file
+            if args.debug: print(f"res_path={res_path}")
 
-            if resPath.is_file():
-                if args.debug: print(f"{resPath} exists")
-                res = yaml.safe_load(open(resPath))
+            if res_path.is_file():
+                if args.debug: print(f"{res_path} exists")
+                res = yaml.safe_load(open(res_path))
 
                 if skey in size.keys():
                     if 'resources' in size[skey].keys():
@@ -437,82 +437,82 @@ To: {overlayPath}
                         if isDS:
                             res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = pull_policy
 
-                writeYamlFile(res, resPath)
+                writeYamlFile(res, res_path)
 
     ###
     ### Setup helm values files
     ###
     if do_helm:
         if Path(helm).is_absolute():
-            helmPath = Path(helm)
+            helm_path = Path(helm)
         else:
-            helmPath = rootPath / helm
-        helmPath = helmPath / overlayPath.name
-        if args.debug: print(f"helmPath={helmPath}")
+            helm_path = root_path / helm
+        helm_path = helm_path / overlay_path.name
+        if args.debug: print(f"helm_path={helm_path}")
 
-        valuesFile = helmPath / 'values.yaml'
-        if args.debug: print(f"valuesFile={valuesFile}")
-        if helmPath.is_dir():
-            if valuesFile.is_file():
+        values_file = helm_path / 'values.yaml'
+        if args.debug: print(f"values_file={values_file}")
+        if helm_path.is_dir():
+            if values_file.is_file():
                 print('Updating existing helm values.')
-                logAction = 'Update'
+                log_action = 'Update'
             else:
                 print('Helm environment dir exists, but has no values.yaml.')
-                logAction = 'Create'
-        elif helmPath.is_file():
+                log_action = 'Create'
+        elif helm_path.is_file():
             utils.exit_msg('Helm path exists as a file. Remove it and try again.')
         else:
-            print(f'{helmPath} not found, creating.')
-            helmPath.mkdir(mode=0o750, parents=True)
-            logAction = 'Create'
+            print(f'{helm_path} not found, creating.')
+            helm_path.mkdir(mode=0o750, parents=True)
+            log_action = 'Create'
 
-        valuesSizeFile = helmPath / 'values-size.yaml'
-        if args.debug: print(f"valuesSizeFile={valuesSizeFile}")
-        vS = {}
-        if valuesSizeFile.is_file():
-            vS = yaml.safe_load(open(valuesSizeFile))
-        vS.update(size)
-        writeYamlFile(vS, valuesSizeFile)
+        values_size_file = helm_path / 'values-size.yaml'
+        if args.debug: print(f"values_size_file={values_size_file}")
+        vs = {}
+        if values_size_file.is_file():
+            vs = yaml.safe_load(open(values_size_file))
+        vs.update(size)
+        writeYamlFile(vs, values_size_file)
 
-        valuesImagesFile = helmPath / 'values-images.yaml'
-        if args.debug: print(f"valuesImagesFile={valuesImagesFile}")
-        vImg = {}
-        if valuesImagesFile.is_file():
-           vImg = yaml.safe_load(open(valuesImagesFile))
-        vImg.update(valuesImages)
-        writeYamlFile(vImg, valuesImagesFile)
+        values_images_file = helm_path / 'values-images.yaml'
+        if args.debug: print(f"values_images_file={values_images_file}")
+        vimg = {}
+        if values_images_file.is_file():
+           vimg = yaml.safe_load(open(values_images_file))
+        vimg.update(values_images)
+        writeYamlFile(vimg, values_images_file)
 
-        valuesIngressFile = helmPath / 'values-ingress.yaml'
-        if args.debug: print(f"valuesIngressFile={valuesIngressFile}")
-        vI = {}
-        if valuesIngressFile.is_file():
-           vI = yaml.safe_load(open(valuesIngressFile))
-        vI.update(valuesIngress)
-        writeYamlFile(vI, valuesIngressFile)
+        values_ingress_file = helm_path / 'values-ingress.yaml'
+        if args.debug: print(f"values_ingress_file={values_ingress_file}")
+        vi = {}
+        if values_ingress_file.is_file():
+           vi = yaml.safe_load(open(values_ingress_file))
+        vi.update(values_ingress)
+        writeYamlFile(vi, values_ingress_file)
 
         values = {}
-        if valuesFile.is_file():
-            values = yaml.safe_load(open(valuesFile))
-        merge(values, vS, vI, vImg)
-        writeYamlFile(values, valuesFile)
+        if values_file.is_file():
+            values = yaml.safe_load(open(values_file))
+        merge(values, vs, vi, vimg)
+        writeYamlFile(values, values_file)
 
     ###
     ### Logs
     ###
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
-    cmdAry = sys.argv
-    cmdAry[0] = prog
-    cmd = ' '.join(cmdAry)
-    logFile = 'env.log'
-    logLine = f"{timestamp} {logAction} {cmd}"
+    cmd_ary = sys.argv
+    cmd_ary[0] = prog
+    cmd = ' '.join(cmd_ary)
+    log_file = 'env.log'
+    log_line = f"{timestamp} {log_action} {cmd}"
     if do_kustomize:
-        logPathOverlay = overlayPath / logFile
-        with open(logPathOverlay, 'a') as logOverlay_f:
-            logOverlay_f.write(f"{logLine}\n")
+        log_path_overlay = overlay_path / log_file
+        with open(log_path_overlay, 'a') as log_overlay_f:
+            log_overlay_f.write(f"{log_line}\n")
     if do_helm:
-        logPathHelm = helmPath / logFile
-        with open(logPathHelm, 'a') as logHelm_f:
-            logHelm_f.write(f"{logLine}\n")
+        log_path_helm = helm_path / log_file
+        with open(log_path_helm, 'a') as log_helm_f:
+            log_helm_f.write(f"{log_line}\n")
 
 
 if __name__ == '__main__':
