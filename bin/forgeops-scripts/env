@@ -35,7 +35,7 @@ def writeYamlFile(data, file):
         yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
 
 def main():
-    prog = 'forgeops overlay'
+    prog = 'forgeops-ng env'
 
     parser = argparse.ArgumentParser(description='Manage a ForgeRock Identity Platform kustomize overlay',
                                      prog=prog,
