@@ -115,17 +115,24 @@ for c in ${COMPONENTS[@]} ; do
   fi
 
   IMAGE=$c
+  TAG_OPT=
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
     IMAGE="${PUSH_TO}/${IMAGE}"
   fi
-  [[ -n "$TAG" ]] && IMAGE="${IMAGE}:${TAG}"
+  if [ -n "$TAG" ] ; then
+    IMAGE="${IMAGE}:${TAG}"
+    TAG_OPT="-t ${TAG}"
+  fi
 
   runOrPrint cd $build_d
   runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS -t $IMAGE .
 
+  PUSH_OPT=
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
     runOrPrint $CONTAINER_ENGINE push $IMAGE
+    PUSH_OPT="--push-to ${PUSH_TO}"
   fi
 
   kube kustomize edit set image name=$IMAGE $OVERLAY_PATH/image-defaulter
+  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $c
 done

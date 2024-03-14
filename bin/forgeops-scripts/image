@@ -1,0 +1,222 @@
+#!/usr/bin/env python3
+"""Manage images in aForgeRock deployment"""
+
+import argparse
+import datetime
+import json
+from mergedeep import merge
+import os
+from pathlib import Path
+import shutil
+import sys
+import yaml
+
+sys.path.append(os.path.join(sys.path[0], '..'))
+import utils
+
+# Avoid using anchors/aliases in outputted YAML
+# Notice we call this with yaml.dump, but we are still using safe_dump
+# From https://ttl255.com/yaml-anchors-and-aliases-and-how-to-disable-them/
+class NoAliasDumper(yaml.SafeDumper):
+    def ignore_aliases(self, data):
+        return True
+
+def writeYamlFile(data, file):
+    """Write an object to a yaml file"""
+    with open(file, 'w') as f:
+        yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
+
+def containsElement(search, target):
+    """Check to see if search list contains at least one element from target list"""
+    if any(c in target for c in search):
+        return True
+    return False
+
+def main():
+    prog = 'forgeops-ng image'
+    components = ['all', 'apps', 'am', 'idm', 'ds', 'ig', []]
+
+    parser = argparse.ArgumentParser(description='Manage images in a ForgeRock Identity Platform environment',
+                                     prog=prog,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-d', '--debug', action='store_true', help='Turn on debugging')
+    parser.add_argument('components', nargs='*', choices=components)
+    parser.add_argument('-k', '--kustomize', default=argparse.SUPPRESS, help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
+    parser.add_argument('-H', '--helm', default=argparse.SUPPRESS, help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
+    parser.add_argument('-e', '--env-name', required=True, default=argparse.SUPPRESS, help='Name of environment to manage')
+    parser.add_argument('-s', '--source', help='Name of source environment')
+    parser.add_argument('-r', '--push-to', help='Container registry to use for images')
+    parser.add_argument('-t', '--tag', help='Set the tag used for images')
+    parser.add_argument('--no-helm', action='store_true', help="Don't manage helm values files")
+    parser.add_argument('--no-kustomize', action='store_true', help="Don't manage kustomize overlay")
+    parser.add_argument('--copy', action='store_true', help='Copy images from --source to --env-name')
+    # Needed to be called from bin/forgeops, but ignored
+    parser.add_argument('--dryrun', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--verbose', action='store_true', help=argparse.SUPPRESS)
+
+    args = parser.parse_args()
+
+    if args.copy and not args.source:
+        utils.exit_msg('You must supply a source (-s) when using --copy.')
+
+    if not args.copy and not args.components:
+        utils.exit_msg('You must supply at least one component to update when not using --copy.')
+
+    am_image_name='am'
+    ds_image_name='ds'
+    idm_image_name='idm'
+    ig_image_name='ig'
+
+    script_path = Path(__file__).parent
+    if args.debug: print(f'script_path = {script_path}')
+    root_path = script_path.parent.parent
+    if args.debug: print(f'root_path = {root_path}')
+
+    # Setup defaults for values that can be set in forgeops-ng.conf
+    helm = 'helm'
+    if getattr(args, 'helm', None):
+        helm = args.helm
+    elif os.getenv('HELM_PATH'):
+        helm = os.getenv('HELM_PATH')
+
+    kustomize = 'kustomize'
+    if getattr(args, 'kustomize', None):
+        kustomize = args.kustomize
+    elif os.getenv('KUSTOMIZE_PATH'):
+        kustomize = os.getenv('KUSTOMIZE_PATH')
+
+    push_to = None
+    if args.push_to:
+        push_to = args.push_to
+    elif os.getenv('PUSH_TO'):
+        push_to = os.getenv('PUSH_TO')
+
+    do_helm = True
+    if args.no_helm or os.getenv('NO_HELM') == 'true':
+        do_helm = False
+
+    do_kustomize = True
+    if args.no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
+        do_kustomize = False
+    # End defaults setup
+
+    if Path(kustomize).is_absolute():
+        kustomize_path = Path(kustomize)
+    else:
+        kustomize_path = root_path / kustomize
+    if args.debug: print(f"kustomize_path={kustomize_path}")
+    if not kustomize_path.is_dir():
+       utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
+
+    if Path(helm).is_absolute():
+        helm_root = Path(helm)
+    else:
+        helm_root = root_path / helm
+    helm_path = helm_root / args.env_name
+    if args.debug:
+        print(f"helm_path={helm_path}")
+        print(f"src_helm_path={src_helm_path}")
+
+    values_images = {}
+    if containsElement(components, args.components):
+       if containsElement(['am', 'all', 'apps'], args.components):
+           values_images['am'] = { 'image': {} }
+           values_images['am']['image']['repository'] = f'{push_to}/{am_image_name}' if push_to else am_image_name
+           if args.tag:
+               values_images['am']['image']['tag'] = args.tag
+       if containsElement(['ds', 'all', 'apps'], args.components):
+           values_images['ds_cts'] = { 'image': {} }
+           values_images['ds_cts']['image']['repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
+           values_images['ds_idrepo'] = { 'image': {} }
+           values_images['ds_idrepo']['image']['repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
+           if args.tag:
+               values_images['ds_cts']['image']['tag'] = args.tag
+               values_images['ds_idrepo']['image']['tag'] = args.tag
+       if containsElement(['idm', 'all', 'apps'], args.components):
+           values_images['idm'] = { 'image': {} }
+           values_images['idm']['image']['repository'] = f'{push_to}/{idm_image_name}' if push_to else idm_image_name
+           if args.tag:
+               values_images['idm']['image']['tag'] = args.tag
+       if containsElement(['ig', 'all'], args.components):
+           values_images['ig'] = { 'image': {} }
+           values_images['ig']['image']['repository'] = f'{push_to}/{ig_image_name}' if push_to else idm_image_name
+           if args.tag:
+               values_images['ig']['image']['tag'] = args.tag
+
+    if do_kustomize and args.copy:
+        if Path(args.source).is_absolute():
+            source_path = Path(source)
+        else:
+            source_path = overlay_root / source
+
+        if args.debug: print(f"source_path={source_path}")
+
+        overlay_root = kustomize_path / 'overlay'
+        if not overlay_root.is_dir():
+           utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
+
+        overlay_path = overlay_root / args.env_name
+        src_overlay_path = overlay_root / args.source
+        if args.debug:
+            print(f"overlay_path={overlay_path}")
+            print(f"src_overlay_path={src_overlay_path}")
+
+        img_def_fn = 'image-defaulter/kustomization.yaml'
+        if not overlay_path.exists():
+            utils.exit_msg(f'{overlay_path} does not exist. Run forgeops-ng env to create it.')
+        if not src_overlay_path.exists():
+            utils.exit_msg(f'{src_overlay_path} does not exist. Run forgeops-ng env to create it.')
+        img_kust = overlay_path / img_def_fn
+        src_img_kust = src_overlay_path / img_def_fn
+        img_kust.write_bytes(src_img_kust.read_bytes())
+
+    if do_helm:
+        vimg_fn = 'values-images.yaml'
+        vimg_file = helm_path / vimg_fn
+        values_file = helm_path / 'values.yaml'
+
+        if values_file.is_file() or vimg_file.is_file()::
+            print('Updating existing helm values.')
+        else:
+            utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops-ng env to populate.')
+
+        if args.copy:
+            src_helm_path = helm_root / args.source
+            src_vimg_file = src_helm_path / vimg_fn
+            if src_vimg_file.is_file():
+                vimg_file.write_bytes(src_vimg_file.read_bytes())
+            else:
+                utils.exit_msg(f'Source environment ({src_helm_path}) not populated. Run forgeops-ng env to populate.')
+
+        vimg = {}
+        vimg = yaml.safe_load(open(vimg_file))
+        merge(vimg, values_images)
+        writeYamlFile(vimg, vimg_file)
+
+        values = {}
+        values = yaml.safe_load(open(values_file))
+        merge(values, vimg)
+        writeYamlFile(values, values_file)
+
+    ###
+    ### Logs
+    ###
+    timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
+    cmd_ary = sys.argv
+    cmd_ary[0] = prog
+    cmd = ' '.join(cmd_ary)
+    log_action = 'Update'
+    log_file = 'env.log'
+    log_line = f"{timestamp} {log_action} {cmd}"
+    if do_kustomize and args.copy:
+        log_path_overlay = overlay_path / log_file
+        with open(log_path_overlay, 'a') as log_overlay_f:
+            log_overlay_f.write(f"{log_line}\n")
+    if do_helm:
+        log_path_helm = helm_path / log_file
+        with open(log_path_helm, 'a') as log_helm_f:
+            log_helm_f.write(f"{log_line}\n")
+
+
+if __name__ == '__main__':
+    main()

@@ -49,6 +49,7 @@ COMMANDS=(
   'delete'
   'env'
   'info'
+  'image'
   'wait'
 )
 
