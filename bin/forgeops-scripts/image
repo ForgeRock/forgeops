@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manage images in aForgeRock deployment"""
+"""Manage images in a ForgeRock deployment"""
 
 import argparse
 import datetime
