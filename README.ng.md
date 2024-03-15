@@ -83,8 +83,8 @@ build new images.
 
 ### Per overlay image-defaulter
 
-A side effect of having discrete overlays is the image-defaulter component now
-lives inside each of each overlay. When using Kustomize, you can develop and
+A side effect of having discrete overlays is the image-defaulter component is
+included in each overlay. When using Kustomize, you can develop and
 build your images in your single instance environment. Once you are happy with
 it, you can copy the image-defaulter's kustomization.yaml file into your
 running overlay.
@@ -143,13 +143,13 @@ requested.
 So if we want a medium sized stage deployment with an FQDN of iam.example.com,
 we'd do this:
 
-`./bin/forgeops-ng env --fqdn iam.example.com --medium --env-name stage`
+`./bin/forgeops-ng env --fqdn stage.iam.example.com --medium --env-name stage`
 
 We recommend creating a single-instance environment to go along with each
 actual environment. This allows you to use the single to develop your file
 based config, and build images with the config(s) for that environment.
 
-`./bin/forgeops-ng env --fqdn iam.example.com --env-name stage-single`
+`./bin/forgeops-ng env --fqdn stage-single.iam.example.com --env-name stage-single`
 
 You will find the environments in `kustomize-ng/overlay/` and `helm/`.
 
@@ -348,6 +348,27 @@ forgeops-ng env --env-name test --single-instance
 
 This will set the mem, cpu, and disk to the small definition, but set the
 replicas to 1.
+
+#### image
+
+Both the current forgeops script and the new forgeops-ng script will update the
+image-defaulter in your Kustomize overlay when doing a build. The image script
+was created to help out Helm users by updating the images in the values files
+for the requested overlay.
+
+This command is called by the build script for you, so you don't need to do
+anything special when you build images. However, if you follow our advice and
+create a single instance environment for each environment you run, it can be
+useful to you. After updating and exporting your config, you can build new
+images which updates the images in your overlay and values files. At this
+point, you can use the image command to copy your images from one environment
+to another.
+
+For example, in a production environment called `prod` you might configure and
+build your images in a single instance environment called `prod-single`. To
+copy the freshly built images to the `prod` environment you would do this:
+
+`forgeops-ng image --env-name prod --source prod-single --copy`
 
 #### info
 
