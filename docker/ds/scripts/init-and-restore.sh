@@ -124,7 +124,9 @@ if [ ! -z "${BACKEND_NAMES}" ]; then
         echo "Running disaster recovery with version: ${DISASTER_RECOVERY_ID}"
         recovery_backends=(${BACKEND_NAMES})
         for ((i = 0 ; i < ${#recovery_backends[@]} ; i+=2 )); do
-            basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${recovery_backends[$(($i+1))]} --property base-dn | awk '{print $2}')
+            if ! [ "${recovery_backends[$(($i+1))]}" = "schema" ]; then
+                basedns=$(dsconfig get-backend-prop --offline --script-friendly --no-prompt --backend-name ${recovery_backends[$(($i+1))]} --property base-dn | awk '{print $2}')
+            fi
             for basedn in ${basedns}; do
                 echo "Running disaster recovery on basedn ${basedn} for backend ${recovery_backends[$(($i+1))]}"
                 dsrepl disaster-recovery --no-prompt --user-generated-id ${DISASTER_RECOVERY_ID} --baseDn "${basedn}"
