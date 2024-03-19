@@ -93,12 +93,6 @@ export SSL_CERT_DIR="/var/run/secrets/ds-ssl-keypair"
 export MASTER_CERT_DIR="/var/run/secrets/ds-master-keypair"
 export TRUSTSTORE_DIR="/var/run/secrets/truststore"
 
-
-# These should be set and passed in by K8S. We use the same defaults here.
-export DS_UID_ADMIN_PASSWORD_FILE="${DS_UID_ADMIN_PASSWORD_FILE:-/var/run/secrets/admin/dirmanager.pw}"
-export DS_UID_MONITOR_PASSWORD_FILE="${DS_UID_MONITOR_PASSWORD_FILE:-/var/run/secrets/monitor/monitor.pw}"
-
-
 echo
 echo "Server configured with:"
 echo "    Group ID                        : $DS_GROUP_ID"

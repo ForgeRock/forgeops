@@ -100,7 +100,7 @@ copyKeys() {
 
     [[ -d $MASTER_CERT_DIR ]] && cat $MASTER_CERT_DIR/tls.key $MASTER_CERT_DIR/tls.crt $MASTER_CERT_DIR/ca.crt > $PEM_KEYS_DIRECTORY/master-key
 
-    # If the user provides a truststore then use it...
+    # If the user provides a truststore then use it.
     [[ -d $TRUSTSTORE_DIR ]] && cp $TRUSTSTORE_DIR/ca.crt $PEM_TRUSTSTORE_DIRECTORY/trust.pem
 }
 
@@ -150,10 +150,6 @@ init)
     copyKeys
     executeScript setup
     init
-    ;;
-
-set-passwords-only)
-    setAdminAndMonitorPasswords
     ;;
 
 backup)

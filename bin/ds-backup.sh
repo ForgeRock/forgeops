@@ -28,9 +28,8 @@ BACKUP_SCHEDULE_IDREPO="*/30 * * * *"
 #   Pod:         /local/path
 #   Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
 BACKUP_DIRECTORY_IDREPO=""
-# Optional backends, default: all backends
-# Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
-BACKENDS_IDREPO=""
+# Backends to backup.
+BACKENDS_IDREPO="amIdentityStore,cfgStore,idmRepo,schema"
 # Name of task on DS pod. Change if configuring multiple backup schedules.
 TASK_NAME_IDREPO="recurringBackupTask"
 
@@ -41,9 +40,8 @@ BACKUP_SCHEDULE_CTS="*/30 * * * *"
 # Pod:         /local/path
 # Cloud Storage: s3://bucket/path | az://container/path | gs://bucket/path
 BACKUP_DIRECTORY_CTS=""
-# Optional backends, default: all backends
-# Current enabled backends: amCts,amIdentityStore,cfgStore,idmRepo,monitorUser,proxyUser,rootUser,schema,tasks
-BACKENDS_CTS=""
+# Backend to backup
+BACKENDS_CTS="amCts"
 # Name of task on DS pod. Change if configuring multiple backup schedules.
 TASK_NAME_CTS="recurringBackupTask"
 
