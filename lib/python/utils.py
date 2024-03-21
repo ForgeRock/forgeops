@@ -83,7 +83,7 @@ size_paths = {
     'small': 'overlay/small',
     'medium': 'overlay/medium',
     'large': 'overlay/large',
-    'cdk': 'base'
+    'single': 'base'
 }
 
 bundles = {
@@ -389,7 +389,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
-    size: size of the component to generate. e.a. cdk, mini, small, medium, large.
+    size: size of the component to generate. e.a. single, mini, small, medium, large.
     ns: target namespace.
     fqdn: set the FQDN used in the generated package.
     ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
@@ -437,7 +437,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
             c(profile_dir, config_profile)
         else:
             run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
-        if c in patcheable_components and size != 'cdk':
+        if c in patcheable_components and size != 'single':
             p = patcheable_components[c]
             if os.path.exists(os.path.join(src_profile_dir, p)):
                 shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
@@ -472,7 +472,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
-    size: size of the component to generate and install. e.a. cdk, mini, small, medium, large.
+    size: size of the component to generate and install. e.a. single, mini, small, medium, large.
     ns: target namespace.
     fqdn: set the FQDN used in the deployment.
     ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
@@ -521,7 +521,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(root_dir, 'kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, config_profile, operator, custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'single', ns, '.', ingress_class, '', legacy, config_profile, operator, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)

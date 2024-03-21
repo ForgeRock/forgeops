@@ -45,7 +45,7 @@ build_dockerfiles = {
 }
 wait_targets = ['ds', 'am', 'amster', 'idm', 'apps', 'secrets', 'ig']
 size_map = {
-    'cdk': {
+    'single': {
     },
     'custom': {
         'base': 'base',
@@ -176,13 +176,13 @@ def main():
     common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
     common_lg.add_argument('--legacy', dest='legacy', default=False, action='store_true', help=argparse.SUPPRESS)
     common_op.add_argument('--operator', '-o', dest='operator', default=False, action='store_true', help="Use DS Operator to deploy DS")
-    common_pf.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of config profile in docker/<component>/config-profiles")
+    common_pf.add_argument('--config-profile', '-p', dest='config_profile', default='default', help="Name of config profile in docker/<component>/config-profiles")
     common_dl.add_argument('--deploy-env', dest='deploy_env', default=None, help='Suffix of kustomize manifest directory for multiple deployments. For example: kustomize/deploy-<suffix>')
     common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
                                                           'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
                                                           'secrets', []])
     size_group = common_sz.add_mutually_exclusive_group()
-    size_group.add_argument('--cdk', action='store_const', dest='size', const='cdk', help='(Default) Install/generate manifests for the CDK')
+    size_group.add_argument('--single-instance', action='store_const', dest='size', const='single', help='(Default) Install/generate manifests for the CDK')
     size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install/generate manifests for the CDM mini platform')
     size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install/generate manifests for the CDM small platform')
     size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install/generate manifests for the CDM medium platform')
@@ -190,22 +190,20 @@ def main():
     size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches')
 
     subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
-    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_lg, common_dl, common_op], allow_abbrev=False,
+    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_lg, common_dl, common_op, common_pf], allow_abbrev=False,
                                           help='Generate manifests and install the platform components or component bundles')
     parser_install.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_install.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
-    parser_install.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
     parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
     parser_install.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
-    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_lg, common_dl, common_op],
+    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_lg, common_dl, common_op, common_pf],
                                           help='Generate the ForgeRock Identity Platform manifests')
     parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
                                 help='Select the FQDN for this deployment')
     parser_generate.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
                                 help='Select the INGRESS_CLASS for this deployment (default: nginx)')
-    parser_generate.add_argument('--config-profile', '-p', dest='config_profile', default='cdk', help="Name of amster config profile in docker/amster/config-profiles")
     parser_delete = subparser.add_parser(
         'delete', parents=[common_ns, common, common_dg, common_pf], help='Delete ForgeRock Identity Platform components or component bundles')
     parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
@@ -235,7 +233,7 @@ def main():
         ctx = utils.get_context()
         namespace = getattr(args, 'namespace', None) or ctx_namespace
         fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
-        size = args.size if getattr(args, 'size', None) else 'cdk'
+        size = args.size if getattr(args, 'size', None) else 'single'
         ingress_class = args.ingress_class if getattr(args, 'ingress_class', None) else 'nginx'
 
         # Check for legacy installation

@@ -29,7 +29,7 @@ Export config from running instance to a given profile. AM and IDM only.
 """
 HELP_EXPORT_BASELINE_PROFILE = """
 Specify a base profile to start with if the target profile doesn't
- exist. (default: cdk)
+ exist. (default: default)
 """
 HELP_CMD_COMPONENTS = """
 ForgeRock Identity Platform component.
@@ -94,7 +94,7 @@ examples:
   $ ./bin/config export am <myprofile>
 
   # Export AM configruation for a profile that doesn't exist
-  $ ./bin/config export --baseline-profile cdk am <mynewprofile>
+  $ ./bin/config export --baseline-profile default am <mynewprofile>
 """
 
 PLATFORM_COMPONENTS = {
@@ -320,7 +320,7 @@ def main():
                                                   formatter_class=argparse.RawDescriptionHelpFormatter,
                                                   description=HELP_EXPORT_CMD_DESCRIPTION)
     export_cmd_parser.add_argument('--baseline-profile',
-                                   default='cdk',
+                                   default='default',
                                    help=HELP_EXPORT_BASELINE_PROFILE)
     export_cmd_parser.add_argument('component',
                                    choices=EXPORT_COMPONENTS.keys(),
