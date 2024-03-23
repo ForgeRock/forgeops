@@ -6,7 +6,7 @@ resources:
 images:
 - name: .*admin-ui.*
   newName: gcr.io/forgerock-io/platform-admin-ui/docker-build
-  newTag: 7.4.0-postcommit-latest
+  newTag: 7.6.0-SNAPSHOT-postcommit-latest
 labels:
 - includeSelectors: true
   pairs:
