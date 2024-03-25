@@ -16,6 +16,9 @@ spec:
       labels:
         tier: middle
     spec:
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 0
       containers:
       - env:
         - name: NAMESPACE

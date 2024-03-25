@@ -5,8 +5,8 @@ SHELL := /bin/bash
 RELEASE_REVS := $(shell forgeops release-revlist)
 ACTIVE_TAG := $(shell forgeops current-tag)
 
-BASE_COMPONENTS = 7.0/ingress secrets git-server ../dev/scripts
-DS_COMPONENTS = ds-idrepo ds-cts 
+BASE_COMPONENTS = ingress secrets ../dev/scripts
+DS_COMPONENTS = ds-idrepo ds-cts
 APP_COMPONENTS = am amster idm rcs-agent
 UI_COMPONENTS = admin-ui end-user-ui login-ui
 .PHONY: $(BASE_COMPONENTS) $(DS_COMPONENTS) $(APP_COMPONENTS) $(UI_COMPONENTS) quickstart
@@ -15,7 +15,7 @@ branch-notes:
 	@gitchangelog master..HEAD
 
 changelog.md:
-	gitchangelog  $(RELEASE_REVS) > changelog.md
+	echo "Add link to Docs team release notes" > changelog.md
 	# debug TODO remove later
 	cat changelog.md
 
@@ -25,15 +25,13 @@ clean_artifacts:
 
 artifacts: clean_artifacts $(BASE_COMPONENTS) $(DS_COMPONENTS) $(APP_COMPONENTS) $(UI_COMPONENTS)
 
-ingress: 7.0/ingress
-
 $(BASE_COMPONENTS):
 	$(eval $@_OUT := dist/base.yaml)
 	$(eval $@_DIR := dist/kustomize/base)
 	@mkdir -p $($@_DIR)
 	@(cd $($@_DIR) && kustomize init --labels app.kubernetes.io/part-of:forgerock) 2> /dev/null || true
 	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/dev/kustomizeConfig) 2> /dev/null
-	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/base/$@) 
+	@(cd $($@_DIR) && kustomize edit add resource ../../../kustomize/base/$@)
 	@if [[ "$@" == "git-server" ]]; then \
 		(cd $($@_DIR) && kustomize edit set image $@=${DOCKER_REPO}/$@); \
 	fi
@@ -106,27 +104,14 @@ quickstart: artifacts
 	@mkdir -p $($@_DIR)
 	@(cd $($@_DIR) && kustomize init --labels app.kubernetes.io/part-of:forgerock) 2> /dev/null || true
 	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/base)
-	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/ds) 
-	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/apps) 
-	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/ui) 
+	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/ds)
+	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/apps)
+	@(cd $($@_DIR) && kustomize edit add resource ../../../dist/kustomize/ui)
 	kustomize build $($@_DIR) > $($@_OUT)
 
 release: changelog.md quickstart
-	sed -i "0,/FORGEOPS_VERSION/s/FORGEOPS_VERSION=.*/FORGEOPS_VERSION=\"${ACTIVE_TAG}\"/" bin/quickstart.sh
 	forgeops create-release-notes \
-	--asset=dist/quickstart.yaml --asset=bin/quickstart.sh \
-    --asset=dist/admin-ui.yaml \
-    --asset=dist/am.yaml \
-    --asset=dist/amster.yaml \
-    --asset=dist/apps.yaml \
-    --asset=dist/base.yaml \
-    --asset=dist/ds-cts.yaml \
-    --asset=dist/ds-idrepo.yaml \
-    --asset=dist/ds.yaml \
-    --asset=dist/end-user-ui.yaml \
-    --asset=dist/idm.yaml \
-    --asset=dist/login-ui.yaml \
-    --asset=dist/rcs-agent.yaml \
-    --asset=dist/ui.yaml \
+	--asset=bin/cdk \
+	--asset=dist/*.yaml \
     changelog.md
 

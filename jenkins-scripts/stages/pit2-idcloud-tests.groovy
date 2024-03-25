@@ -19,8 +19,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
         // TODO: To update to use 'pit2-idcloud' once RELENG-1165 is done
         node('pit2-upgrade') {
             stage(stageName) {
-                def forgeopsPath = localGitUtils.checkoutForgeops()
-
                 dir('lodestar') {
                     def stagesCloud = [:]
                     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
@@ -29,7 +27,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         def config = [
                             TESTS_SCOPE                     : 'tests/pit1',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_PATH               : forgeopsPath,
+                            STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
                             REPORT_NAME_PREFIX              : normalizedStageName,
                             TENANT                          : 'openam-pitperf-tests',
                         ]

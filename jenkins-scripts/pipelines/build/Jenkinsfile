@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -7,7 +7,7 @@
  */
 
 @Library([
-    'forgerock-pipeline-libs@39a35f682fee65b814a730c9281ac4c08d3198b7',
+    'forgerock-pipeline-libs@a4f6060382c4edd70bedfd33adfa87120772fb53',
     'java-pipeline-libs@7d909d2ffb9ab751dc96e9c7bc9d253d3d993dbb'
 ]) _
 
@@ -54,7 +54,8 @@ timestamps {
                     prAutomation = load("${libsLocation}/pr-automation.groovy")
                 } else {
                     pipeline = load("${jobLocation}/postcommit.groovy")
-                    createPlatformImagesPr = load("${stagesLocation}/create-platform-images-pr.groovy")
+                    tagReadyForDevPipelines = load("${stagesLocation}/tag-ready-for-dev-pipelines.groovy")
+                    createPlatformImagesPR = load("${stagesLocation}/create-platform-images-pr.groovy")
                 }
                 pit1TestStage = load("${stagesLocation}/pr-postcommit-pit1-tests.groovy")
                 perfTestStage = load("${stagesLocation}/pr-postcommit-perf-tests.groovy")
@@ -86,13 +87,16 @@ timestamps {
         pipeline.build()
     }
 
-    if (commonModule.branchSupportsIDCloudReleases()) {
+    if (commonModule.branchSupportsPitTests()) {
         pipeline.postBuildTests(pipelineRun)
+    }
 
+    if (commonModule.branchSupportsIDCloudReleases()) {
         if (isPR()) {
             prAutomation.mergeIfAutomatedProductVersionUpdate(pipelineRun, commonModule.FORGEOPS_GIT_COMMIT)
         } else {
-            createPlatformImagesPr.runStage(pipelineRun)
+            tagReadyForDevPipelines.runStage(pipelineRun)
+            pipeline.createPlatformImagesPR(pipelineRun)
         }
     }
 }

@@ -1,0 +1,17 @@
+
+resources:
+- import-ldif-job.yaml
+- sa.yaml
+- pvc.yaml
+
+commonLabels:
+  app: ds-import-ldif
+
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+- name: ldif-scripts
+  files:
+  - import-ldif.sh
+  - gs-restore.sh

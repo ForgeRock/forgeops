@@ -112,13 +112,12 @@ gcloud beta container --project "$PROJECT" clusters create "$NAME" \
     --no-enable-master-authorized-networks \
     --release-channel "regular" \
     --machine-type "$MACHINE" \
-    --image-type "COS" \
+    --image-type "COS_CONTAINERD" \
     --disk-type "pd-ssd" --disk-size "100" \
     --metadata disable-legacy-endpoints=true \
     --scopes "https://www.googleapis.com/auth/devstorage.read_only","https://www.googleapis.com/auth/logging.write","https://www.googleapis.com/auth/monitoring","https://www.googleapis.com/auth/servicecontrol","https://www.googleapis.com/auth/service.management.readonly","https://www.googleapis.com/auth/trace.append" \
     $PREEMPTIBLE \
     --node-labels "$DEFAULT_POOL_LABELS" \
-    --enable-stackdriver-kubernetes \
     --enable-ip-alias \
     --num-nodes "$NUM_NODES" \
     --network "$NETWORK" \

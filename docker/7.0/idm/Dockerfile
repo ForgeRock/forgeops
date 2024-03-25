@@ -1,5 +1,5 @@
 # Note: M5 integration with AM currently not working
-FROM gcr.io/forgerock-io/idm/pit1:7.1.5
+FROM gcr.io/forgerock-io/idm:7.1.5
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
@@ -8,8 +8,9 @@ COPY debian-buster-sources.list /etc/apt/sources.list
 RUN rm -f bundle/org.apache.felix.webconsole*.jar  && \
     rm -f bundle/openidm-felix-webconsole-*.jar
 
-# Removes any existing conf files that might conflict with our config. This includes the embedded ds repo.
-RUN rm -fr /opt/openidm/conf
+# Removes unwanted default config bundled out of the box.
+RUN rm conf/felix.webconsole.json
+RUN rm conf/selfservice.propertymap.json
 
 # Remove this once https://bugster.forgerock.org/jira/browse/OPENIDM-16100 is integrated
 # This sets the RAM based on cgroups to 65% of the container memory

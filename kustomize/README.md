@@ -7,9 +7,6 @@ If you are not familiar with Kustomize, please read the documents and study the
 tutorials [here](https://kustomize.io/) before you try to work with ForgeRock's 
 Kustomize artifacts.
 
-**TL;DR;** With Kustomize, you create base assets (Kubernetes YAML files), and 
-then patch them or overlay them. The modified assets can then be used as new 
-bases. You can nest these to any arbitrary depth.
 
 ## Organization
 
@@ -32,7 +29,7 @@ kustomize build
 
 The Docker images referenced in the Kustomize files are generic (for example, 
 `am` or `ig`), and are not specific to a Docker registry (such as 
-`gcr.io/forgerock-io/am-base:7.1.0`).
+`gcr.io/forgerock-io/am-base:7.1.4`).
 
 We can not directly deploy the generic images, because we need a Docker image
 that has the configuration "baked in". This is where Skaffold comes in to the 
@@ -47,4 +44,4 @@ For more information, see the forgeops repository's [top-level README](../README
 
 The `kustomize` directory demonstrates a directory-based organization. You could
 also use Git branching. For more information, see 
-[this discussion](https://kubectl.docs.kubernetes.io/pages/app_composition_and_deployment/diffing_local_and_remote_resources.html).
+[this page](https://kubectl.docs.kubernetes.io/guides/app_deployment/diffing_local_and_remote_resources/).

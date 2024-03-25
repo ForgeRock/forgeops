@@ -18,8 +18,6 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
     pipelineRun.pushStageOutcome([tags : ['PIT2'], stageDisplayName : stageName], normalizedStageName) {
         node('pit2-greenfield') {
             stage(stageName) {
-                def forgeopsPath = localGitUtils.checkoutForgeops()
-
                 dir('lodestar') {
                     def stagesCloud = [:]
                     stagesCloud[normalizedStageName] = dashboard_utils.spyglaasStageCloud(normalizedStageName)
@@ -27,7 +25,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                     dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
                         def config = [
                             TESTS_SCOPE                     : 'tests/pit1',
-                            CLUSTER_DOMAIN                  : 'pit2.forgeops.com',
+                            CLUSTER_DOMAIN                  : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE               : 'greenfield',
                             CLUSTER_CRASHER                 : 'True',
                             REPEAT                          : params.PIT2_Greenfield.toInteger(),
@@ -35,7 +33,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             TIMEOUT                         : '14',
                             TIMEOUT_UNIT                    : 'HOURS',
                             STASH_LODESTAR_BRANCH           : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_PATH               : forgeopsPath,
+                            STASH_FORGEOPS_BRANCH           : commonModule.FORGEOPS_GIT_COMMIT,
                             REPORT_NAME_PREFIX              : normalizedStageName,
                         ]
 

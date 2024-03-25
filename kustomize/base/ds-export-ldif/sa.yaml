@@ -1,0 +1,6 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: ldif-sa
+  annotations:
+    iam.gke.io/gcp-service-account: ldif-import-export@engineering-devops.iam.gserviceaccount.com

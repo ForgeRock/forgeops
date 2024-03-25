@@ -38,9 +38,7 @@ pause)
     pause
     ;;
 export)
-    # TO DO - export dynamic config
     ./export.sh
-    sleep infinity
     ;;
 import)
     # invoke amster install.

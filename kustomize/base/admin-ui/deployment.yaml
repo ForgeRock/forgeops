@@ -12,8 +12,11 @@ spec:
       labels:
         app: admin-ui
     spec:
+      securityContext:
+        runAsUser: 101
+        runAsGroup: 0
       containers:
-      - image: gcr.io/forgerock-io/platform-admin-ui:7.1.0
+      - image: gcr.io/forgerock-io/platform-admin-ui:7.1.2
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
@@ -41,4 +44,3 @@ spec:
           preStop:
             exec:
               command: ["/usr/sbin/nginx", "-s", "quit"]
-

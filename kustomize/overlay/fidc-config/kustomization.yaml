@@ -1,0 +1,15 @@
+commonLabels:
+  app.kubernetes.io/part-of: "forgerock"
+resources:
+- ../../base/kustomizeConfig
+- ../../base/ingress
+
+patchesStrategicMerge:
+- |-
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: platform-config
+  data:
+    FQDN: "fidc.iam.forgeops.com"
+    CERT_ISSUER: letsencrypt-prod

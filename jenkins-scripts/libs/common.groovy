@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2022 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -22,18 +22,17 @@ FORGEOPS_GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s')
 FORGEOPS_GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 FORGEOPS_GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
-/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
-lodestarFileContent = bitbucketUtils.readFileContent(
-        'cloud',
-        'platform-images',
-        isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME,
-        'lodestar.json').trim()
-LODESTAR_GIT_COMMIT = readJSON(text: lodestarFileContent)['gitCommit']
+/** Globally scoped git commit information for the Lodestar repo */
+LODESTAR_GIT_COMMIT_FILE = 'jenkins-scripts/libs/lodestar-commit.txt'
+
+String getLodestarCommit() {
+    return readFile(file: "${env.WORKSPACE}/${LODESTAR_GIT_COMMIT_FILE}").trim()
+}
+LODESTAR_GIT_COMMIT = getLodestarCommit()
 
 /** Docker image metadata for individual ForgeRock products. */
 dockerImages = [
         'am'        : DockerImagePromotion.load('docker/7.0/am/Dockerfile', 'gcr.io/forgerock-io/am-base', steps),
-        'am-config-upgrader' : DockerImagePromotion.load('docker/7.0/am-config-upgrader/Dockerfile', 'gcr.io/forgerock-io/am-config-upgrader', steps),
         'amster'    : DockerImagePromotion.load('docker/7.0/amster/Dockerfile', 'gcr.io/forgerock-io/amster', steps),
         'ds-cts'    : DockerImagePromotion.load('docker/7.0/ds/cts/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
         'ds-util'   : DockerImagePromotion.load('docker/7.0/ds/dsutil/Dockerfile', 'gcr.io/forgerock-io/ds', steps),
@@ -45,7 +44,6 @@ dockerImages = [
 
 productToRepo = [
         'am' : 'openam',
-        'am-config-upgrader' : 'openam',
         'amster' : 'openam',
         'ds-cts' : 'opendj',
         'ds-util' : 'opendj',
@@ -64,6 +62,17 @@ DockerImagePromotion getDockerImage(String productName) {
 
 String getCurrentTag(String productName) {
     return getDockerImage(productName).tag
+}
+
+/** Does the branch support PIT tests */
+boolean branchSupportsPitTests() {
+    def supportedBranchPrefixes = [
+            'master',
+            'release/',
+            'sustaining/7.1',
+    ]
+    String branch = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+    return supportedBranchPrefixes.any { it -> branch.startsWith(it) }
 }
 
 /** Does the branch support PaaS releases */

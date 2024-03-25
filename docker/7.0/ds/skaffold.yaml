@@ -1,4 +1,4 @@
-# Skaffold used for testing the ds image. You need to deploy the forgeops-secrets first for ds to come up
+# Skaffold used for testing the ds image.
 # Run using  skaffold dev --port-forward
 apiVersion: skaffold/v2beta10
 kind: Config

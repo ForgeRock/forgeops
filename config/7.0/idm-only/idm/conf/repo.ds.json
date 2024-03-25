@@ -2,12 +2,15 @@
     "embedded": false,
     "maxConnectionAttempts" : 5,
     "security": {
-        "keyManager": "jvm",
-        "trustManager": "jvm"
+        "keyManager": "none",
+        "trustManager": "file",
+        "fileBasedTrustManagerType": "JKS",
+        "fileBasedTrustManagerFile": "&{openidm.truststore.location}",
+        "fileBasedTrustManagerPassword": "changeit"
     },
     "ldapConnectionFactories": {
         "bind": {
-            "connectionSecurity": "none",
+            "connectionSecurity": "ssl",
             "connectionPoolSize": 50,
             "heartBeatIntervalSeconds": 60,
             "heartBeatTimeoutMilliSeconds": 10000,
@@ -190,7 +193,7 @@
                 }
             },
             "locks": {
-                "dnTemplate": "ou=locks,dc=openidm,dc=forgerock,dc=io",
+                "dnTemplate": "ou=locks,ou=internal,dc=openidm,dc=forgerock,dc=io",
                 "objectClasses": [
                     "uidObject",
                     "fr-idm-lock"

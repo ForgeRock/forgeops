@@ -125,6 +125,7 @@ def filter_engineeringpit_digests(repo, digests):
     filtered = {}
     for digest_id, digest_meta in digests.items():
         if '-stable' not in digest_meta['tag']:  # NEVER delete anything tagged with '*-stable'
+            log.info(f'DEBUG content of digest_meta: {digest_meta["tag"]}')
             if image_is_stale(digest_id, digest_meta, ENGINEERING_PIT_MAX_AGE):
                 filtered[digest_id] = digest_meta['tag']
     num_digests = len(filtered)

@@ -1,0 +1,41 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - eng-shared-7-1
+      - '--region=us-east1-b'
+    id: authenticate
+    waitFor:
+      - '-'
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./bin/cdk delete -n $$NAMESPACE --yes
+    id: nuke-environment
+    waitFor:
+      - authenticate
+    entrypoint: bash
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./bin/cdk install --fqdn nightly.eng71.forgeops.com -n $$NAMESPACE
+    id: deploy-cdk
+    waitFor:
+      - nuke-environment
+    entrypoint: bash
+  - name: 'us-docker.pkg.dev/$PROJECT_ID/images/skaffold:latest'
+    args:
+      - '-c'
+      - ./cicd/bin/smoke-tests
+    id: smoke-tests
+    waitFor:
+      - deploy-cdk
+    entrypoint: bash
+timeout: 900s
+options:
+  env:
+    - NAMESPACE=nightly
+    - DEFAULT_DOCKER_REPO=us-docker.pkg.dev/engineering-devops/images/nightly-71
+    - SET_IMAGES_LOG=/workspace/set_log.txt

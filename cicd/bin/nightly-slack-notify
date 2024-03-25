@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# cd /workspace/forgeops
+OUT=$(mktemp)
+
+getsec () {
+    kubectl -n $NAMESPACE get secret $1 -o jsonpath="{.data.$2}" | base64 --decode
+}
+
+uid_admin=$(getsec ds-passwords dirmanager\\.pw)
+amadmin=$(getsec  am-env-secrets AM_PASSWORDS_AMADMIN_CLEAR)
+
+BRANCH_NAME=$1
+
+echo $OUT
+cat <<EOF >"${OUT}"
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"emoji": true,
+				"text": "ForgeOps 7.1.x Nightly Images and Deployment"
+			}
+		},
+        {
+        	"type": "section",
+        	"text": {
+        		"type": "mrkdwn",
+        		"text": "*Brought to you by:*"
+        	}
+        },
+        {
+        	"type": "divider"
+        },
+        {
+        	"type": "section",
+        	"text": {
+        		"type": "mrkdwn",
+        		"text": "⋄ ForgeOps"
+        	},
+        	"accessory": {
+        		"type": "button",
+        		"text": {
+        			"type": "plain_text",
+        			"text": "${BRANCH_NAME}",
+        			"emoji": true
+        		},
+        		"value": "${BRANCH_NAME}",
+        		"url": "https://github.com/ForgeRock/forgeops/tree/${BRANCH_NAME}",
+        		"action_id": "button-action"
+        	}
+        },
+		{
+			"type": "divider"
+		},
+        {
+        	"type": "section",
+            "fields": [
+                {
+                    "type": "mrkdwn",
+                    "text": "*amadmin*: \`${amadmin}\`"
+                },
+                {
+                    "type": "mrkdwn",
+                    "text": "*uid=admin*: \`${uid_admin}\`"
+                }
+            ],
+        	"accessory": {
+        		"type": "image",
+        		"image_url": "https://flocker.readthedocs.io/en/latest/_static/images/kubernetes2x.png",
+        		"alt_text": "kuberenetes logo"
+        	}
+        },
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "image",
+					"image_url": "https://yt3.ggpht.com/ytc/AKedOLTTGo9UWGuTfogTnXgQIc8c0yCrjEl9R5P9fjmRVg=s900-c-k-c0x00ffffff-no-rj",
+					"alt_text": "ForgeRock Logo"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "<https://nightly.eng71.forgeops.com/platform/>"
+				}
+			]
+		}
+	]
+}
+EOF
+jq '.' $OUT
+curl -X POST -H 'Content-type: application/json' --data "@${OUT}" $SLACK_WEBHOOK_URL

@@ -49,9 +49,6 @@ kind: Config
     - &IG
       image: ig
       context: docker/7.0/ig
-    - &AM_CONFIG_UPGRADER
-      image: am-config-upgrader
-      context: docker/7.0/am-config-upgrader
 
   commonArtifactSets:
     default-artifacts: &default-artifacts
@@ -74,7 +71,8 @@ kind: Config
 build: &default-build
   artifacts: *default-artifacts
   tagPolicy: &default-tag-policy
-    sha256: {}
+    gitCommit:
+      variant: AbbrevTreeSha
 deploy: &default-deploy
   statusCheckDeadlineSeconds: 900
   kustomize:
@@ -120,7 +118,7 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/am-cdk
+      path: ./kustomize/dev/am
 
 - name: amster
   build:
@@ -138,7 +136,7 @@ profiles:
     tagPolicy: *default-tag-policy
   deploy:
     kustomize:
-      path: ./kustomize/base/idm-cdk
+      path: ./kustomize/dev/idm
 
 - name: ds-cts
   build:
@@ -169,14 +167,6 @@ profiles:
     kustomize:
       path: ./kustomize/base/ig
 
-- name: config-upgrader
-  build:
-    artifacts:
-    - *AM_CONFIG_UPGRADER
-    tagPolicy: *default-tag-policy
-  deploy:
-    kustomize:
-      path: ./kustomize/base/am-config-upgrader
 
 ###################################################################
 #######EVERYTHING BELOW THIS LINE WILL BE DEPRECATED###############
@@ -296,15 +286,4 @@ profiles:
         variant: AbbrevCommitSha
   deploy:
     kustomize:
-      path: ./kustomize/overlay/7.0/amster-export
-
-- name: fr-config-exporter
-  build:
-    artifacts:
-      - *AM_CONFIG_UPGRADER
-    tagPolicy:
-      gitCommit:
-        variant: AbbrevCommitSha
-  deploy:
-    kustomize:
-      path: ./kustomize/dev/fr-config-exporter
+      path: ./kustomize/overlay/7.0/amster-export-skaffold

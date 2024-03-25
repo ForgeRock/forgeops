@@ -1,39 +1,28 @@
-
 # Dockerfile that packages up Skaffold, Kustomize and kubectl to run under a CI/CD pipeline.
 # Publish this to your registry and update your CI/CD pipelines to point at this image.
 # See the tekton/ folder for an example of a CI/CD pipeline that deploys the ForgeRock Identity Platform.
 
-# Download Skaffold
-FROM alpine as download-skaffold
-ARG SKAFFOLD_VERSION=v1.20.0
-ENV SKAFFOLD_URL https://storage.googleapis.com/skaffold/releases/${SKAFFOLD_VERSION}/skaffold-linux-amd64
-RUN wget -O skaffold "${SKAFFOLD_URL}"
-RUN chmod +x skaffold
+# the sdk can install everythiung for us, use the smallest image
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine as base
 
-# Download kustomize. The curl method below is the official / documented way of getting kustomize
-FROM  curlimages/curl as download-kustomize
-USER root
-RUN apk add --no-cache bash
-RUN curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
-RUN chmod +x kustomize
-
-
-FROM gcr.io/cloud-builders/kubectl as runtime
-ENV PATH=/builder/bin/:$PATH
+FROM debian:bullseye-backports
 ENV DOCKER_CONFIG=/builder/home/.docker
+ENV PATH=/builder/google-cloud-sdk/bin:$PATH
+RUN mkdir --mode=0766 -p /builder/bin
+
+COPY --from=base /usr/local/bin/docker /usr/local/bin/
+COPY --from=base /google-cloud-sdk /builder/google-cloud-sdk
+COPY skaffold.bash /builder/skaffold.bash
+
 RUN mkdir -p /builder/bin && \
     apt-get update && \
     apt-get install --no-install-recommends --no-install-suggests -y \
-    git python unzip curl wget && \
+        openssh-client git python3 unzip curl wget ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean all
 
-COPY --from=docker:18.09.6 /usr/local/bin/docker /usr/local/bin/
-COPY --from=download-skaffold skaffold /builder/bin
-COPY --from=download-kustomize kustomize /builder/bin
-COPY skaffold.bash /builder/skaffold.bash
+RUN /builder/google-cloud-sdk/install.sh --bash-completion=false --path-update=true --usage-reporting=false \
+	--additional-components kubectl kustomize skaffold
+
 RUN chmod +700 /builder/skaffold.bash
 ENTRYPOINT ["/builder/skaffold.bash"]
-
-
-

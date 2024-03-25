@@ -8,6 +8,7 @@ resources:
 - notify-task.yaml
 - nuke-deployment.yaml
 - skaffold-deploy-apps.yaml
+- deploy-apps.yaml
 - skaffold-run.yaml
 - slack-notify.yaml
 - wait-platform-up.yaml

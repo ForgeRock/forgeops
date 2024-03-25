@@ -4,8 +4,19 @@
 import argparse
 import os
 import sys
+import time
 from urllib import request
 import utils
+import json
+
+bundles = {
+    'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'dev/scripts'],
+    'ds': ['base/ds-idrepo'],
+    'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
+    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
+    'am': ['dev/am'],
+    'idm': ['dev/idm']
+}
 
 def get_component_url(component, tag):
     """Calculates the target URL of the desired component"""
@@ -33,14 +44,7 @@ def deploy_local_manifest(component, ns, fqdn):
     image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
     utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
               cwd=image_defaulter)
-    bundles = {
-        'base': ['dev/kustomizeConfig', 'base/secrets', 'base/ingress', 'base/git-server', 'dev/scripts'],
-        'ds': ['base/ds-idrepo'],
-        'apps': ['base/amster', 'dev/am', 'dev/idm', 'base/rcs-agent'],
-        'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
-        'am': ['dev/am'],
-        'idm': ['dev/idm']
-    }
+
     components_to_install = bundles.get(component, [f'base/{component}'])
     # Temporarily add the wanted kustomize files
     for c in components_to_install:
@@ -63,19 +67,30 @@ def deploy_component(component, ns, fqdn, tag):
 
 def uninstall_component(component, ns):
     """Uninstall a manifest"""
-    component_url = get_component_url(component, 'latest')
+    if  component == "quickstart":
+        for c in ['ui', 'apps', 'ds', 'base']:
+            uninstall_component(c, ns)
+        return
     try:
-        with request.urlopen(component_url, timeout=5) as r:
-            contents = r.read().decode('ascii')
-            contents = contents.replace('namespace: default', f'namespace: {ns}')
-            utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -',
-                      stdin=bytes(contents, 'ascii'))
-            if component in ['base', 'quickstart']:
-                utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
-                utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
-            if component in ['apps', 'idm']:
-                # Temporary: only need this IDM delete until we release. Latest release idm is a statefulset
-                utils.run('kubectl', f'-n {ns} delete deployment -l app.kubernetes.io/component=idm')
+        # Clean out the temp kustomize files
+        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+        image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
+        components_to_delete = bundles.get(component, [f'base/{component}'])
+        # Temporarily add the wanted kustomize files
+        for c in components_to_delete:
+            utils.run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=image_defaulter)
+        _, contents, _ = utils.run('kustomize', f'build {image_defaulter}', cstdout=True)
+        contents = contents.decode('ascii')
+        utils.run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
+        # Clean out the temp kustomize files
+        utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+                cwd=image_defaulter)
+
+        if component in ['base', 'quickstart']:
+            utils.run('kubectl', f'-n {ns} delete all -l app.kubernetes.io/part-of=forgerock')
+            utils.run('kubectl', f'-n {ns} delete pvc --all --ignore-not-found=true')
     except Exception as e:
         print(f'Could not delete {component}. Got: {e}')
         sys.exit(1)  # Hide python traceback.
@@ -86,12 +101,13 @@ def deploy_quickstart(ns, fqdn, tag):
     deploy_component('base', ns, fqdn, tag)
     utils.message('\nDeploying ds.yaml. This is includes all directory resources.')
     deploy_component('ds', ns, fqdn, tag)
-    utils.message('\nWaiting for git-server and DS deployments. This can take a few mins. First installation takes longer.')
-    utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s')
-    utils.run('kubectl', f'-n {ns} rollout status --watch statefulset ds-idrepo --timeout=300s')
+    utils.message('\nWaiting for DS deployment. This can take a few mins. First installation takes longer.')
+    time.sleep(2)
+    utils.wait_for_ds(ns, 'ds-idrepo')
     utils.message('\nDeploying apps.')
     deploy_component('apps', ns, fqdn, tag)
     utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
+    time.sleep(2)
     utils.run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s')
     utils.message('\nWaiting for amster job to complete. This can take several minutes.')
     utils.run('kubectl', f'-n {ns} wait --for=condition=complete job/amster --timeout=600s')
@@ -115,12 +131,13 @@ def overlay_app_configs(ns, am=True, idm=True):
         utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace')
         utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
     if idm:
-        idm_config_path = os.path.join(config_profile_path, 'idm', 'conf')
         _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
                                        cstdout=True)
         idm_pod_name = idm_pod_name.decode('ascii')
         utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace')
-        utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
+        for directory in os.listdir(os.path.join(config_profile_path, 'idm')):
+            idm_config_path = os.path.join(config_profile_path, 'idm', directory)
+            utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
 
     utils.message('Restarting AM and IDM pods')
     if am:
@@ -128,66 +145,65 @@ def overlay_app_configs(ns, am=True, idm=True):
     if idm:
         utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- kill 1')
 
-def install_dependencies():
-    """Check and install dependencies"""
-    print('Checking secret-agent operator and related CRDs:', end=' ')
-    try:
-        utils.run('kubectl', 'get crd secretagentconfigurations.secret-agent.secrets.forgerock.io',
-                  cstderr=True, cstdout=True)
-    except Exception as _e:
-        utils.warning('secret-agent CRD not found. Installing secret-agent.')
-        utils.secretagent('apply')
+def build_docker_image(component, default_repo):
+    """Builds custom docker images"""
+    # Clean out the temp kustomize files
+    base_dir = os.path.join(sys.path[0], '../')
+    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    image_defaulter = os.path.join(kustomize_dir, 'dev', 'image-defaulter')
+    utils.run('kustomize', 'edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*',
+              cwd=image_defaulter)
+    if default_repo:
+        default_repo_cmd = f'--default-repo={default_repo}'
     else:
-        utils.message('secret-agent CRD found in cluster.')
+        default_repo_cmd = ''
+    utils.run('skaffold', f'build -p {component} --file-output=tag.json {default_repo_cmd}', cwd=base_dir)
+    with open(os.path.join(base_dir, 'tag.json')) as tag_file:
+        tag_data = json.load(tag_file)['builds'][0]["tag"]
+    regex_name = {
+        'am': '.*am',
+        'amster' : '.*amster.*',
+        'idm': '.*idm',
+        'ds-idrepo': '.*ds-idrepo.*',
+        'ds-cts': '.*ds-cts.*',
+        'ig': '.*ig.*'
+    }
+    name = regex_name.get(component, component)
+    utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
+    utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}"')
 
-    print('Checking ds-operator and related CRDs:', end=' ')
-    try:
-        utils.run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
-    except Exception:
-        utils.warning('ds-operator CRD not found. Installing ds-operator.')
-        utils.dsoperator('apply')
-    else:
-        utils.message('ds-operator CRD found in cluster.')
-    print()
 
 def main():
     common = argparse.ArgumentParser(add_help=False)
     common.add_argument('-n', '--namespace', default='',
                         help='Target namespace (default: current namespace)')
-    common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm', 
-                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'rcs-agent', []])
+    common.add_argument('components', nargs='*', choices=['quickstart', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
+                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
+                                                          'rcs-agent', []])
     parser = argparse.ArgumentParser(
         description='Manage ForgeRock platform components')
-    subparser = parser.add_subparsers(dest='cmd', required=True)
+    subparser = parser.add_subparsers(dest='cmd', required=True, metavar='{command}')
     parser_install = subparser.add_parser('install', parents=[common],
                                           help='Install the platform components or component bundles using local manifests')
     parser_install.add_argument('-f', '--fqdn', dest='fqdn',
                                 help='Select the FQDN for this deployment')
-    install_mode_group = parser_install.add_mutually_exclusive_group()
-    install_mode_group.add_argument('--stable', dest='stable', action='store_true',
-                                    help='Install the platform using latest stable manifests. You can set the release tag using --tag')
-    install_mode_group.add_argument('--dev', dest='dev', action='store_true',
-                                    help='Install the platform using local manifests and nightly Docker images. (This is the default mode)')
-    parser_install.add_argument('-t', '--tag', dest='tag', default='latest',
-                                help='Select the forgeops tag to install when using --stable (default: latest)')
     parser_delete = subparser.add_parser(
         'delete', parents=[common], help='Delete ForgeRock Platform components or component bundles')
     parser_delete.add_argument('-y', '--yes', dest='skip_confirmation', action='store_true',
                                help='Skip delete confirmation')
+    parser_build = subparser.add_parser('build', help='Build custom docker images')
+    parser_build.add_argument('components', nargs='*', choices=['am', 'amster', 'idm', 'ds-idrepo', 'ds-cts', 'ig'])
+    parser_build.add_argument('-r', '--default-repo', dest='registry')
     subparser.add_parser('info', parents=[common], help='Print relevant deployment information')
-    subparser.add_parser('config', parents=[common], help='Copy local configs to AM and IDM')
+    subparser.add_parser('config', parents=[common])
     args = parser.parse_args()
 
     _, ctx_namespace, _ = utils.run('kubectl',
                                     'config view --minify --output=jsonpath={..namespace}', cstdout=True)
     ctx_namespace = ctx_namespace.decode('ascii') if ctx_namespace else 'default'
-    namespace = args.namespace or ctx_namespace
+    namespace = getattr(args, 'namespace', None) or ctx_namespace
     components = args.components if getattr(args, 'components', None) else ['quickstart']
     fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
-    stable = getattr(args, 'stable', None)
-    tag = getattr(args, 'tag', None) if stable else None
-    if stable:
-        utils.warning(f'Using "stable" images and k8s manifests as specified in ForgeRock/forgeops "{tag}" release')
     if args.cmd == 'info':
         utils.printsecrets(namespace)
         utils.printurls(namespace)
@@ -208,17 +224,17 @@ def main():
         for c in components:
             uninstall_component(c, namespace)
         return
-
-    install_dependencies()
+    if args.cmd == 'build':
+        for c in components:
+            build_docker_image(c, args.registry)
+        return
+    utils.install_dependencies()
     utils.message(f'Installing component(s): {components}\n')
     if 'quickstart' in components:
-        deploy_quickstart(namespace, fqdn, tag)
-        if tag is None:
-            print()
-            overlay_app_configs(namespace)
+        deploy_quickstart(namespace, fqdn, None)
     else:
         for c in components:
-            deploy_component(c, namespace, fqdn, tag)
+            deploy_component(c, namespace, fqdn, None)
 
     if args.cmd == 'install' and ('base' in components or 'quickstart' in components):
         utils.waitforsecrets(namespace)

@@ -49,7 +49,7 @@ installdependencies () {
     printf "Checking secret-agent operator and related CRDs: "
     if ! $(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io &> /dev/null); then
         printf "secret-agent CRD not found. Installing secret-agent\n"
-        kubectl -n secret-agent-system apply -f "https://github.com/${SECRETAGENT_REPO}/releases/latest/download/secret-agent.yaml"
+        kubectl -n secret-agent-system apply -f "https://github.com/${SECRETAGENT_REPO}/releases/download/v1.0.5/secret-agent.yaml"
         echo "Waiting for secret agent operator..."
         sleep 5
         kubectl wait --for=condition=Established crd secretagentconfigurations.secret-agent.secrets.forgerock.io --timeout=30s
@@ -62,7 +62,7 @@ installdependencies () {
     printf "Checking ds-operator and related CRDs: "
     if ! $(kubectl get crd directoryservices.directory.forgerock.io &> /dev/null); then
         printf "ds-operator CRD not found. Installing ds-operator\n"
-        kubectl -n fr-system apply -f "https://github.com/${DSOPERATOR_REPO}/releases/latest/download/ds-operator.yaml"
+        kubectl -n fr-system apply -f "https://github.com/${DSOPERATOR_REPO}/releases/download/v0.0.8/ds-operator.yaml"
         echo "Waiting for ds-operator..."
         sleep 5
         kubectl wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s
@@ -83,14 +83,15 @@ deployquickstart () {
     echo "******Deploying ds.yaml. This is includes all directory resources******"
     deploycomponent "ds"
     echo 
-    echo "******Waiting for git-server and DS pods to come up. This can take several minutes******"
-    kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=git-server --timeout=120s
+    echo "******Waiting for DS pods to come up. This can take several minutes******"
+    sleep 2
     kubectl -n ${FORGEOPS_NAMESPACE} rollout status --watch statefulset ds-idrepo --timeout=300s
     echo
     echo "******Deploying AM and IDM******"
     deploycomponent "apps"
     echo 
     echo "******Waiting for AM deployment to become available. This can take several minutes******"
+    sleep 2
     kubectl -n ${FORGEOPS_NAMESPACE} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout=600s
     echo
     echo "******Waiting for amster job to complete. This can take several minutes******"
@@ -137,7 +138,7 @@ deploylocalmanifest () {
     (cd kustomize/dev/image-defaulter && kustomize edit remove resource ../../../kustomize/*/*/* ../../../kustomize/*/*)
     case "${1}" in
     "base")
-        INSTALL_COMPONENTS=("dev/kustomizeConfig" "base/secrets" "base/ingress" "base/git-server" "dev/scripts")
+        INSTALL_COMPONENTS=("dev/kustomizeConfig" "base/secrets" "base/ingress" "dev/scripts")
         ;;
     "ds")
         INSTALL_COMPONENTS=("base/ds-idrepo") #no "ds-cts" in dev-mode
@@ -220,11 +221,7 @@ timeout() { perl -e 'alarm shift; exec @ARGV' "$@"; }
 ########################################################################################
 ################################### MAIN STARTS HERE ###################################
 ########################################################################################
-echo $'\e[5;31m'
-echo "**********************************************************************************"
-echo "*************THIS SCRIPT IS DEPRECATED. USE /bin/cdk INSTEAD**********************"
-echo "**********************************************************************************"
-echo $'\e[0m'
+
 UNINSTALL_COMPONENT=false
 PRINT_SECRETS=false
 LOCAL_MODE=false

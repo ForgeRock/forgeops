@@ -11,9 +11,6 @@ cp "/home/forgerock/cdk/${cfgServiceDir}/default.json" ${cfgServiceDir}
 
 # tar destination defaults to /home/forgerock/updated-config.tar
 # Pass `-` as the argument to output the tar stream to stdout. Use kubectl exec am-pod -- export.sh - > tar.out
-export.sh - > tar.out
 dest=${1:-"/home/forgerock/updated-config.tar"}
-
-tar -c --files-from=/var/tmp/export-list -f $dest
 
 tar --exclude boot.json -cf $dest config

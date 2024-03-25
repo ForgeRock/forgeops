@@ -30,15 +30,17 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
             stage(stageName) {
                 // TODO: To update to use 'pit2-platform-ui' once RELENG-1165 is done
                 node('pit2-upgrade') {
-                    def forgeopsPath = localGitUtils.checkoutForgeops()
-
                     def adminImageTag
                     def adminImageRepository
                     def endUserImageTag
                     def endUserImageRepository
                     def loginImageTag
                     def loginImageRepository
-                    dir('forgeops') {
+
+                    privateWorkspace {
+                        checkout scm
+                        sh "git checkout ${commonModule.FORGEOPS_GIT_COMMIT}"
+
                         // Admin UI Tag management
                         def yamlAdminFile = 'kustomize/base/admin-ui/deployment.yaml'
                         def adminImage = readYaml(file: yamlAdminFile).spec.template.spec.containers.image[0]
@@ -63,7 +65,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
 
                     def uiTestsConfig = [
                             TESTS_SCOPE                           : 'tests/k8s/postcommit/platform_ui',
-                            CLUSTER_DOMAIN                        : 'pit2.forgeops.com',
+                            CLUSTER_DOMAIN                        : 'pit-24-7.forgeops.com',
                             CLUSTER_NAMESPACE                     : 'platform-ui',
                             COMPONENTS_ADMINUI_IMAGE_TAG          : adminImageTag,
                             COMPONENTS_ADMINUI_IMAGE_REPOSITORY   : adminImageRepository,
@@ -75,7 +77,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                             SKIP_CLEANUP                          : 'True', // Defer cleanup of the K8S cluster, so it can be used by the e2e tests.
                             REPORT_NAME_PREFIX                    : normalizedStageName,
                             STASH_LODESTAR_BRANCH                 : commonModule.LODESTAR_GIT_COMMIT,
-                            EXT_FORGEOPS_PATH                     : forgeopsPath,
+                            STASH_FORGEOPS_BRANCH                 : commonModule.FORGEOPS_GIT_COMMIT,
                     ]
 
                     dir("platform-ui") {
@@ -90,7 +92,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 }
             }
         } catch(Exception e) {
-            return new FailureOutcome(e, reportUrl)
+            return new FailureOutcome(e, "${env.BUILD_URL}/pit2-platform-ui/")
         }
 
         return new Outcome(Status.SUCCESS, reportUrl)

@@ -8,3 +8,12 @@ resources:
 - ../../base/end-user-ui
 - ../../base/login-ui
 - ../../base/admin-ui
+
+# Set the image to the dev images that are built every night
+images:
+- name: am
+  newName: gcr.io/forgeops-public/am
+  newTag: dev
+- name: idm
+  newName: gcr.io/forgeops-public/idm
+  newTag: dev

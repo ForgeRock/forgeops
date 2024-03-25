@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="${SCRIPT_DIR}/../.."
+SCRIPT_NAME="$(basename "$0")"
+
+usage () {
+read -r -d '' help <<-EOF
+Build ForgeOps CDK Images
+
+For Internal Use Only
+
+Usage:
+    ${SCRIPT_NAME} cdk 7.1-dev gcr.io/example-project/sub
+    IMAGE_TAG=7.1-dev ${SCRIPT_NAME} cdk
+EOF
+    printf "%-10s \n" "$help"
+}
+
+[[ -n "$1" ]] \
+    && PROFILE_NAME=$1
+
+[[ -n "$PROFILE_NAME" ]] \
+    || { echo "PROFILE_NAME must be set or supplied as an argument."; exit 1; }
+
+[[ -n "$2" ]] \
+    && IMAGE_TAG=$2
+
+[[ -n "$IMAGE_TAG" ]] \
+    || { echo "IMAGE_TAG must be set or supplied as an argument."; exit 1; }
+
+[[ -n "$3" ]] \
+    && REPO=$3
+
+[[ -n "$REPO" ]] \
+    || { echo "REPO must be set or supplied as an argument."; exit 1; }
+
+# Configure a ssh for git if set.
+[[ -n "${GIT_KEY}" ]] \
+    && { . ${SCRIPT_DIR}/lib-git-auth.sh \
+        || { echo "failed to configure credentials" && exit 1; };}
+
+
+if ! ${REPO_DIR}/bin/platform-config --profile-name "${PROFILE_NAME}";
+then
+    echo "failed to build config"
+    exit 1
+fi
+
+if ! (cd ${REPO_DIR}; skaffold --filename skaffold.yaml \
+                               --profile docker-image-tag \
+                               --default-repo "${REPO}" \
+                               build);
+then
+    echo "failed to build"
+    exit 1
+fi

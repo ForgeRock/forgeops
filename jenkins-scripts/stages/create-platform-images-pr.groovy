@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 ForgeRock AS. All Rights Reserved
+ * Copyright 2021 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -11,29 +11,24 @@
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 
-def runStage(PipelineRunLegacyAdapter pipelineRun) {
-    pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform Images PR') {
-        node('google-cloud') {
-            stage('Create Platform Images PR') {
-                privateWorkspace {
-                    def DEFAULT_PLATFORM_IMAGES_TAG = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+/** Open a pull request against the Platform-Images repo, containing latest ForgeOps commit */
+void runStage(PipelineRunLegacyAdapter pipelineRun) {
+    pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform-Images PR') {
+        def prBranchName = "increment-platform-images-version-to-${commonModule.FORGEOPS_SHORT_GIT_COMMIT}"
+        def targetPlatformImagesBranch = env.BRANCH_NAME // promote product branches to identically-named branch in ForgeOps
 
-                    def platformImagesRevision = bitbucketUtils.getLatestCommitHash(
-                            'cloud',
-                            'platform-images',
-                            DEFAULT_PLATFORM_IMAGES_TAG)
+        node('build&&linux') {
+            git branch: targetPlatformImagesBranch, url: 'ssh://git@stash.forgerock.org:7999/~rockbot/platform-images.git'
+            sh "git checkout -b ${prBranchName}"
+            gitUtils.setupDefaultUser()
 
-                    def dockerProperties = [
-                            'gitCommit'           : commonModule.FORGEOPS_GIT_COMMIT,
-                            'platformImagesCommit': platformImagesRevision,
-                            'lodestarCommit'      : commonModule.LODESTAR_GIT_COMMIT,
-                    ]
+            def forgeOpsProperties = [
+                    'gitCommit':    commonModule.FORGEOPS_GIT_COMMIT
+            ]
 
-                    return platformImageUtils.createPlatformImagePR('forgeops', env.BRANCH_NAME, dockerProperties)
-                            ? Status.SUCCESS.asOutcome()
-                            : Status.SKIPPED.asOutcome()
-                }
-            }
+            platformImageUtils.createPlatformImagePR('forgeops', targetPlatformImagesBranch, forgeOpsProperties)
+
+            return Status.SUCCESS.asOutcome()
         }
     }
 }

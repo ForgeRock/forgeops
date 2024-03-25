@@ -141,75 +141,13 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 
 #****** UPGRADE CONFIG AND REAPPLY PLACEHOLDERS ******#
 upgrade_config(){
-
-	UPGRADER_DIR="$DOCKER_ROOT/am-config-upgrader"
-	AM_DIR="$DOCKER_ROOT/am"
-	printf "\nReplacing missing placeholders using AM config upgrader...\n\n"
-	printf "Skaffold is used to run the AM upgrader job. Ensure your default-repo is set.\n\n"
-	sleep 3
-
-	rm -fr "$UPGRADER_DIR/config"
-
-	cp -R "$DOCKER_ROOT/am/config"  "$UPGRADER_DIR/"
-	rm -fr "$AM_DIR/config"
-
-	echo "Removing any existing config upgrader jobs..."
-	kubectl delete job am-config-upgrader || true
-
-	# Deploy AM config upgrader job
-	echo "Deploying AM config upgrader job..."
-	exp=$(skaffold run -p config-upgrader)
-
-	# Check to see if AM config upgrader pod is running
-	echo "Waiting for AM config upgrader to come up."
-	while ! [[ "$(kubectl get pod -l app=am-config-upgrader --field-selector=status.phase=Running)" ]];
-	do
-			sleep 5;
-	done
-	printf "AM config upgrader is responding..\n\n"
-
-	pod=`kubectl get pod -l app=am-config-upgrader -o jsonpath='{.items[0].metadata.name}'`
-
-	rm -fr "$UPGRADER_DIR/config"
-
-	kubectl exec $pod -- /home/forgerock/tar-config.sh
-	kubectl cp $pod:/am-config/config/placeholdered-config.tar "$UPGRADER_DIR/placeholdered-config.tar"
-
-	tar -xvf $UPGRADER_DIR/placeholdered-config.tar -C $UPGRADER_DIR
-
-	cp -R "$UPGRADER_DIR/config"  "$AM_DIR"
-	rm -fr "$UPGRADER_DIR/config"
-	rm "$UPGRADER_DIR/placeholdered-config.tar"
-
-	# Shut down config upgrader job
-	printf "Shutting down config upgrader job...\n"
-
-	del=$(skaffold delete -p config-upgrader)
+	$script_dir/am-config-upgrader
 }
 
 # clear the product configs $1 from the docker directory.
 clean_config()
 {
-    for c in "${@}";
-    do
-        ## remove previously copied configs
-        echo "removing $c configs from $DOCKER_ROOT"
-
-        if [ "$c" == "amster" ]; then
-            rm -rf "$DOCKER_ROOT/$c/config"
-
-	    elif [ "$c" == "am" ]; then
-	    	rm -rf "$DOCKER_ROOT/$c/config"
-
-        elif [ "$c" == "idm" ]; then
-            rm -rf "$DOCKER_ROOT/$c/conf"
-	    	rm -rf "$DOCKER_ROOT/$c/script"
-	    	rm -rf "$DOCKER_ROOT/$c/ui"
-        elif [ "$c" == "ig" ]; then
-            rm -rf "$DOCKER_ROOT/$c/config"
-            rm -rf "$DOCKER_ROOT/$c/scripts"
-        fi
-    done
+    $script_dir/platform-config --clean
 }
 
 patch_container() {
@@ -266,30 +204,32 @@ patch_container() {
 # Copy the product config $1 to the docker directory.
 init_config()
 {
-    if [[ -d "${PROFILE_ROOT}/$1" ]]
-    then
-	    for p in "${@}"; do
-            echo "cp -r ${PROFILE_ROOT}/$p" "$DOCKER_ROOT"
-            cp -r "${PROFILE_ROOT}/$p" "$DOCKER_ROOT"
-        done
-        return
-    fi
-    # get patch profile name
-    if [[ -d "${PROFILE_ROOT}/../$1" ]];
-    then
-        echo "cp -r ${PROFILE_ROOT}/../$1" "$DOCKER_ROOT"
-        cp -r "${PROFILE_ROOT}/../$1" "$DOCKER_ROOT"
-    fi
+    ${script_dir}/platform-config --clean --force --profile-dir "config/7.0/${_arg_profile}"
 }
 
 # Show the differences between the source configuration and the current Docker configuration
-# Ignore dot files, shell scripts and the Dockerfile
 # $1 - the product to diff
 diff_config()
 {
 	for p in "${COMPONENTS[@]}"; do
-		echo "diff  -u --recursive ${PROFILE_ROOT}/$p $DOCKER_ROOT/$p"
-		diff -u --recursive -x ".*" -x "Dockerfile" -x "*.sh" "${PROFILE_ROOT}/$p" "$DOCKER_ROOT/$p" || true
+		case $p in
+		idm)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/conf $DOCKER_ROOT/$p/conf"
+			diff -u --recursive "${PROFILE_ROOT}/$p/conf" "$DOCKER_ROOT/$p/conf" || true
+			;;
+		amster)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/config $DOCKER_ROOT/$p/config"
+			diff -u --recursive "${PROFILE_ROOT}/$p/config" "$DOCKER_ROOT/$p/config" || true
+			;;
+		am)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/config $DOCKER_ROOT/$p"
+			diff -u --recursive "${PROFILE_ROOT}/$p/config" "$DOCKER_ROOT/$p/config" || true
+			;;
+		ig)
+			echo "diff  -u --recursive ${PROFILE_ROOT}/$p/config $DOCKER_ROOT/$p/config"
+			diff -u --recursive "${PROFILE_ROOT}/$p/config" "$DOCKER_ROOT/$p/config" || true
+			;;
+		esac
 	done
 }
 
@@ -301,54 +241,34 @@ export_config(){
 		idm)
 			printf "\nExporting IDM configuration...\n\n"
 			rm -fr  "$DOCKER_ROOT/idm/conf"
-			kubectl cp idm-0:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
+			pod=$(kubectl get pod -l app=idm -o jsonpath='{.items[0].metadata.name}')
+			kubectl cp -c openidm $pod:/opt/openidm/conf "$DOCKER_ROOT/idm/conf"
+			printf "\nIDM configuration files have been exported to ${DOCKER_ROOT}/idm/config."
 			;;
 		amster)
 			rm -fr "$DOCKER_ROOT/amster/config"
 			mkdir -p "$DOCKER_ROOT/amster/config"
+			echo "$script_dir/amster" export "$DOCKER_ROOT/amster/config"
 			"$script_dir/amster" export "$DOCKER_ROOT/amster/config"
-			echo "Removing any existing Amster jobs..."
-			kubectl delete job amster || true
-
-			# Deploy Amster job
-			echo "Deploying Amster job..."
-			exp=$(skaffold run -p amster-export)
-
-			# Check to see if Amster pod is running
-			echo "Waiting for Amster pod to come up."
-			while ! [[ "$(kubectl get pod -l app=amster --field-selector=status.phase=Running)" ]];
-			do
-					sleep 5;
-			done
-			printf "Amster job is responding..\n\n"
-
-			pod=`kubectl get pod -l app=amster -o jsonpath='{.items[0].metadata.name}'`
-
-			# Export OAuth2Clients and IG Agents
-			echo "Executing Amster export within the amster pod"
-			kubectl exec $pod -it /opt/amster/export.sh
-
-			# Copy files locally
-			echo "Copying the export to the ./tmp directory"
-			kubectl cp $pod:/var/tmp/amster/realms/ "$DOCKER_ROOT/amster/config"
-
-			printf "Dynamic config exported\n\n"
-
-			# Shut down Amster job
-			printf "Shutting down Amster job...\n"
-
-			del=$(skaffold delete -p amster-export)
 			;;
 		am)
 			# Export AM configuration
 			printf "\nExporting AM configuration..\n\n"
-
+			# TODO: When using a diff, we dont want to delete the existing folder contents
+            # rm -fr  "$DOCKER_ROOT/am/config"
 			pod=$(kubectl get pod -l app=am -o jsonpath='{.items[0].metadata.name}')
+			# Run export.sh to export *everything*  or export-diff.sh to export only files that have changed
+			# The export command passes `-` as the destination - which writes to stdout
+			kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh "/var/tmp/updated-config.tar" \
+				&& kubectl exec $pod -c openam -- echo /var/tmp/export-list | grep -q . \
+				&& kubectl exec $pod -c openam -- /home/forgerock/export-diff.sh - | tar xf -  -C "$DOCKER_ROOT"/am \
+				|| {
+					echo ""
+					echo "No changes were made to the AM configuration. Exiting."
+					exit 0
+				}
 
-			kubectl exec $pod -- /home/forgerock/export.sh - | (cd "$DOCKER_ROOT"/am; tar xvf - )
-
-			printf "\nAny changed configuration files have been exported into ${DOCKER_ROOT}/am/config."
-			printf "\nCheck any changed files before saving back to the config folder to ensure correct formatting/functionality."
+			printf "\nAM configuration files have been exported to ${DOCKER_ROOT}/am/config."
 
 			# Upgrade config and reapply placeholders
 			upgrade_config
@@ -359,77 +279,6 @@ export_config(){
 	done
 }
 
-# Export config from the fr-config git-server to local environment
-# AM configs are processed using the config-upgrader before exporting
-export_config_dev(){
-
-	UPGRADER_DIR="$DOCKER_ROOT/am-config-upgrader"
-    echo "Exporting configs"
-	echo "Replacing missing placeholders using AM config upgrader"
-	printf "Skaffold is used to run the AM upgrader job. Ensure your default-repo is set.\n\n"
-	sleep 3
-
-	rm -fr "$UPGRADER_DIR/fr-config"
-	mkdir -p "$UPGRADER_DIR/fr-config"
-    mkdir -p "$UPGRADER_DIR/config"
-    touch "$UPGRADER_DIR/config/placeholder"
-
-	echo "Removing any existing config upgrader jobs..."
-	kubectl delete job fr-config-exporter --ignore-not-found --wait=true --timeout=30s
-
-	# Deploy AM config upgrader job
-	echo "Deploying AM config upgrader job..."
-	exp=$(skaffold run -p fr-config-exporter)
-
-	# Check to see if AM config upgrader pod is running
-	printf "Waiting for the fr-config-exporter job to initialize: "
-    while ! [[ "$(kubectl get pod -l app.kubernetes.io/name=fr-config-exporter --field-selector=status.phase=Running 2> /dev/null)" ]];
-	do
-        printf "."
-        sleep 5;
-	done
-    echo "done"
-	pod=$(kubectl get pod -l app.kubernetes.io/name=fr-config-exporter -o jsonpath='{.items[0].metadata.name}')
-    echo "Targeting $pod"
-	kubectl exec $pod -c wait-for-copy -- /scripts/tar-config.sh
-    echo "Copying configs from $pod into local environment"
-	kubectl cp $pod:/git/placeholdered-config.tar.gz "$UPGRADER_DIR/placeholdered-config.tar.gz"
-	tar -xzf $UPGRADER_DIR/placeholdered-config.tar.gz -C $UPGRADER_DIR
-
-    # Copy exported configs to docker folder
-    for p in "${COMPONENTS[@]}"; do
-        # We dont support export for all products just yet - so need to case them
-        case $p in
-		am)
-            if [[ -d  "$UPGRADER_DIR/fr-config/am" ]];
-            then
-                DOCKER_EXPORT_DIR="$DOCKER_ROOT/am"
-                rm -fr "$DOCKER_EXPORT_DIR/config"
-                cp -R "$UPGRADER_DIR/fr-config/am/config"  "$DOCKER_EXPORT_DIR"
-            fi
-			;;
-        idm)
-            if [[ -d  "$UPGRADER_DIR/fr-config/idm" ]];
-            then
-                DOCKER_EXPORT_DIR="$DOCKER_ROOT/idm"
-                rm -fr "$DOCKER_EXPORT_DIR/conf"
-                cp -R "$UPGRADER_DIR/fr-config/idm/conf" "$DOCKER_EXPORT_DIR"
-            fi
-            ;;
-		*)
-        	echo "Git export not supported for $p"
-            ;;
-		esac
-	done
-
-    echo "Deleting temporary files"
-	rm -fr "$UPGRADER_DIR/fr-config"
-    rm "$UPGRADER_DIR/placeholdered-config.tar.gz"
-
-	# Shut down config upgrader job
-	echo "Shutting down config upgrader job..."
-	del=$(skaffold delete -p fr-config-exporter)
-}
 
 # Save the configuration in the docker folder back to the git source
 save_config()
@@ -448,41 +297,17 @@ save_config()
 			cp -R "$DOCKER_ROOT/idm/conf"  "$PROFILE_ROOT/idm"
 			;;
 		amster)
-			printf "\nSaving Amster configuration..\n\n"
+			printf "\nSaving Amster configuration\n"
 			#****** REMOVE EXISTING FILES ******#
 			rm -fr "$PROFILE_ROOT/amster/config"
 			mkdir -p "$PROFILE_ROOT/amster/config"
 
-			#****** FIX CONFIG RULES ******#
-
-			# Fix FQDN and amsterVersion fields with placeholders. Remove encrypted password field.
-			fqdn=$(kubectl get configmap platform-config -o yaml |grep AM_SERVER_FQDN | head -1 | awk '{print $2}')
-
-			printf "\n*** APPLYING FIXES ***\n"
-
-			echo "Adding back amsterVersion placeholder ..."
-			echo "Adding back FQDN placeholder ..."
-			echo "Removing 'userpassword-encrypted' fields ..."
-			find "$DOCKER_ROOT/amster/config" -name "*.json" \
-					\( -exec sed -i '' "s/${fqdn}/\&{fqdn}/g" {} \; -o -exec true \; \) \
-					\( -exec sed -i '' 's/"amsterVersion" : ".*"/"amsterVersion" : "\&{version}"/g' {} \; -o -exec true \; \) \
-					-exec sed -i '' '/userpassword-encrypted/d' {} \; \
-
-			# Fix passwords in OAuth2Clients with placeholders or default values.
-			CLIENT_ROOT="$DOCKER_ROOT/amster/config/root/OAuth2Clients"
-			IGAGENT_ROOT="$DOCKER_ROOT/amster/config/root/IdentityGatewayAgents"
-
-			echo "Add back password placeholder with defaults"
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.provisioning.client.secret|openidm}\"/g' ${CLIENT_ROOT}/idm-provisioning.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{idm.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/idm-resource-server.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.rs.client.secret|password}\"/g' ${CLIENT_ROOT}/resource-server.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{pit.client.secret|password}\"/g' ${CLIENT_ROOT}/oauth2.json
-			sed -i '' 's/\"userpassword\" : null/\"userpassword\" : \"\&{ig.agent.password|password}\"/g' ${IGAGENT_ROOT}/ig-agent.json
-
 			#****** COPY FIXED FILES ******#
 			cp -R "$DOCKER_ROOT/amster/config"  "$PROFILE_ROOT/amster"
 
-			printf "\n*** The above fixes have been made to the Amster files. If you have exported new files that should contain commons placeholders or passwords, please update the rules in this script.***\n\n"
+			printf "\nThe above fixes have been made to the Amster files."
+			printf "\nIf you have exported new files that should contain commons "
+			printf "\nplaceholders or passwords, please update the rules in this script.\n\n"
 			;;
 
 		*)
@@ -501,7 +326,7 @@ add_profile ()
 {
 
     # if the version isn't 7.0 use it as the branch for platform-images
-    [[ $_arg_version == "7.0" ]] && branch_name=$_arg_version
+    [[ $_arg_version != "7.0" ]] && branch_name=$_arg_version
     if ! ${script_dir}/platform-config --profile fidc --branch-name "${branch_name}"
     then
         echo "Failed to clone addon profile"
@@ -511,6 +336,14 @@ add_profile ()
     cp -r "${script_dir}/../config/7.0/cdk/amster" "$DOCKER_ROOT"
 
 }
+
+
+sed_flags=" -i "
+if [[ "${OSTYPE}" == "darwin"* ]];
+then
+    sed_flags+=" '' "
+fi
+sed_cmd="sed ${sed_flags}"
 
 # chdir to the script root/..
 cd "$script_dir/.."
@@ -560,9 +393,6 @@ sync)
 	;;
 upgrade)
 	upgrade_config
-	;;
-export-dev)
-	export_config_dev
 	;;
 restore)
 	git restore "$PROFILE_ROOT"
