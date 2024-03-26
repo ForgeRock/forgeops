@@ -32,9 +32,9 @@ The Docker images referenced in the Kustomize files are generic (for example,
 `gcr.io/forgerock-io/am-base:7.x.0`).
 
 You can not directly deploy the generic images, because you need Docker images
-that have the configuration "baked in". The `forgeops build` command builds new 
-Docker images that include configuration, and sets up the Docker image tags in 
-the image defaulter. 
+that are rebuilt to work with forgeops. The `forgeops build` command builds new 
+Docker images that include any customizations to the Docker iamge or custom product 
+configuration, and sets up the Docker image tags in the [image defaulter](./deploy/image-defaulter/kustomization.yaml). 
 
 For more information, see the forgeops repository's [top-level README](../README.md).
 

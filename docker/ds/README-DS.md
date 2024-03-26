@@ -8,7 +8,7 @@ The current production image is in the `ds-new` folder.
 
 The pre 7.3.0 images cts and idrepo here are for reference and ForgeOps internal use only.
 
-## Directory Folders
+## Directory folders
 
 * ds-new - The default DS image used in all ds deployments
 * common: common scripts used to build multiple images
@@ -39,7 +39,7 @@ To create a shell alias for the above command:
 alias fdebug='kubectl run -it dsutil --image=us-docker.pkg.dev/forgeops-public/images/ds-util --restart=Never -- bash'
 ```
 
-## Backup/restore Considerations
+## Backup/restore considerations
 
 DS backups via the `dsbackup create` commands contain user data and its replication metadata.
 The metadata must refer to the current contents of the changelog, to avoid divergences, meaning restoring the backup implies knowledge of when it was taken.

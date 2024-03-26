@@ -1,4 +1,6 @@
-This directory contains per environment (env) values files to be used with our helm
+>NOTE: This README is for the new forgeops-ng command only which is currently in technology preview status
+
+This directory contains per environment (env) values files to be used with our Helm
 chart. These files are created and managed by the `forgeops-ng env` command. It
 will create several files per env.
 
@@ -26,6 +28,6 @@ git push
 helm install -f helm/stage/values.yaml ./charts/identity-platform
 ```
 
-By default, the env command outputs values files and a kustomize overlay. If
-you don't want it to output a kustomize overlay, set `NO_KUSTOMIZE=true` in
+By default, the env command outputs values files and a Kustomize overlay. If
+you don't want it to output a Kustomize overlay, set `NO_KUSTOMIZE=true` in
 `/path/to/forgeops/forgeops-ng.conf`.
