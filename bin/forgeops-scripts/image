@@ -79,7 +79,7 @@ def main():
     elif os.getenv('HELM_PATH'):
         helm = os.getenv('HELM_PATH')
 
-    kustomize = 'kustomize'
+    kustomize = 'kustomize-ng'
     if getattr(args, 'kustomize', None):
         kustomize = args.kustomize
     elif os.getenv('KUSTOMIZE_PATH'):

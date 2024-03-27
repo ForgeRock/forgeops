@@ -54,7 +54,7 @@ processArgs() {
 
   # Vars that can be set in /path/to/forgeops/forgeops-ng.conf
   BUILD_PATH=${BUILD_PATH:-docker}
-  KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize}
+  KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize-ng}
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
   OPERATOR=${OPERATOR:-false}
