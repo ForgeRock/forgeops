@@ -13,6 +13,10 @@ import logging
 import json
 import re
 from pathlib import Path
+import sys
+file_name = Path(__file__)
+current_file_path = file_name.parent.resolve()
+root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -398,7 +402,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     return contents: generated kubernetes manifest. This is equivalent to `kustomize build profile_dir`.
     """
     # Clean out the temp kustomize files
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    kustomize_dir = os.path.join(root_dir, 'kustomize')
     src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
     image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
     profile_dir = custom_path or os.path.join(deploy_path, component)
@@ -477,7 +481,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     deploy_path: base path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy.
     src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
     """
-    deploy_path = deploy_path or os.path.join(sys.path[0], '..', 'kustomize', 'deploy')
+    deploy_path = deploy_path or os.path.join(root_dir, 'kustomize', 'deploy')
     custom_path = os.path.join(deploy_path, component)
     _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=custom_path, src_profile_dir=src_profile_dir, deploy_path=deploy_path)
 
@@ -517,7 +521,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
-        kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+        kustomize_dir = os.path.join(root_dir, 'kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
         _, contents = generate_package(component, 'cdk', ns, '.', ingress_class, '', legacy, config_profile, operator, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
@@ -532,7 +536,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
         shutil.rmtree(uninstall_dir, ignore_errors=True)
 
 def _inject_kustomize_amster(kustomize_profile_path, config_profile):
-    docker_dir = os.path.join(sys.path[0], '../docker')
+    docker_dir = os.path.join(root_dir, 'docker')
     amster_cm_name = 'amster-files.yaml'
     amster_cm_path = os.path.join(kustomize_profile_path, amster_cm_name)
     amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', config_profile)
@@ -658,8 +662,7 @@ def dsoperator(k8s_op, tag='latest'):
 
 def _install_certmanager_issuer():
     """Install certmanager self-signed issuer. This works as a placeholder issuer."""
-    base_dir = os.path.join(sys.path[0], '../')
-    addons_dir = os.path.join(base_dir, 'cluster', 'addons', 'certmanager')
+    addons_dir = os.path.join(root_dir, 'cluster', 'addons', 'certmanager')
     issuer = os.path.join(addons_dir, 'files', 'selfsigned-issuer.yaml')
     print('\nInstalling cert-manager\'s self-signed issuer: ', end='')
     sys.stdout.flush()
@@ -717,8 +720,6 @@ def build_docker_image(component, context, dockerfile, push_to, tag, container_e
     return tag_data: the tag of the built image.
     """
     # Clean out the temp kustomize files
-    base_dir = os.path.join(sys.path[0], '../')
-
     if config_profile:
         build_args = f'--build-arg CONFIG_PROFILE={config_profile}'
     else:
@@ -733,9 +734,9 @@ def build_docker_image(component, context, dockerfile, push_to, tag, container_e
         else:
             image = f'{component}:{tag}'
     run(f'{container_engine}',
-        f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=base_dir)
+        f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=root_dir)
     if push_to.lower() != 'none':
-        run(f'{container_engine}', f'push {image}', cwd=base_dir)
+        run(f'{container_engine}', f'push {image}', cwd=root_dir)
     return image
 
 
