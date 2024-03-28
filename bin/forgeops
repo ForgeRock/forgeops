@@ -111,7 +111,7 @@ def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_pro
 
 def overlay_app_configs(ns, config_profile, am=True, idm=True):
     """Overlay local configs in the AM and IDM pods"""
-    config_profile_path = os.path.join(sys.path[0], '../docker')
+    config_profile_path = os.path.join(root_dir, 'docker')
     if am:
         am_config_path = os.path.join(config_profile_path, 'am', 'config-profiles', config_profile, 'config')
         _, am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
@@ -136,7 +136,7 @@ def overlay_app_configs(ns, config_profile, am=True, idm=True):
 
 def build_docker_image(component, push_to, tag, config_profile=None, deploy_path=None):
     """Builds custom docker images"""
-    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
+    kustomize_dir = os.path.join(root_dir, 'kustomize')
     image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
 
     # Look for PUSH_TO environment variable
@@ -253,7 +253,7 @@ def main():
             remap = size_map[size]
 
     # Set the deploy directory
-    kustomize_dir = os.path.join(sys.path[0], '../kustomize')
+    kustomize_dir = os.path.join(root_dir, 'kustomize')
     if getattr(args, 'deploy_env', None):
         deploy_path = os.path.join(kustomize_dir, 'deploy-' + str(args.deploy_env))
     else:
@@ -349,7 +349,7 @@ def main():
 
     if args.cmd == 'build':
         if args.reset:
-            image_defaulter = os.path.join(deploy_path, 'image-defaulter' ) if deploy_path else os.path.join(sys.path[0], '../kustomize', 'deploy', 'image-defaulter' )
+            image_defaulter = os.path.join(deploy_path, 'image-defaulter' ) if deploy_path else os.path.join(root_dir, 'kustomize', 'deploy', 'image-defaulter' )
             utils.message(f'Reset to git index: {image_defaulter}. ')
             utils.run('git', f'checkout {image_defaulter}')
             return
