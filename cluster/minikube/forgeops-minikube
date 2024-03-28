@@ -4,6 +4,7 @@
 import argparse
 import sys
 import utils
+import forgeops_dependencies
 import platform
 import os
 import subprocess
@@ -154,7 +155,7 @@ def main():
         minikube_ver = minikube_ver.decode('ascii')
 
         # Validate minikube version against minimum required version in utils.py
-        utils.check_component_version('minikube', minikube_ver)
+        forgeops_dependencies.check_component_version('minikube', minikube_ver)
 
         # Set minikube arguments
         k8s_ver = f'--kubernetes-version={args.version}'

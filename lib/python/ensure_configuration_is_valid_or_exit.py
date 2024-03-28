@@ -4,7 +4,6 @@ import site
 from pathlib import Path
 from hashlib import sha1
 
-
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
 root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
@@ -12,9 +11,9 @@ dependencies_dir = os.path.join(root_dir, 'bin', 'forgeops_scripts', 'lib', 'dep
 # Insert lib folders to python path
 sys.path.insert(0, str(root_dir))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
-from bin.utils import warning, error, run
 from lib.python.constants import ENV_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
     CONFIGURED_VERSION_FILE, DEPENDENCIES_DIR
+from bin.utils import run, warning, error
 
 
 def compute_configuration_version():

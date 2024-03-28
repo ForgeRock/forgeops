@@ -16,8 +16,6 @@ CONTAINER_ENGINE=docker
 #
 # Only for generate
 #
-# If you want to use the ds-operator set OPERATOR=true
-OPERATOR=false
 # PULL_POLICY is image pull policy : see available values https://kubernetes.io/docs/concepts/containers/images/
 #PULL_POLICY=
 # Source overlay to use when creating a new overlay
