@@ -18,8 +18,6 @@ CONTAINER_ENGINE=docker
 #
 # Only for generate
 #
-# If you want to use the ds-operator swap the comment
-OPERATOR=false
 #PULL_POLICY=
 # Source overlay to use when creating a new overlay
 SOURCE=default

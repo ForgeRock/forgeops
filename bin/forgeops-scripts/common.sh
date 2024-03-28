@@ -57,7 +57,6 @@ processArgs() {
   KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize-ng}
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
-  OPERATOR=${OPERATOR:-false}
   PUSH_TO=${PUSH_TO:-}
 
   # Vars that cannot be set in /path/to/forgeops/forgeops-ng.conf
@@ -86,7 +85,6 @@ processArgs() {
       -e|--env-name) ENV_NAME=$2 ; shift 2 ;;
       -k|--kustomize) KUSTOMIZE_PATH=$2; shift 2 ;;
       -n|--namespace) NAMESPACE=$2 ; shift 2 ;;
-      -o|--operator) OPERATOR=true ; shift ;;
       -p|--config-profile) CONFIG_PROFILE=$2 ; shift 2 ;;
       -r|--push-to) PUSH_TO=$2 ; shift 2 ;;
       -s|--source) SOURCE=$2 ; shift 2 ;;

@@ -47,7 +47,6 @@ def main():
     parser.add_argument('--helm', '-H', dest='helm', help='Dir to store helm values files (absolute or relative to forgeops root)')
     parser.add_argument('--namespace', '-n', dest='namespace', help='Namespace to set in the overlay')
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
-    parser.add_argument('--operator', '-o', dest='operator', action='store_true', help='Use ds-operator')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
     parser.add_argument('--source', '-s', dest='source', help='Name of source environment')
@@ -100,10 +99,6 @@ def main():
         kustomize = args.kustomize
     elif os.getenv('KUSTOMIZE_PATH'):
         kustomize = os.getenv('KUSTOMIZE_PATH')
-
-    operator = False
-    if args.operator or os.getenv('OPERATOR') == 'true':
-        operator = True
 
     pull_policy = None
     if args.pull_policy:
@@ -321,23 +316,8 @@ To: {overlay_path}
 
             skey = str(d.name).replace('-', '_')
 
-            delete = False
             isDS = True if skey.startswith('ds') else False
-            if isDS:
-                if 'op' in skey and not operator:
-                    delete = True
-                elif 'op' not in skey and operator:
-                    delete = True
-
-                if delete:
-                    shutil.rmtree(d)
-                    continue
-
-                res_file = 'directoryservice.yaml' if operator else 'sts.yaml'
-                if 'op' in skey:
-                    skey = skey.removesuffix('_op')
-            else:
-                res_file = 'deployment.yaml'
+            res_file = 'sts.yaml' if isDS else 'deployment.yaml'
 
             kust_path = d / 'kustomization.yaml'
             if args.debug: print(f"kust_path={kust_path}")
@@ -412,27 +392,18 @@ To: {overlay_path}
 
                 if skey in size.keys():
                     if 'resources' in size[skey].keys():
-                        if isDS and args.operator:
-                            res['spec']['podTemplate']['resources'].update(size[skey]['resources'])
-                        else:
-                            res['spec']['template']['spec']['containers'][0]['resources'].update(size[skey]['resources'])
-                            if isDS:
-                                res['spec']['template']['spec']['initContainers'][0]['resources'].update(size[skey]['resources'])
+                        res['spec']['template']['spec']['containers'][0]['resources'].update(size[skey]['resources'])
+                        if isDS:
+                            res['spec']['template']['spec']['initContainers'][0]['resources'].update(size[skey]['resources'])
                     if isDS and 'volumeClaimSpec' in size[skey].keys():
-                        if args.operator:
-                            res['spec']['volumeClaimSpec'].update(size[skey]['volumeClaimSpec'])
-                        else:
-                            res['spec']['volumeClaimTemplates'][0]['spec'].update(size[skey]['volumeClaimSpec'])
+                        res['spec']['volumeClaimTemplates'][0]['spec'].update(size[skey]['volumeClaimSpec'])
                     if 'replicaCount' in size[skey].keys():
                         res['spec']['replicas'] = size[skey]['replicaCount']
 
                 if pull_policy:
-                    if isDS and args.operator:
-                        res['spec']['podTemplate']['imagePullPolicy'] = pull_policy
-                    else:
-                        res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = pull_policy
-                        if isDS:
-                            res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = pull_policy
+                    res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = pull_policy
+                    if isDS:
+                        res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = pull_policy
 
                 writeYamlFile(res, res_path)
 
