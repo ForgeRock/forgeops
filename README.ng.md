@@ -188,7 +188,7 @@ Once that is done, you'd apply the environment via Helm or Kustomize to deploy.
 You will find the new command here: `/path/to/forgeops/bin/forgeops-ng`
 
 The forgeops-ng command is a bash wrapper script that calls the appropriate
-script in `bin/forgeops-scripts`. These are written in either bash or python
+script in `bin/commands`. These are written in either bash or python
 depending on what makes sense for the task. All of the bash scripts support the
 new `--dryrun` flag which will show you the commands it would run so you can
 inspect them before doing a real run. The python scripts (env info) do not

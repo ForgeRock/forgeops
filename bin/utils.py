@@ -207,6 +207,23 @@ def warning(s):
     print(f"{PURPLE}{s}{ENDC}")
 
 
+def sub_title(title):
+    total_length = 100
+    spacing_length = 3 if len(title) > 0 else 0
+    total_length -= 2 * spacing_length
+    total_length -= len(title)
+    if total_length < 0:
+        warning(f'title "{title}" is too long')
+    one_more = total_length % 2
+    separator_char = '-'
+    separator_count = int(total_length / 2)
+    first_part = separator_count * separator_char + (spacing_length + one_more) * ' '
+    second_part = spacing_length * ' ' + separator_count * separator_char
+    msg = first_part + str(title) + second_part
+    print('')
+    print(msg)
+
+
 def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
     """
     Execute the given command. Raises error if command returns non-zero code.

@@ -3,8 +3,6 @@
 #
 # Setting until forgeops-ng becomes forgeops
 KUSTOMIZE_PATH=kustomize-ng
-# If SKIP_VIRTUAL_ENV=true, you must install python packages in requirements.txt
-SKIP_VIRTUAL_ENV=false
 #NO_KUSTOMIZE=false
 #NO_HELM=false
 
@@ -18,6 +16,9 @@ CONTAINER_ENGINE=docker
 #
 # Only for generate
 #
+# If you want to use the ds-operator set OPERATOR=true
+OPERATOR=false
+# PULL_POLICY is image pull policy : see available values https://kubernetes.io/docs/concepts/containers/images/
 #PULL_POLICY=
 # Source overlay to use when creating a new overlay
 SOURCE=default

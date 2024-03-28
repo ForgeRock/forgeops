@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import os
+import site
+import sys
+from pathlib import Path
+
+
+file_name = Path(__file__)
+current_file_path = file_name.parent.resolve()
+root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
+# Insert lib folders to python path
+sys.path.insert(0, str(root_dir))
+sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+
+from lib.python.constants import CONFIGURED_VERSION_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
+    DEPENDENCIES_DIR
+import bin.utils as utils
+
+# do not use --user param when virtual environment is used
+pip = 'pip3'
+user_param = '' if 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] != '' else '--user '
+pip_install = f'pip3 install --no-cache-dir -i https://pypi.python.org/simple/ {user_param}--no-warn-script-location'
+EXIT_MESSAGE = f'\nPlease fix this issue and run {FORGEOPS_SCRIPT_FILE} env script again.'
+
+
+class ConfigureEnv:
+
+    def __init__(self):
+        self.num_warning = 0
+
+    @staticmethod
+    def install_python_dependencies():
+        os.environ['PYTHONUSERBASE'] = str(dependencies_dir)
+
+        utils.sub_title('Installing python dependencies...')
+        cmd = f'{pip_install} -r "{REQUIREMENTS_FILE}"'
+        print(f'export PYTHONUSERBASE="{str(dependencies_dir)}";')
+        try:
+            utils.run(cmd)
+        except Exception as e:
+            utils.error(f'Command "{" ".join(e.cmd)}" returns error code {e.returncode} (expected 0)')
+            sys.exit(EXIT_MESSAGE)
+
+        sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+        utils.message(f'All requirements in {REQUIREMENTS_FILE} have been successfully installed.')
+
+    @staticmethod
+    def check_python_version():
+        utils.sub_title('Check python version')
+        utils.message(f'python {sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]} is installed')
+        if sys.version_info[0:3] < (3, 6, 5):
+            utils.error('You need python 3.6.5 or later to run this script')
+            exit(1)
+
+    @staticmethod
+    def check_pip():
+        # Check if pip is installed
+        utils.sub_title("Checking if pip is installed...")
+        try:
+            rc, out, err = utils.run(f'{pip} --version', cstdout=True, cstderr=True)
+        except:
+            utils.error('pip is not installed')
+            utils.error('Please run: curl -O https://bootstrap.pypa.io/get-pip.py; sudo python3 get-pip.py; rm get-pip.py')
+            sys.exit(1)
+        pip_version = (out.split()[1]).decode("utf-8")
+        if int(pip_version.split('.')[0]) < 9:
+            utils.error('pip version "%s" is too old, you need pip 9 or later to run this script' % pip_version)
+            utils.error('Please run: sudo pip3 install -U pip')
+            sys.exit(1)
+        utils.message(f'pip ({pip_version}) is correctly installed')
+
+    @staticmethod
+    def write_config_version():
+        # Inline imports since dependencies required for managing config and Forgeops are setup earlier in this script
+        from lib.python.ensure_configuration_is_valid_or_exit import compute_configuration_version
+        with open(CONFIGURED_VERSION_FILE, 'w') as configured_version:
+            configured_version.write(compute_configuration_version() + os.linesep)
+
+    def run(self):
+        if not os.path.isdir(DEPENDENCIES_DIR):
+            try:
+                os.makedirs(DEPENDENCIES_DIR)
+            except Exception as e:
+                utils.error(f'can not create directory {DEPENDENCIES_DIR}, exit')
+                sys.exit(1)
+
+        # Delete the CONFIGURED_VERSION_FILE file first if exists
+        if os.path.exists(CONFIGURED_VERSION_FILE):
+            os.remove(CONFIGURED_VERSION_FILE)
+
+        self.check_python_version()
+        self.check_pip()
+        self.install_python_dependencies()
+        self.write_config_version()
+        utils.sub_title("All done... Enjoy Forgeops")
+        if self.num_warning > 0:
+            utils.warning(f'Found {self.num_warning} warning(s)')
+
+
+if __name__ == '__main__':
+    configure_env = ConfigureEnv()
+    configure_env.run()

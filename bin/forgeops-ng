@@ -16,7 +16,7 @@ usage() {
   Usage:
   $prog COMMAND [OPTIONS] [<component> <component> ...]
 
-  Central interface to the scripts in forgeops-scripts. Use -h with any command
+  Central interface to the scripts in commands folder. Use -h with any command
   to see its usage.
 
   OPTIONS:
@@ -46,6 +46,7 @@ ARG_ARRAY=("$@") # Create an array out of our arguments
 COMMANDS=(
   'apply'
   'build'
+  'configure'
   'delete'
   'env'
   'info'
@@ -106,14 +107,11 @@ if [ -f "$FORGEOPS_CFG" ] ; then
   set +a
 fi
 
-if [ -z "$VIRTUAL_ENV" ] && [ "$SKIP_VIRTUAL_ENV" = false ] ; then
-  message "VIRTUAL_ENV is empty" "debug"
-  if [ ! -f $SCRIPT_DIR/activate ] ; then
-    $SCRIPT_DIR/pyenv setup
+
+# Make sure "forgeops-ng configure" has been run before running any commands
+if [ "${COMMAND}" != "configure" ] ; then
+  if ! python3 "${SCRIPT_DIR}/../lib/python/ensure_configuration_is_valid_or_exit.py" ; then
+    exit 1
   fi
-  source $SCRIPT_DIR/activate
 fi
-message "VIRTUAL_ENV=$VIRTUAL_ENV" "debug"
-
-
-runOrPrint "$SCRIPT_DIR/forgeops-scripts/${COMMAND} $*"
+runOrPrint "$SCRIPT_DIR/commands/${COMMAND} $*"

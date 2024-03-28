@@ -20,7 +20,6 @@ reports/
 res.txt
 results.txt
 /venv/
-/lib/
 skaffold-dev.yaml
  __pycache__/
 build/
@@ -46,3 +45,4 @@ pyenv.cfg
 *.swp
 *.swo
 *~
+lib/dependencies
