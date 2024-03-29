@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/am-cdk/pit1:7.5.0-latest-postcommit
+FROM gcr.io/forgerock-io/am-cdk:7.5.0
 
 ARG CONFIG_PROFILE=cdk
 RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"

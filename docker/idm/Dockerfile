@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/idm-cdk/pit1:7.5.0-latest-postcommit
+FROM gcr.io/forgerock-io/idm-cdk:7.5.0
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 

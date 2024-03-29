@@ -4,23 +4,23 @@ commonLabels:
   app.kubernetes.io/part-of: forgerock
 images:
 - name: .*am:.*
-  newName: us-docker.pkg.dev/forgeops-public/images/am
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/am
+  newTag: 7.5.0
 - name: .*amster.*
-  newName: us-docker.pkg.dev/forgeops-public/images/amster
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/amster
+  newTag: 7.5.0
 - name: .*ds:.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/ds
+  newTag: 7.5.0
 - name: .*ds-cts.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/ds-cts
+  newTag: 7.5.0
 - name: .*ds-idrepo.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/ds-idrepo
+  newTag: 7.5.0
 - name: .*idm
-  newName: us-docker.pkg.dev/forgeops-public/images/idm
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/idm
+  newTag: 7.5.0
 - name: .*ig.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: dev
+  newName: us-docker.pkg.7.5.0/forgeops-public/images/ig
+  newTag: 2024.3.0

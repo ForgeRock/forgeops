@@ -20,12 +20,16 @@ of and plan for that name change.
 ## Setup
 
 The heart of forgeops-ng is `forgeops-ng env`. It allows you to manage common
-aspects of Helm values file(s) and Kustomize overlays. Since it is written in
-python, you need to setup your system to run it. You can do that by using a
-Python virtual environment (venv), or installing the necessary python packages.
+aspects of Helm values file(s) and Kustomize overlays. It uses some extra
+python modules, so you need to install them first.  We have created a new
+configure command to help you setup python to run forgeops-ng. You can run it
+like so:
 
-Either way, you can use the `requirements.txt` file to install the necessary
-packages.
+`forgeops-ng configure`
+
+If you skip this step, forgeops-ng will detect that and prompt you to run it.
+
+The required modules are listed in `lib/python/requirements.txt`
 
 ### Install Python packages
 
