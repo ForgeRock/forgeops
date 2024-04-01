@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:7.5.0-latest-postcommit
+FROM gcr.io/forgerock-io/ds:7.5.0
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
