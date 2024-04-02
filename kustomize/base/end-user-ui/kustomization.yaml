@@ -5,8 +5,8 @@ resources:
 - service.yaml
 images:
 - name: .*enduser-ui.*
-  newName: gcr.io/forgerock-io/platform-enduser-ui/docker-build
-  newTag: 7.6.0-SNAPSHOT-postcommit-latest
+  newName: gcr.io/forgerock-io/platform-enduser-ui
+  newTag: 7.5.0
 labels:
 - includeSelectors: true
   pairs:
