@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds-empty/pit1:7.5.0-latest-postcommit
+FROM gcr.io/forgerock-io/ds-empty/pit1:7.6.0-latest-postcommit
 
 # FOR DEBUG. Remove for production deployment
 USER root
