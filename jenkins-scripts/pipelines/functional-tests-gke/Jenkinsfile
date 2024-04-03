@@ -38,8 +38,11 @@ node('gce-vm-forgeops-n1-standard-8') {
     }
 
     initialSteps()
-    functionalTests.runStage()
-    finalNotification()
+    try {
+        functionalTests.runStage()
+    } finally {
+        finalNotification()
+    }
 }
 
 def initialSteps() {
