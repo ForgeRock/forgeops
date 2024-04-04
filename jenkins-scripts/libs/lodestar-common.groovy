@@ -187,7 +187,7 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('gce-vm-lodestar-n1-standard-8') {
+        node('gce-vm-lodestar-n2d-standard-8') {
             stage(stageName) {
                 try {
                     platformUI.runPlatformUI(commonModule.lodestarRevision, commonModule.platformImagesRevision,
