@@ -6,7 +6,7 @@ resources:
 images:
 - name: ldif-importer
   newName: us-docker.pkg.dev/forgeops-public/images/ldif-importer
-  newTag: dev
+  newTag: 7.5.0
 labels:
 - includeSelectors: true
   pairs:
