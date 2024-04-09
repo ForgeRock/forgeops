@@ -1,4 +1,4 @@
-{{- if and .Values.ds_cts.enabled .Values.ds_cts.snapshot.enabled }}
+{{- if and .Values.ds_cts.snapshot.enabled (or .Values.ds_cts.enabled .Values.ds_snapshot.generate) }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:

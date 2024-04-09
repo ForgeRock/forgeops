@@ -5,10 +5,10 @@ kind: Service
 metadata:
   name: ds-cts
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: ds-cts
     app.kubernetes.io/component: ds-cts
@@ -52,10 +52,10 @@ kind: StatefulSet
 metadata:
   name: ds-cts
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: ds-cts
     app.kubernetes.io/component: ds-cts
@@ -71,7 +71,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-02-01 09:11:10.069493 -0600 CST m=+0.036230543"
+        deployment-date: "2024-04-10 16:24:34.434251 -0500 CDT m=+0.037110793"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -107,7 +107,7 @@ spec:
         - name: init
           securityContext:
             {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.4.0"
+          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - mountPath: /opt/opendj/data
@@ -154,6 +154,11 @@ spec:
               configMapKeyRef:
                 name: platform-config
                 key: AUTORESTORE_FROM_DSBACKUP
+          - name: DISASTER_RECOVERY_ID
+            valueFrom:
+              configMapKeyRef:
+                name: platform-config
+                key: DISASTER_RECOVERY_ID
           envFrom:
           - secretRef:
               name: cloud-storage-credentials
@@ -162,7 +167,7 @@ spec:
         - name: ds
           securityContext:
             {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.4.0"
+          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
           imagePullPolicy: IfNotPresent
           args:
           - start-ds
@@ -235,10 +240,10 @@ spec:
       annotations:
         pv.beta.kubernetes.io/gid: "0"
       labels:
-        helm.sh/chart: identity-platform-7.4
+        helm.sh/chart: identity-platform-7.5
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
-        app.kubernetes.io/version: "7.4"
+        app.kubernetes.io/version: "7.5"
         app.kubernetes.io/managed-by: Helm
         app: ds-cts
         app.kubernetes.io/component: ds-cts

@@ -599,14 +599,14 @@ def main():
     parser.add_argument('-n', '--namespace',
                         help='Target namespace (default: current namespace)')
     parser.add_argument('-b', '--forgeops-branch', dest='forgeops_branch',
-                        help='Forgeops branch used to deploy the platform (e.g. release/7.4-20231204)')
+                        help='Forgeops branch used to deploy the platform (e.g. release/7.5-20240402)')
     args = parser.parse_args()
     max_log_lines = args.max_log_lines if getattr(args, 'max_log_lines', None) else 400
     if getattr(args, 'forgeops_branch', None):
         forgeops_branch = args.forgeops_branch
     else:
         forgeops_branch = input('Please provide the Forgeops branch used to deploy the platform '
-                                '(e.g. release/7.4-20231204) : ')
+                                '(e.g. release/7.5-20240402) : ')
 
     # Get the namespace (either passed in as an arg, or set in the user's context)
     ctx_namespace = utils.get_namespace()

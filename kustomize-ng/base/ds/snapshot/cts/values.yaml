@@ -14,6 +14,7 @@ ds:
   enabled: false
 ds_snapshot:
   configmapCreate: false
+  generate: true
   rbacCreate: false
 ds_cts:
   enabled: false

@@ -5,10 +5,10 @@ kind: Job
 metadata:
   name: ldif-importer
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: ldif-importer
     app.kubernetes.io/component: ldif-importer
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-02-01 09:11:10.513292 -0600 CST m=+0.038073251"
+        deployment-date: "2024-04-10 16:24:34.873415 -0500 CDT m=+0.038997460"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -38,7 +38,7 @@ spec:
         - name: ldif-importer
           securityContext:
             {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:7.4.0"
+          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:7.5.0"
           imagePullPolicy: Always
           envFrom:
           - secretRef:

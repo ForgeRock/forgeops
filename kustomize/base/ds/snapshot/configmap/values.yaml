@@ -1,4 +1,8 @@
 platform:
+  base:
+    enabled: false
+  notes:
+    enabled: false
   disable_secret_agent_config: true
 admin_ui:
   enabled: false

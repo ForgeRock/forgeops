@@ -5,10 +5,10 @@ kind: ConfigMap
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -30,10 +30,10 @@ kind: ConfigMap
 metadata:
   name: idm-logging-properties
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -145,10 +145,10 @@ kind: Service
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -171,10 +171,10 @@ kind: Deployment
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -189,7 +189,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-02-01 09:11:10.414983 -0600 CST m=+0.037354626"
+        deployment-date: "2024-04-10 16:24:34.773418 -0500 CDT m=+0.039177085"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -219,7 +219,7 @@ spec:
             name: idm-logging-properties
       initContainers:
         - name: fbc-init
-          image: "idm:7.4"
+          image: "idm:7.5"
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - mountPath: /fbc
@@ -237,7 +237,7 @@ spec:
               cp -vr ui conf script /fbc
             fi
         - name: truststore-init
-          image: "idm:7.4"
+          image: "idm:7.5"
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: new-truststore
@@ -257,7 +257,7 @@ spec:
         - name: openidm
           securityContext:
             {}
-          image: "idm:7.4"
+          image: "idm:7.5"
           imagePullPolicy: IfNotPresent
           env:
           - name: NAMESPACE
@@ -367,19 +367,16 @@ kind: Ingress
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/body-size: 64m
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      add_header X-ForgeRock-TransactionId $req_id;
-      proxy_set_header X-ForgeRock-TransactionId $req_id;
     nginx.ingress.kubernetes.io/enable-cors: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: 64m
     nginx.ingress.kubernetes.io/proxy-buffer-size: 16k

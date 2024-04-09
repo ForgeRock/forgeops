@@ -98,7 +98,7 @@ HELM_CMD=$(type -P helm)
 
 CHART="oci://us-docker.pkg.dev/forgeops-public/charts"
 CHART_NAME="identity-platform"
-CHART_VER_DEF="7.4"
+CHART_VER_DEF="7.5"
 CHART_VER=
 CHART_SOURCE="local"
 KUSTOMIZE_BASE_DEF=$SCRIPT_DIR/../kustomize/base
@@ -164,7 +164,7 @@ VERSION_OPT="--version $CHART_VER"
 NAMESPACE_OPT="-n $NAMESPACE"
 
 if [ "$CHART_SOURCE" == "local" ] ; then
-  HELM_OPTS="$CHART_NAME $SCRIPT_DIR/../charts/identity-platform"
+  HELM_OPTS="$CHART_NAME $NAMESPACE_OPT $SCRIPT_DIR/../charts/identity-platform"
 else
   HELM_OPTS="$CHART/$CHART_NAME $NAMESPACE_OPT $VERSION_OPT"
 fi

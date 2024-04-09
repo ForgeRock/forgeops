@@ -5,10 +5,10 @@ kind: ConfigMap
 metadata:
   name: amster-config
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
 binaryData:
   fe63c80e189bcab18f001a857c9da6b5535684e60753f4e7c56392a631e15b98: ewogICJtZXRhZGF0YSIgOiB7CiAgICAicmVhbG0iIDogIi8iLAogICAgImFtc3RlclZlcnNpb24iIDogIiZ7dmVyc2lvbn0iLAogICAgImVudGl0eVR5cGUiIDogIkFwcGxpY2F0aW9ucyIsCiAgICAiZW50aXR5SWQiIDogImlQbGFuZXRBTVdlYkFnZW50U2VydmljZSIsCiAgICAicGF0aFBhcmFtcyIgOiB7IH0KICB9LAogICJkYXRhIiA6IHsKICAgICJfaWQiIDogImlQbGFuZXRBTVdlYkFnZW50U2VydmljZSIsCiAgICAibmFtZSIgOiAiaVBsYW5ldEFNV2ViQWdlbnRTZXJ2aWNlIiwKICAgICJkaXNwbGF5TmFtZSIgOiAiRGVmYXVsdCBQb2xpY3kgU2V0IiwKICAgICJkZXNjcmlwdGlvbiIgOiAiVGhlIGJ1aWx0LWluIEFwcGxpY2F0aW9uIHVzZWQgYnkgT3BlbkFNIFBvbGljeSBBZ2VudHMuIiwKICAgICJhdHRyaWJ1dGVOYW1lcyIgOiBbIF0sCiAgICAiY29uZGl0aW9ucyIgOiBbICJTY3JpcHQiLCAiQU1JZGVudGl0eU1lbWJlcnNoaXAiLCAiSVB2NiIsICJTaW1wbGVUaW1lIiwgIklQdjQiLCAiTEVBdXRoTGV2ZWwiLCAiTERBUEZpbHRlciIsICJBdXRoU2NoZW1lIiwgIlNlc3Npb24iLCAiQU5EIiwgIkF1dGhlbnRpY2F0ZVRvUmVhbG0iLCAiUmVzb3VyY2VFbnZJUCIsICJTZXNzaW9uUHJvcGVydHkiLCAiT0F1dGgyU2NvcGUiLCAiT1IiLCAiVHJhbnNhY3Rpb24iLCAiTk9UIiwgIkF1dGhMZXZlbCIsICJBdXRoZW50aWNhdGVUb1NlcnZpY2UiIF0sCiAgICAiY3JlYXRlZEJ5IiA6ICJpZD1kc2FtZXVzZXIsb3U9dXNlcixvdT1hbS1jb25maWciLAogICAgInJlc291cmNlVHlwZVV1aWRzIiA6IFsgIjc2NjU2YTM4LTVmOGUtNDAxYi04M2FhLTRjY2I3NGNlODhkMiIgXSwKICAgICJyZXNvdXJjZUNvbXBhcmF0b3IiIDogbnVsbCwKICAgICJjcmVhdGlvbkRhdGUiIDogMTU3ODU4MDA2NTAzMywKICAgICJsYXN0TW9kaWZpZWREYXRlIiA6IDE1Nzg1ODAwNjUwMzMsCiAgICAibGFzdE1vZGlmaWVkQnkiIDogImlkPWRzYW1ldXNlcixvdT11c2VyLG91PWFtLWNvbmZpZyIsCiAgICAic2F2ZUluZGV4IiA6IG51bGwsCiAgICAic2VhcmNoSW5kZXgiIDogbnVsbCwKICAgICJhcHBsaWNhdGlvblR5cGUiIDogImlQbGFuZXRBTVdlYkFnZW50U2VydmljZSIsCiAgICAiZW50aXRsZW1lbnRDb21iaW5lciIgOiAiRGVueU92ZXJyaWRlIiwKICAgICJzdWJqZWN0cyIgOiBbICJBdXRoZW50aWNhdGVkVXNlcnMiLCAiTk9UIiwgIklkZW50aXR5IiwgIk9SIiwgIkFORCIsICJOT05FIiwgIkp3dENsYWltIiBdLAogICAgImVkaXRhYmxlIiA6IHRydWUKICB9Cn0=
@@ -31,10 +31,10 @@ kind: ConfigMap
 metadata:
   name: amster-scripts
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
 binaryData:
   79738685a656fe6b25061bb14181442210b599f746faeaba408a2401de45038a: IyEvdXNyL2Jpbi9lbnYgYmFzaAojCiMgQ29weXJpZ2h0IChjKSAyMDE2LTIwMTcgRm9yZ2VSb2NrIEFTLiBBbGwgcmlnaHRzIHJlc2VydmVkLgojCnNldCAtZQoKIyBJZiBhIGNvbW1hbmQgYXJnIGlzIG5vdCBwYXNzZWQsIGRlZmF1bHQgdG8gaW1wb3J0CkFDVElPTj0iJHsxOi1pbXBvcnR9IgoKZWNobyAiYW1zdGVyIGFjdGlvbiBpcyAkQUNUSU9OIgoKIyBEZWZhdWx0IGlzIHRvIGNvbm5lY3QgdmlhIHRoZSBpbnRlcm5hbCBodHRwIHNlcnZpY2UgbmFtZQojIE5vdGUgd2UgdXNlIEFNU1RFUl9BTV9SVUwgc28gd2UgZG9udCBjb2xsaWRlIHdpdGggdGhlIHBsYXRmb3JtIEFNX1VSTCAtIHdoaWNoIG1pZ2h0IGJlIGV4dGVybmFsCmV4cG9ydCBBTVNURVJfQU1fVVJMPSR7QU1TVEVSX0FNX1VSTDotaHR0cDovL2FtOjgwL2FtfQoKcGF1c2UoKSB7CiAgICBlY2hvICJBcmdzIGFyZSAkIyAiCgogICAgZWNobyAiQ29udGFpbmVyIHdpbGwgbm93IHBhdXNlLiBZb3UgY2FuIGV4ZWMgaW50byB0aGUgY29udGFpbmVyIHVzaW5nIGt1YmVjdGwgZXhlYyB0byBydW4gZXhwb3J0LnNoIgogICAgIyBTbGVlcCBmb3JldmVyLCB3YWl0aW5nIGZvciBzb21lb25lIHRvIGV4ZWMgaW50byB0aGUgY29udGFpbmVyLgogICAgd2hpbGUgdHJ1ZQogICAgZG8KICAgICAgICBzbGVlcCAxMDAwMDAwICYgd2FpdAogICAgZG9uZQp9CgoKIyBFeHRyYWN0IGFtc3RlciB2ZXJzaW9uIGZvciBjb21tb25zIHBhcmFtZXRlciB0byBtb2RpZnkgY29uZmlncwplY2hvICJFeHRyYWN0aW5nIGFtc3RlciB2ZXJzaW9uIgpWRVI9JCguL2Ftc3RlciAtLXZlcnNpb24pCmVjaG8gIkFtc3RlciB2ZXJzaW9uIG91dHB1dCBpczogJyR7VkVSfSciCltbICIkVkVSIiA9fiAoWzAtOV0uWzAtOV0uWzAtOV0oXC5bMC05XSopPy0oW2EtekEtWjAtOV0rfChbLWEtekEtWjAtOV0rKT9TTkFQU0hPVHxSQ1swLTldK3xNWzAtOV0rKXxbMC05XS5bMC05XS5bMC05XShcLlswLTldKik/KSBdXQpWRVJTSU9OPSR7QkFTSF9SRU1BVENIWzFdfQplY2hvICJBbXN0ZXIgdmVyc2lvbiBpczogJyR7VkVSU0lPTn0nIgpleHBvcnQgVkVSU0lPTgoKY2FzZSAkQUNUSU9OICBpbgpwYXVzZSkKICAgIHBhdXNlCiAgICA7OwpleHBvcnQpCiAgICAjIGludm9rZSBhbXN0ZXIgZXhwb3J0CiAgICAuL2V4cG9ydC5zaCAke1RZUEV9CiAgICA7OwppbXBvcnQpCiAgICAjIGludm9rZSBhbXN0ZXIgaW5zdGFsbC4KICAgIC4vaW1wb3J0LnNoCiAgICA7Owp1cGxvYWQpCiAgICAjIExpa2UgaW1wb3J0IC0gYnV0IHdhaXRzIGZvciBmaWxlcyB0byBiZSB1cGxvYWRlZCB0byBjb25maWcvdXBsb2FkCiAgICAuL2ltcG9ydC5zaCB1cGxvYWQKICAgIDs7CiopCiAgIGV4ZWMgIiRAIgplc2FjCg==
@@ -47,10 +47,10 @@ kind: ConfigMap
 metadata:
   name: amster-retain
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
 data:
   DURATION: "10"
@@ -64,10 +64,10 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": "before-hook-creation"
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
     app: amster
     app.kubernetes.io/component: amster
@@ -76,7 +76,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-02-01 09:11:10.019048 -0600 CST m=+0.035502376"
+        deployment-date: "2024-04-10 16:24:34.381297 -0500 CDT m=+0.035516126"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -106,7 +106,7 @@ spec:
         - name: amster
           securityContext:
             {}
-          image: "gcr.io/forgerock-io/amster/pit1:7.4.0"
+          image: "gcr.io/forgerock-io/amster/pit1:7.5.0"
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -189,7 +189,7 @@ spec:
         - name: pause
           securityContext:
             {}
-          image: "gcr.io/forgerock-io/amster/pit1:7.4.0"
+          image: "gcr.io/forgerock-io/amster/pit1:7.5.0"
           imagePullPolicy: IfNotPresent
           args:
             - bash
