@@ -14,7 +14,7 @@
     'java-pipeline-libs@c7f1fb930553cac9e84d4af6ddc80fc4b10916d9'
 ]) _
 
-node('gce-vm-forgeops-n1-standard-8') {
+node('gce-vm-forgeops-n2d-standard-8') {
     stage('Clone repo') {
         checkout scm
 
