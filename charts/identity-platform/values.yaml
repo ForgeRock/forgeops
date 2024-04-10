@@ -393,7 +393,7 @@ admin_ui:
   replicaCount: 1
 
   image:
-    repository: gcr.io/forgerock-io/platform-admin-ui
+    repository: gcr.io/forgerock-io/platform-admin-ui/docker-build
     tag: "7.6.0-SNAPSHOT-postcommit-latest"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -462,7 +462,7 @@ end_user_ui:
   replicaCount: 1
 
   image:
-    repository: gcr.io/forgerock-io/platform-enduser-ui
+    repository: gcr.io/forgerock-io/platform-enduser-ui/docker-build
     tag: "7.6.0-SNAPSHOT-postcommit-latest"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -531,7 +531,7 @@ login_ui:
   replicaCount: 1
 
   image:
-    repository: gcr.io/forgerock-io/platform-login-ui
+    repository: gcr.io/forgerock-io/platform-login-ui/docker-build
     tag: "7.6.0-SNAPSHOT-postcommit-latest"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
