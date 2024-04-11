@@ -9,12 +9,12 @@ source $SCRIPT_DIR/../stdlib.sh
 # Go back to where we started
 cd $start_dir
 
-echo << EOM
+cat << EOM
 
 The install command is deprecated.  We have replaced it with the apply command
-to more accurately represent the fact that all we are doing now is a `kubectl
-apply -k /path/to/overlay`. We encourage folks to use the kubectl command
-instead of `forgeops-ng apply`.
+to more accurately represent the fact that all we are doing now is a \`kubectl
+apply -k /path/to/overlay\`. We encourage folks to use the kubectl command
+instead of \`forgeops-ng apply\`.
 
 For more information:
 forgeops apply -h
@@ -23,7 +23,7 @@ Running the following apply command for you.
 
 EOM
 
-ARG=("$@") # Create an array out of our arguments
+ARGS=("$@") # Create an array out of our arguments
 
 # Enable debugging so runOrPrint will always print the command before running it
 DEBUG=true

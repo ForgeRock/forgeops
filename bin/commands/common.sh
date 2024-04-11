@@ -142,7 +142,7 @@ processArgs() {
   fi
   message "KUSTOMIZE_PATH=$KUSTOMIZE_PATH" "debug"
 
-  if [ -z "$ENV_NAME" ] && [ "$PROG" =~ apply ] ; then
+  if [ -z "$ENV_NAME" ] && [[ "$PROG" =~ apply ]] ; then
     ENV_NAME=demo
   elif [ -z "$ENV_NAME" ] ; then
     usage 1 'An environment name (--env-name) is required.'
