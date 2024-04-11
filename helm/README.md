@@ -21,11 +21,11 @@ you tell it to.
 So if you wanted to create a stage env with the small size, you could do this:
 ```
 cd /path/to/forgeops
-./bin/forgeops-ng env --small --fqdn stage.example.com -l stage
+./bin/forgeops-ng env --small --fqdn stage.example.com --env-name stage
 git add helm/stage
 git commit -am 'Adding stage env'
 git push
-helm install -f helm/stage/values.yaml ./charts/identity-platform
+helm install identity-platform -f helm/stage/values.yaml ./charts/identity-platform
 ```
 
 By default, the env command outputs values files and a Kustomize overlay. If
