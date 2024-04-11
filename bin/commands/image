@@ -144,16 +144,16 @@ def main():
                values_images['ig']['image']['tag'] = args.tag
 
     if do_kustomize and args.copy:
-        if Path(args.source).is_absolute():
-            source_path = Path(source)
-        else:
-            source_path = overlay_root / source
-
-        if args.debug: print(f"source_path={source_path}")
-
         overlay_root = kustomize_path / 'overlay'
         if not overlay_root.is_dir():
            utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
+
+        if Path(args.source).is_absolute():
+            source_path = Path(args.source)
+        else:
+            source_path = overlay_root / args.source
+
+        if args.debug: print(f"source_path={source_path}")
 
         overlay_path = overlay_root / args.env_name
         src_overlay_path = overlay_root / args.source
@@ -175,7 +175,7 @@ def main():
         vimg_file = helm_path / vimg_fn
         values_file = helm_path / 'values.yaml'
 
-        if values_file.is_file() or vimg_file.is_file()::
+        if values_file.is_file() or vimg_file.is_file():
             print('Updating existing helm values.')
         else:
             utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops-ng env to populate.')
