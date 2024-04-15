@@ -8,7 +8,7 @@
 
 // functional-tests.groovy
 void runStage() {
-    commonModule.runGuillotine(null, 'functional', '--keywords RELEASE')
+    commonModule.runGuillotine(null, 'functional', '--keywords RELEASE --forgeops-profile cdk')
 }
 
 return this
