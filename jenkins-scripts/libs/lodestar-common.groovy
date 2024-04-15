@@ -48,13 +48,6 @@ boolean doRunPostcommitTests() {
     return !params.isEmpty() && params.any { name, value -> name.startsWith('Postcommit_') && value }
 }
 
-ArrayList commonParams() {
-    return [
-        string(name: 'Lodestar_ref', defaultValue: '',
-                description: 'Can be a branch, tag or commit. Leave empty for latest promoted')
-    ]
-}
-
 ArrayList postcommitMandatoryStages(boolean enabled) {
     return [
         booleanParam(name: 'Postcommit_pit1', defaultValue: enabled),
@@ -87,7 +80,7 @@ def getDefaultConfig(Random random, String stageName) {
     def config = [
         STASH_PLATFORM_IMAGES_REF           : commonModule.platformImagesRevision,
         STASH_FORGEOPS_REF                  : commonModule.GIT_COMMIT,
-        STASH_LODESTAR_REF                  : params.Lodestar_ref, // If empty, lodestar ref is computed from platform images
+        STASH_LODESTAR_REF                  : commonModule.lodestarRevision,
         DEPLOYMENT_NAMESPACE                : cloud_config.spyglaasConfig()['DEPLOYMENT_NAMESPACE'] + '-' + randomNumber,
         REPORT_NAME_PREFIX                  : normalizedStageName,
         DO_RECORD_RESULT                    : false,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2024 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -22,9 +22,8 @@ def initialSteps() {
 
     properties([
             buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
-            parameters(commonLodestarModule.commonParams() + [
-                    booleanParam(name: 'PR_deployment_only', defaultValue: true),
-            ] + commonLodestarModule.postcommitMandatoryStages(false)),
+            parameters([booleanParam(name: 'PR_deployment_only', defaultValue: true)]
+                    + commonLodestarModule.postcommitMandatoryStages(false)),
     ])
 
     // Abort any active builds relating to the current PR, as they are superseded by this build
