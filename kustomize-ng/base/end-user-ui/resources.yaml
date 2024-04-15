@@ -49,7 +49,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-04-17 10:12:34.384289 -0500 CDT m=+0.033185793"
+        deployment-date: "2024-04-17 15:18:53.015202 -0500 CDT m=+0.029133501"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform

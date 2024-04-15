@@ -42,7 +42,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: ds-snapshot
-    namespace: damon
+    namespace: prod
 roleRef:
   kind: ClusterRole
   name: ds-snapshot
