@@ -5,10 +5,10 @@ kind: Service
 metadata:
   name: am
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
     app: am
     app.kubernetes.io/component: am
@@ -31,10 +31,10 @@ kind: Deployment
 metadata:
   name: am
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
     app: am
     app.kubernetes.io/component: am
@@ -49,7 +49,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-02-01 09:11:09.972803 -0600 CST m=+0.035664251"
+        deployment-date: "2024-04-17 10:12:34.042395 -0500 CDT m=+0.030144792"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -83,7 +83,7 @@ spec:
           emptyDir: {}
       initContainers:
         - name: fbc-init
-          image: "am:7.4"
+          image: "am:7.6"
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - mountPath: /fbc
@@ -101,7 +101,7 @@ spec:
               cp -r .homeVersion * /fbc
             fi
         - name: truststore-init
-          image: "am:7.4"
+          image: "am:7.6"
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: new-truststore
@@ -120,7 +120,7 @@ spec:
         - name: openam
           securityContext:
             {}
-          image: "am:7.4"
+          image: "am:7.6"
           imagePullPolicy: IfNotPresent
           command:
             - bash
@@ -195,19 +195,16 @@ kind: Ingress
 metadata:
   name: am
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
     app: am
     app.kubernetes.io/component: am
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/body-size: 64m
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      add_header X-ForgeRock-TransactionId $req_id;
-      proxy_set_header X-ForgeRock-TransactionId $req_id;
     nginx.ingress.kubernetes.io/enable-cors: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: 64m
     nginx.ingress.kubernetes.io/proxy-buffer-size: 16k

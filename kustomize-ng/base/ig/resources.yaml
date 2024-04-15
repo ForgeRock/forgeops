@@ -5,10 +5,10 @@ kind: Service
 metadata:
   name: ig
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
     app: ig
     app.kubernetes.io/component: ig
@@ -31,10 +31,10 @@ kind: Deployment
 metadata:
   name: ig
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
     app: ig
     app.kubernetes.io/component: ig
@@ -49,7 +49,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-02-01 09:11:10.464613 -0600 CST m=+0.037957334"
+        deployment-date: "2024-04-17 10:12:34.472475 -0500 CDT m=+0.033074960"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -63,7 +63,7 @@ spec:
         - name: ig
           securityContext:
             {}
-          image: "idm:7.4"
+          image: "idm:7.6"
           imagePullPolicy: IfNotPresent
           env:
           - name: NAMESPACE

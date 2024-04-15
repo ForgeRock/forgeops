@@ -151,8 +151,8 @@ am:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/am
-    tag: "7.4.0"
+    repository: us-docker.pkg.dev/forgeops-public/images/am/pit1
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -228,7 +228,7 @@ amster:
 
   image:
     repository: gcr.io/forgerock-io/amster/pit1
-    tag: "7.4.0"
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -277,7 +277,7 @@ ldif_importer:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ldif-importer
-    tag: "7.4.0"
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: Always
     imagePullSecrets: []
 
@@ -321,8 +321,8 @@ idm:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/idm
-    tag: "7.4.0"
+    repository: us-docker.pkg.dev/forgeops-public/images/idm/pit1
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -600,8 +600,8 @@ ig:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ig
-    tag: "7.4.0"
+    repository: us-docker.pkg.dev/forgeops-public/images/ig/pit1
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -698,8 +698,8 @@ ds_idrepo:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "7.4.0"
+    repository: us-docker.pkg.dev/forgeops-public/images/ds/pit1
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -772,8 +772,8 @@ ds_cts:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "7.4.0"
+    repository: us-docker.pkg.dev/forgeops-public/images/ds/pit1
+    tag: "7.6.0-latest-postcommit"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 

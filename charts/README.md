@@ -21,11 +21,11 @@ desired options.  Example:
 $ kubectl create namespace identity-platform
 $ helm upgrade identity-platform \
     oci://us-docker.pkg.dev/forgeops-public/charts/identity-platform \
-    --version 7.4 --namespace identity-platform --install \
+    --version 7.5 --namespace identity-platform --install \
     -f values-override.yaml
 ```
 
-The above example installs version `7.4` of the Helm chart from the repository.
+The above example installs version `7.5` of the Helm chart from the repository.
 
 The following example, when executed from the `charts/identity-platform`
 directory, can be used to install from a locally cloned git repository:

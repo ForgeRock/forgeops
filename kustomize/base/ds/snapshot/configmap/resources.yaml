@@ -5,10 +5,10 @@ kind: ConfigMap
 metadata:
   name: ds-snapshot-script
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
 data:
   
@@ -78,3 +78,40 @@ data:
   
     echo "Job $DS_SNAPSHOT_NAME did not complete successfully. Exiting"
     exit 1
+---
+# Source: identity-platform/templates/platform-config-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+data:
+  FORGEOPS_PLATFORM_SIZE: cdk
+  FQDN: identity-platform.domain.local
+  AM_URL: /am
+  AM_ADMIN_URL: /am/ui-admin/
+  IDM_ADMIN_URL: /admin
+  IDM_UPLOAD_URL: /upload
+  IDM_EXPORT_URL: /export
+  PLATFORM_ADMIN_URL: /platform
+  IDM_REST_URL: /openidm
+  ENDUSER_UI_URL: /enduser
+  LOGIN_UI_URL: /login/#/service/Login
+  PLATFORM_UI_IS_FRAAS: "false"
+  FRAAS_LOGGING_URL: ""
+  ENDUSER_CLIENT_ID: end-user-ui
+  ADMIN_CLIENT_ID: idm-admin-ui
+  THEME: default
+  AM_STORES_CTS_SERVERS: ds-cts-0.ds-cts:1636
+  AM_STORES_USER_SERVERS: ds-idrepo-0.ds-idrepo:1636
+  AM_SERVER_FQDN: identity-platform.domain.local
+  AUTORESTORE_FROM_DSBACKUP: "false"
+  DSBACKUP_DIRECTORY: ""
+  DSBACKUP_HOSTS: ""
+  DISASTER_RECOVERY_ID: "initial-restore"
+  CERT_ISSUER: default-issuer

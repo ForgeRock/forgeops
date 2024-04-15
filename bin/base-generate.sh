@@ -98,7 +98,7 @@ HELM_CMD=$(type -P helm)
 
 CHART="oci://us-docker.pkg.dev/forgeops-public/charts"
 CHART_NAME="identity-platform"
-CHART_VER_DEF="7.4"
+CHART_VER_DEF="7.6"
 CHART_VER=
 CHART_SOURCE="local"
 KUSTOMIZE_BASE_DEF=$SCRIPT_DIR/../kustomize/base

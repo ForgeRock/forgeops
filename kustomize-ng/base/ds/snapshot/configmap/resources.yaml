@@ -5,10 +5,10 @@ kind: ConfigMap
 metadata:
   name: ds-snapshot-script
   labels:
-    helm.sh/chart: identity-platform-7.4
+    helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.4"
+    app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
 data:
   
