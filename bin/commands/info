@@ -2,15 +2,22 @@
 """Output secrets and URLs for a ForgeRock deployment"""
 
 import argparse
-import datetime
 import json
 import os
-import shutil
 import sys
-import yaml
+import site
+from pathlib import Path
 
-sys.path.append(os.path.join(sys.path[0], '..'))
-import utils
+file_name = Path(__file__)
+current_file_path = file_name.parent.resolve()
+root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
+# Insert lib folders to python path
+sys.path.insert(0, str(root_dir))
+sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+
+import lib.python.utils as utils
+
 
 def main():
     parser = argparse.ArgumentParser(description="Display basic info for a ForgeRock Identity Platform k8s deployment",
@@ -35,6 +42,7 @@ def main():
     output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
     if args.jsonfmt:
         print(json.dumps(output))
+
 
 if __name__ == '__main__':
     main()

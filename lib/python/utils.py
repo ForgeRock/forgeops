@@ -13,7 +13,6 @@ import logging
 import json
 import re
 from pathlib import Path
-import sys
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
 root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
@@ -118,8 +117,7 @@ patcheable_components ={
     'base/secrets': 'secret_agent_config.yaml'
 }
 
-SCRIPT = pathlib.Path(__file__)
-SCRIPT_DIR = SCRIPT.parent.resolve()
+SCRIPT_DIR = pathlib.Path(os.path.join(root_dir, 'bin'))
 REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
 DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
 KUSTOMIZE_BASE_PATH = REPO_BASE_PATH.joinpath('kustomize').resolve()

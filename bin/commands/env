@@ -25,11 +25,15 @@ except Exception as e:
         print(f'[error] {e.__str__()}')
     except:
         raise e
-    sys.exit(10)
+    sys.exit(1)
 
-import yaml
-from mergedeep import merge
-import bin.utils as utils
+try:
+    import yaml
+    from mergedeep import merge
+except:
+    print(f'[error] can not load python libraries. Try to run "bin/forgeops-ng configure" and re-run your command')
+    sys.exit(1)
+import lib.python.utils as utils
 
 
 def genDsConnection(name, num, port=1636):

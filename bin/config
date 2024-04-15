@@ -7,8 +7,19 @@ import io
 import tarfile
 import sys
 import textwrap
+import os
+from pathlib import Path
+import site
 
-import utils
+file_name = Path(__file__)
+current_file_path = file_name.parent.resolve()
+root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
+# Insert lib folders to python path
+sys.path.insert(0, str(root_dir))
+sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+
+from lib.python import utils
 
 HELP_DESCRIPTION = """
 Manage ForgeRock Platform configuration.
@@ -120,10 +131,12 @@ def profile_path(path):
         log.info(f'Creating a new profile: {path}')
         path.mkdir(parents=True)
 
+
 def clean_path(path):
     """Clean profile directory"""
     log.info(f'Clean profile: {path}')
     shutil.rmtree(path)
+
 
 def export_amster(conf):
     profile_path(conf)
@@ -132,6 +145,7 @@ def export_amster(conf):
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
         raise Exception('Couldn\'t run amster export')
+
 
 def export_idm(idm_conf, idm_ui_conf, pod_name):
     """Export IDM config"""
@@ -302,8 +316,7 @@ def main():
 
     # export sub command
     export_cmd_parser = sub_cmd_parser.add_parser('export',
-                                                  epilog=textwrap.dedent(
-                                                      HELP_EXPORT_EXAMPLES),
+                                                  epilog=textwrap.dedent(HELP_EXPORT_EXAMPLES),
                                                   formatter_class=argparse.RawDescriptionHelpFormatter,
                                                   description=HELP_EXPORT_CMD_DESCRIPTION)
     export_cmd_parser.add_argument('--baseline-profile',
@@ -323,8 +336,7 @@ def main():
 
     # path sub command
     path_cmd_parser = sub_cmd_parser.add_parser('path',
-                                                epilog=textwrap.dedent(
-                                                    HELP_PATH_EXAMPLES),
+                                                epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
                                                 formatter_class=argparse.RawTextHelpFormatter,
                                                 description=HELP_PATH_CMD_DESCRIPTION)
     path_sub_cmd_parser = path_cmd_parser.add_subparsers(dest='tool')
@@ -332,8 +344,7 @@ def main():
 
     # docker paths
     path_docker_parser = path_sub_cmd_parser.add_parser('docker',
-                                                        epilog=textwrap.dedent(
-                                                            HELP_PATH_EXAMPLES),
+                                                        epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
                                                         formatter_class=argparse.RawTextHelpFormatter,
                                                         description=HELP_PATH_CMD_DESCRIPTION)
     path_docker_parser.add_argument('component',
@@ -346,8 +357,7 @@ def main():
 
     # kustomize paths
     path_kustomize_parser = path_sub_cmd_parser.add_parser('kustomize',
-                                                           epilog=textwrap.dedent(
-                                                               HELP_PATH_EXAMPLES),
+                                                           epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
                                                            formatter_class=argparse.RawTextHelpFormatter,
                                                            description=HELP_PATH_CMD_DESCRIPTION)
     path_kustomize_parser.add_argument('layer',

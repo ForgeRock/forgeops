@@ -13,7 +13,7 @@ sys.path.insert(0, str(root_dir))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 from lib.python.constants import ENV_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
     CONFIGURED_VERSION_FILE, DEPENDENCIES_DIR
-from bin.utils import run, warning, error
+from lib.python.utils import run, warning, error
 
 
 def compute_configuration_version():

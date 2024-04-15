@@ -7,7 +7,7 @@ start_dir=$(pwd)
 # Figure out the dir we live in
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # Bring in our standard functions
-source $SCRIPT_DIR/stdlib.sh
+source $SCRIPT_DIR/../lib/shell/stdlib.sh
 cd $start_dir
 
 usage() {

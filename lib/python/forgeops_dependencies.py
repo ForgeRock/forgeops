@@ -21,7 +21,7 @@ sys.path.insert(0, str(root_dir))
 sys.path.insert(1, str(bin_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 sys.path.insert(2, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-from bin.utils import REQ_VERSIONS, error, message, run, warning, certmanager, secretagent, dsoperator
+from lib.python.utils import REQ_VERSIONS, error, message, run, warning, certmanager, secretagent, dsoperator
 
 
 def check_component_version(component, version):
