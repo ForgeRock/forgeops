@@ -115,58 +115,58 @@ create-backend-index \
 
 create-backend-index \
           --backend-name amIdentityStore \
-          --set index-type:big-extensible \
+          --set index-type:extensible \
           --index-name fr-idm-managed-user-manager \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
           --backend-name amIdentityStore \
           --set index-type:extensible \
           --index-name fr-idm-managed-user-meta \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
           --backend-name amIdentityStore \
           --set index-type:extensible \
           --index-name fr-idm-managed-user-notifications \
           --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
           --backend-name amIdentityStore \
-          --set index-type:big-extensible \
+          --set index-type:extensible \
           --index-name fr-idm-managed-user-roles \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
           --backend-name amIdentityStore \
-          --set index-type:big-extensible \
+          --set index-type:extensible \
           --index-name fr-idm-managed-user-authzroles-internal-role \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
           --backend-name amIdentityStore \
-          --set index-type:big-extensible \
+          --set index-type:extensible \
           --index-name fr-idm-managed-user-authzroles-managed-role \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:big-extensible \
-          --index-name fr-idm-managed-organization-owner \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-organization-owner \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:big-extensible \
-          --index-name fr-idm-managed-organization-admin \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-organization-admin \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:big-extensible \
-          --index-name fr-idm-managed-organization-member \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-organization-member \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
           --backend-name amIdentityStore \
           --set index-type:ordering \
@@ -179,28 +179,28 @@ create-backend-index \
           --index-name fr-idm-managed-user-inactive-date
 create-backend-index \
           --backend-name amIdentityStore \
-          --set index-type:big-extensible \
+          --set index-type:extensible \
           --index-name fr-idm-managed-user-groups \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+          --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:big-extensible \
-          --index-name fr-idm-managed-assignment-member \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-assignment-member \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:big-extensible \
-          --index-name fr-idm-managed-application-member \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-application-member \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:big-extensible \
-          --index-name fr-idm-managed-application-owner \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-          --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --backend-name amIdentityStore \
+        --set index-type:extensible \
+        --index-name fr-idm-managed-application-owner \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 EOF
 
 # Example of creating additional indexes.
