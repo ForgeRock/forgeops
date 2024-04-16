@@ -153,6 +153,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                                              reportTitles: ''])
                             }
                         }
+                        sh("./shared/scripts/jenkins_clean_namespaces.py")
                     }
                 }
             }
