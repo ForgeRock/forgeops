@@ -1,6 +1,6 @@
 FROM gcr.io/forgerock-io/am-cdk/pit1:7.6.0-latest-postcommit
 
-ARG CONFIG_PROFILE=cdk
+ARG CONFIG_PROFILE=default
 RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"
 COPY  --chown=forgerock:root config-profiles/${CONFIG_PROFILE}/ /home/forgerock/openam/
 
