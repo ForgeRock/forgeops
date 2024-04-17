@@ -1,7 +1,8 @@
 /*
 * Forgeops OpenAM OAuth2 simulation.
 *
-* Copyright ForgeRock AS.
+* Copyright (c) 2019-2024 Ping Identity Corporation. Use of this source code is subject to the
+* Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 */
 
 package am
