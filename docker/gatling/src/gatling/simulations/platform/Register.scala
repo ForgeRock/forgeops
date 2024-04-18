@@ -1,10 +1,8 @@
 /*
 * Forgeops IDM Self Service
-# Copyright 2020 ForgeRock AS. All Rights Reserved
-#
-# Use of this code requires a commercial software license with ForgeRock AS.
-# or with one of its affiliates. All use shall be exclusively subject
-# to such license between the licensee and ForgeRock AS.
+*
+* Copyright (c) 2019-2024 Ping Identity Corporation. Use of this source code is subject to the
+* Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 */
 
 package platform

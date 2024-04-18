@@ -18,7 +18,7 @@
 # Header, with the fields enclosed by brackets [] replaced by your own identifying
 # information: "Portions Copyright [year] [name of copyright owner]".
 #
-# Copyright 2019-2021 ForgeRock AS.
+# Copyright 2019-2024 Ping Identity Corporation
 #
 set -eux
 

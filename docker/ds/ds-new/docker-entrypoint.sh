@@ -3,11 +3,12 @@
 # The entrypoint script for the fully mutable directory deployment.
 # Read this carefully if your not deploying with the provided operator or Kubernetes manifests.
 #
-# Copyright 2019-2021 ForgeRock AS. All Rights Reserved
-#
-# Use of this code requires a commercial software license with ForgeRock AS.
-# or with one of its affiliates. All use shall be exclusively subject
-# to such license between the licensee and ForgeRock AS.
+# Copyright 2019-2024 Ping Identity Corporation. All Rights Reserved
+# 
+# This code is to be used exclusively in connection with Ping Identity 
+# Corporation software or services. Ping Identity Corporation only offers
+# such software or services to legal entities who have entered into a 
+# binding license agreement with Ping Identity Corporation.
 
 # set -x 
 

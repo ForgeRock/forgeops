@@ -1,7 +1,7 @@
 /*
 * Forgeops Gatling Utilities
 *
-* Copyright (c) 2020 ForgeRock AS. Use of this source code is subject to the
+* Copyright (c) 2020-2024 Ping Identity Corporation. Use of this source code is subject to the
 * Common Development and Distribution License (CDDL) that can be found in the LICENSE file
 */
 
