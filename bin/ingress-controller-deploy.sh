@@ -142,14 +142,14 @@ case $INGRESS in
     REPO=https://haproxytech.github.io/helm-charts
     REPO_NAME=haproxytech
     INGRESS_CLASS_YAML=haproxy-ingressclass.yaml
-    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=1.36.1
+    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=1.39.1
     ;;
   nginx)
     CHART=ingress-nginx
     NAMESPACE=nginx
     REPO=https://kubernetes.github.io/ingress-nginx
     REPO_NAME=ingress-nginx
-    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=4.8.0
+    [[ -z "$CHART_VERSION" ]] && CHART_VERSION=4.10.0
     ;;
   *)
     usage 1 "You must pick either haproxy or nginx as an ingress"
