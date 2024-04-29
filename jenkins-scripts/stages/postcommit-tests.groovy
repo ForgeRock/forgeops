@@ -22,7 +22,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     clusterConfig['PIPELINE_NAME'] = isPR() ? 'forgeops-pr' : 'forgeops-postcommit'
 
     def scaleClusterConfig = [:]
-    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend-pool': 5, 'primary-pool': 20]
+    scaleClusterConfig['SCALE_CLUSTER'] = ['frontend': 5, 'default-pool': 20]
 
     saasProductInfo = cloud_utils.getSaasProductInfo()
     platformImagesProductInfo = upgrade.getPlatformImagesProductInfo(commonModule.platformImagesRevision)
