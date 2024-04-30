@@ -6,6 +6,11 @@ metadata:
 spec:
   # The number of DS servers in the topology
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   # The resources assigned to each DS pod
   podTemplate:
     resources:

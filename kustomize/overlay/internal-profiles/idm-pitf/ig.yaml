@@ -1,9 +1,14 @@
-#Patch AM
+# Patch IG
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ig
 spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       annotations:
