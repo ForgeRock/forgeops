@@ -91,3 +91,7 @@ See [CDK Shutdown and Removal] in the ForgeOps documentation.
 [Statement of support]:https://backstage.forgerock.com/docs/forgeops/7.5/start/support.html#kubernetes-services
 [Troubleshooting]:https://ea.forgerock.com/docs/forgeops/troubleshooting/overview.html
 [UI and API access]:https://ea.forgerock.com/docs/forgeops/cdk/access.html
+
+## License
+This project is licensed under the CDDL License - see the [LICENSE](LICENSE) file for details
+Copyright 2024 Ping Identity Corporation. All Rights Reserved.
