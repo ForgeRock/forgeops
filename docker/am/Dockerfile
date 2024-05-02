@@ -6,6 +6,10 @@ COPY  --chown=forgerock:root config-profiles/${CONFIG_PROFILE}/ /home/forgerock/
 
 COPY --chown=forgerock:root *.sh /home/forgerock/
 
+RUN mkdir -p /home/forgerock/logging
+
+ENV CATALINA_OPTS="${CATALINA_OPTS} -Dlogback.configurationFile=/home/forgerock/logging/logback.xml"
+
 WORKDIR /home/forgerock
 
 # If you want to debug AM uncomment these lines:
