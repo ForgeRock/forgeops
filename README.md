@@ -50,10 +50,9 @@ Note that the `idm-provisioning`, `idm-admin-ui` and the `end-user-ui` client co
 integration of IDM and AM.
 * Directory service instances configured for:
    * The shared AM/IDM repo (ds-idrepo).
-   * The AM dynamic runtime data store for polices and agents. Currently, the ds-idrepo is used.
+   * The AM dynamic runtime data store for policies and agents. Currently, the ds-idrepo is used.
    * The Access Manager Core Token Service (ds-cts).
 * A Gatling test harness, which exercises the basic deployment and can be modified to include additional tests.
-
 
 ## Getting Started
 
