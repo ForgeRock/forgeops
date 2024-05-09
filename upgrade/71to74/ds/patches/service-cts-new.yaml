@@ -3,10 +3,10 @@ kind: Service
 metadata:
   labels:
     affinity: directory
-    app: ds-idrepo
-    app.kubernetes.io/instance: ds-idrepo
+    app: ds-cts
+    app.kubernetes.io/instance: ds-cts
     component: ds
-  name: ds-idrepo
+  name: ds-cts
 spec:
   clusterIP: None
   clusterIPs:
@@ -37,9 +37,7 @@ spec:
     protocol: TCP
     targetPort: 8443
   selector:
-    app.kubernetes.io/controller: DirectoryService
-    app.kubernetes.io/instance: ds-idrepo
-    app.kubernetes.io/managed-by: ds-operator
+    app.kubernetes.io/instance: ds-cts
     app.kubernetes.io/name: ds
     app.kubernetes.io/part-of: forgerock
   sessionAffinity: None

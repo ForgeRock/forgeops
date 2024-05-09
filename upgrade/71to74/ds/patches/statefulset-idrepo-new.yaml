@@ -2,9 +2,8 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/controller: DirectoryService
-        app.kubernetes.io/instance: ds-cts
-        app.kubernetes.io/managed-by: ds-operator
+        app: ds-idrepo
+        app.kubernetes.io/instance: ds-idrepo
         app.kubernetes.io/name: ds
         app.kubernetes.io/part-of: forgerock
     spec:
@@ -25,19 +24,19 @@ spec:
           value: /var/run/secrets/admin/dirmanager.pw
         - name: DS_TEST
           value: MY_TEST_VARIABLE
-        image: us-docker.pkg.dev/forgeops-public/images/ds:7.2.0
+        image: us-docker.pkg.dev/forgeops-public/images/ds:7.4.0
         imagePullPolicy: IfNotPresent
         name: ds
         ports:
         - containerPort: 8080
           name: http
           protocol: TCP
-        resources:
-          limits:
-            memory: 1Gi
-          requests:
-            cpu: 500m
-            memory: 900Mi
+        # resources:
+        #   limits:
+        #     memory: 1Gi
+        #   requests:
+        #     cpu: 500m
+        #     memory: 900Mi
         startupProbe:
           failureThreshold: 720
           httpGet:
@@ -81,15 +80,15 @@ spec:
           value: /var/run/secrets/admin/dirmanager.pw
         - name: DS_TEST
           value: MY_TEST_VARIABLE
-        image: us-docker.pkg.dev/forgeops-public/images/ds:7.2.0
+        image: us-docker.pkg.dev/forgeops-public/images/ds:7.4.0
         imagePullPolicy: IfNotPresent
         name: init
-        resources:
-          limits:
-            memory: 1366Mi
-          requests:
-            cpu: 500m
-            memory: 1366Mi
+        # resources:
+        #   limits:
+        #     memory: 1366Mi
+        #   requests:
+        #     cpu: 500m
+        #     memory: 1366Mi
         volumeMounts:
         - mountPath: /opt/opendj/data
           name: data
@@ -111,7 +110,7 @@ spec:
         runAsUser: 11111
       serviceAccount: default
       serviceAccountName: default
-      subdomain: ds-cts
+      subdomain: ds-idrepo
       terminationGracePeriodSeconds: 30
       tolerations:
       - effect: NoSchedule
@@ -121,13 +120,13 @@ spec:
       topologySpreadConstraints:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: ds-cts
+            app.kubernetes.io/instance: ds-idrepo
         maxSkew: 1
         topologyKey: topology.kubernetes.io/zone
         whenUnsatisfiable: ScheduleAnyway
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: ds-cts
+            app.kubernetes.io/instance: ds-idrepo
         maxSkew: 1
         topologyKey: topology.kubernetes.io/hostname
         whenUnsatisfiable: ScheduleAnyway
