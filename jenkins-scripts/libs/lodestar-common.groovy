@@ -177,7 +177,13 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-        node('gce-vm-lodestar-n1-standard-8') {
+        def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+        if (branchName.startsWith('sustaining/') || branchName.startsWith('release/')) {
+            // Skip the UI tests when running on sustaining and release branches
+            return Status.SKIPPED.asOutcome()
+        }
+
+        node('gce-vm-forgeops-n2d-standard-8') {
             stage(stageName) {
                 try {
                     platformUI.runPlatformUI(commonModule.lodestarRevision, commonModule.platformImagesRevision,
