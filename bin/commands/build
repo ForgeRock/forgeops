@@ -37,6 +37,7 @@ OPTIONS:
   -p|--config-profile <profile> : name of the config profile to use
   -r|--push-to <registry>       : container registry to push built images to
   --reset                       : reset image-defaulter to git index
+  -t|--tag <tag>                : image tag to use
 
 Valid Components:
   ${COMPONENTS_VALID[*]}
@@ -133,6 +134,6 @@ for c in ${COMPONENTS[@]} ; do
     PUSH_OPT="--push-to ${PUSH_TO}"
   fi
 
-  kube kustomize edit set image name=$IMAGE $OVERLAY_PATH/image-defaulter
+  runOrPrint $K_CMD kustomize edit set image name=$IMAGE $OVERLAY_PATH/image-defaulter
   runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $c
 done
