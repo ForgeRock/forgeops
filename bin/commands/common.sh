@@ -71,7 +71,8 @@ processArgs() {
   SKIP_CONFIRM=false
 
   # Setup prog for usage()
-  PROG="forgeops $(basename $0)"
+  PROG_NAME=$(basename $0)
+  PROG="forgeops ${PROG_NAME}"
 
   while true; do
     case "$1" in
@@ -88,7 +89,6 @@ processArgs() {
       -p|--config-profile) CONFIG_PROFILE=$2 ; shift 2 ;;
       -r|--push-to) PUSH_TO=$2 ; shift 2 ;;
       -s|--source) SOURCE=$2 ; shift 2 ;;
-      -t|--timeout) TIMEOUT=$2 ; shift 2 ;;
       -y|--yes) SKIP_CONFIRM=true ; shift ;;
       --reset) RESET=true ; shift ;;
       --ds-snapshots) DS_SNAPSHOTS="$2" ; shift 2 ;;
@@ -97,7 +97,6 @@ processArgs() {
       --small) SIZE='small' ; shift ;;
       --medium) SIZE='medium' ; shift ;;
       --large) SIZE='large' ; shift ;;
-      "") break ;;
       -f|--force|--fqdn)
         if [[ "$1" =~ "force" ]] || [[ "$2" =~ ^\- ]] || [[ "$2" == "" ]]; then
           FORCE=true
@@ -109,6 +108,15 @@ processArgs() {
           message "FQDN=$FQDN" "debug"
         fi
         ;;
+      -t|--timeout|--tag)
+        if [ "$PROG_NAME" == "build" ] ; then
+          TAG=$2
+        else
+          TIMEOUT=$2
+        fi
+        shift 2
+        ;;
+      "") break ;;
       *) COMPONENTS+=( $1 ) ; shift ;;
     esac
   done
