@@ -30,7 +30,7 @@ if [[ "$CANCEL" ]]; then
 fi
 
 # Cloud storage backup properties
-AWS_PARAMS="--storageProperty s3.keyId.env.var:AWS_ACCESS_KEY_ID  --storageProperty s3.secret.env.var:AWS_SECRET_ACCESS_KEY"
+AWS_PARAMS="--storageProperty s3.keyId.env.var:AWS_ACCESS_KEY_ID  --storageProperty s3.secret.env.var:AWS_SECRET_ACCESS_KEY --storageProperty endpoint:https://s3.${AWS_REGION}.amazonaws.com"
 AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_STORAGE_ACCOUNT_NAME  --storageProperty az.accountKey.env.var:AZURE_ACCOUNT_KEY --storageProperty endpoint:https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
 GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.json"
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
