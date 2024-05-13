@@ -46,7 +46,7 @@ node('gce-vm-forgeops-n2d-standard-8') {
 def initialSteps() {
     properties([
             buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '20')),
-            pipelineTriggers([cron('H 2 * * 1-5')]),
+            pipelineTriggers([cron('H 2 * * 0')]),
     ])
 
     slackChannel = '#forgeops-notify'
