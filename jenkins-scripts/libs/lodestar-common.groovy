@@ -181,6 +181,12 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
     def reportUrl = "${env.BUILD_URL}/${normalizedStageName}/"
 
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
+        def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+        if (branchName.startsWith('sustaining/') || branchName.startsWith('release/')) {
+            // Skip the UI tests when running on sustaining and release branches
+            return Status.SKIPPED.asOutcome()
+        }
+
         node('gce-vm-lodestar-n2d-standard-8') {
             stage(stageName) {
                 try {
