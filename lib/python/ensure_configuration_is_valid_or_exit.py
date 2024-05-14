@@ -50,7 +50,8 @@ def check_python_venv_lib_deps():
             if req.strip() != '':
                 tmp_req_list.append(req.strip())
     requirements = tmp_req_list
-    rc, out, err = run('pip freeze', cstdout=True, cstderr=True)
+    pip_freeze_cmd = 'pip3 freeze' if not in_virtualenv() else 'python3 -m pip freeze'
+    rc, out, err = run(pip_freeze_cmd, cstdout=True, cstderr=True)
     out = out.decode("utf-8").split('\n')
 
     # Compare installed libs with expected.

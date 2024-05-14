@@ -17,6 +17,7 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python.constants import CONFIGURED_VERSION_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
     DEPENDENCIES_DIR
 import lib.python.utils as utils
+from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv
 
 # do not use --user param when virtual environment is used
 pip = 'pip3'
@@ -38,6 +39,14 @@ class ConfigureEnv:
         cmd = f'{pip_install} -r "{REQUIREMENTS_FILE}"'
         print(f'export PYTHONUSERBASE="{str(dependencies_dir)}";')
         try:
+            print()
+            print(f'DEBUG : VIRTUAL_ENV = {os.environ.get("VIRTUAL_ENV")}')
+            print()
+            pip_list_cmd = 'pip3 list' if not in_virtualenv() else 'python3 -m pip list'
+            print(f'DEBUG {pip_list_cmd}')
+            utils.run(pip_list_cmd)
+            print()
+            print(cmd)
             utils.run(cmd)
         except Exception as e:
             utils.error(f'Command "{" ".join(e.cmd)}" returns error code {e.returncode} (expected 0)')
