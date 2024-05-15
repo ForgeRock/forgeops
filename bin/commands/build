@@ -115,6 +115,12 @@ for c in ${COMPONENTS[@]} ; do
     continue
   fi
 
+  if [ "$c" == "am" ] || [ "$c" == "ds" ] ; then
+    NAME=".*${c}:.*"
+  else
+    NAME=".*${c}.*"
+  fi
+
   IMAGE=$c
   TAG_OPT=
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
@@ -134,6 +140,7 @@ for c in ${COMPONENTS[@]} ; do
     PUSH_OPT="--push-to ${PUSH_TO}"
   fi
 
-  runOrPrint $K_CMD kustomize edit set image name=$IMAGE $OVERLAY_PATH/image-defaulter
+  cd $OVERLAY_PATH/image-defaulter
+  runOrPrint "kustomize edit set image '$NAME=$IMAGE'"
   runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $c
 done
