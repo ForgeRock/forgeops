@@ -56,10 +56,10 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
                         'Postcommit_fo_smoke_small',
                         'Postcommit_fo_set_images',
                         'Postcommit_fo_dsbackup',
-//                         'Postcommit_fo_am_only',
-//                         'Postcommit_fo_idm_only',
-//                         'Postcommit_fo_ig_only',
-//                         'Postcommit_fo_ds_only',
+                        'Postcommit_fo_am_only',
+                        'Postcommit_fo_idm_only',
+                        'Postcommit_fo_ig_only',
+                        'Postcommit_fo_ds_only',
                 ],
         ]
 
@@ -353,36 +353,36 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         )
     }
 
-//     if (params.Postcommit_fo_am_only) {
-//         parallelTestsMap.put('FO AM only',
-//                 {
-//                     commonModule.runGuillotine(pipelineRun, 'FO AM only', 'GKE', '--test-names Deployment.AmOnly')
-//                 }
-//         )
-//     }
-//
-//     if (params.Postcommit_fo_idm_only) {
-//         parallelTestsMap.put('FO IDM only',
-//                 {
-//                     commonModule.runGuillotine(pipelineRun, 'FO IDM only', 'GKE', '--test-names Deployment.IdmOnly')
-//                 }
-//         )
-//     }
-//
-//     if (params.Postcommit_fo_ig_only) {
-//         parallelTestsMap.put('FO IG only',
-//                 {
-//                     commonModule.runGuillotine(pipelineRun, 'FO IG only', 'GKE', '--test-names Deployment.IgOnly')
-//                 }
-//         )
-//     }
-//     if (params.Postcommit_fo_ds_only) {
-//         parallelTestsMap.put('FO DS only',
-//                 {
-//                     commonModule.runGuillotine(pipelineRun, 'FO DS only', 'GKE', '--test-names Deployment.DsOnly')
-//                 }
-//         )
-//     }
+     if (params.Postcommit_fo_am_only) {
+         parallelTestsMap.put('FO AM only',
+                 {
+                     commonModule.runGuillotine(pipelineRun, 'FO AM only', 'GKE', '--test-names Deployment.AmOnly')
+                 }
+         )
+     }
+
+     if (params.Postcommit_fo_idm_only) {
+         parallelTestsMap.put('FO IDM only',
+                 {
+                     commonModule.runGuillotine(pipelineRun, 'FO IDM only', 'GKE', '--test-names Deployment.IdmOnly')
+                 }
+         )
+     }
+
+     if (params.Postcommit_fo_ig_only) {
+         parallelTestsMap.put('FO IG only',
+                 {
+                     commonModule.runGuillotine(pipelineRun, 'FO IG only', 'GKE', '--test-names Deployment.IgOnly')
+                 }
+         )
+     }
+     if (params.Postcommit_fo_ds_only) {
+         parallelTestsMap.put('FO DS only',
+                 {
+                     commonModule.runGuillotine(pipelineRun, 'FO DS only', 'GKE', '--test-names Deployment.DsOnly')
+                 }
+         )
+     }
 
     parallel parallelTestsMap
 }
