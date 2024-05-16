@@ -152,7 +152,7 @@ am:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/am/pit1
-    tag: "7.6.0-latest-postcommit"
+    tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -227,8 +227,8 @@ amster:
   #ttlSecondsAfterFinished: 300
 
   image:
-    repository: gcr.io/forgerock-io/amster/pit1
-    tag: "7.6.0-latest-postcommit"
+    repository: us-docker.pkg.dev/forgeops-public/images/amster
+    tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -277,7 +277,7 @@ ldif_importer:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ldif-importer
-    tag: "7.6.0-latest-postcommit"
+    tag: "dev"
     pullPolicy: Always
     imagePullSecrets: []
 
@@ -322,7 +322,7 @@ idm:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/idm/pit1
-    tag: "7.6.0-latest-postcommit"
+    tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -601,7 +601,7 @@ ig:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ig/pit1
-    tag: "7.6.0-latest-postcommit"
+    tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -700,7 +700,7 @@ ds_idrepo:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds/pit1
-    tag: "7.6.0-latest-postcommit"
+    tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -774,7 +774,7 @@ ds_cts:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds/pit1
-    tag: "7.6.0-latest-postcommit"
+    tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
