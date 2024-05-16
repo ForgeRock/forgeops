@@ -62,6 +62,9 @@ spec:
             secretName: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
+        - name: am-logback
+          configMap:
+            name: am-logback
       initContainers:
         - name: fbc-init
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
@@ -166,6 +169,8 @@ spec:
             mountPath: /var/run/secrets/amster
           - name: fbc
             mountPath: /home/forgerock/openam
+          - name: am-logback
+            mountPath: /home/forgerock/logging
       {{- with .Values.am.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
