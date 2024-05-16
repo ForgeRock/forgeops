@@ -151,7 +151,7 @@ am:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/am/pit1
+    repository: us-docker.pkg.dev/forgeops-public/images/am
     tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -321,7 +321,7 @@ idm:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/idm/pit1
+    repository: us-docker.pkg.dev/forgeops-public/images/idm
     tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -600,7 +600,7 @@ ig:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ig/pit1
+    repository: us-docker.pkg.dev/forgeops-public/images/ig
     tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -699,7 +699,7 @@ ds_idrepo:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds/pit1
+    repository: us-docker.pkg.dev/forgeops-public/images/ds
     tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
@@ -773,7 +773,7 @@ ds_cts:
   replicaCount: 1
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ds/pit1
+    repository: us-docker.pkg.dev/forgeops-public/images/ds
     tag: "dev"
     pullPolicy: IfNotPresent
     imagePullSecrets: []

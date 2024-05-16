@@ -29,7 +29,7 @@ spec:
     - hosts:
         - {{ $host | quote }}
       {{- if $.Values.platform.ingress.tls.secret.name }}
-      secretName: {{ $.Values.platform.tls.secret.name }}
+      secretName: {{ $.Values.platform.ingress.tls.secret.name }}
       {{- else }}
       secretName: "tls-{{ $host }}"
       {{- end }}
