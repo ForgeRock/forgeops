@@ -29,18 +29,15 @@ COMPONENTS_INSTALL=(
   'ds-idrepo'
 )
 
-COMPONENTS_WAIT=('secrets')
-
-# Old list
-# COMPONENTS_WAIT=(
-#   'ds'
-#   'am'
-#   'amster'
-#   'idm'
-#   'apps'
-#   'secrets'
-#   'ig'
-# )
+COMPONENTS_WAIT=(
+   'ds'
+   'am'
+   'amster'
+   'idm'
+   'apps'
+   'secrets'
+   'ig'
+)
 
 #############
 # Functions #
@@ -152,6 +149,8 @@ processArgs() {
 
   if [ -z "$ENV_NAME" ] && [[ "$PROG" =~ apply ]] ; then
     ENV_NAME=demo
+  elif [[ "$PROG" =~ wait ]] ; then
+    message "An environment is not required for wait" "debug"
   elif [ -z "$ENV_NAME" ] ; then
     usage 1 'An environment name (--env-name) is required.'
   fi

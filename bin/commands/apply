@@ -109,11 +109,11 @@ for c in ${COMPONENTS[@]} ; do
   [[ -d $c_path ]] && kube apply -k $c_path
 done
 
-echo "Sleeping 30 seconds to give time for secrets to populate"
+echo "Waiting for secrets to be ready."
 if [ "$DRYRUN" = true ] ; then
-  echo "Not sleeping for dryrun"
+  echo "Skipping wait during dryrun"
 else
-  sleep 30
+  runOrPrint $SCRIPT_DIR/wait $NAMESPACE_OPT secrets -t ${TIMEOUT:-60}
 fi
 
 runOrPrint $SCRIPT_DIR/info $NAMESPACE_OPT

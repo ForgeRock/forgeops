@@ -27,10 +27,7 @@ OPTIONS:
   -a|--amster-retain <n>      : Keep amster pod running for n seconds. (default: 10)
                                 Add "infinity" to keep up indefinitely
   -n|--namespace <ns>         : k8s namespace to install into
-  -o|--overlay OVERLAY        : overlay to use (default: cdk)
-                                (full path or relative to kustomize/overlay)
-  -p|--config-profile PROFILE : Config profile to use for IDP apps
-                                (full path or relative to config dir)
+  -t|--timeout <n>            : set the max time in seconds to wait for (default: 600)
 
 Valid components:
   ${COMPONENTS_VALID[@]}
@@ -45,25 +42,36 @@ Examples:
 EOM
 )
 
-  usageStd $1 "$usage_msg" $2
+  usageStd $1 "$usage_msg" "$2"
 }
 
 waitForResource() {
   message "Starting waitForResource()" "debug"
 
-  local resource_type=$1
-  local resource_name=$2
+  local condition=$1
+  local resource=$2
+
+  echo "Waiting for ${resource} to be ${condition}."
+
+  kube wait --for=condition=$condition --timeout="${TIMEOUT}s" $resource
+}
+
+waitForSecret() {
+  message "Starting waitForSecret()" "debug"
+
+  local secret=$1
   local start_time=$(date +%s)
   local now=$(date +%s)
   local return_code=1
 
+  echo -n "Waiting for secret $secret to exist..."
   while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
-    if runOrPrint "$K_CMD -n $NAMESPACE get $resource_type $resource_name > /dev/null 2>&1" ; then
+    if runOrPrint "$K_CMD $NAMESPACE_OPT get secret $secret > /dev/null 2>&1" ; then
       echo done
       return_code=0
       break
     else
-      echo '.'
+      echo -n '.'
       sleep 1
     fi
     now=$(date +%s)
@@ -73,22 +81,56 @@ waitForResource() {
 }
 
 # Setup valid components now so they get presented in the usage
-COMPONENTS_VALID=$COMPONENTS_WAIT
+COMPONENTS_VALID=${COMPONENTS_WAIT[@]}
 
 # Code in common.sh
 processArgs $*
 checkComponents
 
 SECRET_NAMES=('am-env-secrets' 'idm-env-secrets' 'ds-passwords' 'ds-env-secrets')
+TIMEOUT=${TIMEOUT:-60}
 
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
   case $c in
+    am)
+      waitForResource ready "pod -l app=am"
+      ;;
+
+    amster)
+      waitForResource 'complete' job/amster
+      ;;
+
+    apps)
+      waitForResource ready "pod -l app=am"
+      waitForResource 'complete' job/amster
+      waitForResource ready "pod -l app=idm"
+      ;;
+
+    ds)
+      ds_cts_rep=$($K_CMD get sts ds-cts -o=jsonpath='{.status.replicas}')
+      ds_idrepo_rep=$($K_CMD get sts ds-idrepo -o=jsonpath='{.status.replicas}')
+      for ((i=0;i<$ds_idrepo_rep;i++)) ; do
+        waitForResource ready pod/ds-idrepo-$i
+      done
+      for ((i=0;i<$ds_cts_rep;i++)) ; do
+        waitForResource ready pod/ds-cts-$i
+      done
+      waitForResource 'complete' job/ldif-importer
+      ;;
+
+    idm)
+      waitForResource ready "pod -l app=idm"
+      ;;
+
+    ig)
+      waitForResource ready "pod -l app=ig"
+      ;;
+
     secrets)
-      TIMEOUT=${TIMEOUT:-60}
       for s in ${SECRET_NAMES[@]} ; do
         message "s=$s" "debug"
-        waitForResource secret $s
+        waitForSecret $s
       done
       ;;
 
