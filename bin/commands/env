@@ -25,11 +25,15 @@ except Exception as e:
         print(f'[error] {e.__str__()}')
     except:
         raise e
-    sys.exit(10)
+    sys.exit(1)
 
-import yaml
-from mergedeep import merge
-import bin.utils as utils
+try:
+    import yaml
+    from mergedeep import merge
+except:
+    print(f'[error] can not load python libraries. Try to run "bin/forgeops-ng configure" and re-run your command')
+    sys.exit(1)
+import lib.python.utils as utils
 
 
 def genDsConnection(name, num, port=1636):
@@ -164,7 +168,7 @@ def main():
         if args.single:
             size['am']['replicaCount'] = 1
 
-    if args.cts_cpu or args.cts_disk or args.cts_mem or args.cts_rep:
+    if args.cts_cpu or args.cts_disk or args.cts_mem or args.cts_rep or args.single:
         if 'ds_cts' not in size.keys():
             size['ds_cts'] = {}
             if args.cts_cpu or args.cts_mem:
@@ -189,7 +193,7 @@ def main():
         if args.single:
             size['ds_cts']['replicaCount'] = 1
 
-    if args.idm_cpu or args.idm_mem or args.idm_rep:
+    if args.idm_cpu or args.idm_mem or args.idm_rep or args.single:
         if 'idm' not in size.keys():
             size['idm'] = {}
             if args.idm_cpu or args.idm_mem:
@@ -209,7 +213,7 @@ def main():
         if args.single:
             size['idm']['replicaCount'] = 1
 
-    if args.idrepo_cpu or args.idrepo_disk or args.idrepo_mem or args.idrepo_rep:
+    if args.idrepo_cpu or args.idrepo_disk or args.idrepo_mem or args.idrepo_rep or args.single:
         if 'ds_idrepo' not in size.keys():
             size['ds_idrepo'] = {}
             if args.idrepo_cpu or args.idrepo_mem:
