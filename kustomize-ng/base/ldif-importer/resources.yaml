@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-04-17 15:18:53.143617 -0500 CDT m=+0.029781376"
+        deployment-date: "2024-05-21 07:50:45.633699 -0500 CDT m=+0.035953418"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -38,7 +38,7 @@ spec:
         - name: ldif-importer
           securityContext:
             {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:7.6.0-latest-postcommit"
+          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:dev"
           imagePullPolicy: Always
           envFrom:
           - secretRef:

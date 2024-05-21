@@ -71,7 +71,7 @@ spec:
   template:
     metadata:
       annotations:
-        deployment-date: "2024-04-17 15:18:52.806764 -0500 CDT m=+0.032439751"
+        deployment-date: "2024-05-21 07:50:45.259702 -0500 CDT m=+0.037719251"
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -107,7 +107,7 @@ spec:
         - name: init
           securityContext:
             {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds/pit1:7.6.0-latest-postcommit"
+          image: "ds:dev"
           imagePullPolicy: IfNotPresent
           volumeMounts:
           - mountPath: /opt/opendj/data
@@ -168,7 +168,7 @@ spec:
         - name: ds
           securityContext:
             {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds/pit1:7.6.0-latest-postcommit"
+          image: "ds:dev"
           imagePullPolicy: IfNotPresent
           args:
           - start-ds

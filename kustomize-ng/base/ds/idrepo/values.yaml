@@ -19,6 +19,8 @@ ds_cts:
   enabled: false
 ds_idrepo:
   enabled: true
+  image:
+    repository: ds
 end_user_ui:
   enabled: false
 idm:
