@@ -33,7 +33,7 @@ try:
 except:
     print(f'[error] can not load python libraries. Try to run "bin/forgeops-ng configure" and re-run your command')
     sys.exit(1)
-import lib.python.utils as utils
+import bin.utils as utils
 
 
 def genDsConnection(name, num, port=1636):
