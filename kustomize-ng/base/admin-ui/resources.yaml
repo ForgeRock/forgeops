@@ -48,8 +48,7 @@ spec:
       app.kubernetes.io/component: admin-ui
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 08:09:10.734029 -0500 CDT m=+0.045637584"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -57,12 +56,10 @@ spec:
         app.kubernetes.io/component: admin-ui
     spec:
       serviceAccountName: default
-      securityContext:
-        {}
+      securityContext: {}
       containers:
         - name: admin-ui
-          securityContext:
-            {}
+          securityContext: {}
           image: "gcr.io/forgerock-io/platform-admin-ui:7.5.0"
           imagePullPolicy: IfNotPresent
           lifecycle:
@@ -70,11 +67,11 @@ spec:
               exec:
                 command: ["/usr/bin/nginx", "-s", "quit"]
           env:
-          - name: SUBFOLDER
-            value: platform
+            - name: SUBFOLDER
+              value: platform
           envFrom:
-          - configMapRef:
-              name: platform-config
+            - configMapRef:
+                name: platform-config
           ports:
             - name: http
               containerPort: 8080
@@ -95,8 +92,7 @@ spec:
               port: http
             periodSeconds: 10
             timeoutSeconds: 1
-          resources:
-            {}
+          resources: {}
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

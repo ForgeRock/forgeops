@@ -36,6 +36,7 @@ resources file.
 
 Requirements:
   * helm installed
+  * yq (mikefarah)
 
 Notes:
   * sources
@@ -78,7 +79,7 @@ processDir() {
       local override_opt=
       [[ -f $d/$VALUES_OVERRIDE ]] && override_opt="-f $d/$VALUES_OVERRIDE"
       echo "Generating $d/$RESOURCES_FILE"
-      runOrPrint "$HELM_CMD template $HELM_OPTS -f $d/$VALUES_FILE $override_opt > $d/$RESOURCES_FILE"
+      runOrPrint "$HELM_CMD template $HELM_OPTS -f $d/$VALUES_FILE $override_opt | $YQ_CMD eval -P 'del(.spec.template.metadata.annotations.deployment-date)' - > $d/$RESOURCES_FILE"
       processDir ${d%*/}
     else
       message "Didn't find $VALUES_FILE in ${d%*/}" "debug"
@@ -95,6 +96,7 @@ DRYRUN=false
 VERBOSE=false
 
 HELM_CMD=$(type -P helm)
+YQ_CMD=$(type -P yq)
 
 CHART="oci://us-docker.pkg.dev/forgeops-public/charts"
 CHART_NAME="identity-platform"

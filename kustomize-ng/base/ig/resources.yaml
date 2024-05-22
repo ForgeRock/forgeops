@@ -48,8 +48,7 @@ spec:
       app.kubernetes.io/component: ig
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 08:09:11.259952 -0500 CDT m=+0.037089293"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -57,26 +56,24 @@ spec:
         app.kubernetes.io/component: ig
     spec:
       serviceAccountName: default
-      securityContext:
-        {}
+      securityContext: {}
       containers:
         - name: ig
-          securityContext:
-            {}
+          securityContext: {}
           image: "idm:7.5"
           imagePullPolicy: IfNotPresent
           env:
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: MY_POD_IP
-            valueFrom:
-              fieldRef:
-                fieldPath: status.podIP
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           envFrom:
-          - secretRef:
-              name: openig-secrets-env
+            - secretRef:
+                name: openig-secrets-env
           ports:
             - name: http
               containerPort: 8080
@@ -92,8 +89,7 @@ spec:
               path: /kube/readiness
               port: http
             initialDelaySeconds: 5
-          resources:
-            {}
+          resources: {}
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

@@ -70,8 +70,7 @@ spec:
   serviceName: ds-cts
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 08:09:10.879891 -0500 CDT m=+0.036939209"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -105,87 +104,85 @@ spec:
           emptyDir: {}
       initContainers:
         - name: init
-          securityContext:
-            {}
+          securityContext: {}
           image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - mountPath: /opt/opendj/data
-            name: data
-          - mountPath: /var/run/secrets/admin
-            name: admin-password
-          - mountPath: /var/run/secrets/monitor
-            name: monitor-password
-          - mountPath: /var/run/secrets/ds-ssl-keypair
-            name: ds-ssl-keypair
-          - mountPath: /var/run/secrets/ds-master-keypair
-            name: ds-master-keypair
-          - mountPath: /var/run/secrets/truststore
-            name: truststore
-          - mountPath: /var/run/secrets/keys
-            name: keys
-          - mountPath: /var/run/secrets/cloud-credentials-cache/
-            name: cloud-credentials-cache
+            - mountPath: /opt/opendj/data
+              name: data
+            - mountPath: /var/run/secrets/admin
+              name: admin-password
+            - mountPath: /var/run/secrets/monitor
+              name: monitor-password
+            - mountPath: /var/run/secrets/ds-ssl-keypair
+              name: ds-ssl-keypair
+            - mountPath: /var/run/secrets/ds-master-keypair
+              name: ds-master-keypair
+            - mountPath: /var/run/secrets/truststore
+              name: truststore
+            - mountPath: /var/run/secrets/keys
+              name: keys
+            - mountPath: /var/run/secrets/cloud-credentials-cache/
+              name: cloud-credentials-cache
           args:
-          - init
+            - init
           env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
-            value: "true"
-          - name: DS_UID_MONITOR_PASSWORD_FILE
-            value: /var/run/secrets/monitor/monitor.pw
-          - name: DS_UID_ADMIN_PASSWORD_FILE
-            value: /var/run/secrets/admin/dirmanager.pw
-          - name: DSBACKUP_HOSTS
-            valueFrom:
-              configMapKeyRef:
-                name: platform-config
-                key: DSBACKUP_HOSTS
-          - name: DSBACKUP_DIRECTORY
-            valueFrom:
-              configMapKeyRef:
-                name: platform-config
-                key: DSBACKUP_DIRECTORY
-          - name: AUTORESTORE_FROM_DSBACKUP
-            valueFrom:
-              configMapKeyRef:
-                name: platform-config
-                key: AUTORESTORE_FROM_DSBACKUP
-          - name: DISASTER_RECOVERY_ID
-            valueFrom:
-              configMapKeyRef:
-                name: platform-config
-                key: DISASTER_RECOVERY_ID
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+              value: "true"
+            - name: DS_UID_MONITOR_PASSWORD_FILE
+              value: /var/run/secrets/monitor/monitor.pw
+            - name: DS_UID_ADMIN_PASSWORD_FILE
+              value: /var/run/secrets/admin/dirmanager.pw
+            - name: DSBACKUP_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: DSBACKUP_HOSTS
+            - name: DSBACKUP_DIRECTORY
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: DSBACKUP_DIRECTORY
+            - name: AUTORESTORE_FROM_DSBACKUP
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: AUTORESTORE_FROM_DSBACKUP
+            - name: DISASTER_RECOVERY_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: DISASTER_RECOVERY_ID
           envFrom:
-          - secretRef:
-              name: cloud-storage-credentials
-              optional: true
+            - secretRef:
+                name: cloud-storage-credentials
+                optional: true
       containers:
         - name: ds
-          securityContext:
-            {}
+          securityContext: {}
           image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
           imagePullPolicy: IfNotPresent
           args:
-          - start-ds
+            - start-ds
           env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
-            value: "true"
-          - name: DS_UID_MONITOR_PASSWORD_FILE
-            value: /var/run/secrets/monitor/monitor.pw
-          - name: DS_UID_ADMIN_PASSWORD_FILE
-            value: /var/run/secrets/admin/dirmanager.pw
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+              value: "true"
+            - name: DS_UID_MONITOR_PASSWORD_FILE
+              value: /var/run/secrets/monitor/monitor.pw
+            - name: DS_UID_ADMIN_PASSWORD_FILE
+              value: /var/run/secrets/admin/dirmanager.pw
           envFrom:
-          - secretRef:
-              name: cloud-storage-credentials
-              optional: true
+            - secretRef:
+                name: cloud-storage-credentials
+                optional: true
           ports:
             - name: http
               containerPort: 8080
@@ -211,46 +208,45 @@ spec:
               port: http
             failureThreshold: 720
             initialDelaySeconds: 30
-          resources:
-            {}
+          resources: {}
           volumeMounts:
-          - mountPath: /opt/opendj/data
-            name: data
-          - mountPath: /var/run/secrets/admin
-            name: admin-password
-          - mountPath: /var/run/secrets/monitor
-            name: monitor-password
-          - mountPath: /var/run/secrets/ds-ssl-keypair
-            name: ds-ssl-keypair
-          - mountPath: /var/run/secrets/ds-master-keypair
-            name: ds-master-keypair
-          - mountPath: /var/run/secrets/truststore
-            name: truststore
-          - mountPath: /var/run/secrets/keys
-            name: keys
-          - mountPath: /var/run/secrets/cloud-credentials-cache/
-            name: cloud-credentials-cache
+            - mountPath: /opt/opendj/data
+              name: data
+            - mountPath: /var/run/secrets/admin
+              name: admin-password
+            - mountPath: /var/run/secrets/monitor
+              name: monitor-password
+            - mountPath: /var/run/secrets/ds-ssl-keypair
+              name: ds-ssl-keypair
+            - mountPath: /var/run/secrets/ds-master-keypair
+              name: ds-master-keypair
+            - mountPath: /var/run/secrets/truststore
+              name: truststore
+            - mountPath: /var/run/secrets/keys
+              name: keys
+            - mountPath: /var/run/secrets/cloud-credentials-cache/
+              name: cloud-credentials-cache
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch
           operator: Exists
   volumeClaimTemplates:
-  - metadata:
-      name: data
-      annotations:
-        pv.beta.kubernetes.io/gid: "0"
-      labels:
-        helm.sh/chart: identity-platform-7.5
-        app.kubernetes.io/name: identity-platform
-        app.kubernetes.io/instance: identity-platform
-        app.kubernetes.io/version: "7.5"
-        app.kubernetes.io/managed-by: Helm
-        app: ds-cts
-        app.kubernetes.io/component: ds-cts
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 10Gi
-      storageClassName: fast
+    - metadata:
+        name: data
+        annotations:
+          pv.beta.kubernetes.io/gid: "0"
+        labels:
+          helm.sh/chart: identity-platform-7.5
+          app.kubernetes.io/name: identity-platform
+          app.kubernetes.io/instance: identity-platform
+          app.kubernetes.io/version: "7.5"
+          app.kubernetes.io/managed-by: Helm
+          app: ds-cts
+          app.kubernetes.io/component: ds-cts
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: fast
