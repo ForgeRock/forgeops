@@ -61,8 +61,8 @@ kind: Job
 metadata:
   name: amster
   annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": "before-hook-creation"
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
@@ -75,8 +75,7 @@ spec:
   backoffLimit: 6
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 07:50:45.159916 -0500 CDT m=+0.037922959"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -85,8 +84,7 @@ spec:
     spec:
       restartPolicy: OnFailure
       serviceAccountName: default
-      securityContext:
-        {}
+      securityContext: {}
       volumes:
         - name: amster-config
           configMap:
@@ -104,9 +102,8 @@ spec:
           emptyDir: {}
       initContainers:
         - name: amster
-          securityContext:
-            {}
-          image: "us-docker.pkg.dev/forgeops-public/images/amster:dev"
+          securityContext: {}
+          image: us-docker.pkg.dev/forgeops-public/images/amster:dev
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -118,98 +115,95 @@ spec:
               done
               ./docker-entrypoint.sh import
           env:
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           envFrom:
-          - configMapRef:
-              name: platform-config
-          - secretRef:
-              name: amster-env-secrets
-          - secretRef:
-              name: ds-env-secrets
-          resources:
-            {}
+            - configMapRef:
+                name: platform-config
+            - secretRef:
+                name: amster-env-secrets
+            - secretRef:
+                name: ds-env-secrets
+          resources: {}
           volumeMounts:
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/Applications/iPlanetAMWebAgentService.json
-            subPath: fe63c80e189bcab18f001a857c9da6b5535684e60753f4e7c56392a631e15b98
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/Applications/oauth2Scopes.json
-            subPath: 8ba770d2c9209e987e12d2a02ac51014a3da4cd05c9bd08d09c58b174c133ded
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/Applications/sunAMDelegationService.json
-            subPath: e5e03f343398d8332c1f53b51ee06981a41de72cfb4820960793c0daef9f3c73
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/IdentityGatewayAgents/ig-agent.json
-            subPath: b83e99de89a7582bfaadacd9daf94c92e9c2a4ed4d5b61bc6269d65bd4b6ba06
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/client-application.json
-            subPath: 26ca813f81ad68ee51af855f07fac803004b622f9b36dc86d22f91316b37cdb3
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/clientOIDC_0.json
-            subPath: d8d3b9733a30acda46342a9b3871cf199de2e61f6bdcb14ca61456eda1654e5e
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/end-user-ui.json
-            subPath: b992a5572abd75c14e11c7a4cc59c4c57927dfb18563746faf2fbf17cde41e01
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/idm-admin-ui.json
-            subPath: 90985fa04421866c455581fc1aaa7918f4c54703d0754dee57f99736d47972c2
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/idm-provisioning.json
-            subPath: 82dc89d29679e4d5f5265691d9f5b0efaa06e061dae43b25238a1af0077d5fe6
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/idm-resource-server.json
-            subPath: 44c1bed9b66036d441b622856c289d83714e7e7801c137a8f6f3aa0738f63b14
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/oauth2.json
-            subPath: d32432dccba0babd7612ae7c8cbd6742ab65361c6eb6b9bffa587c16a0e1464c
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/resource-server.json
-            subPath: 421568e5dd7cc68daf6ac8d4fb96bc4a38097c70afbfe518704fff44a7d058b4
-          - name: amster-config
-            mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/smokeclient.json
-            subPath: 7f5f4261c715ba7f2a4094a9c1ddf298ada0416ac6e9fb7d445853a3827ac235
-          - name: amster-scripts
-            mountPath: /amster-scripts/docker-entrypoint.sh
-            subPath: 79738685a656fe6b25061bb14181442210b599f746faeaba408a2401de45038a
-          - name: amster-scripts
-            mountPath: /amster-scripts/export.sh
-            subPath: a70ab199085ab146f5b9ca4fde5b679154668c0143b58478c13910d2154fd889
-          - name: amster-scripts
-            mountPath: /amster-scripts/import.sh
-            subPath: 63ccbd1ea3a3b7fab64c58c9f0dc82359a2c4704d376e029800d4d139fb4e07e
-          - name: amster-secrets
-            mountPath: /var/run/secrets/amster
-            readOnly: true
-          - name: export-files
-            mountPath: /var/tmp/amster
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/Applications/iPlanetAMWebAgentService.json
+              subPath: fe63c80e189bcab18f001a857c9da6b5535684e60753f4e7c56392a631e15b98
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/Applications/oauth2Scopes.json
+              subPath: 8ba770d2c9209e987e12d2a02ac51014a3da4cd05c9bd08d09c58b174c133ded
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/Applications/sunAMDelegationService.json
+              subPath: e5e03f343398d8332c1f53b51ee06981a41de72cfb4820960793c0daef9f3c73
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/IdentityGatewayAgents/ig-agent.json
+              subPath: b83e99de89a7582bfaadacd9daf94c92e9c2a4ed4d5b61bc6269d65bd4b6ba06
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/client-application.json
+              subPath: 26ca813f81ad68ee51af855f07fac803004b622f9b36dc86d22f91316b37cdb3
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/clientOIDC_0.json
+              subPath: d8d3b9733a30acda46342a9b3871cf199de2e61f6bdcb14ca61456eda1654e5e
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/end-user-ui.json
+              subPath: b992a5572abd75c14e11c7a4cc59c4c57927dfb18563746faf2fbf17cde41e01
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/idm-admin-ui.json
+              subPath: 90985fa04421866c455581fc1aaa7918f4c54703d0754dee57f99736d47972c2
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/idm-provisioning.json
+              subPath: 82dc89d29679e4d5f5265691d9f5b0efaa06e061dae43b25238a1af0077d5fe6
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/idm-resource-server.json
+              subPath: 44c1bed9b66036d441b622856c289d83714e7e7801c137a8f6f3aa0738f63b14
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/oauth2.json
+              subPath: d32432dccba0babd7612ae7c8cbd6742ab65361c6eb6b9bffa587c16a0e1464c
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/resource-server.json
+              subPath: 421568e5dd7cc68daf6ac8d4fb96bc4a38097c70afbfe518704fff44a7d058b4
+            - name: amster-config
+              mountPath: /opt/amster/config/config/realms/root/OAuth2Clients/smokeclient.json
+              subPath: 7f5f4261c715ba7f2a4094a9c1ddf298ada0416ac6e9fb7d445853a3827ac235
+            - name: amster-scripts
+              mountPath: /amster-scripts/docker-entrypoint.sh
+              subPath: 79738685a656fe6b25061bb14181442210b599f746faeaba408a2401de45038a
+            - name: amster-scripts
+              mountPath: /amster-scripts/export.sh
+              subPath: a70ab199085ab146f5b9ca4fde5b679154668c0143b58478c13910d2154fd889
+            - name: amster-scripts
+              mountPath: /amster-scripts/import.sh
+              subPath: 63ccbd1ea3a3b7fab64c58c9f0dc82359a2c4704d376e029800d4d139fb4e07e
+            - name: amster-secrets
+              mountPath: /var/run/secrets/amster
+              readOnly: true
+            - name: export-files
+              mountPath: /var/tmp/amster
       containers:
         - name: pause
-          securityContext:
-            {}
-          image: "us-docker.pkg.dev/forgeops-public/images/amster:dev"
+          securityContext: {}
+          image: us-docker.pkg.dev/forgeops-public/images/amster:dev
           imagePullPolicy: IfNotPresent
           args:
             - bash
             - -c
             - sleep ${DURATION:-10}
           envFrom:
-          - configMapRef:
-              name: amster-retain
-              optional: true
+            - configMapRef:
+                name: amster-retain
+                optional: true
           readinessProbe:
             exec:
               command:
                 - cat
                 - /etc/hosts
             initialDelaySeconds: 1
-          resources:
-            {}
+          resources: {}
           volumeMounts:
-          - name: export-files
-            mountPath: /var/tmp/amster
+            - name: export-files
+              mountPath: /var/tmp/amster
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

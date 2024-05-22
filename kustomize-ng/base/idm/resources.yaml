@@ -188,8 +188,7 @@ spec:
       app.kubernetes.io/component: idm
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 07:50:45.540846 -0500 CDT m=+0.036047876"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -197,8 +196,7 @@ spec:
         app.kubernetes.io/component: idm
     spec:
       serviceAccountName: default
-      securityContext:
-        {}
+      securityContext: {}
       volumes:
         - name: fbc
           emptyDir: {}
@@ -219,71 +217,70 @@ spec:
             name: idm-logging-properties
       initContainers:
         - name: fbc-init
-          image: "idm:7.6"
+          image: idm:7.6
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - mountPath: /fbc
-            name: fbc
+            - mountPath: /fbc
+              name: fbc
           command:
-          - /bin/bash
-          - -c
-          - |
-            if [ -d /fbc/config ];
-            then
-              echo "Existing openidm configuration found. Skipping copy"
-            else
-              echo "Copying docker image configuration files to the shared volume"
-              cd /opt/openidm
-              cp -vr ui conf script /fbc
-            fi
+            - /bin/bash
+            - -c
+            - |
+              if [ -d /fbc/config ];
+              then
+                echo "Existing openidm configuration found. Skipping copy"
+              else
+                echo "Copying docker image configuration files to the shared volume"
+                cd /opt/openidm
+                cp -vr ui conf script /fbc
+              fi
         - name: truststore-init
-          image: "idm:7.6"
+          image: idm:7.6
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - name: new-truststore
-            mountPath: /truststore
-          - name: truststore
-            mountPath: /var/run/secrets/truststore
+            - name: new-truststore
+              mountPath: /truststore
+            - name: truststore
+              mountPath: /var/run/secrets/truststore
           command:
             - /opt/openidm/bin/import-pem-certs.sh
           env:
-          - name: TRUSTSTORE_PATH
-            value: /truststore/idmtruststore
-          - name: TRUSTSTORE_PASSWORD
-            value: changeit
-          - name: IDM_PEM_TRUSTSTORE
-            value: /var/run/secrets/truststore/ca.crt
+            - name: TRUSTSTORE_PATH
+              value: /truststore/idmtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            - name: IDM_PEM_TRUSTSTORE
+              value: /var/run/secrets/truststore/ca.crt
       containers:
         - name: openidm
-          securityContext:
-            {}
-          image: "idm:7.6"
+          securityContext: {}
+          image: idm:7.6
           imagePullPolicy: IfNotPresent
           env:
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: OPENIDM_REPO_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ds-passwords
-                key: dirmanager.pw
-          - name: USERSTORE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ds-passwords
-                key: dirmanager.pw
-          - name: RS_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: amster-env-secrets
-                key: IDM_RS_CLIENT_SECRET
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPENIDM_REPO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ds-passwords
+                  key: dirmanager.pw
+            - name: USERSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ds-passwords
+                  key: dirmanager.pw
+            - name: RS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: amster-env-secrets
+                  key: IDM_RS_CLIENT_SECRET
           envFrom:
-          - configMapRef:
-              name: idm
-          - secretRef:
-              name: idm-env-secrets
+            - configMapRef:
+                name: idm
+            - secretRef:
+                name: idm-env-secrets
           ports:
             - name: http
               containerPort: 8080
@@ -332,30 +329,29 @@ spec:
                   value: "true"
             failureThreshold: 40
             periodSeconds: 10
-          resources:
-            {}
+          resources: {}
           volumeMounts:
-          - mountPath: /var/run/secrets/idm
-            name: idm-secrets
-          - name: new-truststore
-            mountPath: /opt/openidm/idmtruststore
-            readOnly: true
-            subPath: idmtruststore
-          - mountPath: /opt/openidm/logs
-            name: logs
-          - mountPath: /opt/openidm/audit
-            name: audit-logs
-          - mountPath: /var/run/openidm/logging
-            name: idm-logging-properties
-          - name: fbc
-            mountPath: /opt/openidm/conf
-            subPath: conf
-          - name: fbc
-            mountPath: /opt/openidm/ui
-            subPath: ui
-          - name: fbc
-            mountPath: /opt/openidm/script
-            subPath: script
+            - mountPath: /var/run/secrets/idm
+              name: idm-secrets
+            - name: new-truststore
+              mountPath: /opt/openidm/idmtruststore
+              readOnly: true
+              subPath: idmtruststore
+            - mountPath: /opt/openidm/logs
+              name: logs
+            - mountPath: /opt/openidm/audit
+              name: audit-logs
+            - mountPath: /var/run/openidm/logging
+              name: idm-logging-properties
+            - name: fbc
+              mountPath: /opt/openidm/conf
+              subPath: conf
+            - name: fbc
+              mountPath: /opt/openidm/ui
+              subPath: ui
+            - name: fbc
+              mountPath: /opt/openidm/script
+              subPath: script
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch
@@ -390,10 +386,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - "identity-platform.domain.local"
-      secretName: "tls-identity-platform.domain.local"
+        - identity-platform.domain.local
+      secretName: tls-identity-platform.domain.local
   rules:
-    - host: "identity-platform.domain.local"
+    - host: identity-platform.domain.local
       http:
         paths:
           - path: /openidm

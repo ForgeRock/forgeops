@@ -17,8 +17,7 @@ spec:
   ttlSecondsAfterFinished: 300
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 07:50:45.633699 -0500 CDT m=+0.035953418"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -36,24 +35,22 @@ spec:
             secretName: ds-passwords
       containers:
         - name: ldif-importer
-          securityContext:
-            {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:dev"
+          securityContext: {}
+          image: us-docker.pkg.dev/forgeops-public/images/ldif-importer:dev
           imagePullPolicy: Always
           envFrom:
-          - secretRef:
-              name: ds-env-secrets
+            - secretRef:
+                name: ds-env-secrets
           readinessProbe:
             exec:
               command:
                 - cat
                 - /etc/hosts
             initialDelaySeconds: 1
-          resources:
-            {}
+          resources: {}
           volumeMounts:
-          - name: passwords
-            mountPath: /var/run/secrets/opendj-passwords
+            - name: passwords
+              mountPath: /var/run/secrets/opendj-passwords
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

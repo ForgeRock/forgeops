@@ -11,20 +11,7 @@ metadata:
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
 data:
-  
-  logback.xml: "<!--\n    ~ Copyright 2022-2024 Ping Identity Corporation. All Rights
-    Reserved\n    ~ \n    ~ This code is to be used exclusively in connection with Ping
-    Identity \n    ~ Corporation software or services. Ping Identity Corporation only
-    offers\n    ~ such software or services to legal entities who have entered into
-    a \n    ~ binding license agreement with Ping Identity Corporation.\n-->\n\n<configuration
-    scan=\"true\" scanPeriod=\"30 seconds\">\n\n    <appender name=\"JSON\" class=\"ch.qos.logback.core.ConsoleAppender\">\n
-    \       <encoder class=\"ch.qos.logback.core.encoder.LayoutWrappingEncoder\">\n
-    \           <layout class=\"org.forgerock.openam.logback.JsonLayout\">\n                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>\n
-    \               <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>\n
-    \               <jsonFormatter class=\"ch.qos.logback.contrib.jackson.JacksonJsonFormatter\"/>\n
-    \               <appendLineSeparator>true</appendLineSeparator>\n            </layout>\n
-    \       </encoder>\n    </appender>\n\n    <root level=\"WARN\">\n        <appender-ref
-    ref=\"JSON\" />\n    </root>\n</configuration>"
+  logback.xml: "<!--\n    ~ Copyright 2022-2024 Ping Identity Corporation. All Rights Reserved\n    ~ \n    ~ This code is to be used exclusively in connection with Ping Identity \n    ~ Corporation software or services. Ping Identity Corporation only offers\n    ~ such software or services to legal entities who have entered into a \n    ~ binding license agreement with Ping Identity Corporation.\n-->\n\n<configuration scan=\"true\" scanPeriod=\"30 seconds\">\n\n    <appender name=\"JSON\" class=\"ch.qos.logback.core.ConsoleAppender\">\n        <encoder class=\"ch.qos.logback.core.encoder.LayoutWrappingEncoder\">\n            <layout class=\"org.forgerock.openam.logback.JsonLayout\">\n                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>\n                <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>\n                <jsonFormatter class=\"ch.qos.logback.contrib.jackson.JacksonJsonFormatter\"/>\n                <appendLineSeparator>true</appendLineSeparator>\n            </layout>\n        </encoder>\n    </appender>\n\n    <root level=\"WARN\">\n        <appender-ref ref=\"JSON\" />\n    </root>\n</configuration>"
 ---
 # Source: identity-platform/templates/am-service.yaml
 apiVersion: v1
@@ -75,8 +62,7 @@ spec:
       app.kubernetes.io/component: am
   template:
     metadata:
-      annotations:
-        deployment-date: "2024-05-21 07:50:45.109979 -0500 CDT m=+0.037526335"
+      annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
@@ -93,16 +79,16 @@ spec:
         - name: am-secrets
           projected:
             sources:
-            - secret:
-                name: am-passwords
-            - secret:
-                name: am-keystore
+              - secret:
+                  name: am-passwords
+              - secret:
+                  name: am-keystore
         - name: amster-key
           secret:
             secretName: amster
             items:
-            - key: id_rsa.pub
-              path: authorized_keys
+              - key: id_rsa.pub
+                path: authorized_keys
         - name: truststore
           secret:
             secretName: ds-ssl-keypair
@@ -113,70 +99,70 @@ spec:
             name: am-logback
       initContainers:
         - name: fbc-init
-          image: "am:7.6"
+          image: am:7.6
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - mountPath: /fbc
-            name: fbc
+            - mountPath: /fbc
+              name: fbc
           command:
-          - /bin/bash
-          - -c
-          - |
-            if [ -d /fbc/config ];
-            then
-              echo "Existing openam configuration found. Skipping copy"
-            else
-              echo "Copying docker image configuration files to the shared volume"
-              cd /home/forgerock/openam
-              cp -r .homeVersion * /fbc
-            fi
+            - /bin/bash
+            - -c
+            - |
+              if [ -d /fbc/config ];
+              then
+                echo "Existing openam configuration found. Skipping copy"
+              else
+                echo "Copying docker image configuration files to the shared volume"
+                cd /home/forgerock/openam
+                cp -r .homeVersion * /fbc
+              fi
         - name: truststore-init
-          image: "am:7.6"
+          image: am:7.6
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - name: new-truststore
-            mountPath: /truststore
-          - name: truststore
-            mountPath: /var/run/secrets/truststore
-          command: ["/home/forgerock/import-pem-certs.sh"]
+            - name: new-truststore
+              mountPath: /truststore
+            - name: truststore
+              mountPath: /var/run/secrets/truststore
+          command:
+            - /home/forgerock/import-pem-certs.sh
           env:
-          - name: TRUSTSTORE_PATH
-            value: /truststore/amtruststore
-          - name: TRUSTSTORE_PASSWORD
-            value: changeit
-          - name: AM_PEM_TRUSTSTORE
-            value: "/var/run/secrets/truststore/ca.crt"
+            - name: TRUSTSTORE_PATH
+              value: /truststore/amtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            - name: AM_PEM_TRUSTSTORE
+              value: /var/run/secrets/truststore/ca.crt
       containers:
         - name: openam
-          securityContext:
-            {}
-          image: "am:7.6"
+          securityContext: {}
+          image: am:7.6
           imagePullPolicy: IfNotPresent
           command:
             - bash
             - /home/forgerock/docker-entrypoint.sh
           env:
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: AM_STORES_SSL_ENABLED
-            value: "true"
-          - name: TRUSTSTORE_PATH
-            value: /home/forgerock/amtruststore
-          - name: TRUSTSTORE_PASSWORD
-            value: changeit
-          - name: AM_STORES_USER_TYPE
-            value: LDAPv3ForForgeRockIAM
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: AM_STORES_SSL_ENABLED
+              value: "true"
+            - name: TRUSTSTORE_PATH
+              value: /home/forgerock/amtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            - name: AM_STORES_USER_TYPE
+              value: LDAPv3ForForgeRockIAM
           envFrom:
-          - secretRef:
-              name: am-env-secrets
-          - configMapRef:
-              name: platform-config
-          - secretRef:
-              name: amster-env-secrets
-          - secretRef:
-              name: ds-env-secrets
+            - secretRef:
+                name: am-env-secrets
+            - configMapRef:
+                name: platform-config
+            - secretRef:
+                name: amster-env-secrets
+            - secretRef:
+                name: ds-env-secrets
           ports:
             - name: http
               containerPort: 8080
@@ -201,21 +187,20 @@ spec:
               port: http
             failureThreshold: 40
             periodSeconds: 10
-          resources:
-            {}
+          resources: {}
           volumeMounts:
-          - name: new-truststore
-            mountPath: /home/forgerock/amtruststore
-            readOnly: true
-            subPath: amtruststore
-          - name: am-secrets
-            mountPath: /var/run/secrets/am
-          - name: amster-key
-            mountPath: /var/run/secrets/amster
-          - name: fbc
-            mountPath: /home/forgerock/openam
-          - name: am-logback
-            mountPath: /home/forgerock/logging
+            - name: new-truststore
+              mountPath: /home/forgerock/amtruststore
+              readOnly: true
+              subPath: amtruststore
+            - name: am-secrets
+              mountPath: /var/run/secrets/am
+            - name: amster-key
+              mountPath: /var/run/secrets/amster
+            - name: fbc
+              mountPath: /home/forgerock/openam
+            - name: am-logback
+              mountPath: /home/forgerock/logging
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch
@@ -250,10 +235,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - "identity-platform.domain.local"
-      secretName: "tls-identity-platform.domain.local"
+        - identity-platform.domain.local
+      secretName: tls-identity-platform.domain.local
   rules:
-    - host: "identity-platform.domain.local"
+    - host: identity-platform.domain.local
       http:
         paths:
           - path: /am
