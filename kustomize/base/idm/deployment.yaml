@@ -69,16 +69,6 @@ spec:
             secretKeyRef:
               name: ds-passwords
               key: dirmanager.pw
-        - name: USERSTORE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: ds-passwords
-              key: dirmanager.pw
-        - name: RS_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: amster-env-secrets
-              key: IDM_RS_CLIENT_SECRET
         envFrom:
         - configMapRef:
             name: idm
@@ -87,10 +77,6 @@ spec:
         livenessProbe:
           httpGet:
             httpHeaders:
-            - name: X-OpenIDM-Username
-              value: anonymous
-            - name: X-OpenIDM-Password
-              value: anonymous
             - name: X-OpenIDM-NoSession
               value: "true"
             path: /openidm/info/ping
@@ -101,10 +87,6 @@ spec:
         readinessProbe:
           httpGet:
             httpHeaders:
-            - name: X-OpenIDM-Username
-              value: anonymous
-            - name: X-OpenIDM-Password
-              value: anonymous
             - name: X-OpenIDM-NoSession
               value: "true"
             path: /openidm/info/ping
@@ -143,6 +125,9 @@ spec:
         - name: fbc
           mountPath: /opt/openidm/script
           subPath: script
+        - name: idm-file-secrets
+          mountPath: /opt/openidm/secrets
+          readOnly: true
       terminationGracePeriodSeconds: 10
       volumes:
       - name: fbc
@@ -166,8 +151,20 @@ spec:
       - name: idm-logging-properties
         configMap:
            name: idm-logging-properties
+      - name: idm-file-secrets
+        projected:
+          sources:
+            - secret:
+                name: amster-env-secrets
+                items:
+                  - key: IDM_RS_CLIENT_SECRET
+                    path: idm.rs.filter.client.secret
+            - secret:
+                name: idm-env-secrets
+                items:
+                  - key: prometheus-credentials
+                    path: idm.prometheus.credentials
       tolerations:
         - key: kubernetes.io/arch
           operator: Exists
           effect: NoSchedule
-

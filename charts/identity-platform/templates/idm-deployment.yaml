@@ -59,6 +59,19 @@ spec:
         - name: idm-logging-properties
           configMap:
             name: idm-logging-properties
+        - name: idm-file-secrets
+          projected:
+            sources:
+              - secret:
+                  name: amster-env-secrets
+                  items:
+                    - key: IDM_RS_CLIENT_SECRET
+                      path: idm.rs.filter.client.secret
+              - secret:
+                  name: idm-env-secrets
+                  items:
+                    - key: prometheus-credentials
+                      path: idm.prometheus.credentials
       initContainers:
         - name: fbc-init
           image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
@@ -111,16 +124,6 @@ spec:
               secretKeyRef:
                 name: ds-passwords
                 key: dirmanager.pw
-          - name: USERSTORE_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: ds-passwords
-                key: dirmanager.pw
-          - name: RS_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: amster-env-secrets
-                key: IDM_RS_CLIENT_SECRET
           envFrom:
           - configMapRef:
               name: idm
@@ -138,10 +141,6 @@ spec:
               path: /openidm/info/ping
               port: http
               httpHeaders:
-                - name: X-OpenIDM-Username
-                  value: anonymous
-                - name: X-OpenIDM-Password
-                  value: anonymous
                 - name: X-OpenIDM-NoSession
                   value: "true"
             {{- with .Values.idm.livenessProbe }}
@@ -152,10 +151,6 @@ spec:
               path: /openidm/info/ping
               port: http
               httpHeaders:
-                - name: X-OpenIDM-Username
-                  value: anonymous
-                - name: X-OpenIDM-Password
-                  value: anonymous
                 - name: X-OpenIDM-NoSession
                   value: "true"
             {{- with .Values.idm.readinessProbe }}
@@ -166,10 +161,6 @@ spec:
               path: /openidm/info/ping
               port: http
               httpHeaders:
-                - name: X-OpenIDM-Username
-                  value: anonymous
-                - name: X-OpenIDM-Password
-                  value: anonymous
                 - name: X-OpenIDM-NoSession
                   value: "true"
             {{- with .Values.idm.startupProbe }}
@@ -199,6 +190,9 @@ spec:
           - name: fbc
             mountPath: /opt/openidm/script
             subPath: script
+          - name: idm-file-secrets
+            mountPath: /opt/openidm/secrets
+            readOnly: true
       {{- with .Values.idm.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

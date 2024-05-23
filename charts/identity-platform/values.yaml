@@ -131,8 +131,6 @@ platform:
   #    - name: AM_STORES_USER_PASSWORD
   #      length: 32
   #  idm-env-secrets:
-  #    - name: OPENIDM_ADMIN_PASSWORD
-  #      length: 24
   #    - name: OPENIDM_KEYSTORE_PASSWORD
   #      length: 24
   #  rcs-agent-env-secrets:
