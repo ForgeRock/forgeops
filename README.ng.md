@@ -21,47 +21,11 @@ of and plan for that name change.
 
 The heart of forgeops-ng is `forgeops-ng env`. It allows you to manage common
 aspects of Helm values file(s) and Kustomize overlays. Since it is written in
-python, you need to setup your system to run it. You can do that by using a
-Python virtual environment (venv), or installing the necessary python packages.
+python, you need to setup your system to run it. 
 
-Either way, you can use the `requirements.txt` file to install the necessary
-packages.
-
-### Install Python packages
-
-If you just want to install the packages into your system's python, here's what
-you need to install:
-
-* pyyaml
-* mergedeep
-
-`pip install --upgrade -r /path/to/forgeops/requirements.txt`
-
-### Use a Python virtual environment
-
-If you want to use a venv to run forgeops, we have created a script (bin/pyenv)
-to help you set that up.
-
-```
-cd /path/to/forgeops
-bin/pyenv setup
-source bin/activate
-```
-
-After you source `bin/activate`, your prompt should change to let you know that
-you are in a venv. The name of the directory shows up in `()`. You can
-deactivate the venv by running `deactivate`.
-
-```
-> cd /path/to/forgeops
-> source bin/activate
-(forgeops) > ./bin/forgeops-ng ...
-(forgeops) > deactivate
->
-```
-
-You'll need to activate the venv before you'll be able to run forgeops-ng in
-your terminal.
+You may want to run `forgeops-ng configure`. The command will automatically install python dependencies into 
+`/path/to/forgeops/lib/dependencies` folder. You do not have to create a Python Virtual Environment (venv).
+You need at least python 3.9.6+ and pip3 installed.
 
 ## Major Changes
 
