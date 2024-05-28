@@ -11,8 +11,8 @@
 
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
-saasProductInfo = null
-platformImagesProductInfo = null
+productInfoUpgradeFrom = null
+productInfoUpgradeTo = null
 
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean generateSummaryReport) {
 
@@ -24,8 +24,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
     def scaleClusterConfig = [:]
     scaleClusterConfig['SCALE_CLUSTER'] = ['frontend': 5, 'default-pool': 20]
 
-    saasProductInfo = cloud_utils.getSaasProductInfo()
-    platformImagesProductInfo = upgrade.getPlatformImagesProductInfo(commonModule.platformImagesRevision)
+    // Get the product info one time to be sure all the tests will use the same values
+    productInfoUpgradeFrom = upgrade.productInfoUpgradeFrom(commonModule.calculatePlatformImagesBranch())
+    productInfoUpgradeTo = upgrade.productInfoUpgradeTo(commonModule.platformImagesRevision)
 
     try {
         dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
@@ -176,7 +177,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('AM K8s Upgrade',
                 {
                     def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + saasProductInfo + [
+                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
                             TESTS_SCOPE         : 'tests/k8s/postcommit/am',
                             DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
                                     randomNumber,
@@ -186,7 +187,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                             REPORT_NAME_PREFIX       : 'am_k8s_upgrade_deployment',
                     ]
 
-                    def testConfig = upgradeCommonConfig + platformImagesProductInfo + [
+                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
                             REPORT_NAME_PREFIX       : 'am_k8s_upgrade_upgrade',
                     ]
 
@@ -208,7 +209,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('DS K8s Upgrade',
                 {
                     def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + saasProductInfo + [
+                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
                             TESTS_SCOPE         : 'tests/k8s/postcommit/ds/standard',
                             DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
                                     randomNumber,
@@ -218,7 +219,7 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                             REPORT_NAME_PREFIX       : 'ds_k8s_upgrade_deployment',
                     ]
 
-                    def testConfig = upgradeCommonConfig + platformImagesProductInfo + [
+                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
                             REPORT_NAME_PREFIX       : 'ds_k8s_upgrade_upgrade',
                     ]
 
@@ -249,7 +250,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('IDM K8s Upgrade',
                 {
                     def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + saasProductInfo + [
+                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
                             TESTS_SCOPE         : 'tests/k8s/postcommit/idm',
                             DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
                                     randomNumber,
@@ -259,7 +260,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                             REPORT_NAME_PREFIX       : 'idm_k8s_upgrade_deployment',
                     ]
 
-                    def testConfig = upgradeCommonConfig + platformImagesProductInfo + [
+                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
                             REPORT_NAME_PREFIX       : 'idm_k8s_upgrade_upgrade',
                     ]
 
@@ -281,7 +282,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
         parallelTestsMap.put('IG K8s Upgrade',
                 {
                     def randomNumber = random.nextInt(99999) + 100000 // 6 digit random number to compute to namespace
-                    def upgradeCommonConfig = clusterConfig + saasProductInfo + [
+                    def upgradeCommonConfig = clusterConfig + productInfoUpgradeFrom + [
                             TESTS_SCOPE         : 'tests/k8s/postcommit/ig',
                             DEPLOYMENT_NAMESPACE: cloud_config.commonConfig()['DEPLOYMENT_NAMESPACE'] + '-' +
                                     randomNumber,
@@ -291,7 +292,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                             REPORT_NAME_PREFIX       : 'ig_k8s_upgrade_deployment',
                     ]
 
-                    def testConfig = upgradeCommonConfig + platformImagesProductInfo + [
+                    def testConfig = upgradeCommonConfig + productInfoUpgradeTo + [
                             REPORT_NAME_PREFIX       : 'ig_k8s_upgrade_upgrade',
                     ]
 
