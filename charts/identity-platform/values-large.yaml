@@ -11,7 +11,7 @@ am:
       memory: 21Gi
 
 idm:
-  replicaCount: 2
+  replicaCount: 3
 
   resources:
     limits:
