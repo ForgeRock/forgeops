@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import glob
 import os
 import site
 import sys
@@ -20,9 +21,7 @@ import lib.python.utils as utils
 from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv
 
 # do not use --user param when virtual environment is used
-pip = 'pip3'
 user_param = '' if 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] != '' else '--user '
-pip_install = f'pip3 install --no-cache-dir -i https://pypi.python.org/simple/ {user_param}--no-warn-script-location'
 EXIT_MESSAGE = f'\nPlease fix this issue and run {FORGEOPS_SCRIPT_FILE} env script again.'
 
 
@@ -30,20 +29,42 @@ class ConfigureEnv:
 
     def __init__(self):
         self.num_warning = 0
+        self._pip = None
 
-    @staticmethod
-    def install_python_dependencies():
+    @property
+    def pip(self):
+        if self._pip is None:
+            self._pip = 'pip3'
+            is_pass, out, err = utils.run('type pipx', cstdout=True, ignoreFail=True)
+            if is_pass:
+                # pipx installed, try to find pip3 installation
+                last_python_path = None
+                if sys.platform == "darwin":
+                    base_folder = f'/Users/{os.environ["USER"]}/Library/Python/*'
+                    python_paths = glob.glob(base_folder)
+                    last_python_path = python_paths[0]
+                elif sys.platform == "linux" or sys.platform == "linux2":
+                    last_python_path = f'/home/{os.environ["USER"]}/.local'
+                if last_python_path is not None:
+                    self._pip = os.path.join(last_python_path, 'bin', 'pip3')
+                    if not os.path.isfile(self._pip):
+                        print('fail to find pip3')
+                        sys.exit(1)
+
+        return self._pip
+
+    @property
+    def pip_install(self):
+        return f'{self.pip} install --no-cache-dir -i https://pypi.python.org/simple/ {user_param}--no-warn-script-location'
+
+    def install_python_dependencies(self):
         os.environ['PYTHONUSERBASE'] = str(dependencies_dir)
 
         utils.sub_title('Installing python dependencies...')
-        cmd = f'{pip_install} -r "{REQUIREMENTS_FILE}"'
+        cmd = f'{self.pip_install} -r "{REQUIREMENTS_FILE}"'
         print(f'export PYTHONUSERBASE="{str(dependencies_dir)}";')
         try:
-            print()
-            print(f'DEBUG : VIRTUAL_ENV = {os.environ.get("VIRTUAL_ENV")}')
-            print()
             pip_list_cmd = 'pip3 list' if not in_virtualenv() else 'python3 -m pip list'
-            print(f'DEBUG {pip_list_cmd}')
             utils.run(pip_list_cmd)
             print()
             print(cmd)
@@ -63,14 +84,13 @@ class ConfigureEnv:
             utils.error('You need python 3.6.5 or later to run this script')
             exit(1)
 
-    @staticmethod
-    def check_pip():
+    def check_pip(self):
         # Check if pip is installed
         utils.sub_title("Checking if pip is installed...")
         try:
-            rc, out, err = utils.run(f'{pip} --version', cstdout=True, cstderr=True)
+            rc, out, err = utils.run(f'{self.pip} --version', cstdout=True, cstderr=True)
         except:
-            utils.error('pip is not installed')
+            utils.error(f'{self.pip} is not installed')
             utils.error('Please run: curl -O https://bootstrap.pypa.io/get-pip.py; sudo python3 get-pip.py; rm get-pip.py')
             sys.exit(1)
         pip_version = (out.split()[1]).decode("utf-8")
