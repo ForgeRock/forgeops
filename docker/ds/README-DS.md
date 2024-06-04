@@ -1,7 +1,5 @@
 # Directory Server (DS) Customization and Utilities
 
->CAUTION The DS Operator is deprecated and will be removed in a future release
-
 **NOTE**
 
 The current production image is in the `ds-new` folder.

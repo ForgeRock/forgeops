@@ -21,7 +21,7 @@ sys.path.insert(0, str(root_dir))
 sys.path.insert(1, str(bin_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 sys.path.insert(2, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-from lib.python.utils import REQ_VERSIONS, error, message, run, warning, certmanager, secretagent, dsoperator
+from lib.python.utils import REQ_VERSIONS, error, message, run, warning, certmanager, secretagent
 
 
 def check_component_version(component, version):
@@ -62,7 +62,7 @@ def check_base_toolset():
     check_component_version('kustomize', ver)
 
 
-def forgeops_dependencies(legacy, operator):
+def forgeops_dependencies(legacy):
     """
     Check for and install dependencies in the kubernetes cluster if they are not found.
     If dependencies are found in K8s, this function does not modify or reinstall the components.
@@ -109,22 +109,5 @@ def forgeops_dependencies(legacy, operator):
     _, img, _ = run('kubectl', f'-n secret-agent-system get deployment secret-agent-controller-manager -o jsonpath={{.spec.template.spec.containers[0].image}}',
                     cstderr=True, cstdout=True)
     check_component_version('secret-agent', img.decode('ascii').split(':')[1])
-
-    if not legacy and operator:
-        print('Checking ds-operator and related CRDs:', end=' ')
-        try:
-            run('kubectl', 'get crd directoryservices.directory.forgerock.io',
-                cstderr=True, cstdout=True)
-        except Exception:
-            warning('ds-operator CRD not found. Installing ds-operator.')
-            run('kubectl', f'delete crd directorybackups.directory.forgerock.io --ignore-not-found=true')
-            run('kubectl', f'delete crd directoryrestores.directory.forgerock.io --ignore-not-found=true')
-            dsoperator('apply', tag=REQ_VERSIONS['ds-operator']['DEFAULT'])
-        else:
-            message('ds-operator CRD found in cluster.')
-
-        _, img, _ = run('kubectl', f'-n fr-system get deployment ds-operator-ds-operator -o jsonpath={{.spec.template.spec.containers[0].image}}',
-                        cstderr=True, cstdout=True)
-        check_component_version('ds-operator', img.decode('ascii').split(':')[1])
 
     print()

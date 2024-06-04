@@ -27,14 +27,6 @@ Use `bin/ingress-controller-deploy.sh` as a model for installing the correct ver
 ingress rules and ingress definitions must be provided by the user. The ingress definitions
 provided in forgeops are not compatible with this operator.
 1. `secret-agent` version >= v1.1.4  is required for OpenShift clusters.
-1. `ds-operator` version <= v0.1.0 requires the provided clusterrole patch. e.g:
-
-    ```sh
-    bin/ds-operator install
-    kubectl apply -f kustomize/base/openshift/ds-operator-role.yaml
-    ```
-
-    You must apply this patch _before_ deploying the ForgeRock Identity Platform.
 1. You need to provide 2 `storageClass` definitions named `standard` and `fast`.
 These storage classes are used to request PVCs for the platform. You can use the storage class
 definitions in the Terraform modules in the forgeops-extras repository as examples. 

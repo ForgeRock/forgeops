@@ -152,21 +152,6 @@ init)
     init
     ;;
 
-backup)
-    [[ ! -d $DS_DATA_DIR/db ]] && {
-        echo "There is no data to backup!";
-        exit 1
-    }
-    init
-    executeScript backup
-    ;;
-
-restore)
-    # restore needs acces to the master keypair to decrypt data
-    copyKeys
-    executeScript restore
-    ;;
-
 # Start the server.
 # start-ds falls through the case statement
 start-ds)
@@ -176,15 +161,6 @@ start)
     exec start-ds --nodetach
     ;;
 
-dev-init)
-    init
-    ;&
-
-dev)
-    # Sleep until Kubernetes terminates the pod using a SIGTERM.
-    echo "Connect using 'kubectl exec -it POD -- /bin/bash'"
-    waitUntilSigTerm
-    ;;
 *)
     removeLocks
     echo "Undefined entrypoint. Will exec $@"

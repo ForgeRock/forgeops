@@ -43,11 +43,6 @@ DOCKER_REGEX_NAME = {
 }
 
 REQ_VERSIONS ={
-    'ds-operator': {
-        'MIN': 'v0.2.9',
-        'MAX': 'v100.0.0',
-        'DEFAULT': 'v0.2.9',
-    },
     'secret-agent': {
         'MIN': 'v1.1.5',
         'MAX': 'v100.0.0',
@@ -88,12 +83,9 @@ size_paths = {
 
 bundles = {
 	'base': ['base/kustomizeConfig', 'base/ingress'],
-    'ds-operator': ['base/ds-idrepo', 'base/ds-cts'],
     'ds': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
     'ds-idrepo': ['base/ds/idrepo', 'base/ldif-importer'],
     'ds-cts': ['base/ds/cts', 'base/ldif-importer'],
-    'ds-idrepo-op': ['base/ds-idrepo'],
-    'ds-cts-op': ['base/ds-cts'],
     'ds-old': ['base/ds-legacy/idrepo', 'base/ds-legacy/cts', 'base/ldif-importer'],
     'apps': ['base/am', 'base/idm', inject_kustomize_amster],
     'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
@@ -110,8 +102,6 @@ patcheable_components ={
     'base/ds/cts': 'ds-cts.yaml',
     'base/ds-legacy/idrepo': 'ds-idrepo-old.yaml',
     'base/ds-legacy/cts': 'ds-cts-old.yaml',
-    'base/ds-idrepo': 'ds-idrepo-op.yaml',
-    'base/ds-cts': 'ds-cts-op.yaml',
     'base/ig': 'ig.yaml',
     'base/ingress': 'ingress.yaml',
     'base/secrets': 'secret_agent_config.yaml'
@@ -281,7 +271,7 @@ def _waitforresource(ns, resource_type, resource_name):
             continue
 
 
-def _waitfords(ns, ds_name, legacy, operator):
+def _waitfords(ns, ds_name, legacy):
     """
     Wait for DS deployment to become healthy. This is a blocking call with no timeout.
     ns: target namespace.
@@ -289,23 +279,15 @@ def _waitfords(ns, ds_name, legacy, operator):
     """
     print(f'Waiting for Service Account Password Update: ', end='')
     sys.stdout.flush()
-    if operator:
-        _, replicas, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.spec.replicas}}',
-                    cstderr=True, cstdout=True)
-    else:
-        _, replicas, _ = run('kubectl', f'-n {ns} get statefulset {ds_name} -o jsonpath={{.spec.replicas}}',
-                    cstderr=True, cstdout=True)
+    _, replicas, _ = run('kubectl', f'-n {ns} get statefulset {ds_name} -o jsonpath={{.spec.replicas}}',
+                cstderr=True, cstdout=True)
     if replicas.decode('utf-8') == '0':
         print('skipped')
         return
     while True:
         try:
-            if operator:
-                _, valuestr, _ = run('kubectl', f'-n {ns} get directoryservices.directory.forgerock.io {ds_name} -o jsonpath={{.metadata.annotations.password-updated-status}}',
-                                 cstderr=True, cstdout=True)
-            else:
-                _, valuestr, _ = run('kubectl', f'wait -n {ns} job/ldif-importer --for=condition=complete --timeout=60s',
-                                cstderr=True, cstdout=True)
+            _, valuestr, _ = run('kubectl', f'wait -n {ns} job/ldif-importer --for=condition=complete --timeout=60s',
+                            cstderr=True, cstdout=True)
             if len(valuestr) > 0:
                 print('done')
                 break
@@ -343,9 +325,9 @@ def waitforsecrets(ns, timeout=60):
         _runwithtimeout(_waitforresource, [ns, 'secret', secret], timeout)
 
 
-def wait_for_ds(ns, directoryservices_name, legacy, operator, timeout_secs=600):
+def wait_for_ds(ns, directoryservices_name, legacy, timeout_secs=600):
     """
-    Wait for DS pods to be ready after ds-operator deployment.
+    Wait for DS pods to be ready.
     ns: target namespace.
     directoryservices_name: name of the DS deployment to evaluate.
     timeout_secs: timeout in secs.
@@ -353,7 +335,7 @@ def wait_for_ds(ns, directoryservices_name, legacy, operator, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'statefulset', directoryservices_name], 30)
     run('kubectl',
         f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout={timeout_secs}s')
-    _runwithtimeout(_waitfords, [ns, directoryservices_name, legacy, operator], timeout_secs)
+    _runwithtimeout(_waitfords, [ns, directoryservices_name, legacy], timeout_secs)
 
 def wait_for_am(ns, timeout_secs=600):
     """
@@ -385,7 +367,7 @@ def wait_for_idm(ns, timeout_secs=600):
     _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
     return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
 
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=None, src_profile_dir=None, deploy_path=None):
+def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=None, src_profile_dir=None, deploy_path=None):
     """
     Generate Kustomize package and manifests for given component or bundle.
     component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -410,23 +392,11 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}',
               cwd=profile_dir)
 
-    # Set component to DS Operator if operator argument is true
-    if operator:
-        log.debug('ds-operator requested.')
-        if component == 'ds':
-            component = 'ds-operator'
-        if component == 'ds-idrepo':
-            component = 'ds-idrepo-op'
-        if component == 'ds-cts':
-            component = 'ds-cts-op'
-
     log.debug('component = ' + component)
     components_to_install = bundles.get(component, [f'base/{component}'])
 
     # Check components when installing ds-idrepo or ds-cts to ensure the correct components are installed
-    if operator and (component == "ds-idrepo" or component == "ds-cts"):
-        components_to_install = bundles.get(component, [f'base/{component}'])
-    elif not operator and (component == "ds-idrepo" or component == "ds-cts"):
+    if component == "ds-idrepo" or component == "ds-cts":
         components_to_install = bundles.get(component, [f'base/ds/{component}'])
     else:
         components_to_install = bundles.get(component, [f'base/{component}'])
@@ -444,15 +414,10 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
                 run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
 
     fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
-    if operator:
-        dsoperatorpatchjson = [{"op": "add", "path": "data/data/DS_OPERATOR_ENABLED", "value": "true"}]
     ingressclasspatchjson = [{"op": "replace", "path": "/spec/ingressClassName", "value": ingress_class}]
     if component in ['base']:
         run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
             cwd=profile_dir)
-        if operator:
-            run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(dsoperatorpatchjson)}\'',
-                cwd=profile_dir)
         run('kustomize', f'edit add patch --name forgerock --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
             cwd=profile_dir)
         run('kustomize', f'edit add patch --name ig --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
@@ -468,7 +433,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
         contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
     return profile_dir, contents
 
-def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, operator, deploy_path=None, src_profile_dir=None):
+def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path=None, src_profile_dir=None):
     """
     Generate and deploy the given component or bundle.
     component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
@@ -481,7 +446,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     """
     deploy_path = deploy_path or os.path.join(root_dir, 'kustomize', 'deploy')
     custom_path = os.path.join(deploy_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, operator, custom_path=custom_path, src_profile_dir=src_profile_dir, deploy_path=deploy_path)
+    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=custom_path, src_profile_dir=src_profile_dir, deploy_path=deploy_path)
 
     # Remove amster components
     if component == "amster":
@@ -493,14 +458,13 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
 
     run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
 
-def uninstall_component(component, ns, force, ingress_class, legacy, config_profile, operator):
+def uninstall_component(component, ns, force, ingress_class, legacy, config_profile):
     """
     Uninstall a component.
     component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
     ns: target namespace.
     force: set to True to delete all forgeops resources including secrets and PVCs.
     """
-    # Supports deleting of DS Operator custom resources when upgrading from 7.3 to 7.4
     if component in ['ds','ds-idrepo','ds-cts']:
         try:
             # Check if the directoryservice CRD is installed. If not then skip the delete.
@@ -515,13 +479,13 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
 
     if component == "all":
         for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force, ingress_class, legacy, operator)
+            uninstall_component(c, ns, force, ingress_class, legacy)
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
         kustomize_dir = os.path.join(root_dir, 'kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'single', ns, '.', ingress_class, '', legacy, config_profile, operator, custom_path=uninstall_dir)
+        _, contents = generate_package(component, 'single', ns, '.', ingress_class, '', legacy, config_profile, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
         if component == "amster":
             clean_amster_job(ns, False)
@@ -638,24 +602,6 @@ def is_legacy_install(ns):
         return False
     else:
         return True
-
-def dsoperator(k8s_op, tag='latest'):
-    """Check if ds-operator is present in the cluster. If not, installs it."""
-    opts = ''
-    if k8s_op == 'delete':
-        opts = '--ignore-not-found=true'
-    if tag == 'latest':
-        run('kubectl',
-            f'{k8s_op} -f https://github.com/ForgeRock/ds-operator/releases/latest/download/ds-operator.yaml {opts}')
-    else:
-        run('kubectl',
-            f'{k8s_op} -f https://github.com/ForgeRock/ds-operator/releases/download/{tag}/ds-operator.yaml {opts}')
-
-    if k8s_op == 'apply':
-        message('\nWaiting for ds-operator...')
-        time.sleep(5)
-        run('kubectl', 'wait --for=condition=Established crd directoryservices.directory.forgerock.io --timeout=30s')
-        run('kubectl', '-n fr-system wait --for=condition=available deployment  --all --timeout=120s')
 
 
 def _install_certmanager_issuer():

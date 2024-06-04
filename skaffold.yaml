@@ -188,8 +188,8 @@ profiles:
   # deploy:
   #   kustomize:
   #     paths:
-  #     - ./kustomize/base/ds-idrepo
-  #     - ./kustomize/base/ds-cts
+  #     - ./kustomize/base/ds/idrepo
+  #     - ./kustomize/base/ds/cts
 
 - name: ds-cts
   build:
@@ -200,7 +200,7 @@ profiles:
   deploy:
     kustomize:
       paths:
-      - ./kustomize/base/ds-cts
+      - ./kustomize/base/ds/cts
 
 - name: ds-idrepo
   build:
@@ -211,7 +211,7 @@ profiles:
   deploy:
     kustomize:
       paths:
-      - ./kustomize/base/ds-idrepo
+      - ./kustomize/base/ds/idrepo
 
 - name: ig
   build:
