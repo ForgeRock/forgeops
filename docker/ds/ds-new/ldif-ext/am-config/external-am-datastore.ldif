@@ -40,6 +40,13 @@ objectClass: sunServiceComponent
 objectclass: top
 ou: agentgroup
 
+dn: ou=agentgroup,ou=Instances,ou=1.0,ou=AgentService,ou=services,ou=am-config
+objectClass: top
+objectClass: sunServiceComponent
+objectClass: organizationalUnit
+ou: agentgroup
+sunserviceID: agentgroup
+
 dn: ou=default,ou=OrganizationConfig,ou=1.0,ou=AgentService,ou=services,ou=am-config
 objectclass: organizationalunit
 objectClass: sunServiceComponent
