@@ -64,9 +64,9 @@ def main():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', '-d', dest='debug', action='store_true', help='Turn on debugging')
     parser.add_argument('--fqdn', '-f', dest='fqdn', help='Comma separated list of FQDNs')
+    parser.add_argument('--helm', '-H', dest='helm', help='Dir to store helm values files (absolute or relative to forgeops root)')
     parser.add_argument('--ingress', '-i', dest='ingress', help='Ingress class name')
     parser.add_argument('--kustomize', '-k', dest='kustomize', help='Kustomize dir to use (absolute or relative to forgeops root)')
-    parser.add_argument('--helm', '-H', dest='helm', help='Dir to store helm values files (absolute or relative to forgeops root)')
     parser.add_argument('--namespace', '-n', dest='namespace', help='Namespace to set in the overlay')
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
@@ -95,6 +95,11 @@ def main():
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', dest='dryrun', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--verbose', dest='verbose', action='store_true', help=argparse.SUPPRESS)
+
+    issuer = parser.add_mutually_exclusive_group()
+    issuer.add_argument('--issuer', dest='issuer', help='TLS cert Issuer')
+    issuer.add_argument('--cluster-issuer', dest='cluster_issuer', help='TLS cert ClusterIssuer')
+    issuer.add_argument('--skip-issuer', dest='skip_issuer', action='store_true', help='Skip TLS cert issuer setup')
 
     args = parser.parse_args()
 
@@ -255,6 +260,19 @@ def main():
            values_ingress['platform'] = { 'ingress': {} }
         values_ingress['platform']['ingress']['className'] = args.ingress
 
+    issuer_kind_ann = None
+    issuer_kind = None
+    issuer_name = None
+    if args.issuer or args.cluster_issuer:
+        if args.issuer:
+            issuer_kind_ann  = 'issuer'
+            issuer_kind = 'Issuer'
+            issuer_name = args.issuer
+        elif args.cluster_issuer:
+            issuer_kind_ann  = 'cluster-issuer'
+            issuer_kind = 'ClusterIssuer'
+            issuer_name = args.cluster_issuer
+
     values_images = {}
     if pull_policy:
         values_images = {
@@ -303,15 +321,12 @@ def main():
         source_path = overlay_root / source
     if args.debug: print(f"source_path={source_path}")
 
-    log_action = 'Create'
-
-    ###
-    ### Configure kustomize overlay
-    ###
+    # Check if we are Creating or Updating
     if do_kustomize:
+        kustomize_action = 'Create'
         if overlay_path.is_dir():
             print('Updating existing overlay.')
-            log_action = 'Update'
+            kustomize_action = 'Update'
         elif overlay_path.is_file():
             utils.exit_msg('Overlay exists as a file. Remove it and try again')
         elif not args.fqdn:
@@ -323,6 +338,56 @@ From: {source_path}
 To: {overlay_path}
 """
             print(msg)
+
+    if do_helm:
+        helm_path = None
+        helm_action = 'Create'
+        if Path(helm).is_absolute():
+            helm_path = Path(helm)
+        else:
+            helm_path = root_path / helm
+        helm_path = helm_path / args.env_name
+        if args.debug: print(f"helm_path={helm_path}")
+
+        values_file = helm_path / 'values.yaml'
+        if args.debug: print(f"values_file={values_file}")
+        if helm_path.is_dir():
+            if values_file.is_file():
+                print('Updating existing helm values.')
+                helm_action = 'Update'
+            else:
+                print('Helm environment dir exists, but has no values.yaml.')
+        elif helm_path.is_file():
+            utils.exit_msg('Helm path exists as a file. Remove it and try again.')
+        else:
+            print(f'{helm_path} not found, creating.')
+            helm_path.mkdir(mode=0o750, parents=True)
+
+    do_create = False
+    if helm_action == 'Create' or kustomize_action == 'Create':
+        do_create = True
+    # Finish Create or Update check
+
+    if do_create and not args.skip_issuer and not args.issuer and not args.cluster_issuer:
+        msg = f"""
+When creating a new environment, it's best practice to specify a HTTPS certificate issuer (--issuer or --cluster-issuer). You can also skip issuer creation with --skip-issuer. For demos, you can use 'bin/certmanager-deploy.sh' to deploy cert-manager and create a self-signed ClusterIssuer called 'default-issuer'.
+
+"""
+        print(msg)
+        if input('Continue using a ClusterIssuer called "default-issuer"? [Y/N] ').lower() in ['yes', 'y']:
+            issuer_kind_ann = 'cluster-issuer'
+            issuer_kind     = 'ClusterIssuer'
+            issuer_name      = 'default-issuer'
+            print(f"Using {issuer_kind}: {issuer_name}")
+        else:
+            utils.exit_msg('Please rerun with --issuer, --cluster-issuer, or --skip-issuer')
+
+
+    ###
+    ### Configure kustomize overlay
+    ###
+    if do_kustomize:
+        if kustomize_action == 'Create':
             if source_path.is_dir():
                 shutil.copytree(source_path, overlay_path)
             elif source_path.is_file():
@@ -357,7 +422,7 @@ To: {overlay_path}
 
                 writeYamlFile(kust, kust_path)
 
-            ingress_path = d / 'ingress-fqdn.yaml'
+            ingress_path = d / 'ingress-generated.yaml'
             if args.debug: print(f"ingress_path={ingress_path}")
 
             if ingress_path.is_file():
@@ -380,6 +445,13 @@ To: {overlay_path}
                         'op': 'replace',
                         'path': '/spec/ingressClassName',
                         'value': args.ingress
+                    })
+
+                if issuer_kind and issuer_name:
+                    ing.append({
+                        'op': 'add',
+                        'path': f"/spec/metadata/annotations/cert-manager.io~1{issuer_kind}",
+                        'value': issuer_name
                     })
 
                 writeYamlFile(ing, ingress_path)
@@ -433,29 +505,6 @@ To: {overlay_path}
     ### Setup helm values files
     ###
     if do_helm:
-        if Path(helm).is_absolute():
-            helm_path = Path(helm)
-        else:
-            helm_path = root_path / helm
-        helm_path = helm_path / args.env_name
-        if args.debug: print(f"helm_path={helm_path}")
-
-        values_file = helm_path / 'values.yaml'
-        if args.debug: print(f"values_file={values_file}")
-        if helm_path.is_dir():
-            if values_file.is_file():
-                print('Updating existing helm values.')
-                log_action = 'Update'
-            else:
-                print('Helm environment dir exists, but has no values.yaml.')
-                log_action = 'Create'
-        elif helm_path.is_file():
-            utils.exit_msg('Helm path exists as a file. Remove it and try again.')
-        else:
-            print(f'{helm_path} not found, creating.')
-            helm_path.mkdir(mode=0o750, parents=True)
-            log_action = 'Create'
-
         values_size_file = helm_path / 'values-size.yaml'
         if args.debug: print(f"values_size_file={values_size_file}")
         vs = {}
@@ -471,6 +520,16 @@ To: {overlay_path}
            vimg = yaml.safe_load(open(values_images_file))
         vimg.update(values_images)
         writeYamlFile(vimg, values_images_file)
+
+        if issuer_name and issuer_kind:
+            if 'platform' not in values_ingress.keys():
+               values_ingress['platform'] = { 'ingress': { 'tls': { 'issuer': {} } } }
+            elif 'ingress' not in values_ingress['platform'].keys():
+               values_ingress['platform']['ingress'] = { 'tls': { 'issuer': {} } }
+            else:
+               values_ingress['platform']['ingress']['tls'] = { 'issuer': {} }
+            values_ingress['platform']['ingress']['tls']['issuer']['kind'] = issuer_kind
+            values_ingress['platform']['ingress']['tls']['issuer']['name'] = issuer_name
 
         values_ingress_file = helm_path / 'values-ingress.yaml'
         if args.debug: print(f"values_ingress_file={values_ingress_file}")
@@ -494,15 +553,16 @@ To: {overlay_path}
     cmd_ary[0] = prog
     cmd = ' '.join(cmd_ary)
     log_file = 'env.log'
-    log_line = f"{timestamp} {log_action} {cmd}"
     if do_kustomize:
+        k_log_line = f"{timestamp} {kustomize_action} {cmd}"
         log_path_overlay = overlay_path / log_file
         with open(log_path_overlay, 'a') as log_overlay_f:
-            log_overlay_f.write(f"{log_line}\n")
+            log_overlay_f.write(f"{k_log_line}\n")
     if do_helm:
+        h_log_line = f"{timestamp} {helm_action} {cmd}"
         log_path_helm = helm_path / log_file
         with open(log_path_helm, 'a') as log_helm_f:
-            log_helm_f.write(f"{log_line}\n")
+            log_helm_f.write(f"{h_log_line}\n")
 
 
 if __name__ == '__main__':
