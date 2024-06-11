@@ -183,6 +183,8 @@ def main():
                                                           'secrets', []])
     size_group = common_sz.add_mutually_exclusive_group()
     size_group.add_argument('--cdk', action='store_const', dest='size', const='cdk', help='(Default) Install/generate manifests for the CDK')
+    # Hidden option --single-instance for internal purposes only
+    size_group.add_argument('--single-instance', action='store_const', dest='size', const='cdk', help=argparse.SUPPRESS)
     size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install/generate manifests for the CDM mini platform')
     size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install/generate manifests for the CDM small platform')
     size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install/generate manifests for the CDM medium platform')
