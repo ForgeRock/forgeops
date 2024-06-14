@@ -117,6 +117,9 @@ def main():
     if args.single and (args.am_rep or args.idm_rep or args.cts_rep or args.idrepo_rep):
         utils.exit_msg('--single-instance is incompatible with *_rep options')
 
+    if '/' in args.env_name:
+        utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
+
     # Setup defaults for values that can be set in forgeops-ng.conf
     helm = 'helm'
     if args.helm:
