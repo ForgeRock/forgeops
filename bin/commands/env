@@ -101,6 +101,9 @@ def main():
     issuer.add_argument('--cluster-issuer', dest='cluster_issuer', help='TLS cert ClusterIssuer')
     issuer.add_argument('--skip-issuer', dest='skip_issuer', action='store_true', help='Skip TLS cert issuer setup')
 
+    # Flag to skip interactivity for testing
+    parser.add_argument('--testing', dest='testing', action='store_true', help=argparse.SUPPRESS)
+
     args = parser.parse_args()
 
     script_path = Path(__file__).parent
@@ -377,14 +380,20 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
 
 """
         print(msg)
-        if input('Continue using a ClusterIssuer called "default-issuer"? [Y/N] ').lower() in ['yes', 'y']:
-            issuer_kind_ann = 'cluster-issuer'
-            issuer_kind     = 'ClusterIssuer'
-            issuer_name      = 'default-issuer'
-            print(f"Using {issuer_kind}: {issuer_name}")
+
+        use_default_issuer = False
+        if args.testing:
+            use_default_issuer = True
+        elif input('Continue using a ClusterIssuer called "default-issuer"? [Y/N] ').lower() in ['yes', 'y']:
+            use_default_issuer = True
         else:
             utils.exit_msg('Please rerun with --issuer, --cluster-issuer, or --skip-issuer')
 
+        if use_default_issuer:
+            issuer_kind_ann = 'cluster-issuer'
+            issuer_kind = 'ClusterIssuer'
+            issuer_name = 'default-issuer'
+            print(f"Using {issuer_kind}: {issuer_name}")
 
     ###
     ### Configure kustomize overlay
