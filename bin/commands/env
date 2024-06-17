@@ -161,14 +161,14 @@ def main():
                 if args.am_mem:
                     size['am']['resources']['limits'] = {}
         if args.am_cpu:
-            if args.debug: print(f"am_cpu={am_cpu}")
+            if args.debug: print(f"am_cpu={args.am_cpu}")
             size['am']['resources']['requests']['cpu'] = args.am_cpu
         if args.am_mem:
-            if args.debug: print(f"am_mem={am_mem}")
+            if args.debug: print(f"am_mem={args.am_mem}")
             size['am']['resources']['requests']['memory'] = args.am_mem
             size['am']['resources']['limits']['memory'] = args.am_mem
         if args.am_rep:
-            if args.debug: print(f"am_rep={am_rep}")
+            if args.debug: print(f"am_rep={args.am_rep}")
             size['am']['replicaCount'] = int(args.am_rep)
         if args.single:
             size['am']['replicaCount'] = 1
@@ -183,17 +183,17 @@ def main():
             if args.cts_disk:
                 size['ds_cts']['volumeClaimSpec'] = { 'resources': { 'requests': {} } }
         if args.cts_cpu:
-            if args.debug: print(f"cts_cpu={cts_cpu}")
+            if args.debug: print(f"cts_cpu={args.cts_cpu}")
             size['ds_cts']['resources']['requests']['cpu'] = args.cts_cpu
         if args.cts_disk:
-            if args.debug: print(f"cts_disk={cts_disk}")
+            if args.debug: print(f"cts_disk={args.cts_disk}")
             size['ds_cts']['volumeClaimSpec']['resources']['requests']['storage'] = args.cts_disk
         if args.cts_mem:
-            if args.debug: print(f"cts_mem={cts_mem}")
+            if args.debug: print(f"cts_mem={args.cts_mem}")
             size['ds_cts']['resources']['requests']['memory'] = args.cts_mem
             size['ds_cts']['resources']['limits']['memory'] = args.cts_mem
         if args.cts_rep:
-            if args.debug: print(f"cts_rep={cts_rep}")
+            if args.debug: print(f"cts_rep={args.cts_rep}")
             size['ds_cts']['replicaCount'] = int(args.cts_rep)
         if args.single:
             size['ds_cts']['replicaCount'] = 1
@@ -206,14 +206,14 @@ def main():
                 if args.idm_mem:
                     size['idm']['resources']['limits'] = {}
         if args.idm_cpu:
-            if args.debug: print(f"idm_cpu={idm_cpu}")
+            if args.debug: print(f"idm_cpu={args.idm_cpu}")
             size['idm']['resources']['requests']['cpu'] = args.idm_cpu
         if args.idm_mem:
-            if args.debug: print(f"idm_mem={idm_mem}")
+            if args.debug: print(f"idm_mem={args.idm_mem}")
             size['idm']['resources']['requests']['memory'] = args.idm_mem
             size['idm']['resources']['limits']['memory'] = args.idm_mem
         if args.idm_rep:
-            if args.debug: print(f"idm_rep={idm_rep}")
+            if args.debug: print(f"idm_rep={args.idm_rep}")
             size['idm']['replicaCount'] = int(args.idm_rep)
         if args.single:
             size['idm']['replicaCount'] = 1
@@ -228,17 +228,17 @@ def main():
             if args.idrepo_disk:
                 size['ds_idrepo']['volumeClaimSpec'] = { 'resources': { 'requests': {} } }
         if args.idrepo_cpu:
-            if args.debug: print(f"idrepo_cpu={idrepo_cpu}")
+            if args.debug: print(f"idrepo_cpu={args.idrepo_cpu}")
             size['ds_idrepo']['resources']['requests']['cpu'] = args.idrepo_cpu
         if args.idrepo_disk:
-            if args.debug: print(f"idrepo_disk={idrepo_disk}")
+            if args.debug: print(f"idrepo_disk={args.idrepo_disk}")
             size['ds_idrepo']['volumeClaimSpec']['resources']['requests']['storage'] = args.idrepo_disk
         if args.idrepo_mem:
-            if args.debug: print(f"idrepo_mem={idrepo_mem}")
+            if args.debug: print(f"idrepo_mem={args.idrepo_mem}")
             size['ds_idrepo']['resources']['requests']['memory'] = args.idrepo_mem
             size['ds_idrepo']['resources']['limits']['memory'] = args.idrepo_mem
         if args.idrepo_rep:
-            if args.debug: print(f"idrepo_rep={idrepo_rep}")
+            if args.debug: print(f"idrepo_rep={args.idrepo_rep}")
             size['ds_idrepo']['replicaCount'] = int(args.idrepo_rep)
         if args.single:
             size['ds_idrepo']['replicaCount'] = 1
