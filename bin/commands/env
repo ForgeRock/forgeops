@@ -64,7 +64,7 @@ def main():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', '-d', dest='debug', action='store_true', help='Turn on debugging')
     parser.add_argument('--fqdn', '-f', dest='fqdn', help='Comma separated list of FQDNs')
-    parser.add_argument('--helm', '-H', dest='helm', help='Dir to store helm values files (absolute or relative to forgeops root)')
+    parser.add_argument('--helm', '-H', dest='helm', default='helm', help='Dir to store helm values files (absolute or relative to forgeops root)')
     parser.add_argument('--ingress', '-i', dest='ingress', help='Ingress class name')
     parser.add_argument('--kustomize', '-k', dest='kustomize', help='Kustomize dir to use (absolute or relative to forgeops root)')
     parser.add_argument('--namespace', '-n', dest='namespace', help='Namespace to set in the overlay')
@@ -121,10 +121,8 @@ def main():
         utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
 
     # Setup defaults for values that can be set in forgeops-ng.conf
-    helm = 'helm'
-    if args.helm:
-        helm = args.helm
-    elif os.getenv('HELM_PATH'):
+    helm = args.helm
+    if os.getenv('HELM_PATH'):
         helm = os.getenv('HELM_PATH')
 
     kustomize = 'kustomize-ng'
@@ -352,7 +350,10 @@ To: {overlay_path}
             helm_path = Path(helm)
         else:
             helm_path = root_path / helm
-        helm_path = helm_path / args.env_name
+        if helm_path.is_dir():
+            helm_path = helm_path / args.env_name
+        else:
+            utils.msg(f"Helm path doesn't exist or isn't a dir: {helm_path}")
         if args.debug: print(f"helm_path={helm_path}")
 
         values_file = helm_path / 'values.yaml'
