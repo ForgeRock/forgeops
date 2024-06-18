@@ -105,7 +105,7 @@ spec:
       initContainers:
         - name: init
           securityContext: {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
+          image: us-docker.pkg.dev/forgeops-public/images/ds:7.5.0
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /opt/opendj/data
@@ -164,7 +164,7 @@ spec:
       containers:
         - name: ds
           securityContext: {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
+          image: us-docker.pkg.dev/forgeops-public/images/ds:7.5.0
           imagePullPolicy: IfNotPresent
           args:
             - start-ds

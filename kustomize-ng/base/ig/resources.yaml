@@ -60,7 +60,7 @@ spec:
       containers:
         - name: ig
           securityContext: {}
-          image: "idm:7.5"
+          image: idm:7.5
           imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACE

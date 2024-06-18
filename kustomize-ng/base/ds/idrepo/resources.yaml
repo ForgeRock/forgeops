@@ -105,7 +105,7 @@ spec:
       initContainers:
         - name: init
           securityContext: {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
+          image: us-docker.pkg.dev/forgeops-public/images/ds:7.5.0
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /opt/opendj/data
@@ -126,7 +126,8 @@ spec:
               name: cloud-credentials-cache
           # args:
           # - init
-          command: ["/opt/opendj/default-scripts/init-and-restore.sh"]
+          command:
+            - /opt/opendj/default-scripts/init-and-restore.sh
           env:
             - name: POD_NAME
               valueFrom:
@@ -165,7 +166,7 @@ spec:
       containers:
         - name: ds
           securityContext: {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ds:7.5.0"
+          image: us-docker.pkg.dev/forgeops-public/images/ds:7.5.0
           imagePullPolicy: IfNotPresent
           args:
             - start-ds
@@ -267,13 +268,13 @@ spec:
   # You can add your own custom values here.
   secretTemplate:
     annotations:
-      my-secret-annotation: "cert-manager-generated"
+      my-secret-annotation: cert-manager-generated
     labels:
       app: ds-operator
   duration: 21600h # 900 days.
   subject:
     organizations:
-      - "forgerock.org"
+      - forgerock.org
   # The use of the common name field has been deprecated since 2000 and is
   # discouraged from being used.
   commonName: ds
@@ -287,9 +288,9 @@ spec:
     - client auth
   # At least one of a DNS Name, URI, or IP address is required.
   dnsNames:
-    - "*.ds"
-    - "*.ds-idrepo"
-    - "*.ds-cts"
+    - '*.ds'
+    - '*.ds-idrepo'
+    - '*.ds-cts'
   # Issuer references are always required.
   issuerRef:
     name: selfsigned-issuer
@@ -324,10 +325,10 @@ spec:
   duration: 21600h # 900 days
   subject:
     organizations:
-      - "ForgeRock.com"
+      - ForgeRock.com
   # The use of the common name field has been deprecated since 2000 and is
   # discouraged from being used.
-  commonName: "Master Key"
+  commonName: Master Key
   isCA: false
   privateKey:
     algorithm: RSA
@@ -338,7 +339,7 @@ spec:
     - client auth
   # At least one of a DNS Name, URI, or IP address is required.
   dnsNames:
-    - "*.ds"
+    - '*.ds'
   # Issuer references are always required.
   issuerRef:
     name: selfsigned-issuer

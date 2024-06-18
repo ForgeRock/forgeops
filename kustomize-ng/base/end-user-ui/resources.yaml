@@ -10,8 +10,8 @@ metadata:
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
 spec:
   type: ClusterIP
   ports:
@@ -22,8 +22,8 @@ spec:
   selector:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
 ---
 # Source: identity-platform/templates/end-user-ui-deployment.yaml
 apiVersion: apps/v1
@@ -36,36 +36,39 @@ metadata:
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: identity-platform
       app.kubernetes.io/instance: identity-platform
-      app: login-ui
-      app.kubernetes.io/component: login-ui
+      app: end-user-ui
+      app.kubernetes.io/component: end-user-ui
   template:
     metadata:
       annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
-        app: login-ui
-        app.kubernetes.io/component: login-ui
+        app: end-user-ui
+        app.kubernetes.io/component: end-user-ui
     spec:
       serviceAccountName: default
       securityContext: {}
       containers:
         - name: end-user-ui
           securityContext: {}
-          image: "gcr.io/forgerock-io/platform-enduser-ui:7.5.0"
+          image: gcr.io/forgerock-io/platform-enduser-ui:7.5.1
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
               exec:
-                command: ["/usr/bin/nginx", "-s", "quit"]
+                command:
+                  - /usr/bin/nginx
+                  - -s
+                  - quit
           env:
             - name: SUBFOLDER
               value: enduser
@@ -78,7 +81,8 @@ spec:
               protocol: TCP
           startupProbe:
             exec:
-              command: ['true']
+              command:
+                - "true"
             initialDelaySeconds: 10
           livenessProbe:
             httpGet:
@@ -109,8 +113,8 @@ metadata:
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/body-size: 64m
@@ -127,10 +131,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - "identity-platform.domain.local"
-      secretName: "tls-identity-platform.domain.local"
+        - identity-platform.domain.local
+      secretName: tls-identity-platform.domain.local
   rules:
-    - host: "identity-platform.domain.local"
+    - host: identity-platform.domain.local
       http:
         paths:
           - path: /enduser

@@ -36,7 +36,7 @@ spec:
       containers:
         - name: ldif-importer
           securityContext: {}
-          image: "us-docker.pkg.dev/forgeops-public/images/ldif-importer:7.5.0"
+          image: us-docker.pkg.dev/forgeops-public/images/ldif-importer:7.5.0
           imagePullPolicy: Always
           envFrom:
             - secretRef:

@@ -394,7 +394,7 @@ admin_ui:
 
   image:
     repository: gcr.io/forgerock-io/platform-admin-ui
-    tag: "7.5.0"
+    tag: "7.5.1"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -463,7 +463,7 @@ end_user_ui:
 
   image:
     repository: gcr.io/forgerock-io/platform-enduser-ui
-    tag: "7.5.0"
+    tag: "7.5.1"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -508,8 +508,8 @@ end_user_ui:
   podAnnotations: {}
 
   podLabels:
-    app.kubernetes.io/component: login-ui
-    app: login-ui
+    app.kubernetes.io/component: end-user-ui
+    app: end-user-ui
 
   podSecurityContext: {}
     # fsGroup: 2000
@@ -532,7 +532,7 @@ login_ui:
 
   image:
     repository: gcr.io/forgerock-io/platform-login-ui
-    tag: "7.5.0"
+    tag: "7.5.1"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 

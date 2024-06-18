@@ -6,7 +6,7 @@ resources:
 images:
 - name: .*enduser-ui.*
   newName: gcr.io/forgerock-io/platform-enduser-ui
-  newTag: 7.5.0
+  newTag: 7.5.1
 labels:
 - includeSelectors: true
   pairs:

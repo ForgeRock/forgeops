@@ -5,7 +5,7 @@ kind: CronJob
 metadata:
   name: ds-idrepo-snapshot
 spec:
-  schedule: "0 0 * * *"
+  schedule: 0 0 * * *
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -35,7 +35,7 @@ spec:
                     fieldRef:
                       fieldPath: metadata.name
                 - name: PURGE_DELAY
-                  value: "-3 day"
+                  value: -3 day
               volumeMounts:
                 - name: ds-snapshot-script
                   mountPath: /scripts

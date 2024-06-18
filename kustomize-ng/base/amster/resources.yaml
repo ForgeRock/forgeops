@@ -61,8 +61,8 @@ kind: Job
 metadata:
   name: amster
   annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": "before-hook-creation"
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
@@ -103,7 +103,7 @@ spec:
       initContainers:
         - name: amster
           securityContext: {}
-          image: "gcr.io/forgerock-io/amster/pit1:7.5.0"
+          image: gcr.io/forgerock-io/amster/pit1:7.5.0
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -184,7 +184,7 @@ spec:
       containers:
         - name: pause
           securityContext: {}
-          image: "gcr.io/forgerock-io/amster/pit1:7.5.0"
+          image: gcr.io/forgerock-io/amster/pit1:7.5.0
           imagePullPolicy: IfNotPresent
           args:
             - bash
