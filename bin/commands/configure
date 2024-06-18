@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import glob
 import os
 import site
 import sys
@@ -18,8 +17,10 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python.constants import CONFIGURED_VERSION_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
     DEPENDENCIES_DIR
 import lib.python.utils as utils
-from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv
+from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv, is_pipx_installed, \
+    print_how_to_install_dependencies
 
+pip = 'pip3'
 # do not use --user param when virtual environment is used
 user_param = '' if 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] != '' else '--user '
 EXIT_MESSAGE = f'\nPlease fix this issue and run {FORGEOPS_SCRIPT_FILE} env script again.'
@@ -32,30 +33,8 @@ class ConfigureEnv:
         self._pip = None
 
     @property
-    def pip(self):
-        if self._pip is None:
-            self._pip = 'pip3'
-            is_pass, out, err = utils.run('type pipx', cstdout=True, ignoreFail=True)
-            if is_pass:
-                # pipx installed, try to find pip3 installation
-                last_python_path = None
-                if sys.platform == "darwin":
-                    base_folder = f'/Users/{os.environ["USER"]}/Library/Python/*'
-                    python_paths = glob.glob(base_folder)
-                    last_python_path = python_paths[0]
-                elif sys.platform == "linux" or sys.platform == "linux2":
-                    last_python_path = f'/home/{os.environ["USER"]}/.local'
-                if last_python_path is not None:
-                    self._pip = os.path.join(last_python_path, 'bin', 'pip3')
-                    if not os.path.isfile(self._pip):
-                        print('fail to find pip3')
-                        sys.exit(1)
-
-        return self._pip
-
-    @property
     def pip_install(self):
-        return f'{self.pip} install --no-cache-dir -i https://pypi.python.org/simple/ {user_param}--no-warn-script-location'
+        return f'{pip} install --no-cache-dir -i https://pypi.python.org/simple/ {user_param}--no-warn-script-location'
 
     def install_python_dependencies(self):
         os.environ['PYTHONUSERBASE'] = str(dependencies_dir)
@@ -88,9 +67,9 @@ class ConfigureEnv:
         # Check if pip is installed
         utils.sub_title("Checking if pip is installed...")
         try:
-            rc, out, err = utils.run(f'{self.pip} --version', cstdout=True, cstderr=True)
+            rc, out, err = utils.run(f'{pip} --version', cstdout=True, cstderr=True)
         except:
-            utils.error(f'{self.pip} is not installed')
+            utils.error(f'{pip} is not installed')
             utils.error('Please run: curl -O https://bootstrap.pypa.io/get-pip.py; sudo python3 get-pip.py; rm get-pip.py')
             sys.exit(1)
         pip_version = (out.split()[1]).decode("utf-8")
@@ -130,4 +109,7 @@ class ConfigureEnv:
 
 if __name__ == '__main__':
     configure_env = ConfigureEnv()
-    configure_env.run()
+    if is_pipx_installed():
+        print_how_to_install_dependencies()
+    else:
+        configure_env.run()

@@ -8,6 +8,8 @@ from pathlib import Path
 import sys
 import site
 
+from lib.python.ensure_configuration_is_valid_or_exit import print_how_to_install_dependencies
+
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
 root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
@@ -16,8 +18,11 @@ dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
 sys.path.insert(0, str(root_dir))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-import yaml
-from mergedeep import merge
+try:
+    import yaml
+    from mergedeep import merge
+except:
+    print_how_to_install_dependencies()
 import lib.python.utils as utils
 
 

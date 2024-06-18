@@ -11,15 +11,16 @@ dependencies_dir = os.path.join(root_dir, 'bin', 'forgeops_scripts', 'lib', 'dep
 # Insert lib folders to python path
 sys.path.insert(0, str(root_dir))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
-from lib.python.constants import ENV_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
+from lib.python.constants import REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
     CONFIGURED_VERSION_FILE, DEPENDENCIES_DIR
 from lib.python.utils import run, warning, error
+from lib.python import utils
 
 
 def compute_configuration_version():
     """Create a sha1 based on the files we want to monitor the changes"""
     files_content = ""
-    for file_path in [ENV_FILE, REQUIREMENTS_FILE]:
+    for file_path in [REQUIREMENTS_FILE]:
         with open(file_path) as file_stream:
             files_content += file_stream.read()
     return sha1(files_content.encode("utf-8")).hexdigest()
@@ -63,33 +64,49 @@ def check_python_venv_lib_deps():
     return True
 
 
+def print_how_to_install_dependencies():
+    if is_pipx_installed():
+        print(f'If you are using pipx, please install manually python dependencies by using {REQUIREMENTS_FILE}')
+    else:
+        print('You may want to run "forgeops-ng configure" command')
+    sys.exit(1)
+
+
+def is_pipx_installed():
+    is_pass, out, err = utils.run('type pipx', cstdout='bla', cstderr='bla', ignoreFail=True)
+    return is_pass
+
+
 def ensure_configuration_is_valid_or_exit():
     """
     This function makes sure that configure has been run with expected version.
     """
-    configured = False
-    if in_virtualenv():
-        # Virtualenv installs dependencies into itself rather than Guillotine ext/dependencies
-        # as it ignores --user flag.
-        if os.path.isfile(CONFIGURED_VERSION_FILE) and check_python_venv_lib_deps():
-            configured = True
+    if is_pipx_installed():
+        # skip if pipx installed
+        return True
     else:
-        if os.path.isfile(CONFIGURED_VERSION_FILE) and os.path.exists(DEPENDENCIES_DIR):
-            configured = True
+        configured = False
+        if in_virtualenv():
+            # Virtualenv installs dependencies into itself rather than Forgeops lib/dependencies
+            # as it ignores --user flag.
+            if os.path.isfile(CONFIGURED_VERSION_FILE) and check_python_venv_lib_deps():
+                configured = True
+        else:
+            if os.path.isfile(CONFIGURED_VERSION_FILE) and os.path.exists(DEPENDENCIES_DIR):
+                configured = True
 
-    config_cmd_to_run = f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} configure'
+        config_cmd_to_run = f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} configure'
 
-    if not configured:
-        error(f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} not configured, please run {config_cmd_to_run}')
-        exit(1)
-
-    with open(CONFIGURED_VERSION_FILE, 'r') as fd:
-        line = fd.readline().rstrip()
-        version_configured = compute_configuration_version()
-        if line != version_configured:
-            # first version, this should be remove in next weeks
-            error(f'{FORGEOPS_SCRIPT_FILE} configuration needs to be refreshed, please run {config_cmd_to_run}')
+        if not configured:
+            error(f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} not configured, please run {config_cmd_to_run}')
             exit(1)
+
+        with open(CONFIGURED_VERSION_FILE, 'r') as fd:
+            line = fd.readline().rstrip()
+            version_configured = compute_configuration_version()
+            if line != version_configured:
+                error(f'{FORGEOPS_SCRIPT_FILE} configuration needs to be refreshed, please run {config_cmd_to_run}')
+                exit(1)
 
 
 if __name__ == '__main__':
