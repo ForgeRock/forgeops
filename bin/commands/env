@@ -436,7 +436,7 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
 
                 writeYamlFile(kust, kust_path)
 
-            ingress_path = d / 'ingress-generated.yaml'
+            ingress_path = d / 'ingress-fqdn.yaml'
             if args.debug: print(f"ingress_path={ingress_path}")
 
             if ingress_path.is_file():
