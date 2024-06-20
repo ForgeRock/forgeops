@@ -72,7 +72,7 @@ def main():
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
-    parser.add_argument('--source', '-s', dest='source', help='Name of source environment')
+    parser.add_argument('--source', '-s', dest='source', help='Name of source kustomize overlay')
     parser.add_argument('--am-cpu', dest='am_cpu', help='Specify CPU setting for am pods')
     parser.add_argument('--am-mem', dest='am_mem', help='Specify memory setting for am pods')
     parser.add_argument('--am-rep', dest='am_rep', type=int, help='Specify replicas for am pods')
