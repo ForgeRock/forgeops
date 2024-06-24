@@ -353,7 +353,7 @@ To: {overlay_path}
         if helm_path.is_dir():
             helm_path = helm_path / args.env_name
         else:
-            utils.msg(f"Helm path doesn't exist or isn't a dir: {helm_path}")
+            utils.exit_msg(f"Helm path doesn't exist or isn't a dir: {helm_path}")
         if args.debug: print(f"helm_path={helm_path}")
 
         values_file = helm_path / 'values.yaml'
@@ -461,11 +461,20 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
                     })
 
                 if issuer_kind and issuer_name:
-                    ing.append({
+                    issuer = {
                         'op': 'add',
                         'path': f"/spec/metadata/annotations/cert-manager.io~1{issuer_kind}",
                         'value': issuer_name
-                    })
+                    }
+                    issuer_found = False
+                    for idx, item in enumerate(ing):
+                        if 'cert-manager' and 'Issuer' in ing[idx]['path']:
+                            if args.debug: print('Found a cert-manager issuer')
+                            issuer_found = True
+                            ing[idx] = issuer
+
+                    if not issuer_found:
+                        ing.append(issuer)
 
                 writeYamlFile(ing, ingress_path)
 
