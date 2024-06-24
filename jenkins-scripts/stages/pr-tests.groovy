@@ -12,8 +12,9 @@
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
-    return commonLodestarModule.runSpyglaas(pipelineRun, random, 'Deploymnent Only',
-            [TESTS_SCOPE    : 'tests/deployment_only'])
+//    return commonLodestarModule.runSpyglaas(pipelineRun, random, 'Deploymnent Only',
+//            [TESTS_SCOPE    : 'tests/deployment_only'])
+    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords PULL_REQUEST')
 }
 
 return this
