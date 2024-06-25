@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/idm-cdk/pull-requests:7.6.0-PR-13994-3-c22c3b45a5d15e68b3904cec55bfa6b55b6b74f8
+FROM gcr.io/forgerock-io/idm-cdk/pit1:7.6.0-latest-postcommit
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
