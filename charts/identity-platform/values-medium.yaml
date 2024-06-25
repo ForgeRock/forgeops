@@ -25,10 +25,10 @@ ds_idrepo:
 
   resources:
     limits:
-      memory: 11Gi
+      memory: 14Gi
     requests:
       cpu: 8000m
-      memory: 11Gi
+      memory: 14Gi
 
   volumeClaimSpec:
     storageClassName: fast
@@ -43,10 +43,10 @@ ds_cts:
 
   resources:
     limits:
-      memory: 11Gi
+      memory: 14Gi
     requests:
       cpu: 8000m
-      memory: 11Gi
+      memory: 14Gi
 
   volumeClaimSpec:
     storageClassName: fast

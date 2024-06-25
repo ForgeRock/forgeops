@@ -5,30 +5,30 @@ am:
 
   resources:
     limits:
-      memory: 21Gi
+      memory: 26Gi
     requests:
       cpu: 11000m
-      memory: 21Gi
+      memory: 26Gi
 
 idm:
   replicaCount: 3
 
   resources:
     limits:
-      memory: 6Gi
+      memory: 8Gi
     requests:
       cpu: 8000m
-      memory: 6Gi
+      memory: 8Gi
 
 ds_idrepo:
   replicaCount: 3
 
   resources:
     limits:
-      memory: 21Gi
+      memory: 29Gi
     requests:
       cpu: 8000m
-      memory: 21Gi
+      memory: 29Gi
 
   volumeClaimSpec:
     storageClassName: fast
@@ -43,10 +43,10 @@ ds_cts:
 
   resources:
     limits:
-      memory: 21Gi
+      memory: 28Gi
     requests:
       cpu: 12000m
-      memory: 21Gi
+      memory: 28Gi
 
   volumeClaimSpec:
     storageClassName: fast

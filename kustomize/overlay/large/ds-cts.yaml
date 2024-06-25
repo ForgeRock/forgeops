@@ -11,18 +11,18 @@ spec:
       - name: ds
         resources:
           requests:
-            memory: 21Gi
+            memory: 28Gi
             cpu: 12000m
           limits:
-            memory: 21Gi
+            memory: 28Gi
       initContainers:
       - name: init
         resources:
           requests:
-            memory: 21Gi
+            memory: 28Gi
             cpu: 12000m
           limits:
-            memory: 21Gi
+            memory: 28Gi
   volumeClaimTemplates:
   - metadata:
       name: data
