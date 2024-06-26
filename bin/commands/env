@@ -327,6 +327,7 @@ def main():
     if args.debug: print(f"source_path={source_path}")
 
     # Check if we are Creating or Updating
+    kustomize_action = None
     if do_kustomize:
         kustomize_action = 'Create'
         if overlay_path.is_dir():
@@ -344,8 +345,9 @@ To: {overlay_path}
 """
             print(msg)
 
+    helm_action = None
+    helm_path = None
     if do_helm:
-        helm_path = None
         helm_action = 'Create'
         if Path(helm).is_absolute():
             helm_path = Path(helm)
@@ -375,6 +377,14 @@ To: {overlay_path}
     if helm_action == 'Create' or kustomize_action == 'Create':
         do_create = True
     # Finish Create or Update check
+
+    if not do_create and bool(size):
+        msg = f"""
+You are changing the size of an existing environment. If you have already deployed the environment, there could be extra steps needed to apply the size changes. In particular, when changing the size of your DS PVCs you will need to delete the changed StatefulSet(s) and re-deploy them. Any existing PVCs will need to be edited manually and resized. Refer to Kubernetes docs on resizing PVCs for more information.
+
+If you have not yet deployed the environment, then you can ignore this message.
+"""
+        print(msg)
 
     if do_create and not args.skip_issuer and not args.issuer and not args.cluster_issuer:
         msg = f"""
