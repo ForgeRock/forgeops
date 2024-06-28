@@ -1,0 +1,57 @@
+# Default values for intezer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+sensorConfig:
+  license_key: # A license key is required
+  log_to_stdout: true
+  server_base_url: https://protect.intezer.com/api/v2/sensor
+  #
+  # Optional proxy configuration
+  # proxy_address: http://proxy-url:port
+  # proxy_username: username
+  # proxy_password: password
+
+image:
+  repository: alpine
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "3.12"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext:
+  privileged: true
+
+hostNetwork: true
+hostPID: true
+
+resources:
+  limits:
+    cpu: 0.02
+    memory: 500Mi
+  requests:
+    cpu: 0
+    memory: 0
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

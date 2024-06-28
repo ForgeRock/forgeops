@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "intezer.fullname" . }}
+  labels:
+    {{- include "intezer.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "intezer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "intezer.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "intezer.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostNetwork: {{ .Values.hostNetwork }}
+      hostPID: {{ .Values.hostPID }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/bin/sh", "-c", 'wget -O - "https://protect.intezer.com/api/v2/install/daemonset-entrypoint?key=$SENSOR_LICENSE_KEY&beta=False&version={{ .Chart.AppVersion }}" | sh']
+          env:
+            - name: SENSOR_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "intezer.fullname" . }}
+                  key: license_key
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/intezer
+              readOnly: false
+            - name: var-run
+              mountPath: /var/run
+      volumes:
+        - name: config
+          projected:
+            sources:
+              - configMap:
+                  name: {{ include "intezer.fullname" . }}
+              - secret:
+                  name: {{ include "intezer.fullname" . }}
+        - name: var-run
+          hostPath:
+            path: /var/run
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
