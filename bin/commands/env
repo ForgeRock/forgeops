@@ -80,6 +80,7 @@ def main():
     parser.add_argument('--cts-disk', dest='cts_disk', help='Specify disk setting for ds-cts pods')
     parser.add_argument('--cts-mem', dest='cts_mem', help='Specify memory setting for ds-cts pods')
     parser.add_argument('--cts-rep', dest='cts_rep', type=int, help='Specify replicas for ds-cts pods')
+    parser.add_argument('--cts-snap-enable', dest='cts_snap_enable', action='store_true', help='Enable volume snapshots for ds-cts pods')
     parser.add_argument('--idm-cpu', dest='idm_cpu', help='Specify CPU setting for idm pods')
     parser.add_argument('--idm-mem', dest='idm_mem', help='Specify memory setting for idm pods')
     parser.add_argument('--idm-rep', dest='idm_rep', type=int, help='Specify replicas for idm pods')
@@ -87,6 +88,7 @@ def main():
     parser.add_argument('--idrepo-disk', dest='idrepo_disk', help='Specify disk setting for ds-idrepo pods')
     parser.add_argument('--idrepo-mem', dest='idrepo_mem', help='Specify memory setting for ds-idrepo pods')
     parser.add_argument('--idrepo-rep', dest='idrepo_rep', type=int, help='Specify replicas for ds-idrepo pods')
+    parser.add_argument('--idrepo-snap-enable', dest='idrepo_snap_enable', action='store_true', help='Enable volume snapshots for ds-idrepo pods')
     parser.add_argument('--pull-policy', dest='pull_policy', help='Set policy for all platform images')
     parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage helm values files")
     parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage kustomize overlay")
@@ -106,6 +108,9 @@ def main():
     parser.add_argument('--testing', dest='testing', action='store_true', help=argparse.SUPPRESS)
 
     args = parser.parse_args()
+
+    if not args.namespace and (args.cts_snap_enabled or args.idrepo_snap_enable):
+        utils.exit_msg("You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable")
 
     script_path = Path(__file__).parent
     if args.debug: print(f'script_path = {script_path}')
@@ -305,6 +310,20 @@ def main():
         values_images['ig']['image']['pullPolicy'] = pull_policy
         values_images['ds_snapshot']['image']['pullPolicy'] = pull_policy
 
+    values_snap = {}
+    if args.cts_snap_enable:
+        values_snap['ds_cts'] = {
+            'snapshot': {
+                'enabled': True
+            }
+        }
+    if args.idrepo_snap_enable:
+        values_snap['ds_idrepo'] = {
+            'snapshot': {
+                'enabled': True
+            }
+        }
+
     if Path(kustomize).is_absolute():
         kustomize_path = Path(kustomize)
     else:
@@ -419,6 +438,19 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
             else:
                 utils.exit_msg(f"Source overlay doesn't exist: {source_path}")
 
+        if args.cts_snap_enable or args.idrepo_snap_enable:
+            kust_path = overlay_path / 'kustomization.yaml'
+            if kust_path.is_file():
+                kust = yaml.safe_load(open(kust_path))
+                kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds-snapshot', './ds-snapshot')
+                writeYamlFile(kust, kust_path)
+
+            rbac_ns_path = overlay_path / 'ds-snapshot' / 'rbac' / 'namespace.yaml'
+            if rbac_ns_path.is_file():
+                rbac_ns = yaml.safe_load(open(rbac_ns_path))
+                rbac_ns['subjects'] = utils.replace_or_append_dict(rbac_ns['subjects'], 'name', 'ds-snapshot', 'namespace', args.namespace)
+                writeYamlFile(rbac_ns, rbac_ns_path)
+
         for d in overlay_path.iterdir():
             if args.debug: print(f"d={d}")
 
@@ -443,6 +475,14 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
                     if args.debug: print(f"Removing namespace for {skey}")
                     if 'namespace' in kust.keys():
                         del kust['namespace']
+
+                if isDS:
+                    if args.cts_snap_enable and 'ds-cts' in d.name:
+                        kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/cts')
+                        kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
+                    if args.idrepo_snap_enable and 'ds-idrepo' in d.name:
+                        kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/idrepo')
+                        kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
 
                 writeYamlFile(kust, kust_path)
 
@@ -474,12 +514,12 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
                 if issuer_kind and issuer_name:
                     issuer = {
                         'op': 'add',
-                        'path': f"/spec/metadata/annotations/cert-manager.io~1{issuer_kind}",
+                        'path': f"/metadata/annotations/cert-manager.io~1{issuer_kind}",
                         'value': issuer_name
                     }
                     issuer_found = False
                     for idx, item in enumerate(ing):
-                        if 'cert-manager' and 'Issuer' in ing[idx]['path']:
+                        if 'cert-manager' and 'Issuer' in item['path']:
                             if args.debug: print('Found a cert-manager issuer')
                             issuer_found = True
                             ing[idx] = issuer
@@ -543,7 +583,7 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
         vs = {}
         if values_size_file.is_file():
             vs = yaml.safe_load(open(values_size_file))
-        vs.update(size)
+        merge(vs, size)
         writeYamlFile(vs, values_size_file)
 
         values_images_file = helm_path / 'values-images.yaml'
@@ -551,7 +591,7 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
         vimg = {}
         if values_images_file.is_file():
            vimg = yaml.safe_load(open(values_images_file))
-        vimg.update(values_images)
+        merge(vimg, values_images)
         writeYamlFile(vimg, values_images_file)
 
         if issuer_name and issuer_kind:
@@ -569,13 +609,20 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
         vi = {}
         if values_ingress_file.is_file():
            vi = yaml.safe_load(open(values_ingress_file))
-        vi.update(values_ingress)
+        merge(vi, values_ingress)
         writeYamlFile(vi, values_ingress_file)
+
+        values_snap_file = helm_path / 'values-snap.yaml'
+        vsnap = {}
+        if values_snap_file.is_file():
+           vsnap = yaml.safe_load(open(values_snap_file))
+        merge(vsnap, values_snap)
+        writeYamlFile(vsnap, values_snap_file)
 
         values = {}
         if values_file.is_file():
             values = yaml.safe_load(open(values_file))
-        merge(values, vs, vi, vimg)
+        merge(values, vs, vi, vimg, vsnap)
         writeYamlFile(values, values_file)
 
     ###

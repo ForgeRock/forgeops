@@ -826,3 +826,36 @@ def clean_amster_job(ns, retain):
     if os.path.exists('amster-scripts.tar.gz'):
         os.remove('amster-scripts.tar.gz')
     return
+
+def replace_or_append_str(array, search_str, data):
+    """
+    Loop through array looking for search_str, and set the idx to data.
+    """
+
+    found = False
+    for idx, item in enumerate(array):
+        if search_str in item:
+            found = True
+            array[idx] = data
+    if not found:
+        array.append(data)
+
+    return array
+
+def replace_or_append_dict(array, search_key, search_str, target_key, replace_data, append_data=None):
+    """
+    Loop through array of dicts looking for item[search_key] == search_str, and set the target_key to data.
+    """
+
+    if not append_data:
+        append_data = replace_data
+
+    found = False
+    for idx, item in enumerate(array):
+        if search_str in item[search_key]:
+            found = True
+            array[idx][target_key] = replace_data
+    if not found:
+        array.append(append_data)
+
+    return array

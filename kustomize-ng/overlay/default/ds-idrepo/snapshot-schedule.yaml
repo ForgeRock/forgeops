@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: ds-idrepo-snapshot
 spec:
-  schedule: "*/10 0 * * *"
+  schedule: "0 0 * * *"
   jobTemplate:
     spec:
       template:
@@ -12,4 +12,4 @@ spec:
             - name: ds-idrepo-snapshot
               env:
                 - name: PURGE_DELAY
-                  value: "-1 hour"
+                  value: "-3 day"
