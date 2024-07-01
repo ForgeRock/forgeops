@@ -14,7 +14,7 @@ Usage:
 
 Options:
     --key <license_key>		license key for installation (required)
-    --uninstall         	uninstall helm chart
+    --uninstall / --delete      uninstall helm chart
 
 Example:
     $0 --key <license_key>
@@ -46,7 +46,7 @@ while [ $# -gt 0 ]; do
             KEY=$2
             shift; shift
             ;;
-        --uninstall)
+        --uninstall|--delete)
             uninstall
             ;;
         *)
