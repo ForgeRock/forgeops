@@ -57,6 +57,132 @@ def writeYamlFile(data, file):
     with open(file, 'w') as f:
         yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
 
+def process_overlay_dir(path, config, args):
+    """Process a dir inside an overlay"""
+    skey = str(path.name).replace('-', '_')
+
+    isDS = True if (skey.startswith('ds') and 'snapshot' not in skey) else False
+    res_file = 'sts.yaml' if isDS else 'deployment.yaml'
+
+    kust_path = path / 'kustomization.yaml'
+    if args.debug: print(f"kust_path={kust_path}")
+
+    if kust_path.is_file():
+        if args.debug: print(f"{kust_path} exists")
+        kust = yaml.safe_load(open(kust_path))
+        if args.namespace:
+            if args.debug: print(f"Setting namespace for {skey}")
+            kust['namespace'] = args.namespace
+        elif args.no_namespace:
+            if args.debug: print(f"Removing namespace for {skey}")
+            if 'namespace' in kust.keys():
+                del kust['namespace']
+
+        if isDS:
+            if args.cts_snap_enable and 'ds-cts' in path.name:
+                kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/cts')
+                kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
+            if args.idrepo_snap_enable and 'ds-idrepo' in path.name:
+                kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/idrepo')
+                kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
+
+        writeYamlFile(kust, kust_path)
+
+    ingress_path = path / 'ingress-fqdn.yaml'
+    if args.debug: print(f"ingress_path={ingress_path}")
+
+    if ingress_path.is_file():
+        if args.debug: print(f"{ingress_path} exists")
+        ingress_class_found = False
+        ing = yaml.safe_load(open(ingress_path))
+        for idx, item in enumerate(ing):
+            if args.fqdn:
+                if 'secretName' in item['path'] or item['path'] == '/spec/rules/0/host':
+                    ing[idx]['value'] = config['hosts'][0]
+                elif 'hosts' in item['path']:
+                    ing[idx]['value'] = config['hosts']
+            if args.ingress:
+                if 'ingressClassName' in item['path']:
+                    ingress_class_found = True
+                    ing[idx]['value'] = args.ingress
+
+        if args.ingress and not ingress_class_found:
+            ing.append({
+                'op': 'replace',
+                'path': '/spec/ingressClassName',
+                'value': args.ingress
+            })
+
+        if config['issuer_kind'] and config['issuer_name']:
+            issuer = {
+                'op': 'add',
+                'path': f"/metadata/annotations/cert-manager.io~1{config['issuer_kind']}",
+                'value': config['issuer_name']
+            }
+            issuer_found = False
+            for idx, item in enumerate(ing):
+                if 'cert-manager' and 'Issuer' in item['path']:
+                    if args.debug: print('Found a cert-manager issuer')
+                    issuer_found = True
+                    ing[idx] = issuer
+
+            if not issuer_found:
+                ing.append(issuer)
+
+        writeYamlFile(ing, ingress_path)
+
+    platform_config = path / 'platform-config.yaml'
+    if args.debug: print(f"platform_config={platform_config}")
+
+    if skey == 'base' and platform_config.is_file():
+        if args.debug: print(f"{platform_config} exists")
+        pc = yaml.safe_load(open(platform_config))
+        if args.fqdn:
+            pc['data']['FQDN'] = config['hosts'][0]
+
+        if 'ds_cts' in config['size'].keys():
+            if 'replicaCount' in config['size']['ds_cts'].keys():
+                pc['data']['AM_STORES_CTS_SERVERS'] = genDsConnection(
+                    name='ds-cts', num=config['size']['ds_cts']['replicaCount'])
+
+        if 'ds_idrepo' in config['size'].keys():
+            if 'replicaCount' in config['size']['ds_idrepo'].keys():
+                pc['data']['AM_STORES_USER_SERVERS'] = genDsConnection(
+                    name='ds-idrepo', num=config['size']['ds_idrepo']['replicaCount'])
+
+        writeYamlFile(pc, platform_config)
+
+    res_path = path / res_file
+    if args.debug: print(f"res_path={res_path}")
+
+    if res_path.is_file():
+        if args.debug: print(f"{res_path} exists")
+        res = yaml.safe_load(open(res_path))
+
+        if skey in config['size'].keys():
+            if 'resources' in config['size'][skey].keys():
+                res['spec']['template']['spec']['containers'][0]['resources'].update(config['size'][skey]['resources'])
+                if isDS:
+                    res['spec']['template']['spec']['initContainers'][0]['resources'].update(config['size'][skey]['resources'])
+            if isDS and 'volumeClaimSpec' in config['size'][skey].keys():
+                res['spec']['volumeClaimTemplates'][0]['spec'].update(config['size'][skey]['volumeClaimSpec'])
+            if 'replicaCount' in config['size'][skey].keys():
+                res['spec']['replicas'] = config['size'][skey]['replicaCount']
+
+        if config['pull_policy']:
+            res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = config['pull_policy']
+            if isDS:
+                res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = config['pull_policy']
+
+        writeYamlFile(res, res_path)
+
+    # Look for subdirs and process them
+    for d in path.iterdir():
+        if args.debug: print(f"d={d}")
+        if d.is_file():
+            continue
+        process_overlay_dir(d, config, args)
+
 def main():
     prog = 'forgeops-ng env'
 
@@ -109,13 +235,15 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.namespace and (args.cts_snap_enabled or args.idrepo_snap_enable):
+    if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable):
         utils.exit_msg("You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable")
 
-    script_path = Path(__file__).parent
-    if args.debug: print(f'script_path = {script_path}')
-    root_path = script_path.parent.parent
-    if args.debug: print(f'root_path = {root_path}')
+    config = {}
+
+    config['script_path'] = Path(__file__).parent
+    if args.debug: print(f"script_path = {config['script_path']}")
+    config['root_path'] = config['script_path'].parent.parent
+    if args.debug: print(f"root_path = {config['root_path']}")
 
     if args.namespace and args.no_namespace:
         utils.exit_msg('Specify --namespace or --no-namespace, not both')
@@ -127,140 +255,141 @@ def main():
         utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
 
     # Setup defaults for values that can be set in forgeops-ng.conf
-    helm = args.helm
+    config['helm'] = args.helm
     if os.getenv('HELM_PATH'):
-        helm = os.getenv('HELM_PATH')
+        config['helm'] = os.getenv('HELM_PATH')
 
-    kustomize = 'kustomize-ng'
+    config['kustomize'] = 'kustomize-ng'
     if args.kustomize:
-        kustomize = args.kustomize
+        config['kustomize'] = args.kustomize
     elif os.getenv('KUSTOMIZE_PATH'):
-        kustomize = os.getenv('KUSTOMIZE_PATH')
+        config['kustomize'] = os.getenv('KUSTOMIZE_PATH')
 
-    pull_policy = None
+    config['pull_policy'] = None
     if args.pull_policy:
-        pull_policy = args.pull_policy
+        config['pull_policy'] = args.pull_policy
     elif os.getenv('PULL_POLICY'):
-        pull_policy = os.getenv('PULL_POLICY')
+        config['pull_policy'] = os.getenv('PULL_POLICY')
 
-    source = 'default'
+    config['source'] = 'default'
     if args.source:
-        source = args.source
+        config['source'] = args.source
     elif os.getenv('SOURCE'):
-        source = os.getenv('SOURCE')
+        config['source'] = os.getenv('SOURCE')
 
-    do_helm = True
+    config['do_helm'] = True
     if args.no_helm or os.getenv('NO_HELM') == 'true':
-        do_helm = False
+        config['do_helm'] = False
 
-    do_kustomize = True
+    config['do_kustomize'] = True
     if args.no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
-        do_kustomize = False
+        config['do_kustomize'] = False
     # End defaults setup
 
-    size = {}
+    config['size'] = {}
     if args.size:
-        values_path = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
-        size = yaml.safe_load(open(values_path))
+        values_path = config['root_path'] / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
+        config['size'] = yaml.safe_load(open(values_path))
 
     if args.am_cpu or args.am_mem or args.am_rep or args.single:
-        if 'am' not in size.keys():
-            size['am'] = {}
+        if 'am' not in config['size'].keys():
+            config['size']['am'] = {}
             if args.am_cpu or args.am_mem:
-                size['am'] = { 'resources': { 'requests': {} } }
+                config['size']['am'] = { 'resources': { 'requests': {} } }
                 if args.am_mem:
-                    size['am']['resources']['limits'] = {}
+                    config['size']['am']['resources']['limits'] = {}
         if args.am_cpu:
             if args.debug: print(f"am_cpu={args.am_cpu}")
-            size['am']['resources']['requests']['cpu'] = args.am_cpu
+            config['size']['am']['resources']['requests']['cpu'] = args.am_cpu
         if args.am_mem:
             if args.debug: print(f"am_mem={args.am_mem}")
-            size['am']['resources']['requests']['memory'] = args.am_mem
-            size['am']['resources']['limits']['memory'] = args.am_mem
+            config['size']['am']['resources']['requests']['memory'] = args.am_mem
+            config['size']['am']['resources']['limits']['memory'] = args.am_mem
         if args.am_rep:
             if args.debug: print(f"am_rep={args.am_rep}")
-            size['am']['replicaCount'] = int(args.am_rep)
+            config['size']['am']['replicaCount'] = int(args.am_rep)
         if args.single:
-            size['am']['replicaCount'] = 1
+            config['size']['am']['replicaCount'] = 1
 
     if args.cts_cpu or args.cts_disk or args.cts_mem or args.cts_rep or args.single:
-        if 'ds_cts' not in size.keys():
-            size['ds_cts'] = {}
+        if 'ds_cts' not in config['size'].keys():
+            config['size']['ds_cts'] = {}
             if args.cts_cpu or args.cts_mem:
-                size['ds_cts'] = { 'resources': { 'requests': {} }, }
+                config['size']['ds_cts'] = { 'resources': { 'requests': {} }, }
                 if args.cts_mem:
-                    size['ds_cts']['resources']['limits'] = {}
+                    config['size']['ds_cts']['resources']['limits'] = {}
             if args.cts_disk:
-                size['ds_cts']['volumeClaimSpec'] = { 'resources': { 'requests': {} } }
+                config['size']['ds_cts']['volumeClaimSpec'] = { 'resources': { 'requests': {} } }
         if args.cts_cpu:
             if args.debug: print(f"cts_cpu={args.cts_cpu}")
-            size['ds_cts']['resources']['requests']['cpu'] = args.cts_cpu
+            config['size']['ds_cts']['resources']['requests']['cpu'] = args.cts_cpu
         if args.cts_disk:
             if args.debug: print(f"cts_disk={args.cts_disk}")
-            size['ds_cts']['volumeClaimSpec']['resources']['requests']['storage'] = args.cts_disk
+            config['size']['ds_cts']['volumeClaimSpec']['resources']['requests']['storage'] = args.cts_disk
         if args.cts_mem:
             if args.debug: print(f"cts_mem={args.cts_mem}")
-            size['ds_cts']['resources']['requests']['memory'] = args.cts_mem
-            size['ds_cts']['resources']['limits']['memory'] = args.cts_mem
+            config['size']['ds_cts']['resources']['requests']['memory'] = args.cts_mem
+            config['size']['ds_cts']['resources']['limits']['memory'] = args.cts_mem
         if args.cts_rep:
             if args.debug: print(f"cts_rep={args.cts_rep}")
-            size['ds_cts']['replicaCount'] = int(args.cts_rep)
+            config['size']['ds_cts']['replicaCount'] = int(args.cts_rep)
         if args.single:
-            size['ds_cts']['replicaCount'] = 1
+            config['size']['ds_cts']['replicaCount'] = 1
 
     if args.idm_cpu or args.idm_mem or args.idm_rep or args.single:
-        if 'idm' not in size.keys():
-            size['idm'] = {}
+        if 'idm' not in config['size'].keys():
+            config['size']['idm'] = {}
             if args.idm_cpu or args.idm_mem:
-                size['idm'] = { 'resources': { 'requests': {} } }
+                config['size']['idm'] = { 'resources': { 'requests': {} } }
                 if args.idm_mem:
-                    size['idm']['resources']['limits'] = {}
+                    config['size']['idm']['resources']['limits'] = {}
         if args.idm_cpu:
             if args.debug: print(f"idm_cpu={args.idm_cpu}")
-            size['idm']['resources']['requests']['cpu'] = args.idm_cpu
+            config['size']['idm']['resources']['requests']['cpu'] = args.idm_cpu
         if args.idm_mem:
             if args.debug: print(f"idm_mem={args.idm_mem}")
-            size['idm']['resources']['requests']['memory'] = args.idm_mem
-            size['idm']['resources']['limits']['memory'] = args.idm_mem
+            config['size']['idm']['resources']['requests']['memory'] = args.idm_mem
+            config['size']['idm']['resources']['limits']['memory'] = args.idm_mem
         if args.idm_rep:
             if args.debug: print(f"idm_rep={args.idm_rep}")
-            size['idm']['replicaCount'] = int(args.idm_rep)
+            config['size']['idm']['replicaCount'] = int(args.idm_rep)
         if args.single:
-            size['idm']['replicaCount'] = 1
+            config['size']['idm']['replicaCount'] = 1
 
     if args.idrepo_cpu or args.idrepo_disk or args.idrepo_mem or args.idrepo_rep or args.single:
-        if 'ds_idrepo' not in size.keys():
-            size['ds_idrepo'] = {}
+        if 'ds_idrepo' not in config['size'].keys():
+            config['size']['ds_idrepo'] = {}
             if args.idrepo_cpu or args.idrepo_mem:
-                size['ds_idrepo'] = { 'resources': { 'requests': {} }, }
+                config['size']['ds_idrepo'] = { 'resources': { 'requests': {} }, }
                 if args.idrepo_mem:
-                    size['ds_idrepo']['resources']['limits'] = {}
+                    config['size']['ds_idrepo']['resources']['limits'] = {}
             if args.idrepo_disk:
-                size['ds_idrepo']['volumeClaimSpec'] = { 'resources': { 'requests': {} } }
+                config['size']['ds_idrepo']['volumeClaimSpec'] = { 'resources': { 'requests': {} } }
         if args.idrepo_cpu:
             if args.debug: print(f"idrepo_cpu={args.idrepo_cpu}")
-            size['ds_idrepo']['resources']['requests']['cpu'] = args.idrepo_cpu
+            config['size']['ds_idrepo']['resources']['requests']['cpu'] = args.idrepo_cpu
         if args.idrepo_disk:
             if args.debug: print(f"idrepo_disk={args.idrepo_disk}")
-            size['ds_idrepo']['volumeClaimSpec']['resources']['requests']['storage'] = args.idrepo_disk
+            config['size']['ds_idrepo']['volumeClaimSpec']['resources']['requests']['storage'] = args.idrepo_disk
         if args.idrepo_mem:
             if args.debug: print(f"idrepo_mem={args.idrepo_mem}")
-            size['ds_idrepo']['resources']['requests']['memory'] = args.idrepo_mem
-            size['ds_idrepo']['resources']['limits']['memory'] = args.idrepo_mem
+            config['size']['ds_idrepo']['resources']['requests']['memory'] = args.idrepo_mem
+            config['size']['ds_idrepo']['resources']['limits']['memory'] = args.idrepo_mem
         if args.idrepo_rep:
             if args.debug: print(f"idrepo_rep={args.idrepo_rep}")
-            size['ds_idrepo']['replicaCount'] = int(args.idrepo_rep)
+            config['size']['ds_idrepo']['replicaCount'] = int(args.idrepo_rep)
         if args.single:
-            size['ds_idrepo']['replicaCount'] = 1
+            config['size']['ds_idrepo']['replicaCount'] = 1
 
     values_ingress = {}
+    config['hosts'] = None
     if args.fqdn:
-        hosts = args.fqdn.split(',')
-        if args.debug: print(f"hosts={hosts}")
+        config['hosts'] = args.fqdn.split(',')
+        if args.debug: print(f"hosts={config['hosts']}")
         values_ingress = {
             'platform': {
                 'ingress': {
-                    'hosts': hosts
+                    'hosts': config['hosts']
                 }
             }
         }
@@ -270,21 +399,21 @@ def main():
            values_ingress['platform'] = { 'ingress': {} }
         values_ingress['platform']['ingress']['className'] = args.ingress
 
-    issuer_kind_ann = None
-    issuer_kind = None
-    issuer_name = None
+    config['issuer_kind_ann'] = None
+    config['issuer_kind'] = None
+    config['issuer_name'] = None
     if args.issuer or args.cluster_issuer:
         if args.issuer:
-            issuer_kind_ann  = 'issuer'
-            issuer_kind = 'Issuer'
-            issuer_name = args.issuer
+            config['issuer_kind_ann']  = 'issuer'
+            config['issuer_kind'] = 'Issuer'
+            config['issuer_name'] = args.issuer
         elif args.cluster_issuer:
-            issuer_kind_ann  = 'cluster-issuer'
-            issuer_kind = 'ClusterIssuer'
-            issuer_name = args.cluster_issuer
+            config['issuer_kind_ann']  = 'cluster-issuer'
+            config['issuer_kind'] = 'ClusterIssuer'
+            config['issuer_name'] = args.cluster_issuer
 
     values_images = {}
-    if pull_policy:
+    if config['pull_policy']:
         values_images = {
             'am': { 'image': {} },
             'amster': { 'image': {} },
@@ -298,17 +427,17 @@ def main():
             'end_user_ui': { 'image': {} },
             'login_ui': { 'image': {} },
         }
-        values_images['am']['image']['pullPolicy'] = pull_policy
-        values_images['amster']['image']['pullPolicy'] = pull_policy
-        values_images['ds_cts']['image']['pullPolicy'] = pull_policy
-        values_images['ds_idrepo']['image']['pullPolicy'] = pull_policy
-        values_images['idm']['image']['pullPolicy'] = pull_policy
-        values_images['ldif_importer']['image']['pullPolicy'] = pull_policy
-        values_images['admin_ui']['image']['pullPolicy'] = pull_policy
-        values_images['end_user_ui']['image']['pullPolicy'] = pull_policy
-        values_images['login_ui']['image']['pullPolicy'] = pull_policy
-        values_images['ig']['image']['pullPolicy'] = pull_policy
-        values_images['ds_snapshot']['image']['pullPolicy'] = pull_policy
+        values_images['am']['image']['pullPolicy'] = config['pull_policy']
+        values_images['amster']['image']['pullPolicy'] = config['pull_policy']
+        values_images['ds_cts']['image']['pullPolicy'] = config['pull_policy']
+        values_images['ds_idrepo']['image']['pullPolicy'] = config['pull_policy']
+        values_images['idm']['image']['pullPolicy'] = config['pull_policy']
+        values_images['ldif_importer']['image']['pullPolicy'] = config['pull_policy']
+        values_images['admin_ui']['image']['pullPolicy'] = config['pull_policy']
+        values_images['end_user_ui']['image']['pullPolicy'] = config['pull_policy']
+        values_images['login_ui']['image']['pullPolicy'] = config['pull_policy']
+        values_images['ig']['image']['pullPolicy'] = config['pull_policy']
+        values_images['ds_snapshot']['image']['pullPolicy'] = config['pull_policy']
 
     values_snap = {}
     if args.cts_snap_enable:
@@ -324,80 +453,80 @@ def main():
             }
         }
 
-    if Path(kustomize).is_absolute():
-        kustomize_path = Path(kustomize)
+    if Path(config['kustomize']).is_absolute():
+        config['kustomize_path'] = Path(config['kustomize'])
     else:
-        kustomize_path = root_path / kustomize
-    if args.debug: print(f"kustomize_path={kustomize_path}")
-    if not kustomize_path.is_dir():
-       utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
+        config['kustomize_path'] = config['root_path'] / config['kustomize']
+    if args.debug: print(f"kustomize_path={config['kustomize_path']}")
+    if not config['kustomize_path'].is_dir():
+       utils.exit_msg(f"Kustomize dir ({config['kustomize_path']}) isn't a dir or doesn't exist")
 
-    overlay_root = kustomize_path / 'overlay'
-    if not overlay_root.is_dir():
-       utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
+    config['overlay_root'] = config['kustomize_path'] / 'overlay'
+    if not config['overlay_root'].is_dir():
+       utils.exit_msg(f"Overlay root ({config['overlay_root']}) isn't a dir or doesn't exist")
 
-    overlay_path = overlay_root / args.env_name
-    if args.debug: print(f"overlay_path={overlay_path}")
+    config['overlay_path'] = config['overlay_root'] / args.env_name
+    if args.debug: print(f"overlay_path={config['overlay_path']}")
 
-    if Path(source).is_absolute():
-        source_path = Path(source)
+    if Path(config['source']).is_absolute():
+        config['source_path'] = Path(config['source'])
     else:
-        source_path = overlay_root / source
-    if args.debug: print(f"source_path={source_path}")
+        config['source_path'] = config['overlay_root'] / config['source']
+    if args.debug: print(f"source_path={config['source_path']}")
 
     # Check if we are Creating or Updating
-    kustomize_action = None
-    if do_kustomize:
-        kustomize_action = 'Create'
-        if overlay_path.is_dir():
+    config['kustomize_action'] = None
+    if config['do_kustomize']:
+        config['kustomize_action'] = 'Create'
+        if config['overlay_path'].is_dir():
             print('Updating existing overlay.')
-            kustomize_action = 'Update'
-        elif overlay_path.is_file():
+            config['kustomize_action'] = 'Update'
+        elif config['overlay_path'].is_file():
             utils.exit_msg('Overlay exists as a file. Remove it and try again')
         elif not args.fqdn:
             utils.exit_msg('An FQDN is required when generating a new overlay')
         else:
             msg = f"""
 Creating new overlay
-From: {source_path}
-To: {overlay_path}
+From: {config['source_path']}
+To: {config['overlay_path']}
 """
             print(msg)
 
-    helm_action = None
-    helm_path = None
-    if do_helm:
-        helm_action = 'Create'
-        if Path(helm).is_absolute():
-            helm_path = Path(helm)
+    config['helm_action'] = None
+    config['helm_path'] = None
+    if config['do_helm']:
+        config['helm_action'] = 'Create'
+        if Path(config['helm']).is_absolute():
+            config['helm_path'] = Path(config['helm'])
         else:
-            helm_path = root_path / helm
-        if helm_path.is_dir():
-            helm_path = helm_path / args.env_name
+            config['helm_path'] = config['root_path'] / config['helm']
+        if config['helm_path'].is_dir():
+            config['helm_path'] = config['helm_path'] / args.env_name
         else:
-            utils.exit_msg(f"Helm path doesn't exist or isn't a dir: {helm_path}")
-        if args.debug: print(f"helm_path={helm_path}")
+            utils.exit_msg(f"Helm path doesn't exist or isn't a dir: {config['helm_path']}")
+        if args.debug: print(f"helm_path={config['helm_path']}")
 
-        values_file = helm_path / 'values.yaml'
+        values_file = config['helm_path'] / 'values.yaml'
         if args.debug: print(f"values_file={values_file}")
-        if helm_path.is_dir():
+        if config['helm_path'].is_dir():
             if values_file.is_file():
                 print('Updating existing helm values.')
-                helm_action = 'Update'
+                config['helm_action'] = 'Update'
             else:
                 print('Helm environment dir exists, but has no values.yaml.')
-        elif helm_path.is_file():
+        elif config['helm_path'].is_file():
             utils.exit_msg('Helm path exists as a file. Remove it and try again.')
         else:
-            print(f'{helm_path} not found, creating.')
-            helm_path.mkdir(mode=0o750, parents=True)
+            print(f"{config['helm_path']} not found, creating.")
+            config['helm_path'].mkdir(mode=0o750, parents=True)
 
     do_create = False
-    if helm_action == 'Create' or kustomize_action == 'Create':
+    if config['helm_action'] == 'Create' or config['kustomize_action'] == 'Create':
         do_create = True
     # Finish Create or Update check
 
-    if not do_create and bool(size):
+    if not do_create and bool(config['size']):
         msg = f"""
 You are changing the size of an existing environment. If you have already deployed the environment, there could be extra steps needed to apply the size changes. In particular, when changing the size of your DS PVCs you will need to delete the changed StatefulSet(s) and re-deploy them. Any existing PVCs will need to be edited manually and resized. Refer to Kubernetes docs on resizing PVCs for more information.
 
@@ -421,172 +550,52 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
             utils.exit_msg('Please rerun with --issuer, --cluster-issuer, or --skip-issuer')
 
         if use_default_issuer:
-            issuer_kind_ann = 'cluster-issuer'
-            issuer_kind = 'ClusterIssuer'
-            issuer_name = 'default-issuer'
-            print(f"Using {issuer_kind}: {issuer_name}")
+            config['issuer_kind_ann'] = 'cluster-issuer'
+            config['issuer_kind'] = 'ClusterIssuer'
+            config['issuer_name'] = 'default-issuer'
+            print(f"Using {config['issuer_kind']}: {config['issuer_name']}")
 
     ###
     ### Configure kustomize overlay
     ###
-    if do_kustomize:
-        if kustomize_action == 'Create':
-            if source_path.is_dir():
-                shutil.copytree(source_path, overlay_path)
-            elif source_path.is_file():
-                utils.exit_msg(f"Source overlay isn't a directory: {source_path}")
+    if config['do_kustomize']:
+        if config['kustomize_action'] == 'Create':
+            if config['source_path'].is_dir():
+                shutil.copytree(config['source_path'], config['overlay_path'])
+            elif config['source_path'].is_file():
+                utils.exit_msg(f"Source overlay isn't a directory: {config['source_path']}")
             else:
-                utils.exit_msg(f"Source overlay doesn't exist: {source_path}")
+                utils.exit_msg(f"Source overlay doesn't exist: {config['source_path']}")
 
         if args.cts_snap_enable or args.idrepo_snap_enable:
-            kust_path = overlay_path / 'kustomization.yaml'
+            kust_path = config['overlay_path'] / 'kustomization.yaml'
             if kust_path.is_file():
                 kust = yaml.safe_load(open(kust_path))
                 kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds-snapshot', './ds-snapshot')
                 writeYamlFile(kust, kust_path)
 
-            rbac_ns_path = overlay_path / 'ds-snapshot' / 'rbac' / 'namespace.yaml'
+            rbac_ns_path = config['overlay_path'] / 'ds-snapshot' / 'rbac' / 'namespace.yaml'
             if rbac_ns_path.is_file():
                 rbac_ns = yaml.safe_load(open(rbac_ns_path))
                 rbac_ns['subjects'] = utils.replace_or_append_dict(rbac_ns['subjects'], 'name', 'ds-snapshot', 'namespace', args.namespace)
                 writeYamlFile(rbac_ns, rbac_ns_path)
 
-        for d in overlay_path.iterdir():
-            if args.debug: print(f"d={d}")
+        process_overlay_dir(config['overlay_path'], config, args)
 
-            if d.is_file():
-              continue
-
-            skey = str(d.name).replace('-', '_')
-
-            isDS = True if skey.startswith('ds') else False
-            res_file = 'sts.yaml' if isDS else 'deployment.yaml'
-
-            kust_path = d / 'kustomization.yaml'
-            if args.debug: print(f"kust_path={kust_path}")
-
-            if kust_path.is_file():
-                if args.debug: print(f"{kust_path} exists")
-                kust = yaml.safe_load(open(kust_path))
-                if args.namespace:
-                    if args.debug: print(f"Setting namespace for {skey}")
-                    kust['namespace'] = args.namespace
-                elif args.no_namespace:
-                    if args.debug: print(f"Removing namespace for {skey}")
-                    if 'namespace' in kust.keys():
-                        del kust['namespace']
-
-                if isDS:
-                    if args.cts_snap_enable and 'ds-cts' in d.name:
-                        kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/cts')
-                        kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
-                    if args.idrepo_snap_enable and 'ds-idrepo' in d.name:
-                        kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/idrepo')
-                        kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
-
-                writeYamlFile(kust, kust_path)
-
-            ingress_path = d / 'ingress-fqdn.yaml'
-            if args.debug: print(f"ingress_path={ingress_path}")
-
-            if ingress_path.is_file():
-                if args.debug: print(f"{ingress_path} exists")
-                ingress_class_found = False
-                ing = yaml.safe_load(open(ingress_path))
-                for idx, item in enumerate(ing):
-                    if args.fqdn:
-                        if 'secretName' in item['path'] or item['path'] == '/spec/rules/0/host':
-                            ing[idx]['value'] = hosts[0]
-                        elif 'hosts' in item['path']:
-                            ing[idx]['value'] = hosts
-                    if args.ingress:
-                        if 'ingressClassName' in item['path']:
-                            ingress_class_found = True
-                            ing[idx]['value'] = args.ingress
-
-                if args.ingress and not ingress_class_found:
-                    ing.append({
-                        'op': 'replace',
-                        'path': '/spec/ingressClassName',
-                        'value': args.ingress
-                    })
-
-                if issuer_kind and issuer_name:
-                    issuer = {
-                        'op': 'add',
-                        'path': f"/metadata/annotations/cert-manager.io~1{issuer_kind}",
-                        'value': issuer_name
-                    }
-                    issuer_found = False
-                    for idx, item in enumerate(ing):
-                        if 'cert-manager' and 'Issuer' in item['path']:
-                            if args.debug: print('Found a cert-manager issuer')
-                            issuer_found = True
-                            ing[idx] = issuer
-
-                    if not issuer_found:
-                        ing.append(issuer)
-
-                writeYamlFile(ing, ingress_path)
-
-            platform_config = d / 'platform-config.yaml'
-            if args.debug: print(f"platform_config={platform_config}")
-
-            if skey == 'base' and platform_config.is_file():
-                if args.debug: print(f"{platform_config} exists")
-                pc = yaml.safe_load(open(platform_config))
-                if args.fqdn:
-                    pc['data']['FQDN'] = hosts[0]
-
-                if 'ds_cts' in size.keys():
-                    if 'replicaCount' in size['ds_cts'].keys():
-                        pc['data']['AM_STORES_CTS_SERVERS'] = genDsConnection(
-                            name='ds-cts', num=size['ds_cts']['replicaCount'])
-
-                if 'ds_idrepo' in size.keys():
-                    if 'replicaCount' in size['ds_idrepo'].keys():
-                        pc['data']['AM_STORES_USER_SERVERS'] = genDsConnection(
-                            name='ds-idrepo', num=size['ds_idrepo']['replicaCount'])
-
-                writeYamlFile(pc, platform_config)
-
-            res_path = d / res_file
-            if args.debug: print(f"res_path={res_path}")
-
-            if res_path.is_file():
-                if args.debug: print(f"{res_path} exists")
-                res = yaml.safe_load(open(res_path))
-
-                if skey in size.keys():
-                    if 'resources' in size[skey].keys():
-                        res['spec']['template']['spec']['containers'][0]['resources'].update(size[skey]['resources'])
-                        if isDS:
-                            res['spec']['template']['spec']['initContainers'][0]['resources'].update(size[skey]['resources'])
-                    if isDS and 'volumeClaimSpec' in size[skey].keys():
-                        res['spec']['volumeClaimTemplates'][0]['spec'].update(size[skey]['volumeClaimSpec'])
-                    if 'replicaCount' in size[skey].keys():
-                        res['spec']['replicas'] = size[skey]['replicaCount']
-
-                if pull_policy:
-                    res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = pull_policy
-                    if isDS:
-                        res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = pull_policy
-
-                writeYamlFile(res, res_path)
 
     ###
     ### Setup helm values files
     ###
-    if do_helm:
-        values_size_file = helm_path / 'values-size.yaml'
+    if config['do_helm']:
+        values_size_file = config['helm_path'] / 'values-size.yaml'
         if args.debug: print(f"values_size_file={values_size_file}")
         vs = {}
         if values_size_file.is_file():
             vs = yaml.safe_load(open(values_size_file))
-        merge(vs, size)
+        merge(vs, config['size'])
         writeYamlFile(vs, values_size_file)
 
-        values_images_file = helm_path / 'values-images.yaml'
+        values_images_file = config['helm_path'] / 'values-images.yaml'
         if args.debug: print(f"values_images_file={values_images_file}")
         vimg = {}
         if values_images_file.is_file():
@@ -594,17 +603,17 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
         merge(vimg, values_images)
         writeYamlFile(vimg, values_images_file)
 
-        if issuer_name and issuer_kind:
+        if config['issuer_name'] and config['issuer_kind']:
             if 'platform' not in values_ingress.keys():
                values_ingress['platform'] = { 'ingress': { 'tls': { 'issuer': {} } } }
             elif 'ingress' not in values_ingress['platform'].keys():
                values_ingress['platform']['ingress'] = { 'tls': { 'issuer': {} } }
             else:
                values_ingress['platform']['ingress']['tls'] = { 'issuer': {} }
-            values_ingress['platform']['ingress']['tls']['issuer']['kind'] = issuer_kind
-            values_ingress['platform']['ingress']['tls']['issuer']['name'] = issuer_name
+            values_ingress['platform']['ingress']['tls']['issuer']['kind'] = config['issuer_kind']
+            values_ingress['platform']['ingress']['tls']['issuer']['name'] = config['issuer_name']
 
-        values_ingress_file = helm_path / 'values-ingress.yaml'
+        values_ingress_file = config['helm_path'] / 'values-ingress.yaml'
         if args.debug: print(f"values_ingress_file={values_ingress_file}")
         vi = {}
         if values_ingress_file.is_file():
@@ -612,17 +621,10 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
         merge(vi, values_ingress)
         writeYamlFile(vi, values_ingress_file)
 
-        values_snap_file = helm_path / 'values-snap.yaml'
-        vsnap = {}
-        if values_snap_file.is_file():
-           vsnap = yaml.safe_load(open(values_snap_file))
-        merge(vsnap, values_snap)
-        writeYamlFile(vsnap, values_snap_file)
-
         values = {}
         if values_file.is_file():
             values = yaml.safe_load(open(values_file))
-        merge(values, vs, vi, vimg, vsnap)
+        merge(values, vs, vi, vimg, values_snap)
         writeYamlFile(values, values_file)
 
     ###
@@ -633,14 +635,14 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
     cmd_ary[0] = prog
     cmd = ' '.join(cmd_ary)
     log_file = 'env.log'
-    if do_kustomize:
-        k_log_line = f"{timestamp} {kustomize_action} {cmd}"
-        log_path_overlay = overlay_path / log_file
+    if config['do_kustomize']:
+        k_log_line = f"{timestamp} {config['kustomize_action']} {cmd}"
+        log_path_overlay = config['overlay_path'] / log_file
         with open(log_path_overlay, 'a') as log_overlay_f:
             log_overlay_f.write(f"{k_log_line}\n")
-    if do_helm:
-        h_log_line = f"{timestamp} {helm_action} {cmd}"
-        log_path_helm = helm_path / log_file
+    if config['do_helm']:
+        h_log_line = f"{timestamp} {config['helm_action']} {cmd}"
+        log_path_helm = config['helm_path'] / log_file
         with open(log_path_helm, 'a') as log_helm_f:
             log_helm_f.write(f"{h_log_line}\n")
 

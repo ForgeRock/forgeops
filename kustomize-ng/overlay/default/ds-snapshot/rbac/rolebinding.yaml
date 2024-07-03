@@ -5,5 +5,3 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: ds-snapshot
-  # Change namespace to match where forgeops is installed
-  namespace: prod
