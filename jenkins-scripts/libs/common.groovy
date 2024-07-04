@@ -109,7 +109,9 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
                     localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
                     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
                     // Configure environment to make Guillotine works on GKE
-                    sh("./configure.py env --gke-only")
+                    withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
+                        sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
+                    }
                     // Configure Guillotine to run tests
                     sh("./configure.py runtime --forgeops-branch-name ${branchName} ${options}")
                     try {
