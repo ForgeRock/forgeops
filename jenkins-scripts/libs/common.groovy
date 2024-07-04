@@ -111,7 +111,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                 dir('guillotine') {
 
                     localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
-                    def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+                    def forgeopsRef = isPR() ? commonModule.GIT_COMMIT : env.BRANCH_NAME
 
                     if (providerName == 'GKE'){
                         authenticateGke()
@@ -131,7 +131,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                     }
 
                     // Configure Guillotine to run tests
-                    sh("./configure.py runtime --forgeops-branch-name ${branchName} ${options}")
+                    sh("./configure.py runtime --forgeops-ref ${forgeopsRef} ${options}")
 
                     try {
                         // Run the tests
