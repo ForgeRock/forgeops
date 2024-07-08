@@ -587,22 +587,6 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
     ### Setup helm values files
     ###
     if config['do_helm']:
-        values_size_file = config['helm_path'] / 'values-size.yaml'
-        if args.debug: print(f"values_size_file={values_size_file}")
-        vs = {}
-        if values_size_file.is_file():
-            vs = yaml.safe_load(open(values_size_file))
-        merge(vs, config['size'])
-        writeYamlFile(vs, values_size_file)
-
-        values_images_file = config['helm_path'] / 'values-images.yaml'
-        if args.debug: print(f"values_images_file={values_images_file}")
-        vimg = {}
-        if values_images_file.is_file():
-           vimg = yaml.safe_load(open(values_images_file))
-        merge(vimg, values_images)
-        writeYamlFile(vimg, values_images_file)
-
         if config['issuer_name'] and config['issuer_kind']:
             if 'platform' not in values_ingress.keys():
                values_ingress['platform'] = { 'ingress': { 'tls': { 'issuer': {} } } }
@@ -613,18 +597,10 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
             values_ingress['platform']['ingress']['tls']['issuer']['kind'] = config['issuer_kind']
             values_ingress['platform']['ingress']['tls']['issuer']['name'] = config['issuer_name']
 
-        values_ingress_file = config['helm_path'] / 'values-ingress.yaml'
-        if args.debug: print(f"values_ingress_file={values_ingress_file}")
-        vi = {}
-        if values_ingress_file.is_file():
-           vi = yaml.safe_load(open(values_ingress_file))
-        merge(vi, values_ingress)
-        writeYamlFile(vi, values_ingress_file)
-
         values = {}
         if values_file.is_file():
             values = yaml.safe_load(open(values_file))
-        merge(values, vs, vi, vimg, values_snap)
+        merge(values, config['size'], values_ingress, values_images, values_snap)
         writeYamlFile(values, values_file)
 
     ###

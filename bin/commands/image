@@ -193,31 +193,34 @@ def main():
         img_kust.write_bytes(src_img_kust.read_bytes())
 
     if do_helm:
-        vimg_fn = 'values-images.yaml'
-        vimg_file = helm_path / vimg_fn
-        values_file = helm_path / 'values.yaml'
+        values_fn = 'values.yaml'
+        values_file = helm_path / values_fn
 
-        if values_file.is_file() or vimg_file.is_file():
+        if values_file.is_file():
             print('Updating existing helm values.')
         else:
             utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops-ng env to populate.')
 
+        values = {}
+        values = yaml.safe_load(open(values_file))
+
         if args.copy:
             src_helm_path = helm_root / args.source
-            src_vimg_file = src_helm_path / vimg_fn
-            if src_vimg_file.is_file():
-                vimg_file.write_bytes(src_vimg_file.read_bytes())
+            src_values_file = src_helm_path / values_fn
+            if src_values_file.is_file():
+                print(f"Reading in values from {src_values_file}")
             else:
                 utils.exit_msg(f'Source environment ({src_helm_path}) not populated. Run forgeops-ng env to populate.')
 
-        vimg = {}
-        vimg = yaml.safe_load(open(vimg_file))
-        merge(vimg, values_images)
-        writeYamlFile(vimg, vimg_file)
+            src_images = {}
+            src_values = {}
+            src_values = yaml.safe_load(open(src_values_file))
+            for k,v in enumerate(src_values):
+                if 'image' in v:
+                    src_images[k] = { 'image': v }
+            merge(values_images, src_values)
 
-        values = {}
-        values = yaml.safe_load(open(values_file))
-        merge(values, vimg)
+        merge(values, values_images)
         writeYamlFile(values, values_file)
 
     ###
