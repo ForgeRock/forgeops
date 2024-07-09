@@ -92,11 +92,11 @@ fi
 # Create logic to check if platform-config and secrets are there if ds- is given
 
 if [ ! -d "$OVERLAY_PATH" ] ; then
-  echo "Overlay directory is missing, generating $OVERLAY_PATH"
+  echo "Overlay directory is missing, generating $ENV_NAME"
   GEN_OPTS=""
   [[ -n "$FQDN" ]] && GEN_OPTS+=" --fqdn ${FQDN}"
   [[ -n "$SIZE" ]] && GEN_OPTS+=" --${SIZE}"
-  runOrPrint $ROOT_PATH/bin/forgeops overlay -l $OVERLAY_PATH $GEN_OPTS
+  runOrPrint $ROOT_PATH/bin/forgeops-ng env -e $ENV_NAME $GEN_OPTS
 fi
 
 for c in ${COMPONENTS[@]} ; do
