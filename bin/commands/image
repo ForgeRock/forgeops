@@ -4,9 +4,9 @@
 import argparse
 import datetime
 import os
-import site
 from pathlib import Path
 import sys
+import site
 
 sys.path.append(os.path.join(sys.path[0], '..'))
 import utils
@@ -49,9 +49,12 @@ def main():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--debug', action='store_true', help='Turn on debugging')
     parser.add_argument('components', nargs='*', choices=components)
-    parser.add_argument('-k', '--kustomize', default=argparse.SUPPRESS, help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
-    parser.add_argument('-H', '--helm', default=argparse.SUPPRESS, help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
-    parser.add_argument('-e', '--env-name', required=True, default=argparse.SUPPRESS, help='Name of environment to manage')
+    parser.add_argument('-k', '--kustomize', default=argparse.SUPPRESS,
+                        help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
+    parser.add_argument('-H', '--helm', default=argparse.SUPPRESS,
+                        help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
+    parser.add_argument('-e', '--env-name', required=True, default=argparse.SUPPRESS,
+                        help='Name of environment to manage')
     parser.add_argument('-s', '--source', help='Name of source environment')
     parser.add_argument('-r', '--push-to', help='Container registry to use for images')
     parser.add_argument('-t', '--tag', help='Set the tag used for images')
@@ -70,10 +73,10 @@ def main():
     if not args.copy and not args.components:
         utils.exit_msg('You must supply at least one component to update when not using --copy.')
 
-    am_image_name='am'
-    ds_image_name='ds'
-    idm_image_name='idm'
-    ig_image_name='ig'
+    am_image_name = 'am'
+    ds_image_name = 'ds'
+    idm_image_name = 'idm'
+    ig_image_name = 'ig'
 
     script_path = Path(__file__).parent
     if args.debug: print(f'script_path = {script_path}')
@@ -112,9 +115,10 @@ def main():
         kustomize_path = Path(kustomize)
     else:
         kustomize_path = root_path / kustomize
-    if args.debug: print(f"kustomize_path={kustomize_path}")
+    if args.debug:
+        print(f"kustomize_path={kustomize_path}")
     if not kustomize_path.is_dir():
-       utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
+        utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
 
     if Path(helm).is_absolute():
         helm_root = Path(helm)
@@ -123,45 +127,48 @@ def main():
     helm_path = helm_root / args.env_name
     if args.debug:
         print(f"helm_path={helm_path}")
-        print(f"src_helm_path={src_helm_path}")
+        # Disabling this code to avoid python exception : src_helm_path does not exist at thi point
+        # print(f"src_helm_path={src_helm_path}")
 
     values_images = {}
     if containsElement(components, args.components):
-       if containsElement(['am', 'all', 'apps'], args.components):
-           values_images['am'] = { 'image': {} }
-           values_images['am']['image']['repository'] = f'{push_to}/{am_image_name}' if push_to else am_image_name
-           if args.tag:
-               values_images['am']['image']['tag'] = args.tag
-       if containsElement(['ds', 'all', 'apps'], args.components):
-           values_images['ds_cts'] = { 'image': {} }
-           values_images['ds_cts']['image']['repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
-           values_images['ds_idrepo'] = { 'image': {} }
-           values_images['ds_idrepo']['image']['repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
-           if args.tag:
-               values_images['ds_cts']['image']['tag'] = args.tag
-               values_images['ds_idrepo']['image']['tag'] = args.tag
-       if containsElement(['idm', 'all', 'apps'], args.components):
-           values_images['idm'] = { 'image': {} }
-           values_images['idm']['image']['repository'] = f'{push_to}/{idm_image_name}' if push_to else idm_image_name
-           if args.tag:
-               values_images['idm']['image']['tag'] = args.tag
-       if containsElement(['ig', 'all'], args.components):
-           values_images['ig'] = { 'image': {} }
-           values_images['ig']['image']['repository'] = f'{push_to}/{ig_image_name}' if push_to else idm_image_name
-           if args.tag:
-               values_images['ig']['image']['tag'] = args.tag
+        if containsElement(['am', 'all', 'apps'], args.components):
+            values_images['am'] = {'image': {}}
+            values_images['am']['image']['repository'] = f'{push_to}/{am_image_name}' if push_to else am_image_name
+            if args.tag:
+                values_images['am']['image']['tag'] = args.tag
+        if containsElement(['ds', 'all', 'apps'], args.components):
+            values_images['ds_cts'] = {'image': {}}
+            values_images['ds_cts']['image']['repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
+            values_images['ds_idrepo'] = {'image': {}}
+            values_images['ds_idrepo']['image'][
+                'repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
+            if args.tag:
+                values_images['ds_cts']['image']['tag'] = args.tag
+                values_images['ds_idrepo']['image']['tag'] = args.tag
+        if containsElement(['idm', 'all', 'apps'], args.components):
+            values_images['idm'] = {'image': {}}
+            values_images['idm']['image']['repository'] = f'{push_to}/{idm_image_name}' if push_to else idm_image_name
+            if args.tag:
+                values_images['idm']['image']['tag'] = args.tag
+        if containsElement(['ig', 'all'], args.components):
+            values_images['ig'] = {'image': {}}
+            values_images['ig']['image']['repository'] = f'{push_to}/{ig_image_name}' if push_to else idm_image_name
+            if args.tag:
+                values_images['ig']['image']['tag'] = args.tag
 
     if do_kustomize and args.copy:
         overlay_root = kustomize_path / 'overlay'
         if not overlay_root.is_dir():
-           utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
+            utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
 
         if Path(args.source).is_absolute():
             source_path = Path(args.source)
         else:
             source_path = overlay_root / args.source
 
-        if args.debug: print(f"source_path={source_path}")
+        if args.debug:
+            print(f"source_path={source_path}")
 
         overlay_path = overlay_root / args.env_name
         src_overlay_path = overlay_root / args.source
@@ -179,31 +186,34 @@ def main():
         img_kust.write_bytes(src_img_kust.read_bytes())
 
     if do_helm:
-        vimg_fn = 'values-images.yaml'
-        vimg_file = helm_path / vimg_fn
-        values_file = helm_path / 'values.yaml'
+        values_fn = 'values.yaml'
+        values_file = helm_path / values_fn
 
-        if values_file.is_file() or vimg_file.is_file():
+        if values_file.is_file():
             print('Updating existing helm values.')
         else:
             utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops-ng env to populate.')
 
+        values = {}
+        values = yaml.safe_load(open(values_file))
+
         if args.copy:
             src_helm_path = helm_root / args.source
-            src_vimg_file = src_helm_path / vimg_fn
-            if src_vimg_file.is_file():
-                vimg_file.write_bytes(src_vimg_file.read_bytes())
+            src_values_file = src_helm_path / values_fn
+            if src_values_file.is_file():
+                print(f"Reading in values from {src_values_file}")
             else:
                 utils.exit_msg(f'Source environment ({src_helm_path}) not populated. Run forgeops-ng env to populate.')
 
-        vimg = {}
-        vimg = yaml.safe_load(open(vimg_file))
-        merge(vimg, values_images)
-        writeYamlFile(vimg, vimg_file)
+            src_images = {}
+            src_values = {}
+            src_values = yaml.safe_load(open(src_values_file))
+            for k,v in enumerate(src_values):
+                if 'image' in v:
+                    src_images[k] = { 'image': v }
+            merge(values_images, src_values)
 
-        values = {}
-        values = yaml.safe_load(open(values_file))
-        merge(values, vimg)
+        merge(values, values_images)
         writeYamlFile(values, values_file)
 
     ###
