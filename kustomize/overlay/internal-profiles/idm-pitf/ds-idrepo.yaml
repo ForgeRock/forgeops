@@ -1,26 +1,11 @@
-# Sample DirectoryService deployment
-apiVersion: directory.forgerock.io/v1alpha1
-kind: DirectoryService
+# Patch DS idrepo
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   name: ds-idrepo
 spec:
-  # The number of DS servers in the topology
-  replicas: 1
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
-  # The resources assigned to each DS pod
-  podTemplate:
-    resources:
-      requests:
-        memory: 1366Mi
-        cpu: 500m
-      limits:
-        memory: 1366Mi
-    volumeClaimSpec:
-      storageClassName: fast
-      resources:
-        requests:
-          storage: 10Gi
+  template:
+    metadata:
+      annotations:
+        # prevent autoscaler from terminating the pod
+        "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
