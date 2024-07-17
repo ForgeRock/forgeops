@@ -95,33 +95,33 @@ def process_overlay_dir(path, config, args):
         if args.debug: print(f"{ingress_path} exists")
         ingress_class_found = False
         ing = yaml.safe_load(open(ingress_path))
-        for idx, item in enumerate(ing):
-            if args.fqdn:
-                if 'secretName' in item['path'] or item['path'] == '/spec/rules/0/host':
-                    ing[idx]['value'] = config['hosts'][0]
-                elif 'hosts' in item['path']:
-                    ing[idx]['value'] = config['hosts']
-            if args.ingress:
-                if 'ingressClassName' in item['path']:
-                    ingress_class_found = True
-                    ing[idx]['value'] = args.ingress
-
-        if args.ingress and not ingress_class_found:
-            ing.append({
+        if args.fqdn:
+            ing = utils.replace_or_append_dict(ing, 'path', '/spec/rules/0/host', 'value', config['hosts'][0])
+            ing = utils.replace_or_append_dict(ing, 'path', 'hosts', 'value', config['hosts'])
+        if args.ingress:
+            append = {
                 'op': 'replace',
                 'path': '/spec/ingressClassName',
                 'value': args.ingress
-            })
+            }
+            ing = utils.replace_or_append_dict(ing, 'path', 'IngressClassName', 'value', args.ingress, append)
+        if config.get('ssl_secretname'):
+            append = {
+                'op': 'add',
+                'path': '/spec/tls/0/secretName',
+                'value': config['ssl_secretname']
+            }
+            ing = utils.replace_or_append_dict(ing, 'path', 'secretName', 'value', config['ssl_secretname'], append)
 
-        if config['issuer_kind'] and config['issuer_name']:
+        if config.get('issuer_kind') and config.get('issuer_name'):
             issuer = {
                 'op': 'add',
-                'path': f"/metadata/annotations/cert-manager.io~1{config['issuer_kind']}",
+                'path': f"/metadata/annotations/cert-manager.io~1{config['issuer_kind_ann']}",
                 'value': config['issuer_name']
             }
             issuer_found = False
             for idx, item in enumerate(ing):
-                if 'cert-manager' and 'Issuer' in item['path']:
+                if 'cert-manager' and 'issuer' in item['path']:
                     if args.debug: print('Found a cert-manager issuer')
                     issuer_found = True
                     ing[idx] = issuer
@@ -139,6 +139,7 @@ def process_overlay_dir(path, config, args):
         pc = yaml.safe_load(open(platform_config))
         if args.fqdn:
             pc['data']['FQDN'] = config['hosts'][0]
+            pc['data']['AM_SERVER_FQDN'] = config['hosts'][0]
 
         if 'ds_cts' in config['size'].keys():
             if 'replicaCount' in config['size']['ds_cts'].keys():
@@ -159,7 +160,7 @@ def process_overlay_dir(path, config, args):
         if args.debug: print(f"{res_path} exists")
         res = yaml.safe_load(open(res_path))
 
-        if skey in config['size'].keys():
+        if config['size'].get(skey):
             if 'resources' in config['size'][skey].keys():
                 res['spec']['template']['spec']['containers'][0]['resources'].update(config['size'][skey]['resources'])
                 if isDS:
@@ -169,7 +170,7 @@ def process_overlay_dir(path, config, args):
             if 'replicaCount' in config['size'][skey].keys():
                 res['spec']['replicas'] = config['size'][skey]['replicaCount']
 
-        if config['pull_policy']:
+        if config.get('pull_policy'):
             res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = config['pull_policy']
             if isDS:
                 res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = config['pull_policy']
@@ -199,6 +200,7 @@ def main():
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
     parser.add_argument('--source', '-s', dest='source', help='Name of source kustomize overlay')
+    parser.add_argument('--ssl-secretname', dest='ssl_secretname', help="Name of the secret containing private ssl data")
     parser.add_argument('--am-cpu', dest='am_cpu', help='Specify CPU setting for am pods')
     parser.add_argument('--am-mem', dest='am_mem', help='Specify memory setting for am pods')
     parser.add_argument('--am-rep', dest='am_rep', type=int, help='Specify replicas for am pods')
@@ -236,7 +238,7 @@ def main():
     args = parser.parse_args()
 
     if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable):
-        utils.exit_msg("You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable")
+        utils.exit_msg('You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable')
 
     config = {}
 
@@ -276,6 +278,12 @@ def main():
         config['source'] = args.source
     elif os.getenv('SOURCE'):
         config['source'] = os.getenv('SOURCE')
+
+    config['ssl_secretname'] = None
+    if args.ssl_secretname:
+        config['ssl_secretname'] = args.ssl_secretname
+    elif os.getenv('SSL_SECRETNAME'):
+        config['ssl_secretname'] = os.getenv('SSL_SECRETNAME')
 
     config['do_helm'] = True
     if args.no_helm or os.getenv('NO_HELM') == 'true':
@@ -587,15 +595,24 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
     ### Setup helm values files
     ###
     if config['do_helm']:
-        if config['issuer_name'] and config['issuer_kind']:
-            if 'platform' not in values_ingress.keys():
-               values_ingress['platform'] = { 'ingress': { 'tls': { 'issuer': {} } } }
-            elif 'ingress' not in values_ingress['platform'].keys():
-               values_ingress['platform']['ingress'] = { 'tls': { 'issuer': {} } }
-            else:
-               values_ingress['platform']['ingress']['tls'] = { 'issuer': {} }
-            values_ingress['platform']['ingress']['tls']['issuer']['kind'] = config['issuer_kind']
-            values_ingress['platform']['ingress']['tls']['issuer']['name'] = config['issuer_name']
+        if (config.get('issuer_name') and config.get('issuer_kind')) or config.get('ssl_secretname'):
+            if not values_ingress.get('platform'):
+               values_ingress['platform'] = { 'ingress': { 'tls': {} } }
+            elif not values_ingress['platform'].get('ingress'):
+               values_ingress['platform']['ingress'] = { 'tls': {} }
+            elif not values_ingress['platform']['ingress'].get('tls'):
+               values_ingress['platform']['ingress']['tls'] = {}
+
+            if config['issuer_name'] and config['issuer_kind']:
+                if not values_ingress['platform']['ingress']['tls'].get('issuer'):
+                    values_ingress['platform']['ingress']['tls']['issuer'] = {}
+                values_ingress['platform']['ingress']['tls']['issuer']['kind'] = config['issuer_kind']
+                values_ingress['platform']['ingress']['tls']['issuer']['name'] = config['issuer_name']
+
+            if config.get('ssl_secretname'):
+                if not values_ingress['platform']['ingress']['tls'].get('secret'):
+                    values_ingress['platform']['ingress']['tls']['secret'] = {}
+                values_ingress['platform']['ingress']['tls']['secret']['name'] = config['ssl_secretname']
 
         values = {}
         if values_file.is_file():
