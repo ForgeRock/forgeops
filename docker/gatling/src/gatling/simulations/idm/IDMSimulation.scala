@@ -28,7 +28,7 @@ class IDMSimulation extends Simulation {
             """  {"userName": "user.%s",
                   "givenName": "givenname%s",
                   "sn": "tester%s",
-                  "mail": "user.%s@forgerock.com",
+                  "mail": "user.%s@pingidentity.com",
                   "password": "T35tr0ck123"}
             """.format(userId, userId, userId, userId).stripMargin
         stringJson
