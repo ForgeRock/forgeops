@@ -85,7 +85,7 @@ status)
   ;;
 rstatus)
   # Check replication status
-  setArgs monitor 4444
+  setArgs dirmanager 4444
   kcmd dsrepl status --showReplicas --showChangeLogs "${bind_args}" "${cmd_options}"
   ;;
 idsearch)

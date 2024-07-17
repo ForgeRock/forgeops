@@ -158,6 +158,7 @@ start-ds)
     ;&
 start)
     removeLocks
+    setOnlineToolProperties
     exec start-ds --nodetach
     ;;
 
