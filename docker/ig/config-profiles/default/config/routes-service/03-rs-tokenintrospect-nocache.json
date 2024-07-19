@@ -1,5 +1,5 @@
 {
-  "name": "03-rs-tokenintrospect",
+  "name": "03-rs-tokenintrospect-nocache",
   "monitor": false,
   "condition": "${find(request.uri.path, '^/rs-tokenintrospect-nocache')}",
   "handler": {

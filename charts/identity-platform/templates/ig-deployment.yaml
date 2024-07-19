@@ -56,9 +56,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
-          envFrom:
-          - secretRef:
-              name: openig-secrets-env
           ports:
             - name: http
               containerPort: 8080

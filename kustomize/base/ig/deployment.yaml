@@ -30,9 +30,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        envFrom:
-        - secretRef:
-            name: openig-secrets-env
         image: ig
         imagePullPolicy: Always
         livenessProbe:
