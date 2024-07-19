@@ -91,12 +91,12 @@ rstatus)
 idsearch)
   # List identities
   setArgs dirmanager 1389
-  kcmd ldapsearch -D "uid=admin" "${bind_args}" --baseDN ou=identities "(objectclass=*)"
+  kcmd ldapsearch -D "uid=admin" "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN ou=identities "(objectclass=*)"
   ;;
 monitor)
   # List monitor entries
   setArgs dirmanager 1389
-  kcmd ldapsearch -D "uid=admin" "${bind_args}" --baseDN cn=monitor "(objectclass=*)"
+  kcmd ldapsearch -D "uid=admin" "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN cn=monitor "(objectclass=*)"
    ;;
 list-backups)
   # List backups
