@@ -112,6 +112,27 @@ void sendInformationMessageToPR() {
                   |If you would like to know how to configure which tests are run against your PR, click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
                 """.stripMargin()
         )
+
+        bitbucketUtils.addTaskOnPR('Run Guillotine tests manually?', scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID)
+        bitbucketUtils.commentOnMultibranchPullRequest(
+                """#### Jenkins is building your PR
+                  |### Run specific Guillotine tests manually
+                  |
+                  |> 
+                  |> ```text
+                  |> Pull request will automatically run acceptance/smoke tests for Helm and Kustomize. 
+                  |> But you may need to run specific manual tests to validate your change:  
+                  |> cd guillotine
+                  |> ./configure env
+                  |> ./configure runtime # interactive mode
+                  |> ./run.py
+                  |> https://stash.forgerock.org/projects/CLOUD/repos/guillotine/browse/README.md
+                  |> ```
+                """.stripMargin()
+        )
+        
+        bitbucketUtils.addTaskOnPR('Helm and Kustomize updated? (includes running base-generate.sh)', scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID)
+        bitbucketUtils.addTaskOnPR('Doc Jira created?/readme updated?', scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID)
     }
 }
 
