@@ -70,15 +70,29 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
 }
 
 /**
- * Uses the provided pipelineRun object create PR to Platform Images with ForgeOps commit.
+ * Uses the provided pipelineRun object to a stable tag on ForgeOps repository.
  *
- * @param pipelineRun Used for running tests as part of the pipeline
+ * @param pipelineRun Used to create the tag as part of the pipeline
+ */
+def createRepoStableTag(PipelineRunLegacyAdapter pipelineRun) {
+    try {
+        createRepoStableTag.runStage(pipelineRun)
+    } catch (exception) {
+        sendFailedSlackNotification("Error occurred while creating the stable tag on the repository")
+        throw exception
+    }
+}
+
+/**
+ * Uses the provided pipelineRun object to create PR to Platform Images with ForgeOps commit.
+ *
+ * @param pipelineRun Used to create the PR as part of the pipeline
  */
 def createPlatformImagesPR(PipelineRunLegacyAdapter pipelineRun) {
     try {
         createPlatformImagesPR.runStage(pipelineRun)
     } catch (exception) {
-        sendFailedSlackNotification("Error occurred while running postcommit tests")
+        sendFailedSlackNotification("Error occurred while creating the PR on platform-images")
         throw exception
     }
 }

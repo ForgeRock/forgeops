@@ -51,6 +51,7 @@ node('gce-vm-forgeops-n2d-standard-4') {
                 prTestsStage = load("${stagesLocation}/pr-tests.groovy")
             } else {
                 pipeline = load("${jobLocation}/postcommit.groovy")
+                createRepoStableTag = load("${stagesLocation}/create-repo-stable-tag.groovy")
                 createPlatformImagesPR = load("${stagesLocation}/create-platform-images-pr.groovy")
             }
             // Needed both for PR and postcommit
@@ -81,6 +82,7 @@ node('gce-vm-forgeops-n2d-standard-4') {
     }
 
     if (commonModule.branchSupportsIDCloudReleases() && !isPR()) {
+        pipeline.createRepoStableTag(pipelineRun)
         pipeline.createPlatformImagesPR(pipelineRun)
     }
 
