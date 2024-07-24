@@ -57,9 +57,9 @@ for b in $backends; do
   dr_args="$dr_args --baseDN $b"
 done
 
-setArgs() {
-  pw=$(kubectl get secret ds-passwords -o jsonpath="{.data.${1}\\.pw}" | base64 --decode)
-  bind_args="-w $pw -p $2"
+setDirManagerArgs() {
+  pw=$(kubectl get secret ds-passwords -o jsonpath="{.data.dirmanager\\.pw}" | base64 --decode)
+  bind_args="-D uid=admin -w $pw -p $1"
 }
 
 kcmd() {
@@ -80,23 +80,23 @@ checkKey() {
 case "$cmd"  in
 status)
   # Display basic server information
-  setArgs dirmanager 4444
+  setDirManagerArgs  4444
   kcmd status "${bind_args}" "${cmd_options}"
   ;;
 rstatus)
   # Check replication status
-  setArgs dirmanager 4444
+  setDirManagerArgs  4444
   kcmd dsrepl status --showReplicas --showChangeLogs "${bind_args}" "${cmd_options}"
   ;;
 idsearch)
   # List identities
-  setArgs dirmanager 1389
-  kcmd ldapsearch -D "uid=admin" "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN ou=identities "(objectclass=*)"
+  setDirManagerArgs 1389
+  kcmd ldapsearch "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN ou=identities "(objectclass=*)"
   ;;
 monitor)
   # List monitor entries
-  setArgs dirmanager 1389
-  kcmd ldapsearch -D "uid=admin" "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN cn=monitor "(objectclass=*)"
+  setDirManagerArgs 1389
+  kcmd ldapsearch "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN cn=monitor "(objectclass=*)"
    ;;
 list-backups)
   # List backups
