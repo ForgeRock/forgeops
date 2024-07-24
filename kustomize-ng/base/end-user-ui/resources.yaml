@@ -10,8 +10,8 @@ metadata:
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
 spec:
   type: ClusterIP
   ports:
@@ -22,8 +22,8 @@ spec:
   selector:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
 ---
 # Source: identity-platform/templates/end-user-ui-deployment.yaml
 apiVersion: apps/v1
@@ -36,24 +36,24 @@ metadata:
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
 spec:
   replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: identity-platform
       app.kubernetes.io/instance: identity-platform
-      app: login-ui
-      app.kubernetes.io/component: login-ui
+      app: end-user-ui
+      app.kubernetes.io/component: end-user-ui
   template:
     metadata:
       annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
         app.kubernetes.io/instance: identity-platform
-        app: login-ui
-        app.kubernetes.io/component: login-ui
+        app: end-user-ui
+        app.kubernetes.io/component: end-user-ui
     spec:
       serviceAccountName: default
       securityContext: {}
@@ -113,8 +113,8 @@ metadata:
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
-    app: login-ui
-    app.kubernetes.io/component: login-ui
+    app: end-user-ui
+    app.kubernetes.io/component: end-user-ui
   annotations:
     nginx.ingress.kubernetes.io/affinity: cookie
     nginx.ingress.kubernetes.io/body-size: 64m

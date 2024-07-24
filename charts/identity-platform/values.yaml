@@ -508,8 +508,8 @@ end_user_ui:
   podAnnotations: {}
 
   podLabels:
-    app.kubernetes.io/component: login-ui
-    app: login-ui
+    app.kubernetes.io/component: end-user-ui
+    app: end-user-ui
 
   podSecurityContext: {}
     # fsGroup: 2000
