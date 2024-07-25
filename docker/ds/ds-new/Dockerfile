@@ -19,7 +19,8 @@ COPY --chown=forgerock:root default-scripts /opt/opendj/default-scripts
 COPY --chown=forgerock:root *.sh /opt/opendj/
 
 # Add custom schema files
-COPY --chown=forgerock:root config/schema/*.ldif /opt/opendj/template/db/schema
+RUN mkdir /opt/opendj/custom-schema
+COPY --chown=forgerock:root config/schema/*.ldif /opt/opendj/custom-schema
 
 # Add custom ldap configuration
 COPY --chown=forgerock:root ldif-ext /opt/opendj/ldif-ext
