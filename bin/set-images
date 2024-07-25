@@ -401,16 +401,36 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
     # opening and closing for us.
     # Anything "printed" to stdout is written to the file!
     with fileinput.FileInput(files=docker_files, inplace=True) as f:
+        repo = None
+        tag = None
         # Read each line of the file
         for line in f:
-            before, image, after = parse_from_line(line)
-            # not a FROM command, write the content back.
-            # or we've already written to this file
-            if not image:
+            before = ''
+            image = ''
+            after = ''
+            if line.startswith('FROM '):
+                if 'REPO' in line or 'TAG' in line:
+                    line = f'FROM {repo}:{tag}'
+                before, image, after = parse_from_line(line)
+            else:
+                # not a FROM command, write the content back.
+                # or we've already written to this file
+                if line.startswith('ARG REPO'):
+                    repo = line.strip().split('=')[1]
+                if line.startswith('ARG TAG'):
+                    tag = line.strip().split('=')[1]
                 print(line, end='')
                 continue
             # At this point we have a FROM line
             # Now parse the current repo and tag
+            if 'REPO' in image or 'TAG' in image:
+                if repo is not None and tag is None:
+                    utils.exit_msg('get_docker_from_line : found repo but not tag')
+                elif repo is None and tag is not None:
+                    utils.exit_msg('get_docker_from_line : found tag but not repo')
+                elif repo is not None and tag is not None:
+                    image = f"{repo}:{tag}"
+
             try:
                 current_repo, name, current_tag = parse_repo_tag(image)
             except Exception:

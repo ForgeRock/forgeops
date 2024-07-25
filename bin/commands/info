@@ -20,11 +20,13 @@ import lib.python.utils as utils
 
 
 def main():
+    prog = "forgeops-ng info"
     parser = argparse.ArgumentParser(description="Display basic info for a ForgeRock Identity Platform k8s deployment",
+                                     prog=prog,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--debug', '-d', dest='debug', action='store_true', help='Turn on debugging')
-    parser.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
-    parser.add_argument('--namespace', '-n', dest='namespace', help='Target namespace (default: current ctx namespace)')
+    parser.add_argument('--debug', '-d', dest='debug', action='store_true', default=argparse.SUPPRESS, help='Turn on debugging')
+    parser.add_argument('--json', dest='jsonfmt', action='store_true', default=argparse.SUPPRESS, help='Print information in JSON format')
+    parser.add_argument('--namespace', '-n', dest='namespace', default=argparse.SUPPRESS, help='Target namespace (default: current ctx namespace)')
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', dest='dryrun', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--verbose', dest='verbose', action='store_true', help=argparse.SUPPRESS)
@@ -34,13 +36,14 @@ def main():
     ctx_namespace = utils.get_namespace()
     ctx = utils.get_context()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
+    jsonfmt = getattr(args, 'jsonfmt', None)
 
-    if not args.jsonfmt:
+    if not jsonfmt:
         utils.message(f'Targeting namespace: "{namespace}".')
-    secrets = utils.printsecrets(namespace, not args.jsonfmt)
-    urls = utils.printurls(namespace, not args.jsonfmt)
+    secrets = utils.printsecrets(namespace, not jsonfmt)
+    urls = utils.printurls(namespace, not jsonfmt)
     output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
-    if args.jsonfmt:
+    if jsonfmt:
         print(json.dumps(output))
 
 

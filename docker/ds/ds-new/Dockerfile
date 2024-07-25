@@ -1,4 +1,7 @@
-FROM gcr.io/forgerock-io/ds-empty/pit1:8.0.0-latest-postcommit
+ARG REPO=gcr.io/forgerock-io/ds-empty/pit1
+ARG TAG=8.0.0-latest-postcommit
+
+FROM ${REPO}:${TAG}
 
 # FOR DEBUG. Remove for production deployment
 USER root
