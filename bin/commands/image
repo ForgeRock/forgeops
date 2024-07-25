@@ -2,12 +2,15 @@
 """Manage images in a ForgeRock deployment"""
 
 import argparse
+from copy import copy
+from copy import deepcopy
 import datetime
 import os
+import json
 from pathlib import Path
 import sys
 import site
-
+import textwrap
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -34,6 +37,11 @@ class NoAliasDumper(yaml.SafeDumper):
         return True
 
 
+# Setup a custom argparse formatter so we can use multiple formatters
+class Formatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
+    pass
+
+
 def writeYamlFile(data, file):
     """Write an object to a yaml file"""
     with open(file, 'w') as f:
@@ -47,32 +55,176 @@ def containsElement(search, target):
     return False
 
 
+def get_releases(release_src, components):
+    """ Get the list of available releases """
+    releases = {}
+    for c in components:
+        with open(release_src / f"{c}.json") as f:
+            data = json.load(f)
+            releases[c] = data['releases']
+    return releases
+
+
+def parse_release_str(rel_str):
+    """ Split the release string, and setup a map of different release strings. """
+
+    release = {}
+    release_tup = tuple(map(int, rel_str.split('.')))
+    for i in range(len(release_tup)):
+        if 'major' not in release.keys():
+            release['major'] = release_tup[i]
+        elif 'minor' not in release.keys():
+            release['minor'] = release_tup[i]
+        elif 'patch' not in release.keys():
+            release['patch'] = release_tup[i]
+
+    if 'minor' not in release.keys():
+        release['minor'] = '0'
+    if 'patch' not in release.keys():
+        release['patch'] = 0
+    release['maj_min'] = f"{release['major']}.{release['minor']}"
+    release['full'] = f"{release['maj_min']}.{release['patch']}"
+
+    return release
+
+
+def select_tag(component, releases, release, tag=None):
+    """ Select the best tag based on the component, release, and/or tag. """
+
+    major = release['major']
+    minor = release['minor']
+    patch = release['patch']
+    full = release['full']
+    maj_min = release['maj_min']
+    selected_tag = None
+
+    if 'target' not in release.keys():
+        release['target'] = full
+    target = release['target']
+
+    if maj_min in releases[component].keys():
+        if full in releases[component][maj_min].keys():
+            if tag in releases[component][maj_min][full]['tags']:
+                selected_tag = tag
+            else:
+                selected_tag = releases[component][maj_min][full]['tags'][-1]
+        elif patch > 0:
+            patch_new = patch - 1
+            full_new = f"{maj_min}.{patch_new}"
+            release_new = deepcopy(release)
+            release_new['patch'] = patch_new
+            release_new['full'] = full_new
+            selected_tag = select_tag(component, releases, release_new, tag)
+    else:
+        utils.exit_msg(f"Invalid release {target}. Only supports releases 7.4+.")
+
+    return selected_tag
+
+
+def set_image(image_name, tag, repo=None):
+    """ Create a dictionary entry for a component image """
+    data = { 'image': {} }
+    data['image']['repository'] = f"{repo}/{image_name}" if repo else image_name
+    if tag:
+        data['image']['tag'] = tag
+    return data
+
+
+def write_release_files(tags, repo, docker_path, release_file, image_names):
+    """ Write a release files """
+
+    for c in tags.keys():
+        releases_path = docker_path / c / 'releases'
+        if c == 'ds':
+            releases_path = docker_path / c / 'ds-new' / 'releases'
+        if not releases_path.exists():
+            os.makedirs(releases_path)
+
+        image_name = image_names[c]
+        release_path = releases_path / release_file
+        content = f"REPO={repo}/{image_name}\nTAG={tags[c]}"
+        with open(release_path, 'w') as f:
+            f.write(f"{content}\n")
+
+
+def update_image_defaulter(images, overlay_path):
+    """ Update the image-defaulter """
+
+    for c in images.keys():
+        name = f".*{c}.*"
+        if (c == 'am') or (c == 'ds'):
+            name = f".*{c}:.*"
+        image = f"{images[c]['image']['repository']}"
+        if 'tag' in images[c]['image'].keys():
+            image = f"{image}:{images[c]['image']['tag']}"
+        cmd_args = f"edit set image '{name}={image}'"
+        utils.run('kustomize', cmd_args, cwd=f"{overlay_path}/image-defaulter")
+
+
 def main():
     prog = 'forgeops-ng image'
-    components = ['all', 'apps', 'am', 'idm', 'ds', 'ig', []]
+    components_valid = ['platform', 'apps', 'am', 'amster', 'idm', 'ds', 'ig', []]
 
-    parser = argparse.ArgumentParser(description='Manage images in a ForgeRock Identity Platform environment',
+    forgeops_public_url = 'us-docker.pkg.dev/forgeops-public'
+    #base_repo_def = f"{forgeops_public_url}/images-base"
+    base_repo_def = "gcr.io/forgerock-io" # Temporarily using old URL until new one is working
+    config_repo_def = f"{forgeops_public_url}/images"
+
+    help_examples=f"""
+examples:
+# Set a custom component image in the prod env for am (used by build command)
+{prog} --env-name prod --push-to gcr.io/my-project/idp --tag 7.5.0 am
+
+# Copy images from one env to another (prod-single to prod)
+{prog} --env-name prod --source prod-single --copy
+
+# Select an official release for doing builds for platform components
+{prog} --release 7.5.1 platform
+
+# Select an official release for doing builds with a custom release name for platform components
+{prog} --release 7.5.1 --release-name 7.5.1-2 platform
+
+# Select an official release for an env for platform components
+{prog} --release 7.5.1 --env-name prod platform
+
+# Select an official IG release with a custom release name
+{prog} --release 2024.6.3 --release-name 2024.6.3-1 ig
+"""
+
+    parser = argparse.ArgumentParser(description='Manage images in a Ping Identity Platform (IdP) environment',
                                      prog=prog,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                     epilog=textwrap.dedent(help_examples),
+                                     formatter_class=Formatter)
     parser.add_argument('-d', '--debug', action='store_true', help='Turn on debugging')
-    parser.add_argument('components', nargs='*', choices=components)
+    parser.add_argument('components', nargs='*', choices=components_valid)
     parser.add_argument('-k', '--kustomize', default=argparse.SUPPRESS,
                         help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
+    parser.add_argument('-b', '--build-path', default=argparse.SUPPRESS,
+                        help='Docker dir to use [absolute or relative to forgeops root] (default: docker)')
     parser.add_argument('-H', '--helm', default=argparse.SUPPRESS,
                         help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
-    parser.add_argument('-e', '--env-name', required=True, default=argparse.SUPPRESS,
-                        help='Name of environment to manage')
+    parser.add_argument('-e', '--env-name', help='Name of environment to manage')
     parser.add_argument('-s', '--source', help='Name of source environment')
     parser.add_argument('-r', '--push-to', help='Container registry to use for images')
     parser.add_argument('-t', '--tag', help='Set the tag used for images')
     parser.add_argument('--no-helm', action='store_true', help="Don't manage helm values files")
     parser.add_argument('--no-kustomize', action='store_true', help="Don't manage kustomize overlay")
     parser.add_argument('--copy', action='store_true', help='Copy images from --source to --env-name')
+    parser.add_argument('--release', help='Specify platform image release to set (eg. 7.5.1)')
+    parser.add_argument('--release-file', default=argparse.SUPPRESS, help='Name of release file in docker/component/releases (default: $RELEASE-$DATETIME in UTC)')
+    parser.add_argument('--base-repo', default=argparse.SUPPRESS, help=f"URL for base image container repo (default: {base_repo_def})")
+    parser.add_argument('--config-repo', default=argparse.SUPPRESS, help=f"URL for config image container repo (default: {config_repo_def})")
+    parser.add_argument('--same-repo', action='store_true', help='Use base URL for both container repos')
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--verbose', action='store_true', help=argparse.SUPPRESS)
 
     args = parser.parse_args()
+    if args.debug:
+        print(args)
+
+    if args.copy and args.release:
+        utils.exit_msg('You can only provide --copy or --release, not both.')
 
     if args.copy and not args.source:
         utils.exit_msg('You must supply a source (-s) when using --copy.')
@@ -80,15 +232,33 @@ def main():
     if not args.copy and not args.components:
         utils.exit_msg('You must supply at least one component to update when not using --copy.')
 
-    am_image_name = 'am'
-    ds_image_name = 'ds'
-    idm_image_name = 'idm'
-    ig_image_name = 'ig'
+    if not args.release and not args.env_name:
+        utils.exit_msg('An environment name (--env-name) is required for this operation.')
+
+    update_config_images = True
+    if (args.release and not args.env_name) or args.copy:
+        update_config_images = False
+
+    base_image_names = {
+        'am': 'am-cdk',
+        'amster': 'amster',
+        'ds': 'ds-empty',
+        'idm': 'idm-cdk',
+        'ig': 'ig',
+    }
+
+    components = args.components
+    if containsElement(['platform'], args.components):
+        components = ['am', 'amster', 'idm', 'ds']
+    elif containsElement(['apps'], args.components):
+        components = ['am', 'amster', 'idm']
 
     script_path = Path(__file__).parent
     if args.debug: print(f'script_path = {script_path}')
     root_path = script_path.parent.parent
     if args.debug: print(f'root_path = {root_path}')
+    # Temporary local file, will be hosted via http
+    release_src = root_path / 'releases'
 
     # Setup defaults for values that can be set in forgeops-ng.conf
     helm = 'helm'
@@ -103,9 +273,24 @@ def main():
     elif os.getenv('KUSTOMIZE_PATH'):
         kustomize = os.getenv('KUSTOMIZE_PATH')
 
+    docker_path = 'docker'
+    if getattr(args, 'build_path', None):
+        docker_path = args.build_path
+    elif os.getenv('BUILD_PATH'):
+        docker_path = os.getenv('BUILD_PATH')
+
+    if Path(docker_path).is_absolute():
+        docker_path = Path(docker_path)
+    else:
+        docker_path = root_path / docker_path
+    if args.debug:
+        print(f"docker_path={docker_path}")
+    if not docker_path.is_dir():
+        utils.exit_msg(f"Build path ({docker_path}) isn't a dir or doesn't exist")
+
     push_to = None
     if args.push_to:
-        push_to = args.push_to
+        push_to = args.push_to if args.push_to.lower() != 'none' else None
     elif os.getenv('PUSH_TO'):
         push_to = os.getenv('PUSH_TO')
 
@@ -131,68 +316,95 @@ def main():
         helm_root = Path(helm)
     else:
         helm_root = root_path / helm
-    helm_path = helm_root / args.env_name
+    helm_path = helm_root / args.env_name if args.env_name else None
     if args.debug:
         print(f"helm_path={helm_path}")
-        # Disabling this code to avoid python exception : src_helm_path does not exist at thi point
-        # print(f"src_helm_path={src_helm_path}")
+
+    base_repo = copy(base_repo_def)
+    if getattr(args, 'base_repo', None):
+        base_repo = args.base_repo
+    elif os.getenv('BASE_REPO') is not None:
+        base_repo = os.getenv('BASE_REPO')
+
+    config_repo = copy(config_repo_def)
+    if getattr(args, 'config_repo', None):
+        config_repo = args.config_repo
+    elif os.getenv('CONFIG_REPO') is not None:
+        config_repo = os.getenv('CONFIG_REPO')
+
+    if args.same_repo and args.base_repo:
+        config_repo = base_repo
+    elif args.same_repo and not args.base_repo:
+        utils.exit_msg('Must provide --base-repo with --same-repo')
+
+    releases = {}
+    release = {}
+    release_tags = {}
+    if args.release:
+        timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%S")
+        release_file = f"{args.release}-{timestamp}"
+        if getattr(args, 'release_file', None):
+            release_file = args.release_file
+
+        releases = get_releases(release_src, components)
+        release = parse_release_str(args.release)
+        if containsElement(['am'], components):
+            release_tags['am'] = select_tag('am', releases, release, args.tag)
+        if containsElement(['amster'], components):
+            release_tags['amster'] = select_tag('amster', releases, release, args.tag)
+        if containsElement(['idm'], components):
+            release_tags['idm'] = select_tag('idm', releases, release, args.tag)
+        if containsElement(['ds'], components):
+            release_tags['ds'] = select_tag('ds', releases, release, args.tag)
+        if containsElement(['ig'], components):
+            release_tags['ig'] = select_tag('ig', releases, release, args.tag)
+
+        write_release_files(release_tags, base_repo, docker_path, release_file, base_image_names)
 
     values_images = {}
-    if containsElement(components, args.components):
-        if containsElement(['am', 'all', 'apps'], args.components):
-            values_images['am'] = {'image': {}}
-            values_images['am']['image']['repository'] = f'{push_to}/{am_image_name}' if push_to else am_image_name
-            if args.tag:
-                values_images['am']['image']['tag'] = args.tag
-        if containsElement(['ds', 'all', 'apps'], args.components):
-            values_images['ds_cts'] = {'image': {}}
-            values_images['ds_cts']['image']['repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
-            values_images['ds_idrepo'] = {'image': {}}
-            values_images['ds_idrepo']['image'][
-                'repository'] = f'{push_to}/{ds_image_name}' if push_to else ds_image_name
-            if args.tag:
-                values_images['ds_cts']['image']['tag'] = args.tag
-                values_images['ds_idrepo']['image']['tag'] = args.tag
-        if containsElement(['idm', 'all', 'apps'], args.components):
-            values_images['idm'] = {'image': {}}
-            values_images['idm']['image']['repository'] = f'{push_to}/{idm_image_name}' if push_to else idm_image_name
-            if args.tag:
-                values_images['idm']['image']['tag'] = args.tag
-        if containsElement(['ig', 'all'], args.components):
-            values_images['ig'] = {'image': {}}
-            values_images['ig']['image']['repository'] = f'{push_to}/{ig_image_name}' if push_to else idm_image_name
-            if args.tag:
-                values_images['ig']['image']['tag'] = args.tag
+    if update_config_images:
+        repo = config_repo if args.release else push_to
+        tag = args.tag
+        for component in components:
+            if args.release:
+                tag = release_tags[component]
+            values_images[component] = set_image(component, tag, repo)
 
-    if do_kustomize and args.copy:
+    if do_kustomize:
         overlay_root = kustomize_path / 'overlay'
         if not overlay_root.is_dir():
             utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
-
-        if Path(args.source).is_absolute():
-            source_path = Path(args.source)
-        else:
-            source_path = overlay_root / args.source
-
-        if args.debug:
-            print(f"source_path={source_path}")
-
-        overlay_path = overlay_root / args.env_name
-        src_overlay_path = overlay_root / args.source
+        overlay_path = overlay_root / args.env_name if args.env_name else overlay_root
         if args.debug:
             print(f"overlay_path={overlay_path}")
-            print(f"src_overlay_path={src_overlay_path}")
 
-        img_def_fn = 'image-defaulter/kustomization.yaml'
-        if not overlay_path.exists():
-            utils.exit_msg(f'{overlay_path} does not exist. Run forgeops-ng env to create it.')
-        if not src_overlay_path.exists():
-            utils.exit_msg(f'{src_overlay_path} does not exist. Run forgeops-ng env to create it.')
-        img_kust = overlay_path / img_def_fn
-        src_img_kust = src_overlay_path / img_def_fn
-        img_kust.write_bytes(src_img_kust.read_bytes())
+        if args.copy:
+            source_path = None
+            if Path(args.source).is_absolute():
+                source_path = Path(args.source)
+            else:
+                source_path = overlay_root / args.source
+            if args.debug:
+                print(f"source_path={source_path}")
 
-    if do_helm:
+            src_overlay_path = overlay_root / args.source
+            if args.debug:
+                print(f"src_overlay_path={src_overlay_path}")
+
+            img_def_fn = 'image-defaulter/kustomization.yaml'
+            if not overlay_path.exists():
+                utils.exit_msg(f'{overlay_path} does not exist. Run forgeops-ng env to create it.')
+            if not src_overlay_path.exists():
+                utils.exit_msg(f'{src_overlay_path} does not exist. Run forgeops-ng env to create it.')
+            img_kust = overlay_path / img_def_fn
+            src_img_kust = src_overlay_path / img_def_fn
+            img_kust.write_bytes(src_img_kust.read_bytes())
+
+        if update_config_images:
+            print(f"Updating image-defaulter in {args.env_name} overlay")
+            update_image_defaulter(values_images, overlay_path)
+
+    if do_helm and args.env_name:
         values_fn = 'values.yaml'
         values_file = helm_path / values_fn
 
@@ -206,6 +418,9 @@ def main():
 
         if args.copy:
             src_helm_path = helm_root / args.source
+            if args.debug:
+                print(f"src_helm_path={src_helm_path}")
+
             src_values_file = src_helm_path / values_fn
             if src_values_file.is_file():
                 print(f"Reading in values from {src_values_file}")
@@ -237,7 +452,7 @@ def main():
         log_path_overlay = overlay_path / log_file
         with open(log_path_overlay, 'a') as log_overlay_f:
             log_overlay_f.write(f"{log_line}\n")
-    if do_helm:
+    if do_helm and args.env_name:
         log_path_helm = helm_path / log_file
         with open(log_path_helm, 'a') as log_helm_f:
             log_helm_f.write(f"{log_line}\n")

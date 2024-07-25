@@ -36,6 +36,7 @@ OPTIONS:
                                   (full path or relative to git root)
   -p|--config-profile <profile> : name of the config profile to use
   -r|--push-to <registry>       : container registry to push built images to
+  -R|--release <release>        : release to use for base images
   --reset                       : reset image-defaulter to git index
   -t|--tag <tag>                : image tag to use
 
@@ -101,9 +102,9 @@ message "COMPONENTS=$COMPONENTS" "debug"
 
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
-  BUILD_ARGS=${BUILD_ARGS:-}
+  BUILD_ARGS_REAL=${BUILD_ARGS:-}
   if containsElement $c ${COMPONENTS_FBC[@]} && [ -n "$CONFIG_PROFILE" ] ; then
-    BUILD_ARGS+=" --build-arg CONFIG_PROFILE=$CONFIG_PROFILE"
+    BUILD_ARGS_REAL+=" --build-arg CONFIG_PROFILE=$CONFIG_PROFILE"
   fi
 
   build_d=$BUILD_PATH/$c
@@ -115,10 +116,14 @@ for c in ${COMPONENTS[@]} ; do
     continue
   fi
 
-  if [ "$c" == "am" ] || [ "$c" == "ds" ] ; then
-    NAME=".*${c}:.*"
-  else
-    NAME=".*${c}.*"
+  releases_d=$build_d/releases
+  if [ -d "$releases_d" ] && [ -n "$RELEASE" ] ; then
+    release_f=$releases_d/$RELEASE
+    if [ -f $release_f ] ; then
+      while IFS= read -r line ; do
+        BUILD_ARGS_REAL+=" --build-arg $line"
+      done < $release_f
+    fi
   fi
 
   IMAGE=$c
@@ -131,16 +136,15 @@ for c in ${COMPONENTS[@]} ; do
     TAG_OPT="-t ${TAG}"
   fi
 
-  runOrPrint cd $build_d
-  runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS -t $IMAGE .
+  runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS_REAL -t $IMAGE -f $build_d/Dockerfile $build_d
 
   PUSH_OPT=
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
     runOrPrint $CONTAINER_ENGINE push $IMAGE
     PUSH_OPT="--push-to ${PUSH_TO}"
+  elif [[ "$PUSH_TO" =~ ^([N|n][O|o][N|n][E|e]) ]] ; then
+    PUSH_OPT="--push-to none"
   fi
 
-  cd $OVERLAY_PATH/image-defaulter
-  runOrPrint "kustomize edit set image '$NAME=$IMAGE'"
   runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $c
 done
