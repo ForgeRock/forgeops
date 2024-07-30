@@ -8,6 +8,10 @@
 # AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY: Access key and secret for AWS, if using S3.
 # AZURE_STORAGE_ACCOUNT_NAME, AZURE_ACCOUNT_KEY: Storage account name and key, if using Azure
 
+# Copying Google Cloud service account in to the credentials cache
+GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.json"
+printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
+
 set -e
 
 if [ -n "$(ls -A /opt/opendj/data -I lost+found)" ]; then
@@ -52,7 +56,6 @@ fi
 
 AWS_PARAMS="--storageProperty s3.keyId.env.var:AWS_ACCESS_KEY_ID  --storageProperty s3.secret.env.var:AWS_SECRET_ACCESS_KEY"
 AZ_PARAMS="--storageProperty az.accountName.env.var:AZURE_STORAGE_ACCOUNT_NAME  --storageProperty az.accountKey.env.var:AZURE_ACCOUNT_KEY --storageProperty endpoint:https://${AZURE_STORAGE_ACCOUNT_NAME}.blob.core.windows.net"
-GCP_CREDENTIAL_PATH="/var/run/secrets/cloud-credentials-cache/gcp-credentials.json"
 GCP_PARAMS="--storageProperty gs.credentials.path:${GCP_CREDENTIAL_PATH}"
 EXTRA_PARAMS=""
 
@@ -71,7 +74,6 @@ az://* )
     ;;
 gs://* )
     echo "Google Cloud Storage Bucket detected. Restoring backups from GCS"
-    printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
     EXTRA_PARAMS="${GCP_PARAMS}"
     ;;
 *)
