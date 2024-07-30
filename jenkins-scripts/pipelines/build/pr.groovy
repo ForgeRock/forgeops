@@ -123,8 +123,8 @@ void sendInformationMessageToPR() {
                   |> Pull request will automatically run acceptance/smoke tests for Helm and Kustomize. 
                   |> But you may need to run specific manual tests to validate your change:  
                   |> cd guillotine
-                  |> ./configure env
-                  |> ./configure runtime # interactive mode
+                  |> ./configure.py env
+                  |> ./configure.py runtime # interactive mode
                   |> ./run.py
                   |> https://stash.forgerock.org/projects/CLOUD/repos/guillotine/browse/README.md
                   |> ```
