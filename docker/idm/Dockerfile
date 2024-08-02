@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/idm-cdk:7.4.0
+FROM gcr.io/forgerock-io/idm-cdk:7.4.1
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
