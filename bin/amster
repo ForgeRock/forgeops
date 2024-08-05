@@ -31,17 +31,14 @@ USER_PWD_EXPR_RULES = {
 
 log = utils.logger(name='amster')
 
-def amster_run(ns):
+def amster_run(ns, kustomize_path, scripts_path):
     utils.message('starting...')
-    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    docker_dir = os.path.join(sys.path[0], '..', 'docker')
-    amster_run_job_path = os.path.join(kustomize_dir, 'overlay', 'amster-run')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+    amster_run_job_path = kustomize_path / 'overlay' / 'amster-run'
     try:
         utils.clean_amster_job(ns, False)
         envVars = os.environ
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        utils.run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        utils.run('tar', f'-czf amster-scripts.tar.gz -C {scripts_path} .', cstdout=True, env=envVars)
         utils.run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-scripts.tar.gz')
         pod = _launch_amster_job(amster_run_job_path, ns)
         utils.message('\nWaiting for amster pod to be running. This can take several minutes.')
@@ -49,15 +46,12 @@ def amster_run(ns):
     finally:
         utils.clean_amster_job(ns, True)
 
-def amster_import(ns, src, duration, printlogs=True):
-    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    docker_dir = os.path.join(sys.path[0], '..', 'docker')
-    amster_upload_job_path = os.path.join(kustomize_dir, 'overlay', 'amster-upload')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+def amster_import(ns, src, kustomize_path, scripts_path, duration, printlogs=True):
+    amster_upload_job_path = kustomize_path / 'overlay' / 'amster-upload'
     retain = True if duration > '200' else False
     # If the source dir/file does not exist exit
     if not os.path.exists(src):
-        utils.error(f'Cant read path {src}. Please specify a valid path and try again')
+        utils.error(f"Can't read path {src}. Please specify a valid path and try again")
         sys.exit(1)
     try:
         utils.clean_amster_job(ns, False)
@@ -65,7 +59,7 @@ def amster_import(ns, src, duration, printlogs=True):
         envVars = os.environ
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
         utils.run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
-        utils.run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        utils.run('tar', f'-czf amster-scripts.tar.gz -C {scripts_path} .', cstdout=True, env=envVars)
         utils.run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz')
         utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
         pod = _launch_amster_job(amster_upload_job_path, ns)
@@ -77,11 +71,8 @@ def amster_import(ns, src, duration, printlogs=True):
     finally:
         utils.clean_amster_job(ns, retain)
 
-def amster_export(ns, dst, glob, full, duration):
-    kustomize_dir = os.path.join(sys.path[0], '..', 'kustomize')
-    docker_dir = os.path.join(sys.path[0], '..', 'docker')
-    amster_export_job_path = os.path.join(kustomize_dir, 'overlay', 'amster-export')
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
+def amster_export(ns, dst, kustomize_path, scripts_path, glob, full, duration):
+    amster_export_job_path = kustomize_path / 'overlay' / 'amster-export'
     retain = True if duration > '200' else False
     fqdn = utils.get_fqdn(ns)
     if not os.path.isdir(dst):
@@ -92,7 +83,7 @@ def amster_export(ns, dst, glob, full, duration):
         utils.message('Packing and uploading configs')
         envVars = os.environ
         envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        utils.run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
+        utils.run('tar', f'-czf amster-scripts.tar.gz -C {scripts_path} .', cstdout=True, env=envVars)
         utils.run('kubectl', f'-n {ns} create cm amster-files --from-file=amster-scripts.tar.gz')
         if full:
             utils.run('kubectl', f'-n {ns} create cm amster-export-type --from-literal=export=full')
@@ -229,27 +220,48 @@ def main():
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
+    kustomize_path = root_dir / 'kustomize'
+    docker_path = root_dir / 'docker'
+    scripts_path = docker_path / 'amster' / 'scripts'
+
     if args.cmd == 'clean':
         utils.clean_amster_job(namespace, False)
 
     # Import files into amster.
     if args.cmd == 'import':
-        amster_import(namespace, args.src, args.duration)
+        src = None
+        if Path(args.src).is_absolute():
+            src = Path(args.src)
+        else:
+            src = root_dir / args.src
+
+        amster_import(namespace, src, kustomize_path, scripts_path, args.duration)
         return
 
     # Export files out of amster
     if args.cmd == 'export':
-        amster_export(namespace, args.dst, args.glob, args.full, args.duration)
+        dst = None
+        if Path(args.dst).is_absolute():
+            dst = Path(args.dst)
+        else:
+            dst = root_dir / args.dst
+
+        amster_export(namespace, dst, kustomize_path, scripts_path, args.glob, args.full, args.duration)
         return
 
     # Replace placeholders
     if args.cmd == 'upgrade':
+        if Path(args.src).is_absolute():
+            src = Path(args.src)
+        else:
+            src = root_dir / args.src
+
         upgrade_all_amster_files(args.src, args.fqdn)
         return
 
     # Run amster pod indefinitely for troubleshooting purposes
     if args.cmd == 'run':
-        amster_run(namespace)
+        amster_run(namespace, kustomize_path, scripts_path)
         return
 
 if __name__ == '__main__':
