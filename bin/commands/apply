@@ -83,6 +83,10 @@ if containsElement 'all' ${COMPONENTS[@]} ; then
   COMPONENTS=( 'all' )
 fi
 
+if containsElement 'base' ${COMPONENTS[@]} && ! containsElement 'secrets' ${COMPONENTS[@]} ; then
+  COMPONENTS+=( 'secrets' )
+fi
+
 if containsElementLike 'ds-' ${COMPONENTS[@]} && ! containsElement 'all' ${COMPONENTS[@]} ; then
   if ! kubeExists sts 'ds-cts' || ! kubeExists sts 'ds-idrepo' ; then
     COMPONENTS+=( 'ldif-importer' )
@@ -109,11 +113,13 @@ for c in ${COMPONENTS[@]} ; do
   [[ -d $c_path ]] && kube apply -k $c_path
 done
 
-echo "Waiting for secrets to be ready."
-if [ "$DRYRUN" = true ] ; then
-  echo "Skipping wait during dryrun"
-else
-  runOrPrint $SCRIPT_DIR/wait $NAMESPACE_OPT secrets -t ${TIMEOUT:-60}
+if containsElement 'secrets' ${COMPONENTS[@]} || containsElement 'all' ${COMPONENTS[@]} ; then
+  echo "Waiting for secrets to be ready."
+  if [ "$DRYRUN" = true ] ; then
+    echo "Skipping wait during dryrun"
+  else
+    runOrPrint $SCRIPT_DIR/wait $NAMESPACE_OPT secrets -t ${TIMEOUT:-60}
+  fi
 fi
 
 runOrPrint $SCRIPT_DIR/info $NAMESPACE_OPT
