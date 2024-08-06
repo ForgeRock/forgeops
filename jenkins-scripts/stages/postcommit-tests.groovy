@@ -325,7 +325,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_fo_acceptance) {
         parallelTestsMap.put('FO Acceptance',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Acceptance', 'GKE', '--test-names Acceptance')
+                    commonModule.runGuillotine(pipelineRun, 'FO Acceptance', 'GKE', '--keyword ACCEPTANCE')
                 }
         )
     }
