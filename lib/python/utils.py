@@ -82,7 +82,7 @@ size_paths = {
 }
 
 bundles = {
-	'base': ['base/kustomizeConfig', 'base/ingress'],
+    'base': ['base/kustomizeConfig', 'base/ingress'],
     'ds': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
     'ds-idrepo': ['base/ds/idrepo', 'base/ldif-importer'],
     'ds-cts': ['base/ds/cts', 'base/ldif-importer'],
@@ -533,7 +533,7 @@ def printsecrets(ns, to_stdout=True):
                 'AM_PASSWORDS_AMADMIN_CLEAR': None
             },
             'ds-passwords': {
-                'dirmanager\\\.pw': None,
+                'dirmanager\\\\.pw': None,
             },
             'ds-env-secrets': {
                 'AM_STORES_APPLICATION_PASSWORD': None,
@@ -548,7 +548,7 @@ def printsecrets(ns, to_stdout=True):
             message('\nRelevant passwords:')
             print(
                 f"{secrets['am-env-secrets']['AM_PASSWORDS_AMADMIN_CLEAR']} (amadmin user)")
-            print("{} (uid=admin user)".format(secrets['ds-passwords']['dirmanager\\\.pw']))  # f'strings' do not allow '\'
+            print("{} (uid=admin user)".format(secrets['ds-passwords']['dirmanager\\\\.pw']))  # f'strings' do not allow '\'
             print(f"{secrets['ds-env-secrets']['AM_STORES_APPLICATION_PASSWORD']} (App str svc acct (uid=am-config,ou=admins,ou=am-config))")
             print(f"{secrets['ds-env-secrets']['AM_STORES_CTS_PASSWORD']} (CTS svc acct (uid=openam_cts,ou=admins,ou=famrecords,ou=openam-session,ou=tokens))")
             print(f"{secrets['ds-env-secrets']['AM_STORES_USER_PASSWORD']} (ID repo svc acct (uid=am-identity-bind-account,ou=admins,ou=identities))")
@@ -763,11 +763,15 @@ def sort_dir_json(base):
 
 def get_fqdn(ns):
     """Get the FQDN of the deployment. This is obtained directly from the ingress definition"""
-    _, ingress_name, _ = run(
-        'kubectl', f'-n {ns} get ingress -o jsonpath={{.items[0].metadata.name}}', cstdout=True)
-    _, fqdn, _ = run(
-        'kubectl', f'-n {ns} get ingress {ingress_name.decode("utf-8")} -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
-    return fqdn.decode('ascii')
+    try:
+        _, ingress_name, _ = run(
+            'kubectl', f'-n {ns} get ingress -o jsonpath={{.items[0].metadata.name}}', cstdout=True, cstderr=True)
+        _, fqdn, _ = run(
+            'kubectl', f'-n {ns} get ingress {ingress_name.decode("utf-8")} -o jsonpath={{.spec.rules[0].host}}', cstdout=True)
+        fqdn = fqdn.decode('ascii')
+    except Exception as _e:
+        fqdn = 'unknown.example.com'
+    return fqdn
 
 # IF ns is not None, then return it, otherwise lookup the current namespace context
 def get_namespace(ns=None):
