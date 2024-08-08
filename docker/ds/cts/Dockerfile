@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:7.6.0-latest-postcommit
+FROM gcr.io/forgerock-io/ds/pit1:8.0.0-latest-postcommit
 
 USER root
 
