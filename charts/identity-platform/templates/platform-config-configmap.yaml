@@ -18,6 +18,7 @@ data:
   ENDUSER_UI_URL: /enduser
   LOGIN_UI_URL: /login/#/service/Login
   PLATFORM_UI_IS_FRAAS: "false"
+  ENABLE_WORKFORCE: "true"
   FRAAS_LOGGING_URL: ""
   ENDUSER_CLIENT_ID: end-user-ui
   ADMIN_CLIENT_ID: idm-admin-ui
