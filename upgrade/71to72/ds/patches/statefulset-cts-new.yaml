@@ -23,8 +23,6 @@ spec:
           value: /var/run/secrets/monitor/monitor.pw
         - name: DS_UID_ADMIN_PASSWORD_FILE
           value: /var/run/secrets/admin/dirmanager.pw
-        - name: DS_TEST
-          value: MY_TEST_VARIABLE
         image: us-docker.pkg.dev/forgeops-public/images/ds:7.2.0
         imagePullPolicy: IfNotPresent
         name: ds
@@ -79,8 +77,6 @@ spec:
           value: /var/run/secrets/monitor/monitor.pw
         - name: DS_UID_ADMIN_PASSWORD_FILE
           value: /var/run/secrets/admin/dirmanager.pw
-        - name: DS_TEST
-          value: MY_TEST_VARIABLE
         image: us-docker.pkg.dev/forgeops-public/images/ds:7.2.0
         imagePullPolicy: IfNotPresent
         name: init
