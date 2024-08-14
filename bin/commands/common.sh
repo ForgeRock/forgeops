@@ -69,7 +69,7 @@ processArgs() {
 
   # Setup prog for usage()
   PROG_NAME=$(basename $0)
-  PROG="forgeops ${PROG_NAME}"
+  PROG="forgeops-ng ${PROG_NAME}"
 
   while true; do
     case "$1" in
