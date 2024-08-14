@@ -335,7 +335,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_fo_set_images) {
         parallelTestsMap.put('FO Set Images',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Set Images', '--test-names Forgeops.SetImages')
+                    commonModule.runGuillotine(pipelineRun, 'FO Set Images', '--test-names Kustomize.SetImages')
                 }
         )
     }
