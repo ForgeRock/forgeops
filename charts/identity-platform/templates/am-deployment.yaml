@@ -58,8 +58,12 @@ spec:
             - key: id_rsa.pub
               path: authorized_keys
         - name: truststore
-          secret:
-            secretName: ds-ssl-keypair
+          projected:
+            sources:
+              - secret:
+                  name: truststore-pem
+              - secret:
+                  name: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
         - name: am-logback
@@ -98,8 +102,12 @@ spec:
             value: /truststore/amtruststore
           - name: TRUSTSTORE_PASSWORD
             value: changeit
+            # secret agent generated truststore.
           - name: AM_PEM_TRUSTSTORE
-            value: "/var/run/secrets/truststore/ca.crt"
+            value: /var/run/secrets/truststore/cacerts
+            # cert-manager truststore used for the connection to DS
+          - name: AM_PEM_TRUSTSTORE_DS
+            value: /var/run/secrets/truststore/ca.crt
       containers:
         - name: openam
           securityContext:

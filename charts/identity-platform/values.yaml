@@ -204,7 +204,6 @@ am:
     app: am
 
   podSecurityContext:
-    runAsGroup: 0
     runAsUser: 11111
 
   securityContext: {}
@@ -704,13 +703,12 @@ ds_idrepo:
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
-  resources: {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 1200Mi
-    # requests:
-    #   cpu: 500m
-    #   memory: 1200Mi
+  resources:
+    limits:
+      memory: 1366Mi
+    requests:
+      cpu: 500m
+      memory: 1366Mi
 
   startupProbe:
     failureThreshold: 720
@@ -731,9 +729,24 @@ ds_idrepo:
 
   nodeSelector: {}
 
-  tolerations: []
+  # Create a toleration that allows this pod to be scheduled on a tainted node
+  # This is used to drive directory instances to dedicated nodes for performance.
+  # If a node is not tainted, this has no impact.
+  tolerations:
+    - effect: NoSchedule
+      key: key
+      operator: Equal
+      value: directory
 
-  affinity: {}
+  affinity:
+    # Schedules DS Pods to a node with the label "ds" if it exists
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: ds
+                operator: Exists
 
   podAnnotations: {}
 
@@ -778,13 +791,12 @@ ds_cts:
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
-  resources: {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 1024Mi
-    # requests:
-    #   cpu: 500m
-    #   memory: 1024Mi
+  resources:
+    limits:
+      memory: 1366Mi
+    requests:
+      cpu: 500m
+      memory: 1366Mi
 
   startupProbe:
     failureThreshold: 720
@@ -805,9 +817,24 @@ ds_cts:
 
   nodeSelector: {}
 
-  tolerations: []
+  # Create a toleration that allows this pod to be scheduled on a tainted node
+  # This is used to drive directory instances to dedicated nodes for performance.
+  # If a node is not tainted, this has no impact.
+  tolerations:
+    - effect: NoSchedule
+      key: key
+      operator: Equal
+      value: directory
 
-  affinity: {}
+  affinity:
+    # Schedules DS Pods to a node with the label "ds" if it exists
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+              - key: ds
+                operator: Exists
 
   podAnnotations: {}
 
