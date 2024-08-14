@@ -47,6 +47,7 @@ Selector labels
 */}}
 {{- define "identity-platform.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "identity-platform.name" . }}
+app.kubernetes.io/part-of: {{ include "identity-platform.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
