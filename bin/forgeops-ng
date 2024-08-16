@@ -91,7 +91,8 @@ else
 fi
 message "VALID_COMMAND=$VALID_COMMAND" "debug"
 
-if [ "$VALID_COMMAND" = false ] && containsElement "-h" ${ARG_ARRAY[@]} ; then
+HELP_FLAGS=( '-h' '--help' )
+if [ "$VALID_COMMAND" = false ] && containsElements ${HELP_FLAGS[@]} ${ARG_ARRAY[@]} ; then
   usage 0
 elif [ "$VALID_COMMAND" = false ] ; then
   usage 1 "Invalid command: $COMMAND"
