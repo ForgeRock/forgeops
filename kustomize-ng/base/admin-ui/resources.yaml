@@ -96,7 +96,12 @@ spec:
               port: http
             periodSeconds: 10
             timeoutSeconds: 1
-          resources: {}
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

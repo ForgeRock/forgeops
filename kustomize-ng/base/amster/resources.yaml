@@ -126,7 +126,12 @@ spec:
                 name: amster-env-secrets
             - secretRef:
                 name: ds-env-secrets
-          resources: {}
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
           volumeMounts:
             - name: amster-config
               mountPath: /opt/amster/config/config/realms/root/Applications/iPlanetAMWebAgentService.json
@@ -200,7 +205,12 @@ spec:
                 - cat
                 - /etc/hosts
             initialDelaySeconds: 1
-          resources: {}
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
           volumeMounts:
             - name: export-files
               mountPath: /var/tmp/amster

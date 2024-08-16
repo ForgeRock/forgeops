@@ -162,13 +162,12 @@ am:
     # className: "nginx"
     # annotations: {}
 
-  resources: {}
-    # limits:
-    #   cpu: 250m
-    #   memory: 2000Mi
-    # requests:
-    #   cpu: 250m
-    #   memory: 128Mi
+  resources:
+    limits:
+      memory: 1800Mi
+    requests:
+      cpu: 250m
+      memory: 1800Mi
 
   livenessProbe:
     initialDelaySeconds: 30
@@ -231,13 +230,12 @@ amster:
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
-  resources: {}
-    # limits:
-    #   cpu: 100m
-    #   memory: 512
-    # requests:
-    #   cpu: 100m
-    #   memory: 512
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
 
   readinessProbe:
     initialDelaySeconds: 1
@@ -283,10 +281,10 @@ ldif_importer:
   resources: {}
     # limits:
     #   cpu: 100m
-    #   memory: 512
+    #   memory: 512Mi
     # requests:
     #   cpu: 100m
-    #   memory: 512
+    #   memory: 512Mi
 
   readinessProbe:
     initialDelaySeconds: 1
@@ -331,13 +329,12 @@ idm:
     # className: "nginx"
     # annotations: {}
 
-  resources: {}
-    # limits:
-    #   cpu: 250m
-    #   memory: 1280Mi
-    # requests:
-    #   cpu: 250m
-    #   memory: 768Mi
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      cpu: 250m
+      memory: 1024Mi
 
   livenessProbe:
     initialDelaySeconds: 120
@@ -403,13 +400,12 @@ admin_ui:
     # className: "nginx"
     # annotations: {}
 
-  resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 100Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 100Mi
+  resources:
+     limits:
+       memory: 100Mi
+     requests:
+       cpu: 10m
+       memory: 100Mi
 
   startupProbe:
     initialDelaySeconds: 10
@@ -472,13 +468,12 @@ end_user_ui:
     # className: "nginx"
     # annotations: {}
 
-  resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 100Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 100Mi
+  resources:
+    limits:
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 100Mi
 
   startupProbe:
     initialDelaySeconds: 10
@@ -541,13 +536,12 @@ login_ui:
     # className: "nginx"
     # annotations: {}
 
-  resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 100Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 100Mi
+  resources:
+    limits:
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 100Mi
 
   startupProbe:
     initialDelaySeconds: 10
@@ -614,13 +608,12 @@ ig:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/rewrite-target: "/$2"
 
-  resources: {}
-    # limits:
-    #   cpu: 200m
-    #   memory: 512Mi
-    # requests:
-    #   cpu: 200m
-    #   memory: 512Mi
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
 
   livenessProbe:
     periodSeconds: 30

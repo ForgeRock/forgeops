@@ -208,7 +208,12 @@ spec:
               port: http
             failureThreshold: 720
             initialDelaySeconds: 30
-          resources: {}
+          resources:
+            limits:
+              memory: 1366Mi
+            requests:
+              cpu: 500m
+              memory: 1366Mi
           volumeMounts:
             - mountPath: /opt/opendj/data
               name: data
@@ -226,10 +231,19 @@ spec:
               name: keys
             - mountPath: /var/run/secrets/cloud-credentials-cache/
               name: cloud-credentials-cache
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: ds
+                    operator: Exists
+              weight: 100
       tolerations:
         - effect: NoSchedule
-          key: kubernetes.io/arch
-          operator: Exists
+          key: key
+          operator: Equal
+          value: directory
   volumeClaimTemplates:
     - metadata:
         name: data

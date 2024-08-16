@@ -329,7 +329,12 @@ spec:
                   value: "true"
             failureThreshold: 40
             periodSeconds: 10
-          resources: {}
+          resources:
+            limits:
+              memory: 1024Mi
+            requests:
+              cpu: 250m
+              memory: 1024Mi
           volumeMounts:
             - mountPath: /var/run/secrets/idm
               name: idm-secrets
