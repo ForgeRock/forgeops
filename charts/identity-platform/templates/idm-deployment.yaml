@@ -48,8 +48,12 @@ spec:
           secret:
             secretName: idm
         - name: truststore
-          secret:
-            secretName: ds-ssl-keypair
+          projected:
+            sources:
+              - secret:
+                  name: truststore-pem
+              - secret:
+                  name: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
         - name: logs

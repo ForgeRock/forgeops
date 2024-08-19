@@ -204,6 +204,7 @@ am:
     app: am
 
   podSecurityContext:
+    fsGroup: 0
     runAsUser: 11111
 
   securityContext: {}
@@ -372,8 +373,9 @@ idm:
     app.kubernetes.io/component: idm
     app: idm
 
-  podSecurityContext: {}
-    # fsGroup: 2000
+  podSecurityContext:
+    fsGroup: 0
+    runAsUser: 11111
 
   securityContext: {}
     # capabilities:
