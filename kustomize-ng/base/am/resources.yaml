@@ -7,6 +7,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -21,6 +22,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -35,6 +37,7 @@ spec:
       name: http
   selector:
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app: am
     app.kubernetes.io/component: am
@@ -47,6 +50,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -57,20 +61,23 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
       app.kubernetes.io/instance: identity-platform
       app: am
       app.kubernetes.io/component: am
   template:
     metadata:
-      annotations: {}
+      annotations:
       labels:
         app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
         app.kubernetes.io/instance: identity-platform
         app: am
         app.kubernetes.io/component: am
     spec:
       serviceAccountName: default
       securityContext:
+        fsGroup: 0
         runAsUser: 11111
       volumes:
         - name: fbc
@@ -226,6 +233,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm

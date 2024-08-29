@@ -7,6 +7,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -33,6 +34,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -49,6 +51,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -66,6 +69,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -75,9 +79,10 @@ spec:
   backoffLimit: 6
   template:
     metadata:
-      annotations: {}
+      annotations:
       labels:
         app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
         app.kubernetes.io/instance: identity-platform
         app: amster
         app.kubernetes.io/component: amster

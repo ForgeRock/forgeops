@@ -7,6 +7,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -32,6 +33,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -147,6 +149,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -161,6 +164,7 @@ spec:
       name: http
   selector:
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app: idm
     app.kubernetes.io/component: idm
@@ -173,6 +177,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
@@ -183,20 +188,24 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
       app.kubernetes.io/instance: identity-platform
       app: idm
       app.kubernetes.io/component: idm
   template:
     metadata:
-      annotations: {}
+      annotations:
       labels:
         app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
         app.kubernetes.io/instance: identity-platform
         app: idm
         app.kubernetes.io/component: idm
     spec:
       serviceAccountName: default
-      securityContext: {}
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
       volumes:
         - name: fbc
           emptyDir: {}
@@ -204,8 +213,12 @@ spec:
           secret:
             secretName: idm
         - name: truststore
-          secret:
-            secretName: ds-ssl-keypair
+          projected:
+            sources:
+              - secret:
+                  name: truststore-pem
+              - secret:
+                  name: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
         - name: logs
@@ -250,6 +263,8 @@ spec:
             - name: TRUSTSTORE_PASSWORD
               value: changeit
             - name: IDM_PEM_TRUSTSTORE
+              value: /var/run/secrets/truststore/cacerts
+            - name: IDM_PEM_TRUSTSTORE_DS
               value: /var/run/secrets/truststore/ca.crt
       containers:
         - name: openidm
@@ -370,6 +385,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.6
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm

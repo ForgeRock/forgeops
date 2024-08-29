@@ -21,7 +21,9 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if .Values.platform.annotations.deploymentDate.enabled }}
         deployment-date: {{ now | quote }}
+        {{- end }}
         {{- with .Values.admin_ui.podAnnotations }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
