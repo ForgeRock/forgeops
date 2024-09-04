@@ -7,6 +7,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
@@ -21,6 +22,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
@@ -35,6 +37,7 @@ spec:
       name: http
   selector:
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app: am
     app.kubernetes.io/component: am
@@ -47,6 +50,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
@@ -57,6 +61,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
       app.kubernetes.io/instance: identity-platform
       app: am
       app.kubernetes.io/component: am
@@ -65,13 +70,14 @@ spec:
       annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
         app.kubernetes.io/instance: identity-platform
         app: am
         app.kubernetes.io/component: am
     spec:
       serviceAccountName: default
       securityContext:
-        runAsGroup: 0
+        fsGroup: 0
         runAsUser: 11111
       volumes:
         - name: fbc
@@ -90,8 +96,12 @@ spec:
               - key: id_rsa.pub
                 path: authorized_keys
         - name: truststore
-          secret:
-            secretName: ds-ssl-keypair
+          projected:
+            sources:
+              - secret:
+                  name: truststore-pem
+              - secret:
+                  name: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
         - name: am-logback
@@ -131,7 +141,11 @@ spec:
               value: /truststore/amtruststore
             - name: TRUSTSTORE_PASSWORD
               value: changeit
+              # secret agent generated truststore.
             - name: AM_PEM_TRUSTSTORE
+              value: /var/run/secrets/truststore/cacerts
+              # cert-manager truststore used for the connection to DS
+            - name: AM_PEM_TRUSTSTORE_DS
               value: /var/run/secrets/truststore/ca.crt
       containers:
         - name: openam
@@ -214,6 +228,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm

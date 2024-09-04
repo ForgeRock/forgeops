@@ -7,6 +7,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
@@ -21,6 +22,7 @@ spec:
       name: http
   selector:
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app: login-ui
     app.kubernetes.io/component: login-ui
@@ -33,6 +35,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
@@ -43,6 +46,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
       app.kubernetes.io/instance: identity-platform
       app: login-ui
       app.kubernetes.io/component: login-ui
@@ -51,6 +55,7 @@ spec:
       annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
         app.kubernetes.io/instance: identity-platform
         app: login-ui
         app.kubernetes.io/component: login-ui
@@ -110,6 +115,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm

@@ -7,6 +7,7 @@ metadata:
   labels:
     helm.sh/chart: identity-platform-7.5
     app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
     app.kubernetes.io/version: "7.5"
     app.kubernetes.io/managed-by: Helm
@@ -20,6 +21,7 @@ spec:
       annotations: {}
       labels:
         app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
         app.kubernetes.io/instance: identity-platform
         app: ldif-importer
         app.kubernetes.io/component: ldif-importer
