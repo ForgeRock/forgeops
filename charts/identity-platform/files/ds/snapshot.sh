@@ -55,6 +55,7 @@ EOF
 
 if [ $? == 0 ] ; then
   echo "Job finished. Job logs"
+  kubectl --namespace $NAMESPACE wait -l app="${DS_SNAPSHOT_NAME}-job" --for=condition=Ready pod
   kubectl --namespace $NAMESPACE  --all-containers=true logs -l app="${DS_SNAPSHOT_NAME}-job"
   echo "Cleaning up job"
   kubectl --namespace $NAMESPACE delete job -l app="${DS_SNAPSHOT_NAME}-job"
