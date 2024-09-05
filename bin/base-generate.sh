@@ -10,6 +10,10 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPT_DIR/../lib/shell/stdlib.sh
 cd $start_dir
 
+getRelativePath $SCRIPT_DIR ..
+ROOT_PATH=$RELATIVE_PATH
+message "ROOT_PATH=$ROOT_PATH" "debug"
+
 usage() {
     exit_code=$1
     err=$2
@@ -28,7 +32,7 @@ resources file.
     --dryrun                         : do a dry run
     -v|--verbose                     : be verbose
     -f|--values ValuesFileName       : values file name to look for (default: $VALUES_FILE_DEF)
-    -k|--kustomize KustomizePath     : path to kustomize dir (default: $KUSTOMIZE_BASE_DEF)
+    -k|--kustomize KustomizePath     : path to kustomize dir (default: $KUSTOMIZE_PATH_DEF)
     -n|--namespace NAMESPACE         : namespace to work in
     -r|--resources ResourceFileName  : resource file name to output to (default: $RESOURCES_FILE_DEF)
     -s|--source (local|remote)       : use local or remote chart (default: local)
@@ -103,8 +107,8 @@ CHART_NAME="identity-platform"
 CHART_VER_DEF="7.6"
 CHART_VER=
 CHART_SOURCE="local"
-KUSTOMIZE_BASE_DEF=$SCRIPT_DIR/../kustomize/base
-KUSTOMIZE_BASE=
+KUSTOMIZE_PATH_DEF=$ROOT_PATH/kustomize
+KUSTOMIZE_PATH=
 NAMESPACE_DEF="prod"
 NAMESPACE=
 RESOURCES_FILE_DEF=resources.yaml
@@ -122,7 +126,7 @@ while true; do
     -v|--verbose) VERBOSE=true; shift ;;
     -f|--file) VALUES_FILE=$2; shift 2 ;;
     -F|--override) VALUES_OVERRIDE=$2; shift 2 ;;
-    -k|--kustomize) KUSTOMIZE_BASE=$2; shift 2 ;;
+    -k|--kustomize) KUSTOMIZE_PATH=$2; shift 2 ;;
     -n|--namespace) NAMESPACE=$2; shift 2 ;;
     -r|--resources) RESOURCES_FILE=$2; shift 2 ;;
     -s|--source) CHART_SOURCE=$2; shfit 2 ;;
@@ -151,8 +155,8 @@ message "CHART_NAME=$CHART_NAME" "debug"
 # Set variable defaults if not provided
 CHART_VER=${CHART_VER:-$CHART_VER_DEF}
 message "CHART_VER=$CHART_VER" "debug"
-KUSTOMIZE_BASE=${KUSTOMIZE_BASE:-$KUSTOMIZE_BASE_DEF}
-message "KUSTOMIZE_BASE=$KUSTOMIZE_BASE" "debug"
+KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-$KUSTOMIZE_PATH_DEF}
+message "KUSTOMIZE_PATH=$KUSTOMIZE_PATH" "debug"
 RESOURCES_FILE=${RESOURCES_FILE:-$RESOURCES_FILE_DEF}
 message "RESOURCES_FILE=$RESOURCES_FILE" "debug"
 VALUES_FILE=${VALUES_FILE:-$VALUES_FILE_DEF}
@@ -171,4 +175,19 @@ else
   HELM_OPTS="$CHART/$CHART_NAME $NAMESPACE_OPT $VERSION_OPT"
 fi
 
-processDir "$KUSTOMIZE_BASE"
+if [[ "$KUSTOMIZE_PATH" =~ ^/ ]] ; then
+  message "Kustomize path is a full path: $KUSTOMIZE_PATH" "debug"
+else
+  message "Kustomize path is relative: $KUSTOMIZE_PATH" "debug"
+  KUSTOMIZE_PATH=$ROOT_PATH/$KUSTOMIZE_PATH
+fi
+
+if [ ! -e "$KUSTOMIZE_PATH" ] ; then
+  usage 1 "Kustomize path ($KUSTOMIZE_PATH) doesn't exist."
+fi
+
+if [ ! -d "$KUSTOMIZE_PATH" ] ; then
+  usage 1 "Kustomize path ($KUSTOMIZE_PATH) is not a directory."
+fi
+
+processDir "$KUSTOMIZE_PATH/base"
