@@ -663,6 +663,7 @@ ds_snapshot:
   class: ds-snapshot-class
   configmapCreate: true
   configmapOnly: false
+  generate: false
   podSecurityContext: {}
   rbacCreate: true
   rbacOnly: false
