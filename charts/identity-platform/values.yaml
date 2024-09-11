@@ -19,6 +19,10 @@ platform:
       enabled: false
   base:
     enabled: true
+  cert_manager:
+    # If disabled, the ingress tls issuer and the DS certificates will be not be created/deployed
+    # (DS certificates are ds-master-keypair and ds-ssl-keypair)
+    enabled: true
   ds_ssl:
     enabled: true
   ingress:

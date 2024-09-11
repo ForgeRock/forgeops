@@ -15,7 +15,7 @@ metadata:
     {{- else if .Values.platform.ingress.annotations }}
       {{- toYaml .Values.platform.ingress.annotations | nindent 4 }}
     {{- end }}
-    {{- if .Values.platform.ingress.tls.issuer.name }}
+    {{- if and .Values.platform.cert_manager.enabled .Values.platform.ingress.tls.issuer.name }}
     {{- if (eq "ClusterIssuer" .Values.platform.ingress.tls.issuer.kind) }}
     cert-manager.io/cluster-issuer: {{ .Values.platform.ingress.tls.issuer.name }}
     {{- else }}
