@@ -18,7 +18,7 @@ setup-profile --profile ${CONFIG} \
  && setup-profile  --profile ${IDM_REPO} \
                   --set idm-repo/domain:forgerock.io \
  && setup-profile --profile ${AM_CTS} \
-                  --set am-cts/tokenExpirationPolicy:ds \
+                  --set am-cts/tokenExpirationPolicy:am-sessions-only \
                   --set am-cts/amCtsAdminPassword:password \
  && setup-profile --profile ${DS_PROXIED_SERVER} \
                   --set ds-proxied-server/proxyUserDn:uid=proxy \
