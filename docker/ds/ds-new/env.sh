@@ -1,17 +1,30 @@
 # Source this file to set the environment variables for the Docker container.
 
-# ParallelGC with a single generation tenuring threshold has been shown to give the best
-# performance vs determinism trade-off for servers using JVM heaps of less than 8GB,
-# as well as all batch tool use-cases such as import-ldif.
-# Unusual deployments, such as those requiring very large JVM heaps, should tune this setting
-# and use a different garbage collector, such as G1.
+# As of JDK17 the G1 garbage collector is within a few percentage points of parallel GC in terms of throughput for
+# small heaps, while providing better determinism and scaling for very large heaps. It also exhibits much less
+# off-heap memory overhead compared with JDK11 (less than 10% compared with 20% previously), so it is safer to use it
+# in constrained memory environments such as containers.
+
 # The /dev/urandom device is up to 4 times faster for crypto operations in some VM environments
 # where the Linux kernel runs low on entropy. This settting does not negatively impact random number security
 # and is recommended as the default.
 
+DEFAULT_OPENDJ_JAVA_ARGS="
+-XX:+UseG1GC
+-XX:+ExitOnOutOfMemoryError
+-Djava.security.egd=file:/dev/urandom
+-Xlog:gc:${DS_JAVA_GC_LOGFILE:-/opt/opendj/data/gc.log}:time,uptime:filecount=5,filesize=50M
+-XX:MaxGCPauseMillis=${DS_JAVA_GC_PAUSE_TARGET:-200}
+-XX:MaxRAMPercentage=${DS_JAVA_MAX_RAM_PERCENTAGE:-75}
+-XX:MaxTenuringThreshold=${DS_JAVA_MAX_TENURING_THRESHOLD:-1}
+${DS_JAVA_ADDITIONAL_ARGS:-}
+"
 
-export DEFAULT_OPENDJ_JAVA_ARGS="-XX:MaxRAMPercentage=75 -XX:+UseParallelGC -XX:MaxTenuringThreshold=1 -Djava.security.egd=file:/dev/urandom"
 export OPENDJ_JAVA_ARGS=${OPENDJ_JAVA_ARGS:-${DEFAULT_OPENDJ_JAVA_ARGS}}
+
+# Set to true to enable the usage of Java virtual threads
+export DS_USE_VIRTUAL_THREADS=${DS_USE_VIRTUAL_THREADS:-false}
+OPENDJ_JAVA_ARGS="${OPENDJ_JAVA_ARGS} -Dorg.forgerock.opendj.useVirtualThreads=${DS_USE_VIRTUAL_THREADS}"
 
 
 # Assume the directory admin and monitor passwords are available at the paths below. 
