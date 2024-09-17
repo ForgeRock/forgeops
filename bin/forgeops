@@ -313,7 +313,7 @@ def main():
         # If no -y or --force provided, prompt the user what assets they would like to delete
         elif not delete and not args.skip_confirmation:
             if any(x in "ds dsold ds-idrepo ds-cts all" for x in components):
-                if input('OK to delete PVCs? [Y/N] ').lower() in ['yes', 'y']:
+                if input('OK to delete all PVCs(idrepo and cts)? [Y/N] ').lower() in ['yes', 'y']:
                     delete_components['pvc'] = True
                 if input('OK to delete volume snapshots? [Y/N] ').lower() in ['yes', 'y']:
                     delete_components['snapshots'] = True
