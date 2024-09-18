@@ -12,6 +12,7 @@ spec:
       containers:
       - name: ldif-importer
         image: ldif-importer
+        imagePullPolicy: Always
         envFrom:
         - secretRef:
             name: ds-env-secrets

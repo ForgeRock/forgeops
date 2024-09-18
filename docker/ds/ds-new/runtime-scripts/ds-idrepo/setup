@@ -1,14 +1,13 @@
 #!/usr/bin/env bash
 #
 # Default setup script
-# Setup the directory server for the idrepo and cts backends.
+# Setup the directory server for the identity store, idm repo and config backends.
 
 # This uses DS setup profiles. If the schema for a profile has not been
 # changed it may use an older version. For example, AM 7.5 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
 AM_IDENTITY_STORE="am-identity-store"
 IDM_REPO="idm-repo"
-AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.1"
 
 setup-profile --profile ${CONFIG} \
@@ -17,9 +16,6 @@ setup-profile --profile ${CONFIG} \
                   --set am-identity-store/amIdentityStoreAdminPassword:password \
  && setup-profile  --profile ${IDM_REPO} \
                   --set idm-repo/domain:forgerock.io \
- && setup-profile --profile ${AM_CTS} \
-                  --set am-cts/tokenExpirationPolicy:am-sessions-only \
-                  --set am-cts/amCtsAdminPassword:password \
  && setup-profile --profile ${DS_PROXIED_SERVER} \
                   --set ds-proxied-server/proxyUserDn:uid=proxy \
                   --set ds-proxied-server/proxyUserCertificateSubjectDn:CN=ds,O=ForgeRock.com

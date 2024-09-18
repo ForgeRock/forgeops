@@ -32,37 +32,7 @@ implementation of the concepts behind [Flyway](https://flywaydb.org/).
 
 ## Default Scripts / Life-Cycle Hooks.
 
-The image supports a number of "hooks" that can be used to run custom script actions at 
-various stages of the directory deployment. If the user does not provide their own 
-script, a default script is called (see the `default-scripts/` folder).
-
-While defaults are provided, the idea is to bring your own scripts to implement the exact
-desired behavior. This strategy provides flexibility to accommodate a wide range of use cases.
-
-The life cycle hooks are:
-
-* `setup`: Called if the PVC data volume is empty. This should setup the directory server, including all
- backends, indexes and acis. The default script creates a "idrepo" and cts configuration suitable for running the ForgeOps plaform deployment (CDK/CDM).
- * `post-init`: If the user supplies a post-init script it will be called by the init container after index rebuilds are
- performed. Use this to add any new indexes before the server starts, or to issue other `dsconfig` commands. The directory is offline
- when this script is run.
-
-An example of where `post-init` is useful is the addition of a new index. This can be done online, but needs to be
-repeated on each pod where the index is required.  Instead, the index commands can be added to a post-init script:
-
-```bash
-#!/usr/bin/env bash
-dsconfig --offline --no-prompt --batch <<EOF
-create-backend-index \
-          --backend-name amIdentityStore \
-          --set index-type:equality \
-          --index-name carLicense
-EOF
-
-rebuild-index  --offline \
- --baseDN ou=identities \
- --index carLicense
-```
+> NOTE: Lifecycle scripts via a configmap are no longer supported. The DS docker image now contains the option to configure setup scripts for idrepo and cts separately.
 
 ## Certificates
 

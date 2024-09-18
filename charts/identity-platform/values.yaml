@@ -724,11 +724,6 @@ ds_idrepo:
       requests:
         storage: 10Gi
 
-  # Enable lifecycle scripts for ds-idrepo
-  lifecycleScripts:
-    enabled: false
-    path: "files/ds/lifecycle-scripts/idrepo"
-
   nodeSelector: {}
 
   # Create a toleration that allows this pod to be scheduled on a tainted node
@@ -811,11 +806,6 @@ ds_cts:
     resources:
       requests:
         storage: 10Gi
-
-  # Enable lifecycle scripts for ds-cts
-  lifecycleScripts:
-    enabled: false
-    path: "files/ds/lifecycle-scripts/cts"
 
   nodeSelector: {}
 

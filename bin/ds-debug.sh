@@ -51,7 +51,8 @@ shift
 cmd_options="$*"
 
 # All the backends we know about..
-backends="ou=identities ou=tokens ou=am-config dc=openidm,dc=forgerock,dc=io"
+backends_idrepo="ou=identities ou=am-config dc=openidm,dc=forgerock,dc=io"
+backends_cts="ou=tokens"
 dr_args=""
 for b in $backends; do
   dr_args="$dr_args --baseDN $b"

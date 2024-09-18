@@ -13,9 +13,8 @@ ENV DS_DATA_DIR /opt/opendj/data
 ENV PEM_KEYS_DIRECTORY "/var/run/secrets/keys/ds"
 ENV PEM_TRUSTSTORE_DIRECTORY "/var/run/secrets/keys/truststore"
 
-# Add the default scripts to be used if the deployer does not provide an implementation.
-# See default-scripts/setup
-COPY --chown=forgerock:root default-scripts /opt/opendj/default-scripts
+# Add the runtime scripts to be used if the deployer does not provide an implementation.
+COPY --chown=forgerock:root runtime-scripts /opt/opendj/runtime-scripts
 COPY --chown=forgerock:root *.sh /opt/opendj/
 
 # Add custom schema files

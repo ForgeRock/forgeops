@@ -1,7 +1,7 @@
 # This is a sample of how to extend the schema
 # This adds some generic attributes which can contain string values
 # To use this add the objectclass fr-ext-attrs to the user entry
-# See ../../default-scripts/setup.sh for an example of how to index these attributes
+# See ../../runtime-scripts/(ds-idrepo/ds-cts)/setup.sh for an example of how to index these attributes
 # dn: cn=schema
 # objectClass: top
 # objectClass: ldapSubentry

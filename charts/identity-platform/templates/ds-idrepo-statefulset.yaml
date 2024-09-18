@@ -63,12 +63,6 @@ spec:
           emptyDir: {}
         - name: cloud-credentials-cache
           emptyDir: {}
-        {{- if .Values.ds_idrepo.lifecycleScripts.enabled }}
-        - name: lifecycle-scripts
-          configMap:
-            name: ds-idrepo-lifecycle-scripts
-            defaultMode: 0755
-        {{- end }}
       initContainers:
         - name: init
           securityContext:
@@ -94,13 +88,9 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
-          {{- if .Values.ds_idrepo.lifecycleScripts.enabled }}
-          - mountPath: /opt/opendj/scripts
-            name: lifecycle-scripts
-          {{- end }}
           # args:
           # - init
-          command: ["/opt/opendj/default-scripts/init-and-restore.sh"]
+          command: ["/opt/opendj/runtime-scripts/init-and-restore.sh"]
           env:
           - name: POD_NAME
             valueFrom:
@@ -206,10 +196,6 @@ spec:
             name: keys
           - mountPath: /var/run/secrets/cloud-credentials-cache/
             name: cloud-credentials-cache
-          {{- if .Values.ds_idrepo.lifecycleScripts.enabled }}
-          - mountPath: /opt/opendj/scripts
-            name: lifecycle-scripts
-          {{- end }}
       {{- with .Values.ds_idrepo.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -97,7 +97,7 @@ do
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         BACKENDS='${BACKENDS}' \
-                                                        /opt/opendj/default-scripts/schedule-backup.sh"
+                                                        /opt/opendj/runtime-scripts/schedule-backup.sh"
             ;;
         cancel )
             echo "Cancelling backup schedule: ${TASK_NAME} "
@@ -105,7 +105,7 @@ do
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         CANCEL=TRUE \
-                                                        /opt/opendj/default-scripts/schedule-backup.sh"
+                                                        /opt/opendj/runtime-scripts/schedule-backup.sh"
             ;;
         *)
           echo "Usage: $0 [create|cancel]"

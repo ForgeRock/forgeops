@@ -104,20 +104,6 @@ copyKeys() {
     [[ -d $TRUSTSTORE_DIR ]] && cp $TRUSTSTORE_DIR/ca.crt $PEM_TRUSTSTORE_DIRECTORY/trust.pem
 }
 
-# Execute a user supplied script hook, or use the default if none is supplied.
-# Check for a user supplied script $1, and if not found use the default one.
-executeScript() {
-    # Kubernetes creates a sym link from $1 to ..data/$1 - so we test for the sym link.
-    if [[ -L scripts/$1 ]]; then
-    echo "Executing user supplied $1 script"
-        ./scripts/$1
-    else
-        echo "Executing default $1 script"
-        ./default-scripts/$1
-    fi
-}
-
-
 init() {
     # Make sure master keys and truststore are in place and up to date.
     copyKeys
@@ -125,7 +111,6 @@ init() {
     # Set the admin and monitor passwords from K8S secrets
     setAdminAndMonitorPasswords
 }
-
 
 CMD="${1:-help}"
 case "$CMD" in
@@ -141,14 +126,14 @@ init)
 
         # If the user supplies a post-init script, run it
         # The default-script is a no-op.
-        executeScript post-init
+        ./runtime-scripts/${POD_NAME%-*}/post-init
         exit 0;
     fi
     # Else - no data is present, we need to run setup.
     echo "Untaring protoype setup to $DS_DATA_DIR"
     tar --no-overwrite-dir -C $DS_DATA_DIR -xvzf data.tar.gz
     copyKeys
-    executeScript setup
+    ./runtime-scripts/${POD_NAME%-*}/setup
     init
     ;;
 
