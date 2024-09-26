@@ -1,7 +1,4 @@
-ARG REPO=gcr.io/forgerock-io/amster/pit1
-ARG TAG=7.6.0-latest-postcommit
-
-FROM ${REPO}:${TAG}
+FROM gcr.io/forgerock-io/amster/pit1:7.6.0-latest-postcommit
 
 USER root
 

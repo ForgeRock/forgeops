@@ -1,7 +1,4 @@
-ARG REPO=gcr.io/forgerock-io/ig/pit1
-ARG TAG=2023.4.1-latest-postcommit
-
-FROM ${REPO}:${TAG}
+FROM gcr.io/forgerock-io/ig/pit1:2023.4.1-latest-postcommit
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
