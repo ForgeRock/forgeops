@@ -55,7 +55,7 @@ spec:
       - name: init
         command: ["/opt/opendj/runtime-scripts/init-and-restore.sh"]
         image: ds
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: POD_NAME
           valueFrom:
@@ -120,7 +120,7 @@ spec:
         args:
         - start-ds
         image: ds
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
         - name: POD_NAME
           valueFrom:
