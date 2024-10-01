@@ -21,7 +21,7 @@ def initialSteps() {
             parameters(commonLodestarModule.postcommitMandatoryStages(true)),
     ])
 
-    slackChannel = '#forgeops-notify'
+    slackChannel = '#forgeops-team'
 }
 
 def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
