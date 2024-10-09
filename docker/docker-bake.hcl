@@ -26,8 +26,7 @@ variable "PULL" {
 }
 
 variable "BUILD_ARCH" {
-  # default = "amd64,arm64"
-  default = "amd64"
+  default = "amd64,arm64"
 }
 
 variable "PLATFORM_VERSION" {
