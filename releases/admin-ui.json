@@ -1,7 +1,7 @@
 {
   "releases": {
     "dev": {
-      "component_name": "ds-empty",
+      "component_name": "platform-admin-ui/docker-build",
       "dev": {
         "tags": [
           "8.0.0-latest-postcommit"
@@ -19,17 +19,17 @@
           "7.4.1"
         ]
       },
-      "7.4.2": {
-        "tags": [
-          "7.4.2"
-        ]
-      },
-      "scan": "weekly"
+      "scan": "monthly"
     },
     "7.5": {
       "7.5.0": {
         "tags": [
           "7.5.0"
+        ]
+      },
+      "7.5.1": {
+        "tags": [
+          "7.5.1"
         ]
       },
       "scan": "weekly"

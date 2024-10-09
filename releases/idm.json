@@ -1,5 +1,13 @@
 {
   "releases": {
+    "dev": {
+      "component_name": "idm-cdk",
+      "dev": {
+        "tags": [
+          "8.0.0-latest-postcommit"
+        ]
+      }
+    },
     "7.4": {
       "7.4.0": {
         "tags": [
