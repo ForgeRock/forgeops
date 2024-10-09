@@ -1,7 +1,10 @@
 kind: Component
 apiVersion: kustomize.config.k8s.io/v1alpha1
-commonLabels:
-  app.kubernetes.io/part-of: forgerock
+labels:
+  - includeSelectors: true
+    includeTemplates: true
+    pairs:
+      app.kubernetes.io/part-of: forgerock
 images:
 - name: .*am:.*
   newName: us-docker.pkg.dev/forgeops-public/images/am
@@ -12,15 +15,21 @@ images:
 - name: .*ds:.*
   newName: us-docker.pkg.dev/forgeops-public/images/ds
   newTag: dev
-- name: .*ds-cts.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: dev
-- name: .*ds-idrepo.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: dev
 - name: .*idm
   newName: us-docker.pkg.dev/forgeops-public/images/idm
   newTag: dev
 - name: .*ig.*
   newName: us-docker.pkg.dev/forgeops-public/images/ig
+  newTag: dev
+- name: .*admin-ui.*
+  newName: us-docker.pkg.dev/forgeops-public/images/admin-ui
+  newTag: dev
+- name: .*end-user-ui.*
+  newName: us-docker.pkg.dev/forgeops-public/images/end-user-ui
+  newTag: dev
+- name: .*enduser-ui.*
+  newName: us-docker.pkg.dev/forgeops-public/images/end-user-ui
+  newTag: dev
+- name: .*login-ui.*
+  newName: us-docker.pkg.dev/forgeops-public/images/login-ui
   newTag: dev

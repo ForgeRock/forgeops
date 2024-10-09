@@ -68,27 +68,34 @@ def get_releases(release_src, components):
 def parse_release_str(rel_str):
     """ Split the release string, and setup a map of different release strings. """
 
-    release = {}
-    release_tup = tuple(map(int, rel_str.split('.')))
-    for i in range(len(release_tup)):
-        if 'major' not in release.keys():
-            release['major'] = release_tup[i]
-        elif 'minor' not in release.keys():
-            release['minor'] = release_tup[i]
-        elif 'patch' not in release.keys():
-            release['patch'] = release_tup[i]
+    alt_releases = ['dev']
+    release = {
+        'major': 0,
+        'minor': 0,
+        'patch': 0,
+    }
+    if rel_str.count('.') == 0:
+        release['major'] = rel_str
+    elif rel_str.count('.') == 1:
+        release['major'] = int(rel_str.split('.')[0])
+        release['minor'] = int(rel_str.split('.')[1])
+    elif rel_str.count('.') == 2:
+        release['major'] = int(rel_str.split('.')[0])
+        release['minor'] = int(rel_str.split('.')[1])
+        release['patch'] = int(rel_str.split('.')[2])
 
-    if 'minor' not in release.keys():
-        release['minor'] = '0'
-    if 'patch' not in release.keys():
-        release['patch'] = 0
-    release['maj_min'] = f"{release['major']}.{release['minor']}"
-    release['full'] = f"{release['maj_min']}.{release['patch']}"
+    if rel_str in alt_releases:
+        release['maj_min'] = rel_str
+        release['full'] = rel_str
+    else:
+        release['major'] = int(release['major'])
+        release['maj_min'] = f"{release['major']}.{release['minor']}"
+        release['full'] = f"{release['maj_min']}.{release['patch']}"
 
     return release
 
 
-def select_tag(component, releases, release, tag=None):
+def select_tag(component, releases, release, image_names, tag=None):
     """ Select the best tag based on the component, release, and/or tag. """
 
     major = release['major']
@@ -103,6 +110,8 @@ def select_tag(component, releases, release, tag=None):
     target = release['target']
 
     if maj_min in releases[component].keys():
+        if 'component_name' in releases[component][maj_min]:
+            image_names[component] = releases[component][maj_min]['component_name']
         if full in releases[component][maj_min].keys():
             if tag in releases[component][maj_min][full]['tags']:
                 selected_tag = tag
@@ -134,6 +143,9 @@ def write_release_files(tags, repo, docker_path, release_file, image_names):
     """ Write a release files """
 
     for c in tags.keys():
+        # Skip ui images as we don't support building those
+        if 'ui' in c:
+            continue
         releases_path = docker_path / c / 'releases'
         if c == 'ds':
             releases_path = docker_path / c / 'ds-new' / 'releases'
@@ -150,24 +162,34 @@ def write_release_files(tags, repo, docker_path, release_file, image_names):
 def update_image_defaulter(images, overlay_path):
     """ Update the image-defaulter """
 
-    for c in images.keys():
-        name = f".*{c}.*"
-        if (c == 'am') or (c == 'ds'):
-            name = f".*{c}:.*"
-        image = f"{images[c]['image']['repository']}"
-        if 'tag' in images[c]['image'].keys():
-            image = f"{image}:{images[c]['image']['tag']}"
+    for image_name in images.keys():
+        name = f".*{image_name}.*"
+        if image_name in ['am', 'ds']:
+            name = f".*{image_name}:.*"
+        image = f"{images[image_name]['image']['repository']}"
+        if 'tag' in images[image_name]['image'].keys():
+            image = f"{image}:{images[image_name]['image']['tag']}"
         cmd_args = f"edit set image '{name}={image}'"
         utils.run('kustomize', cmd_args, cwd=f"{overlay_path}/image-defaulter")
+
+        if image_name == 'end-user-ui':
+            name = '.*enduser-ui.*'
+            cmd_args = f"edit set image '{name}={image}'"
+            utils.run('kustomize', cmd_args, cwd=f"{overlay_path}/image-defaulter")
 
 
 def main():
     prog = 'forgeops-ng image'
-    components_valid = ['platform', 'apps', 'am', 'amster', 'idm', 'ds', 'ig', []]
+    components_apps = ['am', 'amster', 'idm']
+    components_ui = ['admin-ui', 'end-user-ui', 'login-ui']
+    components_platform = sum([components_apps, ['ds'], components_ui], [])
+    components_meta = ['platform', 'apps', 'ui']
+    components_valid = sum([components_meta, components_platform, ['ig']], [])
+    components_valid.append([])
 
     forgeops_public_url = 'us-docker.pkg.dev/forgeops-public'
-    #base_repo_def = f"{forgeops_public_url}/images-base"
-    base_repo_def = "gcr.io/forgerock-io" # Temporarily using old URL until new one is working
+    base_repo_dev = "gcr.io/forgerock-io"
+    base_repo_def = f"{forgeops_public_url}/images-base"
     config_repo_def = f"{forgeops_public_url}/images"
 
     help_examples=f"""
@@ -191,7 +213,7 @@ examples:
 {prog} --release 2024.6.3 --release-name 2024.6.3-1 ig
 """
 
-    parser = argparse.ArgumentParser(description='Manage images in a Ping Identity Platform (IdP) environment',
+    parser = argparse.ArgumentParser(description='Manage images in a Ping Identity Platform (PIP) environment',
                                      prog=prog,
                                      epilog=textwrap.dedent(help_examples),
                                      formatter_class=Formatter)
@@ -240,18 +262,31 @@ examples:
         update_config_images = False
 
     base_image_names = {
-        'am': 'am-cdk',
+        'am': 'am',
         'amster': 'amster',
-        'ds': 'ds-empty',
-        'idm': 'idm-cdk',
+        'ds': 'ds',
+        'idm': 'idm',
         'ig': 'ig',
+        'admin-ui': 'admin-ui',
+        'end-user-ui': 'end-user-ui',
+        'login-ui': 'login-ui',
     }
 
-    components = args.components
-    if containsElement(['platform'], args.components):
-        components = ['am', 'amster', 'idm', 'ds']
-    elif containsElement(['apps'], args.components):
-        components = ['am', 'amster', 'idm']
+    components = copy(args.components)
+    if containsElement(['platform'], components):
+        components.extend(components_platform)
+        components.remove('platform')
+    if containsElement(['apps'], components):
+        components.extend(components_apps)
+        components.remove('apps')
+    if containsElement(['ui'], components):
+        components.extend(components_ui)
+        components.remove('ui')
+    # Use set() to remove duplicates from components
+    components = list(set(components))
+
+    if args.debug:
+        print(f"components = {components}")
 
     script_path = Path(__file__).parent
     if args.debug: print(f'script_path = {script_path}')
@@ -345,30 +380,33 @@ examples:
         release_file = f"{args.release}-{timestamp}"
         if getattr(args, 'release_file', None):
             release_file = args.release_file
+        if args.release == 'dev':
+          base_repo = base_repo_dev
 
         releases = get_releases(release_src, components)
         release = parse_release_str(args.release)
-        if containsElement(['am'], components):
-            release_tags['am'] = select_tag('am', releases, release, args.tag)
-        if containsElement(['amster'], components):
-            release_tags['amster'] = select_tag('amster', releases, release, args.tag)
-        if containsElement(['idm'], components):
-            release_tags['idm'] = select_tag('idm', releases, release, args.tag)
-        if containsElement(['ds'], components):
-            release_tags['ds'] = select_tag('ds', releases, release, args.tag)
-        if containsElement(['ig'], components):
-            release_tags['ig'] = select_tag('ig', releases, release, args.tag)
+        for c in components:
+            release_tags[c] = select_tag(c, releases, release, base_image_names, args.tag)
 
         write_release_files(release_tags, base_repo, docker_path, release_file, base_image_names)
 
     values_images = {}
+    images_kustomize = {}
     if update_config_images:
-        repo = config_repo if args.release else push_to
+        repo = push_to
+        if args.release:
+            repo = config_repo
         tag = args.tag
         for component in components:
             if args.release:
-                tag = release_tags[component]
-            values_images[component] = set_image(component, tag, repo)
+                tag = 'dev' if args.release == 'dev' else release_tags[component]
+            if component == 'ds':
+                values_images['ds_cts'] = set_image(component, tag, repo)
+                values_images['ds_idrepo'] = set_image(component, tag, repo)
+                images_kustomize[component] = set_image(component, tag, repo)
+            else:
+                values_images[component.replace('-', '_')] = set_image(component, tag, repo)
+                images_kustomize[component] = set_image(component, tag, repo)
 
     if do_kustomize:
         overlay_root = kustomize_path / 'overlay'
@@ -402,7 +440,7 @@ examples:
 
         if update_config_images:
             print(f"Updating image-defaulter in {args.env_name} overlay")
-            update_image_defaulter(values_images, overlay_path)
+            update_image_defaulter(images_kustomize, overlay_path)
 
     if do_helm and args.env_name:
         values_fn = 'values.yaml'
