@@ -339,10 +339,10 @@ idm:
 
   resources:
     limits:
-      memory: 1024Mi
+      memory: 1280Mi
     requests:
       cpu: 250m
-      memory: 1024Mi
+      memory: 1280Mi
 
   livenessProbe:
     initialDelaySeconds: 120

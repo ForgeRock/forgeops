@@ -346,10 +346,10 @@ spec:
             periodSeconds: 10
           resources:
             limits:
-              memory: 1024Mi
+              memory: 1280Mi
             requests:
               cpu: 250m
-              memory: 1024Mi
+              memory: 1280Mi
           volumeMounts:
             - mountPath: /var/run/secrets/idm
               name: idm-secrets
