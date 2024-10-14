@@ -15,8 +15,7 @@ cd $start_dir
 
 usage() {
   local usage_msg=$(cat<<EOM
-Usage:
-$PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
+usage: $PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
 
 Apply a ForgeRock Identity Platform kustomize overlay into a k8s namespace.
 This runs \`kubectl apply -k\` on an overlay dir.

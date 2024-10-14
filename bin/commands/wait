@@ -15,7 +15,7 @@ cd $start_dir
 
 usage() {
   local usage_msg=$(cat<<EOM
-Usage: $PROG [OPTIONS] [<component> <component> ...]
+usage: $PROG [OPTIONS] [<component> <component> ...]
 
 Wait for platform components to be ready
 

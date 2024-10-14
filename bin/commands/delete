@@ -15,8 +15,7 @@ cd $start_dir
 
 usage() {
   local usage_msg=$(cat<<EOM
-Usage:
-$PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
+usage: $PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
 
 Delete ForgeRock Identity Platform from a k8s namespace.
 

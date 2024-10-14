@@ -15,8 +15,7 @@ cd $start_dir
 
 usage() {
   local usage_msg=$(cat<<EOM
-Usage:
-$PROG --env-name ENV_NAME [OPTIONS] COMPONENT [COMPONENT]...
+usage: $PROG --env-name ENV_NAME [OPTIONS] COMPONENT [COMPONENT]...
 
 Build container images for one or more ForgeRock components.
 
