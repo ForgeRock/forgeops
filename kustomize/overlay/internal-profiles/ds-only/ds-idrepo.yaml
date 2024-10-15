@@ -18,6 +18,13 @@ spec:
       initContainers:
         - name: init
           imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 4Gi
+              cpu: 4
+            limits:
+              memory: 4Gi
+              cpu: 4
   volumeClaimTemplates:
   - metadata:
       name: data
