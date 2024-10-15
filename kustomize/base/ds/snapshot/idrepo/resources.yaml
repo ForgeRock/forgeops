@@ -20,7 +20,7 @@ spec:
           containers:
             - name: ds-idrepo-snapshot
               image: bitnami/kubectl:latest
-              imagePullPolicy: Always
+              imagePullPolicy: IfNotPresent
               command:
                 - /bin/bash
                 - -c

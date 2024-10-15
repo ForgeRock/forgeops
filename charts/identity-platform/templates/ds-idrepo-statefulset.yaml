@@ -90,7 +90,10 @@ spec:
             name: cloud-credentials-cache
           # args:
           # - init
-          command: ["/opt/opendj/runtime-scripts/init-and-restore.sh"]
+          command:
+          - sh
+          - -c
+          - "/opt/opendj/runtime-scripts/init-and-restore.sh || /opt/opendj/default-scripts/init-and-restore.sh"
           env:
           - name: POD_NAME
             valueFrom:
