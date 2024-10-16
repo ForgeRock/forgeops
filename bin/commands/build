@@ -79,8 +79,10 @@ message "CONTAINER_ENGINE=$CONTAINER_ENGINE" "debug"
 
 if [ -d "$BUILD_PATH" ] ; then
   message "Build path exists: $BUILD_PATH" "debug"
+  BUILD_PATH_OPT="-b $BUILD_PATH"
 else
   usage 1 "Build path doesn't exist: $BUILD_PATH"
+  BUILD_PATH_OPT=
 fi
 
 if [ "$RESET" = true ] ; then
@@ -145,5 +147,5 @@ for c in ${COMPONENTS[@]} ; do
     PUSH_OPT="--push-to none"
   fi
 
-  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $c
+  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $BUILD_PATH_OPT $c
 done
