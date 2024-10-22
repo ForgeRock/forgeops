@@ -22,10 +22,9 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                         'platformImagesCommit': commonModule.platformImagesRevision,
                         'lodestarCommit':       commonModule.lodestarRevision,
                 ]
-
-                return platformImageUtils.createPlatformImagePR('forgeops', env.BRANCH_NAME, dockerProperties)
-                        ? Status.SUCCESS.asOutcome()
-                        : Status.SKIPPED.asOutcome()
+                return platformImageUtils.createPlatformImagePR(
+                        'forgeops', commonModule.calculatePlatformImagesBranch(), dockerProperties) ? Status.SUCCESS.asOutcome()
+                                                                                                    : Status.SKIPPED.asOutcome()
             }
         }
     }
