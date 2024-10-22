@@ -62,7 +62,8 @@ lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 /** Does the branch support PIT tests */
 boolean branchSupportsPitTests() {
     def supportedBranchPrefixes = [
-            'master',
+            'main',
+            'dev',
             'idcloud-',
             'release/',
             'sustaining/',
@@ -78,7 +79,7 @@ boolean branchSupportsPitTests() {
 // To be discussed with Bruno and Robin
 boolean branchSupportsIDCloudReleases() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-    return branchName.equals('master') \
+    return branchName.equals('main') \
             || branchName.equals('feature/config') \
             || branchName.equals('release/7.1.0') \
             || branchName.startsWith('idcloud-') \
