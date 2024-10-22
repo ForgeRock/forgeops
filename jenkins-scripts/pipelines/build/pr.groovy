@@ -67,7 +67,7 @@ def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
     }
 }
 
-// Since it's not straightforward to detect changes between the PR branch and master, on the first PR build
+// Since it's not straightforward to detect changes between the PR branch and dev branch, on the first PR build
 // we build everything. This can be disabled by temporarily commenting various lines out of buildDirectories.
 boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
     return forceBuild || BUILD_NUMBER == '1' ||

@@ -81,7 +81,7 @@ boolean branchSupportsIDCloudReleases() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
     return branchName.equals('main') \
             || branchName.equals('feature/config') \
-            || branchName.equals('release/7.1.0') \
+            || branchName.equals('release/') \
             || branchName.startsWith('idcloud-') \
             || branchName.startsWith('sustaining/') \
             || branchName.startsWith('preview/')
@@ -112,7 +112,6 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                 dir('guillotine') {
 
                     localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
-                    def forgeopsRef = isPR() ? commonModule.GIT_COMMIT : env.BRANCH_NAME
 
                     if (providerName == 'GKE'){
                         authenticateGke()
@@ -132,7 +131,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                     }
 
                     // Configure Guillotine to run tests
-                    sh("./configure.py runtime --forgeops-ref ${forgeopsRef} ${options}")
+                    sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
 
                     try {
                         // Run the tests
