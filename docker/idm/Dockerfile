@@ -1,5 +1,5 @@
 ARG REPO=gcr.io/forgerock-io/idm-cdk/pit1
-ARG TAG=7.6.0-latest-postcommit
+ARG TAG=8.0.0-latest-postcommit
 
 FROM ${REPO}:${TAG}
 

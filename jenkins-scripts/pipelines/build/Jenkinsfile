@@ -17,8 +17,8 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 BASE_VERSION = '7.2.0'
 
 buildDirectories = [
-    [ name: 'ds-new', folder: 'ds', arguments: 'ds-new', forceBuild: false ],
-    [ name: 'proxy', folder: 'ds', arguments: '-f proxy/Dockerfile .', forceBuild: false ],
+    [ name: 'ds-proxy', folder: 'ds-proxy', arguments: '.', forceBuild: false ],
+    [ name: 'ds-util', folder: 'ds-util', arguments: '.', forceBuild: false ],
 ]
 
 def pipeline

@@ -147,8 +147,6 @@ def write_release_files(tags, repo, docker_path, release_file, image_names):
         if 'ui' in c:
             continue
         releases_path = docker_path / c / 'releases'
-        if c == 'ds':
-            releases_path = docker_path / c / 'ds-new' / 'releases'
         if not releases_path.exists():
             os.makedirs(releases_path)
 
