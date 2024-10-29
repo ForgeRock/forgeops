@@ -1,0 +1,12 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+components:
+- ../image-defaulter
+
+resources:
+- ../../../../base/idm
+
+patches:
+- path: deployment.yaml
+- path: ingress.yaml

@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: idm
+spec:
+  tls:
+    - hosts:
+      - "prod.iam.example.com"
+      secretName: "prod.iam.example.com"
+  rules:
+    - host: "prod.iam.example.com"

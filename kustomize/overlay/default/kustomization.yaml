@@ -1,0 +1,15 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+resources:
+  - ./base
+  - ./secrets
+  - ./ds-cts
+  - ./ds-idrepo
+  - ./am
+  - ./amster
+  - ./idm
+  - ./ldif-importer
+  - ./admin-ui
+  - ./end-user-ui
+  - ./login-ui

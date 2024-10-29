@@ -49,14 +49,14 @@ processArgs() {
   DRYRUN=false
   VERBOSE=false
 
-  # Vars that can be set in /path/to/forgeops/forgeops-ng.conf
+  # Vars that can be set in /path/to/forgeops/forgeops.conf
   BUILD_PATH=${BUILD_PATH:-docker}
-  KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize-ng}
+  KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize}
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
   PUSH_TO=${PUSH_TO:-}
 
-  # Vars that cannot be set in /path/to/forgeops/forgeops-ng.conf
+  # Vars that cannot be set in /path/to/forgeops/forgeops.conf
   AMSTER_RETAIN=10
   COMPONENTS=()
   CREATE_NAMESPACE=false
@@ -70,7 +70,7 @@ processArgs() {
 
   # Setup prog for usage()
   PROG_NAME=$(basename $0)
-  PROG="forgeops-ng ${PROG_NAME}"
+  PROG="forgeops ${PROG_NAME}"
 
   while true; do
     case "$1" in

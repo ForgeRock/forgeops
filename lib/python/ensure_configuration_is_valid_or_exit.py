@@ -68,7 +68,7 @@ def print_how_to_install_dependencies():
     if is_pipx_installed():
         print(f'If you are using pipx, please install manually python dependencies by using {REQUIREMENTS_FILE}')
     else:
-        print('You may want to run "forgeops-ng configure" command')
+        print('You may want to run "forgeops configure" command')
     sys.exit(1)
 
 

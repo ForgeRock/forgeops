@@ -1,0 +1,450 @@
+---
+# Source: identity-platform/templates/idm-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+data:
+  IDM_ENVCONFIG_DIRS: /opt/openidm/resolver
+  LOGGING_PROPERTIES: /var/run/openidm/logging/logging.properties
+  OPENIDM_ANONYMOUS_PASSWORD: anonymous
+  OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
+  OPENIDM_CONFIG_REPO_ENABLED: "false"
+  PROJECT_HOME: /opt/openidm
+  OPENIDM_ICF_RETRY_DELAYSECONDS: "10"
+  OPENIDM_ICF_RETRY_MAXRETRIES: "12"
+  OPENIDM_AUDIT_HANDLER_JSON_ENABLED: "false"
+  OPENIDM_AUDIT_HANDLER_STDOUT_ENABLED: "true"
+---
+# Source: identity-platform/templates/idm-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-logging-properties
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+data:
+  logging.properties: |
+    # Properties file that configures the operation of the JDK
+    # logging facility.
+    # The system will look for this configuration file, first using
+    # a System property specified at startup:
+    #
+    # >java -Djava.util.logging.config.file=myLoggingConfigFilePath
+    #
+    # If this property is not specified, then the configuration file is
+    # retrieved from its default location at:
+    #
+    # JDK_HOME/jre/lib/logging.properties
+    ############################################################
+    #      Global properties
+    ############################################################
+    # ------------------------------------------
+    # The set of handlers to be loaded upon startup.
+    # Comma-separated list of class names.
+    # (? LogManager docs say no comma here, but JDK example has comma.)
+    # StreamHandler: A simple handler for writing formatted records to an OutputStream.
+    # ConsoleHandler: A simple handler for writing formatted records to System.err
+    # FileHandler: A handler that writes formatted log records either to a single file, or to a set of rotating log files.
+    # SocketHandler: A handler that writes formatted log records to remote TCP ports.
+    # MemoryHandler: A handler that buffers log records in memory.
+    # handlers=java.util.logging.ConsoleHandler
+    # handlers=java.util.logging.FileHandler, java.util.logging.ConsoleHandler
+    # For Docker, write everything to the console
+    handlers=java.util.logging.ConsoleHandler
+    # Default global logging level.
+    # This specifies which kinds of events are logged across
+    # all loggers.  For any given facility this global level
+    # can be overriden by a facility specific level
+    # Note that the ConsoleHandler also has a separate level
+    # setting to limit messages printed to the console.
+    # Loggers and Handlers may override this level
+    .level=INFO
+    # Loggers
+    # ------------------------------------------
+    # Loggers are usually attached to packages.
+    # Here, the level for each package is specified.
+    # The global level is used by default, so levels
+    # specified here simply act as an override.
+    # The levels in descending order are:
+    #   SEVERE (highest value)
+    #   WARNING
+    #   INFO
+    #   CONFIG
+    #   FINE
+    #   FINER
+    #   FINEST (lowest value)
+    ############################################################
+    # Facility specific properties.
+    # Provides extra control for each logger.
+    ############################################################
+    #org.forgerock.openidm.provisioner.level = FINER
+    #org.forgerock.openidm.repo.level = FINER
+    #org.forgerock.openidm.recon.level = FINER
+    # OpenICF is noisy at INFO level
+    org.forgerock.openicf.level=WARNING
+    # Logs the output from OSGi logging
+    org.forgerock.openidm.Framework.level=WARNING
+    # On restart the BarURLHandler can create warning noise
+    org.activiti.osgi.BarURLHandler.level=SEVERE
+    # Suppress warnings of failed connector loading
+    org.identityconnectors.framework.impl.api.local.LocalConnectorInfoManagerImpl.level=SEVERE
+    ############################################################
+    # Handler specific properties.
+    # Describes specific configuration info for Handlers.
+    ############################################################
+    # --- ConsoleHandler ---
+    # Default: java.util.logging.ConsoleHandler.level = INFO
+    # Override of global logging level
+    #java.util.logging.ConsoleHandler.level = WARNING
+    # For Docker
+    java.util.logging.ConsoleHandler.level = INFO
+    java.util.logging.ConsoleHandler.formatter = org.forgerock.openidm.logger.SanitizedThreadIdLogFormatter
+    # specifies the name of the filter class to be associated with this handler,
+    # defaults to {@code null} if this property is not found or has an invalid value.
+    java.util.logging.ConsoleHandler.filter=org.forgerock.openidm.logging.util.LogFilter
+    # --- FileHandler ---
+    # Override of global logging level
+    java.util.logging.FileHandler.level = ALL
+    # Naming style for the output file:
+    # (The output file is placed in the directory
+    # defined by the "user.home" System property.)
+    # java.util.logging.FileHandler.pattern = %h/java%u.log
+    java.util.logging.FileHandler.pattern = logs/openidm%u.log
+    # Limiting size of output file in bytes:
+    java.util.logging.FileHandler.limit = 5242880
+    # Number of output files to cycle through, by appending an
+    # integer to the base file name:
+    java.util.logging.FileHandler.count = 5
+    # Style of output (Simple or XML):
+    # Writes brief "human-readable" summaries of log records.
+    java.util.logging.FileHandler.formatter = org.forgerock.openidm.logger.SanitizedThreadIdLogFormatter
+    # Writes detailed XML-structured information.
+    # java.util.logging.FileHandler.formatter = java.util.logging.XMLFormatter
+    # specifies the character set encoding name.
+    # defaults to the default platform encoding
+    java.util.logging.FileHandler.encoding = UTF-8
+---
+# Source: identity-platform/templates/idm-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: idm
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: idm
+    app.kubernetes.io/component: idm
+---
+# Source: identity-platform/templates/idm-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idm
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
+      app.kubernetes.io/instance: identity-platform
+      app: idm
+      app.kubernetes.io/component: idm
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: idm
+        app.kubernetes.io/component: idm
+    spec:
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      volumes:
+        - name: fbc
+          emptyDir: {}
+        - name: idm-secrets
+          secret:
+            secretName: idm
+        - name: truststore
+          projected:
+            sources:
+              - secret:
+                  name: truststore-pem
+              - secret:
+                  name: ds-ssl-keypair
+        - name: new-truststore
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: audit-logs
+          emptyDir: {}
+        - name: idm-logging-properties
+          configMap:
+            name: idm-logging-properties
+      initContainers:
+        - name: fbc-init
+          image: idm:7.6
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /fbc
+              name: fbc
+          command:
+            - /bin/bash
+            - -c
+            - |
+              if [ -d /fbc/config ];
+              then
+                echo "Existing openidm configuration found. Skipping copy"
+              else
+                echo "Copying docker image configuration files to the shared volume"
+                cd /opt/openidm
+                cp -vr ui conf script /fbc
+              fi
+        - name: truststore-init
+          image: idm:7.6
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: new-truststore
+              mountPath: /truststore
+            - name: truststore
+              mountPath: /var/run/secrets/truststore
+          command:
+            - /opt/openidm/bin/import-pem-certs.sh
+          env:
+            - name: TRUSTSTORE_PATH
+              value: /truststore/idmtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            - name: IDM_PEM_TRUSTSTORE
+              value: /var/run/secrets/truststore/cacerts
+            - name: IDM_PEM_TRUSTSTORE_DS
+              value: /var/run/secrets/truststore/ca.crt
+      containers:
+        - name: openidm
+          securityContext: {}
+          image: idm:7.6
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPENIDM_REPO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ds-passwords
+                  key: dirmanager.pw
+            - name: USERSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ds-passwords
+                  key: dirmanager.pw
+            - name: RS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: amster-env-secrets
+                  key: IDM_RS_CLIENT_SECRET
+          envFrom:
+            - configMapRef:
+                name: idm
+            - secretRef:
+                name: idm-env-secrets
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            initialDelaySeconds: 120
+            periodSeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            failureThreshold: 40
+            periodSeconds: 10
+          resources:
+            limits:
+              memory: 1280Mi
+            requests:
+              cpu: 250m
+              memory: 1280Mi
+          volumeMounts:
+            - mountPath: /var/run/secrets/idm
+              name: idm-secrets
+            - name: new-truststore
+              mountPath: /opt/openidm/idmtruststore
+              readOnly: true
+              subPath: idmtruststore
+            - mountPath: /opt/openidm/logs
+              name: logs
+            - mountPath: /opt/openidm/audit
+              name: audit-logs
+            - mountPath: /var/run/openidm/logging
+              name: idm-logging-properties
+            - name: fbc
+              mountPath: /opt/openidm/conf
+              subPath: conf
+            - name: fbc
+              mountPath: /opt/openidm/ui
+              subPath: ui
+            - name: fbc
+              mountPath: /opt/openidm/script
+              subPath: script
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Exists
+---
+# Source: identity-platform/templates/idm-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: idm
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/body-size: 64m
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/send-timeout: "600"
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - identity-platform.domain.local
+      secretName: tls-identity-platform.domain.local
+  rules:
+    - host: identity-platform.domain.local
+      http:
+        paths:
+          - path: /openidm
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /upload
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /export
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /openicf
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80

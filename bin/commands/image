@@ -179,7 +179,7 @@ def update_image_defaulter(images, overlay_path):
 
 
 def main():
-    prog = 'forgeops-ng image'
+    prog = 'forgeops image'
     components_apps = ['am', 'amster', 'idm']
     components_ui = ['admin-ui', 'end-user-ui', 'login-ui']
     components_platform = sum([components_apps, ['ds'], components_ui], [])
@@ -295,14 +295,14 @@ examples:
     # Temporary local file, will be hosted via http
     release_src = root_path / 'releases'
 
-    # Setup defaults for values that can be set in forgeops-ng.conf
+    # Setup defaults for values that can be set in forgeops.conf
     helm = 'helm'
     if getattr(args, 'helm', None):
         helm = args.helm
     elif os.getenv('HELM_PATH'):
         helm = os.getenv('HELM_PATH')
 
-    kustomize = 'kustomize-ng'
+    kustomize = 'kustomize'
     if getattr(args, 'kustomize', None):
         kustomize = args.kustomize
     elif os.getenv('KUSTOMIZE_PATH'):
@@ -431,9 +431,9 @@ examples:
 
             img_def_fn = 'image-defaulter/kustomization.yaml'
             if not overlay_path.exists():
-                utils.exit_msg(f'{overlay_path} does not exist. Run forgeops-ng env to create it.')
+                utils.exit_msg(f'{overlay_path} does not exist. Run forgeops env to create it.')
             if not src_overlay_path.exists():
-                utils.exit_msg(f'{src_overlay_path} does not exist. Run forgeops-ng env to create it.')
+                utils.exit_msg(f'{src_overlay_path} does not exist. Run forgeops env to create it.')
             img_kust = overlay_path / img_def_fn
             src_img_kust = src_overlay_path / img_def_fn
             img_kust.write_bytes(src_img_kust.read_bytes())
@@ -449,7 +449,7 @@ examples:
         if values_file.is_file():
             print('Updating existing helm values.')
         else:
-            utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops-ng env to populate.')
+            utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops env to populate.')
 
         values = {}
         values = yaml.safe_load(open(values_file))
@@ -463,7 +463,7 @@ examples:
             if src_values_file.is_file():
                 print(f"Reading in values from {src_values_file}")
             else:
-                utils.exit_msg(f'Source environment ({src_helm_path}) not populated. Run forgeops-ng env to populate.')
+                utils.exit_msg(f'Source environment ({src_helm_path}) not populated. Run forgeops env to populate.')
 
             src_images = {}
             src_values = {}

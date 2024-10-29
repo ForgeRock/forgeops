@@ -1,14 +1,9 @@
-# Patch AM
+#Patch AM
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: am
 spec:
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
   template:
     metadata:
       annotations:

@@ -1,428 +1,118 @@
-#!/usr/bin/env python3
-"""This script deploys the ForgeRock Identity Platform to Kubernetes."""
+#!/usr/bin/env bash
 
-import argparse
-import os
-import shutil
-import sys
-import time
-import json
-import logging
+set -e
 
-import site
-from pathlib import Path
-file_name = Path(__file__)
-current_file_path = file_name.parent.resolve()
-root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
-dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
-# Insert lib folders to python path
-sys.path.insert(0, str(root_dir))
-sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../lib/shell/stdlib.sh
 
-from lib.python import utils
-from lib.python.forgeops_dependencies import check_base_toolset, forgeops_dependencies
+usage() {
+  prog=$(basename $0)
 
-build_targets = ['am', 'amster', 'idm', 'ds', 'ig']
-legacy_build_targets = ['ds-idrepo', 'ds-cts']
+  ! read -r -d '' usage_msg <<- EOM
+  Usage:
+  $prog COMMAND [OPTIONS] [<component> <component> ...]
 
-build_contexts = {
-    'am': 'docker/am',
-    'amster': 'docker/amster',
-    'idm': 'docker/idm',
-    'ds': 'docker/ds/ds-new',
-    'ds-idrepo': 'docker/ds',
-    'ds-cts': 'docker/ds',
-    'ig': 'docker/ig'
-}
-build_dockerfiles = {
-    'am': 'docker/am/Dockerfile',
-    'amster': 'docker/amster/Dockerfile',
-    'idm': 'docker/idm/Dockerfile',
-    'ds': 'docker/ds/ds-new/Dockerfile',
-    'ds-idrepo': 'docker/ds/idrepo/Dockerfile',
-    'ds-cts': 'docker/ds/cts/Dockerfile',
-    'ig': 'docker/ig/Dockerfile'
-}
-wait_targets = ['ds', 'am', 'amster', 'idm', 'apps', 'secrets', 'ig']
-size_map = {
-    'single': {
-    },
-    'custom': {
-        'base': 'base',
-        'ds': 'ds',
-    },
-    'custom-old': {
-        'base': 'base',
-        'ds': 'ds-old',
-    },
-    'mini': {
-        'base': 'base',
-        'ds': 'ds',
-    },
-    'small': {
-        'base': 'base',
-        'ds': 'ds',
-    },
-    'medium': {
-        'base': 'base',
-        'ds': 'ds',
-    },
-    'large': {
-        'base': 'base',
-        'ds': 'ds',
-    },
+  Central interface to the scripts in commands folder. Use -h with any command
+  to see its usage.
+
+  OPTIONS:
+  -h|--help                 : display usage and exit
+  --debug                   : turn on debugging
+  --dryrun                  : do a dry run
+
+  Commands: ${COMMANDS[@]}
+  Deprecated Commands: ${COMMANDS_DEPRECATED[@]}
+
+EOM
+
+  usageStd $1 "$usage_msg" $2
+
 }
 
-delete_components = {
-    'pvc': False,
-    'snapshots': False,
-    'secrets': False
-}
+DEBUG=false
+DRYRUN=false
+VERBOSE=false
 
-def install_all(size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, timeout, deploy_path=None, src_profile_dir=None):
-    """Deploy all components in sequence"""
-    remap = size_map[size]
-    utils.message('Deploying base.yaml. This is a one time activity.')
-    utils.install_component(remap.get('base', 'base'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path, src_profile_dir)
-    utils.install_component(remap.get('secrets', 'secrets'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path, src_profile_dir)
-    utils.waitforsecrets(ns, timeout)
-    utils.message('\nDeploying ds.yaml. This includes all directory resources.')
-    utils.install_component(remap.get('ds', 'ds'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path, src_profile_dir)
-    utils.message('\nWaiting for DS deployment. This can take a few minutes. First installation takes longer.')
-    utils.wait_for_ds(ns, 'ds-idrepo', legacy, timeout)
-    utils.wait_for_ds(ns, 'ds-cts', legacy)
-    # Clean any existing Amster resources
-    utils.clean_amster_job(ns, False)
-    utils.message('\nDeploying apps.')
-    utils.install_component(remap.get('apps', 'apps'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path, src_profile_dir)
-    utils.message('\nWaiting for AM deployment. This can take a few minutes. First installation takes longer.')
-    time.sleep(2)
-    utils.wait_for_am(ns, timeout)
-    # Create amster-retain configmap
-    utils.run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
-    utils.message('\nWaiting for amster job to complete. This can take several minutes.')
-    utils.wait_for_amster(ns, duration, timeout)
-    utils.message('\nWaiting for IDM deployment. This can take a few minutes. First installation takes longer.')
-    utils.wait_for_idm(ns, timeout)
-    utils.message('\nDeploying UI.')
-    utils.install_component(remap.get('ui', 'ui'), size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path, src_profile_dir)
-    # message('\nWaiting for UI pods to become ready')
-    # run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/component=ui --timeout=600s')
+# Since we want to see dryruns for both this script and the called script,
+# setting RUNANDPRINT to true so the sub script gets called.
+RUNANDPRINT=true
 
-def overlay_app_configs(ns, config_profile, am=True, idm=True):
-    """Overlay local configs in the AM and IDM pods"""
-    config_profile_path = os.path.join(root_dir, 'docker')
-    if am:
-        am_config_path = os.path.join(config_profile_path, 'am', 'config-profiles', config_profile, 'config')
-        _, am_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=am -o jsonpath={{.items[0].metadata.name}}',
-                                      cstdout=True)
-        am_pod_name = am_pod_name.decode('ascii')
-        utils.message(f'Copying your local AM configs into "{am_pod_name}" pod in "{ns}" namespace.')
-        utils.run('kubectl', f'-n {ns} cp {am_config_path} {am_pod_name}:/home/forgerock/openam/ -c openam')
-    if idm:
-        _, idm_pod_name, _ = utils.run('kubectl', f'-n {ns} get pods -l app.kubernetes.io/name=idm -o jsonpath={{.items[0].metadata.name}}',
-                                       cstdout=True)
-        idm_pod_name = idm_pod_name.decode('ascii')
-        utils.message(f'Copying your local IDM configs into "{idm_pod_name}" pod in "{ns}" namespace.')
-        for directory in os.listdir(os.path.join(config_profile_path, 'idm', 'config-profiles', config_profile)):
-            idm_config_path = os.path.join(config_profile_path, 'idm', 'config-profiles', config_profile, directory)
-            utils.run('kubectl', f'-n {ns} cp {idm_config_path} {idm_pod_name}:/opt/openidm/ -c openidm')
+ARG_ARRAY=("$@") # Create an array out of our arguments
 
-    utils.message('Restarting AM and IDM pods.')
-    if am:
-        utils.run('kubectl', f'-n {ns} exec {am_pod_name}  -c openam  -- /bin/sh -c "kill 1"')
-    if idm:
-        utils.run('kubectl', f'-n {ns} exec {idm_pod_name} -c openidm -- /bin/sh -c "kill 1"')
+COMMANDS=(
+  'apply'
+  'build'
+  'configure'
+  'delete'
+  'env'
+  'info'
+  'image'
+  'wait'
+)
 
-def build_docker_image(component, push_to, tag, config_profile=None, deploy_path=None):
-    """Builds custom docker images"""
-    kustomize_dir = os.path.join(root_dir, 'kustomize')
-    image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
+COMMANDS_DEPRECATED=(
+  'clean'
+  'config'
+  'install'
+  'generate'
+)
 
-    # Look for PUSH_TO environment variable
-    if push_to is None:
-        push_to = os.getenv('PUSH_TO')
-    if push_to is None:
-        print('--push-to must be specified if the PUSH_TO environment variable is not set.')
-        sys.exit(1)
+# Avoiding our pattern of looping and shifting ARG elements as we want to
+# pass those as is to the worker scripts.
 
-    # Set container engine
-    if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
-        print('Podman set as container engine.')
-        container_engine = 'podman'
-    else:
-        container_engine = 'docker'
+COMMAND=$1 # Our first arg should be the command
 
-    # Build docker image
-    tag_data = utils.build_docker_image(component, build_contexts[component], build_dockerfiles[component], push_to, tag, container_engine, config_profile)
+# We need to detect --dryrun and --debug.
+if containsElement '--debug' ${ARG_ARRAY[@]} ; then
+  DEBUG=true
+fi
 
-    # Set image url in image defaulter
-    name = utils.DOCKER_REGEX_NAME.get(component, component)
-    utils.run('kustomize', f'edit set image {name}={tag_data}', cwd=image_defaulter)
-    utils.warning(f'Updated the image_defaulter with your new image for {component}: "{tag_data}".')
+if containsElement '--dryrun' ${ARG_ARRAY[@]} ; then
+  DRYRUN=true
+fi
 
-def main():
-    parser = argparse.ArgumentParser(description='Manage ForgeRock Identity Platform components')
-    common_ns = argparse.ArgumentParser(add_help=False) # namespace
-    common_sz = argparse.ArgumentParser(add_help=False) # predefined deployment size
-    common_dg = argparse.ArgumentParser(add_help=False) # debug
-    common_pf = argparse.ArgumentParser(add_help=False) # config profile
-    common_lg = argparse.ArgumentParser(add_help=False) # legacy
-    common_dl = argparse.ArgumentParser(add_help=False) # generated deployment manifest path
-    common = argparse.ArgumentParser(add_help=False)
-    common_ns.add_argument('--namespace', '-n', default='',
-                           help='Target namespace (default: current ctx namespace)')
-    common_dg.add_argument('--debug', action='store_true', help="Print debug logs")
-    common_lg.add_argument('--legacy', dest='legacy', default=False, action='store_true', help=argparse.SUPPRESS)
-    common_pf.add_argument('--config-profile', '-p', dest='config_profile', default='default', help="Name of config profile in docker/<component>/config-profiles")
-    common_dl.add_argument('--deploy-env', dest='deploy_env', default=None, help='Suffix of kustomize manifest directory for multiple deployments. For example: kustomize/deploy-<suffix>')
-    common.add_argument('components', nargs='*', choices=['all', 'base', 'ds', 'apps', 'ui', 'am', 'amster', 'idm',
-                                                          'ds-idrepo', 'ds-cts', 'admin-ui', 'end-user-ui', 'login-ui', 'ig',
-                                                          'secrets', []])
-    size_group = common_sz.add_mutually_exclusive_group()
-    size_group.add_argument('--single-instance', action='store_const', dest='size', const='single', help='(Default) Install/generate manifests for the CDK')
-    size_group.add_argument('--mini', action='store_const', dest='size', const='mini', help='Install/generate manifests for the CDM mini platform')
-    size_group.add_argument('--small', action='store_const', dest='size', const='small', help='Install/generate manifests for the CDM small platform')
-    size_group.add_argument('--medium', action='store_const', dest='size', const='medium', help='Install/generate manifests for the CDM medium platform')
-    size_group.add_argument('--large', action='store_const', dest='size', const='large', help='Install/generate manifests for the CDM large platform')
-    size_group.add_argument('--custom', dest='custom', help='Full path to a directory containing custom CDM patches')
+message "COMMAND=$COMMAND" "debug"
+message "DEBUG=$DEBUG" "debug"
+message "DRYRUN=$DRYRUN" "debug"
 
-    subparser = parser.add_subparsers(dest='cmd', metavar='{command}')
-    parser_install = subparser.add_parser('install', parents=[common_ns, common, common_sz, common_dg, common_lg, common_dl, common_pf], allow_abbrev=False,
-                                          help='Generate manifests and install the platform components or component bundles')
-    parser_install.add_argument('--fqdn', '-f', dest='fqdn',
-                                help='Select the FQDN for this deployment')
-    parser_install.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
-                                help='Select the INGRESS_CLASS for this deployment (default: nginx)')
-    parser_install.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
-    parser_install.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
-    parser_generate = subparser.add_parser('generate', parents=[common, common_sz, common_dg, common_lg, common_dl, common_pf],
-                                          help='Generate the ForgeRock Identity Platform manifests')
-    parser_generate.add_argument('--fqdn', '-f', dest='fqdn',
-                                help='Select the FQDN for this deployment')
-    parser_generate.add_argument('--ingress-class', '-i', dest='ingress_class', choices=['haproxy', 'nginx'], default='nginx',
-                                help='Select the INGRESS_CLASS for this deployment (default: nginx)')
-    parser_delete = subparser.add_parser(
-        'delete', parents=[common_ns, common, common_dg, common_pf], help='Delete ForgeRock Identity Platform components or component bundles')
-    parser_delete.add_argument('--yes', '-y', dest='skip_confirmation', action='store_true',
-                               help='Skip delete confirmation')
-    parser_delete.add_argument('--force', '-f', dest='force_delete', action='store_true',
-                               help='Delete all components including PVCs, secrets, and volume snapshots. *This will erase all data*')
-    parser_build = subparser.add_parser('build', parents=[common_dg, common_pf, common_dl], help='Build custom Docker images')
-    parser_build.add_argument('components', nargs='*', choices=['all'] + build_targets + legacy_build_targets, default='all', metavar=build_targets)
-    parser_build.add_argument('--push-to', '-r', dest='registry')
-    parser_build.add_argument('--tag', '-t', help='Set the tag used when building images')
-    parser_build.add_argument('--reset', action='store_true', help='Reset the image-defaulter file')
-    parser_info = subparser.add_parser('info', parents=[common_ns, common_dg], help='Print relevant deployment information')
-    parser_info.add_argument('--json', dest='jsonfmt', action='store_true', help='Print information in JSON format')
-    subparser.add_parser('config', parents=[common_ns, common_pf], help='Overlay local configs in the AM and IDM pods') # Internal FR use only!!. Hidden
-    parser_wait = subparser.add_parser('wait', parents=[common_ns, common_dg, common_lg], help='Wait for platform components', allow_abbrev=False)
-    parser_wait.add_argument('components', nargs='*', choices=wait_targets)
-    parser_wait.add_argument('--amster-retain', '-a', dest='duration', default='10', help='Keep amster pod running for a number of seconds. Add "infinity" to keep up indefinitely')
-    parser_wait.add_argument('--timeout', '-t', default=600, help='Set the max time in secs to wait for', type=int)
-    subparser.add_parser('clean', parents=[common_dl], help='Remove all locally generated manifests')
-    args = parser.parse_args()
+message "Validating command: $COMMAND" "debug"
+if containsElement $COMMAND ${COMMANDS[@]} ; then
+  message "Valid command: $COMMAND" "debug"
+  VALID_COMMAND=true
+elif containsElement $COMMAND ${COMMANDS_DEPRECATED[@]} ; then
+  message "Deprecated command: $COMMAND" "debug"
+  VALID_COMMAND=true
+else
+  VALID_COMMAND=false
+fi
+message "VALID_COMMAND=$VALID_COMMAND" "debug"
 
-    # Check toolset versions before doing anything
-    check_base_toolset()
-    deploy_path = None
-    if args.cmd != 'build':
-        ctx_namespace = utils.get_namespace()
-        ctx = utils.get_context()
-        namespace = getattr(args, 'namespace', None) or ctx_namespace
-        fqdn = args.fqdn if getattr(args, 'fqdn', None) else f'{namespace}.iam.example.com'
-        size = args.size if getattr(args, 'size', None) else 'single'
-        ingress_class = args.ingress_class if getattr(args, 'ingress_class', None) else 'nginx'
+HELP_FLAGS=( '-h' '--help' )
+if [ "$VALID_COMMAND" = false ] && containsElements ${HELP_FLAGS[@]} ${ARG_ARRAY[@]} ; then
+  usage 0
+elif [ "$VALID_COMMAND" = false ] ; then
+  usage 1 "Invalid command: $COMMAND"
+else
+  message "Removing $COMMAND from arguments" "debug"
+  shift
+fi
 
-        # Set custom size
-        src_profile_dir = getattr(args, 'custom', None)
-        remap = size_map[size]
-        if src_profile_dir:
-            if args.legacy:
-                size = 'custom-old'
-            else:
-                size = 'custom'
-            remap = size_map[size]
-
-    # Set the deploy directory
-    kustomize_dir = os.path.join(root_dir, 'kustomize')
-    if getattr(args, 'deploy_env', None):
-        deploy_path = os.path.join(kustomize_dir, 'deploy-' + str(args.deploy_env))
-    else:
-        deploy_path = os.path.join(kustomize_dir, 'deploy')
-
-    if getattr(args, 'debug', True):
-        utils.message(f'deployment manifest path: "{deploy_path}"')
-
-    if getattr(args, 'debug', False):
-        utils.log.setLevel(logging.DEBUG)
-        utils.log.handlers[0].setLevel(logging.DEBUG)
-
-    components = args.components if getattr(args, 'components', None) else ['all']
-    if args.cmd == 'info':
-        if not args.jsonfmt:
-            utils.message(f'Targeting namespace: "{namespace}".')
-        secrets = utils.printsecrets(namespace, not args.jsonfmt)
-        urls = utils.printurls(namespace, not args.jsonfmt)
-        output = {'context': ctx, 'namespace': namespace, 'secrets': secrets, 'urls': urls}
-        if args.jsonfmt:
-            print(json.dumps(output))
-        return
-    if args.cmd == 'config':
-        overlay_app_configs(namespace, args.config_profile)
-        return
-    if args.cmd is None:
-        parser.print_help()
-        sys.exit(1)
-
-    if args.cmd == 'clean':
-        utils.message(f'Removing all locally generated manifests from {deploy_path}')
-
-        # Get list of files in deploy directory
-        file_list = os.listdir(deploy_path)
-
-        # Files that can't be deleted
-        keep_files = ["image-defaulter", ".gitignore"]
-
-        # Remove all generated manifests and folders
-        for file_name in file_list:
-            if file_name not in keep_files:
-                shutil.rmtree(deploy_path+"/"+file_name)
-        return
-
-    if args.cmd == 'delete':
-
-        # Set delete flag if PVCs and secrets should be deleted
-        delete = True if args.force_delete else False
-
-        utils.message(f'Uninstalling component(s): {components} from namespace: "{namespace}".')
-        if not args.skip_confirmation:
-            if input('OK to delete components? [Y/N] ').lower() not in ['yes', 'y']:
-                return
-        if 'base' in components: #delete 'base' last
-            components.append(components.pop(components.index('base')))
-        if "all" in components:
-            components = ['ui', 'apps', 'ds', 'base']
-
-        # When -y flag is used to skip prompts, don't automatically delete pvcs, secrets, or volume snapshots unless --force provided
-        if not delete and args.skip_confirmation:
-            if ('all' in components):
-                utils.warning('Will not delete PVCs, secrets, or volume snapshots. You must delete those manually or use --force.')
-            elif any(x in "ds dsold ds-idrepo ds-cts" for x in components):
-                utils.warning('Will not delete PVCs and volume snapshots. You must delete those manually or use --force.')
-        # If no -y or --force provided, prompt the user what assets they would like to delete
-        elif not delete and not args.skip_confirmation:
-            if any(x in "ds dsold ds-idrepo ds-cts all" for x in components):
-                if input('OK to delete all PVCs(idrepo and cts)? [Y/N] ').lower() in ['yes', 'y']:
-                    delete_components['pvc'] = True
-                if input('OK to delete volume snapshots? [Y/N] ').lower() in ['yes', 'y']:
-                    delete_components['snapshots'] = True
-            if any(x in "secrets all base" for x in components):
-                if input('OK to delete secrets? [Y/N] ').lower() in ['yes', 'y']:
-                    delete_components['secrets'] = True
-        # If --force provided but neither ds or secrets provided, then don't delete pvcs, secrets, or volume snapshots
-        elif delete and not any(x in "ds dsold ds-idrepo ds-cts secrets all" for x in components):
-            delete = False
-
-        # Uninstall components
-        for c in components:
-            utils.uninstall_component(remap.get(c, c), namespace, delete, ingress_class, False, args.config_profile)
-
-        # Prompt to delete PVCs, secrets, and volume snapshots
-        if any(x in "ds dsold ds-idrepo ds-cts secrets all" for x in components):
-            if delete_components['pvc'] or delete:
-                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/instance=ds-idrepo --ignore-not-found=true')
-                utils.run('kubectl', f'-n {namespace} delete pvc -l app.kubernetes.io/instance=ds-cts --ignore-not-found=true')
-            if delete_components['snapshots'] or delete:
-                utils.run('kubectl', f'-n {namespace} delete volumesnapshot -l app.kubernetes.io/controller=DirectoryService --ignore-not-found=true')
-            if delete_components['secrets'] or delete:
-                utils.uninstall_component('secrets', namespace, False, ingress_class, False, args.config_profile)
-        return
-
-    if args.cmd == 'build':
-        if args.reset:
-            image_defaulter = os.path.join(deploy_path, 'image-defaulter' ) if deploy_path else os.path.join(root_dir, 'kustomize', 'deploy', 'image-defaulter' )
-            utils.message(f'Reset to git index: {image_defaulter}. ')
-            utils.run('git', f'checkout {image_defaulter}')
-            return
-        if 'all' in components:
-            components = build_targets + legacy_build_targets
-            if 'amster' in components:
-                components.remove('amster')
-        if 'amster' in components:
-            utils.error('Embedding AM dynamic configs in the amster image is deprecated. Manage AM dynamic config with the bin/amster cmd instead.')
-        for c in components:
-            build_docker_image(c, args.registry, args.tag, args.config_profile, deploy_path)
-        return
-
-    if args.cmd == 'wait':
-        if 'apps' in components:
-            components += ['am', 'amster', 'idm']
-            components.remove('apps')
-        if 'ds' in components or 'ds-old' in components:
-            utils.message('Waiting for DS deployment.')
-            utils.wait_for_ds(namespace, 'ds-idrepo', args.legacy, args.timeout)
-            utils.wait_for_ds(namespace, 'ds-cts', args.legacy)
-
-        if 'am' in components:
-            utils.message('Waiting for AM deployment.')
-            utils.wait_for_am(namespace, args.timeout)
-
-        if 'amster' in components:
-            utils.message('Waiting for amster job to complete.')
-            utils.wait_for_amster(namespace, args.duration, args.timeout)
-
-        if 'idm' in components:
-            utils.message('Waiting for IDM deployment.')
-            utils.wait_for_idm(namespace, args.timeout)
-
-        if 'secrets' in components:
-            utils.message('Waiting for secrets.')
-            utils.waitforsecrets(namespace, args.timeout)
-
-        return
-
-    if 'base' in components:
-        components.insert(0, 'secrets')
-
-    if args.cmd == 'generate':
-        instructions = []
-        components.sort(key=_sort_components)
-        utils.message(f'Generating forgeops manifests for {components} platform: "{size}" to deploy path: "{deploy_path}".\n')
-        if 'all' in components:
-            components = ['secrets', 'base', 'ds', 'apps', 'ui']
-        for c in components:
-            custom_path = os.path.join(deploy_path, remap.get(c, c)) if deploy_path else None
-            profile_path, _ = utils.generate_package(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.legacy, args.config_profile, custom_path, src_profile_dir, deploy_path)
-            print(f'Generated manifests for "{c}": {os.path.abspath(profile_path)}')
-            instructions.append(f'kubectl apply -k {os.path.abspath(profile_path)}')
-            if c in wait_targets:
-                instructions.append(f'forgeops wait {c}')
-        if instructions:
-            utils.message('\nTo install the generated packages, run:')
-            print('\n'.join(instructions))
-        utils.message('\nEnjoy your forgeops manifests!')
-        return
-
-    forgeops_dependencies(args.legacy)
-
-    utils.message(f'Installing component(s): {components} platform: "{size}" in namespace: "{namespace}" from deployment manifests in "{args.deploy_env}".\n')
-    if 'all' in components:
-        install_all(size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, args.timeout, deploy_path, src_profile_dir)
-    else:
-        for c in components:
-            utils.install_component(remap.get(c, c), size, namespace, fqdn, ingress_class, ctx, args.duration, args.legacy, args.config_profile, deploy_path, src_profile_dir)
-
-    if args.cmd == 'install' and ('base' in components or 'all' in components):
-        utils.waitforsecrets(namespace, args.timeout)
-        utils.printsecrets(namespace)
-        utils.printurls(namespace)
-    utils.message('\nEnjoy your deployment!')
+FORGEOPS_CFG="$SCRIPT_DIR/../forgeops.conf"
+if [ -f "$FORGEOPS_CFG" ] ; then
+  set -a
+  source $FORGEOPS_CFG
+  set +a
+fi
 
 
-def _sort_components(e):
-    template = ['secrets', 'base', 'ds', 'ds-idrepo', 'ds-idrepo-old', 'ds-cts', 'ds-cts-old', 'apps', 'am', 'amster', 'idm', 'ui']
-    return template.index(e) if e in template else 100
-
-if __name__ == '__main__':
-    main()
+# Make sure "forgeops configure" has been run before running any commands
+if [ "${COMMAND}" != "configure" ] ; then
+  if ! python3 "${SCRIPT_DIR}/../lib/python/ensure_configuration_is_valid_or_exit.py" ; then
+    exit 1
+  fi
+fi
+runOrPrint "$SCRIPT_DIR/commands/${COMMAND} $*"

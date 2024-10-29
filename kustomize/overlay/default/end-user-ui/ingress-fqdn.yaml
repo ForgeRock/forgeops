@@ -1,0 +1,6 @@
+- op: replace
+  path: '/spec/rules/0/host'
+  value: 'prod.iam.example.com'
+- op: replace
+  path: '/spec/tls/0/hosts'
+  value: ['prod.iam.example.com']

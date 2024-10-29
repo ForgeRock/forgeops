@@ -1,0 +1,26 @@
+#Patch DS CTS
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-cts
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: ds
+        resources: {}
+      initContainers:
+      - name: init
+        resources: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        pv.beta.kubernetes.io/gid: "0"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+      storageClassName: fast
