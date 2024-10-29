@@ -185,7 +185,7 @@ def process_overlay_dir(path, config, args):
         process_overlay_dir(d, config, args)
 
 def main():
-    prog = 'forgeops-ng env'
+    prog = 'forgeops env'
 
     parser = argparse.ArgumentParser(description='Manage a ForgeRock Identity Platform environment',
                                      prog=prog,
@@ -256,12 +256,12 @@ def main():
     if '/' in args.env_name:
         utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
 
-    # Setup defaults for values that can be set in forgeops-ng.conf
+    # Setup defaults for values that can be set in forgeops.conf
     config['helm'] = args.helm
     if os.getenv('HELM_PATH'):
         config['helm'] = os.getenv('HELM_PATH')
 
-    config['kustomize'] = 'kustomize-ng'
+    config['kustomize'] = 'kustomize'
     if args.kustomize:
         config['kustomize'] = args.kustomize
     elif os.getenv('KUSTOMIZE_PATH'):

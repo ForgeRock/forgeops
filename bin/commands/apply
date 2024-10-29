@@ -99,7 +99,7 @@ if [ ! -d "$OVERLAY_PATH" ] ; then
   GEN_OPTS=""
   [[ -n "$FQDN" ]] && GEN_OPTS+=" --fqdn ${FQDN}"
   [[ -n "$SIZE" ]] && GEN_OPTS+=" --${SIZE}"
-  runOrPrint $ROOT_PATH/bin/forgeops-ng env -e $ENV_NAME $GEN_OPTS
+  runOrPrint $ROOT_PATH/bin/forgeops env -e $ENV_NAME $GEN_OPTS
 fi
 
 for c in ${COMPONENTS[@]} ; do

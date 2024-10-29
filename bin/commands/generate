@@ -36,4 +36,4 @@ fi
 # Enable debugging so runOrPrint will always print the command before running it
 DEBUG=true
 
-runOrPrint $SCRIPT_DIR/../forgeops-ng env ${ARGS[*]}
+runOrPrint $SCRIPT_DIR/../forgeops env ${ARGS[*]}

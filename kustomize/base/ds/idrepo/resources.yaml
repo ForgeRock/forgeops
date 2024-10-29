@@ -1,0 +1,383 @@
+---
+# Source: identity-platform/templates/ds-idrepo-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-idrepo
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: ds-idrepo
+    app.kubernetes.io/component: ds-idrepo
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 4444
+      targetPort: tcp-admin
+      protocol: TCP
+      name: tcp-admin
+    - port: 1389
+      targetPort: tcp-ldap
+      protocol: TCP
+      name: tcp-ldap
+    - port: 1636
+      targetPort: tcp-ldaps
+      protocol: TCP
+      name: tcp-ldaps
+    - port: 8989
+      targetPort: tcp-replication
+      protocol: TCP
+      name: tcp-replication
+    - port: 8443
+      targetPort: https
+      protocol: TCP
+      name: https
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: ds-idrepo
+    app.kubernetes.io/component: ds-idrepo
+---
+# Source: identity-platform/templates/ds-idrepo-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ds-idrepo
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: ds-idrepo
+    app.kubernetes.io/component: ds-idrepo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
+      app.kubernetes.io/instance: identity-platform
+      app: ds-idrepo
+      app.kubernetes.io/component: ds-idrepo
+  serviceName: ds-idrepo
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: ds-idrepo
+        app.kubernetes.io/component: ds-idrepo
+    spec:
+      serviceAccountName: default
+      subdomain: ds-idrepo
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      volumes:
+        - name: ds-master-keypair
+          secret:
+            secretName: ds-master-keypair
+        - name: ds-ssl-keypair
+          secret:
+            secretName: ds-ssl-keypair
+        - name: truststore
+          secret:
+            secretName: ds-ssl-keypair
+        - name: admin-password
+          secret:
+            secretName: ds-passwords
+        - name: monitor-password
+          secret:
+            secretName: ds-passwords
+        - name: keys
+          emptyDir: {}
+        - name: cloud-credentials-cache
+          emptyDir: {}
+      initContainers:
+        - name: init
+          securityContext: {}
+          image: ds:dev
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /opt/opendj/data
+              name: data
+            - mountPath: /var/run/secrets/admin
+              name: admin-password
+            - mountPath: /var/run/secrets/monitor
+              name: monitor-password
+            - mountPath: /var/run/secrets/ds-ssl-keypair
+              name: ds-ssl-keypair
+            - mountPath: /var/run/secrets/ds-master-keypair
+              name: ds-master-keypair
+            - mountPath: /var/run/secrets/truststore
+              name: truststore
+            - mountPath: /var/run/secrets/keys
+              name: keys
+            - mountPath: /var/run/secrets/cloud-credentials-cache/
+              name: cloud-credentials-cache
+          # args:
+          # - init
+          command:
+            - sh
+            - -c
+            - /opt/opendj/runtime-scripts/init-and-restore.sh || /opt/opendj/default-scripts/init-and-restore.sh
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+              value: "true"
+            - name: DS_UID_MONITOR_PASSWORD_FILE
+              value: /var/run/secrets/monitor/monitor.pw
+            - name: DS_UID_ADMIN_PASSWORD_FILE
+              value: /var/run/secrets/admin/dirmanager.pw
+            - name: DSBACKUP_HOSTS
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: DSBACKUP_HOSTS
+            - name: DSBACKUP_DIRECTORY
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: DSBACKUP_DIRECTORY
+            - name: AUTORESTORE_FROM_DSBACKUP
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: AUTORESTORE_FROM_DSBACKUP
+            - name: DISASTER_RECOVERY_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: platform-config
+                  key: DISASTER_RECOVERY_ID
+          envFrom:
+            - secretRef:
+                name: cloud-storage-credentials
+                optional: true
+      containers:
+        - name: ds
+          securityContext: {}
+          image: ds:dev
+          imagePullPolicy: IfNotPresent
+          args:
+            - start-ds
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
+              value: "true"
+            - name: DS_UID_MONITOR_PASSWORD_FILE
+              value: /var/run/secrets/monitor/monitor.pw
+            - name: DS_UID_ADMIN_PASSWORD_FILE
+              value: /var/run/secrets/admin/dirmanager.pw
+          envFrom:
+            - secretRef:
+                name: cloud-storage-credentials
+                optional: true
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+            - name: tcp-ldap
+              containerPort: 1389
+              protocol: TCP
+            - name: tcp-ldaps
+              containerPort: 1636
+              protocol: TCP
+            - name: tcp-admin
+              containerPort: 4444
+              protocol: TCP
+            - name: tcp-replication
+              containerPort: 8989
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /healthy
+              port: http
+            failureThreshold: 720
+            initialDelaySeconds: 30
+          resources:
+            limits:
+              memory: 1366Mi
+            requests:
+              cpu: 500m
+              memory: 1366Mi
+          volumeMounts:
+            - mountPath: /opt/opendj/data
+              name: data
+            - mountPath: /var/run/secrets/admin
+              name: admin-password
+            - mountPath: /var/run/secrets/monitor
+              name: monitor-password
+            - mountPath: /var/run/secrets/ds-ssl-keypair
+              name: ds-ssl-keypair
+            - mountPath: /var/run/secrets/ds-master-keypair
+              name: ds-master-keypair
+            - mountPath: /var/run/secrets/truststore
+              name: truststore
+            - mountPath: /var/run/secrets/keys
+              name: keys
+            - mountPath: /var/run/secrets/cloud-credentials-cache/
+              name: cloud-credentials-cache
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: ds
+                    operator: Exists
+              weight: 100
+      tolerations:
+        - effect: NoSchedule
+          key: key
+          operator: Equal
+          value: directory
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        annotations:
+          pv.beta.kubernetes.io/gid: "0"
+        labels:
+          helm.sh/chart: identity-platform-7.6
+          app.kubernetes.io/name: identity-platform
+          app.kubernetes.io/part-of: identity-platform
+          app.kubernetes.io/instance: identity-platform
+          app.kubernetes.io/version: "7.6"
+          app.kubernetes.io/managed-by: Helm
+          app: ds-idrepo
+          app.kubernetes.io/component: ds-idrepo
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: fast
+---
+# Source: identity-platform/templates/ds-certificates.yaml
+# Certs for SSL. This is also the truststore secret as well.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ds-ssl-cert
+spec:
+  # Secret names are always required.
+  secretName: ds-ssl-keypair
+  # Secret template is optional. If set, these annotations
+  # and labels will be copied to the secret named example-com-tls.
+
+  # You can add your own custom values here.
+  secretTemplate:
+    annotations:
+      my-secret-annotation: cert-manager-generated
+    labels:
+      app: ds-operator
+  duration: 21600h # 900 days.
+  subject:
+    organizations:
+      - forgerock.org
+  # The use of the common name field has been deprecated since 2000 and is
+  # discouraged from being used.
+  commonName: ds
+  isCA: false
+  privateKey:
+    algorithm: ECDSA
+    # encoding: PKCS1
+    # size: 2048
+  usages:
+    - server auth
+    - client auth
+  # At least one of a DNS Name, URI, or IP address is required.
+  dnsNames:
+    - '*.ds'
+    - '*.ds-idrepo'
+    - '*.ds-cts'
+  # Issuer references are always required.
+  issuerRef:
+    name: selfsigned-issuer
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: Issuer
+    # This is optional since cert-manager will default to this value however
+    # if you are using an external issuer, change this to that issuer group.
+    group: cert-manager.io
+---
+# Source: identity-platform/templates/ds-certificates.yaml
+# The master keypair for encrypting DS data.
+# YOU MUST BACK UP THE PRIVATE KEY
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ds-master-cert
+  # namespace: sandbox
+spec:
+  # Secret names are always required.
+  secretName: ds-master-keypair
+  # Secret template is optional. If set, these annotations
+  # and labels will be copied to the secret named example-com-tls.
+
+  # Note: Labels and annotations from the template are only synced to the Secret at the time when the certificate
+  # is created or renewed. Currently labels and annotations can only be added, but not removed. Removing any
+  # labels or annotations from the template or removing the template itself will have no effect.
+  # See https://github.com/jetstack/cert-manager/issues/4292.
+  secretTemplate:
+    labels:
+      app: ds-operator
+  duration: 21600h # 900 days
+  subject:
+    organizations:
+      - ForgeRock.com
+  # The use of the common name field has been deprecated since 2000 and is
+  # discouraged from being used.
+  commonName: Master Key
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  # At least one of a DNS Name, URI, or IP address is required.
+  dnsNames:
+    - '*.ds'
+  # Issuer references are always required.
+  issuerRef:
+    name: selfsigned-issuer
+    # We can reference ClusterIssuers by changing the kind here.
+    # The default value is Issuer (i.e. a locally namespaced Issuer)
+    kind: Issuer
+    # This is optional since cert-manager will default to this value however
+    # if you are using an external issuer, change this to that issuer group.
+    group: cert-manager.io
+# Source: identity-platform/templates/ds-certificates.yaml
+# DS certificates are now generated by cert-manager
+---
+# Below configures a self signed CA
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}

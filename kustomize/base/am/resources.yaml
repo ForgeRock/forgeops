@@ -1,0 +1,270 @@
+---
+# Source: identity-platform/templates/am-logback-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-logback
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+data:
+  logback.xml: "<!--\n    ~ Copyright 2022-2024 Ping Identity Corporation. All Rights Reserved\n    ~ \n    ~ This code is to be used exclusively in connection with Ping Identity \n    ~ Corporation software or services. Ping Identity Corporation only offers\n    ~ such software or services to legal entities who have entered into a \n    ~ binding license agreement with Ping Identity Corporation.\n-->\n\n<configuration scan=\"true\" scanPeriod=\"30 seconds\">\n\n    <appender name=\"JSON\" class=\"ch.qos.logback.core.ConsoleAppender\">\n        <encoder class=\"ch.qos.logback.core.encoder.LayoutWrappingEncoder\">\n            <layout class=\"org.forgerock.openam.logback.JsonLayout\">\n                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>\n                <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>\n                <jsonFormatter class=\"ch.qos.logback.contrib.jackson.JacksonJsonFormatter\"/>\n                <appendLineSeparator>true</appendLineSeparator>\n            </layout>\n        </encoder>\n    </appender>\n\n    <root level=\"WARN\">\n        <appender-ref ref=\"JSON\" />\n    </root>\n</configuration>"
+---
+# Source: identity-platform/templates/am-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: am
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: am
+    app.kubernetes.io/component: am
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: am
+    app.kubernetes.io/component: am
+---
+# Source: identity-platform/templates/am-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: am
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: am
+    app.kubernetes.io/component: am
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
+      app.kubernetes.io/instance: identity-platform
+      app: am
+      app.kubernetes.io/component: am
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: am
+        app.kubernetes.io/component: am
+    spec:
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      volumes:
+        - name: fbc
+          emptyDir: {}
+        - name: am-secrets
+          projected:
+            sources:
+              - secret:
+                  name: am-passwords
+              - secret:
+                  name: am-keystore
+        - name: amster-key
+          secret:
+            secretName: amster
+            items:
+              - key: id_rsa.pub
+                path: authorized_keys
+        - name: truststore
+          projected:
+            sources:
+              - secret:
+                  name: truststore-pem
+              - secret:
+                  name: ds-ssl-keypair
+        - name: new-truststore
+          emptyDir: {}
+        - name: am-logback
+          configMap:
+            name: am-logback
+      initContainers:
+        - name: fbc-init
+          image: am:7.6
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /fbc
+              name: fbc
+          command:
+            - /bin/bash
+            - -c
+            - |
+              if [ -d /fbc/config ];
+              then
+                echo "Existing openam configuration found. Skipping copy"
+              else
+                echo "Copying docker image configuration files to the shared volume"
+                cd /home/forgerock/openam
+                cp -r .homeVersion * /fbc
+              fi
+        - name: truststore-init
+          image: am:7.6
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: new-truststore
+              mountPath: /truststore
+            - name: truststore
+              mountPath: /var/run/secrets/truststore
+          command:
+            - /home/forgerock/import-pem-certs.sh
+          env:
+            - name: TRUSTSTORE_PATH
+              value: /truststore/amtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            # secret agent generated truststore.
+            - name: AM_PEM_TRUSTSTORE
+              value: /var/run/secrets/truststore/cacerts
+            # cert-manager truststore used for the connection to DS
+            - name: AM_PEM_TRUSTSTORE_DS
+              value: /var/run/secrets/truststore/ca.crt
+      containers:
+        - name: openam
+          securityContext: {}
+          image: am:7.6
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - /home/forgerock/docker-entrypoint.sh
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: AM_STORES_SSL_ENABLED
+              value: "true"
+            - name: TRUSTSTORE_PATH
+              value: /home/forgerock/amtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            - name: AM_STORES_USER_TYPE
+              value: LDAPv3ForForgeRockIAM
+          envFrom:
+            - secretRef:
+                name: am-env-secrets
+            - configMapRef:
+                name: platform-config
+            - secretRef:
+                name: amster-env-secrets
+            - secretRef:
+                name: ds-env-secrets
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /am/json/health/live
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /am/json/health/ready
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /am/json/health/live
+              port: http
+            failureThreshold: 40
+            periodSeconds: 10
+          resources:
+            limits:
+              memory: 1800Mi
+            requests:
+              cpu: 250m
+              memory: 1800Mi
+          volumeMounts:
+            - name: new-truststore
+              mountPath: /home/forgerock/amtruststore
+              readOnly: true
+              subPath: amtruststore
+            - name: am-secrets
+              mountPath: /var/run/secrets/am
+            - name: amster-key
+              mountPath: /var/run/secrets/amster
+            - name: fbc
+              mountPath: /home/forgerock/openam
+            - name: am-logback
+              mountPath: /home/forgerock/logging
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Exists
+---
+# Source: identity-platform/templates/am-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: am
+  labels:
+    helm.sh/chart: identity-platform-7.6
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/managed-by: Helm
+    app: am
+    app.kubernetes.io/component: am
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/body-size: 64m
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/send-timeout: "600"
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - identity-platform.domain.local
+      secretName: tls-identity-platform.domain.local
+  rules:
+    - host: identity-platform.domain.local
+      http:
+        paths:
+          - path: /am
+            pathType: Prefix
+            backend:
+              service:
+                name: am
+                port:
+                  number: 80

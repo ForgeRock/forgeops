@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-config
+data:
+  # Some optional settings
+  # If you are using cert-manager and Let's Encrypt in your cluster and want real certs - set this
+  # CERT_ISSUER: letsencrypt-prod
+  FQDN: "prod.iam.example.com"
+  AM_STORES_CTS_SERVERS: "ds-cts-0.ds-cts:1636"
+  AM_STORES_USER_SERVERS: "ds-idrepo-0.ds-idrepo:1636"

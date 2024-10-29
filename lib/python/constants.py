@@ -9,6 +9,6 @@ FORGEOPS_SCRIPT_DIR = os.path.join(root_dir, 'bin', 'commands')
 DEPENDENCIES_DIR = os.path.join(root_dir, 'lib', 'dependencies')
 REQUIREMENTS_FILE = os.path.join(root_dir, 'lib', 'python', 'requirements.txt')
 
-FORGEOPS_SCRIPT_FILE = os.path.join(root_dir, 'bin', 'forgeops-ng')
+FORGEOPS_SCRIPT_FILE = os.path.join(root_dir, 'bin', 'forgeops')
 ENV_FILE = os.path.join(FORGEOPS_SCRIPT_DIR, 'env')
 CONFIGURED_VERSION_FILE = os.path.join(DEPENDENCIES_DIR, '.configured_version')

@@ -1,12 +1,25 @@
-# Patch DS cts
-apiVersion: apps/v1
-kind: StatefulSet
+# Sample DirectoryService deployment
+apiVersion: directory.forgerock.io/v1alpha1
+kind: DirectoryService
 metadata:
   name: ds-cts
 spec:
-  replicas: 1
-  template:
+  # The number of DS servers in the topology
+  replicas: 0
+  # The resources assigned to each DS pod
+  podTemplate:
     metadata:
       annotations:
         # prevent autoscaler from terminating the pod
         "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
+    resources:
+      requests:
+        memory: 1366Mi
+        cpu: 250m
+      limits:
+        memory: 1366Mi
+    volumeClaimSpec:
+      storageClassName: standard
+      resources:
+        requests:
+          storage: 10Gi

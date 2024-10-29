@@ -1,0 +1,26 @@
+kind: Component
+apiVersion: kustomize.config.k8s.io/v1alpha1
+commonLabels:
+  app.kubernetes.io/part-of: forgerock
+images:
+- name: .*am:.*
+  newName: us-docker.pkg.dev/forgeops-public/images/am
+  newTag: dev
+- name: .*amster.*
+  newName: us-docker.pkg.dev/forgeops-public/images/amster
+  newTag: dev
+- name: .*ds:.*
+  newName: us-docker.pkg.dev/forgeops-public/images/ds
+  newTag: dev
+- name: .*ds-cts.*
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
+  newTag: dev
+- name: .*ds-idrepo.*
+  newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
+  newTag: dev
+- name: .*idm
+  newName: us-docker.pkg.dev/forgeops-public/images/idm
+  newTag: dev
+- name: .*ig.*
+  newName: us-docker.pkg.dev/forgeops-public/images/ig
+  newTag: dev

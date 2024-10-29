@@ -1,0 +1,17 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+components:
+- ../image-defaulter
+
+resources:
+- ../../../base/am
+
+patches:
+- path: deployment.yaml
+- path: ingress-fqdn.yaml
+  target:
+    group: networking.k8s.io
+    version: 'v1'
+    kind: Ingress
+    name: am

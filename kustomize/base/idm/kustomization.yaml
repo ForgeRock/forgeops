@@ -1,23 +1,5 @@
-kind: Kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 resources:
-- configmap.yaml
-- deployment.yaml
-- service.yaml
-
-configMapGenerator:
-- files:
-  - config/logging.properties
-  name: idm-logging-properties
-
-generatorOptions:
-  disableNameSuffixHash: true
-labels:
-- includeSelectors: true
-  pairs:
-    app: idm
-    app.kubernetes.io/component: idm
-    app.kubernetes.io/instance: idm
-    app.kubernetes.io/name: idm
-    app.kubernetes.io/part-of: forgerock
-    tier: middle
+  - resources.yaml

@@ -4,26 +4,16 @@ kind: Deployment
 metadata:
   name: idm
 spec:
-  minReadySeconds: 60
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
+  replicas: 1
   template:
     metadata:
       annotations:
         # prevent autoscaler from terminating the pod
         "cluster-autoscaler.kubernetes.io/safe-to-evict": "false"
     spec:
-      terminationGracePeriodSeconds: 60
       containers:
         - name: openidm
           imagePullPolicy: Always
-          readinessProbe:
-            initialDelaySeconds: 60
-            periodSeconds: 2
-            timeoutSeconds: 5
           resources:
             limits:
               memory: 8Gi

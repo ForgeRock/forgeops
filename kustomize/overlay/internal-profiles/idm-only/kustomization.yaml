@@ -1,12 +1,3 @@
 resources:
-- ../../../base/kustomizeConfig
-- ../../../base/idm
-- ../../../base/ds/idrepo
-- ../../../base/ingress
-
-patches:
-- path: base.yaml
-- path: ds-idrepo.yaml
-- path: ds-idrepo-old.yaml
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
+- ./base
+- ./idm

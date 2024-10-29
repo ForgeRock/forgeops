@@ -2,35 +2,27 @@
 
 ## Introduction
 
-The next evolution of the forgeops tool is available in a Tech Preview status.
+The next evolution of the new forgeops tool is now the default.
 This was done in an effort to simplify the ForgeRock platform deployment, make
 it more deterministic, and continue on our production first path. It no longer
 dynamically generates a Kustomize overlay on every run. Instead, you create and
 manage environments for each deployment you need, then you can apply them as
 you wish with either Kustomize or Helm.
 
-## Naming
-
-As this is a tech demo, we have named it `forgeops-ng`. In the next major
-release of Forgeops, the `-ng` will be dropped and it will become `forgeops`.
-The same will happen for any files or directories that currently contain `-ng`
-in their name.  If you start using `forgeops-ng` before then, please be aware
-of and plan for that name change.
-
 ## Setup
 
-The heart of forgeops-ng is `forgeops-ng env`. It allows you to manage common
+The heart of forgeops is `forgeops env`. It allows you to manage common
 aspects of Helm values file(s) and Kustomize overlays. Since it is written in
 python, you need to setup your system to run it. 
 
-You may want to run `forgeops-ng configure`. The command will automatically install python dependencies into 
+You may want to run `forgeops configure`. The command will automatically install python dependencies into 
 `/path/to/forgeops/lib/dependencies` folder. You do not have to create a Python Virtual Environment (venv).
 You need at least python 3.9.6+ and pip3 installed.
 
 ## Major Changes
 
-There are some major changes introduced by forgeops-ng that may trip you up if
-you are familiar with previous versions of forgeops.
+There are some major changes introduced by the new forgeops that may trip you
+up if you are familiar with previous versions of forgeops.
 
 ### Discrete overlays
 
@@ -38,7 +30,7 @@ The current forgeops command generates a Kustomize overlay every time it runs.
 This process copied yaml files around, and was very confusing because it didn't
 honor customizations in the overlay.
 
-When using forgeops-ng, the overlay management is a step in the workflow that
+When using forgeops, the overlay management is a step in the workflow that
 is purposefully triggered by an admin. It is recommended to create an overlay
 per environment you want to run (eg. test, stage, prod), as well as a single
 instance overlay per environment (eg. test-single, stage-single, prod-single).
@@ -71,7 +63,7 @@ it, and apply uses a default of demo to make it easier to setup a demo.
 
 ## Workflow
 
-The workflow of `forgeops-ng` is designed to be production first. The previous
+The workflow of `forgeops` is designed to be production first. The previous
 forgeops tool was designed as a demonstration, and never intended to be used in
 production. Feedback has been clear that folks want a production workflow and
 tooling to support it.
@@ -79,7 +71,7 @@ tooling to support it.
 The new workflow has three distinct steps (config, build, apply). These steps
 work on discrete environments for both Helm and Kustomize.
 
-The config step (`forgeops-ng env`) happens first, and can be used to manage
+The config step (`forgeops env`) happens first, and can be used to manage
 the overlay and values files on an ongoing basis.  The updates will only make
 the requested changes so your customizations won't be impacted.
 
@@ -95,11 +87,11 @@ apply to deploy those changes.
 
 ### Create an environment
 
-The first thing you do is use `forgeops-ng env` to create an environment. You
+The first thing you do is use `forgeops env` to create an environment. You
 need to provide an FQDN (--fqdn) and an environment name (--env-name).
 
 Previously, we had t-shirt sized overlays called small, medium, and large. Now,
-we just have `kustomize-ng/overlay/default` which is a single instance overlay.
+we just have `kustomize/overlay/default` which is a single instance overlay.
 You can still use `--small`, `--medium`, and `--large` to configure your
 overlay, and the env command will populate your environment with the size you
 requested.
@@ -107,34 +99,34 @@ requested.
 So if we want a medium sized stage deployment with an FQDN of iam.example.com,
 we'd do this:
 
-`./bin/forgeops-ng env --fqdn stage.iam.example.com --medium --env-name stage`
+`./bin/forgeops env --fqdn stage.iam.example.com --medium --env-name stage`
 
 We recommend creating a single-instance environment to go along with each
 actual environment. This allows you to use the single to develop your file
 based config, and build images with the config(s) for that environment.
 
-`./bin/forgeops-ng env --fqdn stage-single.iam.example.com --env-name stage-single`
+`./bin/forgeops env --fqdn stage-single.iam.example.com --env-name stage-single`
 
-You will find the environments in `kustomize-ng/overlay/` and `helm/`.
+You will find the environments in `kustomize/overlay/` and `helm/`.
 
 ### Apply an environment
 
 For Helm, you can just supply the values file(s) to `helm install` or `helm upgrade`.
 
 For Kustomize, you have two options. Running `kubectl apply -k
-/path/to/forgops/kustomize-ng/overlay/MY_OVERLAY` or using `forgeops-ng apply`.
+/path/to/forgops/kustomize/overlay/MY_OVERLAY` or using `forgeops apply`.
 
 To apply the example from above, you'd do:
 
-`./bin/forgeops-ng apply --env-name stage`
+`./bin/forgeops apply --env-name stage`
 
 or
 
-`./bin/forgeops-ng apply --env-name stage-single`
+`./bin/forgeops apply --env-name stage-single`
 
 ### Build images for an environment
 
-When you need to build a new application image, you can use `forgeops-ng build`
+When you need to build a new application image, you can use `forgeops build`
 to do that. It will apply the application config profile you requested from the
 build dir (`docker/APP/config-profiles/PROFILE`), build the container image,
 and push the image up to a registry if you tell it to. It will also update the
@@ -143,15 +135,15 @@ image-defaulter and values files for the targeted environment.
 If we want to build new am and idm images for our stage environment using the
 stage-cfg profile, we'd do this:
 
-`./bin/forgeops-ng build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am idm`
+`./bin/forgeops build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am idm`
 
 Once that is done, you'd apply the environment via Helm or Kustomize to deploy.
 
 ## Command
 
-You will find the new command here: `/path/to/forgeops/bin/forgeops-ng`
+You will find the new command here: `/path/to/forgeops/bin/forgeops`
 
-The forgeops-ng command is a bash wrapper script that calls the appropriate
+The forgeops command is a bash wrapper script that calls the appropriate
 script in `bin/commands`. These are written in either bash or python
 depending on what makes sense for the task. All of the bash scripts support the
 new `--dryrun` flag which will show you the commands it would run so you can
@@ -165,34 +157,34 @@ code was very confusing. We suspect the confusion had more to do with the
 complexity of the logic instead of python. However, bash is a good choice for
 what we are doing. Most of what the forgeops script does is execute command
 lines. Bash is tailor made for that. We use python for scripts that are heavy
-on data structure manipulation. This is why `forgeops-ng env` and `forgeops-ng
+on data structure manipulation. This is why `forgeops env` and `forgeops
 info` are written in python, and the rest are in bash.
 
-Also, by making forgeops-ng be a simple wrapper, it keeps the different
+Also, by making forgeops be a simple wrapper, it keeps the different
 functions clearly delineated so it is clear and easy to see what is going on
 inside that script.
 
 ### Helm Support
 
 As of 7.5, both Kustomize and Helm are supported by forgeops. Those of you that
-want to use the Helm chart, can use forgeops-ng to generate a values file per
-environment. Also, the `forgeops-ng build --env-name ENV_NAME` command will
+want to use the Helm chart, can use forgeops to generate a values file per
+environment. Also, the `forgeops build --env-name ENV_NAME` command will
 update the values file for the environment given just like it updates the
 `image-defaulter` in the Kustomize overlay.
 
 The `values.yaml` file contains all of the values. The other files group the
 different values so that you may use them individually if you need or want to.
 
-The `forgeops-ng env --env-name test` command will create or update a folder in
+The `forgeops env --env-name test` command will create or update a folder in
 /path/to/forgeops/helm/test with different values files.
 
 ```
 > cd $HOME/git/forgeops
-> ./bin/forgeops-ng env --env-name test --small -f test.example.com
+> ./bin/forgeops env --env-name test --small -f test.example.com
 
     Creating new overlay
-    From: /Users/myUser/git/forgeops/kustomize-ng/overlay/default
-    To: /Users/myUser/git/forgeops/kustomize-ng/overlay/test
+    From: /Users/myUser/git/forgeops/kustomize/overlay/default
+    To: /Users/myUser/git/forgeops/kustomize/overlay/test
 
 /Users/myUser/git/forgeops/helm/test not found, creating.
 ```
@@ -211,22 +203,22 @@ helm/test
 
 ### Custom paths
 
-By default, forgeops-ng uses the docker, kustomize-ng, and helm directories
+By default, forgeops uses the docker, kustomize, and helm directories
 that exist in the forgeops repository. However, you can setup your own
-locations separately, and tell forgeops-ng to use them. You can do this with
+locations separately, and tell forgeops to use them. You can do this with
 flags on the command line, or you can set the appropriate environment variable
-in `/path/to/forgeops/forgeops-ng.conf`. You'll notice this is how we are
-telling forgeops-ng to use `kustomize-ng` as its kustomize dir.
+in `/path/to/forgeops/forgeops.conf`. You'll notice this is how we are
+telling forgeops to use `kustomize` as its kustomize dir.
 
 The paths can be relative or absolute.
 
 Kustomize path is absolute or relative to the repo root. It can be set with
 `--kustomzie` on the command line, or by setting `KUSTOMIZE_PATH` in
-`forgeops-ng.conf`. (Default: `kustomize-ng`)
+`forgeops.conf`. (Default: `kustomize`)
 
 Overlay path is relative to the kustomize path
 `/path/to/kustomize/overlay/OVERLAY`. It can be set with `--env-name` on
-the command line or by setting `OVERLAY_PATH` in `forgeops-ng.conf`. It is a
+the command line or by setting `OVERLAY_PATH` in `forgeops.conf`. It is a
 required flag except in apply where it defaults to demo for easy demos.
 
 Build path is absolute, or relative to the repo root. You can set it with `
@@ -236,7 +228,7 @@ Build path is absolute, or relative to the repo root. You can set it with `
 
 #### apply
 
-We have renamed `forgeops install` to `forgeops-ng apply` because most of what
+We have renamed `forgeops install` to `forgeops apply` because most of what
 it's doing is setting up the correct path to a kustomize overlay before running
 `kubectl apply -k` against it.
 
@@ -246,7 +238,7 @@ The build command still builds your application images with any customizations
 and configuration (am/idm). However, now you must provide the environment you
 are building for.
 
-`forgeops-ng build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am`
+`forgeops build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am`
 
 All of this still occurs in `/path/to/forgeops/docker`.
 
@@ -257,11 +249,11 @@ components, just one, or a few. By default, it will leave the PVCs and secrets
 around unless you tell it otherwise. Like build, the major change is that you
 need to specify the overlay to work on.
 
-`forgeops-ng delete --env-name stage`
+`forgeops delete --env-name stage`
 
 #### env
 
-This is the major change in forgeops-ng. You use `forgeops-ng env` to create
+This is the major change in forgeops. You use `forgeops env` to create
 and manage your environments. The `/path/to/forgeops/kustomize/deploy`
 directory is gone.  This allows you more control in how you manage your
 different ForgeRock deployments. It has a number of options available to you
@@ -269,11 +261,11 @@ for setting different configs in your k8s resources. When dealing with an
 existing environment, it will only update the settings provided on the command
 line.
 
-Do `forgeops-ng env -h` to see all of the options.
+Do `forgeops env -h` to see all of the options.
 
 It also keeps a log of runs of the env script as `env.log` for both Helm and
 Kustomize. It records the timestamp, Create or Update, and the command line
-used. This allows you to track the changes made by `forgeops-ng env` in your
+used. This allows you to track the changes made by `forgeops env` in your
 different environments.
 
 When creating a new environment, you need to provide the FQDN. Each environment
@@ -288,26 +280,26 @@ size to use. However, you can also override specific values at the same time.
 For example, if you want to create a small deployment, but you want AM and IDM
 to use 3 replicas instead of 2, you can do this:
 
-`forgeops-ng env --env-name test --fqdn test.example.com --small --am-rep 3 --idm-rep 3`
+`forgeops env --env-name test --fqdn test.example.com --small --am-rep 3 --idm-rep 3`
 
 or you can create the environment, then update it:
 
 ```
-forgeops-ng env --env-name test --fqdn test.example.com --small
-forgeops-ng env --env-name test --am-rep 3 --idm-rep 3
+forgeops env --env-name test --fqdn test.example.com --small
+forgeops env --env-name test --am-rep 3 --idm-rep 3
 ```
 
 If you don't specify a size, it will automatically create the env as a single
 instance deployment. If you do select a size, and want to convert that
 environment into a single instance deployment, you can use `--single-instance`.
 
-`forgeops-ng env --env-name test --fqdn test.example.com --small --single-instance`
+`forgeops env --env-name test --fqdn test.example.com --small --single-instance`
 
 or
 
 ```
-forgeops-ng env --env-name test --fqdn test.example.com --small
-forgeops-ng env --env-name test --single-instance
+forgeops env --env-name test --fqdn test.example.com --small
+forgeops env --env-name test --single-instance
 ```
 
 This will set the mem, cpu, and disk to the small definition, but set the
@@ -315,7 +307,7 @@ replicas to 1.
 
 #### image
 
-Both the current forgeops script and the new forgeops-ng script will update the
+Both the current forgeops script and the new forgeops script will update the
 image-defaulter in your Kustomize overlay when doing a build. The image script
 was created to help out Helm users by updating the images in the values files
 for the requested overlay.
@@ -332,7 +324,7 @@ For example, in a production environment called `prod` you might configure and
 build your images in a single instance environment called `prod-single`. To
 copy the freshly built images to the `prod` environment you would do this:
 
-`forgeops-ng image --env-name prod --source prod-single --copy`
+`forgeops image --env-name prod --source prod-single --copy`
 
 #### info
 

@@ -20,7 +20,7 @@ import lib.python.utils as utils
 
 
 def main():
-    prog = "forgeops-ng info"
+    prog = "forgeops info"
     parser = argparse.ArgumentParser(description="Display basic info for a ForgeRock Identity Platform k8s deployment",
                                      prog=prog,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)

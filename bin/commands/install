@@ -14,7 +14,7 @@ cat << EOM
 The install command is deprecated.  We have replaced it with the apply command
 to more accurately represent the fact that all we are doing now is a \`kubectl
 apply -k /path/to/overlay\`. We encourage folks to use the kubectl command
-instead of \`forgeops-ng apply\`.
+instead of \`forgeops apply\`.
 
 For more information:
 forgeops apply -h
@@ -28,4 +28,4 @@ ARGS=("$@") # Create an array out of our arguments
 # Enable debugging so runOrPrint will always print the command before running it
 DEBUG=true
 
-runOrPrint $SCRIPT_DIR/../forgeops-ng apply ${ARGS[*]}
+runOrPrint $SCRIPT_DIR/../forgeops apply ${ARGS[*]}

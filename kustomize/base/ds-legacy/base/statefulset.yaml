@@ -47,9 +47,6 @@ spec:
       tolerations:
       - key: "WorkerDedicatedDS"
         operator: "Exists"
-      - key: kubernetes.io/arch
-        operator: Exists
-        effect: NoSchedule
       initContainers:
       - name: initialize
         image: ds
@@ -100,11 +97,6 @@ spec:
             configMapKeyRef:
               name: platform-config
               key: AUTORESTORE_FROM_DSBACKUP
-        - name: DISASTER_RECOVERY_ID
-          valueFrom:
-            configMapKeyRef:
-              name: platform-config
-              key: DISASTER_RECOVERY_ID
         resources:
           requests:
             memory: 1366Mi

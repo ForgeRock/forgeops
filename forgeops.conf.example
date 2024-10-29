@@ -1,0 +1,21 @@
+#
+# All commands honor these
+#
+KUSTOMIZE_PATH=kustomize
+#NO_KUSTOMIZE=false
+#NO_HELM=false
+
+#
+# Only for build
+#
+BUILD_PATH=docker
+CONTAINER_ENGINE=docker
+#PUSH_TO=
+
+#
+# Only for generate
+#
+# PULL_POLICY is image pull policy : see available values https://kubernetes.io/docs/concepts/containers/images/
+#PULL_POLICY=
+# Source overlay to use when creating a new overlay
+SOURCE=default
