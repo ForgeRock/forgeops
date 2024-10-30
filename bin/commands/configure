@@ -17,8 +17,7 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python.constants import CONFIGURED_VERSION_FILE, REQUIREMENTS_FILE, FORGEOPS_SCRIPT_FILE, \
     DEPENDENCIES_DIR
 import lib.python.utils as utils
-from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv, is_pipx_installed, \
-    print_how_to_install_dependencies
+from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv, print_how_to_install_dependencies
 
 pip = 'pip3'
 # do not use --user param when virtual environment is used
@@ -109,7 +108,4 @@ class ConfigureEnv:
 
 if __name__ == '__main__':
     configure_env = ConfigureEnv()
-    if is_pipx_installed():
-        print_how_to_install_dependencies()
-    else:
-        configure_env.run()
+    configure_env.run()

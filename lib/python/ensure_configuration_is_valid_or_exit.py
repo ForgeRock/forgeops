@@ -65,48 +65,36 @@ def check_python_venv_lib_deps():
 
 
 def print_how_to_install_dependencies():
-    if is_pipx_installed():
-        print(f'If you are using pipx, please install manually python dependencies by using {REQUIREMENTS_FILE}')
-    else:
-        print('You may want to run "forgeops configure" command')
+    print('You need to run "forgeops configure" command to setup your local environment.')
     sys.exit(1)
-
-
-def is_pipx_installed():
-    is_pass, out, err = utils.run('type pipx', cstdout='bla', cstderr='bla', ignoreFail=True)
-    return is_pass
 
 
 def ensure_configuration_is_valid_or_exit():
     """
     This function makes sure that configure has been run with expected version.
     """
-    if is_pipx_installed():
-        # skip if pipx installed
-        return True
+    configured = False
+    if in_virtualenv():
+        # Virtualenv installs dependencies into itself rather than Forgeops lib/dependencies
+        # as it ignores --user flag.
+        if os.path.isfile(CONFIGURED_VERSION_FILE) and check_python_venv_lib_deps():
+            configured = True
     else:
-        configured = False
-        if in_virtualenv():
-            # Virtualenv installs dependencies into itself rather than Forgeops lib/dependencies
-            # as it ignores --user flag.
-            if os.path.isfile(CONFIGURED_VERSION_FILE) and check_python_venv_lib_deps():
-                configured = True
-        else:
-            if os.path.isfile(CONFIGURED_VERSION_FILE) and os.path.exists(DEPENDENCIES_DIR):
-                configured = True
+        if os.path.isfile(CONFIGURED_VERSION_FILE) and os.path.exists(DEPENDENCIES_DIR):
+            configured = True
 
-        config_cmd_to_run = f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} configure'
+    config_cmd_to_run = f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} configure'
 
-        if not configured:
-            error(f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} not configured, please run {config_cmd_to_run}')
+    if not configured:
+        error(f'{os.path.basename(FORGEOPS_SCRIPT_FILE)} not configured, please run {config_cmd_to_run}')
+        exit(1)
+
+    with open(CONFIGURED_VERSION_FILE, 'r') as fd:
+        line = fd.readline().rstrip()
+        version_configured = compute_configuration_version()
+        if line != version_configured:
+            error(f'{FORGEOPS_SCRIPT_FILE} configuration needs to be refreshed, please run {config_cmd_to_run}')
             exit(1)
-
-        with open(CONFIGURED_VERSION_FILE, 'r') as fd:
-            line = fd.readline().rstrip()
-            version_configured = compute_configuration_version()
-            if line != version_configured:
-                error(f'{FORGEOPS_SCRIPT_FILE} configuration needs to be refreshed, please run {config_cmd_to_run}')
-                exit(1)
 
 
 if __name__ == '__main__':
