@@ -256,8 +256,11 @@ examples:
         utils.exit_msg('An environment name (--env-name) is required for this operation.')
 
     update_config_images = True
+    update_docker_files = False
     if (args.release and not args.env_name) or args.copy:
         update_config_images = False
+        if args.release:
+            update_docker_files = True
 
     base_image_names = {
         'am': 'am',
@@ -379,14 +382,15 @@ examples:
         if getattr(args, 'release_file', None):
             release_file = args.release_file
         if args.release == 'dev':
-          base_repo = base_repo_dev
+            base_repo = base_repo_dev
 
         releases = get_releases(release_src, components)
         release = parse_release_str(args.release)
         for c in components:
             release_tags[c] = select_tag(c, releases, release, base_image_names, args.tag)
 
-        write_release_files(release_tags, base_repo, docker_path, release_file, base_image_names)
+        if update_docker_files:
+            write_release_files(release_tags, base_repo, docker_path, release_file, base_image_names)
 
     values_images = {}
     images_kustomize = {}
