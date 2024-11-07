@@ -139,7 +139,7 @@ def set_image(image_name, tag, repo=None):
     return data
 
 
-def write_release_files(tags, repo, docker_path, release_file, image_names):
+def write_release_names(tags, repo, docker_path, release_name, image_names):
     """ Write a release files """
 
     for c in tags.keys():
@@ -151,7 +151,7 @@ def write_release_files(tags, repo, docker_path, release_file, image_names):
             os.makedirs(releases_path)
 
         image_name = image_names[c]
-        release_path = releases_path / release_file
+        release_path = releases_path / release_name
         content = f"REPO={repo}/{image_name}\nTAG={tags[c]}"
         with open(release_path, 'w') as f:
             f.write(f"{content}\n")
@@ -231,7 +231,7 @@ examples:
     parser.add_argument('--no-kustomize', action='store_true', help="Don't manage kustomize overlay")
     parser.add_argument('--copy', action='store_true', help='Copy images from --source to --env-name')
     parser.add_argument('--release', help='Specify platform image release to set (eg. 7.5.1)')
-    parser.add_argument('--release-file', default=argparse.SUPPRESS, help='Name of release file in docker/component/releases (default: $RELEASE-$DATETIME in UTC)')
+    parser.add_argument('--release-name', default=argparse.SUPPRESS, help='Name of release file in docker/component/releases (default: $RELEASE-$DATETIME in UTC)')
     parser.add_argument('--base-repo', default=argparse.SUPPRESS, help=f"URL for base image container repo (default: {base_repo_def})")
     parser.add_argument('--config-repo', default=argparse.SUPPRESS, help=f"URL for config image container repo (default: {config_repo_def})")
     parser.add_argument('--same-repo', action='store_true', help='Use base URL for both container repos')
@@ -378,9 +378,9 @@ examples:
     release_tags = {}
     if args.release:
         timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%S")
-        release_file = f"{args.release}-{timestamp}"
-        if getattr(args, 'release_file', None):
-            release_file = args.release_file
+        release_name = f"{args.release}-{timestamp}"
+        if getattr(args, 'release_name', None):
+            release_name = args.release_name
         if args.release == 'dev':
             base_repo = base_repo_dev
 
@@ -390,7 +390,7 @@ examples:
             release_tags[c] = select_tag(c, releases, release, base_image_names, args.tag)
 
         if update_docker_files:
-            write_release_files(release_tags, base_repo, docker_path, release_file, base_image_names)
+            write_release_names(release_tags, base_repo, docker_path, release_name, base_image_names)
 
     values_images = {}
     images_kustomize = {}
