@@ -109,7 +109,6 @@ for c in ${COMPONENTS[@]} ; do
   fi
 
   build_d=$BUILD_PATH/$c
-  [[ "$c" == "ds" ]] && build_d=$BUILD_PATH/ds/ds-new
   if [ -d "$build_d" ] ; then
     message "$build_d exists." "debug"
   else
