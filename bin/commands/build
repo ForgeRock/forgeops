@@ -25,19 +25,19 @@ Notes:
   * You must use --push-to or set PUSH_TO in your environment/forgeops.conf
 
 OPTIONS:
-  -h|--help                     : display usage and exit
-  -d|--debug                    : turn on debugging
-  --dryrun                      : do a dry run
-  -v|--verbose                  : be verbose
-  -b|--build-path <path>        : path to build dir (default: docker)
-  -e|--env-name ENV_NAME        : Name of environment to target
-  -k|--kustomize                : path to kustomize dir (default: kustomize)
-                                  (full path or relative to git root)
-  -p|--config-profile <profile> : name of the config profile to use
-  -r|--push-to <registry>       : container registry to push built images to
-  -R|--release <release>        : release to use for base images
-  --reset                       : reset image-defaulter to git index
-  -t|--tag <tag>                : image tag to use
+  -h|--help                        : display usage and exit
+  -d|--debug                       : turn on debugging
+  --dryrun                         : do a dry run
+  -v|--verbose                     : be verbose
+  -b|--build-path <path>           : path to build dir (default: docker)
+  -e|--env-name ENV_NAME           : Name of environment to target
+  -k|--kustomize                   : path to kustomize dir (default: kustomize)
+                                     (full path or relative to git root)
+  -p|--config-profile <profile>    : name of the config profile to use
+  -r|--push-to <registry>          : container registry to push built images to
+  -l|--release-name <release-name> : release to use for base images
+  --reset                          : reset image-defaulter to git index
+  -t|--tag <tag>                   : image tag to use
 
 Valid Components:
   ${COMPONENTS_VALID[*]}
@@ -117,8 +117,8 @@ for c in ${COMPONENTS[@]} ; do
   fi
 
   releases_d=$build_d/releases
-  if [ -d "$releases_d" ] && [ -n "$RELEASE" ] ; then
-    release_f=$releases_d/$RELEASE
+  if [ -d "$releases_d" ] && [ -n "$RELEASE_NAME" ] ; then
+    release_f=$releases_d/$RELEASE_NAME
     if [ -f $release_f ] ; then
       while IFS= read -r line ; do
         BUILD_ARGS_REAL+=" --build-arg $line"

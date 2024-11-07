@@ -64,7 +64,7 @@ processArgs() {
   ENV_NAME=
   FORCE=false
   RESET=false
-  RELEASE=
+  RELEASE_NAME=
   SIZE=
   SKIP_CONFIRM=false
 
@@ -86,7 +86,7 @@ processArgs() {
       -n|--namespace) NAMESPACE=$2 ; shift 2 ;;
       -p|--config-profile) CONFIG_PROFILE=$2 ; shift 2 ;;
       -r|--push-to) PUSH_TO=$2 ; shift 2 ;;
-      -R|--release) RELEASE=$2 ; shift 2 ;;
+      -l|--release-name) RELEASE_NAME=$2 ; shift 2 ;;
       -s|--source) SOURCE=$2 ; shift 2 ;;
       -y|--yes) SKIP_CONFIRM=true ; shift ;;
       --reset) RESET=true ; shift ;;
