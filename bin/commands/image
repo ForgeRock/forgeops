@@ -363,15 +363,12 @@ examples:
         base_repo = os.getenv('BASE_REPO')
 
     config_repo = copy(config_repo_def)
-    if getattr(args, 'config_repo', None):
+    if getattr(args, 'same_repo', None):
+        config_repo = base_repo
+    elif getattr(args, 'config_repo', None):
         config_repo = args.config_repo
     elif os.getenv('CONFIG_REPO') is not None:
         config_repo = os.getenv('CONFIG_REPO')
-
-    if args.same_repo and args.base_repo:
-        config_repo = base_repo
-    elif args.same_repo and not args.base_repo:
-        utils.exit_msg('Must provide --base-repo with --same-repo')
 
     releases = {}
     release = {}
