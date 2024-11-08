@@ -58,7 +58,7 @@ EOM
 }
 
 # Setup valid components now so they get presented in the usage
-COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_INSTALL[@]} 'all')
+COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_APPLY[@]} 'all')
 
 # Code in common.sh
 processArgs $*
@@ -84,6 +84,10 @@ fi
 
 if containsElement 'base' ${COMPONENTS[@]} && ! containsElement 'secrets' ${COMPONENTS[@]} ; then
   COMPONENTS+=( 'secrets' )
+fi
+
+if containsElement 'ds' ${COMPONENTS[@]} ; then
+  expandDSComponent
 fi
 
 if containsElementLike 'ds-' ${COMPONENTS[@]} && ! containsElement 'all' ${COMPONENTS[@]} ; then

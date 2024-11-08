@@ -22,11 +22,12 @@ COMPONENTS_BUILD=(
   'ds'
 )
 
-COMPONENTS_INSTALL=(
+COMPONENTS_APPLY=(
   'amster'
   'base'
   'ds-cts'
   'ds-idrepo'
+  'ds'
 )
 
 COMPONENTS_WAIT=(
@@ -229,6 +230,30 @@ validateOverlay() {
     process against this overlay.
 EOM
   fi
+}
+
+expandDSComponent() {
+  message "Starting expandDSComponent()" "debug"
+
+  new_components=()
+
+  for c in ${COMPONENTS[@]} ; do
+    if [ "$c" == "ds" ] ; then
+      continue
+    else
+      new_components+=( "$c" )
+    fi
+  done
+
+  if ! containsElement "ds-cts" ${COMPONENTS[@]} ; then
+    new_components+=( "ds-cts" )
+  fi
+
+  if ! containsElement "ds-idrepo" ${COMPONENTS[@]} ; then
+    new_components+=( "ds-idrepo" )
+  fi
+
+  COMPONENTS=( "${new_components[@]}" )
 }
 
 # Deprecate functions
