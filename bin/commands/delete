@@ -97,7 +97,7 @@ deleteSnaps() {
 }
 
 # Setup valid components now so they get presented in the usage
-COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_INSTALL[@]} 'all')
+COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_APPLY[@]} 'all')
 
 # Code in common.sh
 processArgs $*
@@ -121,6 +121,10 @@ if containsElement 'all' ${COMPONENTS[@]} ; then
       'ldif-importer'
       'secrets'
       'base' )
+fi
+
+if containsElement 'ds' ${COMPONENTS[@]} ; then
+  expandDSComponent
 fi
 
 DELETE_PVCS=false
