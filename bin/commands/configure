@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import argparse
 import os
 import site
 import sys
+import sysconfig
 from pathlib import Path
 
 
@@ -21,7 +23,6 @@ from lib.python.ensure_configuration_is_valid_or_exit import in_virtualenv, prin
 
 pip = 'pip3'
 # do not use --user param when virtual environment is used
-user_param = '' if 'VIRTUAL_ENV' in os.environ and os.environ['VIRTUAL_ENV'] != '' else '--user '
 EXIT_MESSAGE = f'\nPlease fix this issue and run {FORGEOPS_SCRIPT_FILE} env script again.'
 
 
@@ -30,10 +31,12 @@ class ConfigureEnv:
     def __init__(self):
         self.num_warning = 0
         self._pip = None
+        self.data = {}
 
     @property
     def pip_install(self):
-        return f'{pip} install --no-cache-dir -i https://pypi.python.org/simple/ {user_param}--no-warn-script-location'
+        extra_param = self.data['extra_param']
+        return f'{pip} install --no-cache-dir -i https://pypi.python.org/simple/ {extra_param}--no-warn-script-location'
 
     def install_python_dependencies(self):
         os.environ['PYTHONUSERBASE'] = str(dependencies_dir)
@@ -62,6 +65,13 @@ class ConfigureEnv:
             utils.error('You need python 3.6.5 or later to run this script')
             exit(1)
 
+    @staticmethod
+    def check_externally_managed():
+        if os.path.isfile(f"{sysconfig.get_path('stdlib')}/EXTERNALLY-MANAGED"):
+            return True
+        else:
+            return False
+
     def check_pip(self):
         # Check if pip is installed
         utils.sub_title("Checking if pip is installed...")
@@ -85,6 +95,9 @@ class ConfigureEnv:
         with open(CONFIGURED_VERSION_FILE, 'w') as configured_version:
             configured_version.write(compute_configuration_version() + os.linesep)
 
+    def set_extra_param(self, param):
+        self.data['extra_param'] = param
+
     def run(self):
         if not os.path.isdir(DEPENDENCIES_DIR):
             try:
@@ -107,5 +120,23 @@ class ConfigureEnv:
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Configure local environment to run forgeops',
+                                     prog='forgeops configure')
+    parser.add_argument('--break-system-packages', action='store_true', help='DANGER! Disable system python package protection')
+
+    args = parser.parse_args()
+
     configure_env = ConfigureEnv()
+
+    extra_param = ''
+    if not in_virtualenv():
+        if configure_env.check_externally_managed():
+            if args.break_system_packages:
+                extra_param = '--break-system-packages '
+            else:
+                utils.exit_msg("This system's python is externally managed. Use a virtual environment (python3 -m venv .venv) or --break-system-packages.")
+        else:
+            extra_param = '--user '
+    configure_env.set_extra_param(param=extra_param)
+
     configure_env.run()
