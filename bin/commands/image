@@ -217,11 +217,11 @@ examples:
                                      formatter_class=Formatter)
     parser.add_argument('-d', '--debug', action='store_true', help='Turn on debugging')
     parser.add_argument('components', nargs='*', choices=components_valid)
-    parser.add_argument('-k', '--kustomize', default=argparse.SUPPRESS,
+    parser.add_argument('-k', '--kustomize-path', default=argparse.SUPPRESS,
                         help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
     parser.add_argument('-b', '--build-path', default=argparse.SUPPRESS,
                         help='Docker dir to use [absolute or relative to forgeops root] (default: docker)')
-    parser.add_argument('-H', '--helm', default=argparse.SUPPRESS,
+    parser.add_argument('-H', '--helm-path', default=argparse.SUPPRESS,
                         help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
     parser.add_argument('-e', '--env-name', help='Name of environment to manage')
     parser.add_argument('-s', '--source', help='Name of source environment')
@@ -297,17 +297,17 @@ examples:
     release_src = root_path / 'releases'
 
     # Setup defaults for values that can be set in forgeops.conf
-    helm = 'helm'
-    if getattr(args, 'helm', None):
-        helm = args.helm
+    helm_path = 'helm'
+    if getattr(args, 'helm_path', None):
+        helm_path = args.helm_path
     elif os.getenv('HELM_PATH'):
-        helm = os.getenv('HELM_PATH')
+        helm_path = os.getenv('HELM_PATH')
 
-    kustomize = 'kustomize'
-    if getattr(args, 'kustomize', None):
-        kustomize = args.kustomize
+    kustomize_path = 'kustomize'
+    if getattr(args, 'kustomize_path', None):
+        kustomize_path = args.kustomize_path
     elif os.getenv('KUSTOMIZE_PATH'):
-        kustomize = os.getenv('KUSTOMIZE_PATH')
+        kustomize_path = os.getenv('KUSTOMIZE_PATH')
 
     docker_path = 'docker'
     if getattr(args, 'build_path', None):
@@ -339,17 +339,17 @@ examples:
         do_kustomize = False
     # End defaults setup
 
-    if Path(kustomize).is_absolute():
-        kustomize_path = Path(kustomize)
+    if Path(kustomize_path).is_absolute():
+        kustomize_path = Path(kustomize_path)
     else:
-        kustomize_path = root_path / kustomize
+        kustomize_path = root_path / kustomize_path
     if args.debug:
         print(f"kustomize_path={kustomize_path}")
     if not kustomize_path.is_dir():
         utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
 
-    if Path(helm).is_absolute():
-        helm_root = Path(helm)
+    if Path(helm_path).is_absolute():
+        helm_root = Path(helm_path)
     else:
         helm_root = root_path / helm
     helm_path = helm_root / args.env_name if args.env_name else None

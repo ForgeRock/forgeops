@@ -20,14 +20,16 @@ usage: $PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
 Delete ForgeRock Identity Platform from a k8s namespace.
 
 OPTIONS:
-  -h|--help               : display usage and exit
-  --debug                 : turn on debugging
-  --dryrun                : do a dry run
-  -v|--verbose            : be verbose
-  -e|--env-name ENV_NAME  : name of environment to target
-  -f|--force              : delete all components + pvcs, secrets, volume snapshots
-  -n|--namespace NS       : k8s namespace to delete from
-  -y|--yes                : skip delete confirmation
+  -h|--help                : display usage and exit
+  --debug                  : turn on debugging
+  --dryrun                 : do a dry run
+  -v|--verbose             : be verbose
+  -k|--kustomize-path PATH : path to kustomize dir (default: kustomize)
+                             (full path or relative to git root)
+  -e|--env-name ENV_NAME   : name of environment to target
+  -f|--force               : delete all components + pvcs, secrets, volume snapshots
+  -n|--namespace NS        : k8s namespace to delete from
+  -y|--yes                 : skip delete confirmation
 
 Valid components:
   ${COMPONENTS_VALID[@]}

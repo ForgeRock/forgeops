@@ -31,7 +31,9 @@ OPTIONS:
   -v|--verbose                     : be verbose
   -b|--build-path <path>           : path to build dir (default: docker)
   -e|--env-name ENV_NAME           : Name of environment to target
-  -k|--kustomize                   : path to kustomize dir (default: kustomize)
+  -H|--helm-path                   : path to helm dir (default: helm)
+                                     (full path or relative to git root)
+  -k|--kustomize-path              : path to kustomize dir (default: kustomize)
                                      (full path or relative to git root)
   -p|--config-profile <profile>    : name of the config profile to use
   -r|--push-to <registry>          : container registry to push built images to
@@ -146,5 +148,5 @@ for c in ${COMPONENTS[@]} ; do
     PUSH_OPT="--push-to none"
   fi
 
-  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH $PUSH_OPT $TAG_OPT $BUILD_PATH_OPT $c
+  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH -H $HELM_PATH $PUSH_OPT $TAG_OPT $BUILD_PATH_OPT $c
 done

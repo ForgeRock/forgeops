@@ -53,6 +53,7 @@ processArgs() {
   # Vars that can be set in /path/to/forgeops/forgeops.conf
   BUILD_PATH=${BUILD_PATH:-docker}
   KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-kustomize}
+  HELM_PATH=${HELM_PATH:-helm}
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
   PUSH_TO=${PUSH_TO:-}
@@ -83,7 +84,8 @@ processArgs() {
       -b|--build-path) BUILD_PATH=$2 ; shift 2 ;;
       -c|--create-namespace) CREATE_NAMESPACE=true ; shift ;;
       -e|--env-name) ENV_NAME=$2 ; shift 2 ;;
-      -k|--kustomize) KUSTOMIZE_PATH=$2; shift 2 ;;
+      -H|--helm-path) HELM_PATH=$2; shift 2 ;;
+      -k|--kustomize-path) KUSTOMIZE_PATH=$2; shift 2 ;;
       -n|--namespace) NAMESPACE=$2 ; shift 2 ;;
       -p|--config-profile) CONFIG_PROFILE=$2 ; shift 2 ;;
       -r|--push-to) PUSH_TO=$2 ; shift 2 ;;
@@ -141,6 +143,14 @@ processArgs() {
     COMPONENTS=( 'all' )
   fi
   message "COMPONENTS=${COMPONENTS[*]}" "debug"
+
+  if [[ "$HELM_PATH" =~ ^/ ]] ; then
+    message "Helm path is a full path: $HELM_PATH" "debug"
+  else
+    message "Helm path is relative: $HELM_PATH" "debug"
+    HELM_PATH=$ROOT_PATH/$HELM_PATH
+  fi
+  message "HELM_PATH=$HELM_PATH" "debug"
 
   if [[ "$KUSTOMIZE_PATH" =~ ^/ ]] ; then
     message "Kustomize path is a full path: $KUSTOMIZE_PATH" "debug"
