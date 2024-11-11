@@ -35,7 +35,7 @@ OPTIONS:
   -e|--env-name ENV_NAME      : Name of environment to apply (default: demo)
   -f|--fqdn FQDN[,FQDN]       : list of FQDNs to use when generating a fresh overlay
   -n|--namespace <ns>         : k8s namespace to install into
-  -k|--kustomize PATH         : kustomize dir to use (default: kustomize)
+  -k|--kustomize-path PATH    : kustomize dir to use (default: kustomize)
                                 (full path or relative to forgeops root)
 
 Valid components:

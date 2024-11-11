@@ -192,9 +192,9 @@ def main():
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--debug', '-d', dest='debug', action='store_true', help='Turn on debugging')
     parser.add_argument('--fqdn', '-f', dest='fqdn', help='Comma separated list of FQDNs')
-    parser.add_argument('--helm', '-H', dest='helm', default='helm', help='Dir to store helm values files (absolute or relative to forgeops root)')
+    parser.add_argument('--helm-path', '-H', dest='helm_path', help='Dir to store helm values files (absolute or relative to forgeops root)')
     parser.add_argument('--ingress', '-i', dest='ingress', help='Ingress class name')
-    parser.add_argument('--kustomize', '-k', dest='kustomize', help='Kustomize dir to use (absolute or relative to forgeops root)')
+    parser.add_argument('--kustomize-path', '-k', dest='kustomize_path', help='Kustomize dir to use (absolute or relative to forgeops root)')
     parser.add_argument('--namespace', '-n', dest='namespace', help='Namespace to set in the overlay')
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
@@ -257,15 +257,17 @@ def main():
         utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
 
     # Setup defaults for values that can be set in forgeops.conf
-    config['helm'] = args.helm
-    if os.getenv('HELM_PATH'):
-        config['helm'] = os.getenv('HELM_PATH')
+    config['helm_path'] = 'helm'
+    if args.helm_path:
+        config['helm_path'] = args.helm_path
+    elif os.getenv('HELM_PATH'):
+        config['helm_path'] = os.getenv('HELM_PATH')
 
-    config['kustomize'] = 'kustomize'
-    if args.kustomize:
-        config['kustomize'] = args.kustomize
+    config['kustomize_path'] = 'kustomize'
+    if args.kustomize_path:
+        config['kustomize_path'] = args.kustomize_path
     elif os.getenv('KUSTOMIZE_PATH'):
-        config['kustomize'] = os.getenv('KUSTOMIZE_PATH')
+        config['kustomize_path'] = os.getenv('KUSTOMIZE_PATH')
 
     config['pull_policy'] = None
     if args.pull_policy:
@@ -461,10 +463,10 @@ def main():
             }
         }
 
-    if Path(config['kustomize']).is_absolute():
-        config['kustomize_path'] = Path(config['kustomize'])
+    if Path(config['kustomize_path']).is_absolute():
+        config['kustomize_path'] = Path(config['kustomize_path'])
     else:
-        config['kustomize_path'] = config['root_path'] / config['kustomize']
+        config['kustomize_path'] = config['root_path'] / config['kustomize_path']
     if args.debug: print(f"kustomize_path={config['kustomize_path']}")
     if not config['kustomize_path'].is_dir():
        utils.exit_msg(f"Kustomize dir ({config['kustomize_path']}) isn't a dir or doesn't exist")
@@ -502,13 +504,12 @@ To: {config['overlay_path']}
             print(msg)
 
     config['helm_action'] = None
-    config['helm_path'] = None
     if config['do_helm']:
         config['helm_action'] = 'Create'
-        if Path(config['helm']).is_absolute():
-            config['helm_path'] = Path(config['helm'])
+        if Path(config['helm_path']).is_absolute():
+            config['helm_path'] = Path(config['helm_path'])
         else:
-            config['helm_path'] = config['root_path'] / config['helm']
+            config['helm_path'] = config['root_path'] / config['helm_path']
         if config['helm_path'].is_dir():
             config['helm_path'] = config['helm_path'] / args.env_name
         else:
