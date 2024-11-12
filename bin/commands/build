@@ -63,7 +63,7 @@ EOM
 # Setup valid components now so they get presented in the usage
 COMPONENTS_FBC=( "am" "idm" "ig" )
 COMPONENTS_BUILD_DEP=( "amster" ) # Deprecated build components
-COMPONENTS_VALID=( ${COMPONENTS_STD[@]} ${COMPONENTS_BUILD[@]} ${COMPONENTS_BUILD_DEP[@]} 'all' )
+COMPONENTS_VALID=( ${COMPONENTS_STD[@]} ${COMPONENTS_BUILD[@]} ${COMPONENTS_BUILD_DEP[@]} 'platform' )
 
 # Code in common.sh
 processArgs $*
@@ -97,9 +97,9 @@ if containsElement "amster" ${COMPONENTS[@]} ; then
   usage 1 "Embedding AM dynamic configs in the amster image is not supported. Manage AM dynamic config with the bin/amster cmd instead."
 fi
 
-if containsElement "all" ${COMPONENTS[@]} ; then
-  message "Component 'all' given, setting components"
-  COMPONENTS=( ${COMPONENTS_STD[@]} ${COMPONENTS_BUILD[@]} )
+if containsElement "platform" ${COMPONENTS[@]} ; then
+  message "Component 'platform' given, setting components"
+  COMPONENTS=( 'am' 'idm' 'ds' 'amster' )
 fi
 message "COMPONENTS=$COMPONENTS" "debug"
 
