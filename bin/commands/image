@@ -351,7 +351,7 @@ examples:
     if Path(helm_path).is_absolute():
         helm_root = Path(helm_path)
     else:
-        helm_root = root_path / helm
+        helm_root = root_path / helm_path
     helm_path = helm_root / args.env_name if args.env_name else None
     if args.debug:
         print(f"helm_path={helm_path}")
