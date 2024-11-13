@@ -56,6 +56,7 @@ processArgs() {
   HELM_PATH=${HELM_PATH:-helm}
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
+  IMAGE_REPO=${IMAGE_REPO:-}
   PUSH_TO=${PUSH_TO:-}
 
   # Vars that cannot be set in /path/to/forgeops/forgeops.conf
@@ -184,11 +185,8 @@ processArgs() {
   fi
   message "NAMESPACE=$NAMESPACE" "debug"
 
-  if [ "$DEP_SIZE" = true ] || [ -n "$SIZE" ]; then
-    if [[ ! "PROG" =~ generate ]] ; then
-      deprecateSize
-    fi
-  fi
+  # Deprecations
+  deprecateSize
 }
 
 # Sort the components so base is either first or last
@@ -271,13 +269,15 @@ expandDSComponent() {
 deprecateSize() {
   message "Starting deprecateSize()" "debug"
 
-  cat <<- EOM
-  The size flags have been deprecated in favor of the --overlay flag. The
-  overlay flag accepts a full path to an overlay or a path relative to the
-  kustomize/overlay directory.
+  if [ "$DEP_SIZE" = true ] || [ -n "$SIZE" ]; then
+    cat <<- EOM
+The size flags have been deprecated in favor of the --overlay flag. The
+overlay flag accepts a full path to an overlay or a path relative to the
+kustomize/overlay directory.
 
-  For now, the old size flags utilize the new overlay functionality. Please
-  update your documentation, scripts, CI/CD pipelines, and anywhere else you
-  call forgeops to use --overlay from here on out.
+For now, the old size flags utilize the new overlay functionality. Please
+update your documentation, scripts, CI/CD pipelines, and anywhere else you
+call forgeops to use --overlay from here on out.
 EOM
+  fi
 }

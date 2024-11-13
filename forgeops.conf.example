@@ -1,21 +1,42 @@
 #
 # All commands honor these
 #
-KUSTOMIZE_PATH=kustomize
+#KUSTOMIZE_PATH=kustomize
+#HELM_PATH=helm
 #NO_KUSTOMIZE=false
 #NO_HELM=false
 
 #
-# Only for build
-#
-BUILD_PATH=docker
-CONTAINER_ENGINE=docker
-#PUSH_TO=
-
-#
-# Only for generate
+# Only for env
 #
 # PULL_POLICY is image pull policy : see available values https://kubernetes.io/docs/concepts/containers/images/
 #PULL_POLICY=
 # Source overlay to use when creating a new overlay
-SOURCE=default
+#SOURCE=default
+
+#
+# Only for build
+#
+#BUILD_PATH=docker
+#CONTAINER_ENGINE=docker
+# Use PUSH_TO to set a global registry URL for building your custom images
+#PUSH_TO=
+
+#
+# Container registry URLS
+#
+# These are for folks that need to build their own custom images instead of
+# using the canonical images. If you are using the default/canonical images,
+# then you can ignore these settings. Be sure you know what you are doing
+# before changing these. Usually, you should only need to set BASE_REPO, and
+# leave DEPLOY_REPO alone.
+
+# BASE_REPO contains bare images that have not been setup for forgeops. It's
+# shorthand is 'base'.
+#BASE_REPO=
+
+# DEPLOY_REPO contains images that have been setup for forgeops. It's shorthand
+# is 'deploy'. It can be the canonical forgops-public repo, or your PUSH_TO
+# repo.  If you want to define this, it's recommended to set PUSH_TO as well
+# and make them the same.
+#DEPLOY_REPO=$PUSH_TO

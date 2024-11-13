@@ -117,12 +117,15 @@ def select_tag(component, releases, release, image_names, tag=None):
                 selected_tag = tag
             else:
                 selected_tag = releases[component][maj_min][full]['tags'][-1]
+                if tag is not None:
+                    print(f"The requested tag ({tag}) is not available, using latest tag ({selected_tag}) instead.")
         elif patch > 0:
             patch_new = patch - 1
             full_new = f"{maj_min}.{patch_new}"
             release_new = deepcopy(release)
             release_new['patch'] = patch_new
             release_new['full'] = full_new
+            print(f"The requested release ({full}) is not available for {component}. Trying {full_new}.")
             selected_tag = select_tag(component, releases, release_new, tag)
     else:
         utils.exit_msg(f"Invalid release {target}. Only supports releases 7.4+.")
@@ -188,32 +191,43 @@ def main():
     forgeops_public_url = 'us-docker.pkg.dev/forgeops-public'
     base_repo_dev = "gcr.io/forgerock-io"
     base_repo_def = f"{forgeops_public_url}/images-base"
-    config_repo_def = f"{forgeops_public_url}/images"
+    deploy_repo_def = f"{forgeops_public_url}/images"
 
-    help_examples=f"""
+    help_epilog=f"""
+--image-repo shorthand repos and their defaults:
+base = {base_repo_def}
+deploy = {deploy_repo_def}
+dev = {base_repo_dev}
+
 examples:
 # Set a custom component image in the prod env for am (used by build command)
-{prog} --env-name prod --push-to gcr.io/my-project/idp --tag 7.5.0 am
+{prog} --env-name prod --image-repo my-container-repo/idp --tag 7.5.0 am
 
 # Copy images from one env to another (prod-single to prod)
 {prog} --env-name prod --source prod-single --copy
 
-# Select an official release for doing builds for platform components
+### Manage release files for use with `forgeops build --release-name $RELEASE_NAME`
+# Manage release files for the entire platform (generated release name is 7.5.1-DATETIME)
 {prog} --release 7.5.1 platform
 
-# Select an official release for doing builds with a custom release name for platform components
+# Manage release files with a custom release name for the entire platform
 {prog} --release 7.5.1 --release-name 7.5.1-2 platform
 
-# Select an official release for an env for platform components
-{prog} --release 7.5.1 --env-name prod platform
-
-# Select an official IG release with a custom release name
+# Manage an official IG release with a custom release name
 {prog} --release 2024.6.3 --release-name 2024.6.3-1 ig
+
+### Update Helm values.yaml and Kustomize overlay to use deployable images
+### Needed for demos and initial setup
+# Select an official release for an env for platform components
+{prog} --release 7.5.1 --env-name ig-sfo1 platform
+
+# Select an official IG release for an env
+{prog} --release 7.5.1 --env-name ig-dfw1 ig
 """
 
     parser = argparse.ArgumentParser(description='Manage images in a Ping Identity Platform (PIP) environment',
                                      prog=prog,
-                                     epilog=textwrap.dedent(help_examples),
+                                     epilog=textwrap.dedent(help_epilog),
                                      formatter_class=Formatter)
     parser.add_argument('-d', '--debug', action='store_true', help='Turn on debugging')
     parser.add_argument('components', nargs='*', choices=components_valid)
@@ -225,16 +239,13 @@ examples:
                         help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
     parser.add_argument('-e', '--env-name', help='Name of environment to manage')
     parser.add_argument('-s', '--source', help='Name of source environment')
-    parser.add_argument('-r', '--push-to', help='Container registry to use for images')
     parser.add_argument('-t', '--tag', help='Set the tag used for images')
     parser.add_argument('--no-helm', action='store_true', help="Don't manage helm values files")
     parser.add_argument('--no-kustomize', action='store_true', help="Don't manage kustomize overlay")
     parser.add_argument('--copy', action='store_true', help='Copy images from --source to --env-name')
     parser.add_argument('--release', help='Specify platform image release to set (eg. 7.5.1)')
     parser.add_argument('--release-name', default=argparse.SUPPRESS, help='Name of release file in docker/component/releases (default: $RELEASE-$DATETIME in UTC)')
-    parser.add_argument('--base-repo', default=argparse.SUPPRESS, help=f"URL for base image container repo (default: {base_repo_def})")
-    parser.add_argument('--config-repo', default=argparse.SUPPRESS, help=f"URL for config image container repo (default: {config_repo_def})")
-    parser.add_argument('--same-repo', action='store_true', help='Use base URL for both container repos')
+    parser.add_argument('-r', '--image-repo', default=argparse.SUPPRESS, help=f"Container registry URL to use (defaults: see below)")
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--verbose', action='store_true', help=argparse.SUPPRESS)
@@ -252,8 +263,8 @@ examples:
     if not args.copy and not args.components:
         utils.exit_msg('You must supply at least one component to update when not using --copy.')
 
-    if not args.release and not args.env_name:
-        utils.exit_msg('An environment name (--env-name) is required for this operation.')
+    if getattr(args, 'release_name', None) and not args.release:
+        utils.exit_msg('You must supply --release when using --release-name.')
 
     update_config_images = True
     update_docker_files = False
@@ -324,12 +335,6 @@ examples:
     if not docker_path.is_dir():
         utils.exit_msg(f"Build path ({docker_path}) isn't a dir or doesn't exist")
 
-    push_to = None
-    if args.push_to:
-        push_to = args.push_to if args.push_to.lower() != 'none' else None
-    elif os.getenv('PUSH_TO'):
-        push_to = os.getenv('PUSH_TO')
-
     do_helm = True
     if args.no_helm or os.getenv('NO_HELM') == 'true':
         do_helm = False
@@ -356,19 +361,32 @@ examples:
     if args.debug:
         print(f"helm_path={helm_path}")
 
+    # Process default and global container repo settings before args.image_repo
     base_repo = copy(base_repo_def)
-    if getattr(args, 'base_repo', None):
-        base_repo = args.base_repo
-    elif os.getenv('BASE_REPO') is not None:
+    deploy_repo = copy(deploy_repo_def)
+    if os.getenv('BASE_REPO') is not None:
         base_repo = os.getenv('BASE_REPO')
+    if os.getenv('DEPLOY_REPO') is not None:
+        deploy_repo = os.getenv('DEPLOY_REPO')
+    repo = deploy_repo
+    if args.release and not args.env_name:
+        repo = base_repo
 
-    config_repo = copy(config_repo_def)
-    if getattr(args, 'same_repo', None):
-        config_repo = base_repo
-    elif getattr(args, 'config_repo', None):
-        config_repo = args.config_repo
-    elif os.getenv('CONFIG_REPO') is not None:
-        config_repo = os.getenv('CONFIG_REPO')
+    if getattr(args, 'image_repo', None):
+        if args.image_repo == 'base':
+            repo = base_repo
+        elif args.image_repo == 'base-default':
+            repo = copy(base_repo_def)
+        elif args.image_repo == 'deploy':
+            repo = deploy_repo
+        elif args.image_repo == 'deploy-default':
+            repo = copy(deploy_repo_def)
+        elif args.image_repo == 'dev':
+            repo = copy(base_repo_dev)
+        elif args.image_repo.lower() == 'none':
+            repo = None
+        else:
+            repo = args.image_repo
 
     releases = {}
     release = {}
@@ -379,7 +397,7 @@ examples:
         if getattr(args, 'release_name', None):
             release_name = args.release_name
         if args.release == 'dev':
-            base_repo = base_repo_dev
+            repo = base_repo_dev
 
         releases = get_releases(release_src, components)
         release = parse_release_str(args.release)
@@ -387,14 +405,12 @@ examples:
             release_tags[c] = select_tag(c, releases, release, base_image_names, args.tag)
 
         if update_docker_files:
-            write_release_names(release_tags, base_repo, docker_path, release_name, base_image_names)
+            print(f"Updating release file(s) for docker builds [{release_name}]")
+            write_release_names(release_tags, repo, docker_path, release_name, base_image_names)
 
     values_images = {}
     images_kustomize = {}
     if update_config_images:
-        repo = push_to
-        if args.release:
-            repo = config_repo
         tag = args.tag
         for component in components:
             if args.release:
