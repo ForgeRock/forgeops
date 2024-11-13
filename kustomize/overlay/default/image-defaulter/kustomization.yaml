@@ -12,13 +12,7 @@ images:
 - name: .*ds:.*
   newName: us-docker.pkg.dev/forgeops-public/images/ds
   newTag: dev
-- name: .*ds-cts.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: dev
-- name: .*ds-idrepo.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: dev
-- name: .*idm
+- name: .*idm.*
   newName: us-docker.pkg.dev/forgeops-public/images/idm
   newTag: dev
 - name: .*ig.*

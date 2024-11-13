@@ -22,7 +22,7 @@ Build container images for one or more ForgeRock components.
 Notes:
   * building amster images is not supported, use bin/amster
   * Only ${COMPONENTS_FBC[*]} respect --config-profile
-  * You must use --push-to or set PUSH_TO in your environment/forgeops.conf
+  * Set PUSH_TO in forgeops.conf to configure for the team
 
 OPTIONS:
   -h|--help                        : display usage and exit
@@ -49,10 +49,10 @@ Deprecated Components:
 
 Examples:
   Normal operation:
-  $PROG -p prod -e prod am
+  $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops am
 
   Do a dryrun:
-  $PROG -p prod -e prod --dryrun am
+  $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops --dryrun am
 
 EOM
 )
@@ -140,13 +140,13 @@ for c in ${COMPONENTS[@]} ; do
 
   runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS_REAL -t $IMAGE -f $build_d/Dockerfile $build_d
 
-  PUSH_OPT=
+  REPO_OPT=
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
     runOrPrint $CONTAINER_ENGINE push $IMAGE
-    PUSH_OPT="--push-to ${PUSH_TO}"
-  elif [[ "$PUSH_TO" =~ ^([N|n][O|o][N|n][E|e]) ]] ; then
-    PUSH_OPT="--push-to none"
+    REPO_OPT="--image-repo ${PUSH_TO}"
+  else
+    REPO_OPT="--image-repo none"
   fi
 
-  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH -H $HELM_PATH $PUSH_OPT $TAG_OPT $BUILD_PATH_OPT $c
+  runOrPrint $SCRIPT_DIR/image -e $ENV_NAME -k $KUSTOMIZE_PATH -H $HELM_PATH $REPO_OPT $TAG_OPT $BUILD_PATH_OPT $c
 done
