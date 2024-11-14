@@ -4,8 +4,6 @@ platform:
   notes:
     enabled: false
   disable_secret_agent_config: true
-  ingress:
-    enabled: false
 admin_ui:
   enabled: false
 am:
@@ -25,7 +23,7 @@ idm:
 ig:
   enabled: true
   image:
-    repository: idm
+    repository: ig
     tag: ""
 ldif_importer:
   enabled: false
