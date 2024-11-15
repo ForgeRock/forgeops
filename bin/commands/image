@@ -14,10 +14,10 @@ import textwrap
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
-root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
-dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
+root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
 # Insert lib folders to python path
-sys.path.insert(0, str(root_dir))
+sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
 from lib.python.ensure_configuration_is_valid_or_exit import print_how_to_install_dependencies
@@ -27,6 +27,18 @@ try:
 except:
     print_how_to_install_dependencies()
 import lib.python.utils as utils
+from lib.python.releases import (
+    BASE_REPO_DEF,
+    BASE_REPO_DEV,
+    DEPLOY_REPO_DEF,
+    BASE_IMAGE_NAMES,
+    RELEASES_SRC_DEF,
+    get_releases,
+    parse_release_str,
+    select_tag,
+    set_image,
+    select_image_repo
+)
 
 
 # Avoid using anchors/aliases in outputted YAML
@@ -55,101 +67,14 @@ def containsElement(search, target):
     return False
 
 
-def get_releases(release_src, components):
-    """ Get the list of available releases """
-    releases = {}
-    for c in components:
-        with open(release_src / f"{c}.json") as f:
-            data = json.load(f)
-            releases[c] = data['releases']
-    return releases
-
-
-def parse_release_str(rel_str):
-    """ Split the release string, and setup a map of different release strings. """
-
-    alt_releases = ['dev']
-    release = {
-        'major': 0,
-        'minor': 0,
-        'patch': 0,
-    }
-    if rel_str.count('.') == 0:
-        release['major'] = rel_str
-    elif rel_str.count('.') == 1:
-        release['major'] = int(rel_str.split('.')[0])
-        release['minor'] = int(rel_str.split('.')[1])
-    elif rel_str.count('.') == 2:
-        release['major'] = int(rel_str.split('.')[0])
-        release['minor'] = int(rel_str.split('.')[1])
-        release['patch'] = int(rel_str.split('.')[2])
-
-    if rel_str in alt_releases:
-        release['maj_min'] = rel_str
-        release['full'] = rel_str
-    else:
-        release['major'] = int(release['major'])
-        release['maj_min'] = f"{release['major']}.{release['minor']}"
-        release['full'] = f"{release['maj_min']}.{release['patch']}"
-
-    return release
-
-
-def select_tag(component, releases, release, image_names, tag=None):
-    """ Select the best tag based on the component, release, and/or tag. """
-
-    major = release['major']
-    minor = release['minor']
-    patch = release['patch']
-    full = release['full']
-    maj_min = release['maj_min']
-    selected_tag = None
-
-    if 'target' not in release.keys():
-        release['target'] = full
-    target = release['target']
-
-    if maj_min in releases[component].keys():
-        if 'component_name' in releases[component][maj_min]:
-            image_names[component] = releases[component][maj_min]['component_name']
-        if full in releases[component][maj_min].keys():
-            if tag in releases[component][maj_min][full]['tags']:
-                selected_tag = tag
-            else:
-                selected_tag = releases[component][maj_min][full]['tags'][-1]
-                if tag is not None:
-                    print(f"The requested tag ({tag}) is not available, using latest tag ({selected_tag}) instead.")
-        elif patch > 0:
-            patch_new = patch - 1
-            full_new = f"{maj_min}.{patch_new}"
-            release_new = deepcopy(release)
-            release_new['patch'] = patch_new
-            release_new['full'] = full_new
-            print(f"The requested release ({full}) is not available for {component}. Trying {full_new}.")
-            selected_tag = select_tag(component, releases, release_new, tag)
-    else:
-        utils.exit_msg(f"Invalid release {target}. Only supports releases 7.4+.")
-
-    return selected_tag
-
-
-def set_image(image_name, tag, repo=None):
-    """ Create a dictionary entry for a component image """
-    data = { 'image': {} }
-    data['image']['repository'] = f"{repo}/{image_name}" if repo else image_name
-    if tag:
-        data['image']['tag'] = tag
-    return data
-
-
-def write_release_names(tags, repo, docker_path, release_name, image_names):
+def write_release_names(tags, repo, build_path, release_name, image_names):
     """ Write a release files """
 
     for c in tags.keys():
         # Skip ui images as we don't support building those
         if 'ui' in c:
             continue
-        releases_path = docker_path / c / 'releases'
+        releases_path = build_path / c / 'releases'
         if not releases_path.exists():
             os.makedirs(releases_path)
 
@@ -188,16 +113,11 @@ def main():
     components_valid = sum([components_meta, components_platform, ['ig']], [])
     components_valid.append([])
 
-    forgeops_public_url = 'us-docker.pkg.dev/forgeops-public'
-    base_repo_dev = "gcr.io/forgerock-io"
-    base_repo_def = f"{forgeops_public_url}/images-base"
-    deploy_repo_def = f"{forgeops_public_url}/images"
-
     help_epilog=f"""
 --image-repo shorthand repos and their defaults:
-base = {base_repo_def}
-deploy = {deploy_repo_def}
-dev = {base_repo_dev}
+base = {BASE_REPO_DEF}
+deploy = {DEPLOY_REPO_DEF}
+dev = {BASE_REPO_DEV}
 
 examples:
 # Set a custom component image in the prod env for am (used by build command)
@@ -266,23 +186,34 @@ examples:
     if getattr(args, 'release_name', None) and not args.release:
         utils.exit_msg('You must supply --release when using --release-name.')
 
-    update_config_images = True
-    update_docker_files = False
-    if (args.release and not args.env_name) or args.copy:
-        update_config_images = False
-        if args.release:
-            update_docker_files = True
+    build = getattr(args, 'build_path', None)
+    helm = getattr(args, 'helm_path', None)
+    kustomize = getattr(args, 'kustomize_path', None)
+    (helm_root,
+        kustomize_path,
+        build_path,
+        overlay_root,
+        do_helm,
+        do_kustomize ) = utils.process_overrides(root_path,
+                                                 helm,
+                                                 kustomize,
+                                                 build,
+                                                 args.no_helm,
+                                                 args.no_kustomize)
+    helm_path = helm_root / args.env_name if args.env_name else None
 
-    base_image_names = {
-        'am': 'am',
-        'amster': 'amster',
-        'ds': 'ds',
-        'idm': 'idm',
-        'ig': 'ig',
-        'admin-ui': 'admin-ui',
-        'end-user-ui': 'end-user-ui',
-        'login-ui': 'login-ui',
-    }
+    if args.debug:
+        print(f"build_path={build_path}")
+        print(f"helm_path={helm_path}")
+        print(f"kustomize_path={kustomize_path}")
+        print(f"overlay_root={overlay_root}")
+        print(f"RELEASES_SRC_DEF={RELEASES_SRC_DEF}")
+    if not build_path.is_dir():
+        utils.exit_msg(f"Build path ({build_path}) isn't a dir or doesn't exist")
+    if do_kustomize and not kustomize_path.is_dir():
+        utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
+    if do_helm and helm_path is not None and not helm_path.is_dir():
+        utils.exit_msg(f"Helm dir ({helm_path}) isn't a dir or doesn't exist")
 
     components = copy(args.components)
     if containsElement(['platform'], components):
@@ -300,113 +231,37 @@ examples:
     if args.debug:
         print(f"components = {components}")
 
-    script_path = Path(__file__).parent
-    if args.debug: print(f'script_path = {script_path}')
-    root_path = script_path.parent.parent
-    if args.debug: print(f'root_path = {root_path}')
-    # Temporary local file, will be hosted via http
-    release_src = root_path / 'releases'
+    repo = select_image_repo(args.release, getattr(args, 'image_repo', None),
+                                 getattr(args, 'env_name', None))
 
-    # Setup defaults for values that can be set in forgeops.conf
-    helm_path = 'helm'
-    if getattr(args, 'helm_path', None):
-        helm_path = args.helm_path
-    elif os.getenv('HELM_PATH'):
-        helm_path = os.getenv('HELM_PATH')
-
-    kustomize_path = 'kustomize'
-    if getattr(args, 'kustomize_path', None):
-        kustomize_path = args.kustomize_path
-    elif os.getenv('KUSTOMIZE_PATH'):
-        kustomize_path = os.getenv('KUSTOMIZE_PATH')
-
-    docker_path = 'docker'
-    if getattr(args, 'build_path', None):
-        docker_path = args.build_path
-    elif os.getenv('BUILD_PATH'):
-        docker_path = os.getenv('BUILD_PATH')
-
-    if Path(docker_path).is_absolute():
-        docker_path = Path(docker_path)
-    else:
-        docker_path = root_path / docker_path
-    if args.debug:
-        print(f"docker_path={docker_path}")
-    if not docker_path.is_dir():
-        utils.exit_msg(f"Build path ({docker_path}) isn't a dir or doesn't exist")
-
-    do_helm = True
-    if args.no_helm or os.getenv('NO_HELM') == 'true':
-        do_helm = False
-
-    do_kustomize = True
-    if args.no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
-        do_kustomize = False
-    # End defaults setup
-
-    if Path(kustomize_path).is_absolute():
-        kustomize_path = Path(kustomize_path)
-    else:
-        kustomize_path = root_path / kustomize_path
-    if args.debug:
-        print(f"kustomize_path={kustomize_path}")
-    if not kustomize_path.is_dir():
-        utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
-
-    if Path(helm_path).is_absolute():
-        helm_root = Path(helm_path)
-    else:
-        helm_root = root_path / helm_path
-    helm_path = helm_root / args.env_name if args.env_name else None
-    if args.debug:
-        print(f"helm_path={helm_path}")
-
-    # Process default and global container repo settings before args.image_repo
-    base_repo = copy(base_repo_def)
-    deploy_repo = copy(deploy_repo_def)
-    if os.getenv('BASE_REPO') is not None:
-        base_repo = os.getenv('BASE_REPO')
-    if os.getenv('DEPLOY_REPO') is not None:
-        deploy_repo = os.getenv('DEPLOY_REPO')
-    repo = deploy_repo
-    if args.release and not args.env_name:
-        repo = base_repo
-
-    if getattr(args, 'image_repo', None):
-        if args.image_repo == 'base':
-            repo = base_repo
-        elif args.image_repo == 'base-default':
-            repo = copy(base_repo_def)
-        elif args.image_repo == 'deploy':
-            repo = deploy_repo
-        elif args.image_repo == 'deploy-default':
-            repo = copy(deploy_repo_def)
-        elif args.image_repo == 'dev':
-            repo = copy(base_repo_dev)
-        elif args.image_repo.lower() == 'none':
-            repo = None
-        else:
-            repo = args.image_repo
+    update_config_images = True
+    update_docker_files = False
+    if (args.release and not args.env_name) or args.copy:
+        update_config_images = False
+        if args.release:
+            update_docker_files = True
 
     releases = {}
     release = {}
     release_tags = {}
+    timestamp = None
     if args.release:
         timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M%S")
         release_name = f"{args.release}-{timestamp}"
         if getattr(args, 'release_name', None):
             release_name = args.release_name
         if args.release == 'dev':
-            repo = base_repo_dev
+            repo = BASE_REPO_DEV
 
-        releases = get_releases(release_src, components)
+        releases = get_releases(RELEASES_SRC_DEF, components)
         release = parse_release_str(args.release)
+        image_names = copy(BASE_IMAGE_NAMES)
         for c in components:
-            release_tags[c] = select_tag(c, releases, release, base_image_names, args.tag)
+            release_tags[c], image_names = select_tag(c, releases, release, image_names, args.tag)
 
         if update_docker_files:
             print(f"Updating release file(s) for docker builds [{release_name}]")
-            write_release_names(release_tags, repo, docker_path, release_name, base_image_names)
+            write_release_names(release_tags, repo, build_path, release_name, image_names)
 
     values_images = {}
     images_kustomize = {}

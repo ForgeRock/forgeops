@@ -30,6 +30,20 @@ log_name = 'forgeops'
 
 ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
 
+ENV_COMPONENTS_VALID = [
+        'am',
+        'amster',
+        'ds',
+        'ds-cts',
+        'ds-idrepo',
+        'idm',
+        'ig',
+        'ldif-importer',
+        'admin-ui',
+        'end-user-ui',
+        'login-ui'
+]
+
 DOCKER_REGEX_NAME = {
     'am': 'am',
     'amster': 'amster',
@@ -863,3 +877,74 @@ def replace_or_append_dict(array, search_key, search_str, target_key, replace_da
         array.append(append_data)
 
     return array
+
+def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize):
+    """
+    Process common paths from arguments
+    """
+
+    helm_path = 'helm'
+    if helm is not None:
+        helm_path = helm
+    elif os.getenv('HELM_PATH'):
+        helm_path = os.getenv('HELM_PATH')
+    if Path(helm_path).is_absolute():
+        helm_path = Path(helm_path)
+    else:
+        helm_path = root_path / helm_path
+
+    build_path = 'docker'
+    if build is not None:
+        build_path = build
+    elif os.getenv('BUILD_PATH'):
+        build_path = os.getenv('BUILD_PATH')
+    if Path(build_path).is_absolute():
+        build_path = Path(build_path)
+    else:
+        build_path = root_path / build_path
+
+    kustomize_path = 'kustomize'
+    if kustomize is not None:
+        kustomize_path = kustomize
+    elif os.getenv('KUSTOMIZE_PATH'):
+        kustomize_path = os.getenv('KUSTOMIZE_PATH')
+    if Path(kustomize_path).is_absolute():
+        kustomize_path = Path(kustomize_path)
+    else:
+        kustomize_path = root_path / kustomize_path
+
+    overlay_root = kustomize_path / 'overlay'
+
+    do_helm = True
+    if no_helm or os.getenv('NO_HELM') == 'true':
+        do_helm = False
+    do_kustomize = True
+    if no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
+        do_kustomize = False
+
+    return helm_path, kustomize_path, build_path, overlay_root, do_helm, do_kustomize
+
+def key_exists(data, key_str, separator='.'):
+    """
+    Check to see if a nested key exists.
+    ex:
+    if key_exists(my_dict, 'platform.ingress.hosts'):
+    """
+
+    if type(data) != dict:
+        raise Exception("key_exists(): Must provide a dict to look in")
+    if type(key_str) != str:
+        raise Exception("key_exists(): Must provide a str (key.subkey[.subkey]...) to look for")
+    result = True
+    k = key_str
+    key_str_new = None
+    if '.' in key_str:
+        k, key_str_new = key_str.split('.', 1)
+        if k in data:
+            result = key_exists(data[k], key_str_new)
+        else:
+            result = False
+    else:
+        if k not in data:
+            result = False
+    return result

@@ -13,10 +13,10 @@ import site
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
-root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
-dependencies_dir = os.path.join(root_dir, 'lib', 'dependencies')
+root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
 # Insert lib folders to python path
-sys.path.insert(0, str(root_dir))
+sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
 from lib.python import utils
@@ -220,8 +220,8 @@ def main():
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
-    kustomize_path = root_dir / 'kustomize'
-    docker_path = root_dir / 'docker'
+    kustomize_path = root_path / 'kustomize'
+    docker_path = root_path / 'docker'
     scripts_path = docker_path / 'amster' / 'scripts'
 
     if args.cmd == 'clean':
@@ -233,7 +233,7 @@ def main():
         if Path(args.src).is_absolute():
             src = Path(args.src)
         else:
-            src = root_dir / args.src
+            src = root_path / args.src
 
         amster_import(namespace, src, kustomize_path, scripts_path, args.duration)
         return
@@ -244,7 +244,7 @@ def main():
         if Path(args.dst).is_absolute():
             dst = Path(args.dst)
         else:
-            dst = root_dir / args.dst
+            dst = root_path / args.dst
 
         amster_export(namespace, dst, kustomize_path, scripts_path, args.glob, args.full, args.duration)
         return
@@ -254,7 +254,7 @@ def main():
         if Path(args.src).is_absolute():
             src = Path(args.src)
         else:
-            src = root_dir / args.src
+            src = root_path / args.src
 
         upgrade_all_amster_files(args.src, args.fqdn)
         return
