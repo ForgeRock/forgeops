@@ -39,9 +39,9 @@ else
         --set tolerations[0]."key"="kubernetes\.io/arch" \
         --set tolerations[0]."effect"="NoSchedule" \
         --set tolerations[0]."operator"="Exists" \
-        --set caininjector.tolerations[0]."key"="kubernetes\.io/arch" \
-        --set caininjector.tolerations[0]."effect"="NoSchedule" \
-        --set caininjector.tolerations[0]."operator"="Exists" \
+        --set cainjector.tolerations[0]."key"="kubernetes\.io/arch" \
+        --set cainjector.tolerations[0]."effect"="NoSchedule" \
+        --set cainjector.tolerations[0]."operator"="Exists" \
         --set startupapicheck.tolerations[0]."key"="kubernetes\.io/arch" \
         --set startupapicheck.tolerations[0]."effect"="NoSchedule" \
         --set startupapicheck.tolerations[0]."operator"="Exists" \
