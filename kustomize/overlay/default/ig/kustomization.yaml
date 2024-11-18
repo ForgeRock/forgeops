@@ -9,3 +9,9 @@ resources:
 
 patches:
 - path: deployment.yaml
+- path: ingress-fqdn.yaml
+  target:
+    group: networking.k8s.io
+    version: 'v1'
+    kind: Ingress
+    name: ig
