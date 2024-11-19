@@ -12,10 +12,17 @@ import base64
 import logging
 import json
 import re
+import site
 from pathlib import Path
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
-root_dir = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
+dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
+# Insert lib folders to python path
+sys.path.insert(0, str(root_path))
+sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
+
+from lib.python.releases import RELEASES_SRC_DEF
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -121,7 +128,7 @@ patcheable_components ={
     'base/secrets': 'secret_agent_config.yaml'
 }
 
-SCRIPT_DIR = pathlib.Path(os.path.join(root_dir, 'bin'))
+SCRIPT_DIR = pathlib.Path(os.path.join(root_path, 'bin'))
 REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
 DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
 KUSTOMIZE_BASE_PATH = REPO_BASE_PATH.joinpath('kustomize').resolve()
@@ -396,7 +403,7 @@ def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, conf
     return contents: generated kubernetes manifest. This is equivalent to `kustomize build profile_dir`.
     """
     # Clean out the temp kustomize files
-    kustomize_dir = os.path.join(root_dir, 'kustomize')
+    kustomize_dir = os.path.join(root_path, 'kustomize')
     src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
     image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
     profile_dir = custom_path or os.path.join(deploy_path, component)
@@ -458,7 +465,7 @@ def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, l
     deploy_path: base path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy.
     src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
     """
-    deploy_path = deploy_path or os.path.join(root_dir, 'kustomize', 'deploy')
+    deploy_path = deploy_path or os.path.join(root_path, 'kustomize', 'deploy')
     custom_path = os.path.join(deploy_path, component)
     _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=custom_path, src_profile_dir=src_profile_dir, deploy_path=deploy_path)
 
@@ -497,7 +504,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
         return
     try:
         # generate a manifest with the components to be uninstalled in a temp location
-        kustomize_dir = os.path.join(root_dir, 'kustomize')
+        kustomize_dir = os.path.join(root_path, 'kustomize')
         uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
         _, contents = generate_package(component, 'single', ns, '.', ingress_class, '', legacy, config_profile, custom_path=uninstall_dir)
         run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
@@ -512,7 +519,7 @@ def uninstall_component(component, ns, force, ingress_class, legacy, config_prof
         shutil.rmtree(uninstall_dir, ignore_errors=True)
 
 def _inject_kustomize_amster(kustomize_profile_path, config_profile):
-    docker_dir = os.path.join(root_dir, 'docker')
+    docker_dir = os.path.join(root_path, 'docker')
     amster_cm_name = 'amster-files.yaml'
     amster_cm_path = os.path.join(kustomize_profile_path, amster_cm_name)
     amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', config_profile)
@@ -620,7 +627,7 @@ def is_legacy_install(ns):
 
 def _install_certmanager_issuer():
     """Install certmanager self-signed issuer. This works as a placeholder issuer."""
-    addons_dir = os.path.join(root_dir, 'cluster', 'addons', 'certmanager')
+    addons_dir = os.path.join(root_path, 'cluster', 'addons', 'certmanager')
     issuer = os.path.join(addons_dir, 'files', 'selfsigned-issuer.yaml')
     print('\nInstalling cert-manager\'s self-signed issuer: ', end='')
     sys.stdout.flush()
@@ -692,9 +699,9 @@ def build_docker_image(component, context, dockerfile, push_to, tag, container_e
         else:
             image = f'{component}:{tag}'
     run(f'{container_engine}',
-        f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=root_dir)
+        f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=root_path)
     if push_to.lower() != 'none':
-        run(f'{container_engine}', f'push {image}', cwd=root_dir)
+        run(f'{container_engine}', f'push {image}', cwd=root_path)
     return image
 
 
@@ -878,7 +885,7 @@ def replace_or_append_dict(array, search_key, search_str, target_key, replace_da
 
     return array
 
-def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize):
+def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, releases_src):
     """
     Process common paths from arguments
     """
@@ -922,7 +929,18 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize):
     if no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
         do_kustomize = False
 
-    return helm_path, kustomize_path, build_path, overlay_root, do_helm, do_kustomize
+    r_src = RELEASES_SRC_DEF
+    if releases_src:
+        r_src = release_src
+    elif os.getenv('RELEASES_SRC'):
+        r_src = os.getenv('RELEASES_SRC')
+    if not r_src.startswith('http'):
+        if Path(r_src).is_absolute():
+            r_src = Path(r_src)
+        else:
+            r_src = root_path / r_src
+
+    return helm_path, kustomize_path, build_path, overlay_root, do_helm, do_kustomize, r_src
 
 def key_exists(data, key_str, separator='.'):
     """

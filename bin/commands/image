@@ -156,15 +156,16 @@ examples:
     parser.add_argument('-b', '--build-path', default=argparse.SUPPRESS,
                         help='Docker dir to use [absolute or relative to forgeops root] (default: docker)')
     parser.add_argument('-H', '--helm-path', default=argparse.SUPPRESS,
-                        help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
+                        help='Dir to store Helm values files [absolute or relative to forgeops root] (default: helm)')
     parser.add_argument('-e', '--env-name', help='Name of environment to manage')
     parser.add_argument('-s', '--source', help='Name of source environment')
     parser.add_argument('-t', '--tag', help='Set the tag used for images')
-    parser.add_argument('--no-helm', action='store_true', help="Don't manage helm values files")
-    parser.add_argument('--no-kustomize', action='store_true', help="Don't manage kustomize overlay")
+    parser.add_argument('--no-helm', action='store_true', help="Don't manage Helm values files")
+    parser.add_argument('--no-kustomize', action='store_true', help="Don't manage Kustomize overlay")
     parser.add_argument('--copy', action='store_true', help='Copy images from --source to --env-name')
     parser.add_argument('--release', help='Specify platform image release to set (eg. 7.5.1)')
     parser.add_argument('--release-name', default=argparse.SUPPRESS, help='Name of release file in docker/component/releases (default: $RELEASE-$DATETIME in UTC)')
+    parser.add_argument('--releases-src', default=argparse.SUPPRESS, help=f"URL or path where release files live (default: {RELEASES_SRC_DEF})")
     parser.add_argument('-r', '--image-repo', default=argparse.SUPPRESS, help=f"Container registry URL to use (defaults: see below)")
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', action='store_true', help=argparse.SUPPRESS)
@@ -189,17 +190,20 @@ examples:
     build = getattr(args, 'build_path', None)
     helm = getattr(args, 'helm_path', None)
     kustomize = getattr(args, 'kustomize_path', None)
+    releases_source = getattr(args, 'releases_src', None)
     (helm_root,
         kustomize_path,
         build_path,
         overlay_root,
         do_helm,
-        do_kustomize ) = utils.process_overrides(root_path,
+        do_kustomize,
+        releases_src) = utils.process_overrides(root_path,
                                                  helm,
                                                  kustomize,
                                                  build,
                                                  args.no_helm,
-                                                 args.no_kustomize)
+                                                 args.no_kustomize,
+                                                 releases_source)
     helm_path = helm_root / args.env_name if args.env_name else None
 
     if args.debug:
@@ -207,7 +211,7 @@ examples:
         print(f"helm_path={helm_path}")
         print(f"kustomize_path={kustomize_path}")
         print(f"overlay_root={overlay_root}")
-        print(f"RELEASES_SRC_DEF={RELEASES_SRC_DEF}")
+        print(f"releases_src={releases_src}")
     if not build_path.is_dir():
         utils.exit_msg(f"Build path ({build_path}) isn't a dir or doesn't exist")
     if do_kustomize and not kustomize_path.is_dir():
@@ -253,7 +257,7 @@ examples:
         if args.release == 'dev':
             repo = BASE_REPO_DEV
 
-        releases = get_releases(RELEASES_SRC_DEF, components)
+        releases = get_releases(releases_src, components)
         release = parse_release_str(args.release)
         image_names = copy(BASE_IMAGE_NAMES)
         for c in components:

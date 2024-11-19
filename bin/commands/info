@@ -245,12 +245,13 @@ examples:
     parser.add_argument('-k', '--kustomize-path', default=argparse.SUPPRESS,
                         help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
     parser.add_argument('-H', '--helm-path', default=argparse.SUPPRESS,
-                        help='Dir to store helm values files [absolute or relative to forgeops root] (default: helm)')
-    parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage helm values files")
-    parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage kustomize overlay")
+                        help='Dir to store Helm values files [absolute or relative to forgeops root] (default: helm)')
+    parser.add_argument('--no-helm', action='store_true', help="Don't create/manage Helm values files")
+    parser.add_argument('--no-kustomize', action='store_true', help="Don't create/manage Kustomize overlay")
     parser.add_argument('--json', dest='is_json_format', action='store_true', help='Print information in JSON format')
     parser.add_argument('--namespace', '-n', default=argparse.SUPPRESS, help='Target namespace (default: current ctx namespace)')
     parser.add_argument('--envs', action='store_true', help='List environments')
+    parser.add_argument('--releases-src', default=argparse.SUPPRESS, help=f"URL or path where release files live (default: {RELEASES_SRC_DEF})")
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', dest='dryrun', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--verbose', dest='verbose', action='store_true', help=argparse.SUPPRESS)
@@ -261,24 +262,27 @@ examples:
     build = getattr(args, 'build_path', None)
     helm = getattr(args, 'helm_path', None)
     kustomize = getattr(args, 'kustomize_path', None)
+    releases_source = getattr(args, 'releases_src', None)
     is_json_format = getattr(args, 'is_json_format', None)
     (helm_root,
          kustomize_path,
          build_path,
          overlay_root,
          do_helm,
-         do_kustomize) = utils.process_overrides(root_path,
+         do_kustomize,
+         releases_src) = utils.process_overrides(root_path,
                                                  helm,
                                                  kustomize,
                                                  build,
                                                  args.no_helm,
-                                                 args.no_kustomize)
+                                                 args.no_kustomize,
+                                                 releases_source)
 
     if args.envs:
-        releases = get_releases(RELEASES_SRC_DEF, release_components)
+        releases = get_releases(releases_src, release_components)
         list_envs(overlay_root, helm_root, args.debug, is_json_format)
     elif args.env_name:
-        releases = get_releases(RELEASES_SRC_DEF, release_components)
+        releases = get_releases(releases_src, release_components)
         list_env_info(args.env_name, overlay_root, helm_root, releases, do_helm, do_kustomize, args.debug, is_json_format)
     else:
         ctx_namespace = utils.get_namespace()
