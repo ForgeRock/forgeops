@@ -4,10 +4,12 @@ from copy import copy
 from copy import deepcopy
 import os
 import json
-from pathlib import Path
+from pathlib import Path, PurePath
 import re
 import sys
 import site
+from urllib.request import urlopen
+from urllib.error import URLError, HTTPError
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -24,7 +26,7 @@ FORGEOPS_PUBLIC_URL = 'us-docker.pkg.dev/forgeops-public'
 BASE_REPO_DEV = "gcr.io/forgerock-io"
 BASE_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images-base"
 DEPLOY_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images"
-RELEASES_SRC_DEF = root_path / 'releases'
+RELEASES_SRC_DEF = 'http://releases.forgeops.com'
 
 # This seems like it could be a list. However, these component names can be
 # overridden in the release JSON files. If a release has a custom component name,
@@ -41,17 +43,42 @@ BASE_IMAGE_NAMES = {
 }
 
 
-def get_releases(release_src, components):
+def get_releases(releases_src, components):
     """
     Get the list of available releases
-    release_src: string (/path/to/releases)
+    releases_src: string (absolute path, path releative to root_path, or http URL)
     components: list (components to get release info for)
     """
     releases = {}
+    do_http = False
+    if not isinstance(releases_src, PurePath):
+        if releases_src.startswith('http'):
+            do_http = True
+        else:
+            releases_src = Path(releases_src)
     for c in components:
-        with open(release_src / f"{c}.json") as f:
-            data = json.load(f)
-            releases[c] = data['releases']
+        data = {}
+        json_file = f"{c}.json"
+        if do_http:
+            url = f"{releases_src}/{json_file}"
+            try:
+                with urlopen(f"{url}") as url:
+                    data = json.load(url)
+            except HTTPError as e:
+                print(f"Skipping {url}. HTTP Error: {e.code}")
+                continue
+            except URLError as e:
+                print(f"Skipping {url}. URL Error: {e.reason}")
+                continue
+        else:
+            json_file_path = releases_src / json_file
+            if json_file_path.is_file():
+                with open(releases_src / f"{json_file}") as f:
+                    data = json.load(f)
+            else:
+                print(f"Skipping {json_file_path} (No such file)")
+                continue
+        releases[c] = data['releases']
     return releases
 
 

@@ -23,6 +23,12 @@
 #PUSH_TO=
 
 #
+# Releases
+#
+# You shouldn't use this unless you are building images from scratch
+# RELEASES_SRC=http://releases.forgeops.com
+
+#
 # Container registry URLS
 #
 # These are for folks that need to build their own custom images instead of
