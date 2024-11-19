@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Simple script to schedule DS backups
+# Simple script to schedule PingDS backups
 
 # Creating cloud storage credentials:
 # In order to enable cloud storage, the user must create a secret with the appropriate credentials. 
@@ -10,7 +10,7 @@
 # kubectl create secret generic cloud-storage-credentials --from-file=GOOGLE_CREDENTIALS_JSON=CHANGEME_PATH.json
 ## For Azure deployments, use:
 # kubectl create secret generic cloud-storage-credentials --from-literal=AZURE_STORAGE_ACCOUNT_NAME="CHANGEME_storageAcctName" --from-literal=AZURE_ACCOUNT_KEY="CHANGEME_storageAcctKey" --dry-run=client -o yaml > ./kustomize/base/ds/base/cloud-storage-credentials.yaml
-## Note : You may want to run the command above before running "forgeops install" or restart the ds pods to pick up the updated secret if the ds pods are already running.
+## Note : You may want to run the command above before running "forgeops install" or restart the PingDS pods to pick up the updated secret if the ds pods are already running.
 
 ## CONFIGURE DSBACKUP PROPERTIES IN THE SECTION BELOW ONLY
 #######################################################################################
@@ -18,7 +18,6 @@
 # HOSTS
 #  - CTS    : consists of loadbalanced pods so use any available pod for backups. (e.g HOSTS="ds-cts-0" or HOSTS="ds-idrepo-2,ds-cts-0")
 #  - IDREPO : ds-idrepo-0 is the primary server so use the largest available pod for backups as it won't impact live traffic. (e.g HOSTS="ds-idrepo-2" or HOSTS="ds-idrepo-2,ds-cts-0")
-#  - CDK    : only one ds-idrepo pod (HOSTS="ds-idrepo-0")
 HOSTS="ds-idrepo-2"
 
 ### IDREPO SCHEDULE ###
@@ -30,7 +29,7 @@ BACKUP_SCHEDULE_IDREPO="*/30 * * * *"
 BACKUP_DIRECTORY_IDREPO=""
 # Backends to backup.
 BACKENDS_IDREPO="amIdentityStore,cfgStore,idmRepo"
-# Name of task on DS pod. Change if configuring multiple backup schedules.
+# Name of task on PingDS pod. Change if configuring multiple backup schedules.
 TASK_NAME_IDREPO="recurringBackupTask"
 
 ### CTS SCHEDULE ###
@@ -53,7 +52,7 @@ if [ -z "$1" ] || ! [[ $1 =~ ^(create|cancel)$ ]]; then
     exit 0
 fi
 
-# Get DS version
+# Get PingDS version
 ds_version=$(kubectl exec ds-idrepo-0 -- /opt/opendj/bin/dsconfig --version)
 major_version=$(printf $ds_version| awk -F' ' '{print $1}'| cut -d'.' -f1)
 echo "DS server version: ${ds_version}"
@@ -62,7 +61,7 @@ echo "DS server version: ${ds_version}"
 pods=($(echo "$HOSTS" | awk '{split($0,arr,",")} {for (i in arr) {print arr[i]}}'))
 
 if [ -z "${pods}" ]; then
-    echo "No DS hosts provided. No backups were scheduled."
+    echo "No PingDS hosts provided. No backups were scheduled."
     exit -1
 fi
 echo "Targeting pods: ${pods[@]}"

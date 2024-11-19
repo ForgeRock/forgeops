@@ -3,8 +3,8 @@
 # Default setup script
 # Setup the directory server for the cts backend.
 
-# This uses DS setup profiles. If the schema for a profile has not been
-# changed it may use an older version. For example, AM CTS 7.5 still uses the 6.5 schema for configuration
+# This uses PingDS setup profiles. If the schema for a profile has not been
+# changed it may use an older version. For example, PingAM CTS 7.5 still uses the 6.5 schema for configuration
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.1"
 

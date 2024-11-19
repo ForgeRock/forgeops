@@ -1,10 +1,9 @@
-# Default DS image
+# Default PingDS image
 
 This image supports a "dynamic" directory deployment where data _and_ configuration are stored on a persistent volume claim (PVC).
 In this regard, it behaves more like a traditional VM install. Changes made at runtime are persisted to the PVC.
 
-Note that directory setup is mostly performed at _runtime_, not docker build time. A default setup script is provided, but
- you can to bring your own script (BYOS) to customize the image.
+Note that directory setup is mostly performed at _runtime_, not docker build time. A default setup script is provided, but you can to bring your own script (BYOS) to customize the image.
 
 ## Pros / Cons
 
@@ -30,9 +29,14 @@ is not maintained as part of the Dockerfile. This could be as simple
 as scripts maintained in git that update the schema. This is an adhoc
 implementation of the concepts behind [Flyway](https://flywaydb.org/).
 
-## Default Scripts / Life-Cycle Hooks.
+## Runtime Scripts.
 
-> NOTE: Lifecycle scripts via a configmap are no longer supported. The DS docker image now contains the option to configure setup scripts for idrepo and cts separately.
+> NOTE: Runtime scripts via a configmap are no longer supported. The PingDS docker image now contains the option to configure runtime scripts for idrepo and cts separately.
+
+To configure runtime behaviour for ds-idrepo and ds-cts separately, use the runtime scripts provided for each server in the runtime-scripts directory.  The scripts are used as follows:
+
+- setup: Intial setup runs on first deployment when the PVC contains no data.
+- post-init: Additional setup runs on subsequent deployments when the PVC already contains data.  
 
 ## Certificates
 
@@ -63,7 +67,7 @@ To update any other backends, please update ds-setup.sh to copy the files to the
 
 ## Backup/restore considerations
 
-DS backups via the `dsbackup create` commands contain user data and its replication metadata.
+PingDS backups via the `dsbackup create` commands contain user data and its replication metadata.
 The metadata must refer to the current contents of the changelog, to avoid divergences, meaning restoring the backup implies knowledge of when it was taken.
 If it was taken within the replication purge delay interval, it can be used to restore a pod or the entire deployment; if it is older than the replication purge delay
 it can only be used to restore the entire deployment.

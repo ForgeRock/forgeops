@@ -1,6 +1,6 @@
 # Prometheus and Grafana deployment
 
-The CDM uses the
+The ForgeOps deployment uses the
 [kube-prometheus-stack Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack)
 for monitoring and alerts. Before you attempt to customize the default
 implementation, make sure you are familiar with Prometheus, Alertmanager, and
@@ -13,7 +13,7 @@ Grafana concepts in the following documentation:
 * [Grafana documentation](https://grafana.com/docs/grafana/latest/)
 
 The following sections list the forgeops repository artifacts that are used to
-deploy Prometheus,Alertmanager, and Grafana in the CDM.  
+deploy Prometheus,Alertmanager, and Grafana.  
 
 ## Helm charts
 
@@ -22,8 +22,8 @@ Grafana software. It also deploys the relevant metrics exporters. The
 deployment creates Custom Resources to make Prometheus native to Kubernetes.
   
 * The ``forgerock-metrics`` chart provides configurable service monitors,
-alerting rules and custom ForgeRock dashboards. Service monitors define the
-ForgeRock Identity Platform component endpoints that Prometheus monitors.
+alerting rules and custom Ping Identity Platform dashboards. Service monitors define the
+Ping Identity Platform component endpoints that Prometheus monitors.
 
 ## Scripts
 
@@ -47,7 +47,7 @@ Prometheus, Alertmanager, and Grafana. See the
     bin/deploy-prometheus.yaml -v <custom-values>.yaml
 ```
 
-* ``forgerock-metrics``: a Helm chart that contains ForgeRock service
+* ``forgerock-metrics``: a Helm chart that contains service
 monitors, alerting rules, and dashboards.
 
 <br />
@@ -91,7 +91,7 @@ The Grafana Helm chart is deployed as part of the ``kube-prometheus-stack`` Helm
 chart.  Grafana automatically connects to Prometheus and syncs all the metrics.
 The metrics are visible through graphs.  
 
-Dashboards for ForgeRock products are added to the Grafana deployment from the
+Dashboards for Ping Identity products are added to the Grafana deployment from the
 ``cluster/addons/prometheus/forgerock-metrics/dashboards`` directory.  The
 dashboards are automatically added to a configmap, and then imported into
 Grafana. For more information, see the **Import Custom Grafana Dashboards** how-to below.
@@ -102,7 +102,7 @@ Grafana. For more information, see the **Import Custom Grafana Dashboards** how-
 
 ### Prerequisites
 
-* The ForgeRock applications are deployed in a cloud environment.
+* The Ping Identity Platform applications are deployed in a cloud environment.
 * You have authenticated to a Kubernetes cluster.
 
 ### To Deploy
@@ -113,7 +113,7 @@ Grafana. For more information, see the **Import Custom Grafana Dashboards** how-
 
   * Running the deployment without any overrides uses the default values file,
 which deploys to the ``monitoring`` namespace, and scrapes metrics from all
-ForgeRock product endpoints, across all namespaces, based on configured labels.  
+Ping Identity Platform product endpoints, across all namespaces, based on configured labels.  
 
   * If you want to provide custom Prometheus, Alertmanager or Grafana
 configuration values, see the  
@@ -211,7 +211,7 @@ example:
 The entire configuration for Prometheus, Alertmanager, and Grafana can be found
 in the `kube-prometheus-stack`
 [values file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack).
-Configuration overrides for the CDM are contained in the
+Configuration overrides for the ForgeOps deployment are contained in the
 ``cluster/addons/prometheus/prometheus-operator.yaml`` file. If you want to
 specify additional customized configuration values, do one of the following:
 
@@ -265,4 +265,4 @@ If you want to change the hostname, edit the
 ``prometheus-operator.yaml`` file.
 
 The labels are optional, and the hostname and secret name align with the current
-deployment of the CDM with cert-manager.
+cert-manager enabled ForgeOps deployment.

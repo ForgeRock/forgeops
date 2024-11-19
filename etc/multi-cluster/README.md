@@ -1,1 +1,0 @@
-The multi-cluster sample files have moved to https://github.com/ForgeRock/forgeops-extras/tree/master/samples/multi-cluster.

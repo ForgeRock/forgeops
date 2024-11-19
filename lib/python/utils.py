@@ -31,37 +31,9 @@ RED = '\033[1;91m'
 ENDC = '\033[0m'
 MSG_FMT = '[%(levelname)s] %(message)s'
 
-_IGNORE_FILES = ('.DS_Store',)
-
 log_name = 'forgeops'
 
 ALLOWED_COMMONS_CHARS = re.compile(r'[^A-Za-z0-9\s\..]+')
-
-ENV_COMPONENTS_VALID = [
-        'am',
-        'amster',
-        'ds',
-        'ds-cts',
-        'ds-idrepo',
-        'idm',
-        'ig',
-        'ldif-importer',
-        'admin-ui',
-        'end-user-ui',
-        'login-ui'
-]
-
-DOCKER_REGEX_NAME = {
-    'am': 'am',
-    'amster': 'amster',
-    'idm': 'idm',
-    'ds-idrepo-old': 'ds-idrepo-old',
-    'ds-cts-old': 'ds-cts-old',
-    'ds-idrepo': 'ds-idrepo',
-    'ds-cts': 'ds-cts',
-    'ds': 'ds',
-    'ig': 'ig'
-}
 
 REQ_VERSIONS ={
     'secret-agent': {
@@ -90,42 +62,6 @@ REQ_VERSIONS ={
         'MIN': 'v4.2.0',
         'MAX': 'v100.0.0',
     },
-}
-
-def inject_kustomize_amster(kustomize_profile_path, config_profile): return _inject_kustomize_amster(kustomize_profile_path, config_profile)
-
-size_paths = {
-    'mini': 'overlay/mini',
-    'small': 'overlay/small',
-    'medium': 'overlay/medium',
-    'large': 'overlay/large',
-    'single': 'base'
-}
-
-bundles = {
-    'base': ['base/kustomizeConfig', 'base/ingress'],
-    'ds': ['base/ds/idrepo', 'base/ds/cts', 'base/ldif-importer'],
-    'ds-idrepo': ['base/ds/idrepo', 'base/ldif-importer'],
-    'ds-cts': ['base/ds/cts', 'base/ldif-importer'],
-    'ds-old': ['base/ds-legacy/idrepo', 'base/ds-legacy/cts', 'base/ldif-importer'],
-    'apps': ['base/am', 'base/idm', inject_kustomize_amster],
-    'ui': ['base/admin-ui', 'base/end-user-ui', 'base/login-ui'],
-    'am': ['base/am'],
-    'idm': ['base/idm'],
-    'amster': [inject_kustomize_amster]
-}
-
-patcheable_components ={
-    'base/am': 'am.yaml',
-    'base/idm': 'idm.yaml',
-    'base/kustomizeConfig': 'base.yaml',
-    'base/ds/idrepo': 'ds-idrepo.yaml',
-    'base/ds/cts': 'ds-cts.yaml',
-    'base/ds-legacy/idrepo': 'ds-idrepo-old.yaml',
-    'base/ds-legacy/cts': 'ds-cts-old.yaml',
-    'base/ig': 'ig.yaml',
-    'base/ingress': 'ingress.yaml',
-    'base/secrets': 'secret_agent_config.yaml'
 }
 
 SCRIPT_DIR = pathlib.Path(os.path.join(root_path, 'bin'))
@@ -185,7 +121,6 @@ class ColorFormatter(logging.Formatter):
         formatter.datefmt = '%Y-%m-%dT%H:%M:%S%z'
         return formatter.format(record)
 
-
 def logger(name=log_name, level=logging.INFO):
     log = logging.getLogger(name)
     # Clear any current loggers
@@ -217,7 +152,6 @@ def warning(s):
     """Print warning message"""
     print(f"{PURPLE}{s}{ENDC}")
 
-
 def sub_title(title):
     total_length = 100
     spacing_length = 3 if len(title) > 0 else 0
@@ -233,7 +167,6 @@ def sub_title(title):
     msg = first_part + str(title) + second_part
     print('')
     print(msg)
-
 
 def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
     """
@@ -291,35 +224,6 @@ def _waitforresource(ns, resource_type, resource_name):
             time.sleep(1)
             continue
 
-
-def _waitfords(ns, ds_name, legacy):
-    """
-    Wait for DS deployment to become healthy. This is a blocking call with no timeout.
-    ns: target namespace.
-    ds_name: name of the DS deployment to evaluate.
-    """
-    print(f'Waiting for Service Account Password Update: ', end='')
-    sys.stdout.flush()
-    _, replicas, _ = run('kubectl', f'-n {ns} get statefulset {ds_name} -o jsonpath={{.spec.replicas}}',
-                cstderr=True, cstdout=True)
-    if replicas.decode('utf-8') == '0':
-        print('skipped')
-        return
-    while True:
-        try:
-            _, valuestr, _ = run('kubectl', f'wait -n {ns} job/ldif-importer --for=condition=complete --timeout=60s',
-                            cstderr=True, cstdout=True)
-            if len(valuestr) > 0:
-                print('done')
-                break
-            raise("DS not ready")
-        except Exception as _:
-            print('.', end='')
-            sys.stdout.flush()
-            time.sleep(1)
-            continue
-
-
 def _runwithtimeout(target, args, secs):
     """
     Run a function with a timeout. If timeout is reached, exit program.
@@ -333,213 +237,6 @@ def _runwithtimeout(target, args, secs):
     if t.is_alive():
         print(f'{target} timed out after {secs} secs')
         sys.exit(1)
-
-def waitforsecrets(ns, timeout=60):
-    """
-    Wait for the platform secrets to exist in the Kubernetes api. Times out after 60 secs.
-    ns: target namespace.
-    """
-    secrets = ['am-env-secrets', 'idm-env-secrets',
-               'ds-passwords', 'ds-env-secrets']
-    message('\nWaiting for K8s secrets.')
-    for secret in secrets:
-        _runwithtimeout(_waitforresource, [ns, 'secret', secret], timeout)
-
-
-def wait_for_ds(ns, directoryservices_name, legacy, timeout_secs=600):
-    """
-    Wait for DS pods to be ready.
-    ns: target namespace.
-    directoryservices_name: name of the DS deployment to evaluate.
-    timeout_secs: timeout in secs.
-    """
-    _runwithtimeout(_waitforresource, [ns, 'statefulset', directoryservices_name], 30)
-    run('kubectl',
-        f'-n {ns} rollout status --watch statefulset {directoryservices_name} --timeout={timeout_secs}s')
-    _runwithtimeout(_waitfords, [ns, directoryservices_name, legacy], timeout_secs)
-
-def wait_for_am(ns, timeout_secs=600):
-    """
-    Wait for AM pods to be ready after deployment.
-    ns: Target namespace.
-    timeout_secs: timeout in secs.
-    """
-    _runwithtimeout(_waitforresource, [ns, 'deployment', 'am'], 30)
-    return run('kubectl', f'-n {ns} wait --for=condition=Available deployment -l app.kubernetes.io/name=am --timeout={timeout_secs}s')
-
-def wait_for_amster(ns, duration, timeout_secs=600):
-    """
-    Wait for successful amster job run.
-    ns: target namespace.
-    timeout_secs: timeout in secs.
-    """
-    _runwithtimeout(_waitforresource, [ns, 'job', 'amster'], 30)
-
-    condition = 'ready' if duration > '10' else 'complete'
-
-    return run('kubectl', f'-n {ns} wait --for=condition={condition} job/amster --timeout={timeout_secs}s')
-
-def wait_for_idm(ns, timeout_secs=600):
-    """
-    Wait for IDM pods to be ready after deployment.
-    ns: target namespace.
-    timeout_secs: timeout in secs.
-    """
-    _runwithtimeout(_waitforresource, [ns, 'deployment', 'idm'], 30)
-    return run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/name=idm --timeout={timeout_secs}s')
-
-def generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=None, src_profile_dir=None, deploy_path=None):
-    """
-    Generate Kustomize package and manifests for given component or bundle.
-    component: name of the component or bundle to generate. e.a. base, apps, am, idm, ui, admin-ui, etc.
-    size: size of the component to generate. e.a. single, mini, small, medium, large.
-    ns: target namespace.
-    fqdn: set the FQDN used in the generated package.
-    ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
-    custom_path: path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy/COMPONENT.
-    src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
-    deploy_env: path to root of generated kustomize deployment manifests. Defaults to kustomize/deploy-[--deploy-path value if requested] or kustomize/deploy if --deploy-path parameter not requested.
-    return profile_dir: path to the generated package.
-    return contents: generated kubernetes manifest. This is equivalent to `kustomize build profile_dir`.
-    """
-    # Clean out the temp kustomize files
-    kustomize_dir = os.path.join(root_path, 'kustomize')
-    src_profile_dir = src_profile_dir or os.path.join(kustomize_dir, size_paths[size])
-    image_defaulter = os.path.join(deploy_path, 'image-defaulter') if deploy_path else os.path.join(kustomize_dir, 'deploy', 'image-defaulter')
-    profile_dir = custom_path or os.path.join(deploy_path, component)
-    shutil.rmtree(profile_dir, ignore_errors=True)
-    Path(profile_dir).mkdir(parents=True, exist_ok=True)
-    run('kustomize', f'create', cwd=profile_dir)
-    run('kustomize', f'edit add component {os.path.relpath(image_defaulter, profile_dir)}',
-              cwd=profile_dir)
-
-    log.debug('component = ' + component)
-    components_to_install = bundles.get(component, [f'base/{component}'])
-
-    # Check components when installing ds-idrepo or ds-cts to ensure the correct components are installed
-    if component == "ds-idrepo" or component == "ds-cts":
-        components_to_install = bundles.get(component, [f'base/ds/{component}'])
-    else:
-        components_to_install = bundles.get(component, [f'base/{component}'])
-
-    # Temporarily add the wanted kustomize files
-    for c in components_to_install:
-        if callable(c):
-            c(profile_dir, config_profile)
-        else:
-            run('kustomize', f'edit add resource ../../../kustomize/{c}', cwd=profile_dir)
-        if c in patcheable_components and size != 'single':
-            p = patcheable_components[c]
-            if os.path.exists(os.path.join(src_profile_dir, p)):
-                shutil.copy(os.path.join(src_profile_dir, p), profile_dir)
-                run('kustomize', f'edit add patch --path {p}', cwd=profile_dir)
-
-    fqdnpatchjson = [{"op": "replace", "path": "data/data/FQDN", "value": fqdn}]
-    ingressclasspatchjson = [{"op": "replace", "path": "/spec/ingressClassName", "value": ingress_class}]
-    if component in ['base']:
-        run('kustomize', f'edit add patch --name platform-config --kind ConfigMap --version v1 --patch \'{json.dumps(fqdnpatchjson)}\'',
-            cwd=profile_dir)
-        run('kustomize', f'edit add patch --name forgerock --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
-            cwd=profile_dir)
-        run('kustomize', f'edit add patch --name ig --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
-            cwd=profile_dir)
-        # run('kustomize', f'edit add patch --name icf-ingress --kind Ingress --version v1 --patch \'{json.dumps(ingressclasspatchjson)}\'',
-        #     cwd=profile_dir)
-    _, contents, _ = run('kustomize', f'build {profile_dir}', cstdout=True)
-    contents = contents.decode('ascii')
-    contents = contents.replace('namespace: default', f'namespace: {ns}')
-    contents = contents.replace('namespace: prod', f'namespace: {ns}')
-    if ctx.lower() == 'minikube':
-        contents = contents.replace('imagePullPolicy: Always', 'imagePullPolicy: IfNotPresent')
-        contents = contents.replace('storageClassName: fast', 'storageClassName: standard')
-    return profile_dir, contents
-
-def install_component(component, size, ns, fqdn, ingress_class, ctx, duration, legacy, config_profile, deploy_path=None, src_profile_dir=None):
-    """
-    Generate and deploy the given component or bundle.
-    component: name of the component or bundle to generate and install. e.a. base, apps, am, idm, ui, admin-ui, etc.
-    size: size of the component to generate and install. e.a. single, mini, small, medium, large.
-    ns: target namespace.
-    fqdn: set the FQDN used in the deployment.
-    ctx: specify current kubernetes context. Some environments require special steps. e.a. minikube.
-    deploy_path: base path to store generated files. Defaults to FORGEOPS_REPO/kustomize/deploy.
-    src_profile_dir: path to the overlay where kustomize patches are located. Defaults to kustomize/overlay/SIZE or kustomize/base/ if CDK.
-    """
-    deploy_path = deploy_path or os.path.join(root_path, 'kustomize', 'deploy')
-    custom_path = os.path.join(deploy_path, component)
-    _, contents = generate_package(component, size, ns, fqdn, ingress_class, ctx, legacy, config_profile, custom_path=custom_path, src_profile_dir=src_profile_dir, deploy_path=deploy_path)
-
-    # Remove amster components
-    if component == "amster":
-        clean_amster_job(ns, False)
-
-    # Create amster-retain configmap which defines the
-    if component == 'amster':
-        run('kubectl', f'-n {ns} create cm amster-retain --from-literal=DURATION={duration}')
-
-    run('kubectl', f'-n {ns} apply -f -', stdin=bytes(contents, 'ascii'))
-
-def uninstall_component(component, ns, force, ingress_class, legacy, config_profile):
-    """
-    Uninstall a component.
-    component: name of the component or bundle to uninstall. e.a. base, apps, am, idm, ui, admin-ui, etc.
-    ns: target namespace.
-    force: set to True to delete all forgeops resources including secrets and PVCs.
-    """
-    if component in ['ds','ds-idrepo','ds-cts']:
-        try:
-            # Check if the directoryservice CRD is installed. If not then skip the delete.
-            run('kubectl', 'get crd directoryservices.directory.forgerock.io', cstderr=True, cstdout=True)
-        except:
-            pass
-        else:
-            if component in ['ds','ds-idrepo']:
-                run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-idrepo')
-            if component in ['ds','ds-cts']:
-                run('kubectl', f'-n {ns} delete --ignore-not-found=true directoryservice ds-cts')
-
-    if component == "all":
-        for c in ['ui', 'apps', 'ds', 'base']:
-            uninstall_component(c, ns, force, ingress_class, legacy)
-        return
-    try:
-        # generate a manifest with the components to be uninstalled in a temp location
-        kustomize_dir = os.path.join(root_path, 'kustomize')
-        uninstall_dir = os.path.join(kustomize_dir, 'deploy', 'uninstall-temp')
-        _, contents = generate_package(component, 'single', ns, '.', ingress_class, '', legacy, config_profile, custom_path=uninstall_dir)
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true -f -', stdin=bytes(contents, 'ascii'))
-        if component == "amster":
-            clean_amster_job(ns, False)
-            run('kubectl', f'-n {ns} delete cm amster-retain')
-    except Exception as e:
-        print(f'Could not delete {component}. Got: {e}')
-        sys.exit(1)  # Hide python traceback.
-    finally:
-        #clean up temp folder
-        shutil.rmtree(uninstall_dir, ignore_errors=True)
-
-def _inject_kustomize_amster(kustomize_profile_path, config_profile):
-    docker_dir = os.path.join(root_path, 'docker')
-    amster_cm_name = 'amster-files.yaml'
-    amster_cm_path = os.path.join(kustomize_profile_path, amster_cm_name)
-    amster_config_path = os.path.join(docker_dir, 'amster', 'config-profiles', config_profile)
-    amster_scripts_path = os.path.join(docker_dir, 'amster', 'scripts')
-    try:
-        envVars = os.environ
-        envVars['COPYFILE_DISABLE'] = '1'  #skips "._" files in macOS.
-        run('tar', f'-czf amster-import.tar.gz -C {amster_config_path} .', cstdout=True, env=envVars)
-        run('tar', f'-czf amster-scripts.tar.gz -C {amster_scripts_path} .', cstdout=True, env=envVars)
-        _, cm, _ = run('kubectl', f'create cm amster-files --from-file=amster-import.tar.gz --from-file=amster-scripts.tar.gz --dry-run=client -o yaml',
-                    cstdout=True)
-        with open(amster_cm_path, 'wt') as f:
-            f.write(cm.decode('ascii'))
-        run('kustomize', f'edit add resource ../../../kustomize/overlay/amster-upload', cwd=kustomize_profile_path)
-        run('kustomize', f'edit add resource {amster_cm_name}', cwd=kustomize_profile_path)
-    finally:
-        if os.path.exists('amster-import.tar.gz'):
-            os.remove('amster-import.tar.gz')
-        if os.path.exists('amster-scripts.tar.gz'):
-            os.remove('amster-scripts.tar.gz')
 
 def printsecrets(ns, to_stdout=True):
     """
@@ -576,7 +273,6 @@ def printsecrets(ns, to_stdout=True):
         return secrets
     except Exception as _e:
         sys.exit(1)
-
 
 def printurls(ns, to_stdout=True):
     """
@@ -616,14 +312,6 @@ def secretagent(k8s_op, tag='latest'):
         run('kubectl', '-n secret-agent-system wait --for=condition=available deployment  --all --timeout=120s')
         run('kubectl', '-n secret-agent-system wait --for=condition=ready pod --all --timeout=120s')
         print()
-
-def is_legacy_install(ns):
-    _, _, out = run('kubectl', f'-n {ns} get sts -l app.kubernetes.io/managed-by=ds-operator', cstderr=True, cstdout=True)
-    if "No resources found" in out.decode('utf-8'):
-        return False
-    else:
-        return True
-
 
 def _install_certmanager_issuer():
     """Install certmanager self-signed issuer. This works as a placeholder issuer."""
@@ -671,39 +359,6 @@ def certmanager(k8s_op, tag='latest'):
         run('kubectl', '-n cert-manager wait --for=condition=available deployment  --all --timeout=300s')
         run('kubectl', '-n cert-manager wait --for=condition=ready pod --all --timeout=300s')
         _runwithtimeout(_install_certmanager_issuer, [], 180)
-
-
-
-def build_docker_image(component, context, dockerfile, push_to, tag, container_engine,
-                       config_profile=None):
-    """
-    Build custom docker images.
-    component: name of the component to build the image for. e.a. am, idm, etc.
-    push_to: set the docker registry name to push to. e.a. us-docker.pkg.dev/forgeops-public/images.
-    tag: set the image tag.
-    config_profile: set the CONFIG_PROFILE build envVar. This envVar is referenced by the Dockerfile of forgeops containers.
-    return tag_data: the tag of the built image.
-    """
-    # Clean out the temp kustomize files
-    if config_profile:
-        build_args = f'--build-arg CONFIG_PROFILE={config_profile}'
-    else:
-        build_args = ''
-    if push_to.lower() != 'none':
-        image = f'{push_to}/{component}'
-    else:
-        image = f'{component}'
-    if tag is not None:
-        if push_to.lower() != 'none':
-            image = f'{push_to}/{component}:{tag}'
-        else:
-            image = f'{component}:{tag}'
-    run(f'{container_engine}',
-        f'build {build_args} -t {image} -f {dockerfile} {context}', cwd=root_path)
-    if push_to.lower() != 'none':
-        run(f'{container_engine}', f'push {image}', cwd=root_path)
-    return image
-
 
 def configure_platform_images(clone_path,
                               ref='',

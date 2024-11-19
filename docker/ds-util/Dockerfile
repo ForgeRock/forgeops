@@ -1,4 +1,4 @@
-# Utility ds image for testing, benchmarking, etc.
+# Utility PingDS image for testing, benchmarking, etc.
 # Also useful as a general purpose debugging tool
 FROM gcr.io/forgerock-io/ds/pit1:8.0.0-latest-postcommit
 
@@ -14,6 +14,6 @@ RUN apt-get update \
 COPY --chown=forgerock:root bin/*  bin/
 COPY --chown=forgerock:root ds-idrepo.template config/MakeLDIF
 
-# reset entrypoint of ds container
+# reset entrypoint of PingDS container
 ENTRYPOINT []
 CMD ["bash"]

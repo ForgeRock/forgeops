@@ -3,11 +3,11 @@
 # doc
 read -r -d '' HELP << END
 
-Quick api call script run an AM oauth login and api call to IDM supplying the transaction ids which can be used to search logs for full stack tracing. 
+Quick api call script run an PingAM oauth login and api call to PingIDM supplying the transaction ids which can be used to search logs for full stack tracing. 
 This script also attempts to set the X-ForgeRock-TransactionId header which should be removed by ingress.
 
-ForgeRock Identity Platform API calls are documented on the "UI and API Access" page of the ForgeOps CDK documentation.
-This script relies on using the CDK configuration for client ids and scopes.
+Ping Identity Platform API calls are documented on the "UI and API Access" page of the ForgeOps documentation.
+This script relies on using the default configuration for client ids and scopes.
 This script makes no attempt to check that each API call is successful.
 You can use use the transaction IDs to validate success.
 
@@ -15,7 +15,7 @@ Usage:
     check-txnid.sh fqdn password
 
 Args:
-    fqdn     fully qualified domain of ForgeRock Platform with no hanging /
+    fqdn     fully qualified domain of Ping Identity Platform with no hanging /
     password amadmin password
 
 Dependencies:
@@ -96,7 +96,7 @@ trap 'rm -f $HEADERFILE' EXIT
 # all the curl calls attempt to force set the transaction id, these should be ignored.
 ###########
 
-# this gets a token via the am admin user
+# this gets a token via the PingAM admin user
 tokenId=$(curl -s \
     -X POST \
     -D ${HEADERFILE} \
@@ -149,7 +149,7 @@ accessResponse=$(curl -X POST  \
 accessToken=$(echo "${accessResponse}" | jq -r '.access_token')
 exchangeid=$(parseTxnId)
 
-# call idm  config endpoint
+# call PingIDM  config endpoint
 idmConfig=$(curl -s \
      -D ${HEADERFILE} \
      -H "Authorization: Bearer $accessToken" \

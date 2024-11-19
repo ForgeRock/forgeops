@@ -77,7 +77,7 @@ the requested changes so your customizations won't be impacted.
 
 After that you can apply the environment to get your basic deployment up and
 running. We recommend you start with a single instance deployment to develop
-your AM and IDM configs so you can export them and build your custom container
+your PingAM and PingIDM configs so you can export them and build your custom container
 images.
 
 The build step bakes any file based configuration changes into your application
@@ -256,7 +256,7 @@ need to specify the overlay to work on.
 This is the major change in forgeops. You use `forgeops env` to create
 and manage your environments. The `/path/to/forgeops/kustomize/deploy`
 directory is gone.  This allows you more control in how you manage your
-different ForgeRock deployments. It has a number of options available to you
+different ForgeOps deployments. It has a number of options available to you
 for setting different configs in your k8s resources. When dealing with an
 existing environment, it will only update the settings provided on the command
 line.
@@ -271,13 +271,13 @@ different environments.
 When creating a new environment, you need to provide the FQDN. Each environment
 should answer to it's own FQDN. That is really the minimum amount of
 configuration you need to provide when creating a new environment. You can
-change most things after the fact, except when updating the DS StatefulSets.
+change most things after the fact, except when updating the PingDS StatefulSets.
 Kubernetes only allows certain aspects of a StatefulSet to be updated once it's
 been created.
 
 You can use the `--small`, `--medium`, and `--large` flags to select a t-shirt
 size to use. However, you can also override specific values at the same time.
-For example, if you want to create a small deployment, but you want AM and IDM
+For example, if you want to create a small deployment, but you want PingAM and PingIDM
 to use 3 replicas instead of 2, you can do this:
 
 `forgeops env --env-name test --fqdn test.example.com --small --am-rep 3 --idm-rep 3`

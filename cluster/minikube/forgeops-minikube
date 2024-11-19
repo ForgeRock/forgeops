@@ -143,7 +143,7 @@ def main():
                     utils.run('hyperkit', '-v', cstdout=True, cstderr=True) #check if hyperkit is installed
                     dvr = dvr_opts.get('hyperkit', '')
                 if args.driver == 'docker':
-                    utils.error('The docker driver is not supported when deploying the CDK on Intel-based Macs')
+                    utils.error('The docker driver is not supported when deploying on Intel-based Macs')
                     sys.exit(1)
             if platform.processor() == 'arm':
                 if args.driver == 'hyperkit':

@@ -10,7 +10,7 @@ for testing purposes. You can use Mailhog to:
 * Optionally integrate with an SMTP server for email delivery
 
 **Note**: **This is not meant for use in production environments**. 
-ForgeRock does not guarantee the individual success developers may have in 
+Ping Identity does not guarantee the individual success developers may have in 
 implementing the code on their development platforms.
 
 ## References
@@ -21,7 +21,7 @@ implementing the code on their development platforms.
 ## Set up Mailhog in your Kubernetes cluster
 
 ### Prerequisites:
-1. You have set up the CDK.
+1. You have set up a default ForgeOps deployment.
 1. You have installed Helm.
 1. Your Kubernetes context is set to your cluster.
 1. You have enabled SMTP (such as Postfix) in your host system so you can test SMTP message delivery from your local machine.
@@ -78,13 +78,13 @@ implementing the code on their development platforms.
 
     1. Notice that the message you sent appears in the Mailhog HTTP interface.   
     
-## Enable the email service in IDM
+## Enable the email service in PingIDM
 
 After verifying that the Mailhog server is able to send and receive messages, you 
-can configure email settings in the IDM server.
+can configure email settings in the PingIDM server.
 
-1. Log in to the IDM administration console and configure email settings. 
-![Configure email setting in IDM console](./images/idm-email-setting.png)
+1. Log in to the PingIDM administration console and configure email settings. 
+![Configure email setting in PingIDM console](./images/idm-email-setting.png)
 
 ## Test resetting a user's password
 

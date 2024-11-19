@@ -20,7 +20,7 @@ platform:
   base:
     enabled: true
   cert_manager:
-    # If disabled, the ingress tls issuer and the DS certificates will be not be created/deployed
+    # If disabled, the ingress tls issuer and the PingDS certificates will be not be created/deployed
     # (DS certificates are ds-master-keypair and ds-ssl-keypair)
     enabled: true
   ds_ssl:
@@ -35,7 +35,7 @@ platform:
       nginx.ingress.kubernetes.io/session-cookie-hash: sha1
       nginx.ingress.kubernetes.io/session-cookie-name: route
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
-      # CORS is now set in the AM and IDM configurations
+      # CORS is now set in the PingAM and PingIDM configurations
       nginx.ingress.kubernetes.io/enable-cors: "false"
       nginx.ingress.kubernetes.io/body-size: "64m"
       nginx.ingress.kubernetes.io/send-timeout: "600"
@@ -665,7 +665,7 @@ ig:
     type: ClusterIP
     port: 80
 
-# Common values for doing ds snapshots
+# Common values for doing PingDS snapshots
 ds_snapshot:
   class: ds-snapshot-class
   configmapCreate: true
@@ -736,7 +736,7 @@ ds_idrepo:
       value: directory
 
   affinity:
-    # Schedules DS Pods to a node with the label "ds" if it exists
+    # Schedules PingDS Pods to a node with the label "ds" if it exists
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100
@@ -819,7 +819,7 @@ ds_cts:
       value: directory
 
   affinity:
-    # Schedules DS Pods to a node with the label "ds" if it exists
+    # Schedules PingDS Pods to a node with the label "ds" if it exists
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - weight: 100

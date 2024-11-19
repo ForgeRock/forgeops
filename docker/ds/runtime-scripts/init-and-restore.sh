@@ -15,12 +15,12 @@ printf %s "$GOOGLE_CREDENTIALS_JSON" > ${GCP_CREDENTIAL_PATH}
 set -e
 
 if [ -n "$(ls -A /opt/opendj/data -I lost+found)" ]; then
-  echo "Found data present in /opt/opendj/data before DS initialization"
+  echo "Found data present in /opt/opendj/data before PingDS initialization"
   DATA_PRESENT_BEFORE_INIT="true"
   ls -A /opt/opendj/data -I lost+found
 fi
 
-# Initialize DS regardless of dsbackup restore settings
+# Initialize PingDS regardless of dsbackup restore settings
 /opt/opendj/docker-entrypoint.sh initialize-only;
 
 echo ""

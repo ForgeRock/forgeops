@@ -107,7 +107,7 @@ spec:
           # secret agent generated truststore.
           - name: AM_PEM_TRUSTSTORE
             value: /var/run/secrets/truststore/cacerts
-          # cert-manager truststore used for the connection to DS
+          # cert-manager truststore used for the connection to PingDS
           - name: AM_PEM_TRUSTSTORE_DS
             value: /var/run/secrets/truststore/ca.crt
       containers:

@@ -30,7 +30,7 @@ class BenchConfig {
     val userPoolSize: Integer = Properties.envOrElse("USER_POOL", "1000000").toInt
     // template for test users.
     val userPrefix:String = Properties.envOrElse("USER_PREFIX", "user.");
-    // Run the IDM delete users before running the create user simulation
+    // Run the PingIDM delete users before running the create user simulation
     val deleteUsers: Boolean = Properties.envOrElse("DELETE_USERS", "false").toBoolean
 
     val concurrency: Integer = Properties.envOrElse("CONCURRENCY", "30").toInt

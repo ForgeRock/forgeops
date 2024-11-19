@@ -57,7 +57,7 @@ export DS_ADVERTISED_LISTEN_ADDRESS=${DS_ADVERTISED_LISTEN_ADDRESS:-$(hostname -
 #     userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #     ds-userstore-1.userstore.jnkns-pndj-bld-pr-4958-1.svc.cluster.local
 #
-# DS currently supports various multi-cluster solutions. To deploy in a multi-cluster scenario
+# PingDS currently supports various multi-cluster solutions. To deploy in a multi-cluster scenario
 # explicitly set the DS_BOOTSTRAP_REPLICATION_SERVERS per your topology. Examples below:
 # **Cloud DNS for GKE**
 # FQDN:              ds-cts-1.ds-cts.<namespace>.svc.eu
@@ -100,7 +100,7 @@ fi
 
 
 # These are the default locations of cert-manager generated PEM files are mounted.
-# These files must be copied to appropriate location and format expected by the DS PEM manager
+# These files must be copied to appropriate location and format expected by the PingDS PEM manager
 # TO change these location you must also change the ds-setup.sh script.
 export SSL_CERT_DIR="/var/run/secrets/ds-ssl-keypair"
 export MASTER_CERT_DIR="/var/run/secrets/ds-master-keypair"

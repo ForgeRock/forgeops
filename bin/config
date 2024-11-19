@@ -22,24 +22,24 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python import utils
 
 HELP_DESCRIPTION = """
-Manage ForgeRock Platform configuration.
+Manage Ping Identity Platform configuration.
 """
 HELP_EXPORT_CMD_DESCRIPTION = """
-Export config from running instance to a given profile. AM and IDM only.
+Export config from running instance to a given profile. PingAM and PingIDM only.
 """
 HELP_EXPORT_BASELINE_PROFILE = """
 Specify a base profile to start with if the target profile doesn't
  exist. (default: default)
 """
 HELP_CMD_COMPONENTS = """
-ForgeRock Identity Platform component.
+Ping Identity Platform component.
 """
 HELP_EXPORT_CMD_SORT = """
 Sort configuration json alphanumerically. This will lead to a large initial
  diff but subsequent iterations should be smaller and more readable.
 """
 HELP_EXPORT_CMD_AM_NO_UPGRADE = """
-Do not run AM upgrader rules when exporting configuration.
+Do not run PingAM upgrader rules when exporting configuration.
 """
 HELP_PATH_CMD_TOOL_NAME = """
 Directory of tool configuration files e.g. docker, kustomize
@@ -73,7 +73,7 @@ Directory which contians a kustomization.yaml. e.g. small,medium,large
 
 HELP_PATH_KUSTOMIZE_SUBPROFILE = """
 Directory which contians a kustomization.yaml, this is used for variant images
-like ds which has multiple kustomizations. e.g cts,idrepo,base
+like PingDS which has multiple kustomizations. e.g cts,idrepo,base
 """.strip()
 
 HELP_PATH_EXAMPLES = """
@@ -81,19 +81,19 @@ examples:
   # Path to the "small" kustomize profile
   $ ./bin/config path kustomize overlay small
 
-  # Path to a IDM configuration profile
+  # Path to a PingIDM configuration profile
   $ ./bin/config path docker idm idm-only
 
-  # Path to the directory containing IG Dockerfile
+  # Path to the directory containing PingGateway Dockerfile
   $ ./bin/config path docker ig
 """
 
 HELP_EXPORT_EXAMPLES = """
 examples:
-  # Export AM configuration to an existing profile <myprofile>
+  # ExportPing configuration to an existing profile <myprofile>
   $ ./bin/config export am <myprofile>
 
-  # Export AM configruation for a profile that doesn't exist
+  # Export PingAM configruation for a profile that doesn't exist
   $ ./bin/config export --baseline-profile default am <mynewprofile>
 """
 
@@ -148,11 +148,11 @@ def export_amster(conf):
 
 
 def export_idm(idm_conf, idm_ui_conf, pod_name):
-    """Export IDM config"""
+    """Export PingIDM config"""
     profile_path(idm_conf)
     profile_path(idm_ui_conf)
     idm_ui_conf_file = idm_ui_conf.joinpath("AppConfiguration.js")
-    # Copy from the IDM container to a local path
+    # Copy from the PingIDM container to a local path
     cp_args = f"""
     cp -c openidm
         {pod_name}:/opt/openidm/conf {idm_conf}
@@ -188,7 +188,7 @@ def export_am(am_conf, pod_name):
             log.debug('Starting to extract tarball')
             tarball.extractall(am_conf)
             log.debug('Export Completed.')
-        log.info('Exported AM config')
+        log.info('Exported PingAM config')
 
     except utils.RunError as e:
         log.error(f'{e.cmd} had the following error: \n {e.stderr}')
@@ -199,31 +199,31 @@ def export_am(am_conf, pod_name):
 
 
 def upgrade_am(am_conf):
-    """Run AM configuration through the AM control"""
+    """Run PingAM configuration through the PingAM control"""
 
-    log.info('Running AM static config through the am-config-upgrader to upgrade to the current version of forgeops.')
+    log.info('Running PingAM static config through the am-config-upgrader to upgrade to the current version of forgeops.')
     try:
         utils.run(AM_UPGRADER, str(am_conf))
     except utils.RunError as e:
         log.error(f'Error during upgrade {e.stderr}')
         sys.exit(1)
 
-    log.info('Completed upgrading AM configuration')
+    log.info('Completed upgrading PingAM configuration')
 
-    log.info('Running AM static config through the am-config-upgrader to replace any missing default placeholders.')
+    log.info('Running PingAM static config through the am-config-upgrader to replace any missing default placeholders.')
     try:
         utils.run(AM_UPGRADER, str(am_conf), str(utils.RULES_PATH))
     except utils.RunError as e:
         log.error(f'Error during placeholder replacement {e.stderr}')
         sys.exit(1)
 
-    log.info('Completed replacing AM placeholders')
+    log.info('Completed replacing PingAM placeholders')
 
 
 def export_ig(ig_conf, pod_name):
-    """Export IG config"""
+    """Export PingGateway config"""
     profile_path(ig_conf)
-    # Copy from the IG container to a local path
+    # Copy from the PingGateway container to a local path
     cp_args = f"""
     cp -c ig {pod_name}:/var/ig/config {ig_conf}
     """.strip()
@@ -268,7 +268,7 @@ def run_export(args):
             log.error(f'{e.cmd} had the following error: \n {e.stderr}')
             sys.exit(1)
 
-        # IDM, AM, IG export types
+        # PingIDM, PingAM, PingGateway export types
         try:
             component_name, pod_name = out.splitlines()[0].decode().split(' ')
             log.info(f'Running export for {component_name} in {pod_name}')
@@ -281,7 +281,7 @@ def run_export(args):
             elif component_name == 'am':
                 export_am(conf_path, pod_name)
                 if args.am_export_no_upgrade:
-                    log.debug('Skip AM upgrader rules')
+                    log.debug('Skip PingAM upgrader rules')
                 else:
                     upgrade_am(conf_path)
             log.info('Completed export')
@@ -376,7 +376,7 @@ def main():
     global log
     log = utils.logger(level=parsed.log_level)
     if parsed.cmd == 'export' and parsed.am_export_no_upgrade and not parsed.component == 'am':
-        log.error(f'--no-upgrade is only available for AM')
+        log.error(f'--no-upgrade is only available for PingAM')
         sys.exit(1)
     parsed.func(parsed)
 

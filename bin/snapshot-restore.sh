@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Script to restore a volume snapshot to a DS statefulset.
+# Script to restore a volume snapshot to a PingDS statefulset.
 set -oe pipefail
 
 # Grab our starting dir
@@ -17,12 +17,12 @@ usage() {
     cat <<EOM
 Usage: $prog [OPTIONS] ACTION RESTORE_TARGET
 
-Restore a DS StatefulSet from a VolumeSnapshot. When doing a full restore, the
+Restore a PingDS StatefulSet from a VolumeSnapshot. When doing a full restore, the
 StatefulSet will be scaled down to 0 pods, the existing PVCs will be recreated
 with the snapshot as the data source. This operation requires downtime.
 
 The selective restore creates a new PVC, StatefulSet, and Service that creates a
-single new DS pod. This allows you to selectively export and import data as
+single new PingDS pod. This allows you to selectively export and import data as
 needed. After restoring all needed data, the clean action will clean up the
 temporary resources.
 

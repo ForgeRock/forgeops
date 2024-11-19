@@ -6,7 +6,7 @@ ALIVE="${AMSTER_AM_URL}/json/health/ready"
 
 wait_for_openam()
 {
-   echo "Waiting for AM server at ${ALIVE}..."
+   echo "Waiting for PingAM server at ${ALIVE}..."
    response="000"
 
 	while true
@@ -57,7 +57,7 @@ import() {
       echo "Executing Amster to import dynamic config"
       # Need to be in the amster directory, otherwise Amster can't find its libraries.
 
-      # Use the internal hostname for AM. The external name might not have a proper SSL certificate
+      # Use the internal hostname for PingAM. The external name might not have a proper SSL certificate
       $JAVA_HOME/bin/java -jar ./amster-*.jar  "${1}" -q -D AM_HOST="${INSTANCE}"  > /tmp/out.log 2>&1
 
       echo "Amster output *********"

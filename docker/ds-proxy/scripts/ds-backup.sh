@@ -14,7 +14,7 @@ DEST="$BACKUP_DIR/$NAMESPACE/$BACKUP_TYPE"
 mkdir -p  $DEST
 
 
-# The DS server version needs to match the JE data version
+# The PingDS server version needs to match the JE data version
 echo "Upgrading configuration and data..."
 ./upgrade --dataOnly --acceptLicense --force --ignoreErrors --no-prompt
 

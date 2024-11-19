@@ -17,7 +17,7 @@ usage() {
   local usage_msg=$(cat<<EOM
 usage: $PROG --env-name ENV_NAME [OPTIONS] [<component> <component> ...]
 
-Delete ForgeRock Identity Platform from a k8s namespace.
+Delete Ping Identity Platform from a k8s namespace.
 
 OPTIONS:
   -h|--help                : display usage and exit

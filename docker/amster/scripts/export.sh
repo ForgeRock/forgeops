@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Set AM url if not set
+# Set PingAM url if not set
 AMSTER_AM_URL=${AMSTER_AM_URL:-http://am:80/am}
 
 # Create a temporary export folder.

@@ -12,7 +12,6 @@ metadata:
     app.kubernetes.io/version: "7.6"
     app.kubernetes.io/managed-by: Helm
 data:
-  FORGEOPS_PLATFORM_SIZE: cdk
   FQDN: identity-platform.domain.local
   AM_URL: /am
   AM_ADMIN_URL: /am/ui-admin/
