@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Output secrets and URLs for a ForgeRock deployment"""
+"""Output secrets and URLs for a ForgeOps deployment"""
 
 from copy import copy
 import argparse

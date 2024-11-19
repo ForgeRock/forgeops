@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Script to assist in exporting AM configuration
+# Script to assist in exporting PingAM configuration
 
 cd /home/forgerock/openam
 

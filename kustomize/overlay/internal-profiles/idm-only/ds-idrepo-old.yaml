@@ -1,4 +1,4 @@
-#Patch DS idrepo
+#Patch PingDS idrepo
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Manage images in a ForgeRock deployment"""
+"""Manage images in a ForgeOps deployment"""
 
 import argparse
 from copy import copy
@@ -133,7 +133,7 @@ examples:
 # Manage release files with a custom release name for the entire platform
 {prog} --release 7.5.1 --release-name 7.5.1-2 platform
 
-# Manage an official IG release with a custom release name
+# Manage an official PingGateway release with a custom release name
 {prog} --release 2024.6.3 --release-name 2024.6.3-1 ig
 
 ### Update Helm values.yaml and Kustomize overlay to use deployable images
@@ -141,7 +141,7 @@ examples:
 # Select an official release for an env for platform components
 {prog} --release 7.5.1 --env-name ig-sfo1 platform
 
-# Select an official IG release for an env
+# Select an official PingGateway release for an env
 {prog} --release 7.5.1 --env-name ig-dfw1 ig
 """
 

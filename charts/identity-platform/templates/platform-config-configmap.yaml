@@ -6,7 +6,6 @@ metadata:
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 data:
-  FORGEOPS_PLATFORM_SIZE: cdk
   FQDN: {{ first .Values.platform.ingress.hosts }}
   AM_URL: /am
   AM_ADMIN_URL: /am/ui-admin/

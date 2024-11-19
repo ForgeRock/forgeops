@@ -26,7 +26,7 @@ am() {
 }
 
 idm() {
-	export DELETE_USERS="false" # Delete the IDM users before running create users
+	export DELETE_USERS="false" # Delete the PingIDM users before running create users
 	export CLIENT_ID=idm-provisioning
 	export CLIENT_PASSWORD=vtt3qtncd1dabsvq7ikehm11expywabq
 	export IDM_USER=amadmin

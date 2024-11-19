@@ -4,9 +4,9 @@ kind: DirectoryService
 metadata:
   name: ds-idrepo
 spec:
-  # The number of DS servers in the topology
+  # The number of PingDS servers in the topology
   replicas: 1
-  # The resources assigned to each DS pod
+  # The resources assigned to each PingDS pod
   podTemplate:
     metadata:
       annotations:

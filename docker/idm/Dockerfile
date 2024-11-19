@@ -5,7 +5,7 @@ FROM ${REPO}:${TAG}
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 
-# Harden IDM by removing the Felix OSGI Console. Unless you are a ForgeRock developer, the
+# Harden PingIDM by removing the Felix OSGI Console. Unless you are a ForgeRock developer, the
 # console is rarely required. Your configuration should NOT include conf/felix.webconsole.json
 RUN rm -f bundle/org.apache.felix.webconsole*.jar  && \
     rm -f bundle/openidm-felix-webconsole-*.jar

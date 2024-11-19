@@ -15,6 +15,6 @@ ENV CATALINA_OPTS="${CATALINA_OPTS} -Dlogback.configurationFile=/home/forgerock/
 
 WORKDIR /home/forgerock
 
-# If you want to debug AM uncomment these lines:
+# If you want to debug PingAM uncomment these lines:
 #ENV JPDA_TRANSPORT=dt_socket
 #ENV JPDA_ADDRESS *:9009

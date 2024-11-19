@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Simplified script used by the operator to automatically initialize and restore DS from backups
+# Simplified script used by the operator to automatically initialize and restore PingDS from backups
 # Note: This script assumes it runs in a k8s init-container with the proper volumes and environment variables attached.
 
 # Restore strategy:
@@ -29,11 +29,11 @@ fi
 
 # Check for existing data on the pvc. This must be done before the data/db is initialized
 if [ -d /opt/opendj/data/db/adminRoot ]; then
-  echo "Data present in /opt/opendj/data before DS initialization. Skipping restore to avoid destroying data"
+  echo "Data present in /opt/opendj/data before PingDS initialization. Skipping restore to avoid destroying data"
   exec /opt/opendj/docker-entrypoint.sh initialize-only;
 fi
 
-# Initialize the DS backends from the prototype docker database
+# Initialize the PingDS backends from the prototype docker database
 /opt/opendj/docker-entrypoint.sh initialize-only;
 
 AWS_PARAMS="--storageProperty s3.keyId.env.var:AWS_ACCESS_KEY_ID  --storageProperty s3.secret.env.var:AWS_SECRET_ACCESS_KEY"

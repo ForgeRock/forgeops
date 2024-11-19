@@ -12,7 +12,7 @@ else
     echo "BACKUP_DIRECTORY is set to $BACKUP_DIRECTORY"
 fi
 
-# Get DS admin password
+# Get PingDS admin password
 ADMIN_PASSWORD=$(cat ${DS_UID_ADMIN_PASSWORD_FILE})
 
 # Get task name, if task with name already running, then cancel

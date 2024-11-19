@@ -2,4 +2,4 @@
 resources:
 - ./base
 - ./am
-- ./ds-idrepo-legacy
+- ./ds-idrepo-old

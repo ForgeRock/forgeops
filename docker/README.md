@@ -1,15 +1,12 @@
-# Docker Images for the ForgeRock Identity Platform
+# Docker Images for the Ping Identity Platform
 
-This directory contains Dockerfiles for building and deploying the ForgeRock 
-Identity Platform.
+This directory contains Dockerfiles for building and deploying the Ping Identity Platform.
 
-## Dockerfiles for Release 7.x
+## Dockerfiles
 
-For 7.x releases of the ForgeRock Identity Platform, the base Dockerfiles for 
-AM, IDM, DS and IG are built upstream in their product repositories. These 
-images are built and pushed to the `gcr.io/forgerock-io/` registry. The source 
-for the Dockerfiles is maintained in the respective product source code 
-repository. 
+The base Dockerfiles for PingAM, PingIDM, PingDS and PingGateway are built upstream in their product 
+repositories. These images are scanned, built and pushed to the `us-docker.pkg.dev/forgeops-public/images-base` 
+registry. The source for the Dockerfiles is maintained in the respective product source code repository. 
 
 The Dockerfiles in the [docker](./) directory are the "child" images that 
 derive from the base images, and overlay any of your customizations and 
@@ -22,4 +19,4 @@ configuration files.
  ## See Also
 
 * [Top-level forgeops README.md](../README.md)
-* [Directory Server image customization](ds/README-DS.md)
+* [PingDS server image customization](ds/README.md)

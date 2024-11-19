@@ -1,6 +1,6 @@
 # Legacy Documentation 
 
-This folder contains the documentation for the deploying the CDM and the DevOps 
+This folder contains the documentation for deploying the CDM and the DevOps 
 examples using Helm charts.   
 
 Deployment using Helm charts is deprecated. We strongly recommend that you move

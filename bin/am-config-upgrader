@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Run the am-config upgrade process on AM FBC configuration files.
+# Run the am-config upgrade process on PingAM FBC configuration files.
 #
-# The default rules upgrade AM configuration to the same version as the upgrader image itself. For
-# example, if the upgrader docker image is version 7.3.1, AM FBC files will be upgraded to 7.3.1.
+# The default rules upgrade PingAM configuration to the same version as the upgrader image itself. For
+# example, if the upgrader docker image is version 7.3.1, PingAM FBC files will be upgraded to 7.3.1.
 #
 # Usage: bin/am-upgrader [am-fbc-files] [rules-directory]
-#  [am-fbc-files] is the directory that contains the exported AM FBC Files. This defaults to docker/am.
+#  [am-fbc-files] is the directory that contains the exported PingAM FBC Files. This defaults to docker/am.
 #   This script assumes FBC files have been previously exported.
 #
 #  If [rules-directory] is not provided, the version upgrade rules bundled in the image will be used. Otherwise
@@ -67,7 +67,7 @@ TAG=${TAG:-7.5.0-latest-postcommit}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
 
-# Where the AM exported files are by default
+# Where the PingAM exported files are by default
 CONFIG_DIR=${1:-docker/am}
 # Where the rules are
 

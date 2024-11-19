@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Checking DS is up
+# Checking PingDS is up
 
 wait_repo() {
     REPO="$1-0.$1"
@@ -15,7 +15,7 @@ wait_repo() {
 wait_repo ds-idrepo
 wait_repo ds-cts
 
-# Set the DS passwords for each store
+# Set the PingDS passwords for each store
 if [ -f "/opt/opendj/ds-passwords.sh" ]; then
     echo "Setting directory service account passwords"
     /opt/opendj/ds-passwords.sh

@@ -15,7 +15,7 @@ import io.gatling.http.protocol.HttpProtocolBuilder
 import scala.concurrent.duration._
 import frutil._
 
-// An IDM simulation - creates users via REST API
+// A PingIDM simulation - creates users via REST API
 class IDMSimulation extends Simulation {
 
     val config = new BenchConfig()

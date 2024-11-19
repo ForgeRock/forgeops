@@ -544,7 +544,7 @@
           "expr": "sum(up and ds_start_time_seconds)",
           "format": "time_series",
           "intervalFactor": 1,
-          "legendFormat": "Total number of ForgeRock DS instances",
+          "legendFormat": "Total number of PingDS instances",
           "refId": "A"
         },
         {
@@ -573,7 +573,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "ForgeRock DS instances",
+      "title": "PingDS instances",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -1955,8 +1955,8 @@
     ]
   },
   "timezone": "browser",
-  "title": "ForgeRock Directory Services",
+  "title": "PingDS",
   "uid": "dsdash2",
   "version": 2,
-  "description": "Metrics for ForgeRock Directory Services\n"
+  "description": "Metrics for PingDS\n"
 }

@@ -15,10 +15,10 @@ import static org.forgerock.openam.amp.dsl.fbc.FileBasedConfigTransforms.*
 import static org.forgerock.openam.amp.dsl.valueproviders.ValueProviders.objectProvider
 
 /**
- * Placeholders to apply to AM 7.x file config.
+ * Placeholders to apply to PingAM 7.x file config.
  *
  * <p>
- *     This is to be used in conjunction with the AM Docker image to placeholder the dev-ops static file deployment.
+ *     This is to be used in conjunction with the PingAM Docker image to placeholder the dev-ops static file deployment.
  *     These rules will replace hard coded values with commons expressions. For example, the fqdn will be replaced with &{fqdn}
  *     Note: in the container, the supplied env vars are UPPERCASE. For example,  &{foo.bar} maps to the env var FOO_BAR
  * </p>

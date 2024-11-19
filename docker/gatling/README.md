@@ -1,6 +1,6 @@
-# Gatling Benchmarks for the ForgeRock Identity Platform
+# Gatling Benchmarks for the Ping Identity Platform
 
-This sample is provided for reference only, and is not supported by ForgeRock. 
+This sample is provided for reference only, and is not supported by Ping Identity. 
 Use this at your own risk.
 
 ## Benchmark Configuration
@@ -14,7 +14,7 @@ Use this at your own risk.
 
 * Get administrative passwords by running the `forgeops info` command.  
   
-* The simulations that require provisioning to IDM also need the secrets for the
+* The simulations that require provisioning to PingIDM also need the secrets for the
   `idm-provisioning` OAuth2 client. Obtain them by running:
   ```
   kubectl exec -it am-6f95c6bd4-vlsgn -- env | grep IDM_PROVISIONING_CLIENT_SECRET`
@@ -34,13 +34,13 @@ directory:
 |----------|-----------
 |`am/AMRestAuthNSim`|Calls the `/json/authenticate` endpoint for authentication.
 |`am/AMAccessTokenSim`|Issues OAuth 2.0 access tokens using the auth code flow.
-|`idm/IDMSimulation`|Creates and optionally deletes IDM test users. Deletion is triggered by setting the `DELETE_USERS` environment variable to `true`. (By default, it's set to `false`.)
-|`platform/Register`|Mimics an interactive user registration. Since this simulation creates new users, it is recommended to set the `USER_PREFIX` environment variable, so that the new user IDs don't collide with existing user Ds seeded in the identity repository.
+|`idm/IDMSimulation`|Creates and optionally deletes PingIDM test users. Deletion is triggered by setting the `DELETE_USERS` environment variable to `true`. (By default, it's set to `false`.)
+|`platform/Register`|Mimics an interactive user registration. Since this simulation creates new users, it is recommended to set the `USER_PREFIX` environment variable, so that the new user IDs don't collide with existing user IDs seeded in the identity repository.
 |`platform/Login`|Mimics an interactive user login using an authentication tree named `Login`. This tree uses the `Progressive Profiling` tree. You must run the `platform.Register` simulation before attempting to run this simulation, because this simulation requires users created by the `platform.Register` simulation.
 |`ig/*`|IG simulations. These simulations are no longer maintained or tested. 
 
 Except as noted, each of these simulation sets are independent from one another. 
-For example, you can run `IDMSimulation` without running either of the AM 
+For example, you can run `IDMSimulation` without running either of the PingAM 
 simulations.  
 
 To compile the simulation code:

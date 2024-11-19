@@ -17,7 +17,7 @@ usage() {
   local usage_msg=$(cat<<EOM
 usage: $PROG --env-name ENV_NAME [OPTIONS] COMPONENT [COMPONENT]...
 
-Build container images for one or more ForgeRock components.
+Build container images for one or more Ping Identity Platform components.
 
 Notes:
   * building amster images is not supported, use bin/amster
@@ -94,7 +94,7 @@ if [ "$RESET" = true ] ; then
 fi
 
 if containsElement "amster" ${COMPONENTS[@]} ; then
-  usage 1 "Embedding AM dynamic configs in the amster image is not supported. Manage AM dynamic config with the bin/amster cmd instead."
+  usage 1 "Embedding PingAM dynamic configs in the amster image is not supported. Manage PingAM dynamic config with the bin/amster cmd instead."
 fi
 
 if containsElement "platform" ${COMPONENTS[@]} ; then

@@ -86,7 +86,7 @@ setAdminAndMonitorPasswords() {
 }
 
 # Copy the K8S secrets to the writable volume. The secrets are expected to be of type k8s.io/tls.
-# These are PEM files -see ds-setup.sh to understand how DS is configured for PEM support.
+# These are PEM files -see ds-setup.sh to understand how PingDS is configured for PEM support.
 # These are likely cert-manager generated, but any tool that generates valid PEM and puts it a k8s tls secret can be used.
 # See https://bugster.forgerock.org/jira/browse/OPENDJ-8374
 copyKeys() {

@@ -19,10 +19,10 @@ spec:
   ingress:
   - from: []
     ports:
-      # AM uses 8081
+      # PingAM uses 8081
       - protocol: TCP
         port: 8081
-      # IDM uses 8080
+      # PingIDM uses 8080
       - protocol: TCP
         port: 8080
 

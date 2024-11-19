@@ -3,8 +3,8 @@
 # Default setup script
 # Setup the directory server for the identity store, idm repo and config backends.
 
-# This uses DS setup profiles. If the schema for a profile has not been
-# changed it may use an older version. For example, AM 7.5 still uses the 6.5 schema for configuration
+# This uses PingDS setup profiles. If the schema for a profile has not been
+# changed it may use an older version. For example, PingAM 7.5 still uses the 6.5 schema for configuration
 CONFIG="am-config:6.5"
 AM_IDENTITY_STORE="am-identity-store"
 IDM_REPO="idm-repo"
@@ -32,7 +32,7 @@ rm -rf /opt/opendj/custom-schema
 ##    set-password-policy-prop --policy-name "Default Password Policy" --set default-password-storage-scheme:"Salted SHA-512"
 #EOF
 
-# These indexes are required for the combined AM/IDM repo
+# These indexes are required for the combined PingAM/PingIDM repo
 dsconfig --offline --no-prompt --batch <<EOF
 create-backend-index \
         --backend-name amIdentityStore \

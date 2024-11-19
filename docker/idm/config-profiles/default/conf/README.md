@@ -1,3 +1,3 @@
-This file is a placeholder to maintain the empty CDK directory.
+This file is a placeholder to maintain the empty default directory.
 
-Files placed in this directory will override the files from the inherited IDM image.
+Files placed in this directory will override the files from the inherited PingIDM image.

@@ -1,5 +1,5 @@
 /*
-* Forgeops IG Access Token No Cache Simulation
+* Forgeops PingGateway Access Token No Cache Simulation
 *
 * Copyright (c) 2019-2024 Ping Identity Corporation. Use of this source code is subject to the
 * Common Development and Distribution License (CDDL) that can be found in the LICENSE file

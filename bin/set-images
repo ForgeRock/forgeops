@@ -74,10 +74,10 @@ $ ./bin/set-images --ref pit2-upgrade
 # Use a specific branch in platform-images and checkout exact commit
 $ ./bin/set-images --ref fdsf123
 
-# Use the given path to find the config and only change the am product.
+# Use the given path to find the config and only change the PingAM product.
 $ ./bin/set-images --config-path /tmp/mychange --products am
 
-# Update the dockerfile for AM to use the same repo and image but the tag of "sometagname"
+# Update the dockerfile for PingAM to use the same repo and image but the tag of "sometagname"
 $ ./bin/set-images --inplace --products am --update-tag sometagname
 
 # Change all the repo names, leaves docker image name (leaves the last part as is) to match the value
@@ -149,7 +149,7 @@ def run_tests(args):
 
 def func_args():
     parser = argparse.ArgumentParser(
-        description='Modify ForgeRock platform base images.',
+        description='Modify Ping Identity Platform base images.',
         epilog=textwrap.dedent(HELP_EXAMPLES),
         # Do not wrap description and epilog.
         formatter_class=argparse.RawDescriptionHelpFormatter)

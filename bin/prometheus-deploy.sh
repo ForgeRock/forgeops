@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Deploys prometheus-operator Helm Chart and Forgerock Metrics which include custom
+# Deploys prometheus-operator Helm Chart and Ping Identity Platform Metrics which include custom
 # endpoints, alerting rules and Grafana dashboards.
 # ./prometheus-deploy.sh -n namespace - deploy to different namespace than monitoring.
 # ./prometheus-deploy.sh -v values file - use different custom values file.
