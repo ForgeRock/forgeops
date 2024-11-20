@@ -184,6 +184,9 @@ examples:
     if not args.copy and not args.components:
         utils.exit_msg('You must supply at least one component to update when not using --copy.')
 
+    if getattr(args, 'image_repo', None) and not args.copy and not args.release and not args.env_name:
+        utils.exit_msg('You must supply --env-name when not doing a copy or a release')
+
     if getattr(args, 'release_name', None) and not args.release:
         utils.exit_msg('You must supply --release when using --release-name.')
 
@@ -287,6 +290,8 @@ examples:
         if not overlay_root.is_dir():
             utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
         overlay_path = overlay_root / args.env_name if args.env_name else overlay_root
+        if not overlay_path.is_dir():
+            utils.exit_msg(f"Overlay path ({overlay_path}) isn't a dir or doesn't exist")
         if args.debug:
             print(f"overlay_path={overlay_path}")
 
