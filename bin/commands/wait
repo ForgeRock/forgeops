@@ -26,7 +26,7 @@ OPTIONS:
   -v|--verbose                : be verbose
   -a|--amster-retain <n>      : Keep amster pod running for n seconds. (default: 10)
                                 Add "infinity" to keep up indefinitely
-  -n|--namespace <ns>         : k8s namespace to install into
+  -n|--namespace <ns>         : k8s namespace to wait for components
   -t|--timeout <n>            : set the max time in seconds to wait for (default: 600)
 
 Valid components:
@@ -89,6 +89,8 @@ checkComponents
 
 SECRET_NAMES=('am-env-secrets' 'idm-env-secrets' 'ds-passwords' 'ds-env-secrets')
 TIMEOUT=${TIMEOUT:-60}
+
+kubeInit
 
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
