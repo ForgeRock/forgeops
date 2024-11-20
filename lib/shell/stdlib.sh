@@ -14,12 +14,12 @@ runOrPrint() {
 
 message() {
   if [ "$DEBUG" = true ] && [ "$2" == "debug" ] ; then
-    echo "$1"
+    echo -e "$1"
   elif [ "$DRYRUN" = true ] || [ "$VERBOSE" = true ] || [ "$DEBUG" = true ] && [ "$2" != "debug" ] ; then
-    echo "$1"
+    echo -e "$1"
   fi
   if [ "$AUTO" = true ] && [ "$2" == "auto" ] ; then
-    echo "$1"
+    echo -e "$1"
   fi
 }
 
