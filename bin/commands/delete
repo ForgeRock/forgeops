@@ -118,6 +118,7 @@ if containsElement 'all' ${COMPONENTS[@]} ; then
       'am'
       'amster'
       'idm'
+      'ig'
       'ds-cts'
       'ds-idrepo'
       'ldif-importer'
@@ -181,7 +182,11 @@ for c in ${COMPONENTS[@]} ; do
     continue
   fi
 
-  kube delete --ignore-not-found=true -k $OVERLAY_PATH/$c
+  if [ -d "$OVERLAY_PATH/$c" ] ; then
+    kube delete --ignore-not-found=true -k $OVERLAY_PATH/$c
+  else
+    message "\nSkipping missing component: $OVERLAY_PATH/$c\n"
+  fi
 
   if [[ "$c" =~ ^ds- ]] ; then
     deletePvcs $c
