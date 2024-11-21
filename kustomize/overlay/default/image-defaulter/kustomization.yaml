@@ -5,16 +5,16 @@ commonLabels:
 images:
 - name: .*am:.*
   newName: us-docker.pkg.dev/forgeops-public/images/am
-  newTag: dev
+  newTag: latest
 - name: .*amster.*
   newName: us-docker.pkg.dev/forgeops-public/images/amster
-  newTag: dev
+  newTag: latest
 - name: .*ds:.*
   newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: dev
+  newTag: latest
 - name: .*idm.*
   newName: us-docker.pkg.dev/forgeops-public/images/idm
-  newTag: dev
+  newTag: latest
 - name: .*ig.*
   newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: dev
+  newTag: latest

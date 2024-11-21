@@ -5,11 +5,11 @@ kind: Service
 metadata:
   name: ds-cts
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: ds-cts
     app.kubernetes.io/component: ds-cts
@@ -54,11 +54,11 @@ kind: StatefulSet
 metadata:
   name: ds-cts
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: ds-cts
     app.kubernetes.io/component: ds-cts
@@ -110,7 +110,7 @@ spec:
       initContainers:
         - name: init
           securityContext: {}
-          image: ds:dev
+          image: ds:latest
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /opt/opendj/data
@@ -171,7 +171,7 @@ spec:
       containers:
         - name: ds
           securityContext: {}
-          image: ds:dev
+          image: ds:latest
           imagePullPolicy: IfNotPresent
           args:
             - start-ds
@@ -257,11 +257,11 @@ spec:
         annotations:
           pv.beta.kubernetes.io/gid: "0"
         labels:
-          helm.sh/chart: identity-platform-7.6
+          helm.sh/chart: identity-platform-1.0.0
           app.kubernetes.io/name: identity-platform
           app.kubernetes.io/part-of: identity-platform
           app.kubernetes.io/instance: identity-platform
-          app.kubernetes.io/version: "7.6"
+          app.kubernetes.io/version: 1.0.0
           app.kubernetes.io/managed-by: Helm
           app: ds-cts
           app.kubernetes.io/component: ds-cts

@@ -1,5 +1,5 @@
-ARG REPO=gcr.io/forgerock-io/ig/pit1
-ARG TAG=2023.4.1-latest-postcommit
+ARG REPO=us-docker.pkg.dev/forgeops-public/images-base/ig
+ARG TAG=latest
 
 FROM ${REPO}:${TAG}
 

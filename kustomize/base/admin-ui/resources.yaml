@@ -5,11 +5,11 @@ kind: Service
 metadata:
   name: admin-ui
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: admin-ui
     app.kubernetes.io/component: admin-ui
@@ -33,11 +33,11 @@ kind: Deployment
 metadata:
   name: admin-ui
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: admin-ui
     app.kubernetes.io/component: admin-ui
@@ -65,7 +65,7 @@ spec:
       containers:
         - name: admin-ui
           securityContext: {}
-          image: gcr.io/forgerock-io/platform-admin-ui/docker-build:7.6.0-SNAPSHOT-postcommit-latest
+          image: us-docker.pkg.dev/forgeops-public/images/admin-ui:latest
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:
@@ -118,11 +118,11 @@ kind: Ingress
 metadata:
   name: admin-ui
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: admin-ui
     app.kubernetes.io/component: admin-ui
