@@ -58,9 +58,7 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_am_k8s_upgrade', defaultValue: enabled),
         booleanParam(name: 'Postcommit_ds_k8s_postcommit', defaultValue: enabled),
         booleanParam(name: 'Postcommit_ds_k8s_upgrade', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_idm_k8s_postcommit', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_idm_k8s_upgrade', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_ig_k8s_postcommit', defaultValue: enabled) ,
+        booleanParam(name: 'Postcommit_ig_k8s_postcommit', defaultValue: enabled),
         booleanParam(name: 'Postcommit_ig_k8s_upgrade', defaultValue: enabled),
         booleanParam(name: 'Postcommit_platform_ui', defaultValue: enabled),
         booleanParam(name: 'Postcommit_set_images', defaultValue: enabled),
@@ -69,7 +67,6 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_fo_set_images', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_dsbackup', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_am_only', defaultValue: false),
-        booleanParam(name: 'Postcommit_fo_idm_only', defaultValue: false),
         booleanParam(name: 'Postcommit_fo_ig_only', defaultValue: false),
         booleanParam(name: 'Postcommit_fo_ds_only', defaultValue: false),
     ]
