@@ -9,7 +9,7 @@
 
 // functional-tests-gke.groovy
 void runStage() {
-    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords FUNCTIONAL')
+    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords "FUNCTIONAL GUILLOTINE"')
 }
 
 return this
