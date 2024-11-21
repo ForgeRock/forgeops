@@ -159,7 +159,7 @@ am:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/am
-    tag: "dev"
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -234,7 +234,7 @@ amster:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/amster
-    tag: "dev"
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -282,7 +282,7 @@ ldif_importer:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ldif-importer
-    tag: "dev"
+    tag: latest
     pullPolicy: Always
     imagePullSecrets: []
 
@@ -327,7 +327,7 @@ idm:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/idm
-    tag: "dev"
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -398,8 +398,8 @@ admin_ui:
   replicaCount: 1
 
   image:
-    repository: gcr.io/forgerock-io/platform-admin-ui/docker-build
-    tag: "7.6.0-SNAPSHOT-postcommit-latest"
+    repository: us-docker.pkg.dev/forgeops-public/images/admin-ui
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -466,8 +466,8 @@ end_user_ui:
   replicaCount: 1
 
   image:
-    repository: gcr.io/forgerock-io/platform-enduser-ui/docker-build
-    tag: "7.6.0-SNAPSHOT-postcommit-latest"
+    repository: us-docker.pkg.dev/forgeops-public/images/end-user-ui
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -534,8 +534,8 @@ login_ui:
   replicaCount: 1
 
   image:
-    repository: gcr.io/forgerock-io/platform-login-ui/docker-build
-    tag: "7.6.0-SNAPSHOT-postcommit-latest"
+    repository: us-docker.pkg.dev/forgeops-public/images/login-ui
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -603,7 +603,7 @@ ig:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ig
-    tag: "dev"
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -701,7 +701,7 @@ ds_idrepo:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "dev"
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -784,7 +784,7 @@ ds_cts:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "dev"
+    tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 

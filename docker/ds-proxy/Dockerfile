@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/ds/pit1:8.0.0-latest-postcommit
+FROM us-docker.pkg.dev/forgeops-public/images-base/ds:latest
 
 COPY debian-buster-sources.list /etc/apt/sources.list
 

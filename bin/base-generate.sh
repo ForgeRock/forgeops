@@ -104,7 +104,7 @@ YQ_CMD=$(type -P yq)
 
 CHART="oci://us-docker.pkg.dev/forgeops-public/charts"
 CHART_NAME="identity-platform"
-CHART_VER_DEF="7.6"
+CHART_VER_DEF="1.0.0"
 CHART_VER=
 CHART_SOURCE="local"
 KUSTOMIZE_PATH_DEF=$ROOT_PATH/kustomize

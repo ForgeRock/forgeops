@@ -5,11 +5,11 @@ kind: ConfigMap
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -31,11 +31,11 @@ kind: ConfigMap
 metadata:
   name: idm-logging-properties
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -147,11 +147,11 @@ kind: Service
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -175,11 +175,11 @@ kind: Deployment
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -230,7 +230,7 @@ spec:
             name: idm-logging-properties
       initContainers:
         - name: fbc-init
-          image: idm:7.6
+          image: idm:latest
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /fbc
@@ -248,7 +248,7 @@ spec:
                 cp -vr ui conf script /fbc
               fi
         - name: truststore-init
-          image: idm:7.6
+          image: idm:latest
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: new-truststore
@@ -269,7 +269,7 @@ spec:
       containers:
         - name: openidm
           securityContext: {}
-          image: idm:7.6
+          image: idm:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACE
@@ -383,11 +383,11 @@ kind: Ingress
 metadata:
   name: idm
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm

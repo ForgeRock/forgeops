@@ -5,11 +5,11 @@ kind: ConfigMap
 metadata:
   name: platform-config
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
 data:
   FQDN: identity-platform.domain.local

@@ -5,11 +5,11 @@ kind: Service
 metadata:
   name: ig
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: ig
     app.kubernetes.io/component: ig
@@ -33,11 +33,11 @@ kind: Deployment
 metadata:
   name: ig
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: ig
     app.kubernetes.io/component: ig
@@ -65,7 +65,7 @@ spec:
       containers:
         - name: ig
           securityContext: {}
-          image: ig:7.6
+          image: ig:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACE
@@ -108,11 +108,11 @@ kind: Ingress
 metadata:
   name: ig
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: ig
     app.kubernetes.io/component: ig

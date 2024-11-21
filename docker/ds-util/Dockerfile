@@ -1,6 +1,4 @@
-# Utility PingDS image for testing, benchmarking, etc.
-# Also useful as a general purpose debugging tool
-FROM gcr.io/forgerock-io/ds/pit1:8.0.0-latest-postcommit
+FROM us-docker.pkg.dev/forgeops-public/images-base/ds:latest
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
