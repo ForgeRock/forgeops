@@ -22,8 +22,7 @@
 #
 set -eux
 
-rm -f template/config/tools.properties
-rm -rf -- README* bat *.zip *.png *.bat setup.sh
+rm -rf -- README* bat *.zip *.png *.bat setup.sh data/ bak/ classes/ extlib/ ldif/ locks/ import-tmp/ logs/ var/ changelogDb/
 
 deploymentId=`./bin/dskeymgr create-deployment-id --deploymentIdPassword password`
 

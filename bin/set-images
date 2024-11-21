@@ -23,6 +23,18 @@ from lib.python import utils
 
 log = None
 
+#### NOTE: If you add a new product or repo, update the map below ####
+# This maps a repo prefix in a Dockerfile to a tag from the platform-images repo.
+REPO_TO_PLATFORM = {
+    # Example:
+    'gcr.io/forgerock-io/ds/pit1': 'ds',
+    'gcr.io/forgerock-io/am-cdk/pit1': 'am',
+    # Amster commits are the same as am
+    'gcr.io/forgerock-io/amster/pit1': 'amster',
+    'gcr.io/forgerock-io/idm-cdk/pit1': 'idm',
+    'gcr.io/forgerock-io/ig/pit1': 'ig',
+}
+
 SCRIPT_DIR = Path(__file__)
 DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
 DEFAULT_CONFIG_PATH = SCRIPT_DIR.joinpath(
