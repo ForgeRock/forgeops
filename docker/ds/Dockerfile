@@ -1,4 +1,4 @@
-ARG REPO=gcr.io/forgerock-io/ds-empty/pit1
+ARG REPO=gcr.io/forgerock-io/ds/pit1
 ARG TAG=8.0.0-latest-postcommit
 
 FROM ${REPO}:${TAG}

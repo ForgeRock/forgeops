@@ -27,8 +27,6 @@ log = None
 # This maps a repo prefix in a Dockerfile to a tag from the platform-images repo.
 REPO_TO_PLATFORM = {
     # Example:
-    # The ds-empty image should use the ds.json file in platform-images to find the sha commit tag
-    'gcr.io/forgerock-io/ds-empty/pit1': 'ds',
     'gcr.io/forgerock-io/ds/pit1': 'ds',
     'gcr.io/forgerock-io/am-cdk/pit1': 'am',
     # Amster commits are the same as am
