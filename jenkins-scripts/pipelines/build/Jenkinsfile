@@ -16,11 +16,6 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 BASE_VERSION = '7.2.0'
 
-buildDirectories = [
-    [ name: 'ds-proxy', folder: 'ds-proxy', arguments: '.', forceBuild: false ],
-    [ name: 'ds-util', folder: 'ds-util', arguments: '.', forceBuild: false ],
-]
-
 def pipeline
 def pipelineRun
 
@@ -72,7 +67,6 @@ node('gce-vm-forgeops-n2d-standard-4') {
     }
 
     pipeline.initialSteps()
-    pipeline.buildDockerImages(pipelineRun)
 
     if (commonModule.branchSupportsPitTests()) {
         // Allow only one postcommit at a time accross all the branches

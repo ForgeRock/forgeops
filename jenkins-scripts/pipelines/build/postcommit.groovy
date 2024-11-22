@@ -24,36 +24,6 @@ def initialSteps() {
     slackChannel = '#forgeops-team'
 }
 
-def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
-    pipelineRun.pushStageOutcome('build-docker-images', stageDisplayName: 'Build Forgeops Images') {
-        for (buildDirectory in buildDirectories) {
-            def directoryName = "${buildDirectory['folder']}/${buildDirectory['name']}"
-            try {
-                stage("Build ${directoryName} image") {
-                    echo "Building 'docker/${directoryName}' ..."
-                    String imageBaseName = "gcr.io/forgerock-io/${buildDirectory['folder']}-${buildDirectory['name']}"
-                    // e.g. 7.2.0-a7267fbc
-                    String gitShaLabel = "${commonModule.BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}"
-
-                    sh commands("cd docker/${buildDirectory['folder']}",
-                            "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} ${buildDirectory['arguments']}")
-                    currentBuild.description += " ${directoryName}"
-                }
-            } catch (exception) {
-                sendFailedSlackNotification("Error occurred while building the `${directoryName}` image")
-                throw exception
-            }
-        }
-
-        return Status.SUCCESS.asOutcome()
-    }
-}
-
-boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
-    return forceBuild ||
-            scmUtils.directoryContentsHaveChangedSincePreviousBuild("docker/${directoryName}")
-}
-
 /**
  * Uses the provided pipelineRun object to run Postcommit tests.
  *
