@@ -39,41 +39,6 @@ def initialSteps() {
     scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 }
 
-def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
-    pipelineRun.pushStageOutcome('build-docker-images', stageDisplayName: 'Build Forgeops Images') {
-        for (buildDirectory in buildDirectories) {
-            def directoryName = "${buildDirectory['folder']}/${buildDirectory['name']}"
-            try {
-                stage("Build ${directoryName} image") {
-                    echo "Building 'docker/${directoryName}' ..."
-                    String imageBaseName = "gcr.io/forgerock-io/${buildDirectory['folder']}-${buildDirectory['name']}"
-                    // e.g. 7.2.0-a7267fbc
-                    String gitShaLabel = "${commonModule.BASE_VERSION}-${commonModule.SHORT_GIT_COMMIT}"
-
-                    sh commands("cd docker/${buildDirectory['folder']}",
-                            "docker build --no-cache --pull --tag ${imageBaseName}:${gitShaLabel} ${buildDirectory['arguments']}")
-                    currentBuild.description += " ${directoryName}"
-                }
-            } catch (FlowInterruptedException exception) {
-                sendBuildAbortedNotification()
-                throw exception
-            } catch (exception) {
-                sendBuildFailureNotification("Error occurred while building the `${directoryName}` image")
-                throw exception
-            }
-        }
-
-        return Status.SUCCESS.asOutcome()
-    }
-}
-
-// Since it's not straightforward to detect changes between the PR branch and dev branch, on the first PR build
-// we build everything. This can be disabled by temporarily commenting various lines out of buildDirectories.
-boolean imageRequiresBuild(String directoryName, boolean forceBuild) {
-    return forceBuild || BUILD_NUMBER == '1' ||
-            scmUtils.directoryContentsHaveChangedComparedToBranch(env.CHANGE_TARGET, "docker/${directoryName}")
-}
-
 /**
  * Uses the provided pipelineRun object to run PR tests.
  *
