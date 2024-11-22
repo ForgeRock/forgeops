@@ -17,9 +17,10 @@ usage() {
     cat <<EOM
 Usage: $prog [OPTIONS] ACTION RESTORE_TARGET
 
-Restore a PingDS StatefulSet from a VolumeSnapshot. When doing a full restore, the
-StatefulSet will be scaled down to 0 pods, the existing PVCs will be recreated
-with the snapshot as the data source. This operation requires downtime.
+Restore a PingDS StatefulSet from a VolumeSnapshot. When doing a full restore,
+the StatefulSet will be scaled down to 0 pods, the existing PVCs will be
+recreated with the snapshot as the data source. This operation requires
+downtime.
 
 The selective restore creates a new PVC, StatefulSet, and Service that creates a
 single new PingDS pod. This allows you to selectively export and import data as
@@ -245,7 +246,13 @@ EOM
 getPvcs() {
   message "Starting getPvcs()" "debug"
 
-  PVCS=$($K_GET pvc -l "app.kubernetes.io/instance=${TARGET_NAME}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+  PVCS=$($K_GET pvc -l "app.kubernetes.io/component=${TARGET_NAME}" --no-headers=true -o custom-columns=NAME:.metadata.name)
+  message "PVCS=$PVCS" "debug"
+
+  if [ -z $PVCS ] ; then
+    echo "ERROR: Didn't find any PVCs for $TARGET_NAME. Exiting."
+    exit 1
+  fi
 
   for pvc in $PVCS ; do
     local pvc_path="${RESTORE_DIR}/${pvc}.json"
@@ -486,11 +493,11 @@ SVC_PATH="$RESTORE_DIR/$SVC_FILE"
 case "$ACTION" in
   full)
     message "Requested restore type: full" "debug"
+    getPvcs # First operation so we fail out if we don't find any
     suspendCronjob
     getSts
     prepSts
     applySts
-    getPvcs
     prepPvcs
     deletePvcs
     createPvcs
