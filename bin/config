@@ -82,7 +82,7 @@ examples:
   $ ./bin/config path kustomize overlay small
 
   # Path to a PingIDM configuration profile
-  $ ./bin/config path docker idm idm-only
+  $ ./bin/config path docker idm
 
   # Path to the directory containing PingGateway Dockerfile
   $ ./bin/config path docker ig
