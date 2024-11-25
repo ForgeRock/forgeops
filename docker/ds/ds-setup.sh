@@ -72,23 +72,6 @@ set-synchronization-provider-prop --provider-name "Multimaster synchronization" 
 set-synchronization-provider-prop --provider-name "Multimaster synchronization" --set "replication-purge-delay:86400 s"
 END_OF_COMMAND_INPUT
 
-
-# These relax some settings needed by the current forgeops deployment.
-dsconfig --offline --no-prompt --batch <<END_OF_COMMAND_INPUT
-set-global-configuration-prop --set "unauthenticated-requests-policy:allow"
-
-set-password-policy-prop --policy-name "Default Password Policy" \
-                         --set "require-secure-authentication:false" \
-                         --set "require-secure-password-changes:false" \
-                         --reset "password-validator"
-
-set-password-policy-prop --policy-name "Root Password Policy" \
-                         --set "require-secure-authentication:false" \
-                         --set "require-secure-password-changes:false" \
-                         --reset "password-validator"
-END_OF_COMMAND_INPUT
-
-
 ### Setup the PEM trustore. This is REQUIRED. ######
 
 # Set up a PEM Trust Manager Provider

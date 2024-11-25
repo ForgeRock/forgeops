@@ -23,7 +23,7 @@ data:
         local USER_PASS=$5
         local FULL_USER_DN="${USER_UID},${USER_DN}"
         echo "Checking ${HOST} for ${USER_UID},${USER_DN}"
-        CXN="-h ${HOST} -p 1389"
+        CXN="-h ${HOST} -p 1636 --useSsl --trustAll"
         ldapsearch ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -b ${USER_DN} "${USER_UID}"  > /dev/null
         SEARCH_RESPONSE=$?
         echo ""
