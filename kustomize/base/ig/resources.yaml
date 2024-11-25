@@ -65,7 +65,7 @@ spec:
       containers:
         - name: ig
           securityContext: {}
-          image: ig:latest
+          image: ig
           imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACE

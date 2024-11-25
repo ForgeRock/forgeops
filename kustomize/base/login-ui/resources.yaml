@@ -65,7 +65,7 @@ spec:
       containers:
         - name: login-ui
           securityContext: {}
-          image: us-docker.pkg.dev/forgeops-public/images/login-ui:latest
+          image: login-ui
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:

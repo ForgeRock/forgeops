@@ -110,7 +110,7 @@ spec:
       initContainers:
         - name: init
           securityContext: {}
-          image: ds:latest
+          image: ds
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /opt/opendj/data
@@ -171,7 +171,7 @@ spec:
       containers:
         - name: ds
           securityContext: {}
-          image: ds:latest
+          image: ds
           imagePullPolicy: IfNotPresent
           args:
             - start-ds

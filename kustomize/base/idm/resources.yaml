@@ -230,7 +230,7 @@ spec:
             name: idm-logging-properties
       initContainers:
         - name: fbc-init
-          image: idm:latest
+          image: idm
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /fbc
@@ -248,7 +248,7 @@ spec:
                 cp -vr ui conf script /fbc
               fi
         - name: truststore-init
-          image: idm:latest
+          image: idm
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: new-truststore
@@ -269,7 +269,7 @@ spec:
       containers:
         - name: openidm
           securityContext: {}
-          image: idm:latest
+          image: idm
           imagePullPolicy: IfNotPresent
           env:
             - name: NAMESPACE

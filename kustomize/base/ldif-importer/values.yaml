@@ -24,5 +24,8 @@ ig:
   enabled: false
 ldif_importer:
   enabled: true
+  image:
+    repository: "ds"
+    tag: ""
 login_ui:
   enabled: false

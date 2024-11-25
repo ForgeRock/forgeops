@@ -24,3 +24,6 @@ ldif_importer:
   enabled: false
 login_ui:
   enabled: true
+  image:
+    repository: "login-ui"
+    tag: ""

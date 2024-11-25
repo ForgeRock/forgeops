@@ -5,11 +5,11 @@ kind: ConfigMap
 metadata:
   name: ldif-importer-scripts
   labels:
-    helm.sh/chart: identity-platform-7.6
+    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
+    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: idm
     app.kubernetes.io/component: idm
@@ -134,7 +134,7 @@ spec:
       containers:
         - name: ldif-importer
           securityContext: {}
-          image: ds:latest
+          image: ds
           imagePullPolicy: Always
           command:
             - sh

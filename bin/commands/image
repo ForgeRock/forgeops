@@ -88,19 +88,11 @@ def update_image_defaulter(images, overlay_path):
     """ Update the image-defaulter """
 
     for image_name in images.keys():
-        name = f".*{image_name}.*"
-        if image_name in ['am', 'ds']:
-            name = f".*{image_name}:.*"
         image = f"{images[image_name]['image']['repository']}"
         if 'tag' in images[image_name]['image'].keys():
             image = f"{image}:{images[image_name]['image']['tag']}"
-        cmd_args = f"edit set image '{name}={image}'"
+        cmd_args = f"edit set image '{image_name}={image}'"
         utils.run('kustomize', cmd_args, cwd=f"{overlay_path}/image-defaulter")
-
-        if image_name == 'end-user-ui':
-            name = '.*enduser-ui.*'
-            cmd_args = f"edit set image '{name}={image}'"
-            utils.run('kustomize', cmd_args, cwd=f"{overlay_path}/image-defaulter")
 
 
 def main():

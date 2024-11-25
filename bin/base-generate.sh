@@ -70,6 +70,16 @@ EOM
   exit $exit_code
 }
 
+stripTag() {
+  message "Starting stripTag()" "debug"
+
+  file=$1
+  message "Stripping image tags from ${file}" "debug"
+  runOrPrint "sed -i '' -e 's,\(image: [-a-z]*\):.*$,\1,' ${file}"
+
+  message "Finishing stripTag()" "debug"
+}
+
 # Get the currently running service definition
 processDir() {
   message "Starting processDir()" "debug"
@@ -84,6 +94,7 @@ processDir() {
       [[ -f $d/$VALUES_OVERRIDE ]] && override_opt="-f $d/$VALUES_OVERRIDE"
       echo "Generating $d/$RESOURCES_FILE"
       runOrPrint "$HELM_CMD template $HELM_OPTS -f $d/$VALUES_FILE $override_opt | $YQ_CMD eval -P 'del(.spec.template.metadata.annotations.deployment-date)' - > $d/$RESOURCES_FILE"
+      stripTag "$d/$RESOURCES_FILE"
       processDir ${d%*/}
     else
       message "Didn't find $VALUES_FILE in ${d%*/}" "debug"

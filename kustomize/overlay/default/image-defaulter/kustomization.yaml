@@ -1,22 +1,32 @@
+---
 kind: Component
 apiVersion: kustomize.config.k8s.io/v1alpha1
 images:
-- name: .*am:.*
-  newName: us-docker.pkg.dev/forgeops-public/images/am
-  newTag: latest
-- name: .*amster.*
-  newName: us-docker.pkg.dev/forgeops-public/images/amster
-  newTag: latest
-- name: .*ds:.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: latest
-- name: .*idm.*
-  newName: us-docker.pkg.dev/forgeops-public/images/idm
-  newTag: latest
-- name: .*ig.*
-  newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: latest
+  - name: am
+    newName: us-docker.pkg.dev/forgeops-public/images/am
+    newTag: latest
+  - name: amster
+    newName: us-docker.pkg.dev/forgeops-public/images/amster
+    newTag: latest
+  - name: ds
+    newName: us-docker.pkg.dev/forgeops-public/images/ds
+    newTag: latest
+  - name: idm
+    newName: us-docker.pkg.dev/forgeops-public/images/idm
+    newTag: latest
+  - name: ig
+    newName: us-docker.pkg.dev/forgeops-public/images/ig
+    newTag: latest
+  - name: admin-ui
+    newName: us-docker.pkg.dev/forgeops-public/images/admin-ui
+    newTag: latest
+  - name: end-user-ui
+    newName: us-docker.pkg.dev/forgeops-public/images/end-user-ui
+    newTag: latest
+  - name: login-ui
+    newName: us-docker.pkg.dev/forgeops-public/images/login-ui
+    newTag: latest
 labels:
-- includeSelectors: true
-  pairs:
-    app.kubernetes.io/part-of: identity-platform
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/part-of: identity-platform

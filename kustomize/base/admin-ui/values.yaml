@@ -6,6 +6,9 @@ platform:
   disable_secret_agent_config: true
 admin_ui:
   enabled: true
+  image:
+    repository: "admin-ui"
+    tag: ""
 am:
   enabled: false
 amster:

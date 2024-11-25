@@ -65,7 +65,7 @@ spec:
       containers:
         - name: admin-ui
           securityContext: {}
-          image: us-docker.pkg.dev/forgeops-public/images/admin-ui:latest
+          image: admin-ui
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:

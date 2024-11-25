@@ -65,7 +65,7 @@ spec:
       containers:
         - name: end-user-ui
           securityContext: {}
-          image: us-docker.pkg.dev/forgeops-public/images/end-user-ui:latest
+          image: end-user-ui
           imagePullPolicy: IfNotPresent
           lifecycle:
             preStop:

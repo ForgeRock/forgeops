@@ -109,7 +109,7 @@ spec:
             name: am-logback
       initContainers:
         - name: fbc-init
-          image: am:latest
+          image: am
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /fbc
@@ -127,7 +127,7 @@ spec:
                 cp -r .homeVersion * /fbc
               fi
         - name: truststore-init
-          image: am:latest
+          image: am
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: new-truststore
@@ -150,7 +150,7 @@ spec:
       containers:
         - name: openam
           securityContext: {}
-          image: am:latest
+          image: am
           imagePullPolicy: IfNotPresent
           command:
             - bash
