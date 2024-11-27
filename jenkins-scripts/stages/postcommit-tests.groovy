@@ -18,7 +18,7 @@ void runStage(PipelineRunLegacyAdapter pipelineRun, Random random, boolean gener
 
     def clusterConfig = [:]
     clusterConfig['PROJECT'] = cloud_config.commonConfig()['PROJECT']
-    clusterConfig['CLUSTER_DOMAIN'] = 'postcommit-forgeops.engineeringpit.com'
+    clusterConfig['CLUSTER_DOMAIN'] = cloud_utils.clusterDomainFromClusterName('postcommit-forgeops')
     clusterConfig['PIPELINE_NAME'] = isPR() ? 'forgeops-pr' : 'forgeops-postcommit'
 
     def scaleClusterConfig = [:]
