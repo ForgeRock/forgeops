@@ -53,7 +53,10 @@ spec:
         effect: NoSchedule
       initContainers:
       - name: init
-        command: ["/opt/opendj/default-scripts/init-and-restore.sh"]
+        command:
+          - sh
+          - -c
+          - /opt/opendj/runtime-scripts/init-and-restore.sh || /opt/opendj/default-scripts/init-and-restore.sh
         image: ds
         imagePullPolicy: IfNotPresent
         env:
