@@ -246,7 +246,7 @@ EOM
 getPvcs() {
   message "Starting getPvcs()" "debug"
 
-  PVCS=$($K_GET pvc -l $APP_LABEL --no-headers=true -o custom-columns=NAME:.metadata.name)
+  PVCS=$($K_GET pvc -l "${APP_LABEL}=${TARGET_NAME}" --no-headers=true -o custom-columns=NAME:.metadata.name)
   message "PVCS=$PVCS" "debug"
 
   if [ -z $PVCS ] ; then
@@ -428,7 +428,7 @@ else
 fi
 
 TARGET_NAME="ds-${TARGET}"
-APP_LABEL="app.kubernetes.io/component=${TARGET_NAME}"
+APP_LABEL="app.kubernetes.io/component"
 CRONJOB_NAME="${TARGET_NAME}-snapshot"
 RESTORE_TARGET_NAME="${TARGET_NAME}-restore"
 
@@ -521,6 +521,6 @@ case "$ACTION" in
     message "Requested restore type: clean" "debug"
     kube delete svc $RESTORE_TARGET_NAME --ignore-not-found=true
     kube delete sts $RESTORE_TARGET_NAME --ignore-not-found=true
-    kube delete pvc -l $APP_LABEL --ignore-not-found=true
+    kube delete pvc -l "${APP_LABEL}=${RESTORE_TARGET_NAME}" --ignore-not-found=true
     ;;
 esac
