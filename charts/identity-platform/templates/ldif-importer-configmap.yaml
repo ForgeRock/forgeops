@@ -1,18 +1,13 @@
----
-# Source: identity-platform/templates/ldif-importer-configmap.yaml
+{{- if and .Release.IsInstall .Values.ldif_importer.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ldif-importer-scripts
   labels:
-    helm.sh/chart: identity-platform-7.6
-    app.kubernetes.io/name: identity-platform
-    app.kubernetes.io/part-of: identity-platform
-    app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: "7.6"
-    app.kubernetes.io/managed-by: Helm
-    app: idm
-    app.kubernetes.io/component: idm
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 data:
   ds-passwords.sh: |
     #!/bin/bash
@@ -90,76 +85,4 @@ data:
             exit 1
         fi
     fi
----
-# Source: identity-platform/templates/ldif-importer-job.yaml
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: ldif-importer
-  labels:
-    helm.sh/chart: identity-platform-1.0.0
-    app.kubernetes.io/name: identity-platform
-    app.kubernetes.io/part-of: identity-platform
-    app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: 1.0.0
-    app.kubernetes.io/managed-by: Helm
-    app: ldif-importer
-    app.kubernetes.io/component: ldif-importer
-spec:
-  backoffLimit: 6
-  ttlSecondsAfterFinished: 300
-  template:
-    metadata:
-      annotations:
-      labels:
-        app.kubernetes.io/name: identity-platform
-        app.kubernetes.io/part-of: identity-platform
-        app.kubernetes.io/instance: identity-platform
-        app: ldif-importer
-        app.kubernetes.io/component: ldif-importer
-    spec:
-      restartPolicy: OnFailure
-      serviceAccountName: default
-      securityContext:
-        fsGroup: 0
-        runAsUser: 0
-      volumes:
-        - name: passwords
-          secret:
-            secretName: ds-passwords
-        - name: ldif-importer
-          configMap:
-            name: ldif-importer-scripts
-            defaultMode: 0777
-      containers:
-        - name: ldif-importer
-          securityContext: {}
-          image: ds:latest
-          imagePullPolicy: Always
-          command:
-            - sh
-            - -c
-            - /opt/opendj/start.sh
-          envFrom:
-            - secretRef:
-                name: ds-env-secrets
-          readinessProbe:
-            exec:
-              command:
-                - cat
-                - /etc/hosts
-            initialDelaySeconds: 1
-          resources: {}
-          volumeMounts:
-            - name: passwords
-              mountPath: /var/run/secrets/opendj-passwords
-            - name: ldif-importer
-              mountPath: /opt/opendj/start.sh
-              subPath: start.sh
-            - name: ldif-importer
-              mountPath: /opt/opendj/ds-passwords.sh
-              subPath: ds-passwords.sh
-      tolerations:
-        - effect: NoSchedule
-          key: kubernetes.io/arch
-          operator: Exists
+{{- end }}

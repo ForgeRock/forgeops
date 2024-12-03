@@ -281,7 +281,7 @@ ldif_importer:
   ttlSecondsAfterFinished: 300
 
   image:
-    repository: us-docker.pkg.dev/forgeops-public/images/ldif-importer
+    repository: us-docker.pkg.dev/forgeops-public/images/ds
     tag: latest
     pullPolicy: Always
     imagePullSecrets: []
@@ -311,7 +311,7 @@ ldif_importer:
 
   podSecurityContext:
     fsGroup: 0
-    runAsUser: 11111
+    runAsUser: 0
 
   securityContext: {}
     # capabilities:
