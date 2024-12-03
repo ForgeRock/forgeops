@@ -1,89 +1,26 @@
 #!/usr/bin/env bash
-# Run the am-config upgrade process on PingAM FBC configuration files.
-#
-# The default rules upgrade PingAM configuration to the same version as the upgrader image itself. For
-# example, if the upgrader docker image is version 7.3.1, PingAM FBC files will be upgraded to 7.3.1.
-#
-# Usage: bin/am-upgrader [am-fbc-files] [rules-directory]
-#  [am-fbc-files] is the directory that contains the exported PingAM FBC Files. This defaults to docker/am.
-#   This script assumes FBC files have been previously exported.
-#
-#  If [rules-directory] is not provided, the version upgrade rules bundled in the image will be used. Otherwise
-#  the rules found in this directory will be run.
-#
-#
-# You can change the version of the upgrader used by supplying the REPO and TAG environment variables.
-# For example:
-# TAG=7.5.0 bin/am-config-upgrader
 
-# Mac does not come with realpath by default.
-# https://stackoverflow.com/questions/3572030/bash-script-absolute-path-with-os-x/18443300#18443300
-realpath() {
-    local OURPWD=$PWD
-    cd "$(dirname "$1")"
-    local LINK=$(readlink "$(basename "$1")")
-    while [ "$LINK" ]; do
-        cd "$(dirname "$LINK")"
-        local LINK=$(readlink "$(basename "$1")")
-    done
-    local REALPATH="$PWD/$(basename "$1")"
-    cd "$OURPWD"
-    echo "$REALPATH"
-}
-     
-# Set container engine
-if [[ -n "${CONTAINER_ENGINE}" ]] && [[ $(echo ${CONTAINER_ENGINE} | awk '{print tolower($0)}') == 'podman' ]];
-then
-    echo "Podman set as container engine."
-    container_engine='podman'
-else
-    container_engine='docker'
-fi
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../lib/shell/stdlib.sh
+# Go back to where we started
+cd $start_dir
 
-# Never run against a minikube daemon
-## TODO update for podman with minikube
-if [[ $container_engine == 'docker' ]];
-then
-    docker ps --format '{{.Names}}' | grep -q minikube \
-        && unset -v DOCKER_HOST DOCKER_CERT_PATH DOCKER_MACHINE_NAME DOCKER_TLS_VERIFY
-fi
+echo << EOM
 
-# Check to see if your container engine is running
-if ! $container_engine info --format ' ';
-then
-    echo "A container engine must be running. Please start your container environment and run again."
-    exit 1
-fi
-# For debugging
-# set  -x
+The am-config-upgrader command has moved, and is now called via the forgeops script.
 
-# The default repo for the upgrader docker image
-REPO=${REPO:-gcr.io/forgerock-io/am-config-upgrader/pit1}
+For more information:
+forgeops upgrade-am-config -h
 
-# The am upgrader image tag to run. To override:
-# TAG=foo  bin/am-config-upgrader
-TAG=${TAG:-7.5.0-latest-postcommit}
+Running the following env command for you.
 
+EOM
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." >/dev/null 2>&1 && pwd )"
+# Enable debugging so runOrPrint will always print the command before running it
+DEBUG=true
 
-# Where the PingAM exported files are by default
-CONFIG_DIR=${1:-docker/am}
-# Where the rules are
-
-
-# If the user supplies a rules volume use that instead of the builtin rules
-RULES_VOLUME=""
-if [[ ! -z "$2" ]]; then
-    RDIR=$(realpath $2)
-    RULES_VOLUME="--volume $RDIR:/rules"
-fi
-
-# For docker volume mounts.
-CONFIG=$(realpath $CONFIG_DIR)
-
-GID=$(id -g)
-
-# Run the upgrader locally - optionally over mounting the /rules directory
-set -x
-$container_engine run --rm --user $UID:$GID --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
+runOrPrint $SCRIPT_DIR/forgeops upgrade-am-config $*

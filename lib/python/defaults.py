@@ -12,6 +12,7 @@ RELEASES_SRC_DEF = 'http://releases.forgeops.com'
 # this map get updated with that custom name.
 BASE_IMAGE_NAMES = {
     'am': 'am',
+    'am-config-upgrader': 'am-config-upgrader',
     'amster': 'amster',
     'ds': 'ds',
     'idm': 'idm',
