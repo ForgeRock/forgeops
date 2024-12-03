@@ -23,20 +23,6 @@ from lib.python import utils
 
 log = None
 
-#### NOTE: If you add a new product or repo, update the map below ####
-# This maps a repo prefix in a Dockerfile to a tag from the platform-images repo.
-REPO_TO_PLATFORM = {
-    # Example:
-    # The ds-empty image should use the ds.json file in platform-images to find the sha commit tag
-    'gcr.io/forgerock-io/ds-empty/pit1': 'ds',
-    'gcr.io/forgerock-io/ds/pit1': 'ds',
-    'gcr.io/forgerock-io/am-cdk/pit1': 'am',
-    # Amster commits are the same as am
-    'gcr.io/forgerock-io/amster/pit1': 'amster',
-    'gcr.io/forgerock-io/idm-cdk/pit1': 'idm',
-    'gcr.io/forgerock-io/ig/pit1': 'ig',
-}
-
 SCRIPT_DIR = Path(__file__)
 DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
 DEFAULT_CONFIG_PATH = SCRIPT_DIR.joinpath(
@@ -438,25 +424,25 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
                 sys.exit(1)
 
             k = f'{current_repo}/{name}'
+            is_from_line = False
             # Is the repo in repo to platform map?
-            if k in REPO_TO_PLATFORM:
-
-                # v is set to the product config.
-                # For example v='ds' means use the ds.json file from platform-images
-                v = REPO_TO_PLATFORM[k]
-
-                # If its not in the list of products - we can skip it
-                if v in products:
+            for product in products:
+                if f'docker/{product}/' in str(f.filename()):
+                    # If its not in the list of products - we can skip it
                     if update_repo is not None or update_tag is not None:
                         repo = k if update_repo is None else update_repo
                         tag = current_tag if update_tag is None else f':{update_tag}'
                         new_image = f'{repo}{tag}'
                     else:
-                        product_config = products[v]
+                        product_config = products[product]
                         new_image = f'{product_config["imageName"]}:{product_config["imageTag"]}'
                     log.info(f'Updating {f.filename()} to use {new_image.strip()}')
                     print(f'{before} {new_image}{after}')
-                    continue
+                    is_from_line = True
+                    break
+
+            if is_from_line:
+                continue
 
             print(line, end='')
 
