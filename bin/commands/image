@@ -75,8 +75,7 @@ def write_release_names(tags, repo, build_path, release_name, image_names):
         if 'ui' in c:
             continue
         releases_path = build_path / c / 'releases'
-        if not releases_path.exists():
-            os.makedirs(releases_path)
+        os.makedirs(releases_path, exist_ok=True)
 
         image_name = image_names[c]
         release_path = releases_path / release_name
@@ -106,7 +105,7 @@ def update_image_defaulter(images, overlay_path):
 
 def main():
     prog = 'forgeops image'
-    components_apps = ['am', 'amster', 'idm']
+    components_apps = ['am', 'amster', 'am-config-upgrader', 'idm']
     components_ui = ['admin-ui', 'end-user-ui', 'login-ui']
     components_platform = sum([components_apps, ['ds'], components_ui], [])
     components_meta = ['platform', 'apps', 'ui']

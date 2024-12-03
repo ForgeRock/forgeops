@@ -40,6 +40,10 @@ COMPONENTS_WAIT=(
    'ig'
 )
 
+SUPPORTED_CONTAINER_ENGINES=('docker' 'podman')
+# Commands that don't require an environment
+COMMANDS_NO_ENV=('wait' 'upgrade-am-config')
+
 #############
 # Functions #
 #############
@@ -163,7 +167,7 @@ processArgs() {
 
   if [ -z "$ENV_NAME" ] && [[ "$PROG" =~ apply ]] ; then
     ENV_NAME=demo
-  elif [[ "$PROG" =~ wait ]] ; then
+  elif containsElement $PROG_NAME ${COMMANDS_NO_ENV[@]} ; then
     message "An environment is not required for wait" "debug"
   elif [ -z "$ENV_NAME" ] ; then
     usage 1 'An environment name (--env-name) is required.'
@@ -226,6 +230,17 @@ checkComponents() {
       usage 1 "Invalid component: $c"
     fi
   done
+}
+
+checkContainerEngine() {
+  message "Starting checkContainerEngine()" "debug"
+
+  CONTAINER_ENGINE=${CONTAINER_ENGINE:-docker}
+  if ! containsElement $CONTAINER_ENGINE ${SUPPORTED_CONTAINER_ENGINES[@]} ; then
+    message "$CONTAINER_ENGINE has not been officially tested. Use at your own risk."
+  fi
+
+  message "Finishing checkContainerEngine()" "debug"
 }
 
 validateOverlay() {
