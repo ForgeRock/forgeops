@@ -93,9 +93,9 @@ if [ "$RESET" = true ] ; then
   exit 0
 fi
 
-if containsElement "amster" ${COMPONENTS[@]} ; then
-  usage 1 "Embedding PingAM dynamic configs in the amster image is not supported. Manage PingAM dynamic config with the bin/amster cmd instead."
-fi
+#if containsElement "amster" ${COMPONENTS[@]} ; then
+#  usage 1 "Embedding PingAM dynamic configs in the amster image is not supported. Manage PingAM dynamic config with the bin/amster cmd instead."
+#fi
 
 if containsElement "platform" ${COMPONENTS[@]} ; then
   message "Component 'platform' given, setting components"
