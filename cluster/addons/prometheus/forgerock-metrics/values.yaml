@@ -25,7 +25,7 @@ am:
 ds:
   component: directory
   enabled: true
-  path: /metrics/prometheus
+  path: /metrics/prometheus/0.0.4
   port: http
   labelSelectorComponent: directory
   labelSelectorName: ds
