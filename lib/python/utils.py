@@ -64,6 +64,20 @@ REQ_VERSIONS ={
     },
 }
 
+ENV_COMPONENTS_VALID = [
+    'am',
+    'amster',
+    'ds',
+    'ds-cts',
+    'ds-idrepo',
+    'idm',
+    'ig',
+    'ldif-importer',
+    'admin-ui',
+    'end-user-ui',
+    'login-ui'
+]
+
 SCRIPT_DIR = pathlib.Path(os.path.join(root_path, 'bin'))
 REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
 DOCKER_BASE_PATH = REPO_BASE_PATH.joinpath('docker').resolve()
