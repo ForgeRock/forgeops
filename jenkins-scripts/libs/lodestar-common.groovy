@@ -118,7 +118,6 @@ def runPyrock(PipelineRunLegacyAdapter pipelineRun, Random random, String stageN
     def normalizedStageName = dashboard_utils.normalizeStageName(stageName)
     def testConfig = getDefaultConfig(random, stageName) + config
     def stagesCloud = [:]
-    def testName = cloud_utils.pyrockGetTestName(testConfig)
     stagesCloud[normalizedStageName] = dashboard_utils.pyrockStageCloud(normalizedStageName)
 
     runCommon(pipelineRun, stageName, stagesCloud) {
