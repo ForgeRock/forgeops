@@ -88,7 +88,7 @@ spec:
             mountPath: /var/run/secrets/cloud-credentials-cache/
           # args:
           # - init
-          command: ["/opt/opendj/default-scripts/init-and-restore.sh"]
+          command: ["/opt/opendj/runtime-scripts/init-and-restore.sh || /opt/opendj/default-scripts/init-and-restore.sh"]
           env:
           - name: POD_NAME
             valueFrom:
