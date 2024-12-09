@@ -20,27 +20,15 @@ sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
 import lib.python.utils as utils
+import lib.python.defaults as defaults
 
-ALT_RELEASES = ['dev']
-FORGEOPS_PUBLIC_URL = 'us-docker.pkg.dev/forgeops-public'
-BASE_REPO_DEV = "gcr.io/forgerock-io"
-BASE_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images-base"
-DEPLOY_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images"
-RELEASES_SRC_DEF = 'http://releases.forgeops.com'
-
-# This seems like it could be a list. However, these component names can be
-# overridden in the release JSON files. If a release has a custom component name,
-# this map get updated with that custom name.
-BASE_IMAGE_NAMES = {
-    'am': 'am',
-    'amster': 'amster',
-    'ds': 'ds',
-    'idm': 'idm',
-    'ig': 'ig',
-    'admin-ui': 'admin-ui',
-    'end-user-ui': 'end-user-ui',
-    'login-ui': 'login-ui',
-}
+ALT_RELEASES = defaults.ALT_RELEASES
+FORGEOPS_PUBLIC_URL = defaults.FORGEOPS_PUBLIC_URL
+BASE_REPO_DEV = defaults.BASE_REPO_DEV
+BASE_REPO_DEF = defaults.BASE_REPO_DEF
+DEPLOY_REPO_DEF = defaults.DEPLOY_REPO_DEF
+RELEASES_SRC_DEF = defaults.RELEASES_SRC_DEF
+BASE_IMAGE_NAMES = defaults.BASE_IMAGE_NAMES
 
 
 def get_releases(releases_src, components):
