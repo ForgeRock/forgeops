@@ -22,7 +22,7 @@ dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
 sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-from lib.python.releases import RELEASES_SRC_DEF
+from lib.python.defaults import RELEASES_SRC_DEF, ENV_COMPONENTS_VALID
 
 CYAN = '\033[1;96m'
 PURPLE = '\033[1;95m'
@@ -63,20 +63,6 @@ REQ_VERSIONS ={
         'MAX': 'v100.0.0',
     },
 }
-
-ENV_COMPONENTS_VALID = [
-    'am',
-    'amster',
-    'ds',
-    'ds-cts',
-    'ds-idrepo',
-    'idm',
-    'ig',
-    'ldif-importer',
-    'admin-ui',
-    'end-user-ui',
-    'login-ui'
-]
 
 SCRIPT_DIR = pathlib.Path(os.path.join(root_path, 'bin'))
 REPO_BASE_PATH = SCRIPT_DIR.joinpath('../').resolve()
