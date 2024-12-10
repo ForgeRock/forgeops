@@ -169,7 +169,7 @@ target "base" {
 target "ds" {
   inherits = ["base"]
 
-  context = "./ds/ds-new"
+  context = "./ds"
   dockerfile = "Dockerfile"
   args = {
     FROM_IMAGE = DS_FROM_IMAGE
@@ -184,7 +184,7 @@ target "ds-cts" {
   inherits = ["base"]
 
   context = "./ds"
-  dockerfile = "cts/Dockerfile"
+  dockerfile = "Dockerfile"
   args = {
     FROM_IMAGE = DS_CTS_FROM_IMAGE
   }
@@ -198,7 +198,7 @@ target "ds-idrepo" {
   inherits = ["base"]
 
   context = "./ds"
-  dockerfile = "idrepo/Dockerfile"
+  dockerfile = "Dockerfile"
   args = {
     FROM_IMAGE = DS_IDREPO_FROM_IMAGE
   }
@@ -211,8 +211,8 @@ target "ds-idrepo" {
 target "ds-proxy" {
   inherits = ["base"]
 
-  context = "./ds"
-  dockerfile = "proxy/Dockerfile"
+  context = "./ds-proxy"
+  dockerfile = "Dockerfile"
   args = {
     FROM_IMAGE = DS_PROXY_FROM_IMAGE
   }
