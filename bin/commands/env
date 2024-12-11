@@ -180,7 +180,7 @@ def process_overlay_dir(path, config, args):
     # Look for subdirs and process them
     for d in path.iterdir():
         if args.debug: print(f"d={d}")
-        if d.is_file():
+        if d.is_file() or 'amster' in d.name:
             continue
         process_overlay_dir(d, config, args)
 

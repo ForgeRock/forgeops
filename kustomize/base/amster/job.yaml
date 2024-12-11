@@ -1,0 +1,79 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: amster
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: amster
+    spec:
+      securityContext:
+        runAsUser: 11111
+        runAsGroup: 0
+      initContainers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: platform-config
+        - secretRef:
+            name: amster-env-secrets
+        - secretRef:
+            name: ds-env-secrets
+        image: amster
+        imagePullPolicy: Always
+        name: amster
+        resources:
+          limits:
+            memory: 512Mi
+          requests:
+            memory: 512Mi
+            cpu: "100m"
+        volumeMounts:
+        - mountPath: /var/run/secrets/amster
+          name: amster-secrets
+          readOnly: true
+        - name: export-files
+          mountPath: /var/tmp/amster
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 0
+      # The pause container is there to give the bin/amster command time
+      # to copy the exported files
+      containers:
+      - name: pause
+        image: amster
+        imagePullPolicy: Always
+        args:  ["bash", "-c", "sleep ${DURATION:-10}"]
+        envFrom:
+        - configMapRef:
+            name: amster-retain
+            optional: true
+        volumeMounts:
+        - mountPath: /var/run/secrets/amster
+          name: amster-secrets
+          readOnly: true
+        - mountPath: /var/tmp/amster
+          name: export-files
+        readinessProbe:
+          exec:
+            command: ["cat", "/etc/hosts"]
+          initialDelaySeconds: 1
+      volumes:
+      - name: amster-secrets
+        secret:
+          secretName: amster
+      - name: platform-config
+        configMap:
+          name: platform-config
+      - name: export-files
+        emptyDir:
+          {}
+      tolerations:
+        - key: kubernetes.io/arch
+          operator: Exists
+          effect: NoSchedule

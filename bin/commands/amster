@@ -31,9 +31,9 @@ USER_PWD_EXPR_RULES = {
 
 log = utils.logger(name='amster')
 
-def amster_run(ns, kustomize_path, scripts_path):
+def amster_run(ns, kustomize_path, scripts_path, env_name):
     utils.message('starting...')
-    amster_run_job_path = kustomize_path / 'overlay' / 'amster-run'
+    amster_run_job_path = kustomize_path / 'overlay' / env_name / 'amster' / 'run'
     try:
         utils.clean_amster_job(ns, False)
         envVars = os.environ
@@ -46,8 +46,8 @@ def amster_run(ns, kustomize_path, scripts_path):
     finally:
         utils.clean_amster_job(ns, True)
 
-def amster_import(ns, src, kustomize_path, scripts_path, duration, printlogs=True):
-    amster_upload_job_path = kustomize_path / 'overlay' / 'amster-upload'
+def amster_import(ns, src, kustomize_path, scripts_path, duration, env_name, printlogs=True):
+    amster_upload_job_path = kustomize_path / 'overlay' / env_name / 'amster' / 'upload'
     retain = True if duration > '200' else False
     # If the source dir/file does not exist exit
     if not os.path.exists(src):
@@ -71,8 +71,8 @@ def amster_import(ns, src, kustomize_path, scripts_path, duration, printlogs=Tru
     finally:
         utils.clean_amster_job(ns, retain)
 
-def amster_export(ns, dst, kustomize_path, scripts_path, glob, full, duration):
-    amster_export_job_path = kustomize_path / 'overlay' / 'amster-export'
+def amster_export(ns, dst, kustomize_path, scripts_path, glob, full, duration, env_name):
+    amster_export_job_path = kustomize_path / 'overlay' / env_name / 'amster' / 'export'
     retain = True if duration > '200' else False
     fqdn = utils.get_fqdn(ns)
     if not os.path.isdir(dst):
@@ -206,6 +206,7 @@ def main():
                         help='Dir to store Helm values files [absolute or relative to forgeops root] (default: helm)')
     common.add_argument('-k', '--kustomize-path', default=argparse.SUPPRESS,
                         help='Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)')
+    common.add_argument('-e', '--env-name', required=True, help='Name of environment to manage')
     parser = argparse.ArgumentParser(
         description='amster import or export json configuration files')
     subparser = parser.add_subparsers(dest='cmd', required=True, help='select action to perform')
@@ -226,9 +227,9 @@ def main():
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
-    build_path_arg = gettarr(args, 'build_path', None)
-    helm_path_arg = gettarr(args, 'helm_path', None)
-    kustomize_path_arg = gettarr(args, 'kustomize_path', None)
+    build_path_arg = getattr(args, 'build_path', None)
+    helm_path_arg = getattr(args, 'helm_path', None)
+    kustomize_path_arg = getattr(args, 'kustomize_path', None)
     (helm_path, kustomize_path, build_path, overlay_root, do_helm, do_kustomize,
      releases_src) = utils.process_overrides(root_path, helm_path_arg,
                                              kustomize_path_arg, build_path_arg,
@@ -246,7 +247,7 @@ def main():
         else:
             src = root_path / args.src
 
-        amster_import(namespace, src, kustomize_path, scripts_path, args.duration)
+        amster_import(namespace, src, kustomize_path, scripts_path, args.duration, args.env_name)
         return
 
     # Export files out of amster
@@ -257,7 +258,7 @@ def main():
         else:
             dst = root_path / args.dst
 
-        amster_export(namespace, dst, kustomize_path, scripts_path, args.glob, args.full, args.duration)
+        amster_export(namespace, dst, kustomize_path, scripts_path, args.glob, args.full, args.duration, args.env_name)
         return
 
     # Replace placeholders
@@ -272,7 +273,7 @@ def main():
 
     # Run amster pod indefinitely for troubleshooting purposes
     if args.cmd == 'run':
-        amster_run(namespace, kustomize_path, scripts_path)
+        amster_run(namespace, kustomize_path, scripts_path, args.env_name)
         return
 
 if __name__ == '__main__':
