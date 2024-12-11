@@ -1,6 +1,6 @@
 """ Global defaults """
 
-ALT_RELEASES = ['dev']
+ALT_RELEASES = ['dev', 'latest']
 FORGEOPS_PUBLIC_URL = 'us-docker.pkg.dev/forgeops-public'
 BASE_REPO_DEV = "gcr.io/forgerock-io"
 BASE_REPO_DEF = f"{FORGEOPS_PUBLIC_URL}/images-base"

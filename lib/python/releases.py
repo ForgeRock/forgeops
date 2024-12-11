@@ -218,5 +218,5 @@ def get_release_from_tag(tag, debug=False):
     if tag is not None:
         result = tag
         if '.' in tag:
-            result = re.sub(".*([0-9].[0-9].[0-9]).*", r"\1", tag)
+            result = re.sub("^.*([0-9].[0-9].[0-9]).*", r"\1", tag)
     return result
