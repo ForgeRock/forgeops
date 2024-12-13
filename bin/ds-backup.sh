@@ -66,6 +66,13 @@ if [ -z "${pods}" ]; then
 fi
 echo "Targeting pods: ${pods[@]}"
 
+echo "Verifying the correct runtime script directory"
+RUNTIME_SCRIPT_DIR="/opt/opendj/runtime-scripts/schedule-backup.sh"
+kubectl exec ds-idrepo-0 -- bash -c "ls -ld /opt/opendj/default-scripts"
+if [[ $? ]]; then
+    RUNTIME_SCRIPT_DIR="/opt/opendj/default-scripts/schedule-backup.sh"
+fi
+
 # Loop through pods and carry out dsbackup task
 for pod in "${pods[@]}"
 do
@@ -96,7 +103,7 @@ do
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         BACKENDS='${BACKENDS}' \
-                                                        /opt/opendj/runtime-scripts/schedule-backup.sh"
+                                                        ${RUNTIME_SCRIPT_DIR}"
             ;;
         cancel )
             echo "Cancelling backup schedule: ${TASK_NAME} "
@@ -104,7 +111,7 @@ do
                                                         TASK_NAME='${TASK_NAME}' \
                                                         BACKUP_DIRECTORY='${BACKUP_DIRECTORY}' \
                                                         CANCEL=TRUE \
-                                                        /opt/opendj/runtime-scripts/schedule-backup.sh"
+                                                        ${RUNTIME_SCRIPT_DIR}"
             ;;
         *)
           echo "Usage: $0 [create|cancel]"

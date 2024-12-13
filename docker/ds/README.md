@@ -88,7 +88,7 @@ Define the backup to be restored
 Change the disaster recovery ID to a new value
 
 ### Restore of a single instance, rest of topology still valid
-Define the backup to be restored. The backup *must* be recent, according to the replication purge delay as described
+Define the backup to be restored. The backup *must* be recent, according to the replication purge delay as described  
 Do not change the disaster recovery ID, it should be the same as the last topology recovery
 
 ### New pod (scale up):
