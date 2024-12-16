@@ -84,10 +84,12 @@ spec:
             name: truststore
           - mountPath: /var/run/secrets/keys
             name: keys
-          - name: cloud-credentials-cache
-            mountPath: /var/run/secrets/cloud-credentials-cache/
-          args:
-          - init
+          - mountPath: /var/run/secrets/cloud-credentials-cache/
+            name: cloud-credentials-cache
+          command:
+          - sh
+          - -c
+          - "/opt/opendj/runtime-scripts/init-and-restore.sh || /opt/opendj/default-scripts/init-and-restore.sh"
           env:
           - name: POD_NAME
             valueFrom:
