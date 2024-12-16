@@ -68,8 +68,10 @@ echo "Targeting pods: ${pods[@]}"
 
 echo "Verifying the correct runtime script directory"
 RUNTIME_SCRIPT_DIR="/opt/opendj/runtime-scripts/schedule-backup.sh"
-kubectl exec ds-idrepo-0 -- bash -c "ls -ld /opt/opendj/default-scripts"
-if [[ $? ]]; then
+kubectl exec ds-idrepo-0 -- bash -c "test -d /opt/opendj/default-scripts"
+
+if [[ $? -eq 0 ]]; then
+    echo "Different runtime script directory found. Changing directory."
     RUNTIME_SCRIPT_DIR="/opt/opendj/default-scripts/schedule-backup.sh"
 fi
 
