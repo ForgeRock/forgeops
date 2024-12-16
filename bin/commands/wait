@@ -118,7 +118,6 @@ for c in ${COMPONENTS[@]} ; do
       for ((i=0;i<$ds_cts_rep;i++)) ; do
         waitForResource ready pod/ds-cts-$i
       done
-      waitForResource 'complete' job/ldif-importer
       ;;
 
     idm)
