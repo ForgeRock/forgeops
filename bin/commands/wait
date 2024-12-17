@@ -110,8 +110,8 @@ for c in ${COMPONENTS[@]} ; do
       ;;
 
     ds)
-      ds_cts_rep=$($K_CMD get sts ds-cts -o=jsonpath='{.status.replicas}')
-      ds_idrepo_rep=$($K_CMD get sts ds-idrepo -o=jsonpath='{.status.replicas}')
+      ds_cts_rep=$($K_CMD get sts ds-cts -o=jsonpath='{.spec.replicas}')
+      ds_idrepo_rep=$($K_CMD get sts ds-idrepo -o=jsonpath='{.spec.replicas}')
       for ((i=0;i<$ds_idrepo_rep;i++)) ; do
         waitForResource ready pod/ds-idrepo-$i
       done
