@@ -114,7 +114,7 @@ if ! $CONTAINER_ENGINE info --format ' ' ; then
 fi
 
 # The default repo for the upgrader docker image
-REPO=${REPO:-us-docker.pkg.dev/forgeops-public/images/am-config-upgrader}
+DEFAULT_REPO=${REPO:-us-docker.pkg.dev/forgeops-public/images/am-config-upgrader}
 
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader
@@ -128,6 +128,9 @@ if [ -n "$RELEASE_NAME" ] ; then
     source $RELEASE_PATH
   fi
 fi
+
+# Reset the REPO value because the source command will set it to the am repo
+REPO=$DEFAULT_REPO
 
 # For docker volume mounts.
 CONFIG=$(realpath $CONFIG_DIR)
