@@ -1,23 +1,31 @@
-# ForgeOps Next Generation
+# ForgeOps Overview
 
 ## Introduction
 
-The next evolution of the new forgeops tool is now the default.
-This was done in an effort to simplify the ForgeRock platform deployment, make
-it more deterministic, and continue on our production first path. It no longer
-dynamically generates a Kustomize overlay on every run. Instead, you create and
-manage environments for each deployment you need, then you can apply them as
-you wish with either Kustomize or Helm.
+The new forgeops tool was created to simplify the ForgeRock platform
+deployment, make it more deterministic, and continue on our production first
+path. It no longer generates a Kustomize overlay on every run.  Instead, you
+create and manage environments for each deployment you need, then you can apply
+them as you wish with either Kustomize or Helm.
 
 ## Setup
 
-The heart of forgeops is `forgeops env`. It allows you to manage common
-aspects of Helm values file(s) and Kustomize overlays. Since it is written in
-python, you need to setup your system to run it. 
+The heart of forgeops is `forgeops env`. It allows you to manage common aspects
+of Helm values file(s) and Kustomize overlays. Since it is written in python,
+you need to setup your system to run it. You need at least python 3.9.6+ and
+pip3 installed.
 
-You may want to run `forgeops configure`. The command will automatically install python dependencies into 
-`/path/to/forgeops/lib/dependencies` folder. You do not have to create a Python Virtual Environment (venv).
-You need at least python 3.9.6+ and pip3 installed.
+The easiest way to do this is to setup a Python virtual environment (venv), and
+run `forgeops configure`.
+
+```
+cd /path/to/forgeops
+python3 -m venv .venv
+source .venv/bin/activate
+./bin/forgeops configure
+```
+
+For more details on setting up your local environment, see <a href="how-tos/laptop-setup.md">Laptop Setup</a>.
 
 ## Major Changes
 
@@ -26,11 +34,11 @@ up if you are familiar with previous versions of forgeops.
 
 ### Discrete overlays
 
-The current forgeops command generates a Kustomize overlay every time it runs.
+The legacy forgeops command generated a Kustomize overlay every time it ran.
 This process copied yaml files around, and was very confusing because it didn't
 honor customizations in the overlay.
 
-When using forgeops, the overlay management is a step in the workflow that
+Now when using forgeops, the overlay management is a step in the workflow that
 is purposefully triggered by an admin. It is recommended to create an overlay
 per environment you want to run (eg. test, stage, prod), as well as a single
 instance overlay per environment (eg. test-single, stage-single, prod-single).
@@ -85,59 +93,10 @@ images. The build script updates the image-defaulter and values files, and
 these are updated for the targeted environment. At that point, you can run an
 apply to deploy those changes.
 
-### Create an environment
+### Production workflow
 
-The first thing you do is use `forgeops env` to create an environment. You
-need to provide an FQDN (--fqdn) and an environment name (--env-name).
-
-Previously, we had t-shirt sized overlays called small, medium, and large. Now,
-we just have `kustomize/overlay/default` which is a single instance overlay.
-You can still use `--small`, `--medium`, and `--large` to configure your
-overlay, and the env command will populate your environment with the size you
-requested.
-
-So if we want a medium sized stage deployment with an FQDN of iam.example.com,
-we'd do this:
-
-`./bin/forgeops env --fqdn stage.iam.example.com --medium --env-name stage`
-
-We recommend creating a single-instance environment to go along with each
-actual environment. This allows you to use the single to develop your file
-based config, and build images with the config(s) for that environment.
-
-`./bin/forgeops env --fqdn stage-single.iam.example.com --env-name stage-single`
-
-You will find the environments in `kustomize/overlay/` and `helm/`.
-
-### Apply an environment
-
-For Helm, you can just supply the values file(s) to `helm install` or `helm upgrade`.
-
-For Kustomize, you have two options. Running `kubectl apply -k
-/path/to/forgops/kustomize/overlay/MY_OVERLAY` or using `forgeops apply`.
-
-To apply the example from above, you'd do:
-
-`./bin/forgeops apply --env-name stage`
-
-or
-
-`./bin/forgeops apply --env-name stage-single`
-
-### Build images for an environment
-
-When you need to build a new application image, you can use `forgeops build`
-to do that. It will apply the application config profile you requested from the
-build dir (`docker/APP/config-profiles/PROFILE`), build the container image,
-and push the image up to a registry if you tell it to. It will also update the
-image-defaulter and values files for the targeted environment.
-
-If we want to build new am and idm images for our stage environment using the
-stage-cfg profile, we'd do this:
-
-`./bin/forgeops build --env-name stage --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am idm`
-
-Once that is done, you'd apply the environment via Helm or Kustomize to deploy.
+For a detailed look at the recommended production workflow, see <a
+href="how-tos/production-workflow.md">Production Workflow</a>.
 
 ## Command
 
