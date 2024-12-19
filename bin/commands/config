@@ -221,7 +221,10 @@ def upgrade_am(am_conf, release_name=None):
 
     log.info('Running PingAM static config through the am-config-upgrader to upgrade to the current version of forgeops.')
     try:
-        utils.run(AM_UPGRADER, str(am_conf))
+        opts = str(am_conf)
+        if release_name:
+            opts = f"--release-name {release_name} {opts}"
+        utils.run(AM_UPGRADER, opts)
     except utils.RunError as e:
         log.error(f'Error during upgrade {e.stderr}')
         sys.exit(1)
@@ -230,9 +233,6 @@ def upgrade_am(am_conf, release_name=None):
 
     log.info('Running PingAM static config through the am-config-upgrader to replace any missing default placeholders.')
     try:
-        opts = str(am_conf)
-        if release_name:
-            opts = f"--release-name {release_name} {opts}"
         utils.run(AM_UPGRADER, opts, str(RULES_PATH))
     except utils.RunError as e:
         log.error(f'Error during placeholder replacement {e.stderr}')
