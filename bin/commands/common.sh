@@ -258,7 +258,7 @@ EOM
 expandDSComponent() {
   message "Starting expandDSComponent()" "debug"
 
-  new_components=()
+  local new_components=()
 
   for c in ${COMPONENTS[@]} ; do
     if [ "$c" == "ds" ] ; then
@@ -274,6 +274,34 @@ expandDSComponent() {
 
   if ! containsElement "ds-idrepo" ${COMPONENTS[@]} ; then
     new_components+=( "ds-idrepo" )
+  fi
+
+  COMPONENTS=( "${new_components[@]}" )
+}
+
+expandUIComponent() {
+  message "Starting expandUIComponent()" "debug"
+
+  local new_components=()
+
+  for c in ${COMPONENTS[@]} ; do
+    if [ "$c" == "ui" ] ; then
+      continue
+    else
+      new_components+=( "$c" )
+    fi
+  done
+
+  if ! containsElement "admin-ui" ${COMPONENTS[@]} ; then
+    new_components+=( "admin-ui" )
+  fi
+
+  if ! containsElement "end-user-ui" ${COMPONENTS[@]} ; then
+    new_components+=( "end-user-ui" )
+  fi
+
+  if ! containsElement "login-ui" ${COMPONENTS[@]} ; then
+    new_components+=( "login-ui" )
   fi
 
   COMPONENTS=( "${new_components[@]}" )
