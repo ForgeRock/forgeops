@@ -68,7 +68,7 @@ data:
         curl -V
         if [ $? -ne 0 ]; then
             echo "The curl command doesn't exist. Installing now..."
-            apt-get install -y curl
+            apt-get update && apt-get install -y curl
         fi
         echo "Waiting for $REPO to be available. Trying /alive endpoint"
         while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' $REPO:8080/alive)" != "200" ]];
