@@ -15,6 +15,7 @@
 *.bak
 *.tmp
 *.orig
+*.yamle
 *~
 # Various IDEs
 .project

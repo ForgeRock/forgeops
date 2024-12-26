@@ -19,13 +19,29 @@ desired options.  Example:
 
 ```bash
 $ kubectl create namespace identity-platform
-$ helm upgrade identity-platform \
-    oci://us-docker.pkg.dev/forgeops-public/charts/identity-platform \
-    --version 7.5 --namespace identity-platform --install \
+$ helm upgrade identity-platform identity-platform \
+    --repo https://ForgeRock.github.io/forgeops/ \
+    --version 2025.1.0 --namespace identity-platform --install \
     -f values-override.yaml
 ```
 
-The above example installs version `7.5` of the Helm chart from the repository.
+The above example installs version `2025.1.0` of the Helm chart from the
+repository.
+
+The next example will deploy the identity platform while using the command line
+to set the host and TLS settings for the ingress:
+
+```bash
+$ kubectl create namespace identity-platform
+$ helm upgrade identity-platform identity-platform \
+    --repo https://ForgeRock.github.io/forgeops/ \
+    --version 2025.1.0 --namespace identity-platform --install \
+    --set platform.ingress.hosts={identity-platform.domain.local} \
+    --set platform.ingress.tls.issuer.name=identity-platform-issuer \
+    --set platform.ingress.tls.issuer.kind=Issuer \
+    --set platform.ingress.tls.issuer.create.type=letsencrypt-prod \
+    --set platform.ingress.tls.issuer.create.email=address@domain.com
+```
 
 The following example, when executed from the `charts/identity-platform`
 directory, can be used to install from a locally cloned git repository:

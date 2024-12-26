@@ -113,6 +113,7 @@ function "tags" {
 group "default" {
   targets = [
     "base",
+    "ui",
   ]
 }
 
