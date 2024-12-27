@@ -210,7 +210,7 @@ def generateSummaryTestReport() {
     privateWorkspace {
         def stageName = SUMMARY_REPORT_NAME
         dashboard_utils.createAndPublishSummaryReport(
-                allStagesCloud, stageName, '', false, stageName, "${stageName}.html")
+                allStagesCloud, stageName, '', stageName, "${stageName}.html")
     }
 }
 
