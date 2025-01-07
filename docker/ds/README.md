@@ -77,6 +77,10 @@ The disaster recovery process resets some replication metadata to allow the new 
 
 The restore/disaster recovery process is automated in Forgeops: when a restore happens, disaster recovery is also run with the disaster recovery ID defined in the configuration. If the disaster recovery ID matches the contents of the restored backup, it reverts to be a NO-OP, otherwise the data is disaster recovered.
 
+The disaster recovery ID is configured in the platform-config configmap as follows:  
+* For Helm: update ds_restore.disasterRecoveryId in your custom values file
+* For Kustomize: update DISASTER_RECOVERY_ID in your custom overlay in base/platform-config.yaml
+
 The use cases covered by ForgeOps are:
 
 ### New topology from backup
