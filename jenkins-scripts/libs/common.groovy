@@ -103,7 +103,7 @@ def authenticateEks() {
     }
 }
 
-def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName, options) {
+def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String providerName, String options, String platformImageRef='') {
     stage(stageName) {
         def normalizedStageName = normalizeStageName(stageName)
         withPipelineRun(pipelineRun, stageName, normalizedStageName) {
@@ -128,6 +128,11 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                     else {
                         echo("FAILURE : unknown providerName `${providerName}`")
                         currentBuild.result = 'FAILURE'
+                    }
+
+                    if (platformImageRef != ''){
+                        def lastForgeopsVersion = sh(script: './configure.py --get-last-forgeops-version', returnStdout: true).trim()
+                        options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
                     }
 
                     // Configure Guillotine to run tests

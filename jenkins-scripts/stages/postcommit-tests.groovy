@@ -290,7 +290,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_fo_acceptance) {
         parallelTestsMap.put('FO Acceptance',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Acceptance', 'GKE', '--keyword ACCEPTANCE')
+                    commonModule.runGuillotine(pipelineRun, 'FO Acceptance', 'GKE', '--keyword ACCEPTANCE', '')
                 }
         )
     }
@@ -298,7 +298,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_fo_smoke_small) {
         parallelTestsMap.put('FO Smoke on Small profile',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Smoke on Small profile', 'GKE', '--test-names Kustomize.Smoke --forgeops-profile small')
+                    commonModule.runGuillotine(pipelineRun, 'FO Smoke on Small profile', 'GKE', '--test-names Kustomize.Smoke --forgeops-profile small', '')
                 }
         )
     }
@@ -306,7 +306,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_fo_set_images) {
         parallelTestsMap.put('FO Set Images',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO Set Images', 'GKE', '--test-names Kustomize.SetImages')
+                    commonModule.runGuillotine(pipelineRun, 'FO Set Images', 'GKE', '--test-names Kustomize.SetImages', '')
                 }
         )
     }
@@ -314,7 +314,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
     if (params.Postcommit_fo_dsbackup) {
         parallelTestsMap.put('FO DsBackup',
                 {
-                    commonModule.runGuillotine(pipelineRun, 'FO DsBackup', 'GKE', '--test-names Kustomize.DsBackup')
+                    commonModule.runGuillotine(pipelineRun, 'FO DsBackup', 'GKE', '--test-names Kustomize.DsBackup', '')
                 }
         )
     }
@@ -322,7 +322,7 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
      if (params.Postcommit_fo_am_only) {
          parallelTestsMap.put('FO AM only',
                  {
-                     commonModule.runGuillotine(pipelineRun, 'FO AM only', 'GKE', '--test-names Deployment.AmOnly')
+                     commonModule.runGuillotine(pipelineRun, 'FO AM only', 'GKE', '--test-names Deployment.AmOnly', '')
                  }
          )
      }
@@ -330,14 +330,14 @@ def runPostcommitSet1(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
      if (params.Postcommit_fo_ig_only) {
          parallelTestsMap.put('FO IG only',
                  {
-                     commonModule.runGuillotine(pipelineRun, 'FO IG only', 'GKE', '--test-names Deployment.IgOnly')
+                     commonModule.runGuillotine(pipelineRun, 'FO IG only', 'GKE', '--test-names Deployment.IgOnly', '')
                  }
          )
      }
      if (params.Postcommit_fo_ds_only) {
          parallelTestsMap.put('FO DS only',
                  {
-                     commonModule.runGuillotine(pipelineRun, 'FO DS only', 'GKE', '--test-names Deployment.DsOnly')
+                     commonModule.runGuillotine(pipelineRun, 'FO DS only', 'GKE', '--test-names Deployment.DsOnly', '')
                  }
          )
      }
