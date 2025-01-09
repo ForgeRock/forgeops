@@ -134,7 +134,6 @@ group "base" {
     "amster",
     "idm",
     "ig",
-    "ldif-importer",
   ]
 }
 
@@ -277,20 +276,6 @@ target "ig" {
   tags = "${tags("${REGISTRY}", "${REPOSITORY}", "ig", "${BUILD_TAG}")}"
   cache-to = ["mode=max,type=registry,ref=${CACHE_REGISTRY}/${CACHE_REPOSITORY}/ig:build-cache"]
   cache-from = ["type=registry,ref=${CACHE_REGISTRY}/${CACHE_REPOSITORY}/ig:build-cache"]
-}
-
-target "ldif-importer" {
-  inherits = ["base"]
-
-  context = "./ldif-importer"
-  dockerfile = "Dockerfile"
-  args = {
-    FROM_IMAGE = LDIF_IMPORTER_FROM_IMAGE
-  }
-
-  tags = "${tags("${REGISTRY}", "${REPOSITORY}", "ldif-importer", "${BUILD_TAG}")}"
-  cache-to = ["mode=max,type=registry,ref=${CACHE_REGISTRY}/${CACHE_REPOSITORY}/ldif-importer:build-cache"]
-  cache-from = ["type=registry,ref=${CACHE_REGISTRY}/${CACHE_REPOSITORY}/ldif-importer:build-cache"]
 }
 
 target "rcs-agent" {
