@@ -9,6 +9,6 @@ entries:
     name: identity-platform
     type: application
     urls:
-    - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-2025.01.0/identity-platform-2025.01.0.tgz
+    - https://github.com/ForgeRock/forgeops/releases/download/identity-platform-2025.1.0/identity-platform-2025.1.0.tgz
     version: 2025.01.0
 generated: "2025-01-09T16:49:39.228834802Z"
