@@ -41,7 +41,7 @@ jobs:
       - name: Set tag
         id: set_tag
         run: |
-          RELEASE_TAG=$(date +%Y.%m)
+          RELEASE_TAG=$(date +%Y.%-m)
           latest_tag=${{ steps.get_latest_release.outputs.tag_name }}
           major="$(echo $latest_tag | cut -d '.' -f 1)"
           minor="$(echo $latest_tag | cut -d '.' -f 2)"
