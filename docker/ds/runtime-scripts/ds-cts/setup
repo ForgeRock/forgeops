@@ -5,6 +5,8 @@
 
 # This uses PingDS setup profiles. If the schema for a profile has not been
 # changed it may use an older version. For example, PingAM CTS 7.5 still uses the 6.5 schema for configuration
+set -e
+
 AM_CTS="am-cts:6.5"
 DS_PROXIED_SERVER="ds-proxied-server:7.1"
 

@@ -5,6 +5,8 @@
 
 # This uses PingDS setup profiles. If the schema for a profile has not been
 # changed it may use an older version. For example, PingAM 7.5 still uses the 6.5 schema for configuration
+set -e
+
 CONFIG="am-config:6.5"
 AM_IDENTITY_STORE="am-identity-store"
 IDM_REPO="idm-repo"
@@ -173,8 +175,8 @@ create-backend-index \
         --backend-name amIdentityStore \
         --set index-type:big-extensible \
         --index-name fr-idm-managed-role-applications \
-        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
-        --set index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
+        --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
+        --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.8
 create-backend-vlv-index \
         --backend-name amIdentityStore \
         --index-name managed-group-by-cn \
@@ -208,10 +210,6 @@ create-backend-index \
         --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.7 \
         --set big-index-extensible-matching-rule:1.3.6.1.4.1.36733.2.1.4.9
 create-backend-index \
-        --backend-name idmRepo \
-        --set index-type:big-equality \
-        --index-name fr-idm-relationship-json
-create-backend-index \
         --backend-name amIdentityStore \
         --set index-type:big-equality \
         --index-name fr-idm-json
@@ -219,10 +217,6 @@ create-backend-index \
         --backend-name amIdentityStore \
         --set index-type:big-equality \
         --index-name fr-idm-managed-assignment-json
-create-backend-index \
-        --backend-name idmRepo \
-        --set index-type:big-equality \
-        --index-name fr-idm-reconassocentry-situation
 set-backend-index-prop \
         --backend-name idmRepo \
         --add index-type:big-equality \
