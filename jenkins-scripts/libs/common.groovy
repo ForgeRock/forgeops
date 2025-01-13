@@ -131,7 +131,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                     }
 
                     if (platformImageRef != ''){
-                        def lastForgeopsVersion = sh(script: './configure.py --get-last-forgeops-version', returnStdout: true).trim()
+                        def lastForgeopsVersion = sh(script: './configure.py --get-forgeops-last-version', returnStdout: true).trim()
                         options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
                     }
 
