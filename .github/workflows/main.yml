@@ -101,25 +101,3 @@ jobs:
           bodyFile: CHANGELOG.md
           generateReleaseNotes: true
           makeLatest: true
-
-      - name: Send Slack release notification
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: webhook-trigger
-          payload: |
-            msg: "${{ steps.create_github_release.outputs.html_url }}"
-
-      - name: Set helm chart URL
-        id: set_helm_chart_url
-        run: |
-          echo "HELM_RELEASE_URL=${{ steps.create_github_release.outputs.html_url }}" | sed -e "s/${{ env.RELEASE_TAG }}/identity-platform-${{ env.RELEASE_TAG }}/" >>$GITHUB_ENV
-
-      - name: Send Slack helm release notification
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: webhook-trigger
-          payload: |
-            msg: "${{ env.HELM_RELEASE_URL }}"
-
