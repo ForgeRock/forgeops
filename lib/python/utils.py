@@ -586,7 +586,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
 
     r_src = RELEASES_SRC_DEF
     if releases_src:
-        r_src = release_src
+        r_src = releases_src
     elif os.getenv('RELEASES_SRC'):
         r_src = os.getenv('RELEASES_SRC')
     if not r_src.startswith('http'):
@@ -611,10 +611,10 @@ def key_exists(data, key_str, separator='.'):
     result = True
     k = key_str
     key_str_new = None
-    if '.' in key_str:
-        k, key_str_new = key_str.split('.', 1)
+    if separator in key_str:
+        k, key_str_new = key_str.split(separator, 1)
         if k in data:
-            result = key_exists(data[k], key_str_new)
+            result = key_exists(data[k], key_str_new, separator)
         else:
             result = False
     else:

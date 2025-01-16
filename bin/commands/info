@@ -223,6 +223,77 @@ def list_env_info(env_name, overlay_root, helm_root, releases, do_helm=True, do_
                 print("\tNo images found. Using chart defaults.")
 
 
+def list_releases(releases, components, is_json_format=False):
+    """
+    List all supported releases, with the latest image tag for each patch release.
+    """
+
+    releases_list = {}
+
+    for component in components:
+        for alt_release in ALT_RELEASES:
+            releases[component].pop(alt_release, None)
+
+        releases_list[component] = {}
+        for maj_release in releases[component].keys():
+            if 'scan' in releases[component][maj_release] and releases[component][maj_release]['scan'] is not None:
+                releases[component][maj_release].pop('scan', None)
+                releases_list[component][maj_release] = {}
+                for patch_release in releases[component][maj_release].keys():
+                    tags = releases[component][maj_release][patch_release]['tags']
+                    releases_list[component][maj_release][patch_release] = tags[-1]
+
+    if is_json_format:
+        print(json.dumps(releases_list))
+    else:
+        c_space = 14
+        v_space = 16
+        tag_space = 25
+        table_title = f"{'Component'.ljust(c_space)} | " \
+                      f"{'Version'.ljust(v_space)} | " \
+                      f"{'Latest Tag'.ljust(tag_space)}"
+        print(table_title)
+        for component in releases_list.keys():
+            for maj_release in releases_list[component].keys():
+                for patch_release in releases_list[component][maj_release].keys():
+                    print(f"{component.ljust(c_space)} | " \
+                          f"{patch_release.ljust(v_space)} | " \
+                          f"{releases_list[component][maj_release][patch_release].ljust(tag_space)}")
+
+
+def get_release_details(release_str, releases, components, is_json_format=False):
+    """
+    Print all of the image tags for the requested release
+    """
+
+    release = parse_release_str(release_str)
+    release_details = {
+        'supported': False,
+        'scan_frequency': 'none',
+        'tags': {}
+    }
+    maj_min = release['maj_min']
+    full = release['full']
+    for component in components:
+        releases[component].pop('dev', None)
+        if maj_min in releases[component]:
+            if 'scan' in releases[component][maj_min]:
+                if releases[component][maj_min]['scan'] is not None:
+                    release_details['supported'] = True
+                    release_details['scan_frequency'] = releases[component][maj_min]['scan']
+            release_details['tags'][component], out = select_tag(component, releases, release, components, all_tags=True)
+
+    if is_json_format:
+        print(json.dumps(release_details))
+    else:
+        print(f"Details for {full} release:")
+        print(f"Supported: {release_details['supported']}")
+        print(f"Scan Frequency: {release_details['scan_frequency']}")
+        print("--- Available Tags ---")
+        for component in release_details['tags'].keys():
+            print(f"{component}: {release_details['tags'][component]}")
+
+
 def main():
     prog = "forgeops info"
 
@@ -255,6 +326,8 @@ examples:
     parser.add_argument('--json', dest='is_json_format', action='store_true', help='Print information in JSON format')
     parser.add_argument('--namespace', '-n', default=argparse.SUPPRESS, help='Target namespace (default: current ctx namespace)')
     parser.add_argument('--envs', action='store_true', help='List environments')
+    parser.add_argument('--list-releases', action='store_true', help='List releases')
+    parser.add_argument('--release', help='Get details for a specific release')
     parser.add_argument('--releases-src', default=argparse.SUPPRESS, help=f"URL or path where release files live (default: {RELEASES_SRC_DEF})")
     # Needed to be called from bin/forgeops, but ignored
     parser.add_argument('--dryrun', dest='dryrun', action='store_true', help=argparse.SUPPRESS)
@@ -288,6 +361,12 @@ examples:
     elif args.env_name:
         releases = get_releases(releases_src, release_components)
         list_env_info(args.env_name, overlay_root, helm_root, releases, do_helm, do_kustomize, args.debug, is_json_format)
+    elif args.list_releases:
+        releases = get_releases(releases_src, release_components)
+        list_releases(releases, release_components, is_json_format)
+    elif args.release:
+        releases = get_releases(releases_src, release_components)
+        get_release_details(args.release, releases, release_components, is_json_format)
     else:
         ctx_namespace = utils.get_namespace()
         ctx = utils.get_context()

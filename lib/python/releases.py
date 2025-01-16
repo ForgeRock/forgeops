@@ -107,7 +107,7 @@ def parse_release_str(rel_str, debug=False):
     return release
 
 
-def select_tag(component, releases, release, image_names, tag=None):
+def select_tag(component, releases, release, image_names, tag=None, all_tags=False):
     """
     Select the best tag based on the component, release, and/or tag.
     component: string (eg: am)
@@ -136,17 +136,20 @@ def select_tag(component, releases, release, image_names, tag=None):
         if 'component_name' in releases[component][maj_min]:
             image_names[component] = releases[component][maj_min]['component_name']
         if full in releases[component][maj_min].keys():
-            if tag in releases[component][maj_min][full]['tags']:
-                selected_tag = tag
+            if all_tags:
+                selected_tag = releases[component][maj_min][full]['tags']
             else:
-                selected_tag = releases[component][maj_min][full]['tags'][-1]
+                if tag in releases[component][maj_min][full]['tags']:
+                    selected_tag = tag
+                else:
+                    selected_tag = releases[component][maj_min][full]['tags'][-1]
         elif patch > 0:
             patch_new = patch - 1
             full_new = f"{maj_min}.{patch_new}"
             release_new = deepcopy(release)
             release_new['patch'] = patch_new
             release_new['full'] = full_new
-            selected_tag, image_names = select_tag(component, releases, release_new, image_names, tag)
+            selected_tag, image_names = select_tag(component, releases, release_new, image_names, tag, all_tags)
     else:
         utils.exit_msg(f"Invalid release {target}. Only supports releases 7.4+.")
 
