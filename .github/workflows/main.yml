@@ -49,7 +49,7 @@ jobs:
           [ -n "$patch" ] && patch=$((patch+1)) || patch=0
           RELEASE_TAG="$RELEASE_TAG.$patch"
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
-          echo "BUILD_TAG=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+          echo "BUILD_TAG=$RELEASE_TAG-$(date +%H%M)" >> $GITHUB_ENV
 
       - name: Build
         id: bake
