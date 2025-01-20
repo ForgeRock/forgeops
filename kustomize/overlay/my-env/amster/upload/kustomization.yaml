@@ -1,0 +1,63 @@
+resources:
+- ../../../../base/amster
+components:
+- ../../image-defaulter
+
+# Insert a new init-container to unpack the tar file before our standard amster container
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+patches:
+- patch: |-
+    - op: add
+      path: /spec/template/spec/initContainers/0
+      value:
+        name: unpack
+        image: busybox
+        volumeMounts:
+        - mountPath: /amster-staging
+          name: amster-files
+        - mountPath: /amster-config
+          name: amster-config
+        - mountPath: /amster-scripts
+          name: amster-scripts
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cd /amster-staging
+          tar -xzvf amster-import.tar.gz -C /amster-config
+          tar -xzvf amster-scripts.tar.gz -C /amster-scripts
+  target:
+    group: batch
+    kind: Job
+    name: amster
+    version: v1
+- patch: |-
+    apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: amster
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          initContainers:
+          - name: amster
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              cp /amster-scripts/* /opt/amster/
+              ./docker-entrypoint.sh import
+            volumeMounts:
+            - mountPath: /opt/amster/config
+              name: amster-config
+            - mountPath: /amster-scripts
+              name: amster-scripts
+          volumes:
+          - name: amster-files
+            configMap:
+              name: amster-files
+          - name: amster-config
+            emptyDir: {}
+          - name: amster-scripts
+            emptyDir: {}

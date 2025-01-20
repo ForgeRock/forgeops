@@ -1,0 +1,8 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+components:
+- ../image-defaulter
+
+resources:
+- ../../../base/amster

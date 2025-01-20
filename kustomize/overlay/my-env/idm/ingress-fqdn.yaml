@@ -1,0 +1,10 @@
+- op: replace
+  path: /spec/rules/0/host
+  value: cip.ccto.bk
+- op: replace
+  path: /spec/tls/0/hosts
+  value:
+  - cip.ccto.bk
+- op: add
+  path: /metadata/annotations/cert-manager.io~1cluster-issuer
+  value: default-issuer

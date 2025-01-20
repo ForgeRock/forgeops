@@ -1,0 +1,16 @@
+am:
+  replicaCount: 1
+ds_cts:
+  replicaCount: 1
+idm:
+  replicaCount: 1
+ds_idrepo:
+  replicaCount: 1
+platform:
+  ingress:
+    hosts:
+    - cip.ccto.bk
+    tls:
+      issuer:
+        kind: ClusterIssuer
+        name: default-issuer
