@@ -62,6 +62,9 @@ spec:
           emptyDir: {}
         - name: audit-logs
           emptyDir: {}
+        - name: idm-logback-xml
+          configMap:
+            name: idm-logback-xml
         - name: idm-logging-properties
           configMap:
             name: idm-logging-properties
@@ -196,6 +199,8 @@ spec:
             name: logs
           - mountPath: /opt/openidm/audit
             name: audit-logs
+          - mountPath: /var/run/openidm/logging/logback
+            name: idm-logback-xml
           - mountPath: /var/run/openidm/logging
             name: idm-logging-properties
           - name: fbc

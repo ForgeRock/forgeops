@@ -10,7 +10,7 @@ metadata:
     {{- end }}
 data:
   IDM_ENVCONFIG_DIRS: /opt/openidm/resolver
-  LOGGING_PROPERTIES: /var/run/openidm/logging/logging.properties
+  LOGGING_PROPERTIES: /var/run/openidm/logging/logback/logback.xml
   OPENIDM_ANONYMOUS_PASSWORD: anonymous
   OPENIDM_CLUSTER_REMOVE_OFFLINE_NODE_STATE: "true"
   OPENIDM_CONFIG_REPO_ENABLED: "false"
@@ -19,6 +19,202 @@ data:
   OPENIDM_ICF_RETRY_MAXRETRIES: "12"
   OPENIDM_AUDIT_HANDLER_JSON_ENABLED: "false"
   OPENIDM_AUDIT_HANDLER_STDOUT_ENABLED: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-logback-xml
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+      {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+      {{- end }}
+data:
+  logback.xml: |
+    <configuration scan="true" scanPeriod="30 seconds">
+        <import class="ch.qos.logback.core.status.NopStatusListener"/>
+        <import class="ch.qos.logback.core.rolling.RollingFileAppender"/>
+        <import class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy"/>
+        <import class="ch.qos.logback.core.ConsoleAppender"/>
+        <import class="ch.qos.logback.classic.filter.ThresholdFilter"/>
+        <import class="ch.qos.logback.classic.encoder.JsonEncoder"/>
+        <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
+        <import class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+        <contextListener class="LevelChangePropagator"/>
+        <conversionRule conversionWord="threadId" converterClass="org.forgerock.openidm.logger.ThreadIdConverter"/>
+        <conversionRule conversionWord="julLevel"
+                        converterClass="org.forgerock.openidm.logger.LogbackToJulLevelConverter"/>
+
+        <statusListener class="NopStatusListener"/>
+
+        <appender name="file" class="RollingFileAppender">
+            <file>logs/openidm.log</file>
+
+            <!-- deny all events with a level below DEBUG, that is TRACE -->
+            <filter class="ThresholdFilter">
+                <level>DEBUG</level>
+            </filter>
+
+            <filter class="org.forgerock.openidm.logger.LogbackLogFilter"/>
+
+            <rollingPolicy class="SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>logs/openidm-%d{yyyy-MM-dd}.log.%i</fileNamePattern>
+                <maxFileSize>5MB</maxFileSize>
+                <maxHistory>5</maxHistory>
+                <totalSizeCap>50MB</totalSizeCap>
+            </rollingPolicy>
+
+            <!--
+            The PatternLayoutEncoder emulates IDM's legacy java.util.logging string format. Uncomment the following
+            PatternLayoutEncoder encoder and comment out the JsonEncoder to implement the legacy string format.
+            -->
+            <!--
+            <encoder class="PatternLayoutEncoder">
+                <charset>UTF-8</charset>
+                <pattern>[%threadId] %date{"MMM dd, yyyy h:mm:ss.SSS a"} %class %method%n%julLevel: %replace(%msg){'[\r\n]+',''}%ex%n</pattern>
+            </encoder>
+            -->
+
+            <encoder class="JsonEncoder">
+                <withFormattedMessage>true</withFormattedMessage>
+                <withMessage>false</withMessage>
+                <withArguments>false</withArguments>
+                <withNanoseconds>false</withNanoseconds>
+                <withSequenceNumber>false</withSequenceNumber>
+            </encoder>
+
+        </appender>
+
+        <appender name="console" class="ConsoleAppender">
+            <!-- deny all events with a level below WARN, that is TRACE, DEBUG, and INFO -->
+            <filter class="ThresholdFilter">
+                <level>WARN</level>
+            </filter>
+
+            <filter class="org.forgerock.openidm.logger.LogbackLogFilter"/>
+
+            <!--
+            The PatternLayoutEncoder emulates IDM's legacy java.util.logging string format. Uncomment the following
+            PatternLayoutEncoder encoder and comment out the JsonEncoder to implement the legacy string format.
+            -->
+            <!--
+            <encoder class="PatternLayoutEncoder">
+                <charset>UTF-8</charset>
+                <pattern>[%threadId] %date{"MMM dd, yyyy h:mm:ss.SSS a"} %class %method%n%julLevel: %replace(%msg){'[\r\n]+',''}%ex%n</pattern>
+            </encoder>
+            -->
+
+            <encoder class="JsonEncoder">
+                <withFormattedMessage>true</withFormattedMessage>
+                <withMessage>false</withMessage>
+                <withArguments>false</withArguments>
+                <withNanoseconds>false</withNanoseconds>
+                <withSequenceNumber>false</withSequenceNumber>
+            </encoder>
+
+        </appender>
+
+        <!--
+         Default root logging level.
+         This specifies which kinds of events are logged across all loggers.
+         For any given facility this root level can be overridden by a facility specific level.
+         Note that the ConsoleHandler also has a separate level setting to limit messages printed to the console.
+         Loggers and Handlers may override this level
+         -->
+
+        <root level="INFO">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+        </root>
+
+        <!--
+        Loggers
+        ***********************************************
+        Loggers are usually attached to packages.
+        Here, the level for each package is specified.
+        The global log level is used by default, so levels
+        specified here simply act as an override.
+        The levels in descending order are:
+            ERROR
+            WARN
+            INFO
+            DEBUG
+            TRACE
+        -->
+
+        <!-- The following section sets logging to WARN level & above in certain packages/classes to filter out noise -->
+
+        <!--
+         Facility specific properties.
+         Provides extra control for each logger.
+         -->
+
+        <!-- <logger name="org.forgerock.openidm.provisioner" level="DEBUG" /> -->
+        <!-- <logger name="org.forgerock.openidm.repo" level="DEBUG" /> -->
+        <!-- <logger name="org.forgerock.openidm.recon" level="DEBUG" /> -->
+
+        <!-- OpenICF is noisy at INFO leve -->
+        <logger name="org.forgerock.openicf" level="WARN"/>
+
+        <!-- OpenICF Connector Logging -->
+        <!-- <logger name="org.identityconnectors" level="DEBUG" /> -->
+        <!-- <logger name="org.forgerock.openicf.connectors" level="DEBUG" /> -->
+
+        <!-- OpenICF Framework API Logging -->
+        <!-- <logger name="org.identityconnectors.framework.impl.api.LoggingProxy" level="DEBUG" /> -->
+        <!-- <logger name="org.identityconnectors.framework.api.operations" level="DEBUG" /> -->
+        <!-- <logger name="org.identityconnectors.framework.api.operations.GetApiOp" level="DEBUG" /> -->
+        <!-- <logger name="org.identityconnectors.framework.api.operations.CreateApiOp" level="DEBUG" /> -->
+        <!-- <logger name="org.identityconnectors.framework.api.operations.UpdateApiOp" level="DEBUG" /> -->
+        <!-- <logger name="org.identityconnectors.framework.api.operations.DeleteApiOp" level="DEBUG" /> -->
+        <!-- <logger name="org.identityconnectors.framework.api.operations.SearchApiOp" level="DEBUG" /> -->
+
+        <!-- Commons api.models and OpenApiTransformer (API Descriptor) is noisy at INFO level -->
+        <logger name="org.forgerock.api.models" level="WARN"/>
+        <logger name="org.forgerock.api.transform.OpenApiTransformer" level="WARN"/>
+
+        <!-- Logs the output from OSGi logging -->
+        <logger name="org.forgerock.openidm.Framework" level="WARN"/>
+
+        <!-- On restart the BarURLHandler can create warning noise -->
+        <logger name="org.activiti.osgi.BarURLHandler" level="ERROR"/>
+
+        <!-- Suppress warnings of failed connector loading -->
+        <logger name="org.identityconnectors.framework.impl.api.local.LocalConnectorInfoManagerImpl" level="ERROR"/>
+
+        <!-- Log all detail for update processes -->
+        <logger name="org.forgerock.openidm.maintenance.upgrade" level="TRACE"/>
+
+        <!-- Suppress messages lower than warnings -->
+        <logger name="org.forgerock.secrets.keystore" level="WARN"/>
+
+        <!--
+        Sets the SchemaField log level to INFO by default because if logging is set to FINE or higher,
+        sensitive information can be leaked into the logs
+         -->
+        <logger name="org.forgerock.openidm.schema.SchemaField" level="INFO"/>
+
+        <!--
+        Logs the output from Jetty
+        Sets the following Jetty classes to INFO level by default because if logging is set to FINE or higher,
+        sensitive information can be leaked into the logs
+         -->
+        <logger name="org.eclipse.jetty" level="WARN"/>
+        <logger name="org.eclipse.jetty.websocket.server" level="WARN"/>
+
+        <!-- Mute intermittent `Error page loop` warning, which does not indicate a real problem -->
+        <logger name="org.eclipse.jetty.server.handler.ErrorHandler" level="ERROR"/>
+
+        <!-- Log Hikari datasource in case we need to debug secret rotation failures -->
+        <logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG"/>
+        <logger name="com.zaxxer.hikari.pool.PoolBase" level="DEBUG"/>
+
+        <!-- Testcontainers log suppressions to reduce verbosity of logs to the osgi console -->
+        <logger name="org.testcontainers.containers.ContainerDef" level="ERROR"/>
+        <logger name="org.testcontainers.utility.ResourceReaper" level="ERROR"/>
+
+    </configuration>
 ---
 apiVersion: v1
 kind: ConfigMap
