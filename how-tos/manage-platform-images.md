@@ -62,6 +62,10 @@ Use a release name of your choosing. If the release exists, it will be overwritt
 
 `forgeops build --release-name 7.5.1 --env-name stage --config-profile stage am`
 
+### Select development versions of the platform for early visibility into new features(unsupported)
+
+`forgeops image --release dev --env-name dev platform`
+
 ### Copy images between environments
 
 #### Stage to prod
