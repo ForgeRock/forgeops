@@ -425,17 +425,16 @@ def main():
     parsed = parser.parse_args()
     global log
     log = utils.logger(level=parsed.log_level)
-    build_path_arg = getattr(parsed, 'build_path', None)
-    helm_path_arg = getattr(parsed, 'helm_path', None)
-    kustomize_path_arg = getattr(parsed, 'kustomize_path', None)
-    overrides = {} # Dict to hold results of process_overrides
-    (overrides['helm_path'],
-     overrides['kustomize_path'],
-     overrides['build_path'],
-     overrides['overlay_root'],
-     overrides['do_helm'],
-     overrides['do_kustomize'],
-     overrides['release_src']) = utils.process_overrides(root_path, helm_path_arg, kustomize_path_arg, build_path_arg, False, False, None)
+    overrides = utils.process_overrides(root_path,
+                                        getattr(parsed, 'helm_path', None),
+                                        getattr(parsed, 'kustomize_path', None),
+                                        getattr(parsed, 'build_path', None),
+                                        getattr(parsed, 'no_helm', False),
+                                        getattr(parsed, 'no_kustomize', False),
+                                        getattr(parsed, 'releases_src', None),
+                                        getattr(parsed, 'pull_policy', None),
+                                        getattr(parsed, 'source', None),
+                                        getattr(parsed, 'ssl_secretname', None))
     if parsed.cmd == 'export' and parsed.am_export_no_upgrade and not parsed.component == 'am':
         log.error(f'--no-upgrade is only available for PingAM')
         sys.exit(1)

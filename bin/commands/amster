@@ -227,14 +227,18 @@ def main():
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
-    build_path_arg = getattr(args, 'build_path', None)
-    helm_path_arg = getattr(args, 'helm_path', None)
-    kustomize_path_arg = getattr(args, 'kustomize_path', None)
-    (helm_path, kustomize_path, build_path, overlay_root, do_helm, do_kustomize,
-     releases_src) = utils.process_overrides(root_path, helm_path_arg,
-                                             kustomize_path_arg, build_path_arg,
-                                             False, False, None)
-    scripts_path = build_path / 'amster' / 'scripts'
+    overrides = utils.process_overrides(root_path,
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None))
+    kustomize_path = overrides['kustomize_path']
+    scripts_path = overrides['build_path'] / 'amster' / 'scripts'
 
     if args.cmd == 'clean':
         utils.clean_amster_job(namespace, False)
@@ -256,7 +260,7 @@ def main():
         if Path(args.dst).is_absolute():
             dst = Path(args.dst)
         else:
-            dst = root_path / args.dst
+            dst = overrides['forgeops_root'] / args.dst
 
         amster_export(namespace, dst, kustomize_path, scripts_path, args.glob, args.full, args.duration, args.env_name)
         return
@@ -266,7 +270,7 @@ def main():
         if Path(args.src).is_absolute():
             src = Path(args.src)
         else:
-            src = root_path / args.src
+            src = overrides['forgeops_root'] / args.src
 
         upgrade_all_amster_files(args.src, args.fqdn)
         return

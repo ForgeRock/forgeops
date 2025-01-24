@@ -336,36 +336,29 @@ examples:
     args = parser.parse_args()
 
     release_components = ['am', 'amster', 'idm', 'ds', 'admin-ui', 'end-user-ui', 'login-ui', 'ig']
-    build = getattr(args, 'build_path', None)
-    helm = getattr(args, 'helm_path', None)
-    kustomize = getattr(args, 'kustomize_path', None)
-    releases_source = getattr(args, 'releases_src', None)
     is_json_format = getattr(args, 'is_json_format', None)
-    (helm_root,
-         kustomize_path,
-         build_path,
-         overlay_root,
-         do_helm,
-         do_kustomize,
-         releases_src) = utils.process_overrides(root_path,
-                                                 helm,
-                                                 kustomize,
-                                                 build,
-                                                 args.no_helm,
-                                                 args.no_kustomize,
-                                                 releases_source)
+    overrides = utils.process_overrides(root_path,
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None))
+
+    releases = {}
+    if args.envs or args.env_name or args.list_releases or args.release:
+        releases = get_releases(overrides['releases_src'], release_components)
 
     if args.envs:
-        releases = get_releases(releases_src, release_components)
-        list_envs(overlay_root, helm_root, args.debug, is_json_format)
+        list_envs(overrides['overlay_root'], overrides['helm_path'], args.debug, is_json_format)
     elif args.env_name:
-        releases = get_releases(releases_src, release_components)
-        list_env_info(args.env_name, overlay_root, helm_root, releases, do_helm, do_kustomize, args.debug, is_json_format)
+        list_env_info(args.env_name, overrides['overlay_root'], overrides['helm_path'], releases, overrides['do_helm'], overrides['do_kustomize'], args.debug, is_json_format)
     elif args.list_releases:
-        releases = get_releases(releases_src, release_components)
         list_releases(releases, release_components, is_json_format)
     elif args.release:
-        releases = get_releases(releases_src, release_components)
         get_release_details(args.release, releases, release_components, is_json_format)
     else:
         ctx_namespace = utils.get_namespace()

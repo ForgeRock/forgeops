@@ -540,10 +540,14 @@ def replace_or_append_dict(array, search_key, search_str, target_key, replace_da
 
     return array
 
-def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, releases_src):
+def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, releases_src, pull_policy, source, ssl_secretname, debug=False):
     """
     Process common paths from arguments
     """
+
+    forgeops_root = root_path
+    if os.getenv('FORGEOPS_ROOT'):
+        forgeops_root = Path(os.getenv('FORGEOPS_ROOT'))
 
     helm_path = 'helm'
     if helm is not None:
@@ -553,7 +557,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     if Path(helm_path).is_absolute():
         helm_path = Path(helm_path)
     else:
-        helm_path = root_path / helm_path
+        helm_path = forgeops_root / helm_path
 
     build_path = 'docker'
     if build is not None:
@@ -563,7 +567,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     if Path(build_path).is_absolute():
         build_path = Path(build_path)
     else:
-        build_path = root_path / build_path
+        build_path = forgeops_root / build_path
 
     kustomize_path = 'kustomize'
     if kustomize is not None:
@@ -573,9 +577,21 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     if Path(kustomize_path).is_absolute():
         kustomize_path = Path(kustomize_path)
     else:
-        kustomize_path = root_path / kustomize_path
+        kustomize_path = forgeops_root / kustomize_path
 
     overlay_root = kustomize_path / 'overlay'
+
+    source_overlay = 'default'
+    if source:
+        source_overlay = source
+    elif os.getenv('SOURCE'):
+        source_overlay = os.getenv('SOURCE')
+
+    ssl_secret = None
+    if ssl_secretname:
+        ssl_secret = ssl_secretname
+    elif os.getenv('SSL_SECRETNAME'):
+        ssl_secret = os.getenv('SSL_SECRETNAME')
 
     do_helm = True
     if no_helm or os.getenv('NO_HELM') == 'true':
@@ -583,6 +599,12 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     do_kustomize = True
     if no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
         do_kustomize = False
+
+    pull_policy_real = None
+    if pull_policy:
+        pull_policy_real = pull_policy
+    elif os.getenv('PULL_POLICY'):
+        pull_policy_real = os.getenv('PULL_POLICY')
 
     r_src = RELEASES_SRC_DEF
     if releases_src:
@@ -595,7 +617,32 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
         else:
             r_src = root_path / r_src
 
-    return helm_path, kustomize_path, build_path, overlay_root, do_helm, do_kustomize, r_src
+    if debug:
+        print(f'helm_path = {helm_path}')
+        print(f'kustomize_path = {kustomize_path}')
+        print(f'build_path = {build_path}')
+        print(f'overlay_root = {overlay_root}')
+        print(f'do_helm = {do_helm}')
+        print(f'do_kustomize = {do_kustomize}')
+        print(f'releases_src = {releases_src}')
+        print(f'forgeops_root = {forgeops_root}')
+        print(f'pull_policy = {pull_policy_real}')
+        print(f'source_overlay = {source_overlay}')
+        print(f'ssl_secretname = {ssl_secretname}')
+
+    return {
+        'helm_path': helm_path,
+        'kustomize_path': kustomize_path,
+        'build_path': build_path,
+        'overlay_root': overlay_root,
+        'do_helm': do_helm,
+        'do_kustomize': do_kustomize,
+        'releases_src': r_src,
+        'forgeops_root': forgeops_root,
+        'pull_policy': pull_policy_real,
+        'source_overlay': source_overlay,
+        'ssl_secretname': ssl_secret
+    }
 
 def key_exists(data, key_str, separator='.'):
     """
@@ -621,3 +668,24 @@ def key_exists(data, key_str, separator='.'):
         if k not in data:
             result = False
     return result
+
+def check_path(path, name, path_type, fail_on_err=False):
+    """
+    Check to see if path exists and is of a given type.
+    path: path to check
+    name: friendly name to use when printing the error
+    path_type: type of path to check for (dir, file)
+    """
+
+    exists = False
+    if path_type == 'dir':
+        if Path(path).is_dir():
+            exists = True
+    elif path_type == 'file':
+        if Path(path).is_file():
+            exists = True
+
+    if fail_on_err and not exists:
+        exit_msg(f"{name} ({path}) isn't a {path_type} or doesn't exist")
+
+    return exists

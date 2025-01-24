@@ -181,37 +181,21 @@ examples:
     if getattr(args, 'release_name', None) and not args.release:
         utils.exit_msg('You must supply --release when using --release-name.')
 
-    build = getattr(args, 'build_path', None)
-    helm = getattr(args, 'helm_path', None)
-    kustomize = getattr(args, 'kustomize_path', None)
-    releases_source = getattr(args, 'releases_src', None)
-    (helm_root,
-        kustomize_path,
-        build_path,
-        overlay_root,
-        do_helm,
-        do_kustomize,
-        releases_src) = utils.process_overrides(root_path,
-                                                 helm,
-                                                 kustomize,
-                                                 build,
-                                                 args.no_helm,
-                                                 args.no_kustomize,
-                                                 releases_source)
+    overrides = utils.process_overrides(root_path,
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None))
+    build_path = overrides['build_path']
+    helm_root = overrides['helm_path']
     helm_path = helm_root / args.env_name if args.env_name else None
-
-    if args.debug:
-        print(f"build_path={build_path}")
-        print(f"helm_path={helm_path}")
-        print(f"kustomize_path={kustomize_path}")
-        print(f"overlay_root={overlay_root}")
-        print(f"releases_src={releases_src}")
-    if not build_path.is_dir():
-        utils.exit_msg(f"Build path ({build_path}) isn't a dir or doesn't exist")
-    if do_kustomize and not kustomize_path.is_dir():
-        utils.exit_msg(f"Kustomize dir ({kustomize_path}) isn't a dir or doesn't exist")
-    if do_helm and helm_path is not None and not helm_path.is_dir():
-        utils.exit_msg(f"Helm dir ({helm_path}) isn't a dir or doesn't exist")
+    kustomize_path = overrides['kustomize_path']
+    releases_src = overrides['releases_src']
 
     components = copy(args.components)
     if containsElement(['platform'], components):
@@ -259,6 +243,7 @@ examples:
 
         if update_docker_files:
             print(f"Updating release file(s) for docker builds [{release_name}]")
+            utils.check_path(build_path, 'Build path', 'dir')
             write_release_names(release_tags, repo, build_path, release_name, image_names)
 
     values_images = {}
@@ -276,13 +261,12 @@ examples:
                 values_images[component.replace('-', '_')] = set_image(component, tag, repo)
                 images_kustomize[component] = set_image(component, tag, repo)
 
-    if do_kustomize:
+    if overrides['do_kustomize']:
+        utils.check_path(kustomize_path, 'Kustomize path', 'dir')
         overlay_root = kustomize_path / 'overlay'
-        if not overlay_root.is_dir():
-            utils.exit_msg(f"Overlay root ({overlay_root}) isn't a dir or doesn't exist")
+        utils.check_path(overlay_root, 'Overlay root', 'dir')
         overlay_path = overlay_root / args.env_name if args.env_name else overlay_root
-        if not overlay_path.is_dir():
-            utils.exit_msg(f"Overlay path ({overlay_path}) isn't a dir or doesn't exist")
+        utils.check_path(overlay_path, 'Overlay path', 'dir')
         if args.debug:
             print(f"overlay_path={overlay_path}")
 
@@ -312,7 +296,8 @@ examples:
             print(f"Updating image-defaulter in {args.env_name} overlay")
             update_image_defaulter(images_kustomize, overlay_path)
 
-    if do_helm and args.env_name:
+    if overrides['do_helm'] and args.env_name:
+        utils.check_path(helm_path, 'Helm path', 'dir')
         values_fn = 'values.yaml'
         values_file = helm_path / values_fn
 
@@ -356,11 +341,11 @@ examples:
     log_action = 'Update'
     log_file = 'env.log'
     log_line = f"{timestamp} {log_action} {cmd}"
-    if do_kustomize and args.copy:
+    if overrides['do_kustomize'] and args.copy:
         log_path_overlay = overlay_path / log_file
         with open(log_path_overlay, 'a') as log_overlay_f:
             log_overlay_f.write(f"{log_line}\n")
-    if do_helm and args.env_name:
+    if overrides['do_helm'] and args.env_name:
         log_path_helm = helm_path / log_file
         with open(log_path_helm, 'a') as log_helm_f:
             log_helm_f.write(f"{log_line}\n")

@@ -260,48 +260,25 @@ def main():
         utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
 
     # Setup defaults for values that can be set in forgeops.conf
-    config['helm_path'] = 'helm'
-    if args.helm_path:
-        config['helm_path'] = args.helm_path
-    elif os.getenv('HELM_PATH'):
-        config['helm_path'] = os.getenv('HELM_PATH')
+    overrides = utils.process_overrides(config['root_path'],
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None),
+                                        args.debug)
 
-    config['kustomize_path'] = 'kustomize'
-    if args.kustomize_path:
-        config['kustomize_path'] = args.kustomize_path
-    elif os.getenv('KUSTOMIZE_PATH'):
-        config['kustomize_path'] = os.getenv('KUSTOMIZE_PATH')
-
-    config['pull_policy'] = None
-    if args.pull_policy:
-        config['pull_policy'] = args.pull_policy
-    elif os.getenv('PULL_POLICY'):
-        config['pull_policy'] = os.getenv('PULL_POLICY')
-
-    config['source'] = 'default'
-    if args.source:
-        config['source'] = args.source
-    elif os.getenv('SOURCE'):
-        config['source'] = os.getenv('SOURCE')
-
-    config['ssl_secretname'] = None
-    if args.ssl_secretname:
-        config['ssl_secretname'] = args.ssl_secretname
-    elif os.getenv('SSL_SECRETNAME'):
-        config['ssl_secretname'] = os.getenv('SSL_SECRETNAME')
-
-    config['do_helm'] = True
-    if args.no_helm or os.getenv('NO_HELM') == 'true':
-        config['do_helm'] = False
-
-    config['do_kustomize'] = True
-    if args.no_kustomize or os.getenv('NO_KUSTOMIZE') == 'true':
-        config['do_kustomize'] = False
-    # End defaults setup
+    if args.debug:
+        print(f"Overrides processed")
+    config = merge(config, overrides)
 
     config['size'] = {}
     if args.size:
-        values_path = config['root_path'] / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
+        values_path = config['forgeops_root'] / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
         config['size'] = yaml.safe_load(open(values_path))
 
     if args.am_cpu or args.am_mem or args.am_rep or args.single:
@@ -486,36 +463,23 @@ def main():
             }
         }
 
-    if Path(config['kustomize_path']).is_absolute():
-        config['kustomize_path'] = Path(config['kustomize_path'])
-    else:
-        config['kustomize_path'] = config['root_path'] / config['kustomize_path']
-    if args.debug: print(f"kustomize_path={config['kustomize_path']}")
-    if not config['kustomize_path'].is_dir():
-       utils.exit_msg(f"Kustomize dir ({config['kustomize_path']}) isn't a dir or doesn't exist")
-
-    config['overlay_root'] = config['kustomize_path'] / 'overlay'
-    if not config['overlay_root'].is_dir():
-       utils.exit_msg(f"Overlay root ({config['overlay_root']}) isn't a dir or doesn't exist")
-
-    config['overlay_path'] = config['overlay_root'] / args.env_name
-    if args.debug: print(f"overlay_path={config['overlay_path']}")
-
-    if Path(config['source']).is_absolute():
-        config['source_path'] = Path(config['source'])
-    else:
-        config['source_path'] = config['overlay_root'] / config['source']
-    if args.debug: print(f"source_path={config['source_path']}")
 
     # Check if we are Creating or Updating
     config['kustomize_action'] = None
     if config['do_kustomize']:
+        utils.check_path(config['kustomize_path'], 'Kustomize path', 'dir', True)
+        utils.check_path(config['overlay_root'], 'Overlay root', 'dir', True)
+
+        config['overlay_path'] = config['overlay_root'] / args.env_name
+        if args.debug: print(f"overlay_path={config['overlay_path']}")
+
+        config['source_path'] = config['overlay_root'] / config['source_overlay']
+        if args.debug: print(f"source_path={config['source_path']}")
+
         config['kustomize_action'] = 'Create'
         if config['overlay_path'].is_dir():
             print('Updating existing overlay.')
             config['kustomize_action'] = 'Update'
-        elif config['overlay_path'].is_file():
-            utils.exit_msg('Overlay exists as a file. Remove it and try again')
         elif not args.fqdn:
             utils.exit_msg('An FQDN is required when generating a new overlay')
         else:
@@ -528,6 +492,7 @@ To: {config['overlay_path']}
 
     config['helm_action'] = None
     if config['do_helm']:
+        utils.check_path(config['helm_path'], 'Helm path', 'dir', True)
         config['helm_action'] = 'Create'
         if Path(config['helm_path']).is_absolute():
             config['helm_path'] = Path(config['helm_path'])

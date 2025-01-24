@@ -3,6 +3,12 @@ RELEASE=2025.1.1
 
 ## New Features/Updated functionality
 
+### Ability to set FORGEOPS_ROOT
+
+Users now have the ability to specify a separate FORGEOPS_ROOT location that contains the `docker`, `helm`, and `kustomize` folders. This allows users to keep their changes in a separate git repo. Users can create a `~/.forgeops.conf` with their personal overrides like specifying `FORGEOPS_ROOT=/path/to/my/local/checkout`. Teams can place a `forgeops.conf` file in their FORGEOPS_ROOT that contains team-wide settings. It is not recommended to create a `/path/to/forgeops_repo/forgeops.conf`.
+
+Doing this gives users the ability to clone the forgeops repo and just checkout the version tag they need. This should make it easier to keep track of what version of ForgeOps is being used, and upgrading to a newer version.
+
 ### Removing forgeops-minikube script
 
 The `cluster/minikube/forgeops-minikube` script was outdated, and unnecessary.
