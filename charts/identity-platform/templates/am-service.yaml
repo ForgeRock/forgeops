@@ -12,9 +12,9 @@ spec:
   type: {{ .Values.am.service.type }}
   ports:
     - port: {{ .Values.am.service.port }}
-      targetPort: http
+      targetPort: https
       protocol: TCP
-      name: http
+      name: https
   selector:
     {{- include "identity-platform.selectorLabels" . | nindent 4 }}
     {{- with .Values.am.podLabels }}
