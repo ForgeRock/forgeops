@@ -70,7 +70,7 @@ node('gce-vm-forgeops-n2d-standard-4') {
 
     if (commonModule.branchSupportsPitTests()) {
         // Allow only one postcommit at a time accross all the branches
-        withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : 'postcommit-forgeops.engineeringpit.com') {
+        withPostcommitLock((isPR() && !commonLodestarModule.doRunPostcommitTests()) ? null : "postcommit-forgeops.${cloud_constants.getDefaultDomain()}") {
             pipeline.postBuildTests(pipelineRun)
         }
     }
