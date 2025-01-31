@@ -9,5 +9,4 @@ spec:
     spec:
       containers:
       - name: openidm
-        imagePullPolicy: Always
         resources: {}

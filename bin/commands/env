@@ -217,6 +217,9 @@ def main():
     parser.add_argument('--idrepo-mem', dest='idrepo_mem', help='Specify memory setting for ds-idrepo pods')
     parser.add_argument('--idrepo-rep', dest='idrepo_rep', type=int, help='Specify replicas for ds-idrepo pods')
     parser.add_argument('--idrepo-snap-enable', dest='idrepo_snap_enable', action='store_true', help='Enable volume snapshots for ds-idrepo pods')
+    parser.add_argument('--ig-cpu', dest='ig_cpu', help='Specify CPU setting for ig pods')
+    parser.add_argument('--ig-mem', dest='ig_mem', help='Specify memory setting for ig pods')
+    parser.add_argument('--ig-rep', dest='ig_rep', type=int, help='Specify replicas for ig pods')
     parser.add_argument('--pull-policy', dest='pull_policy', help='Set policy for all platform images')
     parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage Helm values files")
     parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage Kustomize overlay")
@@ -250,7 +253,7 @@ def main():
     if args.namespace and args.no_namespace:
         utils.exit_msg('Specify --namespace or --no-namespace, not both')
 
-    if args.single and (args.am_rep or args.idm_rep or args.cts_rep or args.idrepo_rep):
+    if args.single and (args.am_rep or args.idm_rep or args.cts_rep or args.idrepo_rep or args.ig_rep):
         utils.exit_msg('--single-instance is incompatible with *_rep options')
 
     if '/' in args.env_name:
@@ -390,6 +393,26 @@ def main():
             config['size']['ds_idrepo']['replicaCount'] = int(args.idrepo_rep)
         if args.single:
             config['size']['ds_idrepo']['replicaCount'] = 1
+
+    if args.ig_cpu or args.ig_mem or args.ig_rep or args.single:
+        if 'ig' not in config['size'].keys():
+            config['size']['ig'] = {}
+            if args.ig_cpu or args.ig_mem:
+                config['size']['ig'] = { 'resources': { 'requests': {} } }
+                if args.ig_mem:
+                    config['size']['ig']['resources']['limits'] = {}
+        if args.ig_cpu:
+            if args.debug: print(f"ig_cpu={args.ig_cpu}")
+            config['size']['ig']['resources']['requests']['cpu'] = args.ig_cpu
+        if args.ig_mem:
+            if args.debug: print(f"ig_mem={args.ig_mem}")
+            config['size']['ig']['resources']['requests']['memory'] = args.ig_mem
+            config['size']['ig']['resources']['limits']['memory'] = args.ig_mem
+        if args.ig_rep:
+            if args.debug: print(f"ig_rep={args.ig_rep}")
+            config['size']['ig']['replicaCount'] = int(args.ig_rep)
+        if args.single:
+            config['size']['ig']['replicaCount'] = 1
 
     values_ingress = {}
     config['hosts'] = None

@@ -1,4 +1,4 @@
-#Patch PingAM
+#Patch PingGateway
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,3 +8,4 @@ spec:
     spec:
       containers:
         - name: ig
+          resources: {}

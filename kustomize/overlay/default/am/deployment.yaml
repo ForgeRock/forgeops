@@ -9,5 +9,4 @@ spec:
     spec:
       containers:
       - name: openam
-        imagePullPolicy: Always
         resources: {}
