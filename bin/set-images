@@ -369,8 +369,7 @@ def update_kustomize(products, kustomize_path, update_repo=None, update_tag=None
         else:
             new_tag = f':{product_config["imageTag"]}'
         # Make sure that the image and tag have a value.
-        product_name_rendered = 'enduser-ui' if product_name == 'end-user-ui' else f'{product_name}'
-        kustomize_set_image = f'.*{product_name_rendered}.*={new_image_name}{new_tag}'
+        kustomize_set_image = f'.*{product_name}.*={new_image_name}{new_tag}'
         log.info(f'Updating {kustomize_dir} to use {new_image_name}{new_tag}')
 
         utils.run('kustomize',
