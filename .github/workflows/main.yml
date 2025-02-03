@@ -30,24 +30,10 @@ jobs:
           username: ${{ vars.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_TOKEN }}
 
-      - name: Get latest release
-        id: get_latest_release
-        uses: joutvhu/get-release@v1
-        with:
-          latest: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set tag
         id: set_tag
         run: |
-          RELEASE_TAG=$(date +%Y.%-m)
-          latest_tag=${{ steps.get_latest_release.outputs.tag_name }}
-          major="$(echo $latest_tag | cut -d '.' -f 1)"
-          minor="$(echo $latest_tag | cut -d '.' -f 2)"
-          [ "$RELEASE_TAG" == "$major.$minor" ] && patch=$(echo $latest_tag | sed -e "s/^$RELEASE_TAG.\(.*\)/\1/")
-          [ -n "$patch" ] && patch=$((patch+1)) || patch=0
-          RELEASE_TAG="$RELEASE_TAG.$patch"
+          RELEASE_TAG=$(head -n 1 CHANGELOG.md | awk -F= '{print $2}')
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           echo "BUILD_TAG=$RELEASE_TAG-$(date +%H%M)" >> $GITHUB_ENV
 
