@@ -1,0 +1,10 @@
+- apiVersion: storage.k8s.io/v1
+  kind: StorageClass
+  metadata:
+    name: fast
+  parameters:
+    storageaccounttype: Premium_LRS
+    kind: Managed
+  provisioner: disk.csi.azure.com
+  reclaimPolicy: Delete
+  volumeBindingMode: WaitForFirstConsumer
