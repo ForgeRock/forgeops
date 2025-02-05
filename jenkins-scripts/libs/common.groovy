@@ -79,7 +79,7 @@ boolean branchSupportsPitTests() {
 // To be discussed with Bruno and Robin
 boolean branchSupportsIDCloudReleases() {
     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-    return branchName.equals('main') \
+    return branchName.equals('dev') \
             || branchName.equals('feature/config') \
             || branchName.equals('release/') \
             || branchName.startsWith('idcloud-') \
