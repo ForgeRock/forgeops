@@ -278,7 +278,7 @@ def main():
 
     config['size'] = {}
     if args.size:
-        values_path = config['forgeops_root'] / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
+        values_path = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
         config['size'] = yaml.safe_load(open(values_path))
 
     if args.am_cpu or args.am_mem or args.am_rep or args.single:

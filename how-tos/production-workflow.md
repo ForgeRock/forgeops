@@ -19,6 +19,106 @@ This workflow is used when creating a new environment. It includes all of the
 steps you'll use in other workflows plus some others. Therefore, we'll explain
 the steps in detail here, and just provide commands for any other workflows.
 
+### Setup your git repos
+
+There are two different ways you can setup your git repo(s). The new and
+recommended method is to setup a custom ForgeOps root. The old method is to
+create a fork of the official ForgeOps repo.
+
+#### Setup a custom ForgeOps root (Recommended)
+
+This step is not mandatory, but it is recommended for production setups. There
+are a few advantages to setting up your own root dir.
+
+* Avoid git merge conflicts with a separate git repo
+* Able to checkout forgeops version tags into branches to easily switch between versions of forgeops
+* Much easier to see what is data vs code
+
+In this example, we will create a new folder in `~/git`, and set it up as a
+ForgeOps root. We'll also use 2025.1.1 as the version of ForgeOps we want to
+use.
+
+```
+cd ~/git
+mkdir forgeops_root
+git clone -b main https://github.com/ForgeRock/forgeops.git
+cd forgeops
+git switch -c 2025.1.1
+cd ..
+cp -r forgeops/{kustomize,helm,docker} forgeops_root
+cp forgeops/forgeops.conf.example forgeops_root/forgeops.conf
+cat 'FORGEOPS_ROOT=${HOME}/git/forgeops_root' > ~/.forgeops.conf
+cd forgeops_root
+git init
+git remote add origin https://github.com/MyOrg/forgeops_root
+git add .
+git commit -a -m 'Initial commit with defaults from forgeops'
+git push
+```
+
+Now your ForgeOps is configured to use `~/git/forgeops_root` as the source of
+your ForgeOps artifacts. This can now be used by your team. All they need to do
+is clone both repos, select a ForgeOps version, and create a `~/.forgeops.conf`
+that defines `FORGEOPS_ROOT`.
+
+##### Setup forgeops.conf
+
+The `forgeops.conf` file in `forgeops_root` can be populated with team-wide
+values so no one has to remember to configure or use them. The file is fully
+commented out to start with, and contains the defaults for the different
+settings in the scripts. You can set the different values as needed. These
+settings can be overridden at runtime by providing the appropriate flag.
+
+For example, you can set `PUSH_TO` here, and not have to remember to set it
+with `--push-to` when calling `forgeops build`. However, if you need to push
+somewhere else as a special case, you can provide `--push-to` and the build
+command will use it for that run.
+
+Please note that it is possible to disable Helm or Kustomize with the `NO_HELM`
+or `NO_KUSTOMIZE` variables. However, it's best to keep them in sync for a
+couple of reasons. First, for Helm users, the `forgeops amster` command uses
+Kustomize to work with resources on the cluster. If you plan on using that
+command, it will need to be able to use the Kustomize overlay for your
+environments. For Kustomize users, having the Helm environment allows you to
+migrate to Helm as it is now the recommended method for deploying ForgeOps.
+
+##### Create a ForgeOps Fork
+
+The old method for working with ForgeOps was to fork the repo in your
+organization's private git service (GitHub or otherwise). In this fork you'd
+create one or more branches that your team works out of, leaving the main
+branch unmodified. All of your organization's artifacts are stored inside this
+fork, and you'll need to deal with merges as new ForgeOps versions are
+released.
+
+In this example, we are going to have a prod branch that contains your
+configuration, and will be the branch you create your feature branches from.
+We'll also be using 2025.1.1 as the ForgeOps version.
+
+Prior to executing these commands, create a fork of
+https://github.com/ForgeRock/forgeops.git. In this example, we will be using
+https://github.com/MyOrg/forgeops as our fork.
+
+```
+mkdir ~/git
+cd ~/git
+git clone -b https://github.com/MyOrg/forgeops.git
+cd forgeops
+git switch -c prod 2025.1.1
+git push -u origin prod
+```
+
+Now you have a fork, and a prod branch based on the 2025.1.1 tag. From here you
+can create a new feature branch for creating your first environment.
+
+#### Create a feature branch
+
+It's best practice to work in a feature branch, so we'll create one in the repo
+where our artifacts are stored. Whether that's in our custom ForgeOps root or
+our ForgeOps fork.
+
+`git switch -c first_env`
+
 ### Create an environment
 
 The first thing you do is use `forgeops env` to create an environment. You
@@ -197,6 +297,20 @@ You can copy the tested images to your real environment.
 ##### forgeops apply
 
 `forgeops apply --env-name stage`
+
+### Commit your changes to git
+
+At this point, you should make sure all of the changes you made are committed to
+git, and you can create a pull request (PR) into the prod branch.
+
+```
+git add .
+git commit -a -m 'Adding initial stage configuration'
+git push
+```
+
+Now you can follow your team's procedures for merging your `first_env` branch
+into the `prod` branch.
 
 ## Selecting dev images
 

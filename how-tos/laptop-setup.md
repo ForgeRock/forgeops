@@ -6,7 +6,7 @@ This document is designed to help folks, who are new to ForgeOps, get their
 local environment setup. It requires some extra Python libraries, and some
 explanation of some basics.
 
-## Clone git repo
+## Clone git repos
 
 There are a couple of options your organization may have to set up it's git
 repos to run ForgeOps and store the configs. Ask your senior admin(s) for the
@@ -14,7 +14,7 @@ details about your organization's git repos.
 
 ### ForgeOps Fork
 
-The first and most common method is to create a fork of the official ForgeOps
+The older and most common method is to create a fork of the official ForgeOps
 repo on GitHub. In this method, all of the configurations are stored in this
 fork. It requires that someone on your team needs to merge in changes as new
 versions of ForgeOps are published.
@@ -37,33 +37,43 @@ cd forgeops
 Now you are in your local clone of your organization's fork. This is where you
 will work with the `forgeops` command.
 
-### Separate Artifact Repository
+### Separate Artifact Repository (forgeops_root)
 
 Another way your organization may do things is to have a separate repo that
-stores all of the artifacts managed by `forgeops`. In this scenario, you may
-have an organizational fork of the ForgeOps repo like above, or your team may
-just use the official repo. The only thing that's changed in here is
-`forgeops.conf`. The ForgeOps tool allows you to specify alternate paths to
-your configurations. This allows you to avoid merge conflicts when upgrading
-ForgeOps. Your team may have one checked into git (fork repo), or you may need
-to set it up for your laptop (official repo).
+stores all of the artifacts managed by `forgeops`. We call this a forgeops
+root, and it is the new recommended method.  In this scenario, you clone the
+official ForgeOps repo from GitHub, and your organization's artifact
+repository.
 
-Ask your senior admin(s) for more details if your team uses this method.
+You need two pieces of info from your team to get started. How to clone your
+artifact repo, and the version of ForgeOps the team is using. For this example,
+we will use https://github.com/MyOrg/forgeops_root as our artifact repo, and
+2025.1.1 for our ForgeOps version.
 
-Once you have cloned your organization's ForgeOps and artifact repos, cd into
-the ForgeOps repo.
+```
+mkdir ~/git
+cd ~/git
+git clone -b main https://github.com/ForgeRock/forgeops.git
+git clone https://github.com/MyOrg/forgeops_root.git
+cat 'FORGEOPS_ROOT=${HOME}/git/forgeops_root' > ~/.forgeops.conf
+cd forgeops
+git switch -c 2025.1.1
+```
+
+Now you have the forgeops repo and your artifact repo cloned and are ready to
+move onto setting up Python.
 
 ## Python Setup
 
 There are a few steps to setting up Python to run `forgeops`. First we must cd
 into our forgeops checkout.
 
-`cd /path/to/forgeops`
+`cd ~/git/forgeops`
 
 ### Python Virtual Environment
 
 The official recommendation of the Python team is to use a virtual environment
-for each set of code, and install your libraries into that. This is the
+for each codebase, and install your libraries into that. This is the
 recommended way to run ForgeOps.
 
 The common way to create a Python virtual environment (venv) is to use the venv
@@ -86,8 +96,8 @@ You won't have to use them directly because we have a command to do it for you.
 
 ### Run configure
 
-We have created the `configure` command that will install the libraries required
-to run `forgeops`. It also creates
+We have created the `forgeops configure` command that will install the
+libraries required to run `forgeops`. It also creates
 `/path/to/forgeops/lib/dependencies/.configured_version` that is used by the
 family of forgeops commands to ensure the proper libraries have been installed.
 
@@ -99,17 +109,14 @@ Now your local clone of the forgeops git repo is ready to run `forgeops`.
 
 It is possible to run `configure` outside of a venv. However, if the Python
 environment in your system has the EXTERNALLY_MANAGED file, then you may need
-to run ./bin/forgeops configure command with the --break-system-packages
-option, though it is NOT RECOMMENDED.
-
-`./bin/forgeops configure --break-system-packages`
-
-This method is best for CI/CD pipelines where you are using ephemeral
-instances, and it doesn't matter if you contaminate the system Python.
+to run `./bin/forgeops configure --break-system-packages`, though it is NOT
+RECOMMENDED. This method is best for CI/CD pipelines where you are using
+ephemeral instances, and it doesn't matter if you contaminate the system
+Python.
 
 ## Running ForgeOps
 
-We have documentation on running ForgeOps in this <a href="how-tos">how-tos</a>
+We have documentation on running ForgeOps in the <a href="how-tos">how-tos</a>
 folder and in our official <a href="https://docs.pingidentity.com/forgeops">Documentation</a>.
 The official documentation covers using ForgeOps generally, while the how-tos are
 targeted at specific tasks.

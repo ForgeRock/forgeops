@@ -1,6 +1,7 @@
 #
 # All commands honor these
 #
+#BUILD_PATH=docker
 #KUSTOMIZE_PATH=kustomize
 #HELM_PATH=helm
 #NO_KUSTOMIZE=false
@@ -17,7 +18,6 @@
 #
 # Only for build
 #
-#BUILD_PATH=docker
 #CONTAINER_ENGINE=docker
 # Use PUSH_TO to set a global registry URL for building your custom images
 #PUSH_TO=
