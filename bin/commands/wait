@@ -53,7 +53,11 @@ waitForResource() {
 
   echo "Waiting for ${resource} to be ${condition}."
 
-  kube wait --for=condition=$condition --timeout="${TIMEOUT}s" $resource
+  if waitResourceExists "$resource" ; then
+    kube wait --for=condition=$condition --timeout="${TIMEOUT}s" $resource
+  else
+    echo "ERROR: $resource not found. Skipping."
+  fi
 }
 
 waitForSecret() {
@@ -66,13 +70,32 @@ waitForSecret() {
 
   echo -n "Waiting for secret $secret to exist..."
   while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
-    if runOrPrint "$K_CMD $NAMESPACE_OPT get secret $secret > /dev/null 2>&1" ; then
+    if kubeExists "secret $secret" ; then
       echo done
       return_code=0
       break
     else
       echo -n '.'
       sleep 1
+    fi
+    now=$(date +%s)
+  done
+
+  return $return_code
+}
+
+waitResourceExists() {
+  message "Starting waitResourceExists()" "debug"
+
+  local resource=$1
+  local start_time=$(date +%s)
+  local now=$(date +%s)
+  local return_code=1
+
+  while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
+    if kubeExists $resource ; then
+      return_code=0
+      break
     fi
     now=$(date +%s)
   done
@@ -110,12 +133,18 @@ for c in ${COMPONENTS[@]} ; do
       ;;
 
     ds)
+      waitResourceExists 'sts/ds-cts'
       ds_cts_rep=$($K_CMD $NAMESPACE_OPT get sts ds-cts -o=jsonpath='{.spec.replicas}')
+      ((ds_cts_rep--))
+      waitResourceExists 'sts/ds-idrepo'
       ds_idrepo_rep=$($K_CMD $NAMESPACE_OPT get sts ds-idrepo -o=jsonpath='{.spec.replicas}')
-      for ((i=0;i<$ds_idrepo_rep;i++)) ; do
+      ((ds_idrepo_rep--))
+      message "ds_cts_rep=${ds_cts_rep}" "debug"
+      message "ds_idrepo_rep=${ds_idrepo_rep}" "debug"
+      for i in $(seq 0 $ds_idrepo_rep) ; do
         waitForResource ready pod/ds-idrepo-$i
       done
-      for ((i=0;i<$ds_cts_rep;i++)) ; do
+      for i in $(seq 0 $ds_cts_rep) ; do
         waitForResource ready pod/ds-cts-$i
       done
       ;;
