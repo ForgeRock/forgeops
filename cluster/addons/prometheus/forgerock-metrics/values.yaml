@@ -17,18 +17,17 @@ am:
   component: am
   enabled: true
   path: /am/json/metrics/prometheus
-  port: am
+  port: http
   labelSelectorComponent: am
   secretUser: prometheus
   secretPassword: prometheus
 
 ds:
-  component: directory
+  component: ds-idrepo
   enabled: true
   path: /metrics/prometheus/0.0.4
   port: http
-  labelSelectorComponent: directory
-  labelSelectorName: ds
+  labelSelectorComponent: ds-idrepo
   secretUser: monitor
   secretPassword: password
 
@@ -36,7 +35,7 @@ idm:
   component: idm
   enabled: true
   path: /openidm/metrics/prometheus
-  port: idm
+  port: http
   labelSelectorComponent: idm
   secretUser: prometheus
   secretPassword: prometheus
@@ -45,7 +44,7 @@ ig:
   component: ig
   enabled: true
   path: /openig/metrics/prometheus
-  port: ig
+  port: http
   labelSelectorComponent: ig
   secretUser: metric
   secretPassword: password
