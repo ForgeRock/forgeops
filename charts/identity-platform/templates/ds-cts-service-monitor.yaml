@@ -1,0 +1,37 @@
+{{- if and .Values.ds_cts.enabled .Values.ds_cts.prometheus.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ds-cts
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_cts.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+  - port: {{ .Values.ds_cts.prometheus.servicemonitor.port }}
+    path: {{ .Values.ds_cts.prometheus.servicemonitor.path }}
+    basicAuth:
+      password:
+        name: prometheus-ds-cts
+        key: password
+      username:
+        name: prometheus-ds-cts
+        key: user
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ds-cts
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-ds-cts
+data:
+  user: {{ .Values.ds_cts.prometheus.servicemonitor.secretUser | b64enc }}
+  password: {{ .Values.ds_cts.prometheus.servicemonitor.secretPassword | b64enc }}
+type: Opaque
+{{- end -}}

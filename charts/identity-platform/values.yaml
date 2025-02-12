@@ -23,6 +23,8 @@ platform:
     # If disabled, the ingress tls issuer and the PingDS certificates will be not be created/deployed
     # (DS certificates are ds-master-keypair and ds-ssl-keypair)
     enabled: true
+  grafana:
+    enabled: false
   ds_ssl:
     enabled: true
   ingress:
@@ -225,6 +227,14 @@ am:
     type: ClusterIP
     port: 80
 
+  prometheus:
+    servicemonitor:
+      enabled: false
+      path: /am/json/metrics/prometheus
+      port: https
+      secretUser: prometheus
+      secretPassword: prometheus
+
 amster:
   enabled: true
   backoffLimit: 6
@@ -392,6 +402,14 @@ idm:
   service:
     type: ClusterIP
     port: 80
+
+  prometheus:
+    servicemonitor:
+      enabled: false
+      path: /openidm/metrics/prometheus
+      port: http
+      secretUser: prometheus
+      secretPassword: prometheus
 
 admin_ui:
   enabled: true
@@ -665,6 +683,14 @@ ig:
     type: ClusterIP
     port: 80
 
+  prometheus:
+    servicemonitor:
+      enabled: false
+      path: /openig/metrics/prometheus
+      port: http
+      secretUser: metric
+      secretPassword: password
+
 # Common values for doing PingDS snapshots
 ds_snapshot:
   class: ds-snapshot-class
@@ -767,6 +793,14 @@ ds_idrepo:
     type: ClusterIP
     port: 8080
 
+  prometheus:
+    servicemonitor:
+      enabled: false
+      path: /metrics/prometheus/0.0.4
+      port: http
+      secretUser: monitor
+      secretPassword: password
+
   snapshot:
     enabled: false
     name: ds-idrepo-snapshot
@@ -849,6 +883,14 @@ ds_cts:
   service:
     type: ClusterIP
     port: 8080
+
+  prometheus:
+    servicemonitor:
+      enabled: false
+      path: /metrics/prometheus/0.0.4
+      port: http
+      secretUser: monitor
+      secretPassword: password
 
   snapshot:
     enabled: false

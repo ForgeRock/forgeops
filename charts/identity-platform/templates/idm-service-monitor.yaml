@@ -1,0 +1,37 @@
+{{- if and .Values.idm.enabled .Values.idm.prometheus.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: idm
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.idm.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+  - port: {{ .Values.idm.prometheus.servicemonitor.port }}
+    path: {{ .Values.idm.prometheus.servicemonitor.path }}
+    basicAuth:
+      password:
+        name: prometheus-idm
+        key: password
+      username:
+        name: prometheus-idm
+        key: user
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: idm
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-idm
+data:
+  user: {{ .Values.idm.prometheus.servicemonitor.secretUser | b64enc }}
+  password: {{ .Values.idm.prometheus.servicemonitor.secretPassword | b64enc }}
+type: Opaque
+{{- end -}}

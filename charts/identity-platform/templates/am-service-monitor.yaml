@@ -1,0 +1,37 @@
+{{- if and .Values.am.enabled .Values.am.prometheus.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: am
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.am.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+  - port: {{ .Values.am.prometheus.servicemonitor.port }}
+    path: {{ .Values.am.prometheus.servicemonitor.path }}
+    basicAuth:
+      password:
+        name: prometheus-am
+        key: password
+      username:
+        name: prometheus-am
+        key: user
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: am
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-am
+data:
+  user: {{ .Values.am.prometheus.servicemonitor.secretUser | b64enc }}
+  password: {{ .Values.am.prometheus.servicemonitor.secretPassword | b64enc }}
+type: Opaque
+{{- end -}}

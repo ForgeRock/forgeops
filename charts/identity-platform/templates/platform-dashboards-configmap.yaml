@@ -1,0 +1,11 @@
+{{- if .Values.platform.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-dashboards
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+{{ (.Files.Glob "files/dashboards/*.json").AsConfig | indent 2 }}
+{{- end }}

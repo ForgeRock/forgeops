@@ -1,0 +1,37 @@
+{{- if and .Values.ds_idrepo.enabled .Values.ds_idrepo.prometheus.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ds-idrepo
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_idrepo.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+  - port: {{ .Values.ds_idrepo.prometheus.servicemonitor.port }}
+    path: {{ .Values.ds_idrepo.prometheus.servicemonitor.path }}
+    basicAuth:
+      password:
+        name: prometheus-ds-idrepo
+        key: password
+      username:
+        name: prometheus-ds-idrepo
+        key: user
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ds-idrepo
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-ds-idrepo
+data:
+  user: {{ .Values.ds_idrepo.prometheus.servicemonitor.secretUser | b64enc }}
+  password: {{ .Values.ds_idrepo.prometheus.servicemonitor.secretPassword | b64enc }}
+type: Opaque
+{{- end -}}

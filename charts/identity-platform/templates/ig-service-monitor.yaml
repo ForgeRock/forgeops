@@ -1,0 +1,37 @@
+{{- if and .Values.ig.enabled .Values.ig.prometheus.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ig
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ig.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+  - port: {{ .Values.ig.prometheus.servicemonitor.port }}
+    path: {{ .Values.ig.prometheus.servicemonitor.path }}
+    basicAuth:
+      password:
+        name: prometheus-ig
+        key: password
+      username:
+        name: prometheus-ig
+        key: user
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: ig
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prometheus-ig
+data:
+  user: {{ .Values.ig.prometheus.servicemonitor.secretUser | b64enc }}
+  password: {{ .Values.ig.prometheus.servicemonitor.secretPassword | b64enc }}
+type: Opaque
+{{- end -}}
