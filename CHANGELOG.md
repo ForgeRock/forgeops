@@ -47,7 +47,7 @@ longer be deleted when the helm chart is uninstalled.
 Updated the AM service in the helm chart to use https target port.
 
 ### Prometheus updates
-Default ports and labels have been updated to match the new helm chart.
+Default ports and labels have been updated to match the new Helm chart.
 
 ## Documentation updates
 
