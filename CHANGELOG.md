@@ -44,7 +44,7 @@ Helm pre-install hooks are now used to deploy DS certificates and they will no
 longer be deleted when the helm chart is uninstalled.
 
 ### Updated AM service target port
-Updated the AM service in the helm chart to use https target port.
+Updated the AM service in the Helm chart to use https target port.
 
 ### Prometheus updates
 Default ports and labels have been updated to match the new Helm chart.
