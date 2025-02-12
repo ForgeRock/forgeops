@@ -1,6 +1,6 @@
 # For schema see https://coreos.com/operators/prometheus/docs/latest/api.html#endpoint
 # This defines a prometheus operator spec for a service to scrape.
-{{- if .Values.ds.enabled }}
+{{- if .Values.ds_cts.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -12,25 +12,25 @@ metadata:
     # Note that this ServiceMonitor needs to be in the same namespace as the operator
     # The monitored targets can be in different namespaces.
     prometheus: prometheus-operator
-    app: {{ .Values.ds.component }}
-  name: {{ .Values.ds.component }}
+    app: {{ .Values.ds_cts.component }}
+  name: {{ .Values.ds_cts.component }}
 spec:
   # Tells prometheus which endpoint / port to scrape
   # The service definition should name the port so we can use the symbolic name below.
   endpoints:
-  - port: {{ .Values.ds.port }}
-    path: {{ .Values.ds.path }}
+  - port: {{ .Values.ds_cts.port }}
+    path: {{ .Values.ds_cts.path }}
     basicAuth:
       username:
-        name: prometheus-ds
+        name: prometheus-ds-cts
         key: user
       password:
-        name: prometheus-ds
+        name: prometheus-ds-cts
         key: password
   # This targets the service using a label.
   selector:
     matchLabels:
-      app.kubernetes.io/component: {{ .Values.ds.labelSelectorComponent }}
+      app.kubernetes.io/component: {{ .Values.ds_cts.labelSelectorComponent }}
   namespaceSelector:
     {{ if eq .Values.namespaceSelectorStrategy "any" }}
     any: true
@@ -44,9 +44,9 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: prometheus-ds
+  name: prometheus-ds-cts
 data:
-  user: {{ .Values.ds.secretUser | b64enc }}
-  password: {{ .Values.ds.secretPassword | b64enc }}
+  user: {{ .Values.ds_cts.secretUser | b64enc }}
+  password: {{ .Values.ds_cts.secretPassword | b64enc }}
 type: Opaque
 {{- end -}}

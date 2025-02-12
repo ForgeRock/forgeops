@@ -22,12 +22,21 @@ am:
   secretUser: prometheus
   secretPassword: prometheus
 
-ds:
+ds_idrepo:
   component: ds-idrepo
   enabled: true
   path: /metrics/prometheus
   port: http
   labelSelectorComponent: ds-idrepo
+  secretUser: monitor
+  secretPassword: password
+
+ds_cts:
+  component: ds-cts
+  enabled: true
+  path: /metrics/prometheus
+  port: http
+  labelSelectorComponent: ds-cts
   secretUser: monitor
   secretPassword: password
 
