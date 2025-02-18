@@ -32,9 +32,9 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
-      targetPort: http
+      targetPort: https
       protocol: TCP
-      name: http
+      name: https
   selector:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
@@ -180,6 +180,9 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8081
               protocol: TCP
           livenessProbe:
             httpGet:

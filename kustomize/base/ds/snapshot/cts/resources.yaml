@@ -19,7 +19,7 @@ spec:
           securityContext: {}
           containers:
             - name: ds-cts-snapshot
-              image: bitnami/kubectl:latest
+              image: bitnami/kubectl:1.31
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/bash
