@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Utility script to run commands inside a ds container
-# This is an internal script provided for debugging purposes only and is not supported by ForgeRock.
+# Utility script to run commands inside a PingDS container
+# This is an internal script provided for debugging purposes only and is not supported by Ping Identity.
 
 POD_NAME="ds-idrepo-0"
 POD_CREDENTIALS_FILE="/var/run/secrets/cloud-credentials-cache/gcp-credentials.json"
@@ -8,8 +8,8 @@ POD_CREDENTIALS_FILE="/var/run/secrets/cloud-credentials-cache/gcp-credentials.j
 usage() {
   echo "Usage: $0 [-p|--pod-name POD_NAME] SUB_COMMAND [SUB_COMMAND_OPTIONS]"
   echo "Options:"
-  echo "  -p, --pod-name       Name of DS pod. Default is ${POD_NAME}"
-  echo "  SUB-COMMAND (run on DS pod) :"
+  echo "  -p, --pod-name       Name of {PingDS pod. Default is ${POD_NAME}"
+  echo "  SUB-COMMAND (run on PingDS pod) :"
   echo "    status             Display basic server information"
   echo "    rstatus            Check replication status"
   echo "    idsearch           Run ldapsearch on ou=identities base dn"
@@ -21,7 +21,7 @@ usage() {
   echo ""
   echo "Note for list-backups and purge sub-commands :"
   echo "  - limitation : work with Google Storage. Could be updated to work with AKS, EKS,... storages"
-  echo "  - DS pod must have Google Storage credentials file in ${POD_CREDENTIALS_FILE}"
+  echo "  - PingDS pod must have Google Storage credentials file in ${POD_CREDENTIALS_FILE}"
   echo ""
   echo "Examples: $0 list-backups --backupLocation gs://my-bucket/ds-backup/project-1/site-1/ds-idrepo-0"
   echo "          $0 purge --backupLocation gs://my-bucket/ds-backup/project-1/site-1/ds-idrepo-0"
@@ -50,16 +50,9 @@ shift
 # PARSING : get command options (if any)
 cmd_options="$*"
 
-# All the backends we know about..
-backends="ou=identities ou=tokens ou=am-config dc=openidm,dc=forgerock,dc=io"
-dr_args=""
-for b in $backends; do
-  dr_args="$dr_args --baseDN $b"
-done
-
-setArgs() {
-  pw=$(kubectl get secret ds-passwords -o jsonpath="{.data.${1}\\.pw}" | base64 --decode)
-  bind_args="-w $pw -p $2"
+setDirManagerArgs() {
+  pw=$(kubectl get secret ds-passwords -o jsonpath="{.data.dirmanager\\.pw}" | base64 --decode)
+  bind_args="-D uid=admin -w $pw -p $1"
 }
 
 kcmd() {
@@ -80,23 +73,23 @@ checkKey() {
 case "$cmd"  in
 status)
   # Display basic server information
-  setArgs dirmanager 4444
+  setDirManagerArgs  4444
   kcmd status "${bind_args}" "${cmd_options}"
   ;;
 rstatus)
   # Check replication status
-  setArgs monitor 4444
+  setDirManagerArgs  4444
   kcmd dsrepl status --showReplicas --showChangeLogs "${bind_args}" "${cmd_options}"
   ;;
 idsearch)
   # List identities
-  setArgs dirmanager 1389
-  kcmd ldapsearch -D "uid=admin" "${bind_args}" --baseDN ou=identities "(objectclass=*)"
+  setDirManagerArgs 1389
+  kcmd ldapsearch "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN ou=identities "(objectclass=*)"
   ;;
 monitor)
   # List monitor entries
-  setArgs dirmanager 1389
-  kcmd ldapsearch -D "uid=admin" "${bind_args}" --baseDN cn=monitor "(objectclass=*)"
+  setDirManagerArgs 1389
+  kcmd ldapsearch "${bind_args}" --noPropertiesFile --useStartTls --trustAll --baseDN cn=monitor "(objectclass=*)"
    ;;
 list-backups)
   # List backups
@@ -117,6 +110,3 @@ purge)
   kubectl exec "${POD_NAME}" -it -- "${ds_debug_custom_cmd}"
 ;;
 esac
-
-# Sample commands to recover from known state
-# https://backstage.forgerock.com/docs/ds/7/config-guide/replication.html#reinit-repl
