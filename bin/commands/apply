@@ -37,6 +37,7 @@ OPTIONS:
   -n|--namespace <ns>         : k8s namespace to install into
   -k|--kustomize-path PATH    : kustomize dir to use (default: kustomize)
                                 (full path or relative to forgeops root)
+  -t|--timeout N<s>           : timeout for wait in seconds
 
 Valid components:
   ${COMPONENTS_VALID[@]}
