@@ -702,6 +702,7 @@ ds_snapshot:
   rbacCreate: true
   rbacOnly: false
   serviceAccountName: ds-snapshot
+  clusterRoleName: ds-snapshot
 
   image:
     repository: bitnami/kubectl

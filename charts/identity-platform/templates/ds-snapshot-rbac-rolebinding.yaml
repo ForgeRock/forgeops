@@ -9,6 +9,6 @@ subjects:
     namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
-  name: {{ .Values.ds_snapshot.serviceAccountName }}
+  name: {{ include "ds_snapshot.clusterRoleName" }}
   apiGroup: rbac.authorization.k8s.io
 {{- end }}

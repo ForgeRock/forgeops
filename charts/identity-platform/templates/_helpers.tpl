@@ -65,6 +65,13 @@ Create the name of the service account to use
 {{/*
 Create the name of the snapshot script configmap use
 */}}
-{{- define "ds_snapshot.configMapName"}}
+{{- define "ds_snapshot.configMapName" }}
 {{- printf "%s-script" .Values.ds_snapshot.serviceAccountName }}
+{{- end }}
+
+{{/*
+Create a ClusterRole name for volume snapshots
+*/}}
+{{- define "ds_snapshot.clusterRoleName" }}
+{{- printf "%s-%s" .Values.ds_snapshot.clusterRoleName .Release.namespace }}
 {{- end }}

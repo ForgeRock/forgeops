@@ -6,3 +6,15 @@ resources:
 
 patches:
 - path: rolebinding.yaml
+- path: cluster-role-name.yaml
+  target:
+    group: rbac.authorization.k8s.io
+    version: 'v1'
+    kind: ClusterRole
+    name: ds-snapshot
+- path: role-binding.yaml
+  target:
+    group: rbac.authorization.k8s.io
+    version: 'v1'
+    kind: RoleBinding
+    name: ds-snapshot

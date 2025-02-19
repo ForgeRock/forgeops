@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Values.ds_snapshot.serviceAccountName }}
+  name: {{ include "ds_snapshot.clusterRoleName" }}
 rules:
   - apiGroups:
       - ""

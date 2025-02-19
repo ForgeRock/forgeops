@@ -18,6 +18,7 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 
 from lib.python.ensure_configuration_is_valid_or_exit import ensure_configuration_is_valid_or_exit, \
     print_how_to_install_dependencies
+from lib.python.defaults import SNAPSHOT_ROLE_NAME
 
 # First ensure configure has been executed
 try:
@@ -54,7 +55,7 @@ class NoAliasDumper(yaml.SafeDumper):
 
 def writeYamlFile(data, file):
     """Write an object to a yaml file"""
-    with open(file, 'w') as f:
+    with open(file, 'w+') as f:
         yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
 
 def process_overlay_dir(path, config, args):
@@ -150,11 +151,41 @@ def process_overlay_dir(path, config, args):
             if 'replicaCount' in config['size']['ds_idrepo'].keys():
                 pc['data']['AM_STORES_USER_SERVERS'] = genDsConnection(
                     name='ds-idrepo', num=config['size']['ds_idrepo']['replicaCount'])
-        
+
         if args.amster_retain:
             pc['data']['AMSTER_DURATION'] = config['amsterRetain']
 
         writeYamlFile(pc, platform_config)
+
+    if (args.idrepo_snap_enable or args.cts_snap_enable or args.snap_role_name is not None) and 'ds-snapshot/rbac' in str(path.resolve()):
+        if args.debug:
+            print("Snapshots are enabled")
+
+        rn_patch_path = path / 'cluster-role-name.yaml'
+        rb_patch_path = path / 'role-binding.yaml'
+        snap_role_name = SNAPSHOT_ROLE_NAME
+        if getattr(args, 'snap_role_name', None):
+            snap_role_name = args.snap_role_name
+        role_name = f"{snap_role_name}-{args.namespace}"
+
+        rn_patch_yaml = [
+            {
+                'op': 'replace',
+                'path': '/metadata/name',
+                'value': role_name
+            }
+        ]
+
+        rb_patch_yaml = [
+            {
+                'op': 'replace',
+                'path': '/roleRef/name',
+                'value': role_name
+            }
+        ]
+
+        writeYamlFile(rn_patch_yaml, rn_patch_path)
+        writeYamlFile(rb_patch_yaml, rb_patch_path)
 
     res_path = path / res_file
     if args.debug: print(f"res_path={res_path}")
@@ -224,6 +255,7 @@ def main():
     parser.add_argument('--ig-mem', dest='ig_mem', help='Specify memory setting for ig pods')
     parser.add_argument('--ig-rep', dest='ig_rep', type=int, help='Specify replicas for ig pods')
     parser.add_argument('--amster-retain', dest='amster_retain', type=int, help='Keep amster pod running for n seconds')
+    parser.add_argument('--snap-role-name', help='Specify the base role name for the ds-snapshot ClusterRole')
     parser.add_argument('--pull-policy', dest='pull_policy', help='Set policy for all platform images')
     parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage Helm values files")
     parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage Kustomize overlay")
@@ -244,7 +276,7 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable):
+    if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable or args.snap_role_name):
         utils.exit_msg('You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable')
 
     config = {}
@@ -478,6 +510,8 @@ def main():
             }
         }
 
+    if getattr(args, 'snap_role_name', None):
+        values_snap['ds_snapshot']['clusterRoleName'] = args.snap_role_name
 
     # Check if we are Creating or Updating
     config['kustomize_action'] = None
