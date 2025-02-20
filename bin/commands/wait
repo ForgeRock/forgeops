@@ -45,6 +45,11 @@ EOM
   usageStd $1 "$usage_msg" "$2"
 }
 
+timeoutExit() {
+  echo "Timeout (${TIMEOUT}s) exceeded."
+  exit 1
+}
+
 waitForResource() {
   message "Starting waitForResource()" "debug"
 
@@ -66,14 +71,12 @@ waitForSecret() {
   local secret=$1
   local start_time=$(date +%s)
   local now=$(date +%s)
-  local return_code=1
 
   echo -n "Waiting for secret $secret to exist..."
   while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
     if kubeExists "secret $secret" ; then
       echo done
-      return_code=0
-      break
+      return 0
     else
       echo -n '.'
       sleep 1
@@ -81,7 +84,7 @@ waitForSecret() {
     now=$(date +%s)
   done
 
-  return $return_code
+  timeoutExit
 }
 
 waitResourceExists() {
@@ -90,17 +93,15 @@ waitResourceExists() {
   local resource=$1
   local start_time=$(date +%s)
   local now=$(date +%s)
-  local return_code=1
 
   while [ $(($now - $start_time)) -le $TIMEOUT ] ; do
     if kubeExists $resource ; then
-      return_code=0
-      break
+      return 0
     fi
     now=$(date +%s)
   done
 
-  return $return_code
+  timeoutExit
 }
 
 # Setup valid components now so they get presented in the usage
