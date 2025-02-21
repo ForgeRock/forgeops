@@ -41,7 +41,7 @@ def genDsConnection(name, num, port=1636):
     """Generate a PingDS connection string to put into base/platform-config.yaml"""
 
     str=f"{name}-0.{name}:{port}"
-    for i in range(1,num-1):
+    for i in range(1,num):
         str += f",{name}-{i}.{name}:{port}"
     return str
 
