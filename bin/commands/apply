@@ -59,12 +59,12 @@ EOM
 }
 
 # Setup valid components now so they get presented in the usage
-COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_APPLY[@]} ${COMPONENTS_UI[@]} 'all')
+COMPONENTS_VALID=(${COMPONENTS_APPLY[@]})
 
 # Code in common.sh
 processArgs $*
 checkComponents
-shiftBaseComponent 'first'
+shiftComponent 'base' 'first'
 
 kubeInit
 
@@ -79,23 +79,28 @@ if [ -n "$NAMESPACE" ] ; then
   fi
 fi
 
-if containsElement 'all' ${COMPONENTS[@]} ; then
-  COMPONENTS=( 'all' )
+COMPONENTS_ALL=('all' 'platform')
+if containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
+  COMPONENTS=( 'platform' )
 fi
 
-if containsElement 'base' ${COMPONENTS[@]} && ! containsElement 'secrets' ${COMPONENTS[@]} ; then
+if containsElement 'base' "${COMPONENTS[*]}" && ! containsElement 'secrets' "${COMPONENTS[*]}" ; then
   COMPONENTS+=( 'secrets' )
 fi
 
-if containsElement 'ds' ${COMPONENTS[@]} ; then
-  expandDSComponent
+if containsElement 'apps' "${COMPONENTS[*]}" ; then
+  expandComponent 'apps' "${COMPONENTS_APPS[*]}"
 fi
 
-if containsElement 'ui' ${COMPONENTS[@]} ; then
-  expandUIComponent
+if containsElement 'ds' "${COMPONENTS[*]}" ; then
+  expandComponent 'ds' "${COMPONENTS_DS[*]}"
 fi
 
-if containsElementLike 'ds-' ${COMPONENTS[@]} && ! containsElement 'all' ${COMPONENTS[@]} ; then
+if containsElement 'ui' "${COMPONENTS[*]}" ; then
+  expandComponent 'ui' "${COMPONENTS_UI[*]}"
+fi
+
+if containsElementLike 'ds-' "${COMPONENTS[*]}" && ! containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
   if ! kubeExists sts 'ds-cts' || ! kubeExists sts 'ds-idrepo' ; then
     COMPONENTS+=( 'ldif-importer' )
   fi
@@ -113,7 +118,7 @@ fi
 
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
-  if [ "$c" == "all" ] ; then
+  if [ "$c" == 'platform' ] ; then
     c_path=$OVERLAY_PATH
   else
     c_path=$OVERLAY_PATH/$c
@@ -121,7 +126,8 @@ for c in ${COMPONENTS[@]} ; do
   [[ -d $c_path ]] && kube apply -k $c_path
 done
 
-if containsElement 'secrets' ${COMPONENTS[@]} || containsElement 'all' ${COMPONENTS[@]} ; then
+elements=('secrets' 'platform')
+if containsElements "${elements[*]}" "${COMPONENTS[*]}" ; then
   echo "Waiting for secrets to be ready."
   if [ "$DRYRUN" = true ] ; then
     echo "Skipping wait during dryrun"

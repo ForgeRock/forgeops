@@ -99,18 +99,18 @@ deleteSnaps() {
 }
 
 # Setup valid components now so they get presented in the usage
-COMPONENTS_VALID=(${COMPONENTS_STD[@]} ${COMPONENTS_APPLY[@]} 'all')
+COMPONENTS_VALID=(${COMPONENTS_APPLY[@]})
 
 # Code in common.sh
 processArgs $*
 checkComponents
-shiftBaseComponent "last"
+shiftComponent 'base' 'last'
 kubeInit
 
 # If all is given as one of many components, set COMPONENTS to a list of
 # sub-overlays to delete. This is an ordered list, and items higher up in the
 # list should be deleted before those lower down.
-if containsElement 'all' ${COMPONENTS[@]} ; then
+if containsElement 'all' "${COMPONENTS[*]}" ; then
   COMPONENTS=(
       'admin-ui'
       'end-user-ui'
@@ -126,8 +126,20 @@ if containsElement 'all' ${COMPONENTS[@]} ; then
       'base' )
 fi
 
-if containsElement 'ds' ${COMPONENTS[@]} ; then
-  expandDSComponent
+if containsElement 'apps' "${COMPONENTS[*]}" ; then
+  expandComponent 'apps' "${COMPONENTS_APPS[*]}"
+fi
+
+if containsElement 'ds' "${COMPONENTS[*]}" ; then
+  expandComponent 'ds' "${COMPONENTS_DS[*]}"
+fi
+
+if containsElement 'platform' "${COMPONENTS[*]}" ; then
+  expandComponent 'platform' "${COMPONENTS_PLATFORM[*]}"
+fi
+
+if containsElement 'ui' "${COMPONENTS[*]}" ; then
+  expandComponent 'ui' "${COMPONENTS_UI[*]}"
 fi
 
 DELETE_PVCS=false
@@ -154,20 +166,20 @@ if [ "$FORCE" = true ] && [ "$SKIP_CONFIRM" = true ] ; then
   DELETE_SNAPS=true
   DELETE_SECRETS=true
 elif [ "$FORCE" = false ] && [ "$SKIP_CONFIRM" = true ] ; then
-  if containsElement "all" ${COMPONENTS[@]} ; then
+  if containsElement "all" "${COMPONENTS[*]}" ; then
     echo "Will not delete PVCs, secrets, or volume snapshots. You must delete those manually or use --force."
-  elif containsElementLike "^ds" ${COMPONENTS[@]} ; then
+  elif containsElementLike "^ds" "${COMPONENTS[*]}" ; then
     echo "Will not delete PVCs and volume snapshots. You must delete those manually or use --force."
   fi
 elif [ "$FORCE" = false ] && [ "$SKIP_CONFIRM" = false ] ; then
-  if containsElementLike "^ds-" ${COMPONENTS[@]} || containsElement "all" ${COMPONENTS[@]} ; then
+  if containsElementLike "^ds-" "${COMPONENTS[*]}" || containsElement "all" "${COMPONENTS[*]}" ; then
     read -p "OK to delete PVCs? [Y/N] " prompt
     [[ "$prompt" =~ ^[yY] ]] && DELETE_PVCS=true
     read -p "OK to delete volume snapshots? [Y/N] " prompt
     [[ "$prompt" =~ ^[yY] ]] && DELETE_SNAPS=true
   fi
   SECRETS_COMP=("secrets" "all" "base")
-  if containsElements ${SECRETS_COMP[@]} ${COMPONENTS[@]}; then
+  if containsElements "${SECRETS_COMP[*]}" "${COMPONENTS[*]}" ; then
     read -p "OK to delete secrets? [Y/N] " prompt
     [[ "$prompt" =~ ^[yY] ]] && DELETE_SECRETS=true
   fi

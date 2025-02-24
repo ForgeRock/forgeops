@@ -408,7 +408,7 @@ message "SNAPSHOT_NAME=$SNAPSHOT_NAME" "debug"
 message "TARGET=$TARGET" "debug"
 
 if [ -n "$ACTION" ] ; then
-  if containsElement $ACTION ${VALID_ACTIONS[@]} ; then
+  if containsElement $ACTION "${VALID_ACTIONS[*]}" ; then
     message "Restore type is valid: $ACTION" "debug"
   else
     usage 1 "Invalid restore type: $ACTION"
@@ -418,7 +418,7 @@ else
 fi
 
 if [ -n "$TARGET" ] ; then
-  if containsElement $TARGET ${VALID_TARGETS[@]} ; then
+  if containsElement $TARGET "${VALID_TARGETS[*]}" ; then
     message "Restore target is valid: $TARGET" "debug"
   else
     usage 1 "Invalid restore target: $TARGET"
@@ -449,7 +449,7 @@ JOB_LABEL="ds-${TARGET}-snapshot-job"
 message "JOB_LABEL=$JOB_LABEL" "debug"
 
 # Use latest snapshot if none given
-if [ -z "$SNAPSHOT_NAME" ] && containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
+if [ -z "$SNAPSHOT_NAME" ] && containsElement $ACTION "${RESTORE_ACTIONS[*]}" ; then
   message "No snapshot name given to use for restore. Using latest." "debug"
   for snap in $($K_GET volumesnapshot -l "app=$JOB_LABEL" -o custom-columns=NAME:.metadata.name --no-headers | sort -r) ; do
     if volumeSnapReady $snap ; then
@@ -461,7 +461,7 @@ if [ -z "$SNAPSHOT_NAME" ] && containsElement $ACTION ${RESTORE_ACTIONS[@]} ; th
     echo "ERROR!! No volume snapshots are ready to use"
     exit 1
   fi
-elif containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
+elif containsElement $ACTION "${RESTORE_ACTIONS[*]}" ; then
   message "Snapshot name given: $SNAPSHOT_NAME" "debug"
   if volumeSnapReady $SNAPSHOT_NAME ; then
     message "VolumeSnapshot $SNAPSHOT_NAME is ready to use"
@@ -479,7 +479,7 @@ if [ -z "$RESTORE_DIR" ] ; then
 fi
 message "RESTORE_DIR=$RESTORE_DIR" "debug"
 
-if [ ! -d "$RESTORE_DIR" ] && containsElement $ACTION ${RESTORE_ACTIONS[@]} ; then
+if [ ! -d "$RESTORE_DIR" ] && containsElement $ACTION "${RESTORE_ACTIONS[*]}" ; then
   mkdir -p $RESTORE_DIR
 fi
 

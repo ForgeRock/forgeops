@@ -5,39 +5,53 @@ kubeInit
 CONFIG_DEFAULT_PATH=$SCRIPT_DIR/../../config
 
 # Component lists
+COMPONENTS_META=('apps' 'ds' 'ui' 'platform')
+
 COMPONENTS_STD=(
   'am'
   'idm'
   'ig'
 )
 
+COMPONENTS_APPS=(
+  'am'
+  'amster'
+  'idm'
+)
+
 COMPONENTS_UI=(
-  'ui'
   'admin-ui'
   'end-user-ui'
   'login-ui'
 )
 
-COMPONENTS_BUILD=(
-  'ds'
+COMPONENTS_DS=(
+  'ds-cts'
+  'ds-idrepo'
 )
 
 COMPONENTS_APPLY=(
-  'amster'
+  ${COMPONENTS_APPS[@]}
+  ${COMPONENTS_DS[@]}
+  ${COMPONENTS_UI[@]}
+  'ig'
   'base'
-  'ds-cts'
-  'ds-idrepo'
-  'ds'
+  'all'
+  ${COMPONENTS_META[@]}
+)
+
+COMPONENTS_PLATFORM=(
+  'secrets'
+  ${COMPONENTS_UI[@]}
+  ${COMPONENTS_DS[@]}
+  ${COMPONENTS_APPS[@]}
 )
 
 COMPONENTS_WAIT=(
-   'ds'
-   'am'
-   'amster'
-   'idm'
-   'apps'
-   'secrets'
+   ${COMPONENTS_PLATFORM[@]}
    'ig'
+   'all'
+   ${COMPONENTS_META[@]}
 )
 
 SUPPORTED_CONTAINER_ENGINES=('docker' 'podman')
@@ -143,10 +157,10 @@ processArgs() {
   [[ ! -x $K_CMD ]] && usage 1 'The kubectl command must be installed and in your $PATH'
 
   # If nothing or all specified as a component, make sure all is the only component
-  if [ -z "$COMPONENTS" ] || containsElement 'all' ; then
+  if [ -z "$COMPONENTS" ] || containsElement 'all' "${COMPONENTS[*]}" ; then
     COMPONENTS=( 'all' )
   fi
-  if containsElement 'all' ${COMPONENTS[@]} && [ "${#COMPONENTS[@]}" -gt 1 ] ; then
+  if containsElement 'all' "${COMPONENTS[*]}" && [ "${#COMPONENTS[@]}" -gt 1 ] ; then
     COMPONENTS=( 'all' )
   fi
   message "COMPONENTS=${COMPONENTS[*]}" "debug"
@@ -169,7 +183,7 @@ processArgs() {
 
   if [ -z "$ENV_NAME" ] && [[ "$PROG" =~ apply ]] ; then
     ENV_NAME=demo
-  elif containsElement $PROG_NAME ${COMMANDS_NO_ENV[@]} ; then
+  elif containsElement $PROG_NAME "${COMMANDS_NO_ENV[*]}" ; then
     message "An environment is not required for wait" "debug"
   elif [ -z "$ENV_NAME" ] ; then
     usage 1 'An environment name (--env-name) is required.'
@@ -196,29 +210,30 @@ processArgs() {
 }
 
 # Sort the components so base is either first or last
-shiftBaseComponent() {
-  message "Starting shiftBaseComponent()" "debug"
+shiftComponent() {
+  message "Starting shiftComponent()" "debug"
 
-  local pos=$1
-  [[ -z "$pos" ]] && usage 1 "shiftBaseComponent() requires a position (first or last)"
+  local component=$1
+  local pos=$2
+  [[ -z "$pos" ]] && usage 1 "shiftComponent() requires a position (first or last)"
 
-  if containsElement 'base' ${COMPONENTS[@]} && [ "${#COMPONENTS[@]}" -gt 1 ]; then
+  if containsElement $component "${COMPONENTS[*]}" && [ "${#COMPONENTS[@]}" -gt 1 ]; then
     local new_components=()
-    [[ "$pos" == "first" ]] && new_components=( "base" )
+    [[ "$pos" == "first" ]] && new_components=( $component )
     local c=
 
     for c in ${COMPONENTS[@]} ; do
       message "c = $c" "debug"
-      [[ "$c" == "base" ]] && continue
+      [[ "$c" == "$component" ]] && continue
       new_components+=( "$c" )
       message "new_components = ${new_components[*]}" "debug"
     done
 
-    [[ "$pos" == "last" ]] && new_components+=( "base" )
+    [[ "$pos" == "last" ]] && new_components+=( $component )
     COMPONENTS=( "${new_components[@]}" )
   fi
 
-  message "Finishing shiftBaseComponent()" "debug"
+  message "Finishing shiftComponent()" "debug"
 }
 
 # Check our components to make sure they are valid
@@ -226,7 +241,7 @@ checkComponents() {
   message "Starting checkComponents()" "debug"
 
   for c in ${COMPONENTS[@]} ; do
-    if containsElement $c ${COMPONENTS_VALID[@]} ; then
+    if containsElement $c "${COMPONENTS_VALID[*]}" ; then
       message "Valid component: $c" "debug"
     else
       usage 1 "Invalid component: $c"
@@ -238,7 +253,7 @@ checkContainerEngine() {
   message "Starting checkContainerEngine()" "debug"
 
   CONTAINER_ENGINE=${CONTAINER_ENGINE:-docker}
-  if ! containsElement $CONTAINER_ENGINE ${SUPPORTED_CONTAINER_ENGINES[@]} ; then
+  if ! containsElement $CONTAINER_ENGINE "${SUPPORTED_CONTAINER_ENGINES[*]}" ; then
     message "$CONTAINER_ENGINE has not been officially tested. Use at your own risk."
   fi
 
@@ -257,54 +272,26 @@ EOM
   fi
 }
 
-expandDSComponent() {
-  message "Starting expandDSComponent()" "debug"
+expandComponent() {
+  message "Starting expandComponent()" "debug"
 
+  local component=$1
+  local components=$2
   local new_components=()
 
   for c in ${COMPONENTS[@]} ; do
-    if [ "$c" == "ds" ] ; then
+    if [ "$c" == "$component" ] ; then
       continue
     else
       new_components+=( "$c" )
     fi
   done
 
-  if ! containsElement "ds-cts" ${COMPONENTS[@]} ; then
-    new_components+=( "ds-cts" )
-  fi
-
-  if ! containsElement "ds-idrepo" ${COMPONENTS[@]} ; then
-    new_components+=( "ds-idrepo" )
-  fi
-
-  COMPONENTS=( "${new_components[@]}" )
-}
-
-expandUIComponent() {
-  message "Starting expandUIComponent()" "debug"
-
-  local new_components=()
-
-  for c in ${COMPONENTS[@]} ; do
-    if [ "$c" == "ui" ] ; then
-      continue
-    else
+  for c in $components ; do
+    if ! containsElement $c "${COMPONENTS[*]}" ; then
       new_components+=( "$c" )
     fi
   done
-
-  if ! containsElement "admin-ui" ${COMPONENTS[@]} ; then
-    new_components+=( "admin-ui" )
-  fi
-
-  if ! containsElement "end-user-ui" ${COMPONENTS[@]} ; then
-    new_components+=( "end-user-ui" )
-  fi
-
-  if ! containsElement "login-ui" ${COMPONENTS[@]} ; then
-    new_components+=( "login-ui" )
-  fi
 
   COMPONENTS=( "${new_components[@]}" )
 }

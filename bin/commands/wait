@@ -104,6 +104,18 @@ waitResourceExists() {
   timeoutExit
 }
 
+waitForDS() {
+  local ds=$1
+
+  waitResourceExists "sts/${ds}"
+  local rep=$($K_CMD $NAMESPACE_OPT get sts $ds -o=jsonpath='{.spec.replicas}')
+  ((rep--))
+  message "rep=${rep}" "debug"
+  for i in $(seq 0 $rep) ; do
+    waitForResource ready "pod/${ds}-${i}"
+  done
+}
+
 # Setup valid components now so they get presented in the usage
 COMPONENTS_VALID=${COMPONENTS_WAIT[@]}
 
@@ -111,14 +123,41 @@ COMPONENTS_VALID=${COMPONENTS_WAIT[@]}
 processArgs $*
 checkComponents
 
+if containsElements 'all' "${COMPONENTS[*]}" ; then
+  expandComponent 'all' "${COMPONENTS_PLATFORM[*]}"
+fi
+
+if containsElement 'apps' "${COMPONENTS[*]}" ; then
+  expandComponent 'apps' "${COMPONENTS_APPS[*]}"
+fi
+
+if containsElement 'ds' "${COMPONENTS[*]}" ; then
+  expandComponent 'ds' "${COMPONENTS_DS[*]}"
+  shiftComponent 'ds-cts' 'first'
+  shiftComponent 'ds-idrepo' 'first'
+fi
+
+if containsElements 'platform' "${COMPONENTS[*]}" ; then
+  expandComponent 'platform' "${COMPONENTS_PLATFORM[*]}"
+fi
+
+if containsElement 'ui' "${COMPONENTS[*]}" ; then
+  expandComponent 'ui' "${COMPONENTS_UI[*]}"
+fi
+
 SECRET_NAMES=('am-env-secrets' 'idm-env-secrets' 'ds-passwords' 'ds-env-secrets')
 TIMEOUT=${TIMEOUT:-60}
 
 kubeInit
 
+message "COMPONENTS=${COMPONENTS[*]}" "debug"
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
   case $c in
+    admin-ui)
+      waitForResource ready "pod -l app=admin-ui"
+      ;;
+
     am)
       waitForResource ready "pod -l app=am"
       ;;
@@ -133,21 +172,16 @@ for c in ${COMPONENTS[@]} ; do
       waitForResource ready "pod -l app=idm"
       ;;
 
-    ds)
-      waitResourceExists 'sts/ds-cts'
-      ds_cts_rep=$($K_CMD $NAMESPACE_OPT get sts ds-cts -o=jsonpath='{.spec.replicas}')
-      ((ds_cts_rep--))
-      waitResourceExists 'sts/ds-idrepo'
-      ds_idrepo_rep=$($K_CMD $NAMESPACE_OPT get sts ds-idrepo -o=jsonpath='{.spec.replicas}')
-      ((ds_idrepo_rep--))
-      message "ds_cts_rep=${ds_cts_rep}" "debug"
-      message "ds_idrepo_rep=${ds_idrepo_rep}" "debug"
-      for i in $(seq 0 $ds_idrepo_rep) ; do
-        waitForResource ready pod/ds-idrepo-$i
-      done
-      for i in $(seq 0 $ds_cts_rep) ; do
-        waitForResource ready pod/ds-cts-$i
-      done
+    ds-cts)
+      waitForDS ds-cts
+      ;;
+
+    ds-idrepo)
+      waitForDS ds-idrepo
+      ;;
+
+    end-user-ui)
+      waitForResource ready "pod -l app=end-user-ui"
       ;;
 
     idm)
@@ -156,6 +190,10 @@ for c in ${COMPONENTS[@]} ; do
 
     ig)
       waitForResource ready "pod -l app=ig"
+      ;;
+
+    login-ui)
+      waitForResource ready "pod -l app=login-ui"
       ;;
 
     secrets)

@@ -78,11 +78,11 @@ COMMANDS_DEPRECATED=(
 COMMAND=$1 # Our first arg should be the command
 
 # We need to detect --dryrun and --debug.
-if containsElement '--debug' ${ARG_ARRAY[@]} ; then
+if containsElement '--debug' "${ARG_ARRAY[*]}" ; then
   DEBUG=true
 fi
 
-if containsElement '--dryrun' ${ARG_ARRAY[@]} ; then
+if containsElement '--dryrun' "${ARG_ARRAY[*]}" ; then
   DRYRUN=true
 fi
 
@@ -91,10 +91,10 @@ message "DEBUG=$DEBUG" "debug"
 message "DRYRUN=$DRYRUN" "debug"
 
 message "Validating command: $COMMAND" "debug"
-if containsElement $COMMAND ${COMMANDS[@]} ; then
+if containsElement "$COMMAND" "${COMMANDS[*]}" ; then
   message "Valid command: $COMMAND" "debug"
   VALID_COMMAND=true
-elif containsElement $COMMAND ${COMMANDS_DEPRECATED[@]} ; then
+elif containsElement "$COMMAND" "${COMMANDS_DEPRECATED[*]}" ; then
   message "Deprecated command: $COMMAND" "debug"
   VALID_COMMAND=true
 else
@@ -102,8 +102,8 @@ else
 fi
 message "VALID_COMMAND=$VALID_COMMAND" "debug"
 
-HELP_FLAGS=( '-h' '--help' )
-if [ "$VALID_COMMAND" = false ] && containsElements ${HELP_FLAGS[@]} ${ARG_ARRAY[@]} ; then
+HELP_FLAGS=('-h' '--help')
+if [ "$VALID_COMMAND" = false ] && containsElements "${HELP_FLAGS[*]}" "${ARG_ARRAY[*]}" ; then
   usage 0
 elif [ "$VALID_COMMAND" = false ] ; then
   usage 1 "Invalid command: $COMMAND"

@@ -37,14 +37,18 @@ getRelativePath() {
 # From http://stackoverflow.com/questions/3685970/check-if-an-array-contains-a-value
 containsElement() {
   local e
-  for e in "${@:2}" ; do [[ "$e" == "$1" ]] && return 0 ; done
+  for e in $2 ; do
+    if [ "$e" == "$1" ] ; then
+      return 0
+    fi
+  done
   return 1
 }
 
 containsElements() {
   local e
-  for e in "${@:1}"; do
-    if containsElement $e "${@:2}" ; then
+  for e in $1; do
+    if containsElement "$e" "$2" ; then
       return 0
     fi
   done
@@ -53,14 +57,18 @@ containsElements() {
 
 containsElementLike() {
   local e
-  for e in "${@:2}" ; do [[ "$e" =~ $1 ]] && return 0 ; done
+  for e in $2 ; do
+    if [[ "$e" =~ "$1" ]] ; then
+      return 0
+    fi
+    done
   return 1
 }
 
 containsElementsLike() {
   local e
-  for e in "${@:1}"; do
-    if containsElementLike $e "${@:2}" ; then
+  for e in $1; do
+    if containsElementLike $e "$2" ; then
       return 0
     fi
   done

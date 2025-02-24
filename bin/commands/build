@@ -44,9 +44,6 @@ OPTIONS:
 Valid Components:
   ${COMPONENTS_VALID[*]}
 
-Deprecated Components:
-  ${COMPONENTS_BUILD_DEP[*]}
-
 Examples:
   Normal operation:
   $PROG -p prod -e prod --push-to gcr.io/my-project/forgeops am
@@ -62,8 +59,7 @@ EOM
 
 # Setup valid components now so they get presented in the usage
 COMPONENTS_FBC=( "am" "idm" "ig" )
-COMPONENTS_BUILD_DEP=( "amster" ) # Deprecated build components
-COMPONENTS_VALID=( ${COMPONENTS_STD[@]} ${COMPONENTS_BUILD[@]} ${COMPONENTS_BUILD_DEP[@]} 'platform' )
+COMPONENTS_VALID=( ${COMPONENTS_APPS[@]} 'ds' 'ig' 'platform' )
 
 # Code in common.sh
 processArgs $*
@@ -93,11 +89,7 @@ if [ "$RESET" = true ] ; then
   exit 0
 fi
 
-#if containsElement "amster" ${COMPONENTS[@]} ; then
-#  usage 1 "Embedding PingAM dynamic configs in the amster image is not supported. Manage PingAM dynamic config with the bin/amster cmd instead."
-#fi
-
-if containsElement "platform" ${COMPONENTS[@]} ; then
+if containsElement "platform" "${COMPONENTS[*]}" ; then
   message "Component 'platform' given, setting components"
   COMPONENTS=( 'am' 'idm' 'ds' 'amster' )
 fi
@@ -106,7 +98,7 @@ message "COMPONENTS=$COMPONENTS" "debug"
 for c in ${COMPONENTS[@]} ; do
   message "c=$c" "debug"
   BUILD_ARGS_REAL=${BUILD_ARGS:-}
-  if containsElement $c ${COMPONENTS_FBC[@]} && [ -n "$CONFIG_PROFILE" ] ; then
+  if containsElement $c "${COMPONENTS_FBC[*]}" && [ -n "$CONFIG_PROFILE" ] ; then
     BUILD_ARGS_REAL+=" --build-arg CONFIG_PROFILE=$CONFIG_PROFILE"
   fi
 
