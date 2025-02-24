@@ -46,7 +46,8 @@
           },
           "sessionCache": {
               "enabled": true
-          }
+          },
+          "versionHint": "8.0.0"
       }
     },
     {
