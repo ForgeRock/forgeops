@@ -54,7 +54,7 @@ data:
 
             <!-- deny all events with a level below DEBUG, that is TRACE -->
             <filter class="ThresholdFilter">
-                <level>DEBUG</level>
+                <level>TRACE</level>
             </filter>
 
             <filter class="org.forgerock.openidm.logger.LogbackLogFilter"/>
@@ -87,9 +87,9 @@ data:
         </appender>
 
         <appender name="console" class="ConsoleAppender">
-            <!-- deny all events with a level below WARN, that is TRACE, DEBUG, and INFO -->
+            <!-- deny all events with a level below INFO, that is TRACE and DEBUG -->
             <filter class="ThresholdFilter">
-                <level>WARN</level>
+                <level>INFO</level>
             </filter>
 
             <filter class="org.forgerock.openidm.logger.LogbackLogFilter"/>
