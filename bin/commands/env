@@ -281,7 +281,7 @@ def main():
         values_path = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
         config['size'] = yaml.safe_load(open(values_path))
 
-    if args.am_cpu or args.am_mem or args.am_rep or args.single:
+    if args.am_cpu or args.am_mem or isinstance(args.am_rep, int) or args.single:
         if 'am' not in config['size'].keys():
             config['size']['am'] = {}
             if args.am_cpu or args.am_mem:
@@ -295,13 +295,13 @@ def main():
             if args.debug: print(f"am_mem={args.am_mem}")
             config['size']['am']['resources']['requests']['memory'] = args.am_mem
             config['size']['am']['resources']['limits']['memory'] = args.am_mem
-        if args.am_rep:
+        if isinstance(args.am_rep, int):
             if args.debug: print(f"am_rep={args.am_rep}")
             config['size']['am']['replicaCount'] = int(args.am_rep)
         if args.single:
             config['size']['am']['replicaCount'] = 1
 
-    if args.cts_cpu or args.cts_disk or args.cts_mem or args.cts_rep or args.single:
+    if args.cts_cpu or args.cts_disk or args.cts_mem or isinstance(args.cts_rep, int) or args.single:
         if 'ds_cts' not in config['size'].keys():
             config['size']['ds_cts'] = {}
             if args.cts_cpu or args.cts_mem:
@@ -320,13 +320,13 @@ def main():
             if args.debug: print(f"cts_mem={args.cts_mem}")
             config['size']['ds_cts']['resources']['requests']['memory'] = args.cts_mem
             config['size']['ds_cts']['resources']['limits']['memory'] = args.cts_mem
-        if args.cts_rep:
+        if isinstance(args.cts_rep, int):
             if args.debug: print(f"cts_rep={args.cts_rep}")
             config['size']['ds_cts']['replicaCount'] = int(args.cts_rep)
         if args.single:
             config['size']['ds_cts']['replicaCount'] = 1
 
-    if args.idm_cpu or args.idm_mem or args.idm_rep or args.single:
+    if args.idm_cpu or args.idm_mem or isinstance(args.idm_rep, int) or args.single:
         if 'idm' not in config['size'].keys():
             config['size']['idm'] = {}
             if args.idm_cpu or args.idm_mem:
@@ -340,13 +340,13 @@ def main():
             if args.debug: print(f"idm_mem={args.idm_mem}")
             config['size']['idm']['resources']['requests']['memory'] = args.idm_mem
             config['size']['idm']['resources']['limits']['memory'] = args.idm_mem
-        if args.idm_rep:
+        if isinstance(args.idm_rep, int):
             if args.debug: print(f"idm_rep={args.idm_rep}")
             config['size']['idm']['replicaCount'] = int(args.idm_rep)
         if args.single:
             config['size']['idm']['replicaCount'] = 1
 
-    if args.idrepo_cpu or args.idrepo_disk or args.idrepo_mem or args.idrepo_rep or args.single:
+    if args.idrepo_cpu or args.idrepo_disk or args.idrepo_mem or isinstance(args.idrepo_rep, int) or args.single:
         if 'ds_idrepo' not in config['size'].keys():
             config['size']['ds_idrepo'] = {}
             if args.idrepo_cpu or args.idrepo_mem:
@@ -365,13 +365,13 @@ def main():
             if args.debug: print(f"idrepo_mem={args.idrepo_mem}")
             config['size']['ds_idrepo']['resources']['requests']['memory'] = args.idrepo_mem
             config['size']['ds_idrepo']['resources']['limits']['memory'] = args.idrepo_mem
-        if args.idrepo_rep:
+        if isinstance(args.idrepo_rep, int):
             if args.debug: print(f"idrepo_rep={args.idrepo_rep}")
             config['size']['ds_idrepo']['replicaCount'] = int(args.idrepo_rep)
         if args.single:
             config['size']['ds_idrepo']['replicaCount'] = 1
 
-    if args.ig_cpu or args.ig_mem or args.ig_rep or args.single:
+    if args.ig_cpu or args.ig_mem or isinstance(args.ig_rep, int) or args.single:
         if 'ig' not in config['size'].keys():
             config['size']['ig'] = {}
             if args.ig_cpu or args.ig_mem:
@@ -385,7 +385,7 @@ def main():
             if args.debug: print(f"ig_mem={args.ig_mem}")
             config['size']['ig']['resources']['requests']['memory'] = args.ig_mem
             config['size']['ig']['resources']['limits']['memory'] = args.ig_mem
-        if args.ig_rep:
+        if isinstance(args.ig_rep, int):
             if args.debug: print(f"ig_rep={args.ig_rep}")
             config['size']['ig']['replicaCount'] = int(args.ig_rep)
         if args.single:
