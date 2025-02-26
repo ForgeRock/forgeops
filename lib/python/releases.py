@@ -90,17 +90,20 @@ def parse_release_str(rel_str, debug=False):
         release['maj_min'] = rel_str
         release['full'] = rel_str
     else:
-        if rel_str.count('.') == 0:
-            release['major'] = rel_str
-        elif rel_str.count('.') == 1:
-            release['major'] = int(rel_str.split('.')[0])
-            release['minor'] = int(rel_str.split('.')[1])
-        elif rel_str.count('.') == 2:
-            release['major'] = int(rel_str.split('.')[0])
-            release['minor'] = int(rel_str.split('.')[1])
-            release['patch'] = int(rel_str.split('.')[2])
-        release['major'] = int(release['major'])
-        release['major'] = release['major']
+        try:
+            if rel_str.count('.') == 0:
+                release['major'] = rel_str
+            elif rel_str.count('.') == 1:
+                release['major'] = int(rel_str.split('.')[0])
+                release['minor'] = int(rel_str.split('.')[1])
+            elif rel_str.count('.') == 2:
+                release['major'] = int(rel_str.split('.')[0])
+                release['minor'] = int(rel_str.split('.')[1])
+                release['patch'] = int(rel_str.split('.')[2])
+            release['major'] = int(release['major'])
+        except ValueError:
+            print(f'Error : unknown "{rel_str}" release. The release should be like integer.integer.integer (eg 7.5.0)')
+            sys.exit(1)
         release['maj_min'] = f"{release['major']}.{release['minor']}"
         release['full'] = f"{release['maj_min']}.{release['patch']}"
 
