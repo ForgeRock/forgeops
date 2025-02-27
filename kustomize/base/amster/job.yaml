@@ -4,6 +4,7 @@ metadata:
   name: amster
 spec:
   backoffLimit: 0
+  ttlSecondsAfterFinished: 600
   template:
     metadata:
       labels:
