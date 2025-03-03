@@ -240,7 +240,7 @@ amster:
   backoffLimit: 6
   restartPolicy: OnFailure
   deleteOnSuccess: false
-  ttlSecondsAfterFinished: 600
+  #ttlSecondsAfterFinished: 300
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/amster
@@ -288,7 +288,7 @@ ldif_importer:
   enabled: true
   backoffLimit: 6
   restartPolicy: OnFailure
-  ttlSecondsAfterFinished: 600
+  ttlSecondsAfterFinished: 300
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds

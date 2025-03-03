@@ -107,7 +107,7 @@ metadata:
     app.kubernetes.io/component: ldif-importer
 spec:
   backoffLimit: 6
-  ttlSecondsAfterFinished: 600
+  ttlSecondsAfterFinished: 300
   template:
     metadata:
       annotations:
