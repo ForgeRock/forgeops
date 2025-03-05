@@ -8,7 +8,9 @@
 #kubectl delete apiservice v1beta1.webhook.cert-manager.io
 set -oe pipefail
 
-VERSION="v1.13.1"
+# If cm_version is empty, cert-manager will deploy the latest version
+cm_version=
+
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CM_DIR="${CURRENT_DIR}/../cluster/addons/certmanager"
 
@@ -24,9 +26,6 @@ usage() {
 #  extraArgs:
 #  - --enable-certificate-owner-ref=true
 deploy() {
-    # Install CRDs
-    kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/$VERSION/cert-manager.crds.yaml
-
     # Set the minumum resource limits (these work for GKE autopilot clusters)
     cat >/tmp/cert-manager-values.yaml <<EOF
 global:
@@ -54,8 +53,9 @@ EOF
         --repo https://charts.jetstack.io \
         --namespace cert-manager \
         --create-namespace \
-        --version $VERSION \
-        --values /tmp/cert-manager-values.yaml
+        ${cm_version:+--version=$cm_version} \
+        --values /tmp/cert-manager-values.yaml \
+        --set installCRDs=true
 
 
     # Install a self signed cluster issuer
@@ -74,7 +74,6 @@ EOF
 delete() {
     echo "Deleting cert-manager"
     helm -n cert-manager uninstall cert-manager
-    kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/$VERSION/cert-manager.crds.yaml
     exit 0
 }
 

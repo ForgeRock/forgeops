@@ -3,9 +3,11 @@ RELEASE=2025.1.2
 
 ## New Features/Updated functionality
 
+### Updates to bin/certmanager-deploy.sh
+The bin/certmanager-deploy.sh script has been updated to use the latest available version.  
+CRDs are now deployed as part of the helm command using --set installCRDs=true.
 
 ## Bugfixes
-
 
 ## Documentation updates
 
