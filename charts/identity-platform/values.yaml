@@ -602,7 +602,7 @@ ig:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ig
-    tag: "7.5.0"
+    tag: "2024.11.0"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
