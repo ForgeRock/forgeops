@@ -56,6 +56,9 @@ spec:
         - name: amster-secrets
           secret:
             secretName: amster
+            items:
+              - key: id_rsa
+                path: id_rsa
         - name: platform-config
           configMap:
             name: platform-config
@@ -113,11 +116,10 @@ spec:
           args:
             - bash
             - -c
-            - sleep ${DURATION:-10}
+            - sleep ${AMSTER_DURATION:-10}
           envFrom:
           - configMapRef:
-              name: amster-retain
-              optional: true
+              name: platform-config
           readinessProbe:
             exec:
               command:

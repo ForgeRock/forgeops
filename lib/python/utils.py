@@ -494,13 +494,11 @@ def get_secret_value(ns, secret, key):
     return base64.b64decode(value).decode('utf-8')
 
 # Clean up amster resources.
-def clean_amster_job(ns, retain):
-    if not retain:
-        message(f'Cleaning up amster components.')
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-export-type')
-        run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-retain')
+def clean_amster_job(ns):
+    message(f'Cleaning up amster components.')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-export-type')
     if os.path.exists('amster-import.tar.gz'):
         os.remove('amster-import.tar.gz')
     if os.path.exists('amster-scripts.tar.gz'):

@@ -24,8 +24,6 @@ OPTIONS:
   --debug                     : turn on debugging
   --dryrun                    : do a dry run
   -v|--verbose                : be verbose
-  -a|--amster-retain <n>      : Keep amster pod running for n seconds. (default: 10)
-                                Add "infinity" to keep up indefinitely
   -n|--namespace <ns>         : k8s namespace to wait for components
   -t|--timeout <n>            : set the max time in seconds to wait for (default: 600)
 

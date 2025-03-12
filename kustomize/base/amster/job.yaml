@@ -13,7 +13,10 @@ spec:
         runAsUser: 11111
         runAsGroup: 0
       initContainers:
-      - env:
+      - name: amster
+        image: amster
+        imagePullPolicy: Always
+        env:
         - name: NAMESPACE
           valueFrom:
             fieldRef:
@@ -23,9 +26,8 @@ spec:
             name: platform-config
         - secretRef:
             name: amster-env-secrets
-        image: amster
-        imagePullPolicy: Always
-        name: amster
+        - secretRef:
+            name: ds-env-secrets
         resources:
           limits:
             memory: 512Mi
@@ -46,11 +48,10 @@ spec:
       - name: pause
         image: amster
         imagePullPolicy: Always
-        args:  ["bash", "-c", "sleep ${DURATION:-10}"]
+        args:  ["bash", "-c", "sleep ${AMSTER_DURATION:-10}"]
         envFrom:
         - configMapRef:
-            name: amster-retain
-            optional: true
+            name: platform-config
         volumeMounts:
         - mountPath: /var/run/secrets/amster
           name: amster-secrets
@@ -65,6 +66,9 @@ spec:
       - name: amster-secrets
         secret:
           secretName: amster
+          items:
+            - key: id_rsa
+              path: id_rsa
       - name: platform-config
         configMap:
           name: platform-config

@@ -150,6 +150,9 @@ def process_overlay_dir(path, config, args):
             if 'replicaCount' in config['size']['ds_idrepo'].keys():
                 pc['data']['AM_STORES_USER_SERVERS'] = genDsConnection(
                     name='ds-idrepo', num=config['size']['ds_idrepo']['replicaCount'])
+        
+        if args.amster_retain:
+            pc['data']['AMSTER_DURATION'] = config['amsterRetain']
 
         writeYamlFile(pc, platform_config)
 
@@ -220,6 +223,7 @@ def main():
     parser.add_argument('--ig-cpu', dest='ig_cpu', help='Specify CPU setting for ig pods')
     parser.add_argument('--ig-mem', dest='ig_mem', help='Specify memory setting for ig pods')
     parser.add_argument('--ig-rep', dest='ig_rep', type=int, help='Specify replicas for ig pods')
+    parser.add_argument('--amster-retain', dest='amster_retain', type=int, help='Keep amster pod running for n seconds')
     parser.add_argument('--pull-policy', dest='pull_policy', help='Set policy for all platform images')
     parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage Helm values files")
     parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage Kustomize overlay")
@@ -390,6 +394,17 @@ def main():
             config['size']['ig']['replicaCount'] = int(args.ig_rep)
         if args.single:
             config['size']['ig']['replicaCount'] = 1
+
+    values_amster = {}
+    if args.amster_retain:
+        config['amsterRetain'] = None
+        if args.debug: print(f"amster_retain={args.amster_retain}")
+        config['amsterRetain'] = str(args.amster_retain)
+        values_amster = {
+            'amster': {
+                'amsterRetain': config['amsterRetain']
+            }
+        }
 
     values_ingress = {}
     config['hosts'] = None
@@ -606,7 +621,7 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
         values = {}
         if values_file.is_file():
             values = yaml.safe_load(open(values_file))
-        merge(values, config['size'], values_ingress, values_images, values_snap)
+        merge(values, config['size'], values_ingress, values_images, values_snap, values_amster)
         writeYamlFile(values, values_file)
 
     ###
