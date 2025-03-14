@@ -26,12 +26,7 @@ Running the following env command for you.
 
 EOM
 
-ARG=("$@") # Create an array out of our arguments
-ENV_ARGS=("-l" "--overlay")
-
-if ! containsElements "${ENV_ARGS[*]}" "${ARG_ARRAY[*]}" ; then
-  ARGS+=("--overlay demo")
-fi
+ARGS=("$@") # Create an array out of our arguments
 
 # Enable debugging so runOrPrint will always print the command before running it
 DEBUG=true
