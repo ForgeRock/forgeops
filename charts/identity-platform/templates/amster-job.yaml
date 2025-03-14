@@ -86,8 +86,6 @@ spec:
               name: platform-config
           - secretRef:
               name: amster-env-secrets
-          - secretRef:
-              name: ds-env-secrets
           resources:
             {{- toYaml .Values.amster.resources | nindent 12 }}
           volumeMounts:

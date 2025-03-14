@@ -138,8 +138,6 @@ spec:
           - configMapRef:
               name: platform-config
           - secretRef:
-              name: amster-env-secrets
-          - secretRef:
               name: ds-env-secrets
           ports:
             - name: http
