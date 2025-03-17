@@ -107,23 +107,16 @@ checkComponents
 shiftComponent 'base' 'last'
 kubeInit
 
+DELETE_ALL=false
+
 # If all is given as one of many components, set COMPONENTS to a list of
 # sub-overlays to delete. This is an ordered list, and items higher up in the
 # list should be deleted before those lower down.
-if containsElement 'all' "${COMPONENTS[*]}" ; then
-  COMPONENTS=(
-      'admin-ui'
-      'end-user-ui'
-      'login-ui'
-      'am'
-      'amster'
-      'idm'
-      'ig'
-      'ds-cts'
-      'ds-idrepo'
-      'ldif-importer'
-      'secrets'
-      'base' )
+if containsElement 'platform' "${COMPONENTS[*]}" ; then
+  DELETE_ALL=true
+  COMPONENTS=${COMPONENTS_PLATFORM[@]}
+  shiftComponent 'secrets' 'last'
+  COMPONENTS+=( 'base' )
 fi
 
 if containsElement 'apps' "${COMPONENTS[*]}" ; then
@@ -132,10 +125,6 @@ fi
 
 if containsElement 'ds' "${COMPONENTS[*]}" ; then
   expandComponent 'ds' "${COMPONENTS_DS[*]}"
-fi
-
-if containsElement 'platform' "${COMPONENTS[*]}" ; then
-  expandComponent 'platform' "${COMPONENTS_PLATFORM[*]}"
 fi
 
 if containsElement 'ui' "${COMPONENTS[*]}" ; then
@@ -166,20 +155,20 @@ if [ "$FORCE" = true ] && [ "$SKIP_CONFIRM" = true ] ; then
   DELETE_SNAPS=true
   DELETE_SECRETS=true
 elif [ "$FORCE" = false ] && [ "$SKIP_CONFIRM" = true ] ; then
-  if containsElement "all" "${COMPONENTS[*]}" ; then
+  if [ "$DELETE_ALL" = true ] ; then
     echo "Will not delete PVCs, secrets, or volume snapshots. You must delete those manually or use --force."
   elif containsElementLike "^ds" "${COMPONENTS[*]}" ; then
     echo "Will not delete PVCs and volume snapshots. You must delete those manually or use --force."
   fi
 elif [ "$FORCE" = false ] && [ "$SKIP_CONFIRM" = false ] ; then
-  if containsElementLike "^ds-" "${COMPONENTS[*]}" || containsElement "all" "${COMPONENTS[*]}" ; then
+  if containsElementLike "^ds-" "${COMPONENTS[*]}" || [ "$DELETE_ALL" = true ] ; then
     read -p "OK to delete PVCs? [Y/N] " prompt
     [[ "$prompt" =~ ^[yY] ]] && DELETE_PVCS=true
     read -p "OK to delete volume snapshots? [Y/N] " prompt
     [[ "$prompt" =~ ^[yY] ]] && DELETE_SNAPS=true
   fi
-  SECRETS_COMP=("secrets" "all" "base")
-  if containsElements "${SECRETS_COMP[*]}" "${COMPONENTS[*]}" ; then
+  SECRETS_COMP=("secrets" "base")
+  if containsElements "${SECRETS_COMP[*]}" "${COMPONENTS[*]}" || [ "$DELETE_ALL" = true ] ; then
     read -p "OK to delete secrets? [Y/N] " prompt
     [[ "$prompt" =~ ^[yY] ]] && DELETE_SECRETS=true
   fi

@@ -64,7 +64,6 @@ COMPONENTS_VALID=(${COMPONENTS_APPLY[@]})
 # Code in common.sh
 processArgs $*
 checkComponents
-shiftComponent 'base' 'first'
 
 kubeInit
 
@@ -79,9 +78,8 @@ if [ -n "$NAMESPACE" ] ; then
   fi
 fi
 
-COMPONENTS_ALL=('all' 'platform')
-if containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
-  COMPONENTS=( 'platform' )
+if containsElement 'base' "${COMPONENTS[*]}" ; then
+  shiftComponent 'base' 'first'
 fi
 
 if containsElement 'base' "${COMPONENTS[*]}" && ! containsElement 'secrets' "${COMPONENTS[*]}" ; then

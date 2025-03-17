@@ -121,8 +121,8 @@ COMPONENTS_VALID=${COMPONENTS_WAIT[@]}
 processArgs $*
 checkComponents
 
-if containsElements 'all' "${COMPONENTS[*]}" ; then
-  expandComponent 'all' "${COMPONENTS_PLATFORM[*]}"
+if containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
+  COMPONENTS=${COMPONENTS_PLATFORM[@]}
 fi
 
 if containsElement 'apps' "${COMPONENTS[*]}" ; then
@@ -133,10 +133,6 @@ if containsElement 'ds' "${COMPONENTS[*]}" ; then
   expandComponent 'ds' "${COMPONENTS_DS[*]}"
   shiftComponent 'ds-cts' 'first'
   shiftComponent 'ds-idrepo' 'first'
-fi
-
-if containsElements 'platform' "${COMPONENTS[*]}" ; then
-  expandComponent 'platform' "${COMPONENTS_PLATFORM[*]}"
 fi
 
 if containsElement 'ui' "${COMPONENTS[*]}" ; then

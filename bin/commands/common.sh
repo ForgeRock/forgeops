@@ -5,6 +5,8 @@ kubeInit
 CONFIG_DEFAULT_PATH=$SCRIPT_DIR/../../config
 
 # Component lists
+COMPONENTS_ALL=('all' 'platform')
+
 COMPONENTS_META=('apps' 'ds' 'ui' 'platform')
 
 COMPONENTS_STD=(
@@ -156,12 +158,13 @@ processArgs() {
   # Make sure we have a working kubectl
   [[ ! -x $K_CMD ]] && usage 1 'The kubectl command must be installed and in your $PATH'
 
-  # If nothing or all specified as a component, make sure all is the only component
-  if [ -z "$COMPONENTS" ] || containsElement 'all' "${COMPONENTS[*]}" ; then
-    COMPONENTS=( 'all' )
+  if containsElement 'all' "${COMPONENTS[*]}" ; then
+    echo "The 'all' meta component has been deprecated in favor of 'platform'."
   fi
-  if containsElement 'all' "${COMPONENTS[*]}" && [ "${#COMPONENTS[@]}" -gt 1 ] ; then
-    COMPONENTS=( 'all' )
+
+  # If nothing or platform specified as a component, make sure platform is the only component
+  if [ -z "$COMPONENTS" ] || containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
+    COMPONENTS=( 'platform' )
   fi
   message "COMPONENTS=${COMPONENTS[*]}" "debug"
 
