@@ -226,3 +226,16 @@ def get_release_from_tag(tag, debug=False):
         if '.' in tag:
             result = re.sub("^.*([0-9].[0-9].[0-9]).*", r"\1", tag)
     return result
+
+def is_valid_release(tag, debug=False):
+    """
+    Check if the given tag starts with an x.y.z release string.
+    """
+
+    if debug:
+        print(f"is_valid_release(): tag={tag}")
+    result = False
+    if re.match(r'^[0-9]*.[0-9]*.[0-9]*', tag):
+        result = True
+
+    return result
