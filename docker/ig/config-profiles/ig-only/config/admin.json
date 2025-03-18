@@ -1,11 +1,8 @@
 {
   "heap": [
     {
-      "name": "ClientHandler",
-      "type": "ClientHandler"
-    },
-    {
-      "name": "ApiProtectionFilter",
+      "_comment": "This NO-OP filter is needed to expose PingGateway API while being in production mode",
+      "name": "MyApiProtectionFilter",
       "type": "ScriptableFilter",
       "config": {
         "type": "application/x-groovy",
@@ -15,7 +12,7 @@
       }
     },
     {
-      "name": "MetricsProtectionFilter",
+      "name": "MyMetricsProtectionFilter",
       "type": "ScriptableFilter",
       "config": {
         "type": "application/x-groovy",
@@ -29,5 +26,6 @@
     }    
   ],
   "mode": "PRODUCTION",
-  "prefix": "openig"
+  "metricsProtectionFilter": "MyMetricsProtectionFilter",
+  "apiProtectionFilter": "MyApiProtectionFilter"
 }
