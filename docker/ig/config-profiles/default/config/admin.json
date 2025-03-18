@@ -15,5 +15,6 @@
       }
     }
   ],
-  "mode": "PRODUCTION"
+  "mode": "PRODUCTION",
+  "prefix": "openig"
 }
