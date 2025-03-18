@@ -25,7 +25,7 @@ platform:
     enabled: true
   grafana:
     enabled: false
-  ds_ssl:
+  ds_certs:
     enabled: true
   ingress:
     enabled: true

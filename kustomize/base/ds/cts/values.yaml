@@ -2,7 +2,7 @@
 platform:
   base:
     enabled: false
-  ds_ssl:
+  ds_certs:
     enabled: false
   notes:
     enabled: false

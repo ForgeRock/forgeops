@@ -4,6 +4,8 @@ platform:
   disable_secret_agent_config: true
   ingress:
     enabled: false
+  ds_certs:
+    enabled: false
 admin_ui:
   enabled: false
 am:

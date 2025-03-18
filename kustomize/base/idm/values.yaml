@@ -4,6 +4,8 @@ platform:
   notes:
     enabled: false
   disable_secret_agent_config: true
+  ds_certs:
+    enabled: false
 admin_ui:
   enabled: false
 am:
