@@ -13,6 +13,12 @@ CRDs are now deployed as part of the helm command using --set installCRDs=true.
 Added --amster-retain option to bin/forgeops env.  
 Now user can configure environment to keep amster running for troubleshooting purposes.
 
+## Removed Features
+
+### Removed generate command
+
+The deprecated `forgeops generate` command has been removed.
+
 ## Documentation updates
 
 ### New how-to explaining how to add a second DNS alias for the root realm in PingAM

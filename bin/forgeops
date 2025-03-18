@@ -69,7 +69,6 @@ COMMANDS=(
 COMMANDS_DEPRECATED=(
   'clean'
   'install'
-  'generate'
 )
 
 # Avoiding our pattern of looping and shifting ARG elements as we want to
