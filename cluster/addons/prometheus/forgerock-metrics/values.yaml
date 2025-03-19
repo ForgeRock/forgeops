@@ -52,8 +52,8 @@ idm:
 ig:
   component: ig
   enabled: true
-  path: /openig/metrics/prometheus
-  port: http
+  path: /metrics/prometheus/0.0.4
+  port: http-admin
   labelSelectorComponent: ig
   secretUser: metric
   secretPassword: password

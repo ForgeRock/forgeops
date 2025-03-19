@@ -1,5 +1,6 @@
 {{- if and .Values.ig.enabled .Values.platform.ingress.enabled -}}
 {{- $svcPort := .Values.ig.service.port -}}
+{{- $adminPort := .Values.ig.serviceAdmin.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -39,6 +40,13 @@ spec:
     - host: {{ $host | quote }}
       http:
         paths:
+          - path: /admin(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: ig
+                port:
+                  number: {{ $adminPort }}
           - path: /ig(/|$)(.*)
             pathType: Prefix
             backend:

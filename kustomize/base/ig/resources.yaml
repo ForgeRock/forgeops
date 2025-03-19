@@ -20,6 +20,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: 8085
+      targetPort: http-admin
+      protocol: TCP
+      name: http-admin
   selector:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
@@ -80,6 +84,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+            - name: http-admin
+              containerPort: 8085
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /kube/liveness
@@ -131,6 +138,13 @@ spec:
     - host: identity-platform.domain.local
       http:
         paths:
+          - path: /admin(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: ig
+                port:
+                  number: 8085
           - path: /ig(/|$)(.*)
             pathType: Prefix
             backend:

@@ -10,6 +10,11 @@ CRDs are now deployed as part of the helm command using --set installCRDs=true.
 ### New PingGateway version available
 PingGateway 2025.3.0 has been released and is available to deploy with forgeops tooling.
 
+### Update PingGateway deployment to use the new default admin endpoint
+Ping Gateway has 2 endpoints now:
+- `/ig` the main entry point to PingGateway
+- `/admin` the API of the PingGateway admin, containing the `/ping` handler used for live checks for example.
+
 ## Bugfixes
 
 ### Fix --amster-retain option

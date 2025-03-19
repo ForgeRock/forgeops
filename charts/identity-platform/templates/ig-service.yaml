@@ -15,6 +15,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: {{ .Values.ig.serviceAdmin.port }}
+      targetPort: http-admin
+      protocol: TCP
+      name: http-admin
   selector:
     {{- include "identity-platform.selectorLabels" . | nindent 4 }}
     {{- with .Values.ig.podLabels }}

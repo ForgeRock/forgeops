@@ -683,12 +683,15 @@ ig:
   service:
     type: ClusterIP
     port: 80
+  serviceAdmin:
+    type: ClusterIP
+    port: 8085
 
   prometheus:
     servicemonitor:
       enabled: false
-      path: /openig/metrics/prometheus
-      port: http
+      path: /metrics/prometheus/0.0.4
+      port: http-admin
       secretUser: metric
       secretPassword: password
 
