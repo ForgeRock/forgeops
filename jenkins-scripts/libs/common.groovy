@@ -111,7 +111,11 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
                 dir('guillotine') {
 
-                    localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
+                  //  localGitUtils.cloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master', true)
+                    checkout scmGit(branches: [[name: 'refs/heads/master']],
+                            extensions: [],
+                            userRemoteConfigs: [[refspec: '+refs/heads/master:refs/remotes/origin/master',
+                                                 url: 'ssh://git@stash.forgerock.org:7999/cloud/guillotine.git']])
 
                     if (providerName == 'GKE'){
                         authenticateGke()
