@@ -112,3 +112,18 @@ else
     fi
 fi
 
+sg_repo=https://helm.mittwald.de
+sg_version=
+sg_namespace=secret-generator
+sg_chart_name=kubernetes-secret-generator
+sg_installed=$(kubectl get deployment -l app.kubernetes.io/name=kubernetes-secret-generator 2>/dev/null)
+    if [ -n "$sg_installed" ] ; then
+        echo "Secret Generator has already been installed."
+    else
+        echo "Secret Generator not found.  Installing..."
+        kubectl create namespace $sg_namespace 2>/dev/null || true
+        helm upgrade $sg_chart_name $sg_chart_name --repo $sg_repo \
+            --namespace $sg_namespace --install --reset-values \
+            ${sg_version:+--version=$sg_version} \
+            --set secretLength=26
+    fi
