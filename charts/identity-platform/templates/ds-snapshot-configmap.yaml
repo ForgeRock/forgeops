@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "ds_snapshot.configMapName" . }}
+  name: {{ include "ds-snapshot.configMapName" . }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
 data:

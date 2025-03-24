@@ -180,6 +180,11 @@ message "NAMESPACE=$NAMESPACE" "debug"
 VERSION_OPT="--version $CHART_VER"
 NAMESPACE_OPT="-n $NAMESPACE"
 
+if [ ! -x "$YQ_CMD" ] ; then
+  echo "ERROR! mikefarah yq is not installed. Install it and run command again."
+  exit 1
+fi
+
 if [ "$CHART_SOURCE" == "local" ] ; then
   HELM_OPTS="$CHART_NAME $NAMESPACE_OPT $SCRIPT_DIR/../charts/identity-platform"
 else

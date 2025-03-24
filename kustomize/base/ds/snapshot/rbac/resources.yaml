@@ -9,7 +9,7 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: ds-snapshot
+  name: ds-snapshot-%!s(<nil>)
 rules:
   - apiGroups:
       - ""
@@ -73,5 +73,5 @@ subjects:
     namespace: prod
 roleRef:
   kind: ClusterRole
-  name: ds-snapshot
+  name: ds-snapshot-%!s(<nil>)
   apiGroup: rbac.authorization.k8s.io

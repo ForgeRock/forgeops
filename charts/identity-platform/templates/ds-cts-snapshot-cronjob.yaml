@@ -44,12 +44,12 @@ spec:
             - name: PURGE_DELAY
               value: {{ .Values.ds_cts.snapshot.purgeDelay | quote }}
             volumeMounts:
-            - name: {{ include "ds_snapshot.configMapName" . }}
+            - name: {{ include "ds-snapshot.configMapName" . }}
               mountPath: /scripts
           volumes:
-          - name: {{ include "ds_snapshot.configMapName" . }}
+          - name: {{ include "ds-snapshot.configMapName" . }}
             configMap:
-              name: {{ include "ds_snapshot.configMapName" . }}
+              name: {{ include "ds-snapshot.configMapName" . }}
               defaultMode: 0555
           restartPolicy: Never
 {{- end }}
