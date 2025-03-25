@@ -132,6 +132,10 @@ fi
 # Reset the REPO value because the source command will set it to the am repo
 REPO=$DEFAULT_REPO
 
+# Only retrieve the release identifier from the tag
+echo "Stripping the date string suffix from the PingAM release tag so it retrieves the correct version of the upgrader to match PingAM"
+TAG=${TAG%%-*}
+
 # For docker volume mounts.
 CONFIG=$(realpath $CONFIG_DIR)
 
