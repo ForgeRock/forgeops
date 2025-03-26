@@ -6,6 +6,7 @@ platform:
     enabled: false
   ds_certs:
     enabled: false
+  secret_generator_enable: false
 admin_ui:
   enabled: false
 am:

@@ -6,6 +6,7 @@ platform:
   disable_secret_agent_config: true
   ds_certs:
     enabled: false
+  secret_generator_enable: false
 admin_ui:
   enabled: false
 am:
