@@ -1,4 +1,4 @@
-RELEASE=2025.1.2
+RELEASE=2025.2.0
 # Release Notes  
 
 ## New Features/Updated functionality
@@ -6,6 +6,9 @@ RELEASE=2025.1.2
 ### Updates to bin/certmanager-deploy.sh
 The bin/certmanager-deploy.sh script has been updated to use the latest available version.  
 CRDs are now deployed as part of the helm command using --set installCRDs=true.
+
+### New PingGateway version available
+PingGateway 2025.3.0 has been released and is available to deploy with forgeops tooling.
 
 ## Bugfixes
 
