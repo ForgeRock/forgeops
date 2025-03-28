@@ -63,6 +63,32 @@ def _get_containers(namespace, pod):
     return containers
 
 
+def _get_forgeops_file_content(filename):
+    file_path = f'{root_path}/{filename}'
+
+    # Read file content
+    if os.path.isfile(file_path):
+        with open(file_path, 'r') as file:
+            file_content = file.read()
+    else:
+        print(f'File: {file_path} does not exist')
+        file_content = ""
+
+    # Returns file contents
+    return file_content
+
+
+def _get_forgeops_version():
+    file_path = f'{root_path}/CHANGELOG.md'
+
+    # Read first line from CHANGELOG.md
+    with open(file_path, 'r') as file:
+        file_content = file.readline()
+
+    # Return forgeops version number only
+    return file_content.split('=')[1]
+
+
 def _get_awscli_version():
     success, awscli, _ = utils.run_condfail('aws', '--version', cstdout=True, cstderr=True, ignoreFail=True)
     if success:
@@ -147,14 +173,6 @@ def _get_python3_version():
         return 'command to get Python3 version failed'
 
 
-def _get_skaffold_version():
-    success, skaffold, _ = utils.run_condfail('skaffold', 'version', cstdout=True, cstderr=True, ignoreFail=True)
-    if success:
-        return skaffold.decode('ascii').strip()[1:]
-    else:
-        return 'command to get Skaffold version failed'
-
-
 def get_names(name, namespace):
     success, get_output, _ = utils.run_condfail('kubectl', f'get {name} --namespace {namespace} '
                                                            f'--output=jsonpath={{.items[*].metadata.name}}',
@@ -163,20 +181,6 @@ def get_names(name, namespace):
         return get_output.decode('utf-8').split()
     else:
         return []
-
-
-def write_context(output):
-    get_output = utils.get_context()
-
-    # Write section
-    context_html = '''
-    <br>
-    <h2><a id="context">Kubernetes Context</a></h2>
-    <pre>{get_output}</pre>
-    <p><a href="#toc">Back to Index</a></p>
-    <br>
-    '''.format(get_output=get_output)
-    output.write(context_html)
 
 
 def write_crds(output):
@@ -197,7 +201,7 @@ def write_crds(output):
     output.write(crds_html)
 
 
-def write_forgeops_info(output, forgeops_branch):
+def write_forgeops_info(output):
     # write Forgeops branch name and git log
     success, get_output, _ = utils.run_condfail('git', f'--no-pager log -n 10', cstdout=True, ignoreFail=True)
     if success:
@@ -208,9 +212,6 @@ def write_forgeops_info(output, forgeops_branch):
     # Write section
     html = f'''
     <br>
-    <h2><a id="forgeops_branch">Forgeops Branch Name</a></h2>
-    <pre>{forgeops_branch}</pre>
-    <p><a href="#toc">Back to Index</a></p>
     <h2><a id="git">Forgeops Repository Git Log (Most Recent Entries)</a></h2>
     <pre>{get_output}</pre>
     <p><a href="#toc">Back to Index</a></p>
@@ -218,10 +219,23 @@ def write_forgeops_info(output, forgeops_branch):
     '''
     output.write(html)
 
+def write_forgeops_environment(output, env_log):
+    # Write section
+    env_html = f'''
+    <br>
+    <h2><a id="env">Deployment environment env.log</a></h2>
+    <pre>{env_log}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    <br>
+    '''.format(env_log=env_log)
+    output.write(env_html)
 
-def write_header(output, namespace):
+def write_header(output, namespace, helm_or_kust):
     # Get current date and time
     now = datetime.now()
+
+    # Get current kube context
+    context = utils.get_context()
 
     # Write file heading
     heading_html = '''
@@ -237,11 +251,17 @@ def write_header(output, namespace):
     <body>
     <h1>ForgeOps Debug Output</h1>
     <p>
+    ForgeOps Release: {version}
+    <br>
     Namespace: {namespace}
+    <br>
+    Kubernetes context: {context}
+    <br>
+    Deployment method: {helm_or_kust}
     <br>
     Logged at {now}
     </p>
-    '''.format(namespace=namespace, now=now)
+    '''.format(version=_get_forgeops_version(), namespace=namespace, helm_or_kust=helm_or_kust, now=now, context=context)
     output.write(heading_html)
 
 
@@ -420,24 +440,6 @@ def write_k_description(output, namespace, k_type, k_name):
     output.write(html)
 
 
-def write_skaffold_config(output):
-    success, get_output, _ = utils.run_condfail('skaffold', f'config list', cstdout=True, ignoreFail=True)
-    if success:
-        get_output = get_output.decode('utf-8').replace('\n', '<br/>')
-    else:
-        get_output = 'Command to get the Skaffold configuration failed<br/>'
-
-    # Write section
-    skaffold_config_html = '''
-    <br>
-    <h2><a id="skaffoldconfig">Skaffold Configuration</a></h2>
-    <pre>{get_output}</pre>
-    <p><a href="#toc">Back to Index</a></p>
-    <br>
-    '''.format(get_output=get_output)
-    output.write(skaffold_config_html)
-
-
 def write_storage_classes(output, namespace):
     success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace}, get storageclasses',
                                                 cstdout=True, ignoreFail=True)
@@ -470,7 +472,6 @@ def write_sw_versions(output, container_engine):
     kustomize_vers = _get_kustomize_version()
     minikube_vers = _get_minikube_version()
     python3_vers = _get_python3_version()
-    skaffold_vers = _get_skaffold_version()
 
     # Write PVC description
     sw_versions_html = '''
@@ -487,7 +488,6 @@ def write_sw_versions(output, container_engine):
     Kustomize: {kustomize_vers}</br>
     Minikube: {minikube_vers}</br>
     Python 3: {python3_vers}</br>
-    Skaffold: {skaffold_vers}</br>
     <p><a href="#toc">Back to Index</a></p>
     '''.format(awscli_vers=awscli_vers,
                azcli_vers=azcli_vers,
@@ -499,12 +499,11 @@ def write_sw_versions(output, container_engine):
                kube_server_vers=kube_server_vers,
                kustomize_vers=kustomize_vers,
                minikube_vers=minikube_vers,
-               python3_vers=python3_vers,
-               skaffold_vers=skaffold_vers)
+               python3_vers=python3_vers)
     output.write(sw_versions_html)
 
 
-def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
+def write_toc(output, pods, stss, pvcs, jobs, objs, operators, env_log):
     # Build TOCs of pods, PVCs, and other objects
     pods_toc = ''
     for pod in pods:
@@ -519,38 +518,21 @@ def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
     for job in jobs:
         jobs_toc += f'<li><a href="#job_{job}">{job}</a></li>'
     operators_toc = ''
-    for operator in operators:
-        operators_toc += f'<li><a href="#{operator[3]}">{operator[3]}</a></li>'
+    operators_toc += f'<li><a href="#{operators[3]}">{operators[3]}</a></li>'
     objects_toc = ''
     for obj in objs:
         objects_toc += f'<li><a href="#{obj[1]}">{obj[1]}</a></li>'
         objects_toc += f'<li><a href="#{obj[2]}">{obj[2]}</a></li>'
     other_toc = ''
-    other_toc += f'<li><a href="#context">Kubernetes context</a></li>'
     other_toc += f'<li><a href="#sw_versions">Third-party software versions</a></li>'
     other_toc += f'<li><a href="#crds">CRDs</a></li>'
     other_toc += f'<li><a href="#storageclasses">Kubernetes storage classes</a></li>'
-    other_toc += f'<li><a href="#skaffoldconfig">Skaffold configuration</a></li>'
-    other_toc += f'<li><a href="#forgeops_branch">Forgeops branch name</a></li>'
     other_toc += f'<li><a href="#git">Forgeops repository Git log (most recent entries)</a></li>'
+    if not env_log == "":
+        other_toc += f'<li><a href="#env">Deployment environment env.log</a></li>'
 
     # Write TOC
 
-    # write directoryservice TOC only if directoryservice objects found
-    ds_srv_html = ''
-    if len(ds_srvs) > 0:
-        ds_srvs_toc = ''
-        for ds_srv in ds_srvs:
-            ds_srvs_toc += f'<li><a href="#directoryservice_{ds_srv}">{ds_srv}</a></li>'
-        ds_srv_html = f'''<h2>DirectoryService</h2>
-    <ul>
-        <li><a href="#directoryservice_list">DirectoryService (kubectl CLI output)</a></li>
-        <li>DirectoryService Descriptions</li>
-        <ul>
-        {ds_srvs_toc}
-        </ul>
-    </ul>
-'''
 
     toc_html = f'''
     <h2><a id="toc">Environment Information</a></h2>
@@ -577,7 +559,6 @@ def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
     <ul>
     {pvcs_toc}
     </ul>
-    {ds_srv_html}
     <h2>Operator Logs</h2>
     <ul>
     {operators_toc}
@@ -594,10 +575,6 @@ def write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators):
         {jobs_toc}
         </ul>
     </ul>
-    <h2><a id="toc">Environment</a></h2>
-    <ul>
-    {other_toc}
-    </ul>
     '''
     output.write(toc_html)
 
@@ -609,23 +586,47 @@ def main():
                         help='Maximum lines to print from each container log (default: 400)')
     parser.add_argument('-n', '--namespace',
                         help='Target namespace (default: current namespace)')
-    parser.add_argument('-b', '--forgeops-branch', dest='forgeops_branch',
-                        help='Forgeops branch used to deploy the platform (e.g. release/7.4-20231204)')
+    parser.add_argument('-e', '--env-name', dest='env_name',
+                        help='Helm or Kustomize environment name created using `forgeops env`')
+    deploy = parser.add_mutually_exclusive_group(required=True)
+    deploy.add_argument('-k', '--kustomize', dest='helm_or_kust', action='store_const', const='kustomize',  
+                       help='Deployed with Kustomize')
+    deploy.add_argument('-l', '--helm', dest='helm_or_kust', action='store_const', const='helm',
+                       help='Deployed with Helm')    
     args = parser.parse_args()
     max_log_lines = args.max_log_lines if getattr(args, 'max_log_lines', None) else 400
-    if getattr(args, 'forgeops_branch', None):
-        forgeops_branch = args.forgeops_branch
+
+    helm_or_kust = getattr(args, 'helm_or_kust', None)
+        
+    # Get env name argument
+    if getattr(args, 'env_name', None):
+        env_name = args.env_name
     else:
-        forgeops_branch = input('Please provide the Forgeops branch used to deploy the platform '
-                                '(e.g. release/7.4-20231204) : ')
+        env_name = input('Please provide the env name you created when using `forgeops env`(e.g. kustomize/overlay/<env-name> or helm/<env-name>) '
+                                'or press enter to continue: ')
+    
+    if helm_or_kust == 'helm':
+        env_path = f'helm/'
+    else: 
+        env_path = f'kustomize/overlay/'
+    
+    # Check if env folder exists otherwise exit
+    env_log = ""
+    if not env_name == "": 
+        if os.path.isdir(f'{root_path}/{env_path}{env_name}'):
+            env_log = _get_forgeops_file_content(f'{env_path}{env_name}/env.log')
+            if env_log == "":
+                print(f'env.log does not exist or is empty, so skipping')
+        else:
+            print(f'{helm_or_kust} env: {env_name} does not exist. Please provide a correct environment name')
+            sys.exit(1)
 
     # Get the namespace (either passed in as an arg, or set in the user's context)
     ctx_namespace = utils.get_namespace()
     namespace = getattr(args, 'namespace', None) or ctx_namespace
 
     # Definitions of some stuff we'll be getting information about
-    operators = [['app.kubernetes.io/name=secret-agent-manager', 'secret-agent-system', 'manager', 'secret-agent'],
-                 ['control-plane=ds-operator', 'fr-system', 'ds-operator', 'ds-operator']]
+    operators = ['app.kubernetes.io/name=secret-agent-manager', 'secret-agent-system', 'manager', 'secret-agent']
     objs = [['service', 'Services (kubectl CLI output)', 'Services (YAML)'],
             ['ingress', 'Ingress (kubectl CLI output)', 'Ingress (YAML)'],
             ['configmap', 'Configmap (kubectl CLI output)', 'Configmap (YAML)'],
@@ -636,7 +637,6 @@ def main():
     stss = get_names('statefulset', namespace)
     pvcs = get_names('pvc', namespace)
     jobs = get_names('job', namespace)
-    ds_srvs = get_names('directoryservice', namespace)
 
     # Set container engine
     if os.getenv('CONTAINER_ENGINE') and os.getenv('CONTAINER_ENGINE').lower() == 'podman':
@@ -651,17 +651,20 @@ def main():
     with open(output_file, 'w') as output:
 
         # Write the header and TOC
-        write_header(output, namespace)
-        write_toc(output, pods, stss, pvcs, jobs, ds_srvs, objs, operators)
+        write_header(output, namespace, helm_or_kust)
+        write_toc(output, pods, stss, pvcs, jobs, objs, operators, env_log)
 
         # Write diagnostics about the environment
         print('Writing environment information')
-        write_context(output)
         write_sw_versions(output, container_engine)
         write_crds(output)
         write_storage_classes(output, namespace)
-        write_skaffold_config(output)
-        write_forgeops_info(output, forgeops_branch)
+        write_forgeops_info(output)
+
+        if not env_log == "":
+            # Write Helm or Kustomize env logs
+            print('Writing Helm or Kustomize env logs')        
+            write_forgeops_environment(output, env_log)
 
         # Write pod descriptions and container logs
         print('Writing pod descriptions and container logs')
@@ -691,23 +694,10 @@ def main():
             print(f'  {pvc}')
             write_k_description(output, namespace, 'pvc', pvc)
 
-        # Write directoryservice only if directoryservice objects found
-        if len(ds_srvs) > 0:
-            print('Writing directoryservice information')
-            ds_srv_title_html = '''
-            <hr>
-            <h2>DirectoryService</h2>'''
-            output.write(ds_srv_title_html)
-            write_k_list('directoryservice', output, namespace)
-            for ds_srv in ds_srvs:
-                print(f'  {ds_srv}')
-                write_k_description(output, namespace, 'directoryservice', ds_srv)
-
         # Write operator logs
         print('Writing operator logs')
-        for operator in operators:
-            print(f'  {operator[3]}')
-            write_operator_logs(output, operator, int(max_log_lines))
+        print(f'  {operators[3]}')
+        write_operator_logs(output, operators, int(max_log_lines))
 
         # Write special objects (CLI and YAML output)
         print('Writing information about various Kubernetes objects')
