@@ -33,7 +33,7 @@ else
     helm upgrade cert-manager cert-manager --repo $cm_repo \
         --namespace $cm_namespace --install --reset-values \
         ${cm_version:+--version=$cm_version} \
-        --set installCRDs=true \
+        --set crds.enabled=true \
         --set global.leaderElection.namespace=$cm_namespace \
         \
         --set tolerations[0]."key"="kubernetes\.io/arch" \
@@ -48,6 +48,26 @@ else
         --set webhook.tolerations[0]."key"="kubernetes\.io/arch" \
         --set webhook.tolerations[0]."effect"="NoSchedule" \
         --set webhook.tolerations[0]."operator"="Exists"
+fi
+
+tm_repo=https://charts.jetstack.io
+tm_namespace=cert-manager
+tm_version=
+tm_installed=$(kubectl get crd -l app=trust-manager 2>/dev/null)
+if [ -n "$tm_installed" ]; then
+    echo "trust-manager has already been installed."
+else
+    echo "trust-manager not found.  Installing..."
+    kubectl create namespace $tm_namespace 2>/dev/null || true
+    helm upgrade trust-manager trust-manager --repo $tm_repo \
+        --namespace $tm_namespace --install --reset-values \
+        ${tm_version:+--version=$tm_version} \
+        --set crds.enabled=true \
+        --set secretTargets.enabled=true \
+        --set secretTargets.authorizedSecretsAll=true \
+        --set tolerations[0]."key"="kubernetes\.io/arch" \
+        --set tolerations[0]."effect"="NoSchedule" \
+        --set tolerations[0]."operator"="Exists"
 fi
 
 if [ "$ingress" = "nginx" ]; then
