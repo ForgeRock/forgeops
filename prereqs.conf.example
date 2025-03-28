@@ -1,0 +1,21 @@
+#CM_VERSION=
+#TM_VERSION=
+# Nginx version
+#NX_VERSION=
+# HAProxy version
+#HP_VERISON=
+# Secret Agent version
+#SA_VERSION=
+# Secret Generator version
+#SG_VERSION=
+#
+# If you set any of the following, it overrides the runtime options.
+#
+# You can set an array of targets if you don't want all of the prereqs
+#TARGETS=("cert-manager" "trust-manager" "ingress" "secrets")
+#
+# Specify an ingress
+#INGRESS="haproxy"
+#
+# Specify a secret manager
+#SECRETS="secret-generator"
