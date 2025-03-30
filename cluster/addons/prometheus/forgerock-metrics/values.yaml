@@ -17,7 +17,7 @@ am:
   component: am
   enabled: true
   path: /metrics/prometheus/0.0.4
-  port: https
+  port: http
   labelSelectorComponent: am
   secretUser: prometheus
   secretPassword: prometheus
