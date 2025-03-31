@@ -5,7 +5,6 @@ resources:
 - ../../../../base/ds/snapshot/rbac
 
 patches:
-- path: rolebinding.yaml
 - path: cluster-role-name.yaml
   target:
     group: rbac.authorization.k8s.io

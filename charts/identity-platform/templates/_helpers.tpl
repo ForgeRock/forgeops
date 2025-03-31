@@ -73,5 +73,9 @@ Create the name of the snapshot script configmap use
 Create a ClusterRole name for volume snapshots
 */}}
 {{- define "ds-snapshot.clusterRoleName" }}
+{{- if .Values.ds_snapshot.appendNSToRole }}
 {{- printf "%s-%s" .Values.ds_snapshot.clusterRoleName .Release.namespace }}
+{{- else }}
+{{- .Values.ds_snapshot.clusterRoleName }}
+{{- end }}
 {{- end }}

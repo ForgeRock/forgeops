@@ -18,6 +18,7 @@ ds:
 ds_snapshot:
   rbacCreate: true
   rbacOnly: true
+  appendNSToRole: false
 ds_cts:
   enabled: false
   snapshot:
