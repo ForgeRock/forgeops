@@ -181,6 +181,11 @@ def process_overlay_dir(path, config, args):
                 'op': 'replace',
                 'path': '/roleRef/name',
                 'value': role_name
+            },
+            {
+                'op': 'replace',
+                'path': '/subjects/0/namespace',
+                'value': args.namespace
             }
         ]
 
