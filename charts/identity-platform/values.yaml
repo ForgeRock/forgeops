@@ -98,11 +98,6 @@ platform:
 
   secret_generator_enable: false
   secrets:
-  #  ds-passwords:
-  #    - name: dirmanager.pw
-  #      length: 32
-  #    - name: monitor.pw
-  #      value: password
   #  am-passwords:
   #    - name: .keypass
   #      length: 24
@@ -139,6 +134,11 @@ platform:
         - AM_STORES_APPLICATION_PASSWORD
         - AM_STORES_CTS_PASSWORD
         - AM_STORES_USER_PASSWORD
+    ds-passwords:
+      length: 32
+      autogenerate:
+        - dirmanager.pw
+        - monitor.pw
   #  idm-env-secrets:
   #    - name: OPENIDM_ADMIN_PASSWORD
   #      length: 24
