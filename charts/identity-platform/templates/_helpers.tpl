@@ -79,3 +79,25 @@ Create a ClusterRole name for volume snapshots
 {{- .Values.ds_snapshot.clusterRoleName }}
 {{- end }}
 {{- end }}
+
+{{/*
+Define the key in the amster secret for the private SSH key
+*/}}
+{{- define "amster.ssh.private_key_name" }}
+{{- if .Values.platform.secret_generator_enable }}
+{{- printf "ssh-privatekey" }}
+{{- else }}
+{{- printf "id_rsa" }}
+{{- end }}
+{{- end }}
+
+{{/*
+Define the key in the amster secret for the public SSH key
+*/}}
+{{- define "amster.ssh.public_key_name" }}
+{{- if .Values.platform.secret_generator_enable }}
+{{- printf "ssh-publickey" }}
+{{- else }}
+{{- printf "id_rsa.pub" }}
+{{- end }}
+{{- end }}

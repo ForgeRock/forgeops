@@ -57,7 +57,7 @@ spec:
           secret:
             secretName: amster
             items:
-            - key: id_rsa.pub
+            - key: {{ include "amster.ssh.public_key_name" . | quote }}
               path: authorized_keys
         - name: truststore
           projected:

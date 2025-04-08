@@ -98,6 +98,8 @@ platform:
 
   secret_generator_enable: false
   secrets:
+    amster:
+      type: ssh-keypair
   #  am-passwords:
   #    - name: .keypass
   #      length: 24

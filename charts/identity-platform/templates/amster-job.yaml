@@ -57,7 +57,7 @@ spec:
           secret:
             secretName: amster
             items:
-              - key: id_rsa
+              - key: {{ include "amster.ssh.private_key_name" . | quote }}
                 path: id_rsa
         - name: platform-config
           configMap:
