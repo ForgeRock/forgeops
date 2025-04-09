@@ -16,21 +16,48 @@ usage() {
   Usage:
   $prog COMMAND [OPTIONS] [<prereq> <prereq> ...]
 
-  Central interface to the scripts in commands folder. Use -h with any command
-  to see its usage.
+  Install/Upgrade prereq tools into Kubernetes cluster. Use prereqs.conf to pin
+  versions and set preferred ingress and secrets tool.
 
   OPTIONS:
   -h|--help                 : display usage and exit
   -d|--debug                : turn on debugging
   --dryrun                  : do a dry run
   -v|--verbose              : be verbose
+  -f|--cfg /path/to/file    : file of overrides (default: /path/to/forgeops/prereqs.conf)
   --haproxy                 : use haproxy instead of nginx
   --secret-generator        : use secret-generator instead of secret-agent
+  --upgrade                 : upgrade if already installed
 
   Available prereqs: ${TARGETS_ALL[*]}
 
   You can use secret-agent or secrets-generator for the secrets target.
   You can use nginx or haproxy for the ingress target.
+
+  Examples:
+  Install all prereqs with defaults:
+  $prog
+
+  Install all prereqs using haproxy and secret-generator:
+  $prog --haproxy --secret-generator
+
+  Install only cert-manager and an ingress (nginx):
+  $prog cert-manager ingress
+
+  Only install HAProxy ingress:
+  $prog --haproxy ingress
+
+  Upgrade all prereqs:
+  $prog --upgrade
+
+  Upgrade all prereqs using HAProxy and secret-generator:
+  $prog --upgrade --haproxy --secret-generator
+
+  Upgrade cert-manager only:
+  $prog --upgrade cert-manager
+
+  Do a dryrun:
+  $prog --dryrun
 
 EOM
 
@@ -47,15 +74,19 @@ applyChart() {
   local opts=$6
   local installed=$7
   local chart_repo="$chart_name $chart_name --repo $repo"
+  local msg="$pretty not found.  Installing..."
 
   if [[ "$repo" =~ ^oci:// ]] ; then
     chart_repo="$chart_name $repo"
   fi
 
-  if [ -n "$installed" ] ; then
+  if [ -n "$installed" ] && [ "$UPGRADE" = false ] ; then
     echo "$pretty has already been installed."
   else
-    echo "$pretty not found.  Installing..."
+    if [ -n "$installed" ] && [ "$UPGRADE" = true ] ; then
+      msg="Upgrading $pretty..."
+    fi
+    echo $msg
     runOrPrint "helm upgrade $chart_repo \
         ${version:+--version=$version} --atomic \
         --namespace $namespace --install --reset-values \
@@ -71,6 +102,7 @@ INGRESS=${INGRESS:-nginx}
 SECRETS=${SECRETS:-secret-agent}
 CONFIG_FILE=${PREREQS_CONF:-$SCRIPT_DIR/../prereqs.conf}
 TARGETS=()
+UPGRADE=${UPGRADE:-false}
 
 TARGETS_ALL=(
     "cert-manager"
@@ -88,6 +120,7 @@ while true ; do
     -f|--cfg) CONFIG_FILE=$2 ; shift 2 ;;
     --haproxy) INGRESS=haproxy ; shift ;;
     --secret-generator) SECRETS=secret-generator ; shift ;;
+    --upgrade) UPGRADE=true ; shift ;;
     "") break ;;
     *) TARGETS+=( $1 ) ; shift ;;
   esac
@@ -97,6 +130,7 @@ message "DEBUG=$DEBUG" "debug"
 message "DRYRUN=$DRYRUN" "debug"
 message "VERBOSE=$VERBOSE" "debug"
 message "CONFIG_FILE=$CONFIG_FILE" "debug"
+message "UPGRADE=$UPGRADE" "debug"
 
 if containsElement "all" "${TARGETS[*]}" || [ -z "$TARGETS" ] ; then
     TARGETS=${TARGETS_ALL[@]}
