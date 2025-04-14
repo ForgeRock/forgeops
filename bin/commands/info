@@ -107,14 +107,14 @@ def shared_env_info(name, releases, repo, tag, debug=False):
         current_release = parse_release_str(release_name)
         if debug:
             print(f"release_name={release_name}")
-        maj_min = current_release['maj_min']
-        full = current_release['full']
+        maj_min = f"{current_release.major}.{current_release.minor}"
+        full = str(current_release)
         if tag in ALT_RELEASES:
             latest_tag = tag
-        elif utils.key_exists(releases[image_name], f"{maj_min}.{full}"):
+        elif utils.key_exists(releases[image_name], f"{maj_min}_{full}", '_'):
             if debug:
                 print(f"shared_env_info(): Found {release_name} for {image_name}")
-            latest_tag = releases[image_name][maj_min][full][tags][-1]
+            latest_tag = releases[image_name][maj_min][full]['tags'][-1]
         else:
             if debug:
                 print("release_name is not set or custom, selecting latest")
@@ -272,8 +272,8 @@ def get_release_details(release_str, releases, components, is_json_format=False)
         'scan_frequency': 'none',
         'tags': {}
     }
-    maj_min = release['maj_min']
-    full = release['full']
+    maj_min = f"{release.major}.{release.minor}"
+    full = str(release)
     for component in components:
         releases[component].pop('dev', None)
         if maj_min in releases[component]:

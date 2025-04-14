@@ -239,7 +239,7 @@ examples:
         release = parse_release_str(args.release)
         image_names = copy(BASE_IMAGE_NAMES)
         for c in components:
-            release_tags[c], image_names = select_tag(c, releases, release, image_names, args.tag)
+            release_tags[c], image_names = select_tag(c, releases, release, image_names, args.tag, args.debug)
 
         if update_docker_files:
             print(f"Updating release file(s) for docker builds [{release_name}]")
