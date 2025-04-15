@@ -41,14 +41,14 @@ spec:
       http:
         paths:
           - path: /admin(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: ig
                 port:
                   number: {{ $adminPort }}
           - path: /ig(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: ig
