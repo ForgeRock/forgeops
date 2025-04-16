@@ -132,6 +132,12 @@ spec:
               secretKeyRef:
                 name: amster-env-secrets
                 key: IDM_RS_CLIENT_SECRET
+          {{- with .Values.platform.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.idm.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           envFrom:
           - configMapRef:
               name: idm

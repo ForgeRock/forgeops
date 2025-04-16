@@ -43,4 +43,9 @@ data:
   DISASTER_RECOVERY_ID: {{ .Values.ds_restore.disasterRecoveryId | quote }}
   CERT_ISSUER: default-issuer
   AMSTER_DURATION: {{ default "" .Values.amster.amsterRetain | quote }}
+  {{- if .Values.platform.configMap.enabled }}
+  {{- with .Values.platform.configMap.data }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
 {{- end }}

@@ -19,10 +19,18 @@ platform:
       enabled: false
   base:
     enabled: true
+  configMap:
+    enabled: false
+    # Provide extra ENV vars to add to platform-config ConfigMap
+    data: {}
+      #ENVIRONMENT: "test"
   cert_manager:
     # If disabled, the ingress tls issuer and the PingDS certificates will be not be created/deployed
     # (DS certificates are ds-master-keypair and ds-ssl-keypair)
     enabled: true
+  env: []
+    #- name: "MY_ENV"
+    #  value: "value"
   grafana:
     enabled: false
   ds_certs:
@@ -172,6 +180,11 @@ am:
     # Uncomment className and/or annotations to override global platform values
     # className: "nginx"
     # annotations: {}
+
+  # Provide extra ENV vars to AM deployment
+  env: []
+    #- name: "AM_ENV_1"
+    #  value: "am_value"
 
   resources:
     limits:
@@ -349,6 +362,11 @@ idm:
     # Uncomment className and/or annotations to override global platform values
     # className: "nginx"
     # annotations: {}
+
+  # Provide extra ENV vars to IDM deployment
+  env: []
+    #- name: "IDM_ENV_1"
+    #  value: "idm_value"
 
   resources:
     limits:

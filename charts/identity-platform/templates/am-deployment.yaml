@@ -132,6 +132,12 @@ spec:
             value: changeit
           - name: AM_STORES_USER_TYPE
             value: LDAPv3ForForgeRockIAM
+          {{- with .Values.platform.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.am.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           envFrom:
           - secretRef:
               name: am-env-secrets
