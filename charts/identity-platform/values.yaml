@@ -138,7 +138,7 @@ platform:
   #    - name: IDM_PROVISIONING_CLIENT_SECRET
   #      length: 24
   #    - name: IDM_RS_CLIENT_SECRET
-    ds_env-secrets:
+    ds-env-secrets:
       length: 32
       autogenerate:
         - AM_STORES_APPLICATION_PASSWORD
@@ -149,11 +149,11 @@ platform:
       autogenerate:
         - dirmanager.pw
         - monitor.pw
-  #  idm-env-secrets:
-  #    - name: OPENIDM_ADMIN_PASSWORD
-  #      length: 24
-  #    - name: OPENIDM_KEYSTORE_PASSWORD
-  #      length: 24
+    idm-env-secrets:
+      length: 24
+      autogenerate:
+        - OPENIDM_ADMIN_PASSWORD
+        - OPENIDM_KEYSTORE_PASSWORD
   #  rcs-agent-env-secrets:
   #    - name: AGENT_IDM_SECRET
   #      length: 32
