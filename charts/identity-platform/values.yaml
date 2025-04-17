@@ -134,11 +134,12 @@ platform:
   #    - name: AM_SESSION_STATELESS_SIGNING_KEY
   #      length: 32
   #      #useBinaryCharacters: true
-  #  amster-env-secrets:
-  #    - name: IDM_PROVISIONING_CLIENT_SECRET
-  #      length: 24
-  #    - name: IDM_RS_CLIENT_SECRET
-    ds-env-secrets:
+    amster-env-secrets:
+      length: 24
+      autogenerate:
+        - IDM_PROVISIONING_CLIENT_SECRET
+        - IDM_RS_CLIENT_SECRET
+    ds_env-secrets:
       length: 32
       autogenerate:
         - AM_STORES_APPLICATION_PASSWORD
