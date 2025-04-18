@@ -105,9 +105,9 @@ platform:
       #   driver: disk.csi.azure.com
 
   secret_generator_enable: false
-  secrets:
-    amster:
-      type: ssh-keypair
+  secrets: {}
+  #  amster:
+  #    type: ssh-keypair
   #  am-passwords:
   #    - name: .keypass
   #      length: 24
@@ -134,27 +134,27 @@ platform:
   #    - name: AM_SESSION_STATELESS_SIGNING_KEY
   #      length: 32
   #      #useBinaryCharacters: true
-    amster-env-secrets:
-      length: 24
-      autogenerate:
-        - IDM_PROVISIONING_CLIENT_SECRET
-        - IDM_RS_CLIENT_SECRET
-    ds_env-secrets:
-      length: 32
-      autogenerate:
-        - AM_STORES_APPLICATION_PASSWORD
-        - AM_STORES_CTS_PASSWORD
-        - AM_STORES_USER_PASSWORD
-    ds-passwords:
-      length: 32
-      autogenerate:
-        - dirmanager.pw
-        - monitor.pw
-    idm-env-secrets:
-      length: 24
-      autogenerate:
-        - OPENIDM_ADMIN_PASSWORD
-        - OPENIDM_KEYSTORE_PASSWORD
+  #  amster-env-secrets:
+  #    length: 24
+  #    autogenerate:
+  #      - IDM_PROVISIONING_CLIENT_SECRET
+  #      - IDM_RS_CLIENT_SECRET
+  #  ds_env_secrets:
+  #    length: 32
+  #    autogenerate:
+  #      - AM_STORES_APPLICATION_PASSWORD
+  #      - AM_STORES_CTS_PASSWORD
+  #      - AM_STORES_USER_PASSWORD
+  #  ds_passwords:
+  #    length: 32
+  #    autogenerate:
+  #      - dirmanager.pw
+  #      - monitor.pw
+  #  idm_env_secrets:
+  #    length: 24
+  #    autogenerate:
+  #      - OPENIDM_ADMIN_PASSWORD
+  #      - OPENIDM_KEYSTORE_PASSWORD
   #  rcs-agent-env-secrets:
   #    - name: AGENT_IDM_SECRET
   #      length: 32
