@@ -22,7 +22,7 @@ inspection.
 ## TLDR
 You create your own collections of component versions, called releases, with this tool.
 
-Site containing release files: http://release.forgeops.com
+Site containing release files: http://releases.forgeops.com
 
 ### Select 7.5.1 for entire platform
 

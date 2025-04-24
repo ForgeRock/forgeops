@@ -139,8 +139,8 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                         options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
                     }
 
-                    // Configure Guillotine to run tests
-                    sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
+                    // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
+                    sh("./configure.py runtime --platform-version=PLATFORM_IMAGE_REF --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
 
                     try {
                         // Run the tests

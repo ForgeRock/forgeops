@@ -9,7 +9,7 @@
 
 // functional-tests-gke.groovy
 void runStage() {
-    commonModule.runGuillotine(null, 'forgeopsDevWithLatestPlatform', 'GKE', '--keywords "FUNCTIONAL"', '')
+    commonModule.runGuillotine(null, 'forgeopsDevWithLatestPlatform', 'GKE', '--keywords "FUNCTIONAL PLATFORM_IMAGE_REF"', '')
 }
 
 return this
