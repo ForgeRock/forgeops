@@ -107,14 +107,16 @@ platform:
   secret_generator_enable: false
   secrets: {}
   #  amster:
-  #    type: ssh-keypair
-  #  am-passwords:
-  #    - name: .keypass
+  #    annotations:
+  #      type: ssh-keypair
+  #  am_passwords:
+  #    annotations:
   #      length: 24
-  #    - name: .storepass
-  #      length: 24
-  #    - name: username
-  #      value: amadmin
+  #      autogenerate:
+  #        - .keypass
+  #        - .storepass
+  #    data:
+  #      username: amadmin
   #  am-env-secrets:
   #    - name: AM_AUTHENTICATION_SHARED_SECRET
   #      length: 32
@@ -134,32 +136,31 @@ platform:
   #    - name: AM_SESSION_STATELESS_SIGNING_KEY
   #      length: 32
   #      #useBinaryCharacters: true
-  #  amster-env-secrets:
-  #    length: 24
-  #    autogenerate:
-  #      - IDM_PROVISIONING_CLIENT_SECRET
-  #      - IDM_RS_CLIENT_SECRET
+  #  amster_env_secrets:
+  #    annotations:
+  #      length: 24
+  #      autogenerate:
+  #        - IDM_PROVISIONING_CLIENT_SECRET
+  #        - IDM_RS_CLIENT_SECRET
   #  ds_env_secrets:
-  #    length: 32
-  #    autogenerate:
-  #      - AM_STORES_APPLICATION_PASSWORD
-  #      - AM_STORES_CTS_PASSWORD
-  #      - AM_STORES_USER_PASSWORD
+  #    annotations:
+  #      length: 32
+  #      autogenerate:
+  #        - AM_STORES_APPLICATION_PASSWORD
+  #        - AM_STORES_CTS_PASSWORD
+  #        - AM_STORES_USER_PASSWORD
   #  ds_passwords:
-  #    length: 32
-  #    autogenerate:
-  #      - dirmanager.pw
-  #      - monitor.pw
+  #    annotations:
+  #      length: 32
+  #      autogenerate:
+  #        - dirmanager.pw
+  #        - monitor.pw
   #  idm_env_secrets:
-  #    length: 24
-  #    autogenerate:
-  #      - OPENIDM_ADMIN_PASSWORD
-  #      - OPENIDM_KEYSTORE_PASSWORD
-  #  rcs-agent-env-secrets:
-  #    - name: AGENT_IDM_SECRET
-  #      length: 32
-  #    - name: AGENT_RCS_SECRET
-  #      length: 32
+  #    annotations:
+  #      length: 24
+  #      autogenerate:
+  #        - OPENIDM_ADMIN_PASSWORD
+  #        - OPENIDM_KEYSTORE_PASSWORD
 
   tolerations:
     - key: kubernetes.io/arch
