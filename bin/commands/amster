@@ -22,11 +22,11 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 from lib.python import utils
 
 USER_PWD_EXPR_RULES = {
-    'idm-provisioning.json': '&{idm.provisioning.client.secret|openidm}',
-    'idm-resource-server.json': '&{idm.rs.client.secret|password}',
-    'resource-server.json': '&{ig.rs.client.secret|password}',
-    'oauth2.json': '&{pit.client.secret|password}',
-    'ig-agent.json': '&{ig.agent.password|password}',
+    'idm-provisioning.json': '&{idm.provisioning.client.secret|YbDtETPLkGJDtOiy}',
+    'idm-resource-server.json': '&{idm.rs.client.secret|YbDtETPLkGJDtOiy}',
+    'resource-server.json': '&{ig.rs.client.secret|YbDtETPLkGJDtOiy}',
+    'oauth2.json': '&{pit.client.secret|YbDtETPLkGJDtOiy}',
+    'ig-agent.json': '&{ig.agent.password|YbDtETPLkGJDtOiy}',
 }
 
 log = utils.logger(name='amster')

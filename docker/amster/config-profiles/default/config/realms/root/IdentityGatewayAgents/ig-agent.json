@@ -10,7 +10,7 @@
     "_id" : "ig-agent",
     "igTokenIntrospection" : "None",
     "igCdssoRedirectUrls" : [ "http://am:80/am/cdcservlet" ],
-    "userpassword" : "&{ig.agent.password|password}",
+    "userpassword" : "&{ig.agent.password|YbDtETPLkGJDtOiy}",
     "status" : "Active",
     "agentgroup" : null,
     "_type" : {
