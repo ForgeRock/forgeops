@@ -113,7 +113,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
                         sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
                     }
                     // Configure Guillotine to run tests
-                    sh("./configure.py runtime --forgeops-branch-name ${branchName} ${options}")
+                    sh("./configure.py runtime --platform-version PLATFORM_IMAGE_REF --forgeops-branch-name ${branchName} ${options}")
                     try {
                         // Run the tests
                         sh("./run.py")
