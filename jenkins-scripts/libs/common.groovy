@@ -131,7 +131,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                     }
 
                     // Configure Guillotine to run tests
-                    sh("./configure.py runtime --forgeops-branch-name ${branchName} --forgeops-profile cdk ${options}")
+                    sh("./configure.py runtime --platform-version PLATFORM_IMAGE_REF --forgeops-branch-name ${branchName} --forgeops-profile cdk ${options}")
 
                     try {
                         // Run the tests
