@@ -117,25 +117,17 @@ platform:
   #        - .storepass
   #    data:
   #      username: amadmin
-  #  am-env-secrets:
-  #    - name: AM_AUTHENTICATION_SHARED_SECRET
+  #  am_env_secrets:
+  #    annotations:
   #      length: 32
-  #      #useBinaryCharacters: true
-  #    - name: AM_ENCRYPTION_KEY
-  #      length: 24
-  #    - name: AM_OIDC_CLIENT_SUBJECT_IDENTIFIER_HASH_SALT
-  #      length: 20
-  #    - name: AM_PASSWORDS_AMADMIN_CLEAR
-  #      length: 24
-  #    - name: AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY
-  #      length: 32
-  #      #useBinaryCharacters: true
-  #    - name: AM_SESSION_STATELESS_ENCRYPTION_KEY
-  #      length: 32
-  #      #useBinaryCharacters: true
-  #    - name: AM_SESSION_STATELESS_SIGNING_KEY
-  #      length: 32
-  #      #useBinaryCharacters: true
+  #      autogenerate:
+  #        - AM_AUTHENTICATION_SHARED_SECRET
+  #        - AM_ENCRYPTION_KEY
+  #        - AM_OIDC_CLIENT_SUBJECT_IDENTIFIER_HASH_SALT
+  #        - AM_PASSWORDS_AMADMIN_CLEAR
+  #        - AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY
+  #        - AM_SESSION_STATELESS_ENCRYPTION_KEY
+  #        - AM_SESSION_STATELESS_SIGNING_KEY
   #  amster_env_secrets:
   #    annotations:
   #      length: 24

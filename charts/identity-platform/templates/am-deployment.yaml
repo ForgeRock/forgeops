@@ -71,6 +71,9 @@ spec:
         - name: am-logback
           configMap:
             name: am-logback
+        - name: entrypoint-scripts
+          configMap:
+            name: am-entrypoint
       initContainers:
         - name: fbc-init
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
@@ -116,9 +119,9 @@ spec:
             {{- toYaml .Values.am.securityContext | nindent 12 }}
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
-          command:
+          command: 
             - bash
-            - /home/forgerock/docker-entrypoint.sh
+            - /home/forgerock/entrypoint-scripts/entrypoint.sh
           env:
           - name: NAMESPACE
             valueFrom:
@@ -132,6 +135,10 @@ spec:
             value: changeit
           - name: AM_STORES_USER_TYPE
             value: LDAPv3ForForgeRockIAM
+          {{- if and .Values.platform.secret_generator_enable (index .Values.platform.secrets "am_env_secrets") }}
+          - name: SECRET_GENERATOR_AM_ENV_SECRETS
+            value: "true"
+          {{- end }}
           {{- with .Values.platform.env }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -188,6 +195,8 @@ spec:
             mountPath: /home/forgerock/openam
           - name: am-logback
             mountPath: /home/forgerock/logging
+          - name: entrypoint-scripts
+            mountPath: /home/forgerock/entrypoint-scripts
       {{- with .Values.am.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
