@@ -1,0 +1,232 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../../lib/shell/stdlib.sh
+# Bring in common.sh
+source $SCRIPT_DIR/common.sh
+# Go back to where we started
+cd $start_dir
+
+usage() {
+  local usage_msg=$(cat<<EOM
+  Usage:
+  $PROG COMMAND [OPTIONS] [<prereq> <prereq> ...]
+
+  Install/Upgrade prereq tools into Kubernetes cluster. Use prereqs.conf to pin
+  versions and set preferred ingress and secrets tool.
+
+  OPTIONS:
+  -h|--help                 : display usage and exit
+  -d|--debug                : turn on debugging
+  --dryrun                  : do a dry run
+  -v|--verbose              : be verbose
+  --haproxy                 : use haproxy instead of nginx
+  --secret-generator        : use secret-generator instead of secret-agent
+  --upgrade                 : upgrade if already installed
+
+  Available prereqs: ${COMPONENTS_PREREQS[*]}
+
+  You can use secret-agent or secrets-generator for the secrets target.
+  You can use nginx or haproxy for the ingress target.
+
+  Examples:
+  Install all prereqs with defaults:
+  $PROG
+
+  Install all prereqs using haproxy and secret-generator:
+  $PROG --haproxy --secret-generator
+
+  Install only cert-manager and an ingress (nginx):
+  $PROG cert-manager ingress
+
+  Only install HAProxy ingress:
+  $PROG --haproxy ingress
+
+  Upgrade all prereqs:
+  $PROG --upgrade
+
+  Upgrade all prereqs using HAProxy and secret-generator:
+  $PROG --upgrade --haproxy --secret-generator
+
+  Upgrade cert-manager only:
+  $PROG --upgrade cert-manager
+
+  Do a dryrun:
+  $PROG --dryrun
+
+EOM
+)
+
+  usageStd $1 "$usage_msg" "$2"
+}
+
+applyChart() {
+  local pretty=$1
+  local repo=$2
+  local chart_name=$3
+  local namespace=$4
+  local version=$5
+  local opts=$6
+  local installed=$7
+  local chart_repo="$chart_name $chart_name --repo $repo"
+  local msg="$pretty not found.  Installing..."
+
+  if [[ "$repo" =~ ^oci:// ]] ; then
+    chart_repo="$chart_name $repo"
+  fi
+
+  if [ -n "$installed" ] && [ "$UPGRADE" = false ] ; then
+    echo "$pretty has already been installed."
+  else
+    if [ -n "$installed" ] && [ "$UPGRADE" = true ] ; then
+      msg="Upgrading $pretty..."
+    fi
+    echo $msg
+    runOrPrint "helm upgrade $chart_repo \
+        ${version:+--version=$version} --atomic \
+        --namespace $namespace --install --reset-values \
+        $opts --create-namespace"
+  fi
+}
+
+# Setup valid components
+COMPONENTS_VALID=( ${COMPONENTS_PREREQS[@]} 'all' )
+
+processArgs $*
+checkComponents
+
+message "UPGRADE=$UPGRADE" "debug"
+message "INGRESS=$INGRESS" "debug"
+message "SECRETS=$SECRETS" "debug"
+
+if containsElement 'all' "${COMPONENTS[*]}" || [ -z "$COMPONENTS" ] ; then
+    expandComponent 'all' "${COMPONENTS_PREREQS[*]}"
+fi
+
+message "COMPONENTS=${COMPONENTS[*]}" "debug"
+
+CM_PRETTY="Cert Manager"
+CM_REPO=https://charts.jetstack.io
+CM_CHART_NAME=cert-manager
+CM_NAMESPACE=cert-manager
+CM_VERSION=${CM_VERSION:-}
+CM_INSTALLED=$(kubectl get crd -l app=cert-manager 2>/dev/null)
+CM_OPTS="--set crds.enabled=true \
+--set global.leaderElection.namespace=$CM_NAMESPACE \
+--set tolerations[0].'key'='kubernetes\.io/arch' \
+--set tolerations[0].'effect'='NoSchedule' \
+--set tolerations[0].'operator'='Exists' \
+--set cainjector.tolerations[0].'key'='kubernetes\.io/arch' \
+--set cainjector.tolerations[0].'effect'='NoSchedule' \
+--set cainjector.tolerations[0].'operator'='Exists' \
+--set startupapicheck.tolerations[0].'key'='kubernetes\.io/arch' \
+--set startupapicheck.tolerations[0].'effect'='NoSchedule' \
+--set startupapicheck.tolerations[0].'operator'='Exists' \
+--set webhook.tolerations[0].'key'='kubernetes\.io/arch' \
+--set webhook.tolerations[0].'effect'='NoSchedule' \
+--set webhook.tolerations[0].'operator'='Exists'"
+
+TM_PRETTY="Trust Manager"
+TM_REPO=https://charts.jetstack.io
+TM_CHART_NAME=trust-manager
+TM_NAMESPACE=trust-manager
+TM_VERSION=${TM_VERSION:-}
+TM_INSTALLED=$(kubectl get crd -l app.kubernetes.io/instance=trust-manager 2>/dev/null)
+TM_OPTS="--set crds.enabled=true \
+--set secretTargets.enabled=true \
+--set secretTargets.authorizedSecretsAll=true \
+--set tolerations[0].'key'='kubernetes\.io/arch' \
+--set tolerations[0].'effect'='NoSchedule' \
+--set tolerations[0].'operator'='Exists'"
+
+if [ "$INGRESS" = "nginx" ]; then
+    ING_PRETTY="NGINX Ingress"
+    ING_REPO=https://kubernetes.github.io/ingress-nginx
+    ING_CHART_NAME=ingress-nginx
+    ING_NAMESPACE=ingress-nginx
+    ING_VERSION=${NX_VERSION:-}
+    ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=ingress-nginx 2>/dev/null)
+    ING_OPTS="--set controller.kind=Deployment \
+--set controller.replicaCount=2 \
+--set controller.allowSnippetAnnotations=true \
+--set controller.service.type=LoadBalancer \
+--set controller.service.externalTrafficPolicy=Local \
+--set controller.service.omitClusterIP=true \
+--set controller.publishService.enabled=true \
+--set controller.stats.enabled=true \
+--set controller.stats.service.omitClusterIP=true \
+--set controller.tolerations[0].'key'='kubernetes\.io/arch' \
+--set controller.tolerations[0].'effect'='NoSchedule' \
+--set controller.tolerations[0].'operator'='Exists' \
+--set controller.admissionWebhooks.patch.tolerations[0].'key'='kubernetes\.io/arch' \
+--set controller.admissionWebhooks.patch.tolerations[0].'effect'='NoSchedule' \
+--set controller.admissionWebhooks.patch.tolerations[0].'operator'='Exists' \
+--set defaultBackend.tolerations[0].'key'='kubernetes\.io/arch' \
+--set defaultBackend.tolerations[0].'effect'='NoSchedule' \
+--set defaultBackend.tolerations[0].'operator'='Exists'"
+else
+    ING_PRETTY="HAProxy Ingress "
+    ING_REPO=https://haproxy-ingress.github.io/charts
+    ING_CHART_NAME=haproxy-ingress
+    ING_NAMESPACE=haproxy-ingress
+    ING_VERSION=${HP_VERSION:-}
+    ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=haproxy-ingress 2>/dev/null)
+    ING_OPTS="--set controller.kind=Deployment \
+--set controller.replicaCount=2 \
+--set controller.minAvailable=2 \
+--set controller.service.type=LoadBalancer \
+--set controller.service.externalTrafficPolicy=Local \
+--set controller.publishService.enabled=true \
+--set controller.stats.enabled=true \
+--set controller.ingressClassResource.enabled=true \
+--set controller.tolerations[0].'key'='kubernetes\.io/arch' \
+--set controller.tolerations[0].'effect'='NoSchedule' \
+--set controller.tolerations[0].'operator'='Exists' \
+--set defaultBackend.tolerations[0].'key'='kubernetes\.io/arch' \
+--set defaultBackend.tolerations[0].'effect'='NoSchedule' \
+--set defaultBackend.tolerations[0].'operator'='Exists'"
+fi
+
+if [ "$SECRETS" == "secret-agent" ] ; then
+  SEC_PRETTY="Secret Agent"
+  SEC_REPO=oci://us-docker.pkg.dev/forgeops-public/charts/secret-agent
+  SEC_CHART_NAME=secret-agent
+  SEC_NAMESPACE=secret-agent
+  SEC_VERSION=${SA_VERSION:-v1.2.5}
+  SEC_INSTALLED=$(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io 2>/dev/null || true)
+  SEC_OPTS="--set tolerations[0].'key'='kubernetes\.io/arch' \
+--set tolerations[0].'effect'='NoSchedule' \
+--set tolerations[0].'operator'='Exists'"
+else
+  SEC_PRETTY="Secret Generator"
+  SEC_REPO=https://helm.mittwald.de
+  SEC_CHART_NAME=kubernetes-secret-generator
+  SEC_VERSION=${SG_VERSION:-}
+  SEC_NAMESPACE=secret-generator
+  SEC_INSTALLED=$(kubectl get deployment -l app.kubernetes.io/name=kubernetes-secret-generator -n $SEC_NAMESPACE 2>/dev/null)
+  SEC_OPTS="--set secretLength=26"
+fi
+
+for c in ${COMPONENTS[@]} ; do
+  message "c=${c}" "debug"
+  case "$c" in
+    cert-manager)
+      applyChart "$CM_PRETTY" "$CM_REPO" "$CM_CHART_NAME" "$CM_NAMESPACE" "$CM_VERSION" "$CM_OPTS" "$CM_INSTALLED"
+      ;;
+    trust-manager)
+      applyChart "$TM_PRETTY" "$TM_REPO" "$TM_CHART_NAME" "$TM_NAMESPACE" "$TM_VERSION" "$TM_OPTS" "$TM_INSTALLED"
+      ;;
+    ingress)
+      applyChart "$ING_PRETTY" "$ING_REPO" "$ING_CHART_NAME" "$ING_NAMESPACE" "$ING_VERSION" "$ING_OPTS" "$ING_INSTALLED"
+      ;;
+    secrets)
+      applyChart "$SEC_PRETTY" "$SEC_REPO" "$SEC_CHART_NAME" "$SEC_NAMESPACE" "$SEC_VERSION" "$SEC_OPTS" "$SEC_INSTALLED"
+      ;;
+  esac
+done

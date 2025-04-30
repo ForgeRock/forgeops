@@ -56,9 +56,16 @@ COMPONENTS_WAIT=(
    ${COMPONENTS_META[@]}
 )
 
+COMPONENTS_PREREQS=(
+  'cert-manager'
+  'trust-manager'
+  'ingress'
+  'secrets'
+)
+
 SUPPORTED_CONTAINER_ENGINES=('docker' 'podman')
 # Commands that don't require an environment
-COMMANDS_NO_ENV=('wait' 'upgrade-am-config')
+COMMANDS_NO_ENV=('wait' 'upgrade-am-config' 'prereqs')
 
 #############
 # Functions #
@@ -78,6 +85,9 @@ processArgs() {
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
   IMAGE_REPO=${IMAGE_REPO:-}
   PUSH_TO=${PUSH_TO:-}
+  INGRESS=${INGRESS:-nginx}
+  SECRETS=${SECRETS:-secret-agent}
+  UPGRADE=${UPGRADE:-false}
 
   # Vars that cannot be set in /path/to/forgeops/forgeops.conf
   AMSTER_RETAIN=10
@@ -112,6 +122,7 @@ processArgs() {
       -r|--push-to) PUSH_TO=$2 ; shift 2 ;;
       -l|--release-name) RELEASE_NAME=$2 ; shift 2 ;;
       -s|--source) SOURCE=$2 ; shift 2 ;;
+      -u|--upgrade) UPGRADE=true ; shift ;;
       -y|--yes) SKIP_CONFIRM=true ; shift ;;
       --reset) RESET=true ; shift ;;
       --ds-snapshots) DS_SNAPSHOTS="$2" ; shift 2 ;;
@@ -120,6 +131,8 @@ processArgs() {
       --small) SIZE='small' ; shift ;;
       --medium) SIZE='medium' ; shift ;;
       --large) SIZE='large' ; shift ;;
+      --haproxy) INGRESS='haproxy' ; shift ;;
+      --secret-generator) SECRETS='secret-generator' ; shift ;;
       -f|--force|--fqdn)
         if [[ "$1" =~ "force" ]] || [[ "$2" =~ ^\- ]] || [[ "$2" == "" ]]; then
           FORCE=true
@@ -158,13 +171,17 @@ processArgs() {
   # Make sure we have a working kubectl
   [[ ! -x $K_CMD ]] && usage 1 'The kubectl command must be installed and in your $PATH'
 
-  if containsElement 'all' "${COMPONENTS[*]}" ; then
+  if containsElement 'all' "${COMPONENTS[*]}" && [ "$PROG_NAME" != 'prereqs' ] ; then
     echo "The 'all' meta component has been deprecated in favor of 'platform'."
   fi
 
   # If nothing or platform specified as a component, make sure platform is the only component
   if [ -z "$COMPONENTS" ] || containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
-    COMPONENTS=( 'platform' )
+    if [ "$PROG_NAME" == 'prereqs' ] ; then
+      COMPONENTS=( 'all' )
+    else
+      COMPONENTS=( 'platform' )
+    fi
   fi
   message "COMPONENTS=${COMPONENTS[*]}" "debug"
 

@@ -23,6 +23,25 @@
 #PUSH_TO=
 
 #
+# Only for prereqs
+#
+#INGRESS=nginx
+#SECRETS=secret-agent
+#UPGRADE=false
+#cert-manager version
+#CM_VERSION=
+#trust-manager version
+#TM_VERSION=
+#nginx version
+#NX_VERSION=
+#haproxy version
+#HP_VERSION=
+#secret-agent version
+#SA_VERSION=
+#secret-generator version
+#SG_VERSION=
+
+#
 # Releases
 #
 # You shouldn't use this unless you are building images from scratch
