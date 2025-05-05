@@ -51,6 +51,35 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
+      - name: Get latest release
+        id: get_latest_release
+        uses: joutvhu/get-release@v1
+        with:
+          latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Start minikube
+        id: minikube
+        uses: medyagh/setup-minikube@latest
+        with:
+          cpus: 4
+          memory: 8000m
+          addons: storage-provisioner,default-storageclass,ingress
+
+      - name: Cluster prereqs
+        run: |
+          kubectl apply -f ./cluster/resources/minikube-fast-storage-class.yaml
+          ./charts/scripts/install-prereqs
+
+      - name: Helm deploy latest
+        run: |
+          kubectl create namespace identity-platform
+          helm upgrade identity-platform identity-platform \
+            --repo https://ForgeRock.github.io/forgeops/ \
+            --version ${{ steps.get_latest_release.outputs.tag_name }} \
+            --namespace identity-platform --install
+
       - name: Update helm chart
         id: update_helm_chart
         run: |
@@ -65,6 +94,13 @@ jobs:
         with:
           charts_dir: charts
           pages_branch: gh-pages
+
+      - name: Helm deploy upgrade
+        run: |
+          helm upgrade identity-platform identity-platform \
+            --repo https://ForgeRock.github.io/forgeops/ \
+            --version ${{ env.RELEASE_TAG }} \
+            --namespace identity-platform --install
 
       - name: Create tag
         id: tag_version
