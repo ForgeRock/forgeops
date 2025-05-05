@@ -8,7 +8,7 @@ start_dir=$(pwd)
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # Bring in our standard functions
 source $SCRIPT_DIR/../lib/shell/stdlib.sh
-cd $start_dir
+cd "${start_dir}"
 
 getRelativePath $SCRIPT_DIR ..
 ROOT_PATH=$RELATIVE_PATH

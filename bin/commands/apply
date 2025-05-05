@@ -11,7 +11,7 @@ source $SCRIPT_DIR/../../lib/shell/stdlib.sh
 # Bring in common.sh
 source $SCRIPT_DIR/common.sh
 # Go back to where we started
-cd $start_dir
+cd "${start_dir}"
 
 usage() {
   local usage_msg=$(cat<<EOM
