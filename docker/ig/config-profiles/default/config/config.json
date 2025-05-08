@@ -43,7 +43,7 @@
           "sessionCache": {
               "enabled": true
           },
-          "version": "8.0.0"
+          "version": "8.0.1"
       }
     },
     {
@@ -63,9 +63,9 @@
         "stores": [{
           "type": "Base64EncodedSecretStore",
           "config": {
-            "_comment": "base64('password') = 'cGFzc3dvcmQ='",
+            "_comment": "base64('YbDtETPLkGJDtOiy') = 'WWJEdEVUUExrR0pEdE9peQ=='",
             "secrets": {
-              "agent.password": "cGFzc3dvcmQ="
+              "agent.password": "WWJEdEVUUExrR0pEdE9peQ=="
             }
           }
         }]

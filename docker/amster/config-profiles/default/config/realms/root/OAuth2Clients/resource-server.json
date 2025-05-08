@@ -73,7 +73,7 @@
     "coreOAuth2ClientConfig" : {
       "status" : "Active",
       "loopbackInterfaceRedirection" : false,
-      "userpassword" : "&{ig.rs.client.secret|password}",
+      "userpassword" : "&{ig.rs.client.secret|YbDtETPLkGJDtOiy}",
       "authorizationCodeLifetime" : 0,
       "accessTokenLifetime" : 0,
       "clientType" : "Confidential",
