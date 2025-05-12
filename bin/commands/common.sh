@@ -58,7 +58,6 @@ COMPONENTS_WAIT=(
 
 COMPONENTS_PREREQS=(
   'cert-manager'
-  'trust-manager'
   'ingress'
   'secrets'
 )

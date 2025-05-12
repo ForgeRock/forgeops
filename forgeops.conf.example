@@ -30,8 +30,6 @@
 #UPGRADE=false
 #cert-manager version
 #CM_VERSION=
-#trust-manager version
-#TM_VERSION=
 #nginx version
 #NX_VERSION=
 #haproxy version
