@@ -116,7 +116,7 @@ if containsElement 'platform' "${COMPONENTS[*]}" ; then
   DELETE_ALL=true
   COMPONENTS=${COMPONENTS_PLATFORM[@]}
   shiftComponent 'secrets' 'last'
-  COMPONENTS+=( 'base' )
+  COMPONENTS+=( 'base' 'ldif-importer')
 fi
 
 if containsElement 'apps' "${COMPONENTS[*]}" ; then
@@ -129,6 +129,12 @@ fi
 
 if containsElement 'ui' "${COMPONENTS[*]}" ; then
   expandComponent 'ui' "${COMPONENTS_UI[*]}"
+fi
+
+if containsElementLike 'ds-' "${COMPONENTS[*]}" && ! containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
+  if ! kubeExists sts 'ds-cts' || ! kubeExists sts 'ds-idrepo' ; then
+    COMPONENTS+=( 'ldif-importer' )
+  fi
 fi
 
 DELETE_PVCS=false
