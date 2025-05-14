@@ -228,10 +228,58 @@ Then you select 7.5.0 just for AM for the same release name.
 ### Alternate release files
 
 If your policy requires you to build your own container images from scratch,
-you can create your own versions of our values files. They can be hosted on
-your own web site or as a path to a file system.
+you can create your own release files and host them on your own web site or
+local file system.
 
-#### HTTP
+#### Getting release files
+
+In order to get started with your own set of release files, it's a good idea to
+use the official files as a starting point. The main index page for
+http://releases.forgeops.com has a list of all of the JSON files hosted there.
+You should download each of them. They each contain a map that has a key called
+'releases'. Like so:
+
+idm.json:
+```
+{
+  "releases": {
+    "8.0": {
+      "8.0.0": {
+        "tags": [
+          "8.0.0",
+          "8.0.0-latest"
+        ]
+      },
+      "scan": "weekly"
+    }
+  }
+}
+```
+
+The top level release is a major.minor release, and it contains all of the
+major.minor.patch releases as well as a scan key that tells our scanning
+pipeline how often it should scan and patch our images for OS vulnerabilities.
+The scan key is used by `forgeops info` to know what releases are supported,
+and it is recommended to set it to something other than 'none'. The
+major.minor.patch maps contain a tags array that lists all of the image tags
+for that component.
+
+#### Populate release files with custom images
+
+You should remove versions that you don't need from the map, and modify the
+ones you do use. For these versions, you should update the tags list to contain
+the image tags of your images. We recommend beginning your tags with the official
+x.y.z version so that the `forgeops info` command can parse the version from
+the tag to help you see newer versions.
+
+#### Host custom release files
+
+After you've populated your custom release files, then you need to host them.
+You can create your own website, or host them on your filesystem. If you want
+to store them on the filesystem, it's recommended that you do so in a shared
+ForgeOps Root so the entire team has access to the same files.
+
+##### HTTP
 
 *Dockerfiles*
 
@@ -241,7 +289,7 @@ your own web site or as a path to a file system.
 
 `forgeops image --image-repo my-image-repo --releases-src http://pip-releases.example.com --release 7.5.1 --env-name stage platform`
 
-#### Filesystem
+##### Filesystem
 
 *Relative to forgeops root*
 
@@ -250,3 +298,55 @@ your own web site or as a path to a file system.
 *Absolute*
 
 `forgeops image --image-repo my-base-image-repo --releases-src $HOME/git/pip-releases --release 7.5.1 platform`
+
+#### Update forgeops.conf to use custom releases source
+
+While you can override the releases source with flags, it's much easier and
+more consistent to set these in your team's forgeops.conf file.  In the bottom
+of `forgeops.conf.example` there is a section on Releases. You'll need to
+define RELEASES_SRC and BASE_REPO at a minimum to use your images. The
+`forgeops build` command will update your Kustomize overlay and Helm values
+with your PUSH_TO repo. The DEPLOY_REPO sets the container registry for
+ForgeOps prepped images that don't have configuration baked in. If you intend
+to provide your file based configs via ConfigMap instead of baking it into the
+images, you'll want to set this as well.
+
+*HTTP source*
+
+`RELEASES_SRC=http://pip-releases.example.com`
+
+*Filesystem source*
+
+In this example, we assume you created a releases folder in your FORGEOPS_ROOT location.
+
+`RELEASES_SRC=releases`
+
+The BASE_REPO should be set to the container repository that you push your base
+images to.
+
+`BASE_REPO=us-docker.pkg.dev/MY_ORG/forgeops-base-images`
+
+Commit and push these changes to your FORGEOPS_ROOT git repo to make them
+available to your entire team and your automation.
+
+#### Viewing new official versions
+
+After you switch your forgeops.conf over to using your custom release files,
+you may want to see what images are officially available. To do this, you can
+comment out RELEASES_SRC and BASE_REPO in your forgeops.conf, and run the
+`forgeops info` and `forgeops image` commands normally. You can also use
+`--releases-src` and/or `--image-repo` with the `forgeops info` and `forgeops
+image` commands to point to the official locations. You can find the current
+defaults by looking in `lib/python/defaults.py`.
+
+`forgeops info --releases-src http://releases.forgeops.com --list-releases`
+
+If you want to play with the official images, you can use the `forgeops image` command to do so.
+
+*Update Dockerfiles*
+
+`forgeops image --releases-src http://releases.forgeops.com --image-repo us-docker.pkg.dev/forgeops-public/images-base --release 8.0.1 platform`
+
+*Update Helm/Kustomize*
+
+`forgeops image --releases-src http://releases.forgeops.com --image-repo us-docker.pkg.dev/forgeops-public/images --release 8.0.1 platform`
