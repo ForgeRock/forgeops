@@ -10,3 +10,8 @@ spec:
       containers:
       - name: openam
         resources: {}
+      initContainers:
+      - name: fbc-init
+        resources: {}
+      - name: truststore-init
+        resources: {}

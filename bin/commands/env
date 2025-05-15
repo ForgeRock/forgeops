@@ -211,8 +211,10 @@ def process_overlay_dir(path, config, args):
 
         if config.get('pull_policy'):
             res['spec']['template']['spec']['containers'][0]['imagePullPolicy'] = config['pull_policy']
-            if isDS:
+            if isDS or skey == 'am' or skey == 'idm':
                 res['spec']['template']['spec']['initContainers'][0]['imagePullPolicy'] = config['pull_policy']
+            if skey == 'am' or skey == 'idm':
+                res['spec']['template']['spec']['initContainers'][1]['imagePullPolicy'] = config['pull_policy']
 
         writeYamlFile(res, res_path)
 
@@ -261,7 +263,7 @@ def main():
     parser.add_argument('--ig-rep', dest='ig_rep', type=int, help='Specify replicas for ig pods')
     parser.add_argument('--amster-retain', dest='amster_retain', type=int, help='Keep amster pod running for n seconds')
     parser.add_argument('--snap-role-name', help='Specify the base role name for the ds-snapshot ClusterRole')
-    parser.add_argument('--pull-policy', dest='pull_policy', help='Set policy for all platform images')
+    parser.add_argument('--pull-policy', dest='pull_policy', choices=['Always', 'IfNotPresent', 'Never'], help='Set policy for all platform images')
     parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage Helm values files")
     parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage Kustomize overlay")
     parser.add_argument('--small', dest='size', action='store_const', const='small', help='A small sized deployment')
