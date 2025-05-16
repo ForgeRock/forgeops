@@ -40,7 +40,7 @@ spec:
     - host: {{ $host | quote }}
       http:
         paths:
-          - path: /admin(/|$)(.*)
+          - path: /igadmin(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
