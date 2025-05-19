@@ -813,6 +813,20 @@ ds_idrepo:
       operator: Equal
       value: directory
 
+  topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ds-idrepo
+      maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ds-idrepo
+      maxSkew: 1
+      topologyKey: topology.kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
+
   affinity:
     # Schedules PingDS Pods to a node with the label "ds" if it exists
     nodeAffinity:
@@ -903,6 +917,20 @@ ds_cts:
       key: key
       operator: Equal
       value: directory
+
+  topologySpreadConstraints:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ds-cts
+      maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/instance: ds-cts
+      maxSkew: 1
+      topologyKey: topology.kubernetes.io/hostname
+      whenUnsatisfiable: ScheduleAnyway
 
   affinity:
     # Schedules PingDS Pods to a node with the label "ds" if it exists

@@ -253,6 +253,19 @@ spec:
           key: key
           operator: Equal
           value: directory
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ds-idrepo
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ds-idrepo
+          maxSkew: 1
+          topologyKey: topology.kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
   volumeClaimTemplates:
     - metadata:
         name: data

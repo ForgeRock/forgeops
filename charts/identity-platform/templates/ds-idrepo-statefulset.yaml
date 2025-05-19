@@ -207,11 +207,15 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      tolerations:
       {{- if .Values.ds_idrepo.tolerations }}
+      tolerations:
         {{- toYaml .Values.ds_idrepo.tolerations | nindent 8 }}
       {{- else if .Values.platform.tolerations }}
         {{- toYaml .Values.platform.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.ds_idrepo.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.ds_idrepo.topologySpreadConstraints | nindent 8 }}
       {{- end }}
   {{- if .Values.ds_idrepo.volumeClaimSpec }}
   volumeClaimTemplates:
