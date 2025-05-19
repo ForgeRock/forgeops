@@ -1,4 +1,93 @@
 ---
+# Source: identity-platform/templates/am-entrypoint-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-entrypoint
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  entrypoint.sh: |
+    #!/usr/bin/env bash
+
+    # Base64 encode secret generate provisioned secrets if enabled
+    if [ -n "${SECRET_GENERATOR_AM_ENV_SECRETS}" ] ; then
+        echo "updating env vars..."
+        AM_AUTHENTICATION_SHARED_SECRET=$(echo $AM_AUTHENTICATION_SHARED_SECRET|base64)
+        AM_SESSION_STATELESS_ENCRYPTION_KEY=$(echo $AM_SESSION_STATELESS_ENCRYPTION_KEY|base64)
+        AM_SESSION_STATELESS_SIGNING_KEY=$(echo $AM_SESSION_STATELESS_SIGNING_KEY|base64)
+        AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY=$(echo $AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY|base64)
+    fi
+
+    # Run upstream docker-entrypoint.sh
+    /home/forgerock/docker-entrypoint.sh
+---
+# Source: identity-platform/templates/am-import-pem-certs-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-import-pem-certs
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  import-pem-certs.sh: |
+    #!/usr/bin/env bash
+    # This script copies the default cacerts to $TRUSTSTORE_PATH
+    # and imports all the certs contained in the $AM_PEM_TRUSTSTORE if it exists
+
+    #
+    # Copyright 2023-2025 Ping Identity Corporation. All Rights Reserved
+    #
+    # This code is to be used exclusively in connection with Ping Identity
+    # Corporation software or services. Ping Identity Corporation only offers
+    # such software or services to legal entities who have entered into a
+    # binding license agreement with Ping Identity Corporation.
+    #
+
+    set -e
+    set -o pipefail
+
+    AM_DEFAULT_TRUSTSTORE=${AM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
+    # If a $AM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
+    if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && ( [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM_PEM_TRUSTSTORE_DS" ] || [ -f "$AM_PEM_TRUSTSTORE_EXTRA" ); then
+        TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/home/forgerock/amtruststore}"
+        TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
+        echo "Copying ${AM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
+        cp ${AM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
+        # Combine certs in a single file
+        touch am_combined_truststore
+        [ -f "$AM_PEM_TRUSTSTORE" ] && cat $AM_PEM_TRUSTSTORE >> am_combined_truststore
+        [ -f "$AM_PEM_TRUSTSTORE_DS" ] && cat $AM_PEM_TRUSTSTORE_DS >> am_combined_truststore
+        [ -f "$AM_PEM_TRUSTSTORE_EXTRA" ] && cat $AM_PEM_TRUSTSTORE_EXTRA >> am_combined_truststore
+        # Calculate the number of certs in the PEM file
+        CERTS=$(grep 'END CERTIFICATE' am_combined_truststore| wc -l)
+        echo "Found (${CERTS}) certificates in am_combined_truststore"
+        echo "Importing (${CERTS}) certificates into ${TRUSTSTORE_PATH}"
+        # For every cert in the PEM file, extract it and import into the JKS truststore
+        for N in $(seq 0 $(($CERTS - 1))); do
+            ALIAS="imported-certs-$N"
+            cat am_combined_truststore |
+                awk "n==$N { print }; /END CERTIFICATE/ { n++ }" |
+                keytool -noprompt -importcert -trustcacerts -storetype JKS \
+                        -alias "${ALIAS}" -keystore "${TRUSTSTORE_PATH}" \
+                        -storepass "${TRUSTSTORE_PASSWORD}" || /bin/true
+        done
+        echo "Import complete!"
+    else
+        echo "Nothing was imported to the truststore. Check ENVs AM_DEFAULT_TRUSTSTORE and AM_PEM_TRUSTSTORE"
+        exit -1
+    fi
+---
 # Source: identity-platform/templates/am-logback-configmap.yaml
 apiVersion: v1
 kind: ConfigMap
@@ -99,14 +188,19 @@ spec:
           projected:
             sources:
               - secret:
-                  name: truststore-pem
-              - secret:
                   name: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
         - name: am-logback
           configMap:
             name: am-logback
+        - name: entrypoint-scripts
+          configMap:
+            name: am-entrypoint
+        - name: am-import-pem-certs
+          configMap:
+            name: am-import-pem-certs
+            defaultMode: 0755
       initContainers:
         - name: fbc-init
           image: am
@@ -134,6 +228,9 @@ spec:
               mountPath: /truststore
             - name: truststore
               mountPath: /var/run/secrets/truststore
+            - name: am-import-pem-certs
+              mountPath: /home/forgerock/import-pem-certs.sh
+              subPath: import-pem-certs.sh
           command:
             - /home/forgerock/import-pem-certs.sh
           env:
@@ -141,10 +238,8 @@ spec:
               value: /truststore/amtruststore
             - name: TRUSTSTORE_PASSWORD
               value: changeit
-            # secret agent generated truststore.
             - name: AM_PEM_TRUSTSTORE
-              value: /var/run/secrets/truststore/cacerts
-            # cert-manager truststore used for the connection to PingDS
+              value: /usr/lib/ssl/cert.pem
             - name: AM_PEM_TRUSTSTORE_DS
               value: /var/run/secrets/truststore/ca.crt
       containers:
@@ -154,7 +249,7 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - bash
-            - /home/forgerock/docker-entrypoint.sh
+            - /home/forgerock/entrypoint-scripts/entrypoint.sh
           env:
             - name: NAMESPACE
               valueFrom:
@@ -221,6 +316,8 @@ spec:
               mountPath: /home/forgerock/openam
             - name: am-logback
               mountPath: /home/forgerock/logging
+            - name: entrypoint-scripts
+              mountPath: /home/forgerock/entrypoint-scripts
       tolerations:
         - effect: NoSchedule
           key: kubernetes.io/arch

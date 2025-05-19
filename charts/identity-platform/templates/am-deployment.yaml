@@ -63,9 +63,11 @@ spec:
           projected:
             sources:
               - secret:
-                  name: truststore-pem
-              - secret:
                   name: ds-ssl-keypair
+              {{- if .Values.platform.truststore.secret.enabled }}
+              - secret:
+                  name: {{ .Values.platform.truststore.secret.name }}
+              {{- end }}
         - name: new-truststore
           emptyDir: {}
         - name: am-logback
@@ -74,6 +76,10 @@ spec:
         - name: entrypoint-scripts
           configMap:
             name: am-entrypoint
+        - name: am-import-pem-certs
+          configMap:
+            name: am-import-pem-certs
+            defaultMode: 0755
       initContainers:
         - name: fbc-init
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
@@ -101,18 +107,23 @@ spec:
             mountPath: /truststore
           - name: truststore
             mountPath: /var/run/secrets/truststore
+          - name: am-import-pem-certs
+            mountPath: /home/forgerock/import-pem-certs.sh
+            subPath: import-pem-certs.sh
           command: ["/home/forgerock/import-pem-certs.sh"]
           env:
           - name: TRUSTSTORE_PATH
             value: /truststore/amtruststore
           - name: TRUSTSTORE_PASSWORD
             value: changeit
-          # secret agent generated truststore.
           - name: AM_PEM_TRUSTSTORE
-            value: /var/run/secrets/truststore/cacerts
-          # cert-manager truststore used for the connection to PingDS
+            value: /usr/lib/ssl/cert.pem
           - name: AM_PEM_TRUSTSTORE_DS
             value: /var/run/secrets/truststore/ca.crt
+          {{- if .Values.platform.truststore.secret.enabled }}
+          - name: AM_PEM_TRUSTSTORE_EXTRA
+            value: /var/run/secrets/truststore/{{ .Values.platform.truststore.secret.key }}
+          {{- end }}
       containers:
         - name: openam
           securityContext:

@@ -342,6 +342,67 @@ data:
     # defaults to the default platform encoding
     java.util.logging.FileHandler.encoding = UTF-8
 ---
+# Source: identity-platform/templates/idm-import-pem-certs-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-import-pem-certs
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  import-pem-certs.sh: |
+    #!/usr/bin/env bash
+    # This script copies the default cacerts to $TRUSTSTORE_PATH
+    # and imports all the certs contained in the $IDM_PEM_TRUSTSTORE if it exists
+
+    #
+    # Copyright 2019-2025 Ping Identity Corporation. All Rights Reserved
+    #
+    # This code is to be used exclusively in connection with Ping Identity
+    # Corporation software or services. Ping Identity Corporation only offers
+    # such software or services to legal entities who have entered into a
+    # binding license agreement with Ping Identity Corporation.
+    #
+
+    set -e
+    set -o pipefail
+
+    IDM_DEFAULT_TRUSTSTORE=${IDM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
+    # If a $IDM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
+    if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && ( [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$IDM_PEM_TRUSTSTORE_DS" ] || [ -f "$IDM_PEM_TRUSTSTORE_EXTRA" ); then
+        TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/opt/openidm/idmtruststore}"
+        TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
+        echo "Copying ${IDM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
+        cp ${IDM_DEFAULT_TRUSTSTORE} ${TRUSTSTORE_PATH}
+        # Combine certs in a single file
+        touch idm_combined_truststore
+        [ -f "$IDM_PEM_TRUSTSTORE" ] && cat $IDM_PEM_TRUSTSTORE >> idm_combined_truststore
+        [ -f "$IDM_PEM_TRUSTSTORE_DS" ] && cat $IDM_PEM_TRUSTSTORE_DS >> idm_combined_truststore
+        [ -f "$IDM_PEM_TRUSTSTORE_EXTRA" ] && cat $IDM_PEM_TRUSTSTORE_EXTRA >> idm_combined_truststore
+        # Calculate the number of certs in the PEM file
+        CERTS=$(grep 'END CERTIFICATE' idm_combined_truststore| wc -l)
+        echo "Found (${CERTS}) certificates in idm_combined_truststore"
+        echo "Importing (${CERTS}) certificates into ${TRUSTSTORE_PATH}"
+        # For every cert in the PEM file, extract it and import into the JKS truststore
+        for N in $(seq 0 $(($CERTS - 1))); do
+            ALIAS="imported-certs-$N"
+            cat idm_combined_truststore |
+                awk "n==$N { print }; /END CERTIFICATE/ { n++ }" |
+                keytool -noprompt -importcert -trustcacerts -storetype JKS \
+                        -alias "${ALIAS}" -keystore "${TRUSTSTORE_PATH}" \
+                        -storepass "${TRUSTSTORE_PASSWORD}" || /bin/true
+        done
+        echo "Import complete!"
+    else
+        echo "Nothing was imported to the truststore. Check ENVs IDM_DEFAULT_TRUSTSTORE and IDM_PEM_TRUSTSTORE"
+        exit -1
+    fi
+---
 # Source: identity-platform/templates/idm-service.yaml
 apiVersion: v1
 kind: Service
@@ -417,8 +478,6 @@ spec:
           projected:
             sources:
               - secret:
-                  name: truststore-pem
-              - secret:
                   name: ds-ssl-keypair
         - name: new-truststore
           emptyDir: {}
@@ -432,6 +491,10 @@ spec:
         - name: idm-logging-properties
           configMap:
             name: idm-logging-properties
+        - name: idm-import-pem-certs
+          configMap:
+            name: idm-import-pem-certs
+            defaultMode: 0755
       initContainers:
         - name: fbc-init
           image: idm
@@ -459,6 +522,9 @@ spec:
               mountPath: /truststore
             - name: truststore
               mountPath: /var/run/secrets/truststore
+            - name: idm-import-pem-certs
+              mountPath: /opt/openidm/bin/import-pem-certs.sh
+              subPath: import-pem-certs.sh
           command:
             - /opt/openidm/bin/import-pem-certs.sh
           env:
@@ -467,7 +533,7 @@ spec:
             - name: TRUSTSTORE_PASSWORD
               value: changeit
             - name: IDM_PEM_TRUSTSTORE
-              value: /var/run/secrets/truststore/cacerts
+              value: /usr/lib/ssl/cert.pem
             - name: IDM_PEM_TRUSTSTORE_DS
               value: /var/run/secrets/truststore/ca.crt
       containers:

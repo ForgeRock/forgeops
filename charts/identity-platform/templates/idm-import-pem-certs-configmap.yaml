@@ -1,0 +1,10 @@
+{{- if .Values.idm.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-import-pem-certs
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+data:
+  {{ (.Files.Glob "files/idm/import-pem-certs.sh").AsConfig | nindent 2 }}
+{{- end }}

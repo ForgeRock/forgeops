@@ -53,9 +53,11 @@ spec:
           projected:
             sources:
               - secret:
-                  name: truststore-pem
-              - secret:
                   name: ds-ssl-keypair
+              {{- if .Values.platform.truststore.secret.enabled }}
+              - secret:
+                  name: {{ .Values.platform.truststore.secret.name }}
+              {{- end }}
         - name: new-truststore
           emptyDir: {}
         - name: logs
@@ -68,6 +70,10 @@ spec:
         - name: idm-logging-properties
           configMap:
             name: idm-logging-properties
+        - name: idm-import-pem-certs
+          configMap:
+            name: idm-import-pem-certs
+            defaultMode: 0755
       initContainers:
         - name: fbc-init
           image: "{{ .Values.idm.image.repository }}:{{ .Values.idm.image.tag | default .Chart.AppVersion }}"
@@ -95,6 +101,9 @@ spec:
             mountPath: /truststore
           - name: truststore
             mountPath: /var/run/secrets/truststore
+          - name: idm-import-pem-certs
+            mountPath: /opt/openidm/bin/import-pem-certs.sh
+            subPath: import-pem-certs.sh
           command:
             - /opt/openidm/bin/import-pem-certs.sh
           env:
@@ -103,9 +112,13 @@ spec:
           - name: TRUSTSTORE_PASSWORD
             value: changeit
           - name: IDM_PEM_TRUSTSTORE
-            value: /var/run/secrets/truststore/cacerts
+            value: /usr/lib/ssl/cert.pem
           - name: IDM_PEM_TRUSTSTORE_DS
             value: /var/run/secrets/truststore/ca.crt
+          {{- if .Values.platform.truststore.secret.enabled }}
+          - name: IDM_PEM_TRUSTSTORE_EXTRA
+            value: /var/run/secrets/truststore/{{ .Values.platform.truststore.secret.key }}
+          {{- end }}
       containers:
         - name: openidm
           securityContext:
