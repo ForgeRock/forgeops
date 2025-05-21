@@ -5,7 +5,7 @@ FROM ${REPO}:${TAG}
 
 # FOR DEBUG. Remove for production deployment
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends vim ncat dnsutils 
+RUN apt-get update && apt-get install -y --no-install-recommends ncat dnsutils 
 USER forgerock
 
 # The PVC mount point where all writeable data is stored.
