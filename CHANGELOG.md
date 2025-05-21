@@ -12,6 +12,11 @@ certificates via the Helm chart.
 Curl has been replaced with ldapsearch in the ldif-importer job. Curl often has
 security vulnerabilities, and so we decided to remove it.
 
+### Replace curl with wget in Amster
+
+Curl has been replaced with wget in the amster job. Curl often has
+security vulnerabilities, and so we've changed it to wget which is more secure.
+
 ## Bugfixes
 
 ## Removed Features

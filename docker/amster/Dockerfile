@@ -8,9 +8,11 @@ USER root
 ENV DEBIAN_FRONTEND=noninteractive
 ENV APT_OPTS="--no-install-recommends --yes"
 RUN apt-get update \
-        && apt-get install -y openldap-utils jq inotify-tools \
+        && apt-get install -y openldap-utils jq inotify-tools wget \
         && apt-get clean \
         && rm -r /var/lib/apt/lists /var/cache/apt/archives
+
+RUN apt-get remove -y curl
 
 USER forgerock
 

@@ -11,11 +11,10 @@ wait_for_openam()
 
 	while true
 	do
-	  echo "Trying ${ALIVE}"
-		response=$(curl --write-out %{http_code} --silent --connect-timeout 30 --output /dev/null ${ALIVE} )
+      echo "Trying ${ALIVE}"
+      response=$(wget --server-response --tries=1 ${ALIVE} 2>&1 | grep "HTTP/1.1 200" | xargs)
 
-      echo "Got Response code ${response}"
-      if [ "${response}" = "200" ];
+      if [ "${response}" = "HTTP/1.1 200" ];
       then
          echo "AM web app is up"
          break
