@@ -49,10 +49,22 @@ spec:
         - name: am-secrets
           projected:
             sources:
+        {{- if not (and .Values.platform.secret_generator_enable .Values.platform.secrets.keystore_create .Values.keystore_create.enabled) }}
             - secret:
                 name: am-passwords
             - secret:
                 name: am-keystore
+        {{- else }}
+            - secret:
+                name: keystore-create
+                items:
+                - key: KEYSTORE_PASSWORD
+                  path: .storepass
+                - key: KEYSTORE_PASSWORD
+                  path: .keypass
+            - secret:
+                name: keystore
+        {{- end }}
         - name: amster-key
           secret:
             secretName: amster
@@ -130,7 +142,7 @@ spec:
             {{- toYaml .Values.am.securityContext | nindent 12 }}
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.am.image.pullPolicy }}
-          command: 
+          command:
             - bash
             - /home/forgerock/entrypoint-scripts/entrypoint.sh
           env:

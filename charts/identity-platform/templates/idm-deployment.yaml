@@ -48,7 +48,11 @@ spec:
           emptyDir: {}
         - name: idm-secrets
           secret:
+            {{- if and .Values.platform.secret_generator_enable .Values.platform.secrets.keystore_create .Values.keystore_create.enabled }}
+            secretName: keystore
+            {{- else }}
             secretName: idm
+            {{- end }}
         - name: truststore
           projected:
             sources:
@@ -140,6 +144,24 @@ spec:
               secretKeyRef:
                 name: ds-passwords
                 key: dirmanager.pw
+          {{- if and .Values.platform.secret_generator_enable .Values.platform.secrets.keystore_create .Values.keystore_create.enabled }}
+          - name: OPENIDM_KEYSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: keystore-create
+                key: KEYSTORE_PASSWORD
+          {{- else }}
+          - name: OPENIDM_KEYSTORE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: idm-env-secrets
+                key: OPENIDM_KEYSTORE_PASSWORD
+          {{- end }}
+          - name: OPENIDM_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: idm-env-secrets
+                key: OPENIDM_ADMIN_PASSWORD
           - name: RS_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
@@ -154,8 +176,6 @@ spec:
           envFrom:
           - configMapRef:
               name: idm
-          - secretRef:
-              name: idm-env-secrets
           ports:
             - name: http
               containerPort: 8080
