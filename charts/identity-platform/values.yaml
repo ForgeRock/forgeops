@@ -462,7 +462,7 @@ keystore_create:
   ttlSecondsAfterFinished: 600
 
   initImage:
-    repository: us-docker.pkg.dev/forgeops-public/images/amster
+    repository: us-docker.pkg.dev/forgeops-public/images/am
     tag: latest
     pullPolicy: IfNotPresent
 
