@@ -114,7 +114,11 @@ def process_overlay_dir(path, config, args):
             }
             ing = utils.replace_or_append_dict(ing, 'path', 'secretName', 'value', config['ssl_secretname'], append)
 
-        if config.get('issuer_kind') and config.get('issuer_name'):
+        if args.ingress_no_cert_manager:
+            for idx, item in enumerate(ing):
+                if 'cert-manager' and 'issuer' in item['path']:
+                    ing.pop(idx)
+        elif config.get('issuer_kind') and config.get('issuer_name'):
             issuer = {
                 'op': 'add',
                 'path': f"/metadata/annotations/cert-manager.io~1{config['issuer_kind_ann']}",
@@ -241,6 +245,7 @@ def main():
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
     parser.add_argument('--source', '-s', dest='source', help='Name of source Kustomize overlay')
+    parser.add_argument('--ingress-no-cert-manager', action='store_true', help="Disable use of cert-manager for ingresses")
     parser.add_argument('--ssl-secretname', dest='ssl_secretname', help="Name of the secret containing private ssl data")
     parser.add_argument('--am-cpu', dest='am_cpu', help='Specify CPU setting for am pods')
     parser.add_argument('--am-mem', dest='am_mem', help='Specify memory setting for am pods')
@@ -587,12 +592,10 @@ If you have not yet deployed the environment, then you can ignore this message.
 """
         print(msg)
 
-    if do_create and not args.skip_issuer and not args.issuer and not args.cluster_issuer:
-        msg = f"""
-When creating a new environment, it's best practice to specify a HTTPS certificate issuer (--issuer or --cluster-issuer). You can also skip issuer creation with --skip-issuer. For demos, you can use 'bin/certmanager-deploy.sh' to deploy cert-manager and create a self-signed ClusterIssuer called 'default-issuer'.
-
-"""
-        print(msg)
+    if args.ingress_no_cert_manager:
+        print("WARNING!!! Removing cert-manager from the ingresses. You must provide your own certificate to protect the deployment.")
+    elif do_create and not args.skip_issuer and not args.issuer and not args.cluster_issuer:
+        print("When creating a new environment, it's best practice to specify a HTTPS certificate issuer (--issuer or --cluster-issuer). You can also skip issuer creation with --skip-issuer. For demos, you can use 'bin/certmanager-deploy.sh' to deploy cert-manager and create a self-signed ClusterIssuer called 'default-issuer'.")
 
         use_default_issuer = False
         if args.testing:
@@ -640,17 +643,20 @@ When creating a new environment, it's best practice to specify a HTTPS certifica
     ### Setup helm values files
     ###
     if config['do_helm']:
-        if (config.get('issuer_name') and config.get('issuer_kind')) or config.get('ssl_secretname'):
+        if (config.get('issuer_name') and config.get('issuer_kind')) or config.get('ssl_secretname') or args.ingress_no_cert_manager:
             if not values_ingress.get('platform'):
                values_ingress['platform'] = { 'ingress': { 'tls': {} } }
             elif not values_ingress['platform'].get('ingress'):
                values_ingress['platform']['ingress'] = { 'tls': {} }
             elif not values_ingress['platform']['ingress'].get('tls'):
                values_ingress['platform']['ingress']['tls'] = {}
-
-            if config['issuer_name'] and config['issuer_kind']:
+            if args.ingress_no_cert_manager or (config['issuer_name'] and config['issuer_kind']):
                 if not values_ingress['platform']['ingress']['tls'].get('issuer'):
                     values_ingress['platform']['ingress']['tls']['issuer'] = {}
+
+            if args.ingress_no_cert_manager:
+                values_ingress['platform']['ingress']['tls']['issuer']['name'] = None
+            elif config['issuer_name'] and config['issuer_kind']:
                 values_ingress['platform']['ingress']['tls']['issuer']['kind'] = config['issuer_kind']
                 values_ingress['platform']['ingress']['tls']['issuer']['name'] = config['issuer_name']
 
