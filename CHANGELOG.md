@@ -19,8 +19,8 @@ security vulnerabilities, and so we've changed it to wget which is more secure.
 
 ## Bugfixes
 
-### Fix `forgeops amster import` command
-The order of the patched amster containers were ordered incorrectly resulting in the amster config not being imported. Reordering the patches in the amster/upload sub overlay resolved this.
+### Fix `forgeops amster import/export` command
+Reordered the patches in the amster/upload and amster/export sub overlays to correctly manage amster configuration.
 
 ## Removed Features
 
