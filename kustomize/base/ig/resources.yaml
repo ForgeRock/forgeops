@@ -138,7 +138,7 @@ spec:
     - host: identity-platform.domain.local
       http:
         paths:
-          - path: /admin(/|$)(.*)
+          - path: /igadmin(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:
