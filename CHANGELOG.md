@@ -22,6 +22,11 @@ security vulnerabilities, and so we've changed it to wget which is more secure.
 ### Fix `forgeops amster import/export` command
 Reordered the patches in the amster/upload and amster/export sub overlays to correctly manage amster configuration.
 
+### Stop AM failing if openam container restarts
+Ensure openam container has access to the default boot.json when something causes the 
+container to restart.  This is because the fbc-init init-container doesn't run when the 
+openam container restarts so the default boot.json isn't set for startup.
+
 ## Removed Features
 
 ## Documentation updates

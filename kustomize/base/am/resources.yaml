@@ -24,6 +24,9 @@ data:
         AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY=$(echo $AM_SELFSERVICE_LEGACY_CONFIRMATION_EMAIL_LINK_SIGNING_KEY|base64)
     fi
 
+    # Copy in the default boot.json to ensure container starts up correctly after a container restart
+    cp /home/forgerock/openam/default-boot.json /home/forgerock/openam/config/boot.json
+    
     # Run upstream docker-entrypoint.sh
     /home/forgerock/docker-entrypoint.sh
 ---
@@ -219,6 +222,8 @@ spec:
                 echo "Copying docker image configuration files to the shared volume"
                 cd /home/forgerock/openam
                 cp -r .homeVersion * /fbc
+                # Keep a copy of the default boot.json to use in the main container in case of a container restart
+                cp /fbc/config/boot.json /fbc/default-boot.json
               fi
         - name: truststore-init
           image: am

@@ -110,6 +110,8 @@ spec:
               echo "Copying docker image configuration files to the shared volume"
               cd /home/forgerock/openam
               cp -r .homeVersion * /fbc
+              # Keep a copy of the default boot.json to use in the main container in case of a container restart
+              cp /fbc/config/boot.json /fbc/default-boot.json
             fi
         - name: truststore-init
           image: "{{ .Values.am.image.repository }}:{{ .Values.am.image.tag | default .Chart.AppVersion }}"
