@@ -12,7 +12,8 @@ RUN apt-get update \
         && apt-get clean \
         && rm -r /var/lib/apt/lists /var/cache/apt/archives
 
-RUN apt-get remove -y curl
+# To be removed in future release
+# RUN apt-get remove -y curl
 
 USER forgerock
 

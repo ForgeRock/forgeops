@@ -76,7 +76,7 @@ spec:
           args:
             - |
               for f in $(find /amster-scripts); do
-                cp $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)
+                cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)
               done
               ./docker-entrypoint.sh import
           env:
