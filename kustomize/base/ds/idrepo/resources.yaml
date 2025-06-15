@@ -54,11 +54,9 @@ kind: StatefulSet
 metadata:
   name: ds-idrepo
   labels:
-    helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: 1.0.0
     app.kubernetes.io/managed-by: Helm
     app: ds-idrepo
     app.kubernetes.io/component: ds-idrepo
@@ -272,11 +270,9 @@ spec:
         annotations:
           pv.beta.kubernetes.io/gid: "0"
         labels:
-          helm.sh/chart: identity-platform-1.0.0
           app.kubernetes.io/name: identity-platform
           app.kubernetes.io/part-of: identity-platform
           app.kubernetes.io/instance: identity-platform
-          app.kubernetes.io/version: 1.0.0
           app.kubernetes.io/managed-by: Helm
           app: ds-idrepo
           app.kubernetes.io/component: ds-idrepo

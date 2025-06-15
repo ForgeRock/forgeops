@@ -556,6 +556,16 @@ spec:
                 secretKeyRef:
                   name: ds-passwords
                   key: dirmanager.pw
+            - name: OPENIDM_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: idm-env-secrets
+                  key: OPENIDM_KEYSTORE_PASSWORD
+            - name: OPENIDM_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: idm-env-secrets
+                  key: OPENIDM_ADMIN_PASSWORD
             - name: RS_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -564,8 +574,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: idm
-            - secretRef:
-                name: idm-env-secrets
           ports:
             - name: http
               containerPort: 8080

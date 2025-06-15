@@ -26,7 +26,7 @@ data:
 
     # Copy in the default boot.json to ensure container starts up correctly after a container restart
     cp /home/forgerock/openam/default-boot.json /home/forgerock/openam/config/boot.json
-    
+
     # Run upstream docker-entrypoint.sh
     /home/forgerock/docker-entrypoint.sh
 ---

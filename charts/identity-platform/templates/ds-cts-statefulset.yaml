@@ -4,9 +4,13 @@ kind: StatefulSet
 metadata:
   name: ds-cts
   labels:
-    {{- include "identity-platform.labels" . | nindent 4 }}
-    {{- with .Values.ds_cts.podLabels }}
-      {{- toYaml . | nindent 4 }}
+    {{- if (not (lookup "apps/v1" "StatefulSet" .Release.Namespace "ds-cts").metadata) }}
+      {{- include "identity-platform.labelsUnversioned" . | nindent 4 }}
+      {{- with .Values.ds_cts.podLabels }}
+        {{- toYaml . | nindent 4 }}
+      {{- end }}
+    {{- else }}
+      {{- toYaml (lookup "apps/v1" "StatefulSet" .Release.Namespace "ds-cts").metadata.labels | nindent 4 }}
     {{- end }}
 spec:
   replicas: {{ .Values.ds_cts.replicaCount }}
@@ -222,9 +226,13 @@ spec:
       annotations:
         pv.beta.kubernetes.io/gid: "0"
       labels:
-        {{- include "identity-platform.labels" . | nindent 8 }}
-        {{- with .Values.ds_cts.podLabels }}
-          {{- toYaml . | nindent 8 }}
+        {{- if (not (lookup "apps/v1" "StatefulSet" .Release.Namespace "ds-cts").metadata) }}
+          {{- include "identity-platform.labelsUnversioned" . | nindent 8 }}
+          {{- with .Values.ds_cts.podLabels }}
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- else }}
+          {{- toYaml (first (lookup "apps/v1" "StatefulSet" .Release.Namespace "ds-cts").spec.volumeClaimTemplates).metadata.labels | nindent 8 }}
         {{- end }}
     spec:
       {{- toYaml .Values.ds_cts.volumeClaimSpec | nindent 6 }}
