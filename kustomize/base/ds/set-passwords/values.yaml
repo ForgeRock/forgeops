@@ -1,3 +1,4 @@
+---
 platform:
   base:
     enabled: false
@@ -25,7 +26,7 @@ idm:
   enabled: false
 ig:
   enabled: false
-ldif_importer:
+ds_set_passwords:
   enabled: true
   image:
     repository: "ds"

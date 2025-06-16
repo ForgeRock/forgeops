@@ -64,7 +64,7 @@ COMPONENTS_PREREQS=(
 
 SUPPORTED_CONTAINER_ENGINES=('docker' 'podman')
 # Commands that don't require an environment
-COMMANDS_NO_ENV=('wait' 'upgrade-am-config' 'prereqs')
+COMMANDS_NO_ENV=('wait' 'upgrade-am-config' 'prereqs' 'rotate' )
 
 #############
 # Functions #

@@ -70,6 +70,10 @@ set-synchronization-provider-prop --provider-name "Multimaster synchronization" 
 
 # Purge delay of 24 hours.
 set-synchronization-provider-prop --provider-name "Multimaster synchronization" --set "replication-purge-delay:86400 s"
+
+# Allow multiple passwords for no downtime rotations
+set-password-policy-prop --policy-name "Default Password Policy" --set allow-multiple-password-values:true
+set-password-policy-prop --policy-name "Root Password Policy" --set allow-multiple-password-values:true
 END_OF_COMMAND_INPUT
 
 ### Setup the PEM trustore. This is REQUIRED. ######

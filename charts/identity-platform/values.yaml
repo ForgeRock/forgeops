@@ -322,8 +322,9 @@ amster:
   env:
     DURATION: "10"
 
-ldif_importer:
+ds_set_passwords:
   enabled: true
+  force: false
   backoffLimit: 6
   restartPolicy: OnFailure
   ttlSecondsAfterFinished: 600

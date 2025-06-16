@@ -116,7 +116,7 @@ if containsElement 'platform' "${COMPONENTS[*]}" ; then
   DELETE_ALL=true
   COMPONENTS=${COMPONENTS_PLATFORM[@]}
   shiftComponent 'secrets' 'last'
-  COMPONENTS+=( 'base' 'ldif-importer')
+  COMPONENTS+=( 'base' 'ds-set-passwords')
 fi
 
 if containsElement 'apps' "${COMPONENTS[*]}" ; then

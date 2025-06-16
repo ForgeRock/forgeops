@@ -100,7 +100,7 @@ fi
 
 if containsElementLike 'ds-' "${COMPONENTS[*]}" && ! containsElements "${COMPONENTS_ALL[*]}" "${COMPONENTS[*]}" ; then
   if ! kubeExists sts 'ds-cts' || ! kubeExists sts 'ds-idrepo' ; then
-    COMPONENTS+=( 'ldif-importer' )
+    COMPONENTS+=( 'ds-set-passwords' )
   fi
 fi
 

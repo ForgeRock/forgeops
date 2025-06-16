@@ -60,18 +60,30 @@ waitUntilSigTerm() {
 setUserPasswordInLdifFile() {
     file=$1
     dn=$2
-    pwd=$3
+    pwds="$3"
+    local pwd_str=""
 
     echo "Updating the \"${dn}\" password"
 
-    # Set the JVM args to avoid blowing up the container memory.
-    enc_pwd=$(OPENDJ_JAVA_ARGS="-Xmx256m -Djava.security.egd=file:/dev/./urandom" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pwd}")
+    for pw in $pwds ; do
+        # Set the JVM args to avoid blowing up the container memory.
+        local enc_pwd=$(OPENDJ_JAVA_ARGS="-Xmx256m -Djava.security.egd=file:/dev/./urandom" encode-password -s "PBKDF2-HMAC-SHA256" -c "${pw}")
+        if [ "$pwd_str" == "" ] ; then
+            pwd_str="userPassword: ${enc_pwd}"
+        else
+            pwd_str=$(cat <<EOM
+${pwd_str}
+userPassword: ${enc_pwd}
+EOM
+)
+        fi
+    done
 
     ldifmodify "${file}" > "${file}.tmp" << EOF
 dn: ${dn}
 changetype: modify
 replace: userPassword
-userPassword: ${enc_pwd}
+${pwd_str}
 EOF
     rm "${file}"
     mv "${file}.tmp" "${file}"
@@ -81,8 +93,14 @@ EOF
 setAdminAndMonitorPasswords() {
     adminPassword="${DS_UID_ADMIN_PASSWORD:-$(cat "${DS_UID_ADMIN_PASSWORD_FILE}")}"
     monitorPassword="${DS_UID_MONITOR_PASSWORD:-$(cat "${DS_UID_MONITOR_PASSWORD_FILE}")}"
-    setUserPasswordInLdifFile $DS_DATA_DIR/db/rootUser/rootUser.ldif       "uid=admin"   $adminPassword
-    setUserPasswordInLdifFile $DS_DATA_DIR/db/monitorUser/monitorUser.ldif "uid=monitor" $monitorPassword
+    if [ -n "$OLD_DIRMANAGER_PW" ] ; then
+        adminPassword="$adminPassword $OLD_DIRMANAGER_PW"
+    fi
+    if [ -n "$OLD_MONITOR_PW" ] ; then
+        monitorPassword="$monitorPassword $OLD_MONITOR_PW"
+    fi
+    setUserPasswordInLdifFile $DS_DATA_DIR/db/rootUser/rootUser.ldif       "uid=admin"   "$adminPassword"
+    setUserPasswordInLdifFile $DS_DATA_DIR/db/monitorUser/monitorUser.ldif "uid=monitor" "$monitorPassword"
 }
 
 # Copy the K8S secrets to the writable volume. The secrets are expected to be of type k8s.io/tls.

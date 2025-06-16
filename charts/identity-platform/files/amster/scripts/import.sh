@@ -4,10 +4,9 @@
 # Alive check
 ALIVE="${AMSTER_AM_URL}/json/health/ready"
 
-wait_for_openam()
-{
-   echo "Waiting for PingAM server at ${ALIVE}..."
-   response="000"
+wait_for_openam() {
+  echo "Waiting for PingAM server at ${ALIVE}..."
+  response="000"
 
 	while true
 	do
@@ -28,8 +27,7 @@ wait_for_openam()
 
 # Function that waits for files to be uploaded to /opt/amster/config/upload
 # This would usually be done via kubectl cp
-wait_config_file_upload()
-{
+wait_config_file_upload() {
    TIMEOUT=60
    mkdir -p /opt/amster/config/upload
    echo "Waiting for files to be uploaded"
@@ -43,7 +41,6 @@ wait_config_file_upload()
 
 # Import config - script is passed in $1
 import() {
-
    echo "Executing script $1"
 
    # Execute Amster if the configuration is found.

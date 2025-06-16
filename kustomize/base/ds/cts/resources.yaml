@@ -166,6 +166,9 @@ spec:
             - secretRef:
                 name: cloud-storage-credentials
                 optional: true
+            - secretRef:
+                name: old-ds-passwords
+                optional: true
       containers:
         - name: ds
           securityContext: {}

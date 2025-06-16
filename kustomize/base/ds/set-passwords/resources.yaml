@@ -1,9 +1,9 @@
 ---
-# Source: identity-platform/templates/ldif-importer-configmap.yaml
+# Source: identity-platform/templates/ds-set-passwords-configmap.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ldif-importer-scripts
+  name: ds-set-passwords-scripts
   labels:
     helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
@@ -35,8 +35,13 @@ data:
         echo "- Changing password of ${FULL_USER_DN}"
         case "${SEARCH_RESPONSE}" in
             "0")
-                echo "ldappasswordmodify ${CXN} -D \"uid=admin\" -w **** -a \"dn:${FULL_USER_DN}\" -n ****"
-                ldappasswordmodify ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -a "dn:${FULL_USER_DN}" -n "${USER_PASS}"
+                echo "ldapmodify ${CXN} -D \"uid=admin\" -w **** -a \"dn:${FULL_USER_DN}\" "
+                ldapmodify ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" <<EOM
+    dn: $FULL_USER_DN
+    changetype: modify
+    replace: userPassword
+    $USER_PASS
+    EOM
             ;;
             "32")
                 echo "ERROR: ${FULL_USER_DN} not found, skipping..."
@@ -51,20 +56,47 @@ data:
 
     ADMIN_PASS=$(cat /var/run/secrets/opendj-passwords/dirmanager.pw)
 
-    chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=identities "uid=am-identity-bind-account" ${AM_STORES_USER_PASSWORD}
-    chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=am-config "uid=am-config" ${AM_STORES_APPLICATION_PASSWORD}
-    chgPass ds-cts-0.ds-cts ${ADMIN_PASS} ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
+    AM_STORES_USER_PASSWORD_REAL="userPassword: $AM_STORES_USER_PASSWORD"
+    AM_STORES_APPLICATION_PASSWORD_REAL="userPassword: $AM_STORES_APPLICATION_PASSWORD"
+    AM_STORES_CTS_PASSWORD_REAL="userPassword: $AM_STORES_CTS_PASSWORD"
 
-    echo "Password script finished"
+    if [ -n "$OLD_AM_STORES_USER_PASSWORD" ] ; then
+      AM_STORES_USER_PASSWORD_REAL=$(cat<<EOM
+    userPassword: $AM_STORES_USER_PASSWORD
+    userPassword: $OLD_AM_STORES_USER_PASSWORD
+    EOM
+    )
+    fi
+
+    if [ -n "$OLD_AM_STORES_APPLICATION_PASSWORD" ] ; then
+      AM_STORES_APPLICATION_PASSWORD_REAL=$(cat<<EOM
+    userPassword: $AM_STORES_APPLICATION_PASSWORD
+    userPassword: $OLD_AM_STORES_APPLICATION_PASSWORD
+    EOM
+    )
+    fi
+
+    if [ -n "$OLD_AM_STORES_CTS_PASSWORD" ] ; then
+      AM_STORES_CTS_PASSWORD_REAL=$(cat<<EOM
+    userPassword: $AM_STORES_CTS_PASSWORD
+    userPassword: $OLD_AM_STORES_CTS_PASSWORD
+    EOM
+    )
+    fi
+
+    chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} 'ou=admins,ou=identities' 'uid=am-identity-bind-account' "${AM_STORES_USER_PASSWORD_REAL}"
+    chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} 'ou=admins,ou=am-config' 'uid=am-config' "${AM_STORES_APPLICATION_PASSWORD_REAL}"
+    chgPass ds-cts-0.ds-cts ${ADMIN_PASS} 'ou=admins,ou=famrecords,ou=openam-session,ou=tokens' 'uid=openam_cts' "${AM_STORES_CTS_PASSWORD_REAL}"
+    echo 'Password script finished'
 
     echo "done"
   start.sh: "#!/usr/bin/env bash\n\n# Checking PingDS is up\n\nwait_repo() {\n    local HOST=\"$1-0.$1\"\n    local USER_DN=$2\n    local USER_UID=$3\n    local CXN=\"-h ${HOST} -p 1636 --useSsl --trustAll\"\n    echo \"Waiting for $HOST to be available.\"\n    SEARCH_CMD=\"ldapsearch ${CXN} -D 'uid=admin' -w '${ADMIN_PASS}' -b ${USER_DN} '${USER_UID}'\"\n    eval $SEARCH_CMD\n    SEARCH_REPONSE=$?\n    while [[ \"$SEARCH_RESPONSE\" != \"0\" ]] ; do\n        sleep 5;\n        eval $SEARCH_CMD\n        SEARCH_RESPONSE=$?\n    done\n    echo \"$REPO is responding\"\n}\n\nADMIN_PASS=$(cat /var/run/secrets/opendj-passwords/dirmanager.pw)\n\nwait_repo ds-idrepo ou=admins,ou=identities \"uid=am-identity-bind-account\" \nwait_repo ds-cts ou=admins,ou=famrecords,ou=openam-session,ou=tokens \"uid=openam_cts\" \n\n# Set the PingDS passwords for each store\nif [ -f \"/opt/opendj/ds-passwords.sh\" ]; then\n    echo \"Setting directory service account passwords\"\n    /opt/opendj/ds-passwords.sh\n    if [ $? -ne 0 ]; then\n        echo \"ERROR: Pre install script failed\"\n        exit 1\n    fi\nfi\n"
 ---
-# Source: identity-platform/templates/ldif-importer-job.yaml
+# Source: identity-platform/templates/ds-set-passwords-job.yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: ldif-importer
+  name: ds-set-passwords
   labels:
     helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
@@ -96,12 +128,12 @@ spec:
         - name: passwords
           secret:
             secretName: ds-passwords
-        - name: ldif-importer
+        - name: ds-set-passwords
           configMap:
-            name: ldif-importer-scripts
+            name: ds-set-passwords-scripts
             defaultMode: 0777
       containers:
-        - name: ldif-importer
+        - name: ds-set-passwords
           securityContext: {}
           image: ds
           imagePullPolicy: Always
@@ -112,6 +144,9 @@ spec:
           envFrom:
             - secretRef:
                 name: ds-env-secrets
+            - secretRef:
+                name: old-ds-env-secrets
+                optional: true
           readinessProbe:
             exec:
               command:
@@ -122,10 +157,10 @@ spec:
           volumeMounts:
             - name: passwords
               mountPath: /var/run/secrets/opendj-passwords
-            - name: ldif-importer
+            - name: ds-set-passwords
               mountPath: /opt/opendj/start.sh
               subPath: start.sh
-            - name: ldif-importer
+            - name: ds-set-passwords
               mountPath: /opt/opendj/ds-passwords.sh
               subPath: ds-passwords.sh
       tolerations:

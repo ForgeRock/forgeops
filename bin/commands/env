@@ -499,7 +499,7 @@ def main():
             'ds_snapshot': { 'image': {} },
             'idm': { 'image': {} },
             'ig': { 'image': {} },
-            'ldif_importer': { 'image': {} },
+            'ds_set_passwords': { 'image': {} },
             'admin_ui': { 'image': {} },
             'end_user_ui': { 'image': {} },
             'login_ui': { 'image': {} },
@@ -509,7 +509,7 @@ def main():
         values_images['ds_cts']['image']['pullPolicy'] = config['pull_policy']
         values_images['ds_idrepo']['image']['pullPolicy'] = config['pull_policy']
         values_images['idm']['image']['pullPolicy'] = config['pull_policy']
-        values_images['ldif_importer']['image']['pullPolicy'] = config['pull_policy']
+        values_images['ds_set_passwords']['image']['pullPolicy'] = config['pull_policy']
         values_images['admin_ui']['image']['pullPolicy'] = config['pull_policy']
         values_images['end_user_ui']['image']['pullPolicy'] = config['pull_policy']
         values_images['login_ui']['image']['pullPolicy'] = config['pull_policy']

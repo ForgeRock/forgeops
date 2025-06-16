@@ -1,0 +1,207 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Grab our starting dir
+start_dir=$(pwd)
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# Bring in our standard functions
+source $SCRIPT_DIR/../../lib/shell/stdlib.sh
+# Bring in common.sh
+source $SCRIPT_DIR/common.sh
+# Go back to where we started
+cd "${start_dir}"
+
+usage() {
+  local usage_msg=$(cat<<EOM
+usage: $PROG [-n NAMESPACE] [<secret> <secret> ...]
+
+Rotate some secrets in your ForgeOps deployment. For now, this tool will help
+you rotate the ds-env-secrets and ds-password secrets.
+
+OPTIONS:
+  -h|--help                   : display usage and exit
+  -d|--debug                  : turn on debugging
+  -r|--dryrun                 : do a dry run
+  -v|--verbose                : be verbose
+  -n|--namespace <ns>         : k8s namespace to install into
+
+Valid components:
+  ${COMPONENTS_VALID[@]}
+
+Requirements:
+  * kubectl
+  * jq
+  * allow-multiple-password-values enabled in DS password policies
+
+Examples:
+  Normal operation:
+  $PROG ds-env-secrets
+
+  Specify a namespace:
+  $PROG -n my_namespace ds-env-secrets
+
+  Do a dryrun:
+  $PROG --dryrun ds-env-secrets
+
+EOM
+)
+
+  usageStd $1 "$usage_msg" "$2"
+}
+
+ds-env-secrets() {
+  message "Starting ds-env-secrets()" "debug"
+  echo "Starting rotation of k8s secret: ds-env-secrets"
+  echo "Creating temporary k8s secret: old-ds-env-secrets"
+  USER_PASS=$(kubectl get secret ds-env-secrets -o json | jq '.data.AM_STORES_USER_PASSWORD')
+  APP_PASS=$(kubectl get secret ds-env-secrets -o json | jq '.data.AM_STORES_APPLICATION_PASSWORD')
+  CTS_PASS=$(kubectl get secret ds-env-secrets -o json | jq '.data.AM_STORES_CTS_PASSWORD')
+
+  SECRET_YAML=$(cat<<EOM
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: old-ds-env-secrets
+data:
+  OLD_AM_STORES_USER_PASSWORD: $USER_PASS
+  OLD_AM_STORES_APPLICATION_PASSWORD: $APP_PASS
+  OLD_AM_STORES_CTS_PASSWORD: $CTS_PASS
+EOM
+)
+
+  echo "$SECRET_YAML" | kube apply -f -
+
+  cat <<EOM
+
+  Creation of old-ds-env-secrets complete. The next steps are manual, and
+  depend on the secret system you employ.
+
+  Step 1: Create new passwords in ds-env-secrets
+    For secret-agent users:
+      kubectl delete secret ds-env-secrets
+
+    For secret-generator users:
+      kubectl annotate secret ds-env-secrets secret-generator.v1.mittwald.de/regenerate=true
+
+    For alternate secret management users, you should recreate ds-env-secrets with new values.
+
+  Step 2: Rerun ds-set-passwords job (old ldif-importer)
+    For Helm:
+      First set ds_set_passwords.force to true in your values.yaml, then do:
+
+      helm upgrade identity-platform identity-platform --repo https://ForgeRock.github.io/forgeops --version 2025.2.0 -f helm/MY_ENV/values.yaml
+
+    For Kustomize:
+      cd kustomize/overlays/MY_ENV/ds-passwords
+      kubectl apply -k .
+
+  Step 3: Restart AM
+    kubectl rollout restart deployment am
+
+EOM
+
+  read -p "$CONTINUE_MSG" input
+
+  cat <<EOM
+
+  Now that you have changed the password and restarted AM, you need to do the following.
+
+    1. kubectl delete secret old-ds-env-secrets
+    2. Execute Step 2 again
+
+EOM
+
+  read -p "$CONTINUE_MSG" input
+}
+
+ds-passwords() {
+  message "Starting ds-passwords" "debug"
+  echo "Starting rotation of k8s secret: ds-env-secrets"
+  echo "Creating temporary k8s secret: old-ds-passwords"
+  DIRMANAGER_PASS=$(kubectl get secret ds-passwords -o json | jq '.data["dirmanager.pw"]')
+  MONITOR_PASS=$(kubectl get secret ds-passwords -o json | jq '.data["monitor.pw"]')
+
+  SECRET_YAML=$(cat<<EOM
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: old-ds-passwords
+data:
+  OLD_DIRMANAGER_PW: $DIRMANAGER_PASS
+  OLD_MONITOR_PW: $MONITOR_PASS
+EOM
+)
+
+  echo "$SECRET_YAML" | kube apply -f -
+
+  cat <<EOM
+
+  Creation of old-ds-passwords complete. The next steps are manual, and
+  depend on the secret system you employ.
+
+  Step 1: Create new passwords in ds-passwords
+    For secret-agent users:
+      kubectl delete secret ds-passwords
+
+    For secret-generator users:
+      kubectl annotate secret ds-passwords secret-generator.v1.mittwald.de/regenerate=true
+
+    For alternate secret management users, you should create a new secret
+    called old-ds-passwords. The secret is an ENV secret with two environment
+    variables (OLD_DIRMANAGER_PW and OLD_MONITOR_PW). This secret needs to be
+    an ENV style secret so it can be optional.
+
+  Step 2: Restart DS
+    kubectl rollout restart statefulset ds-cts 
+    kubectl rollout restart statefulset ds-idrepo
+
+  Step 3: Restart IDM
+    Once both DS StatefulSets have finished restarting, you also need to restart IDM.
+
+    kubectl rollout restart deployment idm
+
+EOM
+
+  read -p "$CONTINUE_MSG" input
+
+  cat <<EOM
+
+  Now that you have changed the password and restarted DS and IDM, you need to do the following.
+
+    1. kubectl delete secret old-ds-passwords
+    2. Execute Step 2 again
+
+EOM
+}
+
+CONTINUE_MSG="After completing these steps, come back to this terminal and hit <ENTER> to continue"
+
+# Setup valid components now so they get presented in the usage
+COMPONENTS_VALID=( "ds-env-secrets" "ds-passwords" )
+
+# Code in common.sh
+processArgs $*
+checkComponents
+
+kubeInit
+
+if [ -n "$NAMESPACE" ] ; then
+  if kubeExists ns $NAMESPACE ; then
+    message "Namespace exists: $NAMESPACE" "debug"
+  else
+    usage 1 "Namespace ($NAMESPACE) doesn't exist"
+  fi
+fi
+
+for secret in ${COMPONENTS[@]} ; do
+  message "secret = $secret" "debug"
+  case "$secret" in
+    ds-env-secrets) ds-env-secrets ;;
+    ds-passwords) ds-passwords ;;
+    *) usage 1 "Unknown secret: $c"
+  esac
+done

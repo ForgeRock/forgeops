@@ -5,4 +5,4 @@ components:
 - ../image-defaulter
 
 resources:
-- ../../../base/ldif-importer
+- ../../../base/ds/set-passwords

@@ -28,7 +28,7 @@ ig:
   image:
     repository: ig
     tag: ""
-ldif_importer:
+ds_set_passwords:
   enabled: false
 login_ui:
   enabled: false

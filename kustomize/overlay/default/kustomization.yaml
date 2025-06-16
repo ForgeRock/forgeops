@@ -9,7 +9,7 @@ resources:
   - ./am
   - ./amster
   - ./idm
-  - ./ldif-importer
+  - ./ds-set-passwords
   - ./admin-ui
   - ./end-user-ui
   - ./login-ui

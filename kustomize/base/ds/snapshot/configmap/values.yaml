@@ -32,7 +32,7 @@ idm:
   enabled: false
 ig:
   enabled: false
-ldif_importer:
+ds_set_passwords:
   enabled: false
 login_ui:
   enabled: false
