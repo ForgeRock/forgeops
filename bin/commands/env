@@ -87,6 +87,12 @@ def process_overlay_dir(path, config, args):
                 kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/idrepo')
                 kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
 
+        if skey == 'secrets':
+            if getattr(args, 'secret_generator', None):
+                kust['resources'] = utils.replace_or_append_str(kust['resources'], './secret-agent', './secret-generator')
+            elif getattr(args, 'secret_agent', None):
+                kust['resources'] = utils.replace_or_append_str(kust['resources'], './secret-generator', './secret-agent')
+
         writeYamlFile(kust, kust_path)
 
     ingress_path = path / 'ingress-fqdn.yaml'
@@ -244,6 +250,8 @@ def main():
     parser.add_argument('--no-namespace', dest='no_namespace', action='store_true', help='Remove namespace from overlay')
     parser.add_argument('--env-name', '-e', dest='env_name', required=True, help='Name of environment to manage')
     parser.add_argument('--single-instance', dest='single', action='store_true', help='Use a single-instance configuration')
+    parser.add_argument('--secret-generator', action='store_true', help='Use secret-generator instead of secret-agent')
+    parser.add_argument('--secret-agent', action='store_true', help='Use secret-agent instead of secret-generator')
     parser.add_argument('--source', '-s', dest='source', help='Name of source Kustomize overlay')
     parser.add_argument('--ingress-no-cert-manager', action='store_true', help="Disable use of cert-manager for ingresses")
     parser.add_argument('--ssl-secretname', dest='ssl_secretname', help="Name of the secret containing private ssl data")
@@ -525,6 +533,14 @@ def main():
     if getattr(args, 'snap_role_name', None):
         values_snap['ds_snapshot']['clusterRoleName'] = args.snap_role_name
 
+    values_secrets = {}
+    if getattr(args, 'secret_generator', None):
+        values_path = root_path / 'charts' / 'identity-platform' / 'values-secret-generator.yaml'
+        values_secrets = yaml.safe_load(open(values_path))
+    elif getattr(args, 'secret_agent', None):
+        values_path = root_path / 'charts' / 'identity-platform' / 'values-secret-agent.yaml'
+        values_secrets = yaml.safe_load(open(values_path))
+
     # Check if we are Creating or Updating
     config['kustomize_action'] = None
     if config['do_kustomize']:
@@ -668,7 +684,9 @@ If you have not yet deployed the environment, then you can ignore this message.
         values = {}
         if values_file.is_file():
             values = yaml.safe_load(open(values_file))
-        merge(values, config['size'], values_ingress, values_images, values_snap, values_amster)
+            if getattr(args, 'secret_agent', None):
+                values['platform']['secrets'] = {}
+        merge(values, config['size'], values_ingress, values_images, values_snap, values_amster, values_secrets)
         writeYamlFile(values, values_file)
 
     ###

@@ -518,7 +518,7 @@ def replace_or_append_str(array, search_str, data):
     if not found:
         array.append(data)
 
-    return array
+    return list(set(array))
 
 def replace_or_append_dict(array, search_key, search_str, target_key, replace_data, append_data=None):
     """
