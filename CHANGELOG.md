@@ -4,6 +4,7 @@ RELEASE=2025.2.0
 ## New Features/Updated functionality
 
 ### Truststore no longer provisioned by secret-agent
+
 OpenSSL now provides the default root CAs.  User can provide additional
 certificates via the Helm chart.
 
@@ -16,6 +17,12 @@ security vulnerabilities, and so we decided to remove it.
 
 Curl has been replaced with wget in the amster job. Curl often has
 security vulnerabilities, and so we've changed it to wget which is more secure.
+
+### Added ability to use secret-generator
+
+Is is now possible to use secret-generator to provision platform secrets
+instead of secret-agent. In the future, secret-agent will be deprecated. It is
+recommended that new deployments use secret-generator.
 
 ## Bugfixes
 
