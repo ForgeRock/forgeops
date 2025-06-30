@@ -1,6 +1,12 @@
 FROM gcr.io/forgerock-io/idm-cdk:7.4.1
 
-COPY debian-buster-sources.list /etc/apt/sources.list
+USER root
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+        apt-get install -y --no-install-recommends openssl && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
+USER 11111
 
 # Harden IDM by removing the Felix OSGI Console. Unless you are a ForgeRock developer, the
 # console is rarely required. Your configuration should NOT include conf/felix.webconsole.json
