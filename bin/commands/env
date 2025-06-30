@@ -89,9 +89,9 @@ def process_overlay_dir(path, config, args):
 
         if skey == 'secrets':
             if getattr(args, 'secret_generator', None):
-                kust['resources'] = utils.replace_or_append_str(kust['resources'], './secret-agent', './secret-generator')
+                kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-agent', './secret-generator')))
             elif getattr(args, 'secret_agent', None):
-                kust['resources'] = utils.replace_or_append_str(kust['resources'], './secret-generator', './secret-agent')
+                kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-generator', './secret-agent')))
 
         writeYamlFile(kust, kust_path)
 

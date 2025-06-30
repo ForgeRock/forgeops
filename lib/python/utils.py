@@ -515,8 +515,6 @@ def replace_or_append_str(array, search_str, data):
         if search_str in item:
             found = True
             array[idx] = data
-        elif data in item:
-            found = True
     if not found:
         array.append(data)
 
