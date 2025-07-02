@@ -3,6 +3,9 @@ RELEASE=2025.2.0
 
 ## New Features/Updated functionality
 
+### New PingIDM versions available
+PingIDM 7.4.1 and 7.5.2 have been released and are available to deploy with forgeops tooling.
+
 ### Truststore no longer provisioned by secret-agent
 
 OpenSSL now provides the default root CAs.  User can provide additional
