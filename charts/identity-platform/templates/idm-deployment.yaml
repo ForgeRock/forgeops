@@ -61,6 +61,7 @@ spec:
               {{- if .Values.platform.truststore.secret.enabled }}
               - secret:
                   name: {{ .Values.platform.truststore.secret.name }}
+                  optional: true
               {{- end }}
         - name: new-truststore
           emptyDir: {}

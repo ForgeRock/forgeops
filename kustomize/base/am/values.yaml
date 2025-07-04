@@ -7,6 +7,9 @@ platform:
   ds_certs:
     enabled: false
   secret_generator_enable: false
+  truststore:
+    secret:
+      enabled: true
 admin_ui:
   enabled: false
 am:
