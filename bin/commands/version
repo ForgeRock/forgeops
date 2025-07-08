@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Figure out the dir we live in
+SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+grep "^RELEASE=" "${SCRIPT_DIR}/../../CHANGELOG.md" | awk -F'=' '{print $2}'

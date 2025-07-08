@@ -65,6 +65,7 @@ COMMANDS=(
   'image'
   'prereqs'
   'rotate'
+  'version'
   'wait'
 )
 
