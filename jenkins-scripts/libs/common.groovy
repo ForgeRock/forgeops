@@ -139,8 +139,18 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                         options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
                     }
 
+                    def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
+                    if (branchName.equals('dev')){
+                        // use "set-image" to set dev product images
+                        platform_option = "--platform-version=PLATFORM_IMAGE_REF"
+                    }
+                    else {
+                        // use "forgeops image" to set official product inages
+                        platform_option = "--platform-version=LATEST"
+                    }
                     // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
-                    sh("./configure.py runtime --platform-version=PLATFORM_IMAGE_REF --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
+                    sh("./configure.py runtime ${platform_option} --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
+
 
                     try {
                         // Run the tests
