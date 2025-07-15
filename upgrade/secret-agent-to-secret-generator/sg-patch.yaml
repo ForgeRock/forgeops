@@ -1,0 +1,18 @@
+---
+$patch: delete
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "ds-passwords"
+---
+$patch: delete
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "idm-env-secrets"
+---
+$patch: delete
+apiVersion: v1
+kind: Secret
+metadata:
+  name: "keystore-create"

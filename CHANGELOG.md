@@ -27,6 +27,11 @@ Is is now possible to use secret-generator to provision platform secrets
 instead of secret-agent. In the future, secret-agent will be deprecated. It is
 recommended that new deployments use secret-generator.
 
+### New forgeops prereqs command
+
+This replaces `charts/scripts/install-prereqs`, and the settings move into
+`forgeops.conf`. See `forgeops prereqs -h` for more information.
+
 ## Bugfixes
 
 ### Fix `forgeops amster import/export` command

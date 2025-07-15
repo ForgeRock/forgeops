@@ -168,7 +168,7 @@ def sub_title(title):
     print('')
     print(msg)
 
-def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
+def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False, dryrun=False):
     """
     Execute the given command. Raises error if command returns non-zero code.
     cmd: command to run.
@@ -180,19 +180,23 @@ def run(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=N
     env: dictionary containing environment variables to pass during runtime.
     ignoreFail: if True, do not raise an exception if the cmd fails.
     return: success, stdout, stderr. stdout and stderr are only populated if cstdout and cstderr are True.
+    dryrun: print the command without running it
     """
     runcmd = f'{cmd} {" ".join(cmdArgs)}'
     stde_pipe = subprocess.PIPE if cstderr else None
     stdo_pipe = subprocess.PIPE if cstdout else None
     log.debug(f'Running: "{runcmd}"' + (f' in CWD="{os.path.abspath(cwd)}"' if cwd else ''))
-    try:
-        _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
-                            check=True, input=stdin, cwd=cwd, env=env)
-        return _r.returncode == 0, _r.stdout, _r.stderr
-    except Exception as e:
-        if ignoreFail:
-            return False, None, None
-        raise(e)
+    if dryrun:
+        print(runcmd)
+    else:
+        try:
+            _r = subprocess.run(shlex.split(runcmd), stdout=stdo_pipe, stderr=stde_pipe,
+                                check=True, input=stdin, cwd=cwd, env=env)
+            return _r.returncode == 0, _r.stdout, _r.stderr
+        except Exception as e:
+            if ignoreFail:
+                return False, None, None
+            raise(e)
 
 def run_condfail(cmd, *cmdArgs, stdin=None, cstdout=False, cstderr=False, cwd=None, env=None, ignoreFail=False):
     """Wrapper function for run() that ignores failures if selected."""

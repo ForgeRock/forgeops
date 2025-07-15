@@ -26,6 +26,7 @@ OPTIONS:
   -r|--dryrun                 : do a dry run
   -v|--verbose                : be verbose
   -n|--namespace <ns>         : k8s namespace to install into
+  -y|--yes                    : skip prompts
 
 Valid components:
   ${COMPONENTS_VALID[@]}
@@ -103,7 +104,9 @@ EOM
 
 EOM
 
-  read -p "$CONTINUE_MSG" input
+  if [ "$SKIP_CONFIRM" = false ] ; then
+    read -p "$CONTINUE_MSG" input
+  fi
 
   cat <<EOM
 
@@ -114,12 +117,14 @@ EOM
 
 EOM
 
-  read -p "$CONTINUE_MSG" input
+  if [ "$SKIP_CONFIRM" = false ] ; then
+    read -p "$CONTINUE_MSG" input
+  fi
 }
 
 ds-passwords() {
   message "Starting ds-passwords" "debug"
-  echo "Starting rotation of k8s secret: ds-env-secrets"
+  echo "Starting rotation of k8s secret: ds-passwords"
   echo "Creating temporary k8s secret: old-ds-passwords"
   DIRMANAGER_PASS=$(kubectl get secret ds-passwords -o json | jq '.data["dirmanager.pw"]')
   MONITOR_PASS=$(kubectl get secret ds-passwords -o json | jq '.data["monitor.pw"]')
@@ -166,7 +171,9 @@ EOM
 
 EOM
 
-  read -p "$CONTINUE_MSG" input
+  if [ "$SKIP_CONFIRM" = false ] ; then
+    read -p "$CONTINUE_MSG" input
+  fi
 
   cat <<EOM
 
