@@ -203,6 +203,7 @@ spec:
         - name: entrypoint-scripts
           configMap:
             name: am-entrypoint
+            defaultMode: 0755
         - name: am-import-pem-certs
           configMap:
             name: am-import-pem-certs
