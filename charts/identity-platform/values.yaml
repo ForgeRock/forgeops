@@ -455,6 +455,8 @@ idm:
       secretUser: prometheus
       secretPassword: prometheus
 
+# keystore-create job requries platform.secret_generator_enable is true and
+# platform.secrets.keystore_create is uncommented.
 keystore_create:
   enabled: true
   backoffLimit: 6
