@@ -1,0 +1,11 @@
+platform:
+  base_generate: true
+  secret_generator_enable: true
+  truststore:
+    secret:
+      enabled: true
+am:
+  enabled: true
+  image:
+    repository: am
+    tag: ""

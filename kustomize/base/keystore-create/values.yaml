@@ -1,0 +1,5 @@
+---
+keystore_create:
+  force: true
+  clusterRoleName: keystore-create
+  appendNSToRole: false

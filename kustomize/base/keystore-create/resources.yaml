@@ -1,0 +1,241 @@
+---
+# Source: identity-platform/templates/keystore-create-rbac-serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: keystore-create
+---
+# Source: identity-platform/templates/keystore-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keystore
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  keystore.json: |
+    {"keytoolAliases":[{"args":["-keyalg","RSA","-keysize","2048","-sigalg","SHA256WITHRSA","-validity","3650","-dname","CN=rsajwtsigningkey,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"rsajwtsigningkey"},{"args":["-keyalg","EC","-keysize","256","-sigalg","SHA256withECDSA","-validity","3650","-dname","CN=es256test,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"es256test"},{"args":["-keyalg","EC","-keysize","384","-sigalg","SHA256withECDSA","-validity","3650","-dname","CN=es384test,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"es384test"},{"args":["-keyalg","EC","-keysize","521","-sigalg","SHA256withECDSA","-validity","3650","-dname","CN=es512test,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"es512test"},{"args":["-keyalg","RSA","-keysize","2048","-sigalg","SHA256WITHRSA","-validity","3650","-dname","CN=selfserviceenctest,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"selfserviceenctest"},{"args":["-keyalg","RSA","-keysize","2048","-sigalg","SHA256WITHRSA","-validity","3650","-dname","CN=test,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"test"},{"args":["-keyalg","HMacSHA512","-keysize","512"],"cmd":"genseckey","name":"hmacsigningtest"},{"args":["-keyalg","HMacSHA512","-keysize","256"],"cmd":"genseckey","name":"selfservicesigntest"},{"args":["-keyalg","aes","-keysize","256"],"cmd":"genseckey","name":"directenctest"},{"args":["-keyalg","aes","-keysize","128"],"cmd":"genseckey","name":"openidm-sym-default"},{"args":["-keyalg","HmacSHA256","-keysize","256"],"cmd":"genseckey","name":"openidm-jwtsessionhmac-key"},{"args":["-keyalg","aes","-keysize","128"],"cmd":"genseckey","name":"openidm-selfservice-key"},{"args":["-keyalg","RSA","-keysize","2048","-sigalg","SHA256WITHRSA","-validity","3650","-dname","CN=server-cert,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"server-cert"},{"args":["-keyalg","RSA","-keysize","2048","-sigalg","SHA256WITHRSA","-validity","3650","-dname","CN=selfservice,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"selfservice"},{"args":["-keyalg","RSA","-keysize","2048","-sigalg","SHA256WITHRSA","-validity","3650","-dname","CN=openidm-localhost,O=ForgeRock,L=Bristol,ST=Bristol,C=UK"],"cmd":"genkeypair","name":"openidm-localhost"}],"secret":{"name":"keystore","replace":false},"storeType":"jceks"}
+---
+# Source: identity-platform/templates/keystore-create-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keystore-create
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+data:
+  keystore-create.sh: |
+    #!/bin/bash
+
+    set -e
+
+    [ -z "$KEYSTORE_CONF_DIR" ] && KEYSTORE_CONF_DIR=/home/forgerock
+    [ -z "$KEYSTORE_CONF" ] && KEYSTORE_CONF=$KEYSTORE_CONF_DIR/keystore.json
+    [ -z "$KEYSTORE_TYPE" ] && KEYSTORE_TYPE=$(jq -r .storeType $KEYSTORE_CONF)
+    [ -z "$KEYSTORE_DIR" ] && KEYSTORE_DIR=/keystore
+    [ -z "$KEYSTORE" ] && KEYSTORE=$KEYSTORE_DIR/keystore.$KEYSTORE_TYPE
+
+    [ -z "$SECRETS_DIR" ] && SECRETS_DIR=/var/run/secrets/keystore
+    [ -z "$STOREPASS_FILE" ] && STOREPASS_FILE=$SECRETS_DIR/.storepass
+    [ -z "$KEYPASS_FILE" ] && KEYPASS_FILE=$SECRETS_DIR/.keypass
+    [ -z "$DSPASS_FILE" ] && DSPASS_FILE=$SECRETS_DIR/dirmanager.pw
+
+    [ -z "$STOREPASS" ] && STOREPASS=$(cat $STOREPASS_FILE)
+    [ -z "$KEYPASS" ] && KEYPASS=$(cat $KEYPASS_FILE)
+    [ -z "$DSPASS" ] && DSPASS=$(cat $DSPASS_FILE)
+
+    [ -f "$KEYSTORE" ] && rm -f "$KEYSTORE"
+
+    # Initialize keystore with $STOREPASS
+    echo "Initializing keystore $KEYSTORE..."
+    echo "$STOREPASS" | keytool -importpass -alias configstorepwd -storetype $KEYSTORE_TYPE -storepass $STOREPASS -keystore $KEYSTORE
+
+    # Import DS password
+    echo "Importing DS password..."
+    echo "$DSPASS" | keytool -importpass -alias dsameuserpwd -storetype $KEYSTORE_TYPE -storepass $STOREPASS -keystore $KEYSTORE
+
+    aliases=$(jq -r .keytoolAliases[].name $KEYSTORE_CONF)
+    for alias in $aliases; do
+        cmd=$(jq -r ".keytoolAliases[] | select(.name==\"$alias\") | .cmd" $KEYSTORE_CONF)
+        case $cmd in
+            genkeypair|genseckey)
+                args=$(jq -r ".keytoolAliases[] | select(.name==\"$alias\") | .args[]" $KEYSTORE_CONF | sed -e ':a;N;s/\n/ /;ba')
+                echo "Executing '$cmd' command for '$alias' alias..."
+                keytool -$cmd -alias $alias $args -storepass "$STOREPASS" -keypass "$KEYPASS" -storetype $KEYSTORE_TYPE -keystore $KEYSTORE
+                ;;
+            *)
+                echo "Unknown/unsupported command '$cmd' for '$alias' alias!"
+                ;;
+        esac
+    done
+
+    echo "Listing keystore entries..."
+    keytool -list -storepass "$STOREPASS" -storetype $KEYSTORE_TYPE -keystore $KEYSTORE
+
+    exit 0
+---
+# Source: identity-platform/templates/keystore-create-rbac-clusterrole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: keystore-create
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+# Source: identity-platform/templates/keystore-create-rbac-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: keystore-create
+subjects:
+  - kind: ServiceAccount
+    name: keystore-create
+    namespace: prod
+roleRef:
+  kind: ClusterRole
+  name: keystore-create
+  apiGroup: rbac.authorization.k8s.io
+---
+# Source: identity-platform/templates/keystore-create-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keystore-create
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+    app: platform-keystore
+    app.kubernetes.io/component: platform-keystore
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: platform-keystore
+        app.kubernetes.io/component: platform-keystore
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: keystore-create
+      securityContext: {}
+      volumes:
+        - name: keystore-secrets
+          projected:
+            sources:
+              - secret:
+                  name: keystore-create
+                  items:
+                    - key: KEYSTORE_PASSWORD
+                      path: .storepass
+                    - key: KEYSTORE_PASSWORD
+                      path: .keypass
+              - secret:
+                  name: ds-passwords
+                  items:
+                    - key: dirmanager.pw
+                      path: dirmanager.pw
+        - name: platform-config
+          configMap:
+            name: platform-config
+        - name: keystore-create
+          configMap:
+            name: keystore-create
+            defaultMode: 0755
+        - name: keystore-config
+          configMap:
+            name: keystore
+        - name: keystore
+          emptyDir: {}
+      initContainers:
+        - name: keystore-create
+          securityContext: {}
+          image: us-docker.pkg.dev/forgeops-public/images/am:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /home/forgerock/keystore-create.sh
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            - configMapRef:
+                name: platform-config
+          resources: {}
+          volumeMounts:
+            - name: keystore-config
+              mountPath: /home/forgerock/keystore.json
+              subPath: keystore.json
+            - name: keystore-secrets
+              mountPath: /var/run/secrets/keystore
+            - name: keystore-create
+              mountPath: /home/forgerock/keystore-create.sh
+              subPath: keystore-create.sh
+            - name: keystore
+              mountPath: /keystore
+      containers:
+        - name: keystore-secret-create
+          securityContext: {}
+          image: bitnami/kubectl:1.31
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - |
+              kubectl get secret $SECRET_NAME \
+                --namespace=$NAMESPACE 2>&1 >/dev/null || \
+                  kubectl create secret generic $SECRET_NAME \
+                    --from-file=/keystore/keystore.jceks --namespace=$NAMESPACE
+          env:
+            - name: SECRET_NAME
+              value: keystore
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            - configMapRef:
+                name: platform-config
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /etc/hosts
+            initialDelaySeconds: 1
+          resources: {}
+          volumeMounts:
+            - name: keystore
+              mountPath: /keystore
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Exists

@@ -87,11 +87,39 @@ def process_overlay_dir(path, config, args):
                 kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds/snapshot', '../../../base/ds/snapshot/idrepo')
                 kust['patches'] = utils.replace_or_append_str(kust['patches'], 'snapshot-schedule', { 'path': 'snapshot-schedule.yaml' })
 
+        # Begin secret-generator/secret-agent logic for kustomization.yaml
         if skey == 'secrets':
             if getattr(args, 'secret_generator', None):
                 kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-agent', './secret-generator')))
             elif getattr(args, 'secret_agent', None):
                 kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], './secret-generator', './secret-agent')))
+
+        if path.name == args.env_name:
+            keystore_str = './keystore-create'
+            if getattr(args, 'secret_generator', None) and keystore_str not in kust['resources']:
+                kust['resources'].append(keystore_str)
+            if getattr(args, 'secret_agent', None) and keystore_str in kust['resources']:
+                kust['resources'].remove(keystore_str)
+
+        if skey in ['am', 'amster', 'idm'] and (args.secret_agent or args.secret_generator):
+            base_path = f"../../../base/{skey}"
+            sa_resource = f"{base_path}/secret-agent"
+            sg_resource = f"{base_path}/secret-generator"
+            old_resource = ''
+            new_resource = ''
+            if args.secret_agent:
+                old_resource = sg_resource
+                new_resource = sa_resource
+            if args.secret_generator:
+                old_resource = sa_resource
+                new_resource = sg_resource
+            if base_path in kust['resources']:
+                old_resource = base_path
+            if args.debug:
+                print(f"old_resource = {old_resource}")
+                print(f"new_resource = {new_resource}")
+            kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], old_resource, new_resource)))
+        # End secret-generator/secret-agent logic
 
         writeYamlFile(kust, kust_path)
 
@@ -228,10 +256,39 @@ def process_overlay_dir(path, config, args):
 
         writeYamlFile(res, res_path)
 
+    if skey == 'keystore_create' and args.secret_generator:
+        rn_patch_path = path / 'cluster-role-name.yaml'
+        rb_patch_path = path / 'role-binding.yaml'
+        role_name = f'identity-platform-keystore-create:{args.namespace}'
+
+        rn_patch_yaml = [
+            {
+                'op': 'replace',
+                'path': '/metadata/name',
+                'value': role_name
+            }
+        ]
+
+        rb_patch_yaml = [
+            {
+                'op': 'replace',
+                'path': '/roleRef/name',
+                'value': role_name
+            },
+            {
+                'op': 'replace',
+                'path': '/subjects/0/namespace',
+                'value': args.namespace
+            }
+        ]
+
+        writeYamlFile(rn_patch_yaml, rn_patch_path)
+        writeYamlFile(rb_patch_yaml, rb_patch_path)
+
     # Look for subdirs and process them
     for d in path.iterdir():
         if args.debug: print(f"d={d}")
-        if d.is_file() or 'amster' in d.name:
+        if d.is_file():
             continue
         process_overlay_dir(d, config, args)
 
@@ -298,6 +355,9 @@ def main():
 
     if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable or args.snap_role_name):
         utils.exit_msg('You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable')
+
+    if not args.namespace and args.secret_generator:
+        utils.exit_msg('You must specify a namespace (-n) with --secret-generator')
 
     config = {}
 

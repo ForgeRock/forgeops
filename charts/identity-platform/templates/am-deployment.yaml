@@ -49,12 +49,7 @@ spec:
         - name: am-secrets
           projected:
             sources:
-        {{- if not (and .Values.platform.secret_generator_enable .Values.platform.secrets.keystore_create .Values.keystore_create.enabled) }}
-            - secret:
-                name: am-passwords
-            - secret:
-                name: am-keystore
-        {{- else }}
+        {{- if eq (include "keystore_create.resources.enabled" .) "true" }}
             - secret:
                 name: keystore-create
                 items:
@@ -64,6 +59,11 @@ spec:
                   path: .keypass
             - secret:
                 name: keystore
+        {{- else }}
+            - secret:
+                name: am-passwords
+            - secret:
+                name: am-keystore
         {{- end }}
         - name: amster-key
           secret:
@@ -162,7 +162,7 @@ spec:
             value: changeit
           - name: AM_STORES_USER_TYPE
             value: LDAPv3ForForgeRockIAM
-          {{- if and .Values.platform.secret_generator_enable (index .Values.platform.secrets "am_env_secrets") }}
+          {{- if and .Values.platform.secret_generator_enable (or .Values.platform.base_generate (index .Values.platform.secrets "am_env_secrets")) }}
           - name: SECRET_GENERATOR_AM_ENV_SECRETS
             value: "true"
           {{- end }}

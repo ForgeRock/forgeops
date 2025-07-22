@@ -5,4 +5,4 @@ components:
 - ../image-defaulter
 
 resources:
-- ../../../base/amster
+- ../../../base/amster/secret-agent

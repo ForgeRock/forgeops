@@ -1,0 +1,20 @@
+---
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+resources:
+- ../../../base/keystore-create
+
+patches:
+- path: cluster-role-name.yaml
+  target:
+    group: rbac.authorization.k8s.io
+    version: 'v1'
+    kind: ClusterRole
+    name: keystore-create
+- path: role-binding.yaml
+  target:
+    group: rbac.authorization.k8s.io
+    version: 'v1'
+    kind: RoleBinding
+    name: keystore-create

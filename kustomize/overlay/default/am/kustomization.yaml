@@ -5,7 +5,7 @@ components:
 - ../image-defaulter
 
 resources:
-- ../../../base/am
+- ../../../base/am/secret-agent
 
 patches:
 - path: deployment.yaml

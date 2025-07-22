@@ -48,7 +48,7 @@ spec:
           emptyDir: {}
         - name: idm-secrets
           secret:
-            {{- if and .Values.platform.secret_generator_enable .Values.platform.secrets.keystore_create .Values.keystore_create.enabled }}
+            {{- if eq (include "keystore_create.resources.enabled" .) "true" }}
             secretName: keystore
             {{- else }}
             secretName: idm
@@ -145,7 +145,7 @@ spec:
               secretKeyRef:
                 name: ds-passwords
                 key: dirmanager.pw
-          {{- if and .Values.platform.secret_generator_enable .Values.platform.secrets.keystore_create .Values.keystore_create.enabled }}
+          {{- if eq (include "keystore_create.resources.enabled" .) "true" }}
           - name: OPENIDM_KEYSTORE_PASSWORD
             valueFrom:
               secretKeyRef:

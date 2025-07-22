@@ -1,0 +1,3 @@
+- op: replace
+  path: /roleRef/name
+  value: keystore-create:prod
