@@ -10,13 +10,13 @@ wait_repo() {
     echo "Waiting for $HOST to be available."
     SEARCH_CMD="ldapsearch ${CXN} -D 'uid=admin' -w '${ADMIN_PASS}' -b ${USER_DN} '${USER_UID}'"
     eval $SEARCH_CMD
-    SEARCH_REPONSE=$?
+    SEARCH_RESPONSE=$?
     while [[ "$SEARCH_RESPONSE" != "0" ]] ; do
         sleep 5;
         eval $SEARCH_CMD
         SEARCH_RESPONSE=$?
     done
-    echo "$REPO is responding"
+    echo "$HOST is responding"
 }
 
 ADMIN_PASS=$(cat /var/run/secrets/opendj-passwords/dirmanager.pw)
