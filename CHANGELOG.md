@@ -32,6 +32,17 @@ recommended that new deployments use secret-generator.
 This replaces `charts/scripts/install-prereqs`, and the settings move into
 `forgeops.conf`. See `forgeops prereqs -h` for more information.
 
+### Added ability to do no downtime DS password rotations
+
+DS images must be built with ForgeOps 2025.2.0 in order to enable multiple
+password values. Rebuild your current images, or use the latest available tag
+for DS images.
+
+### Added `forgeops rotate` command
+
+This assists with doing no downtime password rotations for ds-env-secrets and
+ds-passwords.
+
 ## Bugfixes
 
 ### Fix `forgeops amster import/export` command
