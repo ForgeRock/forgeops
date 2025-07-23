@@ -8,7 +8,7 @@ PingIDM 7.4.1 and 7.5.2 have been released and are available to deploy with forg
 
 ### Option to provision keystores without secret-agent
 
-When `secret-generator` and `keystore-create` kubernetes job are enabled,
+When `secret-generator` and `keystore-create` Kubernetes job are enabled,
 a single keystore is now created for AM and IDM.
 
 ### Truststore no longer provisioned by secret-agent
