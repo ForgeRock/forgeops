@@ -85,6 +85,10 @@ processDir() {
   message "Starting processDir()" "debug"
 
   local dir=$1
+  local base_values_opt=""
+  if [ -n "$BASE_VALUES_FILE" ] ; then
+    base_values_opt="-f $BASE_VALUES_FILE"
+  fi
   for d in $dir/* ; do
     [[ ! -d $d ]] && continue # Skip if not a dir
 
@@ -93,7 +97,7 @@ processDir() {
       local override_opt=
       [[ -f $d/$VALUES_OVERRIDE ]] && override_opt="-f $d/$VALUES_OVERRIDE"
       echo "Generating $d/$RESOURCES_FILE"
-      runOrPrint "$HELM_CMD template $HELM_OPTS -f $d/$VALUES_FILE $override_opt | $YQ_CMD eval -P 'del(.spec.template.metadata.annotations.deployment-date)' - > $d/$RESOURCES_FILE"
+      runOrPrint "$HELM_CMD template $HELM_OPTS $base_values_opt -f $d/$VALUES_FILE $override_opt | $YQ_CMD eval -P 'del(.spec.template.metadata.annotations.deployment-date)' - > $d/$RESOURCES_FILE"
       stripTag "$d/$RESOURCES_FILE"
       processDir ${d%*/}
     else
@@ -168,6 +172,8 @@ CHART_VER=${CHART_VER:-$CHART_VER_DEF}
 message "CHART_VER=$CHART_VER" "debug"
 KUSTOMIZE_PATH=${KUSTOMIZE_PATH:-$KUSTOMIZE_PATH_DEF}
 message "KUSTOMIZE_PATH=$KUSTOMIZE_PATH" "debug"
+BASE_PATH="$KUSTOMIZE_PATH/base"
+message "BASE_PATH=$BASE_PATH" "debug"
 RESOURCES_FILE=${RESOURCES_FILE:-$RESOURCES_FILE_DEF}
 message "RESOURCES_FILE=$RESOURCES_FILE" "debug"
 VALUES_FILE=${VALUES_FILE:-$VALUES_FILE_DEF}
@@ -206,4 +212,11 @@ if [ ! -d "$KUSTOMIZE_PATH" ] ; then
   usage 1 "Kustomize path ($KUSTOMIZE_PATH) is not a directory."
 fi
 
-processDir "$KUSTOMIZE_PATH/base"
+BASE_VALUES_FILE=""
+if [ -f "$BASE_PATH/$VALUES_FILE" ] ; then
+  BASE_VALUES_FILE="$BASE_PATH/$VALUES_FILE"
+elif [ -f "$BASE_PATH/$VALUES_FILE_DEF" ] ; then
+  BASE_VALUES_FILE="$BASE_PATH/$VALUES_FILE_DEF"
+fi
+
+processDir "$BASE_PATH"
