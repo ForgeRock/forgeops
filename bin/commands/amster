@@ -249,7 +249,7 @@ def main():
         if Path(args.dst).is_absolute():
             dst = Path(args.dst)
         else:
-            dst = overrides['forgeops_root'] / args.dst
+            dst = overrides['forgeops_data'] / args.dst
 
         amster_export(namespace, dst, kustomize_path, scripts_path, args.glob, args.full, args.env_name)
         return
@@ -259,7 +259,7 @@ def main():
         if Path(args.src).is_absolute():
             src = Path(args.src)
         else:
-            src = overrides['forgeops_root'] / args.src
+            src = overrides['forgeops_data'] / args.src
 
         upgrade_all_amster_files(args.src, args.fqdn)
         return

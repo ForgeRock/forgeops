@@ -547,9 +547,9 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     Process common paths from arguments
     """
 
-    forgeops_root = root_path
-    if os.getenv('FORGEOPS_ROOT'):
-        forgeops_root = Path(os.getenv('FORGEOPS_ROOT'))
+    forgeops_data = root_path
+    if os.getenv('FORGEOPS_DATA'):
+        forgeops_data = Path(os.getenv('FORGEOPS_DATA'))
 
     helm_path = 'helm'
     if helm is not None:
@@ -559,7 +559,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     if Path(helm_path).is_absolute():
         helm_path = Path(helm_path)
     else:
-        helm_path = forgeops_root / helm_path
+        helm_path = forgeops_data / helm_path
 
     build_path = 'docker'
     if build is not None:
@@ -569,7 +569,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     if Path(build_path).is_absolute():
         build_path = Path(build_path)
     else:
-        build_path = forgeops_root / build_path
+        build_path = forgeops_data / build_path
 
     kustomize_path = 'kustomize'
     if kustomize is not None:
@@ -579,7 +579,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
     if Path(kustomize_path).is_absolute():
         kustomize_path = Path(kustomize_path)
     else:
-        kustomize_path = forgeops_root / kustomize_path
+        kustomize_path = forgeops_data / kustomize_path
 
     overlay_root = kustomize_path / 'overlay'
 
@@ -627,7 +627,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
         print(f'do_helm = {do_helm}')
         print(f'do_kustomize = {do_kustomize}')
         print(f'releases_src = {releases_src}')
-        print(f'forgeops_root = {forgeops_root}')
+        print(f'forgeops_data = {forgeops_data}')
         print(f'pull_policy = {pull_policy_real}')
         print(f'source_overlay = {source_overlay}')
         print(f'ssl_secretname = {ssl_secretname}')
@@ -640,7 +640,7 @@ def process_overrides(root_path, helm, kustomize, build, no_helm, no_kustomize, 
         'do_helm': do_helm,
         'do_kustomize': do_kustomize,
         'releases_src': r_src,
-        'forgeops_root': forgeops_root,
+        'forgeops_data': forgeops_data,
         'pull_policy': pull_policy_real,
         'source_overlay': source_overlay,
         'ssl_secretname': ssl_secret

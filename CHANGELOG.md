@@ -48,6 +48,12 @@ ds-passwords.
 ### Fix `forgeops amster import/export` command
 Reordered the patches in the amster/upload and amster/export sub overlays to correctly manage amster configuration.
 
+### Renamed FORGEOPS_ROOT to FORGEOPS_DATA
+
+In order to reduce confusion, the optional FORGEOPS_ROOT env var has been
+renamed FORGEOPS_DATA. The forgeops command will offer to fix this in
+~/.forgeops.conf if FORGEOPS_ROOT is detected.
+
 ### Stop AM failing if openam container restarts
 Ensure openam container has access to the default boot.json when something causes the 
 container to restart.  This is because the fbc-init init-container doesn't run when the 

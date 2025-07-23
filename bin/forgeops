@@ -42,6 +42,23 @@ source_cfg() {
   fi
 }
 
+change_root_to_data() {
+  echo "The FORGEOPS_ROOT env var has been renamed to FORGEOPS_DATA."
+  read -n 1 -p "Would you like me to update $FORGEOPS_CFG_USER for you? (Y/N)" response
+  if [ "$response" == "y" ] || [ "$response" == "Y" ] ; then
+    sed_cmd=$(type -P sed)
+    if [ -x "$sed_cmd" ] ; then
+      runOrPrint "$sed_cmd -i -e 's,FORGEOPS_ROOT,FORGEOPS_DATA,' $FORGEOPS_CFG_USER"
+      source_cfg $FORGEOPS_CFG_USER
+      return
+    else
+      echo "Unable to update $FORGEOPS_CFG_USER because no sed is available."
+    fi
+  fi
+  echo "Please update your forgeops.conf file(s)."
+  FORGEOPS_DATA=$FORGEOPS_ROOT
+}
+
 DEBUG=false
 DRYRUN=false
 VERBOSE=false
@@ -120,7 +137,11 @@ FORGEOPS_CFG_USER="${HOME}/.forgeops.conf"
 source_cfg $FORGEOPS_CFG_USER
 
 if [ -n "$FORGEOPS_ROOT" ] ; then
-  source_cfg "$FORGEOPS_ROOT/forgeops.cfg"
+  change_root_to_data
+fi
+
+if [ -n "$FORGEOPS_DATA" ] ; then
+  source_cfg "$FORGEOPS_DATA/forgeops.cfg"
   source_cfg $FORGEOPS_CFG_USER # Make sure the user's settings are paramount
 fi
 

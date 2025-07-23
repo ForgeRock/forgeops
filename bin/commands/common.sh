@@ -164,8 +164,8 @@ processArgs() {
   getRelativePath $SCRIPT_DIR ../..
   ROOT_PATH=$RELATIVE_PATH
   message "ROOT_PATH=$ROOT_PATH" "debug"
-  FORGEOPS_ROOT=${FORGEOPS_ROOT:-$ROOT_PATH}
-  message "FORGEOPS_ROOT=$FORGEOPS_ROOT" "debug"
+  FORGEOPS_DATA=${FORGEOPS_DATA:-$ROOT_PATH}
+  message "FORGEOPS_DATA=$FORGEOPS_DATA" "debug"
 
   # Make sure we have a working kubectl
   [[ ! -x $K_CMD ]] && usage 1 'The kubectl command must be installed and in your $PATH'
@@ -188,7 +188,7 @@ processArgs() {
     message "Helm path is a full path: $HELM_PATH" "debug"
   else
     message "Helm path is relative: $HELM_PATH" "debug"
-    HELM_PATH=$FORGEOPS_ROOT/$HELM_PATH
+    HELM_PATH=$FORGEOPS_DATA/$HELM_PATH
   fi
   message "HELM_PATH=$HELM_PATH" "debug"
 
@@ -196,7 +196,7 @@ processArgs() {
     message "Kustomize path is a full path: $KUSTOMIZE_PATH" "debug"
   else
     message "Kustomize path is relative: $KUSTOMIZE_PATH" "debug"
-    KUSTOMIZE_PATH=$FORGEOPS_ROOT/$KUSTOMIZE_PATH
+    KUSTOMIZE_PATH=$FORGEOPS_DATA/$KUSTOMIZE_PATH
   fi
   message "KUSTOMIZE_PATH=$KUSTOMIZE_PATH" "debug"
 
@@ -214,7 +214,7 @@ processArgs() {
     message "Build path is a full path: $BUILD_PATH" "debug"
   else
     message "Build path is relative: $BUILD_PATH" "debug"
-    BUILD_PATH=$FORGEOPS_ROOT/$BUILD_PATH
+    BUILD_PATH=$FORGEOPS_DATA/$BUILD_PATH
   fi
   message "BUILD_PATH=$BUILD_PATH" "debug"
 
