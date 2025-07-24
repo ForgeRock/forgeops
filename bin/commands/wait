@@ -117,6 +117,9 @@ waitForDS() {
 # Setup valid components now so they get presented in the usage
 COMPONENTS_VALID=${COMPONENTS_WAIT[@]}
 
+# We don't require an env name
+ENV_REQUIRED=false
+
 # Code in common.sh
 processArgs $*
 checkComponents

@@ -80,6 +80,8 @@ realpath() {
     echo "$REALPATH"
 }
 
+ENV_REQUIRED=false
+
 processArgs $*
 checkContainerEngine
 

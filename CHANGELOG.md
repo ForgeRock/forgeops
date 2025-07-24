@@ -48,6 +48,15 @@ for DS images.
 This assists with doing no downtime password rotations for ds-env-secrets and
 ds-passwords.
 
+### New `forgeops upgrade` command
+
+This command will upgrade your Kustomize overlays. It is safe to rerun because
+it checks to see if any work needs to be done. It is being added to update the
+secrets child overlay with the new structure. It will be used in the future as
+we update the default overlay. If you use an alternate default overlay, upgrade
+that one first. Test the upgraded overlay to ensure that you don't need to add
+back any customizations you made.
+
 ## Bugfixes
 
 ### Fix `forgeops amster import/export` command

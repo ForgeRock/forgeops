@@ -190,6 +190,9 @@ CONTINUE_MSG="After completing these steps, come back to this terminal and hit <
 # Setup valid components now so they get presented in the usage
 COMPONENTS_VALID=( "ds-env-secrets" "ds-passwords" )
 
+# We don't need an env name
+ENV_REQUIRED=false
+
 # Code in common.sh
 processArgs $*
 checkComponents

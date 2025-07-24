@@ -63,8 +63,6 @@ COMPONENTS_PREREQS=(
 )
 
 SUPPORTED_CONTAINER_ENGINES=('docker' 'podman')
-# Commands that don't require an environment
-COMMANDS_NO_ENV=('wait' 'upgrade-am-config' 'prereqs' 'rotate' )
 
 #############
 # Functions #
@@ -91,9 +89,11 @@ processArgs() {
   # Vars that cannot be set in /path/to/forgeops/forgeops.conf
   AMSTER_RETAIN=10
   COMPONENTS=()
+  COMPONENT_REQUIRED=true
   CREATE_NAMESPACE=false
   DEP_SIZE=false
   ENV_NAME=
+  ENV_REQUIRED=${ENV_REQUIRED:-true}
   FORCE=false
   RESET=false
   RELEASE_NAME=
@@ -170,6 +170,10 @@ processArgs() {
   # Make sure we have a working kubectl
   [[ ! -x $K_CMD ]] && usage 1 'The kubectl command must be installed and in your $PATH'
 
+  if [ "$ENV_REQUIRED" = true ] && [ -z "$ENV_NAME" ] ; then
+    usage 1 "You must provide -e|--env-name"
+  fi
+
   if containsElement 'all' "${COMPONENTS[*]}" && [ "$PROG_NAME" != 'prereqs' ] ; then
     echo "The 'all' meta component has been deprecated in favor of 'platform'."
   fi
@@ -183,6 +187,14 @@ processArgs() {
     fi
   fi
   message "COMPONENTS=${COMPONENTS[*]}" "debug"
+
+  if [ "$ENV_REQUIRED" = false ] ; then
+    message "An environment is not required" "debug"
+  elif [ -z "$ENV_NAME" ] && [[ "$PROG" =~ apply ]] ; then
+    ENV_NAME=demo
+  elif [ -z "$ENV_NAME" ] ; then
+    usage 1 'An environment name (--env-name) is required.'
+  fi
 
   if [[ "$HELM_PATH" =~ ^/ ]] ; then
     message "Helm path is a full path: $HELM_PATH" "debug"
@@ -200,14 +212,8 @@ processArgs() {
   fi
   message "KUSTOMIZE_PATH=$KUSTOMIZE_PATH" "debug"
 
-  if [ -z "$ENV_NAME" ] && [[ "$PROG" =~ apply ]] ; then
-    ENV_NAME=demo
-  elif containsElement $PROG_NAME "${COMMANDS_NO_ENV[*]}" ; then
-    message "An environment is not required for wait" "debug"
-  elif [ -z "$ENV_NAME" ] ; then
-    usage 1 'An environment name (--env-name) is required.'
-  fi
-  OVERLAY_PATH=$KUSTOMIZE_PATH/overlay/$ENV_NAME
+  OVERLAY_ROOT=$KUSTOMIZE_PATH/overlay
+  OVERLAY_PATH=$OVERLAY_ROOT/$ENV_NAME
   message "OVERLAY_PATH=$OVERLAY_PATH" "debug"
 
   if [[ "$BUILD_PATH" =~ ^/ ]] ; then

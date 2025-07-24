@@ -98,6 +98,9 @@ applyChart() {
 # Setup valid components
 COMPONENTS_VALID=( ${COMPONENTS_PREREQS[@]} 'all' )
 
+# We don't need an env name
+ENV_REQUIRED=false
+
 processArgs $*
 checkComponents
 
