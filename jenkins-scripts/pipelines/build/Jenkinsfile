@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2025 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -7,7 +7,7 @@
  */
 
 @Library([
-    'forgerock-pipeline-libs@a9c0208d1d8f14fbe84a6fc882bc9dab64787ee5',
+    'forgerock-pipeline-libs',
     'java-pipeline-libs@c7f1fb930553cac9e84d4af6ddc80fc4b10916d9'
 ]) _
 
