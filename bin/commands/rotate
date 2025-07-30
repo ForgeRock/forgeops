@@ -27,6 +27,7 @@ OPTIONS:
   -v|--verbose                : be verbose
   -n|--namespace <ns>         : k8s namespace to install into
   -y|--yes                    : skip prompts
+  -q|--quiet                  : don't output instructions
 
 Valid components:
   ${COMPONENTS_VALID[@]}
@@ -75,11 +76,12 @@ EOM
 
   echo "$SECRET_YAML" | kube apply -f -
 
-  cat <<EOM
-
-  Creation of old-ds-env-secrets complete. The next steps are manual, and
-  depend on the secret system you employ.
-
+  if [ "$QUIET" = false ] ; then
+    cat <<EOM
+  
+Creation of old-ds-env-secrets complete. The next steps are manual, and
+depend on the secret system you employ.
+  
   Step 1: Create new passwords in ds-env-secrets
     For secret-agent users:
       kubectl delete secret ds-env-secrets
@@ -104,21 +106,22 @@ EOM
 
 EOM
 
-  if [ "$SKIP_CONFIRM" = false ] ; then
-    read -p "$CONTINUE_MSG" input
-  fi
+    if [ "$SKIP_CONFIRM" = false ] ; then
+      read -p "$CONTINUE_MSG" input
+    fi
 
-  cat <<EOM
-
+    cat <<EOM
+  
   Now that you have changed the password and restarted AM, you need to do the following.
 
     1. kubectl delete secret old-ds-env-secrets
     2. Execute Step 2 again
 
 EOM
-
-  if [ "$SKIP_CONFIRM" = false ] ; then
-    read -p "$CONTINUE_MSG" input
+  
+    if [ "$SKIP_CONFIRM" = false ] ; then
+      read -p "$CONTINUE_MSG" input
+    fi
   fi
 }
 
@@ -143,7 +146,8 @@ EOM
 
   echo "$SECRET_YAML" | kube apply -f -
 
-  cat <<EOM
+  if [ ! "$QUIET" = true ] ; then
+    cat <<EOM
 
   Creation of old-ds-passwords complete. The next steps are manual, and
   depend on the secret system you employ.
@@ -171,11 +175,11 @@ EOM
 
 EOM
 
-  if [ "$SKIP_CONFIRM" = false ] ; then
-    read -p "$CONTINUE_MSG" input
-  fi
+    if [ "$SKIP_CONFIRM" = false ] ; then
+      read -p "$CONTINUE_MSG" input
+    fi
 
-  cat <<EOM
+    cat <<EOM
 
   Now that you have changed the password and restarted DS and IDM, you need to do the following.
 
@@ -183,6 +187,7 @@ EOM
     2. Execute Step 2 again
 
 EOM
+  fi
 }
 
 CONTINUE_MSG="After completing these steps, come back to this terminal and hit <ENTER> to continue"

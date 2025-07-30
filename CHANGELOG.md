@@ -32,6 +32,13 @@ Is is now possible to use secret-generator to provision platform secrets
 instead of secret-agent. In the future, secret-agent will be deprecated. It is
 recommended that new deployments use secret-generator.
 
+### Added migration script for secret-generator
+
+Since the process to migrate to secret-generator from secret-agent is so
+complex, we have created a script that will do the steps for you. It uses the
+new rotate command with the new no downtime password rotation logic to
+eliminate downtime during the migration.
+
 ### New forgeops prereqs command
 
 This replaces `charts/scripts/install-prereqs`, and the settings move into
@@ -42,6 +49,13 @@ This replaces `charts/scripts/install-prereqs`, and the settings move into
 DS images must be built with ForgeOps 2025.2.0 in order to enable multiple
 password values. Rebuild your current images, or use the latest available tag
 for DS images.
+
+### New forgeops rotate command
+
+This new command assists with no downtime DS password rotations. It will create
+the old-ds-env-secrets and old-ds-passwords secrets which are used by
+ds-set-passwords and the init container to maintain the old passwords during
+the rotation process.
 
 ### Added `forgeops rotate` command
 

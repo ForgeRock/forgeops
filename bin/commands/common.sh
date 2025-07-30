@@ -81,8 +81,9 @@ processArgs() {
   NO_HELM=${NO_HELM:-false}
   NO_KUSTOMIZE=${NO_KUSTOMIZE:-false}
   IMAGE_REPO=${IMAGE_REPO:-}
-  PUSH_TO=${PUSH_TO:-}
   INGRESS=${INGRESS:-nginx}
+  PUSH_TO=${PUSH_TO:-}
+  QUIET=false
   SECRETS=${SECRETS:-secret-agent}
   UPGRADE=${UPGRADE:-false}
 
@@ -122,6 +123,7 @@ processArgs() {
       -l|--release-name) RELEASE_NAME=$2 ; shift 2 ;;
       -s|--source) SOURCE=$2 ; shift 2 ;;
       -u|--upgrade) UPGRADE=true ; shift ;;
+      -q|--quiet) QUIET=true ; shift ;;
       -y|--yes) SKIP_CONFIRM=true ; shift ;;
       --reset) RESET=true ; shift ;;
       --ds-snapshots) DS_SNAPSHOTS="$2" ; shift 2 ;;
