@@ -9,7 +9,7 @@
 
 // functional-tests-gke.groovy
 void runStage() {
-    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords OLD_RELEASE')
+    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords OLD_RELEASE --cluster-name guillotine-tests-old')
 }
 
 return this
