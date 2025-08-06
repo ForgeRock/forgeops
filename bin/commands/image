@@ -307,7 +307,8 @@ examples:
             utils.exit_msg(f'Helm environment ({args.env_name}) not populated. Run forgeops env to populate.')
 
         values = {}
-        values = yaml.safe_load(open(values_file))
+        with open(values_file, 'r', encoding='utf-8') as f:
+            values = yaml.safe_load(f)
 
         if args.copy:
             src_helm_path = helm_root / args.source
@@ -322,11 +323,12 @@ examples:
 
             src_images = {}
             src_values = {}
-            src_values = yaml.safe_load(open(src_values_file))
-            for k,v in enumerate(src_values):
-                if 'image' in v:
-                    src_images[k] = { 'image': v }
-            merge(values_images, src_values)
+            with open(src_values_file, encoding='utf-8') as f:
+                src_values = yaml.safe_load(f)
+            for k in src_values.keys():
+                if 'image' in src_values[k].keys():
+                    src_images[k] = { 'image': src_values[k]['image'] }
+            merge(values_images, src_images)
 
         merge(values, values_images)
         writeYamlFile(values, values_file)
@@ -343,11 +345,11 @@ examples:
     log_line = f"{timestamp} {log_action} {cmd}"
     if overrides['do_kustomize'] and args.copy:
         log_path_overlay = overlay_path / log_file
-        with open(log_path_overlay, 'a') as log_overlay_f:
+        with open(log_path_overlay, 'a', encoding='utf-8') as log_overlay_f:
             log_overlay_f.write(f"{log_line}\n")
     if overrides['do_helm'] and args.env_name:
         log_path_helm = helm_path / log_file
-        with open(log_path_helm, 'a') as log_helm_f:
+        with open(log_path_helm, 'a', encoding='utf-8') as log_helm_f:
             log_helm_f.write(f"{log_line}\n")
 
 

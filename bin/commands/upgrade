@@ -42,16 +42,18 @@ import lib.python.utils as utils
 # Notice we call this with yaml.dump, but we are still using safe_dump
 # From https://ttl255.com/yaml-anchors-and-aliases-and-how-to-disable-them/
 class NoAliasDumper(yaml.SafeDumper):
+    """ A Dumper that doesn't use YAML aliases """
     def ignore_aliases(self, data):
         return True
 
 def writeYamlFile(data, file):
     """Write an object to a yaml file"""
-    with open(file, 'w+') as f:
+    with open(file, 'w+', encoding='utf-8') as f:
         yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
 
 
 def log(msg, path, verbose=True, log_file='upgrade.log', end="\n"):
+    """ Log a message to the upgrade log """
     log_path = path / log_file
     if not log_path.is_file():
         msg = f"""{msg}
@@ -61,7 +63,7 @@ Do a `git add {log_path}` to track.
 """
     if verbose:
         print(msg, end=end)
-    with open(log_path, 'a') as log_f:
+    with open(log_path, 'a', encoding='utf-8') as log_f:
         log_f.write(f"{msg}{end}")
 
 
@@ -94,8 +96,35 @@ def update_secrets_2025_2_0(overlay_path, source_path):
             log(f"The {secrets_path} child overlay has been updated", overlay_path)
             log('Please note that secret-agent is enabled by default.', overlay_path)
 
+    ldif_importer_path = overlay_path / 'ldif-importer'
+    ds_set_passwords_path = overlay_path / 'ds-set-passwords'
+    def_ds_set_passwords_path = source_path / 'ds-set-passwords'
+    if ldif_importer_path.exists():
+        log("Removing old ldif-importer child overlay from default.", overlay_path)
+        shutil.rmtree(ldif_importer_path)
+    if not ds_set_passwords_path.is_dir():
+        log("Copying ds-set-passwords child overlay from default.", overlay_path)
+        shutil.copytree(def_ds_set_passwords_path, ds_set_passwords_path)
+    kust_path = overlay_path / 'kustomization.yaml'
+    ldif_str = './ldif-importer'
+    dsp_str = './ds-set-passwords'
+    if kust_path.is_file():
+        kust = {}
+        with open(kust_path, encoding='utf-8') as f:
+            kust = yaml.safe_load(f)
+        if ldif_str in kust['resources']:
+            log("Replacing ldif-importer with ds-set-passwords.", overlay_path)
+            kust['resources'] = utils.replace_or_append_str(kust['resources'],
+                                                            ldif_str,
+                                                            dsp_str)
+        if dsp_str not in kust['resources']:
+            log("Adding ds-set-passwords into overlay resources.", overlay_path)
+            kust['resources'].append(dsp_str)
 
-def update_apps_2025_2_0(overlay_path):
+        writeYamlFile(kust, kust_path)
+
+
+def update_apps_2025_2_0(overlay_path, default_overlay):
     """ Update am child overlay (2025.2.0)"""
     log('Checking idm, am, and amster child overlays for 2025.2.0 updates', overlay_path)
     base_path = '../../../base'
@@ -117,11 +146,20 @@ def update_apps_2025_2_0(overlay_path):
         }
     ]
     do_update = False
+    def_keystore_path = default_overlay / 'keystore-create'
+    keystore_path = overlay_path / 'keystore-create'
+    if keystore_path.is_dir():
+        log("Found keystore-create child overlay. Continuing.", overlay_path)
+    else:
+        log("Didn't find keystore-create child overlay, copying from default.", overlay_path)
+        shutil.copytree(def_keystore_path, keystore_path)
+        do_update = True
     for p in paths:
         if p['path'].is_dir():
             kust_path = p['path'] / 'kustomization.yaml'
             if kust_path.is_file():
-                kust = yaml.safe_load(open(kust_path))
+                with open(kust_path, encoding='utf-8') as f:
+                    kust = yaml.safe_load(f)
                 if p['old_resource'] in kust['resources']:
                     log(f"Updating {p['path']} ...", overlay_path, end="")
                     kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], p['old_resource'], p['new_resource'])))
@@ -144,24 +182,24 @@ class UpgradeFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescr
 
 
 if __name__ == '__main__':
-    prog = 'forgeops upgrade'
-    epilog = f"""Notes:
+    PROG = 'forgeops upgrade'
+    EPILOG = f"""Notes:
   * If you use a custom default overlay, upgrade it first.
 
 Examples:
   Normal operation:
-    {prog} -e my_env
+    {PROG} -e my_env
 
   Use custom default overlay:
-    {prog} -e my_env -s my_default
+    {PROG} -e my_env -s my_default
 
   Upgrade custom default:
-    {prog} -e my_default -s default
+    {PROG} -e my_default -s default
 """
 
     parser = argparse.ArgumentParser(description='Upgrade a Ping Identity Platform environment',
-                                     prog=prog,
-                                     epilog=epilog,
+                                     prog=PROG,
+                                     epilog=EPILOG,
                                      formatter_class=UpgradeFormatter)
     parser.add_argument('--debug', '-d', action='store_true', help='Turn on debugging')
     parser.add_argument('--helm-path', '-H', help='Dir to store Helm values files (absolute or relative to forgeops_data)')
@@ -173,9 +211,11 @@ Examples:
 
     config = {}
     config['script_path'] = Path(__file__).parent
-    if args.debug: print(f"script_path = {config['script_path']}")
+    if args.debug:
+        print(f"script_path = {config['script_path']}")
     config['root_path'] = config['script_path'].parent.parent
-    if args.debug: print(f"root_path = {config['root_path']}")
+    if args.debug:
+        print(f"root_path = {config['root_path']}")
 
     # Setup defaults for values that can be set in forgeops.conf
     overrides = utils.process_overrides(config['root_path'],
@@ -191,23 +231,24 @@ Examples:
                                         args.debug)
 
     if args.debug:
-        print(f"Overrides processed")
+        print("Overrides processed")
     config = merge(config, overrides)
+    def_overlay_path = config['overlay_root'] / 'default'
     config['overlay_path'] = config['overlay_root'] / args.env_name
     config['source_path'] = config['overlay_root'] / config['source_overlay']
 
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
-    header=f"""#
-# Running `{prog}` on {args.env_name} at {timestamp}
+    HEADER=f"""#
+# Running `{PROG}` on {args.env_name} at {timestamp}
 #"""
-    log(header, config['overlay_path'])
+    log(HEADER, config['overlay_path'])
 
     # 2025.2.0 updates
     log('Checking 2025.2.0 updates', config['overlay_path'])
     update_secrets_2025_2_0(config['overlay_path'], config['source_path'])
-    update_apps_2025_2_0(config['overlay_path'])
+    update_apps_2025_2_0(config['overlay_path'], def_overlay_path)
 
-    footer=f"""#
-# End `{prog}` on {args.env_name} at {timestamp}
+    FOOTER=f"""#
+# End `{PROG}` on {args.env_name} at {timestamp}
 #"""
-    log(footer, config['overlay_path'])
+    log(FOOTER, config['overlay_path'])

@@ -82,7 +82,7 @@ Create a ClusterRole name for volume snapshots
 */}}
 {{- define "ds-snapshot.clusterRoleName" }}
 {{- if .Values.ds_snapshot.appendNSToRole }}
-{{- printf "%s-%s" .Values.ds_snapshot.clusterRoleName .Release.namespace }}
+{{- printf "%s-%s" .Values.ds_snapshot.clusterRoleName .Release.Namespace }}
 {{- else }}
 {{- .Values.ds_snapshot.clusterRoleName }}
 {{- end }}
@@ -93,7 +93,7 @@ Create a ClusterRole name for creating a keystore
 */}}
 {{- define "keystore-create.clusterRoleName" }}
 {{- if .Values.keystore_create.appendNSToRole }}
-{{- printf "%s:%s" .Values.keystore_create.clusterRoleName .Release.namespace }}
+{{- printf "%s:%s" .Values.keystore_create.clusterRoleName .Release.Namespace }}
 {{- else }}
 {{- .Values.keystore_create.clusterRoleName }}
 {{- end }}

@@ -653,9 +653,9 @@ def key_exists(data, key_str, separator='.'):
     if key_exists(my_dict, 'platform.ingress.hosts'):
     """
 
-    if type(data) != dict:
+    if not isinstance(data, dict):
         raise Exception("key_exists(): Must provide a dict to look in")
-    if type(key_str) != str:
+    if not isinstance(key_str, str):
         raise Exception("key_exists(): Must provide a str (key.subkey[.subkey]...) to look for")
     result = True
     k = key_str

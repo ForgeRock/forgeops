@@ -116,7 +116,7 @@ Failure! The kustomize command is not installed or in the path. Please install k
 def upgrade_env(params, settings):
     """ Run `forgeops upgrade` on the given env """
     cmd = f"{root_path}/bin/forgeops"
-    cmd_opts = f"upgrade -e {params.env_name} -k {settings['kustomize_path']} -h {settings['helm_path']}"
+    cmd_opts = f"upgrade -e {params.env_name} -k {settings['kustomize_path']} -H {settings['helm_path']}"
     print(f"You need to upgrade your env ({params.env_name})")
     print("Press <ENTER> to proceed.")
     input()
@@ -126,7 +126,7 @@ def upgrade_env(params, settings):
 def switch_env(params, settings):
     """ Switch env over to secret-generator """
     k_path = settings['kustomize_path']
-    h_path = settings['helm_path']
+    h_path = settings['helm_path'].parent
     env_name = params.env_name
     cmd = f"{root_path}/bin/forgeops"
     cmd_opts = f"env -e {env_name} -k {k_path} -H {h_path} {settings['namespace_opt']} --secret-generator"
@@ -325,6 +325,10 @@ def do_helm(params, settings):
     settings['helm_path'] = settings['helm_path'] / params.env_name
     if params.debug:
         print(f"helm_path={settings['helm_path']}")
+
+    overlay_path = settings['overlay_root'] / params.env_name
+    print(f"Running upgrade on {params.env_name} to keep things consistent.", overlay_path)
+    upgrade_env(params, settings)
 
     switch_env(params, settings)
     values_file = settings['helm_path'] / 'values.yaml'
