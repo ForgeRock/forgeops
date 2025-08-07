@@ -2,8 +2,6 @@ FROM gcr.io/forgerock-io/ds:7.2.0
 
 USER 0
 
-COPY debian-buster-sources.list /etc/apt/sources.list
-
 RUN apt-get update -y && apt-get install -y curl
 
 USER 11111
