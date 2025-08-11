@@ -28,7 +28,7 @@ spec:
     labels:
       app: ds-operator
 
-  duration: 21600h # 900 days.
+  duration: 175200h # 20 years.
   subject:
     organizations:
       - "forgerock.org"
@@ -80,7 +80,7 @@ spec:
     labels:
       app: ds-operator
 
-  duration: 21600h # 900 days
+  duration: 175200h # 20 years.
   subject:
     organizations:
       - "ForgeRock.com"
