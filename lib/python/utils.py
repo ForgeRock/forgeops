@@ -366,7 +366,7 @@ def certmanager(k8s_op, tag='latest'):
 
 def configure_platform_images(clone_path,
                               ref='',
-                              repo='ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'):
+                              repo='https://github.com/ping-rocks/platform-images.git'):
     """
     Clone platform images and checkout branch to the given path.
     Raise exception if not succesful.
