@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2024-2025 Ping Identity Corporation. All Rights Reserved
  * 
  * This code is to be used exclusively in connection with Ping Identity 
  * Corporation software or services. Ping Identity Corporation only offers
@@ -13,7 +13,7 @@
 import com.forgerock.pipeline.PullRequestBuild
 
 @Library([
-    'forgerock-pipeline-libs@7d7b585639d060ade751c59e3cbf23e127d17063',
+    'forgerock-pipeline-libs',
     'java-pipeline-libs@c7f1fb930553cac9e84d4af6ddc80fc4b10916d9'
 ]) _
 
