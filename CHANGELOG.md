@@ -32,13 +32,6 @@ Is is now possible to use secret-generator to provision platform secrets
 instead of secret-agent. In the future, secret-agent will be deprecated. It is
 recommended that new deployments use secret-generator.
 
-### Added migration script for secret-generator
-
-Since the process to migrate to secret-generator from secret-agent is so
-complex, we have created a script that will do the steps for you. It uses the
-new rotate command with the new no downtime password rotation logic to
-eliminate downtime during the migration.
-
 ### New forgeops prereqs command
 
 This replaces `charts/scripts/install-prereqs`, and the settings move into
@@ -52,15 +45,10 @@ for DS images.
 
 ### New forgeops rotate command
 
-This new command assists with no downtime DS password rotations. It will create
-the old-ds-env-secrets and old-ds-passwords secrets which are used by
-ds-set-passwords and the init container to maintain the old passwords during
-the rotation process.
-
-### Added `forgeops rotate` command
-
-This assists with doing no downtime password rotations for ds-env-secrets and
-ds-passwords.
+This new command assists with no downtime DS password rotations for the 
+ds-env-secrets and ds-passwords secrets. It will create the old-ds-env-secrets 
+and old-ds-passwords secrets which are used by the ds-set-passwords job and 
+the init container to maintain the old passwords during the rotation process.
 
 ### New `forgeops upgrade` command
 
@@ -70,6 +58,13 @@ secrets child overlay with the new structure. It will be used in the future as
 we update the default overlay. If you use an alternate default overlay, upgrade
 that one first. Test the upgraded overlay to ensure that you don't need to add
 back any customizations you made.
+
+### New migration script for secret-generator
+
+Since the process to migrate to secret-generator from secret-agent is so
+complex, we have created a script that will do the steps for you. It uses the
+new rotate command with the new no downtime password rotation logic to
+eliminate downtime during the migration.
 
 ## Bugfixes
 
