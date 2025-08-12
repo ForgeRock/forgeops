@@ -24,7 +24,7 @@ from lib.python import utils
 log = None
 
 SCRIPT_DIR = Path(__file__)
-DEFAULT_REPO = 'ssh://git@stash.forgerock.org:7999/cloud/platform-images.git'
+DEFAULT_REPO = 'https://github.com/ping-rocks/platform-images.git'
 if 'PLATFORM_IMAGES_REPOSITORY_URL' in os.environ.keys():
     DEFAULT_REPO = os.environ['PLATFORM_IMAGES_REPOSITORY_URL']
 DEFAULT_CONFIG_PATH = SCRIPT_DIR.joinpath(
