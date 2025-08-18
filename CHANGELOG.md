@@ -3,8 +3,8 @@ RELEASE=2025.2.0
 
 ## New Features/Updated functionality
 
-### New PingIDM versions available
-PingIDM 7.4.1 and 7.5.2 have been released and are available to deploy with forgeops tooling.
+### New Ping Identity Platform product versions available
+PingIDM 7.4.1 and 7.5.2 and PingGateway 2025.6.0 have been released and are available to deploy with forgeops tooling.
 
 ### Option to provision keystores without secret-agent
 
