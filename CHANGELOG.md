@@ -9,7 +9,9 @@ PingIDM 7.4.1 and 7.5.2 and PingGateway 2025.6.0 have been released and are avai
 ### Option to provision keystores without secret-agent
 
 When `secret-generator` and `keystore-create` Kubernetes job are enabled,
-a single keystore is now created for AM and IDM.
+a single keystore is now created for AM and IDM.  When the `keystore-create`
+job is enabled, the keystore configurations will been consolidated under the
+`keystore_create.config` helm values settings.
 
 ### Truststore no longer provisioned by secret-agent
 
