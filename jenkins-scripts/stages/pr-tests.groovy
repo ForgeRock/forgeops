@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2021-2025 Ping Identity Corporation. All Rights Reserved
  * 
  * This code is to be used exclusively in connection with Ping Identity 
  * Corporation software or services. Ping Identity Corporation only offers
@@ -14,7 +14,7 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
 //    return commonLodestarModule.runSpyglaas(pipelineRun, random, 'Deploymnent Only',
 //            [TESTS_SCOPE    : 'tests/deployment_only'])
-    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords PULL_REQUEST', '')
+    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords "PULL_REQUEST PLATFORM_IMAGE_REF"', '')
 }
 
 return this

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2021-2025 Ping Identity Corporation. All Rights Reserved
  * 
  * This code is to be used exclusively in connection with Ping Identity 
  * Corporation software or services. Ping Identity Corporation only offers
@@ -13,33 +13,6 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
-
-def getPromotedProductTag(platformImagesRevision, productName) {
-    def content = bitbucketUtils.readFileContent(
-            'cloud',
-            'platform-images',
-            platformImagesRevision,
-            "${productName}.json").trim()
-    return readJSON(text: content)['imageTag']
-}
-
-def getPromotedProductRepo(platformImagesRevision, productName) {
-    def content = bitbucketUtils.readFileContent(
-            'cloud',
-            'platform-images',
-            platformImagesRevision,
-            "${productName}.json").trim()
-    return readJSON(text: content)['imageName']
-}
-
-def getPromotedProductCommit(platformImagesRevision, productName) {
-    def content = bitbucketUtils.readFileContent(
-            'cloud',
-            'platform-images',
-            platformImagesRevision,
-            "${productName}.json").trim()
-    return readJSON(text: content)['gitCommit']
-}
 
 SUMMARY_REPORT_NAME = 'SummaryReport'
 

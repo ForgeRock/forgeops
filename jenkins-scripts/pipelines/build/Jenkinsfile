@@ -27,7 +27,6 @@ node('gce-vm-forgeops-n2d-standard-4') {
         def libsLocation = "${env.WORKSPACE}/jenkins-scripts/libs"
         def stagesLocation = "${env.WORKSPACE}/jenkins-scripts/stages"
 
-        localGitUtils = load("${libsLocation}/git-utils.groovy")
         commonModule = load("${libsLocation}/common.groovy")
         commonLodestarModule = load("${libsLocation}/lodestar-common.groovy")
 

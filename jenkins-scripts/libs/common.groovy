@@ -15,6 +15,16 @@ import com.forgerock.pipeline.stage.Status
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
 
+// TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
+githubRepository = scmUtils.isGitHubRepository() \
+        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(),
+        githubUtils.githubAppCredentialsFromUrl(scmUtils.getRepoUrl()))
+        .repository(scmUtils.getRepoName())
+        : null
+githubCommit = scmUtils.isGitHubRepository()
+        ? githubRepository.commit(GIT_COMMIT)
+        : null
+
 /**
  * Globally scoped git commit information
  */
@@ -24,6 +34,7 @@ GIT_COMMITTER = sh(returnStdout: true, script: 'git show -s --pretty=%cn').trim(
 GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
 GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
+
 
 def normalizeStageName(String stageName) {
     return stageName.toLowerCase().replaceAll('\\s', '-')
@@ -44,20 +55,6 @@ String calculatePlatformImagesBranch() {
         return 'master'
     }
 }
-
-/** Revision of platform-images repo used for k8s and platform integration/perf tests. */
-platformImagesRevision = bitbucketUtils.getLatestCommitHash(
-        'cloud',
-        'platform-images',
-        DEFAULT_PLATFORM_IMAGES_TAG)
-
-/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
-lodestarFileContent = bitbucketUtils.readFileContent(
-        'cloud',
-        'platform-images',
-        platformImagesRevision,
-        'lodestar.json').trim()
-lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 
 /** Does the branch support PIT tests */
 boolean branchSupportsPitTests() {
@@ -87,9 +84,35 @@ boolean branchSupportsIDCloudReleases() {
             || branchName.startsWith('preview/')
 }
 
-void buildImage(String directoryName, String imageName, String arguments) {
+/** Revision of platform-images repo used for k8s and platform integration/perf tests. */
+// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
+platformImagesRevision = scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
+                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+                                                                   githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
+                                                     .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
+                                                     .branch(DEFAULT_PLATFORM_IMAGES_TAG)
+                                                     .lastCommitHash()
+                                                     .value()
+                                        : bitbucketUtils.getLatestCommitHash(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+                                                                             scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+                                                                             DEFAULT_PLATFORM_IMAGES_TAG)
+                                                        .trim()
 
-}
+/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
+// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
+lodestarRevision = readJSON(text: (scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
+                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+                                                                   githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
+                                                     .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
+                                                     .readFileContent('lodestar.json', platformImagesRevision)
+                                                     .trim()
+                                        : bitbucketUtils.readFileContent(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+                                                                        scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+                                                                        platformImagesRevision,
+                                                                        'lodestar.json')
+                                                         .trim())
+)['gitCommit']
+
 
 def authenticateGke() {
     withCredentials([file(credentialsId: 'jenkins-guillotine-sa-key', variable: 'GC_KEY')]) {
@@ -97,11 +120,6 @@ def authenticateGke() {
     }
 }
 
-def authenticateEks() {
-    withCredentials([file(credentialsId: 'guillotineAWSKeyCSV', variable: 'EKS_KEY')]) {
-        sh("aws configure import --csv file://${env.EKS_KEY}")
-    }
-}
 
 def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String providerName, String options, String platformImageRef='') {
     stage(stageName) {
@@ -111,33 +129,22 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
                 dir('guillotine') {
 
-                  //  localGitUtils.cloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master', true)
-                    checkout scmGit(branches: [[name: 'refs/heads/master']],
-                            extensions: [],
-                            userRemoteConfigs: [[refspec: '+refs/heads/master:refs/remotes/origin/master',
-                                                 url: 'ssh://git@stash.forgerock.org:7999/cloud/guillotine.git']])
+                    // TODO to chcke sand-baox uncomment and set the url
+                    // env.GUILLOTINE_REPOSITORY_URL = 'https_sandbox_url'
+                    scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
 
-                    if (providerName == 'GKE'){
-                        authenticateGke()
-                        // Configure environment to make Guillotine works on GKE
-                        withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
-                            sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
-                        }
-                    }
-                    else if (providerName == 'EKS'){
-                        authenticateEks()
-                        // Configure environment to make Guillotine works on EKS
-                        sh("./configure.py env --eks-only")
-                    }
-                    else {
-                        echo("FAILURE : unknown providerName `${providerName}`")
-                        currentBuild.result = 'FAILURE'
+                    authenticateGke()
+                    // Configure environment to make Guillotine works on GKE
+                    withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
+                        sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
                     }
 
                     if (platformImageRef != ''){
                         def lastForgeopsVersion = sh(script: './configure.py --get-forgeops-last-version', returnStdout: true).trim()
                         options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
                     }
+
+                    options = "--set forgeops.git-url=${env.FORGEOPS_REPOSITORY_URL} ${options}"
 
                     // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
                     sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")

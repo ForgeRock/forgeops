@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2024-2025 Ping Identity Corporation. All Rights Reserved
  *
  * This code is to be used exclusively in connection with Ping Identity
  * Corporation software or services. Ping Identity Corporation only offers
@@ -24,7 +24,15 @@ void runStage(PipelineRunLegacyAdapter pipelineRun) {
                 gitUtils.setupDefaultUser()
                 
                 sh "git tag --force ${GIT_BRANCH_TAG}-stable"
-                sh "git push --force origin ${GIT_BRANCH_TAG}-stable"
+
+                String cmd = "git push --force origin ${GIT_BRANCH_TAG}-stable"
+                if (scmUtils.isGitHubRepository(env.FORGEOPS_REPOSITORY_URL)) {
+                    withCredentials([gitUsernamePassword(credentialsId: githubUtils.getCredentialsIdFromUrl(env.FORGEOPS_REPOSITORY_URL))]) {
+                        sh cmd
+                    }
+                } else {
+                    sh cmd
+                }
 
                 return Status.SUCCESS.asOutcome()
             }
