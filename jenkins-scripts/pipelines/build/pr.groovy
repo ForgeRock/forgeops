@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 ForgeRock AS. All Rights Reserved
+ * Copyright 2019-2025 ForgeRock AS. All Rights Reserved
  *
  * Use of this code requires a commercial software license with ForgeRock AS.
  * or with one of its affiliates. All use shall be exclusively subject
@@ -16,9 +16,6 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 import com.forgerock.pipeline.stage.Status
 
 def initialSteps() {
-    if (params.isEmpty()) {
-        sendInformationMessageToPR()
-    }
 
     properties([
             buildDiscarder(logRotator(daysToKeepStr: '5', numToKeepStr: '5')),
@@ -30,11 +27,20 @@ def initialSteps() {
     // Abort any active builds relating to the current PR, as they are superseded by this build
     abortMultibranchPrBuilds()
 
+    // TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
+    githubPullRequest = scmUtils.isGitHubRepository() \
+                ? commonModule.githubRepository.pullRequest(env.CHANGE_ID as long)
+            : null
+
+    // Used later by multiple methods, so easier to be have it global
+    prRootCommentId = null
+
+    if (params.isEmpty()) {
+        sendInformationMessageToPR()
+    }
+
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
-    bitbucketCommentId = bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-            buildStatus: 'IN PROGRESS',
-            commitHash: commonModule.GIT_COMMIT
-    )
+    bitbucketCommentId = postStatusCommentOnPr()
 
     // in order to compare the PR with the target branch, we first need to fetch the target branch
     scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
@@ -108,7 +114,7 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
 /** Post a comment on the PR, explaining rules and how to execute additional tests */
 void sendInformationMessageToPR() {
     if (isPR()) {
-        bitbucketUtils.commentOnMultibranchPullRequest(
+        commentOnMultibranchPullRequest(
                 """#### Jenkins is building your PR
                   |If you would like to know how to configure which tests are run against your PR, click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
                 """.stripMargin()
@@ -118,25 +124,20 @@ void sendInformationMessageToPR() {
 
 def sendBuildAbortedNotification() {
     currentBuild.result = 'ABORTED'
-    bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-            commitHash: commonModule.GIT_COMMIT,
-            originalCommentId: bitbucketCommentId
-    )
+    postStatusCommentOnPr()
 }
 
 def sendBuildFailureNotification(String messageSuffix) {
     currentBuild.result = 'FAILURE'
-    bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-            commitHash: commonModule.GIT_COMMIT,
-            originalCommentId: bitbucketCommentId,
-            messageSuffix: messageSuffix
-    )
+    postStatusCommentOnPr(messageSuffix)
+
 }
 
 def finalNotification() {
     stage('Final notification') {
         // If some of the PR tests fail, the plugin that manages this doesn't throw an exception, but
         // it does set the build result to UNSTABLE/FAILURE. If it didn't do that => SUCCESS
+        def message = ''
         if (!currentBuild.result || currentBuild.result == 'SUCCESS') {
             currentBuild.result = 'SUCCESS'
             message = prReportMessage()
@@ -148,11 +149,46 @@ def finalNotification() {
                 originalCommentId: bitbucketCommentId,
                 messageSuffix: message
         )
+        postStatusCommentOnPr(message)
     }
 }
 
 String prReportMessage() {
     return "Report is available [here](${env.JOB_URL}/${env.BUILD_NUMBER}/${commonLodestarModule.SUMMARY_REPORT_NAME}/)"
+}
+
+// TODO GitHub migration remove method when lodestar GitHub migration is complete
+def postStatusCommentOnPr(String message = '', String originalCommentId = prRootCommentId) {
+    if (scmUtils.isGitHubRepository()) {
+        // We rely on GitHub commit statuses to report the build status
+        return
+    }
+
+    Map args = [ buildStatus: currentBuild.result ]
+    args.messageSuffix = message
+    if (originalCommentId != null) {
+        args.originalCommentId = originalCommentId
+    }
+    postMultibranchBuildStatusCommentOnPullRequest(args)
+}
+
+String postMultibranchBuildStatusCommentOnPullRequest(Map args) {
+    if (githubPullRequest != null) {
+        args.commitHash = commonModule.githubCommit
+        args.message = "Build number #${env.BUILD_NUMBER}${args.message.isEmpty() ? '' : "\n${args.message}"}"
+        return githubPullRequest.createBuildStatusComment(args)
+    } else {
+        args.commitHash = GIT_COMMIT
+        return bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(args)
+    }
+}
+
+String commentOnMultibranchPullRequest(String comment) {
+    if (githubPullRequest != null) {
+        githubPullRequest.createComment(comment)
+    } else {
+        bitbucketUtils.commentOnMultibranchPullRequest(comment)
+    }
 }
 
 return this

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024 Ping Identity Corporation. All Rights Reserved
+ * Copyright 2019-2025 Ping Identity Corporation. All Rights Reserved
  * 
  * This code is to be used exclusively in connection with Ping Identity 
  * Corporation software or services. Ping Identity Corporation only offers
@@ -14,6 +14,16 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
+
+// TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
+githubRepository = scmUtils.isGitHubRepository() \
+        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(),
+        githubUtils.githubAppCredentialsFromUrl(scmUtils.getRepoUrl()))
+        .repository(scmUtils.getRepoName())
+        : null
+githubCommit = scmUtils.isGitHubRepository()
+        ? githubRepository.commit(GIT_COMMIT)
+        : null
 
 /**
  * Globally scoped git commit information
@@ -45,19 +55,6 @@ String calculatePlatformImagesBranch() {
     }
 }
 
-/** Revision of platform-images repo used for k8s and platform integration/perf tests. */
-platformImagesRevision = bitbucketUtils.getLatestCommitHash(
-        'cloud',
-        'platform-images',
-        DEFAULT_PLATFORM_IMAGES_TAG)
-
-/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
-lodestarFileContent = bitbucketUtils.readFileContent(
-        'cloud',
-        'platform-images',
-        platformImagesRevision,
-        'lodestar.json').trim()
-lodestarRevision = readJSON(text: lodestarFileContent)['gitCommit']
 
 /** Does the branch support PIT tests */
 boolean branchSupportsPitTests() {
@@ -86,9 +83,35 @@ boolean branchSupportsIDCloudReleases() {
             || branchName.startsWith('preview/')
 }
 
-void buildImage(String directoryName, String imageName, String arguments) {
+/** Revision of platform-images repo used for k8s and platform integration/perf tests. */
+// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
+platformImagesRevision = scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
+                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+        githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
+        .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
+        .branch(DEFAULT_PLATFORM_IMAGES_TAG)
+        .lastCommitHash()
+        .value()
+        : bitbucketUtils.getLatestCommitHash(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+        scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+        DEFAULT_PLATFORM_IMAGES_TAG)
+        .trim()
 
-}
+/** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
+// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
+lodestarRevision = readJSON(text: (scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
+                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+        githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
+        .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
+        .readFileContent('lodestar.json', platformImagesRevision)
+        .trim()
+        : bitbucketUtils.readFileContent(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+        scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
+        platformImagesRevision,
+        'lodestar.json')
+        .trim())
+)['gitCommit']
+
 
 def authenticateGcloud() {
     withCredentials([file(credentialsId: 'jenkins-guillotine-sa-key', variable: 'GC_KEY')]) {
@@ -106,13 +129,17 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
 
                     authenticateGcloud()
 
-                    localGitUtils.deepCloneBranch('ssh://git@stash.forgerock.org:7999/cloud/guillotine.git', 'master')
+                    // TODO to check sand-box uncomment and set the url
+                    // env.GUILLOTINE_REPOSITORY_URL = 'https_sandbox_url'
+                    scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
+
                     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
                     // Configure environment to make Guillotine works on GKE
                     withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
                         sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
                     }
                     // Configure Guillotine to run tests
+                    options = "--set forgeops.git-url=${env.FORGEOPS_REPOSITORY_URL} ${options}"
                     sh("./configure.py runtime --platform-version PLATFORM_IMAGE_REF --forgeops-branch-name ${branchName} ${options}")
                     try {
                         // Run the tests
