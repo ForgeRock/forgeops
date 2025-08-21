@@ -16,7 +16,6 @@ import com.forgerock.pipeline.stage.FailureOutcome
 
 
 fraasProductionTag = 'fraas-production'
-forgeopsFraasProduction = getPromotedProductCommit(fraasProductionTag, 'forgeops')
 
 SUMMARY_REPORT_NAME = 'SummaryReport'
 
