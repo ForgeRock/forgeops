@@ -98,3 +98,9 @@ It now will use `latest` if a tag is not specified.
 Organizations that need to build their own container images can create their
 own release files so `forgeops image` and `forgeops info` will work with these
 custom images.
+
+### Added how-to on creating custom environment variables
+
+Created a new document on how to add custom environment variables to the
+`platform-config` ConfigMap, AM, and IDM. You can find it at
+`how-tos/custom-envs.md`.
