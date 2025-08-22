@@ -28,16 +28,21 @@
 #INGRESS=nginx
 #SECRETS=secret-agent
 #UPGRADE=false
-#cert-manager version
+#cert-manager options
 #CM_VERSION=
-#nginx version
+#CM_NAMESPACE=cert-manager
+#nginx options
 #NX_VERSION=
-#haproxy version
+#NX_NAMESPACE=ingress-nginx
+#haproxy options
 #HP_VERSION=
-#secret-agent version
+#HP_NAMESPACE=haproxy-ingress
+#secret-agent options
 #SA_VERSION=
-#secret-generator version
+#SA_NAMESPACE=secret-agent
+#secret-generator options
 #SG_VERSION=
+#SG_NAMESPACE=secret-generator
 
 #
 # Releases

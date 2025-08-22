@@ -32,8 +32,10 @@ usage() {
 
   Available prereqs: ${COMPONENTS_PREREQS[*]}
 
-  You can use secret-agent or secrets-generator for the secrets target.
-  You can use nginx or haproxy for the ingress target.
+  Notes:
+  * You can use secret-agent or secrets-generator for the secrets target
+  * You can use nginx or haproxy for the ingress target
+  * You can configure the namespaces in your forgeops.conf
 
   Examples:
   Install all prereqs with defaults:
@@ -117,7 +119,7 @@ message "COMPONENTS=${COMPONENTS[*]}" "debug"
 CM_PRETTY="Cert Manager"
 CM_REPO=https://charts.jetstack.io
 CM_CHART_NAME=cert-manager
-CM_NAMESPACE=cert-manager
+CM_NAMESPACE=${CM_NAMESPACE:-cert-manager}
 CM_VERSION=${CM_VERSION:-}
 CM_INSTALLED=$(kubectl get crd -l app=cert-manager 2>/dev/null)
 CM_OPTS="--set crds.enabled=true \
@@ -139,7 +141,7 @@ if [ "$INGRESS" = "nginx" ]; then
     ING_PRETTY="NGINX Ingress"
     ING_REPO=https://kubernetes.github.io/ingress-nginx
     ING_CHART_NAME=ingress-nginx
-    ING_NAMESPACE=ingress-nginx
+    ING_NAMESPACE=${NX_NAMESPACE:-ingress-nginx}
     ING_VERSION=${NX_VERSION:-}
     ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=ingress-nginx 2>/dev/null)
     ING_OPTS="--set controller.kind=Deployment \
@@ -164,7 +166,7 @@ else
     ING_PRETTY="HAProxy Ingress "
     ING_REPO=https://haproxy-ingress.github.io/charts
     ING_CHART_NAME=haproxy-ingress
-    ING_NAMESPACE=haproxy-ingress
+    ING_NAMESPACE=${HP_NAMESPACE:-haproxy-ingress}
     ING_VERSION=${HP_VERSION:-}
     ING_INSTALLED=$(kubectl get clusterroles -l app.kubernetes.io/name=haproxy-ingress 2>/dev/null)
     ING_OPTS="--set controller.kind=Deployment \
@@ -187,7 +189,7 @@ if [ "$SECRETS" == "secret-agent" ] ; then
   SEC_PRETTY="Secret Agent"
   SEC_REPO=oci://us-docker.pkg.dev/forgeops-public/charts/secret-agent
   SEC_CHART_NAME=secret-agent
-  SEC_NAMESPACE=secret-agent
+  SEC_NAMESPACE=${SA_NAMESPACE:-secret-agent}
   SEC_VERSION=${SA_VERSION:-v1.2.5}
   SEC_INSTALLED=$(kubectl get crd secretagentconfigurations.secret-agent.secrets.forgerock.io 2>/dev/null || true)
   SEC_OPTS="--set tolerations[0].'key'='kubernetes\.io/arch' \
@@ -198,7 +200,7 @@ else
   SEC_REPO=https://helm.mittwald.de
   SEC_CHART_NAME=kubernetes-secret-generator
   SEC_VERSION=${SG_VERSION:-}
-  SEC_NAMESPACE=secret-generator
+  SEC_NAMESPACE=${SG_NAMESPACE:-secret-generator}
   SEC_INSTALLED=$(kubectl get deployment -l app.kubernetes.io/name=kubernetes-secret-generator -n $SEC_NAMESPACE 2>/dev/null)
   SEC_OPTS="--set secretLength=26"
 fi
