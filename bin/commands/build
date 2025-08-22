@@ -121,14 +121,12 @@ for c in ${COMPONENTS[@]} ; do
   fi
 
   IMAGE=$c
-  TAG_OPT=
   if [ -n "$PUSH_TO" ] && [ "$PUSH_TO" != 'none' ] ; then
     IMAGE="${PUSH_TO}/${IMAGE}"
   fi
-  if [ -n "$TAG" ] ; then
-    IMAGE="${IMAGE}:${TAG}"
-    TAG_OPT="-t ${TAG}"
-  fi
+  TAG=${TAG:-latest}
+  TAG_OPT="-t ${TAG}"
+  IMAGE="${IMAGE}:${TAG}"
 
   runOrPrint $CONTAINER_ENGINE build $BUILD_ARGS_REAL -t $IMAGE -f $build_d/Dockerfile $build_d
 

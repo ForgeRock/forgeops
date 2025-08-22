@@ -40,7 +40,7 @@ from lib.python.releases import (
 
 # Setup a custom argparse formatter so we can use multiple formatters
 class Formatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
-    pass
+    """ Custom Help formatter """
 
 
 def list_envs(overlay_root, helm_root, debug=False, is_json_format=False):
@@ -67,14 +67,18 @@ def list_envs(overlay_root, helm_root, debug=False, is_json_format=False):
         host = 'None'
         if env in h_envs:
             values_file = helm_root / env / 'values.yaml'
+            values = {}
             if values_file.is_file():
-                values = yaml.safe_load(open(values_file))
+                with(open(values_file, encoding='utf-8')) as f:
+                    values = yaml.safe_load(f)
                 if utils.key_exists(values, 'platform.ingress.hosts'):
                     host = values['platform']['ingress']['hosts'][0]
         else:
             platform_config = overlay_root / env / 'base' / 'platform-config.yaml'
+            pc = {}
             if platform_config.is_file():
-                pc = yaml.safe_load(open(platform_config))
+                with(open(platform_config, encoding='utf-8')) as f:
+                    pc = yaml.safe_load(f)
                 if utils.key_exists(pc, 'data.FQDN'):
                     host = pc['data']['FQDN']
         # Print available envs and exit.

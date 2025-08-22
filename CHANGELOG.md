@@ -23,41 +23,34 @@ OpenSSL now provides the default root CAs.  User can provide additional
 certificates via the Helm chart.
 
 ### Removed curl from ldif-importer
-
 Curl has been replaced with ldapsearch in the ldif-importer job. Curl often has
 security vulnerabilities, and so we decided to remove it.
 
 ### Replace curl with wget in Amster
-
 Curl has been replaced with wget in the amster job. Curl often has
 security vulnerabilities, and so we've changed it to wget which is more secure.
 
 ### Added ability to use secret-generator
-
 Is is now possible to use secret-generator to provision platform secrets
 instead of secret-agent. In the future, secret-agent will be deprecated. It is
 recommended that new deployments use secret-generator.
 
 ### New forgeops prereqs command
-
 This replaces `charts/scripts/install-prereqs`, and the settings move into
 `forgeops.conf`. See `forgeops prereqs -h` for more information.
 
 ### Added ability to do no downtime DS password rotations
-
 DS images must be built with ForgeOps 2025.2.0 in order to enable multiple
 password values. Rebuild your current images, or use the latest available tag
 for DS images.
 
 ### New forgeops rotate command
-
 This new command assists with no downtime DS password rotations for the 
 ds-env-secrets and ds-passwords secrets. It will create the old-ds-env-secrets 
 and old-ds-passwords secrets which are used by the ds-set-passwords job and 
 the init container to maintain the old passwords during the rotation process.
 
 ### New `forgeops upgrade` command
-
 This command will upgrade your Kustomize overlays. It is safe to rerun because
 it checks to see if any work needs to be done. It is being added to update the
 secrets child overlay with the new structure. It will be used in the future as
@@ -66,7 +59,6 @@ that one first. Test the upgraded overlay to ensure that you don't need to add
 back any customizations you made.
 
 ### New migration script for secret-generator
-
 Since the process to migrate to secret-generator from secret-agent is so
 complex, we have created a script that will do the steps for you. It uses the
 new rotate command with the new no downtime password rotation logic to
@@ -78,7 +70,6 @@ eliminate downtime during the migration.
 Reordered the patches in the amster/upload and amster/export sub overlays to correctly manage amster configuration.
 
 ### Renamed FORGEOPS_ROOT to FORGEOPS_DATA
-
 In order to reduce confusion, the optional FORGEOPS_ROOT env var has been
 renamed FORGEOPS_DATA. The forgeops command will offer to fix this in
 ~/.forgeops.conf if FORGEOPS_ROOT is detected.
@@ -87,6 +78,16 @@ renamed FORGEOPS_DATA. The forgeops command will offer to fix this in
 Ensure openam container has access to the default boot.json when something causes the 
 container to restart.  This is because the fbc-init init-container doesn't run when the 
 openam container restarts so the default boot.json isn't set for startup.
+
+### Fixed bug in info command
+The `forgeops info -e my-env` command would throw an exception when an image
+has a tag that doesn't start with X.Y.Z. This was due to a bug in
+lib.python.releases.is_valid_release(). It now properly returns false if a tag
+doesn't match that pattern.
+
+### Fixed bug in build command
+The `forgeops build` command didn't properly handle a user not providing a tag.
+It now will use `latest` if a tag is not specified.
 
 ## Removed Features
 

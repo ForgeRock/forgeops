@@ -264,7 +264,7 @@ def is_valid_release(tag, debug=False):
     if debug:
         print(f"is_valid_release(): tag={tag}")
     result = False
-    if re.match(r'^([0-9]*.[0-9]*.[0-9])*', tag):
+    if re.match(r'^[0-9]+.[0-9]+.[0-9]+', tag):
         result = True
 
     return result
