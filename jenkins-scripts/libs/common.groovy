@@ -85,34 +85,12 @@ boolean branchSupportsIDCloudReleases() {
 }
 
 /** Revision of platform-images repo used for k8s and platform integration/perf tests. */
-// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
-platformImagesRevision = scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
-                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-                                                                   githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
-                                                     .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
-                                                     .branch(DEFAULT_PLATFORM_IMAGES_TAG)
-                                                     .lastCommitHash()
-                                                     .value()
-                                        : bitbucketUtils.getLatestCommitHash(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-                                                                             scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-                                                                             DEFAULT_PLATFORM_IMAGES_TAG)
-                                                        .trim()
+platformImagesRevision = platformImageUtils.getRevision(DEFAULT_PLATFORM_IMAGES_TAG)
+echo "Platform Images revision: ${platformImagesRevision}"
 
 /** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
-// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
-lodestarRevision = readJSON(text: (scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
-                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-                                                                   githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
-                                                     .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
-                                                     .readFileContent('lodestar.json', platformImagesRevision)
-                                                     .trim()
-                                        : bitbucketUtils.readFileContent(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-                                                                        scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-                                                                        platformImagesRevision,
-                                                                        'lodestar.json')
-                                                         .trim())
-)['gitCommit']
-
+lodestarRevision = platformImageUtils.getProductCommit(platformImagesRevision, 'lodestar')
+echo "Lodestar revision: ${lodestarRevision}"
 
 def authenticateGke() {
     withCredentials([file(credentialsId: 'jenkins-guillotine-sa-key', variable: 'GC_KEY')]) {
