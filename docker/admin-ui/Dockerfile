@@ -1,4 +1,4 @@
 ARG REPO=gcr.io/forgerock-io/platform-admin-ui
-ARG TAG=latest
+ARG TAG=8.0.1.0523
 
 FROM ${REPO}:${TAG}
