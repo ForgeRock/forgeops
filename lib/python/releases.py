@@ -95,6 +95,9 @@ def parse_release_str(rel_str, debug=False):
 
 
 def get_available_release(requested_release, component_releases, search='backward', debug=False):
+    """
+    Return a sorted list of available releases from a given release and dictionary of all releases.
+    """
     selected_release = None
     if isinstance(requested_release, str):
         if requested_release == 'latest':
@@ -111,12 +114,12 @@ def get_available_release(requested_release, component_releases, search='backwar
                 minor_releases.remove('scan')
             minor_releases.sort()
             selected_release = Version(minor_releases[-1])
-        elif release in ALT_RELEASES:
+        elif requested_release in ALT_RELEASES:
             selected_release = requested_release
         else:
             utils.exit_msg(f"Unknown release ({requested_release}). Use forgeops info --list-releases to see valid releases")
     else:
-        minor_releases = list()
+        minor_releases = []
         maj_min = f"{requested_release.major}.{requested_release.minor}"
         if maj_min in component_releases:
             for minor_release in component_releases[maj_min].keys():
@@ -220,7 +223,7 @@ def select_image_repo(release, image_repo=None, env=None):
     if release and not env:
         repo = copy(base_repo)
         if release == 'dev':
-            repo = copy(base_repo_dev)
+            repo = copy(BASE_REPO_DEV)
 
     if image_repo:
         if image_repo == 'base':
@@ -232,7 +235,7 @@ def select_image_repo(release, image_repo=None, env=None):
         elif image_repo == 'deploy-default':
             repo = copy(DEPLOY_REPO_DEF)
         elif image_repo == 'dev':
-            repo = copy(base_repo_dev)
+            repo = copy(BASE_REPO_DEV)
         elif image_repo.lower() == 'none':
             repo = None
         else:
