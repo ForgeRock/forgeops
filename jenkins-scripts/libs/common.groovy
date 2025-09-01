@@ -14,16 +14,8 @@ import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 import com.forgerock.pipeline.stage.Status
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
+import com.forgerock.pipeline.git.scm.github.CommitState
 
-// TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
-githubRepository = scmUtils.isGitHubRepository() \
-        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(),
-        githubUtils.githubAppCredentialsFromUrl(scmUtils.getRepoUrl()))
-        .repository(scmUtils.getRepoName())
-        : null
-githubCommit = scmUtils.isGitHubRepository()
-        ? githubRepository.commit(GIT_COMMIT)
-        : null
 
 /**
  * Globally scoped git commit information
@@ -35,6 +27,15 @@ GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
 GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
 
+// TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
+githubRepository = scmUtils.isGitHubRepository() \
+        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(),
+        githubUtils.githubAppCredentialsFromUrl(scmUtils.getRepoUrl()))
+        .repository(scmUtils.getRepoName())
+        : null
+githubCommit = scmUtils.isGitHubRepository()
+        ? githubRepository.commit(GIT_COMMIT)
+        : null
 
 def normalizeStageName(String stageName) {
     return stageName.toLowerCase().replaceAll('\\s', '-')
@@ -98,17 +99,29 @@ def authenticateGke() {
     }
 }
 
+def withGitHubCredentialsForGuillotine(Closure process) {
+    withCredentials([
+            usernamePassword(credentialsId: githubUtils.getCredentialsId(), usernameVariable: 'GITHUB_APP',
+                    passwordVariable: 'GITHUB_TOKEN'),
+            usernamePassword(credentialsId: githubUtils.getSandboxCredentialsId(), usernameVariable:
+                    'GITHUB_SANDBOX_APP', passwordVariable: 'GITHUB_SANDBOX_TOKEN')
+    ]) {
+        process()
+    }
+}
+
 
 def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String providerName, String options, String platformImageRef='') {
     stage(stageName) {
         def normalizedStageName = normalizeStageName(stageName)
+
         withPipelineRun(pipelineRun, stageName, normalizedStageName) {
             // Create container to be able to use python3
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
                 dir('guillotine') {
 
-                    // TODO to chcke sand-baox uncomment and set the url
-                    // env.GUILLOTINE_REPOSITORY_URL = 'https_sandbox_url'
+                    // TODO to check sand-box uncomment and set the url
+                    // env.GUILLOTINE_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops-guillotine'
                     scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
 
                     authenticateGke()
@@ -122,16 +135,21 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                         options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
                     }
 
+                    // TODO to check sand-box uncomment and set the url
+                    // env.FORGEOPS_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops.git'
+
                     options = "--set forgeops.git-url=${env.FORGEOPS_REPOSITORY_URL} ${options}"
+
 
                     // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
                     sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
 
-
                     try {
                         // Run the tests
-                        sh("./run.py")
-                        currentBuild.result = 'SUCCESS'
+                        withGitHubCredentialsForGuillotine() {
+                            sh("./run.py")
+                            currentBuild.result = 'SUCCESS'
+                        }
                     } catch (Exception exc) {
                         currentBuild.result = 'FAILURE'
                         println('Exception in main(): ' + exc.getMessage())
@@ -163,11 +181,13 @@ def withPipelineRun(PipelineRunLegacyAdapter pipelineRun, String stageName, Stri
     def reportUrl = "${env.JOB_URL}/${env.BUILD_NUMBER}/Guillotine_20Test_20Report_20${normalizedStageName}"
     if (pipelineRun != null) {
         pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
-            try {
-                process()
-                return new Outcome(Status.SUCCESS, reportUrl)
-            } catch (Exception e) {
-                return new FailureOutcome(e, reportUrl)
+            withGitHubCommitStatus(stageName) {
+                try {
+                    process()
+                    return new Outcome(Status.SUCCESS, reportUrl)
+                } catch (Exception e) {
+                    return new FailureOutcome(e, reportUrl)
+                }
             }
         }
     } else {
@@ -175,5 +195,54 @@ def withPipelineRun(PipelineRunLegacyAdapter pipelineRun, String stageName, Stri
     }
 }
 
+/**
+ * Sets a commit status on the GitHub commit.
+ * If the pipeline is not using the PingGateway GitHub repository, the process is executed without setting a commit status.
+ *
+ * @param stageName The stage name.
+ * @param process The process to run.
+ * @return A closure, containing the stage steps to execute.
+ */
+def withGitHubCommitStatus(String stageName, Closure process) {
+    // TODO GitHub migration: remove if statement when repo migrated to GitHub
+    if (githubCommit == null) {
+        echo("[INFO] Not in a GitHub repository. Skipping commit status update for stage: ${stageName}")
+        return process()
+    }
+
+    String githubStageName = "ci/${stageName}"
+
+    githubCommit.createStatus(url: env.BUILD_URL, githubStageName, CommitState.PENDING)
+    Object res
+    Throwable excCaught = null
+    try {
+        res = process()
+    } catch (Exception e) {
+        excCaught = e
+        res = new FailureOutcome(e, env.BUILD_URL)
+    }
+
+    CommitState commitState
+    String url = env.BUILD_URL
+    String description = ''
+    if (!(res instanceof Outcome)) {
+        commitState = currentBuild.result == 'SUCCESS' ? CommitState.SUCCESS : CommitState.FAILURE
+        echo("[WARNING] The process did not return an Outcome object." +
+                " Set GitHub commit status based on current build result: ${commitState}")
+    } else {
+        commitState = res.status == Status.SUCCESS ? CommitState.SUCCESS : CommitState.FAILURE
+        description = res instanceof FailureOutcome ? res.exception.message : null
+        if (res.primaryReport != null && !res.primaryReport.trim().isEmpty()) {
+            url = res.primaryReport
+        }
+    }
+
+    githubCommit.createStatus(url: url, description: description, githubStageName, commitState)
+
+    if (excCaught != null) {
+        throw excCaught
+    }
+    return res
+}
 
 return this

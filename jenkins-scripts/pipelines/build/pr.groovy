@@ -40,7 +40,7 @@ def initialSteps() {
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
     bitbucketCommentId = postStatusCommentOnPr()
     // in order to compare the PR with the target branch, we first need to fetch the target branch
-    scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
+    // scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 }
 
 /**

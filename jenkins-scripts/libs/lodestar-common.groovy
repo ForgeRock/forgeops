@@ -39,9 +39,6 @@ ArrayList postcommitMandatoryStages(boolean enabled) {
         booleanParam(name: 'Postcommit_fo_smoke_small', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_set_images', defaultValue: enabled),
         booleanParam(name: 'Postcommit_fo_dsbackup', defaultValue: enabled),
-        booleanParam(name: 'Postcommit_fo_am_only', defaultValue: false),
-        booleanParam(name: 'Postcommit_fo_ig_only', defaultValue: false),
-        booleanParam(name: 'Postcommit_fo_ds_only', defaultValue: false),
     ]
 }
 
@@ -66,11 +63,13 @@ def runCommon(PipelineRunLegacyAdapter pipelineRun, String stageName, Map stages
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
             stage(stageName) {
-                dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
-                    process()
+                commonModule.withGitHubCommitStatus(stageName) {
+                    dashboard_utils.determineUnitOutcome(stagesCloud[normalizedStageName]) {
+                        process()
+                    }
+                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
-                allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
-                return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
             }
         }
     }
@@ -118,22 +117,24 @@ def runUpgrade(PipelineRunLegacyAdapter pipelineRun, Random random, String stage
     pipelineRun.pushStageOutcome(normalizedStageName, stageDisplayName: stageName) {
         dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
             stage(stageName) {
-                try {
-                    dashboard_utils.determineUnitOutcome(stagesCloud[deploymentStageName]) {
-                        withGKESpyglaasNoStages(getDefaultConfig(random, deploymentStageName) + deploymentConfig)
-                    }
-                    allStagesCloud[deploymentReportNamePrefix] = stagesCloud[deploymentStageName]
+                commonModule.withGitHubCommitStatus(stageName) {
+                    try {
+                        dashboard_utils.determineUnitOutcome(stagesCloud[deploymentStageName]) {
+                            withGKESpyglaasNoStages(getDefaultConfig(random, deploymentStageName) + deploymentConfig)
+                        }
+                        allStagesCloud[deploymentReportNamePrefix] = stagesCloud[deploymentStageName]
 
-                    dashboard_utils.determineUnitOutcome(stagesCloud[testStageName]) {
-                        withGKESpyglaasNoStages(getDefaultConfig(random, testStageName) + testConfig)
+                        dashboard_utils.determineUnitOutcome(stagesCloud[testStageName]) {
+                            withGKESpyglaasNoStages(getDefaultConfig(random, testStageName) + testConfig)
+                        }
+                        allStagesCloud[testReportNamePrefix] = stagesCloud[testStageName]
+                    } finally {
+                        // In the deployment part the cleanup is disabled to be able to run the test part
+                        // But if the deployment part fails we need to do the cleanup to remove the namespace
+                        sh("./cleanup.py --namespace=${deploymentConfig.DEPLOYMENT_NAMESPACE}")
                     }
-                    allStagesCloud[testReportNamePrefix] = stagesCloud[testStageName]
-                } finally {
-                    // In the deployment part the cleanup is disabled to be able to run the test part
-                    // But if the deployment part fails we need to do the cleanup to remove the namespace
-                    sh("./cleanup.py --namespace=${deploymentConfig.DEPLOYMENT_NAMESPACE}")
+                    return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
                 }
-                return dashboard_utils.finalLodestarOutcome(stagesCloud, stageName)
             }
         }
     }
@@ -158,22 +159,24 @@ def runPlatformUi(PipelineRunLegacyAdapter pipelineRun, Random random, String st
 
         node('gce-vm-forgeops-n2d-standard-8') {
             stage(stageName) {
-                try {
-                    platformUI.runPlatformUI(commonModule.lodestarRevision, commonModule.platformImagesRevision,
-                            testConfig, normalizedStageName, commonModule.calculatePlatformImagesBranch())
+                commonModule.withGitHubCommitStatus(stageName) {
+                    try {
+                        platformUI.runPlatformUI(commonModule.lodestarRevision, commonModule.platformImagesRevision,
+                                testConfig, normalizedStageName, commonModule.calculatePlatformImagesBranch())
 
-                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
-                    allStagesCloud[normalizedStageName].numFailedTests = 0
-                    allStagesCloud[normalizedStageName].reportUrl = reportUrl
-                } catch (Exception e) {
-                    print(e.getMessage())
-                    allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
-                    allStagesCloud[normalizedStageName].numFailedTests = 1
-                    allStagesCloud[normalizedStageName].reportUrl = reportUrl
-                    allStagesCloud[normalizedStageName].exception = e
-                    return new FailureOutcome(e, reportUrl)
+                        allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
+                        allStagesCloud[normalizedStageName].numFailedTests = 0
+                        allStagesCloud[normalizedStageName].reportUrl = reportUrl
+                    } catch (Exception e) {
+                        print(e.getMessage())
+                        allStagesCloud[normalizedStageName] = stagesCloud[normalizedStageName]
+                        allStagesCloud[normalizedStageName].numFailedTests = 1
+                        allStagesCloud[normalizedStageName].reportUrl = reportUrl
+                        allStagesCloud[normalizedStageName].exception = e
+                        return new FailureOutcome(e, reportUrl)
+                    }
+                    return new Outcome(Status.SUCCESS, reportUrl)
                 }
-                return new Outcome(Status.SUCCESS, reportUrl)
             }
         }
     }
