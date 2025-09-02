@@ -402,6 +402,8 @@ def configure_platform_images(clone_path,
             # add remote
             grun('remote', 'add', 'origin', repo)
             grun('config', '--add', 'remote.origin.fetch',
+                 # TODO GitHub migration: once migration to GitHub is done we can inline if block (i.e. consider as always true)
+                 '+refs/pull/*/head:refs/pr/*' if 'github' in repo.lower() else
                  '+refs/pull-requests/*/from:refs/remotes/origin/pr/*')
             # checkout
             grun('fetch', 'origin')
