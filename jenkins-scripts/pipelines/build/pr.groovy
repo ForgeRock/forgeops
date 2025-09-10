@@ -32,9 +32,12 @@ def initialSteps() {
 
     // Used later by multiple methods, so easier to be have it global
     prRootCommentId = null
+    prTitle = githubPullRequest.title()
+    sendInformationMessageToPR()
 
-    if (params.isEmpty()) {
-        sendInformationMessageToPR()
+    if (isNoTestsPR()) {
+        currentBuild.result = 'SUCCESS'
+        return
     }
 
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
@@ -49,6 +52,11 @@ def initialSteps() {
  * @param pipelineRun Used for running tests as part of the pipeline
  */
 def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
+
+    if (isNoTestsPR()) {
+        return
+    }
+
     try {
         Random random = new Random()
         if (params.PR_deployment_only) {
@@ -75,13 +83,7 @@ def postBuildTests(PipelineRunLegacyAdapter pipelineRun) {
 
 /** Post a comment on the PR, explaining rules and how to execute additional tests */
 void sendInformationMessageToPR() {
-    if (isPR()) {
-        commentOnMultibranchPullRequest(
-                """#### Jenkins is building your PR
-                  |If you would like to know how to configure which tests are run against your PR, click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
-                """.stripMargin()
-        )
-
+    if (!githubPullRequest.containsBlockingCiTasks()) {
         commentOnMultibranchPullRequest(
                 """#### Jenkins is building your PR
                   |### Run specific Guillotine tests manually
@@ -96,12 +98,20 @@ void sendInformationMessageToPR() {
                   |> ./run.py
                   |> https://stash.forgerock.org/projects/CLOUD/repos/guillotine/browse/README.md
                   |> ```
+                  |
+                  |Then launch a PR Build to start the testing by adding the following comments on this PR
+                  |> 
+                  |> ```text
+                  |> /launch pr build
+                  |> ```
+                  |
+                  |If you would like to know how to configure which tests are run against your PR, click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
                 """.stripMargin()
         )
 
-        addTaskOnPR(['Run Guillotine tests manually?', scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID,
-                     'Helm and Kustomize updated? (includes running base-generate.sh)', scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID,
-                     'Doc Jira created?/readme updated?', scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID])
+        addTaskOnPR(['Run Guillotine tests manually?',
+                     'Helm and Kustomize updated? (includes running base-generate.sh)',
+                     'Doc Jira created?/readme updated?'])
     }
 }
 
@@ -176,6 +186,10 @@ void addTaskOnPR(ArrayList<String> tasksList) {
             bitbucketUtils.addTaskOnPR(task, scmUtils.getProjectName(), scmUtils.getRepoName(), env.CHANGE_ID)
         }
     }
+}
+
+boolean isNoTestsPR() {
+    return prTitle.toLowerCase().startsWith('notests')
 }
 
 return this
