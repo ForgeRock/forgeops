@@ -118,57 +118,59 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
         withPipelineRun(pipelineRun, stageName, normalizedStageName) {
             // Create container to be able to use python3
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
-                dir('guillotine') {
+                commonModule.withGitHubCommitStatus(stageName) {
+                    dir('guillotine') {
 
-                    // TODO to check sand-box uncomment and set the url
-                    // env.GUILLOTINE_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops-guillotine'
-                    scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
+                        // TODO to check sand-box uncomment and set the url
+                        // env.GUILLOTINE_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops-guillotine'
+                        scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
 
-                    authenticateGke()
-                    // Configure environment to make Guillotine works on GKE
-                    withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
-                        sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
-                    }
-
-                    if (platformImageRef != ''){
-                        def lastForgeopsVersion = sh(script: './configure.py --get-forgeops-last-version', returnStdout: true).trim()
-                        options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
-                    }
-
-                    // TODO to check sand-box uncomment and set the url
-                    // env.FORGEOPS_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops.git'
-
-                    options = "--set forgeops.git-url=${env.FORGEOPS_REPOSITORY_URL} ${options}"
-
-
-                    // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
-                    sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
-
-                    try {
-                        // Run the tests
-                        withGitHubCredentialsForGuillotine() {
-                            sh("./run.py")
-                            currentBuild.result = 'SUCCESS'
+                        authenticateGke()
+                        // Configure environment to make Guillotine works on GKE
+                        withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
+                            sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
                         }
-                    } catch (Exception exc) {
-                        currentBuild.result = 'FAILURE'
-                        println('Exception in main(): ' + exc.getMessage())
-                        throw exc
-                    } finally {
-                        if (fileExists('reports/latest')) {
-                            dir('tmp_dir') {
-                                // Archive all folders and files out of the docker container
-                                sh(script: "cp -r ../reports/latest/* .")
-                                archiveArtifacts(artifacts: '**')
-                                // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
-                                sh(script: "rm -rf tmp")
-                                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
-                                             reportDir   : '.', reportFiles: 'report.html',
-                                             reportName  : "Guillotine Test Report ${normalizedStageName}",
-                                             reportTitles: ''])
+
+                        if (platformImageRef != '') {
+                            def lastForgeopsVersion = sh(script: './configure.py --get-forgeops-last-version', returnStdout: true).trim()
+                            options = "--set forgeops.versions.${lastForgeopsVersion}.platform-image-ref=${platformImageRef} ${options}"
+                        }
+
+                        // TODO to check sand-box uncomment and set the url
+                        // env.FORGEOPS_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops.git'
+
+                        options = "--set forgeops.git-url=${env.FORGEOPS_REPOSITORY_URL} ${options}"
+
+
+                        // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
+                        sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
+
+                        try {
+                            // Run the tests
+                            withGitHubCredentialsForGuillotine() {
+                                sh("./run.py")
+                                currentBuild.result = 'SUCCESS'
                             }
+                        } catch (Exception exc) {
+                            currentBuild.result = 'FAILURE'
+                            println('Exception in main(): ' + exc.getMessage())
+                            throw exc
+                        } finally {
+                            if (fileExists('reports/latest')) {
+                                dir('tmp_dir') {
+                                    // Archive all folders and files out of the docker container
+                                    sh(script: "cp -r ../reports/latest/* .")
+                                    archiveArtifacts(artifacts: '**')
+                                    // Remove tmp folder (to save disk space) and publish html and logs in jenkins left side bar
+                                    sh(script: "rm -rf tmp")
+                                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true,
+                                                 reportDir   : '.', reportFiles: 'report.html',
+                                                 reportName  : "Guillotine Test Report ${normalizedStageName}",
+                                                 reportTitles: ''])
+                                }
+                            }
+                            sh("./shared/scripts/jenkins_clean_namespaces.py")
                         }
-                        sh("./shared/scripts/jenkins_clean_namespaces.py")
                     }
                 }
             }
