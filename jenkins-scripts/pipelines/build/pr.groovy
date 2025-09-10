@@ -86,7 +86,7 @@ void sendInformationMessageToPR() {
     if (!githubPullRequest.containsBlockingCiTasks()) {
         commentOnMultibranchPullRequest(
                 """#### Jenkins is building your PR
-                  |### Run specific Guillotine tests manually
+                  |#### How to run specific Guillotine tests manually
                   |
                   |> 
                   |> ```text
@@ -99,13 +99,25 @@ void sendInformationMessageToPR() {
                   |> https://stash.forgerock.org/projects/CLOUD/repos/guillotine/browse/README.md
                   |> ```
                   |
-                  |Then launch a PR Build to start the testing by adding the following comments on this PR
+                  |#### How to (re)launch a PR Build
+                  |Add the following line in a comment below
                   |> 
                   |> ```text
                   |> /launch pr build
                   |> ```
                   |
-                  |If you would like to know how to configure which tests are run against your PR, click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
+                  |#### How to run additionnal (PIT) tests
+                  |Click [here](https://platform-jenkins.live.gcp.forgerock.net/job/ForgeOps-build/view/change-requests/job/PR-${env.CHANGE_ID}/build?delay=0sec)
+                  |
+                  |#### How to skip tests
+                  |Add `notests` keyword at the begining of the PR title
+                  |
+                  |#### How to add a task
+                  |Add the following line in a comment below
+                  |> 
+                  |> ```text
+                  |> - [ ] Please do that before merging
+                  |> ```
                 """.stripMargin()
         )
 
