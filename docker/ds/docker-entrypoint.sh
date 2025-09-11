@@ -57,6 +57,13 @@ waitUntilSigTerm() {
     done
 }
 
+enableMultiplePasswordValues() {
+    dsconfig --offline --no-prompt --batch <<EOM
+set-password-policy-prop --policy-name "Default Password Policy" --set allow-multiple-password-values:true
+set-password-policy-prop --policy-name "Root Password Policy" --set allow-multiple-password-values:true
+EOM
+}
+
 setUserPasswordInLdifFile() {
     file=$1
     dn=$2
@@ -99,6 +106,7 @@ setAdminAndMonitorPasswords() {
     if [ -n "$OLD_MONITOR_PW" ] ; then
         monitorPassword="$monitorPassword $OLD_MONITOR_PW"
     fi
+    enableMultiplePasswordValues
     setUserPasswordInLdifFile $DS_DATA_DIR/db/rootUser/rootUser.ldif       "uid=admin"   "$adminPassword"
     setUserPasswordInLdifFile $DS_DATA_DIR/db/monitorUser/monitorUser.ldif "uid=monitor" "$monitorPassword"
 }

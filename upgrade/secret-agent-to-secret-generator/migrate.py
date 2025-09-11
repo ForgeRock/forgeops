@@ -379,7 +379,7 @@ def do_helm(params, settings):
 
     restart_ds(settings['namespace_opt'], params.dryrun)
 
-    delete_old_secrets(settings['namespace_opt'], params['debug'])
+    delete_old_secrets(settings['namespace_opt'], params.debug)
 
     toggle_ds_set_passwords_force(values_file, values, True)
 
