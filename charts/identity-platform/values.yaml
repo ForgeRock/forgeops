@@ -310,7 +310,7 @@ ldif_importer:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: latest
+    tag: 7.4.2
     pullPolicy: Always
     imagePullSecrets: []
 
@@ -755,7 +755,7 @@ ds_idrepo:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: latest
+    tag: 7.4.2
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -846,7 +846,7 @@ ds_cts:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: latest
+    tag: 7.4.2
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
