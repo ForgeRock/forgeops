@@ -1,5 +1,4 @@
 end_user_ui:
-  enabled: true
   image:
     repository: "end-user-ui"
     tag: ""

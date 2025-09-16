@@ -1,11 +1,6 @@
 platform:
-  base_generate: true
   secrets_enabled: true
-  truststore:
-    secret:
-      enabled: true
 idm:
-  enabled: true
   image:
-    repository: idm
+    repository: "idm"
     tag: ""

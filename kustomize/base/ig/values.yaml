@@ -1,5 +1,4 @@
 ig:
-  enabled: true
   image:
-    repository: ig
+    repository: "ig"
     tag: ""

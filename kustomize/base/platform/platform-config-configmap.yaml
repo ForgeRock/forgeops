@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: identity-platform
     app.kubernetes.io/part-of: identity-platform
     app.kubernetes.io/instance: identity-platform
-    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
 data:
   FQDN: identity-platform.domain.local
@@ -34,6 +34,6 @@ data:
   AUTORESTORE_FROM_DSBACKUP: "false"
   DSBACKUP_DIRECTORY: ""
   DSBACKUP_HOSTS: ""
-  DISASTER_RECOVERY_ID: initial-restore
+  DISASTER_RECOVERY_ID: "initial-restore"
   CERT_ISSUER: default-issuer
   AMSTER_DURATION: ""

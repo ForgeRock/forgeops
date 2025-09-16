@@ -1,0 +1,28 @@
+---
+# Source: identity-platform/templates/login-ui-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: login-ui
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: login-ui
+    app.kubernetes.io/component: login-ui
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: login-ui
+    app.kubernetes.io/component: login-ui

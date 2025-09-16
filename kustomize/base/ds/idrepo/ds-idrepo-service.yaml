@@ -1,0 +1,49 @@
+---
+# Source: identity-platform/templates/ds-idrepo-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ds-idrepo
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: ds-idrepo
+    app.kubernetes.io/component: ds-idrepo
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 4444
+      targetPort: tcp-admin
+      protocol: TCP
+      name: tcp-admin
+    - port: 1389
+      targetPort: tcp-ldap
+      protocol: TCP
+      name: tcp-ldap
+    - port: 1636
+      targetPort: tcp-ldaps
+      protocol: TCP
+      name: tcp-ldaps
+    - port: 8989
+      targetPort: tcp-replication
+      protocol: TCP
+      name: tcp-replication
+    - port: 8443
+      targetPort: https
+      protocol: TCP
+      name: https
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: ds-idrepo
+    app.kubernetes.io/component: ds-idrepo

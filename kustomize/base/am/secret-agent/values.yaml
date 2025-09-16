@@ -1,9 +1,6 @@
 platform:
-  truststore:
-    secret:
-      enabled: true
+  disable_secret_agent_config: false
 am:
-  enabled: true
   image:
-    repository: am
+    repository: "am"
     tag: ""

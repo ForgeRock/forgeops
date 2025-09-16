@@ -1,5 +1,3 @@
 platform:
   base:
     enabled: true
-  ingress:
-    enabled: false

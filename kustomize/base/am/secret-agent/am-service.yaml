@@ -1,0 +1,28 @@
+---
+# Source: identity-platform/templates/am-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: am
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: am
+    app.kubernetes.io/component: am
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: https
+      protocol: TCP
+      name: https
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: am
+    app.kubernetes.io/component: am

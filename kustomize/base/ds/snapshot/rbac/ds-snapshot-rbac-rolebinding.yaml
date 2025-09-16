@@ -1,0 +1,14 @@
+---
+# Source: identity-platform/templates/ds-snapshot-rbac-rolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ds-snapshot
+subjects:
+  - kind: ServiceAccount
+    name: ds-snapshot
+    namespace: prod
+roleRef:
+  kind: ClusterRole
+  name: ds-snapshot
+  apiGroup: rbac.authorization.k8s.io

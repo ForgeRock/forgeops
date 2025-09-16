@@ -73,11 +73,52 @@ EOM
 stripTag() {
   message "Starting stripTag()" "debug"
 
-  file=$1
+  local file=$1
   message "Stripping image tags from ${file}" "debug"
-  runOrPrint "sed -i '' -e 's,\(image: [-a-z]*\):.*$,\1,' ${file}"
+  if grep -q 'image:' $file ; then
+    message "Found image line in $file" "debug"
+    local sed_opts='-i'
+    if [ "$(uname -o)" == "Darwin" ] ; then
+      sed_opts="-i ''"
+    fi
+    runOrPrint "sed $sed_opts -e 's/\(image:\) \"\([-a-z]*\):.*$/\1 \2/' ${file}"
+    runOrPrint "$YQ_CMD -i eval -P 'del(.spec.template.metadata.annotations.deployment-date)' $file"
+  fi
 
   message "Finishing stripTag()" "debug"
+}
+
+pruneDir() {
+  local dir=$1
+  local kust_file="kustomization.yaml"
+  local kust_path="$dir/$kust_file"
+  local values_regex='^values'
+  if [ -f "$kust_path" ] ; then
+    resources=$(yq eval '.resources' $kust_path | sed -e 's/^-//')
+    cd $template_path
+    for f in $dir/* ; do
+      [[ ! -f $f ]] && continue # Skip if not a file
+      file=$(basename $f)
+      if [[ "$file" =~ $values_regex ]] || [ "$file" == "$kust_file" ] ; then
+        continue
+      fi
+      if containsElement "$file" "$resources" ; then
+        stripTag "$f"
+      else
+        rm $f
+      fi
+    done
+  fi
+}
+
+rmChart() {
+  local dir=$1
+  local chart_path="$dir/$CHART_NAME"
+  if [ -d "$chart_path" ] ; then
+    echo "Removing $chart_path"
+    runOrPrint "rm -rf $chart_path"
+  fi
+
 }
 
 # Get the currently running service definition
@@ -94,12 +135,15 @@ processDir() {
 
     if [ -f $d/$VALUES_FILE ] ; then
       message "Found $VALUES_FILE in ${d%*/}" "debug"
+      local output_opt="--output-dir $d"
       local override_opt=
-      [[ -f $d/$VALUES_OVERRIDE ]] && override_opt="-f $d/$VALUES_OVERRIDE"
-      echo "Generating $d/$RESOURCES_FILE"
-      runOrPrint "$HELM_CMD template $HELM_OPTS $base_values_opt -f $d/$VALUES_FILE $override_opt | $YQ_CMD eval -P 'del(.spec.template.metadata.annotations.deployment-date)' - > $d/$RESOURCES_FILE"
-      stripTag "$d/$RESOURCES_FILE"
-      processDir ${d%*/}
+      [[ -f "$d/$VALUES_OVERRIDE" ]] && override_opt="-f $d/$VALUES_OVERRIDE"
+      rmChart "$d"
+      echo "Generating $d templates"
+      runOrPrint "$HELM_CMD template $CHART_NAME $HELM_OPTS $output_opt $base_values_opt -f $d/$VALUES_FILE $override_opt > /dev/null 2>&1"
+      pruneDir "$d"
+      rmChart "$d"
+      processDir "${d%*/}"
     else
       message "Didn't find $VALUES_FILE in ${d%*/}" "debug"
       processDir ${d%*/}
@@ -119,6 +163,7 @@ YQ_CMD=$(type -P yq)
 
 CHART="oci://us-docker.pkg.dev/forgeops-public/charts"
 CHART_NAME="identity-platform"
+CHART_OUTPUT_PATH="$CHART_NAME/templates"
 CHART_VER_DEF="1.0.0"
 CHART_VER=
 CHART_SOURCE="local"
@@ -192,7 +237,7 @@ if [ ! -x "$YQ_CMD" ] ; then
 fi
 
 if [ "$CHART_SOURCE" == "local" ] ; then
-  HELM_OPTS="$CHART_NAME $NAMESPACE_OPT $SCRIPT_DIR/../charts/identity-platform"
+  HELM_OPTS="$SCRIPT_DIR/../charts/$CHART_NAME $NAMESPACE_OPT"
 else
   HELM_OPTS="$CHART/$CHART_NAME $NAMESPACE_OPT $VERSION_OPT"
 fi

@@ -1,0 +1,226 @@
+---
+# Source: identity-platform/templates/idm-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: idm
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: identity-platform
+      app.kubernetes.io/part-of: identity-platform
+      app.kubernetes.io/instance: identity-platform
+      app: idm
+      app.kubernetes.io/component: idm
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: idm
+        app.kubernetes.io/component: idm
+    spec:
+      serviceAccountName: default
+      securityContext:
+        fsGroup: 0
+        runAsUser: 11111
+      volumes:
+        - name: fbc
+          emptyDir: {}
+        - name: idm-secrets
+          secret:
+            secretName: idm
+        - name: truststore
+          projected:
+            sources:
+              - secret:
+                  name: ds-ssl-keypair
+        - name: new-truststore
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: audit-logs
+          emptyDir: {}
+        - name: idm-logback-xml
+          configMap:
+            name: idm-logback-xml
+        - name: idm-logging-properties
+          configMap:
+            name: idm-logging-properties
+        - name: idm-import-pem-certs
+          configMap:
+            name: idm-import-pem-certs
+            defaultMode: 0755
+      initContainers:
+        - name: fbc-init
+          image: idm
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /fbc
+              name: fbc
+          command:
+            - /bin/bash
+            - -c
+            - |
+              if [ -d /fbc/config ];
+              then
+                echo "Existing openidm configuration found. Skipping copy"
+              else
+                echo "Copying docker image configuration files to the shared volume"
+                cd /opt/openidm
+                cp -vr ui conf script /fbc
+              fi
+        - name: truststore-init
+          image: idm
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: new-truststore
+              mountPath: /truststore
+            - name: truststore
+              mountPath: /var/run/secrets/truststore
+            - name: idm-import-pem-certs
+              mountPath: /opt/openidm/bin/import-pem-certs.sh
+              subPath: import-pem-certs.sh
+          command:
+            - /opt/openidm/bin/import-pem-certs.sh
+          env:
+            - name: TRUSTSTORE_PATH
+              value: /truststore/idmtruststore
+            - name: TRUSTSTORE_PASSWORD
+              value: changeit
+            - name: IDM_PEM_TRUSTSTORE
+              value: /usr/lib/ssl/cert.pem
+            - name: IDM_PEM_TRUSTSTORE_DS
+              value: /var/run/secrets/truststore/ca.crt
+      containers:
+        - name: openidm
+          securityContext: {}
+          image: idm
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: OPENIDM_REPO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ds-passwords
+                  key: dirmanager.pw
+            - name: USERSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ds-passwords
+                  key: dirmanager.pw
+            - name: OPENIDM_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: idm-env-secrets
+                  key: OPENIDM_KEYSTORE_PASSWORD
+            - name: OPENIDM_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: idm-env-secrets
+                  key: OPENIDM_ADMIN_PASSWORD
+            - name: RS_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: amster-env-secrets
+                  key: IDM_RS_CLIENT_SECRET
+          envFrom:
+            - configMapRef:
+                name: idm
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: https
+              containerPort: 8443
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            initialDelaySeconds: 120
+            periodSeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /openidm/info/ping
+              port: http
+              httpHeaders:
+                - name: X-OpenIDM-Username
+                  value: anonymous
+                - name: X-OpenIDM-Password
+                  value: anonymous
+                - name: X-OpenIDM-NoSession
+                  value: "true"
+            failureThreshold: 40
+            periodSeconds: 10
+          resources:
+            limits:
+              memory: 1280Mi
+            requests:
+              cpu: 250m
+              memory: 1280Mi
+          volumeMounts:
+            - mountPath: /var/run/secrets/idm
+              name: idm-secrets
+            - name: new-truststore
+              mountPath: /opt/openidm/idmtruststore
+              readOnly: true
+              subPath: idmtruststore
+            - mountPath: /opt/openidm/logs
+              name: logs
+            - mountPath: /opt/openidm/audit
+              name: audit-logs
+            - mountPath: /var/run/openidm/logging/logback
+              name: idm-logback-xml
+            - mountPath: /var/run/openidm/logging
+              name: idm-logging-properties
+            - name: fbc
+              mountPath: /opt/openidm/conf
+              subPath: conf
+            - name: fbc
+              mountPath: /opt/openidm/ui
+              subPath: ui
+            - name: fbc
+              mountPath: /opt/openidm/script
+              subPath: script
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Exists

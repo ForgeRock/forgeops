@@ -3,6 +3,22 @@ RELEASE=2025.2.1
 
 ## New Features/Updated functionality
 
+### Changing base-generate.sh
+
+The `base-generate.sh` script creates `kustomize/base` from the Helm chart. It
+has been updated to use `--output-dir` with `helm template` to generate
+individual template files. This allows us to remove logic from the Helm chart
+that's only there for `base-generate.sh`. Update your
+$FORGEOPS_DATA/kustomize/base with these changes.
+
+### Adding ability to provide custom secrets
+
+The `platform.secrets` functionality added in 2025.2.0 has been updated to
+allow for fully custom secrets. This enables users to use an alternate secrets
+provider like `external-secrets`, or add extra secrets without having to use
+secret-generator. The Helm value `platform.secret_generator_enable` has been
+renamed to `platform.secrets_enabled`.
+
 ## Bugfixes
 
 ### Fixed backwards compatibility of PingAM images built from 2025.2.0

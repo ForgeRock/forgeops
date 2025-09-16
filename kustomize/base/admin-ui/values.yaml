@@ -1,5 +1,4 @@
 admin_ui:
-  enabled: true
   image:
     repository: "admin-ui"
     tag: ""

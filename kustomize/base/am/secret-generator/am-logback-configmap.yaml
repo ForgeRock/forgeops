@@ -1,0 +1,28 @@
+---
+# Source: identity-platform/templates/am-logback-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-logback
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+data:
+  
+  logback.xml: "<!--\n    ~ Copyright 2022-2024 Ping Identity Corporation. All Rights
+    Reserved\n    ~ \n    ~ This code is to be used exclusively in connection with Ping
+    Identity \n    ~ Corporation software or services. Ping Identity Corporation only
+    offers\n    ~ such software or services to legal entities who have entered into
+    a \n    ~ binding license agreement with Ping Identity Corporation.\n-->\n\n<configuration
+    scan=\"true\" scanPeriod=\"30 seconds\">\n\n    <appender name=\"JSON\" class=\"ch.qos.logback.core.ConsoleAppender\">\n
+    \       <encoder class=\"ch.qos.logback.core.encoder.LayoutWrappingEncoder\">\n
+    \           <layout class=\"org.forgerock.openam.logback.JsonLayout\">\n                <timestampFormat>yyyy-MM-dd'T'HH:mm:ss.SSSX</timestampFormat>\n
+    \               <timestampFormatTimezoneId>Etc/UTC</timestampFormatTimezoneId>\n
+    \               <jsonFormatter class=\"ch.qos.logback.contrib.jackson.JacksonJsonFormatter\"/>\n
+    \               <appendLineSeparator>true</appendLineSeparator>\n            </layout>\n
+    \       </encoder>\n    </appender>\n\n    <root level=\"WARN\">\n        <appender-ref
+    ref=\"JSON\" />\n    </root>\n</configuration>"

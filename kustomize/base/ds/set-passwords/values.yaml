@@ -1,8 +1,4 @@
-platform:
-  ingress:
-    enabled: false
 ds_set_passwords:
-  enabled: true
   image:
     repository: "ds"
     tag: ""

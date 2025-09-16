@@ -2,4 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - resources.yaml
+  - end-user-ui-service.yaml
+  - end-user-ui-deployment.yaml
+  - end-user-ui-ingress.yaml
