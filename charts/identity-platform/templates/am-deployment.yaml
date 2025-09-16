@@ -162,7 +162,7 @@ spec:
             value: changeit
           - name: AM_STORES_USER_TYPE
             value: LDAPv3ForForgeRockIAM
-          {{- if and .Values.platform.secret_generator_enable (or .Values.platform.base_generate (index .Values.platform.secrets "am_env_secrets")) }}
+          {{- if and .Values.platform.secrets_enabled (or .Values.platform.base_generate (index .Values.platform.secrets "am_env_secrets")) }}
           - name: SECRET_GENERATOR_AM_ENV_SECRETS
             value: "true"
           {{- end }}

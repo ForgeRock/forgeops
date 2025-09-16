@@ -106,11 +106,11 @@ platform:
       #   # AKS
       #   driver: disk.csi.azure.com
 
-  secret_generator_enable: false
+  secrets_enabled: false
   secrets: {}
   #  amster:
   #    annotations:
-  #      type: ssh-keypair
+  #      secret-generator.v1.mittwald.de/type: ssh-keypair
   #  am_env_secrets:
   #    annotations:
   #      length: 32
@@ -457,7 +457,7 @@ idm:
       secretUser: prometheus
       secretPassword: prometheus
 
-# keystore-create job requries platform.secret_generator_enable is true and
+# keystore-create job requries platform.secrets_enabled is true and
 # platform.secrets.keystore_create is uncommented.
 keystore_create:
   enabled: true
