@@ -1,7 +1,3 @@
-platform:
-  ingress:
-    enabled: false
 ds_cts:
-  enabled: true
   image:
-    repository: ds
+    repository: "ds"

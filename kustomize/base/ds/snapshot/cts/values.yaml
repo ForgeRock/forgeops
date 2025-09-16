@@ -1,10 +1,2 @@
 ds_snapshot:
-  configmapCreate: false
-  generate: true
-  rbacCreate: false
-ds_cts:
-  snapshot:
-    enabled: true
-ds_idrepo:
-  snapshot:
-    enabled: false
+  configmapCreate: true

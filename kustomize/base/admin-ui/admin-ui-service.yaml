@@ -1,0 +1,28 @@
+---
+# Source: identity-platform/templates/admin-ui-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-ui
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: admin-ui
+    app.kubernetes.io/component: admin-ui
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: admin-ui
+    app.kubernetes.io/component: admin-ui

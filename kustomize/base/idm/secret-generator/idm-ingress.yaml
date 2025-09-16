@@ -1,0 +1,72 @@
+---
+# Source: identity-platform/templates/idm-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: idm
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: cookie
+    nginx.ingress.kubernetes.io/body-size: 64m
+    nginx.ingress.kubernetes.io/enable-cors: "false"
+    nginx.ingress.kubernetes.io/proxy-body-size: 64m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 16k
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/send-timeout: "600"
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+    nginx.ingress.kubernetes.io/session-cookie-name: route
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - "identity-platform.domain.local"
+      secretName: "tls-identity-platform.domain.local"
+  rules:
+    - host: "identity-platform.domain.local"
+      http:
+        paths:
+          - path: /openidm
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /upload
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /export
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80
+          - path: /openicf
+            pathType: Prefix
+            backend:
+              service:
+                name: idm
+                port:
+                  number: 80

@@ -1,5 +1,4 @@
 login_ui:
-  enabled: true
   image:
     repository: "login-ui"
     tag: ""

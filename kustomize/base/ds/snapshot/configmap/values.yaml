@@ -1,12 +1,2 @@
-platform:
-  ds_certs:
-    enabled: false
 ds_snapshot:
   configmapCreate: true
-  configmapOnly: true
-ds_cts:
-  snapshot:
-    enabled: false
-ds_idrepo:
-  snapshot:
-    enabled: false

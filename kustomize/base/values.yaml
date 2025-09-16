@@ -1,34 +1,3 @@
 platform:
-  base:
-    enabled: false
   notes:
     enabled: false
-  disable_secret_agent_config: true
-  ds_certs:
-    enabled: false
-  secret_generator_enable: false
-  truststore:
-    secret:
-      enabled: false
-admin_ui:
-  enabled: false
-am:
-  enabled: false
-amster:
-  enabled: false
-ds:
-  enabled: false
-ds_cts:
-  enabled: false
-ds_idrepo:
-  enabled: false
-end_user_ui:
-  enabled: false
-idm:
-  enabled: false
-ig:
-  enabled: false
-ds_set_passwords:
-  enabled: false
-login_ui:
-  enabled: false

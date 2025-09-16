@@ -1,11 +1,10 @@
 platform:
-  base_generate: true
+  disable_secret_agent_config: true
   secrets_enabled: true
   truststore:
     secret:
       enabled: true
 am:
-  enabled: true
   image:
-    repository: am
+    repository: "am"
     tag: ""
