@@ -1,6 +1,6 @@
 platform:
   base_generate: true
-  secret_generator_enable: true
+  secrets_enabled: true
   truststore:
     secret:
       enabled: true

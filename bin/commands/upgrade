@@ -177,6 +177,25 @@ def update_apps_2025_2_0(overlay_path, default_overlay):
         log('Please note, the updated child overlays are configured for secret-agent.', overlay_path)
 
 
+def update_secrets_2025_2_1(helm_env_path):
+    """ Update Helm values.yaml (2025.2.1)"""
+    values_file = helm_env_path / 'values.yaml'
+    if values_file.is_file():
+        values = {}
+        with open(values_file, encoding='utf-8') as f:
+            values = yaml.safe_load(f)
+        if utils.key_exists(values, 'platform.secret_generator_enable'):
+            values['platform']['secrets_enabled'] = values['platform']['secret_generator_enable']
+            del values['platform']['secret_generator_enable']
+            if utils.key_exists(values['platform'], 'secrets.amster.annotations.type'):
+                type_val = values['platform']['secrets']['amster']['annotations']['type']
+                values['platform']['secrets']['amster']['annotations']['secret-generator.v1.mittwald.de/type'] = type_val
+                del values['platform']['secrets']['amster']['annotations']['type']
+            writeYamlFile(values, values_file)
+    else:
+        print(f"{values_file} doesn't exist, not updating. Check your environment and try again.")
+
+
 class UpgradeFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
     pass
 
@@ -236,6 +255,7 @@ Examples:
     def_overlay_path = config['overlay_root'] / 'default'
     config['overlay_path'] = config['overlay_root'] / args.env_name
     config['source_path'] = config['overlay_root'] / config['source_overlay']
+    config['helm_env_path'] = config['helm_path'] / args.env_name
 
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
     HEADER=f"""#
@@ -247,6 +267,9 @@ Examples:
     log('Checking 2025.2.0 updates', config['overlay_path'])
     update_secrets_2025_2_0(config['overlay_path'], config['source_path'])
     update_apps_2025_2_0(config['overlay_path'], def_overlay_path)
+
+    # 2025.2.1 updates
+    update_secrets_2025_2_1(config['helm_env_path'])
 
     FOOTER=f"""#
 # End `{PROG}` on {args.env_name} at {timestamp}
