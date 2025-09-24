@@ -10,6 +10,9 @@ import re
 import shutil
 from pathlib import Path
 import site
+import time
+import requests
+import jwt
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -25,8 +28,6 @@ log = None
 
 SCRIPT_DIR = Path(__file__)
 DEFAULT_REPO = 'https://github.com/ping-rocks/platform-images.git'
-if 'PLATFORM_IMAGES_REPOSITORY_URL' in os.environ.keys():
-    DEFAULT_REPO = os.environ['PLATFORM_IMAGES_REPOSITORY_URL']
 DEFAULT_CONFIG_PATH = SCRIPT_DIR.joinpath(
     '../../build/platform-images').resolve()
 
@@ -449,35 +450,56 @@ def update_dockerfiles(products, dockerpath, update_repo=None, update_tag=None):
 
 
 def build_github_repo_url(repo_url):
-    def is_jenkins():
-        """Return true if tests are running through Jenkins"""
-        return "JENKINS_HOME" in os.environ
-    clone_repo_url = repo_url
-    # For GitHub urls we either use https urls + oauth2 token when running in Jenkins and ssh urls running locally
-    github_hostname = "github.com"
-    is_github_repo = github_hostname in repo_url
-    # TODO GitHub migration: once migration to GitHub is done we can inline if block (i.e. consider as always true)
-    if is_github_repo:
+    """Return GitHub url only for https repo url with GitHub token following the environment"""
+    _repo_url = repo_url
+    if repo_url.startswith('https'):
+        github_hostname = "github.com"
         github_https_url_pattern = f"https://{github_hostname}/"
-        github_ssh_url_pattern = f"git@{github_hostname}:"
-        if is_jenkins():
-            # For external components for instance if user provided a ssh GitHub url and we are running in Jenkins
-            # we need to use https GitHub url
-            clone_repo_url = repo_url.replace(github_ssh_url_pattern, github_https_url_pattern)
-            # Pass OAuth2 token
-            token = (
-                os.environ.get("GITHUB_SANDBOX_TOKEN")
-                if "ping-sandbox" in clone_repo_url
-                else os.environ.get("GITHUB_TOKEN")
-            )
-            clone_repo_url = clone_repo_url.replace(
+        if 'GITHUB_TOKEN' in os.environ.keys():
+            # Jenkins environment
+            token = os.environ.get("GITHUB_TOKEN")
+            _repo_url = _repo_url.replace(
                 github_https_url_pattern, f"https://oauth2:{token}@{github_hostname}/"
             )
-        else:
-            clone_repo_url = repo_url.replace(github_https_url_pattern, github_ssh_url_pattern)
+        elif 'GITHUB_APP_ID' in os.environ.keys() and \
+                'GITHUB_PRIVATE_KEY' in os.environ.keys() and \
+                'GITHUB_APP_INSTALLATION_ID' in os.environ.keys():
+            # Cloud Build environment...
+            token = get_github_token()
+            _repo_url = _repo_url.replace(
+                github_https_url_pattern, f"https://x-access-token:{token}@{github_hostname}/"
+            )
+    return _repo_url
 
-    return clone_repo_url
 
+def get_github_token():
+    app_id = os.environ.get("GITHUB_APP_ID")
+    private_key = os.environ.get("GITHUB_PRIVATE_KEY")
+    installation_id = os.environ.get("GITHUB_APP_INSTALLATION_ID")
+    for env_key, env_name in {'APP_ID': app_id, 'PRIVATE_KEY': private_key, 'INSTALLATION_ID': installation_id}.items():
+        if env_name is None or len(env_name) == 0:
+            log.error(f'{env_key} env variable not set')
+            sys.exit(1)
+
+    # Generate the JWT
+    payload = {
+        "iat": int(time.time()),
+        "exp": int(time.time()) + 300,  # Token expires in 5 minutes
+        "iss": app_id
+    }
+    encoded_jwt = jwt.encode(payload, private_key, algorithm="RS256")
+
+    # Exchange the JWT for an installation access token
+    headers = {
+        "Authorization": f"Bearer {encoded_jwt}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    response = requests.post(
+        f"https://api.github.com/app/installations/{installation_id}/access_tokens",
+        headers=headers
+    )
+    response.raise_for_status()
+    return response.json()["token"]
 
 def init_repo(args):
     """configure platform-images repository"""
@@ -491,7 +513,14 @@ def init_repo(args):
 
     log.info(f'Setting repo up in {args.config_path}.')
 
-    git_repo = build_github_repo_url(args.git_repo)
+    git_repo = args.git_repo
+    if DEFAULT_REPO == git_repo:
+        # default git_repo, get GithHub token
+        git_repo = build_github_repo_url(args.git_repo)
+    elif 'PLATFORM_IMAGES_REPOSITORY_URL' in os.environ.keys():
+        # jenkins env
+        git_repo = build_github_repo_url(os.environ['PLATFORM_IMAGES_REPOSITORY_URL'])
+    # else do not build GitHub repo url if the repo url has been provided by the user through --git-repo option
 
     # use a shallow clone
     if not args.ref:
