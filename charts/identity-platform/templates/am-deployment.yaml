@@ -179,6 +179,12 @@ spec:
               name: platform-config
           - secretRef:
               name: ds-env-secrets
+          {{- with .Values.platform.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.am.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080

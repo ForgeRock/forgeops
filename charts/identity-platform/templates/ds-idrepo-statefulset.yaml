@@ -150,6 +150,12 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
+          {{- with .Values.platform.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.ds_idrepo.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           - name: DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS
             value: "true"
           - name: DS_UID_MONITOR_PASSWORD_FILE
@@ -160,6 +166,12 @@ spec:
           - secretRef:
               name: cloud-storage-credentials
               optional: true
+          {{- with .Values.platform.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.ds_idrepo.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080

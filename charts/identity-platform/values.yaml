@@ -33,6 +33,9 @@ platform:
   env: []
     #- name: "MY_ENV"
     #  value: "value"
+  envFrom: []
+    #- secretRef:
+    #    name: my_secret
   grafana:
     enabled: false
   ds_certs:
@@ -209,6 +212,9 @@ am:
   env: []
     #- name: "AM_ENV_1"
     #  value: "am_value"
+  envFrom: []
+    #- secretRef:
+    #    name: "my_am_secret"
 
   resources:
     limits:
@@ -392,6 +398,9 @@ idm:
   env: []
     #- name: "IDM_ENV_1"
     #  value: "idm_value"
+  envFrom: []
+    #- secretRef:
+    #    name: "my_idm_secret"
 
   resources:
     limits:
@@ -791,6 +800,13 @@ ig:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/rewrite-target: "/$2"
 
+  env: []
+    #- name: "IG_ENV_1"
+    #  value: "ig_value"
+  envFrom: []
+    #- secretRef:
+    #    name: "my_ig_secret"
+
   resources:
     limits:
       memory: 512Mi
@@ -891,6 +907,13 @@ ds_idrepo:
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
+
+  env: []
+    #- name: "IDREPO_ENV_1"
+    #  value: "idrepo_value"
+  envFrom: []
+    #- secretRef:
+    #    name: "my_idrepo_secret"
 
   resources:
     limits:
@@ -996,6 +1019,13 @@ ds_cts:
     tag: latest
     pullPolicy: IfNotPresent
     imagePullSecrets: []
+
+  env: []
+    #- name: "CTS_ENV_1"
+    #  value: "cts_value"
+  envFrom: []
+    #- secretRef:
+    #    name: "my_cts_secret"
 
   resources:
     limits:

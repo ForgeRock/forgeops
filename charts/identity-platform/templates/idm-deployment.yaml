@@ -177,6 +177,12 @@ spec:
           envFrom:
           - configMapRef:
               name: idm
+          {{- with .Values.platform.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          {{- with .Values.idm.envFrom }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
           ports:
             - name: http
               containerPort: 8080
