@@ -15,17 +15,6 @@ import com.forgerock.pipeline.stage.Status
 import com.forgerock.pipeline.stage.Outcome
 import com.forgerock.pipeline.stage.FailureOutcome
 
-// TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
-githubRepository = scmUtils.isGitHubRepository() \
-        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(),
-        githubUtils.githubAppCredentialsFromUrl(scmUtils.getRepoUrl()))
-        .repository(scmUtils.getRepoName())
-        : null
-githubCommit = scmUtils.isGitHubRepository()
-        ? githubRepository.commit(GIT_COMMIT)
-        : null
-
-
 /**
  * Globally scoped git commit information
  */
@@ -35,6 +24,16 @@ GIT_COMMITTER = sh(returnStdout: true, script: 'git show -s --pretty=%cn').trim(
 GIT_MESSAGE = sh(returnStdout: true, script: 'git show -s --pretty=%s').trim()
 GIT_COMMITTER_DATE = sh(returnStdout: true, script: 'git show -s --pretty=%cd --date=iso8601').trim()
 GIT_BRANCH = env.JOB_NAME.replaceFirst(".*/([^/?]+).*", "\$1").replaceAll("%2F", "/")
+
+// TODO GitHub migration: remove ternary operator when platform-images GitHub migration is complete
+githubRepository = scmUtils.isGitHubRepository() \
+        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(),
+        githubUtils.githubAppCredentialsFromUrl(scmUtils.getRepoUrl()))
+        .repository(scmUtils.getRepoName())
+        : null
+githubCommit = scmUtils.isGitHubRepository()
+        ? githubRepository.commit(GIT_COMMIT)
+        : null
 
 def normalizeStageName(String stageName) {
     return stageName.toLowerCase().replaceAll('\\s', '-')
@@ -55,6 +54,7 @@ String calculatePlatformImagesBranch() {
         return 'master'
     }
 }
+
 
 /** Does the branch support PIT tests */
 boolean branchSupportsPitTests() {
@@ -84,41 +84,21 @@ boolean branchSupportsIDCloudReleases() {
 }
 
 /** Revision of platform-images repo used for k8s and platform integration/perf tests. */
-// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
-platformImagesRevision = scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
-                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-        githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
-        .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
-        .branch(DEFAULT_PLATFORM_IMAGES_TAG)
-        .lastCommitHash()
-        .value()
-        : bitbucketUtils.getLatestCommitHash(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-        scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-        DEFAULT_PLATFORM_IMAGES_TAG)
-        .trim()
+platformImagesRevision = platformImageUtils.getRevision(DEFAULT_PLATFORM_IMAGES_TAG)
+echo "Platform Images revision: ${platformImagesRevision}"
 
 /** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
-// TODO GitHub migration remove ternary to only use githubUtils when GitHub migration is complete
-lodestarRevision = readJSON(text: (scmUtils.isGitHubRepository(env.PLATFORM_IMAGES_REPOSITORY_URL)\
-                                        ? githubUtils.organization(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-        githubUtils.githubAppCredentialsFromUrl(env.PLATFORM_IMAGES_REPOSITORY_URL))
-        .repository(scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL))
-        .readFileContent('lodestar.json', platformImagesRevision)
-        .trim()
-        : bitbucketUtils.readFileContent(scmUtils.getRepositoryOwnerName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-        scmUtils.getRepoName(env.PLATFORM_IMAGES_REPOSITORY_URL),
-        platformImagesRevision,
-        'lodestar.json')
-        .trim())
-)['gitCommit']
+lodestarRevision = platformImageUtils.getProductCommit(platformImagesRevision, 'lodestar')
+echo "Lodestar revision: ${lodestarRevision}"
 
-def authenticateGke() {
+
+def authenticateGcloud() {
     withCredentials([file(credentialsId: 'jenkins-guillotine-sa-key', variable: 'GC_KEY')]) {
         sh("gcloud auth activate-service-account --key-file=${env.GC_KEY} --project=engineering-devops")
     }
 }
 
-def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName, options) {
+def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, options) {
     stage(stageName) {
         def normalizedStageName = normalizeStageName(stageName)
         withPipelineRun(pipelineRun, stageName, normalizedStageName) {
@@ -126,22 +106,20 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
             dockerUtils.insideGoogleCloudImage(dockerfilePath: 'docker/google-cloud', getDockerfile: true) {
                 dir('guillotine') {
 
-                    // TODO to check sand-bax uncomment and set the url
+                    authenticateGcloud()
+
+                    // TODO to check sand-box uncomment and set the url
                     // env.GUILLOTINE_REPOSITORY_URL = 'https_sandbox_url'
                     scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
 
                     def branchName = isPR() ? env.CHANGE_TARGET : env.BRANCH_NAME
-
-                    authenticateGke()
                     // Configure environment to make Guillotine works on GKE
                     withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
                         sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
                     }
-
                     // Configure Guillotine to run tests
                     options = "--set forgeops.git-url=${env.FORGEOPS_REPOSITORY_URL} ${options}"
-                    sh("./configure.py runtime --platform-version PLATFORM_IMAGE_REF --forgeops-branch-name ${branchName} --forgeops-profile cdk ${options}")
-
+                    sh("./configure.py runtime --platform-version PLATFORM_IMAGE_REF --forgeops-branch-name ${branchName} ${options}")
                     try {
                         // Run the tests
                         sh("./run.py")
@@ -149,7 +127,6 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                     } catch (Exception exc) {
                         currentBuild.result = 'FAILURE'
                         println('Exception in main(): ' + exc.getMessage())
-                        throw exc
                     } finally {
                         if (fileExists('reports/latest')) {
                             dir('tmp_dir') {
@@ -164,7 +141,6 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, stageName, providerName,
                                              reportTitles: ''])
                             }
                         }
-                        sh("./shared/scripts/jenkins_clean_namespaces.py")
                     }
                 }
             }

@@ -41,9 +41,6 @@ def initialSteps() {
 
     prBuild = new PullRequestBuild(steps, env, currentBuild, scm)
     bitbucketCommentId = postStatusCommentOnPr()
-
-    // in order to compare the PR with the target branch, we first need to fetch the target branch
-    scmUtils.fetchRemoteBranch(env.CHANGE_TARGET, scmUtils.getRepoUrl())
 }
 
 def buildDockerImages(PipelineRunLegacyAdapter pipelineRun) {
@@ -130,6 +127,7 @@ def sendBuildAbortedNotification() {
 def sendBuildFailureNotification(String messageSuffix) {
     currentBuild.result = 'FAILURE'
     postStatusCommentOnPr(messageSuffix)
+
 }
 
 def finalNotification() {
@@ -143,11 +141,6 @@ def finalNotification() {
         } else {
             message = "PR tests failed."
         }
-        bitbucketUtils.postMultibranchBuildStatusCommentOnPullRequest(
-                commitHash: commonModule.GIT_COMMIT,
-                originalCommentId: bitbucketCommentId,
-                messageSuffix: message
-        )
         postStatusCommentOnPr(message)
     }
 }
@@ -189,6 +182,5 @@ String commentOnMultibranchPullRequest(String comment) {
         bitbucketUtils.commentOnMultibranchPullRequest(comment)
     }
 }
-
 
 return this
