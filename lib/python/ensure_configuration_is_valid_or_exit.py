@@ -53,11 +53,17 @@ def check_python_venv_lib_deps():
     requirements = tmp_req_list
     pip_freeze_cmd = 'pip3 freeze' if not in_virtualenv() else 'python3 -m pip freeze'
     rc, out, err = run(pip_freeze_cmd, cstdout=True, cstderr=True)
-    out = out.decode("utf-8").split('\n')
-
+    installed_reqs = out.decode("utf-8").split('\n')
     # Compare installed libs with expected.
     for req in requirements:
-        if req not in out:
+        req_name = req.split('==')[0].split('[')[0]
+        is_req_installed = False
+        for installed_req in installed_reqs:
+            installed_req_name = installed_req.split('==')[0]
+            if not req_name.startswith('#') and installed_req_name == req_name:
+                is_req_installed = True
+                break
+        if not is_req_installed:
             warning(f'To run script through IDE, please run : pip3 install {req}')
             return False
 
