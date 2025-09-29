@@ -19,10 +19,10 @@ spec:
           securityContext: {}
           containers:
             - name: ds-idrepo-snapshot
-              image: bitnami/kubectl:1.31
+              image: alpine/kubectl:1.34.1
               imagePullPolicy: IfNotPresent
               command:
-                - /bin/bash
+                - /bin/sh
                 - -c
                 - /scripts/snapshot.sh ds-idrepo-snapshot data-ds-idrepo-0 ds-snapshot-class
               env:

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # This script is called by the cron job to manage snapshots, pvcs and the backup job.
 # It snapshots the desired disk (default date-ds-idrepo-0) and then creates a cloned PVC from the snapshot.
 # The cloned pvc is then used by the customer supplied job to backup the directory server. On job
@@ -8,9 +8,9 @@
 # set -x
 
 
-DS_SNAPSHOT_NAME="${1:-ds-snapshot}"
-DS_VOLUME="${2:-data-ds-idrepo-0}"
-DS_SNAPSHOT_CLASS="${3:-ds-snapshot-class}"
+[ -z "$DS_SNAPSHOT_NAME" ] && DS_SNAPSHOT_NAME="ds-snapshot"
+[ -z "$DS_VOLUME" ] && DS_VOLUME="data-ds-idrepo-0"
+[ -z "$DS_SNAPSHOT_CLASS" ] && DS_SNAPSHOT_CLASS="ds-snapshot-class"
 
 # To use the pod name for the snap - instead of a fixed name
 SNAP_NAME=$DS_SNAPSHOT_NAME-$(date +%Y%m%d-%H%M --utc)

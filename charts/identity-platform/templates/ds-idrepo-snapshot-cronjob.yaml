@@ -29,7 +29,7 @@ spec:
             image: {{ .Values.ds_snapshot.image.repository }}:{{ .Values.ds_snapshot.image.tag }}
             imagePullPolicy: {{ .Values.ds_snapshot.image.pullPolicy }}
             command:
-            - /bin/bash
+            - /bin/sh
             - -c
             - /scripts/snapshot.sh {{ .Values.ds_idrepo.snapshot.name }} {{ .Values.ds_idrepo.snapshot.pvcName }} {{ .Values.ds_snapshot.class }}
             env:
