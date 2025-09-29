@@ -3,6 +3,11 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: {{ .Values.ds_cts.snapshot.name }}
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+    {{- with .Values.ds_snapshot.podLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   schedule: {{ .Values.ds_cts.snapshot.schedule | quote }}
   concurrencyPolicy: Forbid
@@ -13,6 +18,10 @@ spec:
           name: {{ .Values.ds_cts.snapshot.name }}
           labels:
             app: {{ .Values.ds_cts.snapshot.name }}-job
+            {{- include "identity-platform.labels" . | nindent 12 }}
+            {{with .Values.ds_snapshot.podLabels }}
+              {{- toYaml . | nindent 8 }}
+            {{- end }}
         spec:
           {{- if .Values.ds_snapshot.image.imagePullSecrets }}
           imagePullSecrets:
@@ -29,7 +38,7 @@ spec:
             image: {{ .Values.ds_snapshot.image.repository }}:{{ .Values.ds_snapshot.image.tag }}
             imagePullPolicy: {{ .Values.ds_snapshot.image.pullPolicy }}
             command:
-            - /bin/bash
+            - /bin/sh
             - -c
             - /scripts/snapshot.sh {{ .Values.ds_cts.snapshot.name }} {{ .Values.ds_cts.snapshot.pvcName }} {{ .Values.ds_snapshot.class }}
             env:
