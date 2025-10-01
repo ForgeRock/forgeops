@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+""" Migrate from secret-agent to secret-generator """
 
 import argparse
 import datetime

@@ -36,3 +36,8 @@ and ds-snapshot jobs.
 
 ## Documentation updates
 
+### How To on custom secrets
+
+Added `how-tos/custom-secrets.md` that describes how to create custom secrets
+with secret-generator. It also describes how to use the same `platform.secrets`
+dictionary to use an alternate Kubernetes secrets provider.
