@@ -25,7 +25,7 @@ There are two different ways you can setup your git repo(s). The new and
 recommended method is to setup a custom ForgeOps root. The old method is to
 create a fork of the official ForgeOps repo.
 
-#### Setup a custom ForgeOps root (Recommended)
+#### Setup a custom ForgeOps data repo (Recommended)
 
 This step is not mandatory, but it is recommended for production setups. There
 are a few advantages to setting up your own root dir.
@@ -34,36 +34,36 @@ are a few advantages to setting up your own root dir.
 * Able to checkout forgeops version tags into branches to easily switch between versions of forgeops
 * Much easier to see what is data vs code
 
-In this example, we will create a new folder in `~/git`, and set it up as a
-ForgeOps root. We'll also use 2025.1.1 as the version of ForgeOps we want to
-use.
+In this example, we will create a new folder in `~/git`, and set it up to be a
+ForgeOps data dir. We'll also use 2025.2.1 as the version of ForgeOps we want
+to use.
 
 ```
 cd ~/git
-mkdir forgeops_root
+mkdir forgeops_data
 git clone -b main https://github.com/ForgeRock/forgeops.git
 cd forgeops
-git switch -c 2025.1.1
+git switch -c 2025.2.1
 cd ..
-cp -r forgeops/{kustomize,helm,docker} forgeops_root
-cp forgeops/forgeops.conf.example forgeops_root/forgeops.conf
-cat 'FORGEOPS_ROOT=${HOME}/git/forgeops_root' > ~/.forgeops.conf
-cd forgeops_root
+cp -r forgeops/{kustomize,helm,docker} forgeops_data
+cp forgeops/forgeops.conf.example forgeops_data/forgeops.conf
+cat 'FORGEOPS_ROOT=${HOME}/git/forgeops_data' > ~/.forgeops.conf
+cd forgeops_data
 git init
-git remote add origin https://github.com/MyOrg/forgeops_root
+git remote add origin https://github.com/MyOrg/forgeops_data
 git add .
 git commit -a -m 'Initial commit with defaults from forgeops'
 git push
 ```
 
-Now your ForgeOps is configured to use `~/git/forgeops_root` as the source of
+Now your ForgeOps is configured to use `~/git/forgeops_data` as the source of
 your ForgeOps artifacts. This can now be used by your team. All they need to do
 is clone both repos, select a ForgeOps version, and create a `~/.forgeops.conf`
-that defines `FORGEOPS_ROOT`.
+that defines `FORGEOPS_DATA`.
 
 ##### Setup forgeops.conf
 
-The `forgeops.conf` file in `forgeops_root` can be populated with team-wide
+The `forgeops.conf` file in `forgeops_data` can be populated with team-wide
 values so no one has to remember to configure or use them. The file is fully
 commented out to start with, and contains the defaults for the different
 settings in the scripts. You can set the different values as needed. These
