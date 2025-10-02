@@ -41,7 +41,7 @@ spec:
           emptyDir: {}
         - name: idm-secrets
           secret:
-            secretName: idm
+            secretName: keystore
         - name: truststore
           projected:
             sources:
@@ -127,8 +127,8 @@ spec:
             - name: OPENIDM_KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: idm-env-secrets
-                  key: OPENIDM_KEYSTORE_PASSWORD
+                  name: keystore-create
+                  key: KEYSTORE_PASSWORD
             - name: OPENIDM_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
