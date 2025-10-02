@@ -32,6 +32,16 @@ The Bitnami images have been pulled from Docker Hub, and are no longer
 available. We have switched to the Alpine kubectl image for the keystore-create
 and ds-snapshot jobs.
 
+### Fixed no downtime password rotations for legacy installs
+
+
+In 2025.2.0, we added the ability to do no downtime password rotations for DS
+passwords. This requires `allow-mutliple-password-values` to be set to true in
+the Default and Root password policies. This was added to
+`docker/ds/ds-setup.sh`, but that is only effective for fresh deployment. For
+existing deployments it has no effect.  We have added the dsconfig commands
+necessary to enable no downtime password rotations to the startup for DS pods.
+
 ## Removed Features
 
 ## Documentation updates
