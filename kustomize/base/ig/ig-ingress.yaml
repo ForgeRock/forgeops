@@ -1,0 +1,44 @@
+---
+# Source: identity-platform/templates/ig-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ig
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+    app: ig
+    app.kubernetes.io/component: ig
+  annotations:
+    haproxy-ingress.github.io/rewrite-target: /$2
+    haproxy-ingress.github.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - identity-platform.domain.local
+      secretName: tls-identity-platform.domain.local
+  rules:
+    - host: identity-platform.domain.local
+      http:
+        paths:
+          - path: /igadmin(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ig
+                port:
+                  number: 8085
+          - path: /ig(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ig
+                port:
+                  number: 80

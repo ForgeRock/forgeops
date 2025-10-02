@@ -1,0 +1,32 @@
+---
+# Source: identity-platform/templates/ig-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ig
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+    app: ig
+    app.kubernetes.io/component: ig
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: 8085
+      targetPort: http-admin
+      protocol: TCP
+      name: http-admin
+  selector:
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app: ig
+    app.kubernetes.io/component: ig
