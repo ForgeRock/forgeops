@@ -22,6 +22,11 @@ data:
     #
     # set -x
 
+    if [ $# > 0 ]; then
+      DS_SNAPSHOT_NAME=$1
+      DS_VOLUME=$2
+      DS_SNAPSHOT_CLASS=$3
+    fi
 
     [ -z "$DS_SNAPSHOT_NAME" ] && DS_SNAPSHOT_NAME="ds-snapshot"
     [ -z "$DS_VOLUME" ] && DS_VOLUME="data-ds-idrepo-0"
