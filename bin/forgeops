@@ -142,7 +142,7 @@ if [ -n "$FORGEOPS_ROOT" ] ; then
 fi
 
 if [ -n "$FORGEOPS_DATA" ] ; then
-  source_cfg "$FORGEOPS_DATA/forgeops.cfg"
+  source_cfg "$FORGEOPS_DATA/forgeops.conf"
   source_cfg $FORGEOPS_CFG_USER # Make sure the user's settings are paramount
 fi
 
