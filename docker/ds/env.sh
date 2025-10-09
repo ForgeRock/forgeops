@@ -9,7 +9,7 @@
 # where the Linux kernel runs low on entropy. This settting does not negatively impact random number security
 # and is recommended as the default.
 
-DEFAULT_OPENDJ_JAVA_ARGS="
+DEFAULT_DS_JAVA_ARGS="
 -XX:+UseG1GC
 -XX:+ExitOnOutOfMemoryError
 -Djava.security.egd=file:/dev/urandom
@@ -20,12 +20,9 @@ DEFAULT_OPENDJ_JAVA_ARGS="
 ${DS_JAVA_ADDITIONAL_ARGS:-}
 "
 
-export OPENDJ_JAVA_ARGS=${OPENDJ_JAVA_ARGS:-${DEFAULT_OPENDJ_JAVA_ARGS}}
-
-# Set to true to enable the usage of Java virtual threads
-export DS_USE_VIRTUAL_THREADS=${DS_USE_VIRTUAL_THREADS:-false}
-OPENDJ_JAVA_ARGS="${OPENDJ_JAVA_ARGS} -Dorg.forgerock.opendj.useVirtualThreads=${DS_USE_VIRTUAL_THREADS}"
-
+# OPENDJ_JAVA_ARGS is deprecated in 8.x and replaced by DS_JAVA_ARGS.  
+# Keeping OPENDJ_JAVA_ARGS for now to support 7.4 and 7.5 builds in forgeops
+export OPENDJ_JAVA_ARGS=${OPENDJ_JAVA_ARGS:-${DEFAULT_DS_JAVA_ARGS}}
 
 # Assume the directory admin and monitor passwords are available at the paths below. 
 export DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS=${DS_SET_UID_ADMIN_AND_MONITOR_PASSWORDS:-"true"}
