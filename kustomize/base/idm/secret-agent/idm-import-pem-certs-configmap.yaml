@@ -32,7 +32,7 @@ data:
   
     IDM_DEFAULT_TRUSTSTORE=${IDM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
     # If a $IDM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
-    if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && ( [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$IDM_PEM_TRUSTSTORE_DS" ] || [ -f "$IDM_PEM_TRUSTSTORE_EXTRA" ); then
+    if [ -f "$IDM_DEFAULT_TRUSTSTORE" ] && { [ -f "$IDM_PEM_TRUSTSTORE" ] || [ -f "$IDM_PEM_TRUSTSTORE_DS" ] || [ -f "$IDM_PEM_TRUSTSTORE_EXTRA" ] ; }; then
         TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/opt/openidm/idmtruststore}"
         TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
         echo "Copying ${IDM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"

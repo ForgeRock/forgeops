@@ -16,7 +16,7 @@ set -o pipefail
 
 AM_DEFAULT_TRUSTSTORE=${AM_DEFAULT_TRUSTSTORE:-$JAVA_HOME/lib/security/cacerts}
 # If a $AM_PEM_TRUSTSTORE is provided, import it into the truststore. Otherwise, do nothing
-if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && ( [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM_PEM_TRUSTSTORE_DS" ] || [ -f "$AM_PEM_TRUSTSTORE_EXTRA" ); then
+if [ -f "$AM_DEFAULT_TRUSTSTORE" ] && { [ -f "$AM_PEM_TRUSTSTORE" ] || [ -f "$AM_PEM_TRUSTSTORE_DS" ] || [ -f "$AM_PEM_TRUSTSTORE_EXTRA" ] ; }; then
     TRUSTSTORE_PATH="${TRUSTSTORE_PATH:-/home/forgerock/amtruststore}"
     TRUSTSTORE_PASSWORD="${TRUSTSTORE_PASSWORD:-changeit}"
     echo "Copying ${AM_DEFAULT_TRUSTSTORE} to ${TRUSTSTORE_PATH}"
