@@ -263,17 +263,12 @@ examples:
             if args.release:
                 tag = 'dev' if args.release == 'dev' else release_tags[component]
             if component == 'ds':
-                data = set_image(image_names[component], tag, repo, args.skip_image_append)
-                values_images['ds_cts'] = data
-                values_images['ds_idrepo'] = data
-                images_kustomize[component] = data
+                values_images['ds_cts'] = set_image(image_names[component], tag, repo)
+                values_images['ds_idrepo'] = set_image(image_names[component], tag, repo)
+                images_kustomize[component] = set_image(image_names[component], tag, repo)
             else:
-                c = component
-                if args.custom:
-                    c = f"{component}-custom"
-                data = set_image(image_names[c], tag, repo, args.skip_image_append)
-                values_images[c.replace('-', '_')] = data
-                images_kustomize[c] = data
+                values_images[component.replace('-', '_')] = set_image(image_names[component], tag, repo)
+                images_kustomize[component] = set_image(image_names[component], tag, repo)
 
     if overrides['do_kustomize']:
         utils.check_path(kustomize_path, 'Kustomize path', 'dir')
