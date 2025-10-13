@@ -12,7 +12,7 @@ chgPass () {
     local FULL_USER_DN="${USER_UID},${USER_DN}"
     echo "Checking ${HOST} for ${USER_UID},${USER_DN}"
     CXN="-h ${HOST} -p 1636 --useSsl --trustAll"
-    ldapsearch ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -b ${USER_DN} "${USER_UID}"  > /dev/null
+    ldapsearch ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -b ${USER_DN} "${USER_UID}"
     SEARCH_RESPONSE=$?
     echo ""
     echo "- Changing password of ${FULL_USER_DN}"
