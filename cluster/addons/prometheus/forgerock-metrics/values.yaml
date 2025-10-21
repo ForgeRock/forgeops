@@ -26,7 +26,7 @@ ds_idrepo:
   component: ds-idrepo
   enabled: true
   path: /metrics/prometheus/0.0.4
-  port: http
+  port: https
   labelSelectorComponent: ds-idrepo
   secretUser: monitor
   secretPassword: password
@@ -35,7 +35,7 @@ ds_cts:
   component: ds-cts
   enabled: true
   path: /metrics/prometheus/0.0.4
-  port: http
+  port: https
   labelSelectorComponent: ds-cts
   secretUser: monitor
   secretPassword: password
