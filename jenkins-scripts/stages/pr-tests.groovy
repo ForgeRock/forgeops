@@ -12,9 +12,35 @@
 import com.forgerock.pipeline.reporting.PipelineRunLegacyAdapter
 
 void runStage(PipelineRunLegacyAdapter pipelineRun, Random random) {
-//    return commonLodestarModule.runSpyglaas(pipelineRun, random, 'Deploymnent Only',
-//            [TESTS_SCOPE    : 'tests/deployment_only'])
-    commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords "PULL_REQUEST PLATFORM_IMAGE_REF"', '')
+    def parallelTestsMap = [:]
+
+    parallelTestsMap.put('PIT1',
+        {
+            commonLodestarModule.runSpyglaas(pipelineRun, random, 'Pit1',
+                [
+                    TESTS_SCOPE: 'tests/pit1',
+                ]
+            )
+        }
+    )
+    parallelTestsMap.put('Perf postcommit',
+        {
+            commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Postcommit',
+                [
+                    TEST_NAME      : 'postcommit',
+                    CONFIGFILE_NAME: 'conf-closed.yaml',
+                    PROFILE_NAME   : 'small',
+                ]
+            )
+        }
+    )
+    parallelTestsMap.put('Guillotine',
+        {
+            commonModule.runGuillotine(null, 'functional', 'GKE', '--keywords "PULL_REQUEST PLATFORM_IMAGE_REF"', '')
+        }
+    )
+
+    parallel parallelTestsMap
 }
 
 return this

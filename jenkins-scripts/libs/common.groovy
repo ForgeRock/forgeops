@@ -90,7 +90,11 @@ platformImagesRevision = platformImageUtils.getRevision(DEFAULT_PLATFORM_IMAGES_
 echo "Platform Images revision: ${platformImagesRevision}"
 
 /** Revision of Lodestar framework used for K8s and platform integration/perf tests. */
-lodestarRevision = platformImageUtils.getProductCommit(platformImagesRevision, 'lodestar')
+// TODO Temporary workaround:
+//  Use fix Lodestar commit containing changes for ForgeOps dev as this Lodestar commit has not been
+//  promoted to platform-images to avoid side-effects on other pipelines
+// lodestarRevision = platformImageUtils.getProductCommit(platformImagesRevision, 'lodestar')
+lodestarRevision = '6c8c7e820da0cb2913bf65753b0389539a84a06c'
 echo "Lodestar revision: ${lodestarRevision}"
 
 def authenticateGke() {
