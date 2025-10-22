@@ -28,7 +28,18 @@ before. Now it is no longer necessary to build the config into images.
 
 ## New Features/Updated functionality
 
-The 8.0.2 `am-config-upgrader` image changed permission on some files which 
-caused `forgeops upgrade-am-config` to break. The `forgeops upgrade-am-config` 
-command now connects to the container as `root`. This is an ephemeral 
-container running outside the cluster and reduces the security impact.
+### New product versions available
+IDM and DS 8.0.1 secure images available
+AM 7.5.2 secure images available
+
+## Bugfixes
+
+### Fixed bug in base-generate.sh
+
+There was a step missing in the logic for `base-generate.sh` that prevented the
+updated files from being placed properly. It now copies the results of `helm
+template` into the proper location.
+
+## Removed Features
+
+## Documentation updates
