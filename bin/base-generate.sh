@@ -141,8 +141,11 @@ processDir() {
       rmChart "$d"
       echo "Generating $d templates"
       runOrPrint "$HELM_CMD template $CHART_NAME $HELM_OPTS $output_opt $base_values_opt -f $d/$VALUES_FILE $override_opt > /dev/null 2>&1"
+      runOrPrint "cp $d/$CHART_NAME/templates/*.yaml $d"
       pruneDir "$d"
-      rmChart "$d"
+      if [ "$DEBUG" = false ] ; then
+        rmChart "$d"
+      fi
       processDir "${d%*/}"
     else
       message "Didn't find $VALUES_FILE in ${d%*/}" "debug"
