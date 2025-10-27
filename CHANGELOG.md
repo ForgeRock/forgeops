@@ -20,3 +20,5 @@ template` into the proper location.
 
 ## Documentation updates
 
+### Adding user supplied certs to the truststore how-to
+New how-to on adding user supplied certificates to the truststore.
