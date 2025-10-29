@@ -27,6 +27,7 @@ before. Now it is no longer necessary to build the config into images.
 * See `forgeops config build --help` for more info
 
 ## New Features/Updated functionality
+- debug-logs script : provide --output-file option
 
 ### New product versions available
 IDM and DS 8.0.1 secure images available
