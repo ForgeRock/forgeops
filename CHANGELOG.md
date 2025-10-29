@@ -2,6 +2,7 @@ RELEASE=2025.2.2
 # Release Notes
 
 ## New Features/Updated functionality
+- debug-logs script : provide --output-file option
 
 ### New product versions available
 IDM and DS 8.0.1 secure images available

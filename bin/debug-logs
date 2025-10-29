@@ -580,6 +580,7 @@ def write_toc(output, pods, stss, pvcs, jobs, objs, operators, env_log):
 
 
 def main():
+    default_output_file = '/tmp/forgeops/log.html'
     # Parse input arguments
     parser = argparse.ArgumentParser(description='Aggregate pod logs and descriptions')
     parser.add_argument('-m', '--max-log-lines', dest='max_log_lines',
@@ -588,6 +589,9 @@ def main():
                         help='Target namespace (default: current namespace)')
     parser.add_argument('-e', '--env-name', dest='env_name',
                         help='Helm or Kustomize environment name created using `forgeops env`')
+    parser.add_argument('-o', '--output-file', dest='output_file', default=default_output_file,
+                        help=f'html output log file where information will be printed, default is '
+                             f'{default_output_file}')
     deploy = parser.add_mutually_exclusive_group(required=True)
     deploy.add_argument('-k', '--kustomize', dest='helm_or_kust', action='store_const', const='kustomize',  
                        help='Deployed with Kustomize')
@@ -604,7 +608,11 @@ def main():
     else:
         env_name = input('Please provide the env name you created when using `forgeops env`(e.g. kustomize/overlay/<env-name> or helm/<env-name>) '
                                 'or press enter to continue: ')
-    
+
+    # Get output_file name argument
+    if getattr(args, 'output_file', None):
+        output_file = args.output_file
+
     if helm_or_kust == 'helm':
         env_path = f'helm/'
     else: 
@@ -646,8 +654,7 @@ def main():
         container_engine = 'Docker'
 
     # Open the output file. Overwrite any previous content in it.
-    Path('/tmp/forgeops').mkdir(parents=True, exist_ok=True)
-    output_file = '/tmp/forgeops/log.html'
+    Path(os.path.dirname(output_file)).mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w') as output:
 
         # Write the header and TOC
