@@ -1,13 +1,14 @@
-#!/usr/bin/env python3
 """Upgrade a ForgeOps environment to the latest updates"""
 
 import argparse
 import datetime
-import site
 import os
 from pathlib import Path
 import shutil
+import site
 import sys
+import yaml
+
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
 root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
@@ -16,55 +17,9 @@ dependencies_dir = os.path.join(root_path, 'lib', 'dependencies')
 sys.path.insert(0, str(root_path))
 sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE, ''))
 
-from lib.python.ensure_configuration_is_valid_or_exit import ensure_configuration_is_valid_or_exit, \
-    print_how_to_install_dependencies
 from lib.python.defaults import SNAPSHOT_ROLE_NAME
-
-# First ensure configure has been executed
-try:
-    ensure_configuration_is_valid_or_exit()
-except Exception as e:
-    try:
-        print(f'[error] {e.__str__()}')
-    except:
-        raise e
-    sys.exit(1)
-
-try:
-    import yaml
-    from mergedeep import merge
-except:
-    print_how_to_install_dependencies()
+from lib.python.common import write_yaml_file, log
 import lib.python.utils as utils
-
-
-# Avoid using anchors/aliases in outputted YAML
-# Notice we call this with yaml.dump, but we are still using safe_dump
-# From https://ttl255.com/yaml-anchors-and-aliases-and-how-to-disable-them/
-class NoAliasDumper(yaml.SafeDumper):
-    """ A Dumper that doesn't use YAML aliases """
-    def ignore_aliases(self, data):
-        return True
-
-def writeYamlFile(data, file):
-    """Write an object to a yaml file"""
-    with open(file, 'w+', encoding='utf-8') as f:
-        yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
-
-
-def log(msg, path, verbose=True, log_file='upgrade.log', end="\n"):
-    """ Log a message to the upgrade log """
-    log_path = path / log_file
-    if not log_path.is_file():
-        msg = f"""{msg}
-
-WARNING!! {log_path} doesn't exist, creating.
-Do a `git add {log_path}` to track.
-"""
-    if verbose:
-        print(msg, end=end)
-    with open(log_path, 'a', encoding='utf-8') as log_f:
-        log_f.write(f"{msg}{end}")
 
 
 def update_secrets_2025_2_0(overlay_path, source_path):
@@ -121,7 +76,7 @@ def update_secrets_2025_2_0(overlay_path, source_path):
             log("Adding ds-set-passwords into overlay resources.", overlay_path)
             kust['resources'].append(dsp_str)
 
-        writeYamlFile(kust, kust_path)
+        write_yaml_file(kust, kust_path)
 
 
 def update_apps_2025_2_0(overlay_path, default_overlay):
@@ -163,7 +118,7 @@ def update_apps_2025_2_0(overlay_path, default_overlay):
                 if p['old_resource'] in kust['resources']:
                     log(f"Updating {p['path']} ...", overlay_path, end="")
                     kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], p['old_resource'], p['new_resource'])))
-                    writeYamlFile(kust, kust_path)
+                    write_yaml_file(kust, kust_path)
                     log('done', overlay_path)
                     do_update = True
                 else:
@@ -191,77 +146,23 @@ def update_secrets_2025_2_1(helm_env_path):
                 type_val = values['platform']['secrets']['amster']['annotations']['type']
                 values['platform']['secrets']['amster']['annotations']['secret-generator.v1.mittwald.de/type'] = type_val
                 del values['platform']['secrets']['amster']['annotations']['type']
-            writeYamlFile(values, values_file)
+            write_yaml_file(values, values_file)
     else:
         print(f"{values_file} doesn't exist, not updating. Check your environment and try again.")
 
 
-class UpgradeFormatter(argparse.ArgumentDefaultsHelpFormatter, argparse.RawDescriptionHelpFormatter):
-    pass
-
-
-if __name__ == '__main__':
-    PROG = 'forgeops upgrade'
-    EPILOG = f"""Notes:
-  * If you use a custom default overlay, upgrade it first.
-
-Examples:
-  Normal operation:
-    {PROG} -e my_env
-
-  Use custom default overlay:
-    {PROG} -e my_env -s my_default
-
-  Upgrade custom default:
-    {PROG} -e my_default -s default
-"""
-
-    parser = argparse.ArgumentParser(description='Upgrade a Ping Identity Platform environment',
-                                     prog=PROG,
-                                     epilog=EPILOG,
-                                     formatter_class=UpgradeFormatter)
-    parser.add_argument('--debug', '-d', action='store_true', help='Turn on debugging')
-    parser.add_argument('--helm-path', '-H', help='Dir to store Helm values files (absolute or relative to forgeops_data)')
-    parser.add_argument('--kustomize-path', '-k', help='Kustomize dir to use (absolute or relative to forgeops_data)')
-    parser.add_argument('--env-name', '-e', required=True, help='Name of environment to manage')
-    parser.add_argument('--source', '-s', help='Name of source Kustomize overlay')
-
-    args = parser.parse_args()
-
-    config = {}
-    config['script_path'] = Path(__file__).parent
-    if args.debug:
-        print(f"script_path = {config['script_path']}")
-    config['root_path'] = config['script_path'].parent.parent
-    if args.debug:
-        print(f"root_path = {config['root_path']}")
-
-    # Setup defaults for values that can be set in forgeops.conf
-    overrides = utils.process_overrides(config['root_path'],
-                                        getattr(args, 'helm_path', None),
-                                        getattr(args, 'kustomize_path', None),
-                                        getattr(args, 'build_path', None),
-                                        getattr(args, 'no_helm', False),
-                                        getattr(args, 'no_kustomize', False),
-                                        getattr(args, 'releases_src', None),
-                                        getattr(args, 'pull_policy', None),
-                                        getattr(args, 'source', None),
-                                        getattr(args, 'ssl_secretname', None),
-                                        args.debug)
-
-    if args.debug:
-        print("Overrides processed")
-    config = merge(config, overrides)
+def run(args, config):
+    """ Run upgrades """
     def_overlay_path = config['overlay_root'] / 'default'
     config['overlay_path'] = config['overlay_root'] / args.env_name
     config['source_path'] = config['overlay_root'] / config['source_overlay']
     config['helm_env_path'] = config['helm_path'] / args.env_name
 
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
-    HEADER=f"""#
-# Running `{PROG}` on {args.env_name} at {timestamp}
+    header=f"""#
+# Running upgrade on {args.env_name} at {timestamp}
 #"""
-    log(HEADER, config['overlay_path'])
+    log(header, config['overlay_path'])
 
     # 2025.2.0 updates
     log('Checking 2025.2.0 updates', config['overlay_path'])
@@ -269,9 +170,10 @@ Examples:
     update_apps_2025_2_0(config['overlay_path'], def_overlay_path)
 
     # 2025.2.1 updates
+    log('Checking 2025.2.1 updates', config['helm_env_path'])
     update_secrets_2025_2_1(config['helm_env_path'])
 
-    FOOTER=f"""#
-# End `{PROG}` on {args.env_name} at {timestamp}
+    footer=f"""#
+# End upgrade on {args.env_name} at {timestamp}
 #"""
-    log(FOOTER, config['overlay_path'])
+    log(footer, config['overlay_path'])

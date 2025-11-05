@@ -2,15 +2,27 @@ RELEASE=2025.2.2
 # Release Notes
 
 ## New Features/Updated functionality
-- debug-logs script : provide --output-file option
+
+### Adding --output-file to bin/debug-logs
+
+Providing the ability to send the output of bin/debug-logs directly to a file.
 
 ### New product versions available
+
 IDM and DS 8.0.1 secure images available
 AM 7.5.2 secure images available
 
 ### New --retain option for troubleshooting Amster
 You can supply `--retain {duration}` to both `forgeops amster import` and `forgeops amster export` 
 to keep the pod running longer.
+
+### Moved upgrade logic into env command
+
+The `forgeops upgrade` logic has been moved to `forgeops env` as a flag. You
+can now call it like:
+
+`forgeops env -e my_env --upgrade`
+
 
 ## Bugfixes
 

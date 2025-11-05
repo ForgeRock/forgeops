@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import shutil
 import sys
+
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
 root_path = [parent_path for parent_path in current_file_path.parents if (parent_path / 'README.md').exists()][0]
@@ -25,38 +26,30 @@ try:
     ensure_configuration_is_valid_or_exit()
 except Exception as e:
     try:
-        print(f'[error] {e.__str__()}')
-    except:
-        raise e
+        print(f'[error] {str(e)}')
+    except Exception as exc:
+        raise e from exc
     sys.exit(1)
 
 try:
     import yaml
     from mergedeep import merge
+    import env_upgrade as upgrade
 except:
     print_how_to_install_dependencies()
+
 import lib.python.utils as utils
+from lib.python.common import write_yaml_file
 
 
 def genDsConnection(name, num, port=1636):
     """Generate a PingDS connection string to put into base/platform-config.yaml"""
 
-    str=f"{name}-0.{name}:{port}"
+    host_str=f"{name}-0.{name}:{port}"
     for i in range(1,num):
-        str += f",{name}-{i}.{name}:{port}"
-    return str
+        host_str += f",{name}-{i}.{name}:{port}"
+    return host_str
 
-# Avoid using anchors/aliases in outputted YAML
-# Notice we call this with yaml.dump, but we are still using safe_dump
-# From https://ttl255.com/yaml-anchors-and-aliases-and-how-to-disable-them/
-class NoAliasDumper(yaml.SafeDumper):
-    def ignore_aliases(self, data):
-        return True
-
-def writeYamlFile(data, file):
-    """Write an object to a yaml file"""
-    with open(file, 'w+') as f:
-        yaml.dump(data, f, sort_keys=False, Dumper=NoAliasDumper)
 
 def process_overlay_dir(path, config, args):
     """Process a dir inside an overlay"""
@@ -121,7 +114,7 @@ def process_overlay_dir(path, config, args):
             kust['resources'] = list(set(utils.replace_or_append_str(kust['resources'], old_resource, new_resource)))
         # End secret-generator/secret-agent logic
 
-        writeYamlFile(kust, kust_path)
+        write_yaml_file(kust, kust_path)
 
     ingress_path = path / 'ingress-fqdn.yaml'
     if args.debug: print(f"ingress_path={ingress_path}")
@@ -168,7 +161,7 @@ def process_overlay_dir(path, config, args):
             if not issuer_found:
                 ing.append(issuer)
 
-        writeYamlFile(ing, ingress_path)
+        write_yaml_file(ing, ingress_path)
 
     platform_config = path / 'platform-config.yaml'
     if args.debug: print(f"platform_config={platform_config}")
@@ -193,7 +186,7 @@ def process_overlay_dir(path, config, args):
         if args.amster_retain:
             pc['data']['AMSTER_DURATION'] = config['amsterRetain']
 
-        writeYamlFile(pc, platform_config)
+        write_yaml_file(pc, platform_config)
 
     if (args.idrepo_snap_enable or args.cts_snap_enable or args.snap_role_name is not None) and 'ds-snapshot/rbac' in str(path.resolve()):
         if args.debug:
@@ -227,8 +220,8 @@ def process_overlay_dir(path, config, args):
             }
         ]
 
-        writeYamlFile(rn_patch_yaml, rn_patch_path)
-        writeYamlFile(rb_patch_yaml, rb_patch_path)
+        write_yaml_file(rn_patch_yaml, rn_patch_path)
+        write_yaml_file(rb_patch_yaml, rb_patch_path)
 
     res_path = path / res_file
     if args.debug: print(f"res_path={res_path}")
@@ -255,7 +248,7 @@ def process_overlay_dir(path, config, args):
                 if skey in ('am', 'idm'):
                     res['spec']['template']['spec']['initContainers'][1]['imagePullPolicy'] = config['pull_policy']
 
-        writeYamlFile(res, res_path)
+        write_yaml_file(res, res_path)
 
     if skey == 'keystore_create' and args.secret_generator:
         rn_patch_path = path / 'cluster-role-name.yaml'
@@ -283,8 +276,8 @@ def process_overlay_dir(path, config, args):
             }
         ]
 
-        writeYamlFile(rn_patch_yaml, rn_patch_path)
-        writeYamlFile(rb_patch_yaml, rb_patch_path)
+        write_yaml_file(rn_patch_yaml, rn_patch_path)
+        write_yaml_file(rb_patch_yaml, rb_patch_path)
 
     # Look for subdirs and process them
     for d in path.iterdir():
@@ -294,9 +287,9 @@ def process_overlay_dir(path, config, args):
             continue
         process_overlay_dir(d, config, args)
 
-def main():
+def setup_args():
+    """ Setup arguments """
     prog = 'forgeops env'
-
     parser = argparse.ArgumentParser(description='Manage a Ping Identity Platform environment',
                                      prog=prog,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -336,6 +329,7 @@ def main():
     parser.add_argument('--amster-retain', dest='amster_retain', type=int, help='Keep amster pod running for n seconds')
     parser.add_argument('--snap-role-name', help='Specify the base role name for the ds-snapshot ClusterRole')
     parser.add_argument('--pull-policy', dest='pull_policy', choices=['Always', 'IfNotPresent', 'Never'], help='Set policy for all platform images')
+    parser.add_argument('--upgrade', '-u', dest='upgrade', action='store_true', help="Upgrade environment to latest ForgeOps")
     parser.add_argument('--no-helm', dest='no_helm', action='store_true', help="Don't create/manage Helm values files")
     parser.add_argument('--no-kustomize', dest='no_kustomize', action='store_true', help="Don't create/manage Kustomize overlay")
     parser.add_argument('--small', dest='size', action='store_const', const='small', help='A small sized deployment')
@@ -353,49 +347,11 @@ def main():
     # Flag to skip interactivity for testing
     parser.add_argument('--testing', dest='testing', action='store_true', help=argparse.SUPPRESS)
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
-    if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable or args.snap_role_name):
-        utils.exit_msg('You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable')
 
-    if not args.namespace and args.secret_generator:
-        utils.exit_msg('You must specify a namespace (-n) with --secret-generator')
-
-    config = {}
-
-    config['script_path'] = Path(__file__).parent
-    if args.debug:
-        print(f"script_path = {config['script_path']}")
-    config['root_path'] = config['script_path'].parent.parent
-    if args.debug:
-        print(f"root_path = {config['root_path']}")
-
-    if args.namespace and args.no_namespace:
-        utils.exit_msg('Specify --namespace or --no-namespace, not both')
-
-    if args.single and (args.am_rep or args.idm_rep or args.cts_rep or args.idrepo_rep or args.ig_rep):
-        utils.exit_msg('--single-instance is incompatible with *_rep options')
-
-    if '/' in args.env_name:
-        utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
-
-    # Setup defaults for values that can be set in forgeops.conf
-    overrides = utils.process_overrides(config['root_path'],
-                                        getattr(args, 'helm_path', None),
-                                        getattr(args, 'kustomize_path', None),
-                                        getattr(args, 'build_path', None),
-                                        getattr(args, 'no_helm', False),
-                                        getattr(args, 'no_kustomize', False),
-                                        getattr(args, 'releases_src', None),
-                                        getattr(args, 'pull_policy', None),
-                                        getattr(args, 'source', None),
-                                        getattr(args, 'ssl_secretname', None),
-                                        args.debug)
-
-    if args.debug:
-        print("Overrides processed")
-    config = merge(config, overrides)
-
+def manage_env(args, config):
+    """ Main logic for managing an env """
     config['size'] = {}
     if args.size:
         values_path = root_path / 'charts' / 'identity-platform' / f'values-{args.size}.yaml'
@@ -737,14 +693,14 @@ If you have not yet deployed the environment, then you can ignore this message.
                 with open(kust_path, 'r', encoding='utf-8') as f:
                     kust = yaml.safe_load(f)
                 kust['resources'] = utils.replace_or_append_str(kust['resources'], 'ds-snapshot', './ds-snapshot')
-                writeYamlFile(kust, kust_path)
+                write_yaml_file(kust, kust_path)
 
             rbac_ns_path = config['overlay_path'] / 'ds-snapshot' / 'rbac' / 'namespace.yaml'
             if rbac_ns_path.is_file():
                 with open(rbac_ns_path, 'r', encoding='utf-8') as f:
                     rbac_ns = yaml.safe_load(f)
                 rbac_ns['subjects'] = utils.replace_or_append_dict(rbac_ns['subjects'], 'name', 'ds-snapshot', 'namespace', args.namespace)
-                writeYamlFile(rbac_ns, rbac_ns_path)
+                write_yaml_file(rbac_ns, rbac_ns_path)
 
         process_overlay_dir(config['overlay_path'], config, args)
 
@@ -782,14 +738,14 @@ If you have not yet deployed the environment, then you can ignore this message.
             if getattr(args, 'secret_agent', None):
                 values['platform']['secrets'] = {}
         merge(values, config['size'], values_ingress, values_images, values_snap, values_amster, values_secrets)
-        writeYamlFile(values, values_file)
+        write_yaml_file(values, values_file)
 
     ###
     ### Logs
     ###
     timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H:%M:%S%z")
     cmd_ary = sys.argv
-    cmd_ary[0] = prog
+    cmd_ary[0] = 'forgeops env'
     cmd = ' '.join(cmd_ary)
     log_file = 'env.log'
     if config['do_kustomize']:
@@ -804,5 +760,56 @@ If you have not yet deployed the environment, then you can ignore this message.
             log_helm_f.write(f"{h_log_line}\n")
 
 
+def run():
+    """ This is the entrypoint for working with an environment """
+    args = setup_args()
+
+    if not args.namespace and (args.cts_snap_enable or args.idrepo_snap_enable or args.snap_role_name):
+        utils.exit_msg('You must specify a namespace (-n) with --cts-snap-enable and --idrepo-snap-enable')
+
+    if not args.namespace and args.secret_generator:
+        utils.exit_msg('You must specify a namespace (-n) with --secret-generator')
+
+    settings = {}
+
+    settings['script_path'] = Path(__file__).parent
+    if args.debug:
+        print(f"script_path = {settings['script_path']}")
+    settings['root_path'] = settings['script_path'].parent.parent
+    if args.debug:
+        print(f"root_path = {settings['root_path']}")
+
+    if args.namespace and args.no_namespace:
+        utils.exit_msg('Specify --namespace or --no-namespace, not both')
+
+    if args.single and (args.am_rep or args.idm_rep or args.cts_rep or args.idrepo_rep or args.ig_rep):
+        utils.exit_msg('--single-instance is incompatible with *_rep options')
+
+    if '/' in args.env_name:
+        utils.exit_msg('Do not use a path with --env-name. It should just be the name of the environment to manage.')
+
+    # Setup defaults for values that can be set in forgeops.conf
+    overrides = utils.process_overrides(settings['root_path'],
+                                        getattr(args, 'helm_path', None),
+                                        getattr(args, 'kustomize_path', None),
+                                        getattr(args, 'build_path', None),
+                                        getattr(args, 'no_helm', False),
+                                        getattr(args, 'no_kustomize', False),
+                                        getattr(args, 'releases_src', None),
+                                        getattr(args, 'pull_policy', None),
+                                        getattr(args, 'source', None),
+                                        getattr(args, 'ssl_secretname', None),
+                                        args.debug)
+
+    if args.debug:
+        print("Overrides processed")
+    settings = merge(settings, overrides)
+
+    if args.upgrade:
+        upgrade.run(args, settings)
+    else:
+        manage_env(args, settings)
+
+
 if __name__ == '__main__':
-    main()
+    run()

@@ -117,7 +117,7 @@ Failure! The kustomize command is not installed or in the path. Please install k
 def upgrade_env(params, settings):
     """ Run `forgeops upgrade` on the given env """
     cmd = f"{root_path}/bin/forgeops"
-    cmd_opts = f"upgrade -e {params.env_name} -k {settings['kustomize_path']} -H {settings['helm_path']}"
+    cmd_opts = f"env --upgrade -e {params.env_name} -k {settings['kustomize_path']} -H {settings['helm_path']}"
     print(f"You need to upgrade your env ({params.env_name})")
     print("Press <ENTER> to proceed.")
     input()
