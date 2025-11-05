@@ -4,7 +4,7 @@
 # Alive check
 ALIVE="${AMSTER_AM_URL}/json/health/ready"
 
-wait_for_openam() {
+wait_for_am() {
   echo "Waiting for PingAM server at ${ALIVE}..."
   response="000"
 
@@ -24,21 +24,6 @@ wait_for_openam() {
    done
 }
 
-
-# Function that waits for files to be uploaded to /opt/amster/config/upload
-# This would usually be done via kubectl cp
-wait_config_file_upload() {
-   TIMEOUT=60
-   mkdir -p /opt/amster/config/upload
-   echo "Waiting for files to be uploaded"
-   inotifywait /opt/amster/config/upload  -e create --timeout $TIMEOUT || {
-      echo "No uploaded files were found within $TIMEOUT seconds. Exiting"
-      exit 1
-   }
-   echo "Files uploaded - proceeding with amster import"
-}
-
-
 # Import config - script is passed in $1
 import() {
    echo "Executing script $1"
@@ -48,6 +33,13 @@ import() {
       if [ ! -r /var/run/secrets/amster/id_rsa ]; then
          echo "ERROR: Can not find the Amster private key"
          exit 1
+      fi
+
+      if [ -f /opt/amster/config/amster-import.tar.gz ]; then
+         # Unzip amster-import.tar.gz
+         cd /opt/amster/config
+         tar -xzf amster-import.tar.gz
+         cd /opt/amster
       fi
 
       echo "Executing Amster to import dynamic config"
@@ -67,7 +59,7 @@ import() {
       fi
    fi
 
-   echo  "import done"
+   echo  "Import done"
 }
 
 cat >/tmp/import.amster <<EOF
@@ -76,14 +68,9 @@ import-config --path /opt/amster/config  --clean false
 :exit
 EOF
 
-wait_for_openam
+wait_for_am
 
 # If there is no arg - just import any files found in config/
 if [[ -z "$1" ]]; then
-   import "/tmp/import.amster"
-else
-   # Else- wait for upload
-   wait_config_file_upload
-   sleep 5
    import "/tmp/import.amster"
 fi

@@ -36,4 +36,3 @@ data:
   DSBACKUP_HOSTS: ""
   DISASTER_RECOVERY_ID: "initial-restore"
   CERT_ISSUER: default-issuer
-  AMSTER_DURATION: ""

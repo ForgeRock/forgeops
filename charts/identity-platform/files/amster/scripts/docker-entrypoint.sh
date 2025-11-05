@@ -28,7 +28,6 @@ pause() {
     done
 }
 
-
 # Extract amster version for commons parameter to modify configs
 echo "Extracting amster version"
 VER=$(./amster --version)

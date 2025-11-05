@@ -503,12 +503,9 @@ def get_secret_value(ns, secret, key):
 def clean_amster_job(ns):
     message(f'Cleaning up amster components.')
     run('kubectl', f'-n {ns} delete --ignore-not-found=true job amster')
-    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-files')
-    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-export-type')
-    if os.path.exists('amster-import.tar.gz'):
-        os.remove('amster-import.tar.gz')
-    if os.path.exists('amster-scripts.tar.gz'):
-        os.remove('amster-scripts.tar.gz')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-scripts')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-function')
+    run('kubectl', f'-n {ns} delete --ignore-not-found=true cm amster-config')    
     return
 
 def replace_or_append_str(array, search_str, data):

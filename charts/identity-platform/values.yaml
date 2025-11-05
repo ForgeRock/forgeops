@@ -285,7 +285,6 @@ amster:
   backoffLimit: 6
   restartPolicy: OnFailure
   deleteOnSuccess: false
-  #amsterRetain: 600
   ttlSecondsAfterFinished: 600
 
   image:

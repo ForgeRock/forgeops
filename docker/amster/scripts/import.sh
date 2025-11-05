@@ -4,7 +4,7 @@
 # Alive check
 ALIVE="${AMSTER_AM_URL}/json/health/ready"
 
-wait_for_openam()
+wait_for_am()
 {
    echo "Waiting for PingAM server at ${ALIVE}..."
    response="000"
@@ -79,7 +79,7 @@ import-config --path /opt/amster/config  --clean false
 :exit
 EOF
 
-wait_for_openam
+wait_for_am
 
 # If there is no arg - just import any files found in config/
 if [[ -z "$1" ]]; then

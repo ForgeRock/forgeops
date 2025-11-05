@@ -1,0 +1,134 @@
+---
+# Source: identity-platform/templates/amster-job.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: amster
+  annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: before-hook-creation
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: 1.0.0
+    app.kubernetes.io/managed-by: Helm
+    app: amster
+    app.kubernetes.io/component: amster
+spec:
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 600
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: identity-platform
+        app.kubernetes.io/part-of: identity-platform
+        app.kubernetes.io/instance: identity-platform
+        app: amster
+        app.kubernetes.io/component: amster
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: default
+      securityContext: {}
+      volumes:
+        - name: amster-scripts
+          configMap:
+            name: amster-scripts
+        - name: config
+          configMap:
+            name: amster-config
+            optional: true
+        - name: amster-secrets
+          secret:
+            secretName: amster
+            items:
+              - key: id_rsa
+                path: id_rsa
+        - name: platform-config
+          configMap:
+            name: platform-config
+        - name: export-files
+          emptyDir: {}
+      initContainers:
+        - name: amster
+          securityContext: {}
+          image: us-docker.pkg.dev/forgeops-public/images/amster:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - "for f in $(find /amster-scripts); do\n  cp -r $f /opt/amster/ && chmod 775 /opt/amster/$(basename $f)\ndone\n[ -z \"$FUNCTION\" ] && FUNCTION=\"import\" \n./docker-entrypoint.sh $FUNCTION\n"
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          envFrom:
+            - configMapRef:
+                name: platform-config
+            - configMapRef:
+                name: amster-function
+                optional: true
+            - secretRef:
+                name: amster-env-secrets
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          volumeMounts:
+            - name: amster-scripts
+              mountPath: /amster-scripts/docker-entrypoint.sh
+              subPath: 79738685a656fe6b25061bb14181442210b599f746faeaba408a2401de45038a
+            - name: amster-scripts
+              mountPath: /amster-scripts/export.sh
+              subPath: a70ab199085ab146f5b9ca4fde5b679154668c0143b58478c13910d2154fd889
+            - name: amster-scripts
+              mountPath: /amster-scripts/import.sh
+              subPath: 63ccbd1ea3a3b7fab64c58c9f0dc82359a2c4704d376e029800d4d139fb4e07e
+            - name: config
+              mountPath: /opt/amster/config/amster-import.tar.gz
+              subPath: amster-import.tar.gz
+            - name: amster-secrets
+              mountPath: /var/run/secrets/amster
+              readOnly: true
+            - name: export-files
+              mountPath: /var/tmp/amster
+      containers:
+        - name: pause
+          securityContext: {}
+          image: us-docker.pkg.dev/forgeops-public/images/amster:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - bash
+            - -c
+            - sleep ${AMSTER_DURATION:-10}
+          envFrom:
+            - configMapRef:
+                name: platform-config
+            - configMapRef:
+                name: amster-function
+                optional: true
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /etc/hosts
+            initialDelaySeconds: 1
+          resources:
+            limits:
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          volumeMounts:
+            - name: export-files
+              mountPath: /var/tmp/amster
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          operator: Exists
