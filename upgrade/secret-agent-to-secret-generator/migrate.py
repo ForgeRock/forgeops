@@ -93,6 +93,18 @@ def pre_check(params, settings):
     print('Checking secrets')
     is_problem = False
     settings['skip'] = {}
+    settings['helm_path'] = settings['helm_path'] / params.env_name
+    if params.debug:
+        print(f"helm_path={settings['helm_path']}")
+    helm_path = settings['helm_path']
+    if utils.check_path(helm_path, 'Helm path', 'dir', True):
+        print(f'Success! {helm_path} is a dir')
+    else:
+        utils.exit_msg(f'{helm_path} is not a dir. Check --env-name and try again.')
+    utils.check_path(settings['kustomize_path'], 'Kustomize path', 'dir', True)
+    utils.check_path(settings['overlay_root'], 'Overlay root path', 'dir', True)
+    settings['overlay_path'] = settings['overlay_root'] / params.env_name
+    utils.check_path(settings['overlay_path'], 'Overlay path', 'dir', True)
     if params.kustomize:
         print('Checking to see if the kustomize command is installed')
         if shutil.which('kustomize') is None:
@@ -321,12 +333,6 @@ def delete_old_secrets(ns_opt, dryrun=False):
 
 def do_helm(params, settings):
     """ Do the procedure for Helm installs """
-
-    utils.check_path(settings['helm_path'], 'Helm path', 'dir', True)
-    settings['helm_path'] = settings['helm_path'] / params.env_name
-    if params.debug:
-        print(f"helm_path={settings['helm_path']}")
-
     overlay_path = settings['overlay_root'] / params.env_name
     print(f"Running upgrade on {params.env_name} to keep things consistent.", overlay_path)
     upgrade_env(params, settings)
@@ -395,9 +401,7 @@ def do_helm(params, settings):
 def do_kustomize(params, settings):
     """ Do the procedure for Kustomize installs """
 
-    utils.check_path(settings['kustomize_path'], 'Kustomize path', 'dir', True)
-    utils.check_path(settings['overlay_root'], 'Overlay root path', 'dir', True)
-    overlay_path = settings['overlay_root'] / params.env_name
+    overlay_path = settings['overlay_path']
     default_path = overlay_path / 'default'
     default_secrets = default_path / 'secrets'
     secrets_path = overlay_path / 'secrets'
@@ -405,12 +409,6 @@ def do_kustomize(params, settings):
     sg_path = secrets_path / 'secret-generator'
     if params.debug:
         print(f"overlay_path={overlay_path}")
-
-    if overlay_path.exists() and overlay_path.is_dir():
-        print(f"{overlay_path} is a directory, continuing.")
-    else:
-        err_msg = f"{overlay_path} is not a directory. Please specify an existing ForgeOps environment."
-        utils.exit_msg(err_msg)
 
     # Modify secret overlays
     if secrets_path.is_dir():
