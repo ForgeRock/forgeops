@@ -1,16 +1,15 @@
 """Functions to help read, process, and select release image tags"""
 
 from copy import copy
-from copy import deepcopy
 import os
 import json
-from packaging.version import Version
 from pathlib import Path, PurePath
 import re
 import sys
 import site
 from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
+from packaging.version import Version
 
 file_name = Path(__file__)
 current_file_path = file_name.parent.resolve()
@@ -94,7 +93,7 @@ def parse_release_str(rel_str, debug=False):
     return release
 
 
-def get_available_release(requested_release, component_releases, search='backward', debug=False):
+def get_available_release(requested_release, component, component_releases, search='backward', debug=False):
     """
     Return a sorted list of available releases from a given release and dictionary of all releases.
     """
@@ -129,11 +128,10 @@ def get_available_release(requested_release, component_releases, search='backwar
         minor_releases.sort()
         if requested_release in minor_releases:
             if debug:
-                print(f"Requested release ({requested_release}) valid")
+                print(f"Requested release ({requested_release}) valid for {component}")
             selected_release = requested_release
         else:
-            if debug:
-                print(f"Requested release ({requested_release}) not valid, searching for valid release.")
+            print(f"Requested release ({str(requested_release)}) not available for {component}, searching for available release.")
             if search == 'latest':
                 selected_release = Version(minor_releases[-1])
             elif search == 'backward':
@@ -170,7 +168,7 @@ def select_tag(component, releases, release, image_names, tag=None, all_tags=Fal
     if isinstance(release, Version):
         if release.minor == 0 and release.micro == 0:
             modifier = 'forward'
-    selected_release = get_available_release(release, releases[component], modifier, debug)
+    selected_release = get_available_release(release, component, releases[component], modifier, debug)
     selected_release_str = str(selected_release)
     maj_min = None
     if isinstance(selected_release, str):

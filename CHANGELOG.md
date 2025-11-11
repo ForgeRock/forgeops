@@ -23,6 +23,11 @@ can now call it like:
 
 `forgeops env -e my_env --upgrade`
 
+### Display a message when requested version isn't available
+
+The `forgeops image` command will select the next available version if the user
+requests a version that isn't available for a product. Now, it will tell you
+that it can't find the requested image to avoid confusion.
 
 ## Bugfixes
 
