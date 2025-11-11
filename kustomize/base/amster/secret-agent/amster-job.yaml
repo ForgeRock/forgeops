@@ -54,7 +54,7 @@ spec:
       initContainers:
         - name: amster
           securityContext: {}
-          image: us-docker.pkg.dev/forgeops-public/images/amster:latest
+          image: amster
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
@@ -101,7 +101,7 @@ spec:
       containers:
         - name: pause
           securityContext: {}
-          image: us-docker.pkg.dev/forgeops-public/images/amster:latest
+          image: amster
           imagePullPolicy: IfNotPresent
           args:
             - bash

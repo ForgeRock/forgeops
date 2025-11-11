@@ -1,3 +1,7 @@
 platform:
   disable_secret_agent_config: true
   secrets_enabled: true
+amster:
+  image:
+    repository: "amster"
+    tag: ""

@@ -46,7 +46,7 @@ def amster_import(ns, src, amster_job_path, retain, printlogs=True):
         utils.run('tar', f'-czf amster-import.tar.gz -C {src} .', cstdout=True, env=envVars)
         utils.run('kubectl', f'-n {ns} create cm amster-config --from-file=amster-import.tar.gz')
 
-        pod = _launch_amster_job(amster_job_path, ns, "import", False, retain,)
+        pod = _launch_amster_job(amster_job_path, ns, "import", False, retain)
         utils.message('\nWaiting for amster job to complete. This can take several minutes.')
         utils.run('kubectl', f'-n {ns} wait --for=condition=Ready pod -l app.kubernetes.io/component=amster --timeout=600s')
         if printlogs:
@@ -200,12 +200,12 @@ def main():
     subparser = parser.add_subparsers(dest='cmd', required=True, help='select action to perform')
     parser_import = subparser.add_parser('import', help='import json configuration files into PingAM', parents=[common])
     parser_import.add_argument('src', help='path to amster config-profile to import')
-    parser_import.add_argument('--retain', dest='retain', type=int, help='Keep amster pod running for n seconds')
+    parser_import.add_argument('--retain', dest='retain', default="10", type=int, help='Keep amster pod running for n seconds')
     parser_export = subparser.add_parser('export', help='export files from amster', parents=[common])
     parser_export.add_argument('--global', dest='glob', action='store_true', help='include the global/ configuration in the amster export')
     parser_export.add_argument('--full', dest='full', action='store_true', help='export all realm configuration')
     parser_export.add_argument('dst', help='path to amster config-profile to export files to')
-    parser_export.add_argument('--retain', dest='retain', type=int, help='Keep amster pod running for n seconds')
+    parser_export.add_argument('--retain', dest='retain', default="10", type=int, help='Keep amster pod running for n seconds')
     subparser.add_parser('clean', help='clean up and remove amster pods', parents=[common])
     parser_upgrade = subparser.add_parser('upgrade', help='replace placeholders of given configs')
     parser_upgrade.add_argument('src', help='source file or directory to update')
@@ -232,8 +232,8 @@ def main():
     amster_job_path = kustomize_path / 'overlay' / args.env_name / 'amster'
     
     # Check that amster overlay path exists otherwise revert to default overlay
-    if not os.path.isdir('{amster_job_path}'):
-        utils.message("The provided ENV_NAME doesn't exist")
+    if not os.path.isdir(amster_job_path):
+        utils.message(f'The provided ENV_NAME {args.env_name} does not exist')
         utils.message("Amster command only uses Kustomize. The env provided doesn't exist so reverting to default overlay")
         amster_job_path = kustomize_path / 'overlay' / 'default' / 'amster'
 
