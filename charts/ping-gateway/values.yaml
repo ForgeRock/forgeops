@@ -99,9 +99,9 @@ ig:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/rewrite-target: "/$2"
 
-  env:
-    - name: AM_URL
-      value: "http://am/am"
+  env: []
+    #- name: "IG_ENV_1"
+  #  value: "ig_value"
   envFrom: []
     #- secretRef:
   #    name: "my_ig_secret"
@@ -164,9 +164,12 @@ ig:
       port: http-admin
       secretUser: metric
       secretPassword: password
+<<<<<<< HEAD
 
 ig_custom:
   image:
     repository: busybox
     tag: musl
     pullPolicy: IfNotPresent
+=======
+>>>>>>> 9274f8f52 (FORGEOPS-5736 Create Helm chart for IG)
