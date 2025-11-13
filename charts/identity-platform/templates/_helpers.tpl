@@ -43,7 +43,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Common labels (no versioning lables)
+Common labels (no versioning labels)
 */}}
 {{- define "identity-platform.labelsUnversioned" -}}
 {{ include "identity-platform.selectorLabels" . }}

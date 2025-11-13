@@ -1,0 +1,17 @@
+{{- if .Values.platform.base.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ig-config
+  labels:
+    {{- include "ping-gateway.labels" . | nindent 4 }}
+data:
+  FQDN: {{ first .Values.platform.ingress.hosts }}
+  ENABLE_WORKFORCE: "true"
+  THEME: default
+  {{- if .Values.platform.configMap.enabled }}
+  {{- with .Values.platform.configMap.data }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  {{- end }}
+{{- end }}

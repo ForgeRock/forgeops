@@ -1,0 +1,8 @@
+{{- if .Values.platform.notes.enabled }}
+1. See the Ping Gateway url below:
+{{- if .Values.platform.ingress.enabled }}
+{{- range $host := .Values.platform.ingress.hosts }}
+  https://{{ $host }}/platform
+{{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,166 @@
+# Default values for ping-gateway.
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+platform:
+  annotations:
+    deploymentDate:
+      enabled: false
+  base:
+    enabled: true
+  # Only used when using bin/base-generate.sh and need something to run in an alternate manner
+  base_generate: false
+  configMap:
+    enabled: false
+    # Provide extra ENV vars to add to platform-config ConfigMap
+    data: {}
+      #ENVIRONMENT: "test"
+  cert_manager:
+    # If disabled, the ingress tls issuer and the PingDS certificates will be not be created/deployed
+    # (DS certificates are ds-master-keypair and ds-ssl-keypair)
+    enabled: true
+  env: []
+    #- name: "MY_ENV"
+    #  value: "value"
+  envFrom: []
+    #- secretRef:
+    #    name: my_secret
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      # kubernetes.io/tls-acme: "true"
+      # Nginx specific ingress annotations
+      nginx.ingress.kubernetes.io/affinity: cookie
+      nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+      nginx.ingress.kubernetes.io/session-cookie-name: route
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      # CORS is now set in the PingAM and PingIDM configurations
+      nginx.ingress.kubernetes.io/enable-cors: "false"
+      nginx.ingress.kubernetes.io/body-size: "64m"
+      nginx.ingress.kubernetes.io/send-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-body-size: "64m"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+      # nginx.ingress.kubernetes.io/configuration-snippet: |
+      #   add_header X-ForgeRock-TransactionId $req_id;
+      #   proxy_set_header X-ForgeRock-TransactionId $req_id;
+
+    hosts:
+      - ping-gateway.domain.local
+      # - ping-gateway-2.local
+    tls:
+      # cert-manager must be deployed in order create/use a certificate issuer
+      issuer:
+        name: # "ping-gateway-issuer"
+        kind: Issuer  # ClusterIssuer
+      #  create:
+      #    type: "letsencrypt-prod" # "letsencrypt-staging" # "self-signed"
+      #    email: "address@domain.com"
+      secret:
+        name: # "ping-gateway-tls"
+      #  create:
+      #    crt: # base64 encoded string (Ex: base64 -w 0 <domain-file>.pem)
+      #    key: # base64 encoded string (Ex: base64 -w 0 <domain-file>.key)
+
+  notes:
+    enabled: true
+
+  tolerations:
+    - key: kubernetes.io/arch
+      operator: Exists
+      effect: NoSchedule
+
+ig:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: us-docker.pkg.dev/forgeops-public/images/ig
+    tag: latest
+    pullPolicy: IfNotPresent
+    imagePullSecrets: []
+
+  ingress:
+    enabled: true
+    # Uncomment className and/or annotations to override global platform values
+    # className: "nginx"
+    annotations:
+      haproxy-ingress.github.io/ssl-redirect: "true"
+      haproxy-ingress.github.io/rewrite-target: "/$2"
+      nginx.ingress.kubernetes.io/ssl-redirect: "true"
+      nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+
+  env: []
+    #- name: "IG_ENV_1"
+  #  value: "ig_value"
+  envFrom: []
+    #- secretRef:
+  #    name: "my_ig_secret"
+
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+  livenessProbe:
+    periodSeconds: 30
+    timeoutSeconds: 5
+
+  readinessProbe:
+    initialDelaySeconds: 5
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+  podLabels:
+    app.kubernetes.io/component: ig
+    app: ig
+
+  podSecurityContext: {}
+  # fsGroup: 2000
+
+  securityContext: {}
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+  # runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+  serviceAdmin:
+    type: ClusterIP
+    port: 8085
+
+  prometheus:
+    servicemonitor:
+      enabled: false
+      path: /metrics/prometheus/0.0.4
+      port: http-admin
+      secretUser: metric
+      secretPassword: password
