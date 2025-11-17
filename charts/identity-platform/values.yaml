@@ -152,7 +152,7 @@ am:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/am
-    tag: "7.5.0"
+    tag: "7.5.2"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -228,7 +228,7 @@ amster:
 
   image:
     repository: gcr.io/forgerock-io/amster/pit1
-    tag: "7.5.0"
+    tag: "7.5.2"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -322,7 +322,7 @@ idm:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/idm
-    tag: "7.5.0"
+    tag: "7.5.2"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -602,7 +602,7 @@ ig:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ig
-    tag: "2024.11.0"
+    tag: "2025.9.0"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -701,7 +701,7 @@ ds_idrepo:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "7.5.0"
+    tag: "7.5.3"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 
@@ -789,7 +789,7 @@ ds_cts:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
-    tag: "7.5.0"
+    tag: "7.5.3"
     pullPolicy: IfNotPresent
     imagePullSecrets: []
 

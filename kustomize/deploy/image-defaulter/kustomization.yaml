@@ -3,27 +3,27 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 images:
 - name: am
   newName: us-docker.pkg.dev/forgeops-public/images/am
-  newTag: 7.5.0
+  newTag: 7.5.2
 - name: amster
   newName: us-docker.pkg.dev/forgeops-public/images/amster
-  newTag: 7.5.0
+  newTag: 7.5.2
 - name: ds
   newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: 7.5.0
+  newTag: 7.5.3
 - name: ds-cts
   newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
-  newTag: 7.5.0
+  newTag: 7.5.2
 - name: ds-idrepo
   newName: us-docker.pkg.dev/forgeops-public/images/ds-idrepo
-  newTag: 7.5.0
+  newTag: 7.5.2
 - name: git-server
   newName: us-docker.pkg.dev/forgeops-public/images/git-server
 - name: idm
   newName: us-docker.pkg.dev/forgeops-public/images/idm
-  newTag: 7.5.0
+  newTag: 7.5.2
 - name: ig
   newName: us-docker.pkg.dev/forgeops-public/images/ig
-  newTag: 2024.3.0
+  newTag: 2025.9.0
 labels:
 - includeSelectors: true
   pairs:

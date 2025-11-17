@@ -1,4 +1,4 @@
-FROM gcr.io/forgerock-io/idm-cdk:7.5.0
+FROM gcr.io/forgerock-io/idm-cdk:7.5.2
 
 USER root
 ENV DEBIAN_FRONTEND=noninteractive
