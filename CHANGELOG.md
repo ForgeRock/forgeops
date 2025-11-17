@@ -49,6 +49,12 @@ source .venv/bin/activate
 ./bin/forgeops configure
 ```
 
+### Updating Grafana dashboards to latest available
+
+The Grafana dashboards in
+`cluster/addons/prometheus/forgerock-metrics/dashboards` has been updated with
+the latest ones provided by the Product teams.
+
 ## Bugfixes
 
 ### Fixed bug in base-generate.sh
