@@ -53,7 +53,7 @@ def amster_import(ns, src, amster_job_path, retain, printlogs=True):
             utils.message('Captured logs from the amster pod')
             utils.run('kubectl', f'-n {ns} logs -c amster {pod}')
     finally:
-        utils.clean_amster_job(ns)
+        utils.message('\nAmster import complete.')
 
 def amster_export(ns, dst, amster_job_path, glob, full, retain, printlogs=True):
     fqdn = utils.get_fqdn(ns)
@@ -84,7 +84,7 @@ def amster_export(ns, dst, amster_job_path, glob, full, retain, printlogs=True):
 
         upgrade_all_amster_files(dst, fqdn)
     finally:
-        utils.clean_amster_job(ns)
+        utils.message('\nAmster export complete.')
 
 def upgrade_all_amster_files(conf_path, fqdn):
     utils.message('Updating amster config.')
