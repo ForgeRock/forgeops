@@ -125,9 +125,6 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                         // env.GUILLOTINE_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops-guillotine'
                         scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'dev')
 
-                        sh("python3 -m venv venv")
-                        sh(". venv/bin/activate")
-
                         authenticateGke()
                         // Configure environment to make Guillotine works on GKE
                         withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
