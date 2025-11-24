@@ -16,6 +16,10 @@ AM 7.5.2 secure images available
 You can supply `--retain {duration}` to both `forgeops amster import` and `forgeops amster export` 
 to keep the pod running longer.
 
+### Increased TTL and randomized Kubernetes job names(Kustomize only)
+Amster, ds-set-passwords and keystore-create jobs will now remain for two hours after completion to allow viewing logs. This value can be amended.  
+All 3 jobs will now be deployed with random Job names in Kustomize to allow multiple jobs to be  deployed.  This is handled differently in Helm by cleaning up before deploying.
+
 ### Moved upgrade logic into env command
 
 The `forgeops upgrade` logic has been moved to `forgeops env` as a flag. You
