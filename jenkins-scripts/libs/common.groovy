@@ -123,7 +123,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
 
                         // TODO to check sand-box uncomment and set the url
                         // env.GUILLOTINE_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops-guillotine'
-                        scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'master')
+                        scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'dev')
 
                         authenticateGke()
                         // Configure environment to make Guillotine works on GKE
