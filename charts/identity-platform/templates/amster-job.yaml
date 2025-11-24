@@ -8,6 +8,7 @@ metadata:
     {{- if .Values.amster.deleteOnSuccess }}
     "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
     {{- end }}
+    "internal.config.kubernetes.io/needsHashSuffix": enabled
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
     {{- with .Values.amster.podLabels }}
