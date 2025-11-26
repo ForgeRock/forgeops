@@ -99,9 +99,9 @@ ig:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/rewrite-target: "/$2"
 
-  env: []
-    #- name: "IG_ENV_1"
-  #  value: "ig_value"
+  env:
+    - name: AM_URL
+      value: "http://am/am"
   envFrom: []
     #- secretRef:
   #    name: "my_ig_secret"

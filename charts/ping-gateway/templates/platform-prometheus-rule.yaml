@@ -1,0 +1,56 @@
+{{- if (and .Values.ig.enabled .Values.ig.prometheus.servicemonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    {{- include "identity-platform.labels" . | nindent 4 }}
+  name: platform-prometheus-rule
+spec:
+  groups:
+  - name: cluster.rules
+    rules:
+    - alert: node_memory_MemFree_bytes
+      expr: node_memory_MemFree < 100000000
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "Node memory running low"
+    - alert: up
+      expr: up == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        description: "Service is down for more than 1 minute"
+    - alert: instance:node_cpu:rate:sum
+      expr: instance:node_cpu:rate:sum > 80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "Instance cpu above 80% for over 5 mins"
+    - alert: node_disk_io_time_seconds_total
+      expr: rate(node_disk_io_time_seconds_total[5m]) > 0.2
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "Disk IO time over 300ms for 5 mins"
+  - name: ig.rules
+    rules:
+    - alert: ig_route_response_time_seconds
+      expr: ig_route_response_time_seconds{route="default",name="default",router="gateway._router"} > 0.4
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "Rate (calls/seconds) of responses with their associated times in milliseconds"
+    - alert: ig_route_response_error_total
+      expr: ig_route_response_error_total{route="default",name="default",router="gateway._router"} > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        description: "count of all responses which generated an exception"
+{{- end }}

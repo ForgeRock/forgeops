@@ -33,7 +33,7 @@
       "name": "AmService-1",
       "type": "AmService",
       "config": {
-          "url": "http://am/am",
+          "url": "&{am.url}",
           "realm": "/",
           "secretsProvider": "amSecretsProvider",
           "agent": {
@@ -42,8 +42,7 @@
           },
           "sessionCache": {
               "enabled": true
-          },
-          "version": "8.0.1"
+          }
       }
     },
     {

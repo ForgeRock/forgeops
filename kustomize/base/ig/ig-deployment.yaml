@@ -40,6 +40,8 @@ spec:
           image: ig
           imagePullPolicy: IfNotPresent
           env:
+            - name: AM_URL
+              value: "http://am/am"
             - name: NAMESPACE
               valueFrom:
                 fieldRef:

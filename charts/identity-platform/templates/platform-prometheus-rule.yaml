@@ -1,4 +1,4 @@
-{{- if or (and .Values.am.enabled .Values.am.prometheus.servicemonitor.enabled) (and .Values.idm.enabled .Values.idm.prometheus.servicemonitor.enabled) (and .Values.ig.enabled .Values.ig.prometheus.servicemonitor.enabled) (and .Values.ds_idrepo.enabled .Values.ds_idrepo.prometheus.servicemonitor.enabled) (and .Values.ds_cts.enabled .Values.ds_cts.prometheus.servicemonitor.enabled) }}
+{{- if or (and .Values.am.enabled .Values.am.prometheus.servicemonitor.enabled) (and .Values.idm.enabled .Values.idm.prometheus.servicemonitor.enabled) (and .Values.ds_idrepo.enabled .Values.ds_idrepo.prometheus.servicemonitor.enabled) (and .Values.ds_cts.enabled .Values.ds_cts.prometheus.servicemonitor.enabled) }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -88,22 +88,6 @@ spec:
         severity: warning
       annotations:
         description: "DS Current response times"
-  - name: ig.rules
-    rules:
-    - alert: ig_route_response_time_seconds
-      expr: ig_route_response_time_seconds{route="default",name="default",router="gateway._router"} > 0.4
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        description: "Rate (calls/seconds) of responses with their associated times in milliseconds"
-    - alert: ig_route_response_error_total
-      expr: ig_route_response_error_total{route="default",name="default",router="gateway._router"} > 0
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        description: "count of all responses which generated an exception"
   - name: idm.rules
     rules:
     - alert: idm_repo_seconds
