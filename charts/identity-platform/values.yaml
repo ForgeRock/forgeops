@@ -36,6 +36,10 @@ platform:
   envFrom: []
     #- secretRef:
     #    name: my_secret
+  external_ds:
+    enabled: false
+    cts_hosts: []
+    idrepo_hosts: []
   grafana:
     enabled: false
   ds_certs:

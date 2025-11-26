@@ -34,8 +34,13 @@ data:
     {{- $ctsServersList = append $ctsServersList (printf "ds-cts-%d.ds-cts:1636" $i) }}
   {{- end }}
   {{- $ctsServers := printf ($ctsServersList | join ",") }}
+  {{- if .Values.platform.external_ds.enabled }}
+  AM_STORES_CTS_SERVERS: {{ .Values.platform.external_ds.cts_hosts | join "," }}
+  AM_STORES_USER_SERVERS: {{ .Values.platform.external_ds.idrepo_hosts | join "," }}
+  {{- else }}
   AM_STORES_CTS_SERVERS: {{ $ctsServers }}
   AM_STORES_USER_SERVERS: {{ $idrepoServers }}
+  {{- end }}
   AM_SERVER_FQDN: {{ first .Values.platform.ingress.hosts }}
   AUTORESTORE_FROM_DSBACKUP: {{ .Values.ds_restore.autoRestore | quote }}
   DSBACKUP_DIRECTORY: {{ .Values.ds_restore.backupLocation | quote }}

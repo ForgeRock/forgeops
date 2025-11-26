@@ -29,6 +29,12 @@ The `forgeops image` command will select the next available version if the user
 requests a version that isn't available for a product. Now, it will tell you
 that it can't find the requested image to avoid confusion.
 
+### Adding ability to specify external DS hosts in Helm chart
+
+You now have the ability to specify external DS host names in your values.yaml.
+See `platform.external_ds` in `charts/identity-platform/values.yaml` for more
+info.
+
 ## Bugfixes
 
 ### Fixed bug in base-generate.sh
