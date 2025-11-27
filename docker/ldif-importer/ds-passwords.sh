@@ -11,7 +11,7 @@ chgPass () {
     local USER_PASS=$5
     local FULL_USER_DN="${USER_UID},${USER_DN}"
     echo "Checking ${HOST} for ${USER_UID},${USER_DN}"
-    CXN="-h ${HOST} -p 1389"
+    CXN="-h ${HOST} -p 1636 --useSsl --trustAll"
     ldapsearch ${CXN} -D "uid=admin" -w "${ADMIN_PASS}" -b ${USER_DN} "${USER_UID}"  > /dev/null
     SEARCH_RESPONSE=$?
     echo ""
@@ -34,7 +34,6 @@ chgPass () {
 
 ADMIN_PASS=$(cat /var/run/secrets/opendj-passwords/dirmanager.pw)
 
-chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}
 chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=identities "uid=am-identity-bind-account" ${AM_STORES_USER_PASSWORD}
 chgPass ds-idrepo-0.ds-idrepo ${ADMIN_PASS} ou=admins,ou=am-config "uid=am-config" ${AM_STORES_APPLICATION_PASSWORD}
 chgPass ds-cts-0.ds-cts ${ADMIN_PASS} ou=admins,ou=famrecords,ou=openam-session,ou=tokens "uid=openam_cts" ${AM_STORES_CTS_PASSWORD}

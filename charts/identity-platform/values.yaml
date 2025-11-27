@@ -277,7 +277,7 @@ ldif_importer:
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ldif-importer
-    tag: "7.5.0"
+    tag: "7.5.3"
     pullPolicy: Always
     imagePullSecrets: []
 

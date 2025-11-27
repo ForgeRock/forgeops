@@ -9,7 +9,7 @@ images:
   newTag: 7.5.2
 - name: ds
   newName: us-docker.pkg.dev/forgeops-public/images/ds
-  newTag: 7.5.3
+  newTag: 7.5.0
 - name: ds-cts
   newName: us-docker.pkg.dev/forgeops-public/images/ds-cts
   newTag: 7.5.2
