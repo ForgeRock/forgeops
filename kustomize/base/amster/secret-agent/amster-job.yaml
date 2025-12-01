@@ -6,7 +6,7 @@ metadata:
   name: amster
   annotations:
     helm.sh/hook: post-install,post-upgrade
-    internal.config.kubernetes.io/needsHashSuffix: enabled
+    helm.sh/hook-delete-policy: before-hook-creation
   labels:
     helm.sh/chart: identity-platform-1.0.0
     app.kubernetes.io/name: identity-platform
@@ -18,7 +18,7 @@ metadata:
     app.kubernetes.io/component: amster
 spec:
   backoffLimit: 6
-  ttlSecondsAfterFinished: 7200
+  ttlSecondsAfterFinished: 600
   template:
     metadata:
       annotations:
