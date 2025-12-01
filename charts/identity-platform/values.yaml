@@ -292,10 +292,11 @@ am_custom:
 
 amster:
   enabled: true
+  force: false
   backoffLimit: 6
   restartPolicy: OnFailure
   deleteOnSuccess: false
-  ttlSecondsAfterFinished: 600
+  ttlSecondsAfterFinished: 7200
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/amster
@@ -344,7 +345,7 @@ ds_set_passwords:
   force: false
   backoffLimit: 6
   restartPolicy: OnFailure
-  ttlSecondsAfterFinished: 600
+  ttlSecondsAfterFinished: 7200
 
   image:
     repository: us-docker.pkg.dev/forgeops-public/images/ds
@@ -488,7 +489,7 @@ keystore_create:
   backoffLimit: 6
   restartPolicy: OnFailure
   deleteOnSuccess: false
-  ttlSecondsAfterFinished: 600
+  ttlSecondsAfterFinished: 7200
   clusterRoleName: identity-platform-keystore-create
   appendNSToRole: true
 
