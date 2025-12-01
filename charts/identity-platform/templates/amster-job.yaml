@@ -1,4 +1,4 @@
-{{- if .Values.amster.enabled }}
+{{- if and (or .Release.IsInstall .Values.amster.force) .Values.amster.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -7,8 +7,6 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     {{- if .Values.amster.deleteOnSuccess }}
     "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
-    {{- else }}
-    "helm.sh/hook-delete-policy": "before-hook-creation"
     {{- end }}
   labels:
     {{- include "identity-platform.labels" . | nindent 4 }}
