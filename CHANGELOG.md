@@ -38,6 +38,17 @@ You now have the ability to specify external DS host names in your values.yaml.
 See `platform.external_ds` in `charts/identity-platform/values.yaml` for more
 info.
 
+### Updated python dependency versions
+
+The versions of the python dependencies have been updated in
+`lib/python/requirements.txt`. Use `forgeops configure` to update your venv.
+
+```
+cd /path/to/forgeops
+source .venv/bin/activate
+./bin/forgeops configure
+```
+
 ## Bugfixes
 
 ### Fixed bug in base-generate.sh
