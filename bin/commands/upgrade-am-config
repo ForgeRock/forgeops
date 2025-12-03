@@ -141,8 +141,6 @@ TAG=${TAG%%-*}
 # For docker volume mounts.
 CONFIG=$(realpath $CONFIG_DIR)
 
-GID=$(id -g)
-
 # Run the upgrader locally - optionally over mounting the /rules directory
 #set -x
-runOrPrint $CONTAINER_ENGINE run --rm --user $UID:$GID --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
+runOrPrint $CONTAINER_ENGINE run --rm --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
