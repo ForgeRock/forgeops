@@ -110,9 +110,14 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun) {
 
     if (params.Postcommit_perf_restore) {
         parallelTestsMap.put('Perf Restore',
-            {
-                commonLodestarModule.runLodestar(pipelineRun, 'Perf Restore') { c -> cloud_tests.runCdmPerfPostcommit(c) }
-            }
+                {
+                    commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
+                            [
+                                    TEST_NAME      : 'platform',
+                                    CONFIGFILE_NAME: 'conf-postcommit-forgeops-perf-restore-100k-closed.yaml',
+                            ]
+                    )
+                }
         )
     }
 
