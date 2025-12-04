@@ -150,8 +150,8 @@ def runPostcommitSet0(PipelineRunLegacyAdapter pipelineRun, Random random, Linke
                 {
                     commonLodestarModule.runPyrock(pipelineRun, random, 'Perf Restore', clusterConfig +
                             [
-                                    TEST_NAME                      : 'platform',
-                                    CONFIGFILE_NAME                : 'conf-postcommit-restore-100k-closed.yaml'
+                                    TEST_NAME      : 'platform',
+                                    CONFIGFILE_NAME: 'conf-postcommit-forgeops-perf-restore-100k-closed.yaml',
                             ]
                     )
                 }
