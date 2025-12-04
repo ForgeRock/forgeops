@@ -10,7 +10,7 @@ Providing the ability to send the output of bin/debug-logs directly to a file.
 ### New product versions available
 
 IDM and DS 8.0.1 secure images available
-AM 7.5.2 secure images available
+AM 7.5.2 and 8.0.2 secure images available
 
 ### New --retain option for troubleshooting Amster
 You can supply `--retain {duration}` to both `forgeops amster import` and `forgeops amster export` 
