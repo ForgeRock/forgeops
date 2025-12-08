@@ -332,7 +332,43 @@ def write_operator_logs(output, operator, max_log_lines):
     '''.format(pod=pod, container=operator[2], log=log, operator_name=operator[3])
     output.write(operator_log_html)
 
+def write_events(output, namespace, max_log_lines):
+    success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace}', 'events',
+                                                cstdout=True, ignoreFail=True)
+    if success:
+        # Split the output into lines...
+        get_output = get_output.decode('utf-8').splitlines()
+        # ... and join the lines into a string, adding <br> at the end of each line
+        events = '<br>'.join(get_output[0:max_log_lines])
+    else:
+        events = print('Command to get events failed\n')
 
+    # Write it out
+    events_html = '''
+    <h2><a id="events">Namespace events (kubectl events)</a></h3>
+    <pre>{events}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(events=events)
+    output.write(events_html)
+
+def write_resources(output):
+    success, get_output, _ = utils.run_condfail('kubectl', 'top', 'nodes',
+                                                cstdout=True, ignoreFail=True)
+    if success:
+        # Replace the newlines with html line breaks
+        resources = get_output.decode('utf-8').replace('\n', '<br/>')
+    else:
+        resources = print('Command to get node resources failed\n')
+
+    # Write section
+    obj_html = '''
+    <br>
+    <h2><a id="resources">Kubectl top nodes</a></h2>
+    <pre>{resources}</pre>
+    <p><a href="#toc">Back to Index</a></p>
+    '''.format(resources=resources)
+    output.write(obj_html)
+    
 def write_k_list(name, output, namespace):
     success, get_output, _ = utils.run_condfail('kubectl', f'--namespace {namespace} get {name}',
                                                 cstdout=True, ignoreFail=True)
@@ -533,11 +569,15 @@ def write_toc(output, pods, stss, pvcs, jobs, objs, operators, env_log):
 
     # Write TOC
 
-
     toc_html = f'''
     <h2><a id="toc">Environment Information</a></h2>
     <ul>
     {other_toc}
+    </ul>
+    <h2>Cluster and Namespace Information</h2>
+    <ul>
+        <li><a href="#resources">Node resources (kubectl top nodes)</a></li>
+        <li><a href="#events">Namespace Events (kubectl events)</a></li>
     </ul>
     <h2>Pods Information</h2>
     <ul>
@@ -672,6 +712,10 @@ def main():
             # Write Helm or Kustomize env logs
             print('Writing Helm or Kustomize env logs')        
             write_forgeops_environment(output, env_log)
+        
+        # Write Cluster node resources
+        print('Writing node resources in current cluster')
+        write_resources(output)
 
         # Write pod descriptions and container logs
         print('Writing pod descriptions and container logs')
@@ -705,6 +749,10 @@ def main():
         print('Writing operator logs')
         print(f'  {operators[3]}')
         write_operator_logs(output, operators, int(max_log_lines))
+
+        # Write namespace events
+        print('Writing all events in current namespace')
+        write_events(output, namespace, int(max_log_lines))
 
         # Write special objects (CLI and YAML output)
         print('Writing information about various Kubernetes objects')
