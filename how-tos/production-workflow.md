@@ -10,8 +10,11 @@ workflow for production environments.
 
 ## Setup
 
-Your system needs to be set up to run ForgeOps. Follow the instructions in
-<a href="how-tos/laptop-setup.md">Laptop Setup</a> for details.
+Your system needs to be set up to run ForgeOps. Follow the instructions in <a
+href="how-tos/laptop-setup.md">Laptop Setup</a> for details. This is a handy
+document to give other team members to help them get their workstation setup to
+run ForgeOps. This allows you to focus on explaining/documenting how your
+organization uses ForgeOps.
 
 ## Initial Workflow
 
@@ -93,7 +96,7 @@ released.
 
 In this example, we are going to have a prod branch that contains your
 configuration, and will be the branch you create your feature branches from.
-We'll also be using 2025.1.1 as the ForgeOps version.
+We'll also be using 2025.2.1 as the ForgeOps version.
 
 Prior to executing these commands, create a fork of
 https://github.com/ForgeRock/forgeops.git. In this example, we will be using
@@ -104,11 +107,11 @@ mkdir ~/git
 cd ~/git
 git clone -b https://github.com/MyOrg/forgeops.git
 cd forgeops
-git switch -c prod 2025.1.1
+git switch -c prod 2025.2.1
 git push -u origin prod
 ```
 
-Now you have a fork, and a prod branch based on the 2025.1.1 tag. From here you
+Now you have a fork, and a prod branch based on the 2025.2.1 tag. From here you
 can create a new feature branch for creating your first environment.
 
 #### Create a feature branch
@@ -121,8 +124,9 @@ our ForgeOps fork.
 
 ### Create an environment
 
-The first thing you do is use `forgeops env` to create an environment. You
-need to provide an FQDN (--fqdn) and an environment name (--env-name).
+The first thing you do is use `forgeops env` to create an environment. You need
+to provide an FQDN (--fqdn), an environment name (--env-name), and a
+certificate issuer.
 
 Previously, we had t-shirt sized overlays called small, medium, and large. Now,
 we just have `kustomize/overlay/default` which is a single instance overlay.
@@ -130,16 +134,21 @@ You can still use `--small`, `--medium`, and `--large` to configure your
 overlay, and the env command will populate your environment with the size you
 requested.
 
+You must specify an Issuer (`--issuer`) or a ClusterIssuer (`--cluster-issuer`).
+In this example, we'll use a ClusterIssuer called my_issuer. We make you select
+this so a production environment doesn't get mistakenly deployed with a
+self-signed certificate.
+
 So if we want a medium sized stage deployment with an FQDN of iam.example.com,
 we'd do this:
 
-`./bin/forgeops env --fqdn stage.iam.example.com --medium --env-name stage`
+`./bin/forgeops env --fqdn stage.iam.example.com --medium --env-name stage --cluster-issuer my_issuer`
 
 We recommend creating a single-instance environment to go along with each
 actual environment. This allows you to use the single to develop your file
 based config, and build images with the config(s) for that environment.
 
-`./bin/forgeops env --fqdn stage-single.iam.example.com --env-name stage-single`
+`./bin/forgeops env --fqdn stage-single.iam.example.com --env-name stage-single --cluster-issuer my_issuer`
 
 You will find the environments in `kustomize/overlay/` and `helm/`. These need
 to be added to git.
@@ -155,7 +164,7 @@ The Forgeops tool now works with multiple versions of PIP so you'll need to
 select which one you want to work with. For an initial environment setup,
 you'll want to set the version for both builds and deployments. After
 developing your initial config, you'll only need to update the UI images in
-your environments..
+your environments.
 
 See <a href="manage-platform-images.md">Manage Platform Images</a> for details.
 
@@ -198,6 +207,31 @@ Now that you have a vanilla single-instance PIP deployment up and running, you
 can start applying your AM and IDM configurations. These are your file-based
 configurations (FBC).
 
+### Export your configurations
+
+After making changes to your single-instance environment, you'll need to export
+your configurations. Be sure to change your context to have the namespace you
+want to target. The `forgeops config` command doesn't honor `-n my_namespace`.
+
+`kubens my_namespace`
+or
+`kubectl config set-context <context_name> --namespace my_namespace`
+
+After that, you can run `forgeops config`.
+
+`forgeops config export idm stage`
+
+When exporting AM's config, it will run the am-config-upgrader on it. You need to provide the release-name so the correct upgrader gets run.
+
+`forgeops config export --release-name 7.5.1 am stage`
+
+Alternatively, you can skip the config upgrader if you aren't changing the version of AM.
+
+`forgeops config export --no-upgrade am stage`
+
+For more details on exporting config and building images with `forgeops build`
+see the <a href="https://docs.pingidentity.com/forgeops/2025.2/customize/fr-data.html">official docs</a>.
+
 ### Build images for an environment
 
 When you need to build a new application image, you can use `forgeops build`
@@ -209,7 +243,12 @@ image-defaulter and values files for the targeted environment.
 If we want to build new am and idm images for our stage environment using the
 stage-cfg profile, we'd do this:
 
-`./bin/forgeops build --env-name stage-single --config-profile stage-cfg --push-to "my.registry.com/my-repo/stage" am idm`
+`./bin/forgeops build --env-name stage-single --config-profile stage --release-name 7.5.1 am`
+
+If you didn't set PUSH_TO in `forgeops.conf`, then you'll need to provide
+`--push-to` every time you run `forgeops build`.
+
+`--push-to "my.registry.com/my-repo/stage"`
 
 Once that is done, you'd apply the environment via Helm or Kustomize to deploy.
 
@@ -217,7 +256,7 @@ Once that is done, you'd apply the environment via Helm or Kustomize to deploy.
 
 Now that you've developed and tested your configs, you can copy them over to the real deployment.
 
-`forgeops copy --source stage-single --env-name stage`
+`forgeops image --copy --source stage-single --env-name stage`
 
 ### Apply the real deployment
 
@@ -242,9 +281,8 @@ just need the config, export, build, copy, and apply steps.
 
 ### Config change
 
-Make your change(s) on your single instance environment.
-
-Export that config change.
+Make your change(s) on your single instance environment, then export that
+config change. Be sure to change the namespace in your context.
 
 `forgeops config export am stage`
 
@@ -254,13 +292,15 @@ Export that config change.
 
 Build your new images with your config.
 
-`forgeops build -e stage-single -p stage am`
+`forgeops build -e stage-single -p stage --release-name 7.5.1 am`
 
-`forgeops build -e stage-single -p stage idm`
+`forgeops build -e stage-single -p stage --release-name 7.5.1 idm`
 
 ### Apply and test
 
-Apply it to your single environment and test it.
+Apply it to your single environment and test it. When applying, be sure to
+switch your context to the correct namespace, or use `-n my_namespace` with
+each command.
 
 #### Using Helm
 
@@ -301,7 +341,7 @@ You can copy the tested images to your real environment.
 ### Commit your changes to git
 
 At this point, you should make sure all of the changes you made are committed to
-git, and you can create a pull request (PR) into the prod branch.
+git:
 
 ```
 git add .
@@ -309,8 +349,8 @@ git commit -a -m 'Adding initial stage configuration'
 git push
 ```
 
-Now you can follow your team's procedures for merging your `first_env` branch
-into the `prod` branch.
+Now you can create a PR and follow your team's procedures for merging your
+`first_env` branch in.
 
 ## Selecting dev images
 
