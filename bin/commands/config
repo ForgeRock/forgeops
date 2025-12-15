@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+""" Manage file based configuration for Ping Identity Platform"""
 import argparse
 import pathlib
 import subprocess
