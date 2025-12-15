@@ -125,10 +125,13 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                         // env.GUILLOTINE_REPOSITORY_URL = 'https://github.com/ping-sandbox/forgeops-guillotine'
                         scmUtils.checkoutRepository(env.GUILLOTINE_REPOSITORY_URL, 'dev')
 
+                        sh("python3 -m venv venv")
+                        sh(". venv/bin/activate")
+
                         authenticateGke()
                         // Configure environment to make Guillotine works on GKE
                         withCredentials([file(credentialsId: 'jenkins-guillotine-storage-gke-sa-key', variable: 'G_STORAGE_GKE_KEY')]) {
-                            sh("./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
+                            sh("./venv/bin/python3 ./configure.py env --gke-only --gke-storage-sa ${env.G_STORAGE_GKE_KEY}")
                         }
 
                         if (platformImageRef != '') {
@@ -143,12 +146,12 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
 
 
                         // Configure Guillotine to run tests, force Guillotine to use platform images (platform version in dev)
-                        sh("./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
+                        sh("./venv/bin/python3 ./configure.py runtime --forgeops-ref ${commonModule.GIT_COMMIT} ${options}")
 
                         try {
                             // Run the tests
                             withGitHubCredentialsForGuillotine() {
-                                sh("./run.py")
+                                sh("./venv/bin/python3 ./run.py")
                                 currentBuild.result = 'SUCCESS'
                             }
                         } catch (Exception exc) {
@@ -169,7 +172,7 @@ def runGuillotine(PipelineRunLegacyAdapter pipelineRun, String stageName, String
                                                  reportTitles: ''])
                                 }
                             }
-                            sh("./shared/scripts/jenkins_clean_namespaces.py")
+                            sh("./venv/bin/python3 ./shared/scripts/jenkins_clean_namespaces.py")
                         }
                     }
                 }
