@@ -5,8 +5,8 @@ import pathlib
 import subprocess
 import shutil
 import io
-import tarfile
 import sys
+import tarfile
 import textwrap
 import os
 from pathlib import Path
@@ -22,8 +22,13 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 
 from lib.python import utils
 
+CONFIGMAP_CMD_ALIAS = ['cm']
+
 HELP_DESCRIPTION = """
 Manage Ping Identity Platform configuration.
+"""
+HELP_CONFIGMAP_CMD_DESCRIPTION = """
+Create a ConfigMap from an export. PingAM and PingIDM only.
 """
 HELP_EXPORT_CMD_DESCRIPTION = """
 Export config from running instance to a given profile. PingAM and PingIDM only.
@@ -47,6 +52,10 @@ Directory of tool configuration files e.g. docker, kustomize
 """
 HELP_PATH_CMD_DESCRIPTION = """
 Resolve an absolute path to a location in the forgeops directory tree.
+"""
+
+HELP_NAMESPACE = """
+Kubernetes namespace to target
 """
 
 HELP_PATH_DOCKER_CMD = """
@@ -97,22 +106,31 @@ like PingDS which has multiple kustomizations. e.g cts,idrepo,base
 HELP_PATH_EXAMPLES = """
 examples:
   # Path to the "small" kustomize profile
-  $ ./bin/config path kustomize overlay small
+  $ ./bin/forgeops config path kustomize overlay small
 
   # Path to a PingIDM configuration profile
-  $ ./bin/config path docker idm
+  $ ./bin/forgeops config path docker idm
 
   # Path to the directory containing PingGateway Dockerfile
-  $ ./bin/config path docker ig
+  $ ./bin/forgeops config path docker ig
+"""
+
+HELP_CONFIGMAP_EXAMPLES = """
+examples:
+  # Create am-fbc ConfigMap in context namespace
+  $ ./bin/forgeops config configmap am <myprofile>
+
+  # Create idm-fbc ConfigMap in a specific namespace
+  $ ./bin/forgeops config configmap --namespace my_ns idm <mynewprofile>
 """
 
 HELP_EXPORT_EXAMPLES = """
 examples:
   # ExportPing configuration to an existing profile <myprofile>
-  $ ./bin/config export am <myprofile>
+  $ ./bin/forgeops config export am <myprofile>
 
   # Export PingAM configruation for a profile that doesn't exist
-  $ ./bin/config export --baseline-profile default am <mynewprofile>
+  $ ./bin/forgeops config export --baseline-profile default am <mynewprofile>
 """
 
 PLATFORM_COMPONENTS = {
@@ -126,6 +144,12 @@ PLATFORM_COMPONENTS = {
 EXPORT_COMPONENTS = {
     'am': ('am',),
     'idm': ('idm',),
+}
+
+CONFIGMAP_COMPONENTS = {
+    'am': ('am',),
+    'idm': ('idm',),
+    'ig': ('ig',),
 }
 
 APP_CONF_PATH_FMT = {
@@ -320,6 +344,34 @@ def run_export(args, overrides):
         log.info('Sorting completed.')
 
 
+def run_configmap(args, overrides):
+    """ Create/Update a ConfigMap resource """
+    conf_path = pathlib.Path(overrides['build_path'].joinpath(
+        APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
+    if not conf_path.is_dir():
+        msg = f"ERROR! No such profile ({args.profile}) at {conf_path}"
+        utils.exit_msg(1, msg)
+    cm_name = f'{args.component}-fbc'
+    tmp_dir = Path(f"/tmp/{os.getpid()}")
+    arcname = 'config'
+    tgz_fn = f"{arcname}.tgz"
+    tgz_file = tmp_dir / tgz_fn
+    if not tmp_dir.is_dir():
+        tmp_dir.mkdir(0o755, True, True) # mode, parents, exist_ok
+    with tarfile.open(tgz_file, "w:gz") as tar:
+        tar.add(conf_path, arcname=arcname)
+    ns_opt = ""
+    if getattr(args, 'namespace', None):
+        ns_opt = f'-n {args.namespace}'
+    try:
+        utils.run(KUBECTL, f'delete configmap {cm_name} {ns_opt}', cstdout=True, cstderr=True)
+    except:
+        print(f"Didn't find ConfigMap {cm_name}, continuing.")
+    cmd_args = f'create configmap {cm_name} --from-file {tgz_file} {ns_opt}'
+    utils.run(KUBECTL, cmd_args, cstdout=True)
+    print(f'ConfigMap {cm_name} created. Restart {args.component} to update config.')
+
+
 def run_path(args, overrides):
     if args.tool == 'docker' and args.component != 'ds':
         profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
@@ -349,6 +401,11 @@ def main():
     common_hk.add_argument('--kustomize-path',
                         '-k',
                         help=HELP_KUSTOMIZE_PATH)
+    common_ns = argparse.ArgumentParser(add_help=False,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    common_ns.add_argument('--namespace',
+                        '-n',
+                        help=HELP_NAMESPACE)
     sub_cmd_parser = parser.add_subparsers(dest="cmd")
 
     # export sub command
@@ -374,6 +431,18 @@ def main():
                                    help=HELP_RELEASE_NAME)
     export_cmd_parser.set_defaults(func=run_export)
 
+    # configmap sub command
+    cm_cmd_parser = sub_cmd_parser.add_parser('configmap',
+                                                  epilog=textwrap.dedent(HELP_CONFIGMAP_EXAMPLES),
+                                                  formatter_class=argparse.RawDescriptionHelpFormatter,
+                                                  parents=[common_ns],
+                                                  aliases=CONFIGMAP_CMD_ALIAS,
+                                                  description=HELP_CONFIGMAP_CMD_DESCRIPTION)
+    cm_cmd_parser.add_argument('component',
+                               choices=CONFIGMAP_COMPONENTS.keys(),
+                               help=HELP_CMD_COMPONENTS)
+    cm_cmd_parser.add_argument('profile')
+    cm_cmd_parser.set_defaults(func=run_configmap)
     # path sub command
     path_cmd_parser = sub_cmd_parser.add_parser('path',
                                                 epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
