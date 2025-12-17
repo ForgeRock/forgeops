@@ -39,6 +39,10 @@ spec:
       volumes:
         - name: fbc
           emptyDir: {}
+        - name: config
+          configMap:
+            name: idm-fbc
+            optional: true
         - name: idm-secrets
           secret:
             secretName: idm
@@ -77,8 +81,10 @@ spec:
             - /bin/bash
             - -c
             - |
-              if [ -d /fbc/config ];
-              then
+              if [ -f /config/config.tgz ] ; then
+                echo "Found config in ConfigMap"
+                tar -zxf config.tgz -c /fbc
+              elif [ -d /fbc/config ]; then
                 echo "Existing openidm configuration found. Skipping copy"
               else
                 echo "Copying docker image configuration files to the shared volume"
