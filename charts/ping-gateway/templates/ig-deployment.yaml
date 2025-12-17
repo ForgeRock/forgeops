@@ -43,6 +43,28 @@ spec:
       serviceAccountName: {{ include "ping-gateway.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.ig.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: fbc
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: ig-fbc
+            optional: true
+      initContainers:
+        - name: fbc-init
+          image: "{{ .Values.ig.image.repository }}:{{ .Values.ig.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ig.image.pullPolicy }}
+          volumeMounts:
+          - mountPath: /fbc
+            name: fbc
+          command:
+          - /bin/bash
+          - -c
+          - |
+            if [ -f /config/config.tgz ] ; then
+              echo "Found config in ConfigMap"
+              tar -zxf /config/config.tgz -c /fbc
+            fi
       containers:
         - name: ig
           securityContext:
