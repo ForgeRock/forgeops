@@ -55,6 +55,15 @@ The Grafana dashboards in
 `cluster/addons/prometheus/forgerock-metrics/dashboards` has been updated with
 the latest ones provided by the Product teams.
 
+### Ability to provide file based config as a ConfigMap
+
+The `forgeops config` command has a new subcommand called `configmap` that will
+create a ConfigMap for AM, IDM, or IG with a FBC config profile as a tgz.
+Updates have been made to the Helm chart and the Kustomize base that will use
+the ConfigMap if it exists. If it doesn't exist, then it will use the built in
+config like normal. This means that it is no longer necessary to build the
+config into images.
+
 ## Bugfixes
 
 ### Fixed bug in base-generate.sh
