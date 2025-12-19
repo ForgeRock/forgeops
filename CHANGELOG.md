@@ -64,6 +64,19 @@ the ConfigMap if it exists. If it doesn't exist, then it will use the built in
 config like normal. This means that it is no longer necessary to build the
 config into images.
 
+### Repository clean up
+
+The repository has been cleaned up by moving several items around. This is
+being done to focus the forgeops repository on the bare essentials needed to
+manage ForgeOps deployments.
+
+* Moving examples from etc into the forgeops-extras repo under the samples folder
+* Moving the contents of the cluster folder into the etc dir
+* Removing old bin/ wrapper scripts
+  * bin/amster -> `forgeops amster`
+  * bin/config -> `forgeops config`
+  * bin/am-config-upgrader -> `forgeops upgrade-am-config`
+
 ## Bugfixes
 
 ### Fixed bug in base-generate.sh
