@@ -11,7 +11,7 @@
         },
         "type": "StaticResponseHandler"
       },
-      "scanInterval": 1
+      "scanInterval": "1 second"
     }
   },
   "heap": [
