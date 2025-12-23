@@ -3,6 +3,7 @@
     "name": "_router",
     "type": "Router",
     "config": {
+      "directory": "${openig.configDirectory}/routes",
       "defaultHandler": {
         "config": {
           "entity": "Message from ConfigJson.MyMainRouter.defaultHandler",
