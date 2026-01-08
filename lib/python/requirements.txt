@@ -3,4 +3,4 @@ packaging==25.0
 PyJWT[crypto]==2.10.1
 PyYAML==6.0.3
 requests==2.32.5
-urllib3==2.5.0
+urllib3==2.6.3
