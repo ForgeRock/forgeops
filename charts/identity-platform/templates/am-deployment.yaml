@@ -113,7 +113,11 @@ spec:
           - |
             if [ -f /config/config.tgz ] ; then
               echo "Found config in ConfigMap"
-              tar -zxf /config/config.tgz -c /fbc
+              tar -zxf /config/config.tgz -C /fbc
+              cd /home/forgerock/openam
+              cp -rv .homeVersion * /fbc
+              cp -av /fbc/archive/config /fbc
+              rm -rf /fbc/archive
               cp /fbc/config/boot.json /fbc/default-boot.json
             elif [ -d /fbc/config ]; then
               echo "Existing openam configuration found. Skipping copy"

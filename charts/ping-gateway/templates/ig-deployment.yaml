@@ -57,13 +57,17 @@ spec:
           volumeMounts:
           - mountPath: /fbc
             name: fbc
+          - mountPath: /config
+            name: config
           command:
           - /bin/bash
           - -c
           - |
             if [ -f /config/config.tgz ] ; then
               echo "Found config in ConfigMap"
-              tar -zxf /config/config.tgz -c /fbc
+              tar -zxf /config/config.tgz -C /fbc
+              cp -av /fbc/archive/* /fbc/
+              rm -rf /fbc/archive
             fi
       containers:
         - name: ig
@@ -118,6 +122,9 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.ig.resources | nindent 12 }}
+          volumeMounts:
+          - name: config
+            mountPath: /config
       {{- with .Values.ig.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

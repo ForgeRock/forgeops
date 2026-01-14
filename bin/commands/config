@@ -353,13 +353,11 @@ def run_configmap(args, overrides):
         utils.exit_msg(1, msg)
     cm_name = f'{args.component}-fbc'
     tmp_dir = Path(f"/tmp/{os.getpid()}")
-    arcname = 'config'
-    tgz_fn = f"{arcname}.tgz"
-    tgz_file = tmp_dir / tgz_fn
+    tgz_file = tmp_dir / 'config.tgz'
     if not tmp_dir.is_dir():
         tmp_dir.mkdir(0o755, True, True) # mode, parents, exist_ok
     with tarfile.open(tgz_file, "w:gz") as tar:
-        tar.add(conf_path, arcname=arcname)
+        tar.add(conf_path, arcname='archive')
     ns_opt = ""
     if getattr(args, 'namespace', None):
         ns_opt = f'-n {args.namespace}'
