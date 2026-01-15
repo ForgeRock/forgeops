@@ -2,9 +2,10 @@
 
 ## Introduction
 
-This document is designed to help folks, who are new to ForgeOps, get their
-local environment setup. It requires some extra Python libraries, and some
-explanation of some basics.
+This document is designed to be given out by Ping Identity Platform (PIP)
+admins to folks new to PIP/ForgeOps in their organization. It will help you get
+your laptop setup to run ForgeOps so you can get further instruction on how to
+to use ForgeOps with your organization's implementation of PIP/ForgeOps.
 
 ## Clone git repos
 
