@@ -16,19 +16,16 @@ import com.forgerock.pipeline.stage.Status
 void runStage(PipelineRunLegacyAdapter pipelineRun) {
     stage ('Create Platform Images PR') {
         pipelineRun.pushStageOutcome('create-platform-images-pr', stageDisplayName: 'Create Platform-Images PR') {
-            // TODO Remove and uncomment the below -- LODESTAR-1877 temporary workaround to prevent promotion in platform-images
-            //  to avoid side-effects on other product pipelines
-            throw new Exception("ForgeOps Promotion is temporary disabled")
-//            privateWorkspace {
-//                def dockerProperties = [
-//                        'gitCommit':            commonModule.GIT_COMMIT,
-//                        'platformImagesCommit': commonModule.platformImagesRevision,
-//                        'lodestarCommit':       commonModule.lodestarRevision,
-//                ]
-//                return platformImageUtils.createPlatformImagePR(
-//                        'forgeops', commonModule.calculatePlatformImagesBranch(), dockerProperties) ? Status.SUCCESS.asOutcome()
-//                                                                                                    : Status.SKIPPED.asOutcome()
-//            }
+            privateWorkspace {
+                def dockerProperties = [
+                        'gitCommit':            commonModule.GIT_COMMIT,
+                        'platformImagesCommit': commonModule.platformImagesRevision,
+                        'lodestarCommit':       commonModule.lodestarRevision,
+                ]
+                return platformImageUtils.createPlatformImagePR(
+                        'forgeops', commonModule.calculatePlatformImagesBranch(), dockerProperties) ? Status.SUCCESS.asOutcome()
+                                                                                                    : Status.SKIPPED.asOutcome()
+            }
         }
     }
 }
