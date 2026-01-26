@@ -115,9 +115,6 @@ if ! $CONTAINER_ENGINE info --format ' ' ; then
     exit 1
 fi
 
-# The default repo for the upgrader docker image
-DEFAULT_REPO=${REPO:-us-docker.pkg.dev/forgeops-public/images/am-config-upgrader}
-
 # The am upgrader image tag to run. To override:
 # TAG=foo  bin/am-config-upgrader
 TAG=${TAG:-latest}
@@ -125,22 +122,33 @@ TAG=${TAG:-latest}
 if [ -n "$RELEASE_NAME" ] ; then
   # If we were given a release name, source the file if it exists to
   # override $REPO and $TAG from that file
-  RELEASE_PATH=$BUILD_PATH/am/releases/$RELEASE_NAME
+  RELEASE_PATH=$BUILD_PATH/am-config-upgrader/releases/$RELEASE_NAME
   if [ -f $RELEASE_PATH ] ; then
     source $RELEASE_PATH
+  else
+    echo "Unable to find release $RELEASE_NAME in $RELEASE_PATH. Exiting."
+    exit 1
   fi
 fi
 
-# Reset the REPO value because the source command will set it to the am repo
-REPO=$DEFAULT_REPO
-
-# Only retrieve the release identifier from the tag
-echo "Stripping the date string suffix from the PingAM release tag so it retrieves the correct version of the upgrader to match PingAM"
-TAG=${TAG%%-*}
+REPO=${REPO:-us-docker.pkg.dev/forgeops-public/images/am-config-upgrader}
 
 # For docker volume mounts.
 CONFIG=$(realpath $CONFIG_DIR)
 
 # Run the upgrader locally - optionally over mounting the /rules directory
 #set -x
-runOrPrint $CONTAINER_ENGINE run --rm --volume "$CONFIG":/am-config $RULES_VOLUME "$REPO:$TAG"
+CMD="$CONTAINER_ENGINE run --rm --user 0 --volume $CONFIG:/am-config $RULES_VOLUME $REPO:$TAG"
+if [ "$DEBUG" = true ] ; then
+  echo "DEBUG: Listing contents of volume mounts"
+  $CMD ls /am-config
+  $CMD ls /rules
+fi
+runOrPrint "$CMD"
+
+SYSTEM=$(uname -s)
+if [ "$SYSTEM" == "Linux" ] ; then
+  echo "Detected Linux localhost, fixing local permissions. Requires sudo access."
+  GID=$(id -g)
+  runOrPrint "$CMD chown -R $UID:$GID /am-config/config"
+fi

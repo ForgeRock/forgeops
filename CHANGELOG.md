@@ -65,6 +65,11 @@ the ConfigMap if it exists. If it doesn't exist, then it will use the built in
 config like normal. This means that it is no longer necessary to build the
 config into images.
 
+### Ability to build am-config-upgrader image
+
+We have added docker/am-config-upgrader/Dockerfile and the ability to build an
+am-config-upgrader image with `forgeops build`.
+
 ### Repository clean up
 
 The repository has been cleaned up by moving several items around. This is
@@ -94,6 +99,13 @@ with the provided configuration.  This has now been corrected.
 
 `forgeops amster export` now waits for AM to be up.  Previously this function was only included 
 in the import command.
+
+### upgrade-am-config fix
+
+The 8.0.2 image of am-config-upgrader changed some permissions that caused
+`forgeops upgrade-am-config` to break. The `forgeops upgrade-am-config` command
+now connects to the container as root. This is a temporary ephemeral container
+running off of the cluster which reduces the security impact.
 
 ## Removed Features
 

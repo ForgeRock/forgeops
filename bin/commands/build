@@ -58,8 +58,8 @@ EOM
 }
 
 # Setup valid components now so they get presented in the usage
-COMPONENTS_FBC=( "am" "idm" "ig" )
-COMPONENTS_VALID=( ${COMPONENTS_APPS[@]} 'ds' 'ig' 'platform' )
+COMPONENTS_FBC=( "am" "idm" "ig")
+COMPONENTS_VALID=( ${COMPONENTS_APPS[@]} 'ds' 'ig' 'platform' 'am-config-upgrader')
 
 # Code in common.sh
 processArgs $*
