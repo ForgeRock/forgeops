@@ -319,7 +319,7 @@ def secretagent(k8s_op, tag='latest'):
 
 def _install_certmanager_issuer():
     """Install certmanager self-signed issuer. This works as a placeholder issuer."""
-    addons_dir = os.path.join(root_path, 'cluster', 'addons', 'certmanager')
+    addons_dir = os.path.join(root_path, 'etc', 'addons', 'certmanager')
     issuer = os.path.join(addons_dir, 'files', 'selfsigned-issuer.yaml')
     print('\nInstalling cert-manager\'s self-signed issuer: ', end='')
     sys.stdout.flush()

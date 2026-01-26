@@ -36,7 +36,7 @@ Prometheus, Alertmanager, and Grafana endpoints.
 Note: All path locations mentioned in this README are relative to the forgeops
 repository's top-level directory.
 
-## Files in the ``cluster/addons/prometheus`` directory  
+## Files in the ``etc/addons/prometheus`` directory  
 
 * `prometheus-operator.yaml`: Overrides values for the Prometheus operator,
 Prometheus, Alertmanager, and Grafana. See the
@@ -70,10 +70,10 @@ configuration watcher to look for updated configurations.
 
 Alertmanager is used to redirect specific alerts from Prometheus to configured
 receivers. Use the `alertmanager` section in the `prometheus-operator.yaml` 
-file in the `cluster/addons/prometheus/` directory to configure Alertmanager.
+file in the `etc/addons/prometheus/` directory to configure Alertmanager.
 
 Prometheus alerts are configured by product, in the
-`cluster/addons/prometheus/forgerock-metrics/templates/fr-alerts.yaml` file.
+`etc/addons/prometheus/forgerock-metrics/templates/fr-alerts.yaml` file.
 The Helm chart that includes the `fr-alerts.yaml` file also contains
 a Prometheus rules CRD. The CRD syncs the rules with Prometheus using labels.
 
@@ -84,7 +84,7 @@ chart.  Grafana automatically connects to Prometheus and syncs all the metrics.
 The metrics are visible through graphs.
 
 Dashboards for Ping Identity products are added to the Grafana deployment from the
-`cluster/addons/prometheus/forgerock-metrics/dashboards` directory.  The
+`etc/addons/prometheus/forgerock-metrics/dashboards` directory.  The
 dashboards are automatically added to a configmap, and then imported into
 Grafana. For more information, see the **Import Custom Grafana Dashboards** how-to below.
 
@@ -202,10 +202,10 @@ The entire configuration for Prometheus, Alertmanager, and Grafana can be found
 in the `kube-prometheus-stack`
 [values file](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack).
 Configuration overrides for the ForgeOps deployment are contained in the
-`cluster/addons/prometheus/prometheus-operator.yaml` file. If you want to
+`etc/addons/prometheus/prometheus-operator.yaml` file. If you want to
 specify additional customized configuration values, do one of the following:
 
-* Extend the `cluster/addons/prometheus/prometheus-operator.yaml` file, adding
+* Extend the `etc/addons/prometheus/prometheus-operator.yaml` file, adding
 your custom configuration values to the file.
 
 * Provide your own custom configuration by copying the
@@ -229,7 +229,7 @@ details on configuring alerts.
 ### Configure alert notifications
 
 The default Alertmanager configuration in the
-`cluster/addons/prometheus/prometheus-operator.yaml` file is not configured to
+`etc/addons/prometheus/prometheus-operator.yaml` file is not configured to
 send any alert notifications. Use the the `alertmanager.config` section in the
 Prometheus operator Helm chart values file to configure alert notifications.
 
@@ -243,7 +243,7 @@ and
 Grafana includes a set of predefined dashboards for viewing Kubernetes and
 cluster metrics.  You can add custom dashboards to your deployment by adding
 dashboard JSON files to the
-`cluster/addons/prometheus/forgerock-metrics/dashboards` directory.
+`etc/addons/prometheus/forgerock-metrics/dashboards` directory.
 
 ### Expose Prometheus and Grafana externally
 

@@ -53,7 +53,7 @@ source .venv/bin/activate
 ### Updating Grafana dashboards to latest available
 
 The Grafana dashboards in
-`cluster/addons/prometheus/forgerock-metrics/dashboards` has been updated with
+`etc/addons/prometheus/forgerock-metrics/dashboards` has been updated with
 the latest ones provided by the Product teams.
 
 ### Ability to provide file based config as a ConfigMap

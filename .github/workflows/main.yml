@@ -69,7 +69,7 @@ jobs:
 
       - name: Cluster prereqs
         run: |
-          kubectl apply -f ./cluster/resources/minikube-fast-storage-class.yaml
+          kubectl apply -f ./etc/resources/minikube-fast-storage-class.yaml
           ./charts/scripts/install-prereqs
 
       - name: Helm deploy latest
