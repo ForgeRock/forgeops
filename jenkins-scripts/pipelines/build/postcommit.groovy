@@ -21,7 +21,7 @@ def initialSteps() {
             parameters(commonLodestarModule.postcommitMandatoryStages(true)),
     ])
 
-    slackChannel = '#forgeops-team'
+    slackChannel = '#ppds-k8s'
 }
 
 /**
