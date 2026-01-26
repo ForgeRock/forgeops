@@ -1,24 +1,42 @@
-RELEASE=2025.2.2
+RELEASE=2026.1.0
+
 # Release Notes
+
+## Highlights in this release
+
+### Ability to provide file based config as a ConfigMap
+
+The `forgeops config` command has a new `configmap` subcommand to create
+ConfigMaps for AM, IDM, or IG with the FBC config profile as tgz files.
+Helm chart and the Kustomize base have been updated to use the ConfigMap if it 
+exists. If it doesn't exist, then it will use the built-in config in images as 
+before. Now it is no longer necessary to build the config into images.
+
+Refer to the [Apply AM configmap](https://staging-docs.pingidentity.com/forgeops/dev/customize/am.html#apply-am-configmap) and 
+[Apply IDM configmap](https://staging-docs.pingidentity.com/forgeops/dev/customize/idm.html#apply-idm-configmap) sections in the documentation for further information.
 
 ## New Features/Updated functionality
 
-### Adding --output-file to bin/debug-logs
+### Direct `debug-logs` output to a file
 
-Providing the ability to send the output of bin/debug-logs directly to a file.
+Added the ability to send the output of `bin/debug-logs` directly to a file.
 
 ### New product versions available
 
-IDM and DS 8.0.1 secure images available
-AM 7.5.2 and 8.0.2 secure images available
-Secret Agent 1.2.8
+The following new versions are available:
+- IDM and DS 8.0.1 secure images 
+- AM 7.5.2 and 8.0.2 secure images
+- Secret Agent 1.2.8 
 
-### New --retain option for troubleshooting Amster
-You can supply `--retain {duration}` to both `forgeops amster import` and `forgeops amster export` 
-to keep the pod running longer.
+### New `--retain` option for troubleshooting Amster
+
+You can use the `--retain {duration}` option with `forgeops amster import` and 
+`forgeops amster export` commands to keep the pod running longer.
 
 ### Increased TTL
-Amster, ds-set-passwords and keystore-create jobs will now remain for two hours after completion to allow viewing logs. This value can be amended.
+
+Amster, ds-set-passwords and keystore-create jobs will now remain for two hours 
+after completion to allow viewing logs. This value can be amended.
 
 ### Moved upgrade logic into env command
 
@@ -27,22 +45,22 @@ can now call it like:
 
 `forgeops env -e my_env --upgrade`
 
-### Display a message when requested version isn't available
+### Display a message when requested image version isn't available
 
 The `forgeops image` command will select the next available version if the user
 requests a version that isn't available for a product. Now, it will tell you
 that it can't find the requested image to avoid confusion.
 
-### Adding ability to specify external DS hosts in Helm chart
+### Ability to specify external DS hosts in Helm chart
 
-You now have the ability to specify external DS host names in your values.yaml.
+Added the ability to specify external DS host names in your `values.yaml`.
 See `platform.external_ds` in `charts/identity-platform/values.yaml` for more
 info.
 
 ### Updated python dependency versions
 
-The versions of the python dependencies have been updated in
-`lib/python/requirements.txt`. Use `forgeops configure` to update your venv.
+The python dependencies have been updated in `lib/python/requirements.txt`. 
+Use `forgeops configure` to update your venv.
 
 ```
 cd /path/to/forgeops
@@ -50,66 +68,62 @@ source .venv/bin/activate
 ./bin/forgeops configure
 ```
 
-### Updating Grafana dashboards to latest available
+### Grafana dashboards to update 
 
 The Grafana dashboards in
 `etc/addons/prometheus/forgerock-metrics/dashboards` has been updated with
 the latest ones provided by the Product teams.
 
-### Ability to provide file based config as a ConfigMap
-
-The `forgeops config` command has a new subcommand called `configmap` that will
-create a ConfigMap for AM, IDM, or IG with a FBC config profile as a tgz.
-Updates have been made to the Helm chart and the Kustomize base that will use
-the ConfigMap if it exists. If it doesn't exist, then it will use the built in
-config like normal. This means that it is no longer necessary to build the
-config into images.
-
 ### Ability to build am-config-upgrader image
 
-We have added docker/am-config-upgrader/Dockerfile and the ability to build an
-am-config-upgrader image with `forgeops build`.
+Added `am-config-upgrader/Dockerfile` and the ability to build an
+`am-config-upgrader` image with `forgeops build`.
 
 ### Repository clean up
 
-The repository has been cleaned up by moving several items around. This is
-being done to focus the forgeops repository on the bare essentials needed to
-manage ForgeOps deployments.
+The `forgeops` repository has been cleaned up by moving several items around. 
+This is being done to focus the forgeops repository on the essential artifacts 
+needed to manage ForgeOps deployments.
 
-* Moving examples from etc into the forgeops-extras repo under the samples folder
-* Moving the contents of the cluster folder into the etc dir
-* Removing old bin/ wrapper scripts
+* Moved examples from `etc` folder to the `samples` folder in `forgeops-extras` 
+repository.
+* Moved the contents of the `cluster` folder into the `etc` folder.
+* Removed the scripts in the old `bin` folder, as their functionality is now 
+provided through the `forgeops` tool.
   * bin/amster -> `forgeops amster`
   * bin/config -> `forgeops config`
   * bin/am-config-upgrader -> `forgeops upgrade-am-config`
 
 ## Bugfixes
 
-### Fixed bug in base-generate.sh
+### Fixed bug in `base-generate.sh`
+
 There was a step missing in the logic for `base-generate.sh` that prevented the
 updated files from being placed properly. It now copies the results of `helm
 template` into the proper location.
 
-### Amster bug fixes
-Providing --full to `forgeops amster export` ensures it exports all realm entities.  
-This option was broken but now works.
+### Fixed bugs in `amster`
 
-`forgeops amster import {src}` wasn't overwriting the configuration baked in to the image 
-with the provided configuration.  This has now been corrected.
+Included the `--full` option in `forgeops amster export` to enable exporting 
+all realm entities. The bugs in this option have been fixed.
 
-`forgeops amster export` now waits for AM to be up.  Previously this function was only included 
-in the import command.
+`forgeops amster import {src}` wasn't overwriting the configuration baked in to 
+the image with the provided configuration.  This has now been corrected.
 
-### upgrade-am-config fix
+`forgeops amster export` now waits for AM to be up.  Previously this function 
+was only included in the import command.
 
-The 8.0.2 image of am-config-upgrader changed some permissions that caused
-`forgeops upgrade-am-config` to break. The `forgeops upgrade-am-config` command
-now connects to the container as root. This is a temporary ephemeral container
-running off of the cluster which reduces the security impact.
+### Fixed `forgeops upgrade-am-config`
 
-## Removed Features
+The 8.0.2 `am-config-upgrader` image changed permission on some files which 
+caused `forgeops upgrade-am-config` to break. The `forgeops upgrade-am-config` 
+command now connects to the container as `root`. This is an ephemeral 
+container running outside the cluster and reduces the security impact.
 
-## Documentation updates
+## How-tos
 
-### Adding user supplied certs to the truststore how-to
-New how-to on adding user supplied certificates to the truststore.
+### Included new procedures
+
+* [Add user supplied certificates](how-tos/custom-secrets.md) to the truststore.
+* [Change FQDN in a ForgeOps deployment](how-tos/change-fqdn-in-running-deployment.md).
+
