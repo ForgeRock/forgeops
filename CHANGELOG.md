@@ -68,12 +68,6 @@ source .venv/bin/activate
 ./bin/forgeops configure
 ```
 
-### Grafana dashboards to update 
-
-The Grafana dashboards in
-`etc/addons/prometheus/forgerock-metrics/dashboards` has been updated with
-the latest ones provided by the Product teams.
-
 ### Ability to build am-config-upgrader image
 
 Added `am-config-upgrader/Dockerfile` and the ability to build an
@@ -126,4 +120,5 @@ container running outside the cluster and reduces the security impact.
 
 * [Add user supplied certificates](how-tos/custom-secrets.md) to the truststore.
 * [Change FQDN in a ForgeOps deployment](how-tos/change-fqdn-in-running-deployment.md).
+* [Use an externally deployed PingDS with a ForgeOps deployment](how-tos/use-an-externally-deployed-ds-with-a-forgeops-deployment.md).
 
