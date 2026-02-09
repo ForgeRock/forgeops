@@ -344,32 +344,6 @@ def run_export(args, overrides):
         log.info('Sorting completed.')
 
 
-def run_configmap(args, overrides):
-    """ Create/Update a ConfigMap resource """
-    conf_path = pathlib.Path(overrides['build_path'].joinpath(
-        APP_CONF_PATH_FMT[args.component](profile=args.profile))).resolve()
-    if not conf_path.is_dir():
-        msg = f"ERROR! No such profile ({args.profile}) at {conf_path}"
-        utils.exit_msg(1, msg)
-    cm_name = f'{args.component}-fbc'
-    tmp_dir = Path(f"/tmp/{os.getpid()}")
-    tgz_file = tmp_dir / 'config.tgz'
-    if not tmp_dir.is_dir():
-        tmp_dir.mkdir(0o755, True, True) # mode, parents, exist_ok
-    with tarfile.open(tgz_file, "w:gz") as tar:
-        tar.add(conf_path, arcname='archive')
-    ns_opt = ""
-    if getattr(args, 'namespace', None):
-        ns_opt = f'-n {args.namespace}'
-    try:
-        utils.run(KUBECTL, f'delete configmap {cm_name} {ns_opt}', cstdout=True, cstderr=True)
-    except:
-        print(f"Didn't find ConfigMap {cm_name}, continuing.")
-    cmd_args = f'create configmap {cm_name} --from-file {tgz_file} {ns_opt}'
-    utils.run(KUBECTL, cmd_args, cstdout=True)
-    print(f'ConfigMap {cm_name} created. Restart {args.component} to update config.')
-
-
 def run_path(args, overrides):
     if args.tool == 'docker' and args.component != 'ds':
         profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
@@ -429,18 +403,6 @@ def main():
                                    help=HELP_RELEASE_NAME)
     export_cmd_parser.set_defaults(func=run_export)
 
-    # configmap sub command
-    cm_cmd_parser = sub_cmd_parser.add_parser('configmap',
-                                                  epilog=textwrap.dedent(HELP_CONFIGMAP_EXAMPLES),
-                                                  formatter_class=argparse.RawDescriptionHelpFormatter,
-                                                  parents=[common_ns],
-                                                  aliases=CONFIGMAP_CMD_ALIAS,
-                                                  description=HELP_CONFIGMAP_CMD_DESCRIPTION)
-    cm_cmd_parser.add_argument('component',
-                               choices=CONFIGMAP_COMPONENTS.keys(),
-                               help=HELP_CMD_COMPONENTS)
-    cm_cmd_parser.add_argument('profile')
-    cm_cmd_parser.set_defaults(func=run_configmap)
     # path sub command
     path_cmd_parser = sub_cmd_parser.add_parser('path',
                                                 epilog=textwrap.dedent(HELP_PATH_EXAMPLES),
