@@ -1,0 +1,9 @@
+ARG REPO=us-docker.pkg.dev/forgeops-public/images/fbc
+ARG TAG=latest
+
+FROM ${REPO}:${TAG}
+
+ARG CONFIG_PROFILE=default
+RUN echo "\033[0;36m*** Building '${CONFIG_PROFILE}' profile ***\033[0m"
+RUN mkdir /config
+COPY --chown=forgerock:root config-profiles/${CONFIG_PROFILE}/ /config/
