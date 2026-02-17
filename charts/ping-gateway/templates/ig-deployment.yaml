@@ -96,9 +96,6 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.ig.resources | nindent 12 }}
-          volumeMounts:
-          - name: config
-            mountPath: /config
       {{- with .Values.ig.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
