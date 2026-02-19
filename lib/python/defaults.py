@@ -14,11 +14,14 @@ SNAPSHOT_SERVICE_ACCOUNT = 'ds-snapshot'
 # this map get updated with that custom name.
 BASE_IMAGE_NAMES = {
     'am': 'am',
+    'am-fbc': 'am-fbc',
     'am-config-upgrader': 'am-config-upgrader',
     'amster': 'amster',
     'ds': 'ds',
     'idm': 'idm',
+    'idm-fbc': 'idm-fbc',
     'ig': 'ig',
+    'ig-fbc': 'ig-fbc',
     'admin-ui': 'admin-ui',
     'end-user-ui': 'end-user-ui',
     'login-ui': 'login-ui',

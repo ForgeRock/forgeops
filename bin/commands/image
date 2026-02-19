@@ -154,6 +154,7 @@ examples:
     parser.add_argument('--no-helm', action='store_true', help="Don't manage Helm values files")
     parser.add_argument('--no-kustomize', action='store_true', help="Don't manage Kustomize overlay")
     parser.add_argument('--copy', action='store_true', help='Copy images from --source to --env-name')
+    parser.add_argument('--fbc', action='store_true', help='Append -fbc to component name when setting FBC images')
     parser.add_argument('--release', help='Specify platform image release to set (eg. 7.5.1)')
     parser.add_argument('--release-name', default=argparse.SUPPRESS, help='Name of release file in docker/component/releases (default: $RELEASE-$DATETIME in UTC)')
     parser.add_argument('--releases-src', default=argparse.SUPPRESS, help=f"URL or path where release files live (default: {RELEASES_SRC_DEF})")
@@ -180,6 +181,9 @@ examples:
 
     if getattr(args, 'release_name', None) and not args.release:
         utils.exit_msg('You must supply --release when using --release-name.')
+
+    if args.fbc and (getattr(args, 'release', None) or getattr(args, 'copy', None)):
+        utils.exit_msg('You cannot supply --fbc with --release or --copy')
 
     overrides = utils.process_overrides(root_path,
                                         getattr(args, 'helm_path', None),
@@ -254,12 +258,17 @@ examples:
             if args.release:
                 tag = 'dev' if args.release == 'dev' else release_tags[component]
             if component == 'ds':
-                values_images['ds_cts'] = set_image(image_names[component], tag, repo)
-                values_images['ds_idrepo'] = set_image(image_names[component], tag, repo)
-                images_kustomize[component] = set_image(image_names[component], tag, repo)
+                data = set_image(image_names[component], tag, repo)
+                values_images['ds_cts'] = data
+                values_images['ds_idrepo'] = data
+                images_kustomize[component] = data
             else:
-                values_images[component.replace('-', '_')] = set_image(image_names[component], tag, repo)
-                images_kustomize[component] = set_image(image_names[component], tag, repo)
+                c = component
+                if args.fbc:
+                    c = f"{component}-fbc"
+                data = set_image(image_names[c], tag, repo)
+                values_images[c.replace('-', '_')] = data
+                images_kustomize[c] = data
 
     if overrides['do_kustomize']:
         utils.check_path(kustomize_path, 'Kustomize path', 'dir')
