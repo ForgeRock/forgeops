@@ -1,5 +1,5 @@
-ARG REPO=us-docker.pkg.dev/forgeops-public/images/fbc
-ARG TAG=latest
+ARG REPO=busybox
+ARG TAG=musl
 
 FROM ${REPO}:${TAG}
 
