@@ -27,6 +27,7 @@ The following new versions are available:
 - IDM and DS 8.0.1 secure images 
 - AM 7.5.2 and 8.0.2 secure images
 - Secret Agent 1.2.8 
+- IG 2025.11.0 and 2025.11.1
 
 ### New `--retain` option for troubleshooting Amster
 
