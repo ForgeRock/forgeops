@@ -21,6 +21,7 @@
 #CONTAINER_ENGINE=docker
 # Use PUSH_TO to set a global registry URL for building your custom images
 #PUSH_TO=
+#DOCKER_BUILD_EXTRA_ARGS="--platform linux/amd64,linux/arm64"
 
 #
 # Only for prereqs

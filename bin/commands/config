@@ -22,72 +22,49 @@ sys.path.insert(1, str(dependencies_dir) + site.USER_SITE.replace(site.USER_BASE
 
 from lib.python import utils
 
-CONFIGMAP_CMD_ALIAS = ['cm']
-
-HELP_DESCRIPTION = """
-Manage Ping Identity Platform configuration.
-"""
-HELP_CONFIGMAP_CMD_DESCRIPTION = """
-Create a ConfigMap from an export. PingAM and PingIDM only.
-"""
-HELP_EXPORT_CMD_DESCRIPTION = """
-Export config from running instance to a given profile. PingAM and PingIDM only.
-"""
+HELP_DESCRIPTION = "Manage Ping Identity Platform configuration."
+HELP_BUILD_CMD_DESCRIPTION = "Build an FBC image. PingAM, PingIDM, and PingGateway only."
+HELP_EXPORT_CMD_DESCRIPTION = "Export config from running instance to a given profile. PingAM and PingIDM only."
 HELP_EXPORT_BASELINE_PROFILE = """
 Specify a base profile to start with if the target profile doesn't
  exist. (default: default)
 """
-HELP_CMD_COMPONENTS = """
-Ping Identity Platform component.
-"""
+HELP_CMD_COMPONENTS = "Ping Identity Platform component."
 HELP_EXPORT_CMD_SORT = """
 Sort configuration json alphanumerically. This will lead to a large initial
  diff but subsequent iterations should be smaller and more readable.
 """
-HELP_EXPORT_CMD_AM_NO_UPGRADE = """
-Do not run PingAM upgrader rules when exporting configuration.
-"""
-HELP_PATH_CMD_TOOL_NAME = """
-Directory of tool configuration files e.g. docker, kustomize
-"""
-HELP_PATH_CMD_DESCRIPTION = """
-Resolve an absolute path to a location in the forgeops directory tree.
-"""
+HELP_EXPORT_CMD_AM_NO_UPGRADE = "Do not run PingAM upgrader rules when exporting configuration."
+HELP_PATH_CMD_TOOL_NAME = "Directory of tool configuration files e.g. docker, kustomize"
+HELP_PATH_CMD_DESCRIPTION = "Resolve an absolute path to a location in the forgeops directory tree."
 
-HELP_NAMESPACE = """
-Kubernetes namespace to target
-"""
+HELP_NAMESPACE = "Kubernetes namespace to target"
+
+HELP_BUILD_ENV_NAME = "ForgeOps environment to update after building FBC image."
+HELP_BUILD_PROFILE = "Config profile to bake into image."
+HELP_BUILD_DOCKER_ARGS = "Extra arguments to pass to docker. Use -- after config build arguments to specify."
+HELP_BUILD_PUSH_TO = "Container registry to push built images to."
+HELP_BUILD_TAG = "Tag to use on FBC image."
 
 HELP_PATH_DOCKER_CMD = """
 Resolve the path to a directory which contains a Dockerfile, optionally resolve
  the path for a config profile used in a Dockerfile.
 """
-HELP_PATH_DOCKER_PROFILE_NAME = """
-Add the config profile name to the path.
-"""
-HELP_BUILD_PATH = """
-Docker build path to use [absolute or relative to forgeops root] (default: docker)
-"""
+HELP_PATH_DOCKER_PROFILE_NAME = "Add the config profile name to the path."
+HELP_BUILD_PATH = "Docker build path to use [absolute or relative to forgeops root] (default: docker)"
+HELP_DRYRUN = "Do a dry run."
 
-HELP_HELM_PATH = """
-Dir to store Helm values files [absolute or relative to forgeops root] (default: helm)
-"""
-HELP_PATH_HELM_ENV_NAME = """
-Environment name to get path to
-"""
+HELP_HELM_PATH = "Dir to store Helm values files [absolute or relative to forgeops root] (default: helm)"
+HELP_PATH_HELM_ENV_NAME = "Environment name to get path to"
 
 HELP_PATH_KUSTOMIZE_CMD = """
 Resolve the path to a directory which contains kustomization
  directories that hold many manifests. Optionally resolve to profile. e.g.
  small.
 """
-HELP_KUSTOMIZE_PATH = """
-Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)
-"""
+HELP_KUSTOMIZE_PATH = "Kustomize dir to use [absolute or relative to forgeops root] (default: kustomize)"
 
-HELP_RELEASE_NAME = """
-Name of release file to use
-"""
+HELP_RELEASE_NAME = "Name of release file to use"
 
 HELP_PATH_KUSTOMIZE_LAYER = """
 The parent directory containing multiple kustomize profile directories.
@@ -115,13 +92,13 @@ examples:
   $ ./bin/forgeops config path docker ig
 """
 
-HELP_CONFIGMAP_EXAMPLES = """
+HELP_BUILD_EXAMPLES = """
 examples:
-  # Create am-fbc ConfigMap in context namespace
-  $ ./bin/forgeops config configmap am <myprofile>
+  # Build an am-fbc image
+  $ ./bin/forgeops config build --env-name my_env am <my_profile>
 
-  # Create idm-fbc ConfigMap in a specific namespace
-  $ ./bin/forgeops config configmap --namespace my_ns idm <mynewprofile>
+  # Build an idm-fbc image passing extra flags to docker build
+  $ ./bin/forgeops config build --env-name my_env idm <my_profile> -- --platform linux/amd64,linux/arm64
 """
 
 HELP_EXPORT_EXAMPLES = """
@@ -146,7 +123,7 @@ EXPORT_COMPONENTS = {
     'idm': ('idm',),
 }
 
-CONFIGMAP_COMPONENTS = {
+BUILD_COMPONENTS = {
     'am': ('am',),
     'idm': ('idm',),
     'ig': ('ig',),
@@ -179,6 +156,11 @@ def clean_path(path):
     """Clean profile directory"""
     log.info(f'Clean profile: {path}')
     shutil.rmtree(path)
+
+
+def _get_profile_path(component, profile_name, build_path):
+    return pathlib.Path(build_path.joinpath(
+        APP_CONF_PATH_FMT[component](profile=profile_name))).resolve()
 
 
 def export_amster(conf):
@@ -344,6 +326,46 @@ def run_export(args, overrides):
         log.info('Sorting completed.')
 
 
+def run_build(args, overrides):
+    """ Build an FBC container and use the image command to set it in a ForgeOps environment"""
+
+    conf_path = _get_profile_path(args.component, args.profile, overrides['build_path'])
+    app_path = pathlib.Path(overrides['build_path'].joinpath(args.component)).resolve()
+    if not conf_path.is_dir():
+        msg = f"ERROR! No such profile ({args.profile}) at {conf_path}"
+        utils.exit_msg(1, msg)
+    build_args = ''
+    if args.profile != 'default':
+        build_args = build_args + f" --build-arg CONFIG_PROFILE={args.profile}"
+    image = f"{args.component}-fbc:{args.tag}"
+    repo = getattr(args, 'push_to')
+    if not repo:
+        repo = 'none'
+    if repo == 'none' and os.getenv('PUSH_TO'):
+        repo = os.getenv('PUSH_TO')
+    if repo != 'none':
+        image = f"{repo}/{image}"
+    docker_extra_args = ' '.join(getattr(args, 'docker_args', ''))
+    if docker_extra_args == '' and os.getenv('DOCKER_BUILD_EXTRA_ARGS'):
+        docker_extra_args = os.getenv('DOCKER_BUILD_EXTRA_ARGS', '')
+    docker_build_args = f"build {build_args} {docker_extra_args} -t {image} -f {app_path}/Dockerfile-FBC {app_path}"
+    docker_push_args = f"push {image}"
+    docker_cmd = os.getenv('CONTAINER_ENGINE', 'docker')
+    utils.run(docker_cmd, docker_build_args, dryrun=args.dryrun)
+    if repo != 'none':
+        utils.run(docker_cmd, docker_push_args, dryrun=args.dryrun)
+    forgeops_cmd = f"{root_path}/bin/forgeops"
+    image_args = ' '.join([
+        f"image -e {args.env_name} --fbc",
+        f"-k {overrides['kustomize_path']}",
+        f"-H {overrides['helm_path']}",
+        f"-b {overrides['build_path']}",
+        f"--image-repo {repo} --tag {args.tag}",
+        args.component
+    ])
+    utils.run(forgeops_cmd, image_args, dryrun=args.dryrun)
+
+
 def run_path(args, overrides):
     if args.tool == 'docker' and args.component != 'ds':
         profile = f'config-profiles/{args.profile}' if args.profile != '' else ''
@@ -365,6 +387,11 @@ def main():
     common_bp.add_argument('--build-path',
                         '-b',
                         help=HELP_BUILD_PATH)
+    common_dr = argparse.ArgumentParser(add_help=False,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    common_dr.add_argument('--dryrun',
+                           action='store_true',
+                           help=HELP_DRYRUN)
     common_hk = argparse.ArgumentParser(add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     common_hk.add_argument('--helm-path',
@@ -402,6 +429,26 @@ def main():
     export_cmd_parser.add_argument('--release-name',
                                    help=HELP_RELEASE_NAME)
     export_cmd_parser.set_defaults(func=run_export)
+
+    # build sub command
+    build_cmd_parser = sub_cmd_parser.add_parser('build',
+                                                epilog=textwrap.dedent(HELP_BUILD_EXAMPLES),
+                                                formatter_class=argparse.RawTextHelpFormatter,
+                                                parents=[common_bp, common_dr, common_hk],
+                                                description=HELP_BUILD_CMD_DESCRIPTION)
+    build_cmd_parser.add_argument('--env-name', '-e', required=True, help=HELP_BUILD_ENV_NAME)
+    build_cmd_parser.add_argument('--push-to', '-r', help=HELP_BUILD_PUSH_TO)
+    build_cmd_parser.add_argument('--tag', '-t', default='latest', help=HELP_BUILD_TAG)
+    build_cmd_parser.add_argument('component',
+                                  choices=BUILD_COMPONENTS.keys(),
+                                  help=HELP_CMD_COMPONENTS)
+    build_cmd_parser.add_argument('profile',
+                                  default='default',
+                                  help=HELP_BUILD_PROFILE)
+    build_cmd_parser.add_argument('docker_args',
+                                  nargs=argparse.REMAINDER,
+                                  help=HELP_BUILD_DOCKER_ARGS)
+    build_cmd_parser.set_defaults(func=run_build)
 
     # path sub command
     path_cmd_parser = sub_cmd_parser.add_parser('path',
