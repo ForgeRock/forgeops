@@ -40,6 +40,7 @@ metadata:
     app: idm
     app.kubernetes.io/component: idm
 data:
+  
   logback.xml: |
     <configuration scan="true" scanPeriod="30 seconds">
         <import class="ch.qos.logback.core.status.NopStatusListener"/>
@@ -51,30 +52,30 @@ data:
         <import class="ch.qos.logback.classic.encoder.JsonEncoder"/>
         <import class="ch.qos.logback.classic.encoder.PatternLayoutEncoder"/>
         <import class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
-
+  
         <contextListener class="LevelChangePropagator"/>
         <conversionRule conversionWord="threadId" converterClass="org.forgerock.openidm.logger.ThreadIdConverter"/>
         <conversionRule conversionWord="julLevel"
                         converterClass="org.forgerock.openidm.logger.LogbackToJulLevelConverter"/>
-
+  
         <statusListener class="NopStatusListener"/>
-
+  
         <appender name="file" class="RollingFileAppender">
             <file>logs/openidm.log</file>
-
+  
             <!-- deny all events with a level below DEBUG, that is TRACE -->
             <filter class="ThresholdFilter">
                 <level>TRACE</level>
             </filter>
-
+  
             <filter class="org.forgerock.openidm.logger.LogbackLogFilter"/>
-
+  
             <rollingPolicy class="TimeBasedRollingPolicy">
                 <fileNamePattern>logs/openidm-%d{yyyy-MM-dd}.log</fileNamePattern>
                 <maxHistory>30</maxHistory>
                 <totalSizeCap>1GB</totalSizeCap>
             </rollingPolicy>
-
+  
             <!--
             The PatternLayoutEncoder emulates IDM's legacy java.util.logging string format. Uncomment the following
             PatternLayoutEncoder encoder and comment out the JsonEncoder to implement the legacy string format.
@@ -85,7 +86,7 @@ data:
                 <pattern>[%threadId] %date{"MMM dd, yyyy h:mm:ss.SSS a"} %class %method%n%julLevel: %replace(%msg){'[\r\n]+',''}%ex%n</pattern>
             </encoder>
             -->
-
+  
             <encoder class="JsonEncoder">
                 <withFormattedMessage>true</withFormattedMessage>
                 <withMessage>false</withMessage>
@@ -93,17 +94,17 @@ data:
                 <withNanoseconds>false</withNanoseconds>
                 <withSequenceNumber>false</withSequenceNumber>
             </encoder>
-
+  
         </appender>
-
+  
         <appender name="console" class="ConsoleAppender">
             <!-- deny all events with a level below INFO, that is TRACE and DEBUG -->
             <filter class="ThresholdFilter">
                 <level>INFO</level>
             </filter>
-
+  
             <filter class="org.forgerock.openidm.logger.LogbackLogFilter"/>
-
+  
             <!--
             The PatternLayoutEncoder emulates IDM's legacy java.util.logging string format. Uncomment the following
             PatternLayoutEncoder encoder and comment out the JsonEncoder to implement the legacy string format.
@@ -114,7 +115,7 @@ data:
                 <pattern>[%threadId] %date{"MMM dd, yyyy h:mm:ss.SSS a"} %class %method%n%julLevel: %replace(%msg){'[\r\n]+',''}%ex%n</pattern>
             </encoder>
             -->
-
+  
             <encoder class="JsonEncoder">
                 <withFormattedMessage>true</withFormattedMessage>
                 <withMessage>false</withMessage>
@@ -122,9 +123,9 @@ data:
                 <withNanoseconds>false</withNanoseconds>
                 <withSequenceNumber>false</withSequenceNumber>
             </encoder>
-
+  
         </appender>
-
+  
         <!--
          Default root logging level.
          This specifies which kinds of events are logged across all loggers.
@@ -132,12 +133,12 @@ data:
          Note that the ConsoleHandler also has a separate level setting to limit messages printed to the console.
          Loggers and Handlers may override this level
          -->
-
+  
         <root level="INFO">
             <appender-ref ref="console"/>
             <appender-ref ref="file"/>
         </root>
-
+  
         <!--
         Loggers
         ***********************************************
@@ -152,25 +153,25 @@ data:
             DEBUG
             TRACE
         -->
-
+  
         <!-- The following section sets logging to WARN level & above in certain packages/classes to filter out noise -->
-
+  
         <!--
          Facility specific properties.
          Provides extra control for each logger.
          -->
-
+  
         <!-- <logger name="org.forgerock.openidm.provisioner" level="DEBUG" /> -->
         <!-- <logger name="org.forgerock.openidm.repo" level="DEBUG" /> -->
         <!-- <logger name="org.forgerock.openidm.recon" level="DEBUG" /> -->
-
+  
         <!-- OpenICF is noisy at INFO leve -->
         <logger name="org.forgerock.openicf" level="WARN"/>
-
+  
         <!-- OpenICF Connector Logging -->
         <!-- <logger name="org.identityconnectors" level="DEBUG" /> -->
         <!-- <logger name="org.forgerock.openicf.connectors" level="DEBUG" /> -->
-
+  
         <!-- OpenICF Framework API Logging -->
         <!-- <logger name="org.identityconnectors.framework.impl.api.LoggingProxy" level="DEBUG" /> -->
         <!-- <logger name="org.identityconnectors.framework.api.operations" level="DEBUG" /> -->
@@ -179,32 +180,32 @@ data:
         <!-- <logger name="org.identityconnectors.framework.api.operations.UpdateApiOp" level="DEBUG" /> -->
         <!-- <logger name="org.identityconnectors.framework.api.operations.DeleteApiOp" level="DEBUG" /> -->
         <!-- <logger name="org.identityconnectors.framework.api.operations.SearchApiOp" level="DEBUG" /> -->
-
+  
         <!-- Commons api.models and OpenApiTransformer (API Descriptor) is noisy at INFO level -->
         <logger name="org.forgerock.api.models" level="WARN"/>
         <logger name="org.forgerock.api.transform.OpenApiTransformer" level="WARN"/>
-
+  
         <!-- Logs the output from OSGi logging -->
         <logger name="org.forgerock.openidm.Framework" level="WARN"/>
-
+  
         <!-- On restart the BarURLHandler can create warning noise -->
         <logger name="org.activiti.osgi.BarURLHandler" level="ERROR"/>
-
+  
         <!-- Suppress warnings of failed connector loading -->
         <logger name="org.identityconnectors.framework.impl.api.local.LocalConnectorInfoManagerImpl" level="ERROR"/>
-
+  
         <!-- Log all detail for update processes -->
         <logger name="org.forgerock.openidm.maintenance.upgrade" level="TRACE"/>
-
+  
         <!-- Suppress messages lower than warnings -->
         <logger name="org.forgerock.secrets.keystore" level="WARN"/>
-
+  
         <!--
         Sets the SchemaField log level to INFO by default because if logging is set to FINE or higher,
         sensitive information can be leaked into the logs
          -->
         <logger name="org.forgerock.openidm.schema.SchemaField" level="INFO"/>
-
+  
         <!--
         Logs the output from Jetty
         Sets the following Jetty classes to INFO level by default because if logging is set to FINE or higher,
@@ -212,18 +213,18 @@ data:
          -->
         <logger name="org.eclipse.jetty" level="WARN"/>
         <logger name="org.eclipse.jetty.websocket.server" level="WARN"/>
-
+  
         <!-- Mute intermittent `Error page loop` warning, which does not indicate a real problem -->
         <logger name="org.eclipse.jetty.server.handler.ErrorHandler" level="ERROR"/>
-
+  
         <!-- Log Hikari datasource in case we need to debug secret rotation failures -->
         <logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG"/>
         <logger name="com.zaxxer.hikari.pool.PoolBase" level="DEBUG"/>
-
+  
         <!-- Testcontainers log suppressions to reduce verbosity of logs to the osgi console -->
         <logger name="org.testcontainers.containers.ContainerDef" level="ERROR"/>
         <logger name="org.testcontainers.utility.ResourceReaper" level="ERROR"/>
-
+  
     </configuration>
 ---
 # Source: identity-platform/templates/idm-configmap.yaml
@@ -241,6 +242,7 @@ metadata:
     app: idm
     app.kubernetes.io/component: idm
 data:
+  
   logging.properties: |
     # Properties file that configures the operation of the JDK
     # logging facility.
@@ -341,3 +343,48 @@ data:
     # specifies the character set encoding name.
     # defaults to the default platform encoding
     java.util.logging.FileHandler.encoding = UTF-8
+---
+# Source: identity-platform/templates/idm-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: idm-init-scripts
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: idm
+    app.kubernetes.io/component: idm
+data:
+  
+  custom-vol-init.sh: |
+    #!/bin/sh
+  
+    if [ -d /custom/config ]; then
+        echo "Existing openidm configuration found in /custom. Skipping copy."
+    elif [ "$(ls -A /config)" ]; then
+        echo "Copying configuration files to the custom volume."
+        mkdir -p /custom/config
+        cp -rv /config/* /custom/config/
+        ls -F /custom
+    else
+        echo "No custom FBC found. Continuing with defaults."
+    fi
+  filesystem-init.sh: |
+    #!/bin/sh
+  
+    if [ -d /fbc/conf ]; then
+      echo "Existing openidm configuration found. Skipping copy."
+    elif [ -d /custom/config ]; then
+      echo "Found config in custom volume."
+      cd /opt/openidm
+      cp -rv ui conf script /fbc
+      cp -av /custom/config/* /fbc/
+    else
+      echo "Copying docker image configuration files to the shared volume"
+      cd /opt/openidm
+      cp -rv ui conf script /fbc
+    fi

@@ -1,0 +1,46 @@
+---
+# Source: identity-platform/templates/am-init-scripts-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: am-init-scripts
+  labels:
+    helm.sh/chart: identity-platform-1.0.0
+    app.kubernetes.io/name: identity-platform
+    app.kubernetes.io/part-of: identity-platform
+    app.kubernetes.io/instance: identity-platform
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: Helm
+    app: am
+    app.kubernetes.io/component: am
+data:
+  
+  custom-vol-init.sh: |
+    #!/bin/sh
+  
+    if [ -d /custom/config ]; then
+      echo "Existing openam configuration found in /custom. Skipping copy."
+    elif [ -d /config/config ]; then
+      echo "Copying configuration files to the custom volume."
+      cp -rv /config/config /custom
+    else
+      echo "No custom FBC found. Continuing with defaults."
+    fi
+  filesystem-init.sh: |
+    #!/bin/sh
+  
+    if [ -d /fbc/config ]; then
+      echo "Existing openam configuration found. Skipping copy."
+    elif [ -d /custom/config ]; then
+      echo "Found config in custom volume."
+      cd /home/forgerock/openam
+      cp -rv .homeVersion * /fbc
+      cp -av /custom/config /fbc
+      cp /fbc/config/boot.json /fbc/default-boot.json
+    else
+      echo "Copying docker image configuration files to the shared volume"
+      cd /home/forgerock/openam
+      cp -r .homeVersion * /fbc
+      # Keep a copy of the default boot.json to use in the main container in case of a container restart
+      cp /fbc/config/boot.json /fbc/default-boot.json
+    fi

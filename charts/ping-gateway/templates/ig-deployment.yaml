@@ -43,6 +43,36 @@ spec:
       serviceAccountName: {{ include "ping-gateway.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.ig.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: custom
+          emptyDir: {}
+        - name: fbc
+          emptyDir: {}
+        - name: init-scripts
+          configMap:
+            name: ig-init-scripts
+            defaultMode: 0755
+      init_containers:
+        - name: custom-vol-init
+          image: "{{ .Values.ig_custom.image.repository }}:{{ .Values.ig_custom.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ig_custom.image.pullPolicy }}
+          volumeMounts:
+          - mountPath: /custom
+            name: custom
+          - mountPath: /scripts
+            name: init-scripts
+          command: [/scripts/custom-vol-init.sh]
+        - name: filesystem-init
+          image: "{{ .Values.ig.image.repository }}:{{ .Values.ig.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ig.image.pullPolicy }}
+          volumeMounts:
+          - mountPath: /fbc
+            name: fbc
+          - mountPath: /custom
+            name: custom
+          - mountPath: /scripts
+            name: init-scripts
+          command: [scripts/filesystem-init.sh]
       containers:
         - name: ig
           securityContext:
@@ -96,6 +126,10 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.ig.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /var/ig/config
+            name: fbc
+            subPath: config
       {{- with .Values.ig.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
