@@ -164,12 +164,8 @@ ig:
       port: http-admin
       secretUser: metric
       secretPassword: password
-<<<<<<< HEAD
-
-ig_custom:
+ig_fbc:
   image:
     repository: busybox
     tag: musl
     pullPolicy: IfNotPresent
-=======
->>>>>>> 9274f8f52 (FORGEOPS-5736 Create Helm chart for IG)
