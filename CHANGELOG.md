@@ -29,6 +29,10 @@ The following new versions are available:
 - Secret Agent 1.2.8 
 - IG 2025.11.0 and 2025.11.1
 
+### Helm 4 supported
+
+Tested Helm 4 with our charts and everything works.
+
 ### New `--retain` option for troubleshooting Amster
 
 You can use the `--retain {duration}` option with `forgeops amster import` and 
