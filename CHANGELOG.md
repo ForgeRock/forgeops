@@ -4,16 +4,23 @@ RELEASE=2026.1.0
 
 ## Highlights in this release
 
-### Ability to provide file based config as a ConfigMap
+### Upgrade your environments
 
-The `forgeops config` command has a new `configmap` subcommand to create
-ConfigMaps for AM, IDM, or IG with the FBC config profile as tgz files.
-Helm chart and the Kustomize base have been updated to use the ConfigMap if it 
-exists. If it doesn't exist, then it will use the built-in config in images as 
+The new custom image requires changes to your environments and your default
+environment if you are using the FORGEOPS_DATA functionality. Run `forgeops
+env` against your environments with the `--upgrade` flag.
+
+`forgeops env -e my_env --upgrade`
+
+### New image for customizations
+
+The `forgeops config` command has a new `build` subcommand to create custom
+busybox images for AM and IDM with the FBC config profile.  The deployment (Helm 
+and Kustomize) have been updated to use the FBC on these images if it
+exists. If it doesn't exist, then it will use the built-in config in images as
 before. Now it is no longer necessary to build the config into images.
 
-Refer to the [Apply AM configmap](https://staging-docs.pingidentity.com/forgeops/dev/customize/am.html#apply-am-configmap) and 
-[Apply IDM configmap](https://staging-docs.pingidentity.com/forgeops/dev/customize/idm.html#apply-idm-configmap) sections in the documentation for further information.
+* See `forgeops config build --help` for more info
 
 ## New Features/Updated functionality
 

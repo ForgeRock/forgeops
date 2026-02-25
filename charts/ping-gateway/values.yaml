@@ -165,7 +165,7 @@ ig:
       secretUser: metric
       secretPassword: password
 
-ig_fbc:
+ig_custom:
   image:
     repository: busybox
     tag: musl
